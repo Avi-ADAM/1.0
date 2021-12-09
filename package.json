@@ -17,6 +17,7 @@
   "dependencies": {
     "@fontsource/fira-mono": "^4.5.0",
     "cssnano": "^5.0.12",
+    "postcss": "^8.4.4",
     "prettier": "^2.3.2",
     "prettier-plugin-svelte": "^2.3.1",
     "svelte-forms-lib": "^2.0.0",

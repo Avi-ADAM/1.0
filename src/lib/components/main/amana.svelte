@@ -496,7 +496,7 @@ background-color:var(--lturk);
     width: 100vw;
     height:100vh;
     margin:0px auto;
-    background-image: url(SHALOM1.svg);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088864/SHALOM1_awkhot.svg);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -511,7 +511,7 @@ background-color:var(--lturk);
     font-family: 'StamSefarad', serif;
     text-align: center;
     font-weight: 900;
-    background-image: url(megila1.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: 180vw 180vh;
     background-repeat: no-repeat;
     background-position: center;
@@ -563,7 +563,7 @@ background-color:var(--lturk);
       padding:9vh 0;*/
       
   }
-
+  /*
   .centeron{
         background-image: url('ceter.png');
  background-repeat: no-repeat;
@@ -576,13 +576,13 @@ background-color:var(--lturk);
 position: absolute;
 top: 4%;
 left: 45.2%;
- }
+ }*/
     
   
   .button {
     justify-self: center;
           align-self: center;   
-    background-image: url(buHe.png);  
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);  
  background-repeat: no-repeat;
  background-size: 170px;
  margin: auto;
@@ -602,14 +602,14 @@ left: 45.2%;
 }
 
 @media(min-width:577px) and (max-width:1099px) {
-  .centeron{
+  /*.centeron{
     background-image: url('ceter.png');
     background-repeat: no-repeat;
     background-size: 50px;
     align-self: center;
     min-height: 50px;
     min-width: 50px;
- }
+ }*/
   .aab{
     display: flex;
     flex-direction: column;
@@ -621,7 +621,7 @@ left: 45.2%;
     width: 100vw;
     height:100vh;
     margin:0px auto;
-    background-image: url(SHALOM2.svg);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088888/SHALOM2_nd7evv.svg);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -633,7 +633,7 @@ left: 45.2%;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(buHe.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);
     background-repeat: no-repeat;
     background-size: 170px;
     margin: auto;
@@ -646,7 +646,7 @@ left: 45.2%;
     font-family: 'StamSefarad', serif;
     text-align: center;
     font-weight: 900;
-    background-image: url(megila1.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: cover;
     background-repeat: no-repeat;
     background-position: center;
@@ -694,11 +694,11 @@ left: 45.2%;
     width: 100vw;
     height:100vh;
     margin:0px auto;
- background-image: url(reka2.png);
+ background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089050/reka2_unoegx.png);
 background-position: center; 
   background-repeat: no-repeat; 
   background-size: cover; }
-
+  /*
     .centeron{
    background-image: url('ceter.png');
    background-repeat: no-repeat;
@@ -707,11 +707,11 @@ background-position: center;
    min-height: 50px;
    min-width: 50px;
   
-   }
+   }*/
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(buHe.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);
     background-repeat: no-repeat;
     background-size: 170px;
     margin: auto;
@@ -725,7 +725,7 @@ background-position: center;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
-    background-image: url(megila1.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: 768px;
     background-repeat: no-repeat;
     background-position: center;
@@ -735,7 +735,7 @@ background-position: center;
   .container {
     display: flex;
     padding-top: 10em;
-    background-image: url(BG.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089083/BG_umwddj.png);
     background-size: contain;
     height: 170px;
     background-repeat: no-repeat;
@@ -794,6 +794,7 @@ background-position: center;
     background: inherit;
     background-size: inherit;
   }
+  /*
    .centeron{
     background-image: url('ceter.png');
     background-repeat: no-repeat;
@@ -807,11 +808,11 @@ background-position: center;
     position: fixed;
     top: 2%;
     left: 47.9%;
- }
+ }*/
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(buHe.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);
     background-repeat: no-repeat;
     background-size: 130px;
     margin: auto;
@@ -826,7 +827,7 @@ background-position: center;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
-    background-image: url(megila1.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: 1150px  ;
     background-repeat: no-repeat;
     background-position: center;
@@ -834,7 +835,7 @@ background-position: center;
   .container {
     display: flex;
     padding-top: 67px;
-    background-image: url(BG.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089083/BG_umwddj.png);
     background-size: contain;
     height: 170px;
     background-repeat: no-repeat;
