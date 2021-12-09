@@ -1,143 +1,109 @@
 <script context="module">
-  export async function load({ fetch }) {
-    const res = await fetch('https://api.spacex.land/graphql', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        query: `{
-            launchesPast(limit: 10) {
-                mission_name
-                launch_date_local
-                links {
-                    video_link
-                }
-            }
-        }`
-      })
-    });
 
-    if (res.ok) {
-      const { data } = await res.json();
-      return {
-        props: {
-          launches: data.launchesPast
-        }
-      };
-    }
-
-    return {
-      status: res.status,
-      error: new Error(`Error fetching GraphQL data`)
-    };
-  }
+	export const prerender = true;
+ 
 </script>
+
+   
+<svelte:head>
+	<title>האמנה העולמית לביטחון ושלום</title>
+</svelte:head>
 
 <script>
-  export let launches;
+  import Amana1 from "../lib/components/main/amana.svelte"
+ 
+
+  
 </script>
 
-<h1>SpaceX Launches</h1>
-<p>
-  This is an example <a
-    class="link"
-    target="_blank"
-    rel="noopener"
-    href="https://svelte.dev">SvelteKit</a
-  >
-  application fetching GraphQL data from the public
-  <a
-    class="link"
-    target="_blank"
-    rel="noopener"
-    href="https://api.spacex.land/graphql">SpaceX API</a
-  >. View source on
-  <a
-    class="link"
-    target="_blank"
-    rel="noopener"
-    href="https://github.com/leerob/sveltekit-graphql">GitHub</a
-  >.
-</p>
-<ul>
-  {#each launches as launch}
-    <li>
-      <a
-        class="card-link"
-        target="_blank"
-        rel="noopener"
-        href={launch.links.video_link}
-      >
-        <h2>{launch.mission_name}</h2>
-        <p>{new Date(launch.launch_date_local).toLocaleString()}</p>
-      </a>
-    </li>
-  {/each}
-</ul>
-<footer>
-  <p>
-    Created with <a
-      class="link"
-      target="_blank"
-      rel="noopener"
-      href="https://svelte.dev">SvelteKit</a
-    >
-    and deployed with
-    <a class="link" target="_blank" rel="noopener" href="https://vercel.com"
-      >▲ Vercel</a
-    >.
-  </p>
-</footer>
+<div class="main">
 
+
+
+
+<Amana1/>
+	
+   </div>
 <style>
-  :global(body) {
-    font-family: Menlo, Consolas, Monaco, Liberation Mono, Lucida Console,
-      monospace;
-    background-color: #fafafa;
-    max-width: 650px;
-    margin: 32px auto;
-    padding: 0 16px;
-  }
-  h1 {
-    letter-spacing: -0.025em;
-  }
-  h2 {
-    font-size: 18px;
-  }
-  ul {
-    list-style: none;
-    padding: 0;
-    margin-top: 32px;
-  }
-  li {
-    border: 1px solid #eaeaea;
-    border-radius: 8px;
-    margin-bottom: 16px;
-    background-color: white;
-    transition: 0.15s box-shadow ease-in-out;
-  }
-  li:hover {
-    box-shadow: 0 5px 10px rgba(0, 0, 0, 0.12);
-  }
-  p {
-    color: #666;
-    font-size: 14px;
-    line-height: 1.75;
-  }
-  a {
-    color: #0070f3;
-    text-decoration: none;
-  }
-  .card-link {
-    padding: 8px 24px;
-    display: block;
-  }
-  .link {
-    transition: 0.15s text-decoration ease-in-out;
-    color: #0761d1;
-  }
-  .link:hover {
-    text-decoration: underline;
-  }
+
+:global(.multiselect) {
+  color:#02a2ff;
+  /* top-level wrapper div */
+}
+
+:global(li.selected) {
+  border: var(--sms-focus-border, 1pt solid var(--sms-active-color, cornflowerblue))
+  /* selected options in the dropdown list */
+}
+:global(li:not(.selected):hover) {
+  color: #FF0092;
+  /* unselected but hovered options in the dropdown list */
+}
+
+:global(li.active) {
+  color:#EEE8AA;
+  /* active means element was navigated to with up/down arrow keys */
+  /* ready to be selected by pressing enter */
+}
+
+	:root {
+  --primary-light: #a6f9d6;
+  --primary: #5be2a9;
+  --primary-dark: #53ce9a;
+  --secondary: #1e2145;
+  --white: #fff;
+  --grey: #e6e6ff;
+  --grey-dark: #6d7098;
+  --red: #ff6b6b;
+}
+button:disabled {
+  background-color: var(--grey);
+}
+
+button:focus:not(:disabled) {
+  box-shadow: 0 0 0 4px var(--primary-light);
+}
+
+button:hover:not(:disabled) {
+ 
+  background: radial-gradient(skyblue 20%, var(--barbi-pink))
+		skyblue ;
+}
+
+*, *:after, *:before {
+	box-sizing: border-box;
+}
+@media (min-width: 1100px) {
+  
+.main {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+		width: 100%;
+    height: 100vh;
+		box-sizing: border-box;
+      margin:0px ;
+     background-image: url(reka2.png);
+background-position: center; 
+  background-repeat: no-repeat; 
+  background-size: cover;
+	} 
+}
+
+@media (max-width: 1099px) {
+.main {
+		flex: 1;
+		display: flex;
+		flex-direction: column;
+	
+	} 
+}
+@media (max-width: 720px) {
+.main {
+		flex: 1;
+		display: flex;
+ width: 100vw;	
+ padding: 0;
+	} 
+}
 </style>
