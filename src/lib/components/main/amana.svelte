@@ -301,7 +301,7 @@ onSubmit: values => {
       }),
     }) 
       .then(response => response.json())
-      .then(data => console.log(data));
+      .then(data => console.log("התקבל בהצלחה"));
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
