@@ -289,7 +289,7 @@ const { form, handleChange, handleSubmit } = createForm({
             countries: []
           },
 onSubmit: values => {
-            fetch('http://localhost:5000/chezins', {
+            fetch('https://strapi-k4vr.onrender.com/chezins', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
