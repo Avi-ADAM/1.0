@@ -305,6 +305,7 @@ onSubmit: values => {
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
+            alert("החתימה התקבלה, נשלח מייל כשהאתר יתרחב, בקרוב")
           }
         });
 
