@@ -720,14 +720,14 @@ background-position: center;
     min-width: 170px;
   }
   .amana{
-    width: 768px;
+    width: 908px;
     padding: 0px 25px;
     font-size:25px;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 768px;
+    background-size: 1100px;
     background-repeat: no-repeat;
     background-position: center;
     margin: 0 auto;
@@ -823,7 +823,7 @@ background-position: center;
 
   .amana{
     width: 100vw;
-    padding: 0px 100px;
+    padding: 0px 120px;
     font-size:25px;
     font-family: 'StamSefarad', serif;
     text-align:center;
