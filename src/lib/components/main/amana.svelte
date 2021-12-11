@@ -280,6 +280,7 @@ function find_contry_id(contry_name_arr){
        let already = false;
    let datar;
    let idx;
+   let data;
     import { createForm } from "svelte-forms-lib";
     
 const { form, handleChange, handleSubmit } = createForm({
@@ -301,12 +302,12 @@ onSubmit: values => {
       }),
     }) 
       .then(response => response.json())
-      .then(data => datar);
+      .then(data => 
+      idx =data.id);
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
-            console.log(datar)
-                        datar.id = idx;
+            datar = data;
             already = true;
           }
         });
@@ -524,7 +525,7 @@ background-color:var(--lturk);
  .amana{   
    
     padding: 1.5em 1em 1em 1em;
-    font-size: 129%;
+    font-size: 120%;
     font-family: 'StamSefarad', serif;
     text-align: center;
     font-weight: 900;
