@@ -5,6 +5,7 @@
     import { email } from '../registration/email.js'
     import { regHelper } from '../../stores/regHelper.js';
         import { goto,  prefetch } from '$app/navigation';
+        import * as yup from "yup";
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -284,12 +285,19 @@ function find_contry_id(contry_name_arr){
    let data;
     import { createForm } from "svelte-forms-lib";
     
-const { form, handleChange, handleSubmit } = createForm({
+const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
             name: "",
             email: "",
             countries: []
           },
+      validationSchema: yup.object().shape({
+        name: yup.string().required(),
+        email: yup
+          .string()
+          .email()
+          .required()
+      }),
 onSubmit: values => {
             fetch('https://strapi-k4vr.onrender.com/chezins', {
       method: 'POST',
@@ -338,9 +346,15 @@ function show (){
           name="name"
           placeholder="שמי"
           required
+                on:blur={handleChange}
+
           on:change={handleChange}
           bind:value={$form.name}
-        /> </div>
+        /> 
+     {#if $errors.name}
+      <small>{$errors.name}</small>
+    {/if}
+</div>
 <div class="flexi1">
   <h3        class="amanat " id="m" 
  style="font-family: StamSefarad, serif; font-size: 1.5em;" dir="rtl">מ: </h3> 
@@ -355,13 +369,19 @@ function show (){
   <h3        class="amanat" 
  style="    white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.5em; line-height:normal;" dir="rtl">דואר L.</h3>
   <input
+ 
     placeholder="המייל שלי"
     id="email"
     name="email"
     required
+          on:blur={handleChange}
     on:change={handleChange}
     bind:value={$form.email}
-    /></div>
+    />
+ {#if $errors.email}
+      <small>{$errors.email}</small>
+    {/if}
+</div>
     </section>     
     </div> 
     <div class="aab">
@@ -609,6 +629,7 @@ left: 45.2%;
  margin: auto;
  min-height: 170px;
  min-width: 170px;
+     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
   }
   
  .flexi {
@@ -660,6 +681,7 @@ left: 45.2%;
     margin: auto;
     min-height: 170px;
     min-width: 170px;
+     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
   }
   .amana{
     padding: 0px 13vw;
@@ -738,6 +760,8 @@ background-position: center;
     margin: auto;
     min-height: 170px;
     min-width: 170px;
+         cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
+
   }
   .amana{
     width: 908px;
@@ -839,6 +863,8 @@ background-position: center;
     margin: auto;
     min-height: 130px;
     min-width: 130px;
+    cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
+
   }
 
   .amana{

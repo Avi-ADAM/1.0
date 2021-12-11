@@ -22,7 +22,8 @@
     "prettier-plugin-svelte": "^2.3.1",
     "svelte-forms-lib": "^2.0.0",
     "svelte-multiselect": "^1.2.3",
-    "svelte-preprocess": "^4.9.8"
+    "svelte-preprocess": "^4.9.8",
+    "yup": "^0.32.11"
   },
   "prettier": {
     "arrowParens": "always",
