@@ -629,7 +629,7 @@ left: 45.2%;
  margin: auto;
  min-height: 170px;
  min-width: 170px;
-     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
+     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
   }
   
  .flexi {
@@ -681,7 +681,7 @@ left: 45.2%;
     margin: auto;
     min-height: 170px;
     min-width: 170px;
-     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
+     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
   }
   .amana{
     padding: 0px 13vw;
@@ -760,7 +760,7 @@ background-position: center;
     margin: auto;
     min-height: 170px;
     min-width: 170px;
-         cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
+     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
 
   }
   .amana{
@@ -863,7 +863,7 @@ background-position: center;
     margin: auto;
     min-height: 130px;
     min-width: 130px;
-    cursor: url(https://res.cloudinary.com/love1/image/upload/v1639254458/Fingerprint-Heart-II_l7wgwj.svg), auto;
+     cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
 
   }
 
