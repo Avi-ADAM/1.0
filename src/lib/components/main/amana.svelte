@@ -4,6 +4,7 @@
     import { userName } from '../../stores/store.js';
     import { email } from '../registration/email.js'
     import { regHelper } from '../../stores/regHelper.js';
+        import { goto,  prefetch } from '$app/navigation';
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -279,7 +280,7 @@ function find_contry_id(contry_name_arr){
     let selected;
        let already = false;
    let datar;
-   let idx;
+   let idx = 1;
    let data;
     import { createForm } from "svelte-forms-lib";
     
@@ -303,7 +304,7 @@ onSubmit: values => {
     }) 
       .then(response => response.json())
       .then(data => 
-      idx =data.id);
+      idx = data.id);
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
@@ -371,7 +372,7 @@ function show (){
                    <br>
                     כי אני {$form.name} לא רוצה להיות קרבן של אלימות ומפני שאין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס שמצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
               <br>	
-   אני {$form.name} אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
+   אני {$form.name} אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
               <br>
               כאשר כל  {selected} תהיה חתומה על אמנה זו אני {$form.name} אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת {selected} ממנה בשמי
               <br>
@@ -395,6 +396,8 @@ function show (){
       {:else if already == true}
   <h1 class="alredy" dir="rtl">{$form.name}
   חתימתך התקבלה, הגעת למקום ה-{idx} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
+  <button class="p-4 rounded bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>
+
   {/if}
   </div>
   </form>
@@ -403,7 +406,7 @@ function show (){
   <style>
    .alredy{
            text-align: center;
-           margin: 4vh 0 4vw 4vw;
+           margin: 4vh  4vw 2vh 4vw;
           background-color: var(--gold);
           padding: 4vh 4vw;
           font-family: 'StamSefarad', serif;
@@ -546,7 +549,7 @@ background-color:var(--lturk);
   }
   .flexid{
     display: flex;
-    flex-direction: row;
+    flex-direction: colomn;
     justify-content: center;
    align-items: center;
    order: 1;
@@ -790,7 +793,7 @@ background-position: center;
   }
    .flexid{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     order: 1;
@@ -800,7 +803,7 @@ background-position: center;
 @media(min-width:1100px) {
   .flexid{
     display: flex;
-    flex-direction: row;
+    flex-direction: column;
     justify-content: center;
     align-items: center;
     order: 1;
@@ -906,6 +909,35 @@ background-position: center;
    .amana{
     padding: 0 110px;
     background-size: 1400px  ;
+  }
+   .centeron{
+   left: 48%;
+  }
+}
+
+@media(min-width:1300px) {
+   .amana{
+    padding: 0 150px;
+    background-size: 1500px  ;
+  }
+   .centeron{
+   left: 48%;
+  }
+}
+
+@media(min-width:1450px) {
+   .amana{
+    padding: 0 210px;
+    background-size: 1600px  ;
+  }
+   .centeron{
+   left: 48%;
+  }
+}
+@media(min-width:1700px) {
+   .amana{
+    padding: 0 210px;
+    background-size: 1888px  ;
   }
    .centeron{
    left: 48%;
