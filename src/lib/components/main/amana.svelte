@@ -277,8 +277,8 @@ function find_contry_id(contry_name_arr){
     const required = true;
     
     let selected;
-       
-
+       let already = false;
+       let datar = {id: 0};
 
     import { createForm } from "svelte-forms-lib";
     
@@ -301,11 +301,11 @@ onSubmit: values => {
       }),
     }) 
       .then(response => response.json())
-      .then(data => console.log("התקבל בהצלחה"));
+      .then(data => datar);
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
-            alert("החתימה התקבלה, נשלח מייל כשהאתר יתרחב, בקרוב")
+            already = true;
           }
         });
 
@@ -382,17 +382,31 @@ function show (){
 <form on:submit={handleSubmit}>
 
 <div class="flexid">
- 
+   {#if already == false}
+
     <button
      class="button hover:scale-150"
       on:submit="{handleSubmit}"
       type="submit"
-      ></button>   
+      ></button> 
+      {:else if already == true}
+  <h1 class="alredy" dir="rtl">{$form.name}
+  חתימתך התקבלה, הגעת למקום ה-{datar.id} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
+  {/if}
   </div>
   </form>
-      </div> </div>
+  
+</div> </div>
   <style>
-   
+   .alredy{
+           text-align: center;
+           margin: 4vh 0 4vw 4vw;
+          background-color: var(--gold);
+          padding: 4vh 4vw;
+          font-family: 'StamSefarad', serif;
+          color: var(--barbi-pink);
+          border: 1px var(--lturk);
+   }
 
    :global(.multiselect) {
     background-color: var(--gold) !important ;
