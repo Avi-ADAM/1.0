@@ -17,8 +17,9 @@ export const prerender = true;
 	</picture>
 </div>
 
-	<div dir="rtl" style=" padding: 5vh  8vw 0 8vw;
- text-align: center; color: var(--barbi-pink); width: 100vw; " >
+	<div dir="rtl" style=" padding: 1vh  8vw 0 8vw;
+ text-align: center;  font-size: 100%;
+ color: var(--barbi-pink); width: 100vw; " >
 <br/>	בני אדם יהיו חופשיים רק אם יתנהלו ביניהם בהדדיות ומתוך הסכמה.
 בכל שפה, תרבות ומדינה הערכים הללו מקובלים, ובכל זאת עדיין ישנן מלחמות וישנה אלימות.
 <br/>
@@ -41,16 +42,29 @@ export const prerender = true;
 ויקויים בנו מקרא שכתוב, ונתתי שלום בארץ ושכבתם ואין מחריד והשבתי חיה רעה מן הארץ וחרב לא תעבור בארצכם.
 ה` שלום, ברכנו בשלום.
 		</div>
-	
+	<div class="fli" dir="rtl">
+		<div style="white-space: nowrap; padding: 5px;">	<a  href="https://www.facebook.com/onehHart1"  class="text-barbi" > 1❤️1 
+	ב
+-<img align="left" height="32" width="32" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>	
+	</div> 
+<div style="white-space: nowrap; padding: 5px;"> <a href="https://www.facebook.com/worldnonviolent" class="text-barbi">האמנה העולמית לשלום וביטחון ב
+-<img align="left" height="32" width="32" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>
+	</div></div>
 </div>
 
 <style>
+.fli{
+	display: flex;
+    flex-direction: row;
+    justify-content: center;
+   align-items: center;
+}
 	.rabi{
 		color:rgb(21, 203, 209);
-		width: 100vw;
   font-family: 'StamSefarad', serif;
  text-align: center;
- padding: 5vh  4vw 0 4vw;
+ font-size: 100%;
+ padding: 5vh  4vw 2vh 4vw;
 	}
 	.content {
 		width: 100%;
@@ -58,8 +72,8 @@ export const prerender = true;
 		margin: var(--column-margin-top) auto 0 auto;
 	}
 	.body  {
+	min-height: 100vh;
 		width: 100vw;
-		height: 100vh;
 		background-color: black !important ;
 		color: black !important;
 	}
