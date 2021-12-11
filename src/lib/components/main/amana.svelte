@@ -278,8 +278,8 @@ function find_contry_id(contry_name_arr){
     
     let selected;
        let already = false;
-       let datar = {id: 0};
-
+   let datar;
+   let idx;
     import { createForm } from "svelte-forms-lib";
     
 const { form, handleChange, handleSubmit } = createForm({
@@ -305,6 +305,8 @@ onSubmit: values => {
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
+            console.log(datar)
+                        datar.id = idx;
             already = true;
           }
         });
@@ -391,7 +393,7 @@ function show (){
       ></button> 
       {:else if already == true}
   <h1 class="alredy" dir="rtl">{$form.name}
-  חתימתך התקבלה, הגעת למקום ה-{datar.id} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
+  חתימתך התקבלה, הגעת למקום ה-{idx} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
   {/if}
   </div>
   </form>
