@@ -386,6 +386,11 @@ function show (){
     </div> 
     <div class="aab">
 <div dir="rtl" class="amana" id="amana-show">
+ <h1 dir="rtl" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
+     הצהרת העצמאות האישית של 
+        <span> {$form.name}</span>  
+        :
+    </h1>
           <span>
               <span>
                 אני {$form.name}      לעולם לא אנהג באלימות ולא אפגע באף אדם         
