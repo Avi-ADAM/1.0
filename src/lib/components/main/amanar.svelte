@@ -185,7 +185,7 @@ function find_contry_id(contry_name_arr){
                     { value: 151 , label: 'New Caledonia', heb: 'קלדוניה החדשה', ar: "كاليدونيا الجديدة	"},
                     { value: 153 , label: 'New Zealand', heb: 'ניו זינלנד', ar: "نيوزيلندا	"},
                     { value: 155 , label: 'Nicaragua', heb: 'ניקרגואה', ar: "نيكاراجوا	"},
-                    { value: 154 , label: 'Niger', heb: 'ניז\'ר', ar "النيجر"},
+                    { value: 154 , label: 'Niger', heb: 'ניז\'ר', ar: "النيجر"},
                     { value: 156 , label: 'Nigeria', heb: 'ניגריה', ar: "نيجيريا"},
                     { value: 157 , label: 'Niue', heb: 'ניואה', ar: "نييوي"},
                     { value: 158 , label: 'Norfolk Island', heb: 'האי נורפוק', ar: "جزيرة نورفولك"},
