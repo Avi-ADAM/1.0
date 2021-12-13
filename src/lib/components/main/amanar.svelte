@@ -191,7 +191,7 @@ function find_contry_id(contry_name_arr){
                     { value: 158 , label: 'Norfolk Island', heb: 'האי נורפוק', ar: "جزيرة نورفولك"},
                     { value: 124 , label: 'North Macedonia', heb: 'מקדוניה (FYROM)', ar: "مقدونيا الشمالية"},
                     { value: 161 , label: 'Northern Mariana Islands', heb: 'איי מריאנה הצפוניים', ar: "جزر ماريانا الشمالية	"},
-                    { value: 162 , label: 'Norway', heb: 'נורווגיה', ar "النرويج"},
+                    { value: 162 , label: 'Norway', heb: 'נורווגיה', ar: "النرويج"},
                     { value: 164 , label: 'Oman', heb: 'עומאן', ar: "عُمان"},
                     { value: 163 , label: 'Pakistan', heb: 'פקיסטאן', ar: "باكستان"},
                     { value: 165 , label: 'Palau', heb: 'פלאו', ar: "بالاو"},
