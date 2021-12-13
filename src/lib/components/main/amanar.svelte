@@ -6,6 +6,8 @@
     import { regHelper } from '../../stores/regHelper.js';
         import { goto,  prefetch } from '$app/navigation';
         import * as yup from "yup";
+                    import { onMount } from 'svelte';
+
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -313,7 +315,7 @@ onSubmit: values => {
     }) 
       .then(response => response.json())
       .then(data => 
-      idx = data.id);
+       datar);
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
@@ -330,6 +332,35 @@ function show (){
 function tran (){
 trans = !trans;
 }
+let error;
+onMount(async () => {
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+    
+        try {
+            const res = await fetch("https://strapi-k4vr.onrender.com/chezins/count", {
+              method: "GET",
+              headers: {
+                 'Content-Type': 'application/json'
+              },
+            }).then(checkStatus)
+          .then(parseJSON);
+ idx = res + 2
+ console.log(idx)
+        } catch (e) {
+            error = e
+        }
+    });
       </script>
    
       <div class="all">
