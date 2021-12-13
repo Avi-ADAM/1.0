@@ -218,10 +218,10 @@ function find_contry_id(contry_name_arr){
                     { value: 185 , label: 'Saint Vincent and The Grenadines', heb: 'סנט וינסנט והגרנדינים'},
                     { value: 186 , label: 'Samoa', heb: 'סמואה'},
                     { value: 187 , label: 'San Marino', heb: 'סן מרינו'},
-                    { value: 259, label: "tibet", heb: "טיבט", ar: "التبت"},
                     { value: 188 , label: 'Sao Tome and Principe', heb: 'סאו טומה ופרינסיפה'},
                     { value: 189 , label: 'Saudi Arabia', heb: 'ערב הסעודית'},
                     { value: 191 , label: 'Senegal', heb: 'סנגל'},
+                    { value: 259, label: "tibet", heb: "טיבט", ar: "التبت"},
                     { value: 192 , label: 'Serbia', heb: 'סרביה'},
                     { value: 194 , label: 'Seychelles', heb: 'סיישל'},
                     { value: 193 , label: 'Sierra Leone', heb: 'סיירה לאון'},
@@ -276,7 +276,7 @@ function find_contry_id(contry_name_arr){
                     { value: 243 , label: 'Zimbabwe', heb: 'זימבבואה'}
                   ];
     const nameC = `country`;
-    const placeholder = `המקום שלי`;
+    const placeholder = `My place`;
     const required = true;
     
     let selected;
@@ -327,7 +327,7 @@ function show (){
   const lines = document.getElementById("lines")
   
 }
-let trans = false;
+    let trans = false;
 function tran (){
 trans = !trans;
 }
@@ -342,26 +342,25 @@ trans = !trans;
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
-          <a style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/en" >English</a>
+          <a style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/" >עברית</a>
           <a class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
           {/if}
           </div>
       <div class="mobile">
         
 
-<section class="container" dir="rtl" id="lines"> 
+<section class="container" dir="ltr" id="lines"> 
     
 <div class="flexi">
   <h3
        class="amanat" 
-       style="white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.5em; line-height: normal;" 
-       dir="rtl">
-     ההצהרה של: 
+       style="white-space: nowrap; font-family: StamSefarad, serif; font-weight: 700; font-size: 1em; line-height: normal;" 
+       dir="ltr">The Declaration of:  
       </h3>
   <input 
           id="name"
           name="name"
-          placeholder="שמי"
+          placeholder="my name"
           required
                 on:blur={handleChange}
 
@@ -369,25 +368,25 @@ trans = !trans;
           bind:value={$form.name}
         /> 
      {#if $errors.name}
-      <small>{$errors.name}</small>
+      <small style="color: red; white-space: pre-wrap;">{$errors.name}</small>
     {/if}
 </div>
 <div class="flexi1">
   <h3        class="amanat " id="m" 
- style="font-family: StamSefarad, serif; font-size: 1.5em;" dir="rtl">מ: </h3> 
+ style="font-family: StamSefarad, serif; font-size: 1em; font-weight: 700;" dir="ltr">from: </h3> 
       <MultiSelect
       bind:selected
       {nameC} 
       {placeholder}
-      options={country.map(c => c.heb)}
+      options={country.map(c => c.label)}
        {required}
        />  </div>    
 <div class="flexi2">
   <h3        class="amanat" 
- style="    white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.5em; line-height:normal;" dir="rtl">דואר L.</h3>
+ style="font-weight: 700; white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1em; line-height:normal;" dir="ltr">Email:</h3>
   <input
  
-    placeholder="המייל שלי"
+    placeholder="my email"
     id="email"
     name="email"
     required
@@ -396,30 +395,24 @@ trans = !trans;
     bind:value={$form.email}
     />
  {#if $errors.email}
-      <small>{$errors.email}</small>
+      <small style="color: red; white-space: pre-wrap;" >{$errors.email}</small>
     {/if}
 </div>
     </section>     
     </div> 
     <div class="aab">
-<div dir="rtl" class="amana" id="amana-show">
- <h1 dir="rtl" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
-     הצהרת העצמאות האישית של 
-        <span> {$form.name}</span>  
-        :
+<div dir="ltr" class="amana" id="amana-show">
+ <h1 dir="ltr" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
+       {$form.name}'s Declaration of Independence:
     </h1>
           <span>
               <span>
-                אני {$form.name}      לעולם לא אנהג באלימות ולא אפגע באף אדם         
+              I ,{$form.name}, will never use violence or hurt anyone.   
                    <br>
-                    כי אני {$form.name} לא רוצה להיות קרבן של אלימות ומפני שאין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס שמצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
-              <br>	
-   אני {$form.name} אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
-              <br>
-              כאשר כל  {selected} תהיה חתומה על אמנה זו אני {$form.name} אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת {selected} ממנה בשמי
-              <br>
-              אני {$form.name} אוותר על כלי הנשק של צבא {selected} כאשר כל האנושות תהיה חתומה על האמנה הזו
-          </span>
+Because I, {$form.name}, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force.              <br>	
+I, {$form.name}, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication              <br>
+When the entire {selected} is a signatory to this Convention, I, {$form.name}, will relinquish my weapons and the armed policemen from whom the {selected} State is Appointments in my name.              <br>
+I, {$form.name}, will give up the weapons of the {selected} Army when all of humanity will be a signatory to this Convention          </span>
           </span>
     </div>
      
@@ -437,8 +430,8 @@ trans = !trans;
       ></button> 
       {:else if already == true}
   <h1 class="alredy" dir="rtl">{$form.name}
-  חתימתך התקבלה, הגעת למקום ה-{idx} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
-  <button class="p-4 rounded bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>
+ Your signature has been received, you have reached the number {idx} place, an email will be sent when we expand, soon</h1>
+ <!-- <button class="p-4 rounded bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>-->
 
   {/if}
   </div>
@@ -518,8 +511,7 @@ background-color:var(--lturk);
 }
 .amanat{
   padding: 1rem;
-    text-shadow: 1px 1px 4px var(--gold) ;
-
+  text-shadow: 1px 1px 4px var(--gold) ;
 }
 
   input {
@@ -650,7 +642,7 @@ left: 45.2%;
   .button {
     justify-self: center;
           align-self: center;   
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);  
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
  background-repeat: no-repeat;
  background-size: 170px;
  margin: auto;
@@ -704,7 +696,7 @@ left: 45.2%;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
     background-repeat: no-repeat;
     background-size: 170px;
     margin: auto;
@@ -714,12 +706,12 @@ left: 45.2%;
   }
   .amana{
     padding: 0px 13vw;
-    font-size:20px;
+    font-size:100%;
     font-family: 'StamSefarad', serif;
     text-align: center;
     font-weight: 900;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: cover;
+    background-size: 888px;
     background-repeat: no-repeat;
     background-position: center;
     align-self: center;
@@ -783,7 +775,7 @@ background-position: center;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
     background-repeat: no-repeat;
     background-size: 170px;
     margin: auto;
@@ -795,7 +787,7 @@ background-position: center;
   .amana{
     width: 908px;
     padding: 0px 25px;
-    font-size:25px;
+    font-size: 120%;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
@@ -886,7 +878,7 @@ background-position: center;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
     background-repeat: no-repeat;
     background-size: 130px;
     margin: auto;
@@ -899,7 +891,7 @@ background-position: center;
   .amana{
     width: 100vw;
     padding: 0px 120px;
-    font-size:25px;
+    font-size:120%;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
