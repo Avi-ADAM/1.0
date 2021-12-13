@@ -719,7 +719,7 @@ left: 45.2%;
     text-align: center;
     font-weight: 900;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: cover;
+    background-size: 900px;
     background-repeat: no-repeat;
     background-position: center;
     align-self: center;
