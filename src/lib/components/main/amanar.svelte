@@ -353,7 +353,7 @@ trans = !trans;
 <div class="flexi">
   <h3
        class="amanat" 
-       style="white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.5em; line-height: normal;" 
+       style="white-space: nowrap; font-family: StamSefarad, serif; font-size: 1em; line-height: normal;" 
        dir="rtl">
      البيان من: 
       </h3>
@@ -373,7 +373,7 @@ trans = !trans;
 </div>
 <div class="flexi1">
   <h3        class="amanat " id="m" 
- style="font-family: StamSefarad, serif; font-size: 1.5em;" dir="rtl">من: </h3> 
+ style="font-family: StamSefarad, serif; font-size: 1em;" dir="rtl">من: </h3> 
       <MultiSelect
       bind:selected
       {nameC} 
@@ -383,7 +383,7 @@ trans = !trans;
        />  </div>    
 <div class="flexi2">
   <h3        class="amanat" 
- style="    white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.5em; line-height:normal;" dir="rtl">البريد الإلكتروني</h3>
+ style="    white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1em; line-height:normal;" dir="rtl">البريد الإلكتروني</h3>
   <input
  
     placeholder="البريد الإلكتروني"
@@ -706,7 +706,7 @@ left: 45.2%;
   }
   .amana{
     padding: 0px 13vw;
-    font-size:20px;
+    font-size: 100%;
     font-family: 'StamSefarad', serif;
     text-align: center;
     font-weight: 900;
@@ -787,7 +787,7 @@ background-position: center;
   .amana{
     width: 908px;
     padding: 0px 25px;
-    font-size:25px;
+    font-size: 130%;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
@@ -891,7 +891,7 @@ background-position: center;
   .amana{
     width: 100vw;
     padding: 0px 120px;
-    font-size:25px;
+    font-size: 140%;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
