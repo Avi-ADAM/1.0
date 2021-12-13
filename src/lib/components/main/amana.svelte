@@ -930,7 +930,7 @@ background-position: center;
   .amana{
     width: 100vw;
     padding: 0px 120px;
-    font-size:25px;
+    font-size:22px;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
