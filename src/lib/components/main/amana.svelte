@@ -289,6 +289,7 @@ function find_contry_id(contry_name_arr){
     let erorim = {st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "ehad1one@gmail.com"  }
     let selected = [];
        let already = false;
+       let erorims = false;
    let datar;
    let idx = 1;
    let data;
@@ -308,7 +309,11 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
- axios
+
+ if (selected.length < 1) {
+ erorims = true
+ } else {
+  axios
   .post('https://strapi-k4vr.onrender.com/chezins', {
      name: $form.name,
         email: $form.email,
@@ -338,7 +343,7 @@ onSubmit: values => {
 
           });
 
-          }
+          }}
         });
 
 function show (){
@@ -429,8 +434,8 @@ onMount(async () => {
       {placeholder}
       options={country.map(c => c.heb)}
        /> 
-   {#if $errors.contries}
-      <small>{$errors.contries}</small>
+   {#if erorims == true}
+      <small style="color: red;">יש לבחור לפחות 1</small>
     {/if}
    </div>    
 <div class="flexi2">
