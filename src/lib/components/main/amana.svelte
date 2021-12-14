@@ -313,6 +313,7 @@ onSubmit: values => {
  if (selected.length < 1) {
  erorims = true
  } else {
+ erorims = false
   axios
   .post('https://strapi-k4vr.onrender.com/chezins', {
      name: $form.name,
