@@ -1,7 +1,4 @@
-﻿<script context="module">
-export const prerender = true;
-</script>
-
+﻿
 <svelte:head>
 	<title>אודות האמנה לשלום וביטחון</title>
 </svelte:head>
@@ -50,6 +47,8 @@ export const prerender = true;
 <div style="white-space: nowrap; padding: 5px;"> <a href="https://www.facebook.com/worldnonviolent" class="text-barbi">האמנה העולמית לשלום וביטחון ב
 -<img align="left" height="32" width="32" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>
 	</div></div>
+	
+
 </div>
 
 <style>

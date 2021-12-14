@@ -4,9 +4,11 @@
     import { userName } from '../../stores/store.js';
     import { email } from '../registration/email.js'
     import { regHelper } from '../../stores/regHelper.js';
-        import { goto,  prefetch } from '$app/navigation';
-        import * as yup from "yup";
-            import { onMount } from 'svelte';
+    import { goto,  prefetch } from '$app/navigation';
+    import * as yup from "yup";
+    import { onMount } from 'svelte';
+        import axios from 'axios';
+
 
 
 function find_contry_id(contry_name_arr){
@@ -277,11 +279,15 @@ function find_contry_id(contry_name_arr){
                     { value: 244 , label: 'Zambia', heb: 'זמביה'},
                     { value: 243 , label: 'Zimbabwe', heb: 'זימבבואה'}
                   ];
-    const nameC = `country`;
-    const placeholder = `המקום שלי`;
+    const name = `countries`;
+        let lang ="he";
+
+    const placeholdr = {he: "", ar: "", en: ""};
+    const pl = `${placeholdr}.${lang}`;
+    const placeholder =`המקום שלי`;
     const required = true;
-    
-    let selected;
+    let erorim = {st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "ehad1one@gmail.com"  }
+    let selected = [];
        let already = false;
    let datar;
    let idx = 1;
@@ -292,7 +298,7 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
             name: "",
             email: "",
-            countries: []
+            countries: selected
           },
       validationSchema: yup.object().shape({
         name: yup.string().required(),
@@ -302,25 +308,36 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
-            fetch('https://strapi-k4vr.onrender.com/chezins', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: $form.name,
+ axios
+  .post('https://strapi-k4vr.onrender.com/chezins', {
+     name: $form.name,
         email: $form.email,
         countries: find_contry_id(selected)
-      }),
-    }) 
-      .then(response => response.json())
-      .then(data => 
-      datar);
+              },
+  {
+  headers: {
+        'Content-Type': 'application/json',
+            }})
+  .then(response => {
+    console.log('הצליח', response.data);
+   already = true;
             userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
             datar = data;
-            already = true;
+              })
+  .catch(error => {
+    console.log('צריך לתקן:', error.response);
+    erorim.st = true
+    if (error.response === undefined){
+        erorim.msg = "השרת נרדם 😴, הערנו אותו, נא לנסות שוב"
+    } else {
+        erorim.msg =  ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות לעולם חוזרת, הנה הפרטים היבשים `
+    }
+        console.log('לתקן:', error.response);
+
+          });
+
           }
         });
 
@@ -408,11 +425,14 @@ onMount(async () => {
  style="font-family: StamSefarad, serif; font-size: 1.5em;" dir="rtl">מ: </h3> 
       <MultiSelect
       bind:selected
-      {nameC} 
+      {name} 
       {placeholder}
       options={country.map(c => c.heb)}
-       {required}
-       />  </div>    
+       /> 
+   {#if $errors.contries}
+      <small>{$errors.contries}</small>
+    {/if}
+   </div>    
 <div class="flexi2">
   <h3        class="amanat" 
  style="    white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.5em; line-height:normal;" dir="rtl">דואר L.</h3>
@@ -466,6 +486,10 @@ onMount(async () => {
       on:submit="{handleSubmit}"
       type="submit"
       ></button> 
+      {#if erorim.st == true}
+
+      <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>
+      {/if}
       {:else if already == true}
   <h1 class="alredy" dir="rtl">{$form.name}
   חתימתך התקבלה, הגעת למקום ה-{idx} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
@@ -627,7 +651,7 @@ background-color:var(--lturk);
   }
   .flexid{
     display: flex;
-    flex-direction: colomn;
+    flex-direction: column;
     justify-content: center;
    align-items: center;
    order: 1;
@@ -679,6 +703,7 @@ left: 45.2%;
     
   
   .button {
+ 
     justify-self: center;
           align-self: center;   
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088797/buHe_vc9zew.png);  
@@ -702,6 +727,13 @@ left: 45.2%;
 }
 
 @media(min-width:577px) and (max-width:1099px) {
+.flexid{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+   align-items: center;
+   order: 1;
+  }
   /*.centeron{
     background-image: url('ceter.png');
     background-repeat: no-repeat;
