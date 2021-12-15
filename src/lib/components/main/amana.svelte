@@ -314,10 +314,11 @@ onSubmit: values => {
  erorims = true
  } else {
  erorims = false
+ const mail = $form.email.toLowerCase()
   axios
   .post('https://strapi-k4vr.onrender.com/chezins', {
      name: $form.name,
-        email: $form.email,
+        email: mail,
         countries: find_contry_id(selected)
               },
   {
@@ -418,7 +419,6 @@ onMount(async () => {
           placeholder="שמי"
           required
                 on:blur={handleChange}
-
           on:change={handleChange}
           bind:value={$form.name}
         /> 
