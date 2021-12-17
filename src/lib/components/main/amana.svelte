@@ -291,7 +291,7 @@ function find_contry_id(contry_name_arr){
        let already = false;
        let erorims = false;
    let datar;
-   let idx = 1;
+  export let idx = 1;
    let data;
     import { createForm } from "svelte-forms-lib";
     
@@ -326,23 +326,22 @@ onSubmit: values => {
         'Content-Type': 'application/json',
             }})
   .then(response => {
-    console.log('הצליח', response.data);
    already = true;
-            userName.set($form.name);
+   document.cookie = `email=${mail}; expires=` + new Date(2022, 0, 1).toUTCString();
+       document.cookie = `un=${$form.name}; expires=` + new Date(2022, 0, 1).toUTCString();
+   userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);
             datar = data;
               })
   .catch(error => {
-    console.log('צריך לתקן:', error.response);
     erorim.st = true
     if (error.response === undefined){
-        erorim.msg = "השרת נרדם 😴, הערנו אותו, נא לנסות שוב"
+        erorim.msg = "השרת נרדם 😴, הערנו אותו, אנו מנסים שוב";
+        handleSubmit();
     } else {
         erorim.msg =  ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות לעולם חוזרת, הנה הפרטים היבשים `
     }
-        console.log('לתקן:', error.response);
-
           });
 
           }}
@@ -357,37 +356,8 @@ let trans = false;
 function tran (){
 trans = !trans;
 }
-let error;
-onMount(async () => {
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch("https://strapi-k4vr.onrender.com/chezins/count", {
-              method: "GET",
-              headers: {
-                 'Content-Type': 'application/json'
-              },
-            }).then(checkStatus)
-          .then(parseJSON);
- idx = res + 2
- console.log(idx)
-        } catch (e) {
-            error = e
-        }
-    });
       </script>
-   
+   <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
       <div class="all">
           <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
@@ -409,7 +379,7 @@ onMount(async () => {
 <div class="flexi">
   <h3
        class="amanat" 
-       style="white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.5em; line-height: normal;" 
+       style="font-weight: 900; white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.2em; line-height: normal;" 
        dir="rtl">
      ההצהרה של: 
       </h3>
@@ -423,12 +393,12 @@ onMount(async () => {
           bind:value={$form.name}
         /> 
      {#if $errors.name}
-      <small>{$errors.name}</small>
+      <small style="color: red;">{$errors.name}</small>
     {/if}
 </div>
 <div class="flexi1">
   <h3        class="amanat " id="m" 
- style="font-family: StamSefarad, serif; font-size: 1.5em;" dir="rtl">מ: </h3> 
+ style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1.2em;" dir="rtl">מ: </h3> 
       <MultiSelect
       bind:selected
       {name} 
@@ -441,7 +411,7 @@ onMount(async () => {
    </div>    
 <div class="flexi2">
   <h3        class="amanat" 
- style="    white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.5em; line-height:normal;" dir="rtl">דואר L.</h3>
+ style=" font-weight: 900;   white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.2em; line-height:normal;" dir="rtl">דואר L.</h3>
   <input
  
     placeholder="המייל שלי"
@@ -453,7 +423,7 @@ onMount(async () => {
     bind:value={$form.email}
     />
  {#if $errors.email}
-      <small>{$errors.email}</small>
+      <small style="color: red;">{$errors.email}</small>
     {/if}
 </div>
     </section>     
@@ -578,11 +548,15 @@ background-color:var(--lturk);
   display: "";
 }
 .amanat{
-  padding: 1rem;
-    text-shadow: 1px 1px 4px var(--gold) ;
+padding: 0 1rem;
+    text-shadow: 1px 1px var(--barbi-pink) ;
+        background-color: var(--gold);
+          opacity: 0.8;
 
 }
-
+small{
+    background-color: white ;
+}
   input {
    
     font-family: inherit;
@@ -617,7 +591,6 @@ background-color:var(--lturk);
   margin: 0 auto;
   padding: 0;
     text-shadow: 1px 1px 4px var(--gold) ;
-
 }
   .mobile{
     width: 100vw;
@@ -835,7 +808,7 @@ left: 45.2%;
     width: 100vw;
     height:100vh;
     margin:0px auto;
- background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089050/reka2_unoegx.png);
+ background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
 background-position: center; 
   background-repeat: no-repeat; 
   background-size: cover; }
@@ -874,6 +847,7 @@ background-position: center;
     background-position: center;
     margin: 0 auto;
     align-self: center;
+    opacity: 0.8;
   }
   .container {
     display: flex;
@@ -976,6 +950,7 @@ background-position: center;
     background-size: 1150px  ;
     background-repeat: no-repeat;
     background-position: center;
+    opacity: 0.9;
   }
   .container {
     display: flex;

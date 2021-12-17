@@ -10,20 +10,104 @@
 </svelte:head>
 
 <script>
+      import { userName } from '../lib/stores/store.js';
   import Amana1 from "../lib/components/main/amana.svelte"
- 
+  import One from "../lib/components/main/bein.svelte"
+  import { show } from '../lib/components/registration/store-show.js';
+  import { regHelper } from '../lib/stores/regHelper.js';
+  import { onMount } from 'svelte';
+      import { email } from '../lib/components/registration/email.js'
+
+  let idx = 1;
+let error;
+onMount(async () => {
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+    
+        try {
+            const res = await fetch("https://strapi-k4vr.onrender.com/chezins/count", {
+              method: "GET",
+              headers: {
+                 'Content-Type': 'application/json'
+              },
+            }).then(checkStatus)
+          .then(parseJSON);
+ idx = res + 2
+ console.log(idx)
+        } catch (e) {
+            error = e
+        }
+    });
+
+   let kvar;
+    onMount(async () => {
+    if (document.cookie) {
+      const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('email='))
+  .split('=')[1];
+    kvar  = cookieValue; 
+    email.set(cookieValue);
+const un = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('un='))
+  .split('=')[1];
+   userName.set(un);
+
+  }
+    });
+
+
+  let regHelperL = 0;
 
   
+regHelper.subscribe(value => {
+  regHelperL = value;
+});
+
+	let user = { signed: false };
+
+	function toggle() {
+		regHelperL = 0;
+    show.set(0);
+    regHelper.set(0)
+	}
 </script>
 
 <div class="main">
 
+  {#if kvar}
+<One {idx} />
 
-
-
-<Amana1/>
+<!--{ goto("/oneHomeGr", )}
+todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית לקחת פרטים מהקוקיות או מלוקלסטורג'--> 
+{:else}
+{#if regHelperL == 1}
+<One {idx}/>
 	
-   </div>
+{/if}
+
+
+{#if regHelperL == 0}
+<Amana1 {idx}/>
+	 
+{/if}
+  
+{/if}
+
+ </div>
+
+
 <style>
 
 :global(.multiselect) {
@@ -83,7 +167,7 @@ button:hover:not(:disabled) {
     height: 100vh;
 		box-sizing: border-box;
       margin:0px ;
-     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089050/reka2_unoegx.png);
+     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
 background-position: center; 
   background-repeat: no-repeat; 
   background-size: cover;
