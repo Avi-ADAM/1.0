@@ -30,7 +30,8 @@ axios
   })
   .then(response => {
     console.log('ההרשמה הצליחה', response.data.user);
-    
+    document.cookie = `jwt=${data.jwt}; expires=` + new Date(2022, 0, 1).toUTCString();
+    document.cookie = `id=${data.user.id}; expires=` + new Date(2022, 0, 1).toUTCString();
   })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
@@ -67,6 +68,7 @@ axios
 
 		<div class="field">
 			<input
+				autocomplete="new-password"
    				type={showPassword ? "text" : "password"}
 				name="email"
 				class="input"
@@ -111,10 +113,10 @@ axios
 <style>
 
 	.field {
-		width: 100%;
+		width: 80%;
 		position: relative;
 		border-bottom: 2px dashed var(--text-color);
-		margin: 1rem auto 1rem;
+		margin: 1rem auto ;
 	}
 	.label {
 		color: var(--text-color);
@@ -126,6 +128,7 @@ axios
 		overflow: hidden;
 		margin: 0;
 		width: 100%;
+		margin: 0 auto;
 		padding: 0.25rem 0;
 		background-color: white;
 		color: white;
@@ -176,7 +179,8 @@ axios
 	.strength {
 		display: flex;
 		height: 20px;
-		width: 100%;
+		width: 80%;
+		margin: 0 auto;
 	}
 	.bar {
 		margin-right: 5px;
@@ -205,7 +209,7 @@ axios
 	}
 	ul {
 		list-style: none;
-		margin: 10px 0;
+		margin: 10px 26%;
 		padding: 0;
 		font-size: 0.7rem;
 		text-align: center;
