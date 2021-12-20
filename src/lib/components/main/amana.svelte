@@ -356,9 +356,9 @@ let trans = false;
 function tran (){
 trans = !trans;
 }
-      </script><!--
+      </script>
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
---><div class="all">
+<div class="all">
           <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
           <button on:click={tran}><img alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
@@ -594,6 +594,9 @@ small{
   margin: 0 auto;
   padding: 0;
     text-shadow: 1px 1px 4px var(--gold) ;
+       background-color: transparent;
+          opacity: 1;
+
 }
   .mobile{
     width: 100vw;
@@ -709,6 +712,12 @@ left: 45.2%;
 }
 
 @media(min-width:577px) and (max-width:1099px) {
+   .amanat{
+  margin: 0 auto;
+  padding: 0;
+    text-shadow: 1px 1px 4px var(--gold) ;
+    background-color: transparent;
+}
 .flexid{
     display: flex;
     flex-direction: column;
@@ -807,6 +816,13 @@ left: 45.2%;
 }
 
 @media(min-width:942px) and (max-width:1099px) {
+ .amanat{
+padding: 0 1rem;
+    text-shadow: 1px 1px var(--barbi-pink) ;
+        background-color: var(--gold);
+          opacity: 0.8;
+
+}
  .mobile{
     width: 100vw;
     height:100vh;

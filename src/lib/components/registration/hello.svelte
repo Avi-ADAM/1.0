@@ -97,9 +97,9 @@ grid-column: 1 /6;
 }
  @media (max-width:500px){
 	 .midscreenText-2 {
-		   background-size: 15.25rem 5rem;
-  height: 5rem;
-  width: 15.25rem;
+		   background-size: 18.25rem 6rem;
+  height: 6rem;
+  width: 18.25rem;
   font-size: 1rem;
   margin-top: 26vh;
 	 }
@@ -187,8 +187,7 @@ from, to {
 
   .button {
   grid-column: 1/6;
-  grid-row: 4/5;
-    
+  grid-row: 2/3;
     align-self: center;
     justify-content: center;
    

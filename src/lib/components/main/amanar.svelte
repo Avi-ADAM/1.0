@@ -366,7 +366,7 @@ onMount(async () => {
       <div class="all">
           <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
-          <button on:click={tran}><img src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          <button on:click={tran}><img alt="translation" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
           <button on:click={tran} class=" text-barbi hover:text-lturk "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -542,8 +542,10 @@ background-color:var(--lturk);
   display: "";
 }
 .amanat{
-  padding: 1rem;
-    text-shadow: 1px 1px 4px var(--gold) ;
+  padding: 0 1rem;
+    text-shadow: 1px 1px var(--barbi-pink) ;
+   background-color: var(--gold);
+          opacity: 0.8;
 
 }
 
@@ -581,6 +583,9 @@ background-color:var(--lturk);
   margin: 0 auto;
   padding: 0;
     text-shadow: 1px 1px 4px var(--gold) ;
+       background-color: transparent;
+          opacity: 1;
+
  }
 
   .mobile{
@@ -695,6 +700,12 @@ left: 45.2%;
 }
 
 @media(min-width:577px) and (max-width:1099px) {
+  .amanat{
+  margin: 0 auto;
+  padding: 0;
+    text-shadow: 1px 1px 4px var(--gold) ;
+    background-color: transparent;
+}
   /*.centeron{
     background-image: url('ceter.png');
     background-repeat: no-repeat;
@@ -785,6 +796,13 @@ left: 45.2%;
 }
 
 @media(min-width:942px) and (max-width:1099px) {
+  .amanat{
+padding: 0 1rem;
+    text-shadow: 1px 1px var(--barbi-pink) ;
+        background-color: var(--gold);
+          opacity: 0.8;
+
+}
  .mobile{
     width: 100vw;
     height:100vh;

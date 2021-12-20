@@ -176,7 +176,7 @@ margin-bottom: 8vh;
   height: 7.5rem;
   width: 22.875rem;
   font-size: 1rem;
-    margin-top: 26vh;
+    margin-top: 20vh;
 
 	 }
    .midscreen{

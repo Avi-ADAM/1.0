@@ -83,7 +83,7 @@ button:hover:not(:disabled) {
     height: 100vh;
 		box-sizing: border-box;
       margin:0px ;
-     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089050/reka2_unoegx.png);
+     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
 background-position: center; 
   background-repeat: no-repeat; 
   background-size: cover;
