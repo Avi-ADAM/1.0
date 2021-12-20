@@ -140,7 +140,7 @@ selected = newSele;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת ערך חדש</button>
     </div>-->
-   <button class="button-in-2" on:click="{increment}">
+   <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
 להמשיך      </button>
 
 

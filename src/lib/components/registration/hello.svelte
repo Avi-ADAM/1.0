@@ -52,7 +52,7 @@ function increment() {
   <!--  <a class="midscreen-link" sveltekit:prefetch href="/aboutOne">אודות 1❤️1</a>
  -->
 <button out:fly={{y: -600, x: 500,  opacity: 0.6, duration: 1000}} title="1❤️1 לפתיחת" class="button" on:click="{increment}">
-  <svg  class="key"  width="100%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`500 0 2722 1018.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
+  <svg  class="key"  width="100%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`600 80 2222 918.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient gradientUnits="userSpaceOnUse" cx="1023.699" cy="448.468" r="843.488" id="gradient-1" gradientTransform="matrix(1.964807, -0.050779, 0.025836, 0.999666, -1004.848942, 91.27403)">
       <stop offset="0" style="stop-color: rgb(177, 219, 207);"/>
@@ -83,7 +83,7 @@ grid-column: 1 /6;
   grid-row: 1/ 2;
   align-self: center;
   justify-self: center;
-  font-size: 1.8rem;
+  font-size: 1.7rem;
   line-height: normal;
   font-weight: 900;
   color: var(--barbi-pink);
@@ -152,10 +152,12 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
 #maf{
     visibility: hidden;
     opacity: 0;
+     transition: all .2s ease-in-out; 
 animation: 
      cssAnimation 0s 12s forwards,
-     css 5s 12s forwards
+     css 4s 12s forwards
 }
+#maf:hover { transform: scale(1.09); }
 /* The typing effect */
 @keyframes cssAnimation {
   to   { 

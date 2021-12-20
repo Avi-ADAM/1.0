@@ -58,11 +58,11 @@ axios
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
 		if (validations[0] == true){dispatch ('progres',{
 		tx: 0,
-		txx: 8
+		txx: 6
 	} ) } 
 	if (validations[1] == true ){dispatch ('progres',{
 		tx: 0,
-		txx: 6
+		txx: 5
 	} ) }
 	if (validations[2] == true ){dispatch ('progres',{
 		tx: 0,
@@ -312,12 +312,11 @@ margin: 2rem auto 0 auto;
 }
 @media (max-width:500px){
 	 .midscreenText-2 {
-		   background-size: 15.25rem 5rem;
+		   background-size: 16.5rem 5rem;
   height: 5rem;
-  width: 15.25rem;
+  width: 16.5rem;
   font-size: 1rem;
     margin-top: 26vh;
-
 	 }
 }
    

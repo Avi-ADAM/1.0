@@ -78,7 +78,7 @@ function increment() {
     roles2.set(find_role_id(selected));
     dispatch ('progres',{
 		tx: 0,
-		txx: 14
+		txx: 12
 	} )
     console.log("xke", selected);
     console.log("id", find_role_id(selected));
@@ -142,7 +142,7 @@ selected = newSele;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת תפקיד שאינו ברשימה</button>
     </div>-->
-   <button class="button-in-2" on:click="{increment}">
+   <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
 להמשיך      </button>
 
 
