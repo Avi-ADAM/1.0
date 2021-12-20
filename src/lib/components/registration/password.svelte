@@ -24,7 +24,7 @@ function increment() {
 		show.update(n => n + 1);
     
 axios
-  .post('http://localhost:5000/auth/local/register', {
+  .post('https://strapi-k4vr.onrender.com/auth/local/register', {
     username: userName_value, 
     email: emailL,
     password: passwordx,
@@ -58,19 +58,19 @@ axios
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
 		if (validations[0] == true){dispatch ('progres',{
 		tx: 0,
-		txx: 20
+		txx: 8
 	} ) } 
 	if (validations[1] == true ){dispatch ('progres',{
 		tx: 0,
-		txx: 18
+		txx: 6
 	} ) }
 	if (validations[2] == true ){dispatch ('progres',{
 		tx: 0,
-		txx: 14
+		txx: 4
 	} ) }
 	if (validations[3] == true ){dispatch ('progres',{
 		tx: 0,
-		txx: 10
+		txx: 2
 	} ) }
 	}
 	function getV (e){

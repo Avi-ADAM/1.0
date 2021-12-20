@@ -2,6 +2,23 @@
    import { userName } from '../../stores/store.js';
     import { show } from './store-show.js';
     export let idx = 1;
+     import {
+    scale,
+    fly
+} from 'svelte/transition';
+	import { cubicOut } from 'svelte/easing';
+
+
+    function slidefade(node, params) {
+        const existingTransform = getComputedStyle(node).transform.replace('none', '');
+
+        return {
+            delay: params.delay || 100,
+            duration: params.duration || 4000,
+            easing: params.easing || cubicOut,
+            css: (t, u) => `translateY:(-40%); translateX: (50% ,100%); transform: ${existingTransform} scale(${t}); opacity: ${t};`
+        };
+    }
 export let userName_value ="";
 let show_value;
 
@@ -34,7 +51,7 @@ function increment() {
     <a class="midscreen-link" sveltekit:prefetch href="/about" title=" 1❤️1 אודות ">?</a>
   <!--  <a class="midscreen-link" sveltekit:prefetch href="/aboutOne">אודות 1❤️1</a>
  -->
-<button title="1❤️1 לפתיחת" class="button" on:click="{increment}">
+<button out:fly={{y: -600, x: 500,  opacity: 0.6, duration: 1000}} title="1❤️1 לפתיחת" class="button" on:click="{increment}">
   <svg  class="key"  width="100%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`500 0 2722 1018.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient gradientUnits="userSpaceOnUse" cx="1023.699" cy="448.468" r="843.488" id="gradient-1" gradientTransform="matrix(1.964807, -0.050779, 0.025836, 0.999666, -1004.848942, 91.27403)">
@@ -76,8 +93,19 @@ grid-column: 1 /6;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 0.5rem ;
-  
+  padding-top: 0.5rem ;  
+}
+ @media (max-width:500px){
+	 .midscreenText-2 {
+		   background-size: 15.25rem 5rem;
+  height: 5rem;
+  width: 15.25rem;
+  font-size: 1rem;
+  margin-top: 26vh;
+	 }
+   .midscreen-link{
+
+   }
 }
 
 .a1 {
@@ -182,17 +210,6 @@ align-self: center;
 justify-self: center;
   }
 
-  @media (max-width:500px){
-	 .midscreenText-2 {
-		   background-size: 15.25rem 5rem;
-  height: 5rem;
-  width: 15.25rem;
-  font-size: 1rem;
-  margin-top: 26vh;
-	 }
-   .midscreen-link{
-
-   }
-}
+ 
   </style>
 
