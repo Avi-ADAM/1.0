@@ -3,7 +3,8 @@ import { userName } from '../../stores/store.js';
 import { show } from './store-show.js';
 import { email } from './email.js';  
 import axios from 'axios';
-
+ import { createEventDispatcher } from 'svelte';
+ const dispatch = createEventDispatcher();
 let userName_value;
 
 let emailL;
@@ -32,7 +33,11 @@ axios
     console.log('ההרשמה הצליחה', response.data.user);
     document.cookie = `jwt=${data.jwt}; expires=` + new Date(2022, 0, 1).toUTCString();
     document.cookie = `id=${data.user.id}; expires=` + new Date(2022, 0, 1).toUTCString();
-  })
+	dispatch ('progres',{
+		tx: 0,
+		txx: 0
+	} )
+})
   .catch(error => {
     console.log('צריך לתקן:', error.response);
   });
@@ -51,6 +56,22 @@ axios
 			password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
+		if (validations[0] == true){dispatch ('progres',{
+		tx: 0,
+		txx: 20
+	} ) } 
+	if (validations[1] == true ){dispatch ('progres',{
+		tx: 0,
+		txx: 18
+	} ) }
+	if (validations[2] == true ){dispatch ('progres',{
+		tx: 0,
+		txx: 14
+	} ) }
+	if (validations[3] == true ){dispatch ('progres',{
+		tx: 0,
+		txx: 10
+	} ) }
 	}
 	function getV (e){
     passwordx = e.target.value

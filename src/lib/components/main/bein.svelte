@@ -25,6 +25,10 @@ let w;
 let vb = 3322.126 + w;
 let tx = 600;
 let txx = 20;
+function add (event){
+  tx = event.detail.tx;
+  txx = event.detail.txx;
+}
 </script>
 <div class="body" bind:clientWidth={w}>
 <div class="background">
@@ -45,7 +49,7 @@ let txx = 20;
   {:else if show_value == 5}  
 <VidValDate/>//  if show_value == 7-->
   {:else if show_value == 1}
-   <Password />   
+   <Password on:progres={add}/>   
   {:else if show_value == 2}
     <h1 dir="rtl" class="midscreenText-3">
 תודה
@@ -142,7 +146,7 @@ justify-content: center;
   height: 9.75rem;
   width: 29.5rem;
 text-align: center; 
-  margin-top: 17vh;  
+  margin-top: -11vh;  
 padding-top: 8px;
 padding-right: 25px;
 padding-left: 25px;
@@ -155,7 +159,7 @@ margin-bottom: 8vh;
   height: 5rem;
   width: 15.25rem;
   font-size: 1rem;
-    margin-top: 26vh;
+    margin-top: 5vh;
 
 	 }
    .midscreen{
