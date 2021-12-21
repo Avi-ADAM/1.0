@@ -1,18 +1,17 @@
 <script>
     import Addnewro from './addNewRoleToSkill.svelte';
     import MultiSelect from 'svelte-multiselect';
-    import { Textarea, TextField, MaterialAppMin } from 'svelte-materialify';
     import { onMount } from 'svelte';
     import axios from 'axios';
-    import { idd } from './store/idd.js';
-    import { skillIdStore } from './store/skillIdStore.js'
+    import { idd } from '../../stores/idd.js';
+ //   import { skillIdStore } from './store/skillIdStore.js'
     import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
 export let roles1 = [];
 export let mid = -1;
  let selected;
  let id;
-const placeholder = `בחירת תפקיד משוייך`;
+const placeholder = `קישור לתפקיד`;
     let addro = false;    
 let idk;
     idd.subscribe(newwork => {
@@ -23,7 +22,7 @@ let idk;
     let desS;
     let meData;
     let error1 = null;
-    let link ="http://localhost:5000/skills";
+    let link ="https://strapi-k4vr.onrender.com/skills";
 
     onMount(async () => {
       const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -39,14 +38,18 @@ let idk;
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("http://localhost:5000/tafkidims?_limit=-1", {
-            method: "GET",
-            headers: {
-               'Content-Type': 'application/json'
-            },
-          }).then(checkStatus)
-        .then(parseJSON);
-          roles1 = res
+          const res = await fetch("https://strapi-k4vr.onrender.com/graphql", {
+              method: "POST",
+              headers: {
+                 'Content-Type': 'application/json'
+              },body: JSON.stringify({
+                        query: `query {
+  tafkidims { id roleDescription}
+}
+              `})
+            }).then(checkStatus)
+          .then(parseJSON);
+            roles1 = res.data.tafkidims
       } catch (e) {
           error1 = e
       }
@@ -91,7 +94,7 @@ function addNewSkill() {
         console.log('הצליח', response.data);
         meData = response.data;
         console.log(meData.id);
-        skillIdStore.set(meData.id);
+      //  skillIdStore.set(meData.id);
         id = meData.id;
         dispatchskillid (meData, id);
         addS = false;
@@ -114,14 +117,11 @@ function dispatchb () {
     } );
 };
   </script>
-  <div style="margin: 0 auto; background-color: var(--gold)">
 {#if addS == false}
 <button
 class="bg-sturk hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
 on:click={() => addS = true}>הוספת כישור שאינו ברשימה</button>
 {:else}
-<MaterialAppMin >
-  <div style=" margin: 0 auto; background-color: var(--gold)">
 <button title={cencel}
 on:click={dispatchb}
               class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded text-center"
@@ -131,32 +131,24 @@ on:click={dispatchb}
 
 
 
- <h1 style="font-size: 2rem; line-height: normal; color: var(--barbi-pink) background-color: var(--gold)"> הוספת כישור חדש</h1>    
+ <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink) background-color: var(--gold)"> הוספת כישור חדש</h1>    
+
+  
+  <div dir="rtl" class='textinput'>
+  <input    bind:value={skillName_value}
+ type='text' class='input' required>
+  <label for="name" class='label'>שם הכישור</label>
+  <span class='line'></span>
 </div>
-<div style=" margin: 0 auto; background-color: var(--gold)">
-  
+
+           <div dir="rtl" class='textinput'>
+  <input bind:value={desS}  
+ type='text' class='input' required>
+  <label for="des" class='label'>תיאור קצר</label>
+  <span class='line'></span>
+</div>
       
-      <TextField
-       class="m-4 " 
-       style=" background-color: var(--gold); padding-top: 10px; margin: 0 auto;" 
-       color="pink accent-2" 
-       dense 
-       rounded 
-       outlined 
-       bind:value={skillName_value}
-       >שם הכישור</TextField>
-   
-    <Textarea 
-    class="m-4" 
-    style="background-color: var(--gold);  padding-top: 10px; margin: 0 auto;" 
-    color="pink accent-2" 
-    bind:value={desS}  
-    autogrow 
-    outlined 
-    rounded 
-    rows={2}>תיאור קצר</Textarea>
-  
-  
+     
 <div>
   <MultiSelect
   bind:selected
@@ -187,11 +179,72 @@ on:click={() => addro = false}
 </svg></button>
   <Addnewro on:finnish={finnish}/>
   {/if}</div>
- </MaterialAppMin> 
+ 
 {/if}
 
-</div>
+
 
 <style>
+ .textinput {
+  position: relative;
+  width: 80%;
+  display: block;
+}
+
+.input {
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  margin: 0;
+  padding: 10px 0;
+  outline: none;
+  border-bottom: solid 1px #212121;
+  font-size: 15px;
+  margin-top: 12px;
+  width: 100%;
+  color: #212121;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color: #212121;
+  user-select: none;
+}
+
+.line {
+  height: 2px;
+  background-color: #2196F3;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+}
+
+.input:focus ~ .line, .input:valid ~ .line {
+  width: 100%;
+}
+
+.input:focus ~ .label, .input:valid ~ .label {
+  font-size: 11px;
+  color: #2196F3;
+  top: 0;
+}
+
+@media (max-width:600px){
  
-  </style>
+.textinput {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+ 
+}
+</style>

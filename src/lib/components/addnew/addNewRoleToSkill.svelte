@@ -1,12 +1,11 @@
 <script>
-    import {Textarea, TextField, MaterialAppMin } from 'svelte-materialify';
     import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
     import axios from 'axios';
-    import { idd } from './store/idd.js';
+    import { idd } from '../../stores/idd.js';
     let roleName_value;
         let desS;
-        let link ="http://localhost:5000/tafkidims";
+        let link ="https://strapi-k4vr.onrender.com/tafkidims";
         let meData;
     function add () {
       console.log(roleName_value);
@@ -42,29 +41,25 @@
        };
     </script>
     
-    <div dir="rtl" style="background-color: var(--gold)">
         <h1 style="font-size: 2rem; line-height: normal; color: var(--barbi-pink) background-color: var(--gold)">הוספת תפקיד חדש</h1>    
     
    
-        <MaterialAppMin >
+<div dir="rtl" class='textinput'>
+  <input    bind:value={roleName_value}
+ type='text' class='input' required>
+  <label for="name" class='label'>שם</label>
+  <span class='line'></span>
+</div>
+
+           <div dir="rtl" class='textinput'>
+  <input bind:value={desS}  
+ type='text' class='input' required>
+  <label for="des" class='label'>תיאור קצר</label>
+  <span class='line'></span>
+</div>
           
-            <TextField
-             class="m-4 "
-              style=" background-color: var(--gold); padding-top: 10px; margin: 0 auto;" 
-              color="pink accent-2" 
-              dense 
-              rounded 
-              outlined 
-              bind:value={roleName_value}
-              >שם </TextField>
-         
-          <Textarea 
-          class="m-4" 
-          style="background-color: var(--gold);  padding-top: 10px; margin: 0 auto;" 
-          color="pink accent-2" bind:value={desS}  
-          autogrow outlined 
-          rounded rows={2}>תיאור קצר</Textarea>
-          <div dir="rtl" style="background-color: var(--gold)">
+          
+          <div dir="rtl" >
 
           <button on:click={add}
           title="הוספת תפקיד חדש"
@@ -74,7 +69,70 @@
           </svg></button>
 
         </div>
-        </MaterialAppMin>
-    </div>
+       
+
     
 
+    <style>
+ .textinput {
+  position: relative;
+  width: 80%;
+  display: block;
+}
+
+.input {
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  margin: 0;
+  padding: 10px 0;
+  outline: none;
+  border-bottom: solid 1px #212121;
+  font-size: 15px;
+  margin-top: 12px;
+  width: 100%;
+  color: #212121;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color: #212121;
+  user-select: none;
+}
+
+.line {
+  height: 2px;
+  background-color: #2196F3;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+}
+
+.input:focus ~ .line, .input:valid ~ .line {
+  width: 100%;
+}
+
+.input:focus ~ .label, .input:valid ~ .label {
+  font-size: 11px;
+  color: #2196F3;
+  top: 0;
+}
+
+@media (max-width:600px){
+.textinput {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+ 
+}
+</style>

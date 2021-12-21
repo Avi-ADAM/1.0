@@ -1354,6 +1354,11 @@
   dependencies:
     "has-flag" "^4.0.0"
 
+"svelte-accessible-dialog@^2.1.3":
+  "integrity" "sha512-W3JVaPgLznHn297uTF32Ybp5FUYr7Mm9Geiu8zhQvOTIkLdo/iLpOeytTaD7U/8CdNFx8YWJayBCnAXJvxdLew=="
+  "resolved" "https://registry.npmjs.org/svelte-accessible-dialog/-/svelte-accessible-dialog-2.1.3.tgz"
+  "version" "2.1.3"
+
 "svelte-forms-lib@^2.0.0":
   "integrity" "sha512-PPlK1Eb6DF/suaFlaugQV+s5Cn+gbwXUcRuCvgonEAP7pbrD80LA2MR9/0vYRcixn7Fppofmkwjf+0nCwRVSuA=="
   "resolved" "https://registry.npmjs.org/svelte-forms-lib/-/svelte-forms-lib-2.0.0.tgz"

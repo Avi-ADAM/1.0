@@ -4,7 +4,7 @@
     import { show } from './store-show.js';
     import { skills1 } from './skills1.js';
     import { onMount } from 'svelte';
- //   import Addnewskill from '../addnew/addNewSkill.svelte';
+   import Addnewskill from '../addnew/addNewSkill.svelte';
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
     let skills2 = [];
@@ -83,7 +83,7 @@ function increment() {
     
     console.log("id", find_skill_id(selected));
 	}
-// import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+ import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
 
 let isOpen = false;
@@ -109,7 +109,7 @@ selected = newSele;
 
   }
   </script>
-  <!--
+  
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
@@ -119,7 +119,7 @@ selected = newSele;
   </DialogContent>
   </div>
 </DialogOverlay>
--->
+
   
     <h1 class="midscreenText-2">
       
@@ -133,12 +133,12 @@ selected = newSele;
   {placeholder}
   options={skills2.map(c => c.skillName)}
   /></div>
- <!--<div  class="input-2-2">
+<div  class="input-2-2">
   <button
   on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
   >הוספת כישור שאינו ברשימה</button>
-  </div>--> 
+  </div>
     <button class="button-in-1-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
     להמשיך
     </button>

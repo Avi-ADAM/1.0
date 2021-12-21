@@ -4,7 +4,7 @@
     import { show } from './store-show.js';
     import { workways1 } from './workways1.js';
     import { onMount } from 'svelte';
-   //     import Addneww from '../addnew/addnewWorkway.svelte';
+    import Addneww from '../addnew/addnewWorkway.svelte';
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
     
@@ -93,7 +93,7 @@ function increment() {
 
 
 
-// import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+ import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
 
 let isOpen = false;
@@ -118,7 +118,7 @@ selected.push(newN);
 selected = newSele;
 
   }
-  </script><!--
+  </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
@@ -128,7 +128,7 @@ selected = newSele;
   </DialogContent>
   </div>
 </DialogOverlay>
-  -->
+
 <h1 class="midscreenText-2">
     {userName_value}
 <br/>
@@ -140,13 +140,13 @@ selected = newSele;
      bind:selected
      {placeholder}
      options={workways2.map(c => c.workWayName)}
-     /></div><!--
+     /></div>
     <div  class="input-2-2">
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת חדשה</button>
-    </div>-->
+    </div>
    <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
 להמשיך      </button>
 

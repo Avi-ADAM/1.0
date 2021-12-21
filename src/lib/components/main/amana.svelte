@@ -358,8 +358,8 @@ trans = !trans;
 }
       </script><!--
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
---><div class="all">
-          <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
+      --><div class="all">
+          <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
           <button on:click={tran}><img alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
@@ -439,7 +439,7 @@ trans = !trans;
               <span>
                 אני {$form.name}      לעולם לא אנהג באלימות ולא אפגע באף אדם         
                    <br>
-                    כי אני {$form.name} לא רוצה להיות קרבן של אלימות ומפני שאין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס שמצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
+                   אני {$form.name} מצהיר שאין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס שמצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
               <br>	
    אני {$form.name} אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
               <br>
@@ -1062,7 +1062,7 @@ background-position: center;
   }
 }
  :global(.multiselect) {
-    width: 250px;
+    max-width: 250px;
    
   }
   </style> 

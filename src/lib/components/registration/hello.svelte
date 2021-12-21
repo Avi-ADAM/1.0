@@ -51,7 +51,7 @@ function increment() {
     <a class="midscreen-link" sveltekit:prefetch href="/about" title=" 1❤️1 אודות ">?</a>
   <!--  <a class="midscreen-link" sveltekit:prefetch href="/aboutOne">אודות 1❤️1</a>
  -->
-<button out:fly={{y: -600, x: 500,  opacity: 0.6, duration: 1000}} title="1❤️1 לפתיחת" class="button" on:click="{increment}">
+<button out:fly={{y: -600, x: 500,  opacity: 0.6, duration: 2000}} title="1❤️1 לפתיחת" class="button" on:click="{increment}">
   <svg  class="key"  width="100%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`600 80 2222 918.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient gradientUnits="userSpaceOnUse" cx="1023.699" cy="448.468" r="843.488" id="gradient-1" gradientTransform="matrix(1.964807, -0.050779, 0.025836, 0.999666, -1004.848942, 91.27403)">

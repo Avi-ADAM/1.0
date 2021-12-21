@@ -1,9 +1,8 @@
 
 <script>
-import { Textarea, TextField, MaterialAppMin } from 'svelte-materialify';
 import { onMount } from 'svelte';
 import axios from 'axios';
-import { idr } from './store/idr';
+import { idr } from '../../stores/idr.js';
 import Addnewskil from './addNewSkillToRole.svelte';
 import MultiSelect from 'svelte-multiselect';
 import { createEventDispatcher } from 'svelte';
@@ -25,7 +24,7 @@ let desR;
 export let skills2 = [];
 let error1 = null;
 
-let link ="http://localhost:5000/tafkidims";
+let link ="hhttps://strapi-k4vr.onrender.com/tafkidims";
 
 onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -42,14 +41,18 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("http://localhost:5000/skills?_limit=-1", {
-              method: "GET",
+            const res = await fetch("https://strapi-k4vr.onrender.com/graphql", {
+              method: "POST",
               headers: {
                  'Content-Type': 'application/json'
-              },
+              },body: JSON.stringify({
+                        query: `query {
+  skills { id skillName}
+}
+              `})
             }).then(checkStatus)
           .then(parseJSON);
-            skills2 = res
+            skills2 = res.data.skills
         } catch (e) {
             error1 = e
             console.log(error1)
@@ -131,8 +134,7 @@ function dispatchb () {
 class="bg-sturk hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
 on:click={() => addR = true}>הוספת תפקיד חדש</button>
 {:else}
-<MaterialAppMin >
-  <div style=" margin: 0 auto; background-color: var(--gold)">
+
 
 <button title={cencel}
 on:click={dispatchb}
@@ -141,31 +143,21 @@ class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 ro
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
   
-<div>
+
     <h1 style="font-size: 2rem; line-height: normal; color: var(--barbi-pink) background-color: var(--gold)">הוספת תפקיד חדש</h1>    
+<div dir="rtl" class='textinput'>
+  <input  bind:value={roleName_value}
+ type='text' class='input' required>
+  <label for="name" class='label'>שם</label>
+  <span class='line'></span>
 </div>
-  </div>
 
-    
-  <TextField
-   style=" background-color: var(--gold); padding-top: 10px; margin: 0 auto;" 
-   color="pink accent-2" 
-   dense 
-   rounded 
-   outlined 
-   bind:value={roleName_value}
-   >שם </TextField>
-
-<Textarea 
-style="background-color: var(--gold);  padding-top: 10px; margin: 0 auto;" 
-color="pink accent-2" 
-bind:value={desR}  
-autogrow 
-outlined 
-rounded 
-rows={2}>תיאור קצר</Textarea>
-
-<div style="margin: 0 auto; background-color: var(--gold)">
+   <div dir="rtl" class='textinput'>
+  <input bind:value={desR}  
+ type='text' class='input' required>
+  <label for="des" class='label'>תיאור קצר</label>
+  <span class='line'></span>
+</div>
 
    <div>
       <MultiSelect
@@ -173,7 +165,8 @@ rows={2}>תיאור קצר</Textarea>
       {placeholder}
       options={skills2.map(c => c.skillName)}
       />
-     </div><div>
+     </div>
+     <div>
       {#if addsk == false}
  {#if newsk} <p>{newsk}</p> {/if}
       <button
@@ -196,9 +189,72 @@ rows={2}>תיאור קצר</Textarea>
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
       <Addnewskil on:finnish={finnish}/>{/if}</div>
-     </MaterialAppMin> 
+  
     {/if}
     </div>
 
+    <style>
+ .textinput {
+  position: relative;
+  width: 80%;
+  display: block;
+}
+
+.input {
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  margin: 0;
+  padding: 10px 0;
+  outline: none;
+  border-bottom: solid 1px #212121;
+  font-size: 15px;
+  margin-top: 12px;
+  width: 100%;
+  color: #212121;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color: #212121;
+  user-select: none;
+}
+
+.line {
+  height: 2px;
+  background-color: #2196F3;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+}
+
+.input:focus ~ .line, .input:valid ~ .line {
+  width: 100%;
+}
+
+.input:focus ~ .label, .input:valid ~ .label {
+  font-size: 11px;
+  color: #2196F3;
+  top: 0;
+}
+
+@media (max-width:600px){
+.textinput {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+ 
+}
+</style>
 
 

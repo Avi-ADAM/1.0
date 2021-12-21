@@ -4,7 +4,7 @@
     import { show } from './store-show.js';
     import { roles2 } from './roles2.js';
     import { onMount } from 'svelte';
-  //  import Addnewrole from '../addnew/addNewRole.svelte';
+    import Addnewrole from '../addnew/addNewRole.svelte';
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
     let roles1 = [];
@@ -83,7 +83,7 @@ function increment() {
     console.log("xke", selected);
     console.log("id", find_role_id(selected));
 	}
-// import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+ import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
 
 let isOpen = false;
@@ -109,7 +109,7 @@ selected.push(newN);
 selected = newSele;
 
   }
-  </script><!--
+  </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
@@ -119,7 +119,6 @@ selected = newSele;
   </DialogContent>
   </div>
 </DialogOverlay>
--->
   
 <h1 class="midscreenText-2">
     {userName_value}
@@ -135,13 +134,13 @@ selected = newSele;
      /></div>
     <!-- 
            on:change={(e) => alert(`You ${e.detail.type}ed '${e.detail.token}'`)}
-
+-->
       <div  class="input-2-2">
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת תפקיד שאינו ברשימה</button>
-    </div>-->
+    </div>
    <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
 להמשיך      </button>
 

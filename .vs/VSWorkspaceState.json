@@ -1,0 +1,15 @@
+{
+  "ExpandedNodes": [
+    "",
+    "\\src",
+    "\\src\\lib",
+    "\\src\\lib\\components",
+    "\\src\\lib\\components\\main",
+    "\\src\\lib\\components\\registration",
+    "\\src\\lib\\stores",
+    "\\src\\routes",
+    "\\static"
+  ],
+  "SelectedNode": "\\package.json",
+  "PreviewInSolutionExplorer": false
+}

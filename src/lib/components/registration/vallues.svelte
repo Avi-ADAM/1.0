@@ -4,7 +4,7 @@
     import { show } from './store-show.js';
     import { valluss } from './valluss.js';
     import { onMount } from 'svelte';
- //   import AddnewVal from '../addnew/addnewval.svelte';
+    import AddnewVal from '../addnew/addnewval.svelte';
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher(); 
     let vallues = [{valueName: "שלום"}];
@@ -83,7 +83,7 @@ function increment() {
 		txx: 20
 	} )
 	}
-//  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
 
 let isOpen = false;
@@ -110,7 +110,7 @@ selected = newSele;
 
   }
   </script>
-<!--
+
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
@@ -120,7 +120,7 @@ selected = newSele;
   </DialogContent>
   </div>
 </DialogOverlay>
-  -->
+  
 <h1 class="midscreenText-2">
   {userName_value}
   <br/>
@@ -134,12 +134,12 @@ selected = newSele;
      options={vallues.map(c => c.valueName)}
      /></div>
      {/key}
-  <!--   <div  class="input-2-2">
+  <div  class="input-2-2">
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת ערך חדש</button>
-    </div>-->
+    </div>
    <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
 להמשיך      </button>
 

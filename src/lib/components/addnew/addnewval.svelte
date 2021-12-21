@@ -1,15 +1,15 @@
 <script>
-    import { Textarea, TextField, MaterialAppMin } from 'svelte-materialify';
+  //  import { Textarea, TextField, MaterialAppMin } from 'svelte-materialify';
     import axios from 'axios';
      import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
  let vallues = [];
-
+// דף של השראה כפתור להוסיף את ההשראה שלך, כפתור לתיקונים  
     let name_value;
     let desV;
    
     let error1 = null;
-    let link ="http://localhost:5000/vallues";
+    let link ="https://strapi-k4vr.onrender.com/vallues";
 let meData;
 export let vallId;   
 
@@ -70,34 +70,83 @@ class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 r
 <div>
  <h1 style="font-size: 2rem; line-height: normal; "> הוספת ערך חדש</h1>    
 </div>
-<div style=" margin: 0 auto;">
-  <MaterialAppMin >
-      
-      <TextField
-       class="m-4 " 
-       style=" background-color: var(--gold); padding-top: 10px; margin: 0 auto;" 
-       color="pink accent-2" 
-       dense 
-       rounded 
-       outlined 
-       bind:value={name_value}
-       >שם הערך</TextField>
-   
-    <Textarea 
-    class="m-4" 
-    style="background-color: var(--gold);  padding-top: 10px; margin: 0 auto;" 
-    color="pink accent-2" 
-    bind:value={desV}  
-    autogrow 
-    outlined 
-    rounded 
-    rows={2}>תיאור קצר</Textarea>
-  
-  </MaterialAppMin>
+<div dir="rtl" class='textinput'>
+  <input  bind:value={name_value} type='text' class='input' required>
+  <label for="name" class='label'>שם הערך</label>
+  <span class='line'></span>
+</div>
+<br />
+<div dir="rtl" class='textinput'>
+  <input type='text' class='input' bind:value={desV} required>
+  <label for="descrip" class='label'>תיאור קצר</label>
+  <span class='line'></span>
+</div>
 
-
-<button on:click={addNewVall}
+<button style="margin-top: 20px; " on:click={addNewVall}
 class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded">הוספה
-</button></div>
+</button>
 
 {/if}
+<style>
+ .textinput {
+  position: relative;
+  width: 80%;
+  display: block;
+}
+
+.input {
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  margin: 0;
+  padding: 10px 0;
+  outline: none;
+  border-bottom: solid 1px #212121;
+  font-size: 15px;
+  margin-top: 12px;
+  width: 100%;
+  color: #212121;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.label {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color: #212121;
+  user-select: none;
+}
+
+.line {
+  height: 2px;
+  background-color: #2196F3;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+}
+
+.input:focus ~ .line, .input:valid ~ .line {
+  width: 100%;
+}
+
+.input:focus ~ .label, .input:valid ~ .label {
+  font-size: 11px;
+  color: #2196F3;
+  top: 0;
+}
+
+@media (max-width:600px){
+.textinput {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+ 
+}
+</style>

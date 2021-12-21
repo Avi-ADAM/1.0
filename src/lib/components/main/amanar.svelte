@@ -1040,7 +1040,7 @@ background-position: center;
   }
 }
  :global(.multiselect) {
-    width: 250px;
+    max-width: 250px;
    
   }
   </style> 
