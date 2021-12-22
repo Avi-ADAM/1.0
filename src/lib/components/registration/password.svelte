@@ -4,6 +4,31 @@ import { show } from './store-show.js';
 import { email } from './email.js';  
 import axios from 'axios';
  import { createEventDispatcher } from 'svelte';
+ import { skills1 } from './skills1.js';
+import { roles2 } from './roles2.js';
+import { workways1 } from './workways1.js';
+import { valluss } from './valluss.js';
+
+let skills1_value;
+let roles2_val;
+let work_ways1;
+let vallues;
+
+valluss.subscribe(newwork => {
+  vallues = newwork;
+})
+
+workways1.subscribe(newwork => {
+  work_ways1 = newwork;
+})
+
+skills1.subscribe(newskills => {
+  skills1_value = newskills;
+})
+
+roles2.subscribe(newRole => {
+  roles2_val = newRole;
+})
  const dispatch = createEventDispatcher();
 let userName_value;
 
@@ -28,6 +53,10 @@ axios
     username: userName_value, 
     email: emailL,
     password: passwordx,
+	 skills: skills1_value,
+    tafkidims: roles2_val,
+    work_ways: work_ways1,
+    vallues: vallues,
   })
   .then(response => {
     console.log('ההרשמה הצליחה', response.data.user);
@@ -324,31 +353,7 @@ margin: 2rem auto 0 auto;
 <!--
 <script>
 import PassIn from './passIn.svelte'
-import { skills1 } from './skills1.js';
-import { roles2 } from './roles2.js';
-import { workways1 } from './workways1.js';
-import { valluss } from './valluss.js';
 
-let skills1_value;
-let roles2_val;
-let work_ways1;
-let vallues;
-
-valluss.subscribe(newwork => {
-  vallues = newwork;
-})
-
-workways1.subscribe(newwork => {
-  work_ways1 = newwork;
-})
-
-skills1.subscribe(newskills => {
-  skills1_value = newskills;
-})
-
-roles2.subscribe(newRole => {
-  roles2_val = newRole;
-})
 
 
 userName.subscribe(value => {
@@ -368,10 +373,7 @@ axios
     username: userName_value, 
     email: emailL,
     password: passwordx,
-    skills: skills1_value,
-    tafkidims: roles2_val,
-    work_ways: work_ways1,
-    vallues: vallues,
+   
   })
   .then(response => {
     console.log('ההרשמה הצליחה', response.data.user);
