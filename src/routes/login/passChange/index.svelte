@@ -18,10 +18,9 @@ axios
   })
   .then(response => {
     // Handle success.
+        console.log('Your user\'s password has been changed.', response);
+                    goto("/login", )
     before = false;
-    console.log('Your user\'s password has been changed.');
-                goto("/login", )
-
   })
   .catch(error => {
     // Handle error.
