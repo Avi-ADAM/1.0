@@ -699,7 +699,10 @@ left: 45.2%;
  min-height: 170px;
  min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-  }
+   -webkit-animation:spin 17s linear infinite;
+    -moz-animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;
+    }
   
  .flexi {
    padding-top: 2vh;
@@ -766,7 +769,10 @@ left: 45.2%;
     min-height: 170px;
     min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-  }
+    -webkit-animation:spin 17s linear infinite;
+    -moz-animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;
+    }
   .amana{
     padding: 0px 13vw;
     font-size:20px;
@@ -852,7 +858,9 @@ background-position: center;
     min-height: 170px;
     min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-
+  -webkit-animation:spin 17s linear infinite;
+    -moz-animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;
   }
   .amana{
     width: 908px;
