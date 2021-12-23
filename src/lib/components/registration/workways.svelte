@@ -104,7 +104,7 @@ let isOpen = false;
     function addnew (event){
     
     const newOb = event.detail.skob;
-    const newN = event.detail.skob.skillName;
+    const newN = event.detail.skob.workWayName;
     isOpen = false;
     const newValues = workways2 ;
     newValues.push(newOb);
