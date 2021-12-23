@@ -968,9 +968,7 @@ background-position: center;
     -moz-animation:spin 17s linear infinite;
     animation:spin 17s linear infinite;
 }
-@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+
 
 
   .amana{
@@ -1038,6 +1036,9 @@ background-position: center;
     height: 100vh;
   }
 } 
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 @media(min-width:1200px) {
    .amana{
     padding: 0 110px;
