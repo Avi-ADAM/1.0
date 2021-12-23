@@ -4,7 +4,7 @@ import axios from 'axios';
 
 let passwordx;
 let errorl = null;
-let before = false;
+let before = true;
    function shaneh () {
         passwordx = passwordx.trim();
         
@@ -86,7 +86,7 @@ axios
    				type={showPassword ? "text" : "password"}
 				name="email"
 				class="input"
-				placeholder="יצירת סיסמה"
+				placeholder=" יצירת סיסמה חדשה"
 				on:input={validatePassword}
 				on:blur={getV}
 			/>
@@ -120,7 +120,7 @@ axios
 			</li>
 		</ul>
 
-		<button class="button-in" on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
+		<button  on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
 	</form>
 </main>
 
@@ -242,10 +242,12 @@ axios
 		margin-top: 2rem;
 		padding: 5px 20px 10px 20px;
 		font-weight: bold;
-		border: 2px solid greenyellow;
-		color: greenyellow;
+		border: 2px solid rgb(250, 0, 187);
+		color: rgb(153, 255, 0);
 		background: transparent;
 		transition: all 1000ms;
+    margin-left: 1rem;
+    margin-right: auto;
 	}
 	button:disabled {
 		border-color: var(--gold);
