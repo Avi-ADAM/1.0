@@ -67,7 +67,6 @@ let idk;
       return arr;
      };
 function dispatchskillid (meData, id) {
-  console.log("hh", id)
   dispatch('addnewskill', {
     id: id,
     mid: mid,
@@ -77,9 +76,7 @@ function dispatchskillid (meData, id) {
 
 function addNewSkill() {
   tafkidimslist = find_role_id(selected);
-  console.log(tafkidimslist);
   tafkidimslist.push(idk);
-  console.log(tafkidimslist);
 	axios
       .post(link, {
         skillName: skillName_value,
@@ -91,9 +88,7 @@ function addNewSkill() {
        
                 }})
       .then(response => {
-        console.log('הצליח', response.data);
         meData = response.data;
-        console.log(meData.id);
       //  skillIdStore.set(meData.id);
         id = meData.id;
         dispatchskillid (meData, id);

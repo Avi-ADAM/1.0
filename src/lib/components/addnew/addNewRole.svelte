@@ -60,7 +60,6 @@ onMount(async () => {
     });
 
     function dispatchrole (meData, id) {
-  console.log("hh", id)
   dispatch('addnewrole', {
     id: id,
     mid: mid,
@@ -69,8 +68,7 @@ onMount(async () => {
 };
 
 function addrole () {
-  console.log("id", find_skill_id(selected));
-  console.log('gggyu');
+
 skillslist = find_skill_id(selected);
 skillslist.push(idro);
 axios
@@ -84,7 +82,6 @@ axios
    
             }})
   .then(response => {
-    console.log('הצליח', response.data);
     meData = response.data;
     id = meData.id;
         dispatchrole (meData, id);
@@ -93,7 +90,6 @@ axios
   .catch(error => {
     console.log('צריך לתקן:', error);
             });
-  console.log("hh")
 };    
 
 

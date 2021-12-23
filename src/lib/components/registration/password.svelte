@@ -59,7 +59,6 @@ axios
     vallues: vallues,
   })
   .then(response => {
-    console.log('ההרשמה הצליחה', response.data.user);
     document.cookie = `jwt=${data.jwt}; expires=` + new Date(2022, 0, 1).toUTCString();
     document.cookie = `id=${data.user.id}; expires=` + new Date(2022, 0, 1).toUTCString();
 	dispatch ('progres',{

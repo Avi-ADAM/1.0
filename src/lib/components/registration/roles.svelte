@@ -80,8 +80,6 @@ function increment() {
 		tx: 0,
 		txx: 12
 	} )
-    console.log("xke", selected);
-    console.log("id", find_role_id(selected));
 	}
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
@@ -102,7 +100,6 @@ let isOpen = false;
        
     roles1 = newValues;
    const newSele = selected;
-    console.log(selected)
 
 selected.push(newN);
 

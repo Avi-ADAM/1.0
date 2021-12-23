@@ -17,7 +17,6 @@ function addNewSkill () {
   headers: {
             }})
   .then(response => {
-    console.log('הצליח', response.data);
     meData = response.data;
     finnish (meData.id);
          idr.set(meData.id);
@@ -25,12 +24,10 @@ function addNewSkill () {
   .catch(error => {
     console.log('צריך לתקן:', error);
             });
-  console.log("hh")
 };    
 
 
 function finnish (id) {
-        console.log("hh", id)
   dispatch('finnish', {
     id: id,
     addsk: false,

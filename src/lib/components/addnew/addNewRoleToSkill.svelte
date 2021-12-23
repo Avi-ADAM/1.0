@@ -8,7 +8,6 @@
         let link ="https://strapi-k4vr.onrender.com/tafkidims";
         let meData;
     function add () {
-      console.log(roleName_value);
         axios
       .post(link, {
         roleDescription: roleName_value,
@@ -19,19 +18,15 @@
 
                 }})
       .then(response => {
-        console.log('הצליח', response.data);
         meData = response.data;
-        console.log(meData.id);
          idd.set(meData.id);
          finnish (meData.id);
                   })
       .catch(error => {
         console.log('צריך לתקן:', error);
                 });
-      console.log("hh")
     }; 
        function finnish (id) {
-        console.log("hh", id)
   dispatch('finnish', {
     id: id,
     addro: false,

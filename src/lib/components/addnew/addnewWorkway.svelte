@@ -17,7 +17,6 @@
    
     
         function dispatchww (meData, id) {
-      console.log("hh", id)
       dispatch('addww', {
         id: id,
         mid: mid,
@@ -36,7 +35,6 @@
        
                 }})
       .then(response => {
-        console.log('הצליח', response.data);
         meData = response.data;
         id = meData.id;
             dispatchww (meData, id);
@@ -45,7 +43,6 @@
       .catch(error => {
         console.log('צריך לתקן:', error);
                 });
-      console.log("hh")
     };    
     
 

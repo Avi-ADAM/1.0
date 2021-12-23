@@ -37,9 +37,7 @@
               `})
             }).then(checkStatus)
           .then(parseJSON);
-                      console.log(res)
             vallues = res.data.vallues 
-            console.log(vallues)
         } catch (e) {
             error1 = e
         }
@@ -77,7 +75,6 @@ show.subscribe(newValue => {
 function increment() {
 		show.update(n => n + 1);
     valluss.set(find_value_id(selected));
-    console.log("ככה צריך" ,vallues);
     dispatch ('progres',{
 		tx: 0,
 		txx: 20
@@ -102,7 +99,6 @@ let isOpen = false;
        
     vallues = newValues;
    const newSele = selected;
-    console.log(selected)
 
 selected.push(newN);
 

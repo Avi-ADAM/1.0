@@ -43,7 +43,6 @@ onMount(async () => {
             }).then(checkStatus)
           .then(parseJSON);
  idx = res + 2
- console.log(idx)
         } catch (e) {
             error = e
         }

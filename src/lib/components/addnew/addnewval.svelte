@@ -26,7 +26,6 @@ function addNewVall() {
        
                 }})
       .then(response => {
-        console.log('הצליח', response.data);
         meData = response.data;
         vallId = meData.id;
                 dispatchvall (vallId, meData)

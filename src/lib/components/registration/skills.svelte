@@ -78,10 +78,7 @@ function increment() {
 		tx: 0,
 		txx: 16
 	} )
-    console.log("ככה צריך" ,skills2);
-    console.log("xke", selected);
     
-    console.log("id", find_skill_id(selected));
 	}
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
@@ -101,7 +98,6 @@ let isOpen = false;
        
     skills2 = newValues;
    const newSele = selected;
-    console.log(selected)
 
 selected.push(newN);
 

@@ -38,8 +38,6 @@
             }).then(checkStatus)
           .then(parseJSON);
             workways2 = res.data.workWays
-            console.log(res)
-            console.log(workways2);
         } catch (e) {
             error1 = e
         }
@@ -78,16 +76,12 @@ show.subscribe(newValue => {
 });
 
 function increment() {
-  console.log(selected)
 		show.update(n => n + 1);
     workways1.set(find_workway_id(selected));
     dispatch ('progres',{
 		tx: 0,
 		txx: 8
 	} )
-    console.log("ככה צריך" ,workways2);
-    console.log("xke", selected);
-    console.log("id", find_workway_id(selected));
 	}
 
 
@@ -102,22 +96,16 @@ let isOpen = false;
    
   };
     function addnew (event){
-    
     const newOb = event.detail.skob;
     const newN = event.detail.skob.workWayName;
     isOpen = false;
     const newValues = workways2 ;
     newValues.push(newOb);
-       
     workways2 = newValues;
-   const newSele = selected;
-    console.log(selected)
-
-selected.push(newN);
-
-selected = newSele;
-
-  }
+    const newSele = selected;
+    selected.push(newN);
+    selected = newSele;
+}
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
