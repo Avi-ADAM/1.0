@@ -16,7 +16,7 @@ export let mid = -1;
  let selected;
  let id;
  let meData = [];
-const placeholder = `בחירת כישורים משוייכים`; 
+const placeholder = `כישורים קשורים`; 
 let tafkidimslist = [];
 let skillslist = [];
 let roleName_value;
@@ -24,7 +24,7 @@ let desR;
 export let skills2 = [];
 let error1 = null;
 
-let link ="hhttps://strapi-k4vr.onrender.com/tafkidims";
+let link ="https://strapi-k4vr.onrender.com/tafkidims";
 
 onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -115,8 +115,8 @@ let cencel = " ביטול"
 let addsk = false;
 let newsk;
 function finnish (event) {
-  addsk = event.detail.addsk;
   newsk = event.detail.new;
+  addsk = false;
 };
 function dispatchb () {
    addR = false
@@ -127,8 +127,6 @@ function dispatchb () {
 </script>
 
 
-<div style="margin: 0 auto; background-color: var(--gold)">
-
 {#if addR == false}
 <button
 class="bg-sturk hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
@@ -138,13 +136,13 @@ on:click={() => addR = true}>הוספת תפקיד חדש</button>
 
 <button title={cencel}
 on:click={dispatchb}
-class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
+class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold rounded"
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
   
 
-    <h1 style="font-size: 2rem; line-height: normal; color: var(--barbi-pink) background-color: var(--gold)">הוספת תפקיד חדש</h1>    
+    <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">הוספת תפקיד חדש</h1>    
 <div dir="rtl" class='textinput'>
   <input  bind:value={roleName_value}
  type='text' class='input' required>
@@ -191,7 +189,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 ro
       <Addnewskil on:finnish={finnish}/>{/if}</div>
   
     {/if}
-    </div>
+   
 
     <style>
  .textinput {

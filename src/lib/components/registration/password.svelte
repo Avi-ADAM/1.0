@@ -289,30 +289,29 @@ axios
 		bottom: 0.5rem;
 	}
 
-	 .midscreenText-2 {
+.midscreenText-2 {
       grid-column: 1 /4;
-  grid-row: 1/ 2;
-  align-self: center;
-    justify-self: center;
-		max-width: 100vw;
-  font-size: 1.8rem;
-  line-height: normal;
-  font-weight: 900;
-  color: var(--barbi-pink);
-  margin-top: 75px;
-  background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
-  background-size: 29.5rem 9.75rem;
-  height: 9.75rem;
-  width: 29.5rem;
+      grid-row: 1/ 2;
+      align-self: center;
+      justify-self: center;
+	  max-width: 100vw;
+      font-size: 1.8rem;
+      line-height: normal;
+      font-weight: 900;
+      color: var(--barbi-pink);
+      margin-top: 75px;
+      background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
+      background-size: 29.5rem 9.75rem;
+      height: 9.75rem;
+      width: 29.5rem;
 text-align: center; 
   margin-top: 17vh;
-
 padding-top: 8px;
 padding-right: 25px;
 padding-left: 25px;
-
 }
- .button-in{
+ 
+.button-in{
     grid-column: 1/6;
     grid-row: 6 / 7;
     margin-top: 25px;
@@ -351,40 +350,7 @@ margin: 2rem auto 0 auto;
    
 </style>
 <!--
-<script>
-import PassIn from './passIn.svelte'
 
-
-
-userName.subscribe(value => {
-  userName_value = value;
-});
-
-
-email.subscribe(new1Value => {
-  emailL = new1Value;
-});
-
-function increment() {
-		show.update(n => n + 1);
-    
-axios
-  .post('http://localhost:5000/auth/local/register', {
-    username: userName_value, 
-    email: emailL,
-    password: passwordx,
-   
-  })
-  .then(response => {
-    console.log('ההרשמה הצליחה', response.data.user);
-    
-  })
-  .catch(error => {
-    console.log('צריך לתקן:', error.response);
-  });
-	}
-
-</script>
 
    
      <div class="input-2">
@@ -395,7 +361,4 @@ axios
 להמשיך
 </button>
 
-
-<style>
-  
-    </style>-->
+-->
