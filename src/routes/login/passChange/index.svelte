@@ -18,7 +18,7 @@ axios
   .post('https://strapi-k4vr.onrender.com/auth/reset-password', {
     code: email,
     password: passwordx,
-    passwordConfirmation: passwordx
+    passwordConfirmation: passwordx,
   })
   .then(response => {
     // Handle success.
