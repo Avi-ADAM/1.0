@@ -6,10 +6,14 @@ import axios from 'axios';
 let passwordx;
 let errorl = null;
 let before = true;
-   function shaneh () {
-        passwordx = passwordx.trim();
-        
-// Request API.
+  
+
+function shaneh () {
+  consol.log("1")
+          passwordx = passwordx.trim();
+  consol.log("2")
+
+  // Request API.
 axios
   .post('https://strapi-k4vr.onrender.com/auth/reset-password', {
     code: email,
