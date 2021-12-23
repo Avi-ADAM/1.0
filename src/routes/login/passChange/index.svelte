@@ -1,7 +1,8 @@
 <script>
 import axios from 'axios';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
-
+ import { page } from '$app/stores'
+    const email = $page.query.get('code')
 let passwordx;
 let errorl = null;
 let before = true;
@@ -11,7 +12,7 @@ let before = true;
 // Request API.
 axios
   .post('https://strapi-k4vr.onrender.com/auth/reset-password', {
-    code: 'privateCode',
+    code: email,
     password: passwordx,
     passwordConfirmation: passwordx
   })
