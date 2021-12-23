@@ -32,7 +32,7 @@
         loginError = null;
 
         axios
-            .post('https://strapi-k4vr.onrender.com/auth/local', {
+            .post('https://strapi-k4vr.onrender.com/auth/', {
                 identifier: email,
                 password,
             })
