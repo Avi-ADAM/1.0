@@ -144,7 +144,7 @@ min-height: 100vh;
 
     width: 100vw;
     height: 100vh;
-      background: url(nicelove.svg) !important;
+      background: url(https://res.cloudinary.com/love1/image/upload/v1640287148/nicelove_o5pzyv.svg) !important;
       background-position: center; 
       background-size: cover;
       background-repeat: no-repeat; 
@@ -159,7 +159,7 @@ min-height: 100vh;
    
 input{
         
-        background-image: url(line1.png) !important;
+        background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png) !important;
         border: 1px solid var(--gold);
         background-position: center;
         background-repeat: no-repeat;
@@ -171,7 +171,7 @@ input{
         color: var(--barbi-pink);
     }
     .center{
-        background-image: url('favicon_io/coin512.png');
+        background-image: url(https://res.cloudinary.com/love1/image/upload/v1640287183/coin512_ux4m6e.png);
  background-repeat: no-repeat;
 margin:  0.5em 4em;
  background-size: 100px;
@@ -195,7 +195,7 @@ transform: translate(-50%, -50%);
 min-height: 100%;
 min-width: 100%;
 border-radius: 50%;
- background-image: url(diamond.png);
+ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640287109/diamond_uapr5j.png);
  background-position: center;
  background-repeat: no-repeat;
  
