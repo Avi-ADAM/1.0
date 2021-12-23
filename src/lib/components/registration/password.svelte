@@ -76,6 +76,7 @@ axios
 	let validations = [];
 	let showPassword = false;
 	function validatePassword(e) {
+		        passwordx = e.target.value
 		const password = e.target.value;
 		validations = [
 			password.length > 5,

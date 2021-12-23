@@ -44,9 +44,7 @@
                 liUN.set(data.user.username);
                 goto("/one", )
                // goto("/oneHomeGr", )
-                console.log(data.user.id)
-                console.log(data)
-                console.log(data.user.username)
+              
             })
             .catch((err) => {
                 if (err.response) {
