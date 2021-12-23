@@ -32,7 +32,7 @@
         loginError = null;
 
         axios
-            .post('https://strapi-k4vr.onrender.com/auth/', {
+            .post('https://strapi-k4vr.onrender.com/auth/local', {
                 identifier: email,
                 password,
             })
@@ -131,8 +131,12 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
 
     @media (max-width: 600px) {
         .login {
-            width: 80%;
+            width: 126%;
         }
+           
+input{
+    
+}
     }
   
  input:focus {
