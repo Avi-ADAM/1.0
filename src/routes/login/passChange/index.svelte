@@ -9,9 +9,9 @@ let before = true;
   
 
 function shaneh () {
-  consol.log("1")
+  console.log("1")
           passwordx = passwordx.trim();
-  consol.log("2")
+  console.log("2")
 
   // Request API.
 axios
@@ -66,7 +66,7 @@ axios
 
 
 <main>
-	<form>
+	<form on:submit|preventDefault={shaneh}>
 		 
 
 		<div class="field">
@@ -109,7 +109,7 @@ axios
 			</li>
 		</ul>
 
-		<button  on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
+		<button on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
 	</form>
 </main>
 
