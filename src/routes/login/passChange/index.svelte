@@ -45,13 +45,10 @@ axios
 			password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
-		if (validations[0] == true)
-	if (validations[1] == true )
-	if (validations[2] == true )
-	if (validations[3] == true )
+		
 	}
 	function getV (e){
-    password = e.target.value
+    passwordx = e.target.value
 	}
 </script>
 {#if before}
