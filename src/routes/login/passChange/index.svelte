@@ -45,22 +45,10 @@ axios
 			password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
-		if (validations[0] == true){dispatch ('progres',{
-		tx: 0,
-		txx: 6
-	} ) } 
-	if (validations[1] == true ){dispatch ('progres',{
-		tx: 0,
-		txx: 5
-	} ) }
-	if (validations[2] == true ){dispatch ('progres',{
-		tx: 0,
-		txx: 4
-	} ) }
-	if (validations[3] == true ){dispatch ('progres',{
-		tx: 0,
-		txx: 2
-	} ) }
+		if (validations[0] == true)
+	if (validations[1] == true )
+	if (validations[2] == true )
+	if (validations[3] == true )
 	}
 	function getV (e){
     password = e.target.value
