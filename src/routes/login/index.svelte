@@ -135,6 +135,9 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
 input{
     
 }
+    .center{
+        margin: 0 auto;
+    }
     }
   
  input:focus {

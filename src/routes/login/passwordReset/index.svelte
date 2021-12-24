@@ -13,7 +13,7 @@ axios
   .post('https://strapi-k4vr.onrender.com/auth/forgot-password', {
     email: email,
     url:
-      'https://strapi-k4vr.onrender.com/admin/plugins/users-permissions/auth/reset-password',
+      'https://www.1one.world/login/passChange',
   })
   .then(response => {
     // Handle success.
@@ -28,7 +28,7 @@ axios
     }
 </script>
 {#if before}
-<h3>{heading}</h3>
+<h3 style="text-align:center; font-size: 1em;">{heading}</h3>
 {#if erori} <small style="color: red; ">{erori}</small>{/if}
 <form on:submit|preventDefault={onSubmit}>
   <div>
