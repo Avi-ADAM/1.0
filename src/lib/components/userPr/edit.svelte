@@ -31,7 +31,7 @@ export let addNs;
    export let list =[];
   export let a = "";
     export let linkp = "skills";
-    let link =`https://strapi-k4vr.onrender.com/${linkp}?_limit=-1`;
+    let link =`https://strapi-k4vr.onrender.com/graphql?_limit=-1`;
     let error1 = null;
     export let addSl = false;
 let idLi;
@@ -60,15 +60,18 @@ let idLi;
           'Content-Type': 'application/json'   
         };
           try {
-              const res = await fetch(link, {
-                method: 'GET',
-         
-          headers: {
-              'Authorization': bearer1,
-              'Content-Type': 'application/json'
-                    },
-              }).then(checkStatus)
-            .then(parseJSON);
+              const res = await  fetch("https://strapi-k4vr.onrender.com/graphql", {
+              method: "POST",
+              headers: {
+                'Authorization': bearer1,
+                 'Content-Type': 'application/json'
+              },body: JSON.stringify({
+                        query: `query {
+  ${linkp} { id ${valc}}
+}
+              `})
+            }).then(checkStatus)
+          .then(parseJSON);
               meData = res;
               allvn = meData.map(c => c[valc]);
               console.log(res);
