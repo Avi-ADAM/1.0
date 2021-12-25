@@ -528,14 +528,14 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
       align-items: center;
       justify-content: center;
       text-align: center;
-      background-image: url(4nd.svg);
+      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
      background-position:right center; 
     background-repeat: no-repeat; 
     background-size: cover;
 }
 .selectedl {
   z-index: 289;
-background-image: url(4nd.svg);
+background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
      background-position: left center; 
     background-repeat: no-repeat; 
     background-size: cover;
@@ -568,7 +568,7 @@ background-image: url(4nd.svg);
   .body{ 
     width: 100vw;
     height: 100vh;
-      background: url(amana.svg) !important;
+      background: url(https://res.cloudinary.com/love1/image/upload/v1640438668/amana_kocsdt.svg) !important;
       background-position: center; 
       background-size: cover;
       background-repeat: no-repeat; 
@@ -584,7 +584,7 @@ background-image: url(4nd.svg);
        /* border-radius: 50%;*/ 
     min-height: 332px;
     min-width: 320px;
-    background: url(goldenP.svg);/*13ndp*/
+    background: url(https://res.cloudinary.com/love1/image/upload/v1640438986/goldenP_bz4wu5.svg);/*13ndp*/
     background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
@@ -605,7 +605,7 @@ background-image: url(4nd.svg);
     }
     
     .another{
-     background-image: url(to.svg);
+     background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
      background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
@@ -666,7 +666,7 @@ background-image: url(4nd.svg);
           transform: translate(-50%, -50%);
       text-shadow: 1px 1px  rgb(63, 56, 18);
 padding: 0.2em;
-     background-image: url(goldbg.svg);
+     background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438792/goldbg_aw7tx0.svg);
      background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;

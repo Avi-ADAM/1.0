@@ -350,7 +350,7 @@ on:click={bitul}
               text-shadow: 1px 1px  var(--barbi-pink);
 padding: 1em;
       border-radius: 15%;
-     background-image: url(to.svg);
+     background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
      background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
