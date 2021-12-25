@@ -314,7 +314,7 @@ addSl4 = false;
     title="לדף הבית"
     style="height: 180px; margin: 0 auto;"
     class="hover:scale-200 hover:transform translate-y-20"
-    src='crown-7.svg'
+    src='https://res.cloudinary.com/love1/image/upload/v1640439191/crown-7_ug9koc.svg'
     alt="link"></a></div>
 
   <div id="circular-text"  class="userName" >
