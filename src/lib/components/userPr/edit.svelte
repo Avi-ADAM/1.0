@@ -72,7 +72,7 @@ let idLi;
               `})
             }).then(checkStatus)
           .then(parseJSON);
-              meData = res;
+              meData = res.data[linkp];
               allvn = meData.map(c => c[valc]);
               console.log(res);
           } catch (e) {
