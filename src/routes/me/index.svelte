@@ -289,7 +289,7 @@ current = "a2"
     current = "a3"
     addSl3 = true;
   }
-  else if (a == "work-ways"){
+  else if (a == "workWays"){
     current = "a5";
             addSl5 = true;
 
