@@ -7,7 +7,7 @@
     import { idM } from '../../lib/stores/idM.js';    
     import { liUN } from '../../lib/stores/liUN.js';
    
-
+    let active = false;
     let loginError = null;
     let email = "";
     let password = "";
@@ -22,6 +22,7 @@
         "heb": "סיסמה"
     }
     function login() {
+        active = true;
         email = email.trim();
         password = password.trim();
 
@@ -112,8 +113,8 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
                            />
 </div>                  
                  <div>
-                        <button disabled={!$validity.valid}
-                        class="center hover:scale-150  "    
+                        <button class:active={active} disabled={!$validity.valid}
+                        class="center hover:scale-150 bt "    
                      ></button>
                      </div>
                   
@@ -139,7 +140,15 @@ input{
         margin: 0 auto;
     }
     }
-  
+  .active{
+   cursor:wait;
+     -webkit-animation:spin 17s linear infinite;
+    -moz-animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;
+  }
+  @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
  input:focus {
 color: var(--barbi-pink);
 border: 1px solid var(--barbi-pink);
@@ -184,9 +193,13 @@ margin:  0.5em 4em;
  min-height: 100px;
  min-width: 100px;
  border-radius: 50%;
+        cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
+
     }
    
 .login {
+       cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
+
 position: fixed;
 top: 50%;
 left: 50%;

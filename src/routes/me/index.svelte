@@ -306,12 +306,12 @@ addSl4 = false;
 }
 
 </script>
-
-{#if addP == 0}
+<!--
+{#if addP == 0}href="/oneHomeGr"-->
 <div class="body">
   <div class="name">
-  <a href="/oneHomeGr"><img
-    title="לדף הבית"
+  <a href="/" ><img
+    title=" לדף הבית, בקרוב ללוח הפעולות"
     style="height: 180px; margin: 0 auto;"
     class="hover:scale-200 hover:transform translate-y-20"
     src='https://res.cloudinary.com/love1/image/upload/v1640439191/crown-7_ug9koc.svg'
@@ -335,7 +335,7 @@ addSl4 = false;
   <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}"><Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={"תפקידים"} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} placeholder ={" בחירת תפקידים"}/>  </div>
   <div class:selected="{current === 'a3'}" class:a3="{current !== 'a3'}"><Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} placeholder ={" בחירת משאבים"}/> </div>
   <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={"ערכים"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} placeholder ={" בחירת ערכים"}/>  </div>
-  <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי יצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"work-ways"} placeholder ={" בחירת דרכים"}/> </div>
+  <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי יצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} placeholder ={" בחירת דרכים"}/> </div>
   {/key}
    {/if}
     <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
@@ -371,6 +371,8 @@ addSl4 = false;
             
   {/if}
   {:else}
+      <div class="centr"></div>
+
     <div class="middleu"> 
   {#if addpic == 0}    
     <button
@@ -378,7 +380,8 @@ addSl4 = false;
       style="  position: absolute;
     transform: translate(-50%, -50%);
     top:50%;
-    left: 50%;  "
+    left: 50%;      z-index: 16;
+"
       class="bg-pink-200 hover:bg-barbi text-mturk rounded"
      title=" העלאת תמונת פרופיל" > <svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path transition:draw="{{duration: 1000}}" fill="currentColor" d="M7 19L12 14L13.88 15.88C13.33 16.79 13 17.86 13 19H7M10 10.5C10 9.67 9.33 9 8.5 9S7 9.67 7 10.5 7.67 12 8.5 12 10 11.33 10 10.5M13.09 20H6V4H13V9H18V13.09C18.33 13.04 18.66 13 19 13C19.34 13 19.67 13.04 20 13.09V8L14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H13.81C13.46 21.39 13.21 20.72 13.09 20M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" />
@@ -398,7 +401,8 @@ addSl4 = false;
   
     <h6 style="font-size:17px; color:var(--barbi-pink); margin: 0 auto; padding:0;     text-shadow: 1px 1px  rgb(63, 56, 18);
 ">הפרויקטים שלי</h6>
-     
+<h1>בקרוב...</h1>
+     <!--
    <div >
            {#each myP as data, i}
            <div style="white-space: nowrap;" >  
@@ -424,7 +428,7 @@ addSl4 = false;
                    colors="primary:#ee66aa,secondary:#66eece"
                style="width:42px;height:42px;">
                   </lord-icon> 
-              </button></div>  
+              </button></div>  -->
 </div> 
      
     
@@ -443,16 +447,16 @@ addSl4 = false;
 </div>
 
 </div>
+</div>
 
-
-  </div>
+  <!--
 {:else if addP == 1}
 <button 
 on:click={() => addP = 0} 
 class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 >ביטול</button> 
-  <Addnew userName_value={meData.username}/>
-  {/if}
+  <Addnew userName_value={meData.username}/> 
+  {/if}-->
  <!-- המשימות שסיימתי-->         
 
   <style>
@@ -570,8 +574,8 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     height: 100vh;
       background: url(https://res.cloudinary.com/love1/image/upload/v1640438668/amana_kocsdt.svg) !important;
       background-position: center; 
-      background-size: cover;
-      background-repeat: no-repeat; 
+      background-size: cover !important;
+      background-repeat: no-repeat !important; 
 
     }
     .centr{
@@ -588,7 +592,7 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
-    z-index: 6;
+  /*  z-index: 6;*/
     }
     .name{
     
