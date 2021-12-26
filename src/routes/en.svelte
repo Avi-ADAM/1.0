@@ -7,6 +7,16 @@
    
 <svelte:head>
 	<title>World Security and Peace Convention</title>
+  <!-- Global site tag (gtag.js) - Google Analytics -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
+</script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'UA-191152109-2');
+</script>
 </svelte:head>
 
 <script>
