@@ -73,7 +73,7 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
                 <form on:submit|preventDefault={login} in:fade >
                     <div>
                     {#if loginError}
-                        <h1 style="color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
+                        <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
                         <button
                          on:click={handleclick} 
                          title={buttonForgot}  
