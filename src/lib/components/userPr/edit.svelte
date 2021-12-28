@@ -152,7 +152,7 @@ async function increment() {
  
    
 export let Valname = "כישורים";  
-
+let yy = 0;
 
 function find_id(arra){
      var  arr = [];
@@ -180,17 +180,16 @@ const filterByReference = (allob, id)=> {
 }
 
 function addSK (id){
+  yy = 1;
   list = data;
 const oldob = data;
 const old = oldob.map(c => c.id).map(String);
 const neww = find_id(id);
 let array3 = old.concat(neww);
 array3 = [...new Set([...old,...neww])];
-  console.log(array3);  
 
 const resp = filterByReference(meData, array3);
 const datana = resp;
-console.log(datana)
   dispatch('add', {
     data: datana,
     linkp: linkp,
@@ -200,13 +199,12 @@ console.log(datana)
 }
 
 function min(id){
+  yy = 2;
   list = data;
 const oldob = data;
 const x = oldob.map(c => c.id);
 const indexy = x.indexOf(id);
-console.log(indexy);
 oldob.splice(indexy, 1);
-console.log(oldob);
 dispatch('remove', {
     data: oldob,
     linkp: linkp
@@ -215,6 +213,7 @@ dispatch('remove', {
 }
 
 function open () {
+  //if there is no already , but to check changes
 get ();
   dispatch('open', {
     linkp: linkp,
@@ -222,7 +221,9 @@ get ();
 };
 
 function bitul () {
-  list = data;
+  if (yy == 0){
+    list = data;
+  }
  dispatch('close', {
     linkp: linkp,
     list: list,
@@ -232,6 +233,7 @@ function bitul () {
 export let addR = false;
 export let addW = false;
 function addnew (event) {
+  yy = 3;
 list = data;
 const id = event.detail.id;
 const oldob = data;
