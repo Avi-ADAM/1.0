@@ -222,6 +222,7 @@ get ();
 };
 
 function bitul () {
+  list = data;
  dispatch('close', {
     linkp: linkp,
     list: list,
