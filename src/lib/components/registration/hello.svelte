@@ -75,7 +75,7 @@ function increment() {
 </svg>
 </button>
   
-<a style="position: absolute; top: 90% left 90%" href="https://opensea.io/collection/1love1-collection"><img alt="nft" title=" מכירת nft למימון הפעילות שלנו" src="https://res.cloudinary.com/love1/image/upload/v1640604252/nft-sign-svgrepo-com_a5xvx7.svg"> </a>
+<a style="position: absolute; top: 96% left 90%" href="https://opensea.io/collection/1love1-collection"><img alt="nft" title=" מכירת nft למימון הפעילות שלנו" src="https://res.cloudinary.com/love1/image/upload/v1640604252/nft-sign-svgrepo-com_a5xvx7.svg"> </a>
     
 <style>
 .midscreenText-2 {

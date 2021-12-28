@@ -57,17 +57,17 @@ let cencel = 'ביטול';
  
 {#if addS == false}
 <button
-class="bg-sturk hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
+class="bg-sturk hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-2 rounded"
 on:click={() => addS = true}>הוספת ערך שאינו ברשימה</button>
 {:else}
 <button title={cencel}
 on:click={dispatchb}
-class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold  rounded text-center" ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded text-center" ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
 
 <div>
- <h1 class="font-bold" style="font-size: 1rem; line-height: normal; "> הוספת ערך חדש</h1>    
+ <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--gold); "> הוספת ערך חדש</h1>    
 </div>
 <div dir="rtl" class='textinput'>
   <input  bind:value={name_value} type='text' class='input' required>
@@ -82,7 +82,7 @@ class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold  rounded te
 </div>
 
 <button style="margin-top: 20px; " on:click={addNewVall}
-class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded">הוספה
+class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-1 px-1 rounded">הוספה
 </button>
 
 {/if}
@@ -99,12 +99,13 @@ class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded">ה�
   margin: 0;
   padding: 10px 0;
   outline: none;
-  border-bottom: solid 1px #212121;
+  border-bottom: solid 1px var(--barbi-pink);
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: #212121;
+  color: var(--gold);
   -webkit-tap-highlight-color: transparent;
+  background: transparent;
 }
 
 .label {
@@ -115,7 +116,7 @@ class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-1 px-1 rounded">ה�
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: #212121;
+  color: var(--barbi-pink);
   user-select: none;
 }
 

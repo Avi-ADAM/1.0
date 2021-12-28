@@ -65,13 +65,13 @@
     
     <button title={cencel}
     on:click={dispatchb}
-    class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
+    class=" hover:bg-barbi text-gold hover:text-gold font-bold  p-0.5 rounded"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button> 
       
     <div>
-        <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink) background-color: var(--gold)">הוספת דרך חדשה</h1>    
+        <h1 style="font-size: 1rem; line-height: normal; color: var(--gold);">הוספת דרך חדשה</h1>    
     </div>
 
 <div dir="rtl" class='textinput'>
@@ -108,8 +108,9 @@
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: #212121;
+ color: var(--gold);
   -webkit-tap-highlight-color: transparent;
+  background: transparent;
 }
 
 .label {

@@ -204,8 +204,9 @@ class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold rounded"
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: #212121;
+  color: var(--gold);
   -webkit-tap-highlight-color: transparent;
+  background: transparent;
 }
 
 .label {

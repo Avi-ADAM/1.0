@@ -196,8 +196,9 @@ on:click={() => addro = false}
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: #212121;
+ color: var(--gold);
   -webkit-tap-highlight-color: transparent;
+  background: transparent;
 }
 
 .label {
