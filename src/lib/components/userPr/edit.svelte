@@ -303,10 +303,12 @@ on:click={bitul}
 <Addnewsk  on:addnewskill={addnew} addS={addS}/>
 {:else if datan == "taf"}
 <Addnewr on:addnewrole={addnew} addR={addR}/>
-<!--
-{:else if datan == "mash"}
+
+{:else if datan == "mash"}<!--
 <Addnewn on:addww={addnew} addW={addW}/>
+
 -->
+<h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink);">בקרוב...</h1>
 {:else if datan == "val"}
 <Addnewv/>
 
@@ -318,7 +320,7 @@ on:click={bitul}
       <button
         on:click={increment} 
          title="הוספת {Valname} חדשים"
-    class=" hover:bg-barbi text-mturk hover:text-gold font-bold py-1 px-2 rounded" 
+    class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 rounded" 
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
     </svg>

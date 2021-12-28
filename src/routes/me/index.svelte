@@ -353,7 +353,7 @@ addSl4 = false;
     alt="link"></a></div>
 
   <div id="circular-text"  class="userName" >
-    <svg width="500" height="100" viewBox="0 0 500 100">
+    <svg width="45vw" height="9vw" viewBox="0 0 500 100">
     <path id="curve" d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" />
     <text width="500" id="text" >
       <textPath   text-anchor="center" class="curved-text" xlink:href="#curve" startOffset="150">
@@ -383,10 +383,10 @@ addSl4 = false;
   <!-- <Profile src={picLink}/>--> 
   <div
   class="imgpr"
-    style="border-radius: 50%;  margin-right:auto; margin-left:auto; height: 260px; width: 260px;"  >
+  >
     <img
     class="imgpr"
-    style="border-radius: 50%; z-index: 1; margin-right:auto; margin-left:auto; height: 260px; width: 260px;"  
+  
     src={picLink}
     alt="profilePic">
     </div>
@@ -723,7 +723,7 @@ addSl4 = false;
       <stop offset="0" style="stop-color: rgba(255, 0, 251, 1)"/>
       <stop offset="1" style="stop-color: rgba(153, 0, 150, 1)"/>
     </radialGradient>
-    <linearGradient gradientUnits="userSpaceOnUse" x1="310.778" y1="161.583" x2="310.778" y2="220.333" id="gradient-1" gradientTransform="matrix(2.699794, 0, 0, 1.054363, -528.259358, -10.380798)">
+    <linearGradient gradientUnits="userSpaceOnUse" x1="310.778" y1="161.583" x2="310.778" y2="220.333" id="gradient-1" gradientTransform="matrix(4.538021, 0.000001, 0, 1.297314, -1099.540463, -56.774407)">
       <stop offset="0" style="stop-color: rgb(52, 217, 203);"/>
       <stop offset="0.347" style="stop-opacity: 0.49565; stop-color: rgb(162, 114, 162);"/>
       <stop offset="0.694" style="stop-opacity: 0.81739; stop-color: rgb(217, 190, 243);"/>
@@ -751,6 +751,7 @@ addSl4 = false;
       <stop offset="1" style="stop-color: rgb(221, 209, 94);"/>
     </radialGradient>
   </defs>
+      <title>סך הכל הרווחתי</title>
   <g id="imagebot_2" style="" transform="matrix(1.133505, 0, 0, 1, -5.338863, -2.934956)">
     <g filter="url(#imagebot_164_blur)" id="imagebot_164" transform="translate(0.000976563 0) matrix(1 0 0 1 -349.55 -446.51)">
       <path stroke-width="0" id="imagebot_165" d="M493.61,508.95L459.228,518.7949L431.708,512.5018L493.61,508.95z" style="fill: url(#gradient-44);"/>
@@ -881,9 +882,10 @@ addSl4 = false;
     </g>
     <title>סך הכל הרווחתי</title>
   </g>
-  <path d="M 310.778 159.986 L 367.556 175.472 L 367.556 206.444 L 310.778 221.93 L 254 206.444 L 254 175.472 Z" style="fill: url(#gradient-1); fill-opacity: 0.73;" transform="matrix(0.99646, -0.084069, 0.084068, 0.99646, -181.471886, -69.014609)" bx:shape="n-gon 310.778 190.958 65.562 30.972 6 0 1@5541fb59"/>
-  <text style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 22.4427px; font-weight: 700; stroke: url(#gradient-3); text-anchor: middle; white-space: pre; filter: url(#drop-shadow-filter-0);" transform="matrix(0.490135, 0, 0, 0.609781, 143.706635, 92.741051)">{total} <tspan x="0" dy="1em">​</tspan>💗</text>
-</svg>
+  <path d="M 310.778 152.849 L 406.216 171.904 L 406.216 210.013 L 310.778 229.067 L 215.34 210.013 L 215.34 171.904 Z" style="fill: url(#gradient-1); fill-opacity: 0.73;" transform="matrix(0.999813, 0.019346, -0.019346, 0.999813, -163.843097, -95.620727)" bx:shape="n-gon 310.778 190.958 110.202 38.109 6 0 1@0cc060df"/>
+  <text style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 54.1178px; font-weight: 700; line-height: 288.628px; stroke: url(#gradient-3); text-anchor: middle; white-space: pre; filter: url(#drop-shadow-filter-0);" transform="matrix(0.627037, 0.018356, -0.018632, 0.636449, 145.136673, 107.674744)"><tspan>{total}<tspan x="0" dy="1em">​</tspan> </tspan><tspan x="0" dy="1em">​</tspan><tspan>💗</tspan></text>
+</svg> 
+  
 </div>
 <div class="anothere">
   <button 
@@ -909,6 +911,80 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
  <!-- המשימות שסיימתי-->         
 
   <style>
+    .centr{
+       max-height: 128.25px;
+    max-width: 123px;
+    min-height: 128.25px;
+    min-width: 123px;
+}
+.middle{
+    
+      max-height: 123px;
+    max-width: 123px;
+    min-width:  123px;
+    
+      }
+      .imgpr{
+        height: 100px;
+        width: 100px;
+            top:48.5%;
+
+      }
+             .userName{
+    top: 54.5%;
+       }
+      @media (min-width: 420px) {
+          .userName{
+    top: 55.5%;
+       }
+      }
+@media (min-width: 520px) {
+    .centr{
+       max-height: 227.25px;
+    max-width: 220px;
+    min-height: 227.25px;
+    min-width: 220px;
+}
+.middle{
+    
+      max-height: 220px;
+    max-width: 220px;
+    min-width:  220px;
+    
+      }
+      .imgpr{
+        height: 170px;
+        width: 170px;
+    top:47%;
+      }
+         .userName{
+    top: 60.5%;
+       }
+}
+@media (min-width: 881px) {
+    .centr{
+       max-height: 332px;
+    max-width: 320px;
+    min-height: 332px;
+    min-width: 320px;
+}
+.middle{
+    
+      max-height: 320px;
+    max-width: 320px;
+    min-width:  320px;
+    
+      }
+      .imgpr{
+        height: 260px;
+        width: 260px;
+        
+      }
+       .userName{
+    top: 65.5%;
+       }
+}
+
      :global([data-svelte-dialog-overlay].overlay) {
     z-index: 700;
 
@@ -929,7 +1005,6 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
   .userName{
       position: absolute;
     transform: translate(-50%, -50%);
-    top: 65.5%;
     left: 50%; 
    
     z-index: 289;
@@ -1018,9 +1093,12 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     .imgpr {
       position: absolute;
     transform: translate(-50%, -50%);
-    top:47%;
     left: 50%;
      z-index: 1;
+    border-radius: 50%;
+      margin-right:auto; 
+      margin-left:auto; 
+   
 
 /*   max-width: 100%;
    max-height: 250px !important; */
@@ -1041,9 +1119,8 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     left: 50%; 
     max-height: 332px;
     max-width: 320px;
-       /* border-radius: 50%;*/ 
-    min-height: 332px;
-    min-width: 320px;
+/*    min-height: 332px;
+    min-width: 320px;*/
     background: url(https://res.cloudinary.com/love1/image/upload/v1640438986/goldenP_bz4wu5.svg);/*13ndp*/
     background-position: center; 
     background-repeat: no-repeat; 

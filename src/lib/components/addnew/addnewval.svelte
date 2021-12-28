@@ -57,7 +57,7 @@ let cencel = 'ביטול';
  
 {#if addS == false}
 <button
-class="bg-sturk hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-2 rounded"
+class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-2 rounded"
 on:click={() => addS = true}>הוספת ערך שאינו ברשימה</button>
 {:else}
 <button title={cencel}
@@ -67,7 +67,7 @@ class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded text-center
 </svg></button>
 
 <div>
- <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--gold); "> הוספת ערך חדש</h1>    
+ <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); "> הוספת ערך חדש</h1>    
 </div>
 <div dir="rtl" class='textinput'>
   <input  bind:value={name_value} type='text' class='input' required>
@@ -81,8 +81,11 @@ class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded text-center
   <span class='line'></span>
 </div>
 
-<button style="margin-top: 20px; " on:click={addNewVall}
-class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-1 px-1 rounded">הוספה
+<button style="margin-top: 20px; " on:click={addNewVall} 
+title="הוספה"
+class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded"><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+  <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
+</svg>
 </button>
 
 {/if}
@@ -99,7 +102,7 @@ class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-1 px-1 rou
   margin: 0;
   padding: 10px 0;
   outline: none;
-  border-bottom: solid 1px var(--barbi-pink);
+  border-bottom: solid 1px var(--gold);
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
@@ -116,7 +119,7 @@ class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-1 px-1 rou
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--barbi-pink);
+  color: var(--gold);
   user-select: none;
 }
 
