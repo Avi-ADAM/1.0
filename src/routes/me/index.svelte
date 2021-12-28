@@ -53,7 +53,67 @@ let addsL = false;
   let name;
     let totalErning = "2000";
   let addP = 0;
+ let namer = [];
+    let st = 0;
+    let stylef = '31px';
 
+function letters(data){
+  console.log(data);
+  
+   if (data.length >= 2 && data.length < 4) {
+        st = 185;
+     } 
+  else if (data.length >= 4 && data.length < 5) {
+        st = 180;
+     } 
+  else if (data.length >= 5 && data.length < 6) {
+        st = 170;
+     } else if (data.length >= 6 && data.length < 7) {
+        st = 165
+     } else if (data.length >= 7 && data.length < 8) {
+        st = 160
+     }else if (data.length >= 8 && data.length < 9) {
+        st = 150
+     }else if (data.length >= 9 && data.length < 10) {
+            st = 140
+     }else if (data.length >= 10 && data.length < 11) {
+            st = 130;
+     }else if (data.length >= 11 && data.length < 12) {
+            st = 135;
+            stylef = '29px';
+    } else  if (data.length >= 12 && data.length <13) {
+                st = 130;
+                stylef = '29px';
+     }else  if (data.length >= 13 && data.length <14) {
+                st = 125;
+                stylef = '25px';
+     }else  if (data.length >= 14 && data.length <15) {
+                st = 125;
+                stylef = '25px';
+     }else  if (data.length >= 15 && data.length <17) {
+                st = 125;
+                stylef = '25px';
+     }else  if (data.length >= 17 && data.length <19) {
+                st = 130;
+                stylef = '19px';
+     }else  if (data.length >= 19 && data.length <20) {
+                st = 130;
+                stylef = '17px';
+     }else  if (data.length >= 20 && data.length <21) {
+                st = 125;
+                stylef = '17px';
+     }else  if (data.length >= 21 && data.length <22) {
+                st = 125;
+                stylef = '16px';
+     } else  if (data.length >= 22){
+                       st = 125;
+         stylef = '14px';
+    }
+   // if ((/[\u0590-\u05FF]/).test(data) | (/[\u0600-\u06FF]/).test(data)) {
+    //  st += 20;
+    //  }
+}
+//
     function sendP () {
     const cookieValue = document.cookie
   .split('; ')
@@ -143,6 +203,7 @@ onMount(async () => {
             }).then(checkStatus)
           .then(parseJSON);
             meData = res;
+          letters(meData.username);
             myP = meData.projects_1s;
             skil = meData.skills;
             taf = meData.tafkidims;
@@ -343,7 +404,7 @@ addSl4 = false;
 </DialogOverlay>
 <!--
 {#if addP == 0}href="/oneHomeGr"-->
-<div class="body">
+<div class="body"  style="--the:{stylef};">
   <div class="name">
   <a href="/" ><img
     title=" לדף הבית, בקרוב ללוח הפעולות"
@@ -356,8 +417,7 @@ addSl4 = false;
     <svg width="45vw" height="9vw" viewBox="0 0 500 100">
     <path id="curve" d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" />
     <text width="500" id="text" >
-      <textPath   text-anchor="center" class="curved-text" xlink:href="#curve" startOffset="150">
-{meData.username}      </textPath>
+      <textPath  text-anchor="center" class="curved-text" xlink:href="#curve" startOffset="{st}">{meData.username}</textPath>
     </text>
   </svg>
     </div>
@@ -999,7 +1059,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 .curved-text{
   fill: var(--barbi-pink) /* rgb(238 12 109)*/;
   text-anchor: center;
-    font-size: 31px;
+    font-size: var(--the, 31px);
     text-shadow: 1px 1px  rgb(63, 56, 18);
 }
   .userName{
