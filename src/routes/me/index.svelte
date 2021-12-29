@@ -408,7 +408,7 @@ addSl4 = false;
   <div class="name">
   <a href="/" ><img
     title=" לדף הבית, בקרוב ללוח הפעולות"
-    style="height: 180px; margin: 0 auto;"
+    style="height: 29vh; margin: 0 auto;"
     class="hover:scale-200 hover:transform translate-y-20"
     src='https://res.cloudinary.com/love1/image/upload/v1640439191/crown-7_ug9koc.svg'
     alt="link"></a></div>
@@ -523,7 +523,7 @@ addSl4 = false;
     
 </div> 
 <div class="anotheri">
-  <svg width="170" height="170" viewBox="10.359 38.373 262.893 179.464" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <svg width="24vw" height="24vh" viewBox="10.359 38.373 262.893 179.464" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
   <defs>
     <linearGradient id="imagebot_157">
       <stop offset="0" stop-color="#0a062b" id="imagebot_163"/>
@@ -972,27 +972,30 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 
   <style>
     .centr{
-       max-height: 128.25px;
-    max-width: 123px;
-    min-height: 128.25px;
-    min-width: 123px;
+       max-height: 20.52vh;
+    max-width: 19.68vh;
+    min-height: 20.52vh;
+    min-width: 19.68vh;
 }
 .middle{
     
-      max-height: 123px;
-    max-width: 123px;
-    min-width:  123px;
+      max-height: 19.68vh;
+    max-width: 19.68vh;
+    min-width: 19.68vh;
     
       }
       .imgpr{
-        height: 100px;
-        width: 100px;
+        height: 16vh;
+        width: 16vh;
             top:48.5%;
 
       }
              .userName{
-    top: 54.5%;
+    top: 55.5%;
        }
+         .name{
+             top: 20%;
+           }
       @media (min-width: 420px) {
           .userName{
     top: 55.5%;
@@ -1000,49 +1003,72 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
       }
 @media (min-width: 520px) {
     .centr{
-       max-height: 227.25px;
-    max-width: 220px;
-    min-height: 227.25px;
-    min-width: 220px;
+       max-height: 36.36vh;
+    max-width: 35.2vh;
+    min-height: 36.36vh;
+    min-width: 35.2vh;
 }
 .middle{
     
-      max-height: 220px;
-    max-width: 220px;
-    min-width:  220px;
+      max-height: 35.2vh;
+    max-width: 35.2vh;
+    min-width:  35.2vh;
     
       }
       .imgpr{
-        height: 170px;
-        width: 170px;
+        height: 27.2vh;
+        width: 27.2vh;
     top:47%;
       }
          .userName{
     top: 60.5%;
        }
+        .name{
+             top: 20%;
+           }
+
 }
-@media (min-width: 881px) {
+@media (min-width: 892px) {
     .centr{
-       max-height: 332px;
-    max-width: 320px;
-    min-height: 332px;
-    min-width: 320px;
+       max-height: 53.12vh;
+    max-width: 51.2vh;
+    min-height: 53.12vh;
+    min-width: 51.2vh;
 }
 .middle{
     
-      max-height: 320px;
-    max-width: 320px;
-    min-width:  320px;
+      max-height: 51.2vh;
+    max-width: 51.2vh;
+    min-width:  51.2vh;
     
       }
       .imgpr{
-        height: 260px;
-        width: 260px;
-        
+        height: 41.6vh;
+        width: 41.6vh;
+        top:47%;
+
       }
        .userName{
     top: 65.5%;
        }
+           .name{
+             top: 0%;
+           }
+}
+@media (min-height: 620px) and (min-width: 892px) {
+    .name{
+             top: 8%;
+           }
+}
+@media (min-height: 500px) and (min-width: 520px) {
+    .name{
+             top: 8%;
+           }
+}
+@media (min-height: 620px) and (min-width: 520px) {
+    .name{
+             top: 10%;
+           }
 }
 
      :global([data-svelte-dialog-overlay].overlay) {
@@ -1177,8 +1203,7 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     transform: translate(-50%, -50%);
     top:50%;
     left: 50%; 
-    max-height: 332px;
-    max-width: 320px;
+   
 /*    min-height: 332px;
     min-width: 320px;*/
     background: url(https://res.cloudinary.com/love1/image/upload/v1640438986/goldenP_bz4wu5.svg);/*13ndp*/
@@ -1191,7 +1216,6 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     
   position: absolute;
     transform: translate(-50%, -50%);
-    top: 8%;
     left: 50%; 
     z-index: 10;
   /*  background: url(ceter.png);
