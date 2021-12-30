@@ -86,8 +86,8 @@ function shaneh () {
 <option value="6">שישי</option>
 <option value="7">שבת</option>
 </select>-->
-<button type="button" on:click={logout} class="bg-gold text-red-800 hover:text-gold hover:bg-red-800">יציאה מהחשבון במכשיר זה</button>
-<button type="button" on:click={()=> change = true} class="bg-gold text-barbi hover:text-gold hover:bg-barbi">שינו ססמה</button>
+<button type="button" on:click={logout} class="bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded">יציאה מהחשבון במכשיר זה</button>
+
 
 {#if change}
 {#if before}
@@ -156,7 +156,7 @@ function shaneh () {
 			</li>
 		</ul>
 
-		<button on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
+		<button class="bg:gold hover:bg-barbi text-barbi hover:text-gold" on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
 	</form>
 </main>
 
@@ -166,6 +166,9 @@ function shaneh () {
 <h1>הסיסמה שונתה בהצלחה</h1>
 
     {/if}
+    {:else}
+    <button type="button" on:click={()=> change = true} class="bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded ">שינוי סיסמה</button>
+
     {/if}
 <style>
 
@@ -274,7 +277,7 @@ function shaneh () {
 		color: var(--gold);
 		opacity: 0.8;
 	}
-	/* Buttons */
+	/* Buttons 
 	button {
 		margin-top: 2rem;
 		padding: 5px 20px 10px 20px;
@@ -285,10 +288,10 @@ function shaneh () {
 		transition: all 1000ms;
     margin-left: 1rem;
     margin-right: auto;
-	}
+	}*/
 	button:disabled {
 		border-color: var(--gold);
-		color: var(--gold);
+		color: rgb(153, 255, 0);
 	}
 	.toggle-password {
 		position: absolute;

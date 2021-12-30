@@ -29,6 +29,8 @@ import { fly } from 'svelte/transition';
     let allvn = []
      export let addS = false;
     let list = [];
+    let listt = [];
+    export let kish;
 //  export let a = "";
     export let linkp = "skills";
     let link =`https://strapi-k4vr.onrender.com/graphql?_limit=-1`;
@@ -126,11 +128,11 @@ async function increment() {
            `mutation { updateUser(
     input: {
       where: { id: "${uid}" }
-      data: { ${linkpe}: [${list}] }
+      data: { ${kish}: [${list}] }
     }
   ){
       user {
-          ${linkpe}{
+          ${kish}{
               id
           }
       }
@@ -181,7 +183,7 @@ const filterByReference = (allob, id)=> {
 
 function addSK (id){
   yy = 1;
-  list = data;
+  listt = data;
 const oldob = data;
 const old = oldob.map(c => c.id).map(String);
 const neww = find_id(id);
@@ -200,7 +202,7 @@ const datana = resp;
 
 function min(id){
   yy = 2;
-  list = data;
+  listt = data;
 const oldob = data;
 const x = oldob.map(c => c.id);
 const indexy = x.indexOf(id);
@@ -222,11 +224,11 @@ get ();
 
 function bitul () {
   if (yy == 0){
-    list = data;
+    listt = data;
   }
  dispatch('close', {
     linkp: linkp,
-    list: list,
+    list: listt,
     } );
 };
 
@@ -234,7 +236,7 @@ export let addR = false;
 export let addW = false;
 function addnew (event) {
   yy = 3;
-list = data;
+listt = data;
 const id = event.detail.id;
 const oldob = data;
 const old = oldob.map(c => c.id);
