@@ -7,6 +7,8 @@
 import Addnewp from '../../lib/components/userPr/uploadPic.svelte';
 import { uPic } from  '../../lib/stores/uPic.js';
 import Edit from '../../lib/components/userPr/edit.svelte';
+import EditB from '../../lib/components/userPr/editBasic.svelte';
+
 //import Profile from '../../lib/components/userPr/new.svelte';
 //import { addS } from '../../lib/stores/addS.js';
 //import { idPr } from '../../lib/stores/idPr.js';
@@ -15,11 +17,7 @@ import Edit from '../../lib/components/userPr/edit.svelte';
       import {  fly } from 'svelte/transition';
 
 let isOpen = false;
- const closer = () => {
-    isOpen = false;
-    updX = 0;
-  addpic = 0;
-  };
+
     let current = "";
 
     let url1 = "https://strapi-k4vr.onrender.com/upload";
@@ -45,7 +43,7 @@ let addSl2 = false;
 let addSl3 = false;
 let addSl4 = false;
 let addSl5 = false;
- 
+ let a = 0;
 let addNs1 = true;  
 let addsL = false;
   let error1 = null;
@@ -166,7 +164,7 @@ function letters(data){
 //    idPr.set(id);
 //    goto("/projectPrivat", );
 //  };
-
+let mail;
 onMount(async () => {
     const cookieValue = document.cookie
   .split('; ')
@@ -210,6 +208,7 @@ onMount(async () => {
             val = meData.vallues;
             mash = meData.mashaabims;
             work = meData.work_ways;
+            mail = meData.email;
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
             uPic.set(meData.profilePic.formats.thumbnail.url);
@@ -325,7 +324,16 @@ console.log (meDatanew);
             work = meData.work_ways;
   addNs1 = true;
 };
-
+ const closer = () => {
+    isOpen = false;
+    updX = 0;
+  addpic = 0;
+  a = 0;
+  };
+  function basic (){
+      isOpen = true;
+      a = 1;
+  }
 function openen () {
   isOpen = true;
   updX = 1;
@@ -398,7 +406,11 @@ addSl4 = false;
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded"
           on:click={closer}>ביטול</button>
+          {#if a == 0}
           <Addnewp on:message={callbackFunction}/>
+          {:else if a == 1}
+          <EditB {mail}/>
+          {/if}
   </DialogContent>
   </div>
 </DialogOverlay>
@@ -453,8 +465,7 @@ addSl4 = false;
    {#if updX == 0}
    <button
      on:click={openen}
-     class=" hover:bg-barbi text-mturk rounded"
-     style="z-index: 20; margin-right:auto; margin-left:auto ; position: absolute ; top: 72.2%; left: 48%;  transform: translate(-50%, -50%); z-index: 289; "
+     class=" hover:bg-barbi text-mturk rounded edit"
      title="עריכת תמונת פרופיל"
      >  <svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path transition:draw="{{duration: 1000}}" fill="currentColor" d="M22.7 14.3L21.7 15.3L19.7 13.3L20.7 12.3C20.8 12.2 20.9 12.1 21.1 12.1C21.2 12.1 21.4 12.2 21.5 12.3L22.8 13.6C22.9 13.8 22.9 14.1 22.7 14.3M13 19.9V22H15.1L21.2 15.9L19.2 13.9L13 19.9M11.21 15.83L9.25 13.47L6.5 17H13.12L15.66 14.55L13.96 12.29L11.21 15.83M11 19.9V19.05L11.05 19H5V5H19V11.31L21 9.38V5C21 3.9 20.11 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H11V19.9Z" />
@@ -469,11 +480,7 @@ addSl4 = false;
   {#if addpic == 0}    
     <button
       on:click={openen}
-      style="  position: absolute;
-    transform: translate(-50%, -50%);
-    top: 72.2%; left: 48%; z-index: 216;
-"
-      class=" hover:bg-barbi text-mturk rounded"
+ class=" hover:bg-barbi text-mturk rounded haalaa"
      title=" העלאת תמונת פרופיל" > <svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path transition:draw="{{duration: 1000}}" fill="currentColor" d="M7 19L12 14L13.88 15.88C13.33 16.79 13 17.86 13 19H7M10 10.5C10 9.67 9.33 9 8.5 9S7 9.67 7 10.5 7.67 12 8.5 12 10 11.33 10 10.5M13.09 20H6V4H13V9H18V13.09C18.33 13.04 18.66 13 19 13C19.34 13 19.67 13.04 20 13.09V8L14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H13.81C13.46 21.39 13.21 20.72 13.09 20M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" />
 </svg>
@@ -523,7 +530,7 @@ addSl4 = false;
     
 </div> 
 <div class="anotheri">
-  <svg width="24vw" height="24vh" viewBox="10.359 38.373 262.893 179.464" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+  <svg class="svgg"  viewBox="10.359 38.373 262.893 179.464" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
   <defs>
     <linearGradient id="imagebot_157">
       <stop offset="0" stop-color="#0a062b" id="imagebot_163"/>
@@ -947,16 +954,17 @@ addSl4 = false;
 </svg> 
   
 </div>
+{#if a == 0}
 <div class="anothere">
   <button 
-  on:click={()=> alert('soon')} 
+  on:click={basic} 
   title="עריכת פרטים בסיסיים"
   class=" hover:bg-barbi text-mturk rounded"
   ><svg  style="width:24px;height:24px" viewBox="0 0 24 24">
  <path transition:draw="{{duration: 1000}}" fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
 </svg></button>
 </div>
-
+{/if}
 </div>
 </div>
 
@@ -971,6 +979,32 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
  <!-- המשימות שסיימתי-->         
 
   <style>
+    .anothere{
+      position : absolute;
+      top: 72.2%;
+          left: 52%;
+    }
+    .edit{
+    z-index: 20;
+     margin-right:auto; 
+     margin-left:auto ; 
+     position: absolute ; 
+     top: 72.2%;
+      left: 48%; 
+       transform: translate(-50%, -50%);
+    }
+
+    .svgg{
+      width: 24vw;
+       height: 24vh;
+    }
+    .haalaa {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 72.2%;
+    left: 48%;
+    z-index: 16; 
+    }
     .centr{
        max-height: 20.52vh;
     max-width: 19.68vh;
@@ -1093,7 +1127,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
     transform: translate(-50%, -50%);
     left: 50%; 
    
-    z-index: 289;
+    z-index: 10;
     }
 .a1{
   position: absolute;
@@ -1290,7 +1324,7 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
       top: 72.2%;
           left: 52%;
           transform: translate(-50%, -50%);
-                  z-index: 299;   
+                  z-index: 209;   
      background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
