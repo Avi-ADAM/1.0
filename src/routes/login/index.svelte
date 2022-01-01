@@ -38,8 +38,8 @@
                 password,
             })
             .then(({ data }) => {
-                document.cookie = `jwt=${data.jwt}; expires=` + new Date(2022, 0, 1).toUTCString();
-                document.cookie = `id=${data.user.id}; expires=` + new Date(2022, 0, 1).toUTCString();
+                document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
+                document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);

@@ -327,8 +327,8 @@ onSubmit: values => {
             }})
   .then(response => {
    already = true;
-   document.cookie = `email=${mail}; expires=` + new Date(2022, 0, 1).toUTCString();
-       document.cookie = `un=${$form.name}; expires=` + new Date(2022, 0, 1).toUTCString();
+   document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
+       document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
    userName.set($form.name);
             email.set($form.email);
             regHelper.set(1);

@@ -20,6 +20,8 @@
 </svelte:head>
 
 <script>
+      import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+
       import { userName } from '../lib/stores/store.js';
   import Amana1 from "../lib/components/main/amana.svelte"
   import One from "../lib/components/main/bein.svelte"
@@ -57,6 +59,7 @@ onMount(async () => {
             error = e
         }
     });
+	let user;
 
    let kvar;
     onMount(async () => {
@@ -72,8 +75,12 @@ const un = document.cookie
   .find(row => row.startsWith('un='))
   .split('=')[1];
    userName.set(un);
-
-  }
+const reg = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+user = reg;
+}
     });
 
 
@@ -84,7 +91,6 @@ regHelper.subscribe(value => {
   regHelperL = value;
 });
 
-	let user = { signed: false };
 
 	function toggle() {
 		regHelperL = 0;
@@ -94,11 +100,13 @@ regHelper.subscribe(value => {
 </script>
 
 <div class="main">
-
+{#if user > 0}
+{ goto("/login", )}
+{:else}
   {#if kvar}
 <One {idx} />
 
-<!--{ goto("/oneHomeGr", )}
+<!--
 todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית לקחת פרטים מהקוקיות או מלוקלסטורג'--> 
 {:else}
 {#if regHelperL == 1}
@@ -113,7 +121,7 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
 {/if}
   
 {/if}
-
+{/if}
  </div>
 
 

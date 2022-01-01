@@ -59,8 +59,8 @@ axios
     vallues: vallues,
   })
   .then(response => {
-    document.cookie = `jwt=${data.jwt}; expires=` + new Date(2022, 0, 1).toUTCString();
-    document.cookie = `id=${data.user.id}; expires=` + new Date(2022, 0, 1).toUTCString();
+    document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
 	dispatch ('progres',{
 		tx: 0,
 		txx: 0
@@ -110,7 +110,7 @@ axios
 
 <main>
 	<form>
-		 <h1 class="midscreenText-2">
+		 <h1 title="מהי הסיסמה שלך" class="midscreenText-2">
         {userName_value}
       <br>
     מה היא מילת הקסם שלך
