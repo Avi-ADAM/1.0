@@ -165,10 +165,10 @@ function back() {
 		</ul>
 <div class="but">
 		  <button class="button-in-1-2" on:click="{increment}"  disabled={strength < 4}>
-    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
+    <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
     </button>
   <button class="button-2" on:click="{back}">
-    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
     </button>
 </div>
 	</form>
@@ -293,8 +293,7 @@ function back() {
 	}
 
 .midscreenText-2 {
-      grid-column: 1 /4;
-      grid-row: 1/ 2;
+     margin: 17vh auto 0 auto;
       align-self: center;
       justify-self: center;
 	  max-width: 100vw;
@@ -302,13 +301,11 @@ function back() {
       line-height: normal;
       font-weight: 900;
       color: var(--barbi-pink);
-      margin-top: 75px;
       background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
       background-size: 29.5rem 9.75rem;
       height: 9.75rem;
       width: 29.5rem;
 text-align: center; 
-  margin-top: 17vh;
 padding-top: 8px;
 padding-right: 25px;
 padding-left: 25px;
@@ -330,7 +327,8 @@ margin: 2rem auto 0 auto;
 	.but{
 		display:flex;
 		flex-direction: row;
-justify-content: space-between;	}
+justify-content: space-between;	
+}
 	.button-in-1-2{
    
     align-self: center;
@@ -355,6 +353,9 @@ justify-content: space-between;	}
     background: var(--gold);
     text-align: center;
 }
+.img-4{
+	height: 15vh;
+}
 @media (max-width:500px){
 	 .midscreenText-2 {
 		   background-size: 16.5rem 5rem;
@@ -363,6 +364,9 @@ justify-content: space-between;	}
   font-size: 1rem;
     margin-top: 26vh;
 	 }
+.img-4{
+	height: 10vh;
+}
 }
    
 </style>
