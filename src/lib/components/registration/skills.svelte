@@ -73,11 +73,23 @@ show.subscribe(newValue => {
 
 function increment() {
 		show.update(n => n + 1);
-    skills1.set(find_skill_id(selected));
     dispatch ('progres',{
 		tx: 0,
 		txx: 16
-	} )
+	} );
+    skills1.set(find_skill_id(selected));
+    
+    
+	}
+  
+function back() {
+		show.update(n => n - 1);
+       dispatch ('progres',{
+		tx: 600,
+		txx: 20
+	} );
+    skills1.set(find_skill_id(selected));
+ 
     
 	}
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -135,15 +147,17 @@ selected = newSele;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
   >הוספת כישור שאינו ברשימה</button>
   </div>
-    <button class="button-in-1-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
-    להמשיך
+    <button class="button-in-1-2" on:click="{increment}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
     </button>
-  
+  <button class="button-2" on:click="{back}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    </button>
 
 <style>
 
     .midscreenText-2 {
-      grid-column: 1 /4;
+      grid-column: 1 /5;
   grid-row: 1/ 2;
   align-self: center;
   justify-self: center;
@@ -171,29 +185,38 @@ selected = newSele;
  .input-2{
     grid-column: 2/4;
     grid-row: 2/3;
-        margin-top:0;
-
-    }
+           align-self: center;
+    justify-self: center;
+  }
+    
 }
     .input-2-2{
-    grid-column: 1/4;
+    grid-column: 1/5;
     grid-row: 5/6;
     text-align: center;
-
+    margin: 0 auto;
     }
     .button-in-1-2{
-    grid-column: 2/3;
+    grid-column: 1/2;
     grid-row: 8/9;
-    background: var(--barbi-pink);
-    border-radius: 50%;
-    color: var(--gold);
-    }
+    align-self: center;
+    justify-self: center;
+  }
+    .button-2{
+      grid-column: 4/5;
+      grid-row:8/9;
+       align-self: center;
+    justify-self: center;
+  }
    
     .input-2{
-    grid-column: 2/3;
+    grid-column: 2/4;
     grid-row: 2/3;
     text-align: center;
-            margin-top: -8vh;
+            margin-top: -4vh;
+               align-self: center;
+    justify-self: center;
+  
 
     }
    

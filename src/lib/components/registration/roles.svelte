@@ -75,11 +75,21 @@ show.subscribe(newValue => {
 
 function increment() {
 		show.update(n => n + 1);
-    roles2.set(find_role_id(selected));
-    dispatch ('progres',{
+     dispatch ('progres',{
 		tx: 0,
-		txx: 12
-	} )
+		txx: 11
+	} );
+    roles2.set(find_role_id(selected));
+   
+	}
+  function back() {
+		show.update(n => n - 1);
+      dispatch ('progres',{
+		tx: 0,
+		txx: 20
+	} );
+    roles2.set(find_role_id(selected));
+  
 	}
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
@@ -138,8 +148,12 @@ selected = newSele;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת תפקיד שאינו ברשימה</button>
     </div>
-   <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
-להמשיך      </button>
+    <button class="button-in-1-2" on:click="{increment}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
+    </button>
+  <button class="button-2" on:click="{back}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    </button>
 
 
 <style>
@@ -182,15 +196,19 @@ selected = newSele;
     }
 }
  
-  
-    .button-in-2{
-    grid-column: 2/3;
+   .button-in-1-2{
+    grid-column: 1/2;
     grid-row: 7 / 8;
-     background: var(--barbi-pink);
-    border-radius: 50%;
-    color: var(--gold);
-    padding: 5px;
-    }
+    align-self: center;
+    justify-self: center;
+  }
+    .button-2{
+      grid-column: 4/5;
+    grid-row: 7 / 8;
+       align-self: center;
+    justify-self: center;
+  }
+    
     .input-2{
     grid-column: 2/4;
     grid-row: 2/3;

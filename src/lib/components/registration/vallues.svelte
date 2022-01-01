@@ -80,6 +80,16 @@ function increment() {
 		txx: 20
 	} )
 	}
+
+  function back() {
+		show.update(n => n - 1);
+    valluss.set(find_value_id(selected));
+    dispatch ('progres',{
+		tx: 600,
+		txx: 20
+	} )
+	}
+
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
 
@@ -136,9 +146,12 @@ selected = newSele;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת ערך חדש</button>
     </div>
-   <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
-להמשיך      </button>
-
+     <button class="button-in-2" on:click="{increment}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
+    </button>
+  <button class="button-2" on:click="{back}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    </button>
 
 <style>
     .midscreenText-2 {
@@ -175,14 +188,18 @@ selected = newSele;
     }
 }
     .button-in-2{
-    grid-column: 2/3;
+    grid-column: 1/2;
     grid-row: 7 / 8;
-    background-color: var(--barbi-pink);
-        text-align: center;
-      padding: 5px;
-      border-radius: 50%;
-      color: var(--gold)
-    }
+    align-self: center;
+    justify-self: center;
+  }
+    .button-2{
+      grid-column: 4/5;
+    grid-row: 7 / 8;
+       align-self: center;
+    justify-self: center;
+  }
+   
     .input-2{
     grid-column: 2/4;
     grid-row: 2/3;

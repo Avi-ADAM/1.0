@@ -77,13 +77,22 @@ show.subscribe(newValue => {
 
 function increment() {
 		show.update(n => n + 1);
-    workways1.set(find_workway_id(selected));
     dispatch ('progres',{
 		tx: 0,
 		txx: 8
-	} )
+	} );
+    workways1.set(find_workway_id(selected));
+   
 	}
-
+function back() {
+		show.update(n => n - 1);
+     dispatch ('progres',{
+		tx: 0,
+		txx: 16
+	} );
+    workways1.set(find_workway_id(selected));
+   
+	}
 
 
 
@@ -135,8 +144,12 @@ let isOpen = false;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
       >הוספת חדשה</button>
     </div>
-   <button class="button-in-2 hover:bg-gold hover:text-barbi" on:click="{increment}">
-להמשיך      </button>
+  <button class="button-in-1-2" on:click="{increment}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
+    </button>
+  <button class="button-2" on:click="{back}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    </button>
 
 
 <style>
@@ -173,15 +186,20 @@ let isOpen = false;
 
     }
 }
-    .button-in-2{
-    grid-column: 2/3;
+    
+   
+   .button-in-1-2{
+    grid-column: 1/2;
     grid-row: 7 / 8;
-    background-color: var(--barbi-pink);
-        text-align: center;
-      padding: 5px;
-      border-radius: 50%;
-      color: var(--gold)
-    }
+    align-self: center;
+    justify-self: center;
+  }
+    .button-2{
+      grid-column: 4/5;
+    grid-row: 7 / 8;
+       align-self: center;
+    justify-self: center;
+  }
     .input-2{
     grid-column: 2/4;
     grid-row: 2/3;

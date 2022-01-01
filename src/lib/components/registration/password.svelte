@@ -71,7 +71,15 @@ axios
   });
 	}
 
-
+  
+function back() {
+		show.update(n => n - 1);
+    dispatch ('progres',{
+		tx: 0,
+		txx: 11
+	} )
+    
+	}
 	let strength = 0;
 	let validations = [];
 	let showPassword = false;
@@ -155,8 +163,14 @@ axios
 				{validations[3] ? "🏆" : "❌"} ולפחות סמל אחד ($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
 			</li>
 		</ul>
-
-		<button class="button-in" on:click={increment} disabled={strength < 4}>להרשמה</button>
+<div class="but">
+		  <button class="button-in-1-2" on:click="{increment}"  disabled={strength < 4}>
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
+    </button>
+  <button class="button-2" on:click="{back}">
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    </button>
+</div>
 	</form>
 </main>
 
@@ -268,19 +282,8 @@ axios
 		opacity: 0.8;
 	}
 	/* Buttons */
-	button {
-		margin-top: 2rem;
-		padding: 5px 20px 10px 20px;
-		font-weight: bold;
-		border: 2px solid greenyellow;
-		color: greenyellow;
-		background: transparent;
-		transition: all 1000ms;
-	}
-	button:disabled {
-		border-color: var(--gold);
-		color: var(--gold);
-	}
+	
+	
 	.toggle-password {
 		position: absolute;
 		cursor: help;
@@ -324,6 +327,20 @@ padding-left: 25px;
 	    text-align: center;
 margin: 2rem auto 0 auto;
     }
+	.but{
+		display:flex;
+		flex-direction: row;
+justify-content: space-between;	}
+	.button-in-1-2{
+   
+    align-self: center;
+    justify-self: center;
+  }
+    .button-2{
+      
+       align-self: center;
+    justify-self: center;
+  }
    
     .input{
    
