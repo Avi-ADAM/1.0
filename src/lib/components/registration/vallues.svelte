@@ -147,10 +147,10 @@ selected = newSele;
       >הוספת ערך חדש</button>
     </div>
      <button class="button-in-2" on:click="{increment}">
-    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
     </button>
   <button class="button-2" on:click="{back}">
-    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg"/>
     </button>
 
 <style>

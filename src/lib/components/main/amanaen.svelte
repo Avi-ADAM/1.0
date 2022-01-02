@@ -587,7 +587,7 @@ background-color:var(--lturk);
     width: 100vw;
     height:100vh;
     margin:0px auto;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088864/SHALOM1_awkhot.svg);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641148938/news_nvsgba.svg);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -675,7 +675,7 @@ left: 45.2%;
   .button {
     justify-self: center;
           align-self: center;   
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162205/anglit-removebg-preview_dcb8nd.png);  
  background-repeat: no-repeat;
  background-size: 170px;
  margin: auto;
@@ -738,7 +738,7 @@ left: 45.2%;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162205/anglit-removebg-preview_dcb8nd.png);  
     background-repeat: no-repeat;
     background-size: 170px;
     margin: auto;
@@ -827,7 +827,7 @@ background-position: center;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162205/anglit-removebg-preview_dcb8nd.png);  
     background-repeat: no-repeat;
     background-size: 170px;
     margin: auto;
@@ -932,7 +932,7 @@ background-position: center;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639322184/bu_bubcta.png);  
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162205/anglit-removebg-preview_dcb8nd.png);  
     background-repeat: no-repeat;
     background-size: 130px;
     margin: auto;

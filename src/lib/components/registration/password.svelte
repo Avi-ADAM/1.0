@@ -165,10 +165,10 @@ function back() {
 		</ul>
 <div class="but">
 		  <button class="button-in-1-2" on:click="{increment}"  disabled={strength < 4}>
-    <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641054292/kadima_eozauj.svg"/>
+    <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
     </button>
   <button class="button-2" on:click="{back}">
-    <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641054292/azara_uthnhk.svg"/>
+    <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg"/>
     </button>
 </div>
 	</form>
