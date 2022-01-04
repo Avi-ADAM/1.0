@@ -125,10 +125,10 @@ function letters(data){
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     let link ="https://strapi-k4vr.onrender.com/users/" + idLi ;
-    let fd = new FormData();
-        fd.append('files', files[0]);
+  //  let fd = new FormData();
+     //   fd.append('files', files[0]);
       axios
-     .post( url1, fd  ,{
+     .post( url1, files  ,{
                     headers: {
                         Authorization: bearer1,
                     },
@@ -268,6 +268,7 @@ onMount(async () => {
  
 	function callbackFunction(event) {
     files = event.detail.files;
+    console.log(files);
     sendP ();
 	}
 

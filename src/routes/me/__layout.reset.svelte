@@ -26,6 +26,6 @@ function login () {
     <slot />
 {:else}
 <h1>הגעת לעמוד הדורש הרשמה</h1>
-<button on:click={reg}>להרשמה</button>
-<button on:click={login}>להתחברות</button>
+<button class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded" on:click={reg}>להרשמה</button>
+<button class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded" on:click={login}>להתחברות</button>
 {/if}
