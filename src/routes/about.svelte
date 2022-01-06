@@ -17,15 +17,17 @@
 	<div dir="rtl" style=" padding: 1vh  8vw 0 8vw;
  text-align: center;  font-size: 100%;
  color: var(--barbi-pink); width: 100vw; " >
-<br/>	בני אדם יהיו חופשיים רק אם יתנהלו ביניהם בהדדיות ומתוך הסכמה.
-בכל שפה, תרבות ומדינה הערכים הללו מקובלים, ובכל זאת עדיין ישנן מלחמות וישנה אלימות.
+	בני אדם הם חופשיים כאשר הם מתנהלים בהדדיות ומתוך הסכמה.<br/>
+בכל שפה, תרבות ומדינה הערכים הללו מקובלים, ובכל זאת עדיין ישנן מלחמות, כפיה ואלימות.
 <br/>
-הניסוח אוניברסלי ומאחד בין כל בני האדם שחפצים בחיים חופשיים מאלימות. 
+הניסוח האוניברסלי מאחד בין כל החפצים בחיים חופשיים מאלימות. 
 <br/>
-ניסוח עליו מסכימים כולם וגורם לבני אדם ממדינות, לאומים ותרבויות שונות
+ניסוח אחיד עליו מסכימים כולם, גורם לבני אדם ממדינות, לאומים ותרבויות שונות
 לבטוח זה בזה, לדעת כי ערך החיים נמצא אצל כולם מעל הכל, ולהגיע להסכמה הדדית​
 <br/>
  הארות הערות וכל דבר למייל ehad1one@gmail.com
+ <br/>
+1❤️1
 </div>		
 <div class="rabi">
 <strong>תפילה לשלום / רבי נחמן מברסלב</strong><br/>
@@ -40,23 +42,110 @@
 ה` שלום, ברכנו בשלום.
 		</div>
 	<div class="fli" dir="rtl">
+		<span class="sec">
 		<div style="white-space: nowrap; padding: 5px;">	<a  href="https://www.facebook.com/onehHart1"  class="text-barbi" > 1❤️1 
 	ב
--<img align="left" height="32" width="32" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>	
+-<img align="left" height="32" width="32" alt="facebook" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>	
 	</div> 
 <div style="white-space: nowrap; padding: 5px;"> <a href="https://www.facebook.com/worldnonviolent" class="text-barbi">האמנה העולמית לשלום וביטחון ב
--<img align="left" height="32" width="32" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>
+-<img align="left" height="32" width="32" alt="facebook" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>
+	</div>  <div class="th">
+<div style="white-space: nowrap; padding: 5px;"> <a href="https://opensea.io/1love1" class="text-barbi"> לקולקציית ה
+-<img align="left" height="32" width="32" alt="NFT" src="https://res.cloudinary.com/love1/image/upload/v1640604252/nft-sign-svgrepo-com_a5xvx7.svg"></a>
+	</div></div> </span > <span class="sec">
+	<div style="white-space: nowrap; padding: 5px;"> <a href="https://payboxapp.page.link/mXnKCtYiWADBgAcB8" class="text-barbi" style="padding-top:16px;">לתמוך בנו עם
+-<img align="left" id="pb" height="32" width="64" alt="payBox" src="https://res.cloudinary.com/love1/image/upload/v1641485170/PBr_hdbfuv.png"></a>
+	</div> <div class="th">
+	<div style="white-space: nowrap; padding: 5px;"> <a href="https://discord.gg/DNaMwrXzyS" class="text-barbi">לערוץ ה
+-<img align="left" height="32" width="64" alt="Discord" src="https://res.cloudinary.com/love1/image/upload/v1641482980/discord-seeklogo.com_tkftet.svg"></a>
 	</div></div>
+</span>
 	
-
+</div>
 </div>
 
 <style>
+		.body  {
+
+	
+		width: 100vw;
+		background-color: black !important ;
+		color: black !important;
+	}
+	#pb{
+		height: 32px;
+		width: 72px;
+	}
+	.welcome {
+		position: relative;
+		width: 100vw;
+		align-items: center;
+		aspect-ratio: 9/1;
+		/*height: 28vh;
+		padding: 0 0 calc(100% * 495 / 1548) 0;
+	*/}
+	.fli{
+			display: flex;
+    flex-direction: column;
+    justify-content: center;
+   align-items: center;
+	}
+	.sec{
+			display: flex;
+    flex-direction: column;
+    justify-content: center;
+   align-items: center;
+	}
+	.th{
+			display: flex;
+    flex-direction: row;
+    justify-content: center;
+   align-items: center;
+	}
+		@media (min-width: 620px){
+				.body  {
+
+	min-height: 100vh;
+	max-height: 100vh;
+		width: 100vw;
+		background-color: black !important ;
+		color: black !important;
+	}
+		.welcome {
+					aspect-ratio: 7/1;
+
+		}
+		.fli{
+			display: flex;
+    flex-direction: column;
+		}
+		.sec{
+			display: flex;
+    flex-direction: row;
+    justify-content: center;
+   align-items: center;
+	}
+	.th{
+			display: flex;
+    flex-direction: row;
+	}
+		}
+
+	@media (min-width: 840px){
+		.welcome {
+		position: relative;
+		width: 100vw;
+		align-items: center;
+		aspect-ratio: 5/1;
+		/*height: 28vh;
+		padding: 0 0 calc(100% * 495 / 1548) 0;
+	*/}
 .fli{
 	display: flex;
     flex-direction: row;
     justify-content: center;
    align-items: center;
+}
 }
 	.rabi{
 		color:rgb(21, 203, 209);
@@ -70,19 +159,8 @@
 		max-width: var(--column-width);
 		margin: var(--column-margin-top) auto 0 auto;
 	}
-	.body  {
-	min-height: 100vh;
-		width: 100vw;
-		background-color: black !important ;
-		color: black !important;
-	}
-	.welcome {
-		position: relative;
-		width: 100%;
-		align-items: center;
-		height: 0;
-		padding: 0 0 calc(100% * 495 / 2048) 0;
-	}
+
+	
 	.welcome img {
 		position: absolute;
 		width: 100%;
