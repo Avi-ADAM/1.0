@@ -262,15 +262,15 @@ dispatch('addnew', {
       {#if addSl == false}
       <div class="another" style="margin: auto"> 
  
-        <h6 style="font-weight: bold;  color: var(--barbi-pink); text-shadow: 1px 1px  aqua; ">ה{Valname} שלי</h6>
-       {#if data} {#each data as dat, i}
-           <p style="margin: 0; line-height: 1; color:aqua; padding: auto;">{dat[valc]}</p>
-           {/each} {/if}
+        <h6 style="font-weight: bold;  color: var(--barbi-pink); text-shadow: 1px 1px  aqua; " class="th">ה{Valname} שלי</h6>
+       {#if data} <span class="d"> {#each data as dat, i}
+           <p style="margin: 0; line-height: 1; color:aqua; padding: auto;" class="t">{dat[valc]}</p>
+           {/each} </span>{/if}
 <button
-class=" hover:bg-barbi text-mturk rounded"
+class=" hover:bg-barbi text-mturk rounded "
 title="עריכה"
 on:click={open} 
-><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+><svg  class="e" viewBox="0 0 24 24">
  <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
 </svg>
 </button> 
@@ -281,7 +281,7 @@ on:click={open}
 <button class=" hover:bg-barbi text-gold  font-bold rounded"
 title="ביטול"
 on:click={bitul}
-><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+><svg  style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
  
@@ -336,7 +336,32 @@ on:click={bitul}
 
 {/if}
  <style>
-   
+   @media (max-width: 528px){
+     .th{
+       font-size: 12px;
+     }
+     .t{
+       font-size: 10px;
+     }
+     .d{
+       max-height: 15vh;
+       overflow-y: scroll;
+     }
+        .another{
+    max-height: 20vh;
+     min-height: 20vh;
+        }
+          .e{
+ width:17px;
+ height:17px;
+   }
+   }
+     @media (min-width: 529px){
+   .e{
+ width:24px;
+ height:24px; 
+   }
+  }
    .another{
               text-shadow: 1px 1px  var(--barbi-pink);
 padding: 1em;

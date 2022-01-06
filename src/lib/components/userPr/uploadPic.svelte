@@ -92,12 +92,9 @@ let files;
 	<h2>
 		העלאת תמונת פרופיל
 	</h2>
-	<input class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
-<!--	<h2>
-		Or... use this cute dog 🐕
-	</h2>
-<button type="button" on:click={() => {image = defaultSrc}}>Click me!</button>
--->{:else}
+	<input class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded a" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
+
+{:else}
 	<h2>התאמת גודל התמונה</h2>
 	<div id="cr" >
 		<Cropper
@@ -127,6 +124,14 @@ let files;
 </div>{/if}
 
 <style>
+  @media (max-width: 568px) {
+     .a{
+font-size: 8px;
+  }
+  }
+  .a{
+    width: 40vW;
+  }
     .prof-pic-wrapper{
         height: 200px;
         width: 200px;
@@ -138,7 +143,7 @@ let files;
     #cr{
       position: relative;
       width: 40vw;
-      height: 50vh;
+      aspect-ratio: 1;
     }
     .prof-pic{
         position: absolute;

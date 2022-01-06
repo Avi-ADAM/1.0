@@ -96,7 +96,7 @@ function shaneh () {
         <div>
             {#if errorl}
                         <h1 
-                        style="color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;"
+                        style="color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7; max-width: 40vw;"
                         >{errorl} </h1>
        {/if} 
     </div>

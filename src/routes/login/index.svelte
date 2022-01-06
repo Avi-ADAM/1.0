@@ -43,7 +43,7 @@
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);
-                goto("/one", )
+                goto("/me", )
                // goto("/oneHomeGr", )
               
             })

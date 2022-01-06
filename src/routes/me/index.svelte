@@ -500,7 +500,7 @@ addSl4 = false;
 ">הפרויקטים שלי</h6>
 <h1>בקרוב...</h1>
      <!--
-   <div >
+   <div class="d" >
            {#each myP as data, i}
            <div style="white-space: nowrap;" >  
             <a style="color:aqua; text-shadow: 1px 1px  var(--barbi-pink); font-size:13px; " class="hover:text-gold" sveltekit:prefetch href={`http://localhost:3000/project/${data.id}`} >{data.projectName}</a>
@@ -980,18 +980,58 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
  <!-- המשימות שסיימתי-->         
 
   <style>
+  
+  @media (max-width: 528px) {
+    .d{
+       max-height: 15vh;
+       overflow-y: scroll;
+     }
+/*    .a1 {
+ max-height: 25vh;
+     min-height: 25vh;
+
+}
+ .a2  {
+  max-height: 25vh;
+      min-height: 25vh;
+
+}
+.a3  {
+  max-height: 25vh;
+      min-height: 25vh;
+
+}
+.a4  {
+  max-height: 25vh;
+      min-height: 25vh;
+}
+.a5 {
+  max-height: 25vh;
+    min-height: 25vh;
+
+}
+.a6 {
+  max-height: 25vh;
+  min-height: 25vh;
+
+}*/
+    .another{
+ max-height: 20vh;
+  min-height: 20vh;
+  }
+}
     .anothere{
       position : absolute;
-      top: 72.2%;
-          left: 52%;
+      top: 59.2%;
+          left: 54%;
     }
     .edit{
     z-index: 20;
      margin-right:auto; 
      margin-left:auto ; 
      position: absolute ; 
-     top: 72.2%;
-      left: 48%; 
+     top: 59.2%;
+      left: 46%; 
        transform: translate(-50%, -50%);
     }
 
@@ -1002,8 +1042,8 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
     .haalaa {
     position: absolute;
     transform: translate(-50%, -50%);
-    top: 72.2%;
-    left: 48%;
+     top: 59.2%;
+      left: 46%; 
     z-index: 16; 
     }
     .centr{
@@ -1029,14 +1069,34 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
     top: 55.5%;
        }
          .name{
-             top: 20%;
+             top: 24%;
            }
+           .anotheri{
+  top: 64%;
+  }
       @media (min-width: 420px) {
           .userName{
     top: 55.5%;
        }
       }
 @media (min-width: 520px) {
+  .anotheri{
+  top: 84%;
+  }
+  .haalaa {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 65.2%;
+    left: 48%;
+    }
+  .anothere{
+      top: 65.2%;
+          left: 52%;
+          }
+  .edit{
+        top: 65.2%;
+      left: 48%; 
+  }
     .centr{
        max-height: 36.36vh;
     max-width: 35.2vh;
@@ -1064,6 +1124,20 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 
 }
 @media (min-width: 892px) {
+  .haalaa {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    top: 72.2%;
+    left: 48%;
+    }
+  .anothere{
+      top: 72.2%;
+          left: 52%;
+          }
+  .edit{
+        top: 72.2%;
+      left: 48%; 
+  }
     .centr{
        max-height: 53.12vh;
     max-width: 51.2vh;
@@ -1088,6 +1162,11 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
        }
            .name{
              top: 0%;
+           }
+}
+@media (min-height: 500px)  {
+    .name{
+             top: 27%;
            }
 }
 @media (min-height: 620px) and (min-width: 892px) {
@@ -1130,6 +1209,8 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
    
     z-index: 10;
     }
+  
+
 .a1{
   position: absolute;
     transform: translate(-50%, -50%);
@@ -1141,7 +1222,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
   position: absolute;
     transform: translate(-50%, -50%);
     top:50%;
-    left: 80%;
+    left: 86%;
 }
 .a3{
   position: absolute;
@@ -1159,7 +1240,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
   position: absolute;
     transform: translate(-50%, -50%);
     top:50%;
-    left: 20%;
+    left: 14%;
 }
 .a5{
   position: absolute;
@@ -1167,6 +1248,15 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
     top:80%;
     left: 30%;
 } 
+  @media (min-width: 348px) {
+ .a2  {
+  left: 80%
+
+}
+.a4  {
+  left: 20%
+}
+  }
 .selected {
   z-index: 289;
 
@@ -1285,8 +1375,7 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
           text-align: center;
    display: flex;
    align-items: center;
-    min-height: 320px;
-    min-width: 320px;
+  
     border-radius: 50%;
     
       }
@@ -1312,7 +1401,6 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
 }
 .anotheri{
   position : absolute;
-      top: 84%;
           left: 50%;
           transform: translate(-50%, -50%);
       display:flex;
@@ -1322,8 +1410,6 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     }
     .anothere{
       position : absolute;
-      top: 72.2%;
-          left: 52%;
           transform: translate(-50%, -50%);
                   z-index: 209;   
      background-position: center; 

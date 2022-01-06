@@ -101,7 +101,7 @@ regHelper.subscribe(value => {
 
 <div class="main">
 {#if user > 0}
-{ goto("/login", )}
+{ goto("/me", )}
 {:else}
   {#if kvar}
 <One {idx} />
