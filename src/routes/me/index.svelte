@@ -151,6 +151,7 @@ function letters(data){
             picLink =  $uPic;
     updX = 0;
     isOpen = false;
+    a = 0;
   //  updpic.set(0);
                   })
       .catch(error => {
@@ -267,6 +268,7 @@ onMount(async () => {
  
  
 	function callbackFunction(event) {
+    a = 2;
     files = event.detail.files;
     console.log(files);
     sendP ();
@@ -399,6 +401,10 @@ addSl4 = false;
  addSl5 = false;  
 }
 
+
+  import { RingLoader
+} from 'svelte-loading-spinners'
+
 </script>
 
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -409,9 +415,16 @@ addSl4 = false;
           on:click={closer}>ביטול</button>
           {#if a == 0}
           <Addnewp on:message={callbackFunction}/>
+
+
           {:else if a == 1}
           <EditB {mail}/>
-          {/if}
+          {:else if a == 2}
+          <div class="sp bg-gold">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> {/if}
   </DialogContent>
   </div>
 </DialogOverlay>
@@ -980,6 +993,10 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
  <!-- המשימות שסיימתי-->         
 
   <style>
+    .sp{
+   display: grid;
+    justify-content: center;
+  align-items: center;   }
   
   @media (max-width: 528px) {
     .d{

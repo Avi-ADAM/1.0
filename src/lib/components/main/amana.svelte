@@ -8,8 +8,10 @@
     import * as yup from "yup";
     import { onMount } from 'svelte';
         import axios from 'axios';
+          import { RingLoader
+} from 'svelte-loading-spinners'
 
-
+let g = false;
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -309,7 +311,7 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
-
+g = true;
  if (selected.length < 1) {
  erorims = true
  } else {
@@ -326,6 +328,7 @@ onSubmit: values => {
         'Content-Type': 'application/json',
             }})
   .then(response => {
+    g = false;
    already = true;
    document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
        document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
@@ -335,6 +338,7 @@ onSubmit: values => {
             datar = data;
               })
   .catch(error => {
+    g = false;
     erorim.st = true
     if (error.response === undefined){
         erorim.msg = "השרת נרדם 😴, הערנו אותו, אנו מנסים שוב";
@@ -456,13 +460,19 @@ trans = !trans;
 
 <div class="flexid">
    {#if already == false}
-
+{#if g == false}
     <button
      class="button hover:scale-150"
      title="לחצת ויצאת לחופשי"
       on:submit="{handleSubmit}"
       type="submit"
       ></button> 
+       {:else if g == true}
+          <div class="sp bg-gold">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="240" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> {/if}
       {#if erorim.st == true}
 
       <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>

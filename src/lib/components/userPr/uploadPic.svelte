@@ -118,7 +118,7 @@ let files;
 	
 	<br>
   <div dir="rtl">
-  <button type="button" on:click={cropImage} class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded">לחתוך!</button>
+  <button type="button" on:click={cropImage} class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded bt">לחתוך!</button>
 
 	<button type="button" class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded" on:click={reset}>להתחיל הכל מהתחלה?</button>
 </div>{/if}
@@ -129,6 +129,14 @@ let files;
 font-size: 8px;
   }
   }
+  .bt:active{
+    animation: changeColor 1s infinite;
+  }
+  @keyframes changeColor
+{
+  from { background: aqua; }
+  to { background: fuchsia; }
+}
   .a{
     width: 40vW;
   }

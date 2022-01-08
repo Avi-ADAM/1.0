@@ -1387,6 +1387,11 @@
   "resolved" "https://registry.npmjs.org/svelte-hmr/-/svelte-hmr-0.14.9.tgz"
   "version" "0.14.9"
 
+"svelte-loading-spinners@^0.1.7":
+  "integrity" "sha512-EKCId1DjVL2RSUVJJsvtNcqQHox03XIgh4xh/4p7r6ST7d8mut6INY9/LqK4A17PFU64+3quZmqiSfOlf480CA=="
+  "resolved" "https://registry.npmjs.org/svelte-loading-spinners/-/svelte-loading-spinners-0.1.7.tgz"
+  "version" "0.1.7"
+
 "svelte-multiselect@^1.2.3":
   "integrity" "sha512-hpxWoWFs8VCB6TnLl5lRnVpu16fLu3ZZA054SD8Oi0JxECr5eW8VTvjihM6axDK/iYI/1Sd+2VIJNnV0fpPc5g=="
   "resolved" "https://registry.npmjs.org/svelte-multiselect/-/svelte-multiselect-1.2.3.tgz"

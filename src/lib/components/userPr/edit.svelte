@@ -100,7 +100,9 @@ if (index > -1) {
 console.log("skillslist",skillslist);
 };    
 let miData = [];
+let g = false;
 async function increment() {
+      g = true;
      let list = data.map(c => c.id);
      const linkpe = linkp;
   const cookieValue = document.cookie
@@ -133,7 +135,7 @@ async function increment() {
   ){
       user {
           ${kish}{
-              id
+              id ${valc}
           }
       }
   }
@@ -145,14 +147,19 @@ async function increment() {
          console.log(miData)
          addSl = false;
  dispatch('close', {
-    linkp: linkp
+    linkp: linkp,
+    list: miData.data.updateUser.user[kish]
+
     } );
+    g = false;
         } catch (e) {
             error1 = e
         }
     };
  
    
+  import { RingLoader
+} from 'svelte-loading-spinners'
 export let Valname = "כישורים";  
 let yy = 0;
 
@@ -256,7 +263,7 @@ dispatch('addnew', {
     } );
   
 };
-
+//style="margin:auto; overflow:auto;"
   </script>
 
       {#if addSl == false}
@@ -276,8 +283,8 @@ on:click={open}
 </button> 
 </div>
 {:else if  addSl == true}
-
-<div class="anotherE" style="margin:auto; overflow:auto; " transition:fly={{x: 250, opacity: 1}}>
+{#if g == false}
+<div class="anotherE"  transition:fly={{x: 250, opacity: 1}}>
 <button class=" hover:bg-barbi text-gold  font-bold rounded"
 title="ביטול"
 on:click={bitul}
@@ -288,7 +295,7 @@ on:click={bitul}
    <h6 class="text-center text-sm text-barbi">עריכת ה{Valname} שלי </h6>
      {#if data} {#each data as da, i}
   <p class="text-center text-sm text-lturk">
-       <button  title={less} on:click={min(da.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
+       <button class="text-gold hover:text-barbi"  title={less} on:click={min(da.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg>{da[valc]}</button>
       </p>
@@ -325,17 +332,26 @@ on:click={bitul}
       <button
         on:click={increment} 
          title="הוספת {Valname} חדשים"
-    class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 rounded" 
+    class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded hover:scale-150" 
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
     </svg>
     </button> 
+     {:else if g == true}
+          <div class="sp bg-gold">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> {/if}
         
 
  
 
 {/if}
  <style>
+   .bt{
+
+   }
    @media (max-width: 528px){
      .th{
        font-size: 12px;
