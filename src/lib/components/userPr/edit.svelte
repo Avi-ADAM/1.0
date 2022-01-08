@@ -201,7 +201,7 @@ const resp = filterByReference(meData, array3);
 const datana = resp;
   dispatch('add', {
     data: datana,
-    linkp: linkp,
+    linkp: kish,
     valc: valc,
     a: datan
     } );
@@ -216,7 +216,7 @@ const indexy = x.indexOf(id);
 oldob.splice(indexy, 1);
 dispatch('remove', {
     data: oldob,
-    linkp: linkp
+    linkp: kish
     } );
 
 }
@@ -259,7 +259,7 @@ dispatch('addnew', {
     id: array3,
     data: data,
     skob: skob,
-    linkp: linkp
+    linkp: kish
     } );
   
 };
