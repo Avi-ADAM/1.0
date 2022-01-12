@@ -3,10 +3,10 @@
     import { idPr } from '../../stores/idPr.js';
     import axios from 'axios';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
-    import AddnewVal from './addNewval.svelte';
+    import AddnewVal from './addnewval.svelte';
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
-
+    let before = false;
     let url1 = "https://strapi-k4vr.onrender.com/upload";
     let linkP;
     let desP;
@@ -60,6 +60,7 @@ if (files) {
     console.log('הצליח', response.data);
     resP = response.data; 
     idPr.set(resP.id);
+    before = true;
   //  goto("/projectPrivat", );
               })
   .catch(error => {
@@ -85,6 +86,7 @@ if (files) {
     console.log('הצליח', response.data);
     resP = response.data; 
     idPr.set(resP.id);
+        before = true;
   //  goto("/projectPrivat", );
               })
   .catch(error => {
@@ -152,7 +154,9 @@ let vallues = [];
 export let userName_value;
 
   </script>  
+  {#if before}
 <img class="bg" src="https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg" alt="bg">
+
 <div dir="rtl" class="jho">
   <h1>יצירת פרויקט חדש</h1>
 <br>
@@ -208,18 +212,27 @@ style="color: var(--barbi-pink); margin: 0 auto;"
     on:click={() => addval = true} 
     class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
     >הוספת ערך חדש</button>
-  {#if addval == true} <AddnewVal/>{/if}</div>
+  {#if addval == true} <AddnewVal />{/if}</div>
   <br>
   <br>
 <button 
     class="cen bg-pink-500 hover:bg-pink-700 text-white font-bold p-4 rounded"
      on:click="{sendP}"
      name="addm">ליצור ולפרסם פרויקט </button>
-
-
-
 </div>
+{:else}
+<div class="aft">
+  <h1>הפרויקט נוצר בהצלחה</h1>
+</div>
+{/if}
+
+
 <style>
+  .aft{
+    display: grid;
+    align-items: center;
+    justify-content: center;
+  }
   .cen{
     margin: 0 auto;
 
