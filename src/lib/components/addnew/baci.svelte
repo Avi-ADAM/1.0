@@ -60,7 +60,7 @@ if (files) {
     console.log('הצליח', response.data);
     resP = response.data; 
     idPr.set(resP.id);
-    goto("/projectPrivat", );
+  //  goto("/projectPrivat", );
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
@@ -85,7 +85,7 @@ if (files) {
     console.log('הצליח', response.data);
     resP = response.data; 
     idPr.set(resP.id);
-    goto("/projectPrivat", );
+  //  goto("/projectPrivat", );
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
