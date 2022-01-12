@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@fontsource/fira-mono": "^4.5.0",
+    "@lottiefiles/svelte-lottie-player": "^0.2.0",
     "axios": "^0.24.0",
     "cssnano": "^5.0.12",
     "postcss": "^8.4.4",

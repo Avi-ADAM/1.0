@@ -3,7 +3,7 @@
   import { onMount } from 'svelte';
   import axios from 'axios'
 	import { draw } from 'svelte/transition';
-// import Addnew from '../../lib/components/addnew/baci.svelte';
+ import Addnew from '../../lib/components/addnew/baci.svelte';
 import Addnewp from '../../lib/components/userPr/uploadPic.svelte';
 import { uPic } from  '../../lib/stores/uPic.js';
 import Edit from '../../lib/components/userPr/edit.svelte';
@@ -161,10 +161,11 @@ function letters(data){
     })};
     
 
-//function project (id) {
+function project (id) {
+  alert('בקרוב')
 //    idPr.set(id);
 //    goto("/projectPrivat", );
-//  };
+  };
 let mail;
 onMount(async () => {
     const cookieValue = document.cookie
@@ -428,8 +429,8 @@ addSl4 = false;
   </DialogContent>
   </div>
 </DialogOverlay>
-<!--
-{#if addP == 0}href="/oneHomeGr"-->
+
+{#if addP == 0}
 <div class="body"  style="--the:{stylef};">
   <div class="name">
   <a href="/about" ><img
@@ -511,8 +512,7 @@ addSl4 = false;
   
     <h6 style="font-size:17px; color:var(--barbi-pink); margin: 0 auto; padding:0;     text-shadow: 1px 1px  rgb(63, 56, 18);
 ">הפרויקטים שלי</h6>
-<h1>בקרוב...</h1>
-     <!--
+
    <div class="d" >
            {#each myP as data, i}
            <div style="white-space: nowrap;" >  
@@ -528,17 +528,17 @@ addSl4 = false;
            </div>
   {/each}
 </div>
-<div style="width:42px; height:42px; ">
-<button        
+<button   
+class="text-barbi hover:text-gold"     
     on:click={() => addP = 1} 
-    title="יצירת פרויקט חדש">
- <lord-icon
+    title="יצירת פרויקט חדש"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" /></svg>
+<!-- <lord-icon
         src="https://cdn.lordicon.com/mecwbjnp.json"
       trigger="loop-on-hover"
                    colors="primary:#ee66aa,secondary:#66eece"
                style="width:42px;height:42px;">
-                  </lord-icon> 
-              </button></div>  -->
+                  </lord-icon> -->
+              </button> 
 </div> 
      
     
@@ -980,16 +980,15 @@ addSl4 = false;
 </div>
 {/if}
 </div>
-</div>
 
-  <!--
+</div>
 {:else if addP == 1}
 <button 
 on:click={() => addP = 0} 
 class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 >ביטול</button> 
   <Addnew userName_value={meData.username}/> 
-  {/if}-->
+  {/if}
  <!-- המשימות שסיימתי-->         
 
   <style>
