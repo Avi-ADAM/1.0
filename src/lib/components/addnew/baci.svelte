@@ -154,7 +154,7 @@ let vallues = [];
 export let userName_value;
 
   </script>  
-  {#if before}
+  {#if before == false}
 <img class="bg" src="https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg" alt="bg">
 
 <div dir="rtl" class="jho">
