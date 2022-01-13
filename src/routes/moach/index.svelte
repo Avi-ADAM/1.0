@@ -1,5 +1,9 @@
 <script>
   //	import { draw } from 'svelte/transition';
+  import { RingLoader
+} from 'svelte-loading-spinners'
+    import Uplad from '../../lib/components/userPr/uploadPic.svelte';
+    import axios from 'axios';
 
    import { onMount } from 'svelte'; 
    import { idPr } from '../../lib/stores/idPr.js';
@@ -17,6 +21,11 @@
    //     import Fini from '../../lib/components/projectPr/fini.svelte';
 
 //import { validate_component } from 'svelte/internal';
+ import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+      import {  fly } from 'svelte/transition';
+
+let isOpen = false;
+let a = 0;
   let fmiData = [];
   let tahaS = false;
   let bmiData = [];
@@ -661,18 +670,129 @@ function bighand() {
 }
 
 function addp () {
+  if (projectUsers.length == 1) {
+      a = 0;
+            isOpen = true;
+  }  else {
+    alert("בפרויקט עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+  }
 //if project users more then 1
 }
 function editp () {
+  if (projectUsers.length == 1) {
+      a = 0;
+            isOpen = true;
+  } else {
+    alert("בפרויקט עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+  }
 //if project users more then 1
 
 } 
 function editb () {
 //if project users more then 1
-
+ if (projectUsers.length == 1) {
+      a = 1;
+            isOpen = true;
+  } else {
+    alert("בפרויקט עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+  }
 }
+
+ const closer = () => {
+    isOpen = false;
+  a = 0;
+  };
+    let files;
+
+  function basic (){
+      isOpen = true;
+      a = 1;
+  } 	function allbackFunction(event) {
+    a = 2;
+    files = event.detail.files;
+    sendP ();
+	}
+      let url1 = "https://strapi-k4vr.onrender.com/upload";
+let meDatap = [];
+    function sendP () {
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+    let linkdi ="https://strapi-k4vr.onrender.com/projects/" + $idPr ;
+  //  let fd = new FormData();
+     //   fd.append('files', files[0]);
+      axios
+     .post( url1, files  ,{
+                    headers: {
+                        Authorization: bearer1,
+                    },
+                })
+                .then(({ data }) => {
+                    const imageId = data[0].id;  
+      axios
+      .put(linkdi, {
+        profilePic: imageId,
+                  },
+      {
+      headers: {
+        'Authorization': bearer1
+                }})
+      .then(response => {
+        meDatap = response.data;
+       
+          srcP = meDatap.profilePic.formats.thumbnail.url;
+                    srcP = meDatap.profilePic.formats.small.url;
+
+        srcP = meDatap.profilePic.url;
+    isOpen = false;
+    a = 0;
+                  })
+      .catch(error => {
+        console.log('צריך לתקן:', error.response);
+        if (error.response != undefined) {
+          a = 3;
+        }
+                });
+      
+    })};
     </script>
+
+
     {#if $idPr }
+    
+ <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent aria-label="form">
+      <div style="z-index: 400;" dir="rtl" >
+             <button class=" hover:bg-barbi text-mturk rounded"
+          on:click={closer}>ביטול</button>
+          {#if a == 0}
+          <Uplad on:message={allbackFunction}/>
+
+
+          {:else if a == 1}
+        <!--  <EditB {mail}/>--><h1>בקרוב... יום יומיים</h1>
+          {:else if a == 2}
+          <div class="sp bg-gold">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> 
+         {:else if a == 3}
+         <h1> אירעה שגיאה</h1>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded" on:click={()=> a = 0}>לנסות שוב</button>
+         {/if}
+  </DialogContent>
+  </div>
+</DialogOverlay>
 <!--{#if idUst.map(c => c.id) == idUsl} 
 בנוסף במקרה של רענון יעלם האידי של הפרוייקט
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור פרוייקט או להחזיר לדף הבית-->
@@ -1114,5 +1234,9 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     text-align: center;
     font-size: var(--the, 24px);
 }
-
+   .sp{
+   display: grid;
+    justify-content: center;
+  align-items: center; 
+  }
  </style>

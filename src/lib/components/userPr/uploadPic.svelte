@@ -48,7 +48,6 @@ formData.append('files', file, 'image.jpg')
     //  console.log("bafs", croppedImage)
     //   const data = croppedImage.replace(/^data:image\/\w+;base64,/, "");
     
-  console.log("bafsi", croppedImage, file)
  
     dispatch('message', {
     files: formData
@@ -90,7 +89,7 @@ let files;
 
 {#if !image}
 	<h2>
-		העלאת תמונת פרופיל
+העלאת תמונה
 	</h2>
 	<input class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded a" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
 

@@ -366,6 +366,7 @@ on:click={bitul}
         .another{
     max-height: 20vh;
      min-height: 20vh;
+     max-width: 25vW;
         }
           .e{
  width:17px;

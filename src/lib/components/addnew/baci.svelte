@@ -6,6 +6,12 @@
     import AddnewVal from './addnewval.svelte';
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
+    import Uplad from '../userPr/uploadPic.svelte';
+     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+      import {  fly } from 'svelte/transition';
+let loading = false;
+let isOpen = false;
+let a = 0;
     let before = false;
     let url1 = "https://strapi-k4vr.onrender.com/upload";
     let linkP;
@@ -15,10 +21,16 @@
     let projectName_value;
     let token; 
    let idL;
-
+let run = [];
 let imageId = 5;
 let files;
+  let shgi = false;
+    
 function sendP () {
+    if (run.includes(projectName_value)){
+  shgi = true; 
+} else{
+  loading = true;
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -30,11 +42,11 @@ function sendP () {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-let fd = new FormData();
+//let fd = new FormData();
 if (files) {
-    fd.append('files', files[0]);
+  //  fd.append('files', files[0]);
   axios
- .post( url1, fd  ,{
+ .post( url1, files  ,{
                 headers: {
                     Authorization: bearer1,
                 },
@@ -61,10 +73,12 @@ if (files) {
     resP = response.data; 
     idPr.set(resP.id);
     before = true;
+    loading = false;
   //  goto("/projectPrivat", );
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
+        loading = false;
             });
   console.log("hh")
 })} else {
@@ -87,17 +101,19 @@ if (files) {
     resP = response.data; 
     idPr.set(resP.id);
         before = true;
+            loading = false;
   //  goto("/projectPrivat", );
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
+        loading = false;
             });
   console.log("hh")
 
 
 
 }
-
+  }
 }
 ;
 
@@ -107,6 +123,12 @@ let vallues = [];
     let addval = false;
     
     onMount(async () => {
+       const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -117,24 +139,32 @@ let vallues = [];
         });
       };
       const headers = {
-        'Content-Type': 'application/json',
-      };
+ 'Authorization': bearer1,
+                 'Content-Type': 'application/json'      };
     
         try {
-            const res = await fetch("https://strapi-k4vr.onrender.com/vallues?_limit=-1", {
-              method: "GET",
+           const res = await fetch("https://strapi-k4vr.onrender.com/graphql", {
+              method: "POST",
               headers: {
+                   'Authorization': bearer1,
                  'Content-Type': 'application/json'
-              },
+              },  body: JSON.stringify({
+                        query: `query {
+  vallues { id valueName}
+  projects { projectName}
+}
+              `})
             }).then(checkStatus)
           .then(parseJSON);
-            vallues = res
+            vallues = res.data.vallues;
+           const runi = res.data.projects;
+           run = runi.map(c => c.projectName)
         } catch (e) {
             error1 = e
         }
     });
 
-
+let suc = false;
     function find_value_id(value_name_arr){
      var  arr = [];
       for (let j = 0; j< value_name_arr.length; j++ ){
@@ -152,8 +182,60 @@ let vallues = [];
     const placeholder = `ערכים ומטרות`;
  
 export let userName_value;
+  import { RingLoader
+} from 'svelte-loading-spinners'
+ const closer = () => {
+    isOpen = false;
+  a = 0;
+  };
+  	function callbackFunction(event) {
+    a = 2;
+    files = event.detail.files;
+    isOpen = false;
+    suc = true;
+	}
+  function openen () {
+  isOpen = true;
+ 
+}
 
+
+  function addnew (event){
+    
+    const newOb = event.detail.skob;
+    const newN = event.detail.skob.valueName;
+    const newValues = vallues;
+    newValues.push(newOb);
+       
+    vallues = newValues;
+   const newSele = selected;
+
+selected.push(newN);
+
+selected = newSele;
+addval == false;
+  }
   </script>  
+<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent aria-label="form">
+      <div style="z-index: 400;" dir="rtl" >
+             <button class=" hover:bg-barbi text-mturk rounded"
+          on:click={closer}>ביטול</button>
+          {#if a == 0}
+          <Uplad on:message={callbackFunction}/>
+
+          {:else if a == 2}
+          <div class="sp bg-gold">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> {/if}
+  </DialogContent>
+  </div>
+</DialogOverlay>
+
+
   {#if before == false}
 <img class="bg" src="https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg" alt="bg">
 
@@ -167,6 +249,8 @@ export let userName_value;
   <label for="des" class='label'>שם הפרויקט</label>
   <span class='line'></span>
 </div>
+{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
+
     <div dir="rtl" class='textinput'>
   <input name="es"  bind:value={desP}    
  type='text' class='input' required >
@@ -187,13 +271,8 @@ export let userName_value;
   <span class='line'></span>
 </div>
 <br>
-<label style="color:  var(--barbi-pink); margin: 0 auto;" for="avatar">הוסף לוגו</label>
-<input type="file"
-style="color: var(--barbi-pink); margin: 0 auto;"
-       id="avatar" name="avatar"
-       accept="image/png, image/jpeg"
-       bind:files={files}
-       >
+<button on:click={openen} class="bg-gold hover:bg-barbi text-barbi hover:text-gold rounded p-2" >הוסף לוגו</button>
+{#if suc == true}<small class="text-barbi">לוגו נבחר בהצלחה</small>{/if}
          
 <h1 class="midscreenText-2">
   {userName_value} 
@@ -208,18 +287,19 @@ style="color: var(--barbi-pink); margin: 0 auto;"
    options={vallues.map(c => c.valueName)}
    /></div>
    <div  class="input-2-2">
+   {#if addval == false}
     <button
     on:click={() => addval = true} 
-    class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+    class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded"
     >הוספת ערך חדש</button>
-  {#if addval == true} <AddnewVal />{/if}</div>
-  <br>
-  <br>
+  {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
+  <br>{#if loading == false}
 <button 
-    class="cen bg-pink-500 hover:bg-pink-700 text-white font-bold p-4 rounded"
+    class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded"
      on:click="{sendP}"
      name="addm">ליצור ולפרסם פרויקט </button>
-</div>
+       {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+{/if}</div>
 {:else}
 <div class="aft">
   <h1>הפרויקט נוצר בהצלחה</h1>
@@ -228,6 +308,11 @@ style="color: var(--barbi-pink); margin: 0 auto;"
 
 
 <style>
+     .sp{
+   display: grid;
+    justify-content: center;
+  align-items: center; 
+  }
   .aft{
     display: grid;
     align-items: center;
@@ -261,6 +346,7 @@ style="color: var(--barbi-pink); margin: 0 auto;"
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
+
 
 .label {
   font-family: 'Roboto', sans-serif;

@@ -510,37 +510,39 @@ addSl4 = false;
           
 <div class="another" dir="rtl">
   
-    <h6 style="font-size:17px; color:var(--barbi-pink); margin: 0 auto; padding:0;     text-shadow: 1px 1px  rgb(63, 56, 18);
-">הפרויקטים שלי</h6>
+    <h6 class="cot">הפרויקטים שלי</h6>
 
-   <div class="d" >
            {#each myP as data, i}
-           <div style="white-space: nowrap;" >  
-            <a style="color:aqua; text-shadow: 1px 1px  var(--barbi-pink); font-size:13px; " class="hover:text-gold" sveltekit:prefetch href={`http://localhost:3000/project/${data.id}`} >{data.projectName}</a>
-          <button
+           <div class="cont" >  
+            <a  class="pt hover:text-gold" sveltekit:prefetch href={"/me"} >{data.projectName}</a>
+          <!--<h3 class="pt">{data.projectName}</h3> `http://localhost:3000/project/${data.id}`--> <button
           class=" hover:bg-barbi text-mturk rounded"
           title="עריכה"
           on:click={project(data.id)}
-          ><svg style="width:13px;height:13px" viewBox="0 0 24 24">
+          ><svg class="sv" viewBox="0 0 24 24">
            <path transition:draw="{{duration: 1000}}" fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
           </svg>
           </button>
            </div>
   {/each}
-</div>
+
 <button   
-class="text-barbi hover:text-gold"     
+style="    z-index: 7;"
+class="text-barbi hover:text-gold hover:bg-barbi hover:scale-150"     
     on:click={() => addP = 1} 
-    title="יצירת פרויקט חדש"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" /></svg>
-<!-- <lord-icon
+    title="יצירת פרויקט חדש"><svg  width="24" height="24"  viewBox="0 0 24 24">
+      <path fill="currentColor" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
+    </svg>
+ </button> 
+</div> 
+     
+      <!-- <lord-icon
         src="https://cdn.lordicon.com/mecwbjnp.json"
       trigger="loop-on-hover"
                    colors="primary:#ee66aa,secondary:#66eece"
                style="width:42px;height:42px;">
                   </lord-icon> -->
-              </button> 
-</div> 
-     
+             
     
 </div> 
 <div class="anotheri">
@@ -992,12 +994,37 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
  <!-- המשימות שסיימתי-->         
 
   <style>
+    .cot{
+    color:var(--barbi-pink);
+     margin: 0 auto; 
+     padding:0;  
+   text-shadow: 1px 1px  rgb(63, 56, 18);
+    }
+    .pt{
+      color:aqua;
+       text-shadow: 1px 1px  var(--barbi-pink);
+    }
     .sp{
    display: grid;
     justify-content: center;
-  align-items: center;   }
+  align-items: center; 
+  }
   
   @media (max-width: 528px) {
+    .cont{
+      white-space: none;
+      line-height: 1;
+    }
+    .sv{
+      width:8px
+      ;height:8px;
+    }
+    .cot{
+         font-size: 10px ;
+    }
+    .pt{
+      font-size: 8px;
+    }
     .d{
        max-height: 15vh;
        overflow-y: scroll;
@@ -1034,6 +1061,8 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
     .another{
  max-height: 20vh;
   min-height: 20vh;
+         max-width: 35vw;
+
   }
 }
     .anothere{
@@ -1095,7 +1124,20 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
     top: 55.5%;
        }
       }
-@media (min-width: 520px) {
+@media (min-width: 529px) {
+  .cont{
+      white-space: nowrap;
+    }
+    .sv{
+      width:13px
+      ;height:13px;
+    }
+  .cot{
+         font-size:17px;
+    }
+  .pt{
+    font-size: 13px;
+  }
   .anotheri{
   top: 84%;
   }
@@ -1182,7 +1224,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 }
 @media (min-height: 500px)  {
     .name{
-             top: 27%;
+             top: 25%;
            }
 }
 @media (min-height: 620px) and (min-width: 892px) {
@@ -1375,6 +1417,8 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
     border-radius: 15%;
       display:flex;
       flex-direction: column;
+       align-items: center;
+      justify-content: center;
       z-index: -1;
     }
       .middle{
