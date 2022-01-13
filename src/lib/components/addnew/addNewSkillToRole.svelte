@@ -7,7 +7,13 @@ let skillName_value;
     let desS;
     let link ="https://strapi-k4vr.onrender.com/skills";
     let meData;
+     export let rn = [];
+    let shgi = false;
 function addNewSkill () {
+   shgi = false;
+if (rn.includes(skillName_value)){
+  shgi = true;
+} else {
     axios
   .post(link, {
     skillName: skillName_value,
@@ -23,7 +29,7 @@ function addNewSkill () {
               })
   .catch(error => {
     console.log('צריך לתקן:', error);
-            });
+            });}
 };    
 
 
@@ -45,6 +51,7 @@ function finnish (id) {
   <label for="name" class='label'>שם</label>
   <span class='line'></span>
 </div>
+{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
 
 <div dir="rtl" class='textinput'>
   <input    bind:value={desS}

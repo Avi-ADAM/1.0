@@ -11,7 +11,7 @@ import EditB from '../../lib/components/userPr/editBasic.svelte';
 
 //import Profile from '../../lib/components/userPr/new.svelte';
 //import { addS } from '../../lib/stores/addS.js';
-//import { idPr } from '../../lib/stores/idPr.js';
+import { idPr } from '../../lib/stores/idPr.js';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
@@ -162,9 +162,9 @@ function letters(data){
     
 
 function project (id) {
-  alert('בקרוב')
-//    idPr.set(id);
-//    goto("/projectPrivat", );
+ // alert('בקרוב')
+    idPr.set(id);
+    goto("/moach", );
   };
 let mail;
 onMount(async () => {

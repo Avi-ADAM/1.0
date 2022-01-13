@@ -13,7 +13,8 @@
     let error1 = null;
     
     let link ="https://strapi-k4vr.onrender.com/work-ways";
-    
+    export let rn = [];
+    let shgi = false;
    
     
         function dispatchww (meData, id) {
@@ -26,6 +27,10 @@
     };
     
     function addww () {
+       shgi = false;
+if (rn.includes(Name_value)){
+  shgi = true;
+} else {
     axios
       .post(link, {
         workWayName: Name_value,
@@ -42,7 +47,7 @@
                   })
       .catch(error => {
         console.log('צריך לתקן:', error);
-                });
+                });}
     };    
     
 
@@ -80,6 +85,8 @@
   <label for="name" class='label'>שם</label>
   <span class='line'></span>
 </div>
+{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
+
 <br/>
 
 

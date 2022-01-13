@@ -119,10 +119,10 @@ selected = newSele;
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form">
-      <div dir="rtl" >
+  <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"  aria-label="form">
+      <div class="a" dir="rtl" >
            
-              <Addnewrole on:b={close} addR={true} on:addnewrole={addnew}/>
+              <Addnewrole rn={roles1.map(c => c.roleDescription)} on:b={close} addR={true} on:addnewrole={addnew}/>
   </DialogContent>
   </div>
 </DialogOverlay>
@@ -157,6 +157,12 @@ selected = newSele;
 
 
 <style>
+
+    :global([data-svelte-dialog-content].content) {
+     background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);
+      background-position: center;
+      background-size: cover;
+  }
   :global(.multiselect) {
     background-color: var(--gold) !important ;
   /* top-level wrapper div */

@@ -7,7 +7,7 @@ import Addnewskil from './addNewSkillToRole.svelte';
 import MultiSelect from 'svelte-multiselect';
 import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
-
+export let rn = [];
 let idro;
 idr.subscribe(newwork => {
 idro = newwork;
@@ -23,7 +23,7 @@ let roleName_value;
 let desR;
 export let skills2 = [];
 let error1 = null;
-
+let shgi = false;
 let link ="https://strapi-k4vr.onrender.com/tafkidims";
 
 onMount(async () => {
@@ -68,7 +68,10 @@ onMount(async () => {
 };
 
 function addrole () {
-
+  shgi = false;
+if (rn.includes(roleName_value)){
+  shgi = true;
+} else {
 skillslist = find_skill_id(selected);
 skillslist.push(idro);
 axios
@@ -89,7 +92,7 @@ axios
               })
   .catch(error => {
     console.log('צריך לתקן:', error);
-            });
+            });}
 };    
 
 
@@ -145,6 +148,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
   <label for="name" class='label'>שם</label>
   <span class='line'></span>
 </div>
+{#if shgi == true}<small class="text-red-600">התפקיד כבר קיים</small>{/if}
 
    <div dir="rtl" class='textinput'>
   <input bind:value={desR}  
@@ -166,7 +170,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
       <button
        on:click={() => addsk = true} 
        class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-1 px-1 rounded"
-       >הוספת כישור אחר</button>
+       >הוספת כישור שאינו ברשימה</button>
        <br/>
     <button on:click={addrole}
     title="הוספת תפקיד חדש"
@@ -182,12 +186,13 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
-      <Addnewskil on:finnish={finnish}/>{/if}</div>
+      <Addnewskil  rn={skills2.map(c => c.skillName)} on:finnish={finnish}/>{/if}</div>
   
     {/if}
    
 
     <style>
+
  .textinput {
   position: relative;
   width: 80%;

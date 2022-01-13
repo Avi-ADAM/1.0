@@ -312,9 +312,9 @@ on:click={bitul}
        
      
       {#if datan == "skil"} 
-<Addnewsk  on:addnewskill={addnew} addS={addS}/>
+<Addnewsk rn={allvn} on:addnewskill={addnew} addS={addS}/>
 {:else if datan == "taf"}
-<Addnewr on:addnewrole={addnew} addR={addR}/>
+<Addnewr rn={allvn} on:addnewrole={addnew} addR={addR}/>
 
 {:else if datan == "mash"}<!--
 <Addnewn on:addww={addnew} addW={addW}/>
@@ -322,10 +322,10 @@ on:click={bitul}
 -->
 <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink);">בקרוב...</h1>
 {:else if datan == "val"}
-<Addnewv/>
+<Addnewv rn={allvn}/>
 
 {:else if datan == "work"}
-<Addneww/>
+<Addneww rn={allvn}/>
 
 {/if} </div>
   

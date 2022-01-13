@@ -12,10 +12,14 @@
     let link ="https://strapi-k4vr.onrender.com/vallues";
 let meData;
 export let vallId;   
-
+export let rn = [];
+    let shgi = false;
 
 function addNewVall() {
-
+   shgi = false;
+if (rn.includes(name_value)){
+  shgi = true;
+} else {
 	axios
       .post(link, {
         valueName: name_value,
@@ -34,7 +38,7 @@ function addNewVall() {
         console.log('צריך לתקן:', error.response);
         error = error1 
         console.log(error1)
-                });
+                });}
     };    
 
  
@@ -74,6 +78,7 @@ class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded text-center
   <label for="name" class='label'>שם הערך</label>
   <span class='line'></span>
 </div>
+{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
 <br />
 <div dir="rtl" class='textinput'>
   <input type='text' class='input' bind:value={desV} required>

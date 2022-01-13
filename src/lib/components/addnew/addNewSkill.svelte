@@ -23,7 +23,8 @@ let idk;
     let meData;
     let error1 = null;
     let link ="https://strapi-k4vr.onrender.com/skills";
-
+    export let rn = [];
+    let shgi = false;
     onMount(async () => {
       const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       const checkStatus = (resp) => {
@@ -75,6 +76,10 @@ function dispatchskillid (meData, id) {
 };
 
 function addNewSkill() {
+   shgi = false;
+if (rn.includes(skillName_value)){
+  shgi = true;
+} else {
   tafkidimslist = find_role_id(selected);
   tafkidimslist.push(idk);
 	axios
@@ -96,7 +101,7 @@ function addNewSkill() {
                   })
       .catch(error => {
         console.log('צריך לתקן:', error);
-                });
+                });}
     };    
 
 export let addS = false;
@@ -135,6 +140,7 @@ on:click={dispatchb}
   <label for="name" class='label'>שם הכישור</label>
   <span class='line'></span>
 </div>
+{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
 
            <div dir="rtl" class='textinput'>
   <input bind:value={desS}  
@@ -172,7 +178,7 @@ on:click={() => addro = false}
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
-  <Addnewro on:finnish={finnish}/>
+  <Addnewro rn={roles1.map(c => c.roleDescription)} on:finnish={finnish}/>
   {/if}</div>
  
 {/if}

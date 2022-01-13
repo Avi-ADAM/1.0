@@ -120,10 +120,10 @@ selected = newSele;
   
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form">
+  <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"  aria-label="form">
       <div dir="rtl" >
              
-      <Addnewskill addS={true} on:b={close} on:addnewskill={addnew}/>
+      <Addnewskill rn={skills2.map(c => c.skillName)} addS={true} on:b={close} on:addnewskill={addnew}/>
   </DialogContent>
   </div>
 </DialogOverlay>

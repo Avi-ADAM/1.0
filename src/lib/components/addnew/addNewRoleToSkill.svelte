@@ -3,11 +3,16 @@
  const dispatch = createEventDispatcher();
     import axios from 'axios';
     import { idd } from '../../stores/idd.js';
+    export let rn = [];
     let roleName_value;
         let desS;
         let link ="https://strapi-k4vr.onrender.com/tafkidims";
         let meData;
+        let shgi = false;
     function add () {
+      if (rn.includes(roleName_value)){
+  shgi = true;
+} else {
         axios
       .post(link, {
         roleDescription: roleName_value,
@@ -24,7 +29,7 @@
                   })
       .catch(error => {
         console.log('צריך לתקן:', error);
-                });
+                });}
     }; 
        function finnish (id) {
   dispatch('finnish', {
@@ -45,6 +50,7 @@
   <label for="name" class='label'>שם</label>
   <span class='line'></span>
 </div>
+{#if shgi == true}<small class="text-red-600">התפקיד כבר קיים</small>{/if}
 
            <div dir="rtl" class='textinput'>
   <input bind:value={desS}  
