@@ -1063,12 +1063,37 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 
 @keyframes mymove {
   from {fill: #FFFFFF;}
-  to {fill: var(--gold);}
+  50% {fill: var(--gold)}
+  to {fill: #FFFFFF;}
 }
+@keyframes mymove2 {
+  from {
+    fill: #FFFFFF;
+    filter: drop-shadow(0px 0px 8px #ffe7f8);
+  }
+  25% {
+  fill: var(--gold);
+      filter: drop-shadow(0px 0px 8px #6150f7);
+  }
+  50% {
+    fill:var(--barbi-pink);
+      filter: drop-shadow(0px 0px 8px #f773cf);
 
+  }
+
+  75% {fill: var(--gold);
+        filter: drop-shadow(0px 0px 8px #6150f7);
+
+  }
+  to{fill: #FFFFFF;
+      filter: drop-shadow(0px 0px 8px #ffe7f8);
+
+  }
+}
 @keyframes mymove1 {
   from {fill: var(--gold);}
-  to {fill: #FFFFFF;}
+  50% {fill: #FFFFFF;}
+  to{fill: var(--gold)}
 }
   .st1{fill:var(--gold);
        animation: mymove1 5s infinite;
@@ -1077,6 +1102,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
 
   .svgh:hover{
     fill: #fff;
+           animation: mymove2 2s infinite;
           filter: drop-shadow(0px 0px 8px #f561c9);
    /*   -webkit-filter: drop-shadow(  0 0 7px #fff,
       0 0 10px #fff,
