@@ -1,10 +1,10 @@
 <script>
 import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
-let freeday;
-let username;
+ import { createEventDispatcher } from 'svelte';
+    const dispatch = createEventDispatcher();
+
 let password;
-let email;
-let bio;
+let shgi;
 function logout() {
     var cookies = document.cookie.split(";");
 
@@ -17,12 +17,28 @@ function logout() {
     goto("/",)
 }
 
+function save (){
+	console.log( frd,
+	 bi,
+	 un,
+	 mail)
+    dispatch('message', {
+    frd: frd,
+	bi : bi,
+	un: un,
+	em: mail,
+    })
+  };
+
 
 import axios from 'axios';
 let passwordx;
 let errorl = null;
 let before = true;
 export let mail;
+export let un;
+export let bi;
+export let frd;
 let passi;  
 
 function shaneh () {
@@ -64,31 +80,68 @@ function shaneh () {
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
 		
 	}
+	let chan = false;
+	function ch (){
+		chan = true
+	}
 	function getV (e){
     passwordx = e.target.value
 	}
     let change = false;
 </script>
-
-<h1 class="text-barbi text-center text-m"> עריכת הפרטים שלי</h1>
-<!--<input type="text" bind:value={username}>
-<input type="email" bind:value={email}>-->
-<input type="text-area" bind:value={bio} >
+<h1 class="text-barbi text-center text-m">עריכת הפרטים שלי</h1>
+ <div dir="rtl" class='textinputi'>
+  <input name="des" on:change={ch} bind:value={un}  
+ type='text' class='inputi'required >
+  <label for="des" class='labeli'>שם </label>
+  <span class='line'></span>
+</div>
+{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
 <!--
-<input type="password" bind:value={password}>
-<select>
-<option  value=""  >היום החופשי שלי</option>
-<option  value="1">ראשון</option>
-<option value="2">שני</option>
-<option value="3">שלישי</option>
-<option value="4">רביעי</option>
-<option value="5">חמישי</option>
-<option value="6">שישי</option>
-<option value="7">שבת</option>
-</select>-->
-<button type="button" on:click={logout} class="bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded">יציאה מהחשבון במכשיר זה</button>
+    <div dir="rtl" class='textinputi'>
+  <input name="es" on:change={ch}  bind:value={mail}    
+ type='text' class='inputi' required >
+  <label for="es" class='labeli'>מייל</label>
+  <span class='line'></span>
+</div>-->
 
-
+   <div dir="rtl" class='textinputi'>
+  <input name="s" on:change={ch}  bind:value={bi}     
+ type='text' class='inputi' required>
+  <label for="s" class='labeli'>ביוגרפיה</label>
+  <span class='line'></span>
+</div>
+   <div dir="rtl" class="mb-3 xl:w-96 m-2">
+    <select on:change={ch} bind:value={frd}
+	 class="form-select appearance-none
+      block
+      w-full
+      px-3
+      py-1.5
+      text-barbi
+      font-normal
+      bg-white bg-clip-padding bg-no-repeat
+      border border-solid border-gold
+      rounded
+      transition
+      ease-in-out
+      m-0
+      focus:text-lturk focus:bg-gold focus:border-barbi focus:outline-none">
+<option selected  value="na">היום החופשי שלי</option>
+<option value="sun">ראשון</option>
+<option value="mon">שני</option>
+<option value="thu">שלישי</option>
+<option value="wen">רביעי</option>
+<option value="teh">חמישי</option>
+<option value="fri">שישי</option>
+<option value="shabat">שבת</option>
+</select>
+</div>
+{#if chan == true}
+<div>
+<button type="button" on:click={save} class="m-2 bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded">שמירת שינויים</button>
+</div>
+{/if}
 {#if change}
 {#if before}
 <div>
@@ -167,11 +220,85 @@ function shaneh () {
 
     {/if}
     {:else}
-    <button type="button" on:click={()=> change = true} class="bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded ">שינוי סיסמה</button>
+    <button type="button" on:click={()=> change = true} class="bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded m-2">שינוי סיסמה</button>
 
     {/if}
+<div>
+<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded">יציאה מהחשבון במכשיר זה</button>
+</div>
 <style>
+.inputi {
+  font-size: 8px;
 
+}
+select{
+	font-size: 8px;
+}
+
+@media (min-width: 528px) {
+.inputi {
+  font-size: 15px;
+
+}
+select{
+	font-size: 100%;
+}
+
+}
+
+ .textinputi {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.inputi {
+  font-family: 'Roboto', sans-serif;
+  border: none;
+  margin: 0;
+  padding: 10px 0;
+  outline: none;
+  border-bottom: solid 1px var(--gold);
+  margin-top: 12px;
+  width: 100%;
+ color:  var(--barbi-pink);
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+}
+
+
+.labeli {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color:var(--barbi-pink);
+  user-select: none;
+}
+
+.line {
+  height: 2px;
+  background-color: #2196F3;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+}
+
+.inputi:focus ~ .line, .inputi:valid ~ .line {
+  width: 100%;
+}
+
+.inputi:focus ~ .labeli, .inputi:valid ~ .labeli {
+  font-size: 11px;
+  color: var(--gold);
+  top: 0;
+}
 	.field {
 		width: 80%;
 		position: relative;

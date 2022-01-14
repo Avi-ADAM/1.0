@@ -294,16 +294,16 @@ on:click={bitul}
  
    <h6 class="text-center text-sm text-barbi">עריכת ה{Valname} שלי </h6>
      {#if data} {#each data as da, i}
-  <p class="text-center text-sm text-lturk">
-       <button class="text-gold hover:text-barbi"  title={less} on:click={min(da.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
+  <div class="text-center text-sm text-lturk">
+       <button class="text-gold hover:text-barbi"  title={less} on:click={min(da.id)}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-    </svg>{da[valc]}</button>
-      </p>
+    </svg></button>{da[valc]}
+  </div>
  
    {/each} {/if}
-
- <h3 class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </h3>
-  <span >   <MultiSelect
+<br>
+ 
+  <span > <h3 class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </h3>  <MultiSelect
       bind:selected={data.selected2}
       {placeholder}
       options={allvn}

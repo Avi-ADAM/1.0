@@ -25,7 +25,7 @@ let run = [];
 let imageId = 5;
 let files;
   let shgi = false;
-    
+    let restime;
 function sendP () {
     if (run.includes(projectName_value)){
   shgi = true; 
@@ -62,7 +62,8 @@ if (files) {
     profilePic: imageId,
     linkToWebsite: linkP,
     descripFor: desPl,
-    vallues: find_value_id(selected)
+    vallues: find_value_id(selected),
+     restime: restime
               },
   {
   headers: {
@@ -90,7 +91,8 @@ if (files) {
     publicDescription: desP,
     linkToWebsite: linkP,
     descripFor: desPl,
-    vallues: find_value_id(selected)
+    vallues: find_value_id(selected),
+    restime: restime
               },
   {
   headers: {
@@ -293,7 +295,33 @@ addval == false;
     class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded"
     >הוספת ערך חדש</button>
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
-  <br>{#if loading == false}
+  <br>
+ <div dir="rtl" class="mb-3 xl:w-96 m-2">
+    <select bind:value={restime} class="form-select appearance-none
+      block
+      w-full
+      px-3
+      py-1.5
+      text-barbi
+      font-normal
+      bg-white bg-clip-padding bg-no-repeat
+      border border-solid border-gold
+      rounded
+      transition
+      ease-in-out
+      m-0
+      focus:text-lturk focus:bg-gold focus:border-barbi focus:outline-none">
+<option value="feh" selected >זמן תגובה לקבלת החלטות בפרויקט</option>
+<option value="feh">שעות 48</option>
+<option value="sth">שעות 72</option>
+<option value="nsh">שעות 96</option>
+<option value="sevend">שבוע</option>
+
+</select>
+<small style="color: red;">לאחר זמן זה חוסר מענה יחשב כהסכמה</small>
+</div>
+  {#if loading == false}
+
 <button 
     class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded"
      on:click="{sendP}"

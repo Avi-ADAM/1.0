@@ -162,7 +162,6 @@ function letters(data){
     
 
 function project (id) {
- // alert('בקרוב')
     idPr.set(id);
     goto("/moach", );
   };
@@ -203,6 +202,8 @@ onMount(async () => {
             }).then(checkStatus)
           .then(parseJSON);
             meData = res;
+            console.log(meData)
+                        mail = meData.email;
           letters(meData.username);
             myP = meData.projects_1s;
             skil = meData.skills;
@@ -210,7 +211,6 @@ onMount(async () => {
             val = meData.vallues;
             mash = meData.mashaabims;
             work = meData.work_ways;
-            mail = meData.email;
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
             uPic.set(meData.profilePic.formats.thumbnail.url);
@@ -223,9 +223,12 @@ onMount(async () => {
         }
     });
   
- /// picLink = "http://localhost:5000" + $uPic;
- async function refresh (p, valc) {
-      const cookieValue = document.cookie
+let userName_value;
+let emailL;
+let biog;
+let frd;
+    function sendD () {
+    const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
@@ -236,36 +239,31 @@ onMount(async () => {
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link =`https://strapi-k4vr.onrender.com/${p}?_limit=-1`;
-          const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-          const checkStatus = (resp) => {
-          if (resp.status >= 200 && resp.status < 300) {
-            return resp;
-          }
-          return parseJSON(resp).then((resp) => {
-            throw resp;
-          });
-        };
-        const headers = {
-          'Content-Type': 'application/json'   
-        };
-          try {
-              const res = await fetch(link, {
-                method: 'GET',
-         
-          headers: {
-              'Authorization': bearer1,
-              'Content-Type': 'application/json'
-                    },
-              }).then(checkStatus)
-            .then(parseJSON);
-              odata = res;
-              allvn = odata.map(c => c[valc]);
-          } catch (e) {
-              error1 = e
-              console.log(error1);
-          }
-      };
+    let link ="https://strapi-k4vr.onrender.com/users/" + idLi 
+      axios
+      .put(link, {
+        username: userName_value, 
+    email: emailL,
+    bio: biog,
+    frd: frd
+                  },
+      {
+      headers: {
+        'Authorization': bearer1
+                }})
+      .then(response => {
+        meData = response.data;
+       
+    isOpen = false;
+    a = 0;
+  //  updpic.set(0);
+                  })
+      .catch(error => {
+        console.log('צריך לתקן:', error.response);
+                });
+      
+    };
+    
  
  
 	function callbackFunction(event) {
@@ -273,6 +271,14 @@ onMount(async () => {
     files = event.detail.files;
     console.log(files);
     sendP ();
+	}
+  	function callbackFunctio(event) {
+    a = 2;
+    userName_value = event.detail.un;
+    emailL = event.detail.em;
+    biog = event.detail.bi;
+    frd = event.detail.frd;
+  //  sendD ();
 	}
 
 
@@ -419,7 +425,7 @@ addSl4 = false;
 
 
           {:else if a == 1}
-          <EditB {mail}/>
+          <EditB frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio}/>
           {:else if a == 2}
           <div class="sp bg-gold">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
@@ -528,11 +534,68 @@ addSl4 = false;
 
 <button   
 style="    z-index: 7;"
-class="text-barbi hover:text-gold hover:bg-barbi hover:scale-150"     
+class=" hover:scale-150 "     
     on:click={() => addP = 1} 
-    title="יצירת פרויקט חדש"><svg  width="24" height="24"  viewBox="0 0 24 24">
-      <path fill="currentColor" d="M12,20C7.59,20 4,16.41 4,12C4,7.59 7.59,4 12,4C16.41,4 20,7.59 20,12C20,16.41 16.41,20 12,20M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2M13,7H11V11H7V13H11V17H13V13H17V11H13V7Z" />
-    </svg>
+    title="יצירת פרויקט חדש"><svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
+<style type="text/css">
+	
+</style>
+
+<g class="n svgh" >
+	<path   class="st2 svgh"  d="M626.407,50.022c-7.193-0.778-14.386-0.539-21.585-0.225c-7.199-0.314-14.392-0.553-21.585,0.225
+		C251.878,55.423,34.711,353.506,78.035,650.425c23.893,167.215,115.647,257.266,171.46,316.006
+		c120.016,126.058,98.977,162.49,139.248,225.625c-21.847,28.048-24.026,71.245-1.648,99.612
+		c-17.364,28.58-17.665,68.765,4.713,94.775c-20.476,31.982-18.608,77.175,8.345,100.906
+		c-5.833,37.263,21.687,100.389,96.352,99.134c1.835,7.057,2.615,35.574,28.544,52.411c22.791,15.301,33.22,8.487,120.829,10.596
+		c13.537,0.213,27.393-2.995,38.715-10.596c25.906-16.821,26.712-45.365,28.544-52.411c69.851,1.174,102.81-57.885,96.352-99.134
+		c27.183-23.933,28.625-69.231,8.345-100.906c22.378-26.01,22.077-66.196,4.713-94.775c22.378-28.367,20.199-71.564-1.648-99.612
+		c18.569-29.111,27.339-62.953,42.134-93.907c40.361-89.323,118.845-144.285,175.146-219.92
+		C1278.898,552.106,1058.01,57.057,626.407,50.022z"/>
+	<g>
+		<path class="st1" d="M524.2,322.601c48.714,52.887,44.272,124.135-12.19,172.027c46.6,39.059,62.963,107.336,29.43,160.439
+			c-21.599-8.771-47.219-9.905-68.41,0.62c-15.397-10.737-34.816-15.521-53.314-11.269c-14.058-51.802-57.926-76.267-110.562-64.442
+			c0-12.952-2.87-25.904-9.444-37.155c20.766-1.914,41.142-10.418,55.99-25.249c21.952,26.53,58.082,34.106,89.726,13.891
+			c8.221,17.169,22.396,31.539,40.132,38.803c2.906-7.194,5.723-14.405,8.717-21.545c-36.456-15.635-47.837-72.308-8.523-99.453
+			c-4.43-6.414-8.806-12.863-13.236-19.26c-24.93,16.638-38.218,47.839-33.984,77.394c-24.695,20.091-53.098,13.835-68.269-9.143
+			c7.335-14.263,9.798-31.113,5.262-46.617c33.944-20.88,37.112-62.047,22.485-93.251c47.074-1.22,78.651-30.766,80.175-77.022
+			c22.378-7.016,40.061-26.241,45.111-49.168c-7.389-1.931-14.813-3.703-22.307-5.191c-9.078,40.401-58.74,44.695-86.395,13.129
+			c-5.971,5.014-11.747,10.223-17.488,15.468c14.635,16.726,35.472,28.19,57.903,29.271
+			c-12.072,102.836-178.404,29.849-144.847-52.677c9.459-25.101,38.855-44.549,72.096-30.794
+			C493.056,37.494,609.684,207.751,524.2,322.601z M286.208,279.616c15.991,41.547,43.497,61.444,79.91,74.452
+			c32.534,25.859,18.474,85.043-26.028,83.081c25.214,28.823,16.994,54.331-9.639,70.395
+			c-57.774,33.943-73.298-18.663-141.941,17.311c-43.266-51.995,2.963-129.5,66.887-128.263
+			C221.842,360.836,220.778,286.18,286.208,279.616z M278.695,614.9c56.62-24.962,104.915-20.123,119.634,39.707
+			c-17.346,12.793-26.79,34.834-23.867,56.22c-62.888,42.087-43.474,132.334,37.988,140.542
+			c4.057,29.944,26.453,54.98,54.253,65.629c3.154-7.087,5.599-14.44,8.434-21.634c-50.724-20.729-57.526-88.132,2.959-104.308
+			c-1.719-7.53-3.366-15.078-5.05-22.609c-29.82,6.607-52.852,26.297-60.313,59.48c-64.036-8.064-70.705-74.236-11.535-105.141
+			c-14.002-59.62,33.091-71.614,70.324-36.783c66.736-56.035,146.207,56.851,67.755,140.435
+			c92.475,100.044-11.622,222.972-100.392,132.267c-67.741,27.295-108.964-11.979-99.843-80.902
+			c-70.81,20.231-114.179-35.714-93.305-105.424c-66.112-20.811-90.579-79.246-87.564-143.235
+			C167.241,497.084,324.8,511.164,278.695,614.9z"/>
+		<path class="st0" d="M827.386,201.408c33.147-13.716,62.603,5.603,72.096,30.794c33.577,82.577-132.791,155.377-144.847,52.677
+			c22.431-1.081,43.268-12.545,57.903-29.271c-5.741-5.245-11.517-10.454-17.488-15.468c-27.647,31.557-77.315,27.28-86.395-13.129
+			c-7.495,1.488-14.919,3.26-22.307,5.191c5.05,22.928,22.733,42.152,45.111,49.168c1.524,46.257,33.105,75.801,80.175,77.022
+			c-14.488,30.908-11.75,72.193,22.485,93.251c-4.536,15.504-2.073,32.354,5.262,46.617c-15.126,22.91-43.508,29.288-68.269,9.143
+			c4.235-29.554-9.054-60.756-33.984-77.394c-4.43,6.396-8.806,12.846-13.236,19.26c39.299,27.134,27.947,83.812-8.523,99.453
+			c2.994,7.141,5.812,14.352,8.717,21.545c17.736-7.265,31.911-21.634,40.132-38.803c31.218,19.942,67.449,13.031,89.726-13.891
+			c14.848,14.83,35.224,23.335,55.99,25.249c-6.573,11.251-9.444,24.203-9.444,37.155c-52.583-11.813-96.491,12.589-110.562,64.442
+			c-18.498-4.252-37.917,0.532-53.314,11.269c-21.191-10.525-46.812-9.391-68.41-0.62c-33.571-53.164-17.113-121.428,29.43-160.439
+			c-56.477-47.905-60.891-119.154-12.19-172.027c-75.922-102.004,5.287-223.719,84.02-180.337
+			C794.058,155.889,811.901,178.498,827.386,201.408z M954.25,396.593c63.903-1.237,110.171,76.246,66.887,128.263
+			c-15.694-8.225-37.67-20.541-78.882-8.363c-46.737,13.978-119.009-26.402-72.698-79.343
+			c-44.501,1.961-58.568-57.218-26.028-83.081c35.043-12.519,63.386-31.523,79.91-74.452
+			C988.214,286.114,988.173,360.442,954.25,396.593z M963.906,772.381c20.839,69.591-22.337,125.7-93.305,105.424
+			c9.123,68.938-32.481,108.044-99.843,80.902c-89.352,91.299-192.353-32.78-100.392-132.267
+			c-78.548-83.687,0.915-196.557,67.755-140.435c36.775-34.403,84.439-23.315,70.324,36.783
+			c58.943,30.786,52.747,97.046-11.535,105.141c-7.412-32.964-30.243-52.818-60.313-59.48c-1.683,7.53-3.331,15.078-5.05,22.609
+			c60.391,16.15,53.744,83.554,2.959,104.308c2.835,7.194,5.28,14.547,8.434,21.634c27.8-10.649,50.196-35.685,54.253-65.629
+			c81.536-8.215,100.853-98.471,37.988-140.542c2.924-21.386-6.52-43.428-23.867-56.22c14.762-60.007,63.078-64.641,119.634-39.707
+			c-37.249-83.81,51.987-98.654,90.062-61.323C1069.097,599.65,1069.536,739.131,963.906,772.381z"/>
+	</g>
+</g>
+</svg>
+
  </button> 
 </div> 
      
@@ -994,6 +1057,62 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
  <!-- המשימות שסיימתי-->         
 
   <style>
+    .st0{fill:#FFFFFF;
+     animation: mymove 5s infinite;
+}
+
+@keyframes mymove {
+  from {fill: #FFFFFF;}
+  to {fill: var(--gold);}
+}
+
+@keyframes mymove1 {
+  from {fill: var(--gold);}
+  to {fill: #FFFFFF;}
+}
+  .st1{fill:var(--gold);
+       animation: mymove1 5s infinite;
+  }
+  .st2{fill:var(--barbi-pink);}
+
+  .svgh:hover{
+    fill: #fff;
+          filter: drop-shadow(0px 0px 8px #f561c9);
+   /*   -webkit-filter: drop-shadow(  0 0 7px #fff,
+      0 0 10px #fff,
+      0 0 21px #fff,
+      0 0 42px #0fa,
+      0 0 82px #0fa,
+      0 0 92px #0fa,
+      0 0 102px #0fa,
+      0 0 151px #0fa);
+  filter: drop-shadow( 0 0 7px #fff,
+      0 0 10px #fff,
+      0 0 21px #fff,
+      0 0 42px #0fa,
+      0 0 82px #0fa,
+      0 0 92px #0fa,
+      0 0 102px #0fa,
+      0 0 151px #0fa );*/
+
+     
+  }
+    .n{
+       cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
+  
+    }
+    
+.n:hover:before {
+  transform: scale(1.2);
+  box-shadow: 0 0 15px #d35400;
+  filter: blur(3px);
+}
+
+.n:hover {
+  color: #ffa502;
+  box-shadow: 0 0 15px #d35400;
+  text-shadow: 0 0 15px #d35400;
+}
     .cot{
     color:var(--barbi-pink);
      margin: 0 auto; 
@@ -1322,7 +1441,7 @@ class="bg-pink-200 hover:bg-barbi text-mturk rounded"
   top: 0;
   right: 0;
   height: 100vh;
-  padding: 2rem 1rem 0.6rem;
+  padding: 5rem 1rem 0.6rem;
   border-left: 1px solid #aaa;
   overflow-y: auto;
   overflow-x: auto;
@@ -1347,7 +1466,7 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
   top: 0;
   left: 0;
   height: 100%;
-  padding: 2rem 1rem 0.6rem;
+  padding: 5rem 1rem 0.6rem;
   overflow-y: scroll;
     overflow-x: auto;
 
@@ -1454,6 +1573,11 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
   padding: 20px;
  */ 
 }
+
+
+@-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 
 #circular-text span {
  /* position: absolute;
