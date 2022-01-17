@@ -4,7 +4,7 @@
 } from 'svelte-loading-spinners'
     import Uplad from '../../lib/components/userPr/uploadPic.svelte';
     import axios from 'axios';
-
+    import Editb from '../../lib/components/prPr/editp.svelte'
    import { onMount } from 'svelte'; 
    import { idPr } from '../../lib/stores/idPr.js';
   // import { idM } from '../../lib/stores/idM.js';
@@ -80,7 +80,8 @@ let a = 0;
     let error1 = null;
    let meData;
     let srcP; 
-   
+   let desP;
+   let projectname;
   let token; 
   let linkP;
  
@@ -92,6 +93,8 @@ let projectUsers =[];
 let idL;
 let vallues = [];
 let ata = [];
+let restime;
+let valit;
 onMount(async () => {
   // ולידציה שהיוזר חבר בפרוייקט
     const cookieValue = document.cookie
@@ -186,6 +189,7 @@ onMount(async () => {
             vallues {valueName}
             linkToWebsite
             profilePic {url formats }
+            restime
           } }
           `} )
             }).then(checkStatus)
@@ -193,8 +197,12 @@ onMount(async () => {
             meData = res.data.project;
             project = res.data.project;
             console.log(meData);
+            projectname = res.data.project.projectName;
+            desP = project.publicDescription
+            linkP = res.data.project.linkToWebsite
             meData.descripFor = descPri;
             projectUsers = project.user_1s;
+            restime = project.restime;
             if (project.mesimabetahaliches.length > 1){
             bmiData = project.mesimabetahaliches;
             } else if (project.mesimabetahaliches.length == null) {
@@ -219,6 +227,7 @@ onMount(async () => {
             pmiData = pmiData;
             bmiData = bmiData;
             vallues = project.vallues;
+            valit = vallues.map(c => c.valueName);
              meData.linkToWebsite = linkP;
             noofopen = project.open_missions.length;
             if (project.profilePic !== null){
@@ -707,7 +716,8 @@ function editb () {
   function basic (){
       isOpen = true;
       a = 1;
-  } 	function allbackFunction(event) {
+  } 
+  	function allbackFunction(event) {
     a = 2;
     files = event.detail.files;
     sendP ();
@@ -763,8 +773,60 @@ let meDatap = [];
                 });
       
     })};
+     function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+    let linkdi ="https://strapi-k4vr.onrender.com/projects/" + $idPr ;
+      axios
+      .put(linkdi, {
+projectName: projectName_valuei, 
+    publicDescription: desPi,
+    linkToWebsite: linkPi,
+    descripFor: desPli,
+    vallues: selectedi,
+    restime: restimei                  },
+      {
+      headers: {
+        'Authorization': bearer1
+                }})
+      .then(response => {
+        meDatap = response.data;
+        console.log(meDatap);
+        meDatap.projectName = projectname;
+        meDatap.desP = desP;
+        meDatap.restime = restime;
+        meDatap.vallues = valit
+        vallues = valit.map(c => c.valueName)
+        meDatap.linkP = linkP;
+        meDatap.desPl = descripFor;
+    isOpen = false;
+    a = 0;
+                  })
+      .catch(error => {
+        console.log('צריך לתקן:', error.response);
+        if (error.response != undefined) {
+          a = 3;
+        }
+                });
+      
+    };
+    function updete (event) {
+    a = 2;
+upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, event.detail.desPl, event.detail.selected, event.detail.restime)
+    }
     </script>
+<!--<div class="manu">
 
+</div>-->
 
     {#if $idPr }
     
@@ -779,7 +841,14 @@ let meDatap = [];
 
 
           {:else if a == 1}
-        <!--  <EditB {mail}/>--><h1>בקרוב... יום יומיים</h1>
+        <Editb
+        on:message={updete}
+        selected={valit}
+        {restime}
+         {desP}
+          projectName_value={projectname}
+          desPl={descripFor}
+          {linkP}/>
           {:else if a == 2}
           <div class="sp bg-gold">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
@@ -824,7 +893,7 @@ let meDatap = [];
 </button>
           {/if}
            <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded"
+          class=" hover:bg-barbi text-pink-200 rounded"
           title="עריכת פרטי פרויקט"
           on:click={editb} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -832,9 +901,9 @@ let meDatap = [];
           </svg>
           </button>
     </div>
-  <h1 class="1 bg-lturk">{project.projectName}</h1>
+  <h1 class="1 bg-lturk">{projectname}</h1>
   {#if project.publicDescription}
-  <h6 class="2 bg-lturk">{project.publicDescription}</h6>
+  <h6 class="2 bg-lturk">{desP}</h6>
   {/if}
   {#if project.descripFor}
   <p class="bg-lturk">{descripFor}</p>
@@ -1200,10 +1269,10 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     <h1 class="bg-white">לא מורשה</h1>
     {/if}-->
  {:else }  
- <div>
+ <div class="flex-center">
    <!-- למשוך רשימת פרויקטים של המשתמש או לפחות להוסיףך סולמית למיקום המדויק בעמוד -->
 <a class="text-mturk hover:text-lturk font-bold py-2 px-4 m-4 rounded"
- href={`http://localhost:3000/me`}
+ href={`http://1one.world/me`}
  ><h1>לבחירת פרויקט</h1></a>
  </div> 
  {/if}

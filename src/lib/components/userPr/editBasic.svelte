@@ -18,10 +18,7 @@ function logout() {
 }
 
 function save (){
-	console.log( frd,
-	 bi,
-	 un,
-	 mail)
+	
     dispatch('message', {
     frd: frd,
 	bi : bi,
