@@ -297,6 +297,7 @@ addval == false;
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
+      <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בפרויקט</h2>
     <select bind:value={restime} class="form-select appearance-none
       block
       w-full
@@ -311,8 +312,7 @@ addval == false;
       ease-in-out
       m-0
       focus:text-lturk focus:bg-gold focus:border-barbi focus:outline-none">
-<option value="feh" selected >זמן תגובה לקבלת החלטות בפרויקט</option>
-<option value="feh">שעות 48</option>
+<option value="feh" selected>שעות 48</option>
 <option value="sth">שעות 72</option>
 <option value="nsh">שעות 96</option>
 <option value="sevend">שבוע</option>

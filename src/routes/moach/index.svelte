@@ -724,6 +724,7 @@ function editb () {
 	}
       let url1 = "https://strapi-k4vr.onrender.com/upload";
 let meDatap = [];
+let mecata = [];
     function sendP () {
     const cookieValue = document.cookie
   .split('; ')
@@ -773,7 +774,7 @@ let meDatap = [];
                 });
       
     })};
-     function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
+    async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -786,28 +787,28 @@ let meDatap = [];
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     let linkdi ="https://strapi-k4vr.onrender.com/projects/" + $idPr ;
-      axios
+   await   axios
       .put(linkdi, {
-projectName: projectName_valuei, 
+    projectName: projectName_valuei, 
     publicDescription: desPi,
     linkToWebsite: linkPi,
     descripFor: desPli,
     vallues: selectedi,
-    restime: restimei                  },
+    restime: restimei,
+                    },
       {
       headers: {
         'Authorization': bearer1
                 }})
-      .then(response => {
-        meDatap = response.data;
-        console.log(meDatap);
-        meDatap.projectName = projectname;
-        meDatap.desP = desP;
-        meDatap.restime = restime;
-        meDatap.vallues = valit
-        vallues = valit.map(c => c.valueName)
-        meDatap.linkP = linkP;
-        meDatap.desPl = descripFor;
+      .then(resp => {
+        mecata = resp.data;
+      console.log(mecata);
+       projectname  = mecata.projectName;
+       desP = mecata.publicDescription;
+       restime  = mecata.restime ;
+       vallues  = mecata.vallues;
+       linkP  = mecata.linkP;
+        descripFor = mecata.descripFor;
     isOpen = false;
     a = 0;
                   })
@@ -821,7 +822,7 @@ projectName: projectName_valuei,
     };
     function updete (event) {
     a = 2;
-upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, event.detail.desPl, event.detail.selected, event.detail.restime)
+upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, event.detail.desPl, event.detail.valit, event.detail.restime)
     }
     </script>
 <!--<div class="manu">
@@ -1307,5 +1308,16 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
    display: grid;
     justify-content: center;
   align-items: center; 
+  }
+    :global([data-svelte-dialog-content].content) {
+     background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);
+      background-position: center;
+      background-size: cover;
+      width: 80vw;
+  }
+  @media (min-width: 568px){
+        :global([data-svelte-dialog-content].content) {
+width:50vw;
+        }
   }
  </style>
