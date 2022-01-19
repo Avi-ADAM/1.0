@@ -311,7 +311,7 @@ addval == false;
       transition
       ease-in-out
       m-0
-      focus:text-lturk focus:bg-gold focus:border-barbi focus:outline-none">
+      focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
 <option value="feh" selected>שעות 48</option>
 <option value="sth">שעות 72</option>
 <option value="nsh">שעות 96</option>

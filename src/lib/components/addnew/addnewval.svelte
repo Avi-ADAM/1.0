@@ -56,11 +56,11 @@ function dispatchb () {
 };
 export let addS = false; 
 let cencel = 'ביטול';
-
+export let color = "--gold";
  </script>
  
 {#if addS == false}
-<button
+<button style="--the:{color};"
 class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-2 rounded"
 on:click={() => addS = true}>הוספת ערך שאינו ברשימה</button>
 {:else}
@@ -111,7 +111,7 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded"><
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: var(--gold);
+  color: var(--the);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -124,7 +124,7 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded"><
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--gold);
+  color: var(--the);
   user-select: none;
 }
 

@@ -58,11 +58,12 @@ if (rn.includes(Name_value)){
   dispatch('b', {
     } );
 };
+export let color = "--gold";
     </script>
     
       
     {#if addW == false}
-    <button
+    <button style="--the:{color};"
     class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
     on:click={() => addW = true}>הוספת חדשה</button>
     {:else}
@@ -115,7 +116,7 @@ if (rn.includes(Name_value)){
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
- color: var(--gold);
+ color: var(--the);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -128,7 +129,7 @@ if (rn.includes(Name_value)){
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--gold);
+  color: var(--the);
   user-select: none;
 }
 

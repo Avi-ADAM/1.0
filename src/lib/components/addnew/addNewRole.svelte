@@ -8,6 +8,7 @@ import MultiSelect from 'svelte-multiselect';
 import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
 export let rn = [];
+export let color = "--gold"
 let idro;
 idr.subscribe(newwork => {
 idro = newwork;
@@ -127,9 +128,9 @@ function dispatchb () {
 
 
 {#if addR == false}
-<button
+<button style="--the:{color};"
 class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
-on:click={() => addR = true}>הוספת תפקיד חדש</button>
+on:click={() => addR = true}>הוספת תפקיד שאינו ברשימה</button>
 {:else}
 
 
@@ -186,7 +187,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
-      <Addnewskil  rn={skills2.map(c => c.skillName)} on:finnish={finnish}/>{/if}</div>
+      <Addnewskil {color} rn={skills2.map(c => c.skillName)} on:finnish={finnish}/>{/if}</div>
   
     {/if}
    
@@ -209,7 +210,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: var(--gold);
+  color: var(--the);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -222,7 +223,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--gold);
+  color: var(--the);
   user-select: none;
 }
 

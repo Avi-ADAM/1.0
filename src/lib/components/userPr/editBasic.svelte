@@ -39,11 +39,7 @@ export let frd;
 let passi;  
 
 function shaneh () {
-  console.log("1")
           passwordx = passwordx.trim();
-  console.log("2")
-
-  // Request API.{
    axios
   .post('https://strapi-k4vr.onrender.com/password', {
      identifier: mail,
@@ -52,8 +48,7 @@ function shaneh () {
     onfirmPassword: passwordx
   })
   .then(response => {
-    // Handle success.
-        console.log('Your user\'s password has been changed.', response);
+        console.log('Your password has been changed.', response);
     before = false;
   })
   .catch(error => {
@@ -109,6 +104,7 @@ function shaneh () {
   <span class='line'></span>
 </div>
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
+      <h2 class="text-center text-barbi">היום החופשי שלי</h2>
     <select on:change={ch} bind:value={frd}
 	 class="form-select appearance-none
       block
@@ -123,8 +119,8 @@ function shaneh () {
       transition
       ease-in-out
       m-0
-      focus:text-lturk focus:bg-gold focus:border-barbi focus:outline-none">
-<option selected  value="na">היום החופשי שלי</option>
+      focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
+<option  value="na" selected>היום החופשי שלי</option>
 <option value="sun">ראשון</option>
 <option value="mon">שני</option>
 <option value="thu">שלישי</option>

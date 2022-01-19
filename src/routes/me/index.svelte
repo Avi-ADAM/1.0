@@ -243,7 +243,6 @@ let frd;
       axios
       .put(link, {
         username: userName_value, 
-    email: emailL,
     bio: biog,
     frd: frd
                   },
@@ -275,10 +274,10 @@ let frd;
   	function callbackFunctio(event) {
     a = 2;
     userName_value = event.detail.un;
-    emailL = event.detail.em;
+   // emailL = event.detail.em;
     biog = event.detail.bi;
     frd = event.detail.frd;
-  //  sendD ();
+    sendD ();
 	}
 
 
@@ -536,7 +535,8 @@ addSl4 = false;
 style="    z-index: 7;"
 class=" hover:scale-150 "     
     on:click={() => addP = 1} 
-    title="יצירת פרויקט חדש"><svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+    title="יצירת פרויקט חדש">
+<svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
 <style type="text/css">
 	

@@ -160,7 +160,7 @@ addval == false;
     on:click={() => addval = true} 
     class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded"
     >הוספת ערך חדש</button>
-  {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
+  {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
    <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בפרויקט</h2>

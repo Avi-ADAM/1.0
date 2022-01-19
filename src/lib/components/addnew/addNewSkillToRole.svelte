@@ -41,11 +41,12 @@ function finnish (id) {
     new: skillName_value
     } );
        };
+       export let color = "--gold"
 </script>
 
   <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">הוספת כישור חדש</h1>    
 
-<div dir="rtl" class='textinput'>
+<div style="--the:{color};" dir="rtl" class='textinput'>
   <input    bind:value={skillName_value}
  type='text' class='input' required>
   <label for="name" class='label'>שם</label>
@@ -86,7 +87,7 @@ function finnish (id) {
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: var(--gold);
+  color: var(--the);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -99,7 +100,7 @@ function finnish (id) {
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--gold);
+  color: var(--the);
   user-select: none;
 }
 
