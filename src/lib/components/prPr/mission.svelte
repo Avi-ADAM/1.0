@@ -1,7 +1,7 @@
 <script>
     import MultiSelect from 'svelte-multiselect';
    import axios from 'axios';
-   import Addnewro from '../addnew/addNewrole.svelte';
+   import Addnewro from '../addnew/addNewRole.svelte';
    import { createEventDispatcher } from 'svelte';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   import AddNewWorkway from '../addnew/addnewWorkway.svelte';
