@@ -64,23 +64,36 @@ onMount(async () => {
    let kvar;
     onMount(async () => {
     if (document.cookie) {
-      const cookieValue = document.cookie
+     
+const unt = document.cookie
   .split('; ')
-  .find(row => row.startsWith('email='))
-  .split('=')[1];
-    kvar  = cookieValue; 
-    email.set(cookieValue);
-const un = document.cookie
+  .find(row => row.startsWith('un='))
+  if (unt != null) {
+  const un = document.cookie
   .split('; ')
   .find(row => row.startsWith('un='))
   .split('=')[1];
-   userName.set(un);
-const reg = document.cookie
+   userName.set(un);}
+const regt = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  if (regt != null) {
+  const reg = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
-user = reg;
-}
+
+user = reg;}
+ const cookieValuet = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('email='))
+  if (cookieValuet != null){
+const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('email='))
+  .split('=')[1];    kvar  = cookieValue; 
+    email.set(cookieValue);
+}}
     });
 
 
