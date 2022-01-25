@@ -1421,6 +1421,11 @@
     "sorcery" "^0.10.0"
     "strip-indent" "^3.0.0"
 
+"svelte-viewport-info@^0.1.12":
+  "integrity" "sha512-kBEK2TmafL/uG5fJYDF5jSYY/C3Rz9Sn4U9iOt76MLRabI3XkdsDmhQYEsBhtuuUcjTyNlK+uj9hLxX5vg/M8Q=="
+  "resolved" "https://registry.npmjs.org/svelte-viewport-info/-/svelte-viewport-info-0.1.12.tgz"
+  "version" "0.1.12"
+
 "svelte@^3.2.0", "svelte@^3.23.0", "svelte@^3.38.3", "svelte@^3.44.0", "svelte@>=3.19.0":
   "integrity" "sha512-aGgrNCip5PQFNfq9e9tmm7EYxWLVHoFsEsmKrtOeRD8dmoGDdyTQ+21xd7qgFd8MNdKGSYvg7F9dr+Tc0yDymg=="
   "resolved" "https://registry.npmjs.org/svelte/-/svelte-3.44.3.tgz"

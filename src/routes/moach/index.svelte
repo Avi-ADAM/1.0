@@ -8,17 +8,17 @@
    import { onMount } from 'svelte'; 
    import { idPr } from '../../lib/stores/idPr.js';
   // import { idM } from '../../lib/stores/idM.js';
- //  import Mission from '../../lib/components/addnew/mission.svelte';
-  // import ChoosMission from '../../lib/components/addnew/choosMission.svelte';
+ import Mission from '../../lib/components/prPr/mission.svelte';
+  import ChoosMission from '../../lib/components/prPr/choosMission.svelte';
  //   import ChoosNeed from '../../lib/components/addnew/choosneed.svelte';
  //   import TotalNeeds from '../../lib/components/addnew/totalNeeds.svelte';
  //   import { total } from '../../lib/components/addnew/store/total.js';
  //   import { beforeUpdate, tick } from 'svelte';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
- //   import OpenM from '../../lib/components/projectPr/openM.svelte';
- //   import PendsM from '../../lib/components/projectPr/pendsM.svelte';
-  //      import Betaha from '../../lib/components/projectPr/betaha.svelte';
-   //     import Fini from '../../lib/components/projectPr/fini.svelte';
+   import OpenM from '../../lib/components/prPr/openM.svelte';
+    import PendsM from '../../lib/components/prPr/pendsM.svelte';
+        import Betaha from '../../lib/components/prPr/betaha.svelte';
+       import Fini from '../../lib/components/prPr/fini.svelte';
 
 //import { validate_component } from 'svelte/internal';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -52,7 +52,7 @@ let a = 0;
       };
     
         try {
-            const res = await fetch("http://localhost:5000/missions?_limit=-1", {
+            const res = await fetch("https://strapi-k4vr.onrender.com/missions?_limit=-1", {
               method: "GET",
               headers: {
                 'Authorization': bearer1,
@@ -213,17 +213,17 @@ onMount(async () => {
             } else if (project.finnished_missions.length == null) {
             fmiData.push(project.finnished_missions);
             }
-            if (project.open_missions.length > 1){
+          //  if (project.open_missions.length > 1){
             omiData = project.open_missions;
-            } else if (project.open_missions.length == null){
-            omiData.push(project.open_missions);
-            }
+          //  } else if (project.open_missions.length == null){
+          //  omiData.push(project.open_missions);
+          //  }
             if (project.pendms.length > 1){
             pmiData = project.pendms;
             } else if (project.pendms.length == null){
             pmiData.push(project.pendms);
             }
-            omiData = omiData;
+        //    omiData = omiData;
             pmiData = pmiData;
             bmiData = bmiData;
             vallues = project.vallues;
@@ -268,12 +268,12 @@ async function callbackFunction(event) {
   showvd = event.detail.show; 
     blabla = event.detail.bla;
     addM = true;
-    goto("/projectPrivat#xyz")
+    goto("/moach#xyz")
 	};    
 
 async function findiM() {
   var resultString = li.join('&id_in=');
- let link ="http://localhost:5000/missions?id_in=" + resultString ;
+ let link ="https://strapi-k4vr.onrender.com/missions?id_in=" + resultString ;
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -307,21 +307,6 @@ async function findiM() {
         }
 };
 
-//beforeUpdate(async () => {
-//  console.log('the component is about to update');
-//  await tick();
-//  console.log('the tick component just updated');
-//});
-//import { afterUpdate } from 'svelte';
-//
-//	afterUpdate(() => {
-//		console.log('the component just updated');
-//	});
-//  import { onDestroy } from 'svelte';
-//
-//onDestroy(() => {
-//  console.log('the component is being destroyed');
-//}); 
 let error8;
 let roles = [];
 async function findT ()  {
@@ -339,7 +324,7 @@ async function findT ()  {
       };
     
         try {
-            const res = await fetch("http://localhost:5000/tafkidims?_limit=-1", {
+            const res = await fetch("https://strapi-k4vr.onrender.com/tafkidims?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -368,7 +353,7 @@ async function findZ ()  {
       };
     
         try {
-            const res = await fetch("http://localhost:5000/skills?_limit=-1", {
+            const res = await fetch("https://strapi-k4vr.onrender.com/skills?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -397,7 +382,7 @@ async function findX ()  {
       };
     
         try {
-            const res = await fetch("http://localhost:5000/work-ways?_limit=-1", {
+            const res = await fetch("https://strapi-k4vr.onrender.com/work-ways?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -920,19 +905,20 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
    <h6 class="textlink hover:text-scale-150 hover:text-gold">{user.username}</h6>
   {/each}
   <div class="border-2 border-gold m-2"> 
-    <h2 class="text-barbi hover:text-gold">ערכי הפרויקט</h2>
-  <div class="flex-row"> 
+    <h2 class="text-barbi text-bold underline decoration-gold">ערכים ומטרות</h2>
+  <div class="flex flex-row flex-wrap justify-between"> 
 
   {#each vallues as vallue, i }
-    <h3>{vallue.valueName}</h3>
+    <h3> {vallue.valueName} </h3>
   {/each}</div></div>
   </div>
   <!--
   <div>
- <Fini users={projectUsers} {fmiData}/></div>
-<div>
+ <Fini users={projectUsers} {fmiData}/></div>-->
+
+<div class="bg-lturk" style="width:240px; height:240px; margin: 0 auto;">
    {#if hovered}
-  <button on:click={hosa} on:mouseleave={bighand} ><img title={hosafa}  width="240px" height="240px" src="buttonP2.svg" alt="cheked"></button> 
+  <button on:click={hosa} on:mouseleave={bighand} ><img title={hosafa}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"></button> 
 
   {:else}
  
@@ -1138,22 +1124,23 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
     {/if}
     <path d="M 372.047 192.183 C 187.585 192.183 38.049 341.719 38.049 526.181 C 38.049 710.643 187.585 860.179 372.047 860.179 C 556.509 860.179 706.045 710.643 706.045 526.181 C 706.045 341.719 556.509 192.183 372.047 192.183 Z M 372.047 212.007 C 545.56 212.007 686.221 352.667 686.221 526.181 C 686.221 699.694 545.56 840.355 372.047 840.355 C 198.534 840.355 57.873 699.694 57.873 526.181 C 57.873 352.667 198.534 212.007 372.047 212.007 Z" id="circle4344" class="s-y1SdroFNffHn" style="opacity: 0.7; fill: rgb(31, 28, 36); fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;"/>
   
-    {#if omiData[0]}
 
   {#if openMS === false}
-    <g transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"  on:click={() => openMS = true} style="">
+    <g class="gg" transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"  on:click={() => openMS = true} style="">
       <title>הצגת ועריכת משימות פתוחות</title>
-      <rect style=  "opacity: 0.3; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; fill: url(#linearGradient43281);" id="rect-1" width="342.857" height="148.571" x="200.619" y="593.895" ry="2.542"/>
-      <text dominant-baseline="middle" style= "text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill: rgb(171, 55, 200); fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre;" x="371" y="703.429" id="text4238"><tspan id="tspan4240" x="371" y="703.429" style="text-anchor: middle; font-size: 96.8px; word-spacing: 0px;">{noofopen}</tspan></text>
-      <text id= "text-4" y="703.429" x="371" dominant-baseline="middle" style=" text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre; fill: url(#linearGradient4248-1);"><tspan y="703.429" x="371" id="tspan4246" style=" text-anchor: middle; fill-opacity: 1; font-size: 96.8px; word-spacing: 0px; fill: url(#linearGradient42481);">{noofopen}</tspan></text>
+      <rect style=  "opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-1" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>
+      <text dominant-baseline="middle" style= "text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill: rgb(171, 55, 200); fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre;" x="371" y="682.429" id="text4238"><tspan id="tspan4240" x="371" y="682.429" style="text-anchor: middle; font-size: 96.8px; word-spacing: 0px;">{noofopen}</tspan></text>
+      <text id= "text-4" y="682.429" x="371" dominant-baseline="middle" style=" text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre; fill: url(#linearGradient4248-1);"><tspan y="682.429" x="371" id="tspan4246" style=" text-anchor: middle; fill-opacity: 1; font-size: 96.8px; word-spacing: 0px; fill: url(#linearGradient42481);">{noofopen}</tspan></text>
     </g>
-    {/if}{/if}
+    {/if}
      
   </g>
   
 </svg>  
 {/if}
-<br/>
+</div>
+<div class="bg-lturk m-4" >
+
 {#if pmiData.length > 0}
 
   {#if pendS === false}
@@ -1187,7 +1174,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 {/if} 
 {/if}
 
-  {#if openMS === true && omiData.length > 0}
+  {#if openMS === true && omiData !== null}
   
   <button title={cencel1}
   on:click={() => openMS = false}
@@ -1198,13 +1185,11 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 <OpenM omiData={omiData}/>
  
   {/if}
-</div>
 
-<div class="bg-lturk m-4" > -->
   <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->
-<!--
+
   
  {#if addM == true}<button
  title={cencel}
@@ -1221,7 +1206,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  
  {/if}
     </div>
-    
+    <!--
 <div class="bg-lturk m-4" >
   {#if addN == 0} 
       <button
@@ -1238,7 +1223,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       
       {/if}    
    
-    </div>
+    </div>-->
     <div class="bg-lturk p-4" id="xyz">
     {#if showvd == true}<Mission 
                                 userslength={projectUsers.length}
@@ -1261,6 +1246,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                  on:removeW={removeW}
                                  on:close={close}
                                  /> {/if}</div>
+                                 <!--
     <div class="bg-lturk" >
     {#if totalneed >= 1} <TotalNeeds/>{/if}</div>-->
    </div> 
@@ -1279,6 +1265,26 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  {/if}
 
  <style>
+   .gg{
+       transition: all 1s;
+  transform-origin: 50% 50%;
+   }
+   .gg:hover{
+     transform: scale(1.1);
+
+   }
+   #rect-1{
+     fill: black;
+        transition: all 1s;
+  transform-origin: 50% 50%;
+   }
+   #rect-1:hover{
+     fill: #67E8F9;
+   }
+ 
+   .all{
+     min-height: 100vh;
+   }
 .textlink:hover{
   -webkit-text-stroke: 1px var(--barbi-pink);
 }

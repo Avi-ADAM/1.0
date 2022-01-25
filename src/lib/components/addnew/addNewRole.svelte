@@ -126,9 +126,9 @@ function dispatchb () {
 
 </script>
 
-
+<div style="--the:{`var(${color})`};">
 {#if addR == false}
-<button style="--the:{color};"
+<button 
 class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
 on:click={() => addR = true}>הוספת תפקיד שאינו ברשימה</button>
 {:else}
@@ -191,7 +191,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
   
     {/if}
    
-
+</div>
     <style>
 
  .textinput {
@@ -210,7 +210,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: var(--the);
+  color: --the;
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -223,7 +223,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded"
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--the);
+  color: --the;
   user-select: none;
 }
 

@@ -46,7 +46,7 @@ function finnish (id) {
 
   <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">הוספת כישור חדש</h1>    
 
-<div style="--the:{color};" dir="rtl" class='textinput'>
+<div style="--the:{`var(${color})`};" dir="rtl" class='textinput'>
   <input    bind:value={skillName_value}
  type='text' class='input' required>
   <label for="name" class='label'>שם</label>
@@ -87,7 +87,7 @@ function finnish (id) {
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: var(--the);
+  color: --the;
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -100,7 +100,7 @@ function finnish (id) {
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--the);
+  color: --the;
   user-select: none;
 }
 

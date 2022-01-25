@@ -118,6 +118,7 @@ function dispatchb () {
 };
 export let color = "--gold";
   </script>
+  <div style="--the:{`var(${color})`};">
 {#if addS == false}
 <button style="--the:{color};"
 class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
@@ -184,7 +185,7 @@ on:click={() => addro = false}
  
 {/if}
 
-
+</div>
 
 <style>
  .textinput {
@@ -203,7 +204,7 @@ on:click={() => addro = false}
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
- color: var(--the);
+ color: --the;
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -216,7 +217,7 @@ on:click={() => addro = false}
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--the);
+  color: --the;
   user-select: none;
 }
 

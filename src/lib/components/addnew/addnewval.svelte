@@ -57,10 +57,11 @@ function dispatchb () {
 export let addS = false; 
 let cencel = 'ביטול';
 export let color = "--gold";
+console.log(color);
  </script>
- 
+ <div style="--the:{`var(${color})`};">
 {#if addS == false}
-<button style="--the:{color};"
+<button 
 class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-2 rounded"
 on:click={() => addS = true}>הוספת ערך שאינו ברשימה</button>
 {:else}
@@ -70,7 +71,7 @@ class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded text-center
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
 
-<div>
+<div >
  <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); "> הוספת ערך חדש</h1>    
 </div>
 <div dir="rtl" class='textinput'>
@@ -94,6 +95,7 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded"><
 </button>
 
 {/if}
+</div>
 <style>
  .textinput {
   position: relative;
@@ -111,7 +113,7 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded"><
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color: var(--the);
+  color: --the;
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -124,7 +126,7 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded"><
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: var(--the);
+  color: --the;
   user-select: none;
 }
 
