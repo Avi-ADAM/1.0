@@ -590,7 +590,7 @@ dispatch('addneww', {
 </div>
           </td>
           {/each}
-        </tr><tr>
+        </tr><!--<tr>
           <th>השמת המשימה לעצמי</th>
           {#each miData as data, i}
           <td>
@@ -642,7 +642,7 @@ dispatch('addneww', {
 </div>
       </td>
       {/each}
-    </tr><tr >
+    </tr>--><tr >
       <th>שווי סך הכל למשימה </th>
       {#each miData as data, i}
       <td>

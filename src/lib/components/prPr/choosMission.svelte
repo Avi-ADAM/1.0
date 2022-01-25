@@ -24,7 +24,7 @@ export let mission1 = [];
      };
 let moving = [];
 let ids;
-const placeholder = `בחירת והוספת פעולות לפרוייקט`;
+const placeholder = `בחירה מרשימה`;
 function handl() {
 
     if (selected.length > 0) {
@@ -63,7 +63,7 @@ function newM (event) {
   </script>
 
 <div dir="rtl">
-<h1 class="text-barbi font-bold">הוספת פעולות הנדרשות לתפקוד הפרויקט</h1>
+<h1 class="text-barbi font-bold">הוספת פעולות הנדרשות להקמה או\ו לתפקוד הפרויקט</h1>
   
            <div class="inline-block relative w-64">
         

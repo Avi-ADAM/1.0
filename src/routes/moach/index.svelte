@@ -1127,7 +1127,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
 
   {#if openMS === false}
     <g class="gg" transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"  on:click={() => openMS = true} style="">
-      <title>הצגת ועריכת משימות פתוחות</title>
+      <title>הצגת ועריכת פעולות פתוחות</title>
       <rect style=  "opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-1" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>
       <text dominant-baseline="middle" style= "text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill: rgb(171, 55, 200); fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre;" x="371" y="682.429" id="text4238"><tspan id="tspan4240" x="371" y="682.429" style="text-anchor: middle; font-size: 96.8px; word-spacing: 0px;">{noofopen}</tspan></text>
       <text id= "text-4" y="682.429" x="371" dominant-baseline="middle" style=" text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre; fill: url(#linearGradient4248-1);"><tspan y="682.429" x="371" id="tspan4246" style=" text-anchor: middle; fill-opacity: 1; font-size: 96.8px; word-spacing: 0px; fill: url(#linearGradient42481);">{noofopen}</tspan></text>
@@ -1174,7 +1174,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 {/if} 
 {/if}
 
-  {#if openMS === true && omiData !== null}
+  {#if openMS === true && omiData.length > 0}
   
   <button title={cencel1}
   on:click={() => openMS = false}
@@ -1183,7 +1183,16 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button> 
 <OpenM omiData={omiData}/>
- 
+ {:else if openMS === true && omiData.length == 0}
+  <button title={cencel1}
+  on:click={() => openMS = false}
+  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
+   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+  </svg></button>
+ <h2> אין פעולות פתוחות לפרויקט זה, מומלץ ליצור כבר עכשיו
+   <br>
+   (לחצו על היד המחזיקה מנורה שלמעלה)</h2>
   {/if}
 
   <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
