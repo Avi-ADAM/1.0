@@ -1,7 +1,7 @@
 <script>
 import Addnewskil from './addNewSkill.svelte';
 let addskil = false;
-import Addnewro from './addNewrole.svelte';
+import Addnewro from './addNewRole.svelte';
 let addro = false;
 import MultiSelect from 'svelte-multiselect';
 import axios from 'axios';
