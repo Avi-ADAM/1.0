@@ -116,7 +116,7 @@ export let color = "--gold";
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
- color: --the;
+  color:var( --the, var(--gold));
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -129,7 +129,7 @@ export let color = "--gold";
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color: --the;
+  color:var( --the, var(--gold));
   user-select: none;
 }
 
