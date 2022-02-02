@@ -8,7 +8,7 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import PendingM from "../../lib/components/lev/pandingMesima.svelte";
     import Welcomt from "../../lib/components/lev/welcomTo.svelte";
     import Fiappru from '../../lib/components/lev/fiappru.svelte';
-    import Viewport from 'svelte-viewport-info'
+  //  import Viewport from 'svelte-viewport-info'
     let updateP;
     let idL;
     let meData = [];
@@ -129,45 +129,46 @@ let adder = [];
 let check;
 let wi = 125
 function createD(){
-    console.log('Viewport Width x Height:     ',Viewport.Width+'x'+Viewport.Height)
-     if (Viewport.Width >= 1640){
-        check = 15
-    } else if (Viewport.Width >= 1240){
-        check = 12
-    } else if (Viewport.Width >= 950){
-        check = 9
-    } else {
-        check = 6
-    }
-    if (Viewport.Height >= 840 && Viewport.Height < 1040){
-     if (Viewport.Width >= 1640){
-        check = 25
-    } else if (Viewport.Width >= 1240){
-        check = 20
-    } else if (Viewport.Width >= 950){
-        check = 15
-    } else {
-        check = 10
-    }
-    } else if (Viewport.Height >= 1040){
-      if (Viewport.Width >= 1640){
-        check = 35
-    } else if (Viewport.Width >= 1240){
-        check = 28
-    } else if (Viewport.Width >= 950){
-        check = 21
-    } else {
-        check = 14
-    }  
-    }
-    if (Viewport.Width >= 550){
-        wi = 75;
-    }
-    orech = fia +  sug + pen + ask + wel + beta + des;
+  //  console.log('Viewport Width x Height:     ',Viewport.Width+'x'+Viewport.Height)
+//     if (Viewport.Width >= 1640){
+//        check = 15
+//    } else if (Viewport.Width >= 1240){
+//        check = 12
+//    } else if (Viewport.Width >= 950){
+//        check = 9
+//    } else {
+//        check = 6
+//    }
+//    if (Viewport.Height >= 840 && Viewport.Height < 1040){
+//     if (Viewport.Width >= 1640){
+//        check = 25
+//    } else if (Viewport.Width >= 1240){
+//        check = 20
+//    } else if (Viewport.Width >= 950){
+//        check = 15
+//    } else {
+//        check = 10
+//    }
+//    } else if (Viewport.Height >= 1040){
+//      if (Viewport.Width >= 1640){
+//        check = 35
+//    } else if (Viewport.Width >= 1240){
+//        check = 28
+//    } else if (Viewport.Width >= 950){
+//        check = 21
+//    } else {
+//        check = 14
+//    }  
+//    }
+//    if (Viewport.Width >= 550){
+//        wi = 75;
+//    }
+check = 4
+   orech = fia +  sug + pen + ask + wel + beta + des;
     if (orech < check &&  adder.length === 0){
         for (var i = orech; i < check; i++){
         adder.push(
- `<svg width="${wi}px" height="${wi}px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+ `<svg class="svggg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
   <circle fill="none" cx="50" cy="50" r="50"/>
 </svg>`
         )
@@ -1073,8 +1074,16 @@ des={0}  />
 
 
 <style>
-    
-
+    .svggg{
+        width:75px; 
+        height:75px;
+    }
+@media (min-width:550){
+     .svggg{
+        width:125px; 
+        height:125px;
+    }
+}
     @media  (max-width: 839px) {
     
     .screen{
