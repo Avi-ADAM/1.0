@@ -438,8 +438,8 @@ addSl4 = false;
 {#if addP == 0}
 <div class="body"  style="--the:{stylef};">
   <div class="name">
-  <a href="/about" ><img
-    title=" לדף אודות, בקרוב ללב המערכת"
+  <a href="/lev" ><img
+    title=" ללב המערכת"
     style="height: 7vh; margin: 0 auto;"
     class="hover:scale-200 hover:transform translate-y-20"
     src='https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg'

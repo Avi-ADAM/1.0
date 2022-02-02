@@ -1,5 +1,5 @@
 <script>
-import Addnewro from '../addnew/addNewrole.svelte';
+import Addnewro from '../addnew/addNewRole.svelte';
 import {
     createEventDispatcher
 } from 'svelte';

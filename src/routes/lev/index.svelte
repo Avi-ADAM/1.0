@@ -1,0 +1,1212 @@
+<script>
+import Mid from "../../lib/components/lev/mid.svelte"
+  import MissionInProgress from "../../lib/components/lev/missionInProgress.svelte"
+    import ProjectSuggestor from "../../lib/components/lev/projectSuggestor.svelte"
+    import DecisionMaking from "../../lib/components/lev/decisionMaking.svelte";
+    import Reqtojoin from '../../lib/components/lev/reqtojoin.svelte';
+    import { onMount } from 'svelte';
+    import PendingM from "../../lib/components/lev/pandingMesima.svelte";
+    import Welcomt from "../../lib/components/lev/welcomTo.svelte";
+    import Fiappru from '../../lib/components/lev/fiappru.svelte';
+    import Viewport from 'svelte-viewport-info'
+    let updateP;
+    let idL;
+    let meData = [];
+    let miData = [];
+    let askdata = [];
+    let token;
+    let error1 = null;
+    let askedarr = [];
+    let declineddarr = [];
+    let d = [];
+    let sk = [];
+    var dictids = {};
+    var dictasked = [];
+    let askedcoin = [];
+
+    let mtaha = [];   
+    let sug =  0
+let pen = 0
+let ask = 0
+let wel = 0
+let beta = 0
+let des = 0
+let fia = 0;
+let fiapp = [];
+
+    function mesimabetahalicha (data) {
+    const mtahan = data.data.user.mesimabetahaliches;
+        for (var i = 0; i < mtahan.length; i++) {
+            mtaha[i] = mtahan[i];
+    }
+    beta = mtaha.length;
+  //  createD()
+    bubleUiAngin(pends,mtaha, walcomen,askedcoin, meData );
+}
+
+function ishursium (dati){
+ const start = dati.data.user.projects_1s
+      const myid = dati.data.user.id;
+  for (var i = 0; i < start.length; i++) {
+            for (var j = 0; j < start[i].finiapruvals.length; j++){
+                      const rt = letters(start[i].finiapruvals[j].missname); 
+                    fiapp.push({
+                            uid: start[i].finiapruvals[j].users_permissions_user.id,
+                            username: start[i].finiapruvals[j].users_permissions_user.username,
+                            src: start[i].finiapruvals[j].users_permissions_user.profilePic.formats.thumbnail.url,
+                            hearotMeyuchadot: start[i].finiapruvals[j].mesimabetahalich.hearotMeyuchadot,
+                            missionDetails: start[i].finiapruvals[j].mesimabetahalich.descrip,
+                             nhours: start[i].finiapruvals[j].noofhours,
+                          mId: start[i].finiapruvals[j].mesimabetahalich.id,
+                             perhour: start[i].finiapruvals[j].mesimabetahalich.perhour,
+                            missId: start[i].finiapruvals[j].mesimabetahalich.mission.id,
+                           // deadline: start[i].asks[j].open_mission.sqadualed,
+                            openName: start[i].finiapruvals[j].missname,
+                            omid: start[i].finiapruvals[j].id,
+                            askId: start[i].finiapruvals[j].id,
+                            why: start[i].finiapruvals[j].why,
+                            whatt: start[i].finiapruvals[j].what,
+                            users: start[i].finiapruvals[j].vots,
+                           name: rt[0],
+                          stylef: rt[1], 
+                           st: rt[2],
+                            projectId: start[i].finiapruvals[j].project.id,
+                            projectName : start[i].finiapruvals[j].project.projectName,
+                            noof: start[i].finiapruvals[j].project.user_1s.length,
+                            src2: start[i].finiapruvals[j].project.profilePic.formats.thumbnail.url,
+                            myid: dati.data.user.id
+                               
+                              });
+            }
+                    console.log("somting")
+
+  }
+                      console.log("sokmting")
+
+  for (var k = 0; k < fiapp.length; k++) {
+     const x = fiapp[k].users
+     fiapp[k].uids = [];
+     fiapp[k].what = [];
+     for (var z = 0; z < x.length; z++){
+      fiapp[k].uids.push(x[z].users_permissions_user.id);
+           fiapp[k].what.push(x[z].what);
+ }
+ }    
+
+ for (var t = 0; t <fiapp.length; t++){
+    fiapp[t].id = t;
+    const allid = fiapp[t].uids;
+    const myid = dictasked[t].myid;
+    fiapp[t].already = false;
+    fiapp[t].noofusersOk = 0;
+    fiapp[t].noofusersNo = 0;
+
+    if(allid.includes(myid)){
+      fiapp[t].already = true;
+     // fiapp.splice(t, 1);
+    }
+        for (var r=0; r< fiapp[t].users.length; r++){
+            if (fiapp[t].users[r].what === true) {
+                
+                 fiapp[t].noofusersOk += 1;
+               
+            }else if (fiapp[t].users[r].what === false) {
+              
+                 fiapp[t].noofusersNo += 1;
+               
+            }
+        }
+    const noofusersWaiting = fiapp[t].noof - fiapp[t].users.length;
+    fiapp[t].noofusersWaiting = noofusersWaiting;
+        
+    }
+    fiapp = fiapp
+    fia = fiapp.length;
+//createD()
+}
+let orech;
+let adder = [];
+let check;
+let wi = 125
+function createD(){
+    console.log('Viewport Width x Height:     ',Viewport.Width+'x'+Viewport.Height)
+     if (Viewport.Width >= 1640){
+        check = 15
+    } else if (Viewport.Width >= 1240){
+        check = 12
+    } else if (Viewport.Width >= 950){
+        check = 9
+    } else {
+        check = 6
+    }
+    if (Viewport.Height >= 840 && Viewport.Height < 1040){
+     if (Viewport.Width >= 1640){
+        check = 25
+    } else if (Viewport.Width >= 1240){
+        check = 20
+    } else if (Viewport.Width >= 950){
+        check = 15
+    } else {
+        check = 10
+    }
+    } else if (Viewport.Height >= 1040){
+      if (Viewport.Width >= 1640){
+        check = 35
+    } else if (Viewport.Width >= 1240){
+        check = 28
+    } else if (Viewport.Width >= 950){
+        check = 21
+    } else {
+        check = 14
+    }  
+    }
+    if (Viewport.Width >= 550){
+        wi = 75;
+    }
+    orech = fia +  sug + pen + ask + wel + beta + des;
+    if (orech < check &&  adder.length === 0){
+        for (var i = orech; i < check; i++){
+        adder.push(
+ `<svg width="${wi}px" height="${wi}px" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+  <circle fill="none" cx="50" cy="50" r="50"/>
+</svg>`
+        )
+        }
+adder = adder
+console.log(adder)
+    }
+}
+async function createasked (da) {
+  const start = da.data.user.projects_1s
+      const myid = da.data.user.id;
+  for (var i = 0; i < start.length; i++) {
+            for (var j = 0; j < start[i].asks.length; j++){
+                    console.log(start[i].asks[j])
+                       const rt = letters(start[i].asks[j].open_mission.name);
+                      let src21 = ``;
+                       if (start[i].asks[j].project.profilePic){
+                       src21 = start[i].asks[j].project.profilePic.formats.thumbnail.url
+                    } else{
+                        src21 = start[i].asks[j].project.profilePic
+                    }
+                    dictasked.push({
+                            uid: start[i].asks[j].users_permissions_user.id,
+                            username: start[i].asks[j].users_permissions_user.username,
+                            src: start[i].asks[j].users_permissions_user.profilePic.formats.thumbnail.url,
+                            publicklinks: start[i].asks[j].open_mission.publicklinks,
+                            privatlinks: start[i].asks[j].open_mission.privatlinks,
+                            hearotMeyuchadot: start[i].asks[j].open_mission.hearotMeyuchadot,
+                            missionDetails: start[i].asks[j].open_mission.descrip,
+                            nhours: start[i].asks[j].open_mission.noofhours,
+                            perhour: start[i].asks[j].open_mission.perhour,
+                            missId: start[i].asks[j].open_mission.mission.id,
+                            deadline: start[i].asks[j].open_mission.sqadualed,
+                            openName: start[i].asks[j].open_mission.name,
+                            omid: start[i].asks[j].open_mission.id,
+                            askId: start[i].asks[j].id,
+                            users: start[i].asks[j].vots,
+                            decid: start[i].asks[j].open_mission.declined,
+                            name: rt[0],
+                            stylef: rt[1], 
+                            st: rt[2],
+                            projectId: start[i].asks[j].project.id,
+                            projectName : start[i].asks[j].project.projectName,
+                            noof: start[i].asks[j].project.user_1s.length,
+                            src2: src21,
+                            myid: da.data.user.id
+                               //   uid: start[i].asks[j].users[k].id,
+                                //  omid: start[i].open_missions[j].id,
+                                //  project: start[i].id
+                              });
+            }
+
+  }
+  for (var k = 0; k < dictasked.length; k++) {
+     const x = dictasked[k].users
+     dictasked[k].uids = [];
+     dictasked[k].what = [];
+     for (var z = 0; z < x.length; z++){
+      dictasked[k].uids.push(x[z].users_permissions_user.id);
+           dictasked[k].what.push(x[z].what);
+ }
+}    
+
+for (var t = 0; t <dictasked.length; t++){
+    dictasked[t].id = t;
+    const allid = dictasked[t].uids;
+    const myid = dictasked[t].myid;
+    dictasked[t].already = false;
+     dictasked[t].noofusersOk = 0;
+     dictasked[t].noofusersNo = 0;
+
+    if(allid.includes(myid)){
+      dictasked[t].already = true;
+      dictasked.splice(t, 1);
+    }
+        for (var r=0; r< dictasked[t].users.length; r++){
+            if (dictasked[t].users[r].what === true) {
+                
+                 dictasked[t].noofusersOk += 1;
+               
+            }else if (dictasked[t].users[r].what === false) {
+              
+                 dictasked[t].noofusersNo += 1;
+               
+            }
+        }
+    const noofusersWaiting = dictasked[t].noof - dictasked[t].users.length;
+    dictasked[t].noofusersWaiting = noofusersWaiting;
+        
+    }
+  askedcoin = dictasked;
+  ask = askedcoin.length;
+  console.log(askedcoin);
+}
+
+function letters(data){
+    let namer = [];
+    let st = 175;
+    let stylef = '24px';
+    if ((/[\u0590-\u05FF]/).test(data) | (/[\u0600-\u06FF]/).test(data)) {
+        let sep = "";
+        sep = data.split(' ').filter(w => w !== '');
+        for (let i = 0; i < sep.length; i++) {
+            if ((/[\u0590-\u05FF]/).test(sep[i]) | (/[\u0600-\u06FF]/).test(sep[i])) {
+                namer[i] = sep[i].split("").reverse().join("");
+
+            } else {
+                namer[i] = sep[i];
+
+            }
+        }
+        const x = namer.reverse().join(" ");
+        data = x; 
+        st = 145;
+    }
+    if (data.length >= 15 && data.length < 19) {
+        stylef = '21px';
+     } else if (data.length >= 19 && data.length < 20) {
+            stylef = '20px';
+     } else  if (data.length >= 20 && data.length <21) {
+            stylef = '18px';
+     } else  if (data.length >= 21){
+         stylef = '16px';
+    }
+    return [data, stylef, st];
+}
+function deloi (event ){
+const newasked = fiapp;
+const todel = event.detail.asked
+newasked.splice(todel, 1);
+fiapp = newasked;
+fia = fiapp.length;
+}
+
+function delo (event ){
+const newasked = askedcoin;
+const todel = event.detail.asked
+newasked.splice(todel, 1);
+askedcoin = newasked;
+ask = askedcoin.length;
+}
+
+const filterArrayd = (arr1, arr2) => {
+   const filterede = arr1.filter(el => {
+      return arr2.indexOf(el) === -1;
+   });
+   return filterede;
+};
+const filterArray = (arr1, arr2) => {
+   const filterede = arr1.filter(el => {
+      return arr2.indexOf(el) !== -1;
+   });
+   return filterede;
+};
+async function showOpenPro (mi) {
+  const r = mi.data.user.askeds;
+  if (r.length > 0) { 
+    const p = r.map(c => c.id);
+  askedarr = p;
+  console.log(askedarr);
+  }
+   const r1 = mi.data.user.declined;
+  if (r1.length > 0) { 
+    const p1 = r1.map(c => c.id);
+ declineddarr = p1;
+  console.log(declineddarr);
+  }
+  const x = mi.data.user.skills;
+const t = mi.data.user.work_ways;
+const y = mi.data.user.tafkidims;
+const mytaf = y.map(c => c.id);
+const mysk = x.map(c => c.id);
+
+for (var i = 0; i < y.length; i++) {
+    const q = y[i].open_missions;
+    var l = [];
+    var z = [];
+    var www = [];
+    var wwn = [];
+    var rate = [];
+    var mtaf = [];
+    var msk = [];
+    for (var j = 0; j < q.length; j++) {
+        l[j] = q[j].id;
+        z[j] = q[j].work_ways.map(c => c.id);
+        mtaf[j] = q[j].tafkidims.map(c => c.id);
+        msk[j] = q[j].skills.map(c => c.id);
+        const tafn = filterArrayd(mtaf[j], mytaf);
+        const skn = filterArrayd(msk[j], mysk);
+        if (t.length > 0) {
+            var s = t.map(c => c.id);
+            www[j] = filterArray(z[j], s);
+            wwn[j] = filterArrayd(z[j], s);
+            if (www[j].length > 0 && wwn[j].length === 0) {
+                if (q[j].id in dictids) {
+                    dictids[q[j].id] += 1;
+                } else {
+                    dictids[q[j].id] = www[j].length + 1;
+                    if (msk[j].length > 0) {
+                        if (mysk.length > 0) {
+                            if (skn.length > 0) {
+                                dictids[q[j].id] -= (skn.length * 2);
+                            }
+                        } else {
+                            dictids[q[j].id] -= (msk[j].length * 2)
+                        }
+                    } 
+                    if (mtaf[j].length > 0) {
+                        if (tafn.length > 0) {
+                            dictids[q[j].id] -= tafn.length;
+                        }
+                    }
+                }
+            } else if (www[j].length > 0 && wwn[j].length > 0) {
+                if (q[j].id in dictids) {
+                    dictids[q[j].id] += 1
+                } else {
+                    dictids[q[j].id] = 1 + www[j].length - wwn[j].length;
+                    if (msk[j].length > 0) {
+                        if (mysk.length > 0) {
+                            if (skn.length > 0) {
+                                dictids[q[j].id] -= (skn.length * 2);
+                            }
+                        } else {
+                            dictids[q[j].id] -= (msk[j].length * 2)
+                        }
+                    }
+                    if (mtaf[j].length > 0) {
+                        if (tafn.length > 0) {
+                            dictids[q[j].id] -= tafn.length;
+                        }
+                    }
+                }
+            } else if (www[j].length === 0 && wwn[j].length > 0) {
+                if (q[j].id in dictids) {
+                    dictids[q[j].id] += 1
+                } else {
+                    dictids[q[j].id] = 1 - (2 * wwn[j].length);
+                    if (msk[j].length > 0) {
+                        if (mysk.length > 0) {
+                            if (skn.length > 0) {
+                                dictids[q[j].id] -= (skn.length * 2);
+                            }
+                        } else {
+                            dictids[q[j].id] -= (msk[j].length * 2);
+                        }
+                    }
+                    if (mtaf[j].length > 0) {
+                        if (tafn.length > 0) {
+                            dictids[q[j].id] -= tafn.length;
+                        }
+                    }
+                }
+            } else if (www[j].length === 0 && wwn[j].length === 0) {
+                if (q[j].id in dictids) {
+                    dictids[q[j].id] += 1
+                } else {
+                    dictids[q[j].id] = 1;
+                    if (msk[j].length > 0) {
+                        if (mysk.length > 0) {
+                            if (skn.length > 0) {
+                                dictids[q[j].id] -= (skn.length * 2);
+                            }
+                        } else {
+                            dictids[q[j].id] -= (msk[j].length * 2);
+                        }
+                    }
+                    if (mtaf[j].length > 0) {
+                        if (tafn.length > 0) {
+                            dictids[q[j].id] -= tafn.length;
+                        }
+                    }
+                }
+            }
+        } else if (t.length == 0) {
+            if (q[j].id in dictids) {
+                dictids[q[j].id] += 1
+            } else {
+                dictids[q[j].id] = 1;
+                if (msk[j].length > 0) {
+                    if (mysk.length > 0) {
+                        if (skn.length > 0) {
+                            dictids[q[j].id] -= (skn.length * 2);
+                        }
+                    } else {
+                        dictids[q[j].id] -= (msk[j].length * 2);
+                    }
+                }
+                if (mtaf[j].length > 0) {
+                    if (tafn.length > 0) {
+                        dictids[q[j].id] -= tafn.length;
+                    }
+                }
+            }
+        }
+    }
+
+    d[i] = [l, z, www, wwn, rate, dictids];
+
+}
+  console.log(d);
+
+
+    for (var i = 0; i < x.length; i++){
+    const q = x[i].open_missions;
+    var l = [];
+    var z =[];
+    var www = [];
+    var wwn = [];
+    var rate = [];
+    var mtaf =[];
+    var msk = [];
+  for (var j = 0; j < q.length; j++){
+      l[j] = q[j].id;
+    z[j] = q[j].work_ways.map(c => c.id);
+    mtaf[j] = q[j].tafkidims.map(c => c.id);
+    msk[j] = q[j].skills.map(c => c.id);
+     var s = t.map(c => c.id);
+     const  tafn = filterArrayd(mtaf[j], mytaf); 
+     const  skn = filterArrayd(msk[j], mysk); 
+   www[j] = filterArray(z[j], s);
+   wwn[j] = filterArrayd(z[j], s);  
+    if (q[j].id in dictids){
+          dictids[q[j].id] += 2}
+      else{
+   if (t.length > 0)  {
+       if (www[j].length > 0 && wwn[j].length === 0) {
+        dictids[q[j].id] = www[j].length + 2;
+       if (skn.length > 0 ) {
+        dictids[q[j].id] -= (skn.length * 2); 
+        } 
+       if (tafn.length > 0 ) {
+        dictids[q[j].id] -= tafn.length; 
+        } 
+      
+        } else if (www[j].length > 0 && wwn[j].length > 0) {
+   
+        dictids[q[j].id] = 2 + www[j].length - wwn[j].length;
+        if (skn.length > 0 ) {
+        dictids[q[j].id] -= (skn.length * 2); 
+        } 
+       if (tafn.length > 0 ) {
+        dictids[q[j].id] -= tafn.length; 
+        } 
+   
+  } else if (www[j].length === 0 && wwn[j].length > 0){
+    
+        dictids[q[j].id] = 2 - (2 * wwn[j].length);
+        if (skn.length > 0 ) {
+        dictids[q[j].id] -= (skn.length * 2); 
+        } 
+       if (tafn.length > 0 ) {
+        dictids[q[j].id] -= tafn.length; 
+        } 
+      
+  } else if (www[j].length === 0 && wwn[j].length === 0){
+    
+        dictids[q[j].id] = 2;
+        if (skn.length > 0 ) {
+        dictids[q[j].id] -= (skn.length * 2); 
+        } 
+       if (tafn.length > 0 ) {
+        dictids[q[j].id] -= tafn.length;  
+  }
+   }
+   }
+   else if (t.length === 0){
+   
+        dictids[q[j].id] = 2;     
+        if (skn.length > 0 ) {
+        dictids[q[j].id] -= (skn.length * 2); 
+        } 
+       if (tafn.length > 0 ) {
+        dictids[q[j].id] -= tafn.length; 
+     }
+    }
+  }
+    
+ }
+   
+    
+sk[i] = [l, z, www, wwn, rate]; 
+
+
+    } 
+console.log(dictids);
+let asanddec =  askedarr.concat(declineddarr);
+asanddec = [...new Set([...askedarr,...declineddarr])];
+  const filteredw = Object.keys(dictids)
+  .filter(key => !asanddec.includes(key))
+  .reduce((obj, key) => {
+    obj[key] = dictids[key];
+    return obj;
+  }, {});
+  console.log(filteredw);
+var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-filteredw[b]})
+console.log(keysSorted);
+ // add declined filter add sort by value
+  var resultString = keysSorted.join('&id_in=');
+ let link ="https://strapi-k4vr.onrender.com/open-missions?id_in=" + resultString ;
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json'   
+      };
+        try {
+            const res = await fetch(link, {
+              method: 'GET',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+            }).then(checkStatus)
+          .then(parseJSON);
+            meData = res;
+           console.log(meData);
+        } catch (e) {
+            error1 = e
+        }
+        for (var i = 0; i <meData.length; i++){
+            if(meData[i].project.profilePic){
+         meData[i].srcb = meData[i].project.profilePic.formats.thumbnail.url
+            }
+        }
+        sug = meData.length;
+     createD()
+
+    };
+    // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו 
+    
+onMount(async () => {
+
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+    let link ="https://strapi-k4vr.onrender.com/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+          `{ user (id:${idL})  
+          { mesimabetahaliches  (where:{forappruval: false, finnished: false }){
+             id hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
+              project{projectName id user_1s {id}
+                            profilePic {url formats }}}
+            welcom_tops (where:{clicked: false }){
+                project { id projectName}
+            }
+              skills 
+            { id open_missions(where:{archived: false }) 
+                { id skills { id } 
+                    tafkidims {id}  
+                    work_ways { id} 
+                } 
+                }
+                id
+                username
+                     askeds  { id} 
+                     declined { id} 
+                     work_ways { id } 
+                     tafkidims { id 
+                        open_missions (where:{archived: false }) { id 
+                            skills { id } 
+                            work_ways { id } 
+                            tafkidims {id}
+                        } 
+                        } 
+                            projects_1s {id  
+                                asks (where:{archived: false }){ id
+                                    vots  {what why id users_permissions_user {id}}
+                                     open_mission { id mission {id} declined { id} sqadualed publicklinks noofhours perhour privatlinks descrip hearotMeyuchadot name}
+                                      project {projectName id user_1s {id} profilePic {url formats }}
+                                       users_permissions_user { username id profilePic {url formats } } }
+                                finiapruvals (where:{archived: false}) {
+              id missname why what {url formats} noofhours mesimabetahalich {id perhour hearotMeyuchadot descrip mission {id} } vots  {what why id users_permissions_user {id}}
+            project {projectName id 
+                                        profilePic {url formats } 
+                                        user_1s { id}
+            } users_permissions_user { username id profilePic {url formats } } }
+                                       pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
+                                    privatlinks publicklinks
+                                    rishon {id}
+                                    skills { id skillName}
+                                    tafkidims {id roleDescription}
+                                    work_ways {id workWayName} 
+                                    mission { id}
+                                    vallues { id}
+                                    users  {what why id users_permissions_user {id}} 
+                                    project {projectName id 
+                                        profilePic {url formats } 
+                                        user_1s { id}
+                                }
+                            }
+                                     open_missions(where:{archived: false }) {id declined { id} users  {id} } 
+                                    } 
+                                 }
+                                 }`
+        })
+})
+  .then(r => r.json())
+  .then(data => miData = data);
+         console.log(miData)
+            makeWalcom(miData);
+           showOpenPro (miData);
+           createasked (miData); // לא עבד כשלא היו משימות פתוחות
+           createpends (miData);
+           mesimabetahalicha (miData);
+          ishursium(miData);
+      //    createD()
+
+        } catch (e) {
+            error1 = e
+        }
+    });
+
+let walcomen = [] ;
+
+function makeWalcom (ata) {
+        const usernames = ata.data.user.username;
+    for (var i = 0; i < ata.data.user.welcom_tops.length; i++) {
+       const wal = ata.data.user.welcom_tops[i];
+        walcomen.push({
+    id: wal.project.id,
+    username: usernames,
+    projectName: wal.project.projectName,
+})
+    }
+    walcomen = walcomen;
+    wel = walcomen.length;
+}    
+
+let pends = [];
+
+function createpends (data) {
+    //rishonnnn so to create openM first avilable only to rishon then to rest of users..
+    const myid = data.data.user.id;
+    const projects = data.data.user.projects_1s;
+    for (var i = 0; i < projects.length; i++) {
+        for (var j = 0; j < projects[i].pendms.length; j++) {
+            const pend = projects[i].pendms[j]
+                    pends.push({
+                                  name: pend.name,
+                                  projectId: pend.project.id,
+                                  hearotMeyuchadot: pend.hearotMeyuchadot,
+                                  descrip: pend.descrip,
+                                  noofhours: pend.noofhours,
+                                  perhour: pend.perhour,
+                                  projectName: pend.project.projectName,
+                                  user_1s: pend.project.user_1s,
+                                  src: pend.project.profilePic.formats.thumbnail.url,
+                                  users: pend.users,
+                                  myid: myid,
+                                  missionId: pend.mission.id, 
+                                  skills: pend.skills,
+                                  tafkidims: pend.tafkidims,
+                                  workways: pend.work_ways,
+                                  vallues: pend.vallues,
+                                  privatlinks: pend.privatlinks,
+                                   publicklinks: pend.publicklinks,
+                                   mdate: pend.sqadualed,
+                                   pendId: pend.id,
+                              });
+               
+}
+}
+ for (var k = 0; k < pends.length; k++) {
+     const x = pends[k].users
+     for (var z = 0; z < x.length; z++){
+        pends[k].uids = [];
+      pends[k].uids.push(x[z].users_permissions_user.id);
+              pends[k].what = [];
+
+           pends[k].what.push(x[z].what);
+ }
+}    
+
+for (var t = 0; t <pends.length; t++){
+    const allid = pends[t].uids;
+    const myid = pends[t].myid;
+    pends[t].already = false;
+ pends[t].noofusersOk = 0;
+ pends[t].noofusersNo = 0;
+
+    if(allid.includes(myid)){
+      pends[t].already = true;
+         
+    }
+        for (var r=0; r< pends[t].users.length; r++){
+            if (pends[t].users[r].what === true) {
+                
+                 pends[t].noofusersOk += 1;
+               
+            }else if (pends[t].users[r].what === false) {
+              
+                 pends[t].noofusersNo += 1;
+               
+            }
+        }
+    const noofusersWaiting = pends[t].user_1s.length - pends[t].users.length;
+    pends[t].noofusersWaiting = noofusersWaiting;
+        
+    }
+    pen = pends.length;
+    bubleUiAngin(pends)
+}
+ function less (event) {
+   console.log(event.detail)
+const id = event.detail.id;
+const newdata = meData;
+const y = meData.map(c => c.id);
+const index = y.indexOf(id);
+newdata.splice(index, 1);
+meData = newdata;
+ };  
+let shows = true;
+function show(event){
+    shows = true;
+}
+
+function coinLapach (event){
+    const data = event.detail.data;
+    const newdata = pends;
+const y = pends.map(c => c.id);
+const index = y.indexOf(data);
+newdata.splice(index, 1);
+pends = newdata;
+pen = pends.length;
+}
+// one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
+function showonly (event){
+const value = event.detail.data;
+console.log(value);
+let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
+for(let i=0;i<hide.length;i++){
+      hide[i].style.display='none'}
+let show = document.getElementsByClassName(value)
+        for(let i=0;i<show.length;i++){
+        show[i].style.display=''}
+ 
+}
+function showall (event){
+var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
+
+     for(let i=0;i<show.length;i++){
+        show[i].style.display=''}
+}
+function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
+console.log("arr1")
+// let arr1 = [...pendsi, ...mtahai, ...walcomeni, ...askedcoini, ...meDatai];
+console.log("arr2")
+}
+</script>
+
+<!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
+<div class="screen"> 
+ {#each adder as add }
+   {@html add}
+ {/each}
+    {#each pends as pen, i}
+    <div  class="normSml pend" style="display:''"
+><PendingM
+        on:show={show}
+        on:coinLapach={coinLapach}
+      descrip={pen.descrip}
+      projectName = {pen.projectName}
+      name = {pen.name}
+              hearotMeyuchadot = {pen.hearotMeyuchadot}
+              noofhours = {pen.noofhours} 
+              src = {pen.src}
+               noofusersWaiting={pen.noofusersWaiting}
+                projectId={pen.projectId}
+                uids={pen.uids}
+                what={pen.what}
+                noofusersOk={pen.noofusersOk}
+                total={pen.noOfHours * pen.perhour}
+                perhour={pen.perhour}
+                noofusersNo={pen.noofusersNo}
+                already={pen.already}
+                noofusers={pen.user_1s.length}
+                missionId={pen.missionId}
+                skills={pen.skills}
+                tafkidims={pen.tafkidims}
+                workways={pen.workways}
+                mdate={pen.mdate}
+                vallues={pen.vallues}
+                pendId={pen.pendId}
+                users={pen.users}
+                shows={shows}
+                /></div>
+    {/each}
+
+    
+        {#each  fiapp  as da, i}
+        <div  class="fiap normSml" style="display:'';"><Fiappru
+            on:acsept={deloi}
+            on:decline={deloi}
+            mId={da.mId}
+            noofusersWaiting={da.noofusersWaiting}
+            uids={da.uids}
+            what={da.what}
+            noofusersOk={da.noofusersOk}
+            noofusersNo={da.noofusersNo}
+            already={da.already}
+            users={da.users}
+            askId={da.askId}
+            projectName = {da.projectName}
+            useraplyname ={da.username}
+            userId ={ da.uid} 
+            missionDetails = {da.descrip} 
+            src = {da.src}
+            src2 = {da.src2}
+            why={da.why}
+            whatt={da.whatt}
+            missionBName={da.openName}
+            name={da.name}
+            projectId={da.projectId}
+               noofpu={da.noof}
+            publicklinks={da.publicklinks}
+             privatlinks={da.privatlinks}
+            hearotMeyuchadot={da.hearotMeyuchadot}
+            valph ={da.perhour}
+            nhours={da.nhours}
+            deadline={da.deadline}
+                missId={da.missId}
+                id={da.id}
+                openMid={da.omid}
+                stylef={da.stylef}
+                st={da.st}
+                declined={da.decid}
+                /></div>
+    {/each}
+
+    {#each  walcomen  as aba, i} 
+   <div  class="normSml welc" style="display:'';"><Welcomt 
+    id={aba.id}
+       username={aba.username}
+       projectName={aba.projectName}
+       /></div>
+   {/each}
+
+
+    {#each meData as data, i}
+    <div  class="sugg normSml" style="display:''"><ProjectSuggestor
+      on:less={less}
+      askedarr={askedarr}
+      {declineddarr}
+      deadLine = {data.sqadualed}
+      oid = {data.id}
+              projectName = {data.project.projectName}
+              role ={data.tafkidims.map(c => c.roleDescription)}
+              skills ={ data.skills.map(c => c.skillName)} 
+              missionDetails = {data.descrip} 
+              notes = {data.hearotMeyuchadot}
+              src = {data.srcb}
+               missionName={data.name}
+                projectId={data.project.id}
+                workways={data.workways}
+                noOfHours={data.noOfHours}
+                perhour={data.perhour}
+                total={data.noofhours * data.perhour}
+                /></div>
+    {/each}
+
+
+        {#each  askedcoin  as da, i}
+        <div  class="asks normSml" style="display:'';"><Reqtojoin
+            on:acsept={delo}
+            on:decline={delo}
+            noofusersWaiting={da.noofusersWaiting}
+            uids={da.uids}
+            what={da.what}
+            noofusersOk={da.noofusersOk}
+            noofusersNo={da.noofusersNo}
+            already={da.already}
+            users={da.users}
+            askId={da.askId}
+            projectName = {da.projectName}
+            useraplyname ={da.username}
+            userId ={ da.uid} 
+            missionDetails = {da.descrip} 
+            src = {da.src}
+            src2 = {da.src2}
+            openmissionName={da.openName}
+            name={da.name}
+            projectId={da.projectId}
+               noofpu={da.noof}
+            publicklinks={da.publicklinks}
+             privatlinks={da.privatlinks}
+            hearotMeyuchadot={da.hearotMeyuchadot}
+            valph ={da.perhour}
+            nhours={da.nhours}
+            deadline={da.deadline}
+                missId={da.missId}
+                id={da.id}
+                openMid={da.omid}
+                stylef={da.stylef}
+                st={da.st}
+                declined={da.decid}
+                /></div>
+    {/each}
+
+
+    {#each mtaha as taha, i}
+   <div class="betaha normSml" style="display:'';"><MissionInProgress
+    noofpu={taha.project.user_1s.length}
+    mId={taha.id}
+    missionName={taha.name}
+    projectId={taha.project.id}
+    projectName={taha.project.projectName}
+    missionDetails={taha.descrip}
+    src={taha.project.profilePic.formats.thumbnail.url}
+    link={taha.privatlinks}
+    dueDateOrCountToDedline ={taha.admaticedai}
+    hoursdon ={taha.howmanyhoursalready}
+    hourstotal = {taha.hoursassinged}
+    perhour = {taha.perhour}
+    /></div>
+
+    {/each}
+    <!--
+        <div  class="normSml desi" style="display:'';"><DecisionMaking  decisionName={"?לפתוח קבוצת ווצאפ"} projectName={"פסיפס"} projectId={6}/></div> 
+    <div class="normSml desi"><DecisionMaking decisionName={"?מה לבנות קודם"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"} deadLine={"10.7.2021"}/></div> 
+
+
+   <div class="normSml"><DecisionMaking decisionName={"?להוסיף גם מכירה"} projectName={"BARB"} src={"barbi.jpeg"} projectId={2}/></div> 
+  <div class="normSml"><ProjectSuggestor missionName={"לבנות וידאו צ'ט"} projectId={1}/></div>
+   <div class="normSml"><MissionInProgress missionName={" מפת מיקום החותמים"} projectId={1}/></div>
+   <div class="normSml"><DecisionMaking decisionName={"?לחפש מתכנת"} projectName={"BARB"} projectId={2} src={"barbi.jpeg"}/></div> 
+  <div class="normSml"><ProjectSuggestor missionName={"להוסיף דאטהבייס"} projectId={1}/></div> 
+   <div class="normSml"><MissionInProgress missionName={" עיצוב עמוד הבית"} projectName= {"BARB"} projectId={2} src={"barbi.jpeg"}/></div>
+    <div class="normSml"><ProjectSuggestor missionName={"בניית מערכת תשלומים"} projectId={1}/></div>
+    <div class="normSml"><MissionInProgress missionName={" הרשמה ולוגין"} projectId={1}/></div>
+   <div class="normSml"><ProjectSuggestor missionName={"תמונות לחיצות"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
+ 
+    <div class="normSml"><MissionInProgress missionName={" צור פרויקט חדש "} projectId={1}/></div>
+    <div class="normSml"><ProjectSuggestor missionName={"סליקה ותשלומים"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
+    <div class="normSml"><MissionInProgress missionName={"מנוע מיון בועות "} projectId={1}/></div>
+    <div class="normSml"><DecisionMaking decisionName={"?לחפש מתכנת"} projectId={1}/></div> 
+    <div class="normSml"><DecisionMaking decisionName={"?מה לבנות קודם"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"} deadLine={"10.7.2021"}/></div> 
+    <div class="normSml"><DecisionMaking decisionName={"?לחפש קופירייטר"} projectId={1}/></div> 
+   <div class="normSml"><ProjectSuggestor missionName={"פרסום בפייסבוק"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
+   <div class="normSml"><MissionInProgress missionName={" חיבור לסטראפי של בועות"} projectId={1}/></div>
+    <div class="normSml"><ProjectSuggestor missionName={"קמפיין פייסבוק"} projectId={1}/></div>
+    <div class="normSml"><MissionInProgress missionName={" עיצוב עמוד מוצר "} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
+    <div class="normSml"><ProjectSuggestor missionName={"קמפיין טיקטוק"} projectId={1}/></div>
+    <div class="normSml"><MissionInProgress missionName={" הצעות לפרוייקטים strapiב "} projectId={1}/></div>
+    <div class="normSml"><DecisionMaking  decisionName={"?לחפש מתכנת"} projectName={"פסיפס"} projectId={6}/></div> 
+    <div class="normSml"><MissionInProgress missionName={" החלטות strapiב "} projectId={1} /></div>
+   <div class="normSml"><ProjectSuggestor missionName={"ייעוץ משפטי"} projectId={1}/></div>
+   <div class="normSml"><MissionInProgress missionName={" משימות strapiב "} projectId={1}/></div>
+    <div class="normSml"><ProjectSuggestor  missionName={"הנהלת חשבונות"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
+    <div class="normSml"><MissionInProgress missionName={"הזנת מוצרים"}  projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
+   <div class="normSml"><ProjectSuggestor missionName={"ייבוא מסין"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
+-->
+    <div 
+ class="midCom">
+        <Mid 
+on:showall={showall}
+on:showonly={showonly}
+{sug}
+{pen}
+{ask}
+{wel}
+{beta}
+{fia}
+des={0}  />
+    </div>
+</div> 
+
+
+
+<style>
+    
+
+    @media  (max-width: 839px) {
+    
+    .screen{
+        background-color: white !important;
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+
+        grid-row: center;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        overflow: scroll;
+    }
+
+    .midCom{
+    grid-row: 2/ 4;
+    grid-column: 2 /4;
+    align-self: center;
+    border-radius: 50%; 
+    }
+
+    .normSml{
+    align-items: center;
+    }
+   
+    .normSml:hover{
+        
+        border-radius: 50%;
+    }
+}
+  
+    @media (min-width: 840px){
+    
+    .screen{
+        background-color: white !important;
+        display: grid;
+        grid-template-columns: repeat(6, 1fr);
+                grid-template-rows: repeat(4, 1fr);
+
+        grid-row: center;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        overflow: scroll;
+    }
+    .midCom{
+        grid-row: 2 / 4;
+    grid-column: 3 /5;
+      align-self: center;
+      
+        border-radius: 50%; 
+    }
+
+    .normSml{
+       
+        align-items: center;
+        
+        
+    }
+    .normSml:hover{
+        
+        border-radius: 50%;
+    }
+
+    }
+
+ @media  (min-width: 1240px){
+    .screen{
+        padding:20px 20px;
+        background-image: url(4nd.svg) !important;
+        background-size: cover;
+        height: 100vh !important;
+        display: grid;
+        grid-template-columns: repeat(8, 1fr);
+        grid-template-rows: repeat(4, 1fr);
+        grid-row: center;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+
+    }
+    .midCom{
+        padding: 13px  0px;
+        grid-row: 2 / 4;
+    grid-column: 4 /6;
+      align-self: center;
+    }
+    .midCom:hover {
+        min-width: 299px;
+        min-height: 299px;
+    }
+    .normSml{
+    margin:  0;
+    }
+    .normSml:hover{
+        
+        border-radius: 50%;
+    }
+    }
+     @media  (min-width: 1640px){
+    .screen{
+        grid-template-columns: repeat(10, 1fr);
+
+    }
+     .midCom{
+        padding: 13px  0px;
+        grid-row: 2 / 4;
+    grid-column: 5 /7;
+      align-self: center;
+          }
+    }
+ @media (min-height: 840px){
+    .midCom{
+        grid-row: 3 / 5;
+    }
+    .screen{
+    grid-template-rows: repeat(6, 1fr);
+
+    }
+    }
+   @media (min-height: 1040px){
+    .midCom{
+        grid-row: 4 / 5;
+    }
+     .screen{
+    grid-template-rows: repeat(8, 1fr);
+
+    }
+    }
+</style>
