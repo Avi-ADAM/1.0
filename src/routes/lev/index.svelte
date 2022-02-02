@@ -2,7 +2,7 @@
 import Mid from "../../lib/components/lev/mid.svelte"
   import MissionInProgress from "../../lib/components/lev/missionInProgress.svelte"
     import ProjectSuggestor from "../../lib/components/lev/projectSuggestor.svelte"
-    import DecisionMaking from "../../lib/components/lev/decisionMaking.svelte";
+   // import DecisionMaking from "../../lib/components/lev/decisionMaking.svelte";
     import Reqtojoin from '../../lib/components/lev/reqtojoin.svelte';
     import { onMount } from 'svelte';
     import PendingM from "../../lib/components/lev/pandingMesima.svelte";
