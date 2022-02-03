@@ -2508,7 +2508,6 @@ fiap = "fiap";
 
 
 let big2 = `
-
 <g transform="matrix(.65222 0 0 .69204 -158.37 -25.222)" style="">
 <path transform="matrix(1.0121 0 0 1.0121 296.09 -9.4615)" d="m322.86 250.22a117.86 117.86 0 1 1-235.71 0 117.86 117.86 0 1 1 235.71 0z" fill="#808080" filter="url(#bnx)"/>
 <path transform="matrix(1.0121 0 0 1.0121 296.09 -9.4615)" d="m322.86 250.22a117.86 117.86 0 1 1-235.71 0 117.86 117.86 0 1 1 235.71 0z" fill="url(#bsk)"/>
@@ -3021,7 +3020,7 @@ let big2 = `
 </script>
 
 <div in:fly={{duration: 4200, y:1000}} class="midCom">
-     <svg height="290" width="290"  class="midCom" version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+     <svg  class="midCom" version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
    {@html big}
    <g on:click={()=>disp(sugg)} name="number " class="btn" transform="translate(.91591 -68.953)">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
@@ -3129,6 +3128,8 @@ let big2 = `
 <g transform="matrix(1.1568 0 0 1.0803 -24.933 7.8349)" style="">
    {@html big2}
 
+
+
 <g transform="matrix(2.7372 0 0 2.734 -293.37 -137.56)" style="">
 <title>prtofilePic</title>
 <foreignObject transform="matrix(.094044 0 0 .10082 148.38 80.164)" width="450" height="450"   >
@@ -3209,42 +3210,16 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
     
 
  
-<style>
-.midCom{
-   
-    
-    min-height: 290px;
-    min-width: 290px;
-}
-.btn{
-     
-    }
-    
+<style>	
+  .midCom{	
+    height: 170px;	
+    width: 170px;	
+}	
+@media (min-width: 550px) {	
+.midCom{	
+    height: 290px;	
+    width: 290px;	
+}	
+}	
 
-.btn:hover {
-  
-  }
-
-    @media only screen 
-  and (min-device-width: 375px) 
-  and (max-device-width: 812px) 
-  and (-webkit-min-device-pixel-ratio: 3)
-  and (orientation: portrait) {
-      
-.midCom{
-   
-    min-height: 170px;
-    min-width: 170px;
- 
-}
-.btn{
-   
-    }
-    
-
-.btn:hover {
-   
-  }
-
-   }
 </style>

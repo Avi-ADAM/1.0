@@ -78,10 +78,7 @@ function ishursium (dati){
                                
                               });
             }
-                    console.log("somting")
-
   }
-                      console.log("sokmting")
 
   for (var k = 0; k < fiapp.length; k++) {
      const x = fiapp[k].users
@@ -168,13 +165,12 @@ check = 4
     if (orech < check &&  adder.length === 0){
         for (var i = orech; i < check; i++){
         adder.push(
- `<svg class="svggg" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
-  <circle fill="none" cx="50" cy="50" r="50"/>
+ `<svg class="svggg" viewBox="0 0 100 100" >
+  <circle fill="none" id="d" cx="50" cy="50" r="50"/>
 </svg>`
         )
         }
 adder = adder
-console.log(adder)
     }
 }
 async function createasked (da) {
@@ -182,7 +178,6 @@ async function createasked (da) {
       const myid = da.data.user.id;
   for (var i = 0; i < start.length; i++) {
             for (var j = 0; j < start[i].asks.length; j++){
-                    console.log(start[i].asks[j])
                        const rt = letters(start[i].asks[j].open_mission.name);
                       let src21 = ``;
                        if (start[i].asks[j].project.profilePic){
@@ -261,7 +256,6 @@ for (var t = 0; t <dictasked.length; t++){
     }
   askedcoin = dictasked;
   ask = askedcoin.length;
-  console.log(askedcoin);
 }
 
 function letters(data){
@@ -328,13 +322,11 @@ async function showOpenPro (mi) {
   if (r.length > 0) { 
     const p = r.map(c => c.id);
   askedarr = p;
-  console.log(askedarr);
   }
    const r1 = mi.data.user.declined;
   if (r1.length > 0) { 
     const p1 = r1.map(c => c.id);
  declineddarr = p1;
-  console.log(declineddarr);
   }
   const x = mi.data.user.skills;
 const t = mi.data.user.work_ways;
@@ -469,7 +461,7 @@ for (var i = 0; i < y.length; i++) {
     d[i] = [l, z, www, wwn, rate, dictids];
 
 }
-  console.log(d);
+  
 
 
     for (var i = 0; i < x.length; i++){
@@ -554,7 +546,6 @@ sk[i] = [l, z, www, wwn, rate];
 
 
     } 
-console.log(dictids);
 let asanddec =  askedarr.concat(declineddarr);
 asanddec = [...new Set([...askedarr,...declineddarr])];
   const filteredw = Object.keys(dictids)
@@ -563,9 +554,7 @@ asanddec = [...new Set([...askedarr,...declineddarr])];
     obj[key] = dictids[key];
     return obj;
   }, {});
-  console.log(filteredw);
 var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-filteredw[b]})
-console.log(keysSorted);
  // add declined filter add sort by value
   var resultString = keysSorted.join('&id_in=');
  let link ="https://strapi-k4vr.onrender.com/open-missions?id_in=" + resultString ;
@@ -603,7 +592,6 @@ console.log(keysSorted);
             }).then(checkStatus)
           .then(parseJSON);
             meData = res;
-           console.log(meData);
         } catch (e) {
             error1 = e
         }
@@ -807,7 +795,6 @@ for (var t = 0; t <pends.length; t++){
     bubleUiAngin(pends)
 }
  function less (event) {
-   console.log(event.detail)
 const id = event.detail.id;
 const newdata = meData;
 const y = meData.map(c => c.id);
@@ -832,7 +819,6 @@ pen = pends.length;
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
 function showonly (event){
 const value = event.detail.data;
-console.log(value);
 let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
 for(let i=0;i<hide.length;i++){
       hide[i].style.display='none'}
@@ -848,17 +834,15 @@ var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha,
         show[i].style.display=''}
 }
 function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
-console.log("arr1")
 // let arr1 = [...pendsi, ...mtahai, ...walcomeni, ...askedcoini, ...meDatai];
-console.log("arr2")
 }
 </script>
 
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
 <div class="screen"> 
- {#each adder as add }
+<!-- {#each adder as add }
    {@html add}
- {/each}
+ {/each}-->
     {#each pends as pen, i}
     <div  class="normSml pend" style="display:''"
 ><PendingM
@@ -1073,6 +1057,9 @@ des={0}  />
 
 
 <style>
+    #d{
+        fill: none;
+    }
     .svggg{
         width:75px; 
         height:75px;
@@ -1103,6 +1090,7 @@ des={0}  />
     grid-row: 2/ 4;
     grid-column: 2 /4;
     align-self: center;
+    justify-self: center;
     border-radius: 50%; 
     }
 
@@ -1155,7 +1143,7 @@ des={0}  />
  @media  (min-width: 1240px){
     .screen{
         padding:20px 20px;
-        background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) !important;
+       background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) !important;
         background-size: cover;
         height: 100vh !important;
         display: grid;
