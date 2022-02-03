@@ -90,41 +90,41 @@ let error1 = null;
   <div dir="rtl" >
 
       <div class="middle">
-    
+    {#if srcU }
  <img
  height="150px" width="150px" 
      style="border-radius: 50%; margin-right:auto; margin-left:auto ;"  
 
   src={srcU} 
   alt="profilePicAvatar" />
-
+{/if}
       </div>
          <div class="flexi">
            <div class="q">
 <h3 >{user.username}</h3></div>
-<div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" >
+<div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h6  style="font-size:23px; color:var(--barbi-pink); ">הכישורים שלי </h6>
     {#each uskill as dat, i}
-       <h3 class="text-lturk">{dat.skillName}</h3>
+       <h3 class="text-gold">{dat.skillName}</h3>
        {/each}
       </div>
-<div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" >
+<div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h6  style="font-size:23px; color:var(--barbi-pink); ">התפקידים שלי </h6>
     {#each ur as dat, i}
-       <h3 class="text-lturk">{dat.roleDescription}</h3>
+       <h3 class="text-gold">{dat.roleDescription}</h3>
        {/each}
       </div>
-      <div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" >
+      <div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h6  style="font-size:23px; color:var(--barbi-pink); ">דרכי העבודה שלי </h6>
     {#each  uww as dat, i}
-       <h3 class="text-lturk">{dat.workWayName}</h3>
+       <h3 class="text-gold">{dat.workWayName}</h3>
        {/each}
       </div>
-<div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" >
+<div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h1 style="font-size:23px; color:var(--barbi-pink); ">הפרויקטים שלי</h1>
   {#each projects as data, i}
     
-  <a class="text-lturk hover:text-gold hover:scale-150" sveltekit:prefetch href={`/project/${data.id}`} ><h3>{data.projectName}</h3></a>
+  <a class="text-gold hover:text-barbi hover:scale-150" sveltekit:prefetch href={`/project/${data.id}`} ><h3>{data.projectName}</h3></a>
    
     {/each} 
   

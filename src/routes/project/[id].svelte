@@ -76,28 +76,31 @@ onMount(async () => {
 </script>
 <div dir="rtl" class="all">
   <div class="4">
+    {#if srcP}
     <img
     width="250" height="250" 
     style="border-radius: 50%; margin-right:auto; margin-left:auto ;"  
     src={srcP}
-    alt="profilePic"></div>
+    alt="profilePic">
+  {/if}
+  </div>
 <h1 class="q">{project.projectName}</h1>
 {#if project.publicDescription !== null}
 <h6 class="text-barbi text-center">{project.publicDescription}</h6>
 {/if}
-<div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" class="3">
+<div style="background-color: var(--mturk); margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--gold);" class="3">
     <h2 style="color: var(--barbi-pink);
 " >1 בפרוייקט </h2>
 {#each projectUsers as user}
-<a sveltekit:prefetch href={`/user/${user.id}`}><h6 class="text-mturk hover:text-barbi">{user.username}</h6></a>
+<a sveltekit:prefetch href={`/user/${user.id}`}><h6 class="text-gold hover:text-barbi">{user.username}</h6></a>
 {/each}
 </div>
 
-<div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" >
+<div style="background-color: var(--mturk); margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--gold);" >
 <h3 style="color: var(--barbi-pink);
 " class="5">משימות פנויות </h3>
 {#each projecto as om }
-<p class="text-mturk hover:text-barbi">{om.name}</p>
+<p class="text-gold hover:text-barbi">{om.name}</p>
 {/each}
 </div>
 </div>
