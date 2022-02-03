@@ -899,10 +899,10 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
   {/if}
   <div class="3 bg-lturk ">
   {#each projectUsers as user}
-  <!--
+  
   <a class="textlink hover:text-scale-150 hover:text-gold"
-   sveltekit:prefetch href={`http://localhost:3000/user/${user.id}`}></a>-->
-   <h6 class="textlink hover:text-scale-150 hover:text-gold">{user.username}</h6>
+   sveltekit:prefetch href={`/user/${user.id}`}>  <h6 class="textlink hover:text-scale-150 hover:text-gold">{user.username}</h6></a>
+ 
   {/each}
   <div class="border-2 border-gold m-2"> 
     <h2 class="text-barbi text-bold underline decoration-gold">ערכים ומטרות</h2>

@@ -703,7 +703,6 @@ onMount(async () => {
 })
   .then(r => r.json())
   .then(data => miData = data);
-         console.log(miData)
             makeWalcom(miData);
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות

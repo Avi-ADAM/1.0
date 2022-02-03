@@ -519,7 +519,7 @@ addSl4 = false;
 
            {#each myP as data, i}
            <div class="cont" >  
-            <a  class="pt hover:text-gold" sveltekit:prefetch href={"/me"} >{data.projectName}</a>
+            <a  class="pt hover:text-gold" sveltekit:prefetch href={`/project/${data.id}`} >{data.projectName}</a>
           <!--<h3 class="pt">{data.projectName}</h3> `http://localhost:3000/project/${data.id}`--> <button
           class=" hover:bg-barbi text-mturk rounded"
           title="עריכה"

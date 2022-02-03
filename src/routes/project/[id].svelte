@@ -1,5 +1,4 @@
 <script context="module">
-en = newwork;
     export const load = async ({page, fetch}) => {
        const id = page.params.id;
 
@@ -24,7 +23,6 @@ let srcP;
 let error1 = null;
 let projecto = [];
 onMount(async () => {
-    console.log (document.cookie);
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -35,7 +33,6 @@ onMount(async () => {
   .split('=')[1];
   idL = cookieValueId;
     token  = cookieValue; 
-    console.log(token);
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -49,18 +46,24 @@ onMount(async () => {
       const headers = {
         'Content-Type': 'application/json'   
       };
+        let link ="https://strapi-k4vr.onrender.com/graphql" ;
         try {
-            const res = await fetch(`https://strapi-k4vr.onrender.com/${projectId}`, {
-              method: 'GET',
+             await fetch(link, {
+              method: 'POST',
        
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-            }).then(checkStatus)
-          .then(parseJSON);
-            project = res;
-            console.log(project);
+        body: 
+        JSON.stringify({query: 
+          `{  project (id:${projectId}) {projectName  user_1s {id username}
+                        publicDescription    profilePic {url formats }   open_missions (where:{archived: false }) { id name}}
+        }`
+        })
+})
+  .then(r => r.json())
+  .then(data => project = data.data.project);
             projectUsers = project.user_1s;
             projecto = project.open_missions;
             srcP =`${project.profilePic.formats.small.url}`
@@ -72,30 +75,31 @@ onMount(async () => {
     
 </script>
 <div dir="rtl" class="all">
-<h1 class="q">{project.projectName}</h1>
-{#if project.description}
-<h6 class="2">{project.publicDescription}</h6>
-{/if}
-<div style="text-align:center; padding: 10px;" class="3">
-    <h2 style="color: var(--barbi-pink);
-" >1 בפרוייקט </h2>
-{#each projectUsers as user}
-<a sveltekit:prefetch href={`/user/${user.id}`}><h6>{user.username}</h6></a>
-{/each}
-</div>
-<div class="4">
+  <div class="4">
     <img
     width="250" height="250" 
     style="border-radius: 50%; margin-right:auto; margin-left:auto ;"  
     src={srcP}
     alt="profilePic"></div>
+<h1 class="q">{project.projectName}</h1>
+{#if project.publicDescription !== null}
+<h6 class="text-barbi text-center">{project.publicDescription}</h6>
+{/if}
+<div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" class="3">
+    <h2 style="color: var(--barbi-pink);
+" >1 בפרוייקט </h2>
+{#each projectUsers as user}
+<a sveltekit:prefetch href={`/user/${user.id}`}><h6 class="text-mturk hover:text-barbi">{user.username}</h6></a>
+{/each}
 </div>
-<div style="text-align:center; padding: 10px;" >
+
+<div style="text-align:center; padding: 10px; border: 2px solid var(--gold);" >
 <h3 style="color: var(--barbi-pink);
 " class="5">משימות פנויות </h3>
 {#each projecto as om }
-<p>{om.name}</p>
+<p class="text-mturk hover:text-barbi">{om.name}</p>
 {/each}
+</div>
 </div>
 
 <style>
@@ -103,7 +107,7 @@ onMount(async () => {
 
   }
   .q{
-font-size: 82px;
+font-size: 220%;
 text-align: center;
 color: var(--barbi-pink);
   }

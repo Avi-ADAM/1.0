@@ -15,7 +15,7 @@ import { idPr } from '../../stores/idPr.js';
     export let link = "https://www.free-mates.com"
     export let linkDescription = "to website"
     export let projectId;
-    export let linkP = "http://localhost:3000/project/"
+    export let linkP = "/project/"
     export let hourstotal;
     export let hoursdon = 0;
     export let mId;
