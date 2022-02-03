@@ -8,6 +8,8 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import PendingM from "../../lib/components/lev/pandingMesima.svelte";
     import Welcomt from "../../lib/components/lev/welcomTo.svelte";
     import Fiappru from '../../lib/components/lev/fiappru.svelte';
+    import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+
   //  import Viewport from 'svelte-viewport-info'
     let updateP;
     let idL;
@@ -611,13 +613,18 @@ onMount(async () => {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
+  if (cookieValue != null) {
+      const cookieValu = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
   .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValu; 
+  
     let bearer1 = 'bearer' + ' ' + token;
     let link ="https://strapi-k4vr.onrender.com/graphql" ;
         try {
@@ -702,6 +709,10 @@ onMount(async () => {
         } catch (e) {
             error1 = e
         }
+    } else {
+            goto ("/",)
+
+    }
     });
 
 let walcomen = [] ;
@@ -840,9 +851,9 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
 <div class="screen"> 
-<!-- {#each adder as add }
+{#each adder as add }
    {@html add}
- {/each}-->
+ {/each}
     {#each pends as pen, i}
     <div  class="normSml pend" style="display:''"
 ><PendingM
