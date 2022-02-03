@@ -15,7 +15,7 @@
     export let missionDetails = "do x like y in z";
     export let src = "coin.png";
     export let projectId;
-    export let link = "/project/";
+    export let linki = "/project/";
     export let oid = 0;
     export let notes = "";
     export let workways= "";
@@ -166,7 +166,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
     in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 >
         <img class="img" src={src}  alt="logo">
-        <a sveltekit:prefetch  href={`${link}${projectId}`}><h3 class="hover:text-lturk lt" >{projectName}</h3></a>
+        <a sveltekit:prefetch  href={`${linki}${projectId}`}><h3 class="hover:text-lturk lt" >{projectName}</h3></a>
         <h1 style="color: rgb(87, 208, 248 ); " class="ltn">{missionName}</h1>
         <h3 class="ltn" >{skills.join(' ')}</h3>
         {#if total} <p>{total}</p>{/if}
@@ -183,7 +183,7 @@ in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
 use:clickOutside on:click_outside={toggleShow}>
 	
     <img  src={src} class="img"   alt="project logo">
-    <a sveltekit:prefetch  href={`${link}${projectId}`}><h3 class="hover:text-lturk ltb" >{projectName}</h3></a>
+    <a sveltekit:prefetch  href={`${linki}${projectId}`}><h3 class="hover:text-lturk ltb" >{projectName}</h3></a>
     <h3 class="lt">{missionName}</h3>
    {#if deadLine} <h5 class="lt">{deadLine}</h5>{/if}
     <h6 class="ltn" style=" line-height: 0.7;">{missionDetails}</h6>
