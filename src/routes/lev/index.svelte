@@ -1156,7 +1156,7 @@ des={0}  />
  @media  (min-width: 1240px){
     .screen{
         padding:20px 20px;
-        background-image: url(4nd.svg) !important;
+        background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) !important;
         background-size: cover;
         height: 100vh !important;
         display: grid;

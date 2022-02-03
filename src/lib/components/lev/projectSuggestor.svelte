@@ -15,7 +15,7 @@
     export let missionDetails = "do x like y in z";
     export let src = "coin.png";
     export let projectId;
-    export let link = "https://strapi-k4vr.onrender.com/project/";
+    export let link = "/project/";
     export let oid = 0;
     export let notes = "";
     export let workways= "";
