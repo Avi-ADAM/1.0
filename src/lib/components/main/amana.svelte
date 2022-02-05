@@ -10,7 +10,29 @@
         import axios from 'axios';
           import { RingLoader
 } from 'svelte-loading-spinners'
+onMount(async () => {
+  
 
+   
+      var chatbox = document.getElementById('fb-customer-chat');
+      chatbox.setAttribute("page_id", "684861488632219");
+      chatbox.setAttribute("attribution", "biz_inbox");
+   
+      window.fbAsyncInit = function() {
+        FB.init({
+          xfbml            : true,
+          version          : 'v12.0'
+        });
+      };
+
+      (function(d, s, id) {
+        var js, fjs = d.getElementsByTagName(s)[0];
+        if (d.getElementById(id)) return;
+        js = d.createElement(s); js.id = id;
+        js.src = 'https://connect.facebook.net/he_IL/sdk/xfbml.customerchat.js';
+        fjs.parentNode.insertBefore(js, fjs);
+      }(document, 'script', 'facebook-jssdk'));
+})
 let g = false;
 
 function find_contry_id(contry_name_arr){
@@ -360,7 +382,14 @@ let trans = false;
 function tran (){
 trans = !trans;
 }
-      </script><!--
+      </script>
+         <!-- Messenger פלאגין של צ'אט Code -->
+    <div id="fb-root"></div>
+
+    <!-- Your פלאגין של צ'אט code -->
+    <div id="fb-customer-chat" class="fb-customerchat">
+    </div>
+      <!--
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      --> <div class="all">
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
