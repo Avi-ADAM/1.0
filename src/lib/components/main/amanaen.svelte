@@ -433,16 +433,16 @@ onMount(async () => {
     <div class="aab">
 <div dir="ltr" class="amana" id="amana-show">
  <h1 dir="ltr" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
-       {$form.name}'s Declaration of Independence:
+       <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>'s Declaration of Independence:
     </h1>
           <span>
               <span>
-              I ,{$form.name}, will never use violence or hurt anyone.   
+              I ,<span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will never use violence or hurt anyone.   
                    <br>
-Because I, {$form.name}, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force.              <br>	
-I, {$form.name}, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication              <br>
-When the entire {selected} is a signatory to this Convention, I, {$form.name}, will relinquish my weapons and the armed policemen from whom the {selected} State is Appointments in my name.              <br>
-I, {$form.name}, will give up the weapons of the {selected} Army when all of humanity will be a signatory to this Convention          </span>
+Because I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force.              <br>	
+I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication              <br>
+When the entire <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> is a signatory to this Convention, I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will relinquish my weapons and the armed policemen from whom the <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> State is Appointments in my name.              <br>
+I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will give up the weapons of the <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> Army when all of humanity will be a signatory to this Convention          </span>
           </span>
     </div>
      

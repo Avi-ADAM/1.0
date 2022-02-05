@@ -385,19 +385,19 @@ trans = !trans;
        class="amanat" 
        style="font-weight: 900; white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.2em; line-height: normal;" 
        dir="rtl">
-     ההצהרה של: 
+    שמי: 
       </h3>
   <input 
           id="name"
           name="name"
-          placeholder="שמי"
+          placeholder="השם שלי"
           required
                 on:blur={handleChange}
           on:change={handleChange}
           bind:value={$form.name}
         /> 
      {#if $errors.name}
-      <small style="color: red;">{$errors.name}</small>
+      <small style="color: red;">יש למלא שם</small>
     {/if}
 </div>
 <div class="flexi1">
@@ -410,7 +410,7 @@ trans = !trans;
       options={country.map(c => c.heb)}
        /> 
    {#if erorims == true}
-      <small style="color: red;">יש לבחור לפחות 1</small>
+      <small style="color: red;">יש לבחור לפחות מקום 1</small>
     {/if}
    </div>    
 <div class="flexi2">
@@ -436,20 +436,20 @@ trans = !trans;
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
      הצהרת העצמאות האישית של 
-        <span> {$form.name}</span>  
+        <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  
         :
     </h1>
           <span>
               <span>
-                אני {$form.name}      לעולם לא אנהג באלימות ולא אפגע באף אדם         
+                אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>      לעולם לא אנהג באלימות ולא אפגע באף אדם         
                    <br>
-                   אני {$form.name} מצהיר שאין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס שמצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
+                   אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> מצהיר שאין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס שמצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
               <br>	
-   אני {$form.name} אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
+   אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
               <br>
-              כאשר כל  {selected} תהיה חתומה על אמנה זו אני {$form.name} אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת {selected} ממנה בשמי
+              כאשר כל  <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> תהיה חתומה על אמנה זו אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> ממנה בשמי
               <br>
-              אני {$form.name} אוותר על כלי הנשק של צבא {selected} כאשר כל האנושות תהיה חתומה על האמנה הזו
+              אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> כאשר כל האנושות תהיה חתומה על האמנה הזו
           </span>
           </span>
     </div>

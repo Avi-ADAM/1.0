@@ -281,7 +281,7 @@ function find_contry_id(contry_name_arr){
     const placeholder = `الدول التي أنت مواطنها`;
     const required = true;
     
-    let selected;
+    let selected = [];
        let already = false;
    let datar;
    let idx = 1;
@@ -434,17 +434,17 @@ onMount(async () => {
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
     إعلان استقلال  
-        <span> {$form.name}</span>  
+        <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  
         الشخصي
         :
     </h1>
           <span>
               <span>
-أنا {$form.name} لن أستخدم العنف أبدًا أو أؤذي أي شخص                   <br>
-لأنني {$form.name} لا أريد أن أكون ضحية للعنف ولأنه لا توجد سلطة أو قيمة أو غرض أو معتقد أو مال أو فائدة تبرر الإضرار بحياة الشخص والعنف والإكراه بالقوة.              <br>	
-أنا {$form.name} سأمنح ثقتي في الخير وأنه عندما توقع البشرية جمعاء هذه الاتفاقية: سيتوقف العنف والقتال والحكم عن أن يكون شكلاً من أشكال التواصل البشري              <br>
-عندما تكون كل {selected} من الموقعين على هذه المعاهدة أنا {$form.name} سأتخلى عن أسلحتي ورجال الشرطة المسلحين الذين عينتهم دولة {selected} بالنيابة عني.              <br>
-أنا {$form.name} ، سأتخلى عن أسلحة الجيش {selected} عندما توقع البشرية جمعاء على هذه الاتفاقية.          </span>
+أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> لن أستخدم العنف أبدًا أو أؤذي أي شخص                   <br>
+لأنني <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> لا أريد أن أكون ضحية للعنف ولأنه لا توجد سلطة أو قيمة أو غرض أو معتقد أو مال أو فائدة تبرر الإضرار بحياة الشخص والعنف والإكراه بالقوة.              <br>	
+أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> سأمنح ثقتي في الخير وأنه عندما توقع البشرية جمعاء هذه الاتفاقية: سيتوقف العنف والقتال والحكم عن أن يكون شكلاً من أشكال التواصل البشري              <br>
+عندما تكون كل <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> من الموقعين على هذه المعاهدة أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> سأتخلى عن أسلحتي ورجال الشرطة المسلحين الذين عينتهم دولة <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> بالنيابة عني.              <br>
+أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> ، سأتخلى عن أسلحة الجيش <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> عندما توقع البشرية جمعاء على هذه الاتفاقية.          </span>
     </div>
      
 
