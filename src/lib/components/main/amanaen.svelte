@@ -281,7 +281,7 @@ function find_contry_id(contry_name_arr){
     const placeholder = `My place`;
     const required = true;
     
-    let selected;
+    let selected = [];
        let already = false;
    let datar;
    let idx = 1;
