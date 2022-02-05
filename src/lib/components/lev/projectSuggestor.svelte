@@ -243,9 +243,9 @@ use:clickOutside on:click_outside={toggleShow}>
         color: var(--barbi-pink);
         min-height: 75px;
         min-width: 75px;
-        max-width: 75px;
-        max-height: 75px;
-
+        max-width: 95px;
+        max-height: 95px;
+aspect-ratio: 1/1;
          background-color: rgb(100, 224, 137);
          border-radius: 50%;
          text-shadow: 1px 1px  rgb(63, 56, 18);
