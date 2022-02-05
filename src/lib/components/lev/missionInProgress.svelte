@@ -22,6 +22,7 @@ import { idPr } from '../../stores/idPr.js';
     export let missId; //add in gr
     export let noofpu; //addtopr
     export let perhour;
+    let already = false;
     function project (id) {
     idPr.set(id);
     goto("/projectPrivat", );
@@ -146,13 +147,14 @@ $:  zman = msdonf + lapse;
 //
 
 function done() {
-  console.log("done")
+  already = true;
   //file upload in a chlon kofetz and then archived,, future build smart contracts on blockchain
   isOpen = true;
 }
 let isOpen = false;
 function close() {
   isOpen = false;
+  already = false;
 }
 let errorM = {ein:"יש להעלות קובץ המכיל את ביצוע המשימה או לתאר במילים",
                timer: " יש לכבות את הטיימר לפני הגשת המשימה לאישור"   };
@@ -363,9 +365,11 @@ use:clickOutside on:click_outside={toggleShow}>
 {/if}
 <br/>
     <br />
-    <button title="סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
-        <button on:click={handleRunClick} class="btn b" name="start timer" title= {running ? 'Stop' : 'Start'}><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
-   <!--if stop then opposide sand timer
+    {#if already === false}
+    <button title="סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
+     {/if}   <button on:click={handleRunClick} class="btn b" name="start timer" title= {running ? 'Stop' : 'Start'}><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
+   
+        <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
     
 </div>
@@ -376,10 +380,10 @@ use:clickOutside on:click_outside={toggleShow}>
 
 <style>
      .a{
-        margin-right: 30px;
+        margin-right: 20px;
     }
     .b{
-        margin-left: 30px;
+        margin-left: 20px;
     }
   .mn{
     margin: 1px;
@@ -403,8 +407,11 @@ use:clickOutside on:click_outside={toggleShow}>
       border-radius: 50%;
   }
   .svgg{
-     width:75px; 
-     height:75px;
+    min-height: 75px;
+    min-width: 75px;
+    max-width: 137.5px;
+    max-height: 137.5px;
+    aspect-ratio: 1 /1;
   }
 small {
   color: red ;
@@ -423,9 +430,10 @@ small {
         justify-content: safe center;
         color: var(--barbi-pink);
         min-height: 75px;
-        min-width: 75px;
-        max-width: 75px;
-        max-height: 75px;
+    min-width: 75px;
+    max-width: 137.5px;
+    max-height: 137.5px;
+    aspect-ratio: 1 /1;
 
          border-radius: 50%;
          margin: 10px 10px;
@@ -436,8 +444,11 @@ small {
     }
 	
     .normSmlHover{
-        height: 115px;
-        width: 115px;
+        min-height: 115px;
+    min-width: 115px;
+    max-width: 325px;
+    max-height: 325px;
+    aspect-ratio: 1/ 1;
         color: var(--barbi-pink);
 
         border-radius: 50%;

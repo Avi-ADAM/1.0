@@ -935,7 +935,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
        projectName={aba.projectName}
        /></div>
    {/each}
-
+<!---->
 
     {#each meData as data, i}
     <div  class="sugg normSml" style="display:''"><ProjectSuggestor
@@ -1071,16 +1071,17 @@ des={0}  />
     #d{
         fill: none;
     }
-    .svggg{
-        width:75px; 
-        height:75px;
+  /*  .svggg{
+        min-width:75px; 
+        min-height:75px;
+        aspect-ratio: 1;
     }
 @media (min-width:550){
      .svggg{
         width:125px; 
         height:125px;
     }
-}
+} */
     @media  (max-width: 839px) {
     
     .screen{
@@ -1101,7 +1102,7 @@ des={0}  />
     grid-row: 2/ 4;
     grid-column: 2 /4;
     align-self: center;
-    justify-self: center;
+   /* justify-self: center;*/
     border-radius: 50%; 
     }
 

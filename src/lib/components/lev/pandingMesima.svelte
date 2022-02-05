@@ -24,7 +24,7 @@ import { idPr } from '../../stores/idPr.js';
     export let noofusersWaiting;
     export let total = 0;
     export let noofusers ;
-    export let already;
+    export let already = false;
     export let missionId;
     export let skills = [];
     export let tafkidims = [];
@@ -85,6 +85,7 @@ function objToString (obj) {
     const userss = objToString(users)
 
 async function agree() {
+  already = true;
     const date = (mdate !== undefined) ? ` sqadualed: ${mdate}` : ``;
     const cookieValue = document.cookie
   .split('; ')
@@ -198,6 +199,7 @@ archived: true
 	};
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
 async function nego() {
+  already = true;
         console.log("nego")   
         no = false;
          masa = true;
@@ -205,6 +207,7 @@ async function nego() {
             console.log(no)
 	}
     function decline() {
+      already = true;
       no = true;
             isOpen = true;
         //create why alert (from smui) add validation for minimum 
@@ -214,6 +217,7 @@ async function nego() {
 let isOpen = false;
   async function afterwhy (){
         if (why.length > 20) {
+          
             isOpen = false;
         console.log("decline",why)
          const cookieValue = document.cookie
@@ -263,6 +267,7 @@ let isOpen = false;
         } else{
           console.log("decline",why)
             alert("min 20 ")
+            already = false;
         }
            
 
@@ -271,6 +276,7 @@ let isOpen = false;
     isOpen = false;
     no = false; 
     masa = false;
+    already = false;
   };
 
   function afternego (event) {
@@ -487,10 +493,11 @@ input[type=text]:invalid {
         align-items: center;
         justify-content: safe center;
         color: var(--barbi-pink);
-        min-height: 75px;
-        min-width: 75px;
-        max-width: 75px;
-        max-height: 75px;
+       min-height: 75px;
+    min-width: 75px;
+    max-width: 137.5px;
+    max-height: 137.5px;
+    aspect-ratio: 1 /1;
 
          background-color: rgb(100, 224, 137);
          border-radius: 50%;
@@ -506,8 +513,11 @@ input[type=text]:invalid {
     .normSmlHover{
          text-shadow: 1px 1px  rgb(63, 56, 18);
         color: var(--barbi-pink);
-        height: 115px;
-        width: 115px;
+         min-height: 115px;
+    min-width: 115px;
+    max-width: 325px;
+    max-height: 325px;
+    aspect-ratio: 1/ 1;
         border-radius: 50%;
         line-height: 0.8;
         text-align: center;

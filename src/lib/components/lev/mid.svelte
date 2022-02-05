@@ -3020,7 +3020,7 @@ let big2 = `
 </script>
 
 <div in:fly={{duration: 4200, y:1000}} class="midCom">
-     <svg  class="midCom" version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+     <svg  version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
    {@html big}
    <g on:click={()=>disp(sugg)} name="number " class="btn" transform="translate(.91591 -68.953)">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
@@ -3212,8 +3212,12 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
  
 <style>	
   .midCom{	
-    height: 170px;	
-    width: 170px;	
+    min-height: 170px;	
+    min-width: 170px;	
+     
+    max-width: 550px;
+    max-height: 550px;
+    aspect-ratio: 1/ 1;
 }	
 @media (min-width: 550px) {	
 .midCom{	

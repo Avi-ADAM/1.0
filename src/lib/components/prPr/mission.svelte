@@ -71,8 +71,9 @@ let pendq = '';
 let qwerys =``;
 let rishon4 = ``;
 let rishonves4 = ``;
-
+let already = false;
 async function increment() {
+  already = true;
   // ולידציה שהיוזר חבר בפרוייקט מהקוקיות ומאקספורט של רשימת חברים
 // א השמה של לעצמי אם לבד לעשות קוורי למיסיון אין פרוגרס פרויקט גדול לאסקד
 // סיימתי את המשימה אם לבד השמה של קוורי לפינישד מיסיון אם עוד לפיניאפרובל 
@@ -658,12 +659,13 @@ dispatch('addneww', {
     </table>
   </div>
  <div>
+   {#if already === false}
   <button 
   on:click={increment}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold py-2 px-4 m-2 rounded" 
   type="submit" 
   name="addm">פרסום משימות </button>
-      
+      {/if}
   </div> 
 </div>
 <div class="dd">

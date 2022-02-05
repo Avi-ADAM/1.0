@@ -472,10 +472,11 @@ input[type=text]:invalid {
     align-items: center;
     justify-content: safe center;
     color: var(--barbi-pink);
-    min-height: 125px;
-    min-width: 125px;
-    max-width: 125px;
-    max-height: 125px;
+    min-height: 75px;
+    min-width: 75px;
+    max-width: 137.5px;
+    max-height: 137.5px;
+    aspect-ratio: 1 /1;
 
     background-color: rgb(100, 224, 137);
     border-radius: 50%;

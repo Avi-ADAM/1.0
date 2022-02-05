@@ -42,7 +42,7 @@ export let uids;
 export let what;
 export let noofusersOk;
 export let noofusersNo;
-export let already;
+export let already = false;
 let resP = [];
 let lang;
 export let stylef = '24px';
@@ -88,6 +88,7 @@ let welcome = ``;
 let adduser = ``;
 let adduser2 = ``;
 async function agree() {
+    already = true;
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
     
     
@@ -312,6 +313,8 @@ function ask() {
 }
 
 async function decline() {
+        already = true;
+
         console.log("decline0");
 const declineda = declined.map(c => c.id)
     declineda.push(userId)
@@ -459,7 +462,7 @@ updateOpenMission(
             <h5 class="hslink">{role}</h5>
             <h6 class="hslink">{skills}</h6>
                <p class="vo"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
-            {#if !already}
+            {#if already === false}
             <button on:click={agree}  class = "btn a" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
             <button on:click={decline}  class = "btn b"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
@@ -543,9 +546,9 @@ updateOpenMission(
     color: var(--barbi-pink);
     min-height: 75px;
     min-width: 75px;
-    max-width: 75px;
-    max-height: 75px;
-
+    max-width: 137.5px;
+    max-height: 137.5px;
+    aspect-ratio: 1 /1;
     background-color: rgb(100, 224, 137);
     border-radius: 50%;
 
@@ -571,8 +574,11 @@ updateOpenMission(
 
 .normSmlHover {
     color: var(--barbi-pink);
-    height: 115px;
-    width: 115px;
+    min-height: 115px;
+    min-width: 115px;
+    max-width: 325px;
+    max-height: 325px;
+    aspect-ratio: 1/ 1;
     border-radius: 50%;
     line-height: 0.5;
     text-align: center;

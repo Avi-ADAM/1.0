@@ -45,10 +45,11 @@ console.log(projectName)
     align-items: center;
     justify-content:  center;
     color: var(--barbi-pink);
-    min-height: 75px;
+  min-height: 75px;
     min-width: 75px;
-    max-width: 75px;
-    max-height: 75px;
+    max-width: 137.5px;
+    max-height: 137.5px;
+    aspect-ratio: 1 /1;
 
     background-color: rgb(213, 216, 171);
 
