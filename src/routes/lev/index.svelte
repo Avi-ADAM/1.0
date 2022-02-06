@@ -9,6 +9,7 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import Welcomt from "../../lib/components/lev/welcomTo.svelte";
     import Fiappru from '../../lib/components/lev/fiappru.svelte';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+let ddd;
 
   //  import Viewport from 'svelte-viewport-info'
     let updateP;
@@ -607,7 +608,22 @@ var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-f
 
     };
     // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו 
-    
+
+     let nam = ""
+        let total = ""
+              let  picLink = ""
+    function midd (min){
+        const dd = min.data.user
+         nam = dd.username
+         total = dd.total
+        if (dd.profilePic.formats.thumbnail.url){
+      picLink = dd.profilePic.formats.thumbnail.url
+        } else if (dd.profilePic.small.thumbnail.url){
+        picLink = dd.profilePic.small.thumbnail.url
+        } else if (dd.profilePic.url){
+                 picLink = dd.profilePic.url
+        }
+    }
 onMount(async () => {
 
     const cookieValue = document.cookie
@@ -654,6 +670,8 @@ onMount(async () => {
                 }
                 id
                 username
+                hervachti
+                 profilePic {url formats }  
                      askeds  { id} 
                      declined { id} 
                      work_ways { id } 
@@ -698,6 +716,8 @@ onMount(async () => {
 })
   .then(r => r.json())
   .then(data => miData = data);
+   miData = miData
+   midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות
@@ -732,7 +752,6 @@ function makeWalcom (ata) {
 }    
 
 let pends = [];
-
 function createpends (data) {
     //rishonnnn so to create openM first avilable only to rishon then to rest of users..
     const myid = data.data.user.id;
@@ -1055,6 +1074,9 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
         <Mid 
 on:showall={showall}
 on:showonly={showonly}
+{total}
+picLink={picLink}
+name={nam}
 {sug}
 {pen}
 {ask}
@@ -1068,6 +1090,7 @@ des={0}  />
 
 
 <style>
+    
     #d{
         fill: none;
     }

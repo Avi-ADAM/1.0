@@ -438,7 +438,7 @@ addSl4 = false;
 {#if addP == 0}
 <div class="body"  style="--the:{stylef};">
   <div class="name">
-  <a sveltekit:prefetch href="/lev" ><img
+  <a  href="/lev"><img
     title=" ללב המערכת"
     style="height: 7vh; margin: 0 auto;"
     class="hover:scale-200 hover:transform translate-y-20"
