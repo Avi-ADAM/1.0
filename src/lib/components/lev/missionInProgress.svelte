@@ -54,6 +54,9 @@ import { idPr } from '../../stores/idPr.js';
     running = false
   }
   onDestroy(() => {
+    if (running === true) {
+console.log("oops")
+    }
     clearInterval(timer)
   })
   let miDatan;
@@ -329,7 +332,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
        {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{dueDateOrCountToDedline}</h5>{/if}
                                                      </foreignObject>     
 
-        
+<!--        
 <foreignObject x='-12' y='42' width='125px' height='56px'>
     
        <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{`${hoursdon ? hoursdon : 0} / ${hourstotal}`}</h5>
@@ -339,6 +342,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
         <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>
         
 </foreignObject>
+-->
     </g>
 </svg>
  
@@ -436,7 +440,6 @@ small {
     aspect-ratio: 1 /1;
 
          border-radius: 50%;
-         margin: 10px 10px;
          background: url(https://res.cloudinary.com/love1/image/upload/v1643838415/diamondlight1_db635m.jpg);
     background-position: center; 
     background-repeat: no-repeat; 
