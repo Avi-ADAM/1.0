@@ -9,6 +9,8 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import Welcomt from "../../lib/components/lev/welcomTo.svelte";
     import Fiappru from '../../lib/components/lev/fiappru.svelte';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+        import { isEqual } from 'lodash';
+
 let ddd;
 
   //  import Viewport from 'svelte-viewport-info'
@@ -220,6 +222,8 @@ async function createasked (da) {
             }
 
   }
+  
+  if (dictasked.length > 0){
   for (var k = 0; k < dictasked.length; k++) {
      const x = dictasked[k].users
      dictasked[k].uids = [];
@@ -241,7 +245,9 @@ for (var t = 0; t <dictasked.length; t++){
     if(allid.includes(myid)){
       dictasked[t].already = true;
       dictasked.splice(t, 1);
-    }
+      dictasked = dictasked
+    } 
+    if (dictasked.length > 0){
         for (var r=0; r< dictasked[t].users.length; r++){
             if (dictasked[t].users[r].what === true) {
                 
@@ -252,11 +258,13 @@ for (var t = 0; t <dictasked.length; t++){
                  dictasked[t].noofusersNo += 1;
                
             }
-        }
+        }}
+            if (dictasked.length > 0){
+
     const noofusersWaiting = dictasked[t].noof - dictasked[t].users.length;
     dictasked[t].noofusersWaiting = noofusersWaiting;
         
-    }
+    }}}
   askedcoin = dictasked;
   ask = askedcoin.length;
 }
@@ -559,6 +567,7 @@ asanddec = [...new Set([...askedarr,...declineddarr])];
   }, {});
 var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-filteredw[b]})
  // add declined filter add sort by value
+ if (keysSorted.length > 0){
   var resultString = keysSorted.join('&id_in=');
  let link ="https://strapi-k4vr.onrender.com/open-missions?id_in=" + resultString ;
     const cookieValue = document.cookie
@@ -602,7 +611,7 @@ var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-f
             if(meData[i].project.profilePic){
          meData[i].srcb = meData[i].project.profilePic.formats.thumbnail.url
             }
-        }
+        }}
         sug = meData.length;
      createD()
 
@@ -624,9 +633,11 @@ var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-f
                  picLink = dd.profilePic.url
         }
     }
-onMount(async () => {
+    let tickSpeed = 60000 * 5;
 
-    const cookieValue = document.cookie
+let miDataold = [];
+onMount(async () => {
+  const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   if (cookieValue != null) {
@@ -639,8 +650,17 @@ onMount(async () => {
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValu; 
-  
+  token  = cookieValu; 
+  start ();
+  setInterval(start, tickSpeed);
+
+  } else {
+            goto ("/",)
+    }
+})
+ async function start () { 
+  console.log("start");
+  miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
     let link ="https://strapi-k4vr.onrender.com/graphql" ;
         try {
@@ -716,7 +736,20 @@ onMount(async () => {
 })
   .then(r => r.json())
   .then(data => miData = data);
+  if (isEqual(miData,miDataold)) {
+console.log("nada")
+  } else {
+      console.log("tada")
+  console.log (miData)
+
    miData = miData
+   fiapp = [];
+   pends = [];
+   adder = [];
+   walcomen = [];
+   askedcoin = [];
+   mtaha = [];
+   meData = [];
    midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
@@ -725,15 +758,11 @@ onMount(async () => {
            mesimabetahalicha (miData);
           ishursium(miData);
       //    createD()
-
+  }
         } catch (e) {
             error1 = e
         }
-    } else {
-            goto ("/",)
-
-    }
-    });
+    } ;
 
 let walcomen = [] ;
 

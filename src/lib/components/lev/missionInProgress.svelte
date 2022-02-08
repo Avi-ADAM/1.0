@@ -5,6 +5,7 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
+export let stname;
 
 	export let shows = true
     export let dueDateOrCountToDedline = "11:11"
@@ -53,11 +54,23 @@ import { idPr } from '../../stores/idPr.js';
     lapse = 0
     running = false
   }
+  
   onDestroy(() => {
     if (running === true) {
-console.log("oops")
-    }
+      const saved = lapse * 2.7777777777778E-7;
+    console.log("Saved",formatTime(saved), saved, lapse )
+    const noofnew = hoursdon + saved;
+    hoursdon = noofnew;
     clearInterval(timer)
+    const msdon = hoursdon * 3600000
+     zman = msdon
+    lapse = 0
+    running = false
+    stname = `$1-${projectName}-${missionName}-${zman}-$1`
+
+console.log("oops", zman,`https://timercheck.io/${stname}/36000`)
+fetch(`https://timercheck.io/${stname}/36000`)
+    }
   })
   let miDatan;
  let idL;
