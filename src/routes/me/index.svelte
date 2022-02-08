@@ -438,7 +438,7 @@ addSl4 = false;
 {#if addP == 0}
 <div class="body"  style="--the:{stylef};">
   <div class="name">
-  <a  href="/lev"><img
+  <a target="_self" href="/lev"><img
     title=" ללב המערכת"
     style="height: 7vh; margin: 0 auto;"
     class="hover:scale-200 hover:transform translate-y-20"
