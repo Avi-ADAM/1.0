@@ -202,7 +202,6 @@ onMount(async () => {
             }).then(checkStatus)
           .then(parseJSON);
             meData = res;
-            console.log(meData)
                         mail = meData.email;
           letters(meData.username);
             myP = meData.projects_1s;
