@@ -13,6 +13,8 @@ const projectId = id;
 </script>
 <script>
       import { onMount } from 'svelte';
+  import Header from './../../lib/components/header/header.svelte'
+
 export let projectId;
 let project = [
 ];
@@ -75,6 +77,8 @@ onMount(async () => {
     
 </script>
 <div dir="rtl" class="all">
+  <Header/>
+
   <div class="4">
     {#if srcP}
     <img

@@ -1,5 +1,6 @@
 <script>
   //	import { draw } from 'svelte/transition';
+  import Header from '../../lib/components/header/header.svelte'
   import { RingLoader
 } from 'svelte-loading-spinners'
     import Uplad from '../../lib/components/userPr/uploadPic.svelte';
@@ -852,6 +853,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
 בנוסף במקרה של רענון יעלם האידי של הפרוייקט
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור פרוייקט או להחזיר לדף הבית-->
 <div dir="rtl" class="all bg-lturk text-barbi text-center">
+  <Header/>
   <div>
   {#if project.profilePic !== null}
       <img

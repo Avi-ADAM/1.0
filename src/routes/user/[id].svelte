@@ -17,6 +17,7 @@
   
   export let userId; 
   import { onMount } from 'svelte';
+  import Header from './../../lib/components/header/header.svelte'
 
 let user = [
 ];
@@ -88,7 +89,7 @@ let error1 = null;
     
   </script>
   <div dir="rtl" >
-
+<Header/>
       <div class="middle">
     {#if srcU }
  <img

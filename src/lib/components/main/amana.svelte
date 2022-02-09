@@ -392,6 +392,8 @@ trans = !trans;
       <!--
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      --> <div class="all">
+       <a  sveltekit:prefetch href="/login" ><img title="התחברות ל-1❤️1" class="right translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150" alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
+
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
           <button on:click={tran}><img alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
@@ -463,7 +465,7 @@ trans = !trans;
     </div> 
     <div class="aab">
 <div dir="rtl" class="amana" id="amana-show">
- <h1 dir="rtl" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
+ <h1 dir="rtl" style="color:var(--barbi-pink);  font-weight: 900;">
      הצהרת העצמאות האישית של 
         <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  
         :
@@ -517,6 +519,16 @@ trans = !trans;
   
 </div> </div>
   <style>
+        .right {
+        position: absolute;
+        top: 50px;
+        right: 50px;
+        height: 50px;
+        width: 50px;
+        z-index: 14;
+                aspect-ratio: 1/1;
+
+    }
    .alredy{
            text-align: center;
            margin: 4vh  4vw 2vh 4vw;
