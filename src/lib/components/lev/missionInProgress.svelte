@@ -7,7 +7,7 @@
 import { idPr } from '../../stores/idPr.js';
 import { onMount } from 'svelte';
 export let stname;
-
+let show = true;
 	export let shows = true
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
@@ -24,6 +24,7 @@ export let stname;
     export let missId; //add in gr
     export let noofpu; //addtopr
     export let perhour;
+    let x = 0;
     let already = false;
     function project (id) {
     idPr.set(id);
@@ -32,16 +33,137 @@ export let stname;
 
 let miatan;
   onMount(async () => {
-    if (oldzman > 0) {
-    console.log(Date.now() - stname + oldzman)
-const x = Date.now() - stname + oldzman;
-      const startTime = Date.now() - lapse 
+    if (stname === "0") {
+          console.log("to to"); 
+  } else if (stname === "stopi") {
+    console.log("to to tooooo");
+    x = oldzman
+  } else {
+    console.log(stname)
+      const startTime = stname - lapse
       timer = setInterval(() => {
-        lapse = Date.now() - startTime + x
+        lapse = Date.now() - startTime 
+      }, 1)
+        x = oldzman
+    running = true
+  }
+})
+
+let zmani;
+	function toggleShow() {
+		shows = !shows
+	}
+  let msdonf;
+  $: msdonf = hoursdon * 3600000;
+  export let oldzman;
+  import { onDestroy } from 'svelte'
+  let timer;
+  let running = false;
+  let error1;
+  
+  async function azor () {
+      clearInterval(timer)
+      running = false;
+      zmani += lapse;
+      x += lapse;
+      lapse = 0;
+      const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt='))
+        .split('=')[1];
+    const cookieValueId = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('id='))
+        .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    bearer1 = 'bearer' + ' ' + token;
+        try {
+            await fetch(linkg, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': bearer1,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: `mutation 
+                        { 
+updateMesimabetahalich(
+  input: {
+    where: {id: "${mId}"}
+  data: {
+stname: "stopi",
+timer: ${x}
+  }
+}
+) {mesimabetahalich{id stname timer}}
+}
+`})
+                })
+                .then(r => r.json())
+                .then(data => miCatan = data);
+            console.log(miCatan);
+        } catch (e) {
+            error1 = e
+            console.log(error1);
+        }
+    } 
+    async function start () {
+      const startTime = Date.now() - lapse
+      timer = setInterval(() => {
+        lapse = Date.now() - startTime 
       }, 1)
     
     running = true
+    stname = Date.now()
  const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt='))
+        .split('=')[1];
+    const cookieValueId = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('id='))
+        .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    bearer1 = 'bearer' + ' ' + token;
+        try {
+            await fetch(linkg, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': bearer1,
+                        'Content-Type': 'application/json'
+                    },
+                    //add already declined ids
+                    body: JSON.stringify({
+                        query: `mutation 
+                        { 
+updateMesimabetahalich(
+  input: {
+    where: {id: "${mId}"}
+  data: {
+stname: "${stname}",
+timer: ${x}
+  }
+}
+) {mesimabetahalich{id stname timer}}
+}
+`})
+                })
+                .then(r => r.json())
+                .then(data => miCatan = data);
+            console.log(miCatan);
+        } catch (e) {
+            error1 = e
+            console.log(error1);
+        }
+  }
+
+ async function handleClearClick () {
+    clearInterval(timer)
+    lapse = 0
+    running = false
+    const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
         .split('=')[1];
@@ -82,148 +204,9 @@ timer: 0
             error1 = e
             console.log(error1);
         }
-  } else {
-    console.log("to to");
-  }})
-
-
-	function toggleShow() {
-		shows = !shows
-	}
-  let msdonf;
-  $: msdonf = hoursdon * 3600000;
-  export let oldzman;
-  import { onDestroy } from 'svelte'
-  let timer
-  let running = false
-  let error1;
-  function handleRunClick () {
-    if (running) {
-      clearInterval(timer)
-    } else {
-      const startTime = Date.now() - lapse
-      timer = setInterval(() => {
-        lapse = Date.now() - startTime 
-      }, 1)
-    }
-    running = true
-  }
-  function handleClearClick () {
-    clearInterval(timer)
-    lapse = 0
-    running = false
   }
   let miCatan =[];
-async function beforeUnload () {
-   if (running === true) {
-     const saved = lapse * 2.7777777777778E-7;
-    const noofnew = hoursdon + saved;
-    hoursdon = noofnew;
-    clearInterval(timer)
-    const msdon = hoursdon * 3600000
-    zman = msdon
-    lapse = 0
-    running = false;
-    stname = Date.now()
-    
- const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
-    const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-    idL = cookieValueId;
-    token = cookieValue;
-    bearer1 = 'bearer' + ' ' + token;
-        try {
-            await fetch(linkg, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': bearer1,
-                        'Content-Type': 'application/json'
-                    },
-                    //add already declined ids
-                    body: JSON.stringify({
-                        query: `mutation 
-                        { 
-updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
-  data: {
-stname: "${stname}",
-timer: ${zman}
-  }
-}
-) {mesimabetahalich{id stname timer}}
-}
-`})
-                })
-                .then(r => r.json())
-                .then(data => miCatan = data);
-            console.log(miCatan);
-        } catch (e) {
-            error1 = e
-            console.log(error1);
-        }
-    }
-}
-  onDestroy(async() => {
-    if (running === true) {
-     const saved = lapse * 2.7777777777778E-7;
-    const noofnew = hoursdon + saved;
-    hoursdon = noofnew;
-    clearInterval(timer)
-    const msdon = hoursdon * 3600000
-    zman = msdon
-    lapse = 0
-    running = false;
-    stname = Date.now()
-    
- const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
-    const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-    idL = cookieValueId;
-    token = cookieValue;
-    bearer1 = 'bearer' + ' ' + token;
-        try {
-            await fetch(linkg, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': bearer1,
-                        'Content-Type': 'application/json'
-                    },
-                    //add already declined ids
-                    body: JSON.stringify({
-                        query: `mutation 
-                        { 
-updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
-  data: {
-stname: "${stname}",
-timer: ${zman}
-  }
-}
-) {mesimabetahalich{id stname timer}}
-}
-`})
-                })
-                .then(r => r.json())
-                .then(data => miCatan = data);
-            console.log(miCatan);
-        } catch (e) {
-            error1 = e
-            console.log(error1);
-        }
-    }
-  })
+
   let miDatan;
  let idL;
  let token;
@@ -266,7 +249,9 @@ updateMesimabetahalich(
   input: {
     where: {id: "${mId}"}
   data: {
-howmanyhoursalready: ${hoursdon}
+howmanyhoursalready: ${hoursdon},
+stname: "0",
+timer: 0
   }
 }
 ) {mesimabetahalich{id howmanyhoursalready}}
@@ -284,7 +269,7 @@ howmanyhoursalready: ${hoursdon}
         }
 }
 export let zman;
-$:  zman = msdonf + lapse;
+$:  zman = msdonf + lapse + x;
  import { tweened } from "svelte/motion";
     // lapse refers to the number of milliseconds in the stopwatch
     export let lapse = 0;
@@ -427,7 +412,7 @@ ${tofinished}
   }
 }
 </script>
-<svelte:window on:beforeunload={beforeUnload}/>
+<!--<svelte:window on:beforeunload={beforeUnload}/>-->
 
 <div in:scale={{duration: 3200, opacity: 1, start: 0.1}}
 out:scale={{duration: 2200, opacity: 0.5}}
@@ -529,16 +514,17 @@ use:clickOutside on:click_outside={toggleShow}>
 
             <h5 class="mn">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal}`}</h5>
 
-{#if lapse !== 0}
-<button class="text-sm bg-gold p-1 rounded hover:bg-lturk" on:click={handleClearClick}>ניקוי</button>
-<button class="text-sm bg-lturk p-1 rounded hover:bg-gold" on:click={save}> הוספה</button>
+{#if lapse !== 0 || x !== 0}
+<button class="sm:text-sm text-xs bg-gold p-0.5  sm:p-1 rounded hover:bg-lturk" on:click={handleClearClick}>ניקוי</button>
+<button class="sm:text-sm text-xs  bg-lturk p-0.5 sm:p-1 rounded hover:bg-gold" on:click={save}> הוספה</button>
 {/if}
 <br/>
     <br />
     {#if already === false}
     <button title="סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
-     {/if}   <button on:click={handleRunClick} class="btn b" name="start timer" title= {running ? 'Stop' : 'Start'}><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
-   
+     {/if} 
+     {#if show === true}  <button on:click={running ? azor : start} class="btn b" name="start timer" title= {running ? 'עצירה' : 'התחלה'}><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
+   {/if}
         <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
     
