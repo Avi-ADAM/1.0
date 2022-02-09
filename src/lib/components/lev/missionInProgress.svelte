@@ -33,17 +33,55 @@ export let stname;
 let miatan;
   onMount(async () => {
     if (oldzman > 0) {
-          console.log(`https://timercheck.io/${stname}`)
-
-  const response = await fetch(`https://timercheck.io/${stname}`, {
-  headers: {
-    'content-type': 'application/json'
-  }});
-  const names = await response.json();
-  console.log(names); 
-  // logs [{ name: 'Joker'}, { name: 'Batman' }]
-
-
+    console.log(Date.now() - stname + oldzman)
+const x = Date.now() - stname + oldzman;
+      const startTime = Date.now() - lapse 
+      timer = setInterval(() => {
+        lapse = Date.now() - startTime + x
+      }, 1)
+    
+    running = true
+ const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt='))
+        .split('=')[1];
+    const cookieValueId = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('id='))
+        .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    bearer1 = 'bearer' + ' ' + token;
+        try {
+            await fetch(linkg, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': bearer1,
+                        'Content-Type': 'application/json'
+                    },
+                    //add already declined ids
+                    body: JSON.stringify({
+                        query: `mutation 
+                        { 
+updateMesimabetahalich(
+  input: {
+    where: {id: "${mId}"}
+  data: {
+stname: "0",
+timer: 0
+  }
+}
+) {mesimabetahalich{id stname timer}}
+}
+`})
+                })
+                .then(r => r.json())
+                .then(data => miCatan = data);
+            console.log(miCatan);
+        } catch (e) {
+            error1 = e
+            console.log(error1);
+        }
   } else {
     console.log("to to");
   }})
@@ -76,21 +114,73 @@ let miatan;
     running = false
   }
   let miCatan =[];
-  onDestroy(async() => {
-    if (running === true) {
-      const saved = lapse * 2.7777777777778E-7;
-    console.log("Saved",formatTime(saved), saved, lapse )
+async function beforeUnload () {
+   if (running === true) {
+     const saved = lapse * 2.7777777777778E-7;
     const noofnew = hoursdon + saved;
     hoursdon = noofnew;
     clearInterval(timer)
     const msdon = hoursdon * 3600000
-     zman = msdon
+    zman = msdon
     lapse = 0
-    running = false
-    stname = `$1-${projectName}-${missionName}-${zman}-$1`
-
-console.log("oops", zman,`https://timercheck.io/${stname}/36000`)
-fetch(`https://timercheck.io/${stname}/36000`)
+    running = false;
+    stname = Date.now()
+    
+ const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt='))
+        .split('=')[1];
+    const cookieValueId = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('id='))
+        .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    bearer1 = 'bearer' + ' ' + token;
+        try {
+            await fetch(linkg, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': bearer1,
+                        'Content-Type': 'application/json'
+                    },
+                    //add already declined ids
+                    body: JSON.stringify({
+                        query: `mutation 
+                        { 
+updateMesimabetahalich(
+  input: {
+    where: {id: "${mId}"}
+  data: {
+stname: "${stname}",
+timer: ${zman}
+  }
+}
+) {mesimabetahalich{id stname timer}}
+}
+`})
+                })
+                .then(r => r.json())
+                .then(data => miCatan = data);
+            console.log(miCatan);
+        } catch (e) {
+            error1 = e
+            console.log(error1);
+        }
+    }
+}
+  onDestroy(async() => {
+    if (running === true) {
+     const saved = lapse * 2.7777777777778E-7;
+    const noofnew = hoursdon + saved;
+    hoursdon = noofnew;
+    clearInterval(timer)
+    const msdon = hoursdon * 3600000
+    zman = msdon
+    lapse = 0
+    running = false;
+    stname = Date.now()
+    
  const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -337,6 +427,7 @@ ${tofinished}
   }
 }
 </script>
+<svelte:window on:beforeunload={beforeUnload}/>
 
 <div in:scale={{duration: 3200, opacity: 1, start: 0.1}}
 out:scale={{duration: 2200, opacity: 0.5}}
@@ -392,7 +483,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
             <circle r="1" fill="none" stroke="currentColor" stroke-width="0.4"></circle>
         </g>
         {#if lapse !== 0}
-        <text text-anchor="middle" fill="var(--barbi-pink);" dominant-baseline="middle" font-size="10" style="font-weight: 300; letter-spacing: 1px;">
+        <text text-anchor="middle" fill="red" dominant-baseline="middle" font-size="10" style="font-weight: 300; letter-spacing: 1px;">
             {formatTime(zman)}
         </text>
         {/if}
@@ -434,7 +525,7 @@ use:clickOutside on:click_outside={toggleShow}>
    {#if dueDateOrCountToDedline !== null} <h5  class="mn">{dueDateOrCountToDedline}</h5>{/if}
     <p class="mn">{missionDetails}</p>
     <a class="mn" href={link}>{linkDescription}</a>
-      <span class="mn">{formatTime(lapse)}</span>
+      <span class="mn">{formatTime(zman)}</span>
 
             <h5 class="mn">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal}`}</h5>
 
