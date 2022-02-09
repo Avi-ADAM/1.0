@@ -675,7 +675,7 @@ onMount(async () => {
         JSON.stringify({query: 
           `{ user (id:${idL})  
           { mesimabetahaliches  (where:{forappruval: false, finnished: false }){
-             id hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
+             id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
               project{projectName id user_1s {id}
                             profilePic {url formats }}}
             welcom_tops (where:{clicked: false }){
@@ -1049,6 +1049,8 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
     {#each mtaha as taha, i}
    <div class="betaha normSml" style="display:'';"><MissionInProgress
     noofpu={taha.project.user_1s.length}
+    oldzman={taha.timer}
+    stname={taha.stname}
     mId={taha.id}
     missionName={taha.name}
     projectId={taha.project.id}
@@ -1106,6 +1108,7 @@ on:showonly={showonly}
 {total}
 picLink={picLink}
 name={nam}
+
 {sug}
 {pen}
 {ask}

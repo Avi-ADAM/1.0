@@ -5,6 +5,7 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
+import { onMount } from 'svelte';
 export let stname;
 
 	export let shows = true
@@ -29,11 +30,31 @@ export let stname;
     goto("/projectPrivat", );
   };
 
+let miatan;
+  onMount(async () => {
+    if (oldzman > 0) {
+          console.log(`https://timercheck.io/${stname}`)
+
+  const response = await fetch(`https://timercheck.io/${stname}`, {
+  headers: {
+    'content-type': 'application/json'
+  }});
+  const names = await response.json();
+  console.log(names); 
+  // logs [{ name: 'Joker'}, { name: 'Batman' }]
+
+
+  } else {
+    console.log("to to");
+  }})
+
+
 	function toggleShow() {
 		shows = !shows
 	}
   let msdonf;
   $: msdonf = hoursdon * 3600000;
+  export let oldzman;
   import { onDestroy } from 'svelte'
   let timer
   let running = false
@@ -54,8 +75,8 @@ export let stname;
     lapse = 0
     running = false
   }
-  
-  onDestroy(() => {
+  let miCatan =[];
+  onDestroy(async() => {
     if (running === true) {
       const saved = lapse * 2.7777777777778E-7;
     console.log("Saved",formatTime(saved), saved, lapse )
@@ -70,6 +91,47 @@ export let stname;
 
 console.log("oops", zman,`https://timercheck.io/${stname}/36000`)
 fetch(`https://timercheck.io/${stname}/36000`)
+ const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt='))
+        .split('=')[1];
+    const cookieValueId = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('id='))
+        .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    bearer1 = 'bearer' + ' ' + token;
+        try {
+            await fetch(linkg, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': bearer1,
+                        'Content-Type': 'application/json'
+                    },
+                    //add already declined ids
+                    body: JSON.stringify({
+                        query: `mutation 
+                        { 
+updateMesimabetahalich(
+  input: {
+    where: {id: "${mId}"}
+  data: {
+stname: "${stname}",
+timer: ${zman}
+  }
+}
+) {mesimabetahalich{id stname timer}}
+}
+`})
+                })
+                .then(r => r.json())
+                .then(data => miCatan = data);
+            console.log(miCatan);
+        } catch (e) {
+            error1 = e
+            console.log(error1);
+        }
     }
   })
   let miDatan;
