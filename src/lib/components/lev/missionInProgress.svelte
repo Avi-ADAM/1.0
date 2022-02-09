@@ -221,8 +221,10 @@ async function save() {
     clearInterval(timer)
     const msdon = hoursdon * 3600000
     console.log(msdon)
+        console.log(hoursdon)
     zman = msdon
     lapse = 0
+    x = 0
     running = false
     const cookieValue = document.cookie
         .split('; ')
@@ -513,7 +515,7 @@ use:clickOutside on:click_outside={toggleShow}>
     <a class="mn" href={link}>{linkDescription}</a>
       <span class="mn">{formatTime(zman)}</span>
 
-            <h5 class="mn">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal}`}</h5>
+            <h5 class="mn">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
 
 {#if lapse !== 0 || x !== 0}
 <button class="sm:text-sm text-xs bg-gold p-0.5  sm:p-1 rounded hover:bg-lturk" on:click={handleClearClick}>ניקוי</button>
