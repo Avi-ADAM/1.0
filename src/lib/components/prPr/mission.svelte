@@ -74,8 +74,8 @@ let rishonves4 = ``;
 let already = false;
 async function increment() {
   already = true;
-  // ולידציה שהיוזר חבר בפרוייקט מהקוקיות ומאקספורט של רשימת חברים
-// א השמה של לעצמי אם לבד לעשות קוורי למיסיון אין פרוגרס פרויקט גדול לאסקד
+  // ולידציה שהיוזר חבר ברקמה מהקוקיות ומאקספורט של רשימת חברים
+// א השמה של לעצמי אם לבד לעשות קוורי למיסיון אין פרוגרס ריקמה גדול לאסקד
 // סיימתי את המשימה אם לבד השמה של קוורי לפינישד מיסיון אם עוד לפיניאפרובל 
   
 console.log(miData);
@@ -547,7 +547,7 @@ dispatch('addneww', {
              </td>
              {/each}
         </tr><tr>
-          <th>הערות יחודיות לפרויקט שלי</th>
+          <th>הערות יחודיות לריקמה שלי</th>
           {#each miData as data, i}
           <td>
                                   <div dir="rtl" class='textinput'>
@@ -558,7 +558,7 @@ dispatch('addneww', {
            </td>
            {/each}
       </tr><tr>
-        <th>קישורים יחודיים לפרויקט שלי</th>
+        <th>קישורים יחודיים לריקמה שלי</th>
         {#each miData as data, i}
         <td>
                          <div dir="rtl" class='textinput'>
@@ -602,7 +602,7 @@ dispatch('addneww', {
           </td>
           {/each}
     </tr><tr>
-          <th>השמת המשימה ל-1 מהפרויקט שלי</th>
+          <th>השמת המשימה ל-1 מהריקמה שלי</th>
           {#each miData as data, i}
           <td>
             <input

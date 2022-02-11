@@ -63,7 +63,7 @@ function newM (event) {
   </script>
 
 <div dir="rtl" >
-<h1 class="text-barbi font-bold">הוספת פעולות הנדרשות להקמה או\ו לתפקוד הפרויקט</h1>
+<h1 class="text-barbi font-bold">הוספת פעולות הנדרשות להקמה או\ו לתפקוד הריקמה</h1>
   
            <div class="inline-block relative w-64">
         

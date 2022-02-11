@@ -2489,7 +2489,7 @@ let big2 = `
 <path d="m248.55 614.39 7.2409 7.5208-3.8274-6.057c-1.3198-0.30632-2.3179-0.93376-3.4136-1.4638z" fill="url(#bmz)" fill-rule="evenodd" opacity=".89224" stroke="url(#anw)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#bmv)" fill-rule="evenodd" opacity=".76724" stroke="url(#anv)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#bmt)" fill-rule="evenodd" opacity=".76724" stroke="url(#anu)" stroke-width=".16015px"/>
-<title>הצגת הצעות לפרוייקטים בלבד</title>
+<title>הצגת הצעות לרקמות בלבד</title>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
 </g>
@@ -3106,7 +3106,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 </g>
 <g on:click={() => disp(welc)}  class="btn"  name="number of op" transform="translate(194.44 -541.85)">
-<title>הצגת קבלות פנים לפרוייקטים בלבד</title>
+<title>הצגת קבלות פנים לרקמות בלבד</title>
   <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#blk)" opacity=".89224" stroke="url(#aoh)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#blj)" fill-rule="evenodd" opacity=".89224" stroke="url(#aog)" stroke-width=".16015px"/>

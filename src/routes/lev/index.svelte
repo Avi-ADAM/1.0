@@ -1080,7 +1080,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
     <div class="normSml"><MissionInProgress missionName={" הרשמה ולוגין"} projectId={1}/></div>
    <div class="normSml"><ProjectSuggestor missionName={"תמונות לחיצות"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
  
-    <div class="normSml"><MissionInProgress missionName={" צור פרויקט חדש "} projectId={1}/></div>
+    <div class="normSml"><MissionInProgress missionName={" צור ריקמה חדש "} projectId={1}/></div>
     <div class="normSml"><ProjectSuggestor missionName={"סליקה ותשלומים"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
     <div class="normSml"><MissionInProgress missionName={"מנוע מיון בועות "} projectId={1}/></div>
     <div class="normSml"><DecisionMaking decisionName={"?לחפש מתכנת"} projectId={1}/></div> 
@@ -1091,7 +1091,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
     <div class="normSml"><ProjectSuggestor missionName={"קמפיין פייסבוק"} projectId={1}/></div>
     <div class="normSml"><MissionInProgress missionName={" עיצוב עמוד מוצר "} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
     <div class="normSml"><ProjectSuggestor missionName={"קמפיין טיקטוק"} projectId={1}/></div>
-    <div class="normSml"><MissionInProgress missionName={" הצעות לפרוייקטים strapiב "} projectId={1}/></div>
+    <div class="normSml"><MissionInProgress missionName={" הצעות לרקמות strapiב "} projectId={1}/></div>
     <div class="normSml"><DecisionMaking  decisionName={"?לחפש מתכנת"} projectName={"פסיפס"} projectId={6}/></div> 
     <div class="normSml"><MissionInProgress missionName={" החלטות strapiב "} projectId={1} /></div>
    <div class="normSml"><ProjectSuggestor missionName={"ייעוץ משפטי"} projectId={1}/></div>

@@ -94,7 +94,7 @@ function edit (id) {
              </td>
              {/each}
         </tr><tr>
-          <th>הערות יחודיות לפרויקט שלי</th>
+          <th>הערות יחודיות לריקמה שלי</th>
           {#each omiData as data, i}
           <td>
             {#if data.hearotMeyuchadot != "undefined"}
@@ -103,7 +103,7 @@ function edit (id) {
            </td>
            {/each}
       </tr><tr>
-        <th>קישורים יחודיים לפרויקט שלי</th>
+        <th>קישורים יחודיים לריקמה שלי</th>
         {#each omiData as data, i}
         <td>          {#if data.privatlinks != "undefined"} 
 

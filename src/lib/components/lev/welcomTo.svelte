@@ -30,9 +30,9 @@ console.log(projectName)
      <h1 class="te" style="line-height: 1; font-weight: bold;"
         >         {username}
         <br/>
-ברכות לרגל הצטרפותך לפרוייקט
+ברכות לרגל הצטרפותך לרקמה
          {projectName}</h1>
-    <button class="bg-lturk p-0.5 te" on:click={project(id)}>ללב הפרויקט</button>
+    <button class="bg-lturk p-0.5 te" on:click={project(id)}>ללב הריקמה</button>
 </div>
 </div>
 <style>

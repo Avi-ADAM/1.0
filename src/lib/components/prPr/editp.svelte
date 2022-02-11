@@ -114,13 +114,13 @@ addval == false;
   </script>  
 
 <div dir="rtl" class="jho">
-  <h1> עריכת פרויקט</h1>
+  <h1> עריכת ריקמה</h1>
 <br>
 
         <div dir="rtl" class='textinput'>
   <input name="des" bind:value={projectName_value}  
  type='text' class='input'required >
-  <label for="des" class='label'>שם הפרויקט</label>
+  <label for="des" class='label'>שם הריקמה</label>
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
@@ -145,7 +145,7 @@ addval == false;
   <span class='line'></span>
 </div>
 <h1 class="midscreenText-2">
- ערכים ומטרות שהפרויקט יקדם
+ ערכים ומטרות שהריקמה תקדם
 </h1> 
 
  <div  class="input-2">
@@ -163,7 +163,7 @@ addval == false;
   {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
-   <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בפרויקט</h2>
+   <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>
     <select bind:value={restime} class="form-select appearance-none
       block
       w-full

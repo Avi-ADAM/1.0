@@ -381,7 +381,7 @@ in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
 use:clickOutside on:click_outside={toggleShow}
 >
 	
-        <img on:click={project(projectId)} src={src} class="img" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של פרויקט" }>
+        <img on:click={project(projectId)} src={src} class="img" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
         <a sveltekit:prefetch href={`${link}${projectId}`}
         ><h3 class="pn">{projectName}</h3></a>
         <h1 class="pn">{name}</h1>

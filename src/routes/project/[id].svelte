@@ -94,7 +94,7 @@ onMount(async () => {
 {/if}
 <div style="background-color: var(--mturk); margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--gold);" class="3">
     <h2 style="color: var(--barbi-pink);
-" >1 בפרוייקט </h2>
+" >1 ברקמה </h2>
 {#each projectUsers as user}
 <a sveltekit:prefetch href={`/user/${user.id}`}><h6 class="text-gold hover:text-barbi">{user.username}</h6></a>
 {/each}

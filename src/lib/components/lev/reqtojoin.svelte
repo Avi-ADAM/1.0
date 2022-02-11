@@ -384,7 +384,7 @@ updateOpenMission(
         in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
         >
         <svg  version="1.1" viewBox="-106 -106 212 212" xmlns="http://www.w3.org/2000/svg">
-            <title>בקשה להצטרפות לפרוייקט</title>
+            <title>בקשה להצטרפות לרקמה</title>
             <defs>
                 <linearGradient id="lg" x1="1" y1="1" spreadMethod="pad">
                     <stop offset="0" style="stop-color: rgb(243, 71, 255);"/>

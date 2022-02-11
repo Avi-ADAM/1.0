@@ -388,8 +388,8 @@ title="ביטול"
             on:mouseleave={toggleShow}
             in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
             use:clickOutside on:click_outside={toggleShow}>
-            <img on:click={project(projectId)} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="32" height="32" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של פרויקט" }>
-            <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName, "לחיצה למעבר לדף הציבורי של פרויקט "}</h3></a>
+            <img on:click={project(projectId)} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="32" height="32" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
+            <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName, "לחיצה למעבר לדף הציבורי של ריקמה "}</h3></a>
             <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: var(--barbi-pink); line-height: 0.7; ">{missionBName}</h1>
             <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="32" height="32" alt="user aplly pic" title={useraplyname}>
             <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{useraplyname}</h3></a>

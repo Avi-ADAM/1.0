@@ -466,7 +466,7 @@ trans = !trans;
     <div class="aab">
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:var(--barbi-pink);  font-weight: 900;">
-     הצהרת העצמאות האישית של 
+     ההסכמה של 
         <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  
         :
     </h1>

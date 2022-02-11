@@ -129,7 +129,7 @@ function confirm (id) {
              </td>
              {/each}
         </tr><tr>
-          <th>הערות יחודיות לפרויקט שלי</th>
+          <th>הערות יחודיות לריקמה שלי</th>
           {#each pmiData as data, i}
           <td>
             {#if data.hearotMeyuchadot}
@@ -138,7 +138,7 @@ function confirm (id) {
            </td>
            {/each}
       </tr><tr>
-        <th>קישורים יחודיים לפרויקט שלי</th>
+        <th>קישורים יחודיים לריקמה שלי</th>
         {#each pmiData as data, i}
         <td>          {#if data.privatlinks} 
 

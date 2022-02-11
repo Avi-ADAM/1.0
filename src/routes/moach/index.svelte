@@ -69,8 +69,8 @@ let a = 0;
       };
     let addN = 0;
     let addM =  false;
-    let hosafa = "הוספת פעולות נדרשות לפרויקט";
-    let hosafat = "הוספת משאבים נדרשים לפרויקט";
+    let hosafa = "הוספת פעולות נדרשות לריקמה";
+    let hosafat = "הוספת משאבים נדרשים לריקמה";
     let cencel = "ביטול";
     let showvd = false;
 
@@ -97,7 +97,7 @@ let ata = [];
 let restime;
 let valit;
 onMount(async () => {
-  // ולידציה שהיוזר חבר בפרוייקט
+  // ולידציה שהיוזר חבר ברקמה
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -669,7 +669,7 @@ function addp () {
       a = 0;
             isOpen = true;
   }  else {
-    alert("בפרויקט עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+    alert("בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
   }
 //if project users more then 1
 }
@@ -678,7 +678,7 @@ function editp () {
       a = 0;
             isOpen = true;
   } else {
-    alert("בפרויקט עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+    alert("בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
   }
 //if project users more then 1
 
@@ -689,7 +689,7 @@ function editb () {
       a = 1;
             isOpen = true;
   } else {
-    alert("בפרויקט עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+    alert("בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
   }
 }
 
@@ -850,8 +850,8 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
   </div>
 </DialogOverlay>
 <!--{#if idUst.map(c => c.id) == idUsl} 
-בנוסף במקרה של רענון יעלם האידי של הפרוייקט
-לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור פרוייקט או להחזיר לדף הבית-->
+בנוסף במקרה של רענון יעלם האידי של הרקמה
+לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
 <div dir="rtl" class="all bg-lturk text-barbi text-center">
   <Header/>
   <div>
@@ -863,7 +863,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
       alt="profilePic">
       <button
           class="text-pink-200 hover:bg-barbi hover:text-mturk rounded"
-          title="עריכת תמונת הפרופיל של הפרויקט"
+          title="עריכת תמונת הפרופיל של הריקמה"
           on:click={editp} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M22.7 14.3L21.7 15.3L19.7 13.3L20.7 12.3C20.8 12.2 20.9 12.1 21.1 12.1C21.2 12.1 21.4 12.2 21.5 12.3L22.8 13.6C22.9 13.8 22.9 14.1 22.7 14.3M13 19.9V22H15.1L21.2 15.9L19.2 13.9L13 19.9M11.21 15.83L9.25 13.47L6.5 17H13.12L15.66 14.55L13.96 12.29L11.21 15.83M11 19.9V19.05L11.05 19H5V5H19V11.31L21 9.38V5C21 3.9 20.11 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H11V19.9Z" />
@@ -872,7 +872,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
           {:else}
            <button
           class="bg-pink-200 hover:bg-barbi text-mturk rounded"
-          title="העלאת תמונת פרופיל לפרויקט"
+          title="העלאת תמונת פרופיל לריקמה"
           on:click={addp} 
           >
           <svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -882,7 +882,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
           {/if}
            <button
           class=" hover:bg-barbi text-pink-200 rounded"
-          title="עריכת פרטי פרויקט"
+          title="עריכת פרטי ריקמה"
           on:click={editb} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
            <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
@@ -1195,7 +1195,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button>
- <h2> אין פעולות פתוחות לפרויקט זה, מומלץ ליצור כבר עכשיו
+ <h2> אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו
    <br>
    (לחצו על היד המחזיקה מנורה שלמעלה)</h2>
   {/if}
@@ -1269,15 +1269,15 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
    </div> 
 
   <!--  {:else}
-    לשלוח אותו לפרוייקט ציבורי לקחת ID וכו'
+    לשלוח אותו לרקמה ציבורי לקחת ID וכו'
     <h1 class="bg-white">לא מורשה</h1>
     {/if}-->
  {:else }  
  <div class="flex-center text-center border-2 border-gold rounded m-4">
-   <!-- למשוך רשימת פרויקטים של המשתמש או לפחות להוסיףך סולמית למיקום המדויק בעמוד -->
+   <!-- למשוך רשימת ריקמהים של המשתמש או לפחות להוסיףך סולמית למיקום המדויק בעמוד -->
 <a class="text-mturk hover:text-lturk font-bold py-2 px-4 m-4 rounded"
  href={`/me`}
- ><h1>לבחירת פרויקט</h1></a>
+ ><h1>לבחירת ריקמה</h1></a>
  </div> 
  {/if}
 

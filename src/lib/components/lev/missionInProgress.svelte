@@ -495,7 +495,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
 on:mouseleave={toggleShow}
 in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
 use:clickOutside on:click_outside={toggleShow}>	
-    <img on:click={project(projectId)} class="img" src={src} alt="logo" title={projectName,"לחיצה למעבר ללוח הבקרה של פרויקט" }>
+    <img on:click={project(projectId)} class="img" src={src} alt="logo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
     <a sveltekit:prefetch href={`${linkP}${projectId}`}><h3 class="pn">{projectName}</h3></a>
     <h1 class="mn">{missionName}</h1>
    {#if dueDateOrCountToDedline !== null} <h5  class="mn">{dueDateOrCountToDedline}</h5>{/if}

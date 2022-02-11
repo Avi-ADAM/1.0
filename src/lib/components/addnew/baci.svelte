@@ -242,13 +242,13 @@ addval == false;
 <img class="bg" src="https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg" alt="bg">
 
 <div dir="rtl" class="jho">
-  <h1>יצירת פרויקט חדש</h1>
+  <h1>יצירת ריקמה חדשה</h1>
 <br>
 
         <div dir="rtl" class='textinput'>
   <input name="des" bind:value={projectName_value}  
  type='text' class='input'required >
-  <label for="des" class='label'>שם הפרויקט</label>
+  <label for="des" class='label'>שם הריקמה</label>
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
@@ -278,7 +278,7 @@ addval == false;
          
 <h1 class="midscreenText-2">
   {userName_value} 
- אלו ערכים ומטרות הפרויקט יקדם
+ אלו ערכים ומטרות הריקמה תקדם
 ?
 </h1> 
 
@@ -297,7 +297,7 @@ addval == false;
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
-      <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בפרויקט</h2>
+      <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>
     <select bind:value={restime} class="form-select appearance-none
       block
       w-full
@@ -325,12 +325,12 @@ addval == false;
 <button 
     class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded"
      on:click="{sendP}"
-     name="addm">ליצור ולפרסם פרויקט </button>
+     name="addm">ליצור ולפרסם ריקמה </button>
        {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 {/if}</div>
 {:else}
 <div class="aft">
-  <h1>הפרויקט נוצר בהצלחה</h1>
+  <h1>הריקמה נוצרה בהצלחה</h1>
 </div>
 {/if}
 

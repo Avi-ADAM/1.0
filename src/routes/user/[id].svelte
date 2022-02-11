@@ -122,7 +122,7 @@ let error1 = null;
        {/each}
       </div>
 <div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
-    <h1 style="font-size:23px; color:var(--barbi-pink); ">הפרויקטים שלי</h1>
+    <h1 style="font-size:23px; color:var(--barbi-pink); ">הרקמות שלי</h1>
   {#each projects as data, i}
     
   <a class="text-gold hover:text-barbi hover:scale-150" sveltekit:prefetch href={`/project/${data.id}`} ><h3>{data.projectName}</h3></a>

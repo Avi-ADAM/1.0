@@ -547,7 +547,7 @@ onMount(async () => {
                                     <td>{mdate}</td>
                                     <td><input type="datetime-local" bind:value={mdate2}  ></td>
                                 </tr> <tr>
-                                    <th>הערות יחודיות לפרויקט שלי</th>
+                                    <th>הערות יחודיות לריקמה שלי</th>
                                     <td>{hearotMeyuchadot}</td>
                                     <td>
                                                               <div dir="rtl" class='textinput'>
