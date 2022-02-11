@@ -170,7 +170,7 @@ onMount(async () => {
             finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches {
-              hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks }
+              hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks }
             open_missions (where:{archived: false }) { id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}

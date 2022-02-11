@@ -106,6 +106,16 @@ function confirm (id) {
       </td>
       {/each}
     </tr>
+    <tr style="display:''" id="total" >
+          <th>כבר בוצע</th>
+          {#each bmiData as data, i}
+          <td dir="ltr">
+  <h5 class="mn">{`${data.howmanyhoursalready  ? Math.round((data.howmanyhoursalready + Number.EPSILON) * 100) / 100 : 0} / ${data.hoursassinged} `}</h5>
+          </td>
+          {/each}
+        </tr>
+              
+
     <tr class="ggd">
           <th class="ggd">אפשרויות</th>
           {#each bmiData as data, i}
