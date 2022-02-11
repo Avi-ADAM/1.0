@@ -285,7 +285,7 @@ function close() {
 }
   function project (id) {
     idPr.set(id);
-    goto("/projectPrivat", );
+    goto("/moach", );
   };
 
 </script>

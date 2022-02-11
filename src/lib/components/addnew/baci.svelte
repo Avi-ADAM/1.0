@@ -75,7 +75,7 @@ if (files) {
     idPr.set(resP.id);
     before = true;
     loading = false;
-  //  goto("/projectPrivat", );
+  //  goto("/moach", );
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
@@ -104,7 +104,7 @@ if (files) {
     idPr.set(resP.id);
         before = true;
             loading = false;
-  //  goto("/projectPrivat", );
+   goto("/moach", );
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);

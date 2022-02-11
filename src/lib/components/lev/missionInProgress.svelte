@@ -28,7 +28,7 @@ let show = true;
     let already = false;
     function project (id) {
     idPr.set(id);
-    goto("/projectPrivat", );
+    goto("/moach", );
   };
 
 let miatan;
@@ -289,18 +289,6 @@ $:  zman = msdonf + lapse + x;
     // to avoid constantly setting transition to none add a boolean to short-circuit the second conditional
     let transitioned;
 
- //   // minutes and seconds are undefined by default
- //   $: if (!lapse && minutes && seconds) {
- //       minutes.style.transition = "transform 0.2s ease-in-out";
- //       seconds.style.transition = "transform 0.2s ease-in-out";
- //       transitioned = false;
- //   }
- //   $: if (lapse && !transitioned) {
- //       minutes.style.transition = "none";
- //       seconds.style.transition = "none";
- //       transitioned = true;
- //   }
-//
 
 function done() {
   already = true;

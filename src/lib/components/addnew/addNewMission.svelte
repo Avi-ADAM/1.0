@@ -112,8 +112,8 @@ let cencel = "ביטול"
 </script>
  
     
-  <div>
-    <h1>הוספת פעולה חדשה</h1>
+  <div class="grid items-center text-center justify-items-center">
+    <h1 class="text-center">הוספת פעולה חדשה</h1>
 </div>
 <div style="width: 50%; margin: 0 auto;">
   

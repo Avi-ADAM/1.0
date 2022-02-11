@@ -1141,7 +1141,8 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
 </svg>  
 {/if}
 </div>
-<div class="bg-lturk m-4" >
+<div class="bg-lturk m-4 ">
+
 
 {#if pmiData.length > 0}
 
@@ -1159,6 +1160,7 @@ on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
  <PendsM {pmiData} user_1s={projectUsers.length}/>
 {/if} 
 {/if}
+<div >
 
 {#if bmiData.length > 0}
  {#if tahaS === false}
@@ -1175,8 +1177,9 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  <Betaha {bmiData} />
 {/if} 
 {/if}
-
-  {#if openMS === true && omiData.length > 0}
+</div>
+<div >
+{#if openMS === true && omiData.length > 0}
   
   <button title={cencel1}
   on:click={() => openMS = false}
@@ -1196,13 +1199,15 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
    <br>
    (לחצו על היד המחזיקה מנורה שלמעלה)</h2>
   {/if}
-
+</div>
   <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->
 
-  
- {#if addM == true}<button
+
+ {#if addM == true}
+   <div class="bg-lturk m-4 border-2 border-gold rounded" >
+<button
  title={cencel}
       on:click={closeM}
        class="bg-pink-200 hover:bg-barbi text-mturk hover:text-lturk font-bold p-0.5 rounded"
@@ -1214,7 +1219,8 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
   mission1={mission1} 
   bind:selected={blabla} 
   on:message={callbackFunction}/>
- 
+  </div>
+
  {/if}
     </div>
     <!--
@@ -1235,7 +1241,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       {/if}    
    
     </div>-->
-    <div class="bg-lturk p-4" id="xyz">
+    <div class="bg-lturk p-4 " id="xyz">
     {#if showvd == true}<Mission 
                                 userslength={projectUsers.length}
                                  workways2 ={workways2}
@@ -1267,10 +1273,10 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     <h1 class="bg-white">לא מורשה</h1>
     {/if}-->
  {:else }  
- <div class="flex-center">
+ <div class="flex-center text-center border-2 border-gold rounded m-4">
    <!-- למשוך רשימת פרויקטים של המשתמש או לפחות להוסיףך סולמית למיקום המדויק בעמוד -->
 <a class="text-mturk hover:text-lturk font-bold py-2 px-4 m-4 rounded"
- href={`http://1one.world/me`}
+ href={`/me`}
  ><h1>לבחירת פרויקט</h1></a>
  </div> 
  {/if}

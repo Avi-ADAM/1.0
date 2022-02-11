@@ -17,7 +17,7 @@ import {
 
 function project(id) {
     idPr.set(id);
-    goto("/projectPrivat", );
+    goto("/moach", );
 };
 onMount(async () => {
 console.log(projectName)

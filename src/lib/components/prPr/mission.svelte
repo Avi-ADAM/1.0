@@ -417,7 +417,7 @@ dispatch('addneww', {
   {#if error1 !== null}
   {error1}
   {:else}
-  <div class="dd md:items-center">
+  <div class="dd md:items-center border-2 border-gold rounded">
   <div class="body items-center">
   
   <table dir="rtl" >
