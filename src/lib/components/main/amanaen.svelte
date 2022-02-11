@@ -433,7 +433,7 @@ onMount(async () => {
     <div class="aab">
 <div dir="ltr" class="amana" id="amana-show">
  <h1 dir="ltr" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
-       <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>'s Declaration of Independence:
+       <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>'s Consent:
     </h1>
           <span>
               <span>

@@ -6,7 +6,7 @@
 
    
 <svelte:head>
-	<title>World Security and Peace Convention</title>
+	<title>WorldWide consensus for Security and Peace</title>
   <!-- Global site tag (gtag.js) - Google Analytics -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
 </script>
