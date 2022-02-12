@@ -1178,9 +1178,10 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 {/if} 
 {/if}
 </div>
-<div >
+  <div class="bg-lturk m-4 ">
+
 {#if openMS === true && omiData.length > 0}
-  
+
   <button title={cencel1}
   on:click={() => openMS = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
@@ -1198,8 +1199,10 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  <h2> אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו
    <br>
    (לחצו על היד המחזיקה מנורה שלמעלה)</h2>
+
   {/if}
-</div>
+     </div>
+
   <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->

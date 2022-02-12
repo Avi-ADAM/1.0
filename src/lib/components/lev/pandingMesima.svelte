@@ -345,7 +345,7 @@ title="ביטול"
 	class="normSml"
     in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 >
- <a sveltekit:prefetch href={`${link}${projectId}`}>
+ <a sveltekit:prefetch href={`/project/${projectId}`}>
         <img class="img"
          src={src}  alt="projectlogo" title={projectName}>
        <h3 class="na" >{projectName}</h3>
@@ -382,7 +382,7 @@ use:clickOutside on:click_outside={toggleShow}
 >
 	
         <img on:click={project(projectId)} src={src} class="img" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
-        <a sveltekit:prefetch href={`${link}${projectId}`}
+        <a sveltekit:prefetch href={`/project/${projectId}`}
         ><h3 class="pn">{projectName}</h3></a>
         <h1 class="pn">{name}</h1>
        <p class="p" ><span style="color:var(--gold)" title="שווי שעה">{perhour}</span> * <span style="color: aqua" title="כמות שעות">{noofhours}</span> = {noofhours * perhour} </p>
