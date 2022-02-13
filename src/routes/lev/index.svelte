@@ -180,7 +180,6 @@ adder = adder
 }
 async function createasked (da) {
   const start = da.data.user.projects_1s
-      const myid = da.data.user.id;
   for (var i = 0; i < start.length; i++) {
             for (var j = 0; j < start[i].asks.length; j++){
                        const rt = letters(start[i].asks[j].open_mission.name);
@@ -222,7 +221,8 @@ async function createasked (da) {
             }
 
   }
-  
+  dictasked = dictasked 
+  console.log(dictasked) 
   if (dictasked.length > 0){
   for (var k = 0; k < dictasked.length; k++) {
      const x = dictasked[k].users
@@ -235,7 +235,6 @@ async function createasked (da) {
 }    
 
 for (var t = 0; t <dictasked.length; t++){
-    dictasked[t].id = t;
     const allid = dictasked[t].uids;
     const myid = dictasked[t].myid;
     dictasked[t].already = false;
@@ -244,10 +243,10 @@ for (var t = 0; t <dictasked.length; t++){
 
     if(allid.includes(myid)){
       dictasked[t].already = true;
-      dictasked.splice(t, 1);
-      dictasked = dictasked
+    //  dictasked.splice(t, 1);
+    //  dictasked. = dictasked
     } 
-    if (dictasked.length > 0){
+    if (dictasked.length > 0 ){
         for (var r=0; r< dictasked[t].users.length; r++){
             if (dictasked[t].users[r].what === true) {
                 
@@ -265,6 +264,10 @@ for (var t = 0; t <dictasked.length; t++){
     dictasked[t].noofusersWaiting = noofusersWaiting;
         
     }}}
+    var filters = [false];
+
+var result = dictasked.filter(val=>filters.includes(val.already)); 
+dictasked = result
   askedcoin = dictasked;
   ask = askedcoin.length;
 }
@@ -306,6 +309,7 @@ const todel = event.detail.asked
 newasked.splice(todel, 1);
 fiapp = newasked;
 fia = fiapp.length;
+start()
 }
 
 function delo (event ){
@@ -860,6 +864,7 @@ const y = meData.map(c => c.id);
 const index = y.indexOf(id);
 newdata.splice(index, 1);
 meData = newdata;
+start()
  };  
 let shows = true;
 function show(event){
@@ -874,6 +879,7 @@ const index = y.indexOf(data);
 newdata.splice(index, 1);
 pends = newdata;
 pen = pends.length;
+start()
 }
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
 function showonly (event){
