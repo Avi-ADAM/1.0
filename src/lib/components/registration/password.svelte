@@ -2,26 +2,34 @@
 import { userName } from '../../stores/store.js';
 import { show } from './store-show.js';
 import { email } from './email.js';  
+import { contriesi } from './contries.js';
 import axios from 'axios';
  import { createEventDispatcher } from 'svelte';
  import { skills1 } from './skills1.js';
 import { roles2 } from './roles2.js';
 import { workways1 } from './workways1.js';
 import { valluss } from './valluss.js';
-
+import {fpval} from './fpval.js';
+import { scale } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
 let skills1_value;
 let roles2_val;
 let work_ways1;
 let vallues;
-
+let contriesis = [];
+let fpvall
 valluss.subscribe(newwork => {
   vallues = newwork;
 })
-
+contriesi.subscribe(newwork => {
+  contriesis = newwork;
+})
 workways1.subscribe(newwork => {
   work_ways1 = newwork;
 })
-
+fpval.subscribe(newwork => {
+	fpvall = newwork;
+})
 skills1.subscribe(newskills => {
   skills1_value = newskills;
 })
@@ -44,10 +52,10 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-
-function increment() {
-		show.update(n => n + 1);
-    
+let data;
+let errr = {k: false, m: "", p: false}
+function increment() {    
+errr.p = true;
 axios
   .post('https://strapi-k4vr.onrender.com/auth/local/register', {
     username: userName_value, 
@@ -57,17 +65,27 @@ axios
     tafkidims: roles2_val,
     work_ways: work_ways1,
     vallues: vallues,
+	cuntries: contriesis,
+	free_person: fpvall
   })
   .then(response => {
-    document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-    document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+			show.update(n => n + 1);
+
+	  data = response.data;
+	  	console.log(data);
+
 	dispatch ('progres',{
 		tx: 0,
 		txx: 0
-	} )
+	} );
+
+    document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
 })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
+				errr.m = error.response.data.message
+				errr.k = true
   });
 	}
 
@@ -116,14 +134,14 @@ function back() {
 
 </script>
 
-<main>
-	<form>
+<main transition:scale="{{duration: 900, delay: 400, opacity: 0.5, start: 0.5, easing: quintOut}}">
+	<form on:submit|preventDefault>
 		 <h1 title="מהי הסיסמה שלך" class="midscreenText-2">
         {userName_value}
       <br>
     מה היא מילת הקסם שלך
        </h1>
-
+    <div style="display: none;"><input type="text" style="display: none;" autocomplete="username" name="userName" bind:value={userName_value}></div>
 		<div class="field">
 			<input
 				autocomplete="new-password"
@@ -163,6 +181,7 @@ function back() {
 				{validations[3] ? "🏆" : "❌"} ולפחות סמל אחד ($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
 			</li>
 		</ul>
+	{#if errr.p === false}
 <div class="but">
 		  <button class="button-in-1-2" on:click="{increment}"  disabled={strength < 4}>
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
@@ -171,6 +190,13 @@ function back() {
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg"/>
     </button>
 </div>
+{:else if errr.k === true}
+<h2 class=" bg-white text-red">{errr.m}
+קרתה בעיה,<br>
+ יש לבדוק את המייל,<br>
+ אם לא התקבל מייל הרשמה נא לפנות ל-ehad1one@gmail.com
+</h2>
+{/if}
 	</form>
 </main>
 
@@ -370,16 +396,3 @@ justify-content: space-between;
 }
    
 </style>
-<!--
-
-
-   
-     <div class="input-2">
-    <PassIn bind:value={passwordx} class="input"/>  </div> 
-   
-
-<button class="button-in" on:click="{increment}">
-להמשיך
-</button>
-
--->

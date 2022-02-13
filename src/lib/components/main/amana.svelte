@@ -2,7 +2,9 @@
 <script>
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
-    import { email } from '../registration/email.js'
+    import { email } from '../registration/email.js';
+        import { contriesi } from '../registration/contries.js';
+    import {fpval} from '../registration/fpval.js';
     import { regHelper } from '../../stores/regHelper.js';
     import { goto,  prefetch } from '$app/navigation';
     import * as yup from "yup";
@@ -318,7 +320,7 @@ function find_contry_id(contry_name_arr){
   export let idx = 1;
    let data;
     import { createForm } from "svelte-forms-lib";
-    
+    let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
             name: "",
@@ -353,10 +355,13 @@ g = true;
     g = false;
    already = true;
    document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
-       document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
+   document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
    userName.set($form.name);
-            email.set($form.email);
+            email.set(mail);
+            contriesi.set(find_contry_id(selected))
             regHelper.set(1);
+                    meData = response.data;
+                fpval.set(meData.id)
             datar = data;
               })
   .catch(error => {
@@ -499,20 +504,20 @@ trans = !trans;
       type="submit"
       ></button> 
        {:else if g == true}
-          <div class="sp bg-gold">
+          <div class="sp text-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
-         <RingLoader size="240" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> {/if}
       {#if erorim.st == true}
 
       <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>
       {/if}
-      {:else if already == true}
-  <h1 class="alredy" dir="rtl">{$form.name}
+     <!--  {:else if already == true}
+ <h1 class="alredy" dir="rtl">{$form.name}
   חתימתך התקבלה, הגעת למקום ה-{idx} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
   <button class="p-4 rounded bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>
-
+  -->
   {/if}
   </div>
   </form>

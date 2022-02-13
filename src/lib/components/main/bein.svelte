@@ -7,6 +7,7 @@
     scale,
     fly
 } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
  import  Skills from '../registration/skills.svelte'
  import  VidValDate from '../registration/vidValDate.svelte'
  import Workways from '../registration/workways.svelte'
@@ -34,7 +35,10 @@ function add (event){
   txx = event.detail.txx;
 }
 </script>
-<div class="body" bind:clientWidth={w}>
+<svelte:head>
+  <title>הרשמה ל-1❤️1</title>
+</svelte:head>
+<div transition:scale="{{duration: 900, delay: 100, opacity: 0.5, start: 0.5, easing: quintOut}}" class="body" bind:clientWidth={w}>
 <div class="background">
 
 
@@ -176,7 +180,7 @@ margin-bottom: 8vh;
   height: 7.5rem;
   width: 22.875rem;
   font-size: 1rem;
-    margin-top: 20vh;
+    margin-top: 1vh;
 
 	 }
    .midscreen{
