@@ -896,7 +896,9 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 // let arr1 = [...pendsi, ...mtahai, ...walcomeni, ...askedcoini, ...meDatai];
 }
 </script>
-
+<svelte:head>
+  <title>לב 1❤️1</title>
+</svelte:head>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
 <div class="screen"> 
 {#each adder as add }

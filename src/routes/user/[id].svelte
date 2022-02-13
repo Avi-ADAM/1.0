@@ -88,6 +88,9 @@ let error1 = null;
     });
     
   </script>
+  <svelte:head>
+  <title>פרופיל 1❤️1</title>
+</svelte:head>
   <div dir="rtl" >
 <Header/>
       <div class="middle">

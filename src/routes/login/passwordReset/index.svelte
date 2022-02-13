@@ -27,6 +27,9 @@ axios
   });
     }
 </script>
+<svelte:head>
+  <title>התחברות ל-1❤️1</title>
+</svelte:head>
 {#if before}
 <div dir="rtl" class="flex items-center text-center flex-col">
 <h3 style="text-align:center; font-size: 1em;">{heading}</h3>

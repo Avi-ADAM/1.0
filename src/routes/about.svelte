@@ -1,6 +1,6 @@
 ﻿
 <svelte:head>
-	<title>אודות האמנה לשלום וביטחון</title>
+	<title>אודות הסכמה על שלום וביטחון</title>
 </svelte:head>
 
 

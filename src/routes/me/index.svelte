@@ -411,7 +411,9 @@ addSl4 = false;
 } from 'svelte-loading-spinners'
 
 </script>
-
+  <svelte:head>
+  <title>פרופיל והגדרות 1❤️1</title>
+</svelte:head>
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">

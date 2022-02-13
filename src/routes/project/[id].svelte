@@ -76,6 +76,9 @@ onMount(async () => {
     
     
 </script>
+ <svelte:head>
+  <title>ריקמה 1❤️1</title>
+</svelte:head>
 <div dir="rtl" class="all">
   <Header/>
 

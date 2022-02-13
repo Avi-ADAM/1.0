@@ -811,6 +811,9 @@ let mecata = [];
 upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, event.detail.desPl, event.detail.valit, event.detail.restime)
     }
     </script>
+    <svelte:head>
+  <title>מוח הריקמה 1❤️1</title>
+</svelte:head>
 <!--<div class="manu">
 
 </div>-->
