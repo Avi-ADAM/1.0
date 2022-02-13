@@ -597,7 +597,7 @@ updateOpenMission(
     opacity: 0.6;
     transition: 0.3s;
     padding: 2px;
-    margin-bottom: -10px;
+    margin-top: -55px;
 }
 
 .btn:hover {
