@@ -1156,8 +1156,8 @@ fiap = "fiap";
 <stop stop-color="rgba(51, 0, 255, 1)" offset="1"/>
 </linearGradient>
 <linearGradient id="aoi" x1="122.49" x2="122.49" y1="460.34" y2="482.05" gradientUnits="userSpaceOnUse">
-<stop stop-color="rgba(12, 1, 127, 1)" offset="0"/>
-<stop stop-color="rgba(2, 0, 26, 1)" offset="1"/>
+<stop stop-color="#fff" offset="0"/>
+<stop style="" offset="1"/>
 </linearGradient>
 <linearGradient id="bll" x1="259.5" x2="259.5" y1="613.23" y2="622" gradientUnits="userSpaceOnUse">
 <stop stop-color="#fff" offset="0"/>
@@ -1547,6 +1547,18 @@ fiap = "fiap";
 <stop stop-color="#321814" offset=".462"/>
 <stop stop-color="#fb0032" offset="1"/>
 </radialGradient>
+<linearGradient id="ae1111" x1="122.7" x2="122.7" y1="460.53" y2="481.88" gradientUnits="userSpaceOnUse">
+<stop stop-color="#fff" offset="0"/>
+<stop stop-color="#f3f89b" offset="1"/>
+</linearGradient>
+<linearGradient id="af1111" x1="122.61" x2="122.61" y1="460.46" y2="481.94" gradientUnits="userSpaceOnUse">
+<stop stop-color="rgba(106, 185, 114, 1)" offset="0"/>
+<stop stop-color="#dae8dc" offset="1"/>
+</linearGradient>
+<linearGradient id="ad1111" x1="122.75" x2="122.75" y1="460.09" y2="481.96" gradientUnits="userSpaceOnUse">
+<stop stop-color="#eeada3" offset="0"/>
+<stop stop-color="rgba(177, 32, 10, 1)" offset="1"/>
+</linearGradient>
 </defs>
 <g transform="matrix(.38338 0 0 .4039 -156.16 -138.46)" filter="url(#byq)" stroke-miterlimit="33" stroke-width="0px">
 <path d="m1662.8 563.24c3.3833-11.59 6.3577-23.021 8.8875-34.272l-19.123 35.111 10.235-0.839z" fill="url(#bhl)"/>
@@ -2468,12 +2480,65 @@ fiap = "fiap";
 let big2 = `
 
 `;
+let   hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)"
+let gg ="matrix(1.4501 0 0 1.2385 -229.09 -668.34)";
+let ff ="matrix(1.4501 0 0 1.2385 89.307 -667.51)";
+let ee ="matrix(1.4501 0 0 1.2385 -298.08 -520.09)";
+let dd ="matrix(1.4501 0 0 1.2385 143.65 -520.09)";
+let cc = "matrix(1.4501 0 0 1.2385 -232.98 -365.86)";
+let bb = "matrix(1.4501 0 0 1.2385 81.882 -362.53)";
+let aa2 = "matrix(1.4501 0 0 1.2385 -74.037 -130.15)";
+let hovere = false;
+function hover (num){
+hovere = !hovere
+if (hovere === true){
+    console.log("a")
+if (num === "a"){
+aa2 = " matrix(2.3511 0 0 2.008 -224.88 -505.38)"
+} else if (num === "b"){
+bb = " matrix(2.2954 0 0 1.9604 -36.461 -711.7)"
+} else if (num === "c"){
+cc = " matrix(2.2954 0 0 1.9604 -390.03 -711.7)"
+} else if (num === "d"){
+dd = " matrix(2.2513 0 0 1.9228 10.794 -836.02)"
+} else if (num === "e"){
+ee = " matrix(2.2405 0 0 1.9135 -432.08 -831.91)"
+} else if (num === "f"){
+  ff = " matrix(2.0287 0 0 1.7327 -2.2039 -886.54)"
+} else if (num === "g"){
+    gg = " matrix(2.2293 0 0 1.904 -358.26 -963.3)"
+} else if (num === "h"){
+  hh = "matrix(12.101 0 0 11.246 346.99 -138.29)"
+}
+} else {
+    console.log("b")
+if (num === "a"){
+aa2 = "matrix(1.4501 0 0 1.2385 -74.037 -130.15)"
+} else if (num === "b"){
+bb = "matrix(1.4501 0 0 1.2385 81.882 -362.53)";
+} else if (num === "c"){
+ cc = "matrix(1.4501 0 0 1.2385 -232.98 -365.86)";
+} else if (num === "d"){
+ dd ="matrix(1.4501 0 0 1.2385 143.65 -520.09)";
+} else if (num === "e"){
+ee ="matrix(1.4501 0 0 1.2385 -298.08 -520.09)";
+} else if (num === "f"){
+  ff ="matrix(1.4501 0 0 1.2385 89.307 -667.51)";
+} else if (num === "g"){
+    gg ="matrix(1.4501 0 0 1.2385 -229.09 -668.34)";
+} else if (num === "h"){
+  hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)"
+}
+
+}
+}
 </script>
 
 <div in:fly={{duration: 6200, y:1000}} class="midCom">
-     <svg class="midCom"  version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+     <svg class="midCom"  version="1.1" viewBox="-148.21 -131.51 641.46 651.45" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
    {@html big}
-   <g on:click={()=>disp(sugg)} name="number " class="btn" transform="translate(.91591 -68.953)">
+   <g on:mouseenter={()=>hover("a")} on:mouseleave={()=>hover("a")} on:click={()=>disp(sugg)} name="number " class="btn a" transform="{aa2}"
+>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#bkx)" opacity=".89224" stroke="url(#aoh)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#bku)" fill-rule="evenodd" opacity=".89224" stroke="url(#aog)" stroke-width=".16015px"/>
@@ -2491,10 +2556,10 @@ let big2 = `
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#bmt)" fill-rule="evenodd" opacity=".76724" stroke="url(#anu)" stroke-width=".16015px"/>
 <title>הצגת הצעות לרקמות בלבד</title>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width=".67793px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
 </g>
 
-<g  on:click={() => disp(pend)}  class="btn"  name="number o"  transform="translate(146.88 -177.44)">
+<g  on:mouseenter={()=>hover("b")} on:mouseleave={()=>hover("b")} on:click={() => disp(pend)}  class="btn"  name="number o"  transform="{bb}">
   <title>הצגת פעולות ממתינות לאישור</title>
 
   <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
@@ -2513,9 +2578,9 @@ let big2 = `
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#bly)" fill-rule="evenodd" opacity=".76724" stroke="url(#anv)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#bld)" fill-rule="evenodd" opacity=".76724" stroke="url(#anu)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pen}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="url(#ad1111)" stroke-miterlimit="1" stroke-width=".67793px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pen}</text>
 </g>
-<g on:click={() => disp(asks)}  class="btn"  name="number of " transform="translate(-140.71 -177.44)">
+<g on:mouseenter={()=>hover("c")} on:mouseleave={()=>hover("c")} on:click={() => disp(asks)}  class="btn"  name="number of " transform="{cc}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#bnu)" opacity=".89224" stroke="url(#aoh)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#bnt)" fill-rule="evenodd" opacity=".89224" stroke="url(#aog)" stroke-width=".16015px"/>
@@ -2532,10 +2597,10 @@ let big2 = `
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#bnh)" fill-rule="evenodd" opacity=".76724" stroke="url(#anv)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#bng)" fill-rule="evenodd" opacity=".76724" stroke="url(#anu)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" fill-rule="evenodd" font-family="Shizuru" font-weight="700" stroke="url(#af1111)" stroke-miterlimit="1" stroke-width=".67793px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
 <title>הצגת בקשות הצטרפות בלבד</title>
 </g>
-<g on:click={() => disp(desi)} class="btn"  name="number of o" transform="translate(241.91 -369.63)">
+<g on:mouseenter={()=>hover("d")} on:mouseleave={()=>hover("d")} on:click={() => disp(desi)} class="btn"  name="number of o" transform="{dd}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#bkq)" opacity=".89224" stroke="url(#aoh)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#bkp)" fill-rule="evenodd" opacity=".89224" stroke="url(#aog)" stroke-width=".16015px"/>
@@ -2552,11 +2617,11 @@ let big2 = `
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#bog)" fill-rule="evenodd" opacity=".76724" stroke="url(#anv)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#bnv)" fill-rule="evenodd" opacity=".76724" stroke="url(#anu)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(5, 5, 5)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{des}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#ae1111)" font-family="Shizuru" font-weight="700"  stroke-miterlimit="1" stroke-width=".67793px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{des}</text>
 <title>הצגת החלטות ממתינות למענה בלבד</title>
 </g>
 
-<g on:click={() => disp(betaha)}  class="btn"  name="number of m" transform="translate(-232.58 -369.63)">
+<g on:mouseenter={()=>hover("e")} on:mouseleave={()=>hover("e")} on:click={() => disp(betaha)}  class="btn"  name="number of m" transform="{ee}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#bmo)" opacity=".89224" stroke="url(#aoh)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#bmn)" fill-rule="evenodd" opacity=".89224" stroke="url(#aog)" stroke-width=".16015px"/>
@@ -3105,7 +3170,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </image>
 </g>
 </g>
-<g on:click={() => disp(welc)}  class="btn"  name="number of op" transform="translate(194.44 -541.85)">
+<g on:mouseenter={()=>hover("f")} on:mouseleave={()=>hover("f")} on:click={() => disp(welc)}  class="btn"  name="number of op" transform="{ff}">
 <title>הצגת קבלות פנים לרקמות בלבד</title>
   <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#blk)" opacity=".89224" stroke="url(#aoh)"/>
@@ -3125,7 +3190,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{wel}</text>
 </g>
-<g on:click={() => disp(fiap)}  class="btn" name="number of p" transform="translate(-174.48 -541.85)">
+<g on:mouseenter={()=>hover("g")} on:mouseleave={()=>hover("g")} on:click={() => disp(fiap)}  class="btn" name="number of p" transform="{gg}">
   <title>הצגת אישור פעולות שהסתיימו בלבד</title>
 
   <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
@@ -3146,7 +3211,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#aoi)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{fia}</text>
 </g>
-<g transform="matrix(8.9511 0 0 8.3182 300.46 -11.017)" style="">
+<g on:mouseenter={()=>hover("h")} on:mouseleave={()=>hover("h")} transform="{hh}" style="">
   <a sveltekit:prefetch 
     href="/me" >
 <path d="m-24.698 44.139h20v1.219h-20v-1.219zm0-8.536 5 1.828 5-3.657 5 3.657 5-1.828v7.316h-20v-7.316z" fill="url(#bxp)" stroke="url(#bkr)" stroke-miterlimit="5"/>
@@ -3169,6 +3234,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 
  
 <style>	
+
 
   .midCom{	
     min-height: 170px;	
