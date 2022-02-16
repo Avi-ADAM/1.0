@@ -478,7 +478,7 @@ dispatch('addneww', {
               options={skills2.map(c => c.skillName)}
               on:blur={addSK(data.selected2, data.id)}
               />
-              <AddNewSkill mid={data.id} on:addnewskill={addnewsk} addS={addS} roles1={roles} />
+              <AddNewSkill color={"--barbi-pink"} mid={data.id} on:addnewskill={addnewsk} addS={addS} roles1={roles} />
                 </td>
               {/each}
             </tr> <tr>
@@ -503,7 +503,7 @@ dispatch('addneww', {
               options={roles.map(c => c.roleDescription)}
               on:blur={addR(data.selected3, data.id)}
               />
-              <Addnewro mid={data.id} on:addnewrole={addnewrole}   />
+              <Addnewro color={"--barbi-pink"} mid={data.id} on:addnewrole={addnewrole}   />
             </td>
               {/each}
             </tr> <tr>
@@ -527,7 +527,7 @@ dispatch('addneww', {
               options={workways2.map(c => c.workWayName)}
               on:blur={addW(data.selected1, data.id)}
               />
-              <AddNewWorkway mid={data.id} on:addww={addww}/>
+              <AddNewWorkway color={"--barbi-pink"} mid={data.id} on:addww={addww}/>
             </td>
               {/each}
             </tr> <tr>
