@@ -513,11 +513,7 @@ trans = !trans;
 
       <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>
       {/if}
-     <!--  {:else if already == true}
- <h1 class="alredy" dir="rtl">{$form.name}
-  חתימתך התקבלה, הגעת למקום ה-{idx} נשלח מייל כשהאתר יתרחב, בקרוב </h1>
-  <button class="p-4 rounded bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>
-  -->
+     
   {/if}
   </div>
   </form>

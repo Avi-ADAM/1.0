@@ -38,7 +38,7 @@ function add (event){
 <svelte:head>
   <title>הרשמה ל-1❤️1</title>
 </svelte:head>
-<div  class="body" bind:clientWidth={w}>
+<div transition:scale="{{duration: 900, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}" class="body" bind:clientWidth={w}>
 <div class="background">
 
 
