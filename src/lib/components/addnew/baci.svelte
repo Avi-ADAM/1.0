@@ -241,8 +241,8 @@ addval == false;
   {#if before == false}
 <img class="bg" src="https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg" alt="bg">
 
-<div dir="rtl" class="jho">
-  <h1>יצירת ריקמה חדשה</h1>
+<div dir="rtl" class="jho flex flex-col items-center text-center justify-center">
+  <h1 class="text-gold">יצירת ריקמה חדשה</h1>
 <br>
 
         <div dir="rtl" class='textinput'>
@@ -276,7 +276,7 @@ addval == false;
 <button on:click={openen} class="bg-gold hover:bg-barbi text-barbi hover:text-gold rounded p-2" >הוסף לוגו</button>
 {#if suc == true}<small class="text-barbi">לוגו נבחר בהצלחה</small>{/if}
          
-<h1 class="midscreenText-2">
+<h1 class="midscreenText-2 text-center text-gold">
   {userName_value} 
  אלו ערכים ומטרות הריקמה תקדם
 ?
@@ -297,7 +297,7 @@ addval == false;
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
-      <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>
+      <h2 class="text-center text-gold">זמן תגובה לקבלת החלטות בריקמה</h2>
     <select bind:value={restime} class="form-select appearance-none
       block
       w-full
@@ -353,6 +353,7 @@ addval == false;
   .jho{
  width: 50%;
  margin: 0 auto;
+ 
   }
    .textinput {
   position: relative;
@@ -370,7 +371,7 @@ addval == false;
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
- color:  var(--barbi-pink);
+ color:  var(--gold);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -384,7 +385,7 @@ addval == false;
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color:var(--barbi-pink);
+  color:var(--gold);
   user-select: none;
 }
 
@@ -405,7 +406,7 @@ addval == false;
 
 .input:focus ~ .label, .input:valid ~ .label {
   font-size: 11px;
-  color: var(--gold);
+  color: var(--barbi-pink);
   top: 0;
 }
 
@@ -424,7 +425,6 @@ addval == false;
 }
     h1{
       font-size: 29px;  
-      color:  var(--barbi-pink);  
     }
     img.bg {
   min-height: 100%;

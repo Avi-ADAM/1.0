@@ -50,7 +50,7 @@ let addsL = false;
   let addpic = 0;
   let name;
     let totalErning = "2000";
-  let addP = 0;
+  let addP = false;
  let namer = [];
     let st = 0;
     let stylef = '31px';
@@ -436,7 +436,7 @@ addSl4 = false;
   </div>
 </DialogOverlay>
 
-{#if addP == 0}
+{#if addP == false}
 <div class="body"  style="--the:{stylef};">
   <div class="name">
   <a target="_self" href="/lev"><img
@@ -535,7 +535,7 @@ addSl4 = false;
 <button   
 style="    z-index: 7;"
 class=" hover:scale-150 "     
-    on:click={() => addP = 1} 
+    on:click={() => addP = true} 
     title="יצירת ריקמה חדשה">
 <svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
@@ -1048,11 +1048,14 @@ class=" hover:scale-150 "
 </div>
 
 </div>
-{:else if addP == 1}
-<button 
-on:click={() => addP = 0} 
-class="bg-pink-200 hover:bg-barbi text-mturk rounded"
->ביטול</button> 
+{:else if addP == true}
+<button title="ביטול"
+  on:click={() => addP = false}
+  style="margin: 0 auto;"
+  class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded"
+   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+  </svg></button>
   <Addnew userName_value={meData.username}/> 
   {/if}
  <!-- המשימות שסיימתי-->         
