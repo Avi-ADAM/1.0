@@ -388,6 +388,7 @@ function tran (){
 trans = !trans;
 }
       </script>
+
          <!-- Messenger פלאגין של צ'אט Code 
     <div id="fb-root"></div>
 
@@ -398,17 +399,19 @@ trans = !trans;
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      --> <div class="all">
        <a  sveltekit:prefetch href="/login" ><img title="התחברות ל-1❤️1" class="right translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150" alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
-
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
           <button on:click={tran}><img alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
-          <button on:click={tran} class=" text-barbi hover:text-lturk "
+          <button on:click={tran} class=" text-barbi hover:text-gold p-0.5 "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
-          <a style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/en" >English</a>
-          <a class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
+
+          <a  class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/en" >English</a>
+          <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
+                  <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1❤️1 אודות "  sveltekit:prefetch href="/about" > אודות</a>
+
           {/if}
           </div>
       <div class="mobile">
@@ -520,6 +523,30 @@ trans = !trans;
   
 </div> </div>
   <style>
+     .midscreen-link{
+position: absolute;
+   
+  background-image: url(https://res.cloudinary.com/love1/image/upload/v1639687279/Prismatic-Hearts-Vortex-Heart-13_pyb3yh.svg);
+
+background-position: center; 
+  background-repeat: no-repeat; 
+  background-size: contain;
+  color: var(--barbi-pink);
+  text-shadow: 1px 1px black;
+    text-align: center;
+align-self: center;
+justify-self: center;
+  }
+ .rightt {
+        position: absolute;
+        top: 50px;
+        right: 50%;
+        height: 50px;
+        width: 50px;
+        z-index: 14;
+                aspect-ratio: 1/1;
+
+    }
         .right {
         position: absolute;
         top: 50px;
@@ -637,6 +664,22 @@ small{
     color: #ccc;
   }
   @media(max-width:576px) {
+      .right {
+        position: absolute;
+        top: 50px;
+        height: 50px;
+        width: 50px;
+        z-index: 14;
+                aspect-ratio: 1/1;
+
+    }
+    .midscreen-link{
+position: absolute;
+      top: 192%;
+    left: 82%;
+    font-size: 0.8em;
+  padding: 1.8em 1.8em;
+    }
     #m{
       margin-bottom: -20px;
     }
@@ -875,6 +918,13 @@ left: 45.2%;
 }
 
 @media(min-width:942px) and (max-width:1099px) {
+  .midscreen-link{
+position: absolute;
+      top: 82%;
+    left: 92%;
+    font-size: 1em;
+  padding: 2em 2em;
+  }
  .amanat{
 padding: 0 1rem;
     text-shadow: 1px 1px var(--barbi-pink) ;
@@ -977,6 +1027,13 @@ background-position: center;
 }
 
 @media(min-width:1100px) {
+  .midscreen-link{
+position: absolute;
+      top: 82%;
+    left: 92%;
+    font-size: 1em;
+  padding: 2em 2em;
+  }
   .flexid{
     display: flex;
     flex-direction: column;

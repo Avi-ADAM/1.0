@@ -134,7 +134,7 @@ function back() {
 
 </script>
 
-<main transition:scale="{{duration: 900, delay: 400, opacity: 0.5, start: 0.5, easing: quintOut}}">
+<main >
 	<form on:submit|preventDefault>
 		 <h1 title="מהי הסיסמה שלך" class="midscreenText-2">
         {userName_value}
@@ -183,7 +183,7 @@ function back() {
 		</ul>
 	{#if errr.p === false}
 <div class="but">
-		  <button class="button-in-1-2" on:click="{increment}"  disabled={strength < 4}>
+		  <button  class="button-in-1-2" class:non={strength < 4} on:click="{increment}"  disabled={strength < 4}>
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
     </button>
   <button class="button-2" on:click="{back}">
@@ -201,7 +201,9 @@ function back() {
 </main>
 
 <style>
-
+.non:hover{
+border: 1px solid red;
+}
 	.field {
 		width: 80%;
 		position: relative;

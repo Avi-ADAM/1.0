@@ -41,18 +41,17 @@ function increment() {
     שלום 
    {userName_value} 
         </h1>  <h1 class="a2"  dir="rtl">
- חתימתך התקבלה!
+ הסכמתך התקבלה!
 הגעת למקום ה-{idx} 
 </h1><h1 class="a3"  dir="rtl">
   כעת ביכולתך לפתוח
      את 
     1❤️1
  </h1></div>
-    <a class="midscreen-link" sveltekit:prefetch href="/about" title=" 1❤️1 אודות ">?</a>
   <!--  <a class="midscreen-link" sveltekit:prefetch href="/aboutOne">אודות 1❤️1</a>
  -->
-<button out:fly={{y: -600, x: 500,  opacity: 0.6, duration: 2000}} title="1❤️1 לפתיחת" class="button" on:click="{increment}">
-  <svg class="key" height="80%" width="80%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`600 80 2222 918.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
+<button out:fly={{y: -600, x: 2000,  opacity: 0.6, duration: 2200}} title="1❤️1 לפתיחת" class="button" on:click="{increment}">
+<svg class="key" height="80%" width="80%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`600 80 2222 918.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient gradientUnits="userSpaceOnUse" cx="1023.699" cy="448.468" r="843.488" id="gradient-1" gradientTransform="matrix(1.964807, -0.050779, 0.025836, 0.999666, -1004.848942, 91.27403)">
       <stop offset="0" style="stop-color: rgb(177, 219, 207);"/>
@@ -91,9 +90,7 @@ function increment() {
   <text class="tex" style="white-space: pre; fill: rgb(51, 51, 51); font-family: Arial, sans-serif; font-size: 42.6px;" x="1800.767" y="479.051">  </text>
 </svg>
 </button>
-  
-<a style="position: absolute; top: 96% left 90%" href="https://opensea.io/collection/1love1-collection"><img alt="nft" title=" מכירת nft למימון הפעילות שלנו" src="https://res.cloudinary.com/love1/image/upload/v1640604252/nft-sign-svgrepo-com_a5xvx7.svg"> </a>
-    
+
 <style>
 .midscreenText-2 {
 grid-column: 1 /6;
@@ -103,8 +100,9 @@ grid-column: 1 /6;
   font-size: 1.7rem;
   line-height: normal;
   font-weight: 900;
+      margin-top: 4vh;
+
   color: var(--barbi-pink);
-  margin-top: 17vh;
   background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
   background-size: 29.5rem 9.75rem;
   height: 9.75rem;
@@ -118,7 +116,8 @@ grid-column: 1 /6;
   height: 6rem;
   width: 18.25rem;
   font-size: 1rem;
-  margin-top: 26vh;
+    margin-top: 4vh;
+
 	 }
    .midscreen-link{
 
@@ -131,8 +130,10 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
   letter-spacing: normal; /* Adjust as needed */
      /* border-left: .15em solid orange; The typwriter cursor */
+     visibility: hidden;
      animation: 
-    typing 3.5s steps(40, end);
+    cssAnimation 0s 1.5s forwards,
+    typing 3.5s 1.5s steps(40, end);
     /* blink-caret .75s step-end 3.5s,
     hideb 0s 3.5s;*/
 
@@ -145,8 +146,8 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
     /*  border-left: .15em solid orange; The typwriter cursor */
   visibility: hidden;
      animation: 
-          cssAnimation 0s 3.5s forwards,
-    typing 3.5s 3.5s steps(32, end);
+    cssAnimation 0s 5s forwards,
+    typing 3.5s 5.0s steps(32, end);
   /*  blink-caret .75s step-end 7s,
         hideb 0s 7s forwards;*/
 
@@ -161,8 +162,8 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
    
   visibility: hidden;
      animation: 
-     cssAnimation 0s 7s forwards,
-    typing 5s 7s steps(28, end);
+     cssAnimation 0s 8.5s forwards,
+    typing 5s 8.5s steps(28, end);
    /*  blink-caret .75s step-end 10.5s,
     hideb 1s 10.6s ; */
 }
@@ -172,8 +173,8 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
         transform-origin: center center;
      transition: all .2s ease-in-out; 
 animation: 
-     cssAnimation 0s 12s forwards,
-     css 4s 12s forwards;
+     cssAnimation 0s 13.5s forwards,
+     css 4s 13.5s forwards;
 
 }
 .tex{
@@ -181,8 +182,8 @@ animation:
     opacity: 0;
      transition: all .2s ease-in-out; 
 animation: 
-     cssAnimation 0s 14s forwards,
-     css 4s 14s forwards;
+     cssAnimation 0s 15.5s forwards,
+     css 4s 15.5s forwards;
 }
 
 .key {
@@ -193,28 +194,25 @@ animation:
    transform: scale(1.2);
    }
    @-moz-keyframes clockwise {
-    0% {
-        -moz-transform: rotate(0deg);
+     0% {
+        -moz-transform: rotate(-15deg);
+    }
+    50% {
+        -moz-transform: rotate(-88deg);
     }
     100% {
-        -moz-transform: rotate(360deg);
+        -moz-transform: rotate(-15deg);
     }
 }
 @keyframes clockwise {
     0% {
-        transform: rotate(0deg);
+        transform: rotate(-25deg);
     }
-    25% {
-        transform: rotate(45deg);
+    50% {
+        transform: rotate(-88deg);
     }
-        50% {
-        transform: rotate(0deg);
-    }
-    75% {
-        transform: rotate(-45deg);
-    }
-    100% {
-        transform: rotate(0deg);
+        100% {
+        transform: rotate(-25deg);
     }
 }
    @keyframes leaves {
@@ -259,26 +257,13 @@ from, to {
   grid-row: 2/3;
     align-self: center;
     justify-content: center;
-   animation: 
-      clockwise 20s cubic-bezier(.22,.79,.39,1.54) 17s infinite;
-  }
-  .midscreen-link{
-    grid-column:  1/6 ;
-  grid-row: 5/6;
-  margin: 29px 0px 29px 0 ;
-  background-image: url(https://res.cloudinary.com/love1/image/upload/v1639687279/Prismatic-Hearts-Vortex-Heart-13_pyb3yh.svg);
-font-size: 1em;
-  padding: 2.9em 2.9em;
-background-position: center; 
-  background-repeat: no-repeat; 
-  background-size: contain;
-  color: var(--barbi-pink);
-  text-shadow: 1px 1px black;
-    text-align: center;
-align-self: center;
-justify-self: center;
-  }
+            transform: rotate(-15deg);
+        -moz-transform: rotate(-15deg);
 
+   animation: 
+      clockwise 20s ease-in-out 10s infinite;
+  }
+ 
  
   </style>
 
