@@ -12,29 +12,29 @@
         import axios from 'axios';
           import { RingLoader
 } from 'svelte-loading-spinners'
-onMount(async () => {
-  
-
-   
-      var chatbox = document.getElementById('fb-customer-chat');
-      chatbox.setAttribute("page_id", "684861488632219");
-      chatbox.setAttribute("attribution", "biz_inbox");
-   
-      window.fbAsyncInit = function() {
-        FB.init({
-          xfbml            : true,
-          version          : 'v12.0'
-        });
-      };
-
-      (function(d, s, id) {
-        var js, fjs = d.getElementsByTagName(s)[0];
-        if (d.getElementById(id)) return;
-        js = d.createElement(s); js.id = id;
-        js.src = 'https://connect.facebook.net/he_IL/sdk/xfbml.customerchat.js';
-        fjs.parentNode.insertBefore(js, fjs);
-      }(document, 'script', 'facebook-jssdk'));
-})
+// onMount(async () => {
+//  
+//
+//   
+//      var chatbox = document.getElementById('fb-customer-chat');
+//      chatbox.setAttribute("page_id", "684861488632219");
+//      chatbox.setAttribute("attribution", "biz_inbox");
+//   
+//      window.fbAsyncInit = function() {
+//        FB.init({
+//          xfbml            : true,
+//          version          : 'v12.0'
+//        });
+//      };
+//
+//      (function(d, s, id) {
+//        var js, fjs = d.getElementsByTagName(s)[0];
+//        if (d.getElementById(id)) return;
+//        js = d.createElement(s); js.id = id;
+//        js.src = 'https://connect.facebook.net/he_IL/sdk/xfbml.customerchat.js';
+//        fjs.parentNode.insertBefore(js, fjs);
+//      }(document, 'script', 'facebook-jssdk'));
+// })
 let g = false;
 
 function find_contry_id(contry_name_arr){
@@ -388,13 +388,13 @@ function tran (){
 trans = !trans;
 }
       </script>
-         <!-- Messenger פלאגין של צ'אט Code -->
+         <!-- Messenger פלאגין של צ'אט Code 
     <div id="fb-root"></div>
 
-    <!-- Your פלאגין של צ'אט code -->
+  
     <div id="fb-customer-chat" class="fb-customerchat">
     </div>
-      <!--
+     
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      --> <div class="all">
        <a  sveltekit:prefetch href="/login" ><img title="התחברות ל-1❤️1" class="right translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150" alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
