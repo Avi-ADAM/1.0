@@ -158,13 +158,13 @@ addval == false;
    {#if addval == false}
     <button
     on:click={() => addval = true} 
-    class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded"
+    class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
   {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
    <h2 class="text-center text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>
-    <select bind:value={restime} class="form-select appearance-none
+    <select bind:value={restime} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -188,12 +188,46 @@ addval == false;
 </div>
 
 <button 
-    class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded"
+    class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded-full"
      on:click="{sendP}"
      name="addm">לשמור שינויים </button>
 </div>
 
 <style>
+  
+select.round {
+  background-image:
+    linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),
+    linear-gradient(225deg, rgb(0, 174, 255) 50%, transparent 50%),
+    radial-gradient(#ddd 70%, transparent 72%);
+  background-position:
+    calc(0% + 20px) calc(1em + 2px),
+    calc(0% + 15px) calc(1em + 2px),
+    calc(0% + .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+}
+
+select.round:focus {
+  background-image:
+    linear-gradient(315deg, white 50%, transparent 50%),
+    linear-gradient(225deg, transparent 50%, white 50%),
+    radial-gradient(gray 70%, transparent 72%);
+  background-position:
+    calc(0% + 15px) 1em,
+    calc(0% + 20px) 1em,
+    calc(0% + .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+  border-color: green;
+  outline: 0;
+}
      .sp{
    display: grid;
     justify-content: center;

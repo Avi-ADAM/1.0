@@ -106,7 +106,7 @@ function shaneh () {
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-barbi">היום החופשי שלי</h2>
     <select on:change={ch} bind:value={frd}
-	 class="form-select appearance-none
+	 class="round form-select appearance-none
       block
       w-full
       px-3
@@ -132,7 +132,7 @@ function shaneh () {
 </div>
 {#if chan == true}
 <div>
-<button type="button" on:click={save} class="m-2 bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded">שמירת שינויים</button>
+<button type="button" on:click={save} class="m-2 bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded-full">שמירת שינויים</button>
 </div>
 {/if}
 {#if change}
@@ -213,11 +213,11 @@ function shaneh () {
 
     {/if}
     {:else}
-    <button type="button" on:click={()=> change = true} class="bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded m-2">שינוי סיסמה</button>
+    <button type="button" on:click={()=> change = true} class="bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded-full m-2">שינוי סיסמה</button>
 
     {/if}
 <div>
-<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded">יציאה מהחשבון במכשיר זה</button>
+<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
 </div>
 <style>
 .inputi {
@@ -226,6 +226,40 @@ function shaneh () {
 }
 select{
 	font-size: 8px;
+}
+
+select.round {
+  background-image:
+    linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),
+    linear-gradient(225deg, rgb(0, 174, 255) 50%, transparent 50%),
+    radial-gradient(#ddd 70%, transparent 72%);
+  background-position:
+    calc(0% + 20px) calc(1em + 2px),
+    calc(0% + 15px) calc(1em + 2px),
+    calc(0% + .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+}
+
+select.round:focus {
+  background-image:
+    linear-gradient(315deg, white 50%, transparent 50%),
+    linear-gradient(225deg, transparent 50%, white 50%),
+    radial-gradient(gray 70%, transparent 72%);
+  background-position:
+    calc(0% + 15px) 1em,
+    calc(0% + 20px) 1em,
+    calc(0% + .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+  border-color: green;
+  outline: 0;
 }
 
 @media (min-width: 528px) {

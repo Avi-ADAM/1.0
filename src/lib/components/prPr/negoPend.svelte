@@ -653,7 +653,7 @@ onMount(async () => {
                                 <div>
                                     <button
                                         on:click={increment}
-                                        class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold py-2 px-4 m-2 rounded"
+                                        class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold py-2 px-4 m-2 rounded-full"
                                         type="submit"
                                         name="addm">פרסום משימות </button> </div>
 <style>

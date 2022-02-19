@@ -1,7 +1,7 @@
 import { writable } from "svelte/store";
 
 
-export const idPr = writable();
+export const idPr = writable(0);
 
 
 

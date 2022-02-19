@@ -506,8 +506,8 @@ use:clickOutside on:click_outside={toggleShow}>
             <h5 class="mn">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
 
 {#if lapse !== 0 || x !== 0}
-<button class="sm:text-sm text-xs bg-gold p-0.5  sm:p-1 rounded hover:bg-lturk" on:click={handleClearClick}>ניקוי</button>
-<button class="sm:text-sm text-xs  bg-lturk p-0.5 sm:p-1 rounded hover:bg-gold" on:click={save}> הוספה</button>
+<button class="sm:text-sm text-xs bg-gold p-0.5  sm:p-1 rounded-full hover:bg-lturk" on:click={handleClearClick}>ניקוי</button>
+<button class="sm:text-sm text-xs  bg-lturk p-0.5 sm:p-1 rounded-full hover:bg-gold" on:click={save}> הוספה</button>
 {/if}
 <br/>
     <br />

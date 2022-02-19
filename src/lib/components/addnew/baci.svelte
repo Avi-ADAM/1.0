@@ -222,7 +222,7 @@ addval == false;
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
-             <button class=" hover:bg-barbi text-mturk rounded"
+             <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}>ביטול</button>
           {#if a == 0}
           <Uplad on:message={callbackFunction}/>
@@ -273,7 +273,7 @@ addval == false;
   <span class='line'></span>
 </div>
 <br>
-<button on:click={openen} class="bg-gold hover:bg-barbi text-barbi hover:text-gold rounded p-2" >הוסף לוגו</button>
+<button on:click={openen} class="bg-gold hover:bg-barbi text-barbi hover:text-gold rounded-full p-2" >הוסף לוגו</button>
 {#if suc == true}<small class="text-barbi">לוגו נבחר בהצלחה</small>{/if}
          
 <h1 class="midscreenText-2 text-center text-gold">
@@ -292,13 +292,13 @@ addval == false;
    {#if addval == false}
     <button
     on:click={() => addval = true} 
-    class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded"
+    class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">זמן תגובה לקבלת החלטות בריקמה</h2>
-    <select bind:value={restime} class="form-select appearance-none
+    <select bind:value={restime} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -323,7 +323,7 @@ addval == false;
   {#if loading == false}
 
 <button 
-    class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded"
+    class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded-full"
      on:click="{sendP}"
      name="addm">ליצור ולפרסם ריקמה </button>
        {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
@@ -336,6 +336,40 @@ addval == false;
 
 
 <style>
+  
+select.round {
+  background-image:
+    linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),
+    linear-gradient(225deg, rgb(0, 174, 255) 50%, transparent 50%),
+    radial-gradient(#ddd 70%, transparent 72%);
+  background-position:
+    calc(0% + 20px) calc(1em + 2px),
+    calc(0% + 15px) calc(1em + 2px),
+    calc(0% + .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+}
+
+select.round:focus {
+  background-image:
+    linear-gradient(315deg, white 50%, transparent 50%),
+    linear-gradient(225deg, transparent 50%, white 50%),
+    radial-gradient(gray 70%, transparent 72%);
+  background-position:
+    calc(0% + 15px) 1em,
+    calc(0% + 20px) 1em,
+    calc(0% + .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+  border-color: green;
+  outline: 0;
+}
      .sp{
    display: grid;
     justify-content: center;

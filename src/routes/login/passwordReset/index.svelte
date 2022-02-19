@@ -41,7 +41,7 @@ axios
       <input placeholder="mail@mail.com" type="email" bind:value={email} />
     </label>
   </div>
-  <button class="bg-barbi text-gold hover:bg-gold hover:text-barbi p-2 rounded" style="margin: 1em">Send</button>
+  <button class="bg-barbi text-gold hover:bg-gold hover:text-barbi p-2 rounded-full" style="margin: 1em">Send</button>
 </form></div>
 {:else}
 <h1>{after}</h1>

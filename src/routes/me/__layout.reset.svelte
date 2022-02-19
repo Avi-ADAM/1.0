@@ -27,8 +27,8 @@ function login () {
 {:else}
 <div class="a">
 <h1 class="text-barbi text-xl ">הגעת לעמוד הדורש הרשמה</h1>
-<button class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold m-2 py-2 px-4 rounded" on:click={reg}>להרשמה</button>
-<button class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold m-2 py-2 px-4 rounded" on:click={login}>להתחברות</button>
+<button class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold m-2 py-2 px-4 rounded-full" on:click={reg}>להרשמה</button>
+<button class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold m-2 py-2 px-4 rounded-full" on:click={login}>להתחברות</button>
 </div>
 {/if}
 <style>

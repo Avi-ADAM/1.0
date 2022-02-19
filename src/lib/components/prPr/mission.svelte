@@ -5,6 +5,8 @@
    import { createEventDispatcher } from 'svelte';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   import AddNewWorkway from '../addnew/addnewWorkway.svelte';
+import { RingLoader
+} from 'svelte-loading-spinners'
 
  const dispatch = createEventDispatcher();
 
@@ -145,8 +147,10 @@ pendq = ` users: [
     const tafkidims = element.tafkidims.map(c => c.id);
 const nhours = (element.nhours > 0) ? element.nhours : 0;
 const valph = (element.valph > 0) ? element.valph : 0;
-const date = (element.date !== undefined) ? ` sqadualed: ${element.date}` : ``;
-    //publicklinks save to mission also othet new data
+const date = (element.date !== undefined) ? ` sqadualed: "${new Date(element.date).toISOString()}",` : ``;
+const dates = (element.dates !== undefined) ? ` sqadualed: "${new Date(element.dates).toISOString()}",` : ``;
+ 
+//publicklinks save to mission also othet new data
     // הפרדה של קישורים בפסיק
    
  let link = 'https://strapi-k4vr.onrender.com/graphql';
@@ -175,6 +179,7 @@ const date = (element.date !== undefined) ? ` sqadualed: ${element.date}` : ``;
              privatlinks: "${element.privatlinks}",
              publicklinks: "${element.publicklinks}",
              ${date} 
+             ${dates}
              ${rishon4}
              ${rishonves4}
                          ${pendq} 
@@ -417,7 +422,7 @@ dispatch('addneww', {
   {#if error1 !== null}
   {error1}
   {:else}
-  <div class="dd md:items-center border-2 border-gold rounded">
+  <div class="dd md:items-center border-2 border-gold rounded  p-4" >
   <div class="body items-center">
   
   <table dir="rtl" >
@@ -531,9 +536,14 @@ dispatch('addneww', {
             </td>
               {/each}
             </tr> <tr>
-              <th>תאריך ביצוע</th>
+              <th>תאריך התחלה</th>
               {#each miData as data, i}
             <td><input type="datetime-local" bind:value={data.date}  ></td>
+            {/each}
+          </tr><tr>
+              <th>תאריך סיום</th>
+              {#each miData as data, i}
+            <td><input type="datetime-local" bind:value={data.dates}  ></td>
             {/each}
           </tr> <tr>
             <th>קישורים ציבוריים</th>
@@ -662,15 +672,15 @@ dispatch('addneww', {
    {#if already === false}
   <button 
   on:click={increment}
-  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold py-2 px-4 m-2 rounded" 
+  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold py-2 px-4 m-2 rounded-full" 
   type="submit" 
   name="addm">פרסום משימות </button>
-      {/if}
+      {:else}
+           <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+  {/if}
   </div> 
 </div>
-<div class="dd">
 
-  </div>
   {/if}
   
    

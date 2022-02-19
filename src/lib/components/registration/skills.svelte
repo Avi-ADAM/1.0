@@ -127,7 +127,6 @@ selected = newSele;
   </DialogContent>
   </div>
 </DialogOverlay>
-
   
     <h1 class="midscreenText-2">
       
@@ -144,7 +143,7 @@ selected = newSele;
 <div  class="input-2-2">
   <button
   on:click={() => isOpen = true} 
-      class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded"
+      class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
   >הוספת כישור שאינו ברשימה</button>
   </div>
     <button class="button-in-1-2" on:click="{increment}">

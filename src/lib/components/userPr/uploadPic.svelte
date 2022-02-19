@@ -91,7 +91,7 @@ let files;
 	<h2>
 העלאת תמונה
 	</h2>
-	<input class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded a" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
+	<input class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full a" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
 
 {:else}
 	<h2>התאמת גודל התמונה</h2>
@@ -117,9 +117,9 @@ let files;
 	
 	<br>
   <div dir="rtl">
-  <button type="button" on:click={cropImage} class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded bt">לחתוך!</button>
+  <button type="button" on:click={cropImage} class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full bt">לחתוך!</button>
 
-	<button type="button" class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded" on:click={reset}>להתחיל הכל מהתחלה?</button>
+	<button type="button" class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full" on:click={reset}>להתחיל הכל מהתחלה?</button>
 </div>{/if}
 
 <style>
@@ -167,7 +167,7 @@ font-size: 8px;
                bind:files={files}
                >
 
-               <button on:click={()=>before = false}  class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded">העלאה</button> 
+               <button on:click={()=>before = false}  class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full">העלאה</button> 
               </div>
 {:else}
               <Cropper
@@ -178,6 +178,6 @@ font-size: 8px;
  bind:zoom
  on:cropcomplete={e => console.log(e.detail)}
 />
-               <button on:click={sendP}  class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded">העלאה</button> 
+               <button on:click={sendP}  class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full">העלאה</button> 
 
 {/if}-->

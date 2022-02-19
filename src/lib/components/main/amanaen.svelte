@@ -461,7 +461,7 @@ I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : 
       {:else if already == true}
   <h1 class="alredy" dir="rtl">{$form.name}
  Your signature has been received, you have reached the number {idx} place, an email will be sent when we expand, soon</h1>
- <!-- <button class="p-4 rounded bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>-->
+ <!-- <button class="p-4 rounded-full bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>-->
 
   {/if}
   </div>

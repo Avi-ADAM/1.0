@@ -462,7 +462,7 @@ onMount(async () => {
       {:else if already == true}
   <h1 class="alredy" dir="rtl">{$form.name}
  تم استلام توقيعك ، لقد وصلت إلى الرقم {idx} ، سيتم إرسال بريد إلكتروني للتحديث عندما نتوسع ، قريبًا </h1>
- <!-- <button class="p-4 rounded bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>-->
+ <!-- <button class="p-4 rounded-full bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>-->
 
   {/if}
   </div>

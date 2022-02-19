@@ -122,7 +122,7 @@ function confirm (id) {
           <td class="ggd" style="font-size: 3rem">
            
           <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded"
+          class="bg-pink-200 hover:bg-barbi text-mturk rounded-full"
           title="עריכה"
           on:click={edit(data.id)} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
