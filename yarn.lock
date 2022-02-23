@@ -774,6 +774,11 @@
   "resolved" "https://registry.npmjs.org/json-parse-even-better-errors/-/json-parse-even-better-errors-2.3.1.tgz"
   "version" "2.3.1"
 
+"kit-sw-workbox@^1.0.2":
+  "integrity" "sha512-NOlJQFdmBpIhExfQSzv8vCS220CWFtSbnI2Xznu1Z3GfhXk3pmDHxaRsX53U3bvRAd+0qf6p8w0GJfxBCL9G5Q=="
+  "resolved" "https://registry.npmjs.org/kit-sw-workbox/-/kit-sw-workbox-1.0.2.tgz"
+  "version" "1.0.2"
+
 "kleur@^4.1.4":
   "integrity" "sha512-8QADVssbrFjivHWQU7KkMgptGTl6WAcSdlbBPY4uNF+mWr6DGcKrvY2w4FQJoXch7+fKMjj0dRrL75vk3k23OA=="
   "resolved" "https://registry.npmjs.org/kleur/-/kleur-4.1.4.tgz"
