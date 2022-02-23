@@ -368,7 +368,7 @@ select.round:focus {
     .body {
       overflow-x: auto;
       overflow-y: auto;
-     width: 96vw;
+     min-width: 96vw;
      padding-left: 0.5em;
      padding-right: 0.5em;
     }
@@ -386,7 +386,7 @@ border-radius: 4%;
   }
   th, td{
     background: var(--gold);
-
+    min-width: 150px;
   }
 
   th:hover, td:hover {

@@ -404,7 +404,7 @@ border-radius: 4%;
   }
   th, td{
     background: var(--gold);
-
+    min-width: 150px;
   }
 
   th:hover, td:hover {
