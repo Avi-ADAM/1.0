@@ -16,38 +16,54 @@ export let vallId;
 export let rn = [];
     let shgi = false;
 
-function addNewVall() {
+async function addNewVall() {
    shgi = false;
 if (rn.includes(name_value)){
   shgi = true;
 } else {
-	axios
-      .post(link, {
-        valueName: name_value,
-        descrip: desV
-                  },
-      {
-      headers: {
+  let link ="https://strapi-k4vr.onrender.com/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
        
-                }})
-      .then(response => {
-        meData = response.data;
-        vallId = meData.id;
-                dispatchvall (vallId, meData)
-                  })
-      .catch(error => {
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation { createVallue(
+    input: {
+       data: {
+         valueName: "${name_value}",
+          descrip: "${desV}"
+       }
+    }
+  ){
+          vallue{
+              id valueName
+          }
+  }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+   dispatchvall ( meData);
+                  }
+      catch(error) {
         console.log('צריך לתקן:', error.response);
         error = error1 
         console.log(error1)
-                });}
+                };}
     };    
 
  
-function dispatchvall (vallId, meData) {
+function dispatchvall (meData) {
   dispatch('addnew', {
-    id: vallId,
-    skob: meData
+    id: meData.data.createVallue.vallue.id,
+    skob: meData.data.createVallue.vallue
     } );
+    addS = false
 };
 
 function dispatchb () {

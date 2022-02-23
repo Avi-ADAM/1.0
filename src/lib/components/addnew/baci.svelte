@@ -140,10 +140,6 @@ let vallues = [];
           throw resp;
         });
       };
-      const headers = {
- 'Authorization': bearer1,
-                 'Content-Type': 'application/json'      };
-    
         try {
            const res = await fetch("https://strapi-k4vr.onrender.com/graphql", {
               method: "POST",

@@ -18,6 +18,7 @@ import {
 function project(id) {
     idPr.set(id);
     goto("/moach", );
+    //make it desapire for good
 };
 onMount(async () => {
 console.log(projectName)

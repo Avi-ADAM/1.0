@@ -12,42 +12,55 @@
     let Name_value;
     let error1 = null;
     
-    let link ="https://strapi-k4vr.onrender.com/work-ways";
     export let rn = [];
     let shgi = false;
    
     
-        function dispatchww (meData, id) {
+        function dispatchww (meData) {
+          console.log(meData);
       dispatch('addww', {
-        id: id,
+        id: meData.data.createWorkWay.workWay.id,
         mid: mid,
-        skob: meData,
-        name: meData.workWayName,
+        skob: meData.data.createWorkWay.workWay,
+        name: meData.data.createWorkWay.workWay.workwayName,
         } );
     };
     
-    function addww () {
+   async function addww () {
        shgi = false;
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-    axios
-      .post(link, {
-        workWayName: Name_value,
-                  },
-      {
-      headers: {
+let link ="https://strapi-k4vr.onrender.com/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
        
-                }})
-      .then(response => {
-        meData = response.data;
-        id = meData.id;
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation { createWorkWay(
+    input: {
+       data: {workWayName: "${Name_value}" }
+    }
+  ){
+          workWay{
+              id workWayName
+          }
+  }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+
             dispatchww (meData, id);
-            addW = false;
-                  })
-      .catch(error => {
+            addW = false;}
+      catch(error) {
         console.log('צריך לתקן:', error);
-                });}
+                };}
     };    
     
 
@@ -64,7 +77,7 @@ export let color = "--gold";
       
     {#if addW == false}
     <button style="--the:{color};"
-    class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
+    class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
     on:click={() => addW = true}>הוספת חדשה</button>
     {:else}
 
