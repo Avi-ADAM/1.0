@@ -45,13 +45,9 @@ let addSl4 = false;
 let addSl5 = false;
  let a = 0;
 let addNs1 = true;  
-let addsL = false;
   let error1 = null;
   let addpic = 0;
-  let name;
-    let totalErning = "2000";
   let addP = false;
- let namer = [];
     let st = 0;
     let stylef = '31px';
 
@@ -159,7 +155,7 @@ function letters(data){
                 });
       
     })};
-    
+    let meDataa = [];
 
 function project (id) {
     idPr.set(id);
@@ -178,52 +174,63 @@ onMount(async () => {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://strapi-k4vr.onrender.com/users/" + idL ;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json'   
-      };
-        try {
-            const res = await fetch(link, {
-              method: 'GET',
-       
+      let linkgra = 'https://strapi-k4vr.onrender.com/graphql';
+    try {
+             await fetch(linkgra, {
+              method: 'POST',
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-            }).then(checkStatus)
-          .then(parseJSON);
-            meData = res;
-                        mail = meData.email;
+        body: 
+        JSON.stringify({query:
+          `query { user( id: ${idL}) 
+          { frd
+            bio
+            email 
+            username 
+            hervachti
+            profilePic {url formats }
+            projects_1s { id projectName} 
+            skills { id skillName} 
+            sps (where: {archived: false }) {id  name}
+            tafkidims { id roleDescription}
+            vallues {id valueName}
+            work_ways {id workWayName}
+          } me { id }
+} `   
+} )})
+  .then(r => r.json())
+  .then(data => meDataa = data);
+         console.log(meDataa)
+         if (meDataa.data.me.id === idL){
+   meData =  meDataa.data.user
+       mail = meData.email;
           letters(meData.username);
             myP = meData.projects_1s;
             skil = meData.skills;
             taf = meData.tafkidims;
             val = meData.vallues;
-            mash = meData.mashaabims;
-            work = meData.work_ways;
+            mash = meData.sps;
+            work = meData.work_ways;         
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
+            total = meData.hervachti ? meData.hervachti : 0;
             uPic.set(meData.profilePic.formats.thumbnail.url);
             picLink =  $uPic;
             uPic.set(meData.profilePic.formats.small.url);
             picLink = $uPic;
             total = meData.hervachti;
+          } else {
+            goto("/login")
+          }
         } catch (e) {
             error1 = e
         }
     });
   
 let userName_value;
-let emailL;
 let biog;
 let frd;
     function sendD () {
@@ -288,7 +295,7 @@ let frd;
   skil = meData.skills;
             taf = meData.tafkidims;
             val = meData.vallues;
-            mash = meData.mashaabims;
+            mash = meData.sps;
             work = meData.work_ways;
             addNs1 = true;
  };
@@ -308,7 +315,7 @@ console.log (meDatanew);
  skil = meData.skills;
             taf = meData.tafkidims;
             val = meData.vallues;
-            mash = meData.mashaabims;
+            mash = meData.sps;
             work = meData.work_ways;
   addNs1 = true;
   console.log(a)
@@ -328,7 +335,7 @@ console.log (meDatanew);
  skil = meData.skills;
             taf = meData.tafkidims;
             val = meData.vallues;
-            mash = meData.mashaabims;
+            mash = meData.sps;
             work = meData.work_ways;
   addNs1 = true;
 };
@@ -408,8 +415,71 @@ addSl4 = false;
 
 
   import { RingLoader
-} from 'svelte-loading-spinners'
+} from 'svelte-loading-spinners';
+let mass = false;
 
+function massss (event){
+  console.log("here")
+  if (event.detail.mass == true){
+  mass = true;
+  } else  if (event.detail.mass == false){
+    mass = false;
+  }
+}
+let messege;
+let spid;
+function delm ( event){
+  isOpen = true;
+  a = 3
+  const nj = event.detail.nj;
+  spid = event.detail.id
+  messege = `המשאב ${nj} ימחק האם להמשיך?`
+}
+let miDa = [];
+async function han (){
+  a = 2
+console.log(spid)
+   const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+let linkgra = 'https://strapi-k4vr.onrender.com/graphql';
+    try {
+             await fetch(linkgra, {
+              method: 'POST',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query:
+          `mutation { updateSp(
+    input: {
+      where: {id: ${spid} }
+      data: { 
+        archived: true
+      }
+    }
+  ) {sp {id }}
+} `   
+} )})
+  .then(r => r.json())
+  .then(data => miDa = data);
+         console.log(miDa)
+        const tor = miDa.data.updateSp.sp.id
+        const oldob = mash
+        const x = oldob.map(c => c.id);
+        const indexy = x.indexOf(tor);
+        oldob.splice(indexy, 1);
+        mash = oldob;
+        a = 0;
+        isOpen = false;
+        } catch (e) {
+            error1 = e
+        }
+}
 </script>
   <svelte:head>
   <title>פרופיל והגדרות 1❤️1</title>
@@ -426,6 +496,13 @@ addSl4 = false;
 
           {:else if a == 1}
           <EditB frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio}/>
+          {:else if a == 3}
+          <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3> 
+          <button 
+  class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
+  on:click={han}
+  >מחיקה</button>
+          </div>
           {:else if a == 2}
           <div class="sp bg-gold">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
@@ -461,9 +538,9 @@ addSl4 = false;
   {#key addSl}
   <div class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}"><Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={"כישורים"} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={" בחירת כישורים"}/>  </div>
   <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}"><Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={"תפקידים"} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={" בחירת תפקידים"}/>  </div>
-  <div class:selected="{current === 'a3'}" class:a3="{current !== 'a3'}"><Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"mashaabims"} placeholder ={" בחירת משאבים"}/> </div>
+  <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}"><Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={" בחירת משאבים"}/> </div>
   <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={"ערכים"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={" בחירת ערכים"}/>  </div>
-  <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי יצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> </div>
+  <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי היצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> </div>
   {/key}
    {/if}
     <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
@@ -1061,6 +1138,17 @@ class=" hover:scale-150 "
  <!-- המשימות שסיימתי-->         
 
   <style>
+    .whole{
+      position: absolute;
+      top: 0;
+      left: 0;
+      min-width: 99.9vw;
+      min-height: 100vh;
+        z-index: 700;
+      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
+    background-repeat: no-repeat;
+    background-size: cover;
+    }
     .st0{fill:#FFFFFF;
      animation: mymove 5s infinite;
 }

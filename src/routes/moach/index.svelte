@@ -11,9 +11,9 @@
   // import { idM } from '../../lib/stores/idM.js';
  import Mission from '../../lib/components/prPr/mission.svelte';
   import ChoosMission from '../../lib/components/prPr/choosMission.svelte';
- //   import ChoosNeed from '../../lib/components/addnew/choosneed.svelte';
- //   import TotalNeeds from '../../lib/components/addnew/totalNeeds.svelte';
- //   import { total } from '../../lib/components/addnew/store/total.js';
+    import ChoosNeed from '../../lib/components/prPr/chosNed.svelte';
+   import TotalNeeds from '../../lib/components/prPr/totalNeeds.svelte';
+   import { total } from '../../lib/stores/total.js';
  //   import { beforeUpdate, tick } from 'svelte';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
    import OpenM from '../../lib/components/prPr/openM.svelte';
@@ -67,14 +67,14 @@ let a = 0;
             error2 = e;
         }
       };
-    let addN = 0;
+    let addN = false;
     let addM =  false;
     let hosafa = "הוספת פעולות נדרשות לריקמה";
     let hosafat = "הוספת משאבים נדרשים לריקמה";
     let cencel = "ביטול";
     let showvd = false;
 
-   let totalneed = 0;
+   let totalneed = false;
   // total.subscribe(newwork => {
   //  totalneed = newwork;
   //  });
@@ -96,7 +96,10 @@ let vallues = [];
 let ata = [];
 let restime;
 let valit;
+let projects = [];
+let user = [];
 onMount(async () => {
+  if ($idPr !== 0){
   // ולידציה שהיוזר חבר ברקמה
     const cookieValue = document.cookie
   .split('; ')
@@ -247,7 +250,55 @@ onMount(async () => {
            } catch (e) {
             error1 = e;
             console.log(error1);
-        } 
+        } } else {
+           const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json'   
+      }; let linkg ="https://strapi-k4vr.onrender.com/graphql" ;
+        try {
+             await fetch(linkg, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+          `{  user (id:${idL}) {
+                            projects_1s {id projectName }
+                            } }`
+        })
+})
+  .then(r => r.json())
+  .then(data => user = data.data.user);
+            console.log(user);
+            projects = user.projects_1s;
+          console.log(projects);
+        } catch (e) {
+            error1 = e
+        }
+        }
+
     });
 
     function pre(projectUsers, fmiData){
@@ -257,21 +308,26 @@ onMount(async () => {
    let li = [];
    let miData = [];
  let blabla = [];
+ let load = false;
 async function callbackFunction(event) {
+
+ load = true;
+     goto("/moach#xyz")
+  const  lim = event.detail.li;
+        if (lim.length > 0 || lim > 0){
   showvd = false;
  await refreshM ()
  .then() 
   addM = false;
-		console.log(`Notify fired! Detail: ${event.detail.li}`);
     li = event.detail.li;
   await  findiM ()
 .then()
+load = false;
   showvd = event.detail.show; 
     blabla = event.detail.bla;
     addM = true;
-    goto("/moach#xyz")
 	};    
-
+}
 async function findiM() {
   var resultString = li.join('&id_in=');
  let link ="https://strapi-k4vr.onrender.com/missions?id_in=" + resultString ;
@@ -408,28 +464,32 @@ async function hosa () {
 await findM ()
 .then ()
 addM = true;
+goto("/moach#hosaf",)
 };
 
 async function removeF (event) {
   const miDatanew = event.detail.data;
   const y = miDatanew.map(c => c.id);
- 
-const id = event.detail.id;
-const index = y.indexOf(id);
-if (index > -1) {
+ const id = event.detail.id;
+ const index = y.indexOf(id);
+ if (index > -1) {
   miDatanew.splice(index, 1);
-};
-
-showvd = false;
- await refreshM ()
- .then() 
- miData = miDatanew;
+ };
+  if (miDatanew.length > 0) {
+ showvd = false;
+   addM = false;
+   miData = miDatanew;
   showvd = true; 
-  addM = false;
    blabla = miData.map(c => c.missionName);
-  await findM ()
-.then ()
-addM = true;
+  console.log(blabla, miData);
+
+  addM = true;
+} else { 
+  miData = miDatanew;
+blabla = miData.map(c => c.missionName);
+showvd = false;
+
+}
 };
 
 
@@ -529,14 +589,12 @@ miDatanew[index].tafkidims = resp;
 miDatanew[index].selected3 = [];
 console.log (miDatanew);
 showvd = false;
- await refreshM ()
- .then() 
+
 miData = miDatanew;
   showvd = true; 
   addM = false;
    blabla = miData.map(c => c.missionName);
-  await findM ()
-.then ()
+
 addM = true;
 };
 
@@ -598,17 +656,13 @@ addM = true;
 
 
 async function addnewr (event) {
-  console.log(event.detail.id);
-  console.log(event.detail.data);
-  console.log(event.detail.mid);
-console.log(event.detail.skob);
+  
 const skob = event.detail.skob;
 const mid = event.detail.mid;
 const miDatanew = event.detail.data;
 const y = miDatanew.map(c => c.id);
 const index = y.indexOf(mid);
 miDatanew[index].tafkidims.push(skob);
-console.log (miDatanew);
 showvd = false;
  await refreshM ()
  .then() 
@@ -655,6 +709,50 @@ let openMS = false;
 function close () {
   showvd = false;
   addM = false;
+}
+let meDatamm = [];
+async function updi (){
+var resultString = needr.join('&id_in=');
+let linkpp ="https://strapi-k4vr.onrender.com/mashaabims?id_in=" + resultString ;
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json'   
+      };
+        try {
+            const res = await fetch(linkpp, {
+              method: 'GET',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+            }).then(checkStatus)
+          .then(parseJSON);
+            meDatamm = res;
+            
+        } catch (e) {
+            error1 = e
+        }
+       
+}
+
+function clo () {
+  totalneed = false
+  addN = false;
 }
 let noofopen = 2;
 
@@ -760,7 +858,9 @@ let mecata = [];
                 });
       
     })};
-    async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
+    let ataN = [];
+  
+async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -810,13 +910,46 @@ let mecata = [];
     a = 2;
 upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, event.detail.desPl, event.detail.valit, event.detail.restime)
     }
+    
+function projectn (id) {
+    idPr.set(id);
+    goto("/moach", );
+  };
+let needr = [];
+
+async function needad (event){
+        const x = event.detail.x
+      if (x.length > 0 || x > 0){
+      needr = x;
+     totalneed = false;
+ await updi ()
+ .then() 
+     totalneed = true
+    goto("/moach#nt",)
+  }
+}
+async function wdwd (event) {
+    const miDatanew = event.detail.data;
+  const y = miDatanew.map(c => c.id);
+const id = event.detail.id;
+const index = y.indexOf(id);
+if (index > -1) {
+  miDatanew.splice(index, 1);
+};
+if (miDatanew.length > 0) {
+totalneed = false; 
+ meDatamm = miDatanew;
+   needr = meDatamm.map(c => c.id);
+  totalneed = true; 
+} else {
+  totalneed = false; 
+}
+}
     </script>
     <svelte:head>
   <title>מוח הריקמה 1❤️1</title>
 </svelte:head>
-<!--<div class="manu">
 
-</div>-->
 
     {#if $idPr }
     
@@ -824,7 +957,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
-             <button class=" hover:bg-barbi text-mturk rounded"
+             <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}>ביטול</button>
           {#if a == 0}
           <Uplad on:message={allbackFunction}/>
@@ -847,7 +980,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
          </div> 
          {:else if a == 3}
          <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded" on:click={()=> a = 0}>לנסות שוב</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
          {/if}
   </DialogContent>
   </div>
@@ -865,7 +998,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
       src={srcP}
       alt="profilePic">
       <button
-          class="text-pink-200 hover:bg-barbi hover:text-mturk rounded"
+          class="text-pink-200 hover:bg-barbi hover:text-mturk rounded-full"
           title="עריכת תמונת הפרופיל של הריקמה"
           on:click={editp} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -874,7 +1007,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
           </button>
           {:else}
            <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded"
+          class="bg-pink-200 hover:bg-barbi text-mturk rounded-full"
           title="העלאת תמונת פרופיל לריקמה"
           on:click={addp} 
           >
@@ -884,7 +1017,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
 </button>
           {/if}
            <button
-          class=" hover:bg-barbi text-pink-200 rounded"
+          class=" hover:bg-barbi text-pink-200 rounded-full"
           title="עריכת פרטי ריקמה"
           on:click={editb} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1151,12 +1284,12 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
 
   {#if pendS === false}
 <button
- class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
+ class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
 on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
 {:else}
 <button title={cencel1}
   on:click={() => pendS = false}
-  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
+  class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button>
@@ -1168,12 +1301,12 @@ on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
 {#if bmiData.length > 0}
  {#if tahaS === false}
 <button
- class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
+ class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
 on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 {:else}
 <button title={cencel1}
   on:click={() => tahaS = false}
-  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
+  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button>
@@ -1187,7 +1320,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
   <button title={cencel1}
   on:click={() => openMS = false}
-  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
+  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button> 
@@ -1195,7 +1328,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  {:else if openMS === true && omiData.length == 0}
   <button title={cencel1}
   on:click={() => openMS = false}
-  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded"
+  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button>
@@ -1211,12 +1344,12 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 כולל לפי יוזרים וכו-->
 
 
- {#if addM == true}
-   <div class="bg-lturk m-4 border-2 border-gold rounded" >
+ {#if addM === true}
+   <div id="hosaf" class="bg-lturk m-4 border-2 border-gold rounded" >
 <button
  title={cencel}
       on:click={closeM}
-       class="bg-pink-200 hover:bg-barbi text-mturk hover:text-lturk font-bold p-0.5 rounded"
+       class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
@@ -1229,25 +1362,14 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
  {/if}
     </div>
-    <!--
-<div class="bg-lturk m-4" >
-  {#if addN == 0} 
-      <button
-      on:click={() => addN = 1}
-       class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded"
-       >{hosafat}</button>
-      {:else if addN == 1}<button
-      title={cencel}
-      on:click={() => addN = 0}
-       class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-    </svg></button>  <ChoosNeed/>
-      
-      {/if}    
-   
-    </div>-->
-    <div class="bg-lturk p-4 " id="xyz">
+
+    <div class="bg-lturk " id="xyz">
+      {#if load === true}
+        <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
+
+      <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+        </div>
+                 {/if}
     {#if showvd == true}<Mission 
                                 userslength={projectUsers.length}
                                  workways2 ={workways2}
@@ -1269,9 +1391,33 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                  on:removeW={removeW}
                                  on:close={close}
                                  /> {/if}</div>
-                                 <!--
-    <div class="bg-lturk" >
-    {#if totalneed >= 1} <TotalNeeds/>{/if}</div>-->
+                              
+    <div class="bg-lturk m-4" >
+  {#if addN === false} 
+  
+      <button
+      on:click={() => addN = true}
+       class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+       >{hosafat}</button>
+      {:else if addN == true}
+      <div id="hosafn" class="bg-lturk m-4 border-2 border-gold rounded" >
+      <button
+      title={cencel}
+      on:click={() => addN = false}
+       class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+    </svg></button> 
+     <ChoosNeed on:add={needad} selectedi={needr}/>
+      </div>
+      {/if}    
+   
+    </div>
+    <div class="bg-lturk m-4" id="nt" >
+    {#if totalneed === true} <TotalNeeds projectId={$idPr} userslength={projectUsers.length} {needr} meData={meDatamm}
+                                     on:close={clo}
+                                     on:remove={wdwd}
+    />{/if}</div>
    </div> 
 
   <!--  {:else}
@@ -1279,11 +1425,19 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     <h1 class="bg-white">לא מורשה</h1>
     {/if}-->
  {:else }  
- <div class="flex-center text-center border-2 border-gold rounded m-4">
+ <div class="flex text-center flex-col border-2 border-gold rounded m-4">
    <!-- למשוך רשימת ריקמהים של המשתמש או לפחות להוסיףך סולמית למיקום המדויק בעמוד -->
-<a class="text-mturk hover:text-lturk font-bold py-2 px-4 m-4 rounded"
- href={`/me`}
- ><h1>לבחירת ריקמה</h1></a>
+<h1 class="text-mturk hover:text-lturk font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
+ 
+           {#each projects as data, i}
+          
+          <button
+          class=" hover:bg-barbi text-barbi bg-gold hover:text-gold p-0.5 m-2 rounded-full"
+          on:click={projectn(data.id)}
+          > {data.projectName}
+          </button>
+  {/each}
+
  </div> 
  {/if}
 

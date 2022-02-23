@@ -4,15 +4,14 @@
     import { onMount } from 'svelte';
    // import AddSkil from './addSkil.svelte';
     import { skillsNew } from '../../stores/skillsNew.js';
-    import axios from 'axios';
     import MultiSelect from 'svelte-multiselect';
     import { createEventDispatcher } from 'svelte';
     import Addnewsk from '../addnew/addNewSkill.svelte';
     import Addneww from '../addnew/addnewWorkway.svelte';
     import Addnewv from '../addnew/addnewval.svelte';
     import Addnewr from '../addnew/addNewRole.svelte';
-  //  import Addnewn from '../addnew/addNewNeed.svelte';
-
+    import Addnewn from '../addnew/addNewNeed.svelte';
+    import Newsp from './newsp.svelte';
 
 
 
@@ -101,9 +100,14 @@ console.log("skillslist",skillslist);
 };    
 let miData = [];
 let g = false;
+let needr = [];
+
 async function increment() {
       g = true;
-     let list = data.map(c => c.id);
+     
+     if (datan !== "mash"){
+       console.log(datan,"dd")
+       let list = data.map(c => c.id);
      const linkpe = linkp;
   const cookieValue = document.cookie
   .split('; ')
@@ -155,6 +159,9 @@ async function increment() {
         } catch (e) {
             error1 = e
         }
+      }  else{
+        g = false;
+      }
     };
  
    
@@ -162,7 +169,7 @@ async function increment() {
 } from 'svelte-loading-spinners'
 export let Valname = "כישורים";  
 let yy = 0;
-
+export let masss = false;
 function find_id(arra){
      var  arr = [];
       for (let j = 0; j< arra.length; j++ ){
@@ -174,7 +181,17 @@ function find_id(arra){
       }
       return arr;
      };
-
+function find_name(arra){
+     var  arr = [];
+      for (let j = 0; j< arra.length; j++ ){
+      for (let i = 0; i< meData.length; i++){
+        if(meData[i].id === arra[j]){
+          arr.push(meData[i][valc]);
+        }
+      }
+      }
+      return arr;
+     };
 let less = "הסרה";
 
 const filterByReference = (allob, id)=> {
@@ -189,6 +206,8 @@ const filterByReference = (allob, id)=> {
 }
 
 function addSK (id){
+       if (datan !== "mash"){
+
   yy = 1;
   listt = data;
 const oldob = data;
@@ -205,20 +224,36 @@ const datana = resp;
     valc: valc,
     a: datan
     } );
+  }   
 }
 
-function min(id){
+function adm (id){
+ if (datan === "mash" && id.length > 0) {
+    const neww = find_id(id);
+         needr = neww;
+        updi () 
+      }
+    }
+
+function min(id, nj){
+  if (datan !== "mash" ){
   yy = 2;
   listt = data;
 const oldob = data;
 const x = oldob.map(c => c.id);
 const indexy = x.indexOf(id);
 oldob.splice(indexy, 1);
+
 dispatch('remove', {
     data: oldob,
     linkp: kish
     } );
-
+  } else if (datan === "mash"){
+    dispatch('delm', {
+    id: id,
+    nj: nj
+    } );
+  }
 }
 
 function open () {
@@ -241,6 +276,26 @@ function bitul () {
 
 export let addR = false;
 export let addW = false;
+function addnewM (event) {
+  console.log(needr);
+  const id = event.detail.id;
+const oldob = needr;
+const old = oldob;
+const newi = [id];
+let array3 = old.concat(newi);
+array3 = [...new Set([...old,...newi])];
+const skob = event.detail.skob;
+const slectednew = meData;
+slectednew.push(skob);
+meData = slectednew
+ allvn = meData.map(c => c[valc]);
+  needr = array3;
+  const oldsel = data.selected2
+  oldsel.push(event.detail.name);
+  data.selected2 = oldsel;
+        updi () 
+}
+
 function addnew (event) {
   yy = 3;
 listt = data;
@@ -263,8 +318,131 @@ dispatch('addnew', {
     } );
   
 };
+let meDatamm = [];
+function bitulm (){
+  masss = false;
+   dispatch('massss', {
+            mass: false
+          })
+}
+async function updi (){
+var resultString = needr.join('&id_in=');
+let linkpp ="https://strapi-k4vr.onrender.com/mashaabims?id_in=" + resultString ;
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+        try {
+            const res = await fetch(linkpp, {
+              method: 'GET',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+            }).then(checkStatus)
+          .then(parseJSON);
+            meDatamm = res;
+            g = false;
+              masss = true;
+             dispatch('massss', {
+            mass: true
+          })
+        } catch (e) {
+            error1 = e
+        }
+       
+}
+
+function clo (event) {
+const  id = event.detail.id
+const  name = event.detail.name
+const  skob = event.detail.skob
+const oldob = data;
+const old = oldob.map(c => c.id).map(String);
+const neww = find_id(id);
+let array3 = old.concat(neww);
+array3 = [...new Set([...old,...neww])];
+
+const resp = filterByReference(meData, array3);
+const datana = resp;
+  dispatch('add', {
+    data: datana,
+    linkp: kish,
+    valc: valc,
+    a: datan
+    } );
+data.push(skob)
+data = data
+  console.log(id)
+masss = false
+addSl = false
+ dispatch('close', {
+    linkp: linkp,
+    list: data
+
+    } );
+   dispatch('massss', {
+            mass: false
+          })
+}
+async function wdwd (event) {
+    const miDatanew = event.detail.data;
+  const y = miDatanew.map(c => c.id);
+const id = event.detail.id;
+const index = y.indexOf(id);
+if (index > -1) {
+  miDatanew.splice(index, 1);
+};
+if (miDatanew.length > 0) {
+  masss = false
+   meDatamm = miDatanew;
+   needr = meDatamm.map(c => c.id);
+   const old = data.selected2;
+   const tor = find_name(event.detail.id)
+   const indexd = old.indexOf(tor);
+  if (index > -1) {
+  old.splice(indexd, 1);
+};
+ data.selected2 = old
+   masss = true
+} else {
+   masss = false
+    dispatch('massss', {
+            mass: false
+          })
+}
+}
+function edit (id){
+  console.log(id)
+  alert("בקרוב ממש")
+}
 //style="margin:auto; overflow:auto;"
   </script>
+{#if masss === true}
+
+<div class="grid items-center align-center justify-center" >
+<button class=" hover:bg-barbi text-gold font-bold rounded-full" 
+style="width:24px; height:24px; margin: 0 auto;"
+title="ביטול"
+on:click={bitulm}
+><svg  style="width:24px; height:24px;" viewBox="0 0 24 24">
+  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+</svg></button> 
+  <Newsp {needr} meData={meDatamm}  on:close={clo} on:remove={wdwd}/>
+</div>
+{:else}
 
       {#if addSl == false}
       <div class="another" style="margin: auto"> 
@@ -284,7 +462,7 @@ on:click={open}
 </div>
 {:else if  addSl == true}
 {#if g == false}
-<div class="anotherE"  transition:fly={{x: 250, opacity: 1}}>
+<div class="anotherE"  transition:fly={{x: 350, y: 200 ,opacity: 0.5}}>
 <button class=" hover:bg-barbi text-gold  font-bold rounded-full"
 title="ביטול"
 on:click={bitul}
@@ -295,19 +473,39 @@ on:click={bitul}
    <h6 class="text-center text-sm text-barbi">עריכת ה{Valname} שלי </h6>
      {#if data} {#each data as da, i}
   <div class="text-center text-sm text-lturk">
-       <button class="text-gold hover:text-barbi"  title={less} on:click={min(da.id)}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+       <button class="text-gold hover:text-barbi"  title={less} on:click={min(da.id , da[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-    </svg></button>{da[valc]}
+    </svg></button>
+    {#if datan === "mash"}<button
+class=" hover:bg-barbi text-mturk rounded-full "
+title="עריכה"
+on:click={edit(da.id)} 
+><svg  style="width:17px;height:17px" viewBox="0 0 24 24">
+ <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
+</svg>
+</button> {/if}{da[valc]}
   </div>
  
-   {/each} {/if}
+   {/each} 
+   {#if datan === "mash" && yy == 2}
+   <button
+        on:click={increment} 
+         title="הסרת {Valname} "
+    class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150" 
+    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+      <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
+    </svg>
+    </button>
+   {/if}
+   {/if}
 <br>
  
   <span > <h3 class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </h3>  <MultiSelect
       bind:selected={data.selected2}
       {placeholder}
       options={allvn}
-      on:change={addSK(data.selected2 )}
+      on:change={addSK(data.selected2)}
+      on:blur={adm(data.selected2)}
       /></span>
        
      
@@ -316,19 +514,19 @@ on:click={bitul}
 {:else if datan == "taf"}
 <Addnewr rn={allvn} on:addnewrole={addnew} addR={addR}/>
 
-{:else if datan == "mash"}<!--
-<Addnewn on:addww={addnew} addW={addW}/>
+{:else if datan == "mash"}
 
--->
-<h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink);">בקרוב...</h1>
+<Addnewn rr={13} on:newn={addnewM} addW={addW}/>
+
+
 {:else if datan == "val"}
-<Addnewv rn={allvn}/>
+<Addnewv rn={allvn} on:addnew={addnew}/>
 
 {:else if datan == "work"}
-<Addneww rn={allvn}/>
+<Addneww rn={allvn} on:addww={addnew}/>
 
 {/if} </div>
-  
+  {#if datan !== "mash" && yy > 0}
       <button
         on:click={increment} 
          title="הוספת {Valname} חדשים"
@@ -337,21 +535,36 @@ on:click={bitul}
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
     </svg>
     </button> 
+    {/if}
      {:else if g == true}
-          <div class="sp bg-gold">
+          <div class="sp ">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
-         </div> {/if}
+         </div>
+          {/if}
         
 
  
 
-{/if}
- <style>
-   .bt{
+{/if} {/if}
 
-   }
+ <style>
+   
+    .bt{
+    animation: changeColor 2s infinite ease;
+  }
+   .bt:hover{
+    animation: changeColors 2s infinite ease;
+  }
+  @keyframes changeColor{
+  from { color: var(--gold); }
+  to { color: var(--barbi-pink); }
+}
+ @keyframes changeColors{
+  from { color: var(--gold); }
+  to { color: aqua; }
+}
    @media (max-width: 528px){
      .th{
        font-size: 12px;
