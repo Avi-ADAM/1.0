@@ -99,6 +99,9 @@ let valit;
 let projects = [];
 let user = [];
 onMount(async () => {
+start ()
+})
+async function start () {
   if ($idPr !== 0){
   // ולידציה שהיוזר חבר ברקמה
     const cookieValue = document.cookie
@@ -136,7 +139,8 @@ onMount(async () => {
         JSON.stringify({query:
           `{project(id:"${$idPr}"){
             projectName 
-             user_1s {id}}}
+             user_1s {id}}
+            me{id}}
               `} )
             }).then(checkStatus)
           .then(parseJSON);
@@ -194,7 +198,8 @@ onMount(async () => {
             linkToWebsite
             profilePic {url formats }
             restime
-          } }
+          } 
+        me{id}}
           `} )
             }).then(checkStatus)
           .then(parseJSON);
@@ -299,7 +304,7 @@ onMount(async () => {
         }
         }
 
-    });
+    };
 
     function pre(projectUsers, fmiData){
 
@@ -913,7 +918,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
     
 function projectn (id) {
     idPr.set(id);
-    goto("/moach", );
+start ()
   };
 let needr = [];
 
