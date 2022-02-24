@@ -12,7 +12,7 @@
     import Addnewr from '../addnew/addNewRole.svelte';
     import Addnewn from '../addnew/addNewNeed.svelte';
     import Newsp from './newsp.svelte';
-
+    import Edsp from './editsp.svelte'
 
 
 import { fly } from 'svelte/transition';
@@ -57,9 +57,7 @@ let idLi;
             throw resp;
           });
         };
-        const headers = {
-          'Content-Type': 'application/json'   
-        };
+       
           try {
               const res = await  fetch("https://strapi-k4vr.onrender.com/graphql", {
               method: "POST",
@@ -364,8 +362,29 @@ let linkpp ="https://strapi-k4vr.onrender.com/mashaabims?id_in=" + resultString 
         }
        
 }
+function clodd (event) {
+const  id = event.detail.id
+const  name = event.detail.name
+const  skob = event.detail.skob
+const oldob = data;
+const x = oldob.map(c => c.id);
+const indexy = x.indexOf(id);
+oldob.splice(indexy, 1);
+data.push(skob)
+data = data
+  console.log(id)
+masss = false
+addSl = false
+ dispatch('close', {
+    linkp: linkp,
+    list: data
 
-function clo (event) {
+    } );
+   dispatch('massss', {
+            mass: false
+          })
+        }
+function clohh (event) {
 const  id = event.detail.id
 const  name = event.detail.name
 const  skob = event.detail.skob
@@ -424,9 +443,70 @@ if (miDatanew.length > 0) {
           })
 }
 }
-function edit (id){
+let xd = []
+let ed = false;
+async function edit (id){
+  g = true
   console.log(id)
-  alert("בקרוב ממש")
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+          const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+          const checkStatus = (resp) => {
+          if (resp.status >= 200 && resp.status < 300) {
+            return resp;
+          }
+          return parseJSON(resp).then((resp) => {
+            throw resp;
+          });
+        };
+       
+          try {
+              const res = await  fetch("https://strapi-k4vr.onrender.com/graphql", {
+              method: "POST",
+              headers: {
+                'Authorization': bearer1,
+                 'Content-Type': 'application/json'
+              },body: JSON.stringify({
+                        query: `query {
+  sp (id: "${id}") {
+     id 
+     name
+       descrip
+             kindOf
+             unit
+             spnot  
+             price
+             myp   
+             linkto
+             users_permissions_user {id}
+             sdate
+             fdate
+     }
+     me {id}
+}
+              `})
+            }).then(checkStatus)
+          .then(parseJSON);
+              xd = res.data.sp;
+              console.log(res);
+              if (xd.users_permissions_user.id = res.data.me.id){
+                              console.log(xd);
+                  ed = true;
+            g = false;
+              masss = true;
+             dispatch('massss', {
+            mass: true
+          })
+              }
+          } catch (e) {
+              error1 = e
+              console.log(error1);
+          }
+
 }
 //style="margin:auto; overflow:auto;"
   </script>
@@ -440,7 +520,11 @@ on:click={bitulm}
 ><svg  style="width:24px; height:24px;" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
-  <Newsp {needr} meData={meDatamm}  on:close={clo} on:remove={wdwd}/>
+{#if ed === false}
+  <Newsp {needr} meData={meDatamm}  on:close={clohh} on:remove={wdwd}/>
+{:else if ed === true}
+  <Edsp  meData={xd}  on:close={clodd} />
+{/if}
 </div>
 {:else}
 
