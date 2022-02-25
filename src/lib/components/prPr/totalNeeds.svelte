@@ -77,7 +77,8 @@ pendq = ` users: [
         JSON.stringify({query:
           `mutation { ${linkop}(
     input: {
-      data: { name: "${element.name}",
+      data: { 
+        name: "${element.name}",
       descrip: "${element.descrip}",
         project: "${projectId}",
               kindOf: ${element.kindOf},
@@ -86,6 +87,7 @@ pendq = ` users: [
              price: ${price},
              easy: ${easy},   
              linkto: "${element.linkto}",
+             mashaabim: "${element.id}",
              ${sdate} 
              ${fdate}
             ${pendq}

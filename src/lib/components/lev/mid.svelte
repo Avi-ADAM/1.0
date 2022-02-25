@@ -2532,10 +2532,39 @@ ee ="matrix(1.4501 0 0 1.2385 -298.08 -520.09)";
 
 }
 }
+	import { afterUpdate } from 'svelte';
+
+export let low = true;
+let wi = "0.1";
+onMount (async () => {
+  bit()
+})
+afterUpdate (async () => {
+  bit()
+})
+let myInterval = null;
+
+function bit (){
+  if (low === true){
+     myInterval = setInterval(function () {
+  if(wi === "0.1"){
+      wi = "2"   
+      console.log("bg")
+    } else if (wi === "2"){
+      wi = "0.1"  
+       console.log("sm")
+    }
+  }, 650)
+  } else if (low === false){
+    wi = "1";
+  clearInterval(myInterval)
+  }
+} 
+
 </script>
 
-<div in:fly={{duration: 6200, y:1000}} class="midCom">
-     <svg class="midCom"  version="1.1" viewBox="-148.21 -131.51 641.46 651.45" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+<div in:fly={{duration: 6200, y:500}} class="midCom">
+     <svg class="midCom" style="transform: scale({wi});" version="1.1" viewBox="-148.21 -131.51 641.46 651.45" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
    {@html big}
    <g on:mouseenter={()=>hover("a")} on:mouseleave={()=>hover("a")} on:click={()=>disp(sugg)} name="number " class="btn a" transform="{aa2}"
 >
@@ -3237,6 +3266,8 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 
 
   .midCom{	
+      transition: all 300ms ease-in-out;
+
     min-height: 170px;	
     min-width: 170px;	
      
@@ -3245,9 +3276,10 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
     aspect-ratio: 1/ 1;
 }	
 @media (min-width: 550px) {	
+
 .midCom{	
-    height: 290px;	
-    width: 290px;	
+    min-height: 290px;	
+    min-width: 290px;	
 }	
 }	
 

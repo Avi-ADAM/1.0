@@ -12,6 +12,7 @@ import Mid from "../../lib/components/lev/mid.svelte"
         import { isEqual } from 'lodash';
 
 let ddd;
+let low = true;
 
   //  import Viewport from 'svelte-viewport-info'
     let updateP;
@@ -636,6 +637,7 @@ var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-f
         } else if (dd.profilePic.url){
                  picLink = dd.profilePic.url
         }
+        low = false
     }
     let tickSpeed = 60000 * 5;
 
@@ -706,7 +708,8 @@ onMount(async () => {
                             tafkidims {id}
                         } 
                         } 
-                            projects_1s {id  
+                            projects_1s {id 
+                                open_mashaabims { id name mashaabim { sps {name id}}}  
                                 asks (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
                                      open_mission { id mission {id} declined { id} sqadualed publicklinks noofhours perhour privatlinks descrip hearotMeyuchadot name}
@@ -745,7 +748,6 @@ console.log("nada")
   } else {
       console.log("tada")
   console.log (miData)
-
    miData = miData
    fiapp = [];
    pends = [];
@@ -754,6 +756,7 @@ console.log("nada")
    askedcoin = [];
    mtaha = [];
    meData = [];
+
    midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
@@ -902,6 +905,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 // let arr1 = [...pendsi, ...mtahai, ...walcomeni, ...askedcoini, ...meDatai];
 }
 </script>
+
 <svelte:head>
   <title>לב 1❤️1</title>
 </svelte:head>
@@ -1116,7 +1120,7 @@ on:showonly={showonly}
 {total}
 picLink={picLink}
 name={nam}
-
+{low}
 {sug}
 {pen}
 {ask}
