@@ -2535,7 +2535,7 @@ ee ="matrix(1.4501 0 0 1.2385 -298.08 -520.09)";
 	import { afterUpdate } from 'svelte';
 
 export let low = true;
-let wi = "0.1";
+let wi = "0.2";
 onMount (async () => {
   bit()
 })
@@ -2547,14 +2547,12 @@ let myInterval = null;
 function bit (){
   if (low === true){
      myInterval = setInterval(function () {
-  if(wi === "0.1"){
+  if(wi === "0.2"){
       wi = "2"   
-      console.log("bg")
     } else if (wi === "2"){
-      wi = "0.1"  
-       console.log("sm")
+      wi = "0.2"  
     }
-  }, 650)
+  }, 750)
   } else if (low === false){
     wi = "1";
   clearInterval(myInterval)
@@ -3266,7 +3264,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 
 
   .midCom{	
-      transition: all 300ms ease-in-out;
+      transition: all 250ms ;
 
     min-height: 170px;	
     min-width: 170px;	
