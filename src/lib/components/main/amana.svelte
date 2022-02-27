@@ -469,9 +469,10 @@ trans = !trans;
       <small style="color: red;">{$errors.email}</small>
     {/if}
 </div>
-    </section>     
+    </section> 
+    <div class="onlym"> <a alt="scroll-down-please" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" href="/#dow" data-ca3_icon=""></a></div>    
     </div> 
-    <div class="aab">
+    <div class="aab" id="dow">
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:var(--barbi-pink);  font-weight: 900;">
      ההסכמה של 
@@ -523,6 +524,59 @@ trans = !trans;
   
 </div> </div>
   <style>
+
+.onlym{
+  display: "";
+}
+[data-ca3_icon]::before {
+    font-weight: normal;
+    content: attr(data-ca3_icon);
+}
+
+.ca3-scroll-down-arrow {
+  background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2hldnJvbl90aGluX2Rvd24iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAgMjAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwIDIwIiBmaWxsPSJ3aGl0ZSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTE3LjQxOCw2LjEwOWMwLjI3Mi0wLjI2OCwwLjcwOS0wLjI2OCwwLjk3OSwwYzAuMjcsMC4yNjgsMC4yNzEsMC43MDEsMCwwLjk2OWwtNy45MDgsNy44M2MtMC4yNywwLjI2OC0wLjcwNywwLjI2OC0wLjk3OSwwbC03LjkwOC03LjgzYy0wLjI3LTAuMjY4LTAuMjctMC43MDEsMC0wLjk2OWMwLjI3MS0wLjI2OCwwLjcwOS0wLjI2OCwwLjk3OSwwTDEwLDEzLjI1TDE3LjQxOCw2LjEwOXoiLz48L3N2Zz4=);
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.ca3-scroll-down-link {
+  cursor:pointer;
+  height: 60px;
+  width: 80px;
+  margin: 0px 0 0 -40px;
+  line-height: 60px;
+  position: absolute;
+  left: 50%;
+  bottom: 0px;
+  color: #FFF;
+  text-align: center;
+  font-size: 70px;
+  z-index: 100;
+  text-decoration: none;
+  text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.4);
+
+  -webkit-animation: ca3_fade_move_down 2s ease-in-out infinite;
+  -moz-animation:    ca3_fade_move_down 2s ease-in-out infinite;
+  animation:         ca3_fade_move_down 2s ease-in-out infinite;
+}
+
+
+/*animated scroll arrow animation*/
+@-webkit-keyframes ca3_fade_move_down {
+  0%   { -webkit-transform:translate(0,-20px); opacity: 0;  }
+  50%  { opacity: 1;  }
+  100% { -webkit-transform:translate(0,20px); opacity: 0; }
+}
+@-moz-keyframes ca3_fade_move_down {
+  0%   { -moz-transform:translate(0,-20px); opacity: 0;  }
+  50%  { opacity: 1;  }
+  100% { -moz-transform:translate(0,20px); opacity: 0; }
+}
+@keyframes ca3_fade_move_down {
+  0%   { transform:translate(0,-20px); opacity: 0;  }
+  50%  { opacity: 1;  }
+  100% { transform:translate(0,20px); opacity: 0; }
+}
      .midscreen-link{
 position: absolute;
    
@@ -698,6 +752,7 @@ position: absolute;
     width: 100vw;
     height:100vh;
     margin:0px auto;
+    background-color: var(--gold);
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1641148938/news_nvsgba.svg);
     display: flex;
     flex-direction: column;
@@ -729,6 +784,8 @@ position: absolute;
     justify-content: center;
     align-items: center;
     height: 100vh;
+        background-color: var(--gold);
+
   }
   .flexid{
     display: flex;
@@ -833,6 +890,8 @@ left: 45.2%;
     min-width: 50px;
  }*/
   .aab{
+        background-color: var(--gold);
+
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -840,6 +899,8 @@ left: 45.2%;
     height: 100vh;
   }
    .mobile{
+         background-color: var(--gold);
+
     width: 100vw;
     height:100vh;
     margin:0px auto;
@@ -918,6 +979,7 @@ left: 45.2%;
 }
 
 @media(min-width:942px) and (max-width:1099px) {
+  
   .midscreen-link{
 position: absolute;
       top: 82%;
@@ -1027,6 +1089,9 @@ background-position: center;
 }
 
 @media(min-width:1100px) {
+    .onlym{
+  display: none;
+}
   .midscreen-link{
 position: absolute;
       top: 82%;

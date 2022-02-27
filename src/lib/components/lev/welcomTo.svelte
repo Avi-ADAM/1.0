@@ -18,6 +18,7 @@ import {
 function project(id) {
     idPr.set(id);
     goto("/moach", );
+    
     //make it desapire for good
 };
 onMount(async () => {
@@ -31,9 +32,9 @@ console.log(projectName)
      <h1 class="te" style="line-height: 1; font-weight: bold;"
         >         {username}
         <br/>
-ברכות לרגל הצטרפותך לרקמה
+ברכות לרגל הצטרפותך לרקמת
          {projectName}</h1>
-    <button class="bg-lturk p-0.5 te" on:click={project(id)}>ללב הריקמה</button>
+    <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הריקמה</button>
 </div>
 </div>
 <style>
