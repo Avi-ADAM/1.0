@@ -196,7 +196,7 @@ async function start () {
                                     users  {what why id users_permissions_user {id}} }
             vallues {valueName}
             linkToWebsite
-            profilePic {url formats }
+            profilePic {url  formats }
             restime
           } 
         me{id}}
@@ -205,7 +205,6 @@ async function start () {
           .then(parseJSON);
             meData = res.data.project;
             project = res.data.project;
-            console.log(meData);
             projectname = res.data.project.projectName;
             desP = project.publicDescription
             linkP = res.data.project.linkToWebsite
@@ -317,7 +316,7 @@ async function start () {
 async function callbackFunction(event) {
 
  load = true;
-     goto("/moach#xyz")
+		cow.scrollIntoView({ block: "start"});
   const  lim = event.detail.li;
         if (lim.length > 0 || lim > 0){
   showvd = false;
@@ -466,10 +465,11 @@ console.log("עדכנתי מידע");
 };
 
 async function hosa () {
+
 await findM ()
 .then ()
 addM = true;
-goto("/moach#hosaf",)
+		hosaf.scrollIntoView({ block: "start"});
 };
 
 async function removeF (event) {
@@ -915,22 +915,35 @@ async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restim
     a = 2;
 upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, event.detail.desPl, event.detail.valit, event.detail.restime)
     }
-    
+      let dow;
+      let cow;
+      let hosaf;
+    function scrollTo(dow) {
+      console.log(dow)
+		dow.scrollIntoView({ block: "center"});
+    console.log("done")
+	}
 function projectn (id) {
     idPr.set(id);
 start ()
   };
 let needr = [];
-
+let loadr = false;
 async function needad (event){
         const x = event.detail.x
       if (x.length > 0 || x > 0){
+        scrollTo(dow)
+        loadr = true;
+                scrollTo(dow)
       needr = x;
      totalneed = false;
  await updi ()
  .then() 
+ loadr = false;
+
      totalneed = true
-    goto("/moach#nt",)
+             scrollTo(dow)
+
   }
 }
 async function wdwd (event) {
@@ -1348,9 +1361,9 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->
 
-
+<div bind:this={hosaf}>
  {#if addM === true}
-   <div id="hosaf" class="bg-lturk m-4 border-2 border-gold rounded" >
+   <div  class="bg-lturk m-4 border-2 border-gold rounded" >
 <button
  title={cencel}
       on:click={closeM}
@@ -1366,9 +1379,11 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
   </div>
 
  {/if}
+     </div>
+
     </div>
 
-    <div class="bg-lturk " id="xyz">
+    <div class="bg-lturk " bind:this={cow}>
       {#if load === true}
         <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
 
@@ -1418,8 +1433,15 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       {/if}    
    
     </div>
-    <div class="bg-lturk m-4" id="nt" >
-    {#if totalneed === true} <TotalNeeds projectId={$idPr} userslength={projectUsers.length} {needr} meData={meDatamm}
+    <div class="bg-lturk m-4" bind:this={dow} >
+    {#if totalneed === true} 
+     {#if loadr === true}
+        <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
+
+      <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+        </div>
+                 {/if}
+    <TotalNeeds projectId={$idPr} userslength={projectUsers.length} {needr} meData={meDatamm}
                                      on:close={clo}
                                      on:remove={wdwd}
     />{/if}</div>
@@ -1431,7 +1453,6 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     {/if}-->
  {:else }  
  <div class="flex text-center flex-col border-2 border-gold rounded m-4">
-   <!-- למשוך רשימת ריקמהים של המשתמש או לפחות להוסיףך סולמית למיקום המדויק בעמוד -->
 <h1 class="text-mturk hover:text-lturk font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
  
            {#each projects as data, i}

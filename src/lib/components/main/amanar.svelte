@@ -360,6 +360,10 @@ onMount(async () => {
             error = e
         }
     });
+      let dow;
+    function scrollTo() {
+		dow.scrollIntoView({ behavior: 'smooth' });
+	}
       </script>
    
       <div class="all">
@@ -428,10 +432,10 @@ onMount(async () => {
       <small>{$errors.email}</small>
     {/if}
 </div>
-    </section> 
-    <div class="onlym"> <a alt="scroll-down-please" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" href="/#dow" data-ca3_icon=""></a></div>    
+    </section>
+     <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>    
     </div> 
-    <div class="aab" id="dow">
+    <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
     إعلان استقلال  
@@ -669,7 +673,7 @@ background-color:var(--lturk);
     line-height: normal;
     font-size-adjust: auto;
     height: 80vh;
-    overflow-y: scroll;
+    overflow-y: auto;
   }
   .aab{
              background-color: var(--gold);

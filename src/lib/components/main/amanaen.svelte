@@ -361,6 +361,10 @@ onMount(async () => {
             error = e
         }
     });
+    let dow;
+    function scrollTo() {
+		dow.scrollIntoView({ behavior: 'smooth' });
+	}
       </script>
    
       <div class="all">
@@ -429,9 +433,9 @@ onMount(async () => {
     {/if}
 </div>
     </section>   
-    <div class="onlym"> <a alt="scroll-down-please" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" href="/#dow" data-ca3_icon=""></a></div>    
+   <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>    
     </div> 
-    <div class="aab" id="dow">
+    <div class="aab" bind:this={dow}>
 <div dir="ltr" class="amana" id="amana-show">
  <h1 dir="ltr" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
        <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>'s Consent:
@@ -665,7 +669,7 @@ background-color:var(--lturk);
     line-height: normal;
     font-size-adjust: auto;
     height: 80vh;
-        overflow-y: scroll;
+        overflow-y: auto;
 
   }
   .aab{

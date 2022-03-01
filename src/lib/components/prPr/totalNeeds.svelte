@@ -125,6 +125,7 @@ function myMi ()  {
     meData[i].easy = meData[i].price;
   }
 }
+
 function myMissionH ()  {
   km = false;
   ky = false;
@@ -136,29 +137,49 @@ for (var i = 0; i <meData.length; i++) {
   if (meData[i].kindOf === "monthly"){
     console.log(i,"to to")
     ky = true;
+    meData[i].m = true;
     meData[i].ky = true;
          meData[i].kc = false;
+                   meData[i].r = false;
+    meData[i].y = false;
+
 
   } else if (meData[i].kindOf === "yearly"){
         console.log(i,"y")
     ky = true;
+    meData[i].y = true;
+        meData[i].m = false;
+          meData[i].r = false;
+
      meData[i].ky = true;
               meData[i].kc = false;
 
     } else if (meData[i].kindOf === "rent"){
         console.log(i,"y")
+            meData[i].y = false;
     ky = true;
+    meData[i].r = true;
      meData[i].ky = true;
+             meData[i].m = false;
+
          meData[i].kc = false;
 
     } else if (meData[i].kindOf === "perUnit"){
-          console.log(i,"c")
+    meData[i].y = false;
     meData[i].kc = true;
          meData[i].ky = false;
+                 meData[i].m = false;
+          meData[i].r = false;
+
     kc = true;
   } else {
+        meData[i].y = false;
     meData[i].kc = false;
          meData[i].ky = false;
+                 meData[i].m = false;
+                     meData[i].r = false;
+
+
   }
  
 }
@@ -215,28 +236,6 @@ for (var i = 0; i <meData.length; i++) {
 </div>
         </td>
         {/each}
-    </tr> <tr>
-      <th>עלות</th>
-      {#each meData as data, i}
-      <td>
-        <div dir="rtl" class='textinput'>
-  <input         bind:value={data.price}
- type="number" class='input' required>
-  <label for="name" class='label'>שווי כספי ₪</label>
-  <span class='line'></span>
-</div>
-      {/each}
-    </tr><tr>
-      <th>שווי מקסימלי לחישוב בריקמה</th>
-      {#each meData as data, i}
-      <td>
-        <div dir="rtl" class='textinput'>
-  <input         bind:value={data.easy}
- type="number" class='input' required>
-  <label for="name" class='label'>שווי מוצע</label>
-  <span class='line'></span>
-</div>
-      {/each}
     </tr> <tr>
       <th>סוג</th>
       {#each meData as data, i}
@@ -298,6 +297,28 @@ for (var i = 0; i <meData.length; i++) {
        </td>
         {/each}
   </tr> <tr>
+      <th>עלות</th>
+      {#each meData as data, i}
+      <td>
+        <div dir="rtl" class='textinput'>
+  <input         bind:value={data.price}
+ type="number" class='input' required>
+  <label for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
+  <span class='line'></span>
+</div>
+      {/each}
+    </tr><tr>
+      <th>שווי מקסימלי לחישוב בריקמה</th>
+      {#each meData as data, i}
+      <td>
+        <div dir="rtl" class='textinput'>
+  <input         bind:value={data.easy}
+ type="number" class='input' required>
+  <label for="name" class='label'>שווי מוצע <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
+  <span class='line'></span>
+</div>
+      {/each}
+    </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
       {#each meData as data, i}
       <td>
