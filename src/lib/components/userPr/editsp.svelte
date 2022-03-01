@@ -12,8 +12,14 @@ export let meData = [];
 
   onMount(async () => {
    myMissionH()
+   myMi ()
               });
-   
+   function myMi ()  {
+    meData.hm !== undefined || null || 0 ? meData.hm : 1;
+    meData.easy !== undefined || null || 0 ? meData.easy : meData.price;
+    meData.dates !== undefined || null || 0 ? meData.dates : new Date().toISOString().slice(0, -1);
+    meData.datef !== undefined || null || 0 ? meData.datef :  new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().slice(0, -1);
+}
  let already = false;
  let idL;
 
@@ -95,27 +101,39 @@ function myMissionH ()  {
     ky = true;
     meData.ky = true;
          meData.kc = false;
-
+   meData.m = true;
+                   meData.r = false;
+    meData.y = false;
   } else if (meData.kindOf === "yearly"){
         console.log(i,"y")
     ky = true;
      meData.ky = true;
               meData.kc = false;
-
+meData.m = false;
+                   meData.r = false;
+    meData.y = true;
     } else if (meData.kindOf === "rent"){
         console.log(i,"y")
     ky = true;
      meData.ky = true;
          meData.kc = false;
-
+meData.m = false;
+                   meData.r = true;
+    meData.y = false;
     } else if (meData.kindOf === "perUnit"){
           console.log(i,"c")
     meData.kc = true;
          meData.ky = false;
     kc = true;
+    meData.m = false;
+                   meData.r = false;
+    meData.y = false;
   } else {
     meData.kc = false;
          meData.ky = false;
+          meData.m = false;
+                   meData.r = false;
+    meData.y = false;
   }
  
 
@@ -163,7 +181,7 @@ function myMissionH ()  {
         <div dir="rtl" class='textinput'>
   <input         bind:value={meData.price}
  type="number" class='input' required>
-  <label for="name" class='label'>שווי כספי ₪</label>
+  <label for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
     </tr><tr>
@@ -172,7 +190,7 @@ function myMissionH ()  {
         <div dir="rtl" class='textinput'>
   <input         bind:value={meData.myp}
  type="number" class='input' required>
-  <label for="name" class='label'>שווי מבוקש</label>
+   <label for="name" class='label'>שווי מבוקש <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
     </tr> <tr>
