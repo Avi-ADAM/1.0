@@ -314,9 +314,8 @@ async function start () {
  let blabla = [];
  let load = false;
 async function callbackFunction(event) {
-
+    		cow.scrollIntoView();
  load = true;
-		cow.scrollIntoView({ block: "start"});
   const  lim = event.detail.li;
         if (lim.length > 0 || lim > 0){
   showvd = false;
@@ -330,6 +329,7 @@ load = false;
   showvd = event.detail.show; 
     blabla = event.detail.bla;
     addM = true;
+    		cow.scrollIntoView();
 	};    
 }
 async function findiM() {
