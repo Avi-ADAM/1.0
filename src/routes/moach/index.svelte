@@ -314,7 +314,7 @@ async function start () {
  let blabla = [];
  let load = false;
 async function callbackFunction(event) {
-    		cow.scrollIntoView();
+    		cow.scrollIntoView(true);
  load = true;
   const  lim = event.detail.li;
         if (lim.length > 0 || lim > 0){
@@ -329,7 +329,7 @@ load = false;
   showvd = event.detail.show; 
     blabla = event.detail.bla;
     addM = true;
-    		cow.scrollIntoView();
+    		cow.scrollIntoView(true);
 	};    
 }
 async function findiM() {
@@ -465,11 +465,11 @@ console.log("עדכנתי מידע");
 };
 
 async function hosa () {
-
 await findM ()
 .then ()
 addM = true;
-		hosaf.scrollIntoView({ block: "start"});
+		hosaf.scrollIntoView(true);
+
 };
 
 async function removeF (event) {
@@ -918,11 +918,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
       let dow;
       let cow;
       let hosaf;
-    function scrollTo(dow) {
-      console.log(dow)
-		dow.scrollIntoView({ block: "center"});
-    console.log("done")
-	}
+   
 function projectn (id) {
     idPr.set(id);
 start ()
@@ -932,17 +928,15 @@ let loadr = false;
 async function needad (event){
         const x = event.detail.x
       if (x.length > 0 || x > 0){
-        scrollTo(dow)
+		dow.scrollIntoView(true);
         loadr = true;
-                scrollTo(dow)
       needr = x;
      totalneed = false;
  await updi ()
  .then() 
  loadr = false;
-
-     totalneed = true
-             scrollTo(dow)
+  totalneed = true
+		dow.scrollIntoView(true);
 
   }
 }
@@ -1361,9 +1355,9 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->
 
-<div bind:this={hosaf}>
+<div class="bg-lturk " >
  {#if addM === true}
-   <div  class="bg-lturk m-4 border-2 border-gold rounded" >
+   <div bind:this={hosaf}   class="bg-lturk m-4 border-2 border-gold rounded" >
 <button
  title={cencel}
       on:click={closeM}
@@ -1434,13 +1428,14 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
    
     </div>
     <div class="bg-lturk m-4" bind:this={dow} >
-    {#if totalneed === true} 
-     {#if loadr === true}
+       {#if loadr === true}
         <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
 
       <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
         </div>
                  {/if}
+    {#if totalneed === true} 
+    
     <TotalNeeds projectId={$idPr} userslength={projectUsers.length} {needr} meData={meDatamm}
                                      on:close={clo}
                                      on:remove={wdwd}

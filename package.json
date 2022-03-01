@@ -23,6 +23,7 @@
     "cssnano": "^5.0.12",
     "kit-sw-workbox": "^1.0.2",
     "lodash.isequal": "^4.5.0",
+    "moment": "^2.29.1",
     "postcss": "^8.4.4",
     "prettier": "^2.3.2",
     "prettier-plugin-svelte": "^2.3.1",

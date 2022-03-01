@@ -123,6 +123,8 @@ function myMi ()  {
   for (var i = 0; i <meData.length; i++) {
     meData[i].hm = 1;
     meData[i].easy = meData[i].price;
+    meData[i].dates = new Date().toISOString().slice(0, -1)
+   meData[i].datef =  new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().slice(0, -1)
   }
 }
 

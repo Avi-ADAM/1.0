@@ -6,6 +6,7 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import Reqtojoin from '../../lib/components/lev/reqtojoin.svelte';
     import { onMount } from 'svelte';
     import PendingM from "../../lib/components/lev/pandingMesima.svelte";
+    import PendingMa from "../../lib/components/lev/pmas.svelte"
     import Welcomt from "../../lib/components/lev/welcomTo.svelte";
     import Fiappru from '../../lib/components/lev/fiappru.svelte';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
@@ -640,6 +641,7 @@ var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-f
         low = false
     }
     let tickSpeed = 60000 * 5;
+let sdsa = [];
 
 let miDataold = [];
 onMount(async () => {
@@ -680,7 +682,8 @@ onMount(async () => {
         body: 
         JSON.stringify({query: 
           `{ user (id:${idL})  
-          { mesimabetahaliches  (where:{forappruval: false, finnished: false }){
+          { sps {id name price myp mashaabim {id price open_mashaabims{id price name easy}}} 
+              mesimabetahaliches  (where:{forappruval: false, finnished: false }){
              id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
               project{projectName id user_1s {id}
                             profilePic {url formats }}}
@@ -709,6 +712,10 @@ onMount(async () => {
                         } 
                         } 
                             projects_1s {id 
+                                pmashes (where:{archived: false }){ id hm project {projectName id 
+                                        profilePic {url formats } 
+                                        user_1s { id}
+                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id}  users  {what why id users_permissions_user {id}}} 
                                 open_mashaabims { id name mashaabim { sps {name id}}}  
                                 asks (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
@@ -756,7 +763,9 @@ console.log("nada")
    askedcoin = [];
    mtaha = [];
    meData = [];
-
+    sdsa = [];
+    pmashes = [];
+    huca = [];
    midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
@@ -764,13 +773,124 @@ console.log("nada")
            createpends (miData);
            mesimabetahalicha (miData);
           ishursium(miData);
+          sds(miData);
+          pmash(miData)
+          sps(miData)
       //    createD()
   }
         } catch (e) {
             error1 = e
         }
     } ;
+let pmashes = [];
+let huca = [];
+function sps(pp){
+          console.log("ppkk", huca)
+      for (let i = 0; i < pp.data.user.sps.length; i++){
+                for (let t = 0; t < pp.data.user.sps[i].mashaabim.open_mashaabims.length; t++){
+huca.push(pp.data.user.sps[i].mashaabim.open_mashaabims[t])
+                }
+      }
+      huca = huca
+      console.log("kk", huca)
+}
+ 
+let penm = 0;
+function pmash (data) {
+    //rishonnnn so to create openM first avilable only to rishon then to rest of users..
+    const myid = data.data.user.id;
+    const projects = data.data.user.projects_1s;
+    for (var i = 0; i < projects.length; i++) {
+        for (var j = 0; j < projects[i].pmashes.length; j++) {
+            console.log("gi")
 
+            const pend = projects[i].pmashes[j]
+                    pmashes.push({
+                                  name: pend.name,
+                                  projectId: pend.project.id,
+                                  hearotMeyuchadot: pend.spnot,
+                                  descrip: pend.descrip,
+                                  kindOf: pend.kindOf,
+                                  created_at: pend.created_at,
+                                  projectName: pend.project.projectName,
+                                  user_1s: pend.project.user_1s,
+                                  src: pend.project.profilePic.formats.thumbnail.url,
+                                  users: pend.users,
+                                  myid: myid,
+                                  mshaabId: pend.mashaabim.id, 
+                                  hm: pend.hm,
+                                  price: pend.price,
+                                  easy: pend.easy,
+                                  linkto: pend.linkto,
+                                  sqadualed: pend.sqadualed,
+                                   sqadualedf: pend.sqadualedf,
+                                   pendId: pend.id,
+                              });
+               
+}
+}
+console.log("gi")
+ for (var k = 0; k < pmashes.length; k++) {
+     const x = pmashes[k].users
+     for (var z = 0; z < x.length; z++){
+        pmashes[k].uids = [];
+      pmashes[k].uids.push(x[z].users_permissions_user.id);
+              pmashes[k].what = [];
+
+           pmashes[k].what.push(x[z].what);
+ }
+}    
+
+for (var t = 0; t <pmashes.length; t++){
+    const allid = pmashes[t].uids;
+    const myid = pmashes[t].myid;
+    pmashes[t].already = false;
+ pmashes[t].noofusersOk = 0;
+ pmashes[t].noofusersNo = 0;
+
+    if(allid.includes(myid)){
+      pmashes[t].already = true;
+         
+    }
+        for (var r=0; r< pmashes[t].users.length; r++){
+            if (pmashes[t].users[r].what === true) {
+                
+                 pmashes[t].noofusersOk += 1;
+               
+            }else if (pmashes[t].users[r].what === false) {
+              
+                 pmashes[t].noofusersNo += 1;
+               
+            }
+        }
+    const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].users.length;
+    pmashes[t].noofusersWaiting = noofusersWaiting;
+        
+    }
+    penm = pmashes.length;
+    console.log(pmashes)
+   // bubleUiAngin(pends)
+}
+
+
+function sds (mta) {
+    console.log("sdsa")
+ for (let i = 0; i < mta.data.user.projects_1s.length; i++){
+    if (mta.data.user.projects_1s[i].open_mashaabims.length > 0){
+  for (let j = 0; j < mta.data.user.projects_1s[i].open_mashaabims.length; j++){
+  for (let m = 0; m < mta.data.user.projects_1s[i].open_mashaabims[j].mashaabim.sps.length; m++){
+  const x = mta.data.user.projects_1s[i].open_mashaabims[j].mashaabim.sps;
+                      sdsa.push({
+                 id:  x[m].id,
+                 name: x[m].name
+                      })
+  }
+}
+}
+}
+sdsa = sdsa
+console.log(sdsa, "u")
+}
 let walcomen = [] ;
 
 function makeWalcom (ata) {
@@ -914,6 +1034,39 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 {#each adder as add }
    {@html add}
  {/each}
+  {#each pmashes as pen, i}
+    <div  class="normSml pe" style="display:''"
+><PendingMa
+        on:show={show}
+        on:coinLapach={coinLapach}
+      descrip={pen.descrip}
+      projectName = {pen.projectName}
+      name = {pen.name}
+              hearotMeyuchadot = {pen.hearotMeyuchadot}
+              kindOf = {pen.kindOf} 
+              src = {pen.src}
+               noofusersWaiting={pen.noofusersWaiting}
+                projectId={pen.projectId}
+                uids={pen.uids}
+                what={pen.what}
+                noofusersOk={pen.noofusersOk}
+                created_at={pen.created_at}
+                noofusersNo={pen.noofusersNo}
+                already={pen.already}
+                noofusers={pen.user_1s.length}
+                mshaabId={pen.mshaabId}
+                hm={pen.hm}
+                price={pen.price}
+                easy={pen.easy}
+                sqadualed={pen.sqadualed}
+                sqadualedf={pen.sqadualedf}
+                linkto={pen.linkto}
+                pendId={pen.pendId}
+                users={pen.users}
+                shows={shows}
+                /></div>
+    {/each}
+
     {#each pends as pen, i}
     <div  class="normSml pend" style="display:''"
 ><PendingM
