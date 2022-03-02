@@ -97,8 +97,8 @@ function objToString (obj) {
 
 async function agree() {
   already = true;
-    const date = (sqadualed !== undefined) ? `sdate: "${new Date(sqadualed).toISOString()}",` : ``;
-        const sdate = (sqadualedf !== undefined) ? `sdate: "${new Date(sqadualedf).toISOString()}",` : ``;
+    const date = (sqadualed !== undefined) ? `sqadualed: "${new Date(sqadualed).toISOString()}",` : ``;
+        const sdate = (sqadualedf !== undefined) ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",` : ``;
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -126,10 +126,10 @@ async function agree() {
              spnot: "${hearotMeyuchadot}",
              name: "${name}",
              descrip: "${descrip}",
-             kindOf: "${kindOf}",
-             hm: "${hm}",
-             price: "${price}",
-             easy: "${easy}",
+             kindOf: ${kindOf},
+             hm: ${hm},
+             price: ${price},
+             easy: ${easy},
              linkto: "${linkto}",
              pmash: "${pendId}",
              mashaabim: "${mshaabId}"
