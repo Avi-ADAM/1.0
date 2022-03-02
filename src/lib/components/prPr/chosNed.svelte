@@ -66,8 +66,14 @@ export let selected = [];
 
 function newn(event) {
   addnee = false;
-    dispatch( "add",{
-      x: event.detail.id
+    const skob = event.detail.skob
+  needss.push(skob)
+  selected.push(event.detail.name)
+  needss = needss
+  selected = selected
+    dispatch( "addm",{
+      x: event.detail.id, 
+      skob: event.detail.skob
     })
 	};
 

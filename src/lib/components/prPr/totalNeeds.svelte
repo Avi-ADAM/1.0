@@ -4,6 +4,7 @@
   import { RingLoader
 } from 'svelte-loading-spinners'
 	import { beforeUpdate } from 'svelte';
+  import moment from 'moment'
 
  const dispatch = createEventDispatcher();
   let token; 
@@ -19,6 +20,7 @@ async function upd (){
       
 }
   onMount(async () => {
+                  myMi ()  
    myMissionH()
               myMi ()  
               });
@@ -137,6 +139,9 @@ function myMissionH ()  {
 
 for (var i = 0; i <meData.length; i++) {
   if (meData[i].kindOf === "monthly"){
+    var a = moment(meData[i].datef);
+var b = moment(meData[i].dates);
+meData[i].monts = a.diff(b, 'months', true).toFixed(2); 
     console.log(i,"to to")
     ky = true;
     meData[i].m = true;
@@ -144,50 +149,52 @@ for (var i = 0; i <meData.length; i++) {
          meData[i].kc = false;
                    meData[i].r = false;
     meData[i].y = false;
-
-
+   meData[i].total = meData[i].monts * meData[i].price;
+meData[i].totaltotal = meData[i].monts * meData[i].easy;
   } else if (meData[i].kindOf === "yearly"){
-        console.log(i,"y")
+     var a = moment(meData[i].datef);
+var b = moment(meData[i].dates);
+meData[i].years = a.diff(b, 'years', true).toFixed(2);
     ky = true;
     meData[i].y = true;
         meData[i].m = false;
           meData[i].r = false;
-
      meData[i].ky = true;
               meData[i].kc = false;
-
+   meData[i].total = (meData[i].years * meData[i].price).toFixed(2);
+meData[i].totaltotal = (meData[i].years * meData[i].easy).toFixed(2);
     } else if (meData[i].kindOf === "rent"){
-        console.log(i,"y")
             meData[i].y = false;
     ky = true;
     meData[i].r = true;
      meData[i].ky = true;
              meData[i].m = false;
-
          meData[i].kc = false;
-
+   meData[i].total =  meData[i].price;
+meData[i].totaltotal =  meData[i].easy;
     } else if (meData[i].kindOf === "perUnit"){
     meData[i].y = false;
     meData[i].kc = true;
          meData[i].ky = false;
                  meData[i].m = false;
           meData[i].r = false;
-
     kc = true;
+    meData[i].total = meData[i].hm * meData[i].price;
+meData[i].totaltotal = meData[i].hm * meData[i].easy;
   } else {
         meData[i].y = false;
     meData[i].kc = false;
          meData[i].ky = false;
                  meData[i].m = false;
                      meData[i].r = false;
-
+   meData[i].total =  meData[i].price;
+meData[i].totaltotal =  meData[i].easy;
 
   }
  
 }
  
 };
-
 </script>
 {#if error1 !== null}
 {error1}
@@ -270,7 +277,7 @@ for (var i = 0; i <meData.length; i++) {
       {#each meData as data, i}
       <td >
         <div style="display:{meData[i].kc ? "" : "none"};" dir="rtl" class='textinput'>
-  <input  bind:value={data.hm}
+  <input on:change={() => myMissionH()}  bind:value={data.hm}
  type="number"  class='input' required>
   <label for="name" class='label'>כמות</label>
   <span class='line'></span>
@@ -279,12 +286,12 @@ for (var i = 0; i <meData.length; i++) {
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>
       {#each meData as data, i}
-      <td ><input class="bg-gold hover:bg-mtork border-2 border-barbi rounded" type="datetime-local" style="display:{ meData[i].ky  ? "" : "none"};"  placeholder="הוספת תאריך התחלה" bind:value={data.dates}></td>
+      <td ><input on:change={() => myMissionH()} class="bg-gold hover:bg-mtork border-2 border-barbi rounded" type="datetime-local" style="display:{ meData[i].ky  ? "" : "none"};"  placeholder="הוספת תאריך התחלה" bind:value={data.dates}></td>
       {/each}
     </tr> <tr style="display:{ ky  ? "" : "none"};" >
       <th >תאריך סיום </th>
       {#each meData as data, i}
-      <td ><input class="bg-gold hover:bg-mtork border-2 border-barbi rounded" style="display:{ meData[i].ky  ? "" : "none"};" type="datetime-local" placeholder="הוספת תאריך סיום" bind:value={data.datef}></td>
+      <td ><input on:change={() => myMissionH()} class="bg-gold hover:bg-mtork border-2 border-barbi rounded" style="display:{ meData[i].ky  ? "" : "none"};" type="datetime-local" placeholder="הוספת תאריך סיום" bind:value={data.datef}></td>
       {/each}
     </tr> <tr>
       <th>הערות מיוחדות</th>
@@ -303,9 +310,9 @@ for (var i = 0; i <meData.length; i++) {
       {#each meData as data, i}
       <td>
         <div dir="rtl" class='textinput'>
-  <input         bind:value={data.price}
+  <input  on:change={() => myMissionH()}    bind:value={data.price}
  type="number" class='input' required>
-  <label for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
+  <label for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
       {/each}
@@ -314,11 +321,23 @@ for (var i = 0; i <meData.length; i++) {
       {#each meData as data, i}
       <td>
         <div dir="rtl" class='textinput'>
-  <input         bind:value={data.easy}
+  <input  on:change={() => myMissionH()}  bind:value={data.easy}
  type="number" class='input' required>
-  <label for="name" class='label'>שווי מוצע <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
+  <label for="name" class='label'>שווי מוצע <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
+      {/each}
+    </tr><tr style="display:{kc || ky ? "" : "none"};" >
+      <th>עלות סה"כ</th>
+      {#each meData as data, i}
+      <td  >
+      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.total}</h3>
+      {/each}
+    </tr><tr style="display:{kc || ky ? "" : "none"};">
+      <th>שווי מקסימלי סה"כ</th>
+      {#each meData as data, i}
+      <td   >
+       <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.totaltotal}</h3>
       {/each}
     </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>

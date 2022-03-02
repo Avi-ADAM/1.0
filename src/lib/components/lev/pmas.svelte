@@ -97,8 +97,8 @@ function objToString (obj) {
 
 async function agree() {
   already = true;
-    const date = (sqadualed !== undefined) ? ` sqadualed: ${sqadualed}` : ``;
-        const sdate = (sqadualedf !== undefined) ? ` sqadualed: ${sqadualedf}` : ``;
+    const date = (sqadualed !== undefined) ? `sdate: "${new Date(sqadualed).toISOString()}",` : ``;
+        const sdate = (sqadualedf !== undefined) ? `sdate: "${new Date(sqadualedf).toISOString()}",` : ``;
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
