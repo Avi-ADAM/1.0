@@ -69,6 +69,7 @@ async function han (){
              myp: ${easy},   
              linkto: "${element.linkto}",
              users_permissions_user: "${idL}",
+             mashaabim: "${element.id}", 
              ${sdate} 
              ${fdate}
       }

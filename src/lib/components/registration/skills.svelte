@@ -120,7 +120,7 @@ selected = newSele;
   
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"  aria-label="form">
+  <DialogContent class="content" style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"  aria-label="form">
       <div dir="rtl" >
              
       <Addnewskill rn={skills2.map(c => c.skillName)} addS={true} on:b={close} on:addnewskill={addnew}/>
@@ -173,7 +173,18 @@ selected = newSele;
   padding-top: 0.5rem ; 
    -webkit-text-size-adjust: 100%; 
 }
+ @media (min-width:501px){
+
+  :global([data-svelte-dialog-overlay].content) {
+    z-index: 700;
+                width: 50vw;
+  }
+}
  @media (max-width:500px){
+     :global([data-svelte-dialog-overlay].content) {
+    z-index: 700;
+                width: 80vw;
+  }
 	 .midscreenText-2 {
 		   background-size: 15.25rem 5rem;
   height: 5rem;

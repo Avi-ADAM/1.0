@@ -11,6 +11,7 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import Fiappru from '../../lib/components/lev/fiappru.svelte';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
         import { isEqual } from 'lodash';
+        import Mashsug from '../../lib/components/lev/mashsuggest.svelte'
 
 let ddd;
 let low = true;
@@ -711,12 +712,12 @@ onMount(async () => {
                             tafkidims {id}
                         } 
                         } 
-                            projects_1s {id 
+                            projects_1s { projectName id user_1s {id} profilePic {url formats } 
                                 pmashes (where:{archived: false }){ id hm project {projectName id 
                                         profilePic {url formats } 
                                         user_1s { id}
-                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id}  users  {what why id users_permissions_user {id}}} 
-                                open_mashaabims { id name mashaabim { sps {name id}}}  
+                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id} order}  users  {what why id users_permissions_user {id}}} 
+                                open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
                                 asks (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
                                      open_mission { id mission {id} declined { id} sqadualed publicklinks noofhours perhour privatlinks descrip hearotMeyuchadot name}
@@ -769,7 +770,7 @@ console.log("nada")
    midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
-           createasked (miData); // לא עבד כשלא היו משימות פתוחות
+           createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
            createpends (miData);
            mesimabetahalicha (miData);
           ishursium(miData);
@@ -784,11 +785,12 @@ console.log("nada")
     } ;
 let pmashes = [];
 let huca = [];
+
 function sps(pp){
           console.log("ppkk", huca)
       for (let i = 0; i < pp.data.user.sps.length; i++){
                 for (let t = 0; t < pp.data.user.sps[i].mashaabim.open_mashaabims.length; t++){
-huca.push(pp.data.user.sps[i].mashaabim.open_mashaabims[t])
+  huca.push(pp.data.user.sps[i].mashaabim.open_mashaabims[t])
                 }
       }
       huca = huca
@@ -825,42 +827,45 @@ function pmash (data) {
                                   sqadualed: pend.sqadualed,
                                    sqadualedf: pend.sqadualedf,
                                    pendId: pend.id,
+                                   diun: pend.diun,
                               });
                
-}
-}
-console.log("gi")
- for (var k = 0; k < pmashes.length; k++) {
+    }
+     }
+   console.log("gi")
+   for (var k = 0; k < pmashes.length; k++) {
      const x = pmashes[k].users
+             pmashes[k].uids = [];
      for (var z = 0; z < x.length; z++){
-        pmashes[k].uids = [];
       pmashes[k].uids.push(x[z].users_permissions_user.id);
               pmashes[k].what = [];
-
-           pmashes[k].what.push(x[z].what);
+   pmashes[k].what.push(x[z].what);
  }
-}    
+ }    
 
-for (var t = 0; t <pmashes.length; t++){
+    for (var t = 0; t <pmashes.length; t++){
     const allid = pmashes[t].uids;
     const myid = pmashes[t].myid;
     pmashes[t].already = false;
- pmashes[t].noofusersOk = 0;
- pmashes[t].noofusersNo = 0;
-
+    pmashes[t].noofusersOk = 0;
+    pmashes[t].noofusersNo = 0;
+    pmashes[t].whyno = [];
+    pmashes[t].whyes = [];
+    pmashes[t].mypos = null;
     if(allid.includes(myid)){
       pmashes[t].already = true;
-         
+    for (var l=0; l< pmashes[t].users.length; l++){
+        if (pmashes[t].users[l].users_permissions_user.id === myid)
+      pmashes[t].mypos = pmashes[t].users[l].what;
+              }
     }
         for (var r=0; r< pmashes[t].users.length; r++){
             if (pmashes[t].users[r].what === true) {
-                
-                 pmashes[t].noofusersOk += 1;
-               
+                pmashes[t].noofusersOk += 1;
+                pmashes[t].whyes.push(pmashes[t].users[r].why)
             }else if (pmashes[t].users[r].what === false) {
-              
                  pmashes[t].noofusersNo += 1;
-               
+               pmashes[t].whyno.push(pmashes[t].users[r].why)
             }
         }
     const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].users.length;
@@ -875,24 +880,32 @@ for (var t = 0; t <pmashes.length; t++){
 
 function sds (mta) {
     console.log("sdsa")
- for (let i = 0; i < mta.data.user.projects_1s.length; i++){
+  for (let i = 0; i < mta.data.user.projects_1s.length; i++){
     if (mta.data.user.projects_1s[i].open_mashaabims.length > 0){
   for (let j = 0; j < mta.data.user.projects_1s[i].open_mashaabims.length; j++){
   for (let m = 0; m < mta.data.user.projects_1s[i].open_mashaabims[j].mashaabim.sps.length; m++){
-  const x = mta.data.user.projects_1s[i].open_mashaabims[j].mashaabim.sps;
+      const y = mta.data.user.projects_1s[i].open_mashaabims[j]
+      const z = mta.data.user.projects_1s[i]
+  const x = mta.data.user.projects_1s[i].open_mashaabims[j].mashaabim.sps[m];
                       sdsa.push({
-                 id:  x[m].id,
-                 name: x[m].name
+                projectid: z.id,
+                projectName: z.projectName,
+                srcb: z.profilePic.formats.thumbnail.url,
+                 id:  x.id,
+                 price: x.price,
+                 mashname: x.name,
+                 myp: x.myp,
+                 kindOf: x.kindOf,
+                 spnot: x.spnot,
                       })
   }
-}
-}
-}
-sdsa = sdsa
-console.log(sdsa, "u")
+  }
+ }
+ }
+ sdsa = sdsa
+ console.log(sdsa, "u")
 }
 let walcomen = [] ;
-
 function makeWalcom (ata) {
         const usernames = ata.data.user.username;
     for (var i = 0; i < ata.data.user.welcom_tops.length; i++) {
@@ -901,7 +914,7 @@ function makeWalcom (ata) {
     id: wal.project.id,
     username: usernames,
     projectName: wal.project.projectName,
-})
+  })
     }
     walcomen = walcomen;
     wel = walcomen.length;
@@ -938,8 +951,8 @@ function createpends (data) {
                                    pendId: pend.id,
                               });
                
-}
-}
+ }
+ }
  for (var k = 0; k < pends.length; k++) {
      const x = pends[k].users
      for (var z = 0; z < x.length; z++){
@@ -949,9 +962,9 @@ function createpends (data) {
 
            pends[k].what.push(x[z].what);
  }
-}    
+ }    
 
-for (var t = 0; t <pends.length; t++){
+ for (var t = 0; t <pends.length; t++){
     const allid = pends[t].uids;
     const myid = pends[t].myid;
     pends[t].already = false;
@@ -960,7 +973,7 @@ for (var t = 0; t <pends.length; t++){
 
     if(allid.includes(myid)){
       pends[t].already = true;
-         
+          
     }
         for (var r=0; r< pends[t].users.length; r++){
             if (pends[t].users[r].what === true) {
@@ -980,43 +993,37 @@ for (var t = 0; t <pends.length; t++){
     pen = pends.length;
     bubleUiAngin(pends)
 }
- function less (event) {
-const id = event.detail.id;
-const newdata = meData;
-const y = meData.map(c => c.id);
-const index = y.indexOf(id);
-newdata.splice(index, 1);
-meData = newdata;
-start()
- };  
+function less (event) {
+    const id = event.detail.id;
+    const newdata = meData;
+    const y = meData.map(c => c.id);
+    const index = y.indexOf(id);
+    newdata.splice(index, 1);
+    meData = newdata;
+    start()
+};  
 let shows = true;
 function show(event){
     shows = true;
 }
 
 function coinLapach (event){
-    const data = event.detail.data;
-    const newdata = pends;
-const y = pends.map(c => c.id);
-const index = y.indexOf(data);
-newdata.splice(index, 1);
-pends = newdata;
-pen = pends.length;
-start()
+  start()
 }
+
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
 function showonly (event){
-const value = event.detail.data;
-let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
-for(let i=0;i<hide.length;i++){
-      hide[i].style.display='none'}
-let show = document.getElementsByClassName(value)
-        for(let i=0;i<show.length;i++){
-        show[i].style.display=''}
+  const value = event.detail.data;
+  let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
+  for(let i=0;i<hide.length;i++){
+        hide[i].style.display='none'}
+  let show = document.getElementsByClassName(value)
+          for(let i=0;i<show.length;i++){
+          show[i].style.display=''}
  
 }
 function showall (event){
-var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
+ var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
 
      for(let i=0;i<show.length;i++){
         show[i].style.display=''}
@@ -1034,11 +1041,35 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 {#each adder as add }
    {@html add}
  {/each}
-  {#each pmashes as pen, i}
+ 
+
+{#each mtaha as taha, i}
+   <div class="betaha normSml" style="display:'';"><MissionInProgress
+    noofpu={taha.project.user_1s.length}
+    oldzman={taha.timer}
+    stname={taha.stname}
+    mId={taha.id}
+    missionName={taha.name}
+    projectId={taha.project.id}
+    projectName={taha.project.projectName}
+    missionDetails={taha.descrip}
+    src={taha.project.profilePic.formats.thumbnail.url}
+    link={taha.privatlinks}
+    dueDateOrCountToDedline ={taha.admaticedai}
+    hoursdon ={taha.howmanyhoursalready}
+    hourstotal = {taha.hoursassinged}
+    perhour = {taha.perhour}
+    /></div>
+
+{/each}
+{#each pmashes as pen, i}
     <div  class="normSml pe" style="display:''"
-><PendingMa
+ ><PendingMa
         on:show={show}
         on:coinLapach={coinLapach}
+        mypos={pen.mypos}
+        diun={pen.diun}
+        whyno={pen.whyno}
       descrip={pen.descrip}
       projectName = {pen.projectName}
       name = {pen.name}
@@ -1065,11 +1096,11 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 users={pen.users}
                 shows={shows}
                 /></div>
-    {/each}
+{/each}
 
-    {#each pends as pen, i}
+{#each pends as pen, i}
     <div  class="normSml pend" style="display:''"
-><PendingM
+ ><PendingM
         on:show={show}
         on:coinLapach={coinLapach}
       descrip={pen.descrip}
@@ -1098,10 +1129,10 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 users={pen.users}
                 shows={shows}
                 /></div>
-    {/each}
+{/each}
 
     
-        {#each  fiapp  as da, i}
+{#each  fiapp  as da, i}
         <div  class="fiap normSml" style="display:'';"><Fiappru
             on:acsept={deloi}
             on:decline={deloi}
@@ -1139,41 +1170,18 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 st={da.st}
                 declined={da.decid}
                 /></div>
-    {/each}
+{/each}
 
-    {#each  walcomen  as aba, i} 
+{#each  walcomen  as aba, i} 
    <div  class="normSml welc" style="display:'';"><Welcomt 
     id={aba.id}
        username={aba.username}
        projectName={aba.projectName}
        /></div>
-   {/each}
-<!---->
-
-    {#each meData as data, i}
-    <div  class="sugg normSml" style="display:''"><ProjectSuggestor
-      on:less={less}
-      askedarr={askedarr}
-      {declineddarr}
-      deadLine = {data.sqadualed}
-      oid = {data.id}
-              projectName = {data.project.projectName}
-              role ={data.tafkidims.map(c => c.roleDescription)}
-              skills ={ data.skills.map(c => c.skillName)} 
-              missionDetails = {data.descrip} 
-              notes = {data.hearotMeyuchadot}
-              src = {data.srcb}
-               missionName={data.name}
-                projectId={data.project.id}
-                workways={data.workways}
-                noOfHours={data.noOfHours}
-                perhour={data.perhour}
-                total={data.noofhours * data.perhour}
-                /></div>
-    {/each}
+{/each}
 
 
-        {#each  askedcoin  as da, i}
+{#each  askedcoin  as da, i}
         <div  class="asks normSml" style="display:'';"><Reqtojoin
             on:acsept={delo}
             on:decline={delo}
@@ -1208,28 +1216,49 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 st={da.st}
                 declined={da.decid}
                 /></div>
+{/each}
+
+{#each meData as data, i}
+    <div  class="sugg normSml" style="display:''"><ProjectSuggestor
+      on:less={less}
+      askedarr={askedarr}
+      {declineddarr}
+      deadLine = {data.sqadualed}
+      oid = {data.id}
+              projectName = {data.project.projectName}
+              role ={data.tafkidims.map(c => c.roleDescription)}
+              skills ={ data.skills.map(c => c.skillName)} 
+              missionDetails = {data.descrip} 
+              notes = {data.hearotMeyuchadot}
+              src = {data.srcb}
+               missionName={data.name}
+                projectId={data.project.id}
+                workways={data.workways}
+                noOfHours={data.noOfHours}
+                perhour={data.perhour}
+                total={data.noofhours * data.perhour}
+                /></div>
+{/each}
+{#each sdsa as data, i}
+    <div  class="sugg normSml" style="display:''"><Mashsug
+      on:less={less}
+      askedarr={askedarr}
+      {declineddarr}
+      deadLine = {data.sqadualed}
+      oid = {data.id}
+      price= {data.price}
+      myp={data.myp}
+              projectName = {data.projectName}
+              missionDetails = {data.descrip} 
+              notes = {data.hearotMeyuchadot}
+              src = {data.srcb}
+               mashName={data.mashname}
+                projectId={data.projectid}
+                descrip={data.descrip}
+                spnot={data.spnot}
+                /></div>
     {/each}
 
-
-    {#each mtaha as taha, i}
-   <div class="betaha normSml" style="display:'';"><MissionInProgress
-    noofpu={taha.project.user_1s.length}
-    oldzman={taha.timer}
-    stname={taha.stname}
-    mId={taha.id}
-    missionName={taha.name}
-    projectId={taha.project.id}
-    projectName={taha.project.projectName}
-    missionDetails={taha.descrip}
-    src={taha.project.profilePic.formats.thumbnail.url}
-    link={taha.privatlinks}
-    dueDateOrCountToDedline ={taha.admaticedai}
-    hoursdon ={taha.howmanyhoursalready}
-    hourstotal = {taha.hoursassinged}
-    perhour = {taha.perhour}
-    /></div>
-
-    {/each}
     <!--
         <div  class="normSml desi" style="display:'';"><DecisionMaking  decisionName={"?לפתוח קבוצת ווצאפ"} projectName={"פסיפס"} projectId={6}/></div> 
     <div class="normSml desi"><DecisionMaking decisionName={"?מה לבנות קודם"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"} deadLine={"10.7.2021"}/></div> 

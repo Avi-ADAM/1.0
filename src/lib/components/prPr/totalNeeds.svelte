@@ -62,6 +62,7 @@ pendq = ` users: [
   qwerys = "openMashaabim";
 }
   for (const element of meData) {
+    const spnot = element.spnot !== undefined ? element.spnot : "";
   const hm = (element.hm > 0) ? element.hm : 1;
   const price = (element.price > 0) ? element.price : 0;
   const easy = (element.easy > 0) ? element.easy : 0;
@@ -85,7 +86,7 @@ pendq = ` users: [
         project: "${projectId}",
               kindOf: ${element.kindOf},
              hm: ${hm},
-             spnot: "${element.spnot}",  
+             spnot: "${spnot}",  
              price: ${price},
              easy: ${easy},   
              linkto: "${element.linkto}",
@@ -189,11 +190,8 @@ meData[i].totaltotal = meData[i].hm * meData[i].easy;
                      meData[i].r = false;
    meData[i].total =  meData[i].price;
 meData[i].totaltotal =  meData[i].easy;
-
   }
- 
 }
- 
 };
 </script>
 {#if error1 !== null}

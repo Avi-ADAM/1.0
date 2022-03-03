@@ -258,20 +258,17 @@ let isOpen = false;
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+                 coinLapach()
         } catch (e) {
             error1 = e
             console.log(error1)
-        }
-       
-
-        } else{
+ }
+            } else{
           console.log("decline",why)
             alert("min 20 ")
             already = false;
         }
-           
-
-    }
+              }
      const close = () => {
     isOpen = false;
     no = false; 
@@ -296,13 +293,12 @@ let isOpen = false;
 
 
 
-<div transition:fly={{y: 550, opacity: 0.2, duration: 2000}}
->
+<div transition:fly={{y: 550, opacity: 0.2, duration: 2000}}>
     <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form">
-      <div dir="rtl" >
-              <button on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+  <DialogContent aria-label="form" class="content">
+      <div dir="rtl" class="grid items-center justify-center text-center">
+              <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
