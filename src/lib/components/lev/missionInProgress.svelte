@@ -533,19 +533,16 @@ out:scale={{duration: 2200, opacity: 0.5}}
   ><SwiperSlide
     ><div class="{`normSmll${perhour}-${projectId}`} " id="normSmll"
 >
-  
-    <p class="mn ab">{missionDetails}</p>
-    <a class="mn bc text-gold bg-barbi hover:bg-gold hover:tect-barbi" href={link}>{linkDescription}</a>
-      <span class="mn cd">{formatTime(zman)}</span>
+        <span class="mn ab  ">{formatTime(zman)}</span>
+    <p class="mn bc">{missionDetails}</p>
 
-            <h5 class="mn de">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
+            <h5 class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
+    <a class="mn de text-gold bg-barbi hover:bg-gold hover:text-barbi p-0"  style="color: var(--gold); padding: 0px;" href={link}>{linkDescription}</a>
 
 {#if lapse !== 0 || x !== 0}
 <button class="sm:text-sm text-xs bg-gold p-0.5   rounded-full hover:bg-lturk ga" on:click={handleClearClick}>ניקוי</button>
 <button class="sm:text-sm text-xs  bg-lturk p-0.5  rounded-full hover:bg-gold gb" on:click={save}> הוספה</button>
 {/if}
-<br/>
-    <br />
     {#if already === false}
     <button title=" סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
      {/if} 
