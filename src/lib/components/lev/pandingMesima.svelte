@@ -7,7 +7,6 @@
  import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
  const dispatch = createEventDispatcher();
-	export let shows = true;
     export let descrip = "";
     export let projectName = "";
     export let name = "";
@@ -61,13 +60,8 @@ console.log(ok, nook , nut, name, projectName)
     data: pendId
     } );
 	};
-	function toggleShow() {
-		shows = !shows
-	};
-    function toggleShowf() {
-        dispatch('show')
-		shows = !shows
-	};
+
+    
 function objToString (obj) {
     let str = '';
     for (let i = 0; i < obj.length; i++) {
@@ -288,13 +282,36 @@ let isOpen = false;
     goto("/moach", );
   };
 
+ import { Swiper, SwiperSlide } from "swiper/svelte";
 
+  // Import Swiper styles
+  import "swiper/css";
+
+  import "swiper/css/effect-flip";
+  import "./style.css";
+
+  // import required modules
+  import { EffectFlip, Navigation } from "swiper";
+   let swiperRef = null;
+
+  const setSwiperRef = ({ detail }) => {
+    const [swiper] = detail;
+    // set swiper instance
+    setTimeout(() => {
+      swiperRef = swiper;
+    });
+  };
+
+  
+  const slideTo = (index) => {
+    swiperRef.slideTo(index , 400);
+  };
+ function toggleShow (){
+  slideTo(1)
+ }
 </script>
 
-
-
-<div transition:fly={{y: 550, opacity: 0.2, duration: 2000}}>
-    <DialogOverlay {isOpen} onDismiss={close} >
+ <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
       <div dir="rtl" class="grid items-center justify-center text-center">
@@ -335,11 +352,26 @@ title="ביטול"
   </div>
 </DialogOverlay>
 
-{#if shows}
-<div
-	on:mouseenter={toggleShowf}
-	class="normSml"
-    in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
+<div 
+use:clickOutside on:click_outside={toggleShow} 
+class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
+<Swiper
+  on:swiper={setSwiperRef}
+  effect={"flip"}
+    loop={true}
+  loopFillGroupWithBlank={true}
+  grabCursor={true}
+  modules={[EffectFlip, Navigation]}
+  flipEffect={{ slideShadows: false}}
+  class="mySwiper"
+  navigation={{
+    nextEl: `.normSml${pendId}`,
+    prevEl: `.normSmll${pendId}`,
+  }}
+>
+  <SwiperSlide
+    ><div
+	class="{`normSml${pendId}`}" id="normSml" 
 >
  <a sveltekit:prefetch href={`/project/${projectId}`}>
         <img class="img"
@@ -369,22 +401,19 @@ title="ביטול"
  
         {/if}-->
 </div>
-
-{:else}
-<div class="normSmlHover" 
-on:mouseleave={toggleShow}
-in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
-use:clickOutside on:click_outside={toggleShow}
+</SwiperSlide
+  ><SwiperSlide
+    ><div class="{`normSmll${pendId}`} " id="normSmll"
 >
 	
-        <img on:click={project(projectId)} src={src} class="img" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
-        <a sveltekit:prefetch href={`/project/${projectId}`}
-        ><h3 class="pn">{projectName}</h3></a>
-        <h1 class="pn">{name}</h1>
-       <p class="p" ><span style="color:var(--gold)" title="שווי שעה">{perhour}</span> * <span style="color: aqua" title="כמות שעות">{noofhours}</span> = {noofhours * perhour} </p>
-<p class="p"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
-    <h5 class="pnn">{descrip}</h5>
-    <h6 class="pnn">{hearotMeyuchadot}</h6>
+        <img on:click={project(projectId)} src={src} class="img ab" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
+      
+   {#if descrip}
+ <h5 class="pnn bc">{descrip}</h5>
+      {/if}
+   {#if hearotMeyuchadot}
+     <h6 class="pnn cd">{hearotMeyuchadot}</h6>
+     {/if}
      <!--  <svg height="10" width="180">
   <defs>
     <linearGradient id="solids" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -407,12 +436,63 @@ use:clickOutside on:click_outside={toggleShow}
         {/if}
     
 </div>
-
-{/if}
+</SwiperSlide
+  >
+</Swiper>
 </div>
 
 
 <style>
+    .ab{
+        grid-column: 1/3;
+        grid-row: 1/ 2;
+
+    }
+    .bc{
+        grid-column: 1/3;
+        grid-row: 2/ 3;
+
+    }
+      .cd{
+        grid-column: 1/3;
+        grid-row: 3/ 4;
+
+    }
+      .de{
+        grid-column: 1/3;
+        grid-row: 4/ 5;
+
+    }
+  .a{
+        margin-right: 30px;
+        grid-column: 1/2;
+    }
+    .b{
+        margin-left: 30px;
+        grid-column: 2/3;
+    }
+   #normSmll{
+
+        white-space: normal;
+        text-align: center; 
+        align-items: center;
+        justify-content: safe center;
+        color: var(--barbi-pink);
+      min-height: 75px;
+    min-width: 75px;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 /1;
+         border-radius: 50%;
+         text-shadow: 1px 1px  rgb(63, 56, 18);
+         background: url(https://res.cloudinary.com/love1/image/upload/v1643838503/pink_qfdffz.jpg);
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-size: cover;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto auto auto auto;
+    }
   .pnn{
   color:aqua;
    margin: 2px;
@@ -482,7 +562,7 @@ input[type=text]:invalid {
      padding-left: 10px;
      padding-right: 10px;
 }
-	.normSml{
+	#normSml{
         
         text-align: center; 
         line-height: 0.8;
@@ -494,7 +574,6 @@ input[type=text]:invalid {
     max-width: 137.5px;
     max-height: 137.5px;
     aspect-ratio: 1 /1;
-
          background-color: rgb(100, 224, 137);
          border-radius: 50%;
          text-shadow: 1px 1px  rgb(63, 56, 18);
@@ -506,7 +585,7 @@ input[type=text]:invalid {
 
     }
 	
-    .normSmlHover{
+    #normSmlHover{
          text-shadow: 1px 1px  rgb(63, 56, 18);
         color: var(--barbi-pink);
          min-height: 115px;
@@ -533,6 +612,8 @@ input[type=text]:invalid {
   padding: 2px;
   margin-right: 4px;
   margin-left: 4px;
+          grid-row: 5/ 6;
+
     }
     
 
@@ -568,13 +649,13 @@ input[type=text]:invalid {
      width: 32px;
       height : 32px;
   }
-	.normSml{
+	#normSml{
         min-height: 125px;
         min-width: 125px;
         max-width: 125px;
         max-height: 125px;
   }
-   .normSmlHover{
+   #normSmlHover{
 
         height: 195px;
         width: 195px;

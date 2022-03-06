@@ -76,9 +76,7 @@ console.log(yers,monts)
     data: pendId
     } );
 	};
-	function toggleShow() {
-		shows = !shows
-	};
+
     function toggleShowf() {
         dispatch('show')
 		shows = !shows
@@ -362,12 +360,36 @@ async function afreact (){
         }
 }
 
+ import { Swiper, SwiperSlide } from "swiper/svelte";
+
+  // Import Swiper styles
+  import "swiper/css";
+
+  import "swiper/css/effect-flip";
+  import "./style.css";
+
+  // import required modules
+  import { EffectFlip, Navigation } from "swiper";
+   let swiperRef = null;
+
+  const setSwiperRef = ({ detail }) => {
+    const [swiper] = detail;
+    // set swiper instance
+    setTimeout(() => {
+      swiperRef = swiper;
+    });
+  };
+
+  
+  const slideTo = (index) => {
+    swiperRef.slideTo(index , 400);
+  };
+ function toggleShow (){
+  slideTo(1)
+ }
 </script>
 
 
-
-<div transition:fly={{y: 550, opacity: 0.2, duration: 2000}}
->
     <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">
@@ -425,18 +447,33 @@ title="ביטול"
   </div>
 </DialogOverlay>
 
-{#if shows}
-<div
-	on:mouseenter={toggleShowf}
-	class="normSml"
-    in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
+
+<div 
+use:clickOutside on:click_outside={toggleShow} 
+class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
+<Swiper
+  on:swiper={setSwiperRef}
+  effect={"flip"}
+    loop={true}
+  loopFillGroupWithBlank={true}
+  grabCursor={true}
+  modules={[EffectFlip, Navigation]}
+  flipEffect={{ slideShadows: false}}
+  class="mySwiper"
+  navigation={{
+    nextEl: `.normSml${pendId}-${price}`,
+    prevEl: `.normSmll${pendId}-${price}`,
+  }}
+>
+  <SwiperSlide
+    ><div
+	class="{`normSml${pendId}-${price}`}" id="normSml" 
 >
  <a sveltekit:prefetch href={`/project/${projectId}`}>
         <img class="img"
          src={src}  alt="projectlogo" title={projectName}>
-       <h3 class="na" >{projectName}</h3>
     </a>
-        <h1 class="mn">{name}</h1>
+            <h1 class="pn">{name}</h1>
         {#if kindOf === "perUnit"}
        <p class="p"><span style="color:var(--gold)" title="שווי ליחידה">{easy > 0 ? easy : price}</span> * <span style="color: aqua" title="כמות ">{hm}</span> = {easy > 0 ? easy * hm : price * hm} </p>
    {:else if kindOf === "total" || kindOf === "rent"}
@@ -466,29 +503,15 @@ title="ביטול"
        -->
 </div>
 
-{:else}
-<div class="normSmlHover" 
-on:mouseleave={toggleShow}
-in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
-use:clickOutside on:click_outside={toggleShow}
->
-	
-        <img on:click={project(projectId)} src={src} class="img" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
+</SwiperSlide
+  ><SwiperSlide
+    ><div class="{`normSmll${pendId}-${price}`} " id="normSmll"
+ >
         <a sveltekit:prefetch href={`/project/${projectId}`}
         ><h3 class="pn">{projectName}</h3></a>
-        <h1 class="pn">{name}</h1>
-   {#if kindOf === "perUnit"}
-       <p class="p"><span style="color:var(--gold)" title="שווי ליחידה">{easy > 0 ? easy : price}</span> * <span style="color: aqua" title="כמות ">{hm}</span> = {easy > 0 ? easy : price * hm} </p>
-   {:else if kindOf === "total" || kindOf === "rent"}
-       <p class="p"><span style="color:var(--gold)" title="שווי">{easy > 0 ? easy : price}</span></p>
-          {:else if kindOf === "monthly"}
-       <p class="p"><span style="color:var(--gold)" title="שווי ">{easy > 0 ? easy : price}</span> * <span style="color: aqua" title="כמות חודשים">{monts}</span> = {easy > 0 ? easy * monts : price * monts} </p>
-          {:else if kindOf === "yearly"}
-       <p class="p"><span style="color:var(--gold)" title="שווי">{easy > 0 ? easy : price}</span> * <span style="color: aqua" title="כמות חודשים">{yers}</span> = {easy > 0 ? easy * yers : price * yers} </p>
-{/if}<p class="p"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
     {#if whyno.length > 0}<h4 style="color:var(--barbi)">{whyno.join(' ~ ')}</h4>{/if} 
  {#if descrip !== undefined || null}<h5 class="pnn">{descrip}</h5>{/if}
-    {#if hearotMeyuchadot !== undefined || null}<h6 class="pnn">{hearotMeyuchadot}</h6>{/if}
+    {#if hearotMeyuchadot !== undefined || null || "undefined"}<h6 class="pnn">{hearotMeyuchadot}</h6>{/if}
     
     <!--  <svg height="10" width="180">
   <defs>
@@ -519,12 +542,41 @@ use:clickOutside on:click_outside={toggleShow}
         {/if}
     
 </div>
-
-{/if}
+</SwiperSlide
+  >
+</Swiper>
 </div>
 
 
 <style>
+    .ab{
+        grid-column: 1/3;
+        grid-row: 1/ 2;
+
+    }
+    .bc{
+        grid-column: 1/3;
+        grid-row: 2/ 3;
+
+    }
+      .cd{
+        grid-column: 1/3;
+        grid-row: 3/ 4;
+
+    }
+      .de{
+        grid-column: 1/3;
+        grid-row: 4/ 5;
+
+    }
+  .a{
+        margin-right: 30px;
+        grid-column: 1/2;
+    }
+    .b{
+        margin-left: 30px;
+        grid-column: 2/3;
+    }
   .pnn{
   color:aqua;
    margin: 2px;
@@ -594,8 +646,7 @@ input[type=text]:invalid {
      padding-left: 10px;
      padding-right: 10px;
 }
-	.normSml{
-        
+   #normSmll{
         text-align: center; 
         line-height: 0.8;
         align-items: center;
@@ -618,7 +669,7 @@ input[type=text]:invalid {
 
     }
 	
-    .normSmlHover{
+    #normSml{
          text-shadow: 1px 1px  rgb(63, 56, 18);
         color: var(--barbi-pink);
          min-height: 115px;

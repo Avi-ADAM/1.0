@@ -15,7 +15,7 @@ let show = true;
     export let missionDetails = "do x in y"
     export let src = "coin.png"
     export let link = "https://www.free-mates.com"
-    export let linkDescription = "to website"
+    export let linkDescription = "לביצוע"
     export let projectId;
     export let linkP = "/project/"
     export let hourstotal;
@@ -50,9 +50,7 @@ let miatan;
 })
 
 let zmani;
-	function toggleShow() {
-		shows = !shows
-	}
+
   let msdonf;
   $: msdonf = hoursdon * 3600000;
   export let oldzman;
@@ -402,12 +400,38 @@ ${tofinished}
         }
   }
 }
+ let swiperRef = null;
+
+  const setSwiperRef = ({ detail }) => {
+    const [swiper] = detail;
+    // set swiper instance
+    setTimeout(() => {
+      swiperRef = swiper;
+    });
+  };
+
+  
+  const slideTo = (index) => {
+    swiperRef.slideTo(index , 400);
+  };
+ function toggleShow (){
+  slideTo(1)
+ }
+  import { Swiper, SwiperSlide } from "swiper/svelte";
+
+  // Import Swiper styles
+  import "swiper/css";
+
+  import "swiper/css/effect-flip";
+  import "./style.css";
+
+  // import required modules
+  import { EffectFlip, Navigation } from "swiper";
+ 
 </script>
+
 <!--<svelte:window on:beforeunload={beforeUnload}/>-->
 
-<div in:scale={{duration: 3200, opacity: 1, start: 0.1}}
-out:scale={{duration: 2200, opacity: 0.5}}
->
 
     <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -425,14 +449,30 @@ out:scale={{duration: 2200, opacity: 0.5}}
   </div>
 </DialogOverlay>
 
-{#if shows}
-<div
-	on:mouseenter={toggleShow}
-	
-	class="normSml"
-    in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
-
-	>
+<div 
+use:clickOutside on:click_outside={toggleShow} 
+class="hover:scale-150 duration-1000 ease-in"     in:scale={{duration: 3200, opacity: 1, start: 0.1}}
+out:scale={{duration: 2200, opacity: 0.5}}
+>
+<Swiper
+  on:swiper={setSwiperRef}
+  effect={"flip"}
+  speed={1000}
+    loop={true}
+  loopFillGroupWithBlank={true}
+  grabCursor={true}
+  modules={[EffectFlip, Navigation]}
+  flipEffect={{ slideShadows: false}}
+  class="mySwiper"
+  navigation={{
+    nextEl: `.normSml${perhour}-${projectId}`,
+    prevEl: `.normSmll${perhour}-${projectId}`,
+  }}
+>
+  <SwiperSlide
+    ><div
+	class="{`normSml${perhour}-${projectId}`}" id="normSml" 
+><div>
    
 <svg viewBox="0 0 100 100" class="svgg">
     <g transform="translate(50 50)">
@@ -466,7 +506,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
                 <a sveltekit:prefetch href={`${linkP}${projectId}`}><text y='-12' text-anchor="middle" font-size="8" >{projectName}</text></a>
          <text y='-6' text-anchor="middle"  style=" color: var(--barbi-pink); " font-size="8">{missionName}</text>
 
-                                                     <foreignObject  x='-12' y='-42' width='125px' height='56px'>   
+                                                     <foreignObject  x='-12' y='-42' width='25px' height='56px'>   
     
         <img style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
          
@@ -487,27 +527,22 @@ out:scale={{duration: 2200, opacity: 0.5}}
 -->
     </g>
 </svg>
- 
+   
 </div>
+</SwiperSlide
+  ><SwiperSlide
+    ><div class="{`normSmll${perhour}-${projectId}`} " id="normSmll"
+>
+  
+    <p class="mn ab">{missionDetails}</p>
+    <a class="mn bc text-gold bg-barbi hover:bg-gold hover:tect-barbi" href={link}>{linkDescription}</a>
+      <span class="mn cd">{formatTime(zman)}</span>
 
-{:else}
-<div class="normSmlHover"
-on:mouseleave={toggleShow}
-in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
-use:clickOutside on:click_outside={toggleShow}>	
-    <img on:click={project(projectId)} class="img" src={src} alt="logo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
-    <a sveltekit:prefetch href={`${linkP}${projectId}`}><h3 class="pn">{projectName}</h3></a>
-    <h1 class="mn">{missionName}</h1>
-   {#if dueDateOrCountToDedline !== null} <h5  class="mn">{dueDateOrCountToDedline}</h5>{/if}
-    <p class="mn">{missionDetails}</p>
-    <a class="mn" href={link}>{linkDescription}</a>
-      <span class="mn">{formatTime(zman)}</span>
-
-            <h5 class="mn">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
+            <h5 class="mn de">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
 
 {#if lapse !== 0 || x !== 0}
-<button class="sm:text-sm text-xs bg-gold p-0.5  sm:p-1 rounded-full hover:bg-lturk" on:click={handleClearClick}>ניקוי</button>
-<button class="sm:text-sm text-xs  bg-lturk p-0.5 sm:p-1 rounded-full hover:bg-gold" on:click={save}> הוספה</button>
+<button class="sm:text-sm text-xs bg-gold p-0.5   rounded-full hover:bg-lturk ga" on:click={handleClearClick}>ניקוי</button>
+<button class="sm:text-sm text-xs  bg-lturk p-0.5  rounded-full hover:bg-gold gb" on:click={save}> הוספה</button>
 {/if}
 <br/>
     <br />
@@ -518,19 +553,48 @@ use:clickOutside on:click_outside={toggleShow}>
    {/if}
         <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
-    
-</div>
-
-{/if}
-
+ 
+</SwiperSlide
+  >
+</Swiper>
 </div>
 
 <style>
-     .a{
-        margin-right: 20px;
+  .ab{
+        grid-column: 1/3;
+        grid-row: 1/ 2;
+
+    }
+    .bc{
+        grid-column: 1/3;
+        grid-row: 2/ 3;
+
+    }
+      .cd{
+        grid-column: 1/3;
+        grid-row: 3/ 4;
+
+    }
+      .de{
+        grid-column: 1/3;
+        grid-row: 4/ 5;
+}
+ 
+.ga{
+        grid-column: 1/2;
+        grid-row: 5/ 6;
+}
+.gb{
+        grid-column: 2/3;
+        grid-row: 5/ 6;
+}
+  .a{
+        margin-right: 30px;
+        grid-column: 1/2;
     }
     .b{
-        margin-left: 20px;
+        margin-left: 30px;
+        grid-column: 2/3;
     }
   .mn{
     margin: 1px;
@@ -568,7 +632,7 @@ small {
         font-family: "Roboto Mono", monospace;
         color: hsl(0, 0%, 5%);
     }
-	.normSml{
+	#normSml{
        
         
         text-align: center; 
@@ -588,7 +652,28 @@ small {
     background-repeat: no-repeat; 
     background-size: cover;
     }
-	
+	 #normSmll{
+
+        white-space: normal;
+        text-align: center; 
+        align-items: center;
+        justify-content: safe center;
+        color: var(--barbi-pink);
+      min-height: 75px;
+    min-width: 75px;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 /1;
+         border-radius: 50%;
+         text-shadow: 1px 1px  rgb(63, 56, 18);
+                 background: url(https://res.cloudinary.com/love1/image/upload/v1643838415/diamondlight1_db635m.jpg);
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-size: cover;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto auto auto auto;
+    }
     .normSmlHover{
         min-height: 115px;
     min-width: 115px;
@@ -614,7 +699,7 @@ small {
         opacity: 0.6;
   transition: 0.3s;
   padding: 2px;
- 
+         grid-row: 6/ 7;
     }
     
 
@@ -624,14 +709,9 @@ small {
     }
 
  @media  (min-width: 550px) {
-      .a{
-        margin-right: 55px;
-    }
-    .b{
-        margin-left: 55px;
-    }
+    
      .mn{
-    margin: 7px;
+    margin: 2px;
      font-size: 13px ;
   }
     .pn{

@@ -486,7 +486,7 @@ let linkgra = 'https://strapi-k4vr.onrender.com/graphql';
 </svelte:head>
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form">
+  <DialogContent aria-label="form" class="content">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}>ביטול</button>
@@ -1138,6 +1138,10 @@ class=" hover:scale-150 "
  <!-- המשימות שסיימתי-->         
 
   <style>
+      :global([data-svelte-dialog-overlay].content) {
+    z-index: 700;
+                width: 80vw;
+  }
     .whole{
       position: absolute;
       top: 0;
@@ -1248,6 +1252,10 @@ class=" hover:scale-150 "
   }
   
   @media (max-width: 528px) {
+     :global([data-svelte-dialog-overlay].content) {
+    z-index: 700;
+                width: 80vw;
+  }
     .cont{
       white-space: none;
       line-height: 1;
@@ -1419,6 +1427,10 @@ class=" hover:scale-150 "
 
 }
 @media (min-width: 892px) {
+    :global([data-svelte-dialog-overlay].content) {
+    z-index: 700;
+                width: 50vw;
+  }
   .haalaa {
     position: absolute;
     transform: translate(-50%, -50%);
@@ -1480,12 +1492,14 @@ class=" hover:scale-150 "
            }
 }
 
-     :global([data-svelte-dialog-overlay].overlay) {
+     :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
-
+                width: 80vw;
   }
   :global(data-svelte-dialog-overlay){
         z-index: 700;
+                width: 50vw;
+
   }
 #curve {
   fill: transparent;

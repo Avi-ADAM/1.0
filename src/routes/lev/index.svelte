@@ -42,7 +42,7 @@ let des = 0
 let fia = 0;
 let fiapp = [];
 
-    function mesimabetahalicha (data) {
+function mesimabetahalicha (data) {
     const mtahan = data.data.user.mesimabetahaliches;
         for (var i = 0; i < mtahan.length; i++) {
             mtaha[i] = mtahan[i];
@@ -98,7 +98,7 @@ function ishursium (dati){
  }
  }    
 
- for (var t = 0; t <fiapp.length; t++){
+  for (var t = 0; t <fiapp.length; t++){
     fiapp[t].id = t;
     const allid = fiapp[t].uids;
     const myid = dictasked[t].myid;
@@ -135,50 +135,50 @@ let check;
 let wi = 125
 function createD(){
   //  console.log('Viewport Width x Height:     ',Viewport.Width+'x'+Viewport.Height)
-//     if (Viewport.Width >= 1640){
-//        check = 15
-//    } else if (Viewport.Width >= 1240){
-//        check = 12
-//    } else if (Viewport.Width >= 950){
-//        check = 9
-//    } else {
-//        check = 6
-//    }
-//    if (Viewport.Height >= 840 && Viewport.Height < 1040){
-//     if (Viewport.Width >= 1640){
-//        check = 25
-//    } else if (Viewport.Width >= 1240){
-//        check = 20
-//    } else if (Viewport.Width >= 950){
-//        check = 15
-//    } else {
-//        check = 10
-//    }
-//    } else if (Viewport.Height >= 1040){
-//      if (Viewport.Width >= 1640){
-//        check = 35
-//    } else if (Viewport.Width >= 1240){
-//        check = 28
-//    } else if (Viewport.Width >= 950){
-//        check = 21
-//    } else {
-//        check = 14
-//    }  
-//    }
-//    if (Viewport.Width >= 550){
-//        wi = 75;
-//    }
-check = 4
-   orech = fia +  sug + pen + ask + wel + beta + des;
+  //     if (Viewport.Width >= 1640){
+  //        check = 15
+  //    } else if (Viewport.Width >= 1240){
+  //        check = 12
+  //    } else if (Viewport.Width >= 950){
+  //        check = 9
+  //    } else {
+  //        check = 6
+  //    }
+  //    if (Viewport.Height >= 840 && Viewport.Height < 1040){
+  //     if (Viewport.Width >= 1640){
+  //        check = 25
+  //    } else if (Viewport.Width >= 1240){
+  //        check = 20
+  //    } else if (Viewport.Width >= 950){
+  //        check = 15
+  //    } else {
+  //        check = 10
+  //    }
+  //    } else if (Viewport.Height >= 1040){
+  //      if (Viewport.Width >= 1640){
+  //        check = 35
+  //    } else if (Viewport.Width >= 1240){
+  //        check = 28
+  //    } else if (Viewport.Width >= 950){
+  //        check = 21
+  //    } else {
+  //        check = 14
+  //    }  
+  //    }
+  //    if (Viewport.Width >= 550){
+  //        wi = 75;
+  //    }
+  check = 4
+     orech = fia +  sug + pen + ask + wel + beta + des;
     if (orech < check &&  adder.length === 0){
         for (var i = orech; i < check; i++){
         adder.push(
  `<svg class="svggg" viewBox="0 0 100 100" >
   <circle fill="none" id="d" cx="50" cy="50" r="50"/>
-</svg>`
+ </svg>`
         )
         }
-adder = adder
+ adder = adder
     }
 }
 async function createasked (da) {
@@ -235,9 +235,9 @@ async function createasked (da) {
       dictasked[k].uids.push(x[z].users_permissions_user.id);
            dictasked[k].what.push(x[z].what);
  }
-}    
+ }    
 
-for (var t = 0; t <dictasked.length; t++){
+ for (var t = 0; t <dictasked.length; t++){
     const allid = dictasked[t].uids;
     const myid = dictasked[t].myid;
     dictasked[t].already = false;
@@ -269,8 +269,8 @@ for (var t = 0; t <dictasked.length; t++){
     }}}
     var filters = [false];
 
-var result = dictasked.filter(val=>filters.includes(val.already)); 
-dictasked = result
+ var result = dictasked.filter(val=>filters.includes(val.already)); 
+ dictasked = result
   askedcoin = dictasked;
   ask = askedcoin.length;
 }
@@ -307,20 +307,20 @@ function letters(data){
     return [data, stylef, st];
 }
 function deloi (event ){
-const newasked = fiapp;
-const todel = event.detail.asked
-newasked.splice(todel, 1);
-fiapp = newasked;
-fia = fiapp.length;
-start()
+   const newasked = fiapp;
+   const todel = event.detail.asked
+   newasked.splice(todel, 1);
+   fiapp = newasked;
+   fia = fiapp.length;
+   start()
 }
 
 function delo (event ){
-const newasked = askedcoin;
-const todel = event.detail.asked
-newasked.splice(todel, 1);
-askedcoin = newasked;
-ask = askedcoin.length;
+   const newasked = askedcoin;
+   const todel = event.detail.asked
+   newasked.splice(todel, 1);
+   askedcoin = newasked;
+   ask = askedcoin.length;
 }
 
 const filterArrayd = (arr1, arr2) => {
@@ -346,13 +346,13 @@ async function showOpenPro (mi) {
     const p1 = r1.map(c => c.id);
  declineddarr = p1;
   }
-  const x = mi.data.user.skills;
-const t = mi.data.user.work_ways;
-const y = mi.data.user.tafkidims;
-const mytaf = y.map(c => c.id);
-const mysk = x.map(c => c.id);
+    const x = mi.data.user.skills;
+  const t = mi.data.user.work_ways;
+  const y = mi.data.user.tafkidims;
+  const mytaf = y.map(c => c.id);
+  const mysk = x.map(c => c.id);
 
-for (var i = 0; i < y.length; i++) {
+ for (var i = 0; i < y.length; i++) {
     const q = y[i].open_missions;
     var l = [];
     var z = [];
@@ -478,7 +478,7 @@ for (var i = 0; i < y.length; i++) {
 
     d[i] = [l, z, www, wwn, rate, dictids];
 
-}
+ }
   
 
 
@@ -560,19 +560,19 @@ for (var i = 0; i < y.length; i++) {
  }
    
     
-sk[i] = [l, z, www, wwn, rate]; 
+ sk[i] = [l, z, www, wwn, rate]; 
 
 
     } 
-let asanddec =  askedarr.concat(declineddarr);
-asanddec = [...new Set([...askedarr,...declineddarr])];
+ let asanddec =  askedarr.concat(declineddarr);
+ asanddec = [...new Set([...askedarr,...declineddarr])];
   const filteredw = Object.keys(dictids)
   .filter(key => !asanddec.includes(key))
   .reduce((obj, key) => {
     obj[key] = dictids[key];
     return obj;
   }, {});
-var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-filteredw[b]})
+ var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-filteredw[b]})
  // add declined filter add sort by value
  if (keysSorted.length > 0){
   var resultString = keysSorted.join('&id_in=');
@@ -667,7 +667,7 @@ onMount(async () => {
             goto ("/",)
     }
 })
- async function start () { 
+async function start () { 
   console.log("start");
   miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
@@ -682,8 +682,9 @@ onMount(async () => {
                   },
         body: 
         JSON.stringify({query: 
-          `{ user (id:${idL})  
-          { sps {id name price myp mashaabim {id price open_mashaabims{id price name easy}}} 
+`{ user (id:${idL})  
+          { sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ id price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
+                            profilePic {url formats }}}}} 
               mesimabetahaliches  (where:{forappruval: false, finnished: false }){
              id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
               project{projectName id user_1s {id}
@@ -746,16 +747,16 @@ onMount(async () => {
                                      open_missions(where:{archived: false }) {id declined { id} users  {id} } 
                                     } 
                                  }
-                                 }`
+}`
         })
-})
+  })
   .then(r => r.json())
   .then(data => miData = data);
   if (isEqual(miData,miDataold)) {
-console.log("nada")
-  } else {
+   console.log("nada")
+   } else {
       console.log("tada")
-  console.log (miData)
+   console.log (miData)
    miData = miData
    fiapp = [];
    pends = [];
@@ -782,16 +783,36 @@ console.log("nada")
         } catch (e) {
             error1 = e
         }
-    } ;
+} ;
 let pmashes = [];
 let huca = [];
 
 function sps(pp){
           console.log("ppkk", huca)
       for (let i = 0; i < pp.data.user.sps.length; i++){
+        const y = pp.data.user.sps[i];
+                  console.log("ppkk", huca)
+          if (y.mashaabim.open_mashaabims.length > 0){
+                        console.log("pp", huca)
+
                 for (let t = 0; t < pp.data.user.sps[i].mashaabim.open_mashaabims.length; t++){
-  huca.push(pp.data.user.sps[i].mashaabim.open_mashaabims[t])
-                }
+               const  x = pp.data.user.sps[i].mashaabim.open_mashaabims[t]
+                const z = pp.data.user.sps[i].mashaabim.open_mashaabims[t].project;
+  huca.push({
+                projectid: z.id,
+                projectName: z.projectName,
+                srcb: z.profilePic.formats.thumbnail.url,
+                 id:  x.id,
+                 price: x.price,
+                 mashname: x.name,
+                 myp: y.myp,
+                 easy: x.easy,
+                 kindOf: x.kindOf,
+                 spnot: x.spnot,
+                 descrip: x.descrip,
+                 oid: y.id
+  })
+                }}
       }
       huca = huca
       console.log("kk", huca)
@@ -897,6 +918,8 @@ function sds (mta) {
                  myp: x.myp,
                  kindOf: x.kindOf,
                  spnot: x.spnot,
+                 descrip: x.descrip,
+                 oid: y.id
                       })
   }
   }
@@ -1000,6 +1023,15 @@ function less (event) {
     const index = y.indexOf(id);
     newdata.splice(index, 1);
     meData = newdata;
+    start()
+};  
+function lessi (event) {
+    const id = event.detail.id;
+    const newdata = huca;
+    const y = huca.map(c => c.id);
+    const index = y.indexOf(id);
+    newdata.splice(index, 1);
+    huca = newdata;
     start()
 };  
 let shows = true;
@@ -1239,13 +1271,15 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 total={data.noofhours * data.perhour}
                 /></div>
 {/each}
-{#each sdsa as data, i}
+{#each huca as data, i}
     <div  class="sugg normSml" style="display:''"><Mashsug
-      on:less={less}
+      on:less={lessi}
+      i={i}
       askedarr={askedarr}
       {declineddarr}
       deadLine = {data.sqadualed}
-      oid = {data.id}
+      oid = {data.oid}
+      id = {data.id}
       price= {data.price}
       myp={data.myp}
               projectName = {data.projectName}
@@ -1256,6 +1290,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 projectId={data.projectid}
                 descrip={data.descrip}
                 spnot={data.spnot}
+                easy={data.easy}
                 /></div>
     {/each}
 
