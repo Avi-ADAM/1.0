@@ -405,8 +405,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
   ><SwiperSlide
     ><div class="{`normSmll${pendId}`} " id="normSmll"
 >
-	
-        <img on:click={project(projectId)} src={src} class="img ab" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
+	  <img on:click={project(projectId)} src={src} class="img ab" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
       
    {#if descrip}
  <h5 class="pnn bc">{descrip}</h5>
@@ -443,6 +442,10 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 
 
 <style>
+ .btin{
+    width:13px;
+     height:13px;
+  }
     .ab{
         grid-column: 1/3;
         grid-row: 1/ 2;
@@ -464,11 +467,9 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 
     }
   .a{
-        margin-right: 30px;
         grid-column: 1/2;
     }
     .b{
-        margin-left: 30px;
         grid-column: 2/3;
     }
    #normSmll{
@@ -668,5 +669,9 @@ input[type=text]:invalid {
         :global([data-svelte-dialog-content].content) {
 width:50vw;
         }
+         .btin{
+    width:24px;
+     height:24px;
+  }
   }
 </style>

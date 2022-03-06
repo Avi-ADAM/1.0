@@ -3,6 +3,28 @@
 
 
 .swiper {
+  width: 75px;
+  height: 75px;
+  border-radius: 50%;
+}
+
+.swiper-slide {
+  background-position: center;
+  background-size: cover;
+  width: 75px;
+  height: 75px;
+    border-radius: 50%;
+
+}
+
+.swiper-slide img {
+  display: block;
+  width: 100%;
+      border-radius: 50%;
+
+}
+@media (min-width: 550px) {
+.swiper {
   width: 125px;
   height: 125px;
   border-radius: 50%;
@@ -16,10 +38,4 @@
     border-radius: 50%;
 
 }
-
-.swiper-slide img {
-  display: block;
-  width: 100%;
-      border-radius: 50%;
-
 }

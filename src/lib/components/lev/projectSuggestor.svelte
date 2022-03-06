@@ -255,11 +255,9 @@ class="hover:scale-150 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 
     }
   .a{
-        margin-right: 30px;
         grid-column: 1/2;
     }
     .b{
-        margin-left: 30px;
         grid-column: 2/3;
     }
   .ltb{

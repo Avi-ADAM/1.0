@@ -540,13 +540,13 @@ out:scale={{duration: 2200, opacity: 0.5}}
     <a class="mn de text-gold bg-barbi hover:bg-gold hover:text-barbi p-0"  style="color: var(--gold); padding: 0px;" href={link}>{linkDescription}</a>
 
 {#if lapse !== 0 || x !== 0}
-<button class="sm:text-sm text-xs bg-gold p-0.5   rounded-full hover:bg-lturk ga" on:click={handleClearClick}>ניקוי</button>
-<button class="sm:text-sm text-xs  bg-lturk p-0.5  rounded-full hover:bg-gold gb" on:click={save}> הוספה</button>
+<button  class="md:text-sm  bg-gold sm:p-0.5 p-0 rounded-full hover:bg-lturk ga" on:click={handleClearClick}>ניקוי</button>
+<button class="md:text-sm  bg-lturk sm:p-0.5 p-0 rounded-full hover:bg-gold gb" on:click={save}> הוספה</button>
 {/if}
     {#if already === false}
-    <button title=" סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
+    <button title=" סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
      {/if} 
-     {#if show === true}  <button on:click={running ? azor : start} class="btn b" name="start timer" title= {running ? 'עצירה' : 'התחלה'}><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
+     {#if show === true}  <button on:click={running ? azor : start} class="btn b" name="start timer" title= {running ? 'עצירה' : 'התחלה'}><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
    {/if}
         <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
@@ -557,6 +557,10 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </div>
 
 <style>
+  .btin{
+    width:13px;
+     height:13px;
+  }
   .ab{
         grid-column: 1/3;
         grid-row: 1/ 2;
@@ -580,17 +584,18 @@ out:scale={{duration: 2200, opacity: 0.5}}
 .ga{
         grid-column: 1/2;
         grid-row: 5/ 6;
+        font-size: 9px;
 }
 .gb{
         grid-column: 2/3;
         grid-row: 5/ 6;
+                font-size: 9px;
+
 }
   .a{
-        margin-right: 30px;
         grid-column: 1/2;
     }
     .b{
-        margin-left: 30px;
         grid-column: 2/3;
     }
   .mn{
@@ -617,8 +622,8 @@ out:scale={{duration: 2200, opacity: 0.5}}
   .svgg{
     min-height: 75px;
     min-width: 75px;
-    max-width: 137.5px;
-    max-height: 137.5px;
+    max-width: 100%;
+    max-height: 100%;
     aspect-ratio: 1 /1;
   }
 small {
@@ -639,8 +644,8 @@ small {
         color: var(--barbi-pink);
         min-height: 75px;
     min-width: 75px;
-    max-width: 137.5px;
-    max-height: 137.5px;
+    max-width: 100%;
+    max-height: 100%;
     aspect-ratio: 1 /1;
 
          border-radius: 50%;
@@ -671,6 +676,7 @@ small {
     grid-template-columns: auto auto;
     grid-template-rows: auto auto auto auto auto;
     }
+    /*
     .normSmlHover{
         min-height: 115px;
     min-width: 115px;
@@ -686,7 +692,7 @@ small {
     background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
-    }
+    }*/
     .btn{ 
         
         background-color: rgb(87, 208, 248);
@@ -706,7 +712,18 @@ small {
     }
 
  @media  (min-width: 550px) {
-    
+   .ga{
+             font-size: 17px;
+
+   }
+   .gb{
+             font-size: 17px;
+
+   }
+    .btin{
+    width:24px;
+     height:24px;
+  }
      .mn{
     margin: 2px;
      font-size: 13px ;
