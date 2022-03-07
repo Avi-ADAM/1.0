@@ -492,7 +492,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     background-size: cover;
     display: grid;
     grid-template-columns: auto auto;
-    grid-template-rows: auto auto auto auto auto;
+    grid-auto-rows: auto auto auto auto ;
     }
     input[type=text]{
     -webkit-border-radius: 20px;
