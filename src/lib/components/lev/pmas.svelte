@@ -708,7 +708,9 @@ input[type=text]:invalid {
     padding: 6px;
     }
   
-  
+   :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 100;
+  }
   :global([data-svelte-dialog-content].content) {
       width: 80vw;
   }

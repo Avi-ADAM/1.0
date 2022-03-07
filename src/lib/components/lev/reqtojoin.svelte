@@ -63,9 +63,33 @@ export let users;
 let idL;
 let bearer1; 
 let token;
-function toggleShow() {
-    shows = !shows
-};
+import { Swiper, SwiperSlide } from "swiper/svelte";
+
+  // Import Swiper styles
+  import "swiper/css";
+
+  import "swiper/css/effect-flip";
+  import "./style.css";
+
+  // import required modules
+  import { EffectFlip, Navigation } from "swiper";
+   let swiperRef = null;
+
+  const setSwiperRef = ({ detail }) => {
+    const [swiper] = detail;
+    // set swiper instance
+    setTimeout(() => {
+      swiperRef = swiper;
+    });
+  };
+
+  
+  const slideTo = (index) => {
+    swiperRef.slideTo(index , 400);
+  };
+ function toggleShow (){
+  slideTo(1)
+ }
 let error1;
 let miDatan = [];
 let linkg = 'https://strapi-k4vr.onrender.com/graphql';
@@ -373,30 +397,44 @@ updateOpenMission(
 }
 </script>
 
-<div transition:fly={{y: 250, opacity: 0.9, duration: 2000} }
+<div 
+use:clickOutside on:click_outside={toggleShow} 
+class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+<Swiper
+  on:swiper={setSwiperRef}
+  effect={"flip"}
+    loop={true}
+  loopFillGroupWithBlank={true}
+  grabCursor={true}
+  modules={[EffectFlip, Navigation]}
+  flipEffect={{ slideShadows: false}}
+  class="mySwiper"
+  navigation={{
+    nextEl: `.normSml${askId}-noo`,
+    prevEl: `.normSmll${askId}-noo`,
+  }}
+>
+  <SwiperSlide
+    ><div
+	class="{`normSml${askId}-noo`}" id="normSml" 
+>
+<div
     style="--the:{stylef};"
     >
-    {#if shows === false}
-    <div
-        on:mouseenter={toggleShow}
-
-        class="normSml"
-        in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
-        >
         <svg  version="1.1" viewBox="-106 -106 212 212" xmlns="http://www.w3.org/2000/svg">
             <title>בקשה להצטרפות לרקמה</title>
             <defs>
-                <linearGradient id="lg" x1="1" y1="1" spreadMethod="pad">
+                <linearGradient id="lgg" x1="1" y1="1" spreadMethod="pad">
                     <stop offset="0" style="stop-color: rgb(243, 71, 255);"/>
                         <stop offset="1" style="stop-color: rgb(173, 241, 255);"/>
                             </linearGradient>
-                            <linearGradient id="lgb" x1="1" y1="1">
+                            <linearGradient id="lgbg" x1="1" y1="1">
                                 <stop offset="0" style="stop-color: rgb(185, 185, 255);"/>
                                     <stop offset="1" style="stop-color: rgb(0, 170, 170);"/>
                                         </linearGradient>
                                         </defs>
-                                        <circle r="100" fill="url(#lg)" transform="rotate(135)" stroke="url(#lgb)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
-                                         <circle r="80" fill="url(#lg)" transform="rotate(315)" stroke="none"/>
+                                        <circle r="100" fill="url(#lgg)" transform="rotate(135)" stroke="url(#lgbg)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
+                                         <circle r="80" fill="url(#lgg)" transform="rotate(315)" stroke="none"/>
                                                
                                                          <a sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}>
                                                 <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
@@ -445,33 +483,87 @@ updateOpenMission(
                                                     -->
                                                     </div>
 
-{:else}
-        <div class="normSmlHover"
-            on:mouseleave={toggleShow}
-            in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
-            use:clickOutside on:click_outside={toggleShow}>
-            <img class="timg" src={src2}  alt="projectlogo" title={projectName}>
-            <a sveltekit:prefetch class="flink"  href={`${link}${projectId}`}
-            ><h3 class="hflink">{projectName}</h3></a>
-            <h1 class="na">{openmissionName}</h1>
-            <img class="seimg" src={src}  alt="user apply pic" title={useraplyname}>
-            <a sveltekit:prefetch class="slink" href={`${linkU}${userId}`}
-            ><h3 class="hslink">{useraplyname}</h3></a>
-            <h5 class="hslink">{deadline}</h5>
-            <h6 class="hslink">{missionDetails}</h6>
-            <h5 class="hslink">{role}</h5>
-            <h6 class="hslink">{skills}</h6>
-               <p class="vo"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
+</div>
+</SwiperSlide
+  ><SwiperSlide
+    ><div class="{`normSmll${askId}-noo`}" id="normSmll"
+>
+        {#if deadline}    <h5 class="hslink ab">{deadline}</h5>{/if}
+         {#if missionDetails}   <h6 class="hslink bc">{missionDetails}</h6>{/if}
+            <h5 class="hslink cd">{role}</h5>
+            <h6 class="hslink de">{skills}</h6>
+               <p class="vo ef"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
             {#if already === false}
-            <button on:click={agree}  class = "btn a" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+            <button on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
-            <button on:click={decline}  class = "btn b"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+            <button on:click={decline}  class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
         </div>
-        {/if}
-        </div>
+       
+</SwiperSlide
+  >
+</Swiper>
+</div>
+
 
 <style>
+    .btin{
+    width:13px;
+     height:13px;
+  }
+   .pnn{
+   margin: 2px;
+    font-size: 8px; 
+    font-weight: bold; 
+   line-height: 0.7; 
+  }
+    .ab{
+        grid-column: 1/3;
+        grid-row: 1/ 2;
+
+    }
+    .bc{
+        grid-column: 1/3;
+        grid-row: 2/ 3;
+
+    }
+      .cd{
+        grid-column: 1/3;
+        grid-row: 3/ 4;
+
+    }
+ .ef{
+       grid-column: 1/3;
+        grid-row: 4/ 5;
+
+ }
+  .ga{
+        grid-column: 1/2;
+    }
+    .gb{
+        grid-column: 2/3;
+    }
+   #normSmll{
+    background: url(https://res.cloudinary.com/love1/image/upload/v1643838617/coin_ngsrxn.svg);
+
+        white-space: normal;
+        text-align: center; 
+        align-items: center;
+        justify-content:  center;
+        color: var(--barbi-pink);
+      min-height: 75px;
+    min-width: 75px;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 /1;
+         border-radius: 50%;
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-size: cover;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-auto-rows: auto auto auto auto ;
+    }
     .a{
         margin-right: 20px;
     }
@@ -537,7 +629,7 @@ updateOpenMission(
     font-size: var(--the, 24px);
 }
 
-.normSml {
+#normSml {
 
     text-align: center;
     line-height: 0.5;
@@ -546,8 +638,8 @@ updateOpenMission(
     color: var(--barbi-pink);
     min-height: 75px;
     min-width: 75px;
-    max-width: 137.5px;
-    max-height: 137.5px;
+    max-width: 100%;
+    max-height: 100%;
     aspect-ratio: 1 /1;
     background-color: rgb(100, 224, 137);
     border-radius: 50%;
@@ -559,34 +651,6 @@ updateOpenMission(
 
 }
 
-.normSml:hover {
-    color: var(--barbi-pink);
-    height: 115px;
-    width: 115px;
-    border-radius: 50%;
-    line-height: 0.5;
-    text-align: center;
-    background: url(https://res.cloudinary.com/love1/image/upload/v1643838617/coin_ngsrxn.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
-
-.normSmlHover {
-    color: var(--barbi-pink);
-    min-height: 115px;
-    min-width: 115px;
-    max-width: 325px;
-    max-height: 325px;
-    aspect-ratio: 1/ 1;
-    border-radius: 50%;
-    line-height: 0.5;
-    text-align: center;
-    background: url(https://res.cloudinary.com/love1/image/upload/v1643838617/coin_ngsrxn.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
 
 .btn {
 
@@ -598,6 +662,9 @@ updateOpenMission(
     transition: 0.3s;
     padding: 2px;
     margin-top: -55px;
+      grid-column: 1/3;
+        grid-row: 5/ 6;
+
 }
 
 .btn:hover {
@@ -605,6 +672,10 @@ updateOpenMission(
     padding: 6px;
 }
 @media  (min-width: 550px) {
+      .btin{
+    width:24px;
+     height:24px;
+  }
      .a{
         margin-right: 56px;
     }
@@ -646,17 +717,13 @@ updateOpenMission(
         margin-top: 2px;
          margin-bottom: 2px
     }
-	.normSml{
+	#normSml{
         min-height: 125px;
         min-width: 125px;
-        max-width: 125px;
-        max-height: 125px;
+        max-width: 100%;
+        max-height: 100%;
   }
-   .normSmlHover{
-
-        height: 195px;
-        width: 195px;
-   }
+ 
    .timg{
        height: 32px;
        height: 32px;
