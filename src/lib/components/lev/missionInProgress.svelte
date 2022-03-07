@@ -1,14 +1,14 @@
 <script>
-	import { fly, scale } from 'svelte/transition';
+	  import { fly, scale } from 'svelte/transition';
     import { clickOutside } from './outsidclick.js';
-        import { formatTime } from './utils.js';
-  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+    import { formatTime } from './utils.js';
+    import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
-import { idPr } from '../../stores/idPr.js';
-import { onMount } from 'svelte';
-export let stname;
-let show = true;
-	export let shows = true
+    import { idPr } from '../../stores/idPr.js';
+    import { onMount } from 'svelte';
+    export let stname;
+    let show = true;
+	  export let shows = true
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
     export let missionName = "do x" 
@@ -26,10 +26,10 @@ let show = true;
     export let perhour;
     let x = 0;
     let already = false;
-    function project (id) {
+function project (id) {
     idPr.set(id);
     goto("/moach", );
-  };
+};
 
 let miatan;
   onMount(async () => {
@@ -433,9 +433,9 @@ ${tofinished}
 <!--<svelte:window on:beforeunload={beforeUnload}/>-->
 
 
-    <DialogOverlay {isOpen} onDismiss={close} >
+    <DialogOverlay {isOpen} onDismiss={close} class="overlay">
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form">
+  <DialogContent aria-label="form" class="content">
       <div dir="rtl" >
               <button on:click={close}>ביטול</button>
              
@@ -533,11 +533,11 @@ out:scale={{duration: 2200, opacity: 0.5}}
   ><SwiperSlide
     ><div class="{`normSmll${perhour}-${projectId}`} " id="normSmll"
 >
-        <span class="mn ab  ">{formatTime(zman)}</span>
-    <p class="mn bc">{missionDetails}</p>
+  <span class="mn ab  ">{formatTime(zman)}</span>
+  {#if missionDetails}  <p class="mn bc">{missionDetails}</p>{/if}
 
-            <h5 class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
-    <a class="mn de text-gold bg-barbi hover:bg-gold hover:text-barbi p-0"  style="color: var(--gold); padding: 0px;" href={link}>{linkDescription}</a>
+  <h5 class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
+  <a class="mn de text-gold bg-barbi hover:bg-gold hover:text-barbi p-0"  style="color: var(--gold); padding: 0px;" href={link}>{linkDescription}</a>
 
 {#if lapse !== 0 || x !== 0}
 <button  class="md:text-sm  bg-gold sm:p-0.5 p-0 rounded-full hover:bg-lturk ga" on:click={handleClearClick}>ניקוי</button>
@@ -564,12 +564,13 @@ out:scale={{duration: 2200, opacity: 0.5}}
   .ab{
         grid-column: 1/3;
         grid-row: 1/ 2;
-
+        margin-top: 5px;
+        color: var(--gold);
     }
     .bc{
         grid-column: 1/3;
         grid-row: 2/ 3;
-
+        color: var(--gold);
     }
       .cd{
         grid-column: 1/3;
@@ -599,7 +600,6 @@ out:scale={{duration: 2200, opacity: 0.5}}
         grid-column: 2/3;
     }
   .mn{
-    margin: 1px;
      line-height: 1; 
      font-size: 8px ;
      font-weight: bold; 
@@ -712,6 +712,20 @@ small {
     }
 
  @media  (min-width: 550px) {
+   .a{
+        grid-column: 1/2;
+        margin-left: 5px;
+    }
+    .b{
+        grid-column: 2/3;
+                margin-right: 5px;
+
+    }
+   .ab{
+     
+        margin-top: 13px;
+        color: var(--gold);
+    }
    .ga{
              font-size: 17px;
 
@@ -725,7 +739,6 @@ small {
      height:24px;
   }
      .mn{
-    margin: 2px;
      font-size: 13px ;
   }
     .pn{
@@ -752,5 +765,22 @@ small {
      height:125px;
   }
     }
+            :global([data-svelte-dialog-content].content) {
+      width: 80vw;
+      z-index: 60;
+  }
+    :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 100;
+  }
+  @media (min-width: 568px){
+        :global([data-svelte-dialog-content].content) {
+width:50vw;
+      z-index: 60;
+
+        }
+          :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 100;
+  }
+      }
 </style>
 

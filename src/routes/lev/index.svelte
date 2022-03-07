@@ -83,49 +83,55 @@ function ishursium (dati){
                             noof: start[i].finiapruvals[j].project.user_1s.length,
                             src2: start[i].finiapruvals[j].project.profilePic.formats.thumbnail.url,
                             myid: dati.data.user.id
-                               
+
                               });
             }
   }
-
-  for (var k = 0; k < fiapp.length; k++) {
+    console.log(fiapp)
+ for (var k = 0; k < fiapp.length; k++) {
      const x = fiapp[k].users
-     fiapp[k].uids = [];
-     fiapp[k].what = [];
+             fiapp[k].uids = [];
      for (var z = 0; z < x.length; z++){
       fiapp[k].uids.push(x[z].users_permissions_user.id);
-           fiapp[k].what.push(x[z].what);
+              fiapp[k].what = [];
+   fiapp[k].what.push(x[z].what);
  }
  }    
 
-  for (var t = 0; t <fiapp.length; t++){
-    fiapp[t].id = t;
+    for (var t = 0; t <fiapp.length; t++){
     const allid = fiapp[t].uids;
-    const myid = dictasked[t].myid;
+    const myid = fiapp[t].myid;
     fiapp[t].already = false;
     fiapp[t].noofusersOk = 0;
     fiapp[t].noofusersNo = 0;
-
+    fiapp[t].whyno = [];
+    fiapp[t].whyes = [];
+    fiapp[t].mypos = null;
     if(allid.includes(myid)){
       fiapp[t].already = true;
-     // fiapp.splice(t, 1);
+    for (var l=0; l< fiapp[t].users.length; l++){
+        if (fiapp[t].users[l].users_permissions_user.id === myid)
+      fiapp[t].mypos = fiapp[t].users[l].what;
+              }
     }
+
         for (var r=0; r< fiapp[t].users.length; r++){
             if (fiapp[t].users[r].what === true) {
-                
-                 fiapp[t].noofusersOk += 1;
-               
+                fiapp[t].noofusersOk += 1;
+                fiapp[t].whyes.push(fiapp[t].users[r].why)
             }else if (fiapp[t].users[r].what === false) {
-              
                  fiapp[t].noofusersNo += 1;
-               
+               fiapp[t].whyno.push(fiapp[t].users[r].why)
             }
         }
+
     const noofusersWaiting = fiapp[t].noof - fiapp[t].users.length;
     fiapp[t].noofusersWaiting = noofusersWaiting;
-        
+                        console.log(fiapp,"hguyg")
+
     }
     fiapp = fiapp
+    console.log(fiapp)
     fia = fiapp.length;
 //createD()
 }

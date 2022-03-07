@@ -59,9 +59,33 @@ export let users;
 let idL;
 let bearer1; 
 let token;
-function toggleShow() {
-    shows = !shows
-};
+ import { Swiper, SwiperSlide } from "swiper/svelte";
+
+  // Import Swiper styles
+  import "swiper/css";
+
+  import "swiper/css/effect-flip";
+  import "./style.css";
+
+  // import required modules
+  import { EffectFlip, Navigation } from "swiper";
+   let swiperRef = null;
+
+  const setSwiperRef = ({ detail }) => {
+    const [swiper] = detail;
+    // set swiper instance
+    setTimeout(() => {
+      swiperRef = swiper;
+    });
+  };
+
+  
+  const slideTo = (index) => {
+    swiperRef.slideTo(index , 400);
+  };
+ function toggleShow (){
+  slideTo(1)
+ }
 let error1;
 let miDatan = [];
 let linkg = 'https://strapi-k4vr.onrender.com/graphql';
@@ -314,16 +338,30 @@ title="ביטול"
 </DialogOverlay>
 
 
-<div transition:fly={{y: 250, opacity: 0.9, duration: 2000} }
+<div 
+use:clickOutside on:click_outside={toggleShow} 
+class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+<Swiper
+  on:swiper={setSwiperRef}
+  effect={"flip"}
+    loop={true}
+  loopFillGroupWithBlank={true}
+  grabCursor={true}
+  modules={[EffectFlip, Navigation]}
+  flipEffect={{ slideShadows: false}}
+  class="mySwiper"
+  navigation={{
+    nextEl: `.normSml${mId}-oo`,
+    prevEl: `.normSmll${mId}-oo`,
+  }}
+>
+  <SwiperSlide
+    ><div
+	class="{`normSml${mId}-oo`}" id="normSml" 
+>
+<div
     style="--the:{stylef};"
     >
-    {#if shows === false}
-    <div
-        on:mouseenter={toggleShow}
-
-        class="normSml"
-        in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
-        >
         <svg  version="1.1"  viewBox="-106 -106 212 212" xmlns="http://www.w3.org/2000/svg">
             <title>בקשה לאישור ביצוע משימה בהצלחה</title>
             <defs>
@@ -383,30 +421,77 @@ title="ביטול"
                                                     -->
                                                     </div>
 
-{:else}
-        <div class="normSmlHover"
-            on:mouseleave={toggleShow}
-            in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
-            use:clickOutside on:click_outside={toggleShow}>
-            <img on:click={project(projectId)} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="32" height="32" alt="projectlogo" title={projectName,"לחיצה למעבר ללוח הבקרה של ריקמה" }>
-            <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName, "לחיצה למעבר לדף הציבורי של ריקמה "}</h3></a>
-            <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: var(--barbi-pink); line-height: 0.7; ">{missionBName}</h1>
-            <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="32" height="32" alt="user aplly pic" title={useraplyname}>
-            <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{useraplyname}</h3></a>
-            <h5 style=" margin: 2px; font-size: 13px; font-weight: bold; line-height: 1;">{why}</h5>
-            <h6 style="margin: 2px; font-size: 13px; font-weight: bold; line-height: 1;">{missionDetails}</h6>
+</div>
+</SwiperSlide
+  ><SwiperSlide
+    ><div class="{`normSmll${mId}-oo`} " id="normSmll"
+>
+            <p class="ab" style="margin: 7px;"><span style="color:green" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
+            <h5 class="bc" style=" margin: 2px; font-size: 13px; font-weight: bold; line-height: 1;">{why}</h5>
+            <h6 class="cd"  style="margin: 2px; font-size: 13px; font-weight: bold; line-height: 1;">{missionDetails}</h6>
          
-            <p style="margin: 7px;"><span style="color:green" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
             {#if !already}
-            <button1 on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button1>
-            <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>
-            <button2 on:click={open} style="margin: 0;" class = "btn"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button2>
+            <button on:click={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+        <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>--> 
+            <button on:click={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
         </div>
-        {/if}
-        </div>
+          
+</SwiperSlide
+  >
+</Swiper>
+</div>
+
 
 <style>
+    .btin{
+    width:13px;
+     height:13px;
+  }
+    .ab{
+        grid-column: 1/3;
+        grid-row: 1/ 2;
+
+    }
+    .bc{
+        grid-column: 1/3;
+        grid-row: 2/ 3;
+
+    }
+      .cd{
+        grid-column: 1/3;
+        grid-row: 3/ 4;
+
+    }
+ 
+  .ga{
+        grid-column: 1/2;
+    }
+    .gb{
+        grid-column: 2/3;
+    }
+   #normSmll{
+
+        white-space: normal;
+        text-align: center; 
+        align-items: center;
+        justify-content: safe center;
+        color: var(--barbi-pink);
+      min-height: 75px;
+    min-width: 75px;
+    max-width: 100%;
+    max-height: 100%;
+    aspect-ratio: 1 /1;
+         border-radius: 50%;
+         text-shadow: 1px 1px  rgb(63, 56, 18);
+    background: url(https://res.cloudinary.com/love1/image/upload/v1643838283/newcoin_mxgoxa.svg);
+    background-position: center; 
+    background-repeat: no-repeat; 
+    background-size: cover;
+    display: grid;
+    grid-template-columns: auto auto;
+    grid-template-rows: auto auto auto auto auto;
+    }
     input[type=text]{
     -webkit-border-radius: 20px;
     -moz-border-radius: 20px;
@@ -465,7 +550,7 @@ input[type=text]:invalid {
     font-size: var(--the, 24px);
 }
 
-.normSml {
+#normSml {
 
     text-align: center;
     line-height: 0.5;
@@ -474,8 +559,8 @@ input[type=text]:invalid {
     color: var(--barbi-pink);
     min-height: 75px;
     min-width: 75px;
-    max-width: 137.5px;
-    max-height: 137.5px;
+    max-width: 100%;
+    max-height: 100%;
     aspect-ratio: 1 /1;
 
     background-color: rgb(100, 224, 137);
@@ -488,31 +573,8 @@ input[type=text]:invalid {
 
 }
 
-.normSml:hover {
-    color: var(--barbi-pink);
-    height: 195px;
-    width: 195px;
-    border-radius: 50%;
-    line-height: 0.5;
-    text-align: center;
-    background: url(https://res.cloudinary.com/love1/image/upload/v1643838283/newcoin_mxgoxa.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
 
-.normSmlHover {
-    color: var(--barbi-pink);
-    height: 195px;
-    width: 195px;
-    border-radius: 50%;
-    line-height: 0.5;
-    text-align: center;
-    background: url(https://res.cloudinary.com/love1/image/upload/v1643838283/newcoin_mxgoxa.svg);
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: cover;
-}
+
 
 .btn {
 
@@ -525,139 +587,20 @@ input[type=text]:invalid {
     padding: 2px;
     margin-right: 4px;
     margin-left: 4px;
+            grid-row: 4/ 5;
+
 }
 
 .btn:hover {
     opacity: 1;
     padding: 6px;
 }
-
-@media only screen and (min-device-width: 375px) and (max-device-width: 812px) and (-webkit-min-device-pixel-ratio: 3) and (orientation: portrait) {
-    .normSml {
-        text-align: center;
-        line-height: 0.5;
-        align-items: center;
-        justify-content: safe center;
-        color: var(--barbi-pink);
-        min-height: 125px;
-        min-width: 125px;
-        max-width: 125px;
-        background-color: rgb(100, 224, 137);
-        border-radius: 50%;
-        background: url(newcoin.svg);
-        background-position: center;
-        background-repeat: no-repeat;
-    background-size: 125px 125px;
-
-    }
-
-    .normSml:hover {
-        color: var(--barbi-pink);
-        height: 195px;
-        width: 195px;
-        border-radius: 50%;
-        line-height: 0.5;
-        text-align: center;
-        background: url(newcoin.svg);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-
-    .normSmlHover {
-        color: var(--barbi-pink);
-        height: 195px;
-        width: 195px;
-        border-radius: 50%;
-        line-height: 0.5;
-        text-align: center;
-        background: url(coin.svg);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-
-    .btn {
-
-        background-color: rgb(87, 208, 248);
-        border-radius: 50%;
-        color: var(--barbi-pink);
-        text-align: center;
-        opacity: 0.6;
-        transition: 0.3s;
-        padding: 2px;
-        margin-right: 4px;
-        margin-left: 4px;
-    }
-
-    .btn:hover {
-        opacity: 1;
-        padding: 6px;
-    }
-
-}
-@media  (min-width: 375px) {
-    .normSml {
-        text-align: center;
-        line-height: 0.5;
-        align-items: center;
-        justify-content: safe center;
-        color: var(--barbi-pink);
-        min-height: 125px;
-        min-width: 125px;
-        max-width: 125px;
-        background-color: rgb(100, 224, 137);
-        border-radius: 50%;
-        background: url(newcoin.svg);
-        background-position: center;
-        background-repeat: no-repeat;
-    background-size: 125px 125px;
-
-    }
-
-    .normSml:hover {
-        color: var(--barbi-pink);
-        height: 195px;
-        width: 195px;
-        border-radius: 50%;
-        line-height: 0.5;
-        text-align: center;
-        background: url(newcoin.svg);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-
-    .normSmlHover {
-        color: var(--barbi-pink);
-        height: 195px;
-        width: 195px;
-        border-radius: 50%;
-        line-height: 0.5;
-        text-align: center;
-        background: url(coin.svg);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-
-    .btn {
-
-        background-color: rgb(87, 208, 248);
-        border-radius: 50%;
-        color: var(--barbi-pink);
-        text-align: center;
-        opacity: 0.6;
-        transition: 0.3s;
-        padding: 2px;
-        margin-right: 4px;
-        margin-left: 4px;
-    }
-
-    .btn:hover {
-        opacity: 1;
-        padding: 6px;
-    }
-
+@media (min-width: 550px){
+       #normSmll{
+           min-width: 125px;
+           min-height: 125px;
+              max-width: 100%;
+        max-height: 100%;
+       }
 }
 </style>

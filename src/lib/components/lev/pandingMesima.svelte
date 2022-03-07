@@ -311,7 +311,7 @@ let isOpen = false;
  }
 </script>
 
- <DialogOverlay {isOpen} onDismiss={close} >
+ <DialogOverlay {isOpen} onDismiss={close} class="overlay" >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
       <div dir="rtl" class="grid items-center justify-center text-center">
@@ -586,22 +586,6 @@ input[type=text]:invalid {
 
     }
 	
-    #normSmlHover{
-         text-shadow: 1px 1px  rgb(63, 56, 18);
-        color: var(--barbi-pink);
-         min-height: 115px;
-    min-width: 115px;
-    max-width: 325px;
-    max-height: 325px;
-    aspect-ratio: 1/ 1;
-        border-radius: 50%;
-        line-height: 0.8;
-        text-align: center;
-        background: url(https://res.cloudinary.com/love1/image/upload/v1643838503/pink_qfdffz.jpg);
-    background-position: center; 
-    background-repeat: no-repeat; 
-    background-size: cover;
-    }
     .btn{ 
         
         background-color: rgb(87, 208, 248);
@@ -653,22 +637,27 @@ input[type=text]:invalid {
 	#normSml{
         min-height: 125px;
         min-width: 125px;
-        max-width: 125px;
-        max-height: 125px;
+        max-width: 100%;
+        max-height: 100%;
   }
-   #normSmlHover{
-
-        height: 195px;
-        width: 195px;
-   }
+  
     }
      :global([data-svelte-dialog-content].content) {
       width: 80vw;
+      z-index: 60;
+  }
+    :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 100;
   }
   @media (min-width: 568px){
         :global([data-svelte-dialog-content].content) {
 width:50vw;
+      z-index: 60;
+
         }
+          :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 100;
+  }
          .btin{
     width:24px;
      height:24px;
