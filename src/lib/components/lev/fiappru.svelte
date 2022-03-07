@@ -28,8 +28,8 @@ export let useraplyname = "do x like y in z";
 export let src = "coin.png";
 export let src2 = " ";
 export let projectId;
-export let link = "https://strapi-k4vr.onrender.com/project/";
-export let linkU = "https://strapi-k4vr.onrender.com/user/";
+export let link = "/project/";
+export let linkU = "/user/";
 export let userId;
 export let missionDetails = "";
 export let name;
@@ -390,7 +390,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                         </foreignObject>     
                                <text fill="#FF0092" text-anchor="middle" x='0' y='46' style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;">{useraplyname}</text>
                            </a>   
-                   <path fill-opacity="0.01"  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
+                   <path id="curve" fill-opacity="0.01"  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                        <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
                            <textPath color="#FF0092" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
                                {missionBName}
@@ -403,9 +403,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                        
                    </foreignObject>
                    </a>  
-            <!--     <g  x='-90' y='0' width="29" height="29">
-<path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"></path>
-                                                  </g> -->   
+               
                                                 </svg>
                                                     <!--  <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="32" height="32" alt="projectlogo" title={projectName}>
         <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName}</h3></a>
@@ -424,19 +422,18 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
 </div>
 </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${mId}-oo`} " id="normSmll"
+    ><div class="{`normSmll${mId}-oo`}" id="normSmll"
 >
-            <p class="ab" style="margin: 7px;"><span style="color:green" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
-            <h5 class="bc" style=" margin: 2px; font-size: 13px; font-weight: bold; line-height: 1;">{why}</h5>
-            <h6 class="cd"  style="margin: 2px; font-size: 13px; font-weight: bold; line-height: 1;">{missionDetails}</h6>
+            <p class="ab pnn" ><span style="color:green" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
+            <h5 class="bc pnn" >{why}</h5>
+          {#if missionDetails}  <h6 class="cd pnn" >{missionDetails}</h6>{/if}
          
             {#if !already}
             <button on:click={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
         <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>--> 
             <button on:click={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
-        </div>
-          
+          </div>
 </SwiperSlide
   >
 </Swiper>
@@ -447,6 +444,12 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     .btin{
     width:13px;
      height:13px;
+  }
+   .pnn{
+   margin: 2px;
+    font-size: 8px; 
+    font-weight: bold; 
+   line-height: 0.7; 
   }
     .ab{
         grid-column: 1/3;
@@ -475,7 +478,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
         white-space: normal;
         text-align: center; 
         align-items: center;
-        justify-content: safe center;
+        justify-content:  center;
         color: var(--barbi-pink);
       min-height: 75px;
     min-width: 75px;
@@ -483,7 +486,6 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     max-height: 100%;
     aspect-ratio: 1 /1;
          border-radius: 50%;
-         text-shadow: 1px 1px  rgb(63, 56, 18);
     background: url(https://res.cloudinary.com/love1/image/upload/v1643838283/newcoin_mxgoxa.svg);
     background-position: center; 
     background-repeat: no-repeat; 
@@ -555,7 +557,7 @@ input[type=text]:invalid {
     text-align: center;
     line-height: 0.5;
     align-items: center;
-    justify-content: safe center;
+    justify-content:  center;
     color: var(--barbi-pink);
     min-height: 75px;
     min-width: 75px;
@@ -569,12 +571,8 @@ input[type=text]:invalid {
     background: url(https://res.cloudinary.com/love1/image/upload/v1643838283/newcoin_mxgoxa.svg);
     background-position: center;
     background-repeat: no-repeat;
-    background-size: 125px 125px;
 
 }
-
-
-
 
 .btn {
 
@@ -596,6 +594,11 @@ input[type=text]:invalid {
     padding: 6px;
 }
 @media (min-width: 550px){
+          .pnn{
+   margin: 3px;
+    font-size: 10px; 
+    
+  }
        #normSmll{
            min-width: 125px;
            min-height: 125px;
