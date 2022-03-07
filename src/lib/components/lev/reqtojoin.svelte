@@ -452,9 +452,9 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
 
                                                 
                                                 
-                                                <path id="curve" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
+                                                <path id="curvee" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                                                     <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
-                                                        <textPath color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
+                                                        <textPath color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
                                                             {openmissionName}
                                                         </textPath>
                                                     </text>
@@ -619,7 +619,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
        width: 22px;
        height: 22px;
 }
-    #curve {
+    #curvee {
     fill: transparent;
 }
 
