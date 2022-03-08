@@ -532,16 +532,25 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
         grid-row: 3/ 4;
 
     }
- .ef{
+ .de{
        grid-column: 1/3;
         grid-row: 4/ 5;
 
  }
+  .ef{
+       grid-column: 1/3;
+        grid-row: 5/ 6;
+
+ }
   .ga{
         grid-column: 1/2;
+                margin-right: 20px;
+
     }
     .gb{
         grid-column: 2/3;
+                margin-left: 20px;
+
     }
    #normSmll{
     background: url(https://res.cloudinary.com/love1/image/upload/v1643838617/coin_ngsrxn.svg);
@@ -661,9 +670,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     opacity: 0.6;
     transition: 0.3s;
     padding: 2px;
-    margin-top: -55px;
-      grid-column: 1/3;
-        grid-row: 5/ 6;
+        grid-row: 6/ 7;
 
 }
 
@@ -676,11 +683,11 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     width:24px;
      height:24px;
   }
-     .a{
-        margin-right: 56px;
+     .ga{
+        margin-right: 26px;
     }
-    .b{
-        margin-left: 56px;
+    .gb{
+        margin-left: 26px;
     }
      .vo{
    margin: 7px;
