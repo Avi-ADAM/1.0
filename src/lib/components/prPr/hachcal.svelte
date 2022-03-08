@@ -94,160 +94,58 @@ function pre (){
     ulist = ulist
 
 }
+let revach = 0;
+let x = [];
+$: for (let i = 0; i <ulist.length; i++) {
+x[i] = (ulist[i].p / 100) * revach
+}
+</script>
 
-    </script>
-    {#if hagdel === false}
-    <div style =" margin: 0 auto;" class="flex items-center justify-center">
-    <svg width="250px" height="250px" style="display: inline;" viewBox="0 0 64 64" class="pie">
-        {#each ulist as use, i}
-        <defs>
-  <pattern id={use.imid} patternUnits="userSpaceOnUse" width="100" height="100">
-    <image href={use.src} x="0" y="0" width="100" height="100" />
-  </pattern>
-</defs>
-  <circle  r="25%" cx="50%" cy="50%" stroke-dasharray={use.s, 100} stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
-  <title>{use.un}, {use.p.toFixed(2)}%</title></circle>
-  {/each}
-</svg>
-</div>
-    {:else}
+<h1>יש להזין את סכום הרווח שנצבר והמחשבון יציג כמה מגיע לכל 1</h1>
+
+<input type="number" bind:value={revach} />
 <div class="dd md:items-center">
   <div class="body items-center">
   
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >פעולות בתהליך ביצוע</h1>
+      >טבלת חישוב ראשונית</h1>
     </caption>
         <tr class="gg">
           <th class="gg">אפשרויות</th>
-          {#each fmiData as data, i}
+          {#each ulist as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
         </td>
           {/each}
     </tr> <tr class="ggr">
       <th class="ggr">שם</th>
-      {#each fmiData as data, i}
-            <td class="ggr">{data.name}</td>
+      {#each ulist as data, i}
+            <td class="ggr">{data.username}</td>
             {/each}
           </tr> <tr>
-            <th>תיאור</th>
-            {#each fmiData as data, i}
-            <td>{data.descrip}</td>
-              {/each}
-            </tr>
-         <tr>
-              <th>תאריך ביצוע</th>
-              {#each fmiData as data, i}
-            <td>              {#if data.Sqadualed}
-              {data.Sqadualed}
-            {/if}
-            </td>
-            {/each}
-          </tr> <tr>
-            <th>קישורים ציבוריים</th>
-            {#each fmiData as data, i}
-            <td>
-              {#if data.publicklinks}
-              {data.publicklinks}
-              {/if}
-             </td>
-             {/each}
-        </tr><tr>
-          <th>הערות יחודיות לריקמה שלי</th>
+          <th> החלק מהרווח</th>
           {#each fmiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot}
-            {data.hearotMeyuchadot}
-            {/if}
+            {#if  revach > 0}
+ {x[i]}
+ {:else}  
+ 0      
+     {/if}
            </td>
            {/each}
-      </tr><tr>
-        <th>קישורים יחודיים לריקמה שלי</th>
-        {#each fmiData as data, i}
-        <td>          {#if data.privatlinks} 
-
-          {data.privatlinks} 
-          {/if}
-         </td>
-         {/each}
-    </tr><tr style="display:''" id="hoursD">
-          <th >כמה שעות זה אמור לקחת? </th>
-          {#each fmiData as data, i}
-          <td>
-            {#if data.hoursassinged > 0}
-
-           {data.hoursassinged}
-           {/if}
-          </td>
-          {/each}
-        </tr><tr style="display:''" id="vallueperhourN" >
-          <th>כמה שווה שעה ?</th>
-          {#each fmiData as data, i}
-          <td>
-            {#if data.perhour > 0}
-
-            {data.perhour}
-            {/if}
-          </td>
-          {/each}
-        </tr><tr >
-      <th>שווי סך הכל למשימה </th>
-      {#each fmiData as data, i}
-      <td>
-      {#if data.perhour > 0 & data.hoursassinged > 0}
-      
-      {data.perhour * data.hoursassinged}
-      
-      {:else} <p>0</p>
-      {/if}
-      </td>
-      {/each}
-    </tr>
-    <tr class="ggd">
-          <th class="ggd">אפשרויות</th>
-          {#each fmiData as data, i}
-          <td class="ggd" style="font-size: 3rem">
-           
-          <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded-full"
-          title="עריכה"
-          on:click={edit(data.id)} 
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-           <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
-          </svg>
-          </button> 
-         
-        </td>
-          {/each}
-    </tr> 
+      </tr><tr >
+      <th >אחוז בפרויקט</th>
+      {#each ulist as data, i}
+            <td >{data.p}</td>
+            {/each}
+          </tr> 
     </table>
   </div>
   </div>
-{/if}
-  
-   
-  <style>
-.pie {
-  width: 250px;
-  background: #f06;
-  border-radius: 50%;
-}
-
-.pie circle {
-  fill: none;
-  stroke-width: 32;
-  animation: rotate 4.5s ease-in;
-}
-
-@keyframes rotate {
-  to {
-    x : 0;
-  } 
-}
-
-   .gg{ 
+<style>
+     .gg{ 
      position: sticky;
      top: 1px; 
      background-color: var(--naim) !important;

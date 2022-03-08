@@ -20,6 +20,7 @@
     import PendsM from '../../lib/components/prPr/pendsM.svelte';
         import Betaha from '../../lib/components/prPr/betaha.svelte';
        import Fini from '../../lib/components/prPr/fini.svelte';
+       import Hach from '../../lib/components/prPr/hachcal.svelte';
 
 //import { validate_component } from 'svelte/internal';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -101,6 +102,7 @@ let user = [];
 onMount(async () => {
 start ()
 })
+let users;
 async function start () {
   if ($idPr !== 0){
   // ולידציה שהיוזר חבר ברקמה
@@ -975,6 +977,8 @@ totalneed = false;
   totalneed = false; 
 }
 }
+let hal = false;
+let pir = false;
     </script>
     <svelte:head>
   <title>מוח הריקמה 1❤️1</title>
@@ -1458,6 +1462,15 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                      on:close={clo}
                                      on:remove={wdwd}
     />{/if}</div>
+{#if fmiData.length > 0}
+    <Fini fmiData={fmiData} users={projectUsers}/>
+    <button on:click={() => hal = true} class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
+    חישוב רווח בגירסה ראשונית
+  </button>
+      {#if hal === true}
+    <Hach fmiData={fmiData} users={projectUsers}/>
+      {/if}
+    {/if}
    </div> 
 
   <!--  {:else}
