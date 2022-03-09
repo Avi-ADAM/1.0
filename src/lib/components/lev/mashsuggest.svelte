@@ -137,7 +137,7 @@ const cookieValue = document.cookie
           `mutation { updateUser(
     input: {
       where: { id: "${uId}" }
-      data: {declined: [${ds}] }
+      data: {declinedm: [${ds}] }
     }
   ){
       user {

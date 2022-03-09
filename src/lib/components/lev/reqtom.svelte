@@ -48,7 +48,16 @@ let lang;
 export let stylef = '24px';
 export let askId;
 export let users;
-   
+    //
+    //axios
+    // .post('https://translation.googleapis.com/language/translate/v2/detect?key=AIzaSyBd6vOhf0c3AH4yw2FXbHWfIbjJD0BX0pg', {
+    //  "q": `"${openmissionName}"` 
+    //             })
+    //   .then(response => {
+    // console.log('הצליח', response.data);
+    //  resP = response.data; 
+    //lang = resP.data.detections[0][0].language;
+    // console.log(lang)
     
 
 let idL;
@@ -415,17 +424,17 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
         <svg  version="1.1" viewBox="-106 -106 212 212" xmlns="http://www.w3.org/2000/svg">
             <title>בקשה להצטרפות לרקמה</title>
             <defs>
-                <linearGradient id="lgg" x1="1" y1="1" spreadMethod="pad">
-                    <stop offset="0" style="stop-color: rgb(243, 71, 255);"/>
-                        <stop offset="1" style="stop-color: rgb(173, 241, 255);"/>
+                <linearGradient id="lggm" x1="1" y1="1" spreadMethod="pad">
+                   <stop offset="0" style="stop-color: rgb(100, 71, 105);"/>
+                        <stop offset="1" style="stop-color: rgb(54, 241, 155);"/>
                             </linearGradient>
-                            <linearGradient id="lgbg" x1="1" y1="1">
-                                <stop offset="0" style="stop-color: rgb(185, 185, 255);"/>
-                                    <stop offset="1" style="stop-color: rgb(0, 170, 170);"/>
+                            <linearGradient id="lgbgm" x1="1" y1="1">
+                                <stop offset="0" style="stop-color: rgb(125, 105, 155);"/>
+                                    <stop offset="1" style="stop-color: rgb(0, 100, 120);"/>
                                         </linearGradient>
                                         </defs>
-                                        <circle r="100" fill="url(#lgg)" transform="rotate(135)" stroke="url(#lgbg)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
-                                         <circle r="80" fill="url(#lgg)" transform="rotate(315)" stroke="none"/>
+                                        <circle r="100" fill="url(#lggm)" transform="rotate(135)" stroke="url(#lgbgm)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
+                                         <circle r="80" fill="url(#lggm)" transform="rotate(315)" stroke="none"/>
                                                
                                                          <a sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}>
                                                 <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >

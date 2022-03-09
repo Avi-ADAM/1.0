@@ -49,7 +49,7 @@ function add (event){
 </div>
 {:else if show_value == 1}
 <div class="midscreen"
- in:scale="{{duration: 1300, delay: 2200, opacity: 0.5, start: 0.5, easing: quintOut}}"
+ in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"
  out:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
 <Vallues on:progres={add}/>
 </div>

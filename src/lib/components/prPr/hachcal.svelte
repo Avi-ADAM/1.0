@@ -113,7 +113,7 @@ x[i] = (ulist[i].p / 100) * revach
       >טבלת חישוב ראשונית</h1>
     </caption>
         <tr class="gg">
-          <th class="gg">אפשרויות</th>
+          <th class="gg"></th>
           {#each ulist as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}

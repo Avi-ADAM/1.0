@@ -689,7 +689,13 @@ async function start () {
         body: 
         JSON.stringify({query: 
 `{ user (id:${idL})  
-          { sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ id price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
+          { declinedm { id }
+          askms (where:{archived: false }){ id
+                                    vots  {what why id users_permissions_user {id}}
+                                     open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy}
+                                      project {projectName id user_1s {id} profilePic {url formats }}
+                                       users_permissions_user { username id profilePic {url formats } } }
+              sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ id price descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
                             profilePic {url formats }}}}} 
               mesimabetahaliches  (where:{forappruval: false, finnished: false }){
              id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
@@ -765,6 +771,7 @@ async function start () {
    console.log (miData)
    miData = miData
    fiapp = [];
+   dictasked = [];
    pends = [];
    adder = [];
    walcomen = [];
