@@ -204,7 +204,7 @@ onMount(async () => {
   .then(r => r.json())
   .then(data => meDataa = data);
          console.log(meDataa)
-         if (meDataa.data.me.id === idL){
+         if (meDataa.data.me.id === idL && meDataa.data.me != null){
    meData =  meDataa.data.user
        mail = meData.email;
           letters(meData.username);

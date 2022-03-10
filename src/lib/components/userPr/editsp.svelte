@@ -94,10 +94,8 @@ function myMissionH ()  {
   ky = false;
   kc = false;
   let is = [];
-      console.log(i,"toeg3e to")
 
   if (meData.kindOf === "monthly"){
-    console.log(i,"to to")
     ky = true;
     meData.ky = true;
          meData.kc = false;
@@ -105,7 +103,6 @@ function myMissionH ()  {
                    meData.r = false;
     meData.y = false;
   } else if (meData.kindOf === "yearly"){
-        console.log(i,"y")
     ky = true;
      meData.ky = true;
               meData.kc = false;
@@ -113,7 +110,6 @@ meData.m = false;
                    meData.r = false;
     meData.y = true;
     } else if (meData.kindOf === "rent"){
-        console.log(i,"y")
     ky = true;
      meData.ky = true;
          meData.kc = false;
@@ -121,7 +117,6 @@ meData.m = false;
                    meData.r = true;
     meData.y = false;
     } else if (meData.kindOf === "perUnit"){
-          console.log(i,"c")
     meData.kc = true;
          meData.ky = false;
     kc = true;

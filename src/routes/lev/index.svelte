@@ -795,6 +795,7 @@ async function start () {
   }
         } catch (e) {
             error1 = e
+                        goto ("/login",)
         }
 } ;
 let pmashes = [];
