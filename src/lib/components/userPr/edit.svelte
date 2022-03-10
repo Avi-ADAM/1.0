@@ -322,6 +322,8 @@ function bitulm (){
    dispatch('massss', {
             mass: false
           })
+          needr = []
+          meDatamm = []
 }
 async function updi (){
 var resultString = needr.join('&id_in=');
