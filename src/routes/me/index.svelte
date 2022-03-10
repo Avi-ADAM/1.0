@@ -594,7 +594,7 @@ let linkgra = 'https://strapi-k4vr.onrender.com/graphql';
 <div class="another" dir="rtl">
   
     <h6 class="cot">הרקמות שלי</h6>
-
+<span class="d">
            {#each myP as data, i}
            <div class="cont" >  
             <a  class="pt hover:text-gold" sveltekit:prefetch href={`/project/${data.id}`} >{data.projectName}</a>
@@ -607,7 +607,7 @@ let linkgra = 'https://strapi-k4vr.onrender.com/graphql';
           </svg>
           </button>
            </div>
-  {/each}
+  {/each}</span>
 
 <button   
 style="    z-index: 7;"
@@ -1138,6 +1138,10 @@ class=" hover:scale-150 "
  <!-- המשימות שסיימתי-->         
 
   <style>
+     .d{
+       max-height: 15vh;
+       overflow-y: scroll;
+     }
       :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
                 width: 80vw;
@@ -1307,7 +1311,7 @@ class=" hover:scale-150 "
  max-height: 20vh;
   min-height: 20vh;
          max-width: 35vw;
-
+     
   }
 }
     .anothere{
