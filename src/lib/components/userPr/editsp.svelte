@@ -176,7 +176,7 @@ meData.m = false;
         <div dir="rtl" class='textinput'>
   <input         bind:value={meData.price}
  type="number" class='input' required>
-  <label for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
+  <label for="name" class='label'>שווי כספי <span style="display:{ meData.m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData.y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData.r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
     </tr><tr>
@@ -185,7 +185,7 @@ meData.m = false;
         <div dir="rtl" class='textinput'>
   <input         bind:value={meData.myp}
  type="number" class='input' required>
-   <label for="name" class='label'>שווי מבוקש <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
+   <label for="name" class='label'>שווי מבוקש <span style="display:{ meData.m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData.y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData.r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
     </tr> <tr>

@@ -101,6 +101,7 @@ function remove (id) {
 
   let ky = false;
   let kc = false;
+  let km  = false;
 function myMi ()  {
   for (var i = 0; i <meData.length; i++) {
     meData[i].hm = 1;
@@ -115,7 +116,6 @@ function myMissionH ()  {
   ky = false;
   kc = false;
   let is = [];
-      console.log(i,"toeg3e to")
 
 for (var i = 0; i <meData.length; i++) {
   if (meData[i].kindOf === "monthly"){
