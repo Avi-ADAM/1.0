@@ -582,7 +582,7 @@ async function showOpenPro (mi) {
  // add declined filter add sort by value
  if (keysSorted.length > 0){
   var resultString = keysSorted.join('&id_in=');
- let link ="https://strapi-k4vr.onrender.com/open-missions?id_in=" + resultString ;
+ let link ="https://oneloveone.onrender.com/open-missions?id_in=" + resultString ;
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -677,7 +677,7 @@ async function start () {
   console.log("start");
   miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://strapi-k4vr.onrender.com/graphql" ;
+    let link ="https://oneloveone.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

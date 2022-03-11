@@ -1,23 +1,7 @@
-<script context="module">
- 
-  export const load = async ({page}) => {
-      const id = page.params.id;
-      
-      const userId = id;
-      return {
-          props:{
-              userId,
-          },
-      }
-  };
-</script>
-
-
 <script>
   
   export let userId; 
   import { onMount } from 'svelte';
-  import Header from './../../lib/components/header/header.svelte'
 
 let user = [
 ];
@@ -88,11 +72,8 @@ let error1 = null;
     });
     
   </script>
-  <svelte:head>
-  <title>פרופיל 1❤️1</title>
-</svelte:head>
+ 
   <div dir="rtl" >
-<Header/>
       <div class="middle">
     {#if srcU }
  <img

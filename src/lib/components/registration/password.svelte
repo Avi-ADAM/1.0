@@ -57,7 +57,7 @@ let errr = {k: false, m: "", p: false}
 function increment() {    
 errr.p = true;
 axios
-  .post('https://strapi-k4vr.onrender.com/auth/local/register', {
+  .post('https://oneloveone.onrender.com/auth/local/register', {
     username: userName_value, 
     email: emailL,
     password: passwordx,

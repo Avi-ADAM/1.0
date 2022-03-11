@@ -33,7 +33,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://strapi-k4vr.onrender.com/mashaabims?_limit=-1", {
+            const res = await fetch("https://oneloveone.onrender.com/mashaabims?_limit=-1", {
               method: "GET",
               headers: {
                 'Authorization': bearer1,

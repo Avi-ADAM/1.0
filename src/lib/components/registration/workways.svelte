@@ -26,7 +26,7 @@
       };
     
         try {
-            const res = await fetch("https://strapi-k4vr.onrender.com/graphql", {
+            const res = await fetch("https://oneloveone.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

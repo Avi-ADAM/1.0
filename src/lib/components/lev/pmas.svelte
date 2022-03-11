@@ -20,7 +20,7 @@ import { idPr } from '../../stores/idPr.js';
     export let kindOf = "";
     export let src = "coin.png";
     export let projectId;
-    export let link = "https://strapi-k4vr.onrender.com/project/";
+    export let link = "https://oneloveone.onrender.com/project/";
     export let uids = [];
     export let what = [];
     export let noofusersOk;
@@ -94,7 +94,7 @@ function objToString (obj) {
     }}
     return str;
 }
-            let linkg = 'https://strapi-k4vr.onrender.com/graphql';
+            let linkg = 'https://oneloveone.onrender.com/graphql';
     const userss = objToString(users);
     const diunim = objToString(diun);
 async function agree(alr) {

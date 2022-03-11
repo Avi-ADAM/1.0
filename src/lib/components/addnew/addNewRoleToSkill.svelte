@@ -8,7 +8,7 @@
     export let rn = [];
     let roleName_value;
         let desS;
-        let link ="https://strapi-k4vr.onrender.com/tafkidims";
+        let link ="https://oneloveone.onrender.com/tafkidims";
         let meData;
         let shgi = false;
     function add () {

@@ -31,7 +31,7 @@
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-let link ="https://strapi-k4vr.onrender.com/graphql" ;
+let link ="https://oneloveone.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

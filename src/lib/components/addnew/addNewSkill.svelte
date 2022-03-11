@@ -22,7 +22,7 @@ let idk;
     let desS;
     let meData;
     let error1 = null;
-    let link ="https://strapi-k4vr.onrender.com/skills";
+    let link ="https://oneloveone.onrender.com/skills";
     export let rn = [];
     let shgi = false;
     onMount(async () => {
@@ -39,7 +39,7 @@ let idk;
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("https://strapi-k4vr.onrender.com/graphql", {
+          const res = await fetch("https://oneloveone.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

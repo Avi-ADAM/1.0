@@ -1,16 +1,4 @@
-<script context="module">
-    export const load = async ({page, fetch}) => {
-       const id = page.params.id;
 
-const projectId = id;
-        return {
-            props:{
-                projectId,
-            },
-        }
-
-    };
-</script>
 <script>
       import { onMount } from 'svelte';
   import Header from './../../lib/components/header/header.svelte'
@@ -76,11 +64,8 @@ onMount(async () => {
     
     
 </script>
- <svelte:head>
-  <title>ריקמה 1❤️1</title>
-</svelte:head>
+ 
 <div dir="rtl" class="all">
-  <Header/>
 
   <div class="4">
     {#if srcP}

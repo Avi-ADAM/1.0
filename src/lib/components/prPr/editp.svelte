@@ -59,7 +59,7 @@ let vallues = [];
                  'Content-Type': 'application/json'      };
     
         try {
-           const res = await fetch("https://strapi-k4vr.onrender.com/graphql", {
+           const res = await fetch("https://oneloveone.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

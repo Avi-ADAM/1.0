@@ -342,7 +342,7 @@ g = true;
  erorims = false
  const mail = $form.email.toLowerCase()
   axios
-  .post('https://strapi-k4vr.onrender.com/chezins', {
+  .post('https://oneloveone.onrender.com/chezins', {
      name: $form.name,
         email: mail,
         countries: find_contry_id(selected)

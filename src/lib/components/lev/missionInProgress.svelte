@@ -210,7 +210,7 @@ timer: 0
  let idL;
  let token;
  let bearer1;
- let linkg = "https://strapi-k4vr.onrender.com/graphql"
+ let linkg = "https://oneloveone.onrender.com/graphql"
 async function save() {
     const saved = lapse * 2.7777777777778E-7 + x * 2.7777777777778E-7;
     console.log("Saved",formatTime(saved), saved, lapse , x)

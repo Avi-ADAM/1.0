@@ -10,10 +10,10 @@
     function onSubmit () {   
 // Request API.
 axios
-  .post('https://strapi-k4vr.onrender.com/auth/forgot-password', {
+  .post('https://oneloveone.onrender.com/auth/forgot-password', {
     email: email,
     url:
-      'https://strapi-k4vr.onrender.com/admin/plugins/users-permissions/auth/reset-password',
+      'https://oneloveone.onrender.com/admin/plugins/users-permissions/auth/reset-password',
   })
   .then(response => {
     // Handle success.

@@ -39,7 +39,7 @@ import { missionNew } from '../../stores/missionNew';
     };
   
       try {
-          const res = await fetch("https://strapi-k4vr.onrender.com/tafkidims?_limit=-1", {
+          const res = await fetch("https://oneloveone.onrender.com/tafkidims?_limit=-1", {
             method: "GET",
             headers: {
                'Content-Type': 'application/json'

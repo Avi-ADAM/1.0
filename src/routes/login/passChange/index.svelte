@@ -15,7 +15,7 @@ function shaneh () {
 
   // Request API.
 axios
-  .post('https://strapi-k4vr.onrender.com/auth/reset-password', {
+  .post('https://oneloveone.onrender.com/auth/reset-password', {
     code: email,
     password: passwordx,
     passwordConfirmation: passwordx,

@@ -47,7 +47,7 @@ async function han (){
   const easy = (element.easy > 0) ? element.easy : 0;
   const sdate = (element.dates !== undefined) ? `sdate: "${new Date(element.dates).toISOString()}",` : ``;
    const fdate = (element.datef !== undefined) ? `fdate: "${new Date(element.datef).toISOString()}" ,` : ``;
- let linkgra = 'https://strapi-k4vr.onrender.com/graphql';
+ let linkgra = 'https://oneloveone.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',

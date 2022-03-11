@@ -92,7 +92,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://strapi-k4vr.onrender.com/graphql';
+let linkg = 'https://oneloveone.onrender.com/graphql';
 
 function objToString (obj) {
     let str = '';
