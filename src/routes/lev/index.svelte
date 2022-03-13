@@ -26,6 +26,7 @@ let low = true;
     let error1 = null;
     let askedarr = [];
     let declineddarr = [];
+    let declineddarra = [];
     let d = [];
     let sk = [];
     var dictids = {};
@@ -803,6 +804,9 @@ let huca = [];
 
 function sps(pp){
           console.log("ppkk", huca)
+          const t = pp.data.user.declinedm
+           declineddarra = t.map(c => c.id)
+                    console.log("ppkk", t)
       for (let i = 0; i < pp.data.user.sps.length; i++){
         const y = pp.data.user.sps[i];
                   console.log("ppkk", huca)
@@ -812,6 +816,7 @@ function sps(pp){
                 for (let t = 0; t < pp.data.user.sps[i].mashaabim.open_mashaabims.length; t++){
                const  x = pp.data.user.sps[i].mashaabim.open_mashaabims[t]
                 const z = pp.data.user.sps[i].mashaabim.open_mashaabims[t].project;
+                if (!declineddarra.includes(x.id)){
   huca.push({
                 projectid: z.id,
                 projectName: z.projectName,
@@ -826,6 +831,7 @@ function sps(pp){
                  descrip: x.descrip,
                  oid: y.id
   })
+}
                 }}
       }
       huca = huca
@@ -1290,7 +1296,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
       on:less={lessi}
       i={i}
       askedarr={askedarr}
-      {declineddarr}
+      {declineddarra}
       deadLine = {data.sqadualed}
       oid = {data.oid}
       id = {data.id}

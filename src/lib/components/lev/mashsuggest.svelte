@@ -21,7 +21,7 @@
     export let myp = 0;
     export let total = 0;
     export let askedarr =[];
-    export let declineddarr = [];
+    export let declineddarra = [];
     export let id;
     export let i;
 let already = false;
@@ -57,6 +57,8 @@ let miData = [];
   };
 async function agree() {
   already = true;
+     const ds = declineddarra;
+ ds.push(`${oid}`);
 const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -83,12 +85,24 @@ const cookieValue = document.cookie
     input: {
       data:{ open_mashaabim: ${oid},
             project: ${projectId},
-            sp: ${id}
+            sp: ${id},
             users_permissions_user: ${uId}
     }
     }
   ){
     askm {id}
+  }
+  updateUser(
+    input: {
+      where: { id: "${uId}" }
+      data: {declinedm: [${ds}] }
+    }
+  ){
+      user {
+          askeds{
+              id
+          }
+      }
   }
 }`   
 } )})
@@ -110,7 +124,7 @@ function nego(oid) {
 async function decline(oid) {
   already = true;
         console.log("decline", oid);
-       const ds = declineddarr;
+       const ds = declineddarra;
  ds.push(`${oid}`);
  console.log(ds)
 const cookieValue = document.cookie
@@ -223,19 +237,20 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     .ab{
         grid-column: 1/3;
         grid-row: 1/ 2;
-
+        font-size: 9px;
     }
     .bc{
         grid-column: 1/3;
         grid-row: 2/ 3;
-
+        font-size: 9px; 
     }
+
   .a{
-        margin-right: 30px;
+        margin-right: 10px;
         grid-column: 1/2;
     }
     .b{
-        margin-left: 30px;
+        margin-left: 10px;
         grid-column: 2/3;
     }
   .ltb{
@@ -309,7 +324,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     background-size: cover;
 
     }
-	
+	/*
     .normSmlHover{
         text-shadow: 1px 1px var(--gold);
         color: var(--barbi-pink);
@@ -325,7 +340,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
-    }
+    }*/
     .btn{ 
         grid-row: 3/ 4;
         background-color: rgb(87, 208, 248);

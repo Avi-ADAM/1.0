@@ -1142,6 +1142,27 @@ class=" hover:scale-150 "
        max-height: 15vh;
        overflow-y: scroll;
      }
+     .d::-webkit-scrollbar {
+    width: 10px;
+}
+ 
+.d::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+}
+ 
+.d::-webkit-scrollbar-thumb {
+    background-color: #d4aa70;
+    border-radius: 100px;
+}
+.d {
+    scrollbar-color: #D4AA70 #e4e4e4;
+}
+.d::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
+    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+    border-radius: 100px;
+}
       :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
                 width: 80vw;
@@ -1374,6 +1395,9 @@ class=" hover:scale-150 "
        }
       }
 @media (min-width: 529px) {
+     .d::-webkit-scrollbar {
+    width: 12px;
+}
   .cont{
       white-space: nowrap;
     }
