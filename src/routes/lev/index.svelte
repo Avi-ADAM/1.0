@@ -12,6 +12,7 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
         import { isEqual } from 'lodash';
         import Mashsug from '../../lib/components/lev/mashsuggest.svelte'
+        import Reqtom from '../../lib/components/lev/reqtom.svelte'
 
 let ddd;
 let low = true;
@@ -42,7 +43,8 @@ let beta = 0
 let des = 0
 let fia = 0;
 let fiapp = [];
-
+let askedm = [];
+let askm = 0;
 function mesimabetahalicha (data) {
     const mtahan = data.data.user.mesimabetahaliches;
         for (var i = 0; i < mtahan.length; i++) {
@@ -282,6 +284,99 @@ async function createasked (da) {
   ask = askedcoin.length;
 }
 
+
+async function createmask (da) {
+  const start = da.data.user.projects_1s
+  for (var i = 0; i < start.length; i++) {
+            for (var j = 0; j < start[i].askms.length; j++){
+                       const rt = letters(start[i].askms[j].open_mashaabim.name);
+                      let src21 = ``;
+                       if (start[i].profilePic){
+                       src21 = start[i].profilePic.formats.thumbnail.url
+                    } else{
+                        src21 = start[i].profilePic
+                    }
+                    askedm.push({
+                            uid: start[i].askms[j].users_permissions_user.id,
+                            username: start[i].askms[j].users_permissions_user.username,
+                            src: start[i].askms[j].users_permissions_user.profilePic.formats.thumbnail.url,
+                            price: start[i].askms[j].open_mashaabim.price,
+                            easy: start[i].askms[j].open_mashaabim.easy,
+                            spnot: start[i].askms[j].open_mashaabim.spnot,
+                            descrip: start[i].askms[j].open_mashaabim.descrip,
+                            hm: start[i].askms[j].open_mashaabim.hm,
+                            myp: start[i].askms[j].sp.myp,
+                            kindOf: start[i].askms[j].open_mashaabim.kindOf,
+                            spid: start[i].askms[j].sp.id,
+                            deadline: start[i].askms[j].open_mashaabim.sqadualed,
+                            openName: start[i].askms[j].open_mashaabim.name,
+                            omid: start[i].askms[j].open_mashaabim.id,
+                            askId: start[i].askms[j].id,
+                            users: start[i].askms[j].vots,
+                            name: rt[0],
+                            stylef: rt[1], 
+                            st: rt[2],
+                            projectId: start[i].id,
+                            projectName : start[i].projectName,
+                            noof: start[i].user_1s.length,
+                            src2: src21,
+                            myid: da.data.user.id
+                              });
+            }
+
+  }
+  askedm = askedm 
+  console.log(askedm) 
+  if (askedm.length > 0){
+  for (var k = 0; k < askedm.length; k++) {
+     const x = askedm[k].users
+     askedm[k].uids = [];
+     askedm[k].what = [];
+     for (var z = 0; z < x.length; z++){
+      askedm[k].uids.push(x[z].users_permissions_user.id);
+           askedm[k].what.push(x[z].what);
+ }
+ }    
+
+ for (var t = 0; t <askedm.length; t++){
+    const allid = askedm[t].uids;
+    const myid = askedm[t].myid;
+    askedm[t].already = false;
+     askedm[t].noofusersOk = 0;
+     askedm[t].noofusersNo = 0;
+
+    if(allid.includes(myid)){
+      askedm[t].already = true;
+    //  dictasked.splice(t, 1);
+    //  dictasked. = dictasked
+    } 
+    if (askedm.length > 0 ){
+        for (var r=0; r< askedm[t].users.length; r++){
+            if (askedm[t].users[r].what === true) {
+                
+                 askedm[t].noofusersOk += 1;
+               
+            }else if (askedm[t].users[r].what === false) {
+              
+                 askedm[t].noofusersNo += 1;
+               
+            }
+        }}
+            if (askedm.length > 0){
+
+    const noofusersWaiting = askedm[t].noof - askedm[t].users.length;
+    askedm[t].noofusersWaiting = noofusersWaiting;
+        
+    }}}
+    var filters = [false];
+
+ var result = askedm.filter(val=>filters.includes(val.already)); 
+ askedm = result
+  askedm = askedm;
+  askm = askedm.length;
+}
+
+
 function letters(data){
     let namer = [];
     let st = 175;
@@ -300,7 +395,7 @@ function letters(data){
         }
         const x = namer.reverse().join(" ");
         data = x; 
-        st = 145;
+        st = 175;
     }
     if (data.length >= 15 && data.length < 19) {
         stylef = '21px';
@@ -330,6 +425,13 @@ function delo (event ){
    ask = askedcoin.length;
 }
 
+function delom (event ){
+   const newasked = askedm;
+   const todel = event.detail.asked
+   newasked.splice(todel, 1);
+   askedm = newasked;
+   askm = askedm.length;
+}
 const filterArrayd = (arr1, arr2) => {
    const filterede = arr1.filter(el => {
       return arr2.indexOf(el) === -1;
@@ -690,13 +792,13 @@ async function start () {
         body: 
         JSON.stringify({query: 
 `{ user (id:${idL})  
-          { declinedm { id }
+          { 
           askms (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
-                                     open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy}
+                                     open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy }
                                       project {projectName id user_1s {id} profilePic {url formats }}
                                        users_permissions_user { username id profilePic {url formats } } }
-              sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ id price descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
+              sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ declinedsps { id } id price descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
                             profilePic {url formats }}}}} 
               mesimabetahaliches  (where:{forappruval: false, finnished: false }){
              id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
@@ -727,11 +829,17 @@ async function start () {
                         } 
                         } 
                             projects_1s { projectName id user_1s {id} profilePic {url formats } 
+                            maaps(where:{archived: false }){id created_at name sp{id } open_mashaabim{id}vots{what why id users_permissions_user {id}}}
                                 pmashes (where:{archived: false }){ id hm project {projectName id 
                                         profilePic {url formats } 
                                         user_1s { id}
                                 } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id} order}  users  {what why id users_permissions_user {id}}} 
                                 open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
+                                askms(where:{archived: false }){ id 
+                                     vots  {what why id users_permissions_user {id}}
+                                       users_permissions_user { username id profilePic {url formats } }
+                        open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy }
+                          sp { id price myp }}
                                 asks (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
                                      open_mission { id mission {id} declined { id} sqadualed publicklinks noofhours perhour privatlinks descrip hearotMeyuchadot name}
@@ -792,6 +900,7 @@ async function start () {
           sds(miData);
           pmash(miData)
           sps(miData)
+          createmask(miData)
       //    createD()
   }
         } catch (e) {
@@ -803,10 +912,7 @@ let pmashes = [];
 let huca = [];
 
 function sps(pp){
-          console.log("ppkk", huca)
-          const t = pp.data.user.declinedm
-           declineddarra = t.map(c => c.id)
-                    console.log("ppkk", t)
+         
       for (let i = 0; i < pp.data.user.sps.length; i++){
         const y = pp.data.user.sps[i];
                   console.log("ppkk", huca)
@@ -816,8 +922,10 @@ function sps(pp){
                 for (let t = 0; t < pp.data.user.sps[i].mashaabim.open_mashaabims.length; t++){
                const  x = pp.data.user.sps[i].mashaabim.open_mashaabims[t]
                 const z = pp.data.user.sps[i].mashaabim.open_mashaabims[t].project;
-                if (!declineddarra.includes(x.id)){
+                        const declineddarra = pp.data.user.sps[i].mashaabim.open_mashaabims[t].declinedsps.map(c => c.id)
+                if (!declineddarra.includes(y.id)){
   huca.push({
+      declineddarra: declineddarra,
                 projectid: z.id,
                 projectName: z.projectName,
                 srcb: z.profilePic.formats.thumbnail.url,
@@ -829,7 +937,8 @@ function sps(pp){
                  kindOf: x.kindOf,
                  spnot: x.spnot,
                  descrip: x.descrip,
-                 oid: y.id
+                 oid: y.id,
+                 already: false
   })
 }
                 }}
@@ -917,7 +1026,6 @@ function pmash (data) {
     console.log(pmashes)
    // bubleUiAngin(pends)
 }
-
 
 function sds (mta) {
     console.log("sdsa")
@@ -1233,6 +1341,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 {/each}
 
 
+
 {#each  askedcoin  as da, i}
         <div  class="asks normSml" style="display:'';"><Reqtojoin
             on:acsept={delo}
@@ -1270,6 +1379,43 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 /></div>
 {/each}
 
+{#each  askedm  as da, i}
+        <div  class="asks normSml" style="display:'';"><Reqtom
+            on:acsept={delom}
+            on:decline={delom}
+            noofusersWaiting={da.noofusersWaiting}
+            uids={da.uids}
+            what={da.what}
+            noofusersOk={da.noofusersOk}
+            noofusersNo={da.noofusersNo}
+            already={da.already}
+            users={da.users}
+            askId={da.askId}
+            projectName = {da.projectName}
+            useraplyname ={da.username}
+            userId ={ da.uid} 
+            missionDetails = {da.descrip} 
+            src = {da.src}
+            src2 = {da.src2}
+            openmissionName={da.openName}
+            name={da.name}
+            projectId={da.projectId}
+               noofpu={da.noof}
+            myp={da.myp}
+             easy={da.easy}
+            spnot={da.spnot}
+            price ={da.price}
+            deadline={da.deadline}
+                missId={da.missId}
+                id={da.id}
+                openMid={da.omid}
+                stylef={da.stylef}
+                st={da.st}
+                declined={da.decid}
+                spid={da.spid}
+                /></div>
+{/each}
+
 {#each meData as data, i}
     <div  class="sugg normSml" style="display:''"><ProjectSuggestor
       on:less={less}
@@ -1296,12 +1442,13 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
       on:less={lessi}
       i={i}
       askedarr={askedarr}
-      {declineddarra}
+     declineddarra= {data.declineddarra}
       deadLine = {data.sqadualed}
       oid = {data.oid}
       id = {data.id}
       price= {data.price}
       myp={data.myp}
+      already= {data.already}
               projectName = {data.projectName}
               missionDetails = {data.descrip} 
               notes = {data.hearotMeyuchadot}

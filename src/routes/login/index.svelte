@@ -6,6 +6,7 @@
     import { JWT } from '../../lib/stores/jwt.js';
     import { idM } from '../../lib/stores/idM.js';    
     import { liUN } from '../../lib/stores/liUN.js';
+    import { serialize } from 'cookie';
    
     let active = false;
     let loginError = null;

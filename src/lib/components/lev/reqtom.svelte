@@ -15,8 +15,9 @@ export let shows = false;
 export let deadline;
 export let projectName = "ONE";
 export let openmissionName = "do x";
-export let role = "programer";
-export let skills = ["html", "css"];
+export let myp;
+export let easy;
+export let price;
 export let useraplyname = "do x like y in z";
 export let src = "coin.png";
 export let src2 = " ";
@@ -48,16 +49,7 @@ let lang;
 export let stylef = '24px';
 export let askId;
 export let users;
-    //
-    //axios
-    // .post('https://translation.googleapis.com/language/translate/v2/detect?key=AIzaSyBd6vOhf0c3AH4yw2FXbHWfIbjJD0BX0pg', {
-    //  "q": `"${openmissionName}"` 
-    //             })
-    //   .then(response => {
-    // console.log('הצליח', response.data);
-    //  resP = response.data; 
-    //lang = resP.data.detections[0][0].language;
-    // console.log(lang)
+export let spid;  
     
 
 let idL;
@@ -129,8 +121,7 @@ async function agree() {
      console.log(idL);
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
-  //  uids.push(userId);
-   // uids = uids;
+  
     console.log(uids);
     if (uids.includes(userId)){
         welcome = ``;
@@ -161,7 +152,6 @@ input: {
     }
     //add to pr users create missioninprogres, create welcom ballun;  first check for no of pr users and full consent ,(delete or save for refernce but put archive ) openM and asked 
     if (noofpu === 1) {
-        console.log("agree, ecsepted")
         
         try {
             await fetch(linkg, {
@@ -170,34 +160,27 @@ input: {
                         'Authorization': bearer1,
                         'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify({
+                    body: JSON.stringify({ 
                         query: `mutation 
-                        { createMesimabetahalich(
+                        { createMaap(
     input: {
       data: {project: "${projectId}",
-             mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
              name: "${openmissionName}",
-             descrip: "${missionDetails}",
-             hoursassinged: ${nhours},
-             perhour: ${valph},   
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
-             users_permissions_user: "${userId}",
-            ${date}
+             sp: "${spid}",
+             open_mashaabim: ${omid}
                   }
     }
-  ) {mesimabetahalich{project{id }}}
+  ) {maap{project{id }}}
 
-updateOpenMission(
+updateOpenMashaabim(
   input:  {
     where: {id: "${openMid}"}
   data: {archived: true}
 }
-) {openMission{id archived}}
+) {openMashaabim{id archived}}
 ${welcome}
 ${adduser}
- updateAsk(
+ updateAskm(
                             input:{
                                 where: {id: "${askId}" }
                                 data: { archived: true,
@@ -208,7 +191,7 @@ ${adduser}
                                       }
                                     ]}
                             }
-                        ){ask{id}}
+                        ){askm{id}}
 }
 `})
                 })
@@ -236,32 +219,25 @@ ${adduser}
                     },
                     body: JSON.stringify({
                         query: `mutation 
-                        { createMesimabetahalich(
+                        { createMaap(
     input: {
       data: {project: "${projectId}",
-             mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
              name: "${openmissionName}",
-             descrip: "${missionDetails}",
-             hoursassinged: ${nhours},
-             perhour: ${valph},   
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
-             users_permissions_user: "${userId}",
-            ${date}
+             sp: "${spid}",
+             open_mashaabim: ${omid}
                   }
     }
-  ) {mesimabetahalich{project{id }}}
+  ) {maap{project{id }}}
 
-updateOpenMission(
+updateOpenMashaabim(
   input:  {
     where: {id: "${openMid}"}
   data: {archived: true}
 }
-) {openMission{id archived}}
+) {openMashaabim{id archived}}
 ${welcome}
 ${adduser2}
- updateAsk(
+ updateAskm(
                             input:{
                                 where: {id: "${askId}" }
                                 data: { archived: true,
@@ -272,7 +248,7 @@ ${adduser2}
                                       }
                                     ]}
                             }
-                        ){ask{id}}
+                        ){askm{id}}
 }
 `})
                 })
@@ -300,7 +276,7 @@ ${adduser2}
                     body: JSON.stringify({
                         query: `mutation 
                         {
-                            updateAsk(
+                            updateAskm(
                             input:{
                                 where: {id: "${askId}" }
                                 data: { vots: [${userss}, 
@@ -310,7 +286,7 @@ ${adduser2}
                                       }
                                     ]}
                             }
-                        ){ask{id}}
+                        ){askm{id}}
                      
                     }
 `})
@@ -370,12 +346,19 @@ const declineda = declined.map(c => c.id)
                     body: JSON.stringify({
                         query: `mutation 
                         { 
-updateOpenMission(
+updateAskm(
   input: {
-    where: {id: "${openMid}"}
-  data: {declined: [${declineda}]}
+    where: {id: "${id}"}
+  data: {vots: [${userss}, 
+                                       {
+                                        what: false
+                                        users_permissions_user: "${idL}"
+                                      }
+                                    ],
+                                  archived: true
 }
-) {openMission{id declined {id}}}
+}
+) {askm{id }}
 }
 `})
                 })
@@ -465,22 +448,9 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                                     
                                                 </foreignObject>
                                                 </a>  
-                                         <!--     <g  x='-90' y='0' width="29" height="29">
-<path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"></path>
-                                                  </g> -->   
+                                     
                                                 </svg>
-                                                    <!--  <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="32" height="32" alt="projectlogo" title={projectName}>
-        <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName}</h3></a>
-        <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: rgb(87, 208, 248 ); line-height: 0.7; ">{openmissionName}</h1>
-        <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="32" height="32" alt="user aplly pic" title={useraplyname}>
-        <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{useraplyname}</h3></a>        
-        <button1 on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin"><i class="far fa-check-circle"></i></button1>
-        <button3 on:click= {nego} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>
-        <button2 on:click={decline} style="margin: 0;" class = "btn"name="decline"><i class="far fa-times-circle"></i></button2>
-        <button on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin"><i class="far fa-check-circle"></i></button>
-                                                    <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>
-                                                    <button on:click={decline} style="margin: 0;" class = "btn"name="decline"><i class="far fa-times-circle"></i></button>
-                                                    -->
+                                                
                                                     </div>
 
 </div>
@@ -488,10 +458,10 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
   ><SwiperSlide
     ><div class="{`normSmll${askId}-noo`}" id="normSmll"
 >
-        {#if deadline}    <h5 class="hslink ab">{deadline}</h5>{/if}
-         {#if missionDetails}   <h6 class="hslink bc">{missionDetails}</h6>{/if}
-            <h5 class="hslink cd">{role}</h5>
-            <h6 class="hslink de">{skills}</h6>
+         {#if missionDetails !== null}   <h6 class="hslink ab">{missionDetails}</h6>{/if}
+                 {#if deadline}    <h5 class="hslink bc">{deadline}</h5>{/if}
+       <h3 class="hslink cd" title="שווי">{price}</h3>
+        <h3 class="hslink de" ><span style="color: var(--gold)" title="ההצעה שהתקבלה">{myp}</span> /<span  title="ההצעה של הריקמה"> {easy}</span> </h3>
                <p class="vo ef"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
             {#if already === false}
             <button on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
@@ -553,7 +523,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
 
     }
    #normSmll{
-    background: url(https://res.cloudinary.com/love1/image/upload/v1643838617/coin_ngsrxn.svg);
+    background: url(https://res.cloudinary.com/love1/image/upload/v1647261055/spare_gv0gui.svg);
 
         white-space: normal;
         text-align: center; 
@@ -568,7 +538,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
          border-radius: 50%;
     background-position: center; 
     background-repeat: no-repeat; 
-    background-size: cover;
+    background-size: 125% 125%;
     display: grid;
     grid-template-columns: auto auto;
     grid-auto-rows: auto auto auto auto ;
@@ -653,7 +623,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     background-color: rgb(100, 224, 137);
     border-radius: 50%;
 
-    background: url(https://res.cloudinary.com/love1/image/upload/v1643838617/coin_ngsrxn.svg);
+    background: url(https://res.cloudinary.com/love1/image/upload/v1647261055/spare_gv0gui.svg);
     background-position: center;
     background-repeat: no-repeat;
     background-size: cover;

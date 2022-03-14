@@ -5,7 +5,7 @@
 
 <div class="wall container">
     <div class="row">
-    <div class="rock">אני מאמין באמונה שלמה בביאת המשיח! ואף על פי שימהמה עם כל זה אחכה לו בכל יום שיבוא.</div>
+    <div class="rock">אני מאמין באמונה שלמה בביאת המשיח! ואף על פי שיתמהמה עם כל זה אחכה לו בכל יום שיבוא.</div>
     <div class="rock">a</div>
     <div class="rock">a</div>
     <div class="rock">a</div>
@@ -165,6 +165,7 @@
   background-color: var(--gold);
   border-radius: 5px;
   margin: 0.2vw;
+  box-shadow: 0 0 19px 1px #CC76FE inset;
 }
 .rock:hover{
     transform: scale( 1.5);

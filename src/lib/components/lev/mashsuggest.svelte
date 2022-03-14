@@ -24,7 +24,7 @@
     export let declineddarra = [];
     export let id;
     export let i;
-let already = false;
+    export let already = false;
     let token;
     let uId;
 
@@ -55,10 +55,10 @@ let miData = [];
     idPr.set(id);
     goto("/moach", );
   };
-async function agree() {
+async function agree(oid) {
   already = true;
      const ds = declineddarra;
- ds.push(`${oid}`);
+ ds.push(`${id}`);
 const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -83,23 +83,23 @@ const cookieValue = document.cookie
           `mutation { 
   createAskm(
     input: {
-      data:{ open_mashaabim: ${oid},
+      data:{ open_mashaabim: ${id},
             project: ${projectId},
-            sp: ${id},
+            sp: ${oid},
             users_permissions_user: ${uId}
     }
     }
   ){
     askm {id}
   }
-  updateUser(
+  updateSp(
     input: {
-      where: { id: "${uId}" }
-      data: {declinedm: [${ds}] }
+      where: { id: "${oid}" }
+      data: {declinedm: "${id}" }
     }
   ){
-      user {
-          askeds{
+      sp {
+          declinedm{
               id
           }
       }
@@ -148,14 +148,14 @@ const cookieValue = document.cookie
                   },
         body: 
         JSON.stringify({query:
-          `mutation { updateUser(
+          `mutation { updateSp(
     input: {
-      where: { id: "${uId}" }
-      data: {declinedm: [${ds}] }
+      where: { id: "${oid}" }
+      data: {declinedm: "${id}" }
     }
   ){
-      user {
-          askeds{
+      sp {
+          declinedm{
               id
           }
       }
@@ -231,7 +231,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
   >
 </Swiper>
 </div>
-
+   
 
 <style>
     .ab{
