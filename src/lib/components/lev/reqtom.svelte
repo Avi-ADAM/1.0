@@ -224,7 +224,7 @@ ${adduser}
       data: {project: "${projectId}",
              name: "${openmissionName}",
              sp: "${spid}",
-             open_mashaabim: ${omid}
+             open_mashaabim: ${openMid}
                   }
     }
   ) {maap{project{id }}}
