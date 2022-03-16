@@ -188,7 +188,7 @@ vots: [${userss},
 ) {maap{id archived}}
 updateSp( input:  {
     where: {id: "${spid}"}
-  data: {panui: false}
+  data: {panui: false}}
 ){sp{id}}
 }
 `})
