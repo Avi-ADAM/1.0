@@ -141,7 +141,7 @@ async function agree() {
     uids = uids;
     console.log(uids);
         const date = (sqadualed !== undefined) ? `sqadualed: "${new Date(sqadualed).toISOString()}",` : ``;
-        const sdate = (sqadualedf !== undefined) ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",` : ``;
+        const sdate = (sqadualedf !== undefined) ? `sqadualef: "${new Date(sqadualedf).toISOString()}",` : ``;
     //add rating for app +5 for declin -5, nego mean demends for apruval
      if (noofpu - 1 === noofusersOk) {
             console.log("create new finnished and add vote and archive fiapp")
