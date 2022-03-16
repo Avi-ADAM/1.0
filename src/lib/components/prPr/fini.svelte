@@ -114,7 +114,7 @@ function pre (){
 
     </script>
     {#if hagdel === false}
-    <div style =" margin: 0 auto;" class="flex items-center justify-center">
+    <div style =" margin: 20px auto;" class="flex items-center justify-center ">
     <svg width="250px" height="250px" style="display: inline;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
         <defs>
@@ -127,14 +127,22 @@ function pre (){
   {/each}
 </svg>
 </div>
+<button class="hover:bg-barbi bg-gold text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
     {:else}
+     <button
+      title="סגירת הפירוט"
+      on:click={() => hagdel = false}
+       class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+    </svg></button> 
 <div class="dd md:items-center">
   <div class="body items-center">
   
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >פעולות בתהליך ביצוע</h1>
+      >פעולות שבוצעו ואושרו</h1>
     </caption>
         <tr class="gg">
           <th class="gg">אפשרויות</th>
@@ -146,7 +154,7 @@ function pre (){
     </tr> <tr class="ggr">
       <th class="ggr">שם</th>
       {#each fmiData as data, i}
-            <td class="ggr">{data.name}</td>
+            <td class="ggr">{data.missionName}</td>
             {/each}
           </tr> <tr>
             <th>תיאור</th>
@@ -190,7 +198,7 @@ function pre (){
          </td>
          {/each}
     </tr><tr style="display:''" id="hoursD">
-          <th >כמה שעות זה אמור לקחת? </th>
+          <th >כמה שעות זה  לקח </th>
           {#each fmiData as data, i}
           <td>
             {#if data.hoursassinged > 0}
@@ -200,7 +208,7 @@ function pre (){
           </td>
           {/each}
         </tr><tr style="display:''" id="vallueperhourN" >
-          <th>כמה שווה שעה ?</th>
+          <th>כמה שווה שעה</th>
           {#each fmiData as data, i}
           <td>
             {#if data.perhour > 0}
@@ -213,32 +221,134 @@ function pre (){
       <th>שווי סך הכל למשימה </th>
       {#each fmiData as data, i}
       <td>
-      {#if data.perhour > 0 & data.hoursassinged > 0}
-      
-      {data.perhour * data.hoursassinged}
-      
-      {:else} <p>0</p>
-      {/if}
+      {data.total}
       </td>
       {/each}
     </tr>
-    <tr class="ggd">
-          <th class="ggd">אפשרויות</th>
-          {#each fmiData as data, i}
-          <td class="ggd" style="font-size: 3rem">
-           
-          <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded-full"
-          title="עריכה"
-          on:click={edit(data.id)} 
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-           <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
-          </svg>
-          </button> 
-         
+     <tr>
+            <th> הערות סיום</th>
+            {#each fmiData as data, i}
+            <td>
+              {#if data.why}
+              {data.why}
+              {/if}
+             </td>
+             {/each}
+        </tr>
+         <tr>
+            <th>בוצע על ידי</th>
+            {#each fmiData as data, i}
+            <td>
+              {data.users_permissions_user.username}
+             </td>
+             {/each}
+        </tr>
+    </table>
+
+     <table dir="rtl" >
+    <caption class="sm:text-right md:text-center text-right ">  
+      <h1 class="md:text-center text-2xl md:text-2xl font-bold"
+      >משאבים שהתקבלו</h1>
+    </caption>
+        <tr class="gg">
+          <th class="gg">אפשרויות</th>
+          {#each rikmashes as data, i}
+          <td class="gg" style="font-size: 3rem">
+            {i + 1}
         </td>
           {/each}
-    </tr> 
+    </tr> <tr class="ggr">
+      <th class="ggr">שם</th>
+      {#each rikmashes as data, i}
+            <td class="ggr">{data.name}</td>
+            {/each}
+          </tr> <tr>
+            <th>תיאור</th>
+            {#each rikmashes as data, i}
+            <td>{data.descrip}</td>
+              {/each}
+            </tr>
+         <tr>
+              <th>תאריך התחלה</th>
+              {#each rikmashes as data, i}
+            <td>              {#if data.Sqadualed}
+              {data.Sqadualed}
+            {/if}
+            </td>
+            {/each}
+          </tr> <tr>
+            <th> תאריך סיום</th>
+            {#each rikmashes as data, i}
+            <td>
+                    {#if data.Sqadualef}
+              {data.Sqadualef}
+            {/if}
+             </td>
+             {/each}
+        </tr><tr>
+          <th>הערות יחודיות לריקמה שלי</th>
+          {#each rikmashes as data, i}
+          <td>
+            {#if data.spnot}
+            {data.spnot}
+            {/if}
+           </td>
+           {/each}
+      </tr><tr>
+        <th>קישורים יחודיים לריקמה שלי</th>
+        {#each rikmashes as data, i}
+        <td>          {#if data.privatlinks} 
+
+          {data.privatlinks} 
+          {/if}
+         </td>
+         {/each}
+    </tr><tr style="display:''" id="hoursD">
+          <th >כמות </th>
+          {#each rikmashes as data, i}
+          <td>
+            {#if data.hm }
+
+           {data.hm}
+           {/if}
+          </td>
+          {/each}
+        </tr><tr style="display:''" id="vallueperhourN" >
+          <th>כמה שווה 1</th>
+          {#each rikmashes as data, i}
+          <td>
+            {#if data.agprice}
+
+            {data.agprice}
+            {/if}
+          </td>
+          {/each}
+        </tr><tr >
+      <th>שווי סך הכל  </th>
+      {#each rikmashes as data, i}
+      <td>
+      {data.total}
+      </td>
+      {/each}
+    </tr>
+     <tr>
+            <th> הערות סיום</th>
+            {#each rikmashes as data, i}
+            <td>
+              {#if data.why}
+              {data.why}
+              {/if}
+             </td>
+             {/each}
+        </tr>
+         <tr>
+            <th>שותף על ידי</th>
+            {#each rikmashes as data, i}
+            <td>
+              {data.users_permissions_user.username}
+             </td>
+             {/each}
+        </tr>
     </table>
   </div>
   </div>

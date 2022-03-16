@@ -177,8 +177,8 @@ async function start () {
             projectName
             descripFor
             publicDescription
-            finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id}}
-            rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id}}
+            finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id username}}
+            rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches {
               hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks }
@@ -1471,13 +1471,26 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                      on:remove={wdwd}
     />{/if}</div>
 {#if fmiData.length > 0 || rikmashes.length > 0}
+        <div class="m-4 border-2 border-barbi rounded p-4" >
+
     <Fini fmiData={fmiData} users={projectUsers} {rikmashes}/>
+    <br>
+    {#if hal === false}
     <button on:click={() => hal = true} class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
     חישוב רווח בגירסה ראשונית
   </button>
-      {#if hal === true}
+      {:else if hal === true}
+       <button
+      title={cencel}
+      on:click={() => hal = false}
+       class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+        <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+    </svg></button> 
+    
     <Hach fmiData={fmiData} users={projectUsers} {rikmashes}/>
       {/if}
+      </div>
     {/if}
    </div> 
 
