@@ -1,6 +1,7 @@
 <script>
      
 export let fmiData = [];
+export let rikmashes = [];
   export let hagdel = false;
    import { onMount } from 'svelte'; 
 
@@ -29,7 +30,7 @@ pre ()
 
 function pre (){
     console.log(users, fmiData)
-    for (let i = 0; i < users.length; i++){
+  for (let i = 0; i < users.length; i++){
         for (let j = 0; j <fmiData.length; j++){
           
             if (fmiData[j].users_permissions_user.id === users[i].id){
@@ -41,13 +42,30 @@ function pre (){
                    }
             }
         }
-       
+        for (let j = 0; j <rikmashes.length; j++){
+          
+            if (rikmashes[j].users_permissions_user.id === users[i].id){
+                   if (rikmashes[j].users_permissions_user.id in dictid) {
+                    dictid[rikmashes[j].users_permissions_user.id] += rikmashes[j].total
+                   } else {
+                    dictid[rikmashes[j].users_permissions_user.id] = rikmashes[j].total
+
+                   }
+            }
+        }
     }
     for (let j = 0; j <fmiData.length; j++){
            if ("net" in dictid) {
             dictid["net"] += fmiData[j].total   
                           } else {
                     dictid["net"] = fmiData[j].total
+                   }
+                  }
+                  for (let j = 0; j <rikmashes.length; j++){
+           if ("net" in dictid) {
+            dictid["net"] += rikmashes[j].total   
+                          } else {
+                    dictid["net"] = rikmashes[j].total
                    }
                   }
     console.log(dictid)

@@ -727,8 +727,8 @@ function close () {
 }
 let meDatamm = [];
 async function updi (){
-var resultString = needr.join('&id_in=');
-let linkpp ="https://oneloveone.onrender.com/mashaabims?id_in=" + resultString ;
+ var resultString = needr.join('&id_in=');
+ let linkpp ="https://oneloveone.onrender.com/mashaabims?id_in=" + resultString ;
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -1470,13 +1470,13 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                      on:close={clo}
                                      on:remove={wdwd}
     />{/if}</div>
-{#if fmiData.length > 0 }
+{#if fmiData.length > 0 || rikmashes.length > 0}
     <Fini fmiData={fmiData} users={projectUsers} {rikmashes}/>
     <button on:click={() => hal = true} class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
     חישוב רווח בגירסה ראשונית
   </button>
       {#if hal === true}
-    <Hach fmiData={fmiData} users={projectUsers}/>
+    <Hach fmiData={fmiData} users={projectUsers} {rikmashes}/>
       {/if}
     {/if}
    </div> 
