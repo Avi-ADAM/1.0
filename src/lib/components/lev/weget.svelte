@@ -176,7 +176,7 @@ async function agree() {
 }){rikmash {id }}
 updateMaap(
   input:  {
-    where: {id: "${mId}"}
+    where: {id: "${askId}"}
   data: {archived: true,
 vots: [${userss}, 
        {
