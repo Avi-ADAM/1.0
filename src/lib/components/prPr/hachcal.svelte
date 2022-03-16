@@ -128,7 +128,7 @@ x[i] = (ulist[i].p / 100) * revach
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >טבלת חישוב ראשונית</h1>
+      >טבלת חישוב </h1>
     </caption>
         <tr class="gg">
           <th class="gg"></th>
@@ -164,26 +164,15 @@ x[i] = (ulist[i].p / 100) * revach
   </div>
 <style>
      .gg{ 
-     position: sticky;
-     top: 1px; 
+ 
      background-color: var(--naim) !important;
      border-width: 4px;
   border-color: rgb(103, 232, 249);
      border-radius: 4%;
       opacity: 1;
   }
-   .ggd{ 
-     position: sticky;
-     bottom: 1px; 
-     background-color: var(--naim) !important;
-     border-width: 4px;
-  border-color: rgb(103, 232, 249);
-     border-radius: 4%;
-      opacity: 1;
-  }
+   
   .ggr{ 
-     position: sticky;
-     top: 77px; 
      background-color: var(--naim) !important;
      opacity: 1;
 
@@ -200,7 +189,6 @@ x[i] = (ulist[i].p / 100) * revach
     .body {
       overflow-x: auto;
       overflow-y: auto;
-     height: 100vh;
      width: 100vw;
      padding-left: 0.5em;
      padding-right: 0.5em;

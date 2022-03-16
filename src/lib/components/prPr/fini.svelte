@@ -114,7 +114,8 @@ function pre (){
 
     </script>
     {#if hagdel === false}
-    <div style =" margin: 20px auto;" class="flex items-center justify-center ">
+    <div style =" margin: 20px auto;" class="flex flex-col items-center justify-center ">
+      <h1 class="text-barbi">חלוקת שווי הפרויקט</h1>
     <svg width="250px" height="250px" style="display: inline;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
         <defs>
