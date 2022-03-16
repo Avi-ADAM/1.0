@@ -215,17 +215,17 @@ async function start () {
             meData.descripFor = descPri;
             projectUsers = project.user_1s;
             restime = project.restime;
-            if (project.mesimabetahaliches.length > 1){
+            if (project.mesimabetahaliches.length > 0){
             bmiData = project.mesimabetahaliches;
             } else if (project.mesimabetahaliches.length == null) {
             bmiData.push(project.mesimabetahaliches);
             }
-            if (project.finnished_missions.length > 1){
+            if (project.finnished_missions.length > 0){
             fmiData = project.finnished_missions;
             } else if (project.finnished_missions.length == null) {
             fmiData.push(project.finnished_missions);
             }
-             if (project.rikmashes.length > 1){
+             if (project.rikmashes.length > 0){
             rikmashes = project.rikmashes;
             } else if (project.rikmashes.length == null) {
             rikmashes.push(project.rikmashes);
@@ -236,13 +236,14 @@ async function start () {
           //  } else if (project.open_missions.length == null){
           //  omiData.push(project.open_missions);
           //  }
-            if (project.pendms.length > 1){
+            if (project.pendms.length > 0){
             pmiData = project.pendms;
             } else if (project.pendms.length == null){
             pmiData.push(project.pendms);
             }
         //    omiData = omiData;
             pmiData = pmiData;
+            console.log(pmiData)
             bmiData = bmiData;
             vallues = project.vallues;
             valit = vallues.map(c => c.valueName);
@@ -990,6 +991,9 @@ let pir = false;
     </script>
     <svelte:head>
   <title>מוח הריקמה 1❤️1</title>
+ 
+      <link rel="preload" as="image" href="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"  />
+ 
 </svelte:head>
 
 
@@ -1326,7 +1330,7 @@ let pir = false;
 
   {#if pendS === false}
 <button
- class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+ class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full"
 on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
 {:else}
 <button title={cencel1}
