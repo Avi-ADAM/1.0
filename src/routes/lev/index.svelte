@@ -1044,6 +1044,7 @@ async function start () {
     sdsa = [];
     pmashes = [];
     huca = [];
+    wegets=[];
    midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);

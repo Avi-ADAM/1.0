@@ -281,7 +281,7 @@ async function decline() {
                     body: JSON.stringify({
                         query: `mutation 
                         { 
-updateFiniapruval(
+updateMaap(
   input: {
     where: {id: "${askId}"}
   data: {vots: [${userss}, 
@@ -292,7 +292,7 @@ updateFiniapruval(
                                       }
                                     ] }
 }
-) {finiapruval {id vots {id}}}
+) {maap {id vots {id}}}
 }
 `})
                 })
