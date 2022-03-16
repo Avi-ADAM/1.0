@@ -159,6 +159,7 @@ function crMaap(hh){
                             users: start[i].maaps[j].vots,
                             openName: start[i].maaps[j].sp.name,
                             easy: start[i].maaps[j].open_mashaabim.easy,
+                            price: start[i].maaps[j].open_mashaabim.price,
                             sqadualed: start[i].maaps[j].open_mashaabim.sqadualed,
                             sqadualedf: start[i].maaps[j].open_mashaabim.sqadualedf,
                             spnot: start[i].maaps[j].open_mashaabim.spnot,
@@ -1466,6 +1467,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
             userId ={ da.uid} 
             spid = {da.spid} 
             src = {da.src}
+            price={da.price}
             hm={da.hm}
             src2 = {da.src2}
             why={da.why}
