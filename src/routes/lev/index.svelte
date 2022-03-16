@@ -13,6 +13,7 @@ import Mid from "../../lib/components/lev/mid.svelte"
         import { isEqual } from 'lodash';
         import Mashsug from '../../lib/components/lev/mashsuggest.svelte'
         import Reqtom from '../../lib/components/lev/reqtom.svelte'
+        import Weget from '../../lib/components/lev/weget.svelte'
 
 let ddd;
 let low = true;
@@ -45,6 +46,8 @@ let fia = 0;
 let fiapp = [];
 let askedm = [];
 let askm = 0;
+let ma = 0;
+let wegets = [];
 function mesimabetahalicha (data) {
     const mtahan = data.data.user.mesimabetahaliches;
         for (var i = 0; i < mtahan.length; i++) {
@@ -137,6 +140,90 @@ function ishursium (dati){
     console.log(fiapp)
     fia = fiapp.length;
 //createD()
+}
+function crMaap(hh){
+    const start = hh.data.user.projects_1s
+      const myid = hh.data.user.id;
+  for (var i = 0; i < start.length; i++) {
+            for (var j = 0; j < start[i].maaps.length; j++){
+                if(start[i].maaps.length > 0){
+                      const rt = letters(start[i].maaps[j].sp.name); 
+                    wegets.push({
+                            uid: start[i].maaps[j].sp.users_permissions_user.id,
+                            username: start[i].maaps[j].sp.users_permissions_user.username,
+                            src: start[i].maaps[j].sp.users_permissions_user.profilePic.formats.thumbnail.url,
+                             myp: start[i].maaps[j].sp.myp,
+                            spid: start[i].maaps[j].sp.id,
+                            omid: start[i].maaps[j].open_mashaabim.id,
+                            askId: start[i].maaps[j].id,
+                            users: start[i].maaps[j].vots,
+                            openName: start[i].maaps[j].sp.name,
+                            easy: start[i].maaps[j].open_mashaabim.easy,
+                            sqadualed: start[i].maaps[j].open_mashaabim.sqadualed,
+                            sqadualedf: start[i].maaps[j].open_mashaabim.sqadualedf,
+                            spnot: start[i].maaps[j].open_mashaabim.spnot,
+                            kindOf: start[i].maaps[j].open_mashaabim.kindOf,
+                            name: rt[0],
+                            stylef: rt[1], 
+                            st: rt[2],
+                            projectId: start[i].id,
+                            projectName : start[i].projectName,
+                            noof: start[i].user_1s.length,
+                            src2: start[i].profilePic.formats.thumbnail.url,
+                            myid: hh.data.user.id
+                              });
+                                                                    console.log(hh.data.user.projects_1s)
+
+            }
+        }
+  }
+    console.log(wegets)
+ for (var k = 0; k < wegets.length; k++) {
+     const x = wegets[k].users
+             wegets[k].uids = [];
+     for (var z = 0; z < x.length; z++){
+      wegets[k].uids.push(x[z].users_permissions_user.id);
+              wegets[k].what = [];
+   wegets[k].what.push(x[z].what);
+ }
+ }    
+
+    for (var t = 0; t <wegets.length; t++){
+    const allid = wegets[t].uids;
+    const myid = wegets[t].myid;
+    wegets[t].already = false;
+    wegets[t].noofusersOk = 0;
+    wegets[t].noofusersNo = 0;
+    wegets[t].whyno = [];
+    wegets[t].whyes = [];
+    wegets[t].mypos = null;
+    if(allid.includes(myid)){
+      wegets[t].already = true;
+    for (var l=0; l< wegets[t].users.length; l++){
+        if (wegets[t].users[l].users_permissions_user.id === myid)
+      wegets[t].mypos = wegets[t].users[l].what;
+              }
+    }
+
+        for (var r=0; r< wegets[t].users.length; r++){
+            if (wegets[t].users[r].what === true) {
+                wegets[t].noofusersOk += 1;
+                wegets[t].whyes.push(wegets[t].users[r].why)
+            }else if (wegets[t].users[r].what === false) {
+                 wegets[t].noofusersNo += 1;
+               wegets[t].whyno.push(wegets[t].users[r].why)
+            }
+        }
+
+    const noofusersWaiting = wegets[t].noof - wegets[t].users.length;
+    wegets[t].noofusersWaiting = noofusersWaiting;
+                        console.log(wegets,"hguyg")
+
+    }
+    wegets = wegets
+    console.log(wegets)
+    ma = wegets.length;
+
 }
 let orech;
 let adder = [];
@@ -397,18 +484,83 @@ function letters(data){
         data = x; 
         st = 175;
     }
+
+
+ //  if (data.length >= 2 && data.length < 4) {
+ //       st = 185;
+ //    } 
+ // else if (data.length >= 4 && data.length < 5) {
+ //       st = 180;
+ //    } 
+ // else if (data.length >= 5 && data.length < 6) {
+ //       st = 170;
+ //    } else if (data.length >= 6 && data.length < 7) {
+ //       st = 165
+ //    } else if (data.length >= 7 && data.length < 8) {
+ //       st = 160
+ //    }else if (data.length >= 8 && data.length < 9) {
+ //       st = 150
+ //    }else if (data.length >= 9 && data.length < 10) {
+ //           st = 140
+ //    }else if (data.length >= 10 && data.length < 11) {
+ //           st = 130;
+ //    }else if (data.length >= 11 && data.length < 12) {
+ //           st = 135;
+ //           stylef = '29px';
+ //   } else  if (data.length >= 12 && data.length <13) {
+ //               st = 130;
+ //               stylef = '29px';
+ //    }else  if (data.length >= 13 && data.length <14) {
+ //               st = 125;
+ //               stylef = '25px';
+ //    }else  if (data.length >= 14 && data.length <15) {
+ //               st = 125;
+ //               stylef = '25px';
+ //    }else  if (data.length >= 15 && data.length <17) {
+ //               st = 125;
+ //               stylef = '25px';
+ //    }else  if (data.length >= 17 && data.length <19) {
+ //               st = 130;
+ //               stylef = '19px';
+ //    }else  if (data.length >= 19 && data.length <20) {
+ //               st = 130;
+ //               stylef = '17px';
+ //    }else  if (data.length >= 20 && data.length <21) {
+ //               st = 125;
+ //               stylef = '17px';
+ //    }else  if (data.length >= 21 && data.length <22) {
+ //               st = 125;
+ //               stylef = '16px';
+ //    } else  if (data.length >= 22){
+ //                      st = 125;
+ //        stylef = '14px';
+ //   }
+
     if (data.length >= 15 && data.length < 19) {
         stylef = '21px';
+        st = 165
      } else if (data.length >= 19 && data.length < 20) {
             stylef = '20px';
+            st = 155
      } else  if (data.length >= 20 && data.length <21) {
             stylef = '18px';
+            st = 150
      } else  if (data.length >= 21){
          stylef = '16px';
+         st = 145
     }
     return [data, stylef, st];
 }
 function deloi (event ){
+   const newasked = wegets;
+   const todel = event.detail.asked
+   newasked.splice(todel, 1);
+   wegets = newasked;
+   ma = wegets.length;
+   start()
+}
+
+function deloid (event ){
    const newasked = fiapp;
    const todel = event.detail.asked
    newasked.splice(todel, 1);
@@ -829,7 +981,8 @@ async function start () {
                         } 
                         } 
                             projects_1s { projectName id user_1s {id} profilePic {url formats } 
-                            maaps(where:{archived: false }){id created_at name sp{id } open_mashaabim{id}vots{what why id users_permissions_user {id}}}
+                            maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
+                            open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
                                 pmashes (where:{archived: false }){ id hm project {projectName id 
                                         profilePic {url formats } 
                                         user_1s { id}
@@ -879,6 +1032,7 @@ async function start () {
       console.log("tada")
    console.log (miData)
    miData = miData
+   askedm = [];
    fiapp = [];
    dictasked = [];
    pends = [];
@@ -901,6 +1055,7 @@ async function start () {
           pmash(miData)
           sps(miData)
           createmask(miData)
+          crMaap(miData)
       //    createD()
   }
         } catch (e) {
@@ -1290,7 +1445,48 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 shows={shows}
                 /></div>
 {/each}
-
+    
+{#each  wegets  as da, i}
+        <div  class="fiap normSml" style="display:'';"><Weget
+            on:acsept={deloid}
+            on:decline={deloid}
+            mId={da.mId}
+            noofusersWaiting={da.noofusersWaiting}
+            uids={da.uids}
+            kindOf={da.kindOf}
+            noofusersOk={da.noofusersOk}
+            noofusersNo={da.noofusersNo}
+            already={da.already}
+            users={da.users}
+            askId={da.askId}
+            myp={da.myp}
+            projectName = {da.projectName}
+            useraplyname ={da.username}
+            userId ={ da.uid} 
+            spid = {da.spid} 
+            src = {da.src}
+            hm={da.hm}
+            src2 = {da.src2}
+            why={da.why}
+            whatt={da.whatt}
+            missionBName={da.openName}
+            name={da.name}
+            projectId={da.projectId}
+               noofpu={da.noof}
+            sqadualedf={da.sqadualedf}
+             sqadualed={da.sqadualed}
+            spnot={da.spnot}
+            easy ={da.easy}
+            nhours={da.nhours}
+            deadline={da.deadline}
+                missId={da.missId}
+                id={da.id}
+                openMid={da.omid}
+                stylef={da.stylef}
+                st={da.st}
+                declined={da.decid}
+                /></div>
+{/each}
     
 {#each  fiapp  as da, i}
         <div  class="fiap normSml" style="display:'';"><Fiappru
@@ -1461,7 +1657,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 /></div>
     {/each}
 
-    <!--
+<!--
         <div  class="normSml desi" style="display:'';"><DecisionMaking  decisionName={"?לפתוח קבוצת ווצאפ"} projectName={"פסיפס"} projectId={6}/></div> 
     <div class="normSml desi"><DecisionMaking decisionName={"?מה לבנות קודם"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"} deadLine={"10.7.2021"}/></div> 
 
