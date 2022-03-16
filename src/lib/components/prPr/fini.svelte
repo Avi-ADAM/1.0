@@ -3,7 +3,7 @@
 export let fmiData = [];
   export let hagdel = false;
    import { onMount } from 'svelte'; 
-
+export let rikmashes = [];
 // what about hours alrerady done to  mission in progres 
 function remove (id) {
   console.log(id)
@@ -41,13 +41,30 @@ function pre (){
                    }
             }
         }
-       
+        for (let j = 0; j <rikmashes.length; j++){
+          
+            if (rikmashes[j].users_permissions_user.id === users[i].id){
+                   if (rikmashes[j].users_permissions_user.id in dictid) {
+                    dictid[rikmashes[j].users_permissions_user.id] += rikmashes[j].total
+                   } else {
+                    dictid[rikmashes[j].users_permissions_user.id] = rikmashes[j].total
+
+                   }
+            }
+        }
     }
     for (let j = 0; j <fmiData.length; j++){
            if ("net" in dictid) {
             dictid["net"] += fmiData[j].total   
                           } else {
                     dictid["net"] = fmiData[j].total
+                   }
+                  }
+                  for (let j = 0; j <rikmashes.length; j++){
+           if ("net" in dictid) {
+            dictid["net"] += rikmashes[j].total   
+                          } else {
+                    dictid["net"] = rikmashes[j].total
                    }
                   }
     console.log(dictid)

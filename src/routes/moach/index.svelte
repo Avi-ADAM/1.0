@@ -99,6 +99,7 @@ let restime;
 let valit;
 let projects = [];
 let user = [];
+let rikmashes = [];
 onMount(async () => {
 start ()
 })
@@ -177,6 +178,7 @@ async function start () {
             descripFor
             publicDescription
             finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id}}
+            rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches {
               hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks }
@@ -223,6 +225,12 @@ async function start () {
             } else if (project.finnished_missions.length == null) {
             fmiData.push(project.finnished_missions);
             }
+             if (project.rikmashes.length > 1){
+            rikmashes = project.rikmashes;
+            } else if (project.rikmashes.length == null) {
+            rikmashes.push(project.rikmashes);
+            }
+            rikmashes = rikmashes
           //  if (project.open_missions.length > 1){
             omiData = project.open_missions;
           //  } else if (project.open_missions.length == null){
@@ -1462,8 +1470,8 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                      on:close={clo}
                                      on:remove={wdwd}
     />{/if}</div>
-{#if fmiData.length > 0}
-    <Fini fmiData={fmiData} users={projectUsers}/>
+{#if fmiData.length > 0 }
+    <Fini fmiData={fmiData} users={projectUsers} {rikmashes}/>
     <button on:click={() => hal = true} class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
     חישוב רווח בגירסה ראשונית
   </button>

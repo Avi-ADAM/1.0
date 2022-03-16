@@ -189,7 +189,7 @@ vots: [${userss},
 updateSp( input:  {
     where: {id: "${spid}"}
   data: {panui: false}
-)
+){sp{id}}
 }
 `})
                 })
