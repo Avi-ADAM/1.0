@@ -167,7 +167,6 @@ async function agree() {
               open_mashaabim: "${openMid}",
               spnot: "${spnot}",
               maap: "${askId}",
-              descrip: "${missionDetails}",
               users_permissions_user: "${userId}",
               sp: "${spid}",
               ${date}
