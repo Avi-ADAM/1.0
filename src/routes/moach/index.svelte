@@ -8,6 +8,7 @@
     import Editb from '../../lib/components/prPr/editp.svelte'
         import Hand from '../../lib/components/prPr/hand.svelte'
         import Handd from '../../lib/components/prPr/handd.svelte'
+        import Mashman from '../../lib/components/prPr/mashmam.svelte'
 
    import { onMount } from 'svelte'; 
    import { idPr } from '../../lib/stores/idPr.js';
@@ -107,6 +108,8 @@ let projects = [];
 let user = [];
 let rikmashes = [];
 let lll;
+let opmash = [];
+let noofopenm = 0;
 onMount(async () => {
  start ()
 })
@@ -197,6 +200,7 @@ JSON.stringify({query:
                                     work_ways {id workWayName} 
                                     mission { id}
                         } 
+                        open_mashaabims (where: {archived: false }){id kindOf hm descrip price easy name spnot sqadualed sqadualedf }
              pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}
@@ -227,6 +231,11 @@ JSON.stringify({query:
             } else if (project.mesimabetahaliches.length == null) {
             bmiData.push(project.mesimabetahaliches);
             }
+             if (project.open_mashaabims.length > 0){
+            opmash = project.open_mashaabims;
+            } else if (project.open_mashaabims.length == null) {
+            opmash.push(project.open_mashaabims);
+            }
             if (project.finnished_missions.length > 0){
             fmiData = project.finnished_missions;
             } else if (project.finnished_missions.length == null) {
@@ -255,6 +264,7 @@ JSON.stringify({query:
             vallues = project.vallues;
             valit = vallues.map(c => c.valueName);
              meData.linkToWebsite = linkP;
+             noofopenm = opmash.length;
             noofopen = project.open_missions.length;
             if (project.profilePic !== null){
             srcP = project.profilePic.url;
@@ -718,6 +728,7 @@ async function addneww (event) {
   .then ()
   addM = true;
 };
+let openMA = false;
 let cencel1 = "סגירה";
 
 let openMS = false;
@@ -991,6 +1002,9 @@ let pir = false;
 function trym(){
    openMS = true
 }
+function tryma(){
+   openMA = true
+}
 function masi(){
    addN = true
    		lll.scrollIntoView(true);
@@ -1078,7 +1092,6 @@ function masi(){
            <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
           </svg>
           </button>
-    </div>
   <h1 class="1 bg-lturk">{projectname}</h1>
   {#if project.publicDescription}
    <h6 class="2 bg-lturk">{desP}</h6>
@@ -1103,7 +1116,6 @@ function masi(){
   {#each vallues as vallue, i }
     <h3> {vallue.valueName} </h3>
   {/each}</div></div>
-  </div>
   <!--
   <div>
  <Fini users={projectUsers} {fmiData}/></div>-->
@@ -1119,7 +1131,7 @@ function masi(){
   <button on:click={masi} on:mouseleave={bighandd} ><img title={hosafat}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"></button> 
 
   {:else}
-   <Handd on:masi={masi} on:bighandd={bighandd} {addN} {hosafat}/>
+   <Handd on:trym={tryma} on:masi={masi} on:bighandd={bighandd} {noofopenm} {openMA} {addN} {hosafat}/>
 
 {/if}
 
@@ -1185,7 +1197,30 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
   {/if}
      </div>
+<div class="bg-lturk m-4 ">
 
+{#if openMA === true && opmash.length > 0}
+
+  <button title={cencel1}
+  on:click={() => openMA = false}
+  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
+   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+  </svg></button> 
+<Mashman meData={opmash}/>
+ {:else if openMA === true && opmash.length == 0}
+  <button title={cencel1}
+  on:click={() => openMA = false}
+  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
+   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+    <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+  </svg></button>
+ <h2> אין משאבים מבוקשים לריקמה זו, מומלץ ליצור כבר עכשיו
+   <br>
+   (לחצו על היד המחזיקה מגנט שלמעלה)</h2>
+
+  {/if}
+     </div>
   <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->
@@ -1292,7 +1327,10 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       {/if}
       </div>
     {/if}
+    <div class="bg-lturk p-4"></div>
    </div> 
+</div>
+</div>
 
   <!--  {:else}
     לשלוח אותו לרקמה ציבורי לקחת ID וכו'
@@ -1313,7 +1351,6 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
  </div> 
  {/if}
-
  <style>
    .hhh{
      display: flex;

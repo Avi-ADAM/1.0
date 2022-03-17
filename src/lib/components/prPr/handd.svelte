@@ -3,8 +3,8 @@
       const dispatch = createEventDispatcher();
 
     export let addN = false;
-    export let openMS = false;
-    export let noofopen = 0;
+    export let openMA = false;
+    export let noofopenm = 0;
     export let hosafat = "";
 function bighand (){
 dispatch('masi');
@@ -189,5 +189,39 @@ function trym (){
     <path d="M23.717 4.223L21.96 2.43 23.896.535c.006-.006.004-.015.009-.021.016-.019.021-.039.027-.063.007-.024.013-.044.01-.068-.001-.008.005-.015.004-.023-.004-.017-.02-.024-.028-.038-.008-.016-.005-.035-.018-.048-.006-.006-.015-.004-.022-.009-.02-.016-.042-.021-.067-.028-.022-.006-.041-.012-.063-.01-.008.001-.016-.006-.024-.004L18.588 1.48c-.064.016-.115.065-.134.129-.018.064 0 .133.046.18l1.757 1.794-1.935 1.896c-.006.006-.004.015-.009.021-.016.019-.021.04-.028.064-.007.024-.013.043-.01.067.001.008-.006.015-.004.024.006.025.023.043.038.062.005.007.003.016.009.023l.011.011c.042.036.095.044.147.036.007-.001.011.006.018.004l5.134-1.257c.064-.016.115-.065.134-.129.018-.066 0-.135-.045-.182zm-2.155-1.661l.005-.005-.005.005zm14.266 12.543l-2.055-1.443 1.557-2.217c.005-.007.001-.015.005-.022.012-.022.013-.042.015-.067s.005-.045-.002-.069c-.002-.008.003-.015-.001-.023-.007-.016-.024-.02-.034-.033-.011-.014-.012-.032-.027-.043-.007-.005-.016-.001-.023-.005-.023-.012-.045-.013-.071-.015-.023-.002-.043-.004-.064.002-.008.002-.016-.003-.024.001l-4.819 2.173c-.06.027-.101.085-.108.151-.006.066.025.131.078.169l2.055 1.443-1.556 2.217c-.005.007-.001.015-.005.022-.012.022-.013.043-.015.068-.002.024-.005.045.002.068.002.008-.003.016.001.024.011.023.031.038.049.054.006.006.006.015.013.02l.013.008c.048.028.102.026.151.008.006-.002.012.004.018.001l4.818-2.174c.06-.027.101-.085.108-.151.004-.064-.026-.129-.079-.167zm-2.422-1.24l.004-.006-.004.006z" style="fill: url(#newlinearGradient4172-1);"/>
   </g>
         {/if}
+        {#if openMA === false}
+    <g class="gg" transform="matrix(1, 0, 0, 1, 351.919037, 213.900604)"  on:click={trym} style="">
+      <title>הצגת בקשות למשאבים</title>
+      <rect style="opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-1" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>
+      <text dominant-baseline="middle" style= "text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill: rgb(171, 55, 200); fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre;" x="371" y="682.429" id="text4238"><tspan id="tspan4240" x="371" y="682.429" style="text-anchor: middle; font-size: 96.8px; word-spacing: 0px;">{noofopenm}</tspan></text>
+      <text id= "text-4" y="682.429" x="371" dominant-baseline="middle" style=" text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre; fill: url(#linearGradient4248-1);"><tspan y="682.429" x="371" id="tspan4246" style=" text-anchor: middle; fill-opacity: 1; font-size: 96.8px; word-spacing: 0px; fill: url(#linearGradient42481);">{noofopenm}</tspan></text>
+    </g>
+    {/if}
 
 </svg>
+<style>
+
+       
+#curve {
+    fill: transparent;
+}
+
+.curved-text {
+    fill: #d0f5f6;
+    text-align: center;
+    font-size: var(--the, 24px);
+}
+ .gg{
+       transition: all 1s;
+   }
+  
+   #rect-1{
+     fill: black;
+        transition: all 1s;
+   }
+   #rect-1:hover{
+     fill: #67E8F9;
+   }
+
+
+</style>
