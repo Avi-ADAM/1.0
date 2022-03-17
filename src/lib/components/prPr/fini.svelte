@@ -4,6 +4,8 @@ export let fmiData = [];
   export let hagdel = false;
    import { onMount } from 'svelte'; 
 export let rikmashes = [];
+  export let meData = [];
+
 // what about hours alrerady done to  mission in progres 
 function remove (id) {
   console.log(id)
@@ -112,6 +114,76 @@ function pre (){
 
 }
 
+
+ 
+  import moment from 'moment';
+
+  onMount(async () => {
+    meData = rikmashes
+   myMissionH()
+              });
+
+ let km = false;
+  let ky = false;
+  let kc = false;
+
+
+function myMissionH ()  {
+  km = false;
+  ky = false;
+  kc = false;
+  let is = [];
+console.log(meData)
+for (var i = 0; i <meData.length; i++) {
+  if (meData[i].kindOf === "monthly"){
+  
+    console.log(i,"to to")
+    ky = true;
+    meData[i].m = true;
+    meData[i].ky = true;
+         meData[i].kc = false;
+                   meData[i].r = false;
+    meData[i].y = false;
+ 
+  } else if (meData[i].kindOf === "yearly"){
+  
+    ky = true;
+    meData[i].y = true;
+        meData[i].m = false;
+          meData[i].r = false;
+     meData[i].ky = true;
+              meData[i].kc = false;
+
+    } else if (meData[i].kindOf === "rent"){
+            meData[i].y = false;
+    ky = true;
+    meData[i].r = true;
+     meData[i].ky = true;
+             meData[i].m = false;
+         meData[i].kc = false;
+   meData[i].total =  meData[i].price;
+meData[i].totaltotal =  meData[i].easy;
+    } else if (meData[i].kindOf === "perUnit"){
+    meData[i].y = false;
+    meData[i].kc = true;
+         meData[i].ky = false;
+                 meData[i].m = false;
+          meData[i].r = false;
+    kc = true;
+    meData[i].total = meData[i].hm * meData[i].price;
+meData[i].totaltotal = meData[i].hm * meData[i].easy;
+  } else if (meData[i].kindOf === "total"){
+        meData[i].y = false;
+    meData[i].kc = false;
+         meData[i].ky = false;
+                 meData[i].m = false;
+                     meData[i].r = false;
+   meData[i].total =  meData[i].price;
+meData[i].totaltotal =  meData[i].easy;
+  }
+}
+};
+ 
     </script>
     {#if hagdel === false}
     <div style =" margin: 20px auto;" class="flex flex-col items-center justify-center ">
@@ -123,7 +195,7 @@ function pre (){
     <image href={use.src} x="0" y="0" width="100" height="100" />
   </pattern>
 </defs>
-  <circle  r="25%" cx="50%" cy="50%" stroke-dasharray={use.s, 100} stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
+  <circle  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s}, 100" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
   <title>{use.un}, {use.p.toFixed(2)}%</title></circle>
   {/each}
 </svg>
@@ -246,113 +318,101 @@ function pre (){
         </tr>
     </table>
 
-     <table dir="rtl" >
+ 
+  
+  <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >משאבים שהתקבלו</h1>
+      >משאבים שהתקבלו ואושרו</h1>
     </caption>
         <tr class="gg">
-          <th class="gg">אפשרויות</th>
-          {#each rikmashes as data, i}
+          <th class="gg"> </th>
+          {#each meData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
-        </td>
+            </td>
           {/each}
     </tr> <tr class="ggr">
       <th class="ggr">שם</th>
-      {#each rikmashes as data, i}
-            <td class="ggr">{data.name}</td>
-            {/each}
-          </tr> <tr>
-            <th>תיאור</th>
-            {#each rikmashes as data, i}
-            <td>{data.descrip}</td>
-              {/each}
-            </tr>
-         <tr>
-              <th>תאריך התחלה</th>
-              {#each rikmashes as data, i}
-            <td>              {#if data.Sqadualed}
-              {data.Sqadualed}
-            {/if}
+      {#each meData as data, i}
+            <td class="ggr">
+                {data.name}
             </td>
             {/each}
-          </tr> <tr>
-            <th> תאריך סיום</th>
-            {#each rikmashes as data, i}
-            <td>
-                    {#if data.Sqadualef}
-              {data.Sqadualef}
-            {/if}
-             </td>
-             {/each}
-        </tr><tr>
-          <th>הערות יחודיות לריקמה שלי</th>
-          {#each rikmashes as data, i}
-          <td>
-            {#if data.spnot}
-            {data.spnot}
-            {/if}
-           </td>
-           {/each}
-      </tr><tr>
-        <th>קישורים יחודיים לריקמה שלי</th>
-        {#each rikmashes as data, i}
-        <td>          {#if data.privatlinks} 
-
-          {data.privatlinks} 
-          {/if}
-         </td>
-         {/each}
-    </tr><tr style="display:''" id="hoursD">
-          <th >כמות </th>
-          {#each rikmashes as data, i}
-          <td>
-            {#if data.hm }
-
-           {data.hm}
-           {/if}
-          </td>
-          {/each}
-        </tr><tr style="display:''" id="vallueperhourN" >
-          <th>כמה שווה 1</th>
-          {#each rikmashes as data, i}
-          <td>
-            {#if data.agprice}
-
-            {data.agprice}
-            {/if}
-          </td>
-          {/each}
-        </tr><tr >
-      <th>שווי סך הכל  </th>
-      {#each rikmashes as data, i}
+          </tr>
+  <tr>
+      <th>תיאור</th>
+      {#each meData as data, i}
+      <td> {#if data.deskrip} {data.deskrip}{/if}
+</td>
+        {/each}
+    </tr> <tr>
+      <th>סוג</th>
+      {#each meData as data, i}
       <td>
-      {data.total}
-      </td>
+      <h1>{data.kindOf}</h1>
+        </td>
       {/each}
-    </tr>
-     <tr>
-            <th> הערות סיום</th>
-            {#each rikmashes as data, i}
-            <td>
-              {#if data.why}
-              {data.why}
-              {/if}
-             </td>
-             {/each}
-        </tr>
-         <tr>
+    </tr> <tr style="display:{kc ? "" : "none"};">
+      <th>כמות</th>
+      {#each meData as data, i}
+      <td >
+       {data.hm}
+      {/each}
+    </tr><tr style="display:{ ky  ? "" : "none"};" >
+      <th>תאריך התחלה </th>
+      {#each meData as data, i}
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      {/each}
+    </tr> <tr style="display:{ ky  ? "" : "none"};" >
+      <th >תאריך סיום </th>
+      {#each meData as data, i}
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      {/each}
+    </tr> <tr>
+      <th>הערות מיוחדות</th>
+      {#each meData as data, i}
+      <td>{#if data.spnot}
+ {data.spnot}{/if}</td>
+        {/each}
+  </tr> <tr>
+      <th>עלות</th>
+      {#each meData as data, i}
+      <td>
+  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
+  <h2>{data.price}</h2>  
+  {/each}
+    </tr><tr>
+      <th>שווי מקסימלי לחישוב בריקמה</th>
+      {#each meData as data, i}
+      <td>
+  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
+        {data.agprice}
+      {/each}
+    </tr><tr style="display:{kc || ky ? "" : "none"};" >
+      <th>עלות סה"כ</th>
+      {#each meData as data, i}
+      <td  >
+      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.total}</h3>
+      {/each}
+    </tr> <tr>
+      <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
+      {#each meData as data, i}
+      <td>{#if data.linkto}{data.linkto}{/if}
+</td>
+        {/each}
+  </tr><tr>
             <th>שותף על ידי</th>
-            {#each rikmashes as data, i}
+            {#each meData as data, i}
             <td>
               {data.users_permissions_user.username}
              </td>
              {/each}
         </tr>
-    </table>
-  </div>
-  </div>
+</table>
+</div>
+  </div> 
+ 
 {/if}
   
    
