@@ -2,7 +2,7 @@
   export let meData = [];
       import { onMount } from 'svelte';
  
-  import moment from 'moment'
+  import moment from 'moment';
 function remove (id) {
   console.log(id)
 };
@@ -23,12 +23,11 @@ function myMissionH ()  {
   ky = false;
   kc = false;
   let is = [];
-      console.log(i,"toeg3e to")
 
 for (var i = 0; i <meData.length; i++) {
   if (meData[i].kindOf === "monthly"){
-    var a = moment(meData[i].datef);
-var b = moment(meData[i].dates);
+    var b = moment(meData[i].sqadualed);
+var a = moment(meData[i].sqadualedf);
 meData[i].monts = a.diff(b, 'months', true).toFixed(2); 
     console.log(i,"to to")
     ky = true;
@@ -40,8 +39,8 @@ meData[i].monts = a.diff(b, 'months', true).toFixed(2);
    meData[i].total = meData[i].monts * meData[i].price;
 meData[i].totaltotal = meData[i].monts * meData[i].easy;
   } else if (meData[i].kindOf === "yearly"){
-     var a = moment(meData[i].datef);
-var b = moment(meData[i].dates);
+     var b = moment(meData[i].sqadualed);
+var a = moment(meData[i].sqadualedf);
 meData[i].years = a.diff(b, 'years', true).toFixed(2);
     ky = true;
     meData[i].y = true;
@@ -69,7 +68,7 @@ meData[i].totaltotal =  meData[i].easy;
     kc = true;
     meData[i].total = meData[i].hm * meData[i].price;
 meData[i].totaltotal = meData[i].hm * meData[i].easy;
-  } else {
+  } else if (meData[i].kindOf === "total"){
         meData[i].y = false;
     meData[i].kc = false;
          meData[i].ky = false;
@@ -107,7 +106,7 @@ meData[i].totaltotal =  meData[i].easy;
   <tr>
       <th>תיאור</th>
       {#each meData as data, i}
-      <td>  {data.deskrip}
+      <td> {#if data.deskrip} {data.deskrip}{/if}
 </td>
         {/each}
     </tr> <tr>
@@ -126,31 +125,31 @@ meData[i].totaltotal =  meData[i].easy;
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>
       {#each meData as data, i}
-      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{data.dates}</h1></td>
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr style="display:{ ky  ? "" : "none"};" >
       <th >תאריך סיום </th>
       {#each meData as data, i}
-      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{data.datef}</h1></td>
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr>
       <th>הערות מיוחדות</th>
       {#each meData as data, i}
-      <td>
- {data.spnot}</td>
+      <td>{#if data.spnot}
+ {data.spnot}{/if}</td>
         {/each}
   </tr> <tr>
       <th>עלות</th>
       {#each meData as data, i}
       <td>
-  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>>
+  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
   <h2>{data.price}</h2>  
   {/each}
     </tr><tr>
       <th>שווי מקסימלי לחישוב בריקמה</th>
       {#each meData as data, i}
       <td>
-  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>>
+  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
         {data.easy}
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >
@@ -168,7 +167,7 @@ meData[i].totaltotal =  meData[i].easy;
     </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
       {#each meData as data, i}
-      <td>{data.linkto}
+      <td>{#if data.linkto}{data.linkto}{/if}
 </td>
         {/each}
   </tr>

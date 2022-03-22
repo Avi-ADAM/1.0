@@ -9,7 +9,7 @@
         import Hand from '../../lib/components/prPr/hand.svelte'
         import Handd from '../../lib/components/prPr/handd.svelte'
         import Mashman from '../../lib/components/prPr/mashmam.svelte'
-
+    import Hamatanot from '../../lib/components/prPr/hamatanot.svelte'
    import { onMount } from 'svelte'; 
    import { idPr } from '../../lib/stores/idPr.js';
   // import { idM } from '../../lib/stores/idM.js';
@@ -75,6 +75,7 @@ async function findM() {
             error2 = e;
         }
 };
+let bmimData = [];
     let addN = false;
     let addM =  false;
     let hosafa = "הוספת פעולות נדרשות לריקמה";
@@ -113,6 +114,7 @@ let noofopenm = 0;
 onMount(async () => {
  start ()
 })
+//sale {id in}
 let users;
 async function start () {
   if ($idPr !== 0){
@@ -187,6 +189,7 @@ JSON.stringify({query:
             projectName
             descripFor
             publicDescription
+            matanotof { id name price quant kindOf }
             finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id username}}
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
@@ -231,6 +234,11 @@ JSON.stringify({query:
             } else if (project.mesimabetahaliches.length == null) {
             bmiData.push(project.mesimabetahaliches);
             }
+              if (project.matanotof.length > 0){
+            bmimData = project.matanotof;
+            } else if (project.matanotof.length == null) {
+            bmimData.push(project.matanotof);
+            }
              if (project.open_mashaabims.length > 0){
             opmash = project.open_mashaabims;
             } else if (project.open_mashaabims.length == null) {
@@ -248,6 +256,7 @@ JSON.stringify({query:
             }
             rikmashes = rikmashes
           //  if (project.open_missions.length > 1){
+            bmimData = bmimData
             omiData = project.open_missions;
           //  } else if (project.open_missions.length == null){
           //  omiData.push(project.open_missions);
@@ -1327,7 +1336,9 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       {/if}
       </div>
     {/if}
-    <div class="bg-lturk p-4"></div>
+    <div class="bg-lturk p-4">
+      <Hamatanot {projectUsers} bmiData={bmimData}/>
+    </div>
    </div> 
 </div>
 </div>

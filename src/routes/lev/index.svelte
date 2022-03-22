@@ -946,11 +946,12 @@ async function start () {
         JSON.stringify({query: 
 `{ user (id:${idL})  
           { 
+              haskama
           askms (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
                                      open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy }
                                       project {projectName id user_1s {id} profilePic {url formats }}
-                                       users_permissions_user { username id profilePic {url formats } } }
+                                       users_permissions_user {haskama username id profilePic {url formats } } }
               sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ declinedsps { id } id price descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
                             profilePic {url formats }}}}} 
               mesimabetahaliches  (where:{forappruval: false, finnished: false }){
@@ -981,12 +982,12 @@ async function start () {
                             tafkidims {id}
                         } 
                         } 
-                            projects_1s { projectName id user_1s {id} profilePic {url formats } 
+                            projects_1s { projectName id user_1s {id haskamaz haskamac haskama} profilePic {url formats } 
                             maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
                             open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
                                 pmashes (where:{archived: false }){ id hm project {projectName id 
                                         profilePic {url formats } 
-                                        user_1s { id}
+                                        user_1s { id haskama}
                                 } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id} order}  users  {what why id users_permissions_user {id}}} 
                                 open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
                                 askms(where:{archived: false }){ id 

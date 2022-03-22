@@ -531,7 +531,7 @@ function erore(){
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:var(--barbi-pink);  font-weight: 900;">
-     ההסכמה של 
+     הצהרת העצמאות האישית של 
         <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  
         :
     </h1>
