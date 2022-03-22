@@ -11,7 +11,10 @@
     import { onMount } from 'svelte';
         import axios from 'axios';
           import { RingLoader
-} from 'svelte-loading-spinners'
+} from 'svelte-loading-spinners';
+ import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+      import {  fly } from 'svelte/transition';
+      import Tikun from './tikunolam.svelte';
 // onMount(async () => {
 //  
 //
@@ -390,7 +393,56 @@ trans = !trans;
 function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
-      </script>
+
+ let isOpen = false;
+let a = 0;
+
+function sell(id){
+isOpen = true;
+a = 0;
+}
+const closer = () => {
+    isOpen = false;
+  a = 0;
+};
+function done(){
+  a = 1;
+}
+
+function erore(){
+  a = 3;
+}
+</script>
+   
+<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent class="content" aria-label="form">
+      <div style="z-index: 400;" dir="rtl" >
+             <button class=" hover:bg-barbi text-mturk rounded-full"
+          on:click={closer}>ביטול</button>
+          {#if a == 0}
+ <Tikun  on:done={done} on:erore={erore}/>
+         
+                    {:else if a == 1}
+
+          <div class="sp bg-gold">
+            <h3 class="text-barbi"> נשלח בהצלחה נעמוד בקשר</h3>
+          </div>
+                    {:else if a == 2}
+
+          <div class="flex text-center items-center justify-center bg-gold">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> 
+         {:else if a == 3}
+         <h1> אירעה שגיאה</h1>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
+         {/if}
+  </DialogContent>
+  </div>
+</DialogOverlay>
+
 
          <!-- Messenger פלאגין של צ'אט Code 
     <div id="fb-root"></div>
@@ -414,6 +466,7 @@ function scrollTo() {
           <a  class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/en" >English</a>
           <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1❤️1 אודות "  sveltekit:prefetch href="/about" > אודות</a>
+                  <button on:click={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
 
           {/if}
           </div>
@@ -527,7 +580,15 @@ function scrollTo() {
   
 </div> </div>
   <style>
-
+ :global([data-svelte-dialog-content].content) {
+      width: 80vw;
+  }
+  @media (min-width: 568px){
+  
+        :global([data-svelte-dialog-content].content) {
+width:78vw;
+        }
+  }
 .onlym{
   display: "";
 }
