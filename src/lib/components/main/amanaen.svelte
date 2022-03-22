@@ -7,7 +7,11 @@
         import { goto,  prefetch } from '$app/navigation';
         import * as yup from "yup";
                     import { onMount } from 'svelte';
-
+   import { RingLoader
+} from 'svelte-loading-spinners';
+ import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+      import {  fly } from 'svelte/transition';
+      import Tikun from './tikuneng.svelte';
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -365,7 +369,54 @@ onMount(async () => {
     function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
-      </script>
+     let isOpen = false;
+let a = 0;
+
+function sell(id){
+isOpen = true;
+a = 0;
+}
+const closer = () => {
+    isOpen = false;
+  a = 0;
+};
+function done(){
+  a = 1;
+}
+
+function erore(){
+  a = 3;
+}
+</script>
+   
+<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;" class="content" aria-label="form">
+      <div style="z-index: 400;" >
+             <button class=" hover:bg-barbi text-mturk rounded-full"
+          on:click={closer}>close</button>
+          {#if a == 0}
+ <Tikun  on:done={done} on:erore={erore}/>
+         
+                    {:else if a == 1}
+
+          <div class="sp bg-gold">
+            <h3 class="text-barbi">success! will be in touch</h3>
+          </div>
+                    {:else if a == 2}
+
+          <div class="flex text-center items-center justify-center bg-gold">
+            <h3 class="text-barbi">one moment please</h3>
+          <br>
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> 
+         {:else if a == 3}
+         <h1> error</h1>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}> try again</button>
+         {/if}
+  </DialogContent>
+  </div>
+</DialogOverlay>
    
       <div class="all">
           <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
@@ -378,6 +429,7 @@ onMount(async () => {
 </svg></button> 
           <a style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/" >עברית</a>
           <a class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
+                           <button on:click={sell} title="ask for change in the text" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">suggest text change</button>
           {/if}
           </div>
       <div class="mobile">
@@ -474,6 +526,16 @@ I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : 
   
 </div> </div>
   <style>
+    
+ :global([data-svelte-dialog-content].content) {
+      width: 80vw;
+  }
+  @media (min-width: 568px){
+  
+        :global([data-svelte-dialog-content].content) {
+width:78vw;
+        }
+  }
     
 .onlym{
   display: "";
@@ -1018,7 +1080,7 @@ background-position: center;
   .amana{
     width: 100vw;
     padding: 0px 120px;
-    font-size:120%;
+    font-size:110%;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
