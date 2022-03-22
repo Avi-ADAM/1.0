@@ -27,9 +27,30 @@ const closer = () => {
     isOpen = false;
   a = 0;
 };
-function done(){
+const sale = (event) => {
+ const  id = event.detail.id
+ const  un = event.detail.un
+ let oldob = bmiData;
+ const x = oldob.map(c => c.id);
+ const indexy = x.indexOf(id);
+ oldob[indexy].quant = un;
+ bmiData = oldob;
+    isOpen = false;
+  a = 0;
+};
+function done(event){
    isOpen = false;
   a = 0;
+  bmiData.push(event.detail.matana);
+  bmiData = bmiData
+}
+export let salee = [];
+function ask (){
+//ליצור מטבע אישור של חלוקה ליצור טופס של פרטי חלוקה כמה אחוז לחלק וכמה להעמיד להוצאות
+}
+let allin = 0;
+$: for (let i = 0; i < salee.length; i++){
+  allin += salee[i].in
 }
 </script>
    
@@ -40,7 +61,7 @@ function done(){
              <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}>ביטול</button>
           {#if a == 0}
- <Sale {projectUsers} {each} {quant} {maid}/>
+ <Sale {projectUsers} {each} {quant} {maid} on:doner={closer} on:done={sale} on:eror={()=>a=3}/>
           {:else if a == 1}
  <New {projectId} on:done={done}/>
 
@@ -89,11 +110,12 @@ function done(){
             <td>{data.price}</td>
               {/each}
             </tr>
-         <tr>
-              <th>כמות מצויה </th>
+         <tr >
+              <th >כמות מצויה </th>
               {#each bmiData as data, i}
-            <td>              {#if data.quant > 0}
-              {data.quant}
+            <td >              
+              {#if data.quant > 0}
+            <h2 style="display:{data.kindOf == "unlimited" ? "none" : ""} ;">{data.quant}</h2> 
             {/if}
             </td>
             {/each}
@@ -101,8 +123,15 @@ function done(){
           <th> סוג </th>
           {#each bmiData as data, i}
           <td>
-            {data.kindOf}
-       
+            {#if data.kindOf == "total"}
+            ליחידה
+          {:else if data.kindOf == "monthly"}
+          חודשי
+          {:else if data.kindOf == "yearly"}
+            שנתי
+         {:else if data.kindOf == "unlimited"}
+          ללא הגבלה
+         {/if}
            </td>
            {/each}
       </tr><!--<tr>
@@ -113,7 +142,7 @@ function done(){
           {data.sale.in} 
           {/if}
          </td>
-         {/each}
+         {/each} 
     </tr><tr >
       <th>סך הכל הכנסה למתנה</th>
       {#each bmiData as data, i}
@@ -165,39 +194,39 @@ function done(){
 				C424,90.344,417.12,82.264,408,80.408z"/>
 			<rect x="320" y="352" width="16" height="16"/>
 			<rect x="160" y="352" width="144" height="16"/>
-		</g>
-	</g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
-<g>
-</g>
+ 		</g>
+ 	</g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
+ <g>
+ </g>
 </svg>
           </button> 
          
@@ -206,9 +235,57 @@ function done(){
     </tr> 
     </table>
     {/if}
+
    <button  class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={addnew}> הוספת מתנה חדשה</button>
-  
+     {#if salee.length > 0}
+
+  <table dir="rtl" >
+    <caption class="sm:text-right md:text-center text-right ">  
+      <h1 class="md:text-center text-2xl md:text-2xl font-bold"
+      > מכירות ממתינות לחלוקה</h1>
+    </caption>
+        <tr class="gg">
+          <th class="gg">אפשרויות</th>
+          {#each salee as data, i}
+          <td class="gg" style="font-size: 3rem">
+            {i + 1}
+                    <!--    <button>מחיקה</button>-->
+        </td>
+          {/each}
+           <td class="gg" style="font-size: 3rem">
+             סך הכל
+        </td>
+    </tr> <tr class="ggr">
+      <th class="ggr">שם המתנה</th>
+      {#each salee as data, i}
+            <td class="ggr">{data.matanot.name}
+            </td>
+            {/each}
+                       <td></td>
+
+          </tr> 
+          <tr>
+            <th>סכום</th>
+            {#each salee as data, i}
+            <td>{data.in}</td>
+              {/each}
+           <td>{allin}</td>
+            </tr>
+         <tr >
+              <th >הכסף ממתין אצל: </th>
+              {#each salee as data, i}
+            <td >              
+              {data.users_permissions_user.username}
+            </td>
+            {/each}
+            <td></td>
+          </tr>
+    </table> 
+    
+   <button  class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+ on:click={ask}>בקשת חלוקה</button>
+    {/if}
   </div>
   </div>
  

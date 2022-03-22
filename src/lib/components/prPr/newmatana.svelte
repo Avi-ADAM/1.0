@@ -13,6 +13,9 @@ let error1;
 let miDatan = [];
 let linkg = 'https://oneloveone.onrender.com/graphql';
 async function add (){
+quant = quant > 0 ? quant : 0;
+price = price > 0 ? price : 0;
+
 already = true;
  const cookieValue = document.cookie
         .split('; ')
@@ -38,7 +41,7 @@ already = true;
              kindOf: ${kindOf}
                   }
     }
-  ) {matanot{id projectcreate{id }}}
+  ) {matanot{id name price quant kindOf}}
 
 }
 `})
@@ -47,7 +50,7 @@ already = true;
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('done', {
-                matana: miDatan.data.createMatanot.matanot.id
+                matana: miDatan.data.createMatanot.matanot
             })
 
         } catch (e) {

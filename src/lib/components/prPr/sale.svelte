@@ -13,8 +13,14 @@ let where = [];
 let placeholder = `אצל מי הכסף`;
 let already = false;
 export let maid;
+let valid = true;
+$: if (hm > quant){
+  valid = false;
+} else {
+    valid = true;
+}
 $: if (hm > 0 && each > 0 ){
-  total = quant * each;
+  total = hm * each;
 }
 let bearer1;
 let token;
@@ -32,7 +38,7 @@ let linkg = 'https://oneloveone.onrender.com/graphql';
       return id;
      };
 async function add (){
-
+if (valid === true){
 already = true;
 let quanter = ``
 if (hm > 0){
@@ -40,7 +46,7 @@ if (hm > 0){
   quanter = `updateMatanot(  input: {
       where: {id: ${maid}}
       data:  {quant: ${quantnew} } }){
-        matanot{quant}
+        matanot{quant id}
       }
 `
 }
@@ -69,7 +75,7 @@ if (hm > 0){
     input: {
       data: {project: "${$idPr}",
              matanot:  "${maid}",
-             users_permission_user: "${find_user_id(selected)}",
+             users_permissions_user: "${find_user_id(selected)}",
              in: ${total},
                   }
     }
@@ -81,22 +87,31 @@ if (hm > 0){
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            if(hm > 0){
             dispatch('done', {
-                id: miDatan.data.createSale.id,
-                in:  miDatan.data.createSale.in
+                id: miDatan.data.updateMatanot.matanot.id,
+                in:  miDatan.data.createSale.in,
+                un: miDatan.data.updateMatanot.matanot.quant
             })
-
+          } else {
+              dispatch('doners')
+          }
         } catch (e) {
             error1 = e
             console.log(error1);
+            dispatch('eror')
         }
+      } else {
+        alert("יש לבדוק אם מספר היחידות שהוזן גבוה ממספר היחידות הקיימות למתנה זו")
+      }
 }
 
 </script>
 <div dir="rtl" class='textinput'>
-  <input max-value={quant} type="number" id="hoursn" name="hoursn"  bind:value={hm} class='input' required>
+  <input max={quant} type="number" id="hoursn" name="hoursn"  bind:value={hm} class='input' required>
   <label for="hoursn" class='label'>כמה יחידות? </label>
   <span class='line'></span>
+  <small style="color: red; display: {valid ? "none" : ""};">מספר היחידות לא יכול להיות גבוה יותר מ{quant}</small>
 </div>
 <div dir="rtl" class='textinput'>
   <input type="number" id="hoursn" name="hoursn"  bind:value={each} class='input' required>
@@ -170,10 +185,17 @@ if (hm > 0){
 .input:focus ~ .line, .input:valid ~ .line {
   width: 100%;
 }
+.input:invalid ~ .line {
+    background-color: #f00000;
+}
+.input:invalid  {
+border-bottom: solid 1px #f00000;
+}
 
 .input:focus ~ .label, .input:valid ~ .label {
   font-size: 11px;
   color: var(--barbi-pink);
   top: 0;
 } 
+
 </style>

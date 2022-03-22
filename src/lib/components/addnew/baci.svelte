@@ -75,7 +75,7 @@ if (files) {
     idPr.set(resP.id);
     before = true;
     loading = false;
-  //  goto("/moach", );
+   goto("/moach", );
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);
@@ -178,7 +178,10 @@ let suc = false;
 
     let selected;
     const placeholder = `ערכים ומטרות`;
- 
+ function project (id) {
+    idPr.set(resP.id);
+    goto("/moach", );
+  };
 export let userName_value;
   import { RingLoader
 } from 'svelte-loading-spinners'
@@ -327,6 +330,8 @@ addval == false;
 {:else}
 <div class="aft">
   <h1>הריקמה נוצרה בהצלחה</h1>
+  <button class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold p-2  rounded-full"
+ on:click={project} >למוח הריקמה</button>
 </div>
 {/if}
 

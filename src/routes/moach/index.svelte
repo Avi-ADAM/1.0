@@ -111,6 +111,7 @@ let rikmashes = [];
 let lll;
 let opmash = [];
 let noofopenm = 0;
+let salee = [];
 onMount(async () => {
  start ()
 })
@@ -189,6 +190,7 @@ JSON.stringify({query:
             projectName
             descripFor
             publicDescription
+            sales {id in matanot {name id} users_permissions_user {id username}}
             matanotof { id name price quant kindOf }
             finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id username}}
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
@@ -234,6 +236,12 @@ JSON.stringify({query:
             } else if (project.mesimabetahaliches.length == null) {
             bmiData.push(project.mesimabetahaliches);
             }
+              if (project.sales.length > 0){
+            salee = project.sales;
+            } else if (project.sales.length == null) {
+            salee.push(project.sales);
+            }
+            salee = salee
               if (project.matanotof.length > 0){
             bmimData = project.matanotof;
             } else if (project.matanotof.length == null) {
@@ -1337,7 +1345,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       </div>
     {/if}
     <div class="bg-lturk p-4">
-      <Hamatanot {projectUsers} bmiData={bmimData}/>
+      <Hamatanot {salee} {projectUsers} bmiData={bmimData}/>
     </div>
    </div> 
 </div>
