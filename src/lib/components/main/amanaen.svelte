@@ -12,6 +12,7 @@
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
       import Tikun from './tikuneng.svelte';
+            import TRan from './translateeng.svelte';
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -371,7 +372,10 @@ onMount(async () => {
 	}
      let isOpen = false;
 let a = 0;
-
+function tr(){
+isOpen = true;
+a = 4;
+}
 function sell(id){
 isOpen = true;
 a = 0;
@@ -387,6 +391,10 @@ function done(){
 function erore(){
   a = 3;
 }
+
+function erorer(){
+  a = 5;
+}
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -397,6 +405,9 @@ function erore(){
           on:click={closer}>close</button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
+         
+                    {:else if a == 4}
+ <TRan on:done={done} on:erore={erorer}/>
          
                     {:else if a == 1}
 
@@ -413,6 +424,9 @@ function erore(){
          {:else if a == 3}
          <h1> error</h1>
          <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}> try again</button>
+           {:else if a == 5}
+         <h1> error</h1>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 4}> try again</button>
          {/if}
   </DialogContent>
   </div>
@@ -430,7 +444,9 @@ function erore(){
           <a style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/" >עברית</a>
           <a class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
                            <button on:click={sell} title="ask for change in the text" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">suggest text change</button>
-          {/if}
+                          <button on:click={tr} title="translate to another language" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >translate</button>
+
+                           {/if}
           </div>
       <div class="mobile">
         
