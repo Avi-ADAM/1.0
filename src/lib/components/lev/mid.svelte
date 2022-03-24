@@ -3276,8 +3276,8 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 @media (min-width: 550px) {	
 
 .midCom{	
-    min-height: 290px;	
-    min-width: 290px;	
+    min-height: 255px;	
+    min-width: 255px;	
 }	
 }	
 

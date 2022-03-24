@@ -1322,7 +1322,11 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                      on:close={clo}
                                      on:remove={wdwd}
     />{/if}</div>
-{#if fmiData.length > 0 || rikmashes.length > 0}
+
+    <div class="bg-lturk p-4">
+      <Hamatanot {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
+      <br>
+      {#if fmiData.length > 0 || rikmashes.length > 0}
         <div class="m-4 border-2 border-barbi rounded p-4" >
 
     <Fini fmiData={fmiData} users={projectUsers} {rikmashes}/>
@@ -1344,9 +1348,8 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       {/if}
       </div>
     {/if}
-    <div class="bg-lturk p-4">
-      <Hamatanot {salee} {projectUsers} bmiData={bmimData}/>
     </div>
+    
    </div> 
 </div>
 </div>

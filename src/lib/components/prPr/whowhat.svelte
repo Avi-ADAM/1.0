@@ -1,0 +1,285 @@
+<script>
+     
+export let fmiData = [];
+export let rikmashes = [];
+  export let hagdel = false;
+   import { onMount } from 'svelte'; 
+   export let salee = [];
+   export let allin = 0
+
+// what about hours alrerady done to  mission in progres 
+function remove (id) {
+  console.log(id)
+};
+function edit (id) {
+  console.log(id)
+}
+function confirm (id) {
+      console.log(id)
+   
+}
+function percentage(partialValue, totalValue) {
+   return (100 * partialValue) / totalValue;
+} 
+let ulist = [
+]; 
+export let users;
+let dictid = {};
+let dictidi = {};
+let hal = false;
+function ask (){
+    
+}
+onMount(async () => {
+cal()
+
+pre ()
+
+})
+function cal (){
+      for (let i = 0; i < users.length; i++){
+        for (let j = 0; j <salee.length; j++){
+                        if (salee[j].users_permissions_user.id === users[i].id){
+                 if (salee[j].users_permissions_user.id in dictidi) {
+                    dictidi[salee[j].users_permissions_user.id] += salee[j].in
+                   } else {
+                    dictidi[salee[j].users_permissions_user.id] = salee[j].in
+                   }
+                        }
+        }
+    }
+    console.log(dictidi)
+}
+function pre (){
+    console.log(users, fmiData)
+  for (let i = 0; i < users.length; i++){
+        for (let j = 0; j <fmiData.length; j++){
+          
+            if (fmiData[j].users_permissions_user.id === users[i].id){
+                   if (fmiData[j].users_permissions_user.id in dictid) {
+                    dictid[fmiData[j].users_permissions_user.id] += fmiData[j].total
+                   } else {
+                    dictid[fmiData[j].users_permissions_user.id] = fmiData[j].total
+
+                   }
+            }
+        }
+        for (let j = 0; j <rikmashes.length; j++){
+          
+            if (rikmashes[j].users_permissions_user.id === users[i].id){
+                   if (rikmashes[j].users_permissions_user.id in dictid) {
+                    dictid[rikmashes[j].users_permissions_user.id] += rikmashes[j].total
+                   } else {
+                    dictid[rikmashes[j].users_permissions_user.id] = rikmashes[j].total
+
+                   }
+            }
+        }
+    }
+    for (let j = 0; j <fmiData.length; j++){
+           if ("net" in dictid) {
+            dictid["net"] += fmiData[j].total   
+                          } else {
+                    dictid["net"] = fmiData[j].total
+                   }
+                  }
+                  for (let j = 0; j <rikmashes.length; j++){
+           if ("net" in dictid) {
+            dictid["net"] += rikmashes[j].total   
+                          } else {
+                    dictid["net"] = rikmashes[j].total
+                   }
+                  }
+    console.log(dictid)
+      const filteredw = Object.keys(dictid)
+      const filtered = Object.keys(dictidi)
+     console.log(filteredw)
+
+  
+        for (let i = 0; i < users.length; i++){
+        //arr from obj key and val then add needed data
+                for (let t = 0; t < filteredw.length; t++){
+
+  if (filteredw[t] === users[i].id){
+                      for (let m = 0; m < filtered.length; m++){
+  if (filtered[m] === users[i].id){
+
+     if ("counter" in dictid) {
+            dictid["counter"] += 1   
+                          } else {
+                    dictid["counter"] = 1
+                   }
+                    if ("pmcounter" in dictid) {
+            dictid["pmcounter"] -= ulist[ulist.length - 1].p   
+                          } else {
+                    dictid["pmcounter"] = 0
+                   }
+      ulist.push({
+          ihave: dictidi[filtered[m]],
+               total: dictid[filteredw[t]],
+                uid: users[i].id,
+                   username : users[i].username,
+                   src: users[i].profilePic.url,
+                   p: percentage(dictid[filteredw[t]], dictid["net"]),
+                   un: users[i].username,
+                   s: percentage(dictid[filteredw[t]], dictid["net"]),
+                    s2: 100,
+                      d: dictid["pmcounter"],
+                        o: "visible",
+                         c: `url(#img${dictid["counter"]})`,
+                          imid: `img${dictid["counter"]}`
+                })
+            }
+        }
+  }
+    }
+
+//each for any user to create his circle
+// so get the total of p get total fmision and mashaabims for each user then do presenteg save as obj arr and show with circle to each
+}
+
+
+    console.log(ulist)
+    ulist = ulist
+
+}
+let revach = allin;
+let x = [];
+$: for (let i = 0; i <ulist.length; i++) {
+x[i] = (ulist[i].p / 100) * revach
+}
+</script>
+
+<div class="dd md:items-center">
+  <div class="body items-center">
+  
+  <table dir="rtl" >
+    <caption class="sm:text-right md:text-center text-right ">  
+      <h1 class="md:text-center text-2xl md:text-2xl font-bold"
+      >טבלת חישוב </h1>
+    </caption>
+        <tr class="gg">
+          <th class="gg"></th>
+          {#each ulist as data, i}
+          <td class="gg" style="font-size: 3rem">
+            {i + 1}
+        </td>
+          {/each}
+    </tr> <tr class="ggr">
+      <th class="ggr">שם</th>
+      {#each ulist as data, i}
+            <td class="ggr">{data.username}</td>
+            {/each}
+          </tr> <tr>
+          <th> החלק מהרווח</th>
+          {#each ulist as data, i}
+          <td>
+            {#if  revach > 0}
+ {x[i]}
+ {:else}  
+ 0      
+     {/if}
+           </td>
+           {/each}
+      </tr><tr>
+          <th>סכום ממתין</th>
+          {#each ulist as data, i}
+          <td>
+            {#if  data.ihave > 0}
+ {data.ihave}
+ {:else}  
+ 0      
+     {/if}
+           </td>
+           {/each}
+      </tr><tr>
+          <th>סכום להעביר</th>
+          {#each ulist as data, i}
+          <td>
+            {#if  revach > 0 &&  (data.ihave-x[i]) > 0 }
+ {data.ihave-x[i]}
+ {:else}  
+ 0      
+     {/if}
+           </td>
+           {/each}
+      </tr><tr>
+          <th>סכום לקבל</th>
+          {#each ulist as data, i}
+          <td>
+            {#if  revach > 0 && (data.ihave-x[i]) < 0 }
+ {x[i]-data.ihave}
+ {:else}  
+ 0      
+     {/if}
+           </td>
+           {/each}
+      </tr><tr >
+      <th >אחוז בפרויקט</th>
+      {#each ulist as data, i}
+            <td >{data.p}</td>
+            {/each}
+          </tr> 
+    </table>
+
+     {#if hal === false}
+   <button  class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+ on:click={ask}>אישור חלוקה</button>
+{/if}
+  </div>
+  </div>
+<style>
+     .gg{ 
+ 
+     background-color: var(--naim) !important;
+     border-width: 4px;
+  border-color: rgb(103, 232, 249);
+     border-radius: 4%;
+      opacity: 1;
+  }
+   
+  .ggr{ 
+     background-color: var(--naim) !important;
+     opacity: 1;
+
+  }
+  .ggr:hover, .gg:hover {
+    background:rgb(132, 241, 223);
+  } 
+    .dd{
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-direction: column;
+    }
+    .body {
+      overflow-x: auto;
+      overflow-y: auto;
+     width: 100vw;
+     padding-left: 0.5em;
+     padding-right: 0.5em;
+    }
+  
+  table, th, td {
+  border-collapse: collapse;
+  border-width: 4px;
+  border-color: rgb(103, 232, 249);
+border-radius: 4%;
+  }
+  table {
+  text-align: center;
+  color: var(--barbi-pink);
+  margin: 0 auto;
+  }
+  th, td{
+    background: var(--gold);
+
+  }
+
+  th:hover, td:hover {
+    background:rgb(132, 241, 223);
+  } 
+  </style>
+      
+        
+   

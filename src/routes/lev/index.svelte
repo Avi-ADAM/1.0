@@ -955,7 +955,7 @@ async function start () {
               sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ declinedsps { id } id price descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
                             profilePic {url formats }}}}} 
               mesimabetahaliches  (where:{forappruval: false, finnished: false }){
-             id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai
+             id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai mission {id}
               project{projectName id user_1s {id}
                             profilePic {url formats }}}
             welcom_tops (where:{clicked: false }){
@@ -1068,6 +1068,9 @@ async function start () {
 } ;
 let pmashes = [];
 let huca = [];
+function mdon(){
+    start()
+}
 
 function sps(pp){
          
@@ -1367,6 +1370,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
     oldzman={taha.timer}
     stname={taha.stname}
     mId={taha.id}
+    missId={taha.mission.id}
     missionName={taha.name}
     projectId={taha.project.id}
     projectName={taha.project.projectName}
@@ -1377,6 +1381,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
     hoursdon ={taha.howmanyhoursalready}
     hourstotal = {taha.hoursassinged}
     perhour = {taha.perhour}
+    on:done={mdon}
     /></div>
 
 {/each}
@@ -1821,15 +1826,12 @@ des={0}  />
 
     }
     .midCom{
-        padding: 13px  0px;
+        padding: 20px  20px;
         grid-row: 2 / 4;
     grid-column: 4 /6;
       align-self: center;
     }
-    .midCom:hover {
-        min-width: 299px;
-        min-height: 299px;
-    }
+    
     .normSml{
     margin:  0;
     }

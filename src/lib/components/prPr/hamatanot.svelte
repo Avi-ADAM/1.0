@@ -4,6 +4,9 @@ import New from './newmatana.svelte';
 import Sale from './sale.svelte';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
+      import Halu from './whowhat.svelte'
+export let fmiData = [];
+export let rikmashes = [];
 export let projectId;
 let isOpen = false;
 let a = 0;
@@ -27,6 +30,7 @@ const closer = () => {
     isOpen = false;
   a = 0;
 };
+let hal = false;
 const sale = (event) => {
  const  id = event.detail.id
  const  un = event.detail.un
@@ -46,6 +50,7 @@ function done(event){
 }
 export let salee = [];
 function ask (){
+hal = true;
 //ליצור מטבע אישור של חלוקה ליצור טופס של פרטי חלוקה כמה אחוז לחלק וכמה להעמיד להוצאות
 }
 let allin = 0;
@@ -282,10 +287,14 @@ $: for (let i = 0; i < salee.length; i++){
             <td></td>
           </tr>
     </table> 
-    
+    {#if hal === false}
    <button  class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>בקשת חלוקה</button>
+{:else}
+<Halu {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
+{/if}
     {/if}
+
   </div>
   </div>
  

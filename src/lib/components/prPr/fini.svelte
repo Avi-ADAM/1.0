@@ -97,7 +97,7 @@ function pre (){
                    p: percentage(dictid[filteredw[t]], dictid["net"]),
                    un: users[i].username,
                    s: percentage(dictid[filteredw[t]], dictid["net"]),
-                    s2: 100,
+                    s2: 101,
                       d: dictid["pmcounter"],
                         o: "visible",
                          c: `url(#img${dictid["counter"]})`,
@@ -187,7 +187,7 @@ meData[i].totaltotal =  meData[i].easy;
     </script>
     {#if hagdel === false}
     <div style =" margin: 20px auto;" class="flex flex-col items-center justify-center ">
-      <h1 class="text-barbi">חלוקת שווי הפרויקט</h1>
+      <h1 class="text-barbi">חלוקת שווי הריקמה</h1>
     <svg width="250px" height="250px" style="display: inline;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
         <defs>
@@ -195,7 +195,7 @@ meData[i].totaltotal =  meData[i].easy;
     <image href={use.src} x="0" y="0" width="100" height="100" />
   </pattern>
 </defs>
-  <circle  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s}, 100" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
+  <circle  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
   <title>{use.un}, {use.p.toFixed(2)}%</title></circle>
   {/each}
 </svg>

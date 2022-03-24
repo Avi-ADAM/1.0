@@ -6,6 +6,9 @@
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
     import { idPr } from '../../stores/idPr.js';
     import { onMount } from 'svelte';
+     import { createEventDispatcher } from 'svelte';
+
+ const dispatch = createEventDispatcher();
     export let stname;
     let show = true;
 	  export let shows = true
@@ -24,6 +27,8 @@
     export let missId; //add in gr
     export let noofpu; //addtopr
     export let perhour;
+     let idL;
+
     let x = 0;
     let already = false;
 function project (id) {
@@ -207,7 +212,6 @@ timer: 0
   let miCatan =[];
 
   let miDatan;
- let idL;
  let token;
  let bearer1;
  let linkg = "https://oneloveone.onrender.com/graphql"
@@ -308,34 +312,8 @@ let tofinished1 = ``;
 let tofinished2 = ``;
 let toapprove1 = ``; 
 let toapprove = ``; 
+let appi = ``;
 async function afterwhy () {
-    console.log("done+ file")
-  if (!why && !what) {
-    activE = errorM.ein
-  } else if (running) {
-    activE = errorM.timer
-  } else {
-if (noofpu === 1) {
-  tofinished1 = `: true`;
-  tofinished2 = `finnished: true`;
-  tofinished = `createFinnishedMission(
-   input: { 
-     data: {
-      missionName: ${missionName},
-      why: ${why},
-      noofhours: ${hoursdon},
-      mesimabetahalich: ${mId},
-      perhour: ${perhour},
-      total: ${perhour*hoursdon},
-      project: ${projectId},
-      mission: ${missId}
-   }
-}){finnishedMission {id }}`
-} else if (noofpu > 1) {
-    toapprove1 = `forappruval: true`;
-}
-//files shit from updatepic
-    //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש 
 const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -347,6 +325,56 @@ const cookieValue = document.cookie
     idL = cookieValueId;
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
+    console.log("done+ file")
+  if (!why && !what) {
+    activE = errorM.ein
+  } else if (running) {
+    activE = errorM.timer
+  } else {
+if (noofpu === 1) {
+  tofinished1 = `finnished: true`;
+  tofinished2 = `finnished: true`;
+  appi = ``
+  tofinished = `
+   createFinnishedMission(
+           input: { 
+             data: {
+              missionName: "${missionName}",
+              why: "${why}",
+              noofhours: ${hoursdon},
+              mesimabetahalich: ${mId},
+              perhour: ${perhour},
+              total: ${perhour*hoursdon},
+              project: ${projectId},
+              descrip: "${missionDetails}",
+              users_permissions_user: "${idL}",
+              mission: ${missId}
+   }
+}){finnishedMission {id }}`
+} else if (noofpu > 1) {
+    toapprove1 = `forappruval: true`;
+    appi =`
+createFiniapruval(
+   input: { 
+     data: {
+      missname: "${missionName}",
+      why: "${why}",
+      noofhours: ${hoursdon},
+      mesimabetahalich: ${mId},
+      project: "${projectId}",
+            users_permissions_user: "${idL}",
+       vots:[ 
+    {
+      what: true
+      users_permissions_user: "${idL}"
+    }
+  ]
+   }
+}){finiapruval {id }}`
+}
+//files shit from updatepic
+    //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש 
+ 
         try {
             await fetch(linkg, {
                     method: 'POST',
@@ -367,23 +395,7 @@ ${tofinished1}
   }
 }
 ) {mesimabetahalich{id forappruval finnished howmanyhoursalready}}
-createFiniapruval(
-   input: { 
-     data: {
-      missname: "${missionName}",
-      why: "${why}",
-      noofhours: ${hoursdon},
-      mesimabetahalich: ${mId},
-      project: "${projectId}",
-            users_permissions_user: "${idL}",
-       vots:[ 
-    {
-      what: true
-      users_permissions_user: "${idL}"
-    }
-  ]
-   }
-}){finiapruval {id }}
+${appi}
 ${tofinished}
 }
 `})
@@ -392,6 +404,7 @@ ${tofinished}
                 .then(data => miDatan = data);
             console.log(miDatan);
               isOpen = false;
+              dispatch("done")
         } catch (e) {
             error1 = e
             console.log(error1);
