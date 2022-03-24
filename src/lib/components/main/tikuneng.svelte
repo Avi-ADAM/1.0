@@ -32,8 +32,7 @@ already = true;
              amortf: "${amortf}",
               amorth: "${amorth}",
              more: "${more}",
-             notes: "${come}",
-            email: "${email}",
+             notes: "${come},${email}",
                   }
     }
   ) {tikunolam{id name}}

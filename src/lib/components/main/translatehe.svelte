@@ -28,7 +28,7 @@ already = true;
                     },
                     body: JSON.stringify({
                         query: `mutation 
-                        { createTranslate(
+                        { createTikunolam(
     input: {
       data: {amort: "${amort}",
              name:  "${name}",
@@ -36,14 +36,11 @@ already = true;
              amortt: "${amortt}",
              amortf: "${amortf}",
               amorth: "${amorth}",
-             lang: "${lang}",
-             notes: "${come}",
-            email: "${email}",
-            from: "עברית"
+             more: "${lang}, from עברית",
+             notes: "${come},${email}",
                   }
     }
-  ) {translate{id name}}
-
+  ) {tikunolam{id name}}
 }
 `})
                 })
