@@ -236,8 +236,8 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td>
        <div dir="rtl" class='textinput'>
-  <input         bind:value={data.descrip}
- type="text" class='input' required>
+  <textarea     bind:value={data.descrip}
+ type="text" class='input d' required></textarea>
   <label for="name" class='label'>תיאור</label>
   <span class='line'></span>
 </div>
@@ -296,8 +296,8 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td>
   <div dir="rtl" class='textinput'>
-  <input         bind:value={data.spnot}
- type="text" class='input' required>
+  <textarea         bind:value={data.spnot}
+ type="text" class='input d' required></textarea>
   <label for="name" class='label'>הערות מיוחדות</label>
   <span class='line'></span>
 </div>
@@ -367,6 +367,33 @@ meData[i].totaltotal =  meData[i].easy;
  {/if} 
 <style>
   
+  textarea::-webkit-resizer {
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent  transparent var(--barbi-pink)  var(--barbi-pink);
+}
+ .d::-webkit-scrollbar {
+    width: 10px;
+}
+   
+.d::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+}
+ 
+.d::-webkit-scrollbar-thumb {
+    background-color: #d4aa70;
+    border-radius: 100px;
+}
+.d {
+    scrollbar-color: #D4AA70 #e4e4e4;
+}
+.d::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
+    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+    border-radius: 100px;
+}
+
 select.round {
   background-image:
     linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),
@@ -506,7 +533,9 @@ border-radius: 4%;
   color: #2196F3;
   top: 0;
 }
-
+.input:focus, .input:valid  {
+ border : 0;
+}
 @media (max-width:600px){
 .textinput {
   position: relative;

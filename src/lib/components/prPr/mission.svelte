@@ -457,7 +457,7 @@ dispatch('addneww', {
             {#each miData as data, i}
             <td>
                       <div dir="rtl" class='textinput'>
-  <input type="text"  id="des" name="des"  bind:value={data.descrip} class='input' required>
+  <textarea type="text"  id="des" name="des"  bind:value={data.descrip} class='input d' required></textarea>
   <label for="des" class='label' >תיאור</label>
   <span class='line'></span>
 </div>
@@ -561,7 +561,7 @@ dispatch('addneww', {
           {#each miData as data, i}
           <td>
                                   <div dir="rtl" class='textinput'>
-  <input type="text"  id="hearotMeyuchadot2" name="hearotMeyuchadot2"  bind:value={data.spnot} class='input' required>
+  <textarea type="text"  id="hearotMeyuchadot2" name="hearotMeyuchadot2"  bind:value={data.spnot} class='input d' required></textarea>
   <label for="hearotMeyuchadot2" class='label' >הערות מיוחדות</label>
   <span class='line'></span>
 </div>
@@ -685,6 +685,33 @@ dispatch('addneww', {
   
    
   <style>
+    
+  textarea::-webkit-resizer {
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent  transparent var(--barbi-pink)  var(--barbi-pink);
+}
+ .d::-webkit-scrollbar {
+    width: 10px;
+}
+   
+.d::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+}
+ 
+.d::-webkit-scrollbar-thumb {
+    background-color: #d4aa70;
+    border-radius: 100px;
+}
+.d {
+    scrollbar-color: #D4AA70 #e4e4e4;
+}
+.d::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
+    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+    border-radius: 100px;
+}
    .gg{ 
      position: sticky;
      top: 1px; 
@@ -801,6 +828,10 @@ border-radius: 4%;
   font-size: 11px;
   color: #2196F3;
   top: 0;
+} 
+
+.input:focus , .input:valid {
+  border: 0;
 } 
   </style>
       
