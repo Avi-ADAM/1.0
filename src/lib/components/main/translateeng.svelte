@@ -28,7 +28,7 @@ already = true;
                     },
                     body: JSON.stringify({
                query: `mutation 
-                        { createTikunolam(
+                        { createTranslate(
     input: {
       data: {amort: "${amort}",
              name:  "${name}",
@@ -36,11 +36,13 @@ already = true;
              amortt: "${amortt}",
              amortf: "${amortf}",
               amorth: "${amorth}",
-             more: "${lang}, from english",
-             notes: "${come},${email}",
+             lang: "${lang}", 
+             from: "english",
+             notes: "${come}",
+             email: "${email}",
                   }
     }
-  ) {tikunolam{id name}}
+  ) {translate{id name}}
                 
       
 }
@@ -59,55 +61,57 @@ already = true;
 }
 
   </script>
-<h1 class="text-center text-barbi">translate to another language</h1>
-    
-<div  class='textinput'>
-  <input type="text" id="hoursn" name="hoursn"  bind:value={amort} class='input' required>
-  <label for="hoursn" class='label'>{amorta}</label>
+<h1 class="text-center text-lturk">translate to another language</h1>
+       <br>
+
+<div class='textinput first'>
+  <textarea id="hoursny" name="hoursn "  bind:value={amort} class='input' required></textarea>
+  <label for="hoursny" class='firsty'>{amorta}</label>
   <span class='line'></span>
 </div>
-<div class='textinput'>
-  <input type="text" id="hoursn" name="hoursn"  bind:value={amorts} class='input' required>
-  <label for="hoursn" class='label'>{amortsa}</label>
+<br>
+<div  class='textinput sec'>
+  <textarea id="hoursn" name="hoursn"  bind:value={amorts} class='input' required></textarea>
+  <label for="hoursn" class=' seci'>{amortsa}</label>
   <span class='line'></span>
 </div>
 <br>
 
-<div  class='textinput'>
-  <input type="text" id="hoursn" name="hoursn"  bind:value={amortt} class='input' required>
-  <label for="hoursn" class='label'>{amortta}</label>
+<div  class='textinput sec'>
+  <textarea id="hoursna" name="hoursn"  bind:value={amortt} class='input' required></textarea>
+  <label for="hoursna" class='seci'>{amortta}</label>
   <span class='line'></span>
 </div>
 <br>
-<div  class='textinput'>
-  <input type="text" id="hoursn" name="hoursn"  bind:value={amortf} class='input' required>
-  <label for="hoursn" class='label'>{amortfa}</label>
+<div  class='textinput sec'>
+  <textarea  id="hoursnp" name="hoursn"  bind:value={amortf} class='input' required></textarea>
+  <label for="hoursnp" class='seci'>{amortfa}</label>
   <span class='line'></span>
 </div>
 <br>
-<div class='textinput'>
-  <input type="text" id="hoursn" name="hoursn"  bind:value={amorth} class='input' required>
-  <label for="hoursn" class='label'>{amortha}</label>
+<div  class='textinput sec'>
+  <textarea  id="hoursnl" name="hoursn"  bind:value={amorth} class='input' required></textarea>
+  <label for="hoursnl" class='seci'>{amortha}</label>
   <span class='line'></span>
 </div>
 <div  class='textinput'>
-  <input type="email" id="hoursn" name="hoursn"  bind:value={lang} class='input' required>
-  <label for="hoursn" class='label'>language:</label>
+  <input type="text" id="hoursnm" name="hoursn"  bind:value={lang} class='input' required>
+  <label for="hoursnm" class='label'>language:</label>
   <span class='line'></span>
 </div>
 <div class='textinput'>
-  <input type="email" id="hoursn" name="hoursn"  bind:value={come} class='input' required>
-  <label for="hoursn" class='label'>notes</label>
+  <textarea  id="hoursnu" name="hoursn"  bind:value={come} class='input' required></textarea>
+  <label for="hoursnu" class='label'>notes</label>
   <span class='line'></span>
 </div>
 <div  class='textinput'>
-  <input type="text" id="hoursn" name="hoursn"  bind:value={name} class='input' required>
-  <label for="hoursn" class='label'>your name</label>
+  <input type="text" id="hoursng" name="hoursn"  bind:value={name} class='input' required>
+  <label for="hoursng" class='label'>your name</label>
   <span class='line'></span>
 </div>
-<div class='textinput'>
-  <input type="email" id="hoursn" name="hoursn"  bind:value={email} class='input' required>
-  <label for="hoursn" class='label'>email</label>
+<div  class='textinput'>
+  <input type="email" id="hoursni" name="hoursn"  bind:value={email} class='input' required>
+  <label for="hoursni" class='label'>email</label>
   <span class='line'></span>
 </div>
 {#if already == false}
@@ -117,12 +121,78 @@ already = true;
  </div>
  {/if}
 <style>
+  textarea#hoursny,textarea#hoursnu,textarea#hoursnm {
+      resize: vertical;
+    height: 60px;
+
+  }
+  textarea.input {
+  resize: vertical;
+height: 170px;
+}
+.sec{
+   margin-top: 70px;
+}
+.input:focus ~ .seci, .input:valid ~ .seci{
+    font-size: 11px;
+  color: var(--gold);
+    top: -76px;
+
+}
+@media (min-width: 498px){
+    textarea.input {
+  resize: vertical;
+height: 129px;
+}
+.sec{
+   margin-top: 50px;
+}
+.input:focus ~ .seci, .input:valid ~ .seci{
+    font-size: 11px;
+  color: var(--gold);
+    top: -50px;
+
+}
+.label,.input:focus ~ .firsty, .input:valid ~ .firsty {
+  font-size: 11px;
+  color: var(--gold);
+  top: 0;
+}
+.first {
+    margin-top: 0px;
+
+}
+}
+@media (min-width: 798px){
+    textarea.input {
+  resize: vertical;
+height: 50px;
+}
+  .sec{
+   margin-top: 12px;
+}
+.input:focus ~ .seci, .input:valid ~ .seci{
+    font-size: 11px;
+  color: var(--gold);
+    top: 0;
+
+}
+}
+@media (min-width: 1098px){
+    textarea.input {
+  resize: vertical;
+height: 40px;
+}
+}
        .textinput {
   position: relative;
   width: 100%;
   display: block;
 }
+.first {
+    margin-top: 20px;
 
+}
 .input {
   font-family: 'Roboto', sans-serif;
   border: none;
@@ -138,7 +208,28 @@ already = true;
   background: transparent;
 }
 
-
+.seci {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color:var(--barbi-pink);
+  user-select: none;
+}
+.firsty {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  left: 0;
+  top: -22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color:var(--barbi-pink);
+  user-select: none;
+}
 .label {
   font-family: 'Roboto', sans-serif;
   font-size: 15px;
@@ -165,11 +256,18 @@ already = true;
 .input:focus ~ .line, .input:valid ~ .line {
   width: 100%;
 }
-
+.input:focus , .input:valid  {
+  border: 0;
+}
 .input:focus ~ .label, .input:valid ~ .label {
   font-size: 11px;
   color: var(--gold);
   top: 0;
+} 
+.input:focus ~ .firsty, .input:valid ~ .firsty {
+  font-size: 11px;
+  color: var(--gold);
+  top: -20;
 } 
 </style>
 

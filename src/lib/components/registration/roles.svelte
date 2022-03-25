@@ -159,9 +159,19 @@ selected = newSele;
 <style>
 
     :global([data-svelte-dialog-content].content) {
-     background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);
-      background-position: center;
-      background-size: cover;
+  background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+
+      width: 80vw;
+  }
+  @media (min-width: 568px){
+  
+        :global([data-svelte-dialog-content].content) {
+ background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+
+width:78vw;
+        }
   }
   :global(.multiselect) {
     background-color: var(--gold) !important ;

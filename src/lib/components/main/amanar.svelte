@@ -544,7 +544,21 @@ function erorer(){
   
 </div> </div>
   <style>
-    
+     :global([data-svelte-dialog-content].content) {
+  background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+
+      width: 80vw;
+  }
+  @media (min-width: 568px){
+  
+        :global([data-svelte-dialog-content].content) {
+ background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+
+width:78vw;
+        }
+  }
 .onlym{
   display: "";
 }
