@@ -235,10 +235,10 @@ addval == false;
   </DialogContent>
   </div>
 </DialogOverlay>
+<div class="a"></div>
 
 
   {#if before == false}
-<img class="bg" src="https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg" alt="bg">
 
 <div dir="rtl" class="jho flex flex-col items-center text-center justify-center">
   <h1 class="text-gold">יצירת ריקמה חדשה</h1>
@@ -253,14 +253,14 @@ addval == false;
 {#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
 
     <div dir="rtl" class='textinput'>
-  <input name="es"  bind:value={desP}    
- type='text' class='input' required >
+  <textarea name="es"  bind:value={desP}    
+ type='text' class='input d' required ></textarea>
   <label for="es" class='label'>תיאור קצר הגלוי לכול</label>
   <span class='line'></span>
 </div>
    <div dir="rtl" class='textinput'>
-  <input name="s"  bind:value={desPl}     
- type='text' class='input' required>
+  <textarea name="s"  bind:value={desPl}     
+ type='text' class='input d' required></textarea>
   <label for="s" class='label'>תיאור מפורט עם נראות סלקטיבית</label>
   <span class='line'></span>
 </div>
@@ -335,9 +335,45 @@ addval == false;
 </div>
 {/if}
 
-
 <style>
-  
+ 
+
+  textarea::-webkit-resizer {
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent  transparent var(--gold)  var(--gold);
+}
+ .d::-webkit-scrollbar {
+    width: 10px;
+}
+   
+.d::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+}
+ 
+.d::-webkit-scrollbar-thumb {
+    background-color: #d4aa70;
+    border-radius: 100px;
+}
+.d {
+    scrollbar-color: #D4AA70 #e4e4e4;
+}
+.d::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
+    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+    border-radius: 100px;
+}
+  .a{
+     background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+ z-index: -1;
+ position: fixed;
+  top: 0;
+  left: 0;
+  min-width: 100vw;
+  min-height: 100vh;
+  }
 select.round {
   background-image:
     linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),
@@ -444,6 +480,9 @@ select.round:focus {
   color: var(--barbi-pink);
   top: 0;
 }
+.input:focus ,.input:valid  {
+  border: 0;
+}
 
 @media (max-width:600px){
  
@@ -453,11 +492,18 @@ select.round:focus {
   display: block;
 }
  .jho{
- width: 100%;
+ width: 90%;
  margin: 0 auto;
   }
  
 }
+@media (min-width:601px){
+ .d::-webkit-scrollbar {
+    width: 17px;
+}
+}
+
+
     h1{
       font-size: 29px;  
     }

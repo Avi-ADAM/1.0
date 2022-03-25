@@ -63,42 +63,42 @@ already = true;
       <br>
 
 <div class='textinput first'>
-  <textarea id="hoursny" name="hoursn "  bind:value={amort} class='input' required></textarea>
+  <textarea id="hoursny" name="hoursn "  bind:value={amort} class='input d' required></textarea>
   <label for="hoursny" class='firsty'>{amortq}</label>
   <span class='line'></span>
 </div>
 <br>
 <div  class='textinput sec'>
-  <textarea id="hoursn" name="hoursn"  bind:value={amorts} class='input' required></textarea>
+  <textarea id="hoursn" name="hoursn"  bind:value={amorts} class='input d' required></textarea>
   <label for="hoursn" class=' seci'>{amortsq}</label>
   <span class='line'></span>
 </div>
 <br>
 
 <div  class='textinput sec'>
-  <textarea id="hoursna" name="hoursn"  bind:value={amortt} class='input' required></textarea>
+  <textarea id="hoursna" name="hoursn"  bind:value={amortt} class='input d' required></textarea>
   <label for="hoursna" class='seci'>{amorttq}</label>
   <span class='line'></span>
 </div>
 <br>
 <div  class='textinput sec'>
-  <textarea  id="hoursnp" name="hoursn"  bind:value={amortf} class='input' required></textarea>
+  <textarea  id="hoursnp" name="hoursn"  bind:value={amortf} class='input d' required></textarea>
   <label for="hoursnp" class='seci'>{amortfq}</label>
   <span class='line'></span>
 </div>
 <br>
 <div  class='textinput sec'>
-  <textarea  id="hoursnl" name="hoursn"  bind:value={amorth} class='input' required></textarea>
+  <textarea  id="hoursnl" name="hoursn"  bind:value={amorth} class='input d' required></textarea>
   <label for="hoursnl" class='seci'>{amorthq}</label>
   <span class='line'></span>
 </div>
 <div  class='textinput'>
-  <textarea  id="hoursnm" name="hoursn"  bind:value={more} class='input' required></textarea>
+  <textarea  id="hoursnm" name="hoursn"  bind:value={more} class='input d' required></textarea>
   <label for="hoursnm" class='label'>add more</label>
   <span class='line'></span>
 </div>
 <div class='textinput'>
-  <textarea  id="hoursnu" name="hoursn"  bind:value={come} class='input' required></textarea>
+  <textarea  id="hoursnu" name="hoursn"  bind:value={come} class='input d' required></textarea>
   <label for="hoursnu" class='label'>notes</label>
   <span class='line'></span>
 </div>
@@ -175,12 +175,41 @@ height: 50px;
     top: 0;
 
 }
+ .d::-webkit-scrollbar {
+    width: 17px;
+}
 }
 @media (min-width: 1098px){
     textarea.input {
   resize: vertical;
-height: 40px;
+height: 44px;
 }
+}
+  textarea::-webkit-resizer {
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent  transparent var(--gold)  var(--gold);
+}
+ .d::-webkit-scrollbar {
+    width: 10px;
+}
+   
+.d::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+}
+ 
+.d::-webkit-scrollbar-thumb {
+    background-color: #d4aa70;
+    border-radius: 100px;
+}
+.d {
+    scrollbar-color: #D4AA70 #e4e4e4;
+}
+.d::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
+    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+    border-radius: 100px;
 }
        .textinput {
   position: relative;
