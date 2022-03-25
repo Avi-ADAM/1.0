@@ -1741,8 +1741,8 @@ des={0}  />
     @media  (max-width: 839px) {
     
     .screen{
-        background-color: white !important;
-        display: grid;
+background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);        display: grid;
         grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(4, 1fr);
 
@@ -1775,7 +1775,8 @@ des={0}  />
     @media (min-width: 840px){
     
     .screen{
-        background-color: white !important;
+background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
         display: grid;
         grid-template-columns: repeat(6, 1fr);
                 grid-template-rows: repeat(4, 1fr);
