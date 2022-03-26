@@ -199,8 +199,8 @@ onMount(async () => {
             vallues {id valueName}
             work_ways {id workWayName}
           } me { id }
-} `   
-} )})
+ } `   
+ } )})
   .then(r => r.json())
   .then(data => meDataa = data);
          console.log(meDataa)
@@ -233,7 +233,7 @@ onMount(async () => {
 let userName_value;
 let biog;
 let frd;
-    function sendD () {
+function sendD () {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -267,11 +267,11 @@ let frd;
         console.log('צריך לתקן:', error.response);
                 });
       
-    };
+};
     
  
  
-	function callbackFunction(event) {
+function callbackFunction(event) {
     a = 2;
     files = event.detail.files;
     console.log(files);
@@ -284,10 +284,10 @@ let frd;
     biog = event.detail.bi;
     frd = event.detail.frd;
     sendD ();
-	}
+}
 
 
- function remove (event) {
+function remove (event) {
   const miDatanew = event.detail.data;
   const linkp = event.detail.linkp;
   addNs1 = false;
@@ -298,19 +298,19 @@ let frd;
             mash = meData.sps;
             work = meData.work_ways;
             addNs1 = true;
- };
+};
 
 async function add (event) {
  const linkp = event.detail.linkp;
-const miDatanew = event.detail.data; 
-const valc = event.detail.valc;
-const a = event.detail.a;
-miDatanew.selected2 = [];
-console.log (miDatanew);
-addNs1 = false;
-const meDatanew = meData;
-meDatanew[linkp] = miDatanew;
-console.log (meDatanew);
+ const miDatanew = event.detail.data; 
+ const valc = event.detail.valc;
+ const a = event.detail.a;
+ miDatanew.selected2 = [];
+ console.log (miDatanew);
+ addNs1 = false;
+ const meDatanew = meData;
+ meDatanew[linkp] = miDatanew;
+ console.log (meDatanew);
  meData = meDatanew;
  skil = meData.skills;
             taf = meData.tafkidims;
@@ -323,14 +323,14 @@ console.log (meDatanew);
 
 async function addnew (event) { 
   const linkp = event.detail.linkp;
-const skob = event.detail.skob;
-const miDatanew = event.detail.data;
-miDatanew.push(skob);
-console.log (miDatanew);
-addNs1 = false;
-const meDatanew = meData;
-meDatanew[linkp] = miDatanew;
-console.log (meDatanew);
+ const skob = event.detail.skob;
+ const miDatanew = event.detail.data;
+ miDatanew.push(skob);
+ console.log (miDatanew);
+ addNs1 = false;
+ const meDatanew = meData;
+ meDatanew[linkp] = miDatanew;
+ console.log (meDatanew);
  meData = meDatanew;
  skil = meData.skills;
             taf = meData.tafkidims;
@@ -339,16 +339,16 @@ console.log (meDatanew);
             work = meData.work_ways;
   addNs1 = true;
 };
- const closer = () => {
+const closer = () => {
     isOpen = false;
     updX = 0;
   addpic = 0;
   a = 0;
-  };
-  function basic (){
+};
+function basic (){
       isOpen = true;
       a = 1;
-  }
+}
 function openen () {
   isOpen = true;
   updX = 1;
@@ -357,15 +357,15 @@ function openen () {
 
 function open (event){
 
-addSl1 = false;
-addSl2 = false;
-addSl3 = false;
-addSl4 = false;
+ addSl1 = false;
+ addSl2 = false;
+ addSl3 = false;
+ addSl4 = false;
  addSl5 = false;  
  const a = event.detail.linkp;
   console.log(addSl);
   if (a == "tafkidims"){
-current = "a2"
+ current = "a2"
     addSl2 = true;
   }
   else if (a == "skills"){
@@ -407,9 +407,9 @@ function close (event){
   }
   current = "l";
   addSl1 = false;
-addSl2 = false;
-addSl3 = false;
-addSl4 = false;
+ addSl2 = false;
+ addSl3 = false;
+ addSl4 = false;
  addSl5 = false;  
 }
 
@@ -438,14 +438,14 @@ function delm ( event){
 let miDa = [];
 async function han (){
   a = 2
-console.log(spid)
+ console.log(spid)
    const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-let linkgra = 'https://oneloveone.onrender.com/graphql';
+ let linkgra = 'https://oneloveone.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -463,8 +463,8 @@ let linkgra = 'https://oneloveone.onrender.com/graphql';
       }
     }
   ) {sp {id }}
-} `   
-} )})
+ } `   
+ } )})
   .then(r => r.json())
   .then(data => miDa = data);
          console.log(miDa)
@@ -499,7 +499,7 @@ let linkgra = 'https://oneloveone.onrender.com/graphql';
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3> 
           <button 
-  class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
+  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
   on:click={han}
   >מחיקה</button>
           </div>
@@ -1654,11 +1654,12 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
   .body{ 
     width: 100vw;
     height: 100vh;
-      background: url(https://res.cloudinary.com/love1/image/upload/v1640438668/amana_kocsdt.svg) !important;
+   /*  background: url(https://res.cloudinary.com/love1/image/upload/v1640438668/amana_kocsdt.svg) !important;
       background-position: center; 
       background-size: cover !important;
-      background-repeat: no-repeat !important; 
-
+      background-repeat: no-repeat !important; */
+background-color: #fff000;
+background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
     }
     .centr{
       position: absolute;

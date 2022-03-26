@@ -241,7 +241,7 @@ $: for (let i = 0; i < salee.length; i++){
     </table>
     {/if}
 
-   <button  class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+   <button  class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink  text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={addnew}> הוספת מתנה חדשה</button>
      {#if salee.length > 0}
 
@@ -288,7 +288,7 @@ $: for (let i = 0; i < salee.length; i++){
           </tr>
     </table> 
     {#if hal === false}
-   <button  class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+   <button  class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>בקשת חלוקה</button>
 {:else}
 <Halu {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
@@ -338,7 +338,6 @@ $: for (let i = 0; i < salee.length; i++){
     }
     .body {
       overflow-y: auto;
-     width: 100vw;
      padding-left: 0.5em;
      padding-right: 0.5em;
     }

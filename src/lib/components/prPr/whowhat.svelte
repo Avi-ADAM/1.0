@@ -28,7 +28,7 @@ let dictid = {};
 let dictidi = {};
 let hal = false;
 function ask (){
-    
+
 }
 onMount(async () => {
 cal()
@@ -223,7 +223,7 @@ x[i] = (ulist[i].p / 100) * revach
     </table>
 
      {#if hal === false}
-   <button  class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+   <button  class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>אישור חלוקה</button>
 {/if}
   </div>

@@ -773,7 +773,8 @@ background-color:var(--lturk);
 .amanat{
 padding: 0 1rem;
     text-shadow: 1px 1px var(--barbi-pink) ;
-        background-color: var(--gold);
+background-color: #bbf0f3;
+background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
           opacity: 0.8;
 
 }
@@ -786,7 +787,7 @@ small{
     font-size: inherit;
     max-width: 200px;
     box-sizing: border-box;
-    border: 1px solid var(--gold);
+    border: 1px solid var(--barbi-pink);
     border-radius: 4px;
     transition: all 150ms ease;
     background: var(--gold);
@@ -838,7 +839,7 @@ position: absolute;
     width: 100vw;
     height:100vh;
     margin:0px auto;
-    background-color: var(--gold);
+background-color :var(--gold) ;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1641148938/news_nvsgba.svg);
     display: flex;
     flex-direction: column;
@@ -870,8 +871,8 @@ position: absolute;
     justify-content: center;
     align-items: center;
     height: 100vh;
-        background-color: var(--gold);
-
+background-color: #bbf0f3;
+background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
   }
   .flexid{
     display: flex;
@@ -976,8 +977,8 @@ left: 45.2%;
     min-width: 50px;
  }*/
   .aab{
-        background-color: var(--gold);
-
+background-color: #bbf0f3;
+background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -985,8 +986,7 @@ left: 45.2%;
     height: 100vh;
   }
    .mobile{
-         background-color: var(--gold);
-
+background-color: var(--gold);
     width: 100vw;
     height:100vh;
     margin:0px auto;
@@ -1076,7 +1076,8 @@ position: absolute;
  .amanat{
 padding: 0 1rem;
     text-shadow: 1px 1px var(--barbi-pink) ;
-        background-color: var(--gold);
+        background-color: var(--gold);background-color: #bbf0f3;
+background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
           opacity: 0.8;
 
 }

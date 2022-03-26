@@ -158,7 +158,7 @@ addval == false;
    {#if addval == false}
     <button
     on:click={() => addval = true} 
-    class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
+    class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
   {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
@@ -188,7 +188,7 @@ addval == false;
 </div>
 
 <button 
-    class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded-full"
+    class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
      on:click="{sendP}"
      name="addm">לשמור שינויים </button>
 </div>

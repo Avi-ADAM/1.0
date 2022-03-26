@@ -147,7 +147,7 @@ let cencel = "ביטול"
    <Addnewro  roles1={roles} color={"--barbi-pink"}/>
 <button
  on:click={subm} 
- class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-6 px-4 m-4 rounded-full"
+ class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-6 px-4 m-4 rounded-full"
  >יצירת והוספת משימה חדשה</button>
  
 </div>

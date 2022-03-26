@@ -1034,7 +1034,7 @@ function masi(){
        <link rel="preload" as="image" href=" https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"  />
 
 </svelte:head>
-
+<div class="alli"></div>
 
     {#if $idPr }
     
@@ -1073,7 +1073,7 @@ function masi(){
 <!--{#if idUst.map(c => c.id) == idUsl} 
 בנוסף במקרה של רענון יעלם האידי של הרקמה
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
-<div dir="rtl" class="all bg-lturk text-barbi text-center">
+<div dir="rtl" class="all  text-barbi text-center">
   <Header/>
   <div>
 {#if project.profilePic !== null}
@@ -1109,17 +1109,17 @@ function masi(){
            <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
           </svg>
           </button>
-  <h1 class="1 bg-lturk">{projectname}</h1>
+  <h1 class="1 ">{projectname}</h1>
   {#if project.publicDescription}
-   <h6 class="2 bg-lturk">{desP}</h6>
+   <h6 class="2 ">{desP}</h6>
   {/if}
   {#if project.descripFor}
-   <p class="bg-lturk">{descripFor}</p>
+   <p>{descripFor}</p>
   {/if}
   {#if linkP}
-  <a class="bg-lturk" href={linkP}>לינק לאתר</a>  
+  <a  href={linkP}>לינק לאתר</a>  
   {/if}
-  <div class="3 bg-lturk ">
+  <div class="3  ">
   {#each projectUsers as user}
   
   <a class="textlink hover:text-scale-150 hover:text-gold"
@@ -1137,7 +1137,7 @@ function masi(){
   <div>
  <Fini users={projectUsers} {fmiData}/></div>-->
 
-<div class="bg-lturk hhh">
+<div class=" hhh">
    {#if hovered}
   <button on:click={hosa} on:mouseleave={bighand} ><img title={hosafa}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"></button> 
 
@@ -1153,14 +1153,14 @@ function masi(){
 {/if}
 
 </div>
-<div class="bg-lturk m-4 ">
+<div class=" m-4 ">
 
 
 {#if pmiData.length > 0}
 
   {#if pendS === false}
 <button
- class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full"
+ class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full"
 on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
 {:else}
 <button title={cencel1}
@@ -1177,7 +1177,7 @@ on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
 {#if bmiData.length > 0}
  {#if tahaS === false}
 <button
- class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+ class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
 on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 {:else}
 <button title={cencel1}
@@ -1190,7 +1190,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 {/if} 
 {/if}
 </div>
-  <div class="bg-lturk m-4 ">
+  <div class=" m-4 ">
 
 {#if openMS === true && omiData.length > 0}
 
@@ -1214,7 +1214,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
   {/if}
      </div>
-<div class="bg-lturk m-4 ">
+<div class="m-4 ">
 
 {#if openMA === true && opmash.length > 0}
 
@@ -1242,9 +1242,9 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->
 
-<div class="bg-lturk " >
+<div >
  {#if addM === true}
-   <div bind:this={hosaf}   class="bg-lturk m-4 border-2 border-gold rounded" >
+   <div bind:this={hosaf}   class=" m-4 border-2 border-gold rounded" >
 <button
  title={cencel}
       on:click={closeM}
@@ -1264,7 +1264,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
     </div>
 
-    <div class="bg-lturk " bind:this={cow}>
+    <div  bind:this={cow}>
       {#if load === true}
         <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
 
@@ -1293,10 +1293,10 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                  on:close={close}
                                  /> {/if}</div>
                               
-    <div class="bg-lturk m-4" bind:this={lll}>
+    <div class=" m-4" bind:this={lll}>
  
       {#if addN == true}
-      <div id="hosafn" class="bg-lturk m-4 border-2 border-gold rounded"  >
+      <div id="hosafn" class="m-4 border-2 border-gold rounded"  >
       <button
       title={cencel}
       on:click={() => addN = false}
@@ -1309,7 +1309,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       {/if}    
    
     </div>
-    <div class="bg-lturk m-4" bind:this={dow} >
+    <div class=" m-4" bind:this={dow} >
        {#if loadr === true}
         <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
 
@@ -1323,7 +1323,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                      on:remove={wdwd}
     />{/if}</div>
 
-    <div class="bg-lturk p-4">
+    <div class=" p-2">
       <Hamatanot {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>
       {#if fmiData.length > 0 || rikmashes.length > 0}
@@ -1332,7 +1332,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     <Fini fmiData={fmiData} users={projectUsers} {rikmashes}/>
     <br>
     {#if hal === false}
-    <button on:click={() => hal = true} class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
+    <button on:click={() => hal = true} class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
     חישוב רווח בגירסה ראשונית
   </button>
       {:else if hal === true}
@@ -1360,12 +1360,12 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     {/if}-->
  {:else }  
  <div class="flex text-center flex-col border-2 border-gold rounded m-4">
-<h1 class="text-mturk hover:text-lturk font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
+<h1 class="text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
  
            {#each projects as data, i}
           
           <button
-          class=" hover:bg-barbi text-barbi bg-gold hover:text-gold p-0.5 m-2 rounded-full"
+          class=" bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold p-0.5 m-2 rounded-full"
           on:click={projectn(data.id)}
           > {data.projectName}
           </button>
@@ -1374,6 +1374,15 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  </div> 
  {/if}
  <style>
+   .alli{
+    background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%);
+     z-index: -1;
+  min-width: 100vw;
+  min-height: 100vh;
+  position: fixed;
+  top: 0;
+  left: 0;
+   }
    .hhh{
      display: flex;
      flex-direction: column;

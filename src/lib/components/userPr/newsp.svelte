@@ -320,7 +320,7 @@ for (var i = 0; i <meData.length; i++) {
 <div>
     {#if already === false}
   <button 
-  class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
+  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
   on:click={han}
   >פרסום משאבים</button>
   {:else}

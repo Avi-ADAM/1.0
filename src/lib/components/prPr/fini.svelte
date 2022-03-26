@@ -200,7 +200,7 @@ meData[i].totaltotal =  meData[i].easy;
   {/each}
 </svg>
 </div>
-<button class="hover:bg-barbi bg-gold text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
+<button class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
     {:else}
      <button
       title="סגירת הפירוט"

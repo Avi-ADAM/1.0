@@ -272,7 +272,7 @@ addval == false;
   <span class='line'></span>
 </div>
 <br>
-<button on:click={openen} class="bg-gold hover:bg-barbi text-barbi hover:text-gold rounded-full p-2" >הוסף לוגו</button>
+<button on:click={openen} class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >הוסף לוגו</button>
 {#if suc == true}<small class="text-barbi">לוגו נבחר בהצלחה</small>{/if}
          
 <h1 class="midscreenText-2 text-center text-gold">
@@ -291,7 +291,7 @@ addval == false;
    {#if addval == false}
     <button
     on:click={() => addval = true} 
-    class="bg-barbi hover:bg-gold text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
+    class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
@@ -322,7 +322,7 @@ addval == false;
   {#if loading == false}
 
 <button 
-    class="cen bg-barbi  hover:bg-gold text-gold hover:text-barbi font-bold p-4 rounded-full"
+    class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
      on:click="{sendP}"
      name="addm">ליצור ולפרסם ריקמה </button>
        {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
@@ -330,7 +330,7 @@ addval == false;
 {:else}
 <div class="aft">
   <h1>הריקמה נוצרה בהצלחה</h1>
-  <button class="bg-gold hover:bg-barbi text-barbi hover:text-gold font-bold p-2  rounded-full"
+  <button class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
  on:click={project} >למוח הריקמה</button>
 </div>
 {/if}

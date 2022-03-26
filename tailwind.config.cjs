@@ -5,6 +5,7 @@ const config = {
 	mode: "jit",
 	purge: [
 		"./src/**/*.{html,js,svelte,ts}",
+	
 	],
 	theme: { 
 		scale: {
@@ -23,6 +24,13 @@ const config = {
 		  },
 		extend: {
 			colors: {
+					gra: "#BF953F",
+					grb: "#FCF6BA",
+					grc: "#B38728",
+					grd: "#FBF5B7",
+					gre: "#AA771c",
+					graa: "#ffc857",
+					grbb: "#3e2f5b",
 					barbi: '#FF0092',
 					gold: '#EEE8AA',
 					lturk: 'rgb(103, 232, 249)',

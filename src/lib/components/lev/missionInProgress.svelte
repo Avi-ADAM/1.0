@@ -550,7 +550,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
   {#if missionDetails}  <p class="mn bc">{missionDetails}</p>{/if}
 
   <h5 class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
-  <a class="mn de text-gold bg-barbi hover:bg-gold hover:text-barbi p-0"  style="color: var(--gold); padding: 0px;" href={link}>{linkDescription}</a>
+  <a class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0"  style="color: var(--gold); padding: 0px;" href={link}>{linkDescription}</a>
 
 {#if lapse !== 0 || x !== 0}
 <button  class="md:text-sm  bg-gold sm:p-0.5 p-0 rounded-full hover:bg-lturk ga" on:click={handleClearClick}>ניקוי</button>
