@@ -533,7 +533,7 @@ on:click={bitulm}
       {#if addSl == false}
       <div class="another" style="margin: auto"> 
  
-        <h6 style="font-weight: bold;  color: var(--barbi-pink); text-shadow: 1px 1px  aqua; " class="th">ה{Valname} שלי</h6>
+        <h6 style="font-weight: bold;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">ה{Valname} שלי</h6>
        {#if data} <span class="d"> {#each data as dat, i}
            <p style="margin: 0; line-height: 1; color:aqua; padding: auto;" class="t">{dat[valc]}</p>
            {/each} </span>{/if}
@@ -704,7 +704,7 @@ on:click={edit(da.id)}
    }
   }
    .another{
-              text-shadow: 1px 1px  var(--barbi-pink);
+              text-shadow: 1px 1px  #9900cd;
 padding: 1em;
       border-radius: 15%;
       background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);

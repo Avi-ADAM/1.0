@@ -1264,11 +1264,11 @@ class=" hover:scale-150 "
     color:var(--barbi-pink);
      margin: 0 auto; 
      padding:0;  
-   text-shadow: 1px 1px  rgb(63, 56, 18);
+   text-shadow: 1px 1px  #feeb02;
     }
     .pt{
       color:aqua;
-       text-shadow: 1px 1px  var(--barbi-pink);
+       text-shadow: 1px 1px  #9900cd;
     }
     .sp{
    display: grid;
