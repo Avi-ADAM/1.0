@@ -840,7 +840,7 @@ position: absolute;
     height:100vh;
     margin:0px auto;
 background-color :var(--gold) ;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1648335808/Gold-German-Imperial-Crown-No-Background_1_yhf2lw.svg);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1648336677/Gold-German-Imperial-Crown-No-Background_2_psurnd.svg);
     display: flex;
     flex-direction: column;
     justify-content: center;
