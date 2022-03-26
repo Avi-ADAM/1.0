@@ -1688,11 +1688,13 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
     
     }
     
-    .another{
+    .another{ background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
+	background-image: linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
+      /*
      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
      background-position: center; 
     background-repeat: no-repeat; 
-    background-size: cover;
+    background-size: cover;*/
     padding: 1em;
     border-radius: 15%;
       display:flex;

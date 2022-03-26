@@ -707,16 +707,27 @@ on:click={edit(da.id)}
               text-shadow: 1px 1px  var(--barbi-pink);
 padding: 1em;
       border-radius: 15%;
+      background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
+	background-image: linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
+      /*
      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
      background-position: center; 
     background-repeat: no-repeat; 
-    background-size: cover;
+    background-size: cover;*/
       display:flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
+        max-height: 29vh;
+     min-height: 20vh;
+     max-width: 25vW;
+     min-width: 10vw;
     }
+    .d{
+       max-height: 20vh;
+       overflow-y: scroll;
+     }
     
   
  </style>
