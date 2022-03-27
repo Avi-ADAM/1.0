@@ -518,8 +518,7 @@ async function han (){
   <div class="name">
   <a target="_self" href="/lev"><img
     title=" ללב המערכת"
-    style="height: 10vh; width:auto;  margin: 0 auto;"
-    class="hover:scale-200 hover:transform translate-y-20"
+    class="hover:scale-200 hover:transform translate-y-20 ceterr"
     src='https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg'
     alt="link"></a></div>
 
@@ -1138,6 +1137,11 @@ class=" hover:scale-150 "
  <!-- המשימות שסיימתי-->         
 
   <style>
+    .ceterr{
+      height: 10vh;
+       width:auto;
+         margin: 0 auto;
+    }
      .d{
        max-height: 15vh;
        overflow-y: scroll;
@@ -1503,6 +1507,11 @@ class=" hover:scale-150 "
     .name{
              top: 25%;
            }
+            .ceterr{
+      height: 7vh;
+       width:auto;
+         margin: 0 auto;
+    }
 }
 @media (min-height: 620px) and (min-width: 892px) {
     .name{

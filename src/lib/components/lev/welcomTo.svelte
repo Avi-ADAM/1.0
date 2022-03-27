@@ -21,17 +21,12 @@ function project(id) {
     
     //make it desapire for good
 };
-onMount(async () => {
-console.log(projectName)
 
-})
 </script>
-<div transition:fly={{y: 250, opacity: 0.9, duration: 2000} }
-    >
-<div class="normSml" >
+<div transition:fly={{y: 250, opacity: 0.9, duration: 2000}}>
 
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 width="100%" height="100%" viewBox="0 0 57 57" enable-background="new 0 0 57 57" xml:space="preserve">
+	 class="a" viewBox="0 0 57 57" enable-background="new 0 0 57 57" xml:space="preserve">
 
 <g class="group_1">
     <path class="spark_1" d="M25.9,45.8 c-0.6-0.3-1-0.9-0.9-1.6l0.8-5.2 c0.1-0.8,0.9-1.4,1.7-1.2 c0.8,0.1,1.4,0.9,1.2,1.7L28,44.6 c-0.1,0.8-0.9,1.4-1.7,1.2 C26.2,45.9,26.1,45.8,25.9,45.8z"/>
@@ -83,17 +78,16 @@ console.log(projectName)
     <path class="spark_2" d="M40.3,47l-0.1-0.2c-0.4-0.7-1.3-1-2-0.7c-0.7,0.4-1,1.3-0.7,2l0.1,0.2c0.2,0.3,0.4,0.5,0.7,0.7 c0.4,0.2,0.9,0.2,1.3,0 C40.4,48.6,40.7,47.7,40.3,47z"/>
     <path class="spark_3" d="M42.7,51.7l-0.1-0.2c-0.4-0.7-1.3-1-2-0.7c-0.7,0.4-1,1.3-0.7,2L40,53c0.2,0.3,0.4,0.5,0.7,0.7c0.4,0.2,0.9,0.2,1.3,0 C42.8,53.3,43.1,52.4,42.7,51.7z"/>
 </g>
+
 <circle cx="28.5" cy="28.5" r="12.5" class="rou">
-    <text fill="var(--barbi-pink)">  {username}
- הצטרפת לרקמת
-         {projectName}</text>
-</circle>
+   
+    </circle>
+     <text text-anchor="middle"  x="28.5" y="24.5" fill="#FF0092" style="font-size:3px;" >{username}</text>
+ <text text-anchor="middle"  x="28.5" y="30.5" fill="#FF0092" style="font-size:3px;" >הצטרפת לרקמת</text>
+        <text text-anchor="middle"  x="28.5" y="35.5" fill="#FF0092" style="font-size:3px;" >{projectName}</text>
 </svg>
-<div class="te">
-    <h1  style="line-height: 1; font-weight: bold;"
-        >       </h1></div><!--
+<!--
     <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הריקמה</button>-->
-</div>
 </div>
 <style>
     .rou{
@@ -181,7 +175,7 @@ console.log(projectName)
     height: 45%;
     overflow-y: auto;
 }
-.normSml {
+.a {
 
     text-align: center;
     align-items: center;
@@ -197,7 +191,7 @@ console.log(projectName)
 }
 @media  (min-width: 550px) {
   
-	.normSml{
+	.a{
         min-height: 125px;
         min-width: 125px;
         max-width: 125px;

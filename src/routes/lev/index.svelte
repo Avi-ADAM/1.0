@@ -1052,6 +1052,7 @@ async function start () {
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
            createpends (miData);
+           console.log("madeit")
            mesimabetahalicha (miData);
           ishursium(miData);
           sds(miData);
@@ -1220,6 +1221,8 @@ function sds (mta) {
 let walcomen = [] ;
 function makeWalcom (ata) {
         const usernames = ata.data.user.username;
+            console.log(walcomen, "fyfy")
+
     for (var i = 0; i < ata.data.user.welcom_tops.length; i++) {
        const wal = ata.data.user.welcom_tops[i];
         walcomen.push({
@@ -1227,9 +1230,11 @@ function makeWalcom (ata) {
     username: usernames,
     projectName: wal.project.projectName,
   })
+              console.log(walcomen, "fyfy")
     }
     walcomen = walcomen;
     wel = walcomen.length;
+    console.log(walcomen)
 }    
 
 let pends = [];
