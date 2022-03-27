@@ -478,13 +478,13 @@ out:scale={{duration: 2200, opacity: 0.5}}
   flipEffect={{ slideShadows: false}}
   class="mySwiper"
   navigation={{
-    nextEl: `.normSml${perhour}-${projectId}`,
-    prevEl: `.normSmll${perhour}-${projectId}`,
+    nextEl: `.normSml${perhour}-${projectId}-${mId}`,
+    prevEl: `.normSmll${perhour}-${projectId}-${mId}`,
   }}
 >
   <SwiperSlide
     ><div
-	class="{`normSml${perhour}-${projectId}`}" id="normSml" 
+	class="{`normSml${perhour}-${projectId}-${mId}`}" id="normSml" 
 ><div>
    
 <svg viewBox="0 0 100 100" class="svgg">
@@ -544,17 +544,18 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </div>
 </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${perhour}-${projectId}`} " id="normSmll"
+    ><div id="normSmll"
 >
+<div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div> 
   <span class="mn ab  ">{formatTime(zman)}</span>
-  {#if missionDetails}  <p class="mn bc">{missionDetails}</p>{/if}
+  {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p class="mn bc">{missionDetails}</p>{/if}
 
   <h5 class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
-  <a class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0"  style="color: var(--gold); padding: 0px;" href={link}>{linkDescription}</a>
+  <a class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
 
 {#if lapse !== 0 || x !== 0}
-<button  class="md:text-sm  bg-gold sm:p-0.5 p-0 rounded-full hover:bg-lturk ga" on:click={handleClearClick}>ניקוי</button>
-<button class="md:text-sm  bg-lturk sm:p-0.5 p-0 rounded-full hover:bg-gold gb" on:click={save}> הוספה</button>
+<button  class="  bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
+<button class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" on:click={save}> הוספה</button>
 {/if}
     {#if already === false}
     <button title=" סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
@@ -608,15 +609,16 @@ out:scale={{duration: 2200, opacity: 0.5}}
 }
   .a{
         grid-column: 1/2;
+        margin: 0 auto;
     }
     .b{
         grid-column: 2/3;
+        margin: 0 auto;
     }
   .mn{
      line-height: 1; 
      font-size: 8px ;
      font-weight: bold; 
-    color: var(--barbi-pink);
   }
   .pn{
     margin: 1px;

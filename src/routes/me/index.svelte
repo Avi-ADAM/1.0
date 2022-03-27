@@ -518,7 +518,7 @@ async function han (){
   <div class="name">
   <a target="_self" href="/lev"><img
     title=" ללב המערכת"
-    style="height: 7vh; margin: 0 auto;"
+    style="height: 10vh; width:auto;  margin: 0 auto;"
     class="hover:scale-200 hover:transform translate-y-20"
     src='https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg'
     alt="link"></a></div>
