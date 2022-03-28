@@ -224,7 +224,7 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
       overflow-x: auto;
       overflow-y: auto;
      max-height: 100vh;
-     max-width: 100vw;
+     width: 96vw;
      padding-left: 0.5em;
      padding-right: 0.5em;
     }

@@ -87,7 +87,7 @@ $: for (let i = 0; i < salee.length; i++){
 
 
 <div class="dd md:items-center border-2 border-gold rounded">
-  <div class="body items-center">
+  <div class="body items-center d">
         {#if bmiData.length > 0}
 
   <table dir="rtl" >
@@ -96,17 +96,17 @@ $: for (let i = 0; i < salee.length; i++){
       >המתנות שלנו</h1>
     </caption>
         <tr class="gg">
-          <th class="gg">אפשרויות</th>
+          <th class="gg"></th>
           {#each bmiData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
                     <!--    <button>מחיקה</button>-->
         </td>
           {/each}
-    </tr> <tr class="ggr">
-      <th class="ggr">שם</th>
+    </tr> <tr>
+      <th >שם</th>
       {#each bmiData as data, i}
-            <td class="ggr">{data.name}
+            <td >{data.name}
             </td>
             {/each}
           </tr> <tr>
@@ -242,7 +242,7 @@ $: for (let i = 0; i < salee.length; i++){
     {/if}
 
    <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink  text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
- on:click={addnew}> הוספת מתנה חדשה</button>
+ on:click={addnew}>יצירת מתנה </button>
      {#if salee.length > 0}
 
   <table dir="rtl" >
@@ -251,40 +251,34 @@ $: for (let i = 0; i < salee.length; i++){
       > מכירות ממתינות לחלוקה</h1>
     </caption>
         <tr class="gg">
-          <th class="gg">אפשרויות</th>
+          <th class="gg"></th>
+          <th class="gg">שם המתנה</th>
+            <th class="gg">סכום</th>
+            <th class="gg">הכסף ממתין אצל: </th>
+</tr>          
           {#each salee as data, i}
-          <td class="gg" style="font-size: 3rem">
+          <tr>
+                      <th class="gg" style="font-size: 1.5rem">
             {i + 1}
                     <!--    <button>מחיקה</button>-->
-        </td>
-          {/each}
-           <td class="gg" style="font-size: 3rem">
-             סך הכל
-        </td>
-    </tr> <tr class="ggr">
-      <th class="ggr">שם המתנה</th>
-      {#each salee as data, i}
-            <td class="ggr">{data.matanot.name}
+        </th>
+            <td >{data.matanot.name}
             </td>
-            {/each}
-                       <td></td>
-
-          </tr> 
-          <tr>
-            <th>סכום</th>
-            {#each salee as data, i}
             <td>{data.in}</td>
-              {/each}
-           <td>{allin}</td>
-            </tr>
-         <tr >
-              <th >הכסף ממתין אצל: </th>
-              {#each salee as data, i}
+           
             <td >              
               {data.users_permissions_user.username}
             </td>
+         </tr>
             {/each}
-            <td></td>
+        <tr>
+             <td class="gg" style="font-size: 1.5rem">
+             סך הכל
+        </td>
+                <td></td>
+        <td>{allin}</td>
+                        <td></td>
+
           </tr>
     </table> 
     {#if hal === false}
@@ -301,6 +295,27 @@ $: for (let i = 0; i < salee.length; i++){
 
    
   <style>
+    .d::-webkit-scrollbar {
+    width: 10px;
+}
+   
+.d::-webkit-scrollbar-track {
+    background-color: #e4e4e4;
+    border-radius: 100px;
+}
+ 
+.d::-webkit-scrollbar-thumb {
+    background-color: #d4aa70;
+    border-radius: 100px;
+}
+.d {
+    scrollbar-color: #D4AA70 #e4e4e4;
+}
+.d::-webkit-scrollbar-thumb {
+    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
+    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
+    border-radius: 100px;
+}
     .svggg {
       fill: var(--gold);
     }
@@ -310,7 +325,8 @@ $: for (let i = 0; i < salee.length; i++){
     .gg{ 
      position: sticky;
      top: 1px; 
-background-color: #6b0f1a;
+     padding: 15px;
+     background-color: #6b0f1a;
 background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
      border-width: 4px;
@@ -356,7 +372,7 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
     .body {
       overflow-x: auto;
       overflow-y: auto;
-  
+      max-width: 96vw;
      padding-left: 0.5em;
      padding-right: 0.5em;
     }
