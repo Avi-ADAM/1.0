@@ -87,7 +87,7 @@ function newM (event) {
           {/if}-->
 <button
  on:click={() => addmission = true}
-  class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-1 px-2 rounded-full"
+  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-1 px-2 rounded-full"
   >הוספת פעולה שאינה ברשימה</button>
   {:else if addmission == true}
   <div  class="border-2 border-gold rounded m-4">

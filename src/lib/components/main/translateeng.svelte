@@ -116,7 +116,7 @@ already = true;
 </div>
 {#if already == false}
 <div class="flex items-center justify-center">
-<button style="margin: 5px auto;"  class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
+<button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
  on:click={add} >send</button>
  </div>
  {/if}

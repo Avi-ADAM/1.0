@@ -63,7 +63,7 @@ export let addnee = false;
   </script>
  {#if addnee === false}
 
-      <button on:click={() => addnee = true} class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">הוספת משאב שאינו ברשימה</button>
+      <button on:click={() => addnee = true} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">הוספת משאב שאינו ברשימה</button>
       {:else if addnee === true}
       <div  class="border-2 border-gold rounded m-4">
   <button

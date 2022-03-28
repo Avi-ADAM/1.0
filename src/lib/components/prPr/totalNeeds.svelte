@@ -201,7 +201,7 @@ meData[i].totaltotal =  meData[i].easy;
 <h1 style="display:none;">{n}</h1>
 {/each}
   <div class="dd md:items-center border-2 border-gold rounded">
-  <div class="body items-center">
+  <div class="body items-center d">
   
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
@@ -224,8 +224,8 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
             <td class="ggr">
                 <div dir="rtl" class='textinput'>
-  <input type="text"  id="nam" name="nam" bind:value={data.name} class='input' required>
-  <label for="nam" class='label' >שם</label>
+  <input type="text"  id="inputi" name="inputi" bind:value={data.name} class='input' required>
+  <label for="nam" id="labeli" class='label' >שם</label>
   <span class='line'></span>
 </div>
             </td>
@@ -427,24 +427,44 @@ select.round:focus {
   border-color: green;
   outline: 0;
 }
-   .gg{ 
+  .gg{ 
      position: sticky;
      top: 1px; 
-     background-color: var(--naim) !important;
+background-color: #6b0f1a;
+background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
      border-width: 4px;
   border-color: rgb(103, 232, 249);
      border-radius: 4%;
       opacity: 1;
+      color: rgb(132, 241, 223);
+  }
+   .ggd{ 
+     position: sticky;
+     bottom: 1px; 
+background-color: #6b0f1a;
+background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
+     border-width: 4px;
+  border-color: rgb(103, 232, 249);
+     border-radius: 4%;
+      opacity: 1;
+                  color: rgb(132, 241, 223);
+
+
   }
   .ggr{ 
      position: sticky;
      top: 77px; 
-     background-color: var(--naim) !important;
+background-color: #6b0f1a;
+background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
      opacity: 1;
+            color: rgb(132, 241, 223);
 
   }
-  .ggr:hover, .gg:hover {
-    background:rgb(132, 241, 223);
+  .ggr:hover, .gg:hover, .ggd:hover {
+    background:var(--barbi-pink);
   } 
     .dd{
       display: flex;
@@ -455,7 +475,8 @@ select.round:focus {
     .body {
       overflow-x: auto;
       overflow-y: auto;
-     width: 100vw;
+     height: 100vh;
+     width: 96vw;
      padding-left: 0.5em;
      padding-right: 0.5em;
     }
@@ -470,16 +491,52 @@ border-radius: 4%;
   text-align: center;
   color: var(--barbi-pink);
   margin: 0 auto;
+ 
   }
-  th, td{
-    background: var(--gold);
-    min-width: 150px;
+ 
+   th{
+     background-color: #6b0f1a;
+     background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+     color: rgb(132, 241, 223);
+     
+   }
+  td{
+     background-color: #5efaf2;
+     background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
+     min-width: 150px;
   }
+ th:hover{
+       background:var(--barbi-pink);
 
-  th:hover, td:hover {
+ }
+  td:hover {
     background:rgb(132, 241, 223);
   } 
-
+  #labeli {
+  font-family: 'Roboto', sans-serif;
+  font-size: 15px;
+  position: absolute;
+  right: 0;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color:var( --gold);
+  user-select: none;
+}
+  #inputi {
+      color:var(--gold);
+       font-family: 'Roboto', sans-serif;
+  border: none;
+  margin: 0;
+  padding: 10px 0;
+  outline: none;
+  border-bottom: solid 1px var(--mturk);
+  font-size: 15px;
+  margin-top: 12px;
+  width: 100%;
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+  }
  .textinput {
   position: relative;
   width: 100%;
@@ -524,16 +581,20 @@ border-radius: 4%;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
 }
 
-.input:focus ~ .line, .input:valid ~ .line {
+.input:focus ~ .line, .input:valid ~ .line, #inputi:valid ~ #labeli, #inputi:focus ~ #labeli {
   width: 100%;
 }
-
+ #inputi:valid ~ #labeli, #inputi:focus ~ #labeli {
+ font-size: 11px;
+  color: var(--mturk);
+  top: 0;
+ }
 .input:focus ~ .label, .input:valid ~ .label {
   font-size: 11px;
   color: #2196F3;
   top: 0;
 }
-.input:focus, .input:valid  {
+.input:focus, .input:valid, #inputi:valid ~ #labeli, #inputi:focus ~ #labeli   {
  border : 0;
 }
 @media (max-width:600px){

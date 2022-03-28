@@ -129,7 +129,7 @@ function dispatchb () {
 <div style="--the:{`var(${color})`};">
 {#if addR == false}
 <button 
-class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
 on:click={() => addR = true}>הוספת תפקיד שאינו ברשימה</button>
 {:else}
 
@@ -170,7 +170,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
  {#if newsk} <p>{newsk}</p> {/if}
       <button
        on:click={() => addsk = true} 
-       class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-1 px-1 rounded-full"
+       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-1 px-1 rounded-full"
        >הוספת כישור שאינו ברשימה</button>
        <br/>
     <button on:click={addrole}

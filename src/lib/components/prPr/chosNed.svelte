@@ -42,6 +42,7 @@ onMount(async () => {
             }).then(checkStatus)
           .then(parseJSON);
             needss = res
+            dispatch("str")
         } catch (e) {
             error = e
         }

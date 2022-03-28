@@ -79,14 +79,14 @@ function project(id) {
     <path class="spark_3" d="M42.7,51.7l-0.1-0.2c-0.4-0.7-1.3-1-2-0.7c-0.7,0.4-1,1.3-0.7,2L40,53c0.2,0.3,0.4,0.5,0.7,0.7c0.4,0.2,0.9,0.2,1.3,0 C42.8,53.3,43.1,52.4,42.7,51.7z"/>
 </g>
 
-<circle cx="28.5" cy="28.5" r="10.5" class="rou">
+<circle cx="28.5" cy="28.5" r="18" class="rou">
    
     </circle>
-     <text text-anchor="middle"  x="28.5" y="22.5" fill="#FF0092" style="font-size:3px;" >{username}</text>
- <text text-anchor="middle"  x="28.5" y="28.5" fill="#FF0092" style="font-size:3px;" >הצטרפת לרקמת</text>
-        <text text-anchor="middle"  x="28.5" y="33.5" fill="#FF0092" style="font-size:3px;" >{projectName}</text>
-      <foreignObject x="28.5" y="37.5" width="10">  <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הריקמה</button>
-</foreignObject></svg>
+     <text text-anchor="middle" width="16" overflow="scroll"  x="28.5" y="18" fill="#FF0092" style="font-size:4px;" >{username}</text>
+ <text text-anchor="middle"  x="28.5" y="24" fill="#FF0092" style="font-size:4px;" >הצטרפת לרקמת</text>
+        <text text-anchor="middle" width="21" overflow="scroll"  x="28.5" y="30" fill="#FF0092" style="font-size:4px;" >{projectName}</text>
+      <text x="28.5" y="38" text-anchor="middle"  class="btn" style="font-size:4px;" on:click={project(id)}>למוח הריקמה</text>
+</svg>
 <!--
     <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הריקמה</button>-->
 </div>
@@ -188,6 +188,21 @@ function project(id) {
     max-height: 137.5px;
     aspect-ratio: 1 /1;
 
+
+}
+.btn{
+    fill: var(--barbi-pink);
+            stroke: var(--gold);
+            stroke-width: 1px;
+              paint-order: stroke fill;
+
+
+}
+.btn:hover{
+    fill: var(--gold);
+            stroke: var(--barbi-pink);
+            stroke-width: 1px;
+              paint-order: stroke fill;
 
 }
 @media  (min-width: 550px) {

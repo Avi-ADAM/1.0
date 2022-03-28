@@ -272,7 +272,7 @@ addval == false;
   <span class='line'></span>
 </div>
 <br>
-<button on:click={openen} class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >הוסף לוגו</button>
+<button on:click={openen} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >הוסף לוגו</button>
 {#if suc == true}<small class="text-barbi">לוגו נבחר בהצלחה</small>{/if}
          
 <h1 class="midscreenText-2 text-center text-gold">
@@ -330,7 +330,7 @@ addval == false;
 {:else}
 <div class="aft">
   <h1>הריקמה נוצרה בהצלחה</h1>
-  <button class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
+  <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
  on:click={project} >למוח הריקמה</button>
 </div>
 {/if}

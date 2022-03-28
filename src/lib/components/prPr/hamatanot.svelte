@@ -168,15 +168,15 @@ $: for (let i = 0; i < salee.length; i++){
           <td class="ggd" style="font-size: 3rem">
            
           <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded-full p-0.5"
+          class=" hover:bg-gold  rounded-full p-0.5"
           title="דיווח על מכירה"
           on:click={sell(data.id, data.price, data.quant)} 
-          ><svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+          ><svg class="svggg"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 496 496" style=" width:24px;height:24px;" xml:space="preserve">
 <g>
 	<g>
 		<g>
-			<path d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
+			<path  d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
 				h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V104h16v-8.408c9.12-1.856,16-9.936,16-19.592
 				c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4
 				C272,42.344,265.12,34.264,256,32.408z"/>
@@ -241,7 +241,7 @@ $: for (let i = 0; i < salee.length; i++){
     </table>
     {/if}
 
-   <button  class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink  text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+   <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink  text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={addnew}> הוספת מתנה חדשה</button>
      {#if salee.length > 0}
 
@@ -288,7 +288,7 @@ $: for (let i = 0; i < salee.length; i++){
           </tr>
     </table> 
     {#if hal === false}
-   <button  class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+   <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>בקשת חלוקה</button>
 {:else}
 <Halu {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
@@ -301,34 +301,51 @@ $: for (let i = 0; i < salee.length; i++){
 
    
   <style>
-   
-   .gg{ 
+    .svggg {
+      fill: var(--gold);
+    }
+     .svggg:hover {
+      fill: var(--barbi-pink);
+    }
+    .gg{ 
      position: sticky;
      top: 1px; 
-     background-color: var(--naim) !important;
+background-color: #6b0f1a;
+background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
      border-width: 4px;
   border-color: rgb(103, 232, 249);
      border-radius: 4%;
       opacity: 1;
+      color: rgb(132, 241, 223);
   }
    .ggd{ 
      position: sticky;
      bottom: 1px; 
-     background-color: var(--naim) !important;
+background-color: #6b0f1a;
+background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
      border-width: 4px;
   border-color: rgb(103, 232, 249);
      border-radius: 4%;
       opacity: 1;
+                  color: rgb(132, 241, 223);
+
+
   }
   .ggr{ 
      position: sticky;
      top: 77px; 
-     background-color: var(--naim) !important;
+background-color: #6b0f1a;
+background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
      opacity: 1;
+            color: rgb(132, 241, 223);
 
   }
-  .ggr:hover, .gg:hover {
-    background:rgb(132, 241, 223);
+  
+  .ggr:hover, .gg:hover, .ggd:hover {
+    background:var(--barbi-pink);
   } 
     .dd{
       display: flex;
@@ -337,7 +354,9 @@ $: for (let i = 0; i < salee.length; i++){
       flex-direction: column;
     }
     .body {
+      overflow-x: auto;
       overflow-y: auto;
+  
      padding-left: 0.5em;
      padding-right: 0.5em;
     }
@@ -352,13 +371,22 @@ border-radius: 4%;
   text-align: center;
   color: var(--barbi-pink);
   margin: 0 auto;
+ 
   }
-  th, td{
-    background: var(--gold);
-
+   th{
+     background-color: #6b0f1a;
+     background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+     color: rgb(132, 241, 223);
+   }
+  td{
+     background-color: #5efaf2;
+     background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
   }
+ th:hover{
+       background:var(--barbi-pink);
 
-  th:hover, td:hover {
+ }
+  td:hover {
     background:rgb(132, 241, 223);
   } 
   </style>

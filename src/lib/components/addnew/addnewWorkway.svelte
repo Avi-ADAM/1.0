@@ -77,7 +77,7 @@ export let color = "--gold";
       
     {#if addW == false}
     <button style="--the:{color};"
-    class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+    class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
     on:click={() => addW = true}>הוספת חדשה</button>
     {:else}
 

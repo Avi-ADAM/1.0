@@ -1023,7 +1023,8 @@ function tryma(){
    openMA = true
 }
 function masi(){
-   addN = true
+  loadr = true;
+   addN = true;
    		lll.scrollIntoView(true);
 
 }
@@ -1083,7 +1084,7 @@ function masi(){
       src={srcP}
       alt="profilePic">
       <button
-          class="text-pink-200 hover:bg-barbi hover:text-mturk rounded-full"
+          class="text-barbi hover:bg-barbi hover:text-mturk rounded-full"
           title="עריכת תמונת הפרופיל של הריקמה"
           on:click={editp} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1092,7 +1093,7 @@ function masi(){
           </button>
           {:else}
            <button
-          class="bg-pink-200 hover:bg-barbi text-mturk rounded-full"
+          class="bg-barbi hover:bg-mturk text-barbi rounded-full"
           title="העלאת תמונת פרופיל לריקמה"
           on:click={addp} 
           >
@@ -1102,7 +1103,7 @@ function masi(){
  </button>
 {/if}
            <button
-          class=" hover:bg-barbi text-pink-200 rounded-full"
+          class=" hover:bg-mturk text-barbi rounded-full"
           title="עריכת פרטי ריקמה"
           on:click={editb} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1126,7 +1127,7 @@ function masi(){
    sveltekit:prefetch href={`/user/${user.id}`}>  <h6 class="textlink hover:text-scale-150 hover:text-gold">{user.username}</h6></a>
  
   {/each}
-  <div class="border-2 border-gold m-2"> 
+  <div class="border-2 border-barbi m-2"> 
     <h2 class="text-barbi text-bold underline decoration-gold">ערכים ומטרות</h2>
   <div class="flex flex-row flex-wrap justify-between"> 
 
@@ -1155,12 +1156,11 @@ function masi(){
 </div>
 <div class=" m-4 ">
 
-
 {#if pmiData.length > 0}
 
   {#if pendS === false}
 <button
- class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full"
+ class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full"
 on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
 {:else}
 <button title={cencel1}
@@ -1177,7 +1177,7 @@ on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
 {#if bmiData.length > 0}
  {#if tahaS === false}
 <button
- class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+ class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
 on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 {:else}
 <button title={cencel1}
@@ -1244,7 +1244,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
 <div >
  {#if addM === true}
-   <div bind:this={hosaf}   class=" m-4 border-2 border-gold rounded" >
+   <div bind:this={hosaf}   class=" m-4 border-2 border-barbi rounded" >
 <button
  title={cencel}
       on:click={closeM}
@@ -1266,7 +1266,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
     <div  bind:this={cow}>
       {#if load === true}
-        <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
+        <div class="grid justify-center items-center border-2 border-barbi rounded p-4" >
 
       <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
         </div>
@@ -1293,10 +1293,10 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                  on:close={close}
                                  /> {/if}</div>
                               
-    <div class=" m-4" bind:this={lll}>
+<div class=" m-4" bind:this={dow}>
  
       {#if addN == true}
-      <div id="hosafn" class="m-4 border-2 border-gold rounded"  >
+      <div id="hosafn" class="m-4 border-2 border-barbi rounded"  >
       <button
       title={cencel}
       on:click={() => addN = false}
@@ -1304,14 +1304,13 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button> 
-     <ChoosNeed on:add={needad} on:addm={needadm} selectedi={needr}/>
+     <ChoosNeed on:str={()=>loadr = false} on:add={needad} on:addm={needadm} selectedi={needr}/>
       </div>
       {/if}    
    
-    </div>
-    <div class=" m-4" bind:this={dow} >
+    <div class=" m-4" bind:this={lll} >
        {#if loadr === true}
-        <div class="grid justify-center items-center border-2 border-gold rounded p-4" >
+        <div class="grid justify-center items-center border-2 border-barbi rounded p-4" >
 
       <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
         </div>
@@ -1322,17 +1321,17 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
                                      on:close={clo}
                                      on:remove={wdwd}
     />{/if}</div>
-
+</div>
     <div class=" p-2">
       <Hamatanot {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>
       {#if fmiData.length > 0 || rikmashes.length > 0}
-        <div class="m-4 border-2 border-barbi rounded p-4" >
+        <div class="m-4 border-2  border-barbi rounded p-4" >
 
     <Fini fmiData={fmiData} users={projectUsers} {rikmashes}/>
     <br>
     {#if hal === false}
-    <button on:click={() => hal = true} class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
+    <button on:click={() => hal = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
     חישוב רווח בגירסה ראשונית
   </button>
       {:else if hal === true}
@@ -1359,13 +1358,13 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     <h1 class="bg-white">לא מורשה</h1>
     {/if}-->
  {:else }  
- <div class="flex text-center flex-col border-2 border-gold rounded m-4">
-<h1 class="text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
+ <div class="flex text-center flex-col border-2  border-barbi rounded m-4">
+<h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
  
            {#each projects as data, i}
           
           <button
-          class=" bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold p-0.5 m-2 rounded-full"
+          class=" border  border-barbi hover:border-gold font-bold border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold p-0.5 m-2 rounded-full"
           on:click={projectn(data.id)}
           > {data.projectName}
           </button>
@@ -1375,7 +1374,8 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  {/if}
  <style>
    .alli{
-    background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%);
+ /*   background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%); */
+ background: radial-gradient(circle at 0.9%,rgb(2, 255, 187) 0%, rgb(238 232 170)  50%, rgb(2, 255, 187) 100.2%);
      z-index: -1;
   min-width: 100vw;
   min-height: 100vh;

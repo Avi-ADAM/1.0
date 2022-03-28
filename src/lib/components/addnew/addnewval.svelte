@@ -77,7 +77,7 @@ let cencel = 'ביטול';
  <div style="--the:{`var(${color})`};">
 {#if addS == false}
 <button 
-class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-2 rounded-full"
+class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-2 rounded-full"
 on:click={() => addS = true}>הוספת ערך שאינו ברשימה</button>
 {:else}
 <button title={cencel}
