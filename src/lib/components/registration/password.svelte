@@ -10,8 +10,7 @@ import { roles2 } from './roles2.js';
 import { workways1 } from './workways1.js';
 import { valluss } from './valluss.js';
 import {fpval} from './fpval.js';
-import { scale } from 'svelte/transition';
-	import { quintOut } from 'svelte/easing';
+
 let skills1_value;
 let roles2_val;
 let work_ways1;
@@ -67,10 +66,12 @@ axios
     vallues: vallues,
 	cuntries: contriesis,
 	free_person: fpvall
-  })
+  }, {
+  headers: {
+	         'Content-Type': 'application/json'
+            }})
   .then(response => {
 			show.update(n => n + 1);
-
 	  data = response.data;
 	  	console.log(data);
 
@@ -78,7 +79,6 @@ axios
 		tx: 0,
 		txx: 0
 	} );
-
     document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
     document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
 })
