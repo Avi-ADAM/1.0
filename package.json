@@ -24,7 +24,9 @@
     "cookie": "^0.4.2",
     "cssnano": "^5.0.12",
     "d3-format": "^3.1.0",
+    "d3-geo": "^3.0.1",
     "d3-hierarchy": "^3.1.1",
+    "d3-scale": "^4.0.2",
     "kit-sw-workbox": "^1.0.2",
     "lodash.isequal": "^4.5.0",
     "moment": "^2.29.1",
@@ -38,6 +40,7 @@
     "svelte-preprocess": "^4.9.8",
     "svelte-viewport-info": "^0.1.12",
     "swiper": "^8.0.6",
+    "topojson-client": "^3.1.0",
     "yup": "^0.32.11"
   },
   "prettier": {
