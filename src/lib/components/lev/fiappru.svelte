@@ -352,7 +352,6 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
   class="mySwiper"
   navigation={{
     nextEl: `.normSml${mId}-oo`,
-    prevEl: `.normSmll${mId}-oo`,
   }}
 >
   <SwiperSlide

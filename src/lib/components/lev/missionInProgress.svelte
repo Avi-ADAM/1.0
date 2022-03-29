@@ -314,6 +314,7 @@ let toapprove1 = ``;
 let toapprove = ``; 
 let appi = ``;
 async function afterwhy () {
+  already = true;
 const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
