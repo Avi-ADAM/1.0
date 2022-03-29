@@ -42,7 +42,7 @@ let userName_value;
 let emailL;
 let passwordx;
 
-
+let error1;
 userName.subscribe(value => {
   userName_value = value;
 });
@@ -51,42 +51,58 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let data;
+let linkg = 'https://oneloveone.onrender.com/graphql'
+let miDatan;
 let errr = {k: false, m: "", p: false}
-function increment() {    
+async function increment() {    
 errr.p = true;
-axios
-  .post('https://oneloveone.onrender.com/auth/local/register', {
-    username: userName_value, 
-    email: emailL,
-    password: passwordx,
-	 skills: skills1_value,
-    tafkidims: roles2_val,
-    work_ways: work_ways1,
-    vallues: vallues,
-	cuntries: contriesis,
-	free_person: fpvall
-  }, {
-  headers: {
-	         'Content-Type': 'application/json'
-            }})
-  .then(response => {
-			show.update(n => n + 1);
-	  data = response.data;
-	  	console.log(data);
+   try {
+            await fetch(linkg, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: `mutation {
+  register(input: { 
+	  username: "${userName_value}",
+   email: "${emailL}",
+    password: "${passwordx}",
+	skills: [${skills1_value}],
+	 tafkidims: [${roles2_val}],
+    work_ways: [${work_ways1}],
+    vallues: [${vallues}],
+	cuntries: [${contriesis}],
+	free_person: "${fpvall}"
+ }) {
+	 jwt
+    user {
+      username
+      email
+	  id
+    }
+  }
+}
+`})
+                })
+                .then(r => r.json())
+                .then(data => miDatan = data);
+            console.log(miDatan);
+           			show.update(n => n + 1);
 
-	dispatch ('progres',{
+dispatch ('progres',{
 		tx: 0,
 		txx: 0
 	} );
-    document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-    document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
-})
-  .catch(error => {
-    console.log('צריך לתקן:', error.response);
-				errr.m = error.response.data.message
+    document.cookie = `jwt=${miDatan.data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+        } catch (e) {
+            error1 = e
+            console.log(error1);
+				errr.m = error1.response.data.message
 				errr.k = true
-  });
+        }
+
 	}
 
   
