@@ -352,6 +352,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
   class="mySwiper"
   navigation={{
     nextEl: `.normSml${mId}-oo`,
+    prevEl: `.normSmll${mId}-oo`,
   }}
 >
   <SwiperSlide
@@ -421,8 +422,9 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
 </div>
 </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${mId}-oo`}" id="normSmll"
->
+    ><div  id="normSmll"
+><div class="{`normSmll${mId}-oo`}" 
+></div>
             <p class="ab pnn" ><span style="color:green" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
             <h5 class="bc pnn" >{why}</h5>
           {#if missionDetails}  <h6 class="cd pnn" >{missionDetails}</h6>{/if}
