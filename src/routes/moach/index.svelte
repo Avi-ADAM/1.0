@@ -1128,7 +1128,7 @@ function masi(){
  
   {/each}
   <div class="border-2 border-barbi m-2"> 
-    <h2 class="text-barbi text-bold underline decoration-gold">ערכים ומטרות</h2>
+    <h2 class="text-barbi text-bold underline decoration-mturk">ערכים ומטרות</h2>
   <div class="flex flex-row flex-wrap justify-between"> 
 
   {#each vallues as vallue, i }

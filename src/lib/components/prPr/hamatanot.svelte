@@ -4,7 +4,9 @@ import New from './newmatana.svelte';
 import Sale from './sale.svelte';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
-      import Halu from './whowhat.svelte'
+      import Halu from './whowhat.svelte';
+      import { onMount } from 'svelte';
+      import Cir from './graph/circle.svelte';
 export let fmiData = [];
 export let rikmashes = [];
 export let projectId;
@@ -12,7 +14,27 @@ let isOpen = false;
 let a = 0;
 export let bmiData = [];
  import { RingLoader
-} from 'svelte-loading-spinners'
+} from 'svelte-loading-spinners';
+let fermatana = {};
+let arr =[];
+export let salee = [];
+$: for (let i = 0; i < salee.length; i++){
+  console.log(fermatana);
+
+   if (salee[i].matanot.name in fermatana) {
+                    fermatana[salee[i].matanot.name] += salee[i].in
+                   } else {
+                    fermatana[salee[i].matanot.name] = salee[i].in
+                   }
+}
+console.log(fermatana);
+$: if (salee.length > 0) {
+for (let key in fermatana) {
+    if (fermatana.hasOwnProperty(key)) {
+        arr.push( { key: key, value: fermatana[key] } );
+    }
+}}
+arr = arr;
 export let projectUsers = [];
 let quant, each, maid;
 function sell(id, v, z){
@@ -48,7 +70,6 @@ function done(event){
   bmiData.push(event.detail.matana);
   bmiData = bmiData
 }
-export let salee = [];
 function ask (){
 hal = true;
 //ליצור מטבע אישור של חלוקה ליצור טופס של פרטי חלוקה כמה אחוז לחלק וכמה להעמיד להוצאות
@@ -57,6 +78,7 @@ let allin = 0;
 $: for (let i = 0; i < salee.length; i++){
   allin += salee[i].in
 }
+
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -258,7 +280,7 @@ $: for (let i = 0; i < salee.length; i++){
 </tr>          
           {#each salee as data, i}
           <tr>
-                      <th class="gg" style="font-size: 1.5rem">
+                      <th class="ggr" style="font-size: 1.5rem">
             {i + 1}
                     <!--    <button>מחיקה</button>-->
         </th>
@@ -282,19 +304,31 @@ $: for (let i = 0; i < salee.length; i++){
           </tr>
     </table> 
     {#if hal === false}
-   <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+   <button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>בקשת חלוקה</button>
 {:else}
 <Halu {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
 {/if}
     {/if}
+ {#if salee.length > 0} 
+ <div class="border-barbi border">
+   <h1 class="text-center text-barbi text-bold underline decoration-mturk">התפלגות המכירות</h1>
+
+<div class="dff m-4">
+ <Cir data={arr}/></div></div>
+ {/if}
+  </div>
 
   </div>
-  </div>
- 
+
 
    
   <style>
+    .dff{
+      width: 290px;
+      height: 290px;
+      margin: 0 auto;
+    }
     .d::-webkit-scrollbar {
     width: 10px;
 }
@@ -351,7 +385,6 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
   }
   .ggr{ 
      position: sticky;
-     top: 77px; 
 background-color: #6b0f1a;
 background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
@@ -405,6 +438,14 @@ border-radius: 4%;
   td:hover {
     background:rgb(132, 241, 223);
   } 
+
+  @media (min-width: 768px) {
+     .dff{
+      width: 400px;
+      height: 400px;
+      margin: 0 auto;
+    }
+  }
   </style>
       
         
