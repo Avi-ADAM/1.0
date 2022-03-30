@@ -1,5 +1,5 @@
 <script>
-import Mid from "../../lib/components/lev/mid.svelte"
+import Mid from "../../lib/components/lev/midi.svelte"
   import MissionInProgress from "../../lib/components/lev/missionInProgress.svelte"
     import ProjectSuggestor from "../../lib/components/lev/projectSuggestor.svelte"
    // import DecisionMaking from "../../lib/components/lev/decisionMaking.svelte";
@@ -9,37 +9,36 @@ import Mid from "../../lib/components/lev/mid.svelte"
     import PendingMa from "../../lib/components/lev/pmas.svelte"
     import Welcomt from "../../lib/components/lev/welcomTo.svelte";
     import Fiappru from '../../lib/components/lev/fiappru.svelte';
-    import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+    import { goto } from '$app/navigation';
         import { isEqual } from 'lodash';
         import Mashsug from '../../lib/components/lev/mashsuggest.svelte'
         import Reqtom from '../../lib/components/lev/reqtom.svelte'
         import Weget from '../../lib/components/lev/weget.svelte'
 
-let ddd;
 let low = true;
 
   //  import Viewport from 'svelte-viewport-info'
-    let updateP;
     let idL;
     let meData = [];
     let miData = [];
-    let askdata = [];
     let token;
-    let error1 = null;
     let askedarr = [];
     let declineddarr = [];
-    let declineddarra = [];
     let d = [];
     let sk = [];
     var dictids = {};
     var dictasked = [];
     let askedcoin = [];
-
-    let mtaha = [];   
+let error1 = null;
+    let mtaha = [];  
+let pmashd = 0;
+let mashs = 0;
+let maap = 0; 
     let sug =  0
 let pen = 0
 let ask = 0
-let wel = 0
+let wel = 0;
+let askma = 0;
 let beta = 0
 let des = 0
 let fia = 0;
@@ -223,7 +222,7 @@ function crMaap(hh){
     }
     wegets = wegets
     console.log(wegets)
-    ma = wegets.length;
+    maap = wegets.length;
 
 }
 let orech;
@@ -461,7 +460,7 @@ async function createmask (da) {
  var result = askedm.filter(val=>filters.includes(val.already)); 
  askedm = result
   askedm = askedm;
-  askm = askedm.length;
+  askma = askedm.length;
 }
 
 
@@ -1102,12 +1101,12 @@ function sps(pp){
                  oid: y.id,
                  already: false
   })
-}
+ }
                 }}
       }
       huca = huca
-      console.log("kk", huca)
-}
+ mashs = huca.length
+    }
  
 let penm = 0;
 function pmash (data) {
@@ -1184,7 +1183,7 @@ function pmash (data) {
     pmashes[t].noofusersWaiting = noofusersWaiting;
         
     }
-    penm = pmashes.length;
+    pmashd = pmashes.length;
     console.log(pmashes)
    // bubleUiAngin(pends)
 }
@@ -1340,16 +1339,16 @@ function coinLapach (event){
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
 function showonly (event){
   const value = event.detail.data;
-  let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
+  let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi, .ppmash, .pmashs, .pmaap, .askmap" )
   for(let i=0;i<hide.length;i++){
         hide[i].style.display='none'}
   let show = document.getElementsByClassName(value)
           for(let i=0;i<show.length;i++){
           show[i].style.display=''}
- 
+
 }
 function showall (event){
- var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi" )
+ var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi, .ppmash, .pmashs, .pmaap, .askmap" )
 
      for(let i=0;i<show.length;i++){
         show[i].style.display=''}
@@ -1391,7 +1390,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 
 {/each}
 {#each pmashes as pen, i}
-    <div  class="normSml pe" style="display:''"
+    <div  class="normSml ppmash" style="display:''"
  ><PendingMa
         on:show={show}
         on:coinLapach={coinLapach}
@@ -1460,7 +1459,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 {/each}
     
 {#each  wegets  as da, i}
-        <div  class="fiap normSml" style="display:'';"><Weget
+        <div  class="pmaap normSml" style="display:'';"><Weget
             on:acsept={deloid}
             on:decline={deloid}
             mId={da.mId}
@@ -1590,7 +1589,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 {/each}
 
 {#each  askedm  as da, i}
-        <div  class="asks normSml" style="display:'';"><Reqtom
+        <div  class="askmap normSml" style="display:'';"><Reqtom
             on:acsept={delom}
             on:decline={delom}
             noofusersWaiting={da.noofusersWaiting}
@@ -1648,7 +1647,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
                 /></div>
 {/each}
 {#each huca as data, i}
-    <div  class="sugg normSml" style="display:''"><Mashsug
+    <div  class="pmashs normSml" style="display:''"><Mashsug
       on:less={lessi}
       i={i}
       askedarr={askedarr}
@@ -1721,6 +1720,10 @@ name={nam}
 {wel}
 {beta}
 {fia}
+pmash={pmashd}
+{mashs}
+{maap}
+{askma}
 des={0}  />
     </div>
 </div> 
