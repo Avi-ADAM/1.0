@@ -2482,9 +2482,9 @@ export let wi = "0.2";
 let profiletitle ="תמונת הפרופיל שלי"
 
 function hover (id){
-//dispatch("hover",{
-//    id: id
-//})
+dispatch("hover",{
+    id: id
+})
 }
 function disp (id){
 dispatch("disp",{

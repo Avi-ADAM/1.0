@@ -102,30 +102,29 @@ hovere = !hovere
 if (hovere === true){
     console.log("a")
 if (num === "a"){
-aa2 = " matrix(2.3511 0 0 2.008 -224.88 -505.38)"
+aa2 = "matrix(1.923973, 0, 0, 1.923973, -290, -642)"
 } else if (num === "b"){
-bb = " matrix(2.2954 0 0 1.9604 -36.461 -711.7)"
+bb = "matrix(1.804202, 0, 0, 1.804202, 100.91, -749.63)"
 } else if (num === "c"){
-cc = " matrix(2.2954 0 0 1.9604 -390.03 -711.7)"
+cc = " matrix(2.038709, 0, 0, 2.038709, -400, -849.63)"
 } else if (num === "d"){
-dd = " matrix(2.2513 0 0 1.9228 10.794 -836.02)"
+dd = "matrix(1.713625, 0, 0, 1.713625, 58, -862)"
 } else if (num === "e"){
-ee = " matrix(2.2405 0 0 1.9135 -432.08 -831.91)"
-} else if (num === "f"){
-  ff = " matrix(2.0287 0 0 1.7327 -2.2039 -886.54)"
+ee = "matrix(2.177643, 0, 0, 2.177643, -192, -585)"
+} else if (num === "f"){  
+  ff = "matrix(2.32876, 0, 0, 2.32876, -45, -893)"
 } else if (num === "g"){
-    gg = " matrix(2.2293 0 0 1.904 -358.26 -963.3)"
+    gg = " matrix(2.190674, 0, 0, 2.190674, -372, -850)"
 } else if (num === "h"){
-  hh = "matrix(12.101 0 0 11.246 346.99 -138.29)"
+  hh = "matrix(10.802134, 0, 0, 10.038354, 330, -61.017)"
 } else if (num === "q"){
- qq = "translate(146.88 -177.44)";
+ qq = "matrix(1.931463, 0, 0, 1.931463, -10, -648)";
 } else if (num === "j"){
- jj = "translate(-140.71 -449.43)";
+ jj = "matrix(2.252314, 0, 0, 2.252314, -340, -1010)";
 } else if (num === "y"){
- yy = "translate(164.82 -449.43)";
+ yy = "matrix(2.158774, 0, 0, 2.158774, -44.82, -980.43)";
 }  else if (num === "x"){
- xx = "translate(-188.36 -539.11)";
-
+ xx = "matrix(2.108646, 0, 0, 2.108646, -350, -1060)";
 }
 } else {
     console.log("b")
@@ -136,7 +135,7 @@ bb = "translate(241.91 -369.63)";
 } else if (num === "c"){
  cc = "translate(-232.58 -369.63)";
 } else if (num === "d"){
- dd ="translate(194.44 -541.85))";
+ dd ="matrix(1, 0, 0, 1, 194.44, -541.85)";
 } else if (num === "e"){
 ee ="translate(3.8484 -18.405)";
 } else if (num === "f"){
@@ -144,7 +143,7 @@ ee ="translate(3.8484 -18.405)";
 } else if (num === "g"){
     gg ="translate(-156.85 -287.03)";
 } else if (num === "h"){
-  hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)";
+  hh = "matrix(8.9511, 0, 0, 8.3182,  300.46, -11.017)";
 } else if (num === "q"){
  qq = "translate(146.88 -177.44)";
 } else if (num === "j"){
@@ -162,10 +161,10 @@ import { afterUpdate } from 'svelte';
 export let low = true;
 let wi = "0.2";
 onMount (async () => {
-  bit()
+ // bit()
 })
 afterUpdate (async () => {
-  bit()
+ // bit()
 })
 
 let myInterval = null;
@@ -207,7 +206,7 @@ function bit (){
 {fiap} 
 {qq} {jj} {yy}
 {hh} 
-{gg} 
+{gg} {xx}
 {ff}
 {ee} {picLink}
 {dd} 
@@ -218,7 +217,7 @@ function bit (){
 {ppmash} 
 {mashs} 
 {pmashs}
-{maap }
+{maap } {askmap}
 {pmaap} 
 on:hover={hover}
  on:disp={disp}/>
