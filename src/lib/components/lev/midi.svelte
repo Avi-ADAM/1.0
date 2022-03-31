@@ -97,6 +97,7 @@ let jj = "translate(-140.71 -449.43)";
 let yy = "translate(164.82 -449.43)";
 let hovere = false;
 function hover (event){
+
     const num = event.detail.id
 hovere = !hovere
 if (hovere === true){
@@ -161,10 +162,11 @@ import { afterUpdate } from 'svelte';
 export let low = true;
 let wi = "0.2";
 onMount (async () => {
- // bit()
+ bit()
+ 
 })
 afterUpdate (async () => {
- // bit()
+  bit()
 })
 
 let myInterval = null;
@@ -196,7 +198,8 @@ function bit (){
 {pend} 
 {ask}
 {asks} 
-{wel}
+{wel} 
+{askma}
 {welc} 
 {beta}
 {betaha}
@@ -204,20 +207,27 @@ function bit (){
 {desi} 
 {fia}
 {fiap} 
-{qq} {jj} {yy}
+{qq}
+{jj}
+{yy}
 {hh} 
-{gg} {xx}
+{gg}
+{xx}
 {ff}
-{ee} {picLink}
+{ee} 
+{picLink}
 {dd} 
-{cc} {pic}
+{cc} 
+{pic}
 {bb} 
-{aa2} {wi} 
+{aa2} 
+{wi} 
 {pmash} 
 {ppmash} 
 {mashs} 
 {pmashs}
-{maap } {askmap}
+{maap} 
+{askmap}
 {pmaap} 
 on:hover={hover}
  on:disp={disp}/>

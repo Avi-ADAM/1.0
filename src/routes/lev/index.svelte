@@ -1046,12 +1046,10 @@ async function start () {
     pmashes = [];
     huca = [];
     wegets=[];
-   midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
            createpends (miData);
-           console.log("madeit")
            mesimabetahalicha (miData);
           ishursium(miData);
           sds(miData);
@@ -1059,6 +1057,7 @@ async function start () {
           sps(miData)
           createmask(miData)
           crMaap(miData)
+             midd(miData);
       //    createD()
   }
         } catch (e) {
@@ -1233,7 +1232,7 @@ function makeWalcom (ata) {
     }
     walcomen = walcomen;
     wel = walcomen.length;
-    console.log(walcomen)
+    console.log(wel)
 }    
 
 let pends = [];
@@ -1711,13 +1710,12 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 on:showall={showall}
 on:showonly={showonly}
 {total}
-picLink={picLink}
+picLink={picLink} {ask}
+{wel}
 name={nam}
 {low}
 {sug}
 {pen}
-{ask}
-{wel}
 {beta}
 {fia}
 pmash={pmashd}
@@ -1731,10 +1729,7 @@ des={0}  />
 
 
 <style>
-    
-    #d{
-        fill: none;
-    }
+ 
   /*  .svggg{
         min-width:75px; 
         min-height:75px;
