@@ -1046,6 +1046,7 @@ async function start () {
     pmashes = [];
     huca = [];
     wegets=[];
+                 midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
@@ -1057,7 +1058,6 @@ async function start () {
           sps(miData)
           createmask(miData)
           crMaap(miData)
-             midd(miData);
       //    createD()
   }
         } catch (e) {
