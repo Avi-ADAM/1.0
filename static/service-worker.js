@@ -1,20 +1,19 @@
-let CACHE_NAME = "cache-" + Date.now();
+console.log("*****hello from testserviceworker.js inside static folder********")
 
-self.addEventListener("install", event => {
-    console.log("Installed SW");
+self.addEventListener('install', (event) => {
     event.waitUntil(
-        caches.open(CACHE_NAME).then(cache => {
-            return cache.add("/offline.html");
+        caches.open('v3').then((cache) => {
+            cache.add(
+                './favicon.png'
+            );
         })
-  );
-self.skipWaiting();
+    );
 });
 
-
-self.addEventListener("activate", (event) => {
-    console.log("Activated SW");
+self.addEventListener('activate', function (event) {
+    console.log("serviceworker activate fn :", event)
 });
 
-self.addEventListener("fetch", (event) => {
-    console.log("Fetch:", event.request);
-});
+self.addEventListener('fetch', function (event) {
+    console.log("fetch fn inside serviceworker.js")
+})
