@@ -1,56 +1,7 @@
 <script>
     const middle = `
 `
-    const defs= `<defs>
-<linearGradient id="levlevah" bx:pinned="true">
-<stop stop-color="#46281e" offset="0"/>
-<stop stop-color="#fecf00" offset=".337"/>
-<stop stop-color="#fd5" offset=".521"/>
-<stop stop-color="#ff2253" offset=".693"/>
-<stop stop-color="#ffc400" offset=".878"/>
-<stop stop-color="#a67e22" offset="1"/>
-</linearGradient>
-<linearGradient id="levleva" bx:pinned="true">
-<stop stop-color="#ffd828" offset=".214"/>
-<stop stop-color="#f06" offset=".888"/>
-</linearGradient>
-<style bx:fonts="Aubrey" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Aubrey%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Ballet" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Ballet%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Bahianita" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Bahianita%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Barriecito" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Barriecito%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Biryani" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Biryani%3Aital%2Cwght%400%2C200%3B0%2C300%3B0%2C400%3B0%2C600%3B0%2C700%3B0%2C800%3B0%2C900&display=swap);</style>
-<style bx:fonts="Caesar Dressing" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Caesar+Dressing%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Cherish" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Cherish%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Chelsea Market" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Chelsea+Market%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Charm" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Charm%3Aital%2Cwght%400%2C400%3B0%2C700&display=swap);</style>
-<style bx:fonts="Almendra Display" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Almendra+Display%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Almendra SC" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Almendra+SC%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Aclonica" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Aclonica%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Abril Fatface" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Abril+Fatface%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Aguafina Script" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Aguafina+Script%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Angkor" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Angkor%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Asset" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Asset%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Atomic Age" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Atomic+Age%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Cherry Swash" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Cherry+Swash%3Aital%2Cwght%400%2C400%3B0%2C700&display=swap);</style>
-<style bx:fonts="Crafty Girls" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Crafty+Girls%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Hachi Maru Pop" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Lemon" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Lemon%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Love Ya Like A Sister" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Macondo Swash Caps" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Macondo+Swash+Caps%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Major Mono Display" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Major+Mono+Display%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Miss Fajardose" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Miss+Fajardose%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Mystery Quest" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Mystery+Quest%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Shizuru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shizuru%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Shojumaru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shojumaru%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Stick" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Stick%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Zen Tokyo Zoo" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Yuji Mai" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Yuji+Mai%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Walter Turncoat" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Walter+Turncoat%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Wallpoet" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Wallpoet%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Sue Ellen Francisco" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Sue+Ellen+Francisco%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Rampart One" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Rampart+One%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Raleway Dots" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Raleway+Dots%3Aital%2Cwght%400%2C400&display=swap);</style>
-<style bx:fonts="Raleway" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Raleway%3Aital%2Cwght%400%2C100%3B0%2C200%3B0%2C300%3B0%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B0%2C800%3B0%2C900%3B1%2C100%3B1%2C200%3B1%2C300%3B1%2C400%3B1%2C500%3B1%2C600%3B1%2C700%3B1%2C800%3B1%2C900&display=swap);</style>
+    const defs= `
 <linearGradient id="levlevig" x1="1662.1" x2="1662.1" y1="528.96" y2="564.08" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
 <linearGradient id="levlevif" x1="1644" x2="1644" y1="462.58" y2="564.08" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
 <linearGradient id="levlevie" x1="1644.3" x2="1644.3" y1="435.08" y2="487.08" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
@@ -1521,7 +1472,6 @@
 <linearGradient id="levlevdd" x1="122.64" x2="122.64" y1="460.05" y2="481.79" gradientUnits="userSpaceOnUse">
 <stop stop-color="#4b086f" offset=".429"/>
 </linearGradient>
-</defs>
 `
 const firstg = `<g transform="matrix(.38338 0 0 .4039 -156.16 -138.46)" stroke-miterlimit="33" stroke-width="0px">
 <path d="m1662.8 563.24c3.3833-11.59 6.3577-23.021 8.8875-34.272l-19.123 35.111 10.235-0.839z" fill="url(#levlevig)"/>
@@ -2494,8 +2444,23 @@ dispatch("disp",{
 }
     </script>
  <svg class="midCom" style="transform: scale({wi});" version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<linearGradient id="levlevah" bx:pinned="true">
+<stop stop-color="#46281e" offset="0"/>
+<stop stop-color="#fecf00" offset=".337"/>
+<stop stop-color="#fd5" offset=".521"/>
+<stop stop-color="#ff2253" offset=".693"/>
+<stop stop-color="#ffc400" offset=".878"/>
+<stop stop-color="#a67e22" offset="1"/>
+</linearGradient>
+<linearGradient id="levleva" bx:pinned="true">
+<stop stop-color="#ffd828" offset=".214"/>
+<stop stop-color="#f06" offset=".888"/>
+</linearGradient>
 
+<style bx:fonts="Shizuru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shizuru%3Aital%2Cwght%400%2C400&display=swap);</style>
 {@html defs}
+</defs>
 {@html firstg}
   <g on:mouseenter={()=>hover("j")} on:mouseleave={()=>hover("j")} on:click={()=>disp(pmashs)} name="number " class="btn am" transform="{jj}">
     <title>הצגת הצעות להשקעת משאבים ברקמות בלבד</title>
