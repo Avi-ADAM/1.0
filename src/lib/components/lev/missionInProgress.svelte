@@ -547,11 +547,14 @@ out:scale={{duration: 2200, opacity: 0.5}}
   ><SwiperSlide
     ><div id="normSmll"
 >
-<div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div> 
-  <span class="mn ab  ">{formatTime(zman)}</span>
+<div class="{`normSmll${perhour}-${projectId}-${mId}`}">
+<span class="mn ab  ">{formatTime(zman)}</span>
   {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p class="mn bc">{missionDetails}</p>{/if}
 
   <h5 class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
+</div> 
+  
+
   <a class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
 
 {#if lapse !== 0 || x !== 0}
