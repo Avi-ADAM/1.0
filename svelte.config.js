@@ -1,24 +1,12 @@
 import vercel from '@sveltejs/adapter-vercel';
 
-
-
 import preprocess from "svelte-preprocess";
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     kit: {
 		// hydrate the <div id="svelte"> element in src/app.html
     target: '#svelte',
-  vite: {
-    optimizeDeps: {
-      include: [
-        'd3-scale',
-        'd3-shape',
-        'd3-time',
-        'd3-array',
-        'd3-format'
-      ],
-    },
-  },
+  
     },
     preprocess: [preprocess({
         "postcss": true
