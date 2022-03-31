@@ -4,8 +4,6 @@ import preprocess from "svelte-preprocess";
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
     kit: {
-		// hydrate the <div id="svelte"> element in src/app.html
-    target: '#svelte',
     },
     preprocess: [preprocess({
         "postcss": true
@@ -14,7 +12,6 @@ const config = {
 export default {
   kit: {
     adapter: vercel(),
-    target: '#svelte',
   },
 };
 // Workaround until SvelteKit uses Vite 2.3.8 (and it's confirmed to fix the Tailwind JIT problem)
