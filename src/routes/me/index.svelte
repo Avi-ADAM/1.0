@@ -1142,7 +1142,7 @@ class=" hover:scale-150 "
     transform-origin: center;
 
   }
-.name:hover { transform: scale(1.5) translateY(-25%) translateX(-25%); }
+.name:hover { transform: scale(1.5) translateY(-25%) translateX(-37.5%); }
      .d{
        max-height: 15vh;
        overflow-y: scroll;
