@@ -176,11 +176,14 @@ function bit (){
   if (low === true){
      myInterval = setInterval(function () {
   if(wi === "0.2"){
+    console.log("x")
       wi = "2"   
     } else if (wi === "2"){
+          console.log("y")
+
       wi = "0.2"  
     }
-  }, 5750)
+  }, 2050)
   } else if (low === false){
     wi = "1";
   clearInterval(myInterval)
@@ -189,7 +192,7 @@ function bit (){
 
 </script>
 
-<div in:fly={{duration: 6200, y:500}} class="midCom">
+<div   class="midCom">
 
 <Sv 
 {name} 
@@ -238,7 +241,7 @@ on:hover={hover}
 
 
   .midCom{	
-      transition: all 250ms ;
+      transition: all 100oms ease-in-out;
 
     min-height: 170px;	
     min-width: 170px;	

@@ -900,12 +900,14 @@ async function showOpenPro (mi) {
         } else if (dd.profilePic.url){
                  picLink = dd.profilePic.url
         }
-        low = false
     }
     let tickSpeed = 60000 * 5;
 let sdsa = [];
 
 let miDataold = [];
+
+
+
 onMount(async () => {
       if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function(reg) {
@@ -1067,6 +1069,8 @@ async function start () {
           sps(miData)
           createmask(miData)
           crMaap(miData)
+                  low = false
+
       //    createD()
   }
         } catch (e) {
@@ -1371,6 +1375,7 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 </svelte:head>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
 <div class="screen"> 
+    
 {#each adder as add }
    {@html add}
  {/each}

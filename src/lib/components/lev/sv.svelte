@@ -3222,3 +3222,26 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 
 </g>
 </svg>
+
+<style>	
+
+
+  .midCom{	
+      transition: all 1000ms ease-in-out;
+
+    min-height: 170px;	
+    min-width: 170px;	
+     
+    max-width: 550px;
+    max-height: 550px;
+    aspect-ratio: 1/ 1;
+}	
+@media (min-width: 550px) {	
+
+.midCom{	
+    min-height: 255px;	
+    min-width: 255px;	
+}	
+}	
+
+</style>
