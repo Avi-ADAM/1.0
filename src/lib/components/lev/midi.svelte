@@ -180,7 +180,6 @@ function bit (){
       wi = "2"   
     } else if (wi === "2"){
           console.log("y")
-
       wi = "0.2"  
     }
   }, 2050)
@@ -241,7 +240,7 @@ on:hover={hover}
 
 
   .midCom{	
-      transition: all 100oms ease-in-out;
+      transition: all 1000ms ease-in-out;
 
     min-height: 170px;	
     min-width: 170px;	
