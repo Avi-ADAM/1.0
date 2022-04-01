@@ -906,7 +906,7 @@ let sdsa = [];
 
 let miDataold = [];
 
-
+let counter = 0;
 
 onMount(async () => {
       if ('serviceWorker' in navigator) {
@@ -1039,6 +1039,7 @@ async function start () {
   })
   .then(r => r.json())
   .then(data => miData = data);
+  counter += 1;
   if (isEqual(miData,miDataold)) {
    console.log("nada")
    } else {
@@ -1245,14 +1246,23 @@ function makeWalcom (ata) {
     }
     walcomen = walcomen;
     wel = walcomen.length;
-    if (!isEqual(walcomen,walcomenold)) {
+      if (!isEqual(walcomen,walcomenold) ) {
         if (walcomenold.length < walcomen.length){
     // Create and show the notification
     const rikn = walcomen[walcomen.length - 1].projectName
     
     let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
     let text = `שלום ${usernames} ! הצטרפת בהצלחה לרקמת ${rikn}` ;
-    let notification = new Notification('1❤️1', { body: text, icon: img });
+    navigator.serviceWorker.register('sw.js');
+Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+});
+  
+   // let notification = new Notification('1❤️1', { body: text, icon: img });
         }
     }
 
