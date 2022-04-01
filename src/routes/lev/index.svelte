@@ -939,6 +939,7 @@ onMount(async () => {
             goto ("/",)
     }
 })
+let walcomenold= [];
 async function start () { 
   console.log("start");
   miDataold = miData
@@ -1049,6 +1050,7 @@ async function start () {
    dictasked = [];
    pends = [];
    adder = [];
+   walcomenold = walcomen;
    walcomen = [];
    askedcoin = [];
    mtaha = [];
@@ -1232,7 +1234,6 @@ function sds (mta) {
 let walcomen = [] ;
 function makeWalcom (ata) {
         const usernames = ata.data.user.username;
-            console.log(walcomen, "fyfy")
 
     for (var i = 0; i < ata.data.user.welcom_tops.length; i++) {
        const wal = ata.data.user.welcom_tops[i];
@@ -1241,11 +1242,20 @@ function makeWalcom (ata) {
     username: usernames,
     projectName: wal.project.projectName,
   })
-              console.log(walcomen, "fyfy")
     }
     walcomen = walcomen;
     wel = walcomen.length;
-    console.log(wel)
+    if (!isEqual(walcomen,walcomenold)) {
+        if (walcomenold.length < walcomen.length){
+    // Create and show the notification
+    const rikn = walcomen[walcomen.length - 1].projectName
+    
+    let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+    let text = `שלום ${usernames} ! הצטרפת בהצלחה לרקמת ${rikn}` ;
+    let notification = new Notification('1❤️1', { body: text, icon: img });
+        }
+    }
+
 }    
 
 let pends = [];
