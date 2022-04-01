@@ -270,9 +270,8 @@ function shaneh () {
 
 }
 select{
-	font-size: 8px;
+	font-size: 100%;
 }
-
 select.round {
   background-image:
     linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),
