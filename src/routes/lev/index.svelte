@@ -47,14 +47,17 @@ let askedm = [];
 let askm = 0;
 let ma = 0;
 let wegets = [];
+let arr1 = []
 function mesimabetahalicha (data) {
     const mtahan = data.data.user.mesimabetahaliches;
         for (var i = 0; i < mtahan.length; i++) {
             mtaha[i] = mtahan[i];
+            mtaha[i].ani = "mtaha"
+            mtaha[i].pl = 0 + i
     }
     beta = mtaha.length;
   //  createD()
-    bubleUiAngin(pends,mtaha, walcomen,askedcoin, meData );
+   // bubleUiAngin(pends,mtaha, walcomen,askedcoin, meData );
 }
 
 function ishursium (dati){
@@ -87,12 +90,12 @@ function ishursium (dati){
                             projectName : start[i].finiapruvals[j].project.projectName,
                             noof: start[i].finiapruvals[j].project.user_1s.length,
                             src2: start[i].finiapruvals[j].project.profilePic.formats.thumbnail.url,
-                            myid: dati.data.user.id
-
+                            myid: dati.data.user.id,
+                            ani: "fiapp",
+                            pl: -2
                               });
             }
   }
-    console.log(fiapp)
  for (var k = 0; k < fiapp.length; k++) {
      const x = fiapp[k].users
              fiapp[k].uids = [];
@@ -114,6 +117,8 @@ function ishursium (dati){
     fiapp[t].mypos = null;
     if(allid.includes(myid)){
       fiapp[t].already = true;
+            fiapp[t].pl = 20;
+
     for (var l=0; l< fiapp[t].users.length; l++){
         if (fiapp[t].users[l].users_permissions_user.id === myid)
       fiapp[t].mypos = fiapp[t].users[l].what;
@@ -170,14 +175,14 @@ function crMaap(hh){
                             projectName : start[i].projectName,
                             noof: start[i].user_1s.length,
                             src2: start[i].profilePic.formats.thumbnail.url,
-                            myid: hh.data.user.id
+                            myid: hh.data.user.id,
+                            ani: "wegets",
+                            pl: -1 + start[i].maaps[j].vots.length
                               });
-                                                                    console.log(hh.data.user.projects_1s)
 
             }
         }
   }
-    console.log(wegets)
  for (var k = 0; k < wegets.length; k++) {
      const x = wegets[k].users
              wegets[k].uids = [];
@@ -221,7 +226,6 @@ function crMaap(hh){
 
     }
     wegets = wegets
-    console.log(wegets)
     maap = wegets.length;
 
 }
@@ -312,7 +316,9 @@ async function createasked (da) {
                             projectName : start[i].asks[j].project.projectName,
                             noof: start[i].asks[j].project.user_1s.length,
                             src2: src21,
-                            myid: da.data.user.id
+                            myid: da.data.user.id,
+                            ani: "askedcoin",
+                            pl: 1 + i + j
                                //   uid: start[i].asks[j].users[k].id,
                                 //  omid: start[i].open_missions[j].id,
                                 //  project: start[i].id
@@ -407,7 +413,9 @@ async function createmask (da) {
                             projectName : start[i].projectName,
                             noof: start[i].user_1s.length,
                             src2: src21,
-                            myid: da.data.user.id
+                            myid: da.data.user.id,
+                            ani: "askedm",
+                            pl: 2 + i + j
                               });
             }
 
@@ -557,8 +565,8 @@ function deloi (event ){
    newasked.splice(todel, 1);
    wegets = newasked;
    ma = wegets.length;
-   start()
-}
+ counter = 0;
+   start()}
 
 function deloid (event ){
    const newasked = fiapp;
@@ -566,6 +574,7 @@ function deloid (event ){
    newasked.splice(todel, 1);
    fiapp = newasked;
    fia = fiapp.length;
+   counter = 0;
    start()
 }
 
@@ -575,6 +584,8 @@ function delo (event ){
    newasked.splice(todel, 1);
    askedcoin = newasked;
    ask = askedcoin.length;
+   counter = 0;
+   start()
 }
 
 function delom (event ){
@@ -583,6 +594,9 @@ function delom (event ){
    newasked.splice(todel, 1);
    askedm = newasked;
    askm = askedm.length;
+   counter = 0;
+   start()
+
 }
 const filterArrayd = (arr1, arr2) => {
    const filterede = arr1.filter(el => {
@@ -836,8 +850,7 @@ async function showOpenPro (mi) {
  var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-filteredw[b]})
  // add declined filter add sort by value
  if (keysSorted.length > 0){
-  var resultString = keysSorted.join('&id_in=');
- let link ="https://oneloveone.onrender.com/open-missions?id_in=" + resultString ;
+  var resultString = keysSorted.join(' , ');
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -848,48 +861,56 @@ async function showOpenPro (mi) {
   .split('=')[1];
   idL = cookieValueId;
     token  = cookieValue; 
-    let bearer1 = 'bearer' + ' ' + token;
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json'   
-      };
+         let bearer1 = 'bearer' + ' ' + token;
+    let link ="https://oneloveone.onrender.com/graphql" ;
         try {
-            const res = await fetch(link, {
-              method: 'GET',
+             await fetch(link, {
+              method: 'POST',
        
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-            }).then(checkStatus)
-          .then(parseJSON);
-            meData = res;
-        } catch (e) {
-            error1 = e
-        }
-        for (var i = 0; i <meData.length; i++){
-            if(meData[i].project.profilePic){
-         meData[i].srcb = meData[i].project.profilePic.formats.thumbnail.url
+        body: 
+        JSON.stringify({query: 
+            `{openMissions (where: {id_in: [${resultString}]}){ id
+            project { id projectName profilePic {url formats }}
+            sqadualed
+            tafkidims {roleDescription}
+            skills {skillName}
+            descrip
+            hearotMeyuchadot
+            name
+            work_ways {workWayName id}
+            noofhours perhour
             }
+            }`
+           })
+  })
+  .then(r => r.json())
+  .then(data => meData = data.data.openMissions);
+       meData.data
+        for (var i = 0; i <meData.length; i++){
+          meData[i].ani = "meData",
+          meData[i].pl = 10 + i
+        }
+         bubleUiAngin()
+        arr1 = arr1 
+        console.log(arr1)
+         } catch (e) {
+            error1 = e
         }}
         sug = meData.length;
-     createD()
 
+            
+     createD()
     };
     // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו 
 
      let nam = ""
         let total = ""
               let  picLink = ""
-    function midd (min){
+function midd (min){
         const dd = min.data.user
          nam = dd.username
          total = dd.total
@@ -900,7 +921,7 @@ async function showOpenPro (mi) {
         } else if (dd.profilePic.url){
                  picLink = dd.profilePic.url
         }
-    }
+}
     let tickSpeed = 60000 * 5;
 let sdsa = [];
 
@@ -1114,7 +1135,9 @@ function sps(pp){
                  spnot: x.spnot,
                  descrip: x.descrip,
                  oid: y.id,
-                 already: false
+                 already: false, 
+                 ani: "huca",
+                 pl: 6
   })
  }
                 }}
@@ -1154,6 +1177,8 @@ function pmash (data) {
                                    sqadualedf: pend.sqadualedf,
                                    pendId: pend.id,
                                    diun: pend.diun,
+                                    ani: "pmashes",
+                                  pl: 1 
                               });
                
     }
@@ -1242,6 +1267,8 @@ function makeWalcom (ata) {
     id: wal.project.id,
     username: usernames,
     projectName: wal.project.projectName,
+    ani: "walcomen",
+    pl: 1
   })
     }
     walcomen = walcomen;
@@ -1254,7 +1281,7 @@ function makeWalcom (ata) {
     let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
     let text = `שלום ${usernames} ! הצטרפת בהצלחה לרקמת ${rikn}` ;
     navigator.serviceWorker.register('sw.js');
-Notification.requestPermission(function(result) {
+ Notification.requestPermission(function(result) {
   if (result === 'granted') {
     navigator.serviceWorker.ready.then(function(registration) {
       registration.showNotification('1❤️1', { body: text, icon: img });
@@ -1297,6 +1324,8 @@ function createpends (data) {
                                    publicklinks: pend.publicklinks,
                                    mdate: pend.sqadualed,
                                    pendId: pend.id,
+                                    ani: "pends",
+                                  pl: 1 + pend.users.length
                               });
                
  }
@@ -1321,7 +1350,7 @@ function createpends (data) {
 
     if(allid.includes(myid)){
       pends[t].already = true;
-          
+       pends[t].pl = 25    
     }
         for (var r=0; r< pends[t].users.length; r++){
             if (pends[t].users[r].what === true) {
@@ -1339,7 +1368,7 @@ function createpends (data) {
         
     }
     pen = pends.length;
-    bubleUiAngin(pends)
+  //  bubleUiAngin(pends)
 }
 function less (event) {
     const id = event.detail.id;
@@ -1348,6 +1377,7 @@ function less (event) {
     const index = y.indexOf(id);
     newdata.splice(index, 1);
     meData = newdata;
+    counter = 0;
     start()
 };  
 function lessi (event) {
@@ -1357,6 +1387,7 @@ function lessi (event) {
     const index = y.indexOf(id);
     newdata.splice(index, 1);
     huca = newdata;
+     counter = 0;
     start()
 };  
 let shows = true;
@@ -1365,8 +1396,8 @@ function show(event){
 }
 
 function coinLapach (event){
-  start()
-}
+ counter = 0;
+    start()}
 
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
 function showonly (event){
@@ -1385,8 +1416,10 @@ function showall (event){
      for(let i=0;i<show.length;i++){
         show[i].style.display=''}
 }
-function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
-// let arr1 = [...pendsi, ...mtahai, ...walcomeni, ...askedcoini, ...meDatai];
+function bubleUiAngin(){
+ arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca ].sort(({pl:a}, {pl:b}) => b-a)
+
+ //let arr1 = arr11.sort(({pl:a}, {pl:b}) => b-a);
 }
 </script>
 
@@ -1399,309 +1432,293 @@ function bubleUiAngin(pendsi, mtahai, walcomeni ,askedcoini, meDatai ){
 {#each adder as add }
    {@html add}
  {/each}
- 
 
-{#each mtaha as taha, i}
-   <div class="betaha normSml" style="display:'';"><MissionInProgress
-    noofpu={taha.project.user_1s.length}
-    oldzman={taha.timer}
-    stname={taha.stname}
-    mId={taha.id}
-    missId={taha.mission.id}
-    missionName={taha.name}
-    projectId={taha.project.id}
-    projectName={taha.project.projectName}
-    missionDetails={taha.descrip}
-    src={taha.project.profilePic.formats.thumbnail.url}
-    link={taha.privatlinks}
-    dueDateOrCountToDedline ={taha.admaticedai}
-    hoursdon ={taha.howmanyhoursalready}
-    hourstotal = {taha.hoursassinged}
-    perhour = {taha.perhour}
+{#each arr1 as buble, i}
+{#if buble.ani === "mtaha"}
+ <div class="betaha normSml" style="display:'';"><MissionInProgress
+    noofpu={buble.project.user_1s.length}
+    oldzman={buble.timer}
+    stname={buble.stname}
+    mId={buble.id}
+    missId={buble.mission.id}
+    missionName={buble.name}
+    projectId={buble.project.id}
+    projectName={buble.project.projectName}
+    missionDetails={buble.descrip}
+    src={buble.project.profilePic.formats.thumbnail.url}
+    link={buble.privatlinks}
+    dueDateOrCountToDedline ={buble.admaticedai}
+    hoursdon ={buble.howmanyhoursalready}
+    hourstotal = {buble.hoursassinged}
+    perhour = {buble.perhour}
     on:done={mdon}
     /></div>
 
-{/each}
-{#each pmashes as pen, i}
+{:else if buble.ani === "pmashes"}
     <div  class="normSml ppmash" style="display:''"
  ><PendingMa
         on:show={show}
         on:coinLapach={coinLapach}
-        mypos={pen.mypos}
-        diun={pen.diun}
-        whyno={pen.whyno}
-      descrip={pen.descrip}
-      projectName = {pen.projectName}
-      name = {pen.name}
-              hearotMeyuchadot = {pen.hearotMeyuchadot}
-              kindOf = {pen.kindOf} 
-              src = {pen.src}
-               noofusersWaiting={pen.noofusersWaiting}
-                projectId={pen.projectId}
-                uids={pen.uids}
-                what={pen.what}
-                noofusersOk={pen.noofusersOk}
-                created_at={pen.created_at}
-                noofusersNo={pen.noofusersNo}
-                already={pen.already}
-                noofusers={pen.user_1s.length}
-                mshaabId={pen.mshaabId}
-                hm={pen.hm}
-                price={pen.price}
-                easy={pen.easy}
-                sqadualed={pen.sqadualed}
-                sqadualedf={pen.sqadualedf}
-                linkto={pen.linkto}
-                pendId={pen.pendId}
-                users={pen.users}
+        mypos={buble.mypos}
+        diun={buble.diun}
+        whyno={buble.whyno}
+      descrip={buble.descrip}
+      projectName = {buble.projectName}
+      name = {buble.name}
+              hearotMeyuchadot = {buble.hearotMeyuchadot}
+              kindOf = {buble.kindOf} 
+              src = {buble.src}
+               noofusersWaiting={buble.noofusersWaiting}
+                projectId={buble.projectId}
+                uids={buble.uids}
+                what={buble.what}
+                noofusersOk={buble.noofusersOk}
+                created_at={buble.created_at}
+                noofusersNo={buble.noofusersNo}
+                already={buble.already}
+                noofusers={buble.user_1s.length}
+                mshaabId={buble.mshaabId}
+                hm={buble.hm}
+                price={buble.price}
+                easy={buble.easy}
+                sqadualed={buble.sqadualed}
+                sqadualedf={buble.sqadualedf}
+                linkto={buble.linkto}
+                pendId={buble.pendId}
+                users={buble.users}
                 shows={shows}
                 /></div>
-{/each}
+{:else if buble.ani === "pends"}
 
-{#each pends as pen, i}
     <div  class="normSml pend" style="display:''"
  ><PendingM
         on:show={show}
         on:coinLapach={coinLapach}
-      descrip={pen.descrip}
-      projectName = {pen.projectName}
-      name = {pen.name}
-              hearotMeyuchadot = {pen.hearotMeyuchadot}
-              noofhours = {pen.noofhours} 
-              src = {pen.src}
-               noofusersWaiting={pen.noofusersWaiting}
-                projectId={pen.projectId}
-                uids={pen.uids}
-                what={pen.what}
-                noofusersOk={pen.noofusersOk}
-                total={pen.noOfHours * pen.perhour}
-                perhour={pen.perhour}
-                noofusersNo={pen.noofusersNo}
-                already={pen.already}
-                noofusers={pen.user_1s.length}
-                missionId={pen.missionId}
-                skills={pen.skills}
-                tafkidims={pen.tafkidims}
-                workways={pen.workways}
-                mdate={pen.mdate}
-                vallues={pen.vallues}
-                pendId={pen.pendId}
-                users={pen.users}
+      descrip={buble.descrip}
+      projectName = {buble.projectName}
+      name = {buble.name}
+              hearotMeyuchadot = {buble.hearotMeyuchadot}
+              noofhours = {buble.noofhours} 
+              src = {buble.src}
+               noofusersWaiting={buble.noofusersWaiting}
+                projectId={buble.projectId}
+                uids={buble.uids}
+                what={buble.what}
+                noofusersOk={buble.noofusersOk}
+                total={buble.noOfHours * buble.perhour}
+                perhour={buble.perhour}
+                noofusersNo={buble.noofusersNo}
+                already={buble.already}
+                noofusers={buble.user_1s.length}
+                missionId={buble.missionId}
+                skills={buble.skills}
+                tafkidims={buble.tafkidims}
+                workways={buble.workways}
+                mdate={buble.mdate}
+                vallues={buble.vallues}
+                pendId={buble.pendId}
+                users={buble.users}
                 shows={shows}
                 /></div>
-{/each}
-    
-{#each  wegets  as da, i}
+{:else if buble.ani === "wegets"}
         <div  class="pmaap normSml" style="display:'';"><Weget
             on:acsept={deloid}
             on:decline={deloid}
-            mId={da.mId}
-            noofusersWaiting={da.noofusersWaiting}
-            uids={da.uids}
-            kindOf={da.kindOf}
-            noofusersOk={da.noofusersOk}
-            noofusersNo={da.noofusersNo}
-            already={da.already}
-            users={da.users}
-            askId={da.askId}
-            myp={da.myp}
-            projectName = {da.projectName}
-            useraplyname ={da.username}
-            userId ={ da.uid} 
-            spid = {da.spid} 
-            src = {da.src}
-            price={da.price}
-            hm={da.hm}
-            src2 = {da.src2}
-            why={da.why}
-            whatt={da.whatt}
-            missionBName={da.openName}
-            name={da.name}
-            projectId={da.projectId}
-               noofpu={da.noof}
-            sqadualedf={da.sqadualedf}
-             sqadualed={da.sqadualed}
-            spnot={da.spnot}
-            easy ={da.easy}
-            nhours={da.nhours}
-            deadline={da.deadline}
-                missId={da.missId}
-                id={da.id}
-                openMid={da.omid}
-                stylef={da.stylef}
-                st={da.st}
-                declined={da.decid}
+            mId={buble.mId}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            kindOf={buble.kindOf}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            myp={buble.myp}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            spid = {buble.spid} 
+            src = {buble.src}
+            price={buble.price}
+            hm={buble.hm}
+            src2 = {buble.src2}
+            why={buble.why}
+            whatt={buble.whatt}
+            missionBName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            sqadualedf={buble.sqadualedf}
+             sqadualed={buble.sqadualed}
+            spnot={buble.spnot}
+            easy ={buble.easy}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
                 /></div>
-{/each}
-    
-{#each  fiapp  as da, i}
-        <div  class="fiap normSml" style="display:'';"><Fiappru
+{:else if buble.ani === "fiapp"}
+            <div  class="fiap normSml" style="display:'';"><Fiappru
             on:acsept={deloi}
             on:decline={deloi}
-            mId={da.mId}
-            noofusersWaiting={da.noofusersWaiting}
-            uids={da.uids}
-            what={da.what}
-            noofusersOk={da.noofusersOk}
-            noofusersNo={da.noofusersNo}
-            already={da.already}
-            users={da.users}
-            askId={da.askId}
-            projectName = {da.projectName}
-            useraplyname ={da.username}
-            userId ={ da.uid} 
-            missionDetails = {da.descrip} 
-            src = {da.src}
-            src2 = {da.src2}
-            why={da.why}
-            whatt={da.whatt}
-            missionBName={da.openName}
-            name={da.name}
-            projectId={da.projectId}
-               noofpu={da.noof}
-            publicklinks={da.publicklinks}
-             privatlinks={da.privatlinks}
-            hearotMeyuchadot={da.hearotMeyuchadot}
-            valph ={da.perhour}
-            nhours={da.nhours}
-            deadline={da.deadline}
-                missId={da.missId}
-                id={da.id}
-                openMid={da.omid}
-                stylef={da.stylef}
-                st={da.st}
-                declined={da.decid}
+            mId={buble.mId}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            missionDetails = {buble.descrip} 
+            src = {buble.src}
+            src2 = {buble.src2}
+            why={buble.why}
+            whatt={buble.whatt}
+            missionBName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            publicklinks={buble.publicklinks}
+             privatlinks={buble.privatlinks}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            valph ={buble.perhour}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
                 /></div>
-{/each}
-
-{#each  walcomen  as aba, i} 
+{:else if buble.ani === "walcomen"}
    <div  class="normSml welc" style="display:'';"><Welcomt 
-    id={aba.id}
-       username={aba.username}
-       projectName={aba.projectName}
+    id={buble.id}
+       username={buble.username}
+       projectName={buble.projectName}
        /></div>
-{/each}
-
-
-
-{#each  askedcoin  as da, i}
+{:else if buble.ani === "askedcoin"}
         <div  class="asks normSml" style="display:'';"><Reqtojoin
             on:acsept={delo}
             on:decline={delo}
-            noofusersWaiting={da.noofusersWaiting}
-            uids={da.uids}
-            what={da.what}
-            noofusersOk={da.noofusersOk}
-            noofusersNo={da.noofusersNo}
-            already={da.already}
-            users={da.users}
-            askId={da.askId}
-            projectName = {da.projectName}
-            useraplyname ={da.username}
-            userId ={ da.uid} 
-            missionDetails = {da.descrip} 
-            src = {da.src}
-            src2 = {da.src2}
-            openmissionName={da.openName}
-            name={da.name}
-            projectId={da.projectId}
-               noofpu={da.noof}
-            publicklinks={da.publicklinks}
-             privatlinks={da.privatlinks}
-            hearotMeyuchadot={da.hearotMeyuchadot}
-            valph ={da.perhour}
-            nhours={da.nhours}
-            deadline={da.deadline}
-                missId={da.missId}
-                id={da.id}
-                openMid={da.omid}
-                stylef={da.stylef}
-                st={da.st}
-                declined={da.decid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            missionDetails = {buble.descrip} 
+            src = {buble.src}
+            src2 = {buble.src2}
+            openmissionName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            publicklinks={buble.publicklinks}
+             privatlinks={buble.privatlinks}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            valph ={buble.perhour}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
                 /></div>
-{/each}
-
-{#each  askedm  as da, i}
+{:else if buble.ani === "askedm"}
         <div  class="askmap normSml" style="display:'';"><Reqtom
             on:acsept={delom}
             on:decline={delom}
-            noofusersWaiting={da.noofusersWaiting}
-            uids={da.uids}
-            what={da.what}
-            noofusersOk={da.noofusersOk}
-            noofusersNo={da.noofusersNo}
-            already={da.already}
-            users={da.users}
-            askId={da.askId}
-            projectName = {da.projectName}
-            useraplyname ={da.username}
-            userId ={ da.uid} 
-            missionDetails = {da.descrip} 
-            src = {da.src}
-            src2 = {da.src2}
-            openmissionName={da.openName}
-            name={da.name}
-            projectId={da.projectId}
-               noofpu={da.noof}
-            myp={da.myp}
-             easy={da.easy}
-            spnot={da.spnot}
-            price ={da.price}
-            deadline={da.deadline}
-                missId={da.missId}
-                id={da.id}
-                openMid={da.omid}
-                stylef={da.stylef}
-                st={da.st}
-                declined={da.decid}
-                spid={da.spid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            missionDetails = {buble.descrip} 
+            src = {buble.src}
+            src2 = {buble.src2}
+            openmissionName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            myp={buble.myp}
+             easy={buble.easy}
+            spnot={buble.spnot}
+            price ={buble.price}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
+                spid={buble.spid}
                 /></div>
-{/each}
-
-{#each meData as data, i}
+{:else if buble.ani === "meData"}
     <div  class="sugg normSml" style="display:''"><ProjectSuggestor
       on:less={less}
       askedarr={askedarr}
       {declineddarr}
-      deadLine = {data.sqadualed}
-      oid = {data.id}
-              projectName = {data.project.projectName}
-              role ={data.tafkidims.map(c => c.roleDescription)}
-              skills ={ data.skills.map(c => c.skillName)} 
-              missionDetails = {data.descrip} 
-              notes = {data.hearotMeyuchadot}
-              src = {data.srcb}
-               missionName={data.name}
-                projectId={data.project.id}
-                workways={data.workways}
-                noOfHours={data.noOfHours}
-                perhour={data.perhour}
-                total={data.noofhours * data.perhour}
+      deadLine = {buble.sqadualed}
+      oid = {buble.id}
+              projectName = {buble.project.projectName}
+                role ={buble.tafkidims}
+              skills ={ buble.skills} 
+              missionDetails = {buble.descrip} 
+              notes = {buble.hearotMeyuchadot}
+              src = {buble.project.profilePic.formats.thumbnail.url}
+               missionName={buble.name}
+                projectId={buble.project.id}
+                workways={buble.workways}
+                noOfHours={buble.noofhours}
+                perhour={buble.perhour}
+                total={buble.noofhours * buble.perhour}
                 /></div>
-{/each}
-{#each huca as data, i}
+{:else if buble.ani === "huca"}
     <div  class="pmashs normSml" style="display:''"><Mashsug
       on:less={lessi}
       i={i}
       askedarr={askedarr}
-     declineddarra= {data.declineddarra}
-      deadLine = {data.sqadualed}
-      oid = {data.oid}
-      id = {data.id}
-      price= {data.price}
-      myp={data.myp}
-      already= {data.already}
-              projectName = {data.projectName}
-              missionDetails = {data.descrip} 
-              notes = {data.hearotMeyuchadot}
-              src = {data.srcb}
-               mashName={data.mashname}
-                projectId={data.projectid}
-                descrip={data.descrip}
-                spnot={data.spnot}
-                easy={data.easy}
+     declineddarra= {buble.declineddarra}
+      deadLine = {buble.sqadualed}
+      oid = {buble.oid}
+      id = {buble.id}
+      price= {buble.price}
+      myp={buble.myp}
+      already= {buble.already}
+              projectName = {buble.projectName}
+              missionDetails = {buble.descrip} 
+              notes = {buble.hearotMeyuchadot}
+              src = {buble.srcb}
+               mashName={buble.mashname}
+                projectId={buble.projectid}
+                descrip={buble.descrip}
+                spnot={buble.spnot}
+                easy={buble.easy}
                 /></div>
-    {/each}
+{/if}
+{/each}
 
 <!--
         <div  class="normSml desi" style="display:'';"><DecisionMaking  decisionName={"?לפתוח קבוצת ווצאפ"} projectName={"פסיפס"} projectId={6}/></div> 

@@ -176,7 +176,7 @@ function shaneh () {
 </div>
 {#if chan == true}
 <div>
-<button type="button" on:click={save}  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שמירת שינויים</button>
+<button type="button" on:click={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שמירת שינויים</button>
 </div>
 {/if}
 {#if change}
@@ -246,7 +246,7 @@ function shaneh () {
 			</li>
 		</ul>
 
-		<button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full" on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
+		<button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full" on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
 	</form>
 </main>
 
@@ -257,11 +257,11 @@ function shaneh () {
 
     {/if}
     {:else}
-    <button type="button" on:click={()=> change = true}  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שינוי סיסמה</button>
+    <button type="button" on:click={()=> change = true}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שינוי סיסמה</button>
 
     {/if}
 <div>
-	<button type="button" on:click={askNotificationPermission} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">הרשמה לקבלת התראות</button>
+	<button type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">הרשמה לקבלת התראות</button>
 <button type="button" on:click={logout} class="m-2 bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
 </div>
 <style>
