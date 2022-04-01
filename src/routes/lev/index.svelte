@@ -1246,7 +1246,7 @@ function makeWalcom (ata) {
     }
     walcomen = walcomen;
     wel = walcomen.length;
-      if (!isEqual(walcomen,walcomenold) ) {
+      if (!isEqual(walcomen,walcomenold) && counter > 1 ) {
         if (walcomenold.length < walcomen.length){
     // Create and show the notification
     const rikn = walcomen[walcomen.length - 1].projectName
