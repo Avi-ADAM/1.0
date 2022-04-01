@@ -3,6 +3,50 @@ import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
  import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
 
+  function askNotificationPermission() {
+    // function to actually ask the permissions
+    function handlePermission(permission) {
+      // Whatever the user answers, we make sure Chrome stores the information
+      if(!('permission' in Notification)) {
+        Notification.permission = permission;
+      }
+
+      // set the button to shown or hidden, depending on what the user answers
+      if(Notification.permission === 'denied' || Notification.permission === 'default') {
+        notificationBtn.style.display = 'block';
+      } else {
+        notificationBtn.style.display = 'none';
+      }
+    }
+
+    // Let's check if the browser supports notifications
+    if (!"Notification" in window) {
+      console.log("This browser does not support notifications.");
+    } else {
+      if(checkNotificationPromise()) {
+        Notification.requestPermission()
+        .then((permission) => {
+          handlePermission(permission);
+        })
+      } else {
+        Notification.requestPermission(function(permission) {
+          handlePermission(permission);
+        });
+      }
+    }
+  }
+
+  // Function to check whether browser supports the promise version of requestPermission()
+  // Safari only supports the old callback-based version
+  function checkNotificationPromise() {
+    try {
+      Notification.requestPermission().then();
+    } catch(e) {
+      return false;
+    }
+
+    return true;
+  }
 let password;
 let shgi;
 function logout() {
@@ -132,7 +176,7 @@ function shaneh () {
 </div>
 {#if chan == true}
 <div>
-<button type="button" on:click={save} class="m-2 bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded-full">שמירת שינויים</button>
+<button type="button" on:click={save}  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שמירת שינויים</button>
 </div>
 {/if}
 {#if change}
@@ -202,7 +246,7 @@ function shaneh () {
 			</li>
 		</ul>
 
-		<button class="bg:gold hover:bg-barbi text-barbi hover:text-gold" on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
+		<button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full" on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
 	</form>
 </main>
 
@@ -213,10 +257,11 @@ function shaneh () {
 
     {/if}
     {:else}
-    <button type="button" on:click={()=> change = true} class="bg-gold text-barbi hover:text-gold hover:bg-barbi p-2 rounded-full m-2">שינוי סיסמה</button>
+    <button type="button" on:click={()=> change = true}  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שינוי סיסמה</button>
 
     {/if}
 <div>
+	<button type="button" on:click={askNotificationPermission} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">הרשמה לקבלת התראות</button>
 <button type="button" on:click={logout} class="m-2 bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
 </div>
 <style>

@@ -515,10 +515,10 @@ async function han (){
 
 {#if addP == false}
 <div class="body"  style="--the:{stylef};">
-  <div class="name">
-  <a target="_self" href="/lev"><img
+  <div >
+  <a  target="_self" href="/lev"><img
     title=" ללב המערכת"
-    class="hover:scale-200 hover:transform translate-y-20 ceterr"
+    class="ceterr name"
     src='https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg'
     alt="link"></a></div>
 
@@ -1137,11 +1137,12 @@ class=" hover:scale-150 "
  <!-- המשימות שסיימתי-->         
 
   <style>
-    .ceterr{
-      height: 10vh;
-       width:auto;
-         margin: 0 auto;
-    }
+ 
+  .name { transition: all .2s ease-in-out;
+    transform-origin: center;
+
+  }
+.name:hover { transform: scale(1.5) translateY(-25%) translateX(-25%); }
      .d{
        max-height: 15vh;
        overflow-y: scroll;
@@ -1389,7 +1390,13 @@ class=" hover:scale-150 "
        }
          .name{
              top: 24%;
+              
            }
+                 .ceterr{
+      height: 7vh;
+       width:auto;
+         margin: 0 auto;
+    }
            .anotheri{
   top: 64%;
   }
@@ -1454,7 +1461,7 @@ class=" hover:scale-150 "
     top: 60.5%;
        }
         .name{
-             top: 20%;
+             top: 29%;
            }
 
 }
@@ -1500,12 +1507,12 @@ class=" hover:scale-150 "
     top: 65.5%;
        }
            .name{
-             top: 0%;
+             top: 10%;
            }
 }
 @media (min-height: 500px)  {
     .name{
-             top: 25%;
+             top: 37%;
            }
             .ceterr{
       height: 7vh;
@@ -1515,17 +1522,23 @@ class=" hover:scale-150 "
 }
 @media (min-height: 620px) and (min-width: 892px) {
     .name{
-             top: 8%;
+             top: 20%;
            }
 }
 @media (min-height: 500px) and (min-width: 520px) {
     .name{
-             top: 8%;
+             top: 22%;
+               
+           }
+           .ceterr{
+ height: 10vh;
+       width:auto;
+         margin: 0 auto;
            }
 }
 @media (min-height: 620px) and (min-width: 520px) {
     .name{
-             top: 10%;
+             top: 20%;
            }
 }
 
