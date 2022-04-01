@@ -547,7 +547,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
   ><SwiperSlide
     ><div id="normSmll"
 >
-<div class="{`normSmll${perhour}-${projectId}-${mId}`}">
+<div class="{`normSmll${perhour}-${projectId}-${mId}`} di">
 <span class="mn ab  ">{formatTime(zman)}</span>
   {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p class="mn bc">{missionDetails}</p>{/if}
 
@@ -575,6 +575,10 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </div>
 
 <style>
+  .di{
+            grid-column: 1/4;
+
+  }
   .btin{
     width:13px;
      height:13px;
