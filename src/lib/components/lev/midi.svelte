@@ -97,6 +97,7 @@ let jj = "translate(-140.71 -449.43)";
 let yy = "translate(164.82 -449.43)";
 let hovere = false;
 function hover (event){
+    console.log(ask, wel,maap)
 
     const num = event.detail.id
 hovere = !hovere
@@ -179,7 +180,7 @@ function bit (){
     } else if (wi === "2"){
       wi = "0.2"  
     }
-  }, 750)
+  }, 5750)
   } else if (low === false){
     wi = "1";
   clearInterval(myInterval)
