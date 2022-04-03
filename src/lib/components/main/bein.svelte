@@ -13,7 +13,7 @@
  import Workways from '../registration/workways.svelte'
  import Roles from '../registration/roles.svelte'
   import Vallues from '../registration/vallues.svelte'
-  import Scree from '../registration/scree.svelte'
+ // import Scree from '../registration/scree.svelte'
   
 let userName_value;
 let show_value = 0;
