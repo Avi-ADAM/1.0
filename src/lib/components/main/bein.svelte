@@ -215,8 +215,9 @@ margin-bottom: 8vh;
 .background{
   width: 100vw;
   height: 100vh;
-background-color: #f1dfd1;
-background-image: linear-gradient(315deg, #f1dfd1 0%, #f6f0ea 74%);
+  background-color: #bbf0f3;
+background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
+
 }
 
 </style>
