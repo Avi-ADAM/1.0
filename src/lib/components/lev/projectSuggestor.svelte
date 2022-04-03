@@ -215,13 +215,13 @@ class="hover:scale-150 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 </div>
 </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${oid}-${projectId}`} " id="normSmll"
->
-          <h3 class="ltn" >{skills.map(d=> d.skillName).join(' ')}</h3>
+    ><div   id="normSmll"
+><div class="{`normSmll${oid}-${projectId}`} xyz">
+          <h3 class="ltn ab" >{skills.map(d=> d.skillName).join(' ')}</h3>
 
-   {#if deadLine} <h5 class="lt ab">{deadLine}</h5>{/if}
-    <h6 class="ltn bc" style=" line-height: 0.7;">{missionDetails}</h6>
-    <h5 class="lt cd">{role.map(d=> d.roleDescription).join(' ')}</h5>
+   {#if deadLine} <h5 class="lt bc">{deadLine}</h5>{/if}
+    <h6 class="ltn cd" style=" line-height: 0.7;">{missionDetails}</h6>
+    <h5 class="lt de">{role.map(d=> d.roleDescription).join(' ')}</h5></div> 
 {#if already === false}
     <button on:click={agree(oid)} class="btn a" name="requestToJoin" title="אני רוצה"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
    <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
@@ -234,23 +234,27 @@ class="hover:scale-150 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 </div>
 
 <style>
+  .xyz{
+            grid-column: 1/4;
+
+  }
   .ab{
-        grid-column: 1/3;
+        grid-column: 1/4;
         grid-row: 1/ 2;
 
     }
     .bc{
-        grid-column: 1/3;
+        grid-column: 1/4;
         grid-row: 2/ 3;
 
     }
       .cd{
-        grid-column: 1/3;
+        grid-column: 1/4;
         grid-row: 3/ 4;
 
     }
       .de{
-        grid-column: 1/3;
+        grid-column: 1/4;
         grid-row: 4/ 5;
 
     }
@@ -258,7 +262,7 @@ class="hover:scale-150 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
         grid-column: 1/2;
     }
     .b{
-        grid-column: 2/3;
+        grid-column: 3/4;
     }
   .ltb{
     margin: 0px;
@@ -357,7 +361,7 @@ class="hover:scale-150 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   padding: 2px;
   margin-right: 4px;
   margin-left: 4px;
-        grid-row: 4/ 5;
+        grid-row: 5/ 6;
     }
     
 

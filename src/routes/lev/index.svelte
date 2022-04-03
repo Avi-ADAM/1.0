@@ -1178,7 +1178,7 @@ function pmash (data) {
                                    pendId: pend.id,
                                    diun: pend.diun,
                                     ani: "pmashes",
-                                  pl: 1 
+                                  pl: 1 + pend.users.length
                               });
                
     }
@@ -1205,6 +1205,7 @@ function pmash (data) {
     pmashes[t].mypos = null;
     if(allid.includes(myid)){
       pmashes[t].already = true;
+            pmashes[t].pl += 48
     for (var l=0; l< pmashes[t].users.length; l++){
         if (pmashes[t].users[l].users_permissions_user.id === myid)
       pmashes[t].mypos = pmashes[t].users[l].what;
@@ -1417,9 +1418,8 @@ function showall (event){
         show[i].style.display=''}
 }
 function bubleUiAngin(){
- arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca ].sort(({pl:a}, {pl:b}) => b-a)
+ arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca ].sort(({pl:a}, {pl:b}) => a - b)
 
- //let arr1 = arr11.sort(({pl:a}, {pl:b}) => b-a);
 }
 </script>
 

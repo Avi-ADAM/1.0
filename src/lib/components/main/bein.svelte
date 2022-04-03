@@ -13,6 +13,7 @@
  import Workways from '../registration/workways.svelte'
  import Roles from '../registration/roles.svelte'
   import Vallues from '../registration/vallues.svelte'
+  import Scree from '../registration/scree.svelte'
   
 let userName_value;
 let show_value = 0;
@@ -69,7 +70,12 @@ function add (event){
   <Workways on:progres={add}/>
   </div>
  <!-- {:else if show_value == 5}  
-<VidValDate on:progres={add}/>-->
+<VidValDate on:progres={add}/>
+ {:else if show_value == 5}
+    <div class="midscreen"
+ transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
+   <Scree on:progres={add}/> 
+   </div>  -->
   {:else if show_value == 5}
     <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
@@ -206,6 +212,11 @@ margin-bottom: 8vh;
      width: 98vw;
    }
 }
-
+.background{
+  width: 100vw;
+  height: 100vh;
+background-color: #f1dfd1;
+background-image: linear-gradient(315deg, #f1dfd1 0%, #f6f0ea 74%);
+}
 
 </style>

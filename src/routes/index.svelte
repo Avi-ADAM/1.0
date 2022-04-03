@@ -21,7 +21,7 @@
 
 <script>
    import { page } from '$app/stores'
-    const emaili = $page.query.get('code')
+    const emaili = $page.url.searchParams.get('code')
       import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 
       import { userName } from '../lib/stores/store.js';
