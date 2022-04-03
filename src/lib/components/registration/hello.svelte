@@ -116,7 +116,7 @@ grid-column: 1 /6;
   height: 6rem;
   width: 18.25rem;
   font-size: 1rem;
-    margin-top: 4vh;
+    margin-top: 13vh;
 
 	 }
    .midscreen-link{
