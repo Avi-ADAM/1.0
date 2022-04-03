@@ -21,7 +21,7 @@
 
 <script>
    import { page } from '$app/stores'
-    const emaili = $page.url.searchParams.get('code')
+    //const emaili = $page.url.searchParams.get('code')
       import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 
       import { userName } from '../lib/stores/store.js';
@@ -35,7 +35,7 @@
   let idx = 1;
 let error;
 onMount(async () => {
-  console.log(emaili)
+  //console.log(emaili)
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
