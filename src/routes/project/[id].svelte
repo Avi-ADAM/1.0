@@ -1,6 +1,6 @@
 <script context="module">
-    export const load = async ({page, fetch}) => {
-       const id = page.params.id;
+    export const load = async ({params}) => {
+       const id = params.id;
 
 const projectId = id;
         return {
@@ -16,7 +16,7 @@ const projectId = id;
   import Header from './../../lib/components/header/header.svelte'
 
 export let projectId;
-let project = [
+export let project = [
 ];
 let projectUsers =[];
 let token;

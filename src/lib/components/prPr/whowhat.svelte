@@ -6,7 +6,10 @@ export let rikmashes = [];
    import { onMount } from 'svelte'; 
    export let salee = [];
    export let allin = 0
-
+let revach = allin;
+let x = [];
+let meca = [];
+let noten = [];
 // what about hours alrerady done to  mission in progres 
 function remove (id) {
   console.log(id)
@@ -28,6 +31,7 @@ let dictid = {};
 let dictidi = {};
 let hal = false;
 function ask (){
+
 
 }
 onMount(async () => {
@@ -133,7 +137,31 @@ function pre (){
         }
   }
     }
+for (let i = 0; i <ulist.length; i++) {
+   ulist[i].x = (ulist[i].p / 100) * revach;
+  if (ulist[i].ihave-ulist[i].x < 0 ){
+        console.log(ulist,"so")
 
+ ulist[i].meca = ulist[i].x-ulist[i].ihave;
+   ulist[i].noten = 0;
+   ulist[i].cama = 0;
+ } else if (ulist[i].ihave-ulist[i].x > 0 ){
+           console.log(ulist,noten)
+
+  ulist[i].noten = ulist[i].ihave-ulist[i].x;
+   ulist[i].meca = 0;
+ }
+
+
+}
+ for (let t=0; t<ulist.length; t++){
+    for (let z=0; z<ulist.length; z++){
+   if (ulist[t].noten.toFixed() == ulist[z].meca.toFixed()){
+     ulist[t].le = ulist[z].username;
+     ulist[t].cama = ulist[z].meca;
+   }
+  }
+ }
 //each for any user to create his circle
 // so get the total of p get total fmision and mashaabims for each user then do presenteg save as obj arr and show with circle to each
 }
@@ -143,11 +171,22 @@ function pre (){
     ulist = ulist
 
 }
-let revach = allin;
-let x = [];
+
+/*
 $: for (let i = 0; i <ulist.length; i++) {
-x[i] = (ulist[i].p / 100) * revach
-}
+   x[i] = (ulist[i].p / 100) * revach;
+  if (ihave[i]-x[i] < 0 ){
+        console.log(ulist,"so")
+
+ meca[i] = x[i]-ihave[i];
+   noten[i] = 0;
+ } else if (ihave[i]-x[i] > 0 ){
+           console.log(ulist,noten)
+
+  noten[i] = ihave[i]-x[i];
+   meca[i] = 0;
+ }
+}*/
 </script>
 
 <div class="dd md:items-center">
@@ -175,18 +214,18 @@ x[i] = (ulist[i].p / 100) * revach
           {#each ulist as data, i}
           <td>
             {#if  revach > 0}
- {x[i]}
+ {data.x.toFixed(2)}
  {:else}  
  0      
      {/if}
            </td>
            {/each}
       </tr><tr>
-          <th>סכום ממתין</th>
+          <th>הסכום שממתין אצלי</th>
           {#each ulist as data, i}
           <td>
             {#if  data.ihave > 0}
- {data.ihave}
+ {data.ihave.toFixed(2)}
  {:else}  
  0      
      {/if}
@@ -196,30 +235,41 @@ x[i] = (ulist[i].p / 100) * revach
           <th>סכום להעביר</th>
           {#each ulist as data, i}
           <td>
-            {#if  revach > 0 &&  (data.ihave-x[i]) > 0 }
- {data.ihave-x[i]}
+            {#if  revach > 0 &&  (data.ihave-data.x) > 0 }
+ {data.noten.toFixed(2)}
  {:else}  
  0      
      {/if}
            </td>
            {/each}
-      </tr><tr>
+      </tr> <tr >
+      <th > להעביר אל:</th>
+      {#each ulist as data, i}
+      <td>
+      {#if data.cama > 0}
+            {`${data.cama.toFixed(2)},${data.le}`}
+            {/if}
+            </td>
+            {/each}
+          </tr> 
+      <tr>
           <th>סכום לקבל</th>
           {#each ulist as data, i}
           <td>
-            {#if  revach > 0 && (data.ihave-x[i]) < 0 }
- {x[i]-data.ihave}
+            {#if  revach > 0 && (data.ihave-data.x) < 0 }
+ {data.meca.toFixed(2)}
  {:else}  
  0      
      {/if}
            </td>
            {/each}
       </tr><tr >
-      <th >אחוז בפרויקט</th>
+      <th >אחוז ברקמה</th>
       {#each ulist as data, i}
-            <td >{data.p}</td>
+            <td >{data.p.toFixed(2)}</td>
             {/each}
           </tr> 
+         
     </table>
 
      {#if hal === false}

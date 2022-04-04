@@ -319,7 +319,7 @@ meData[i].totaltotal =  meData[i].easy;
     </table>
 
  
-  
+  {#if meData.length > 0}
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
@@ -410,6 +410,7 @@ meData[i].totaltotal =  meData[i].easy;
              {/each}
         </tr>
 </table>
+{/if}
 </div>
   </div> 
  
@@ -483,7 +484,6 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
     .body {
       overflow-x: auto;
       overflow-y: auto;
-     max-height: 100vh;
      max-width: 96vw;
      padding-left: 0.5em;
      padding-right: 0.5em;
