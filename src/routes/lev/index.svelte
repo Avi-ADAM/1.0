@@ -269,7 +269,7 @@ function createD(){
   //        wi = 75;
   //    }
   check = 4
-     orech = fia +  sug + pen + ask + wel + beta + des;
+     orech = arr1.lenght;
     if (orech < check &&  adder.length === 0){
         for (var i = orech; i < check; i++){
         adder.push(
@@ -899,14 +899,13 @@ async function showOpenPro (mi) {
         console.log(arr1)
          } catch (e) {
             error1 = e
-        }}
+        }} else{
+          tyu = true
+        }
         sug = meData.length;
-
-            
-     createD()
     };
     // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו 
-
+let tyu = false
      let nam = ""
         let total = ""
               let  picLink = ""
@@ -1093,9 +1092,12 @@ async function start () {
           sps(miData)
           createmask(miData)
           crMaap(miData)
+          if (tyu = true){
+                 bubleUiAngin()
+        arr1 = arr1 
+          }
                   low = false
 
-      //    createD()
   }
         } catch (e) {
             error1 = e
@@ -1419,7 +1421,7 @@ function showall (event){
 }
 function bubleUiAngin(){
  arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca ].sort(({pl:a}, {pl:b}) => a - b)
-
+     createD()
 }
 </script>
 
