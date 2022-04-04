@@ -56,8 +56,26 @@ function mesimabetahalicha (data) {
             mtaha[i].pl = 0 + i
     }
     beta = mtaha.length;
-  //  createD()
-   // bubleUiAngin(pends,mtaha, walcomen,askedcoin, meData );
+     if (!isEqual(mtaha,mtahaold) && counter > 1 ) {
+        if (mtahaold.length < mtaha.length){
+    // Create and show the notification
+            const usernames = data.data.user.username;
+    const rikn = mtaha[mtaha.length - 1].project.projectName
+    
+    let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+    let text = `שלום ${usernames} !יש לך משימה חדשה לביצוע ברקמת ${rikn}` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+});
+  
+   // let notification = new Notification('1❤️1', { body: text, icon: img });
+        }
+    }
 }
 
 function ishursium (dati){
@@ -925,7 +943,7 @@ function midd (min){
 let sdsa = [];
 
 let miDataold = [];
-
+let mtahaold = [];
 let counter = 0;
 
 onMount(async () => {
@@ -1074,6 +1092,7 @@ async function start () {
    walcomenold = walcomen;
    walcomen = [];
    askedcoin = [];
+   mtahaold = mtaha;
    mtaha = [];
    meData = [];
     sdsa = [];
