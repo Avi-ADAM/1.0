@@ -12,7 +12,6 @@ const config = {
 export default {
   kit: {
     adapter: vercel(),
-    target: '#svelte',
   },
 };
 // Workaround until SvelteKit uses Vite 2.3.8 (and it's confirmed to fix the Tailwind JIT problem)

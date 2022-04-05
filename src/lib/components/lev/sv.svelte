@@ -1,7 +1,75 @@
 <script>
-    const middle = `
-`
-    const defs= `
+    import { createEventDispatcher } from 'svelte';
+
+ const dispatch = createEventDispatcher();
+export let hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)";
+export let gg ="translate(-156.85 -287.03)";
+export let ff ="translate(164.82 -287.03)";
+export let ee ="translate(3.8484 -18.405)";
+export let dd ="matrix(1, 0, 0, 1, 194.44, -541.85)";
+export let cc = "translate(-232.58 -369.63)";
+export let bb = "translate(241.91 -369.63)";
+export let aa2 = "translate(-140.71 -177.44)";
+export let qq = "translate(146.88 -177.44)";
+export let jj = "translate(-140.71 -449.43)";
+export let yy = "translate(164.82 -449.43)";
+export let xx = "translate(-188.36 -539.11)";
+export let pic;
+export let picLink;
+export let name = "";
+export let sug = 0;
+export let sugg =  "sugg";
+export let pen = 0;
+export let pend = "pend";
+export let ask = 0;
+export let asks = "asks";
+export let wel = 0;
+export let welc = "welc";
+export let beta = 0;
+export let betaha = "betaha";
+export let des = 0;
+export let desi = "desi";
+export let fia = 0;
+export let fiap = "fiap";
+export let pmash = 0;
+export let ppmash = "ppmash";
+export let mashs = 0;
+export let pmashs = "pmashs";
+export let maap = 0;
+export let pmaap = "pmaap";
+export let askma = 0;
+export let askmap = "askmap";
+export let wi = "0.2";
+let profiletitle ="תמונת הפרופיל שלי"
+
+function hover (id){
+dispatch("hover",{
+    id: id
+})
+
+}
+function disp (id){
+dispatch("disp",{
+    id: id
+})
+}
+    </script>
+ <svg class="midCom" style="transform: scale({wi});" version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+<defs>
+<linearGradient id="levlevah" bx:pinned="true">
+<stop stop-color="#46281e" offset="0"/>
+<stop stop-color="#fecf00" offset=".337"/>
+<stop stop-color="#fd5" offset=".521"/>
+<stop stop-color="#ff2253" offset=".693"/>
+<stop stop-color="#ffc400" offset=".878"/>
+<stop stop-color="#a67e22" offset="1"/>
+</linearGradient>
+<linearGradient id="levleva" bx:pinned="true">
+<stop stop-color="#ffd828" offset=".214"/>
+<stop stop-color="#f06" offset=".888"/>
+</linearGradient>
+
+<style bx:fonts="Shizuru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shizuru%3Aital%2Cwght%400%2C400&display=swap);</style>
 <linearGradient id="levlevig" x1="1662.1" x2="1662.1" y1="528.96" y2="564.08" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
 <linearGradient id="levlevif" x1="1644" x2="1644" y1="462.58" y2="564.08" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
 <linearGradient id="levlevie" x1="1644.3" x2="1644.3" y1="435.08" y2="487.08" gradientUnits="userSpaceOnUse" xlink:href="#levleva"/>
@@ -1472,8 +1540,8 @@
 <linearGradient id="levlevdd" x1="122.64" x2="122.64" y1="460.05" y2="481.79" gradientUnits="userSpaceOnUse">
 <stop stop-color="#4b086f" offset=".429"/>
 </linearGradient>
-`
-const firstg = `<g transform="matrix(.38338 0 0 .4039 -156.16 -138.46)" stroke-miterlimit="33" stroke-width="0px">
+</defs>
+<g transform="matrix(.38338 0 0 .4039 -156.16 -138.46)" stroke-miterlimit="33" stroke-width="0px">
 <path d="m1662.8 563.24c3.3833-11.59 6.3577-23.021 8.8875-34.272l-19.123 35.111 10.235-0.839z" fill="url(#levlevig)"/>
 <path d="m1652.5 564.07 19.123-35.111c5.1526-22.917 8.4822-45.095 9.7776-66.389l-74.9 24.5 46 77z" fill="url(#levlevif)"/>
 <path d="m1606.5 487.07 74.9-24.5c0.3872-6.3695 0.5889-12.658 0.6064-18.865l-32.507-8.6346-43 52z" fill="url(#levlevie)"/>
@@ -2387,81 +2455,7 @@ const firstg = `<g transform="matrix(.38338 0 0 .4039 -156.16 -138.46)" stroke-m
 <path d="m34.248 490.21c1.1127 8.5438 2.5059 17.199 4.171 25.959l29.128-8.0911-33.299-17.868z" fill="url(#levlevij)"/>
 <path d="m70.548 477.07-38.318-5.8604c0.5118 6.2659 1.186 12.598 2.0188 18.993l33.299 17.868 3-31z" fill="url(#levlevii)"/>
 <path d="m54.194 578.6c0.9061 2.9202 1.8341 5.8479 2.7888 8.785l3.5653-3.3107-6.3541-5.4743z" fill="url(#levlevih)"/>
-</g>`
-    import { createEventDispatcher } from 'svelte';
-
- const dispatch = createEventDispatcher();
-export let hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)";
-export let gg ="translate(-156.85 -287.03)";
-export let ff ="translate(164.82 -287.03)";
-export let ee ="translate(3.8484 -18.405)";
-export let dd ="matrix(1, 0, 0, 1, 194.44, -541.85)";
-export let cc = "translate(-232.58 -369.63)";
-export let bb = "translate(241.91 -369.63)";
-export let aa2 = "translate(-140.71 -177.44)";
-export let qq = "translate(146.88 -177.44)";
-export let jj = "translate(-140.71 -449.43)";
-export let yy = "translate(164.82 -449.43)";
-export let xx = "translate(-188.36 -539.11)";
-export let pic;
-export let picLink;
-export let name = "";
-export let sug = 0;
-export let sugg =  "sugg";
-export let pen = 0;
-export let pend = "pend";
-export let ask = 0;
-export let asks = "asks";
-export let wel = 0;
-export let welc = "welc";
-export let beta = 0;
-export let betaha = "betaha";
-export let des = 0;
-export let desi = "desi";
-export let fia = 0;
-export let fiap = "fiap";
-export let pmash = 0;
-export let ppmash = "ppmash";
-export let mashs = 0;
-export let pmashs = "pmashs";
-export let maap = 0;
-export let pmaap = "pmaap";
-export let askma = 0;
-export let askmap = "askmap";
-export let wi = "0.2";
-let profiletitle ="תמונת הפרופיל שלי"
-
-function hover (id){
-dispatch("hover",{
-    id: id
-})
-
-}
-function disp (id){
-dispatch("disp",{
-    id: id
-})
-}
-    </script>
- <svg class="midCom" style="transform: scale({wi});" version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
-<defs>
-<linearGradient id="levlevah" bx:pinned="true">
-<stop stop-color="#46281e" offset="0"/>
-<stop stop-color="#fecf00" offset=".337"/>
-<stop stop-color="#fd5" offset=".521"/>
-<stop stop-color="#ff2253" offset=".693"/>
-<stop stop-color="#ffc400" offset=".878"/>
-<stop stop-color="#a67e22" offset="1"/>
-</linearGradient>
-<linearGradient id="levleva" bx:pinned="true">
-<stop stop-color="#ffd828" offset=".214"/>
-<stop stop-color="#f06" offset=".888"/>
-</linearGradient>
-
-<style bx:fonts="Shizuru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shizuru%3Aital%2Cwght%400%2C400&display=swap);</style>
-{@html defs}
-</defs>
-{@html firstg}
+</g>
   <g on:mouseenter={()=>hover("j")} on:mouseleave={()=>hover("j")} on:click={()=>disp(pmashs)} name="number " class="btn am" transform="{jj}">
     <title>הצגת הצעות להשקעת משאבים ברקמות בלבד</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">

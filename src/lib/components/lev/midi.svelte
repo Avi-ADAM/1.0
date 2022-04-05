@@ -176,10 +176,8 @@ function bit (){
   if (low === true){
      myInterval = setInterval(function () {
   if(wi === "0.2"){
-    console.log("x")
       wi = "2"   
     } else if (wi === "2"){
-          console.log("y")
       wi = "0.2"  
     }
   }, 2050)
