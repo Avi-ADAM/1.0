@@ -310,10 +310,14 @@ async function createasked (da) {
                     } else{
                         src21 = start[i].asks[j].project.profilePic
                     }
+                     let src22 = "";
+                     if (start[i].asks[j].users_permissions_user.profilePic !== null){
+                       src22 = start[i].asks[j].users_permissions_user.profilePic.formats.thumbnail.url
+                    } 
                     dictasked.push({
                             uid: start[i].asks[j].users_permissions_user.id,
                             username: start[i].asks[j].users_permissions_user.username,
-                            src: start[i].asks[j].users_permissions_user.profilePic.formats.thumbnail.url,
+                            src: src22,
                             publicklinks: start[i].asks[j].open_mission.publicklinks,
                             privatlinks: start[i].asks[j].open_mission.privatlinks,
                             hearotMeyuchadot: start[i].asks[j].open_mission.hearotMeyuchadot,
@@ -407,10 +411,14 @@ async function createmask (da) {
                     } else{
                         src21 = start[i].profilePic
                     }
+                    let src22 = "";
+                     if (start[i].askms[j].users_permissions_user.profilePic !== null){
+                       src22 = start[i].askms[j].users_permissions_user.profilePic.formats.thumbnail.url
+                    } 
                     askedm.push({
                             uid: start[i].askms[j].users_permissions_user.id,
                             username: start[i].askms[j].users_permissions_user.username,
-                            src: start[i].askms[j].users_permissions_user.profilePic.formats.thumbnail.url,
+                            src: src22,
                             price: start[i].askms[j].open_mashaabim.price,
                             easy: start[i].askms[j].open_mashaabim.easy,
                             spnot: start[i].askms[j].open_mashaabim.spnot,
