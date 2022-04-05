@@ -931,13 +931,14 @@ function midd (min){
         const dd = min.data.user
          nam = dd.username
          total = dd.total
+         if(dd.profilePic !== null){
         if (dd.profilePic.formats.thumbnail.url){
       picLink = dd.profilePic.formats.thumbnail.url
         } else if (dd.profilePic.small.thumbnail.url){
         picLink = dd.profilePic.small.thumbnail.url
         } else if (dd.profilePic.url){
                  picLink = dd.profilePic.url
-        }
+        }}
 }
     let tickSpeed = 60000 * 5;
 let sdsa = [];
@@ -1100,6 +1101,7 @@ async function start () {
     huca = [];
     wegets=[];
                  midd(miData);
+                 console.log("pass")
             makeWalcom(miData);
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
@@ -1120,7 +1122,6 @@ async function start () {
   }
         } catch (e) {
             error1 = e
-                        goto ("/login",)
         }
 } ;
 let pmashes = [];
