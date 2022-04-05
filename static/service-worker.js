@@ -4,7 +4,7 @@ self.addEventListener('install', (event) => {
     event.waitUntil(
         caches.open('v3').then((cache) => {
             cache.add(
-                './favicon.png'
+                './favicon.ico'
             );
         })
     );
