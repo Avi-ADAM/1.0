@@ -11,9 +11,9 @@ self.addEventListener('install', (event) => {
 });
 
 self.addEventListener('activate', function (event) {
-    console.log("serviceworker activate fn :", event)
+   // console.log("serviceworker activate fn :", event)
 });
 
 self.addEventListener('fetch', function (event) {
-    console.log("fetch fn inside serviceworker.js")
+  //  console.log("fetch fn inside serviceworker.js")
 })
