@@ -1,10 +1,10 @@
 <script>
     import { onMount } from 'svelte';
+  import { t } from '$lib/translations'; 
 
     let country = [];
     let error = null
     let lang = 'en';
-    let header = {'en': "how mani agee", 'he':"כמה הסכימו מכל מקום"} 
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -123,7 +123,7 @@
   }
 </style>
 <div class="ww">
-    <h1 style="font-size:20px;" class="text-barbi text-center">כמה הסכימו מכל מקום
+    <h1 style="font-size:20px;" class="text-barbi text-center">{$t('love.title')}
     </h1>
     <div class="wwa">
 <div class="chart-container">
