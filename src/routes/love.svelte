@@ -109,8 +109,18 @@
       height: 100vh;
       background-color: rgb(103, 232, 249);
   }
+  .wwa{
+      margin: 0 auto;
+      width: auto;
+      height: calc(100vh - 30px);
+      aspect-ratio: 1/1;
+      background-color: rgb(103, 232, 249);
+  }
 </style>
 <div class="ww">
+    <h1 style="font-size:20px;" class="text-barbi text-center">כמה הסכימו מכל מקום
+    </h1>
+    <div class="wwa">
 <div class="chart-container">
   <LayerCake
     data={geojson}
@@ -145,4 +155,4 @@
       {/if}
     </Html>
   </LayerCake>
-</div></div>
+</div></div></div>
