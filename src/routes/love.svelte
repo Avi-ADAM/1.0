@@ -1,4 +1,52 @@
 <script>
+    import { onMount } from 'svelte';
+
+    let country = [];
+    let error = null
+    
+    onMount(async () => {
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+    
+        try {
+            const res = await fetch("https://oneloveone.onrender.com/cuntries?_limit=-1", {
+              method: "GET",
+              headers: {
+                 'Content-Type': 'application/json'
+              },
+            }).then(checkStatus)
+          .then(parseJSON);
+            country = res
+            for (let j = 0; j< country.length; j++){
+      for (let i = 0; i< data.length; i++){
+        if(data[i].name === country[j].name){
+          data[i].agrees = country[j].free_people.length 
+        }else if (data[i].name === "Palestine" && country[j].id === 167 || data[i].name === "Palestine" && country[j].id ===  246){
+             data[i].agrees += country[j].free_people.length
+        } else if (data[i].name === "Russia"  && country[j].name ==="Russian Federation"){
+             data[i].agrees = country[j].free_people.length
+        }else if (data[i].name === "United States of America"  && country[j].name ==="United States"){
+             data[i].agrees = country[j].free_people.length
+        }
+            }
+        }
+
+        } catch (e) {
+            error = e
+        }
+    });
+
+
   import { LayerCake, Svg, Html } from 'layercake';
   import { feature } from 'topojson-client';
   import { geoMercator } from 'd3-geo';
