@@ -110,9 +110,9 @@
       background-color: rgb(103, 232, 249);
   }
   .wwa{
-      margin: 0 auto;
-      width: auto;
-      height: calc(100vh - 30px);
+      margin: auto auto;
+      max-width: 100vw;
+      max-height: calc(100vh - 30px);
       aspect-ratio: 1/1;
       background-color: rgb(103, 232, 249);
   }
