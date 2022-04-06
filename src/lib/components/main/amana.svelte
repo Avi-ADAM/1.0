@@ -6,9 +6,7 @@
         import { contriesi } from '../registration/contries.js';
     import {fpval} from '../registration/fpval.js';
     import { regHelper } from '../../stores/regHelper.js';
-    import { goto,  prefetch } from '$app/navigation';
     import * as yup from "yup";
-    import { onMount } from 'svelte';
         import axios from 'axios';
           import { RingLoader
 } from 'svelte-loading-spinners';
@@ -483,7 +481,7 @@ function erorer(){
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1❤️1 אודות "  sveltekit:prefetch href="/about" > אודות</a>
                   <button on:click={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
                   <button on:click={tr} title="תרגום לשפות נוספות" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >תרגום לשפות נוספות</button>
-
+                            <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/love">מפת ההסכמה</a>
           {/if}
           </div>
       <div class="mobile">

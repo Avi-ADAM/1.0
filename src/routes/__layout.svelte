@@ -19,5 +19,3 @@ import "../app.postcss";
 <main>
 	<slot />
 </main>
-<style>
-</style>
