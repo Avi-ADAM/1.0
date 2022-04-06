@@ -120,8 +120,8 @@ async function agree() {
      console.log(idL);
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
-  //  uids.push(userId);
-   // uids = uids;
+    uids.push(userId);
+    uids = uids;
     console.log(uids);
     if (uids.includes(userId)){
         welcome = ``;
