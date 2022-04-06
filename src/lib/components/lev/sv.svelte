@@ -39,7 +39,7 @@ export let maap = 0;
 export let pmaap = "pmaap";
 export let askma = 0;
 export let askmap = "askmap";
-export let wi = "0.2";
+export let low = true;
 let profiletitle ="תמונת הפרופיל שלי"
 
 function hover (id){
@@ -54,7 +54,36 @@ dispatch("disp",{
 })
 }
     </script>
- <svg class="midCom" style="transform: scale({wi});" version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <style>
+       .midCom{	
+
+    min-height: 170px;	
+    min-width: 170px;	
+     
+    max-width: 550px;
+    max-height: 550px;
+    aspect-ratio: 1/ 1;
+}	
+@media (min-width: 550px) {	
+
+.midCom{	
+    min-height: 255px;	
+    min-width: 255px;	
+}	
+}	
+.sh{
+  	animation: beat .75s infinite alternate;
+	transform-origin: center;
+}
+
+/* Heart beat animation */
+@keyframes beat{
+  from { transform: scale(0.2);}
+	to { transform: scale(1.4); }
+}
+
+      </style>
+ <svg class="midCom" class:sh={low === true}  version="1.1" viewBox="-148.21 -131.51 641.46 671.02" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
 <defs>
 <linearGradient id="levlevah" bx:pinned="true">
 <stop stop-color="#46281e" offset="0"/>
@@ -3217,25 +3246,3 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 </svg>
 
-<style>	
-
-
-  .midCom{	
-      transition: all 1000ms ease-in-out;
-
-    min-height: 170px;	
-    min-width: 170px;	
-     
-    max-width: 550px;
-    max-height: 550px;
-    aspect-ratio: 1/ 1;
-}	
-@media (min-width: 550px) {	
-
-.midCom{	
-    min-height: 255px;	
-    min-width: 255px;	
-}	
-}	
-
-</style>
