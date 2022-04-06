@@ -3,7 +3,8 @@
 
     let country = [];
     let error = null
-    
+    let lang = 'en';
+    let header = {'en': "how mani agee", 'he':"כמה הסכימו מכל מקום"} 
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -32,8 +33,12 @@
         if(data[i].name === country[j].name){
           data[i].agrees = country[j].free_people.length 
         }else if (data[i].name === "Palestine" && country[j].id === 167 || data[i].name === "Palestine" && country[j].id ===  246){
-             data[i].agrees += country[j].free_people.length
-        } else if (data[i].name === "Russia"  && country[j].name ==="Russian Federation"){
+            if (data[i].agrees > 0){
+                data[i].agrees += country[j].free_people.length
+        }else{
+                data[i].agrees = country[j].free_people.length
+        }}
+         else if (data[i].name === "Russia"  && country[j].name ==="Russian Federation"){
              data[i].agrees = country[j].free_people.length
         }else if (data[i].name === "United States of America"  && country[j].name ==="United States"){
              data[i].agrees = country[j].free_people.length
