@@ -430,7 +430,7 @@ function erorer(){
           on:click={closer}>ביטול</button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
-         
+          
                     {:else if a == 4}
  <TRan on:done={done} on:erore={erorer}/>
          
@@ -553,7 +553,7 @@ function erorer(){
               <span>
                 אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>      לעולם לא אנהג באלימות ולא אפגע באף אדם         
                    <br>
-                   אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> מצהיר שאין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס שמצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
+           כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
               <br>	
    אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
               <br>
