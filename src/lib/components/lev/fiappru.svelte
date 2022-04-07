@@ -108,6 +108,7 @@ let welcome = ``;
 let adduser = ``;
 let adduser2 = ``;
 async function agree() {
+    already = true;
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
     
     
@@ -231,6 +232,8 @@ console.log("just add vote to asked and update to not show for me again")
 ;
 
 function ask() {
+        already = true;
+
     console.log("nego")
     // text and more hours if needed ,
     masa = true;
@@ -239,6 +242,8 @@ function ask() {
 }
 
 async function decline() {
+        already = true;
+
         console.log("decline0");
     // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב      
     const cookieValue = document.cookie

@@ -84,10 +84,14 @@ function ishursium (dati){
   for (var i = 0; i < start.length; i++) {
             for (var j = 0; j < start[i].finiapruvals.length; j++){
                       const rt = letters(start[i].finiapruvals[j].missname); 
-                    fiapp.push({
+                                     let src22 = "";
+                     if (start[i].finiapruvals[j].users_permissions_user.profilePic !== null){
+                       src22 = start[i].finiapruvals[j].users_permissions_user.profilePic.formats.thumbnail.url
+                    } 
+                      fiapp.push({
                             uid: start[i].finiapruvals[j].users_permissions_user.id,
                             username: start[i].finiapruvals[j].users_permissions_user.username,
-                            src: start[i].finiapruvals[j].users_permissions_user.profilePic.formats.thumbnail.url,
+                            src: src22,
                             hearotMeyuchadot: start[i].finiapruvals[j].mesimabetahalich.hearotMeyuchadot,
                             missionDetails: start[i].finiapruvals[j].mesimabetahalich.descrip,
                              nhours: start[i].finiapruvals[j].noofhours,
@@ -1109,13 +1113,15 @@ async function start () {
     huca = [];
     wegets=[];
                  midd(miData);
-                 console.log("pass")
             makeWalcom(miData);
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
-           createpends (miData);
+         createpends (miData);
            mesimabetahalicha (miData);
+                                      console.log("pass")
           ishursium(miData);
+                                    console.log("pass")
+
           sds(miData);
           pmash(miData)
           sps(miData)
@@ -1826,7 +1832,8 @@ des={0}  />
     
     .screen{
 background-color: #000000;
-background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);        display: grid;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);       
+ display: grid;
         grid-template-columns: repeat(4, 1fr);
                 grid-template-rows: repeat(4, 1fr);
 
@@ -1892,8 +1899,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
     }
 
     }
-
- @media  (min-width: 1240px){
+    @media  (min-width: 1240px){
     .screen{
         padding:20px 20px;
        background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) !important;
@@ -1925,6 +1931,51 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
         border-radius: 50%;
     }
     }
+/*
+ @media  (min-width: 1240px){
+    .screen{
+        padding:20px 20px;
+       background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) !important;
+        background-size: cover;
+        height: 100vh !important;
+        display: grid;
+        grid-template-columns: 200px;
+        grid-template-rows: 75px;
+        grid-gap: 37.5px;
+        grid-row: center;
+        align-items: center;
+        justify-content: center;
+        width: 100vw;
+        height: 100vh;
+        overflow: auto;
+
+    }
+    .midCom{
+        padding: 20px  20px;
+        grid-row: 3  / 5;
+    grid-column: 2 /4;
+      align-self: center;
+    }
+    .normSml:nth-child(6){
+margin-left: 125px
+    }
+      .normSml:nth-child(7){
+margin-left: 125px
+    }  .normSml:nth-child(8){
+margin-left: 125px
+    }  .normSml:nth-child(9){
+margin-left: 125px
+    }  .normSml:nth-child(10){
+margin-left: 125px
+    }
+    .normSml{
+    margin:  0;
+    }
+    .normSml:hover{
+        
+        border-radius: 50%;
+    }
+    }*/
      @media  (min-width: 1640px){
     .screen{
         grid-template-columns: repeat(10, 1fr);
