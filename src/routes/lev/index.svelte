@@ -87,7 +87,7 @@ function ishursium (dati){
                                      let src22 = "";
                      if (start[i].finiapruvals[j].users_permissions_user.profilePic !== null){
                        src22 = start[i].finiapruvals[j].users_permissions_user.profilePic.formats.thumbnail.url
-                    } 
+                    }  
                       fiapp.push({
                             uid: start[i].finiapruvals[j].users_permissions_user.id,
                             username: start[i].finiapruvals[j].users_permissions_user.username,
@@ -731,7 +731,11 @@ async function showOpenPro (mi) {
                             dictids[q[j].id] -= (msk[j].length * 2);
                         }
                     }
-                    if (mtaf[j].length > 0) {
+
+                // [500,300,100] // need to split 
+                // a = 100
+                // ["500",400]
+                     if (mtaf[j].length > 0) {
                         if (tafn.length > 0) {
                             dictids[q[j].id] -= tafn.length;
                         }
