@@ -461,15 +461,15 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
   flipEffect={{ slideShadows: false}}
   class="mySwiper"
   navigation={{
-    nextEl: `.normSml${pendId}-${price}`,
-    prevEl: `.normSmll${pendId}-${price}`,
+    nextEl: `.normSml${pendId}-${projectId}-hh`,
+    prevEl: `.normSmll${pendId}-${projectId}-hh`,
   }}
 >
   <SwiperSlide
     ><div
-	class="{`normSml${pendId}-${price}`}" id="normSml" 
+	class="{`normSml${pendId}-${projectId}`}" id="normSml" 
 >
- <a sveltekit:prefetch href={`/project/${projectId}`}>
+ <a sveltekit:prefetch href={`/project/${projectId}-hh`}>
         <img class="img"
          src={src}  alt="projectlogo" title={projectName}>
     </a>
@@ -504,7 +504,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 
 </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${pendId}-${price}`} " id="normSmll"
+    ><div class="{`normSmll${pendId}-${projectId}-hh`} " id="normSmll"
  >
         <a sveltekit:prefetch href={`/project/${projectId}`}
         ><h3 class="pn">{projectName}</h3></a>
