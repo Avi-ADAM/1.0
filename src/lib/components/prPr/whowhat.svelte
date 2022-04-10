@@ -48,10 +48,16 @@ function cal (){
                  if (salee[j].users_permissions_user.id in dictidi) {
                     dictidi[salee[j].users_permissions_user.id] += salee[j].in
                    } else {
-                    dictidi[salee[j].users_permissions_user.id] = salee[j].in
+                      dictidi[salee[j].users_permissions_user.id] = salee[j].in
                    }
                         }
-        }
+        }         if (users[i].id in dictidi)  {          
+                    console.log(users[i].id)
+      }
+      else {
+          dictidi[users[i].id] = 0;
+                    console.log(users[i].id)
+      }
     }
     console.log(dictidi)
 }
