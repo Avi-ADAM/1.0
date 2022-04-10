@@ -504,14 +504,15 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 
 </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${pendId}-${projectId}-hh`} " id="normSmll"
+    ><div  id="normSmll"
  >
         <a sveltekit:prefetch href={`/project/${projectId}`}
         ><h3 class="pn">{projectName}</h3></a>
+        <div class="{`normSmll${pendId}-${projectId}-hh`}">
     {#if whyno.length > 0}<h4 style="color:var(--barbi); font-size:10px; font-weight:bold;">{whyno.join(' ~ ')}</h4>{/if} 
  {#if descrip !== undefined || null}<h5 class="pnn">{descrip}</h5>{/if}
     {#if hearotMeyuchadot !== undefined || null || "undefined"}<h6 class="pnn">{hearotMeyuchadot}</h6>{/if}
-    
+    </div>
     <!--  <svg height="10" width="180">
   <defs>
     <linearGradient id="solids" x1="0%" y1="0%" x2="100%" y2="0%">
