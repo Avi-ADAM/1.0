@@ -1,5 +1,6 @@
 <script>
-     
+          import pic from './../../celim/pic.js'
+
 export let fmiData = [];
 export let rikmashes = [];
   export let hagdel = false;
@@ -118,12 +119,18 @@ function pre (){
                           } else {
                     dictid["pmcounter"] = 0
                    }
+                    let src22 = ``;
+                   if (users[i].profilePic !== null){
+                     src22 = users[i].profilePic.url
+                   } else {
+                     src22 = pic
+                   }
       ulist.push({
           ihave: dictidi[filtered[m]],
                total: dictid[filteredw[t]],
                 uid: users[i].id,
                    username : users[i].username,
-                   src: users[i].profilePic.url,
+                   src: src22,
                    p: percentage(dictid[filteredw[t]], dictid["net"]),
                    un: users[i].username,
                    s: percentage(dictid[filteredw[t]], dictid["net"]),
