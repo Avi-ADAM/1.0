@@ -467,9 +467,9 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 >
   <SwiperSlide
     ><div
-	class="{`normSml${pendId}-${projectId}`}" id="normSml" 
+	class="{`normSml${pendId}-${projectId}-hh`}" id="normSml" 
 >
- <a sveltekit:prefetch href={`/project/${projectId}-hh`}>
+ <a  href={`/project/${projectId}-hh`}>
         <img class="img"
          src={src}  alt="projectlogo" title={projectName}>
     </a>
@@ -506,7 +506,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
   ><SwiperSlide
     ><div  id="normSmll"
  >
-        <a sveltekit:prefetch href={`/project/${projectId}`}
+        <a  href={`/project/${projectId}`}
         ><h3 class="pn">{projectName}</h3></a>
         <div class="{`normSmll${pendId}-${projectId}-hh`}">
     {#if whyno.length > 0}<h4 style="color:var(--barbi); font-size:10px; font-weight:bold;">{whyno.join(' ~ ')}</h4>{/if} 
