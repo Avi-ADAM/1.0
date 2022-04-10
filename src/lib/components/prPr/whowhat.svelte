@@ -153,53 +153,58 @@ function pre (){
 for (let i = 0; i <ulist.length; i++) {
    ulist[i].x = (ulist[i].p / 100) * revach;
   if (ulist[i].ihave-ulist[i].x < 0 ){
-        console.log(ulist,"so")
-
  ulist[i].meca = ulist[i].x-ulist[i].ihave;
    ulist[i].noten = 0;
    ulist[i].cama = 0;
  } else if (ulist[i].ihave-ulist[i].x > 0 ){
-           console.log(ulist,noten)
-
   ulist[i].noten = ulist[i].ihave-ulist[i].x;
    ulist[i].meca = 0;
  }
 
 
 }
- for (let t=0; t<ulist.length; t++){
+ 
+}
+for (let t=0; t<ulist.length; t++){
     for (let z=0; z<ulist.length; z++){
-   if (ulist[t].noten.toFixed() == ulist[z].meca.toFixed()){
-     ulist[t].le = ulist[z].username;
-     ulist[t].cama = ulist[z].meca;
+   if (ulist[t].noten.toFixed(2) == ulist[z].meca.toFixed(2) && ulist[t].noten > 0 && ulist[z].meca > 0){
+      ulist[t].le = []
+    ulist[t].le.push({
+       le: ulist[z].username,
+    leid: ulist[z].id,
+    cama: ulist[z].meca
+    }) 
+     ulist[z].kibal = true;
    }
   }
  }
-//each for any user to create his circle
-// so get the total of p get total fmision and mashaabims for each user then do presenteg save as obj arr and show with circle to each
-}
+ ulist.sort(({meca:a}, {meca:b}) => b-a)
 
+ for (let n=0; n<ulist.length; n++){
+    if (ulist[n].noten > 0 && !ulist[n].le){
+      ulist[n].latet = ulist[n].noten;
+               ulist[n].le = []
+
+   for (let z=0; z<ulist.length; z++){
+ if (ulist[n].latet >= ulist[z].meca && ulist[z].kibal != true && ulist[z].meca > 0){
+   ulist[n].le.push({
+       le: ulist[z].username,
+    cama: ulist[z].meca
+    }) 
+     ulist[z].kibal = true;
+    ulist[n].latet -= ulist[z].meca;
+    console.log("here with",ulist[z].username )
+    }
+ }
+    }
+ }
 
     console.log(ulist)
     ulist = ulist
 
 }
 
-/*
-$: for (let i = 0; i <ulist.length; i++) {
-   x[i] = (ulist[i].p / 100) * revach;
-  if (ihave[i]-x[i] < 0 ){
-        console.log(ulist,"so")
 
- meca[i] = x[i]-ihave[i];
-   noten[i] = 0;
- } else if (ihave[i]-x[i] > 0 ){
-           console.log(ulist,noten)
-
-  noten[i] = ihave[i]-x[i];
-   meca[i] = 0;
- }
-}*/
 </script>
 
 <div class="dd md:items-center">
@@ -259,8 +264,11 @@ $: for (let i = 0; i <ulist.length; i++) {
       <th > להעביר אל:</th>
       {#each ulist as data, i}
       <td>
-      {#if data.cama > 0}
-            {`${data.cama.toFixed(2)},${data.le}`}
+        {#if data.le}
+        {#each data.le as ee, i}
+            {` ${ee.le} :  ${ee.cama.toFixed(2)} `}
+            <br>
+            {/each}
             {/if}
             </td>
             {/each}
