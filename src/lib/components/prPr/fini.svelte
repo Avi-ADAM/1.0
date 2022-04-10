@@ -1,5 +1,5 @@
 <script>
-     
+        import pic from './../../celim/pic.js'  
 export let fmiData = [];
   export let hagdel = false;
    import { onMount } from 'svelte'; 
@@ -69,6 +69,7 @@ function pre (){
                     dictid["net"] = rikmashes[j].total
                    }
                   }
+                  
     console.log(dictid)
       const filteredw = Object.keys(dictid)
      console.log(filteredw)
@@ -89,11 +90,17 @@ function pre (){
                           } else {
                     dictid["pmcounter"] = 0
                    }
+                     let src22 = ``;
+                   if (users[i].profilePic !== null){
+                     src22 = users[i].profilePic.url
+                   } else {
+                     src22 = pic
+                   }
       ulist.push({
                total: dictid[filteredw[t]],
                 uid: users[i].id,
                    username : users[i].username,
-                   src: users[i].profilePic.url,
+                   src: src22,
                    p: percentage(dictid[filteredw[t]], dictid["net"]),
                    un: users[i].username,
                    s: percentage(dictid[filteredw[t]], dictid["net"]),
@@ -186,13 +193,13 @@ meData[i].totaltotal =  meData[i].easy;
  
     </script>
     {#if hagdel === false}
-    <div style =" margin: 20px auto;" class="flex flex-col items-center justify-center ">
-      <h1 class="text-barbi">חלוקת שווי הריקמה</h1>
+    <div style =" margin-top: 20px ; margin-left: auto; margin-right:auto;" class="flex flex-col items-center justify-center ">
+      <h1 style =" margin-top: 20px ;" class="text-barbi">חלוקת שווי הריקמה</h1>
     <svg width="250px" height="250px" style="display: inline;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
         <defs>
   <pattern id={use.imid} patternUnits="userSpaceOnUse" width="100" height="100">
-    <image href={use.src} x="0" y="0" width="100" height="100" />
+    <image href={use.src} x="-15" y="-10" width="100" height="100" />
   </pattern>
 </defs>
   <circle  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
