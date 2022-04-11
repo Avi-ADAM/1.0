@@ -88,7 +88,7 @@ let bmimData = [];
   //  totalneed = newwork;
   //  });
     let error1 = null;
-   let meData;
+   let meData = start ();
     let srcP; 
    let desP;
    let projectname;
@@ -187,6 +187,7 @@ async function start () {
               }, body: 
 JSON.stringify({query:
           `{project(id:"${$idPr}"){
+            tosplits (where:{finished : false}){prectentage vots {what users_permissions_user {id}}}
             projectName
             descripFor
             publicDescription
@@ -276,16 +277,16 @@ JSON.stringify({query:
             }
         //    omiData = omiData;
             pmiData = pmiData;
-            console.log(pmiData)
             bmiData = bmiData;
             vallues = project.vallues;
             valit = vallues.map(c => c.valueName);
-             meData.linkToWebsite = linkP;
+            linkP = meData.linkToWebsite;
              noofopenm = opmash.length;
             noofopen = project.open_missions.length;
             if (project.profilePic !== null){
             srcP = project.profilePic.url;
             }
+
            pre(projectUsers, fmiData)
         } catch (e) {
             error1 = e;
@@ -341,13 +342,13 @@ JSON.stringify({query:
   .then(r => r.json())
   .then(data => user = data.data.user);
             console.log(user);
-            projects = user.projects_1s;
+            meData = user.projects_1s;
           console.log(projects);
         } catch (e) {
             error1 = e
         }
         }
-
+  return meData
 };
 
     function pre(projectUsers, fmiData){
@@ -1036,6 +1037,7 @@ function masi(){
 
 </svelte:head>
 <div class="alli"></div>
+{#await meData then }
 
     {#if $idPr }
     
@@ -1076,6 +1078,7 @@ function masi(){
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
 <div dir="rtl" class="all  text-barbi text-center">
   <Header/>
+  
   <div>
 {#if project.profilePic !== null}
       <img
@@ -1323,7 +1326,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     />{/if}</div>
 </div>
     <div class=" p-2">
-      <Hamatanot {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
+      <Hamatanot trili={meData.tosplits} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>
       {#if fmiData.length > 0 || rikmashes.length > 0}
         <div class="m-4 border-2  border-barbi rounded p-4" >
@@ -1351,6 +1354,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     
    </div> 
 </div>
+
 </div>
 
   <!--  {:else}
@@ -1361,7 +1365,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
  <div class="flex text-center flex-col border-2  border-barbi rounded m-4">
 <h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
  
-           {#each projects as data, i}
+           {#each meData as data, i}
           
           <button
           class=" border  border-barbi hover:border-gold font-bold border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold p-0.5 m-2 rounded-full"
@@ -1372,6 +1376,8 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
  </div> 
  {/if}
+ {/await}
+
  <style>
    .alli{
  /*   background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%); */

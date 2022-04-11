@@ -28,8 +28,9 @@ function percentage(partialValue, totalValue) {
 } 
 let ulist = [
 ]; 
+export let trili;
 export let users;
-let linkg = "https://onelovevone.onrender.com/graphql/";
+let linkg = "https://onelovevone.onrender.com/graphql";
 let dictid = {};
 let dictidi = {};
 let hal = false;
@@ -80,11 +81,25 @@ async function ask (){
             console.log(error1)
 
 }
+let hatzaa = false;
+let noofok, noofw, noofno = 0;
 onMount(async () => {
 cal()
 
 pre ()
-
+if (trili.length > 0){
+  already = true;
+  hatzaa = true;
+  const vots = trili[0].vots
+  for (let i = 0; i < vots.length; i++){
+    if (vots[i].what == true) {
+      noofok += 1
+    } else {
+      noofno += 1
+    }
+  }
+  noofw = ulist.length - vots.length
+}
 })
 function cal (){
       for (let i = 0; i < users.length; i++){
@@ -342,6 +357,11 @@ for (let t=0; t<ulist.length; t++){
    <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>אישור חלוקה</button>
 {/if}
+{#if hatzaa == true}
+<div class="border border-barbi m-2 p-2">
+<h1 class="font-bold">הוגשה הצעה לחלוקה והיא בתהליך אישור:<br>
+  {` עד כה ${noofok > 1 ? `ישנן ${noofok} הצבעות`: "ישנה הצבעה אחת" } בעד ${noofno > 0 ? `, ${noofno} נגד `: ""} ${noofw > 0 ? `ו-${noofw} שעוד לא הצביעו`: ""}`}</h1>
+</div>{/if}
   </div>
   </div>
 <style>

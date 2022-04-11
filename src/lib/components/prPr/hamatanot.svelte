@@ -5,11 +5,11 @@ import Sale from './sale.svelte';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
       import Halu from './whowhat.svelte';
-      import { onMount } from 'svelte';
       import Cir from './graph/circle.svelte';
 export let fmiData = [];
 export let rikmashes = [];
 export let projectId;
+export let trili;
 let isOpen = false;
 let a = 0;
 export let bmiData = [];
@@ -305,9 +305,9 @@ $: for (let i = 0; i < salee.length; i++){
     </table> 
     {#if hal === false}
    <button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
- on:click={ask}>בקשת חלוקה</button>
+ on:click={ask}>{trili.length == 0 ? "בקשת חלוקה" : "צפיה בהצעת החלוקה" }</button>
 {:else}
-<Halu {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
+<Halu {trili} {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
 {/if}
     {/if}
  {#if salee.length > 0} 
