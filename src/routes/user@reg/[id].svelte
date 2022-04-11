@@ -17,7 +17,7 @@
   
   export let userId; 
   import { onMount } from 'svelte';
-  import Header from './../../lib/components/header/header.svelte'
+  import Header from '../../lib/components/header/header.svelte'
 
 let user = [
 ];
@@ -52,7 +52,7 @@ let error1 = null;
       };
       const headers = {
         'Content-Type': 'application/json'   
-      }; let link ="https://oneloveone.onrender.com/graphql" ;
+      }; let link ="https://onelovevone.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

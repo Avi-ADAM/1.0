@@ -70,7 +70,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://oneloveone.onrender.com/graphql';
+    let link = 'https://onelovevone.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -138,7 +138,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://oneloveone.onrender.com/graphql';
+    let link = 'https://onelovevone.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',

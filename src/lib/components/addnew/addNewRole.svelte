@@ -25,7 +25,7 @@ let desR;
 export let skills2 = [];
 let error1 = null;
 let shgi = false;
-let link ="https://oneloveone.onrender.com/tafkidims";
+let link ="https://onelovevone.onrender.com/tafkidims";
 
 onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -42,7 +42,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://oneloveone.onrender.com/graphql", {
+            const res = await fetch("https://onelovevone.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

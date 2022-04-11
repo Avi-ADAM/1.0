@@ -13,7 +13,7 @@ let loading = false;
 let isOpen = false;
 let a = 0;
     let before = false;
-    let url1 = "https://oneloveone.onrender.com/upload";
+    let url1 = "https://onelovevone.onrender.com/upload";
     let linkP;
     let desP;
     let desPl;
@@ -55,7 +55,7 @@ if (files) {
                  imageId = data[0].id;
  
   axios
-  .post('https://oneloveone.onrender.com/projects', {
+  .post('https://onelovevone.onrender.com/projects', {
     user_1s: idL,
     projectName: projectName_value, 
     publicDescription: desP,
@@ -84,7 +84,7 @@ if (files) {
   console.log("hh")
 })} else {
   axios
-  .post('https://oneloveone.onrender.com/projects', {
+  .post('https://onelovevone.onrender.com/projects', {
     user_1s: idL,
         profilePic: imageId,
     projectName: projectName_value, 
@@ -141,7 +141,7 @@ let vallues = [];
         });
       };
         try {
-           const res = await fetch("https://oneloveone.onrender.com/graphql", {
+           const res = await fetch("https://onelovevone.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

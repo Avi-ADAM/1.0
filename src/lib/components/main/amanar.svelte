@@ -307,7 +307,7 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
-            fetch('https://oneloveone.onrender.com/chezins', {
+            fetch('https://onelovevone.onrender.com/chezins', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -353,7 +353,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://oneloveone.onrender.com/chezins/count", {
+            const res = await fetch("https://onelovevone.onrender.com/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

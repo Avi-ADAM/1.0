@@ -10,10 +10,10 @@
     function onSubmit () {   
 // Request API.
 axios
-  .post('https://oneloveone.onrender.com/auth/forgot-password', {
+  .post('https://onelovevone.onrender.com/auth/forgot-password', {
     email: email,
     url:
-      'https://oneloveone.onrender.com/admin/plugins/users-permissions/auth/reset-password',
+      'https://onelovevone.onrender.com/admin/plugins/users-permissions/auth/reset-password',
   })
   .then(response => {
     // Handle success.

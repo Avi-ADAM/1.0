@@ -1,6 +1,6 @@
 <script>
           import pic from './../../celim/pic.js'
-
+   import { idPr } from '../../stores/idPr.js';
 export let fmiData = [];
 export let rikmashes = [];
   export let hagdel = false;
@@ -10,6 +10,7 @@ export let rikmashes = [];
 let revach = allin;
 let x = [];
 let meca = [];
+let miDatan = [];
 let noten = [];
 // what about hours alrerady done to  mission in progres 
 function remove (id) {
@@ -28,11 +29,55 @@ function percentage(partialValue, totalValue) {
 let ulist = [
 ]; 
 export let users;
+let linkg = "https://onelovevone.onrender.com/graphql/";
 let dictid = {};
 let dictidi = {};
 let hal = false;
-function ask (){
-
+let error1 = null;
+export let already = false;
+async function ask (){
+  already = true;
+   const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+ let idL = cookieValueId;
+  let  token  = cookieValue; 
+   let  bearer1 = 'bearer' + ' ' + token;
+        try {
+             await fetch(linkg, {
+              method: 'POST',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query:
+          `mutation { createTosplit(
+      input: {
+      data: { project: "${$idPr}"
+      vots: [
+     {
+      what: true
+      users_permissions_user: "${idL}"
+    }
+  ]}
+      }
+  ){tosplit { vots { users_permissions_user { id}}}}
+} `   
+} )})
+  .then(r => r.json())
+  .then(data => miDatan = data);
+         console.log(miDatan)
+        } catch (e) {
+            error1 = e
+            console.log(error1)
+}
+            console.log(error1)
 
 }
 onMount(async () => {
@@ -293,7 +338,7 @@ for (let t=0; t<ulist.length; t++){
          
     </table>
 
-     {#if hal === false}
+     {#if hal === false && already === false}
    <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>אישור חלוקה</button>
 {/if}

@@ -10,7 +10,7 @@
    export let color = "--gold";
 
     let error1 = null;
-    let link ="https://oneloveone.onrender.com/vallues";
+    let link ="https://onelovevone.onrender.com/vallues";
 let meData;
 export let vallId;   
 export let rn = [];
@@ -21,7 +21,7 @@ async function addNewVall() {
 if (rn.includes(name_value)){
   shgi = true;
 } else {
-  let link ="https://oneloveone.onrender.com/graphql" ;
+  let link ="https://onelovevone.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

@@ -68,7 +68,7 @@ pendq = ` users: [
   const easy = (element.easy > 0) ? element.easy : 0;
   const sdate = (element.dates !== undefined) ? `sqadualed: "${new Date(element.dates).toISOString()}",` : ``;
    const fdate = (element.datef !== undefined) ? ` sqadualedf: "${new Date(element.datef).toISOString()}" ,` : ``;
- let link = 'https://oneloveone.onrender.com/graphql';
+ let link = 'https://onelovevone.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',

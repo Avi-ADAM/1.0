@@ -8,7 +8,7 @@
     export let rn = [];
     let roleName_value;
         let desS;
-        let link ="https://oneloveone.onrender.com/tafkidims";
+        let link ="https://onelovevone.onrender.com/tafkidims";
         let meData;
         let shgi = false;
     function add () {

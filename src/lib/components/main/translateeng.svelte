@@ -16,7 +16,7 @@ let error1;
  const dispatch = createEventDispatcher();
 
 let miDatan = [];
-let linkg = 'https://oneloveone.onrender.com/graphql';
+let linkg = 'https://onelovevone.onrender.com/graphql';
 async function add (){
 already = true;
  

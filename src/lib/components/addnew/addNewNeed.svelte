@@ -21,7 +21,7 @@ async function subm() {
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     try {
-           const res = await fetch("https://oneloveone.onrender.com/graphql", {
+           const res = await fetch("https://onelovevone.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

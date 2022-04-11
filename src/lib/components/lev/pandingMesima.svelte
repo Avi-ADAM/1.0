@@ -15,7 +15,7 @@ import { idPr } from '../../stores/idPr.js';
     export let src = "coin.png";
     export let perhour = 0;
     export let projectId;
-    export let link = "https://oneloveone.onrender.com/project/";
+    export let link = "https://onelovevone.onrender.com/project/";
     export let uids = [];
     export let what = [];
     export let noofusersOk;
@@ -75,7 +75,7 @@ function objToString (obj) {
     }}
     return str;
 }
-            let linkg = 'https://oneloveone.onrender.com/graphql';
+            let linkg = 'https://onelovevone.onrender.com/graphql';
     const userss = objToString(users)
 
 async function agree() {

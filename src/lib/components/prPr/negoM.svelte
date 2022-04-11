@@ -400,7 +400,7 @@ async function increment() {
         }
        
 }
-let linkg = "https://oneloveone.onrender.com/graphql"
+let linkg = "https://onelovevone.onrender.com/graphql"
 onMount(async () => {
     const cookieValue = document.cookie
         .split('; ')

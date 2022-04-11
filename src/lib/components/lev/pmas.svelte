@@ -21,7 +21,7 @@ import { idPr } from '../../stores/idPr.js';
     export let kindOf = "";
     export let src = "coin.png";
     export let projectId;
-    export let link = "https://oneloveone.onrender.com/project/";
+    export let link = "https://onelovevone.onrender.com/project/";
     export let uids = [];
     export let what = [];
     export let noofusersOk;
@@ -95,7 +95,7 @@ function objToString (obj) {
     }}
     return str;
 }
-            let linkg = 'https://oneloveone.onrender.com/graphql';
+            let linkg = 'https://onelovevone.onrender.com/graphql';
     const userss = objToString(users);
     const diunim = objToString(diun);
 async function agree(alr) {
@@ -476,7 +476,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     </a>
             <h1 class="pn">{name}</h1>
         {#if kindOf === "perUnit"}
-       <p class="p"><span style="color:var(--gold)" title="שווי ליחידה">{easy > 0 ? easy : price}</span> * <span style="color: aqua" title="כמות ">{hm}</span> = {easy > 0 ? easy * hm : price * hm} </p>
+       <p class="p"><SvelteTooltip tip="שווי ליחידה" top color="var(--gold)"><span style="color:var(--gold)" title="שווי ליחידה">{easy > 0 ? easy : price}</span></SvelteTooltip> * <span style="color: aqua" title="כמות ">{hm}</span> = {easy > 0 ? easy * hm : price * hm} </p>
    {:else if kindOf === "total" || kindOf === "rent"}
        <p class="p"><span style="color:var(--gold)" title="שווי">{easy > 0 ? easy : price}</span></p>
           {:else if kindOf === "monthly"}

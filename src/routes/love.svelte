@@ -1,10 +1,22 @@
+
 <script>
-    import { onMount } from 'svelte';
   import { t } from '$lib/translations'; 
 
     let country = [];
     let error = null
     let lang = 'en';
+   
+
+  import { LayerCake, Svg, Html } from 'layercake';
+  import { feature } from 'topojson-client';
+  import { geoMercator } from 'd3-geo';
+  import { scaleLinear } from 'd3-scale';
+  import { format } from 'd3-format';
+    
+  import MapSvg from './../lib/components/main/map.svg.svelte';
+  import Tooltip from './../lib/components/main/tooltip.html.svelte';
+ import { onMount } from 'svelte';
+ 
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -20,7 +32,7 @@
       };
     
         try {
-            const res = await fetch("https://oneloveone.onrender.com/cuntries?_limit=-1", {
+            const res = await fetch("https://onelovevone.onrender.com/cuntries?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -52,15 +64,6 @@
     });
 
 
-  import { LayerCake, Svg, Html } from 'layercake';
-  import { feature } from 'topojson-client';
-  import { geoMercator } from 'd3-geo';
-  import { scaleLinear } from 'd3-scale';
-  import { format } from 'd3-format';
-    
-  import MapSvg from './../lib/components/main/map.svg.svelte';
-  import Tooltip from './../lib/components/main/tooltip.html.svelte';
-
   // This example loads json data as json using @rollup/plugin-json
   import world from './../lib/components/main/countries110m.json';
   import data from './../lib/components/main/data.json';
@@ -91,9 +94,8 @@
   const flatData = geojson.features.map(d => d.properties);
   const colors = [ "#FF0092",
   'rgb(244, 114, 182)',
-  'rgb(190, 114, 244)',
-					"#EEE8AA",
-                 ];
+  'rgb(209, 146, 255)',
+					"#EEE8AA"];
 
   const addCommas = format(',');
 </script>
@@ -132,7 +134,7 @@
     z={d => dataLookup.get(d[mapJoinKey])[colorKey]}
     zScale={scaleLinear()}
     zRange={colors}
-    zDomain={[0,1,2,65]}
+    zDomain={[0,1,2,64]}
     {flatData}
   >
     <Svg>

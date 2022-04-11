@@ -83,7 +83,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://oneloveone.onrender.com/graphql';
+let linkg = 'https://onelovevone.onrender.com/graphql';
 
 function objToString (obj) {
     let str = '';

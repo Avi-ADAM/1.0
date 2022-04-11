@@ -36,7 +36,7 @@ onMount(async () => {
       const headers = {
         'Content-Type': 'application/json'   
       };
-        let link ="https://oneloveone.onrender.com/graphql" ;
+        let link ="https://onelovevone.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

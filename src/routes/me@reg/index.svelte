@@ -20,7 +20,7 @@ let isOpen = false;
 
     let current = "";
 
-    let url1 = "https://oneloveone.onrender.com/upload";
+    let url1 = "https://onelovevone.onrender.com/upload";
     let updX = 0;
     let meData = [];
   let token; 
@@ -120,7 +120,7 @@ function letters(data){
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://oneloveone.onrender.com/users/" + idLi ;
+    let link ="https://onelovevone.onrender.com/users/" + idLi ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -175,7 +175,7 @@ onMount(async () => {
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-      let linkgra = 'https://oneloveone.onrender.com/graphql';
+      let linkgra = 'https://onelovevone.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -245,7 +245,7 @@ function sendD () {
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://oneloveone.onrender.com/users/" + idLi 
+    let link ="https://onelovevone.onrender.com/users/" + idLi 
       axios
       .put(link, {
         username: userName_value, 
@@ -445,7 +445,7 @@ async function han (){
   .split('=')[1];
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
- let linkgra = 'https://oneloveone.onrender.com/graphql';
+ let linkgra = 'https://onelovevone.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',

@@ -214,7 +214,7 @@ timer: 0
   let miDatan;
  let token;
  let bearer1;
- let linkg = "https://oneloveone.onrender.com/graphql"
+ let linkg = "https://onelovevone.onrender.com/graphql"
 async function save() {
     const saved = lapse * 2.7777777777778E-7 + x * 2.7777777777778E-7;
     console.log("Saved",formatTime(saved), saved, lapse , x)

@@ -896,7 +896,7 @@ async function showOpenPro (mi) {
   idL = cookieValueId;
     token  = cookieValue; 
          let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://oneloveone.onrender.com/graphql" ;
+    let link ="https://onelovevone.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -999,7 +999,7 @@ async function start () {
   console.log("start");
   miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://oneloveone.onrender.com/graphql" ;
+    let link ="https://onelovevone.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -1460,6 +1460,7 @@ function showall (event){
 function bubleUiAngin(){
  arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca ].sort(({pl:a}, {pl:b}) => a - b)
      createD()
+     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart 
 }
 </script>
 

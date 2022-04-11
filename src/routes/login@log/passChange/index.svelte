@@ -15,7 +15,7 @@ function shaneh () {
 
   // Request API.
 axios
-  .post('https://oneloveone.onrender.com/auth/reset-password', {
+  .post('https://onelovevone.onrender.com/auth/reset-password', {
     code: email,
     password: passwordx,
     passwordConfirmation: passwordx,
