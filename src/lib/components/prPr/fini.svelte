@@ -5,6 +5,7 @@ export let fmiData = [];
    import { onMount } from 'svelte'; 
 export let rikmashes = [];
   export let meData = [];
+	import SvelteTooltip from 'svelte-tooltip';
 
 // what about hours alrerady done to  mission in progres 
 function remove (id) {
@@ -190,25 +191,45 @@ meData[i].totaltotal =  meData[i].easy;
   }
 }
 };
- 
+let fir,ssec;
+ function x(a,b,c){
+   if (a == "x"){
+    fir = b;
+    ssec = c;
+       xy = true;
+
+   } else if (a == "y"){
+            xy = false;
+   }
+ }
+ let xy = false;
     </script>
     {#if hagdel === false}
     <div style =" margin-top: 20px ; margin-left: auto; margin-right:auto;" class="flex flex-col items-center justify-center ">
-      <h1 style =" margin-top: 20px ;" class="text-barbi">חלוקת שווי הריקמה</h1>
-    <svg width="250px" height="250px" style="display: inline;" viewBox="0 0 64 64" class="pie">
+      <h1 style =" margin-top: 20px ;" class="text-barbi text-bold text-2xl">חלוקת שווי הריקמה</h1>
+    <svg width="250px" height="250px" style="display: inline; margin: 20px auto;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
         <defs>
   <pattern id={use.imid} patternUnits="userSpaceOnUse" width="100" height="100">
     <image href={use.src} x="-15" y="-10" width="100" height="100" />
   </pattern>
 </defs>
-  <circle  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
-  <title>{use.un}, {use.p.toFixed(2)}%</title></circle>
+  <circle on:mouseenter={x("x",use.un, use.p )} on:mouseleave="{x("y")}"  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
+  <title>{use.un}, {use.p.toFixed(2)}%</title>
+ 
+ </circle>
   {/each}
 </svg>
+{#if xy == true}
+ <SvelteTooltip tip="{fir}, {ssec.toFixed(2)}%" top active>
+  <div id="zz"><h1 style="color:transparent;">stam</h1></div>
+ </SvelteTooltip>
+{/if}
 </div>
+
 <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
-    {:else}
+   
+{:else}
      <button
       title="סגירת הפירוט"
       on:click={() => hagdel = false}
