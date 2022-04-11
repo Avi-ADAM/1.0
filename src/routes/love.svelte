@@ -1,11 +1,13 @@
 
 <script>
   import { t } from '$lib/translations'; 
-
+  import { RingLoader
+} from 'svelte-loading-spinners';
     let country = [];
     let error = null
     let lang = 'en';
-   
+     import datai from './../lib/components/main/data.json';
+
 
   import { LayerCake, Svg, Html } from 'layercake';
   import { feature } from 'topojson-client';
@@ -15,9 +17,8 @@
     
   import MapSvg from './../lib/components/main/map.svg.svelte';
   import Tooltip from './../lib/components/main/tooltip.html.svelte';
- import { onMount } from 'svelte';
- 
-    onMount(async () => {
+ let data = loadi ();
+ async function loadi (){
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -32,7 +33,7 @@
       };
     
         try {
-            const res = await fetch("https://onelovevone.onrender.com/cuntries?_limit=-1", {
+            let res = await fetch("https://onelovevone.onrender.com/cuntries?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -40,6 +41,7 @@
             }).then(checkStatus)
           .then(parseJSON);
             country = res
+             data = datai;
             for (let j = 0; j< country.length; j++){
       for (let i = 0; i< data.length; i++){
         if(data[i].name === country[j].name){
@@ -57,16 +59,16 @@
         }
             }
         }
-
+        data.forEach(d => {
+    dataLookup.set(d[dataJoinKey], d);
+  });
         } catch (e) {
             error = e
         }
-    });
-
-
+        return data
+    }
   // This example loads json data as json using @rollup/plugin-json
   import world from './../lib/components/main/countries110m.json';
-  import data from './../lib/components/main/data.json';
 
   const colorKey = 'agrees';
   const colorKeyy = 'value';
@@ -83,9 +85,7 @@
   const geojson = feature(world, world.objects.units);
   const projection = geoMercator;
 
-  data.forEach(d => {
-    dataLookup.set(d[dataJoinKey], d);
-  });
+  
   let evt;
   let hideTooltip = true;
 
@@ -124,6 +124,13 @@
       background-color: rgb(103, 232, 249);
   }
 </style>
+{#await data}
+<div class="flex flex-col text-center items-center justify-center trr">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> 
+{:then}
 <div class="ww">
     <h1 style="font-size:20px;" class="text-barbi text-center">{$t('love.title')}
     </h1>
@@ -163,3 +170,4 @@
     </Html>
   </LayerCake>
 </div></div></div>
+{/await}
