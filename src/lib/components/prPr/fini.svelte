@@ -214,7 +214,7 @@ let fir,ssec;
   </pattern>
 </defs>
   <circle on:mouseenter={x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
-  <title>{use.un}, {use.p.toFixed(2)}%</title>
+  <title>{use.un}: {use.p.toFixed(2)}%</title>
  
  </circle>
   {/each}
