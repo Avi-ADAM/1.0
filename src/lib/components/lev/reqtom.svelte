@@ -378,10 +378,11 @@ updateAskm(
 
         }
 }
+
 </script>
 
 <div 
-use:clickOutside on:click_outside={toggleShow} 
+use:clickOutside on:click_outside={toggleShow}
 class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper
   on:swiper={setSwiperRef}
@@ -458,6 +459,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
   ><SwiperSlide
     ><div class="{`normSmll${askId}-noo`}" id="normSmll"
 >
+
          {#if missionDetails !== null}   <h6 class="hslink ab">{missionDetails}</h6>{/if}
                  {#if deadline}    <h5 class="hslink bc">{deadline}</h5>{/if}
        <h3 class="hslink cd" title="שווי">{price}</h3>

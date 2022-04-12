@@ -20,6 +20,7 @@
   "dependencies": {
     "@fontsource/fira-mono": "^4.5.7",
     "@lottiefiles/svelte-lottie-player": "^0.2.0",
+    "@okrad/svelte-progressbar": "^1.11.3",
     "axios": "^0.24.0",
     "blueimp-canvas-to-blob": "^3.29.0",
     "cookie": "^0.4.2",

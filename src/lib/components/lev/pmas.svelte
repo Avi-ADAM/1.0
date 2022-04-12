@@ -10,6 +10,8 @@ import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
 	import SvelteTooltip from 'svelte-tooltip';
 
+  import ProgressBar from "@okrad/svelte-progressbar";
+  export let series = [];
  const dispatch = createEventDispatcher();
     export let mypos = null;
     export let whyno = [];
@@ -58,17 +60,41 @@ let monts = 0
 let ok;
 let nook;
 let nut;
-let yers
+let yers;
+async function xyz (){
+
+ ok =  percentage(noofusersOk, noofusers)
+nook = percentage(noofusersNo, noofusers) 
+nut = percentage(noofusersWaiting, noofusers) 
+let ser = [];
+ ser.push({
+perc: ok,
+color: '#7EE081'
+}) 
+if (nook > 0){
+  ser.push({
+perc: nook,
+color: '#78bec7'
+}) 
+}
+if (nut > 0){
+  ser.push({
+perc: nut,
+color: '#EB9CEE'
+}) 
+}
+ser = ser
+return ser
+}
+let ser = xyz();
+
     onMount(async () => {
- ok = percentage(noofusersOk, noofusers)
-nook = percentage(noofusersNo, noofusers) + ok
-nut = percentage(noofusersWaiting, noofusers) + ok
-console.log(ok, nook , nut, name, projectName);
+xyz()
 var a = moment(sqadualedf);
 var b = moment(sqadualed);
 yers = a.diff(b, 'years', true).toFixed(2); 
 monts = a.diff(b, 'months', true).toFixed(2); 
-console.log(yers,monts)
+
 })
 
        function coinLapach() {
@@ -389,7 +415,9 @@ async function afreact (){
   slideTo(1)
  }
 </script>
-
+{#await ser}
+<h1>..</h1>
+{:then ser}
 
     <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -467,14 +495,20 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
   }}
 >
   <SwiperSlide
-    ><div
-	class="{`normSml${pendId}-${projectId}-hh`}" id="normSml" 
->
- <a  href={`/project/${projectId}-hh`}>
+    >  
+
+    <div
+	 id="normSml" 
+>  <div style="position:absolute; top:-10%; left:-8%; width:120%; height:120%;">
+  <ProgressBar series={ser} width={"95%"} textSize={0}  thickness={4} style={"radial"} >  
+   <SvelteTooltip tip="משא ומתן" top color="var(--gold)"><title>התפלגות ההצבעות</title></SvelteTooltip>
+</ProgressBar></div>
+
+ <a  href={`/project/${projectId}`}>
         <img class="img"
          src={src}  alt="projectlogo" title={projectName}>
     </a>
-            <h1 class="pn">{name}</h1>
+            <h1 class="{`normSml${pendId}-${projectId}-hh`} pn" >{name}</h1>
         {#if kindOf === "perUnit"}
        <p class="p"><SvelteTooltip tip="שווי ליחידה" top color="var(--gold)"><span style="color:var(--gold)" title="שווי ליחידה">{easy > 0 ? easy : price}</span></SvelteTooltip> * <span style="color: aqua" title="כמות ">{hm}</span> = {easy > 0 ? easy * hm : price * hm} </p>
    {:else if kindOf === "total" || kindOf === "rent"}
@@ -487,26 +521,14 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 
 
        <p class="p"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
-       <!--  <svg height="10" width="120">
-  <defs>
-    <linearGradient id="solids" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-      <stop offset={`${ok}%`} style="stop-color:rgb(255,0,0);stop-opacity:1" />
-      <stop offset={`${ok}%`} style="stop-color:rgb(0,255,0);stop-opacity:1" />
-      <stop offset={`${nut}%`} style="stop-color:rgb(0,255,0);stop-opacity:1" />
-      <stop offset={`${nut}%`} style="stop-color:rgb(0,0,255);stop-opacity:1" />
-      <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="120" height="10" fill="url(#solids)" />
-</svg> 
-       -->
+   
 </div>
 
 </SwiperSlide
   ><SwiperSlide
     ><div  id="normSmll"
  >
+
         <a  href={`/project/${projectId}`}
         ><h3 class="pn">{projectName}</h3></a>
         <div class="{`normSmll${pendId}-${projectId}-hh`}">
@@ -566,7 +588,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 </Swiper>
 </div>
 
-
+{/await}
 <style>
   .j{
   font-size:12px;
@@ -609,7 +631,8 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
    line-height: 0.7; 
   }
   .pn{
-     margin: 2px; 
+     margin-top: -5px; 
+     margin-bottom: 2px;
      font-size: 8px; 
      line-height: 1; 
      font-weight: bold;
@@ -634,13 +657,13 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
      font-weight: bold;
   }
   .img{
+    padding: 5px;
     margin-top: 0px;
-     margin-bottom: 0px;
       margin-right:auto;
        margin-left: auto;
      border-radius: 50%;
-     width: 22px;
-      height : 22px;
+     width: 40px;
+      height : 40px;
   }
     input[type=text]{
     -webkit-border-radius: 20px;
@@ -769,8 +792,8 @@ width:50vw;
       
   }
   .img{
-     width: 32px;
-      height : 32px;
+     width: 46px;
+      height : 46px;
   }
 	.normSml{
         min-height: 125px;
