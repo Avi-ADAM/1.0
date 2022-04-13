@@ -22,7 +22,6 @@ let isOpen = false;
 
     let url1 = "https://onelovevone.onrender.com/upload";
     let updX = 0;
-    let meData = [];
   let token; 
   let files;
   let idLi;
@@ -50,6 +49,7 @@ let addNs1 = true;
   let addP = false;
     let st = 0;
     let stylef = '31px';
+    let meData = start();
 
 function letters(data){
   console.log(data);
@@ -162,7 +162,7 @@ function project (id) {
     goto("/moach", );
   };
 let mail;
-onMount(async () => {
+async function start () {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -203,7 +203,6 @@ onMount(async () => {
  } )})
   .then(r => r.json())
   .then(data => meDataa = data);
-         console.log(meDataa)
          if (meDataa.data.me.id === idL && meDataa.data.me != null){
    meData =  meDataa.data.user
        mail = meData.email;
@@ -228,7 +227,8 @@ onMount(async () => {
         } catch (e) {
             error1 = e
         }
-    });
+        return meData
+    };
   
 let userName_value;
 let biog;
@@ -481,9 +481,15 @@ async function han (){
         }
 }
 </script>
+
   <svelte:head>
   <title>פרופיל והגדרות 1❤️1</title>
 </svelte:head>
+{#await meData}
+<div class="body grid items-center justify-center">
+         <RingLoader size="260" color="#EEE8AA" unit="px" duration="2s"></RingLoader>
+         </div> 
+{:then meData}
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
@@ -1135,7 +1141,7 @@ class=" hover:scale-150 "
   <Addnew userName_value={meData.username}/> 
   {/if}
  <!-- המשימות שסיימתי-->         
-
+{/await}
   <style>
  
   .name { transition: all .2s ease-in-out;

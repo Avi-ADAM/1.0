@@ -1,11 +1,12 @@
 <script>
-        import pic from './../../celim/pic.js'  
+        import pic from './../../celim/pic.js' 
+       import Tooltip from './../../celim/tooltip.svelte'
 export let fmiData = [];
   export let hagdel = false;
    import { onMount } from 'svelte'; 
 export let rikmashes = [];
   export let meData = [];
-	import SvelteTooltip from 'svelte-tooltip';
+//	import SvelteTooltip from 'svelte-tooltip';
 
 // what about hours alrerady done to  mission in progres 
 function remove (id) {
@@ -205,8 +206,9 @@ let fir,ssec;
     {#if hagdel === false}
     <div style =" margin-left: auto; margin-right:auto;" class="flex flex-col items-center justify-center ">
       <h1 style =" margin-top: 20px ;" class="text-barbi text-bold text-2xl">חלוקת שווי הריקמה</h1>
-      <SvelteTooltip tip="{fir}: {ssec}%" top color="var(--gold)">
-      <svg width="250px" height="250px" style="display: inline; margin: 20px auto;" viewBox="0 0 64 64" class="pie">
+      <div class="pie">
+       <Tooltip title="{fir}: {ssec}%" >
+   <svg width="250px" height="250px" style="display: inline; margin: 20px auto;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
         <defs>
   <pattern id={use.imid} patternUnits="userSpaceOnUse" width="100" height="100">
@@ -214,12 +216,11 @@ let fir,ssec;
   </pattern>
 </defs>
   <circle on:mouseenter={x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
-  <title>{use.un}: {use.p.toFixed(2)}%</title>
  
  </circle>
   {/each}
-</svg>
- </SvelteTooltip>
+</svg> </Tooltip>
+</div>
 </div>
 
 <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
@@ -443,7 +444,7 @@ let fir,ssec;
   <style>
 .pie {
   width: 250px;
-  background: #f06;
+  background: transparent;
   border-radius: 50%;
 }
 

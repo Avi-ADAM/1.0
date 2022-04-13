@@ -29,6 +29,7 @@
 //import { validate_component } from 'svelte/internal';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
+let idL;
 
 let isOpen = false;
 let a = 0;
@@ -88,33 +89,32 @@ let bmimData = [];
   //  totalneed = newwork;
   //  });
     let error1 = null;
-   let meData = start ();
-    let srcP; 
+      let srcP; 
    let desP;
    let projectname;
   let token; 
   let linkP;
+  
  
   let descPri;
   let omiData = [];
   let pmiData = [];
   let project = [];
 let projectUsers =[];
-let idL;
 let vallues = [];
 let ata = [];
 let restime;
 let valit;
-let projects = [];
 let user = [];
 let rikmashes = [];
 let lll;
 let opmash = [];
 let noofopenm = 0;
 let salee = [];
-onMount(async () => {
- start ()
-})
+let trili = [];
+let projects = prog();
+let meData = start ();
+
 //sale {id in}
 let users;
 async function start () {
@@ -128,8 +128,8 @@ async function start () {
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
-  idL = cookieValueId;
-    token  = cookieValue; 
+ let idL = cookieValueId;
+  let  token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     const idpree = 0;
  const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -286,7 +286,7 @@ JSON.stringify({query:
             if (project.profilePic !== null){
             srcP = project.profilePic.url;
             }
-
+            trili = meData.tosplits;
            pre(projectUsers, fmiData)
         } catch (e) {
             error1 = e;
@@ -300,8 +300,13 @@ JSON.stringify({query:
            } catch (e) {
             error1 = e;
             console.log(error1);
-  } } else {
-           const cookieValue = document.cookie
+  } 
+  return meData
+} 
+};
+async function prog (){
+    if ($idPr == 0){
+   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
@@ -341,16 +346,13 @@ JSON.stringify({query:
  })
   .then(r => r.json())
   .then(data => user = data.data.user);
-            console.log(user);
-            meData = user.projects_1s;
-          console.log(projects);
+            projects = user.projects_1s;
         } catch (e) {
             error1 = e
         }
-        }
-  return meData
-};
-
+  return projects
+      } 
+}
     function pre(projectUsers, fmiData){
 
     }
@@ -961,7 +963,7 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
    
 function projectn (id) {
     idPr.set(id);
- start ()
+    goto("/moach", );
 };
 let needr = [];
 let loadr = false;
@@ -1037,10 +1039,13 @@ function masi(){
 
 </svelte:head>
 <div class="alli"></div>
-{#await meData then }
 
     {#if $idPr }
-    
+    {#await meData }
+<div class="alli grid items-center justify-center">
+         <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>
+         </div> 
+         {:then meData}
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
@@ -1326,7 +1331,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     />{/if}</div>
 </div>
     <div class=" p-2">
-      <Hamatanot trili={meData.tosplits} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
+      <Hamatanot {trili} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>
       {#if fmiData.length > 0 || rikmashes.length > 0}
         <div class="m-4 border-2  border-barbi rounded p-4" >
@@ -1361,11 +1366,17 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     לשלוח אותו לרקמה ציבורי לקחת ID וכו'
     <h1 class="bg-white">לא מורשה</h1>
     {/if}-->
+    {/await}
  {:else }  
+ {#await projects }
+<div class="alli grid items-center justify-center">
+         <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>
+         </div> 
+         {:then projects}
  <div class="flex text-center flex-col border-2  border-barbi rounded m-4">
 <h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
  
-           {#each meData as data, i}
+           {#each projects as data, i}
           
           <button
           class=" border  border-barbi hover:border-gold font-bold border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold p-0.5 m-2 rounded-full"
@@ -1374,9 +1385,9 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
           </button>
   {/each}
 
- </div> 
+ </div>  {/await}
+
  {/if}
- {/await}
 
  <style>
    .alli{
