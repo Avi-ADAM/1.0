@@ -411,6 +411,9 @@ async function afreact (){
  function toggleShow (){
   slideTo(1)
  }
+ $: w = 0;
+   console.log(w)
+
 </script>
 {#await ser}
 <h1>..</h1>
@@ -474,11 +477,11 @@ title="ביטול"
 </DialogOverlay>
 
 
-<div
+<div 
 use:clickOutside on:click_outside={toggleShow} 
 class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
  
-<Swiper
+<Swiper 
   on:swiper={setSwiperRef}
   effect={"flip"}
     loop={true}
@@ -492,8 +495,8 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     prevEl: `.normSmll${pendId}-${projectId}-hh`,
   }}
 >
-<div style="position:absolute; top: -10%; left: -10%; ">
-  <ProgressBar series={ser} width={142} textSize={0}  thickness={4}   style="radial"/>  
+<div bind:clientWidth={w} style="position:absolute; top: -10%; left: -10%; width: 113%;">
+  <ProgressBar series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
   <SwiperSlide
     >  
@@ -624,7 +627,6 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
   .p{
     font-weight: bold;
 
-  margin-bottom: -5px;
   }
   .mn{
     font-weight: bold;
@@ -640,8 +642,8 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
       margin-right:auto;
        margin-left: auto;
      border-radius: 50%;
-     width: 40px;
-      height : 40px;
+     width: 25px;
+      height : 25px;
   }
     input[type=text]{
     -webkit-border-radius: 20px;
@@ -696,6 +698,8 @@ input[type=text]:invalid {
     }
 	
     #normSml{
+              font-size: 9px;
+
          text-shadow: 1px 1px  rgb(63, 56, 18);
         color: var(--barbi-pink);
          min-height: 75px;
@@ -704,7 +708,7 @@ input[type=text]:invalid {
     max-height: 94%;
     aspect-ratio: 1/ 1;
         border-radius: 50%;
-        line-height: 0.8;
+        line-height: normal;
         text-align: center;
         background: url(https://res.cloudinary.com/love1/image/upload/v1646078558/niceCoin_usali2.jpg);
     background-position: center; 
@@ -762,7 +766,6 @@ width:50vw;
     
   }
   .pn{
-     font-size: 13px; 
     padding: 0 15px;
   }
       .p{
