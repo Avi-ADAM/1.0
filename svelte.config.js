@@ -1,17 +1,18 @@
 import vercel from '@sveltejs/adapter-vercel';
 
 import preprocess from "svelte-preprocess";
+
 /** @type {import('@sveltejs/kit').Config} */
 const config = {
-    kit: {
-    },
-    preprocess: [preprocess({
-        "postcss": true
-    })]
+  kit: {
+  },
+  preprocess: [preprocess({
+    "postcss": true
+  })]
 };
 export default {
   kit: {
-    adapter: vercel(),
+    adapter: vercel()
   },
 };
 // Workaround until SvelteKit uses Vite 2.3.8 (and it's confirmed to fix the Tailwind JIT problem)

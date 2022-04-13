@@ -7,15 +7,14 @@
     "preview": "svelte-kit preview"
   },
   "devDependencies": {
-    "@sveltejs/adapter-vercel": "1.0.0-next.47",
-    "@sveltejs/kit": "^1.0.0-next.310",
+    "@sveltejs/adapter-vercel": "next",
+    "@sveltejs/kit": "^1.0.0-next.311",
     "autoprefixer": "^10.4.4",
     "layercake": "^6.1.0",
     "postcss-load-config": "^3.1.4",
     "svelte": "^3.47.0",
     "svelte-loading-spinners": "^0.1.7",
-    "svelte-tooltip": "^1.2.0",
-    "tailwindcss": "^3.0.23"
+    "tailwindcss": "^3.0.24"
   },
   "dependencies": {
     "@fontsource/fira-mono": "^4.5.7",
@@ -30,6 +29,7 @@
     "d3-hierarchy": "^3.1.2",
     "d3-scale": "^4.0.2",
     "kit-sw-workbox": "^1.0.2",
+    "local-access": "^1.1.0",
     "lodash.has": "^4.5.2",
     "lodash.isequal": "^4.5.0",
     "moment": "^2.29.2",

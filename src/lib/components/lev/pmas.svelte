@@ -1,17 +1,14 @@
 <script>
     import { clickOutside } from './outsidclick.js';
-    import { scale, fly } from 'svelte/transition';
+    import {  fly } from 'svelte/transition';
    import { createEventDispatcher } from 'svelte';
   import Nego from '../prPr/negoM.svelte';
    import { onMount } from 'svelte'; 
- import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+ import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
-//import { diffre } from 'moment';
   import moment from 'moment'
-	import SvelteTooltip from 'svelte-tooltip';
-
+         import Tooltip from './../../celim/tooltip.svelte';
   import ProgressBar from "@okrad/svelte-progressbar";
-  export let series = [];
  const dispatch = createEventDispatcher();
     export let mypos = null;
     export let whyno = [];
@@ -74,13 +71,13 @@ color: '#7EE081'
 if (nook > 0){
   ser.push({
 perc: nook,
-color: '#78bec7'
+color: '#80037e'
 }) 
 }
 if (nut > 0){
   ser.push({
 perc: nut,
-color: '#EB9CEE'
+color: '#d30e81'
 }) 
 }
 ser = ser
@@ -477,9 +474,10 @@ title="ביטול"
 </DialogOverlay>
 
 
-<div 
+<div
 use:clickOutside on:click_outside={toggleShow} 
 class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
+ 
 <Swiper
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -494,23 +492,23 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     prevEl: `.normSmll${pendId}-${projectId}-hh`,
   }}
 >
+<div style="position:absolute; top: -10%; left: -10%; ">
+  <ProgressBar series={ser} width={142} textSize={0}  thickness={4}   style="radial"/>  
+</div>
   <SwiperSlide
     >  
 
     <div
 	 id="normSml" 
->  <div style="position:absolute; top:-10%; left:-8%; width:120%; height:120%;">
-  <ProgressBar series={ser} width={"95%"} textSize={0}  thickness={4} style={"radial"} >  
-   <SvelteTooltip tip="משא ומתן" top color="var(--gold)"><title>התפלגות ההצבעות</title></SvelteTooltip>
-</ProgressBar></div>
+> 
 
  <a  href={`/project/${projectId}`}>
         <img class="img"
          src={src}  alt="projectlogo" title={projectName}>
     </a>
-            <h1 class="{`normSml${pendId}-${projectId}-hh`} pn" >{name}</h1>
+           <h1 class="{`normSml${pendId}-${projectId}-hh`} pn" >{name}</h1>
         {#if kindOf === "perUnit"}
-       <p class="p"><SvelteTooltip tip="שווי ליחידה" top color="var(--gold)"><span style="color:var(--gold)" title="שווי ליחידה">{easy > 0 ? easy : price}</span></SvelteTooltip> * <span style="color: aqua" title="כמות ">{hm}</span> = {easy > 0 ? easy * hm : price * hm} </p>
+       <p class="p"><Tooltip title="שווי ליחידה"><span style="color:var(--gold)" >{easy > 0 ? easy : price}</span></Tooltip> * <Tooltip title="כמות"><span style="color: aqua" >{hm}</span></Tooltip> = {easy > 0 ? easy * hm : price * hm} </p>
    {:else if kindOf === "total" || kindOf === "rent"}
        <p class="p"><span style="color:var(--gold)" title="שווי">{easy > 0 ? easy : price}</span></p>
           {:else if kindOf === "monthly"}
@@ -520,7 +518,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 {/if}
 
 
-       <p class="p"><span style="color:var(--gold)" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
+       <p class="p"><span style="color:#7EE081;" title="בעד">{noofusersOk} </span><span style="color:#d30e81" title="לא הצביעו">{noofusersWaiting} </span><span style="color:#80037e;" title="נגד">{noofusersNo} </span></p>
    
 </div>
 
@@ -529,57 +527,45 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     ><div  id="normSmll"
  >
 
-        <a  href={`/project/${projectId}`}
-        ><h3 class="pn">{projectName}</h3></a>
-        <div class="{`normSmll${pendId}-${projectId}-hh`}">
-    {#if whyno.length > 0}<h4 style="color:var(--barbi); font-size:10px; font-weight:bold;">{whyno.join(' ~ ')}</h4>{/if} 
- {#if descrip !== undefined || null}<h5 class="pnn">{descrip}</h5>{/if}
-    {#if hearotMeyuchadot !== undefined || null || "undefined"}<h6 class="pnn">{hearotMeyuchadot}</h6>{/if}
-    </div>
-    <!--  <svg height="10" width="180">
-  <defs>
-    <linearGradient id="solids" x1="0%" y1="0%" x2="100%" y2="0%">
-      <stop offset="0%" style="stop-color:rgb(255,0,0);stop-opacity:1" />
-      <stop offset={`${ok}%`} style="stop-color:rgb(255,0,0);stop-opacity:1" />
-      <stop offset={`${ok}%`} style="stop-color:rgb(0,255,0);stop-opacity:1" />
-      <stop offset={`${nut}%`} style="stop-color:rgb(0,255,0);stop-opacity:1" />
-      <stop offset={`${nut}%`} style="stop-color:rgb(0,0,255);stop-opacity:1" />
-      <stop offset="100%" style="stop-color:rgb(0,0,255);stop-opacity:1" />
-    </linearGradient>
-  </defs>
-  <rect width="180" height="10" fill="url(#solids)" />
-</svg> -->
+      <Tooltip title="שווי ליחידה">  <a  href={`/project/${projectId}`}
+        ><h3 class="ab pn">{projectName}</h3></a></Tooltip>
+        <div class="{`normSmll${pendId}-${projectId}-hh`}">    </div>
+
+    {#if whyno.length > 0}<h4 class="bc" style:visibility={whyno.length > 0 ? "hidden"  : "visible"} style="color:var(--barbi); font-size:10px; font-weight:bold;">{whyno.join(' ~ ')}</h4>{/if} 
+ {#if descrip !== undefined || null}<h5 style:visibility={descrip !== undefined || null ? "hidden"  : "visible"} class="pnn cd">{descrip}</h5>{/if}
+    {#if hearotMeyuchadot !== undefined || null || "undefined"}<h6 style:visibility={hearotMeyuchadot !== undefined || null || "undefined"  ? "hidden"  : "visible"}  class="pnn de">{hearotMeyuchadot}</h6>{/if}
+   
      {#if already === false}
-                  <SvelteTooltip tip="אישור" top color="var(--gold)">
+                  <Tooltip title="אישור" >
    <button on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
-                   </SvelteTooltip>   
-          <SvelteTooltip tip="משא ומתן" top color="var(--gold)">
+                   </Tooltip>   
+          <Tooltip title="משא ומתן"  >
    <button on:click= {nego} style="margin: 0;" class = "btn" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
-                      </SvelteTooltip>   
-                           <SvelteTooltip tip="התנגדות" top color="var(--gold)">
+                      </Tooltip>   
+                           <Tooltip title="התנגדות"  >
    <button on:click={decline} style="margin: 0;" class = "btn"name="decline" title="התנגדות"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
-                        </SvelteTooltip>   
+                        </Tooltip>   
 
        {:else if already === true && mypos === true && whyno.length > 0 && allr === false}
-             <SvelteTooltip tip="אישור" top color="var(--gold)">
+             <Tooltip title="אישור"  >
        <button on:click={() => nego("alr")} style="margin: 0;" class = "btn" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
-                </SvelteTooltip>
-                         <SvelteTooltip tip="התנגדות" top color="var(--gold)">
+                </Tooltip>
+                         <Tooltip title="התנגדות"  >
        <button on:click={() => decline("alr")} style="margin: 0;" class = "btn"name="decline" title="התנגדות"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
-                       </SvelteTooltip>
-                            <SvelteTooltip tip="תגובה" top color="var(--gold)">
+                       </Tooltip>
+                            <Tooltip title="תגובה"  >
        <button class="text-barbi bg-gold j" on:click={() => react()}>תגובה</button>
-                             </SvelteTooltip>
+                             </Tooltip>
        {:else if already === true && mypos === false && diun.length > 0  && allr === false}
-         <SvelteTooltip tip="אישור" top color="var(--gold)">
+         <Tooltip title="אישור"  >
  <button on:click={() => agree("alr")} style="margin: 0;" class = "btn" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
-         </SvelteTooltip>
-                  <SvelteTooltip tip="משא ומתן" top color="var(--gold)">
+         </Tooltip>
+                  <Tooltip title="משא ומתן"  >
         <button on:click={() => nego("alr")} style="margin: 0;" class = "btn" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
-                      </SvelteTooltip>
-        <SvelteTooltip tip="תגובה" top color="var(--gold)">
+                      </Tooltip>
+        <Tooltip title="תגובה"  >
         <button on:click={() => react()}>תגובה</button>
-                 </SvelteTooltip>
+                 </Tooltip>
         {/if}
     
 </div>
@@ -597,7 +583,7 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
   width: 13px;
   height: 13px;
   }
-    .ab{
+   .ab{
         grid-column: 1/3;
         grid-row: 1/ 2;
 
@@ -625,40 +611,32 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
     }
   .pnn{
   color:aqua;
-   margin: 2px;
-    font-size: 8px; 
+
     font-weight: bold; 
    line-height: 0.7; 
   }
   .pn{
-     margin-top: -5px; 
-     margin-bottom: 2px;
-     font-size: 8px; 
-     line-height: 1; 
+      padding: 0 9px;
+
      font-weight: bold;
      color: aqua;
   }
   .p{
-    margin: 2px;
-    font-size: 9px;
+    font-weight: bold;
+
+  margin-bottom: -5px;
   }
   .mn{
-  margin: 2px;
-   font-size: 9px;
     font-weight: bold;
      color: rgb(87, 208, 248 ); 
     line-height: 0.7; 
   }
   .na{
     color:aqua;
-     margin: 1px;
-      font-size: 8px;
        line-height: 1;
      font-weight: bold;
   }
   .img{
-    padding: 5px;
-    margin-top: 0px;
       margin-right:auto;
        margin-left: auto;
      border-radius: 50%;
@@ -694,18 +672,19 @@ input[type=text]:invalid {
      padding-right: 10px;
 }
    #normSmll{
+     display: grid;
+        font-size: 9px;
         text-align: center; 
         line-height: 0.8;
         align-items: center;
-        justify-content: safe center;
+        justify-content:  center;
         color: var(--barbi-pink);
        min-height: 75px;
     min-width: 75px;
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 94%;
+    max-height: 94%;
     aspect-ratio: 1 /1;
 
-         background-color: rgb(100, 224, 137);
          border-radius: 50%;
          text-shadow: 1px 1px  rgb(63, 56, 18);
 
@@ -721,8 +700,8 @@ input[type=text]:invalid {
         color: var(--barbi-pink);
          min-height: 75px;
     min-width: 75px;
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 94%;
+    max-height: 94%;
     aspect-ratio: 1/ 1;
         border-radius: 50%;
         line-height: 0.8;
@@ -756,6 +735,7 @@ input[type=text]:invalid {
   }
   :global([data-svelte-dialog-content].content) {
       width: 80vw;
+      z-index: 299;
   }
   @media (min-width: 568px){
     .btin{
@@ -767,27 +747,31 @@ width:50vw;
         }
   }
     @media  (min-width: 550px) {
-         
+       #normSml{
+      font-size: 13px; 
+      }
+       #normSmll{
+     display: grid;
+        font-size: 13px;
+        text-align: center; 
+        line-height: 0.8;
+       }
+        
        .pnn{
-   margin: 7px;
     font-size: 13px; 
     
   }
   .pn{
-     margin: 2px; 
      font-size: 13px; 
-    
+    padding: 0 15px;
   }
       .p{
-    margin: 7px;
     font-size: 13px;
   }
       .mn{
-  margin: 7px;
    font-size: 13px;
   }
       .na{
-     margin: 2px;
       font-size: 13px;
       
   }

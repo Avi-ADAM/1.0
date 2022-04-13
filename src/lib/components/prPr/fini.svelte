@@ -206,7 +206,7 @@ let fir,ssec;
     {#if hagdel === false}
     <div style =" margin-left: auto; margin-right:auto;" class="flex flex-col items-center justify-center ">
       <h1 style =" margin-top: 20px ;" class="text-barbi text-bold text-2xl">חלוקת שווי הריקמה</h1>
-      <div class="pie">
+      <div class="yy">
        <Tooltip title="{fir}: {ssec}%" >
    <svg width="250px" height="250px" style="display: inline; margin: 20px auto;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
@@ -442,6 +442,11 @@ let fir,ssec;
   
    
   <style>
+    .yy{
+      height: 280px;
+      width: 280px;
+      margin: 0 auto;
+    }
 .pie {
   width: 250px;
   background: transparent;
