@@ -7,7 +7,7 @@
     "preview": "svelte-kit preview"
   },
   "devDependencies": {
-    "@sveltejs/adapter-vercel": "next",
+    "@sveltejs/adapter-vercel": "1.0.0-next.47",
     "@sveltejs/kit": "^1.0.0-next.311",
     "autoprefixer": "^10.4.4",
     "layercake": "^6.1.0",
