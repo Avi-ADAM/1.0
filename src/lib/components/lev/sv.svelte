@@ -72,7 +72,7 @@ dispatch("disp",{
 }	
 }	
 .sh{
-  	animation: beat .75s infinite alternate;
+  	animation: beat 2.75s infinite alternate;
 	transform-origin: center;
 }
 
