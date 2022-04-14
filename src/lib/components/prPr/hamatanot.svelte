@@ -142,7 +142,7 @@ $: for (let i = 0; i < salee.length; i++){
               {#each bmiData as data, i}
             <td >              
               {#if data.quant > 0}
-            <h2 style="display:{data.kindOf == "unlimited" ? "none" : ""} ;">{data.quant}</h2> 
+            <p style="display:{data.kindOf == "unlimited" ? "none" : ""} ;">{data.quant}</p> 
             {/if}
             </td>
             {/each}

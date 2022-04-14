@@ -337,13 +337,13 @@ border: 1px solid red;
 	}
 
 .midscreenText-2 {
-     margin: 17vh auto 0 auto;
+     margin: 18vh auto 0 auto;
       align-self: center;
       justify-self: center;
 	  max-width: 100vw;
       font-size: 1.8rem;
       line-height: normal;
-      font-weight: 900;
+text-shadow: 1px 1px purple;
       color: var(--barbi-pink);
       background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
       background-size: 29.5rem 9.75rem;

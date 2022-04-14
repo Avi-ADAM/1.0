@@ -533,7 +533,7 @@ on:click={bitulm}
       {#if addSl == false}
       <div class="another" style="margin: auto"> 
  
-        <h6 style="font-weight: bold;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">ה{Valname} שלי</h6>
+        <h6 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">ה{Valname} שלי</h6>
        {#if data} <span class="d"> {#each data as dat, i}
            <p style="margin: 0; line-height: 1; color:aqua; padding: auto;" class="t">{dat[valc]}</p>
            {/each} </span>{/if}
@@ -556,7 +556,7 @@ on:click={bitul}
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
  
-   <h6 class="text-center text-sm text-barbi">עריכת ה{Valname} שלי </h6>
+   <p class="text-center text-sm text-barbi">עריכת ה{Valname} שלי </p>
      {#if data} {#each data as da, i}
   <div class="text-center text-sm text-lturk">
        <button class="text-gold hover:text-barbi"  title={less} on:click={min(da.id , da[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
@@ -586,7 +586,7 @@ on:click={edit(da.id)}
    {/if}
 <br>
  
-  <span > <h3 class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </h3>  <MultiSelect
+  <span > <p class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </p>  <MultiSelect
       bind:selected={data.selected2}
       {placeholder}
       options={allvn}

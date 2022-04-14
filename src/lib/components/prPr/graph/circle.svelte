@@ -37,9 +37,9 @@ export let data = [];
         valueKey={valueKey}
         fill='#ff0092'
         stroke='#9f0080'
-        textColor='#61004e'
+        textColor='#EEE8AA'
         textStroke='#ffdbf8'
-        textStrokeWidth={1}
+        textStrokeWidth={0}
       />
     </Html>
   </LayerCake>

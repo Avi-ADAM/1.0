@@ -544,7 +544,7 @@ function erorer(){
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
- <h1 dir="rtl" style="color:var(--barbi-pink);  font-weight: 900;">
+ <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
      הצהרת העצמאות האישית של 
         <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  
         :
@@ -850,9 +850,8 @@ background-color :var(--gold) ;
    
     padding: 1.5em 1em 1em 1em;
     font-size: 120%;
-    font-family: 'StamSefarad', serif;
+    font-family: 'StamSefarad', 'Rubik';
     text-align: center;
-    font-weight: 900;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: 180vw 180vh;
     background-repeat: no-repeat;
@@ -1018,7 +1017,6 @@ background-color: var(--gold);
     font-size:20px;
     font-family: 'StamSefarad', serif;
     text-align: center;
-    font-weight: 900;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: 900px;
     background-repeat: no-repeat;
@@ -1117,7 +1115,6 @@ background-position: center;
     font-size:25px;
     font-family: 'StamSefarad', serif;
     text-align:center;
-    font-weight: 900;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: 1100px;
     background-repeat: no-repeat;
@@ -1236,7 +1233,6 @@ position: absolute;
     font-size:22px;
     font-family: 'StamSefarad', serif;
     text-align:center;
-    font-weight: 900;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
     background-size: 1150px  ;
     background-repeat: no-repeat;

@@ -176,7 +176,7 @@ select.round:focus {
 }
 
 .input {
-  font-family: 'Roboto', sans-serif;
+
   border: none;
   margin: 0;
   padding: 10px 0;
@@ -191,7 +191,7 @@ select.round:focus {
 }
 
 .label {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   right: 0;

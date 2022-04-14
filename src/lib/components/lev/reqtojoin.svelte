@@ -407,7 +407,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
 >
   <SwiperSlide
     ><div
-	class="{`normSml${askId}-noo`}" id="normSml" 
+	 id="normSml" 
 >
 <div
     style="--the:{stylef};"
@@ -429,6 +429,7 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                                
                                                          <a sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}>
                                                 <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
+                                                   <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
                                                         width='56px'
                                                         height='56px'
@@ -441,11 +442,10 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                                             <text fill="#EEE8AA " text-anchor="middle" x='0' y='46' style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;">{useraplyname}</text>
                                                         </a>        
 
-                                                
-                                                
+                                            
                                                 <path id="curvee" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                                                     <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
-                                                        <textPath color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
+                                                        <textPath font-family="Rubik" color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
                                                             {openmissionName}
                                                         </textPath>
                                                     </text>
@@ -460,26 +460,15 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
 <path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"></path>
                                                   </g> -->   
                                                 </svg>
-                                                    <!--  <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="32" height="32" alt="projectlogo" title={projectName}>
-        <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName}</h3></a>
-        <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: rgb(87, 208, 248 ); line-height: 0.7; ">{openmissionName}</h1>
-        <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="32" height="32" alt="user aplly pic" title={useraplyname}>
-        <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{useraplyname}</h3></a>        
-        <button1 on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin"><i class="far fa-check-circle"></i></button1>
-        <button3 on:click= {nego} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>
-        <button2 on:click={decline} style="margin: 0;" class = "btn"name="decline"><i class="far fa-times-circle"></i></button2>
-        <button on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin"><i class="far fa-check-circle"></i></button>
-                                                    <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>
-                                                    <button on:click={decline} style="margin: 0;" class = "btn"name="decline"><i class="far fa-times-circle"></i></button>
-                                                    -->
+                                               
                                                     </div>
 
 </div>
 </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${askId}-noo`}" id="normSmll"
+    ><div  id="normSmll"
 >
-        {#if deadline}    <h5 class="hslink ab">{deadline}</h5>{/if}
+        {#if deadline}    <h5 class="hslink ab {`normSmll${askId}-noo`}">{deadline}</h5>{/if}
          {#if missionDetails}   <h6 class="hslink bc">{missionDetails}</h6>{/if}
             <h5 class="hslink cd">{role}</h5>
             <h6 class="hslink de">{skills}</h6>

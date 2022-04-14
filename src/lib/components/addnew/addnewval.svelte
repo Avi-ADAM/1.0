@@ -119,7 +119,7 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded-fu
 }
 
 .input {
-  font-family: 'Roboto', sans-serif;
+
   border: none;
   margin: 0;
   padding: 10px 0;
@@ -134,7 +134,7 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded-fu
 }
 
 .label {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   right: 0;

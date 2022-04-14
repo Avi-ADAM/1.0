@@ -196,7 +196,7 @@ height: 44px;
 }
 
 .input {
-  font-family: 'Roboto', sans-serif;
+
   border: none;
   margin: 0;
   padding: 10px 0;
@@ -211,7 +211,7 @@ height: 44px;
 }
 
 .seci {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   right: 0;
@@ -223,7 +223,7 @@ height: 44px;
 }
 
 .label {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   right: 0;

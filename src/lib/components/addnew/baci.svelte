@@ -317,7 +317,7 @@ addval == false;
 <option value="sevend">שבוע</option>
 
 </select>
-<small style="color: red;">לאחר זמן זה חוסר מענה יחשב כהסכמה</small>
+<small style="color: turquoise;">לאחר זמן זה חוסר מענה יחשב כהסכמה</small>
 </div>
   {#if loading == false}
 
@@ -433,7 +433,6 @@ select.round:focus {
 }
 
 .input {
-  font-family: 'Roboto', sans-serif;
   border: none;
   margin: 0;
   padding: 10px 0;
@@ -449,7 +448,7 @@ select.round:focus {
 
 
 .label {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   right: 0;
@@ -476,8 +475,8 @@ select.round:focus {
 }
 
 .input:focus ~ .label, .input:valid ~ .label {
-  font-size: 11px;
-  color: var(--barbi-pink);
+  font-size: 14px;
+  color: turquoise;
   top: 0;
 }
 .input:focus ,.input:valid  {

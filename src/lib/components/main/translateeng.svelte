@@ -61,23 +61,24 @@ already = true;
 }
 
   </script>
+
 <h1 class="text-center text-lturk">translate to another language</h1>
        <br>
 
-<div class='textinput first'>
+<div class='textinput first' dir="ltr">
   <textarea id="hoursny" name="hoursn "  bind:value={amort} class='input d' required></textarea>
   <label for="hoursny" class='firsty'>{amorta}</label>
   <span class='line'></span>
 </div>
 <br>
-<div  class='textinput sec'>
+<div  class='textinput sec' dir="ltr">
   <textarea id="hoursn" name="hoursn"  bind:value={amorts} class='input d' required></textarea>
   <label for="hoursn" class=' seci'>{amortsa}</label>
   <span class='line'></span>
 </div>
 <br>
 
-<div  class='textinput sec'>
+<div  class='textinput sec' dir="ltr">
   <textarea id="hoursna" name="hoursn"  bind:value={amortt} class='input d' required></textarea>
   <label for="hoursna" class='seci'>{amortta}</label>
   <span class='line'></span>
@@ -223,7 +224,7 @@ height: 44px;
 
 }
 .input {
-  font-family: 'Roboto', sans-serif;
+
   border: none;
   margin: 0;
   padding: 10px 0;
@@ -238,7 +239,7 @@ height: 44px;
 }
 
 .seci {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   right: 0;
@@ -249,7 +250,7 @@ height: 44px;
   user-select: none;
 }
 .firsty {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   left: 0;
@@ -260,7 +261,7 @@ height: 44px;
   user-select: none;
 }
 .label {
-  font-family: 'Roboto', sans-serif;
+
   font-size: 15px;
   position: absolute;
   left: 0;

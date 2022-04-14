@@ -97,11 +97,10 @@ grid-column: 1 /6;
   grid-row: 1/ 2;
   align-self: center;
   justify-self: center;
-  font-size: 1.7rem;
+  font-size: 1.5rem;
   line-height: normal;
-  font-weight: 900;
       margin-top: 4vh;
-
+text-shadow: 1px 1px black;
   color: var(--barbi-pink);
   background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
   background-size: 29.5rem 9.75rem;
@@ -127,7 +126,7 @@ grid-column: 1 /6;
 .a1 {
 overflow: hidden; /* Ensures the content is not revealed until the animation */
   white-space: nowrap; /* Keeps the content on a single line */
-  margin: 0 auto; /* Gives that scrolling effect as the typing happens */
+  margin: 10px auto 0 auto; /* Gives that scrolling effect as the typing happens */
   letter-spacing: normal; /* Adjust as needed */
      /* border-left: .15em solid orange; The typwriter cursor */
      visibility: hidden;
@@ -153,7 +152,8 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
 
 }
 .a3 {
-text-shadow: 1px 1px var(--lturk) ;
+text-shadow: 1px 1px purple ;
+font-size: 1.7rem;
 overflow: hidden; /* Ensures the content is not revealed until the animation */
   white-space: nowrap; /* Keeps the content on a single line */
   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
