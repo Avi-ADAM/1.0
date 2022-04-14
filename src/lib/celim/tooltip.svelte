@@ -33,10 +33,12 @@
 
 <style>
 	.tooltip {
+        z-index: 999;
+        text-shadow: 1px 1px  black;
 		border: 1px solid rgb(239, 45, 178);
 		box-shadow: 1px 1px 1px rgb(224, 165, 211);
-		background: var(--gold);
-        color: var(--barbi-pink);
+		background: linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);;
+        color: var(--mturk);
 		border-radius: 4px;
 		padding: 4px;
 		position: absolute;

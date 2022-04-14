@@ -961,9 +961,10 @@ upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, even
     }
     
    
-function projectn (id) {
+async function projectn (id) {
     idPr.set(id);
-    goto("/moach", );
+    await  goto("/moach");
+    meData = await start()
 };
 let needr = [];
 let loadr = false;

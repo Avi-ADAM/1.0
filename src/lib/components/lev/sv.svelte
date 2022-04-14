@@ -2486,7 +2486,6 @@ dispatch("disp",{
 <path d="m54.194 578.6c0.9061 2.9202 1.8341 5.8479 2.7888 8.785l3.5653-3.3107-6.3541-5.4743z" fill="url(#levlevih)"/>
 </g>
   <g on:mouseenter={()=>hover("j")} on:mouseleave={()=>hover("j")} on:click={()=>disp(pmashs)} name="number " class="btn am" transform="{jj}">
-    <title>הצגת הצעות להשקעת משאבים ברקמות בלבד</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="#dfbbbb" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevey)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -2506,7 +2505,6 @@ dispatch("disp",{
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 47.887 117.55)" x="122.391" y="477.71" fill="url(#levlevdd)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{mashs}</text>
 </g>
   <g on:mouseenter={()=>hover("q")} on:mouseleave={()=>hover("q")} on:click={()=>disp(pmaap)} name="number " class="btn aw" transform="{qq}">
-    <title>הצגת אישור קבלת משאבים לרקמות בלבד</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevbl)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevbm)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -2526,8 +2524,6 @@ dispatch("disp",{
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{maap}</text>
 </g>
        <g on:mouseenter={()=>hover("a")} on:mouseleave={()=>hover("a")} on:click={()=>disp(sugg)} name="number " class="btn a" transform="{aa2}">
-    <title>הצגת הצעות לרקמות בלבד</title>
-
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapd)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevapc)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -2548,7 +2544,6 @@ dispatch("disp",{
 </g>
 
 <g  on:mouseenter={()=>hover("b")} on:mouseleave={()=>hover("b")} on:click={() => disp(pend)}  class="btn"  name="number o"  transform="{bb}">
-  <title>הצגת פעולות ממתינות לאישור</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="#fff" opacity=".89224" stroke="url(#levlevcn)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevfc)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevcm)" stroke-width=".16015px"/>
@@ -2585,7 +2580,6 @@ dispatch("disp",{
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevds)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(5, 5, 5)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
-<title>הצגת בקשות הצטרפות לרקמות בלבד</title>
 </g>
 <g transform="matrix(1.1568 0 0 1.0803 -24.933 7.8349)" style="">
 
@@ -3133,7 +3127,6 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevex)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{des}</text>
-<title>הצגת החלטות ממתינות למענה בלבד</title>
 </g>
 <g on:mouseenter={()=>hover("e")} on:mouseleave={()=>hover("e")} on:click={() => disp(betaha)}  class="btn"  name="number of m" transform="{ee}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
@@ -3153,18 +3146,15 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevei)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{beta}</text>
-<title>הצגת פעולות בתהליך ביצוע בלבד</title>
 </g>
 <g on:mouseenter={()=>hover("h")} on:mouseleave={()=>hover("h")} transform="{hh}" style="">
   <a sveltekit:prefetch 
     href="/me" >
 <path d="m-24.698 44.139h20v1.219h-20v-1.219zm0-8.536 5 1.828 5-3.657 5 3.657 5-1.828v7.316h-20v-7.316z" fill="url(#levlevaw)" stroke="url(#levlevfb)" stroke-miterlimit="5" stroke-width=".57906px"/>
 <text transform="matrix(.075915 0 0 .081691 -14.883 40.747)" fill="rgb(0, 81, 88)" font-family="Arial, sans-serif" font-size="28px" font-weight="700" letter-spacing="1.6px" text-anchor="middle" style="white-space:pre">{name}</text>
-  <title>ללוח הבקרה האישי</title>
     </a>
 </g>
 <g on:mouseenter={()=>hover("y")} on:mouseleave={()=>hover("y")} on:click={()=>disp(ppmash)} name="number " class="btn ap" transform="{yy}">
-    <title>הצגת הצבעות על בקשת משאבים לרקמות בלבד</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevav)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevau)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3184,7 +3174,6 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(54, 59, 56)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pmash}</text>
 </g>
  <g on:mouseenter={()=>hover("x")} on:mouseleave={()=>hover("x")} on:click={()=>disp(askmap)} name="number " class="btn amp" transform="{xx}">
-    <title>הצגת בקשות להצטרפות ולהשקעת משאבים ברקמות בלבד</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdc)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevdb)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3204,7 +3193,6 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevbw)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{askma}</text>
 </g>
 <g on:mouseenter={()=>hover("f")} on:mouseleave={()=>hover("f")} on:click={() => disp(welc)}  class="btn"  name="number of op" transform="{ff}">
-<title>הצגת קבלות פנים לרקמות בלבד</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevaqf)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevaqe)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3224,7 +3212,6 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(62, 78, 77)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{wel}</text>
 </g>
 <g on:mouseenter={()=>hover("g")} on:mouseleave={()=>hover("g")} on:click={() => disp(fiap)}  class="btn" name="number of p" transform="{gg}">
-  <title>הצגת אישור פעולות שהסתיימו בלבד</title>
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapr)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevapq)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
