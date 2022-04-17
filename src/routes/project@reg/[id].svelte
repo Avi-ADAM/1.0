@@ -93,13 +93,13 @@ onMount(async () => {
   </div>
 <h1 class="q">{project.projectName}</h1>
 {#if project.publicDescription !== null}
-<h6 class="text-barbi text-center">{project.publicDescription}</h6>
+<p class="text-barbi text-center">{project.publicDescription}</p>
 {/if}
 <div style="background-color: var(--mturk); margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--gold);" class="3">
     <h2 style="color: var(--barbi-pink);
 " >1 ברקמה </h2>
 {#each projectUsers as user}
-<a sveltekit:prefetch href={`/user/${user.id}`}><h6 class="text-gold hover:text-barbi">{user.username}</h6></a>
+<a sveltekit:prefetch href={`/user/${user.id}`}><p class="text-gold hover:text-barbi">{user.username}</p></a>
 {/each}
 </div>
 

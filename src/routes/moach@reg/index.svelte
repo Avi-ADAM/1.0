@@ -1121,7 +1121,7 @@ function masi(){
           </button>
   <h1 class="1 ">{projectname}</h1>
   {#if project.publicDescription}
-   <h6 class="2 ">{desP}</h6>
+   <p class="2 ">{desP}</p>
   {/if}
   {#if project.descripFor}
    <p>{descripFor}</p>
@@ -1141,7 +1141,7 @@ function masi(){
   <div class="flex flex-row flex-wrap justify-between"> 
 
   {#each vallues as vallue, i }
-    <h3> {vallue.valueName} </h3>
+    <p> {vallue.valueName} </p>
   {/each}</div></div>
   <!--
   <div>

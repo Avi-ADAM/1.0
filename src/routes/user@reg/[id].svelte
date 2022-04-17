@@ -109,26 +109,26 @@ let error1 = null;
 <div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h6  style="font-size:23px; color:var(--barbi-pink); ">הכישורים שלי </h6>
     {#each uskill as dat, i}
-       <h3 class="text-gold">{dat.skillName}</h3>
+       <p class="text-gold">{dat.skillName}</p>
        {/each}
       </div>
 <div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h6  style="font-size:23px; color:var(--barbi-pink); ">התפקידים שלי </h6>
     {#each ur as dat, i}
-       <h3 class="text-gold">{dat.roleDescription}</h3>
+       <p class="text-gold">{dat.roleDescription}</p>
        {/each}
       </div>
       <div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h6  style="font-size:23px; color:var(--barbi-pink); ">דרכי העבודה שלי </h6>
     {#each  uww as dat, i}
-       <h3 class="text-gold">{dat.workWayName}</h3>
+       <p class="text-gold">{dat.workWayName}</p>
        {/each}
       </div>
 <div style="margin: 2px; background-color: var(--mturk); text-align:center; padding: 10px; border: 2px solid var(--gold);" >
     <h1 style="font-size:23px; color:var(--barbi-pink); ">הרקמות שלי</h1>
   {#each projects as data, i}
     
-  <a class="text-gold hover:text-barbi hover:scale-150" sveltekit:prefetch href={`/project/${data.id}`} ><h3>{data.projectName}</h3></a>
+  <a class="text-gold hover:text-barbi hover:scale-150" sveltekit:prefetch href={`/project/${data.id}`} ><p>{data.projectName}</p></a>
    
     {/each} 
   

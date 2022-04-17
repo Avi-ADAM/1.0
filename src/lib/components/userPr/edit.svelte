@@ -656,7 +656,7 @@ on:click={edit(da.id)}
        font-size: 12px;
      }
      .t{
-       font-size: 10px;
+       font-size: 13px;
      }
      .d{
        max-height: 15vh;
