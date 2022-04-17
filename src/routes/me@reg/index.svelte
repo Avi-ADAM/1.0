@@ -1280,6 +1280,7 @@ class=" hover:scale-150 "
     .pt{
       color:aqua;
        text-shadow: 1px 1px  #9900cd;
+       font-size: 13px;
     }
     .sp{
    display: grid;
@@ -1295,6 +1296,7 @@ class=" hover:scale-150 "
     .cont{
       white-space: none;
       line-height: 1;
+      font-size: 13px;
     }
     .sv{
       width:8px
@@ -1304,7 +1306,7 @@ class=" hover:scale-150 "
          font-size: 10px ;
     }
     .pt{
-      font-size: 8px;
+      font-size: 13px;
     }
     .d{
        max-height: 15vh;
