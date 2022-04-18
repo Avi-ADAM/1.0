@@ -183,9 +183,13 @@ const cookieValue = document.cookie
 
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
- 
+ let hovered = false;
 </script>
 <div 
+style="position: relative;" 
+style:z-index={hovered === false ? 1 : 6} 
+on:mouseenter={()=> hovered = true} 
+on:mouseleave={()=> hovered = false}
 use:clickOutside on:click_outside={toggleShow} 
 class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
 <Swiper

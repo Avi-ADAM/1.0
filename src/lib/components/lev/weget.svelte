@@ -326,7 +326,7 @@ function close() {
     idPr.set(id);
     goto("/moach", );
   };
-
+let hovered = false;
 </script>
 
  <DialogOverlay {isOpen} onDismiss={close} >
@@ -354,6 +354,10 @@ title="ביטול"
 
 
 <div 
+style="position: relative;" 
+style:z-index={hovered === false ? 1 : 6} 
+on:mouseenter={()=> hovered = true} 
+on:mouseleave={()=> hovered = false}
 use:clickOutside on:click_outside={toggleShow} 
 class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper
