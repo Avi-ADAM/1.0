@@ -1,7 +1,8 @@
 <script>
+         import Tooltip from './../../celim/tooltip.svelte';
+
     import {  fly } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
-     import { onMount } from 'svelte';
          import { clickOutside } from './outsidclick.js';
 
  const dispatch = createEventDispatcher();
@@ -184,7 +185,19 @@ const cookieValue = document.cookie
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
  let hovered = false;
+ 
+ $: w = 0;
+ let  u = "בקשה לאישור קבלת משאב בהצלחה"
+function hover (id){
+  if (id == "0"){
+u = "בקשה לאישור קבלת משאב בהצלחה"
+  } else {
+    u = id
+  }
+}
 </script>
+<Tooltip title="{u}" >
+
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
@@ -208,34 +221,34 @@ class="hover:scale-150 duration-1000 ease-in" transition:fly={{y:450, duration: 
 >
   <SwiperSlide
     ><div
-	class="{`normSml${oid}`}" id="normSml" 
-><div>
-        <img class="img" src={src}  alt="logo">
-        <button on:click={project(projectId)} class="hover:scale-150 lt" >{projectName}</button>
-        <h1 style="color: var(--barbi-pink); " class="ltn">{mashName}</h1>
-        <h3 class="ltn" title="שווי">{price}</h3>
-        <h3 class="ltn" ><span style="color: var(--gold)" title="ההצעה שלי">{easy}</span> /<span  title="ההצעה של הריקמה"> {myp}</span> </h3>
-        {#if total} <p>{total}</p>{/if}
+><div><span 	class="{`normSml${oid}`}" id="normSml" 
+></span>
+        <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
+        <a on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch href={`/project/${projectId}`} class="hover:scale-150 lt" >{projectName}</a>
+        <h1 on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} style="color: var(--barbi-pink); " class="ltn">{mashName}</h1>
+        <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="ltn" >{price}</h3>
+        <h3 class="ltn" ><span on:mouseenter={()=>hover("ההצעה שלי")} on:mouseleave={()=>hover("0")} style="color: var(--gold)">{easy}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {myp}</span> </h3>
+        {#if total} <p on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{total}</p>{/if}
    </div>
 </div> </SwiperSlide
   ><SwiperSlide
-    ><div class="{`normSmll${oid}`}" id="normSmll"
->
+    ><div  id="normSmll"
+><span class="{`normSmll${oid}`}"></span>
 	
-    {#if descrip !== null }<h6 class="ab">{descrip}</h6>{/if}
-    <h5 class="bc">{spnot}</h5>
+    {#if descrip !== null }<h6 on:mouseenter={()=>hover("תיאור")} on:mouseleave={()=>hover("0")} class="ab">{descrip}</h6>{/if}
+    <h5 on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="bc">{spnot}</h5>
 
 {#if already === false}
-    <button on:click={agree(oid)} class="btn a" name="requestToJoin" title="אני רוצה"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+    <button on:mouseenter={()=>hover(" אני רוצה")} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
 <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
-   --> <button   on:click={decline(oid)} class="btn b" name="decline" title="לא מתאים לי"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+   --> <button on:mouseenter={()=>hover("לא מתאים לי")} on:mouseleave={()=>hover("0")}  on:click={decline(oid)} class="btn b" name="decline" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
     {/if}
 </div>
  </SwiperSlide
   >
 </Swiper>
 </div>
-   
+   </Tooltip>
 
 <style>
     .ab{

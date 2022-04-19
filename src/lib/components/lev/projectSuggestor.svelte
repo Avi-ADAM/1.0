@@ -1,12 +1,11 @@
 <script>
      import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
-    import axios from 'axios';
     import { createEventDispatcher } from 'svelte';
-     import { onMount } from 'svelte';
+     import Tooltip from './../../celim/tooltip.svelte';
+
  const dispatch = createEventDispatcher();
 
-	  export let shows = true;
     export let deadLine = "11.11.2022";
     export let projectName = "ONE";
     export let missionName = "do x";
@@ -17,7 +16,6 @@
     export let projectId;
     export let linki = "/project/";
     export let oid = 0;
-    export let notes = "";
     export let workways= "";
     export let noOfHours = 0;
     export let perhour = 0;
@@ -181,8 +179,16 @@ const cookieValue = document.cookie
 
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
- let hovered = false;
-</script>
+let u = "הצעה להצטרפות לריקמה"
+let hovered = false;
+function hover (id){
+  if (id == "0"){
+u = "הצעה להצטרפות לריקמה"
+  } else {
+    u = id
+  }
+}</script>
+<Tooltip title="{u}" >
 <div
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
@@ -208,35 +214,35 @@ class="hover:scale-150 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 >
   <SwiperSlide
     ><div
-	class="{`normSml${oid}-${projectId}`}" id="normSml" 
-><div>
+	 id="normSml" 
+><div class="{`normSml${oid}-${projectId}`}"></div>
 
-        <img class="img" src={src}  alt="logo">
-        <a sveltekit:prefetch  href={`${linki}${projectId}`}><h3 class="hover:text-lturk lt" >{projectName}</h3></a>
-        <h1 style="color: rgb(87, 208, 248 ); " class="ltn">{missionName}</h1>
+        <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
+        <a sveltekit:prefetch on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  href={`${linki}${projectId}`}><h3 class="hover:text-lturk lt" >{projectName}</h3></a>
+        <h1 on:mouseenter={()=>hover("שם המשימה המוצעת")} on:mouseleave={()=>hover("0")} style="color: rgb(87, 208, 248 ); " class="ltn">{missionName}</h1>
         {#if total} <p>{total}</p>{/if}
    
 </div>
 </SwiperSlide
   ><SwiperSlide
     ><div   id="normSmll"
-><div class="{`normSmll${oid}-${projectId}`} xyz">
-          <h3 class="ltn ab" >{skills.map(d=> d.skillName).join(' ')}</h3>
+><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
+          <h3 on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")} class="ltn ab" >{skills.map(d=> d.skillName).join(' ')}</h3>
 
-   {#if deadLine} <h5 class="lt bc">{deadLine}</h5>{/if}
-    <h6 class="ltn cd" style=" line-height: 0.7;">{missionDetails}</h6>
-    <h5 class="lt de">{role.map(d=> d.roleDescription).join(' ')}</h5></div> 
+   {#if deadLine} <h5 on:mouseenter={()=>hover("תאריך אחרון לביצוע")} on:mouseleave={()=>hover("0")} class="lt bc">{deadLine}</h5>{/if}
+    <h6 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd" style=" line-height: 0.7;">{missionDetails}</h6>
+    <h5 on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="lt de">{role.map(d=> d.roleDescription).join(' ')}</h5></div> 
 {#if already === false}
-    <button on:click={agree(oid)} class="btn a" name="requestToJoin" title="אני רוצה"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+    <button on:mouseenter={()=>hover("אני רוצה")} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
    <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
-   -->  <button   on:click={decline(oid)} class="btn b" name="decline" title="לא מתאים לי"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+   -->  <button on:mouseenter={()=>hover("לא מתאים לי")} on:mouseleave={()=>hover("0")}  on:click={decline(oid)} class="btn b" name="decline" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
     {/if}
 
 </SwiperSlide
   >
 </Swiper>
 </div>
-
+</Tooltip>
 <style>
   .xyz{
             grid-column: 1/4;

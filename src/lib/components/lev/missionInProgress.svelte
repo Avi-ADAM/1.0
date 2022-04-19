@@ -1,4 +1,5 @@
 <script>
+       import Tooltip from './../../celim/tooltip.svelte';
 	  import { fly, scale } from 'svelte/transition';
     import { clickOutside } from './outsidclick.js';
     import { formatTime } from './utils.js';
@@ -442,6 +443,16 @@ ${tofinished}
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
  let hovered = false;
+ 
+ $: w = 0;
+ let  u = "משימה בתהליך ביצוע"
+function hover (id){
+  if (id == "0"){
+ u = "משימה בתהליך ביצוע"
+  } else {
+    u = id
+  }
+}
 </script>
 
 <!--<svelte:window on:beforeunload={beforeUnload}/>-->
@@ -462,6 +473,7 @@ ${tofinished}
   </DialogContent>
   </div>
 </DialogOverlay>
+<Tooltip title="{u}" >
 
 <div 
 style="position: relative;" 
@@ -489,7 +501,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
 >
   <SwiperSlide
     ><div
-	class="{`normSml${perhour}-${projectId}-${mId}`}" id="normSml" 
+	 id="normSml" 
 ><div>
    
 <svg viewBox="0 0 100 100" class="svgg">
@@ -517,16 +529,16 @@ out:scale={{duration: 2200, opacity: 0.5}}
             <circle r="1" fill="none" stroke="currentColor" stroke-width="0.4"></circle>
         </g>
         {#if lapse !== 0}
-        <text text-anchor="middle" fill="red" dominant-baseline="middle" font-size="10" style="font-weight: 300; letter-spacing: 1px;">
+        <text on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")} text-anchor="middle" fill="red" dominant-baseline="middle" font-size="10" style="font-weight: 300; letter-spacing: 1px;">
             {formatTime(zman)}
         </text>
         {/if}
-                <a sveltekit:prefetch href={`${linkP}${projectId}`}><text y='-12' text-anchor="middle" font-size="8" >{projectName}</text></a>
-         <text y='-6' text-anchor="middle"  style=" color: var(--barbi-pink); " font-size="8">{missionName}</text>
+                <a on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch href={`${linkP}${projectId}`}><text y='-12' text-anchor="middle" font-size="8" >{projectName}</text></a>
+         <text on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} y='-6' text-anchor="middle"  style=" color: var(--barbi-pink); " font-size="8">{missionName}</text>
 
                                                      <foreignObject  x='-12' y='-42' width='25px' height='56px'>   
-    
-        <img style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
+    <span class="{`normSml${perhour}-${projectId}-${mId}`}"></span>
+        <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
          
 
        {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{dueDateOrCountToDedline}</h5>{/if}
@@ -550,25 +562,24 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </SwiperSlide
   ><SwiperSlide
     ><div id="normSmll"
->
-<div class="{`normSmll${perhour}-${projectId}-${mId}`} di">
-<span class="mn ab  ">{formatTime(zman)}</span>
-  {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p class="mn bc">{missionDetails}</p>{/if}
+><span class="{`normSmll${perhour}-${projectId}-${mId}`} di"></span>
 
-  <h5 class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
-</div> 
+<span class="mn ab  ">{formatTime(zman)}</span>
+  {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="mn bc">{missionDetails}</p>{/if}
+
+  <h5 on:mouseenter={()=>hover("מספר השעות שכבר בוצעו")} on:mouseleave={()=>hover("0")} class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
   
 
-  <a class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
+  <a on:mouseenter={()=>hover("לינק לביצוע המשימה")} on:mouseleave={()=>hover("0")} class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
 
 {#if lapse !== 0 || x !== 0}
-<button  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
-<button class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" on:click={save}> הוספה</button>
+<button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
+<button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" on:click={save}> הוספה</button>
 {/if}
     {#if already === false}
-    <button title=" סיימתי" on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
+    <button on:mouseenter={()=>hover("לחיצה לסיום המשימה")} on:mouseleave={()=>hover("0")} on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
      {/if} 
-     {#if show === true}  <button on:click={running ? azor : start} class="btn b" name="start timer" title= {running ? 'עצירה' : 'התחלה'}><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
+     {#if show === true}  <button on:mouseenter={()=>hover(`${running ? "עצירת הטיימר" : "הפעלת טיימר"}`)} on:mouseleave={()=>hover("0")} on:click={running ? azor : start} class="btn b" name="start timer" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
    {/if}
         <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
@@ -577,7 +588,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
   >
 </Swiper>
 </div>
-
+</Tooltip>
 <style>
   .di{
             grid-column: 1/4;

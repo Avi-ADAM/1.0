@@ -89,7 +89,6 @@ if (nut > 0 && nook > 0){
 }
 
 ser = ser
-console.log(ser)
 return ser
 }
 
@@ -522,18 +521,14 @@ transition:fly={{y:450, duration: 2200, opacity: 0.5}}
 <div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryot} style="position:absolute;">
   <ProgressBar series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
-  <SwiperSlide
-    >  
-
-    <div
-	 id="normSml" 
-> 
+  <SwiperSlide>  
+<div id="normSml" > 
 
  <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")} >
         <img class="img"
          src={src}  alt="projectlogo" >
  </button>
-           <h1 class="{`normSml${pendId}-${projectId}-hh`} pn" >{name}</h1>
+           <h1 on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} class="{`normSml${pendId}-${projectId}-hh`} pn" >{name}</h1>
         {#if kindOf === "perUnit"}
        <p class="p"><span on:mouseenter={()=>hover(" שווי ליחידה")} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{easy > 0 ? easy : price}</span> * <span on:mouseenter={()=>hover("כמות")} on:mouseleave={()=>hover("0")} style="color: aqua" >{hm}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * hm : price * hm}</span> </p>
    {:else if kindOf === "total" || kindOf === "rent"}
@@ -543,7 +538,7 @@ transition:fly={{y:450, duration: 2200, opacity: 0.5}}
           {:else if kindOf === "yearly"}
        <p class="p"><span on:mouseenter={()=>hover("שווי לשנה")} on:mouseleave={()=>hover("0")}  style="color:var(--gold)" >{easy > 0 ? easy : price}</span> * <span on:mouseenter={()=>hover("מספר שנים")} on:mouseleave={()=>hover("0")}  style="color: aqua" >{yers}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * yers : price * yers}</span> </p>
 {/if}
-       <p class="p"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
+       <p class="p"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
 </div>
 
 </SwiperSlide
@@ -797,8 +792,7 @@ width:50vw;
 	.normSml{
         min-height: 125px;
         min-width: 125px;
-        max-width: 125px;
-        max-height: 125px;
+      
   }
    .normSmlHover{
 

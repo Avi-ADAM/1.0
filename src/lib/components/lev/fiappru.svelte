@@ -1,9 +1,10 @@
 <script>
+      import Tooltip from './../../celim/tooltip.svelte';
+  import ProgressBar from "@okrad/svelte-progressbar";
 import {
     clickOutside
 } from './outsidclick.js';
 import {
-    scale,
     fly
 } from 'svelte/transition';
 import {
@@ -11,7 +12,7 @@ import {
 } from 'svelte';
   import { DialogOverlay, DialogContent 
 } from 'svelte-accessible-dialog';
- import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+ import { goto } from '$app/navigation';
 import { idPr } from './../../stores/idPr.js';
 
 const dispatch = createEventDispatcher();
@@ -59,6 +60,49 @@ export let users;
 let idL;
 let bearer1; 
 let token;
+ function percentage(partialValue, totalValue) {
+   return (100 * partialValue) / totalValue;
+} 
+let ok;
+let nook;
+let nut;
+let tryo = "116%";
+let tryot = "-11%";
+async function xyz (){
+
+ok =  percentage(noofusersOk, noofpu)
+nook = percentage(noofusersNo, noofpu) 
+nut = percentage(noofusersWaiting, noofpu) 
+let ser = [];
+ ser.push({
+perc: ok,
+color: '#7EE081'
+}) 
+
+if (nut > 0){
+  ser.push({
+perc: nut,
+color: '#0000cc'
+}) 
+}
+if (nook > 0){
+  ser.push({
+perc: nook,
+color: '#80037e'
+}) 
+}
+if (nut > 0 && nook > 0){
+  tryo = "129%"
+  tryot = "-17%"
+}
+
+ser = ser
+return ser
+}
+
+let ser = xyz();
+
+
  import { Swiper, SwiperSlide } from "swiper/svelte";
 
   // Import Swiper styles
@@ -316,8 +360,21 @@ function close() {
     idPr.set(id);
     goto("/moach", );
   };
+
+$: w = 0;
+ let u ="בקשה לאישור ביצוע משימה בהצלחה"
 let hovered = false;
+function hover (id){
+  if (id == "0"){
+u ="בקשה לאישור ביצוע משימה בהצלחה"
+  } else {
+    u = id
+  }
+}
 </script>
+{#await ser}
+<h1>..</h1>
+{:then ser}
 
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly={{y: 450, opacity: 0.5, duration: 1000}}>
@@ -342,7 +399,7 @@ title="ביטול"
   </div>
 </DialogOverlay>
 
-
+<Tooltip title="{u}" >
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
@@ -364,15 +421,17 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     prevEl: `.normSmll${mId}-oo`,
   }}
 >
+<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryot} style="position:absolute;">
+  <ProgressBar series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
+</div>
   <SwiperSlide
     ><div
-	class="{`normSml${mId}-oo`}" id="normSml" 
+ id="normSml" 
 >
 <div
     style="--the:{stylef};"
     >
         <svg  version="1.1"  viewBox="-106 -106 212 212" xmlns="http://www.w3.org/2000/svg">
-            <title>בקשה לאישור ביצוע משימה בהצלחה</title>
             <defs>
                 <linearGradient id="lg" x1="1" y1="1" spreadMethod="pad">
                     <stop offset="0" style="stop-color: rgb(100, 71, 105);"/>
@@ -386,46 +445,35 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
            <circle stroke-opacity="0.01" r="100" fill-opacity="0.01" fill="url(#lg)" transform="rotate(135)" stroke="url(#lgb)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
             <circle r="80" fill-opacity="0.01" fill="url(#lg)" transform="rotate(315)" stroke="none"/>
                   
-                            <a sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}>
+                            <a on:mouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}>
                    <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
-                       <img
+                    <span 	class="{`normSml${mId}-oo`}"></span> 
+                    <img
                            width='56px'
                            height='56px'
                            alt={useraplyname}
                            src={src}
                            style="border-radius: 50%;"
-                           title={useraplyname}
                            /> 
                         </foreignObject>     
                                <text fill="#FF0092" text-anchor="middle" x='0' y='46' style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;">{useraplyname}</text>
                            </a>   
                    <path id="curve" fill-opacity="0.01"  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                        <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
-                           <textPath font-weight="bold" color="#FF0092" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
+                           <textPath on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} font-weight="bold" color="#FF0092" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
                                {missionBName}
                            </textPath>
                        </text>
-                 <a sveltekit:prefetch x="0" y="-40"   xlink:href="{`${link}${projectId}`}">
+                 <a on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40"   xlink:href="{`${link}${projectId}`}">
                        <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
+                                        </a>  
                        <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                       <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>
-                       
+                      <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                        <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>
+                       </button>
                    </foreignObject>
-                   </a>  
                
                                                 </svg>
-                                                    <!--  <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="32" height="32" alt="projectlogo" title={projectName}>
-        <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName}</h3></a>
-        <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: rgb(87, 208, 248 ); line-height: 0.7; ">{openmissionName}</h1>
-        <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="32" height="32" alt="user aplly pic" title={useraplyname}>
-        <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}><h3 style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{useraplyname}</h3></a>        
-        <button1 on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin"><i class="far fa-check-circle"></i></button1>
-        <button3 on:click= {nego} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>
-        <button2 on:click={decline} style="margin: 0;" class = "btn"name="decline"><i class="far fa-times-circle"></i></button2>
-        <button on:click={agree} style="margin: 0;" class = "btn" name="requestToJoin"><i class="far fa-check-circle"></i></button>
-                                                    <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>
-                                                    <button on:click={decline} style="margin: 0;" class = "btn"name="decline"><i class="far fa-times-circle"></i></button>
-                                                    -->
                                                     </div>
 
 </div>
@@ -434,21 +482,23 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     ><div  id="normSmll"
 ><div class="{`normSmll${mId}-oo`}" 
 ></div>
-            <p class="ab pnn" ><span style="color:green" title="בעד">{noofusersOk} </span><span style="color:aqua" title="לא הצביעו">{noofusersWaiting} </span><span style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
-            <h5 class="bc pnn" >{why}</h5>
-          {#if missionDetails}  <h6 class="cd pnn" >{missionDetails}</h6>{/if}
+       <p class="ab pnn"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
+
+            <h5 on:mouseenter={()=>hover("טקסט אישור של סיום משימה")} on:mouseleave={()=>hover("0")}  class="bc pnn" >{why}</h5>
+          {#if missionDetails}  <h6 class="cd pnn" on:mouseenter={()=>hover("פרטי משימה")} on:mouseleave={()=>hover("0")}  >{missionDetails}</h6>{/if}
          
             {#if !already}
-            <button on:click={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+            <button on:mouseenter={()=>hover(" אישור")} on:mouseleave={()=>hover("0")}  on:click={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
         <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>--> 
-            <button on:click={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+            <button on:mouseenter={()=>hover(" התנגדות")} on:mouseleave={()=>hover("0")}  on:click={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
           </div>
 </SwiperSlide
   >
 </Swiper>
 </div>
-
+</Tooltip>
+{/await}
 
 <style>
     .btin{
@@ -492,8 +542,8 @@ class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
         color: var(--barbi-pink);
       min-height: 75px;
     min-width: 75px;
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 94%;
+    max-height: 94%;
     aspect-ratio: 1 /1;
          border-radius: 50%;
     background: url(https://res.cloudinary.com/love1/image/upload/v1643838283/newcoin_mxgoxa.svg);
@@ -571,8 +621,8 @@ input[type=text]:invalid {
     color: var(--barbi-pink);
     min-height: 75px;
     min-width: 75px;
-    max-width: 100%;
-    max-height: 100%;
+    max-width: 94%;
+    max-height: 94%;
     aspect-ratio: 1 /1;
 
     background-color: rgb(100, 224, 137);
@@ -610,10 +660,9 @@ input[type=text]:invalid {
     
   }
        #normSmll{
-           min-width: 125px;
-           min-height: 125px;
-              max-width: 100%;
-        max-height: 100%;
+           
+              max-width: 94%;
+        max-height: 94%;
        }
 }
 </style>
