@@ -14,7 +14,7 @@ import Mid from "../../lib/components/lev/midi.svelte"
         import Mashsug from '../../lib/components/lev/mashsuggest.svelte'
         import Reqtom from '../../lib/components/lev/reqtom.svelte'
         import Weget from '../../lib/components/lev/weget.svelte'
-
+        import Hal from '../../lib/components/lev/halukaask.svelte'
 let low = true;
 
   //  import Viewport from 'svelte-viewport-info'
@@ -36,7 +36,8 @@ let mashs = 0;
 let maap = 0; 
     let sug =  0
 let pen = 0
-let ask = 0
+let ask = 0;
+let halu = 0;
 let wel = 0;
 let askma = 0;
 let beta = 0
@@ -1048,8 +1049,9 @@ async function start () {
                             tafkidims {id}
                         } 
                         } 
-                            projects_1s { projectName id user_1s {id haskamaz haskamac haskama} profilePic {url formats } 
-                            maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
+        projects_1s { projectName id user_1s {id haskamaz haskamac haskama} profilePic {url formats } 
+            tosplits (where: {finished: false}) {id name vots  {what why id users_permissions_user {id}}}              
+            maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
                             open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
                                 pmashes (where:{archived: false }){ id hm project {projectName id 
                                         profilePic {url formats } 
@@ -1081,10 +1083,7 @@ async function start () {
                                     mission { id}
                                     vallues { id}
                                     users  {what why id users_permissions_user {id}} 
-                                    project {projectName id 
-                                        profilePic {url formats } 
-                                        user_1s { id}
-                                }
+                                   
                             }
                                      open_missions(where:{archived: false }) {id declined { id} users  {id} } 
                                     } 
@@ -1116,21 +1115,20 @@ async function start () {
     pmashes = [];
     huca = [];
     wegets=[];
+    haluask = [];
                  midd(miData);
             makeWalcom(miData);
            showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
          createpends (miData);
            mesimabetahalicha (miData);
-                                      console.log("pass")
           ishursium(miData);
-                                    console.log("pass")
-
           sds(miData);
           pmash(miData)
           sps(miData)
           createmask(miData)
           crMaap(miData)
+          rashbi(miData);
           if (tyu = true){
                  bubleUiAngin()
         arr1 = arr1 
@@ -1147,7 +1145,69 @@ let huca = [];
 function mdon(){
     start()
 }
+let haluask = [];
+function rashbi (data){
+ const myid = data.data.user.id;
+    const projects = data.data.user.projects_1s;
+    for (var i = 0; i < projects.length; i++) {
+        for (var j = 0; j < projects[i].tosplits.length; j++) {
+            const halu = projects[i].tosplits[j]
+                    haluask.push({
+                                  name: halu.name,
+                                  projectId: projects[i].id,
+                                  projectName: projects[i].projectName,
+                                  user_1s: projects[i].user_1s,
+                                  src:projects[i].profilePic.formats.thumbnail.url,
+                                  users: halu.vots,
+                                  myid: myid,
+                                   pendId: halu.id,
+                                   noofusers: projects[i].user_1s.length,
+                                    ani: "haluk",
+                                  pl: 1 + halu.vots.length
+                              });
+               
+ }
+ }
+ for (var k = 0; k < haluask.length; k++) {
+     const x = haluask[k].users
+     for (var z = 0; z < x.length; z++){
+        haluask[k].uids = [];
+      haluask[k].uids.push(x[z].users_permissions_user.id);
+              haluask[k].what = [];
 
+           haluask[k].what.push(x[z].what);
+ }
+ }    
+
+ for (var t = 0; t <haluask.length; t++){
+    const allid = haluask[t].uids;
+    const myid = haluask[t].myid;
+    haluask[t].already = false;
+ haluask[t].noofusersOk = 0;
+ haluask[t].noofusersNo = 0;
+
+    if(allid.includes(myid)){
+      haluask[t].already = true;
+       haluask[t].pl += 25    
+    }
+        for (var r=0; r< haluask[t].users.length; r++){
+            if (haluask[t].users[r].what === true) {
+                
+                 haluask[t].noofusersOk += 1;
+               
+            }else if (haluask[t].users[r].what === false) {
+              
+                 haluask[t].noofusersNo += 1;
+               
+            }
+        }
+    const noofusersWaiting = haluask[t].user_1s.length - haluask[t].users.length;
+    haluask[t].noofusersWaiting = noofusersWaiting;
+        
+    }
+    halu = haluask.length;
+console.log(haluask);
+}
 function sps(pp){
          
       for (let i = 0; i < pp.data.user.sps.length; i++){
@@ -1346,14 +1406,14 @@ function createpends (data) {
             const pend = projects[i].pendms[j]
                     pends.push({
                                   name: pend.name,
-                                  projectId: pend.project.id,
+                                  projectId: projects[i].id,
                                   hearotMeyuchadot: pend.hearotMeyuchadot,
                                   descrip: pend.descrip,
                                   noofhours: pend.noofhours,
                                   perhour: pend.perhour,
-                                  projectName: pend.project.projectName,
-                                  user_1s: pend.project.user_1s,
-                                  src: pend.project.profilePic.formats.thumbnail.url,
+                                  projectName: projects[i].projectName,
+                                  user_1s: projects[i].user_1s,
+                                  src: projects[i].profilePic.formats.thumbnail.url,
                                   users: pend.users,
                                   myid: myid,
                                   missionId: pend.mission.id, 
@@ -1458,7 +1518,7 @@ function showall (event){
         show[i].style.display=''}
 }
 function bubleUiAngin(){
- arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca ].sort(({pl:a}, {pl:b}) => a - b)
+ arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask ].sort(({pl:a}, {pl:b}) => a - b)
      createD()
      //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart 
 }
@@ -1475,7 +1535,27 @@ function bubleUiAngin(){
  {/each}
 
 {#each arr1 as buble, i}
-{#if buble.ani === "mtaha"}
+{#if buble.ani === "haluk"}
+<div class="normSml halu"><Hal    
+    user_1s={buble.user_1s}
+    myid={buble.myid}
+    pendId={buble.pendId}
+    mypos={buble.mypos}
+    projectName={buble.projectName} 
+    name={buble.name} 
+    src={buble.src}
+    projectId={buble.projectId}
+    noofusersOk={buble.noofusersOk}
+    noofusersNo={buble.noofusersNo}
+    noofusersWaiting={buble.noofusersWaiting}
+    noofusers={buble.noofusers}
+    already={buble.already}
+    created_at={buble.created_at}
+    users={buble.users}
+    diun={buble.diun}
+    order={buble.order}
+                               /></div>
+{:else if buble.ani === "mtaha"}
  <div class="betaha normSml" style="display:'';"><MissionInProgress
     noofpu={buble.project.user_1s.length}
     oldzman={buble.timer}

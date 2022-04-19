@@ -3,7 +3,7 @@
 	let isHovered = false;
 	let x;
 	let y;
-	
+	export let z = 0;
 	function mouseOver(event) {
 		isHovered = true;
 		x = event.pageX + 5;
@@ -28,7 +28,7 @@
 </span>
 
 {#if isHovered}
-	<div style="top: {y}px; left: {x}px;" class="tooltip">{title}</div>
+	<div dir="rtl" style="top: {y + z}px; left: {x + z}px;" class="tooltip">{title}</div>
 {/if}
 
 <style>
@@ -40,7 +40,8 @@
         color: rgb(239, 23, 88);
 		border-radius: 4px;
 		padding: 4px;
-		position: absolute;
+		position: fixed;
+		text-align: center;
 	}
     
 </style>
