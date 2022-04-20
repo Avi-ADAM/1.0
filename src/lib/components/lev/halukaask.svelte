@@ -446,7 +446,7 @@ style="position: relative;"
 style:z-index={hovered === false ? 1 : 6} 
 on:mouseenter={()=> hovered = true} 
 on:mouseleave={()=> hovered = false}
-class="hover:scale-150 duration-1000 ease-in" 
+class="hover:scale-200 duration-1000 ease-in" 
 transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
  
 <Swiper 

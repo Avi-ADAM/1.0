@@ -456,7 +456,7 @@ style:z-index={hovered === false ? 1 : 6}
 on:mouseenter={()=> hovered = true} 
 on:mouseleave={()=> hovered = false}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-150 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+class="hover:scale-200 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
 
 <Swiper
   on:swiper={setSwiperRef}
