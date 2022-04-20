@@ -17,6 +17,7 @@ import Mid from "../../lib/components/lev/midi.svelte"
         import Weget from '../../lib/components/lev/weget.svelte'
         import Hal from '../../lib/components/lev/halukaask.svelte'
 let low = true;
+let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
 
   //  import Viewport from 'svelte-viewport-info'
     let idL;
@@ -1284,7 +1285,6 @@ function pmash (data) {
                
     }
      }
-   console.log("gi")
    for (var k = 0; k < pmashes.length; k++) {
      const x = pmashes[k].users
              pmashes[k].uids = [];
@@ -1502,21 +1502,22 @@ function coinLapach (event){
     start()}
 
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
+
+
 function showonly (event){
-  const value = event.detail.data;
-  let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi, .ppmash, .pmashs, .pmaap, .askmap" )
-  for(let i=0;i<hide.length;i++){
-        hide[i].style.display='none'}
-  let show = document.getElementsByClassName(value)
-          for(let i=0;i<show.length;i++){
-          show[i].style.display=''}
+    const value = event.detail.data;
+ for (const key in milon) {
+        milon[key] = false
+    }
+    
+    milon[value] = true;
 
 }
 function showall (event){
- var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi, .ppmash, .pmashs, .pmaap, .askmap" )
+for (const key in milon) {
+        milon[key] = true
+    }
 
-     for(let i=0;i<show.length;i++){
-        show[i].style.display=''}
 }
 function bubleUiAngin(){
  arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask ].sort(({pl:a}, {pl:b}) => a - b)
@@ -1526,7 +1527,6 @@ function bubleUiAngin(){
 let u = "מסך הלב"
 function hover(event){
     u = event.detail.id
-    console.log(u)
 }
 </script>
 
@@ -1564,8 +1564,8 @@ function hover(event){
     diun={buble.diun}
     order={buble.order}
                                /></div>
-{:else if buble.ani === "mtaha"}
- <div class="betaha normSml" style="display:'';"><MissionInProgress
+{:else if buble.ani === "mtaha" &&  milon.betaha == true}
+ <div   class="betaha normSml" ><MissionInProgress
     on:hover={hover}
     noofpu={buble.project.user_1s.length}
     oldzman={buble.timer}
@@ -1584,9 +1584,8 @@ function hover(event){
     perhour = {buble.perhour}
     on:done={mdon}
     /></div>
-
-{:else if buble.ani === "pmashes"}
-    <div  class="normSml ppmash" style="display:''"
+{:else if buble.ani === "pmashes" && milon.ppmash == true}
+    <div class="normSml ppmash" 
  ><PendingMa
         on:show={show}
               on:hover={hover}
@@ -1621,9 +1620,8 @@ function hover(event){
                 users={buble.users}
                 shows={shows}
                 /></div>
-{:else if buble.ani === "pends"}
-
-    <div  class="normSml pend" style="display:''"
+{:else if buble.ani === "pends" && milon.pend == true}
+    <div  class="normSml pend" 
  ><PendingM
         on:show={show}
               on:hover={hover}
@@ -1655,8 +1653,8 @@ function hover(event){
                 users={buble.users}
                 shows={shows}
                 /></div>
-{:else if buble.ani === "wegets"}
-        <div  class="pmaap normSml" style="display:'';"><Weget
+{:else if buble.ani === "wegets" && milon.pmaap == true}
+        <div class="pmaap normSml" ><Weget
             on:acsept={deloid}
             on:decline={deloid}
                   on:hover={hover}
@@ -1698,8 +1696,8 @@ function hover(event){
                 st={buble.st}
                 declined={buble.decid}
                 /></div>
-{:else if buble.ani === "fiapp"}
-            <div  class="fiap normSml" style="display:'';"><Fiappru
+{:else if buble.ani === "fiapp" && milon.fiap == true}
+            <div  class="fiap normSml" ><Fiappru
             on:acsept={deloi}
             on:decline={deloi}
                   on:hover={hover}
@@ -1738,16 +1736,16 @@ function hover(event){
                 st={buble.st}
                 declined={buble.decid}
                 /></div>
-{:else if buble.ani === "walcomen"}
-   <div  class="normSml welc" style="display:'';"><Welcomt 
+{:else if buble.ani === "walcomen" && milon.welc == true}
+   <div  class="welc normSml" ><Welcomt 
     id={buble.id}
           on:hover={hover}
 
        username={buble.username}
        projectName={buble.projectName}
        /></div>
-{:else if buble.ani === "askedcoin"}
-        <div  class="asks normSml" style="display:'';"><Reqtojoin
+{:else if buble.ani === "askedcoin" && milon.asks == true}
+        <div  class="asks normSml" ><Reqtojoin
             on:acsept={delo}
                   on:hover={hover}
 
@@ -1783,8 +1781,8 @@ function hover(event){
                 st={buble.st}
                 declined={buble.decid}
                 /></div>
-{:else if buble.ani === "askedm"}
-        <div  class="askmap normSml" style="display:'';"><Reqtom
+{:else if buble.ani === "askedm" && milon.askmap == true}
+        <div  class="askmap normSml" ><Reqtom
             on:acsept={delom}
             on:decline={delom}
                   on:hover={hover}
@@ -1820,8 +1818,8 @@ function hover(event){
                 declined={buble.decid}
                 spid={buble.spid}
                 /></div>
-{:else if buble.ani === "meData"}
-    <div  class="sugg normSml" style="display:''"><ProjectSuggestor
+{:else if buble.ani === "meData" && milon.sugg == true}
+    <div class="sugg normSml" ><ProjectSuggestor
       on:less={less}
             on:hover={hover}
 
@@ -1842,8 +1840,8 @@ function hover(event){
                 perhour={buble.perhour}
                 total={buble.noofhours * buble.perhour}
                 /></div>
-{:else if buble.ani === "huca"}
-    <div  class="pmashs normSml" style="display:''"><Mashsug
+{:else if buble.ani === "huca" && milon.pmashs == true}
+    <div  class="pmashs normSml" ><Mashsug
       on:less={lessi}
       on:hover={hover}
       i={i}
@@ -1959,6 +1957,12 @@ des={0}  />
    transform: translate(-75%,75%);
    z-index: 998;
 }.normSml:nth-child(5):hover{
+   transform: translateX(75%);
+   z-index: 998;
+}.normSml:nth-child(6):hover{
+   transform: translateX(-75%);
+   z-index: 998;
+}.normSml:nth-child(7):hover{
    transform: translateX(75%);
    z-index: 998;
 }.normSml:nth-child(8):hover{
@@ -2090,6 +2094,172 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 
     }
     @media  (min-width: 1240px){
+ /* .normSml:nth-child(1){
+    position: absolute;
+    top: 18%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+  }  
+  .normSml:nth-child(2){
+    position: absolute;
+    top: 9%;
+    left: 40%;
+    transform: translate(-50%, -50%);
+  } 
+  .normSml:nth-child(3){
+    position: absolute;
+    top: 9%;
+    left: 60%;
+    transform: translate(-50%, -50%);
+  } 
+    .normSml:nth-child(4){
+    position: absolute;
+    top: 18%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+  .normSml:nth-child(5){
+    position: absolute;
+    top: 18%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+  } 
+    .normSml:nth-child(6){
+    position: absolute;
+    top: 20%;
+    left: 20%;
+    transform: translate(-50%, -50%);
+  } 
+  .normSml:nth-child(7){
+    position: absolute;
+    top: 20%;
+    left: 80%;
+    transform: translate(-50%, -50%);
+  }  
+   .normSml:nth-child(8){
+    position: absolute;
+    top: 30%;
+    left: 70%;
+    transform: translate(-50%, -50%);
+  }  
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  }  
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } 
+   .normSml:nth-child(9){
+    position: absolute;
+    top: 30%;
+    left: 30%;
+    transform: translate(-50%, -50%);
+  } */  
+.normSml:nth-child(1):hover{
+    transform: translate(75%,75%);
+   z-index: 998;
+}.normSml:nth-child(2):hover{
+   transform: translateY(75%);
+   z-index: 998;
+}.normSml:nth-child(3):hover{
+   transform: translateY(75%);
+   z-index: 998;
+}
         .normSml:nth-child(4):hover{
    transform: translateY(75%);
    z-index: 998;
@@ -2127,10 +2297,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 }.normSml:nth-child(8n+28):hover{
    transform: translate(-75%,-75%);
    z-index: 998;
-}/*.normSml:nth-last-child(1):hover{
-   transform: translateY(-75%);
-   z-index: 998;
-}*/
+}
     .screen{
         padding:20px 20px;
        background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) !important;
@@ -2139,18 +2306,21 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
         display: grid;
         grid-template-columns: repeat(8, 1fr);
         grid-template-rows: repeat(4, 1fr);
-        grid-row: center;
+        grid-row: center; 
         align-items: center;
         justify-content: center;
         width: 100vw;
-        height: 100vh;
         overflow: auto;
 
     }
     .midCom{
+      /*  position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);*/
         padding: 20px  20px;
-        grid-row: 2 / 4;
-    grid-column: 4 /6;
+       grid-row: 2 / 4;
+    grid-column: 4 /6; 
       align-self: center;
     }
     
