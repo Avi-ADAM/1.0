@@ -1,5 +1,4 @@
 <script>
-         import Tooltip from './../../celim/tooltip.svelte';
 
     import {  fly } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
@@ -194,9 +193,9 @@ u = "בקשה לאישור קבלת משאב בהצלחה"
   } else {
     u = id
   }
+  dispatch("hover",{id:u})
 }
 </script>
-<Tooltip title="{u}" >
 
 <div 
 style="position: relative;" 
@@ -204,7 +203,7 @@ style:z-index={hovered === false ? 1 : 6}
 on:mouseenter={()=> hovered = true} 
 on:mouseleave={()=> hovered = false}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-200 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
+class="hover:scale-290 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
 <Swiper
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -248,7 +247,6 @@ class="hover:scale-200 duration-1000 ease-in" transition:fly={{y:450, duration: 
   >
 </Swiper>
 </div>
-   </Tooltip>
 
 <style>
     .ab{

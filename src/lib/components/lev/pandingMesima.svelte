@@ -1,5 +1,4 @@
 <script>
-     import Tooltip from './../../celim/tooltip.svelte';
   import ProgressBar from "@okrad/svelte-progressbar";
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
@@ -340,15 +339,26 @@ let isOpen = false;
   slideTo(1)
  }
 $: w = 0;
- let u = "הצבעה על פרסום הצעת משימה בריקמה"
+ let u = "הצבעה על פרסום הצעת משימה לריקמה"
 let hovered = false;
 function hover (id){
   if (id == "0"){
-u = "הצבעה על פרסום הצעת משימה בריקמה"
+u = "הצבעה על פרסום הצעת משימה לריקמה"
   } else {
     u = id
   }
+    dispatch("hover", {id: u});
+
 }
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+u = "הצבעה על פרסום הצעת משימה לריקמה"
+  }
+  dispatch("hover", {id: u});
+ }
 </script>
 {#await ser}
 <h1>..</h1>
@@ -396,14 +406,13 @@ title="ביטול"
   </div>
 </DialogOverlay>
 
-<Tooltip title="{u}" >
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
-on:mouseenter={()=> hovered = true} 
-on:mouseleave={()=> hovered = false}
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-200 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
+class="hover:scale-290 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
 <Swiper
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -460,7 +469,6 @@ class="hover:scale-200 duration-1000 ease-in" transition:fly={{y:450, duration: 
   >
 </Swiper>
 </div>
-</Tooltip>
 {/await}
 
 <style>

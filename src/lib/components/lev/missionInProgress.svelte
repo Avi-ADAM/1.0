@@ -444,14 +444,28 @@ ${tofinished}
   import { EffectFlip, Navigation } from "swiper";
  let hovered = false;
  
- $: w = 0;
  let  u = "משימה בתהליך ביצוע"
+ function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+u = "משימה בתהליך ביצוע"
+  }
+  dispatch("hover", {id: u});
+ }
 function hover (id){
   if (id == "0"){
  u = "משימה בתהליך ביצוע"
   } else {
     u = id
   }
+  if (hovered == false){
+    u = "לב המערכת"
+  } else {
+u = "משימה בתהליך ביצוע"
+  }
+  dispatch("hover", {id: u});
 }
 </script>
 
@@ -473,15 +487,14 @@ function hover (id){
   </DialogContent>
   </div>
 </DialogOverlay>
-<Tooltip title="{u}" >
 
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
-on:mouseenter={()=> hovered = true} 
-on:mouseleave={()=> hovered = false}
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-200 duration-1000 ease-in"     in:scale={{duration: 3200, opacity: 1, start: 0.1}}
+class="hover:scale-290 duration-1000 ease-in"     in:scale={{duration: 3200, opacity: 1, start: 0.1}}
 out:scale={{duration: 2200, opacity: 0.5}}
 >
 <Swiper
@@ -502,7 +515,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
   <SwiperSlide
     ><div
 	 id="normSml" 
-><div>
+>
    
 <svg viewBox="0 0 100 100" class="svgg">
     <g transform="translate(50 50)">
@@ -559,18 +572,18 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </svg>
    
 </div>
-</SwiperSlide
-  ><SwiperSlide
-    ><div id="normSmll"
-><span class="{`normSmll${perhour}-${projectId}-${mId}`} di"></span>
+</SwiperSlide >
 
-<span class="mn ab  ">{formatTime(zman)}</span>
+<SwiperSlide>
+    <div id="normSmll" >
+<div on:mouseenter={()=>hover("זמן שכבר בוצע")} on:mouseleave={()=>hover("0")} class="mn ab  ">{formatTime(zman)}</div>
   {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="mn bc">{missionDetails}</p>{/if}
 
-  <h5 on:mouseenter={()=>hover("מספר השעות שכבר בוצעו")} on:mouseleave={()=>hover("0")} class="mn cd ">{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} / ${hourstotal} `}</h5>
+  <h5  class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שכבר בוצעו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0}`}</span> / <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal}</span></h5>
   
 
   <a on:mouseenter={()=>hover("לינק לביצוע המשימה")} on:mouseleave={()=>hover("0")} class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
+<div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div>
 
 {#if lapse !== 0 || x !== 0}
 <button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
@@ -583,12 +596,11 @@ out:scale={{duration: 2200, opacity: 0.5}}
    {/if}
         <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
- 
+ </div>
 </SwiperSlide
   >
 </Swiper>
 </div>
-</Tooltip>
 <style>
   .di{
             grid-column: 1/4;
@@ -704,9 +716,9 @@ small {
     max-width: 100%;
     max-height: 100%;
     aspect-ratio: 1 /1;
-         border-radius: 50%;
-         text-shadow: 1px 1px  rgb(63, 56, 18);
-                 background: url(https://res.cloudinary.com/love1/image/upload/v1643838415/diamondlight1_db635m.jpg);
+    border-radius: 50%;
+    text-shadow: 1px 1px  rgb(63, 56, 18);
+    background: url(https://res.cloudinary.com/love1/image/upload/v1643838415/diamondlight1_db635m.jpg);
     background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;

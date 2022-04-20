@@ -1,5 +1,4 @@
 <script>
-     import Tooltip from './../../celim/tooltip.svelte';
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
 
@@ -381,7 +380,18 @@ u = "בקשה לאישור קבלת משאב בהצלחה"
   } else {
     u = id
   }
+    dispatch("hover", {id: u});
+
 }
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+u = "בקשה לאישור קבלת משאב בהצלחה"
+  }
+  dispatch("hover", {id: u});
+ }
 </script>
 {#await ser}
 <h1>..</h1>
@@ -409,14 +419,13 @@ title="ביטול"
   </div>
 </DialogOverlay>
 
-<Tooltip title="{u}" >
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
-on:mouseenter={()=> hovered = true} 
-on:mouseleave={()=> hovered = false}
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-200 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -511,7 +520,6 @@ class="hover:scale-200 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
   >
 </Swiper>
 </div>
-</Tooltip>
 {/await}
 
 <style>

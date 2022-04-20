@@ -362,14 +362,25 @@ function close() {
   };
 
 $: w = 0;
- let u ="בקשה לאישור ביצוע משימה בהצלחה"
+ let u ="בקשה לאישור ביצוע משימה בהצלחה";
+
 let hovered = false;
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+u ="בקשה לאישור ביצוע משימה בהצלחה";
+  }
+  dispatch("hover", {id: u});
+ }
 function hover (id){
   if (id == "0"){
 u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
     u = id
   }
+    dispatch("hover", {id: u});
 }
 </script>
 {#await ser}
@@ -399,14 +410,13 @@ title="ביטול"
   </div>
 </DialogOverlay>
 
-<Tooltip title="{u}" >
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
-on:mouseenter={()=> hovered = true} 
-on:mouseleave={()=> hovered = false}
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-200 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -497,7 +507,6 @@ class="hover:scale-200 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
   >
 </Swiper>
 </div>
-</Tooltip>
 {/await}
 
 <style>

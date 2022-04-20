@@ -1,7 +1,8 @@
 <script>
-import { onMount } from 'svelte';
-    import { scale, fly } from 'svelte/transition';
-
+    import { fly } from 'svelte/transition';
+import {
+    createEventDispatcher
+} from 'svelte';
 import {
     idPr
 } from './../../stores/idPr.js';
@@ -21,9 +22,26 @@ function project(id) {
     
     //make it desapire for good
 };
+const dispatch = createEventDispatcher();
+let hovered = false;
+let u = "קבלת פנים לרגל הצטרפותך לריקמה חדשה"
 
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+u = "קבלת פנים לרגל הצטרפותך לריקמה חדשה"
+  }
+  dispatch("hover", {id: u});
+ }
 </script>
-<div transition:fly={{y: 250, opacity: 0.9, duration: 2000}}>
+<div
+style="position: relative;" 
+style:z-index={hovered === false ? 1 : 6} 
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()}
+class="hover:scale-290 duration-1000 ease-in-out" transition:fly={{y: 250, opacity: 0.9, duration: 2000}}>
 
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 class="a" viewBox="-1 0 59 58" enable-background="new 0 0 57 57" xml:space="preserve">

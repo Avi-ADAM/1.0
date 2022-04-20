@@ -7,7 +7,6 @@
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
-         import Tooltip from './../../celim/tooltip.svelte';
   import ProgressBar from "@okrad/svelte-progressbar";
  const dispatch = createEventDispatcher();
     export let mypos = null;
@@ -429,7 +428,17 @@ function hover (id){
   } else {
     u = id
   }
+    dispatch("hover", {id: u});
 }
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+ u = "הצבעה על בקשת משאב לריקמה"
+  }
+  dispatch("hover", {id: u});
+ }
 </script>
 {#await ser}
 <h1>..</h1>
@@ -492,15 +501,14 @@ title="ביטול"
   </div>
 </DialogOverlay>
 
-<Tooltip title="{u}" >
 <div 
 use:clickOutside
 on:click_outside={toggleShow} 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
-on:mouseenter={()=> hovered = true} 
-on:mouseleave={()=> hovered = false}
-class="hover:scale-200 duration-1000 ease-in" 
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()}
+class="hover:scale-290 duration-1000 ease-in" 
 transition:fly={{y:450, duration: 2200, opacity: 0.5}}
 >
  
@@ -528,7 +536,7 @@ transition:fly={{y:450, duration: 2200, opacity: 0.5}}
         <img class="img"
          src={src}  alt="projectlogo" >
  </button>
-           <h1 on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} class="{`normSml${pendId}-${projectId}-hh`} pn" >{name}</h1>
+           <h1 on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} class=" pn" >{name}</h1>
         {#if kindOf === "perUnit"}
        <p class="p"><span on:mouseenter={()=>hover(" שווי ליחידה")} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{easy > 0 ? easy : price}</span> * <span on:mouseenter={()=>hover("כמות")} on:mouseleave={()=>hover("0")} style="color: aqua" >{hm}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * hm : price * hm}</span> </p>
    {:else if kindOf === "total" || kindOf === "rent"}
@@ -539,7 +547,8 @@ transition:fly={{y:450, duration: 2200, opacity: 0.5}}
        <p class="p"><span on:mouseenter={()=>hover("שווי לשנה")} on:mouseleave={()=>hover("0")}  style="color:var(--gold)" >{easy > 0 ? easy : price}</span> * <span on:mouseenter={()=>hover("מספר שנים")} on:mouseleave={()=>hover("0")}  style="color: aqua" >{yers}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * yers : price * yers}</span> </p>
 {/if}
        <p class="p"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
-</div>
+<div class={`normSml${pendId}-${projectId}-hh`}></div>
+      </div>
 
 </SwiperSlide
   ><SwiperSlide
@@ -574,7 +583,6 @@ transition:fly={{y:450, duration: 2200, opacity: 0.5}}
   >
 </Swiper>
 </div>
-</Tooltip>
 {/await}
 <style>
   .j{

@@ -1,5 +1,4 @@
 <script>
-       import Tooltip from './../../celim/tooltip.svelte';
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
 
@@ -435,19 +434,29 @@ function hover (id){
   } else {
     u = id
   }
+    dispatch("hover", {id: u});
+
 }
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+ u = "הצבעה על בקשה להצטרפות לרקמה"
+  }
+  dispatch("hover", {id: u});
+ }
 </script>
 {#await ser}
 <h1>..</h1>
 {:then ser}
-<Tooltip title="{u}" >
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
-on:mouseenter={()=> hovered = true} 
-on:mouseleave={()=> hovered = false}
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow}
-class="hover:scale-200 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -551,7 +560,6 @@ class="hover:scale-200 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
   >
 </Swiper>
 </div>
-</Tooltip>
 {/await}
 
 <style>

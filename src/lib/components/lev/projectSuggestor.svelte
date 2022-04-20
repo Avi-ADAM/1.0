@@ -2,7 +2,6 @@
      import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
-     import Tooltip from './../../celim/tooltip.svelte';
 
  const dispatch = createEventDispatcher();
 
@@ -187,15 +186,26 @@ u = "הצעה להצטרפות לריקמה"
   } else {
     u = id
   }
-}</script>
-<Tooltip title="{u}" >
+    dispatch("hover", {id: u});
+
+}
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } else {
+u = "הצעה להצטרפות לריקמה"
+  }
+  dispatch("hover", {id: u});
+ }
+</script>
 <div
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
-on:mouseenter={()=> hovered = true} 
-on:mouseleave={()=> hovered = false} 
+on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()} 
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-200 duration-1000 ease-in"     in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
+class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 >
 <Swiper
   on:swiper={setSwiperRef}
@@ -242,7 +252,6 @@ class="hover:scale-200 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   >
 </Swiper>
 </div>
-</Tooltip>
 <style>
   .xyz{
             grid-column: 1/4;
