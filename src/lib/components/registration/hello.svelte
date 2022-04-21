@@ -138,6 +138,7 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
 
 }
 .a2 {
+  font-size: 13px;
 overflow: hidden; /* Ensures the content is not revealed until the animation */
   white-space: nowrap; /* Keeps the content on a single line */
   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
@@ -159,7 +160,7 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
   letter-spacing: normal; /* Adjust as needed */
     /* border-left: .15em solid orange;  The typwriter cursor */
-   
+   font-size: 16px;
   visibility: hidden;
      animation: 
      cssAnimation 0s 8.5s forwards,
