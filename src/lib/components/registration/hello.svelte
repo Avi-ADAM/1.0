@@ -135,7 +135,7 @@ text-shadow: 1px 1px black;
    font-size: 13px;
 }
 .a3{
-   font-size: 16px;
+   font-size: 13px;
 }
 }
 
@@ -169,7 +169,6 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
 }
 .a3 {
 text-shadow: 1px 1px purple ;
-font-size: 1.7rem;
 overflow: hidden; /* Ensures the content is not revealed until the animation */
   white-space: nowrap; /* Keeps the content on a single line */
   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
