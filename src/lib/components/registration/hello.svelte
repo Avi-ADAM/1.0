@@ -3,7 +3,6 @@
     import { show } from './store-show.js';
     export let idx = 1;
      import {
-    scale,
     fly
 } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
@@ -109,6 +108,17 @@ text-shadow: 1px 1px black;
   text-align: center;
   padding-top: 0.5rem ;  
 }
+@media (min-width: 501px){
+  .a2 {
+  font-size: 22px;
+  }
+  .a1 {
+  font-size: 32px;
+}
+.a3{
+  font-size: 42px;
+}
+}
  @media (max-width:500px){
 	 .midscreenText-2 {
 		   background-size: 18.25rem 6rem;
@@ -118,9 +128,15 @@ text-shadow: 1px 1px black;
     margin-top: 13vh;
 
 	 }
-   .midscreen-link{
-
-   }
+    .a2 {
+  font-size: 16px;
+  }
+  .a1 {
+   font-size: 13px;
+}
+.a3{
+   font-size: 16px;
+}
 }
 
 .a1 {
@@ -138,7 +154,6 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
 
 }
 .a2 {
-  font-size: 13px;
 overflow: hidden; /* Ensures the content is not revealed until the animation */
   white-space: nowrap; /* Keeps the content on a single line */
   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
@@ -160,7 +175,6 @@ overflow: hidden; /* Ensures the content is not revealed until the animation */
   margin: 0 auto; /* Gives that scrolling effect as the typing happens */
   letter-spacing: normal; /* Adjust as needed */
     /* border-left: .15em solid orange;  The typwriter cursor */
-   font-size: 16px;
   visibility: hidden;
      animation: 
      cssAnimation 0s 8.5s forwards,

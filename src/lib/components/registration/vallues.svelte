@@ -177,7 +177,7 @@ text-shadow: 1px 1px purple;
 		   background-size: 15.25rem 5rem;
   height: 5rem;
   width: 15.25rem;
-  font-size: 1rem;
+  font-size: 0.8rem;
   margin-top: 26vh;
 	 }
  .input-2{

@@ -46,8 +46,13 @@ let error1;
 userName.subscribe(value => {
   userName_value = value;
 });
-
-
+/*skills: [${skills1_value}],
+	 tafkidims: [${roles2_val}],
+    work_ways: [${work_ways1}],
+    vallues: [${vallues}],
+	cuntries: [${contriesis}],
+	free_person: "${fpvall}"
+*/
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
@@ -67,13 +72,7 @@ errr.p = true;
   register(input: { 
 	  username: "${userName_value}",
    email: "${emailL}",
-    password: "${passwordx}",
-	skills: [${skills1_value}],
-	 tafkidims: [${roles2_val}],
-    work_ways: [${work_ways1}],
-    vallues: [${vallues}],
-	cuntries: [${contriesis}],
-	free_person: "${fpvall}"
+    password: "${passwordx}"
  }) {
 	 jwt
     user {

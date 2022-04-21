@@ -196,8 +196,10 @@ text-shadow: 1px 1px purple;
   padding-top: 0.5rem ; 
    -webkit-text-size-adjust: 100%; 
 }
- @media (max-width:500px){
+ @media (max-width:567px){
 	 .midscreenText-2 {
+       font-size: 1.6rem;
+
 		   background-size: 15.25rem 5rem;
   height: 5rem;
   width: 15.25rem;
