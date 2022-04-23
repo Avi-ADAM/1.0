@@ -40,7 +40,7 @@
         color: rgb(239, 23, 88);
 		border-radius: 4px;
 		padding: 4px;
-		position: fixed;
+		position: absolute;
 		text-align: center;
 	}
     

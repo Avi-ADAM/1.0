@@ -1,11 +1,17 @@
 <script>
+  import Tooltip from './../../celim/tooltipb.svelte'
+
+  import {
+    createEventDispatcher
+} from 'svelte';
         import pic from './../../celim/pic.js' 
-       import Tooltip from './../../celim/tooltip.svelte'
 export let fmiData = [];
   export let hagdel = false;
    import { onMount } from 'svelte'; 
 export let rikmashes = [];
   export let meData = [];
+  const dispatch = createEventDispatcher();
+
 //	import SvelteTooltip from 'svelte-tooltip';
 
 // what about hours alrerady done to  mission in progres 
@@ -198,16 +204,19 @@ let fir,ssec;
     fir = b;
     ssec = c.toFixed(2);
        xy = true;
-
+     //  dispatch("tit",{ti: `${fir}: ${ssec}%` })
    } 
  }
  let xy = false;
     </script>
+
     {#if hagdel === false}
-    <div style =" margin-left: auto; margin-right:auto;" class="flex flex-col items-center justify-center ">
+    <div style =" margin-left: auto; margin-right:auto;" >
       <h1 style =" margin-top: 20px ;" class="text-barbi text-bold text-2xl">חלוקת שווי הריקמה</h1>
-      <div class="yy">
-       <Tooltip title="{fir}: {ssec}%" >
+         <div class="yy">       
+           <Tooltip title="{fir}: {ssec}%">
+
+
    <svg width="250px" height="250px" style="display: inline; margin: 20px auto;" viewBox="0 0 64 64" class="pie">
         {#each ulist as use, i}
         <defs>
@@ -219,10 +228,9 @@ let fir,ssec;
  
  </circle>
   {/each}
-</svg> </Tooltip>
+</svg>    </Tooltip>
 </div>
 </div>
-
 <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
    
 {:else}
@@ -440,7 +448,7 @@ let fir,ssec;
  
 {/if}
   
-   
+ 
   <style>
     .yy{
       height: 280px;
