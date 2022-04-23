@@ -1,5 +1,7 @@
 <script>
   //	import { draw } from 'svelte/transition';
+    //     import Tooltip from './../../lib/celim/tooltip.svelte'
+
   import Header from '../../lib/components/header/header.svelte'
   import { RingLoader
 } from 'svelte-loading-spinners'
@@ -76,6 +78,7 @@ async function findM() {
             error2 = e;
         }
 };
+let ti = ""
 let bmimData = [];
     let addN = false;
     let addM =  false;
@@ -800,6 +803,7 @@ async function updi (){
 function clo () {
   totalneed = false
   addN = false;
+  meDatamm = [];
 }
 let noofopen = 2;
 
@@ -1032,6 +1036,10 @@ function masi(){
    		lll.scrollIntoView(true);
 
 }
+
+function titlel (event){
+  ti = event.detail.ti
+}
     </script>
 <svelte:head>
   <title>מוח הריקמה 1❤️1</title>
@@ -1047,6 +1055,7 @@ function masi(){
          <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>
          </div> 
          {:then meData}
+         <!--   <Tooltip title="{ti}" >--> 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
@@ -1082,6 +1091,7 @@ function masi(){
 <!--{#if idUst.map(c => c.id) == idUsl} 
 בנוסף במקרה של רענון יעלם האידי של הרקמה
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
+
 <div dir="rtl" class="all  text-barbi text-center">
   <Header/>
   
@@ -1337,7 +1347,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       {#if fmiData.length > 0 || rikmashes.length > 0}
         <div class="m-4 border-2  border-barbi rounded p-4" >
 
-    <Fini fmiData={fmiData} users={projectUsers} {rikmashes}/>
+    <Fini fmiData={fmiData} users={projectUsers} {rikmashes} on:tit={titlel}/>
     <br>
     {#if hal === false}
     <button on:click={() => hal = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">
@@ -1363,7 +1373,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
 
 </div>
 
-  <!--  {:else}
+  <!-- </Tooltip> {:else}
     לשלוח אותו לרקמה ציבורי לקחת ID וכו'
     <h1 class="bg-white">לא מורשה</h1>
     {/if}-->

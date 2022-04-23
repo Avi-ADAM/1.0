@@ -102,6 +102,7 @@ pendq = ` users: [
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+         meData = [];
     //     if (miDatan[qwerys].)
              dispatch('close');
         } catch (e) {
@@ -475,7 +476,6 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
     .body {
       overflow-x: auto;
       overflow-y: auto;
-     height: 100vh;
      width: 96vw;
      padding-left: 0.5em;
      padding-right: 0.5em;
