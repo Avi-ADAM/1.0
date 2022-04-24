@@ -51,10 +51,15 @@ function less () {
     } );
 }
 let miData = [];
-  function project (id) {
-    idPr.set(id);
-    goto("/moach", );
-  };
+  
+$: pcli = 0
+function linke (){
+     pcli += 1;
+    if(pcli >= 2){
+        dispatch("proj", {id: projectId});
+    }
+}
+ 
 async function agree(oid) {
   already = true;
      const ds = declineddarra;
@@ -203,7 +208,7 @@ style:z-index={hovered === false ? 1 : 6}
 on:mouseenter={()=> hovered = true} 
 on:mouseleave={()=> hovered = false}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-290 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
+class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -222,7 +227,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly={{y:450, duration: 
 ><div><span 	class="{`normSml${oid}`}" id="normSml" 
 ></span>
         <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
-        <a on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch href={`/project/${projectId}`} class="hover:scale-150 lt" >{projectName}</a>
+        <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  class="hover:scale-150 lt" >{projectName}</button>
         <h1 on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} style="color: var(--barbi-pink); " class="ltn">{mashName}</h1>
         <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="ltn" >{price}</h3>
         <h3 class="ltn" ><span on:mouseenter={()=>hover("ההצעה שלי")} on:mouseleave={()=>hover("0")} style="color: var(--gold)">{easy}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {myp}</span> </h3>

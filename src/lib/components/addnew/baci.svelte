@@ -180,7 +180,7 @@ let suc = false;
     const placeholder = `ערכים ומטרות`;
  function project (id) {
     idPr.set(resP.id);
-    goto("/moach", );
+    goto("/moach");
   };
 export let userName_value;
   import { RingLoader
@@ -218,7 +218,7 @@ addval == false;
   }
   </script>  
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
-        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+        <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"

@@ -1,10 +1,9 @@
 <script>
-       import Tooltip from './../../celim/tooltip.svelte';
 	  import { fly, scale } from 'svelte/transition';
     import { clickOutside } from './outsidclick.js';
     import { formatTime } from './utils.js';
     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-    import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+    import { goto, prefetch } from '$app/navigation';
     import { idPr } from '../../stores/idPr.js';
     import { onMount } from 'svelte';
      import { createEventDispatcher } from 'svelte';
@@ -32,10 +31,23 @@
 
     let x = 0;
     let already = false;
-function project (id) {
+
+$: pcli = 0
+$: pmcli = 0
+function linke (s){
+    pcli += 1;
+    if(pcli >= 2){
+        dispatch("proj", {id: projectId});
+    
+  }
+}
+  function project (id) {
+      pmcli += 1;
+    if(pmcli >= 2){
     idPr.set(id);
-    goto("/moach", );
-};
+    goto("/moach")
+    }
+  };
 
 let miatan;
   onMount(async () => {
@@ -450,7 +462,7 @@ ${tofinished}
     if (hovered == false){
     u = "לב המערכת"
   } else {
-u = "משימה בתהליך ביצוע"
+u = "פעולה בתהליך ביצוע"
   }
   dispatch("hover", {id: u});
  }
@@ -473,7 +485,7 @@ u = "משימה בתהליך ביצוע"
 
 
     <DialogOverlay {isOpen} onDismiss={close} class="overlay">
-        <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
       <div dir="rtl" >
               <button on:click={close}>ביטול</button>
@@ -501,7 +513,6 @@ out:scale={{duration: 2200, opacity: 0.5}}
   on:swiper={setSwiperRef}
   effect={"flip"}
   speed={1000}
-
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
@@ -514,8 +525,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
   <SwiperSlide
     ><div
 	 id="normSml" 
->
-   
+>  
 <svg viewBox="0 0 100 100" class="svgg">
     <g transform="translate(50 50)">
         <circle id="dial" cx="0" cy="0" r="42" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="0.3 1.898"></circle>
@@ -545,12 +555,12 @@ out:scale={{duration: 2200, opacity: 0.5}}
             {formatTime(zman)}
         </text>
         {/if}
-                <a on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch href={`${linkP}${projectId}`}><text y='-12' text-anchor="middle" font-size="8" >{projectName}</text></a>
+                <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  ><text y='-12' text-anchor="middle" font-size="8" >{projectName}</text></g>
          <text on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} y='-6' text-anchor="middle"  style=" color: var(--barbi-pink); " font-size="8">{missionName}</text>
 
                                                      <foreignObject  x='-12' y='-42' width='25px' height='56px'>   
     <span class="{`normSml${perhour}-${projectId}-${mId}`}"></span>
-        <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
+        <img on:click={()=>project()} on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
          
 
        {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{dueDateOrCountToDedline}</h5>{/if}

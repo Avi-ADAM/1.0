@@ -389,17 +389,14 @@ $: pcli = 0
 $: pmcli = 0
 function linke (s){
  if (s == "u"){
-      console.log("dghrt")
-
  ucli += 1
  if(ucli >= 2){
-   console.log("rt")
-   goto(`${linkU}${userId}`)
+  dispatch("user", {id: userId});
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-      goto(`${link}${projectId}`)
+        dispatch("proj", {id: projectId});
     }
   }
 }
@@ -407,7 +404,7 @@ function linke (s){
       pmcli += 1;
     if(pmcli >= 2){
     idPr.set(id);
-    goto("/moach", );
+    goto("/moach")
     }
   };
 </script>
@@ -415,9 +412,9 @@ function linke (s){
 <h1>..</h1>
 {:then ser}
 
- <DialogOverlay {isOpen} onDismiss={close} >
-        <div transition:fly={{y: 450, opacity: 0.5, duration: 1000}}>
-  <DialogContent aria-label="form">
+ <DialogOverlay {isOpen} onDismiss={close} class="overlay" >
+        <div transition:fly|local|local={{y: 450, opacity: 0.5, duration: 1000}}>
+  <DialogContent class="content" aria-label="form">
       <div dir="rtl" class="flex items-center flex-col" >
               <button on:click={close} class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
@@ -444,7 +441,7 @@ style:z-index={hovered === false ? 1 : 6}
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()} 
 use:clickOutside on:click_outside={toggleShow}
-class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -482,7 +479,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
            <circle stroke-opacity="0.01" r="100" fill-opacity="0.01" fill="url(#lg)" transform="rotate(135)" stroke="url(#lgb)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
             <circle r="80" fill-opacity="0.01" fill="url(#lg)" transform="rotate(315)" stroke="none"/>
                   
-                            <g  on:dblclick={()=>goto(`${linkU}${userId}`)} on:touchstart={()=>linke("u")} on:mouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
+                            <g  on:click={()=>linke("u")} on:touchstart={()=>linke("u")} on:mouseenter={()=>hover(`לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")}  x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
                    <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                     <span 	class="{`normSml${mId}-oo`}"></span> 
                     <img
@@ -501,11 +498,11 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                {missionBName}
                            </textPath>
                        </text>
-                 <g on:dblclick={()=>goto(`${link}${projectId}`)} on:touchstart={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  x="0" y="-40">
+                 <g on:click={()=>linke("p")} on:touchstart={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  x="0" y="-40">
                        <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                  </g>  
                        <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                      <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                      <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה כפולה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" >
                        </button>
                    </foreignObject>
@@ -689,7 +686,22 @@ input[type=text]:invalid {
     opacity: 1;
     padding: 6px;
 }
-@media (min-width: 550px){
+  :global([data-svelte-dialog-content].content) {
+      width: 80vw;
+      z-index: 60;
+  }
+    :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 1000;
+  }
+  @media (min-width: 568px){
+        :global([data-svelte-dialog-content].content) {
+width:50vw;
+      z-index: 60;
+
+        }
+          :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 1000;
+  }
           .pnn{
    margin: 3px;
     font-size: 10px; 

@@ -548,7 +548,7 @@ on:click={open}
 </div>
 {:else if  addSl == true}
 {#if g == false}
-<div class="anotherE"  transition:fly={{x: 350, y: 200 ,opacity: 0.5}}>
+<div class="anotherE"  transition:fly|local={{x: 350, y: 200 ,opacity: 0.5}}>
 <button class=" hover:bg-barbi text-gold  font-bold rounded-full"
 title="ביטול"
 on:click={bitul}

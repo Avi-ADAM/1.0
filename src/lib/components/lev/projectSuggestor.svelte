@@ -198,6 +198,15 @@ u = "הצעה להצטרפות לריקמה"
   }
   dispatch("hover", {id: u});
  }
+ 
+$: pcli = 0
+function linke (){
+    pcli += 1;
+    if(pcli >= 2){
+        dispatch("proj", {id: projectId});
+    }
+}
+  
 </script>
 <div
 style="position: relative;" 
@@ -226,8 +235,8 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 	 id="normSml" 
 ><div class="{`normSml${oid}-${projectId}`}"></div>
 
-        <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
-        <a sveltekit:prefetch on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  href={`${linki}${projectId}`}><h3 class="hover:text-lturk lt" >{projectName}</h3></a>
+        <img on:click={()=>linke()} on:mouseenter={()=>hover(` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `)} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
+        <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  ><h3 class="hover:text-lturk lt" >{projectName}</h3></button>
         <h1 on:mouseenter={()=>hover("שם המשימה המוצעת")} on:mouseleave={()=>hover("0")} style="color: rgb(87, 208, 248 ); " class="ltn">{missionName}</h1>
         {#if total} <p>{total}</p>{/if}
    

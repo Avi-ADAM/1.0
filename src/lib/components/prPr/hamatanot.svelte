@@ -82,7 +82,7 @@ $: for (let i = 0; i < salee.length; i++){
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
-        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+        <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
@@ -304,10 +304,10 @@ $: for (let i = 0; i < salee.length; i++){
           </tr>
     </table> 
     {#if hal === false}
-   <button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+   <button id="haluk"  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>{trili.length == 0 ? "בקשת חלוקה" : "צפיה בהצעת החלוקה" }</button>
 {:else}
-<Halu {trili} {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
+<Halu  {trili} {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
 {/if}
     {/if}
  {#if salee.length > 0} 

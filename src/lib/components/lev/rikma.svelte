@@ -1,18 +1,20 @@
 
 <script>
-      import { onMount } from 'svelte';
-  import Header from './../../lib/components/header/header.svelte'
+  import {
+    createEventDispatcher
+} from 'svelte';
+ const dispatch = createEventDispatcher();
 
+  import { RingLoader
+} from 'svelte-loading-spinners';
 export let projectId;
-let project = [
-];
 let projectUsers =[];
 let token;
 let idL;
 let srcP;
 let error1 = null;
 let projecto = [];
-onMount(async () => {
+async function xyd () {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -60,17 +62,26 @@ onMount(async () => {
         } catch (e) {
             error1 = e
         }
-    });
-    
+        return project
+    };
+
+    function us (x){
+      dispatch('user',{id:x})
+    }
+    let project = xyd();
+
     
 </script>
- 
+ {#await project}
+ <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ {:then project}
+
 <div dir="rtl" class="all">
 
   <div class="4">
     {#if srcP}
     <img
-    width="250" height="250" 
+    width="180" height="180" 
     style="border-radius: 50%; margin-right:auto; margin-left:auto ;"  
     src={srcP}
     alt="profilePic">
@@ -78,13 +89,14 @@ onMount(async () => {
   </div>
 <h1 class="q">{project.projectName}</h1>
 {#if project.publicDescription !== null}
-<h6 class="text-barbi text-center">{project.publicDescription}</h6>
+<p class="text-barbi text-center">{project.publicDescription}</p>
 {/if}
 <div style="background-color: var(--mturk); margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--gold);" class="3">
     <h2 style="color: var(--barbi-pink);
 " >1 ברקמה </h2>
 {#each projectUsers as user}
-<a sveltekit:prefetch href={`/user/${user.id}`}><h6 class="text-gold hover:text-barbi">{user.username}</h6></a>
+<button  on:click={us(user.id)}><p class="text-gold hover:text-barbi">{user.username}</p></button>
+<br>
 {/each}
 </div>
 
@@ -96,11 +108,9 @@ onMount(async () => {
 {/each}
 </div>
 </div>
-
+{/await}
 <style>
-  .all{
-
-  }
+  
   .q{
 font-size: 220%;
 text-align: center;

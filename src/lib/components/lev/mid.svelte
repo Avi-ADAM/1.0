@@ -2,7 +2,20 @@
  import { onMount } from 'svelte';
     import { createEventDispatcher } from 'svelte';
       import { onDestroy } from 'svelte'
+      /* var show = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi, .ppmash, .pmashs, .pmaap, .askmap" )
 
+     for(let i=0;i<show.length;i++){
+               milon[show[i].classList[0]] = true;
+    }*/
+/* const value = event.detail.data;
+  let hide = document.querySelectorAll(".fiap, .welc, .sugg, .pend, .asks,.betaha, .desi, .ppmash, .pmashs, .pmaap, .askmap" )
+  for(let i=0;i<milon.length;i++){
+              milon[hide[i].classList[0]] = false;
+    }
+  let show = document.getElementsByClassName(value)
+          for(let i=0;i<show.length;i++){
+                                milon[show[i].classList[0]] = true;
+        }*/
  const dispatch = createEventDispatcher();
 let meData;
 let token; 

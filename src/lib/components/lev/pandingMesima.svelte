@@ -313,9 +313,29 @@ let isOpen = false;
     //dispach or update  coin to negotiable state 
   }
 
-   function project (id) {
+  
+$: ucli = 0
+$: pcli = 0
+$: pmcli = 0
+function linke (s){
+ if (s == "u"){
+ ucli += 1
+ if(ucli >= 2){
+  dispatch("user", {id: userId});
+   }
+  }else if (s == "p"){
+    pcli += 1;
+    if(pcli >= 2){
+        dispatch("proj", {id: projectId});
+    }
+  }
+}
+  function project (id) {
+      pmcli += 1;
+    if(pmcli >= 2){
     idPr.set(id);
-    goto("/moach", );
+    goto("/moach")
+    }
   };
 
  import { Swiper, SwiperSlide } from "swiper/svelte";
@@ -373,7 +393,7 @@ u = "הצבעה על פרסום הצעת משימה לריקמה"
 
 
  <DialogOverlay {isOpen} onDismiss={close} class="overlay" >
-        <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
       <div dir="rtl" class="grid items-center justify-center text-center">
               <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
@@ -419,7 +439,7 @@ style:z-index={hovered === false ? 1 : 6}
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-290 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
+class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -683,7 +703,7 @@ input[type=text]:invalid {
       z-index: 60;
   }
     :global([data-svelte-dialog-overlay].overlay) {
-    z-index: 100;
+    z-index: 1000;
   }
   @media (min-width: 568px){
         :global([data-svelte-dialog-content].content) {
@@ -692,7 +712,7 @@ width:50vw;
 
         }
           :global([data-svelte-dialog-overlay].overlay) {
-    z-index: 100;
+    z-index: 1000;
   }
          .btin{
     width:24px;

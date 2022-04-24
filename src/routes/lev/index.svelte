@@ -16,9 +16,13 @@ import Mid from "../../lib/components/lev/midi.svelte"
         import Reqtom from '../../lib/components/lev/reqtom.svelte'
         import Weget from '../../lib/components/lev/weget.svelte'
         import Hal from '../../lib/components/lev/halukaask.svelte'
-let low = true;
-let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
-
+       import Rikma from '../../lib/components/lev/rikma.svelte'
+        import Hevel from '../../lib/components/lev/hevel.svelte'
+        import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+        import { fly } from 'svelte/transition';
+        let low = true;
+                let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
+              let isOpen = false;
   //  import Viewport from 'svelte-viewport-info'
     let idL;
     let meData = [];
@@ -51,6 +55,23 @@ let askm = 0;
 let ma = 0;
 let wegets = [];
 let arr1 = []
+function close() {
+  isOpen = false;
+}
+let eizeish, eizep
+let mode = 0;
+function user(event){
+  isOpen = false
+ eizeish = event.detail.id
+ mode = 1
+ isOpen = true
+}
+function proj(event){
+  isOpen = false
+ eizep = event.detail.id
+ mode =2
+ isOpen = true
+}
 function mesimabetahalicha (data) {
     const mtahan = data.data.user.mesimabetahaliches;
         for (var i = 0; i < mtahan.length; i++) {
@@ -1572,9 +1593,28 @@ function hover(event){
 <svelte:head>
   <title>לב 1❤️1</title>
 </svelte:head>
+<DialogOverlay class="overlay" {isOpen} onDismiss={close} >
+        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 1000}}>
+  <DialogContent aria-label="form" class="content">
+ <div dir="rtl" class="grid items-center justify-center text-center">
+              <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+     title="סגירה"
+    ><svg style="width:48px;height:48px" viewBox="0 0 24 24">
+  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+   </svg></button>
+   <br/>
+   {#if mode == 1}
+    <Hevel userId={eizeish} on:proj={proj}/>
+    {:else if mode == 2}
+    <Rikma projectId={eizep} on:user={user}/>
+    {/if}
+  </div>
+  </DialogContent>
+  </div>
+</DialogOverlay>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
 <Tooltip title="{u}" ispic="true">
-<div class="screen"> 
+<div class="screen" > 
     
 {#each adder as add }
    {@html add}
@@ -1582,10 +1622,11 @@ function hover(event){
 
 {#each arr1 as buble, i}
 {#if buble.ani === "haluk"}
-<div class="normSml halu"><Hal    
+ <div class="normSml halu"><Hal    
     user_1s={buble.user_1s}
           on:hover={hover}
-
+ on:proj={proj}
+ on:user={user}
     myid={buble.myid}
     pendId={buble.pendId}
     mypos={buble.mypos}
@@ -1605,7 +1646,9 @@ function hover(event){
                                /></div>
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
  <div   class="betaha normSml" ><MissionInProgress
-    on:hover={hover}
+  on:proj={proj}
+ on:user={user}  
+  on:hover={hover}
     noofpu={buble.project.user_1s.length}
     oldzman={buble.timer}
     stname={buble.stname}
@@ -1628,7 +1671,8 @@ function hover(event){
  ><PendingMa
         on:show={show}
               on:hover={hover}
-
+  on:proj={proj}
+ on:user={user}
         on:coinLapach={coinLapach}
         mypos={buble.mypos}
         diun={buble.diun}
@@ -1664,7 +1708,8 @@ function hover(event){
  ><PendingM
         on:show={show}
               on:hover={hover}
-
+  on:proj={proj}
+ on:user={user}
         on:coinLapach={coinLapach}
       descrip={buble.descrip}
       projectName = {buble.projectName}
@@ -1697,7 +1742,8 @@ function hover(event){
             on:acsept={deloid}
             on:decline={deloid}
                   on:hover={hover}
-
+          on:proj={proj}
+ on:user={user}
             mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
@@ -1740,8 +1786,9 @@ function hover(event){
             on:acsept={deloi}
             on:decline={deloi}
                   on:hover={hover}
-
-            mId={buble.mId}
+    on:proj={proj} 
+ on:user={user}
+             mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
             what={buble.what}
@@ -1787,7 +1834,8 @@ function hover(event){
         <div  class="asks normSml" ><Reqtojoin
             on:acsept={delo}
                   on:hover={hover}
-
+            on:proj={proj}
+     on:user={user}
             on:decline={delo}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
@@ -1825,7 +1873,8 @@ function hover(event){
             on:acsept={delom}
             on:decline={delom}
                   on:hover={hover}
-
+            on:proj={proj}
+ on:user={user}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
             what={buble.what}
@@ -1861,7 +1910,8 @@ function hover(event){
     <div class="sugg normSml" ><ProjectSuggestor
       on:less={less}
             on:hover={hover}
-
+      on:proj={proj}
+ on:user={user}
       askedarr={askedarr}
       {declineddarr}
       deadLine = {buble.sqadualed}
@@ -1883,6 +1933,8 @@ function hover(event){
     <div  class="pmashs normSml" ><Mashsug
       on:less={lessi}
       on:hover={hover}
+      on:proj={proj}
+ on:user={user}
       i={i}
       askedarr={askedarr}
      declineddarra= {buble.declineddarra}
@@ -1966,7 +2018,23 @@ des={0}  />
 
 
 <style>
- 
+   :global([data-svelte-dialog-content].content) {
+      width: 80vw;
+      z-index: 1000;
+  }
+    :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 1000;
+  }
+  @media (min-width: 568px){
+        :global([data-svelte-dialog-content].content) {
+width:60vw;
+      z-index: 1000;
+
+        }
+          :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 1000;
+  }
+}
   /*  .svggg{
         min-width:75px; 
         min-height:75px;

@@ -18,7 +18,7 @@ import {
 
 function project(id) {
     idPr.set(id);
-    goto("/moach", );
+    goto("/moach");
     
     //make it desapire for good
 };
@@ -41,7 +41,7 @@ style="position: relative;"
 style:z-index={hovered === false ? 1 : 6} 
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
-class="hover:scale-290 duration-1000 ease-in-out" transition:fly={{y: 250, opacity: 0.9, duration: 2000}}>
+class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000}}>
 
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 class="a" viewBox="-1 0 59 58" enable-background="new 0 0 57 57" xml:space="preserve">

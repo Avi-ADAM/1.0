@@ -1,6 +1,6 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
- import { goto } from '$app/navigation';
+ import { goto, prefetch } from '$app/navigation';
 
   import {
     clickOutside
@@ -99,9 +99,29 @@ let ser = xyz();
 let idL;
 let bearer1; 
 let token;
-   function project (id) {
+  
+$: ucli = 0
+$: pcli = 0
+$: pmcli = 0
+function linke (s){
+ if (s == "u"){
+ ucli += 1
+ if(ucli >= 2){
+  dispatch("user", {id: userId});
+   }
+  }else if (s == "p"){
+    pcli += 1;
+    if(pcli >= 2){
+        dispatch("proj", {id: projectId});
+    }
+  }
+}
+  function project (id) {
+      pmcli += 1;
+    if(pmcli >= 2){
     idPr.set(id);
-    goto("/moach", );
+    goto("/moach")
+    }
   };
 import { Swiper, SwiperSlide } from "swiper/svelte";
 
@@ -468,7 +488,7 @@ style:z-index={hovered === false ? 1 : 6}
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
+class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
@@ -513,7 +533,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                         <circle r="100" fill="url(#lgg)" transform="rotate(135)" stroke="url(#lgbg)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
                                          <circle r="80" fill="url(#lgg)" transform="rotate(315)" stroke="none"/>
                                                
-                                                         <a on:mouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}>
+                                                         <g on:click={()=>linke("u")} on:mouseenter={()=>hover(` לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
                                                 <foreignObject  x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                                                    <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
@@ -525,7 +545,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                                         /> 
                                                      </foreignObject>     
                                                             <text fill="#EEE8AA " text-anchor="middle" x='0' y='46' style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;">{useraplyname}</text>
-                                                        </a>        
+                                                    </g>        
 
                                             
                                                 <path id="curvee" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
@@ -534,10 +554,10 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                                             {openmissionName}
                                                         </textPath>
                                                     </text>
-                                              <a on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40"   xlink:href="{`${link}${projectId}`}">
-                                                    <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>  </a>  
+                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  x="0" y="-40" >
+                                                    <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>  </g>  
                                                     <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                                                        <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                                                        <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה כפולה למעבר למוח ריקמת ${projectName}`)} on:mouseleave={()=>hover("0")}>
                                                     <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" >
                                                         </button>
                                                 </foreignObject>
