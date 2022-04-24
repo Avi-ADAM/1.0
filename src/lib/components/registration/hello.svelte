@@ -116,7 +116,7 @@ text-shadow: 1px 1px black;
   font-size: 32px;
 }
 .a3{
-  font-size: 42px;
+  font-size: 29px;
 }
 }
  @media (max-width:500px){
