@@ -53,7 +53,13 @@ function linke (s){
     goto("/moach")
     }
   };
+let zmani;
 
+  let msdonf;
+  $: msdonf = hoursdon * 3600000;
+  export let zman;
+$:  zman = msdonf + lapse + x;
+  export let oldzman;
 let miatan;
   onMount(async () => {
     if (stname === "0") {
@@ -85,7 +91,7 @@ let miatan;
   }
  });
         } 
-            if (mstotal-zman == 300000){
+  if (mstotal-zman == 300000){
  let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -96,6 +102,7 @@ let miatan;
   }
  });
         }else if (mstotal-zman == 60000){
+          console.log("timer stop min")
  let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -124,11 +131,7 @@ let miatan;
   }
 })
 
-let zmani;
 
-  let msdonf;
-  $: msdonf = hoursdon * 3600000;
-  export let oldzman;
   import { onDestroy } from 'svelte'
   let timer;
   let running = false;
@@ -397,8 +400,7 @@ timer: 0
 }
     export let lapse = 0;
 
-export let zman;
-$:  zman = msdonf + lapse + x;
+
     // lapse refers to the number of milliseconds in the stopwatch
 
     // rotation refers to the degrees applied to the minutes dial to have a full rotation for 60 seconds
