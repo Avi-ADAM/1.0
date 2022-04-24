@@ -18,8 +18,7 @@ import {
 
 function project(id) {
     idPr.set(id);
-    goto("/moach");
-    
+    goto("/moach",);
     //make it desapire for good
 };
 const dispatch = createEventDispatcher();
@@ -103,7 +102,7 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
      <text text-anchor="middle" width="16" overflow="scroll"  x="28.5" y="18" fill="#FF0092" style="font-size:4px;" >{username}</text>
  <text text-anchor="middle"  x="28.5" y="24" fill="#FF0092" style="font-size:4px;" >הצטרפת לרקמת</text>
         <text text-anchor="middle" width="21" overflow="scroll"  x="28.5" y="30" fill="#FF0092" style="font-size:4px;" >{projectName}</text>
-      <text x="28.5" y="38" text-anchor="middle"  class="btn" style="font-size:4px;" on:click={project(id)}>למוח הריקמה</text>
+      <text  x="28.5" y="38" text-anchor="middle"  class="btn" style="font-size:4px;" on:click={() =>project(id)}>למוח הריקמה</text>
 </svg>
 <!--
     <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הריקמה</button>-->
@@ -213,8 +212,9 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
             stroke: var(--gold);
             stroke-width: 1px;
               paint-order: stroke fill;
-
-
+        border-radius: 50%;
+        border: 1px solid var(--lturk);
+        cursor: pointer; 
 }
 .btn:hover{
     fill: var(--gold);

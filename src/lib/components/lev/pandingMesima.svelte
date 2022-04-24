@@ -314,20 +314,13 @@ let isOpen = false;
   }
 
   
-$: ucli = 0
 $: pcli = 0
 $: pmcli = 0
 function linke (s){
- if (s == "u"){
- ucli += 1
- if(ucli >= 2){
-  dispatch("user", {id: userId});
-   }
-  }else if (s == "p"){
+ 
     pcli += 1;
     if(pcli >= 2){
         dispatch("proj", {id: projectId});
-    }
   }
 }
   function project (id) {
@@ -460,7 +453,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
     ><div
 	 id="normSml" 
 >
- <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")} >
+ <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")} >
         <img class="img"
          src={src}  alt="projectlogo" >
  </button>
@@ -473,10 +466,10 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   ><SwiperSlide
     ><div id="normSmll"
 ><div class="{`normSmll${pendId}`} "></div>
-<a class="ab na" href={`/project/${projectId}`}>
+<button on:click={()=>linke()} class="ab na" >
 	         <h3 class="ab na"
  on:mouseenter={()=>hover("לחיצה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}>{projectName}</h3>
-   </a>   
+</button>   
  <h5 on:mouseenter={()=>hover("תיאור")} on:mouseleave={()=>hover("0")} class="pnn bc">{descrip !== undefined && descrip !== null ? descrip : ""}</h5>
    {#if hearotMeyuchadot}
      <h6 on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="pnn cd">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</h6>

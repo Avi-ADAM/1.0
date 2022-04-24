@@ -533,7 +533,6 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                                         alt={useraplyname}
                                                         src={src}
                                                         style="border-radius: 50%;"
-                                                        title={useraplyname}
                                                         /> 
                                                      </foreignObject>     
                                                             <text fill="#EEE8AA " text-anchor="middle" x='0' y='46' style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;">{useraplyname}</text>

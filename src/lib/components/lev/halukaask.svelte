@@ -284,21 +284,13 @@ function afternego (event) {
 }
 
 
-$: ucli = 0
 $: pcli = 0
 $: pmcli = 0
-function linke (s){
- if (s == "u"){
- ucli += 1
- if(ucli >= 2){
-  dispatch("user", {id: userId});
-   }
-  }else if (s == "p"){
+function linke (){
     pcli += 1;
     if(pcli >= 2){
         dispatch("proj", {id: projectId});
     }
-  }
 }
   function project (id) {
       pmcli += 1;
@@ -504,7 +496,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 	 id="normSml" 
 > 
 
- <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}  >  
+ <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}  >  
       <img class="img"
          src={src}  alt="projectlogo" >
  </button>
@@ -529,9 +521,10 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
     ><div  id="normSmll"
  >
 
-       <a on:mouseenter={()=>hover("לחיצה למעבר לדף הציבורי של הריקמה")} 
-            on:mouseleave={()=>hover("0")}   class="ab pn" href={`/project/${projectId}`}
-        ><h3 class="ab pn">{projectName}</h3></a>
+       <button on:click={()=>linke()}
+        on:mouseenter={()=>hover("לחיצה למעבר לדף הציבורי של הריקמה")} 
+            on:mouseleave={()=>hover("0")}   class="ab pn" 
+        ><h3 class="ab pn">{projectName}</h3></button>
         <div class="{`normSmll${pendId}-${projectId}-hdh`}">    </div>
 
     {#if whyno.length > 0}<h4
