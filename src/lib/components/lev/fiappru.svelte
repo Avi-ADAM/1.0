@@ -361,10 +361,7 @@ function close() {
     no = false; 
     masa = false;
 }
-  function project (id) {
-    idPr.set(id);
-    goto("/moach", );
-  };
+
 
 $: w = 0;
  let u ="בקשה לאישור ביצוע משימה בהצלחה";
@@ -387,6 +384,32 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
   }
     dispatch("hover", {id: u});
 }
+$: ucli = 0
+$: pcli = 0
+$: pmcli = 0
+function linke (s){
+ if (s == "u"){
+      console.log("dghrt")
+
+ ucli += 1
+ if(ucli >= 2){
+   console.log("rt")
+   goto(`${linkU}${userId}`)
+   }
+  }else if (s == "p"){
+    pcli += 1;
+    if(pcli >= 2){
+      goto(`${link}${projectId}`)
+    }
+  }
+}
+  function project (id) {
+      pmcli += 1;
+    if(pmcli >= 2){
+    idPr.set(id);
+    goto("/moach", );
+    }
+  };
 </script>
 {#await ser}
 <h1>..</h1>
@@ -459,7 +482,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
            <circle stroke-opacity="0.01" r="100" fill-opacity="0.01" fill="url(#lg)" transform="rotate(135)" stroke="url(#lgb)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
             <circle r="80" fill-opacity="0.01" fill="url(#lg)" transform="rotate(315)" stroke="none"/>
                   
-                            <a on:mouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" href={`${linkU}${userId}`}>
+                            <g  on:dblclick={()=>goto(`${linkU}${userId}`)} on:touchstart={()=>linke("u")} on:mouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} sveltekit:prefetch x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
                    <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                     <span 	class="{`normSml${mId}-oo`}"></span> 
                     <img
@@ -467,20 +490,20 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                            height='56px'
                            alt={useraplyname}
                            src={src}
-                           style="border-radius: 50%;"
+                           style="border-radius: 50%;"    
                            /> 
                         </foreignObject>     
                                <text fill="#FF0092" text-anchor="middle" x='0' y='46' style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;">{useraplyname}</text>
-                           </a>   
+                      </g>   
                    <path id="curve" fill-opacity="0.01"  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                        <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
                            <textPath on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} font-weight="bold" color="#FF0092" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
                                {missionBName}
                            </textPath>
                        </text>
-                 <a on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40"   xlink:href="{`${link}${projectId}`}">
+                 <g on:dblclick={()=>goto(`${link}${projectId}`)} on:touchstart={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  x="0" y="-40">
                        <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
-                                        </a>  
+                 </g>  
                        <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
                       <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" >
