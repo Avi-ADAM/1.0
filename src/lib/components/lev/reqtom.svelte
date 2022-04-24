@@ -81,7 +81,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
     swiperRef.slideTo(index , 400);
   };
  function toggleShow (){
-  slideTo(1)
+  slideTo(0)
  }
 let error1;
 let miDatan = [];
@@ -93,7 +93,8 @@ let linkg = 'https://onelovevone.onrender.com/graphql';
 let ok;
 let nook;
 let tryo = "115%";
-let tryot = "-11%"
+let tryot = "-10.5%";
+let tryoti = "-5.25%";
 let nut;
 async function xyz (){
 
@@ -121,6 +122,7 @@ if (nook > 0){
 if (nut > 0 && nook > 0){
   tryo = "129%"
   tryot = "-17%"
+  tryoti = "-11.5%"
 }
 
 ser = ser
@@ -151,11 +153,11 @@ let adduser = ``;
 let adduser2 = ``;
 async function agree() {
     already = true;
+     noofusersOk += 1;
+  noofusersWaiting -= 1;
+  ser = xyz();
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
-    
-    
-    console.log("agree")
-    const cookieValue = document.cookie
+      const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
         .split('=')[1];
@@ -354,14 +356,14 @@ ${adduser2}
 ;
 
 function ask() {
-    console.log("nego")
     // plain text? list? terms???
 }
 
 async function decline() {
         already = true;
-
-        console.log("decline0");
+     noofusersNo -= 1;
+  noofusersWaiting -= 1;
+  ser = xyz();
 const declineda = declined.map(c => c.id)
     declineda.push(userId)
         console.log("decline1");
@@ -457,11 +459,10 @@ on:mouseenter={()=> hoverede()}
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow}
 class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
-<Swiper
+<Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
-    loop={true}
-  loopFillGroupWithBlank={true}
+
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
@@ -476,9 +477,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
  bind:clientWidth={w}
   style:width={tryo}
    style:top={tryot}
-    style:left={tryot}
+    style:left={tryoti}
      style="position:absolute;">
-  <ProgressBar 
+  <ProgressBar cls="transition: all 1000ms ease-in-out;" 
   series={ser} 
   width={w} 
   textSize={0}  

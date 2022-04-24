@@ -43,7 +43,7 @@
     swiperRef.slideTo(index , 400);
   };
  function toggleShow (){
-  slideTo(1)
+  slideTo(0)
  }
 function less () {
     dispatch('less', {
@@ -204,11 +204,10 @@ on:mouseenter={()=> hovered = true}
 on:mouseleave={()=> hovered = false}
 use:clickOutside on:click_outside={toggleShow} 
 class="hover:scale-290 duration-1000 ease-in" transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
-<Swiper
+<Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
-    loop={true}
-  loopFillGroupWithBlank={true}
+
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}

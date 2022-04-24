@@ -67,12 +67,15 @@ let ok;
 let nook;
 let nut;
 let tryo = "116%";
-let tryot = "-11%";
+let tryot = "-10.5%";
+let tryoti = "-5.25%";
+
 async function xyz (){
 
 ok =  percentage(noofusersOk, noofpu)
 nook = percentage(noofusersNo, noofpu) 
 nut = percentage(noofusersWaiting, noofpu) 
+
 let ser = [];
  ser.push({
 perc: ok,
@@ -94,6 +97,7 @@ color: '#80037e'
 if (nut > 0 && nook > 0){
   tryo = "129%"
   tryot = "-17%"
+  tryoti = "-11.5%"
 }
 
 ser = ser
@@ -128,7 +132,7 @@ let ser = xyz();
     swiperRef.slideTo(index , 400);
   };
  function toggleShow (){
-  slideTo(1)
+  slideTo(0)
  }
 let error1;
 let miDatan = [];
@@ -152,11 +156,12 @@ let welcome = ``;
 let adduser = ``;
 let adduser2 = ``;
 async function agree() {
+
     already = true;
+    noofusersOk += 1;
+  noofusersWaiting -= 1;
+  ser = xyz();
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
-    
-    
-    console.log("agree")
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -414,14 +419,13 @@ title="ביטול"
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
 on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
-use:clickOutside on:click_outside={toggleShow} 
+on:mouseleave={()=> hoverede()} 
+use:clickOutside on:click_outside={toggleShow}
 class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
-<Swiper
+<Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
-    loop={true}
-  loopFillGroupWithBlank={true}
+
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
@@ -431,8 +435,8 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     prevEl: `.normSmll${mId}-oo`,
   }}
 >
-<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryot} style="position:absolute;">
-  <ProgressBar series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
+<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryoti} style="position:absolute;">
+  <ProgressBar cls="transition: all 1000ms ease-in-out;" series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
   <SwiperSlide
     ><div

@@ -430,7 +430,7 @@ ${tofinished}
     swiperRef.slideTo(index , 400);
   };
  function toggleShow (){
-  slideTo(1)
+  slideTo(0)
  }
   import { Swiper, SwiperSlide } from "swiper/svelte";
 
@@ -497,12 +497,11 @@ use:clickOutside on:click_outside={toggleShow}
 class="hover:scale-290 duration-1000 ease-in"     in:scale={{duration: 3200, opacity: 1, start: 0.1}}
 out:scale={{duration: 2200, opacity: 0.5}}
 >
-<Swiper
+<Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
   speed={1000}
-    loop={true}
-  loopFillGroupWithBlank={true}
+
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}

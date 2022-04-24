@@ -30,13 +30,14 @@ import { idPr } from '../../stores/idPr.js';
     let idL;
     let no = false;
     let masa = false;
- function percentage(partialValue, totalValue) {
+function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
-   } 
+  } 
 let ok;
 let nook;
 let tryo = "116%";
-let tryot = "-11%"
+let tryot = "-10.5%";
+let tryoti = "-5.25%";
 let nut;
 async function xyz (){
     ok =  percentage(noofusersOk, noofusers)
@@ -62,8 +63,8 @@ async function xyz (){
     }
     if (nut > 0 && nook > 0){
       tryo = "129%"
-      tryot = "-17%"
-    }
+tryot = "-17%"
+  tryoti = "-11.5%"    }
     ser = ser
     return ser
 }
@@ -75,7 +76,7 @@ function coinLapach() {
         dispatch('coinLapach', {
     data: pendId
     } );
-	};
+};
 
 function objToString (obj) {
     let str = '';
@@ -99,7 +100,8 @@ async function agree(alr) {
       } else{
   already = true;
   noofusersOk += 1;
-  xyz ()
+  noofusersWaiting -= 1;
+  ser = xyz();
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -132,12 +134,12 @@ if (noofusersOk  === noofusers){
       users_permissions_user: "${idL}"
     }
   ],
-archived: true
-}
+ archived: true
+ }
       }
   ){tosplit { vots { users_permissions_user { id}}}}
-} `   
-} )})
+ } `   
+ } )})
   .then(r => r.json())
   .then(data => miDatan = data); 
         console.log(miDatan)
@@ -165,10 +167,10 @@ archived: true
       users_permissions_user: "${idL}"
     }
   ],
-}
+ }
       }
   ){tosplit { vots { users_permissions_user { id}}}}
-} `   
+ } `   
 // make coin desapire
 } )})
   .then(r => r.json())
@@ -210,8 +212,9 @@ async function afterwhy (){
           
     isOpen = false;
   already = true;
-  noofusersOk += 1;
-  xyz ()         
+   noofusersNo -= 1;
+  noofusersWaiting -= 1;
+  ser = xyz();        
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -242,7 +245,7 @@ async function afterwhy (){
       users_permissions_user: "${idL}"
     }
   ],
-}
+ }
       }
   ){tosplit { vots { users_permissions_user { id}}}}
 } `   
@@ -263,7 +266,7 @@ async function afterwhy (){
         }
            
 
-    }
+}
 const close = () => {
     isOpen = false;
     no = false; 
@@ -271,26 +274,26 @@ const close = () => {
     already = false;
     allr = false;
           rect = false;
-  };
+};
 
 function afternego (event) {
   isOpen = false;
     no = false; 
     masa = false;
     //dispach or update  coin to negotiable state 
-  }
+}
 
 function project (id) {
     idPr.set(id);
     goto("/moach", );
-  };
+};
   let rect = false;
   let allr = false;
-  async function react (){
+async function react (){
      allr = true;
       rect = true;
       isOpen = true;
-  }
+}
 async function afreact (){
        const cookieValue = document.cookie
   .split('; ')
@@ -328,7 +331,7 @@ async function afreact (){
   ){pmash { users { users_permissions_user { id}}}}
 } `   
 // make coin desapire
-} )})
+ } )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
@@ -347,30 +350,30 @@ async function afreact (){
   import "./style.css";
 
   // import required modules
-  import { EffectFlip, Navigation } from "swiper";
+import { EffectFlip, Navigation } from "swiper";
    let swiperRef = null;
 
-  const setSwiperRef = ({ detail }) => {
+const setSwiperRef = ({ detail }) => {
     const [swiper] = detail;
     // set swiper instance
     setTimeout(() => {
       swiperRef = swiper;
     });
-  };
+};
 
   
-  const slideTo = (index) => {
+const slideTo = (index) => {
     swiperRef.slideTo(index , 400);
-  };
- function toggleShow (){
-  slideTo(1)
- }
+};
+function toggleShow (){
+  slideTo(0)
+}
  $: w = 0;
  let u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
 let hovered = false;
 function hover (id){
   if (id == "0"){
-u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
+ u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
   } else {
     u = id
   }
@@ -382,10 +385,10 @@ function hoverede(){
     if (hovered == false){
     u = "לב המערכת"
   } else {
-u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
+   u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
   }
   dispatch("hover", {id: u});
- }
+}
 </script>
 {#await ser}
 <h1>..</h1>
@@ -458,11 +461,10 @@ on:mouseleave={()=> hoverede()}
 class="hover:scale-290 duration-1000 ease-in" 
 transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
  
-<Swiper 
+<Swiper  dir="rtl" 
   on:swiper={setSwiperRef}
   effect={"flip"}
-    loop={true}
-  loopFillGroupWithBlank={true}
+
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
@@ -472,8 +474,8 @@ transition:fly={{y:450, duration: 2200, opacity: 0.5}}>
     prevEl: `.normSmll${pendId}-${projectId}-hdh`,
   }}
 >
-<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryot} style="position:absolute;">
-  <ProgressBar series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
+<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryoti} style="position:absolute;">
+  <ProgressBar cls="transition: all 1000ms ease-in-out;" series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
   <SwiperSlide
     >  

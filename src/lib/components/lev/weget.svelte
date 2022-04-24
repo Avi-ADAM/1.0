@@ -83,7 +83,7 @@ let token;
     swiperRef.slideTo(index , 400);
   };
  function toggleShow (){
-  slideTo(1)
+  slideTo(0)
  }
 let error1;
 let miDatan = [];
@@ -100,7 +100,8 @@ let yers;
 let ok;
 let nook;
 let tryo = "115%";
-let tryot = "-11%"
+let tryot = "-10.5%";
+let tryoti = "-5.25%";
 let nut;
 async function xyz (){
 
@@ -128,6 +129,7 @@ if (nook > 0){
 if (nut > 0 && nook > 0){
   tryo = "129%"
   tryot = "-17%"
+  tryoti = "-11.5%"
 }
 
 ser = ser
@@ -163,6 +165,10 @@ function objToString (obj) {
     const userss = objToString(users)
 
 async function agree() {
+  already = true;
+   noofusersOk += 1;
+  noofusersWaiting -= 1;
+  ser = xyz();
          if (kindOf === "perUnit"){
        total = agprice * hm } 
    else if (kindOf === "total" || kindOf === "rent")
@@ -302,7 +308,10 @@ function ask() {
 }
 
 async function decline() {
-        console.log("decline0");
+  already = true;
+   noofusersNo -= 1;
+  noofusersWaiting -= 1;
+  ser = xyz();
     // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב      
     const cookieValue = document.cookie
         .split('; ')
@@ -426,11 +435,10 @@ on:mouseenter={()=> hoverede()}
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
 class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity: 0.9, duration: 2000} }>
-<Swiper
+<Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
-    loop={true}
-  loopFillGroupWithBlank={true}
+
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
@@ -440,8 +448,8 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
     prevEl: `.normSmll${spid}-opo`,
   }}
 >
-<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryot} style="position:absolute;">
-  <ProgressBar series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
+<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryoti} style="position:absolute;">
+  <ProgressBar cls="transition: all 1000ms ease-in-out;" series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
   <SwiperSlide
     ><div

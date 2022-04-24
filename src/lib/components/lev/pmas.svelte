@@ -56,7 +56,8 @@ let monts = 0
 let ok;
 let nook;
 let tryo = "116%";
-let tryot = "-11%"
+let tryot = "-10.5%";
+let tryoti = "-5.25%";
 let nut;
 let yers;
 async function xyz (){
@@ -85,6 +86,7 @@ color: '#80037e'
 if (nut > 0 && nook > 0){
   tryo = "129%"
   tryot = "-17%"
+  tryoti = "-11.5%"
 }
 
 ser = ser
@@ -134,6 +136,9 @@ async function agree(alr) {
         alert("soon")
       } else{
   already = true;
+   noofusersOk += 1;
+  noofusersWaiting -= 1;
+  ser = xyz();
     const date = (sqadualed !== undefined) ? `sqadualed: "${new Date(sqadualed).toISOString()}",` : ``;
         const sdate = (sqadualedf !== undefined) ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",` : ``;
     const cookieValue = document.cookie
@@ -266,7 +271,9 @@ let isOpen = false;
         if (why.length > 20) {
           
             isOpen = false;
-        console.log("decline",why)
+             noofusersNo -= 1;
+  noofusersWaiting -= 1;
+  ser = xyz();
          const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -417,7 +424,7 @@ async function afreact (){
     swiperRef.slideTo(index , 400);
   };
  function toggleShow (){
-  slideTo(1)
+  slideTo(0)
  }
  $: w = 0;
  let u = "הצבעה על בקשת משאב לריקמה"
@@ -512,11 +519,10 @@ class="hover:scale-290 duration-1000 ease-in"
 transition:fly={{y:450, duration: 2200, opacity: 0.5}}
 >
  
-<Swiper 
+<Swiper  dir="rtl" 
   on:swiper={setSwiperRef}
   effect={"flip"}
-    loop={true}
-  loopFillGroupWithBlank={true}
+
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
@@ -526,8 +532,8 @@ transition:fly={{y:450, duration: 2200, opacity: 0.5}}
     prevEl: `.normSmll${pendId}-${projectId}-hh`,
   }}
 >
-<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryot} style="position:absolute;">
-  <ProgressBar series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
+<div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryoti} style="position:absolute;">
+  <ProgressBar cls="transition: all 1000ms ease-in-out;" series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
   <SwiperSlide>  
 <div id="normSml" > 
