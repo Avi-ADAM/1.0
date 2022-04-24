@@ -63,7 +63,7 @@ let miatan;
       const startTime = stname - lapse
       timer = setInterval(() => {
         lapse = Date.now() - startTime
-        if (presenteg(zman,mstotal) == 90){
+        if (percentage(zman,mstotal) == 90){
  let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -74,7 +74,7 @@ let miatan;
   }
  });
         } 
-         else if (presenteg(zman,mstotal) == 95){
+         else if (percentage(zman,mstotal) == 95){
  let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -106,7 +106,7 @@ let miatan;
   }
  });
         }
-          if (presenteg(zman,mstotal) == 100){
+          if (percentage(zman,mstotal) == 100){
                 running = false;
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
@@ -185,7 +185,7 @@ timer: ${x}
       const startTime = Date.now() - lapse
       timer = setInterval(() => {
         lapse = Date.now() - startTime 
-         if (presenteg(zman,mstotal) == 90){
+         if (percentage(zman,mstotal) == 90){
  let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -196,7 +196,7 @@ timer: ${x}
   }
  });
         } 
-         else if (presenteg(zman,mstotal) == 95){
+         else if (percentage(zman,mstotal) == 95){
  let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -228,7 +228,7 @@ timer: ${x}
   }
  });
         }
-          if (presenteg(zman,mstotal) == 100){
+          if (percentage(zman,mstotal) == 100){
                 running = false;
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
