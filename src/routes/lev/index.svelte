@@ -80,7 +80,49 @@ function mesimabetahalicha (data) {
         }
     }
 }
+function gvots(data){
+  for (var k = 0; k < data.length; k++) {
+     const x = data[k].users //בעיה לפעמים זה vots
+             data[k].uids = [];
+     for (var z = 0; z < x.length; z++){
+      data[k].uids.push(x[z].users_permissions_user.id);
+              data[k].what = [];
+   data[k].what.push(x[z].what);
+ }
+ }    
 
+    for (var t = 0; t <data.length; t++){
+    const allid = data[t].uids;
+    const myid = data[t].myid;
+    data[t].already = false;
+    data[t].noofusersOk = 0;
+    data[t].noofusersNo = 0;
+    data[t].whyno = [];
+    data[t].whyes = [];
+    data[t].mypos = null;
+    if(allid.includes(myid)){
+      data[t].already = true;
+      data[t].pl = 20;
+    for (var l=0; l< data[t].users.length; l++){
+        if (data[t].users[l].users_permissions_user.id === myid)
+      fiapp[t].mypos = fiapp[t].users[l].what;
+              }
+    }
+
+        for (var r=0; r< fiapp[t].users.length; r++){
+            if (fiapp[t].users[r].what === true) {
+                fiapp[t].noofusersOk += 1;
+                fiapp[t].whyes.push(fiapp[t].users[r].why)
+            }else if (fiapp[t].users[r].what === false) {
+                 fiapp[t].noofusersNo += 1;
+               fiapp[t].whyno.push(fiapp[t].users[r].why)
+            }
+        }
+
+    const noofusersWaiting = fiapp[t].noof - fiapp[t].users.length;
+    fiapp[t].noofusersWaiting = noofusersWaiting;
+    }
+}
 function ishursium (dati){
  const start = dati.data.user.projects_1s
       const myid = dati.data.user.id;
@@ -142,7 +184,7 @@ function ishursium (dati){
     fiapp[t].mypos = null;
     if(allid.includes(myid)){
       fiapp[t].already = true;
-            fiapp[t].pl = 20;
+            fiapp[t].pl += 20;
 
     for (var l=0; l< fiapp[t].users.length; l++){
         if (fiapp[t].users[l].users_permissions_user.id === myid)
@@ -162,11 +204,8 @@ function ishursium (dati){
 
     const noofusersWaiting = fiapp[t].noof - fiapp[t].users.length;
     fiapp[t].noofusersWaiting = noofusersWaiting;
-                        console.log(fiapp,"hguyg")
-
     }
     fiapp = fiapp
-    console.log(fiapp)
     fia = fiapp.length;
 //createD()
 }
@@ -523,7 +562,7 @@ function letters(data){
         }
         const x = namer.reverse().join(" ");
         data = x; 
-        st = 175;
+        st = 5;
     }
 
 
@@ -579,16 +618,16 @@ function letters(data){
 
     if (data.length >= 15 && data.length < 19) {
         stylef = '21px';
-        st = 165
+        st = 225
      } else if (data.length >= 19 && data.length < 20) {
             stylef = '20px';
-            st = 155
+            st = 255
      } else  if (data.length >= 20 && data.length <21) {
             stylef = '18px';
-            st = 150
+            st = 270
      } else  if (data.length >= 21){
          stylef = '16px';
-         st = 145
+         st = 285
     }
     return [data, stylef, st];
 }
@@ -1534,7 +1573,7 @@ function hover(event){
   <title>לב 1❤️1</title>
 </svelte:head>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
-<Tooltip title="{u}">
+<Tooltip title="{u}" ispic="true">
 <div class="screen"> 
     
 {#each adder as add }
@@ -1960,10 +1999,10 @@ des={0}  />
    transform: translateX(75%);
    z-index: 998;
 }.normSml:nth-child(6):hover{
-   transform: translateX(-75%);
+   transform: translateX(0%);
    z-index: 998;
 }.normSml:nth-child(7):hover{
-   transform: translateX(75%);
+   transform: translateX(0%);
    z-index: 998;
 }.normSml:nth-child(8):hover{
    transform: translateX(-75%);
@@ -1981,7 +2020,10 @@ des={0}  />
    transform: translateX(-75%);
    z-index: 998;
 }.normSml:nth-child(13):hover{
-   transform: translateX(75%);
+   transform: translate(75%,-75%);
+   z-index: 998;
+}.normSml:nth-child(16):hover{
+   transform: translate(-75%,-75%);
    z-index: 998;
 }.normSml:nth-child(n+17):hover{
    transform: translateY(-75%);

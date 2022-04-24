@@ -3,16 +3,16 @@
 
 
 .swiper {
-  width: 75px;
-  height: 75px;
+  width: 85px;
+  height: 85px;
   border-radius: 50%;
 }
 
 .swiper-slide {
   background-position: center;
   background-size: cover;
-  width: 75px;
-  height: 75px;
+  width: 85px;
+  height: 85px;
     border-radius: 50%;
 
 }

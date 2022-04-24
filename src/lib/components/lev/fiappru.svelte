@@ -483,7 +483,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly={{y: 250, opacity:
                                         </a>  
                        <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
                       <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
-                        <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>
+                        <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" >
                        </button>
                    </foreignObject>
                

@@ -40,7 +40,6 @@ export let pmaap = "pmaap";
 export let askma = 0;
 export let askmap = "askmap";
 export let low = true;
-let profiletitle ="תמונת הפרופיל שלי"
 
 function hover (id){
 dispatch("hover",{
@@ -3092,7 +3091,6 @@ dispatch("disp",{
 </g>
 </g>
 <g transform="matrix(1.2664 0 0 1.2649 -44.028 -21.237)" style="">
-<title>{profiletitle}</title>
 <foreignObject transform="matrix(.2138 0 0 .2188 120 76)" width="450" height="450"   >
   <img
   alt="profilepic"
