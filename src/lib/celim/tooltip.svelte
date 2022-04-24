@@ -1,20 +1,30 @@
 <script>
 	export let title = '';
 	let isHovered = false;
-	let x;
-	let y;
-	export let z = 0;
+	let x, ix;
+	let y, iy;
+	export let z = 15;
+	export let ispic = false;
+	export let islink = false;
+	function gotop(){
+		console.log(title);
+	}
 	function mouseOver(event) {
 		isHovered = true;
 		x = event.pageX + 5;
 		y = event.pageY + 5;
+		ix = event.pageX + 5;
+		iy = event.pageY + 5;
 	}
 	function mouseMove(event) {
 		x = event.pageX + 5;
 		y = event.pageY + 5;
+		ix = event.pageX + 5;
+		iy = event.pageY + 5;
 	}
 	function mouseLeave() {
 		isHovered = false;
+		ispic = false
 	}
  
 </script>
@@ -28,8 +38,12 @@
 </span>
 
 {#if isHovered}
-	<div dir="rtl" style="top: { y + z}px; left: {x}px;" class="tooltip">{title}</div>
-{/if}
+	<div dir="rtl" style="top: {y}px; left: {x}px;" class="tooltip">{title}</div>
+<!--
+{#if ispic}
+	<div dir="rtl" style="top: {ix}px; left: {iy}px;" class="tooltip"><button on:click={gotop}>קישור</button></div>
+{/if}-->
+	{/if}
 
 <style>
 	.tooltip {

@@ -1999,39 +1999,21 @@ des={0}  />
    transform: translateX(75%);
    z-index: 998;
 }.normSml:nth-child(6):hover{
-   transform: translateX(0%);
+   transform: translateX(-75%);
    z-index: 998;
 }.normSml:nth-child(7):hover{
-   transform: translateX(0%);
+   transform: translateX(75%);
    z-index: 998;
 }.normSml:nth-child(8):hover{
    transform: translateX(-75%);
    z-index: 998;
-}.normSml:nth-child(9):hover{
-   transform: translateX(75%);
-   z-index: 998;
-}.normSml:nth-child(10):hover{
-   transform: translateX(-75%);
-   z-index: 998;
-}.normSml:nth-child(11):hover{
-   transform: translateX(75%);
-   z-index: 998;
-}.normSml:nth-child(12):hover{
-   transform: translateX(-75%);
-   z-index: 998;
-}.normSml:nth-child(13):hover{
-   transform: translate(75%,-75%);
-   z-index: 998;
-}.normSml:nth-child(16):hover{
-   transform: translate(-75%,-75%);
-   z-index: 998;
-}.normSml:nth-child(n+17):hover{
+}.normSml:nth-child(n+9):hover{
    transform: translateY(-75%);
    z-index: 998;
-}.normSml:nth-child(4n+17):hover{
+}.normSml:nth-child(4n+9):hover{
    transform: translate(75%,-75%);
    z-index: 998;
-}.normSml:nth-child(4n+20):hover{
+}.normSml:nth-child(4n+12):hover{
    transform: translate(-75%,-75%);
    z-index: 998;
 }
@@ -2507,7 +2489,46 @@ margin-left: 125px
       align-self: center;
           }
     }
- @media (min-height: 840px){
+ @media (min-height: 750px){
+   @media (max-width: 839px){
+   .normSml:nth-child(6):hover{
+   transform: translateX(0%);
+   z-index: 998;
+}.normSml:nth-child(7):hover{
+   transform: translateX(0%);
+   z-index: 998;
+}.normSml:nth-child(8):hover{
+   transform: translateX(-75%);
+   z-index: 998;
+}.normSml:nth-child(9):hover{
+   transform: translateX(75%);
+   z-index: 998;
+}.normSml:nth-child(10):hover{
+   transform: translateX(-75%);
+   z-index: 998;
+}.normSml:nth-child(11):hover{
+   transform: translateX(75%);
+   z-index: 998;
+}.normSml:nth-child(12):hover{
+   transform: translateX(-75%);
+   z-index: 998;
+}.normSml:nth-child(13):hover{
+   transform: translate(75%,-75%);
+   z-index: 998;
+}.normSml:nth-child(16):hover{
+   transform: translate(-75%,-75%);
+   z-index: 998;
+}.normSml:nth-child(n+17):hover{
+   transform: translateY(-75%);
+   z-index: 998;
+}.normSml:nth-child(4n+17):hover{
+   transform: translate(75%,-75%);
+   z-index: 998;
+}.normSml:nth-child(4n+20):hover{
+   transform: translate(-75%,-75%);
+   z-index: 998;
+}
+   }
     .midCom{
         grid-row: 3 / 5;
     }
@@ -2516,6 +2537,7 @@ margin-left: 125px
 
     }
     }
+  
    @media (min-height: 1040px){
     .midCom{
         grid-row: 4 / 5;
