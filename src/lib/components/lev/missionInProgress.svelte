@@ -472,11 +472,7 @@ function hover (id){
   } else {
     u = id
   }
-  if (hovered == false){
-    u = "לב המערכת"
-  } else {
-u = "משימה בתהליך ביצוע"
-  }
+
   dispatch("hover", {id: u});
 }
 </script>
@@ -527,6 +523,18 @@ out:scale={{duration: 2200, opacity: 0.5}}
 	 id="normSml" 
 >  
 <svg viewBox="0 0 100 100" class="svgg">
+  <defs>
+   <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+<feGaussianBlur stdDeviation="10 10" result="glow"/>
+<feMerge>
+  <feMergeNode in="glow"/>
+<feMergeNode in="glow"/>
+<feMergeNode in="glow"/>
+<feMergeNode in="glow"/>
+<feMergeNode in="glow"/>
+</feMerge>
+</filter>
+  </defs>
     <g transform="translate(50 50)">
         <circle id="dial" cx="0" cy="0" r="42" fill="none" stroke="currentColor" stroke-width="5" stroke-dasharray="0.3 1.898"></circle>
         <use href="#dial" transform="scale(-1 1)"></use>
@@ -536,7 +544,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
         -->
         <g bind:this="{minutes}" transform="rotate({rotation})">
             <g transform="translate(0 -50)">
-                <path d="M -2.25 0 h 4.5 l -2.25 2.5 l -2.25 -2.5" fill="currentColor" stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"></path>
+                <path d="M -2.25 0 h 4.5 l -2.25 2.5 l -2.25 -2.5" fill="currentColor"  stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-linecap="round"></path>
             </g>
         </g>
 
@@ -551,13 +559,17 @@ out:scale={{duration: 2200, opacity: 0.5}}
             <circle r="1" fill="none" stroke="currentColor" stroke-width="0.4"></circle>
         </g>
         {#if lapse !== 0}
-        <text on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")} text-anchor="middle" fill="red" dominant-baseline="middle" font-size="10" style="font-weight: 300; letter-spacing: 1px;">
+        <text font-family="Digital" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")} text-anchor="middle" fill="red" y="10" font-size="7" style="font-weight: 300; letter-spacing: 1px;">
             {formatTime(zman)}
         </text>
         {/if}
-                <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  ><text y='-12' text-anchor="middle" font-size="8" >{projectName}</text></g>
-         <text on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} y='-6' text-anchor="middle"  style=" color: var(--barbi-pink); " font-size="8">{missionName}</text>
-
+                <g style="overflow:hidden; text-anchor: middle;" on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  >
+                  <text y='-8' style="filter: url(#glow); fill: var(--gold);"  text-anchor="middle" font-size="8" >{projectName}</text>
+                  <text y='-8'  style="fill: black;"  text-anchor="middle" font-size="8" >{projectName}</text></g>
+         <g style="overflow:hidden; text-anchor: middle;">
+                <text style="filter: url(#glow); fill: var(--gold);" on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} y="0"   font-size="8">{missionName}</text>
+         <text font-family="Bellefair" style="fill: black;"  on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} y="0"  font-size="8">{missionName}</text>
+    </g>
                                                      <foreignObject  x='-12' y='-42' width='25px' height='56px'>   
     <span class="{`normSml${perhour}-${projectId}-${mId}`}"></span>
         <img on:click={()=>project()} on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
@@ -588,7 +600,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
 <div on:mouseenter={()=>hover("זמן שכבר בוצע")} on:mouseleave={()=>hover("0")} class="mn ab  ">{formatTime(zman)}</div>
   {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="mn bc">{missionDetails}</p>{/if}
 
-  <h5  class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שכבר בוצעו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0}`}</span> / <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal}</span></h5>
+  <h5 dir="ltr" class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0}`}</span> / <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal}</span></h5>
   
 
   <a on:mouseenter={()=>hover("לינק לביצוע המשימה")} on:mouseleave={()=>hover("0")} class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
