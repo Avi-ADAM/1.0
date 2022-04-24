@@ -7,7 +7,9 @@
     import { idPr } from '../../stores/idPr.js';
     import { onMount } from 'svelte';
      import { createEventDispatcher } from 'svelte';
-
+function percentage(partialValue, totalValue) {
+   return (100 * partialValue) / totalValue;
+} 
  const dispatch = createEventDispatcher();
     export let stname;
     let show = true;
@@ -27,6 +29,7 @@
     export let missId; //add in gr
     export let noofpu; //addtopr
     export let perhour;
+    let mstotal = hourstotal*3600000
      let idL;
 
     let x = 0;
@@ -41,6 +44,8 @@ function linke (s){
     
   }
 }
+                let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+
   function project (id) {
       pmcli += 1;
     if(pmcli >= 2){
@@ -52,15 +57,67 @@ function linke (s){
 let miatan;
   onMount(async () => {
     if (stname === "0") {
-          console.log("to to"); 
   } else if (stname === "stopi") {
-    console.log("to to tooooo");
     x = oldzman
   } else {
-    console.log(stname)
       const startTime = stname - lapse
       timer = setInterval(() => {
-        lapse = Date.now() - startTime 
+        lapse = Date.now() - startTime
+        if (presenteg(zman,mstotal) == 90){
+ let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        } 
+         else if (presenteg(zman,mstotal) == 95){
+ let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        } 
+            if (mstotal-zman == 300000){
+ let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        }else if (mstotal-zman == 60000){
+ let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        }
+          if (presenteg(zman,mstotal) == 100){
+                running = false;
+    let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        } 
       }, 1)
         x = oldzman
     running = true
@@ -128,6 +185,61 @@ timer: ${x}
       const startTime = Date.now() - lapse
       timer = setInterval(() => {
         lapse = Date.now() - startTime 
+         if (presenteg(zman,mstotal) == 90){
+ let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        } 
+         else if (presenteg(zman,mstotal) == 95){
+ let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        } 
+            if (mstotal-zman == 300000){
+ let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        }else if (mstotal-zman == 60000){
+ let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        }
+          if (presenteg(zman,mstotal) == 100){
+                running = false;
+    let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+ });
+        } 
       }, 1)
     
     running = true
@@ -230,13 +342,10 @@ timer: 0
  let linkg = "https://onelovevone.onrender.com/graphql"
 async function save() {
     const saved = lapse * 2.7777777777778E-7 + x * 2.7777777777778E-7;
-    console.log("Saved",formatTime(saved), saved, lapse , x)
     const noofnew = hoursdon + saved;
     hoursdon = noofnew;
     clearInterval(timer)
     const msdon = hoursdon * 3600000
-    console.log(msdon)
-        console.log(hoursdon)
     zman = msdon
     lapse = 0
     x = 0
@@ -286,11 +395,11 @@ timer: 0
             console.log(error1);
         }
 }
+    export let lapse = 0;
+
 export let zman;
 $:  zman = msdonf + lapse + x;
- import { tweened } from "svelte/motion";
     // lapse refers to the number of milliseconds in the stopwatch
-    export let lapse = 0;
 
     // rotation refers to the degrees applied to the minutes dial to have a full rotation for 60 seconds
     // multiply the value by 60 for the seconds dial to have a full rotation every second
