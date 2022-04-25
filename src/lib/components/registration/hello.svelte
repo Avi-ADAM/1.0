@@ -14,6 +14,7 @@ onMount(async () =>{
   let isSafari = window.safari == undefined;
 if (isSafari) {
   first.split("").reverse().join("");
+  first = first
   console.log("Safari, yeah!")};
 })
     function slidefade(node, params) {

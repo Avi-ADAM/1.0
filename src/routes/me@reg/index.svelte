@@ -52,7 +52,6 @@ let addNs1 = true;
     let meData = start();
 let username;
 function letters(data){
-  console.log(data);
   
    if (data.length >= 2 && data.length < 4) {
         st = 185;
@@ -231,14 +230,18 @@ async function start () {
         }
         return meData
     };
+    function reverseString(str) {
+    return str.split("").reverse().join("");
+}
   onMount(async () => {
-    await start()
-    .then()
-      let isSafari = window.safari == undefined;
+   let isSafari = window.safari !== undefined;
 if (isSafari) {
+  await start()
+  .then()
   if ((/[\u0590-\u05FF]/).test(username) || (/[\u0600-\u06FF]/).test(username)) {
-   username.split("").reverse().join(""); 
-        }
+ username = reverseString(username)
+  username = username        
+}
   } 
    })
 let userName_value;
