@@ -50,7 +50,7 @@ let addNs1 = true;
     let st = 0;
     let stylef = '31px';
     let meData = start();
-
+let username;
 function letters(data){
   console.log(data);
   
@@ -162,6 +162,7 @@ function project (id) {
     goto("/moach");
   };
 let mail;
+
 async function start () {
     const cookieValue = document.cookie
   .split('; ')
@@ -206,6 +207,7 @@ async function start () {
          if (meDataa.data.me.id === idL && meDataa.data.me != null){
    meData =  meDataa.data.user
        mail = meData.email;
+       username = meData.username;
           letters(meData.username);
             myP = meData.projects_1s;
             skil = meData.skills;
@@ -229,7 +231,16 @@ async function start () {
         }
         return meData
     };
-  
+  onMount(async () => {
+    await start()
+    .then()
+      let isSafari = window.safari == undefined;
+if (isSafari) {
+  if ((/[\u0590-\u05FF]/).test(username) || (/[\u0600-\u06FF]/).test(username)) {
+   username.split("").reverse().join(""); 
+        }
+  }
+   })
 let userName_value;
 let biog;
 let frd;
@@ -532,7 +543,7 @@ async function han (){
     <svg width="45vw" height="9vw" viewBox="0 0 500 100">
     <path id="curve" d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" />
     <text width="500" id="text" >
-      <textPath  text-anchor="center" class="curved-text" xlink:href="#curve" startOffset="{st}">{meData.username}</textPath>
+      <textPath  text-anchor="center" class="curved-text" xlink:href="#curve" startOffset="{st}">{username}</textPath>
     </text>
   </svg>
     </div>
