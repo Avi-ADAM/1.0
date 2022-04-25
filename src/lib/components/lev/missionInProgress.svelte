@@ -113,8 +113,8 @@ let miatan;
   }
  });
         }
-          if (percentage(zman,mstotal) == 100){
-                running = false;
+          if (percentage(zman,mstotal) >= 100){
+           azor ()
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {

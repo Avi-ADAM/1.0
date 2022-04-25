@@ -3,6 +3,8 @@
   import { show } from '../registration/store-show.js';
   import  Hello  from '../registration/hello.svelte'
   import  Password from '../registration/password.svelte'
+   import { goto, prefetch } from '$app/navigation';
+
   import {
     scale,
     fly
@@ -84,14 +86,15 @@ function add (event){
   {:else if show_value == 6}
   <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-    <h1 dir="rtl" class="midscreenText-3">
+    <div dir="rtl" class="midscreenText-3"><h1>
 תודה
 <br>
 {userName_value}
 <br>
 ולהתראות בקרוב</h1>
-    
-   </div>
+    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
+  </div>
+  </div>
 {/if}
 
 <svg style="display:{show_value >= 1 ? '' : 'none'}" class="key"  width="100%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`0 0 ${3322.126 + w*20} 1518.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
