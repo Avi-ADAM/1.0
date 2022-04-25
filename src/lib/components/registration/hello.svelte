@@ -9,13 +9,16 @@
 import { onMount } from 'svelte';
 let first = "לחיצה לפתיחת          "
 let second = "1❤️1                "
-
+    function reverseString(str) {
+    return str.split("").reverse().join("");
+}
 onMount(async () =>{
-  let isSafari = window.safari == undefined;
+  let isSafari = window.safari !== undefined;
 if (isSafari) {
-  first.split("").reverse().join("");
+
+  first = reverseString(first)
   first = first
-  console.log("Safari, yeah!")};
+};
 })
     function slidefade(node, params) {
         const existingTransform = getComputedStyle(node).transform.replace('none', '');
