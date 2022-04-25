@@ -83,7 +83,7 @@ perc: nook,
 color: '#80037e'
 }) 
 }
-if (nut > 0 && nook > 0){
+if (nut > 0 && nook > 0 ){
   tryo = "129%"
   tryot = "-17%"
   tryoti = "-11.5%"
@@ -271,7 +271,7 @@ let isOpen = false;
         if (why.length > 20) {
           
             isOpen = false;
-             noofusersNo -= 1;
+             noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();
          const cookieValue = document.cookie

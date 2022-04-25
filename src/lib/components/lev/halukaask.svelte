@@ -212,7 +212,7 @@ async function afterwhy (){
           
     isOpen = false;
   already = true;
-   noofusersNo -= 1;
+   noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();        
   const cookieValue = document.cookie

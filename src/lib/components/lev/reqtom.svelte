@@ -381,7 +381,7 @@ function ask() {
 
 async function decline() {
         already = true;
-     noofusersNo -= 1;
+     noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();
 const declineda = declined.map(c => c.id)

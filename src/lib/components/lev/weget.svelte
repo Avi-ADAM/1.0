@@ -329,7 +329,7 @@ function ask() {
 
 async function decline() {
   already = true;
-   noofusersNo -= 1;
+   noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();
     // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב      

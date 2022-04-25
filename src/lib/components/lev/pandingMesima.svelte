@@ -246,7 +246,7 @@ let isOpen = false;
   async function afterwhy (){
         if (why.length > 20) {
             isOpen = false;
- noofusersNo -= 1;
+ noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();     
       const cookieValue = document.cookie
