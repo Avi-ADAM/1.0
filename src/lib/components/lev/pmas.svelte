@@ -152,7 +152,7 @@ async function agree(alr) {
   idL = cookieValueId;
     token  = cookieValue; 
      bearer1 = 'bearer' + ' ' + token;
-          if (noofusersOk + 1 === noofusers){
+          if (noofusersOk === noofusers){
     try {
              await fetch(linkg, {
               method: 'POST',

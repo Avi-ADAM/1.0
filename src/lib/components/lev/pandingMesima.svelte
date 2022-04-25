@@ -126,7 +126,7 @@ async function agree() {
   idL = cookieValueId;
     token  = cookieValue; 
      bearer1 = 'bearer' + ' ' + token;
-          if (noofusersOk + 1 === noofusers){
+          if (noofusersOk === noofusers){
               const skillsa = skills.map(c => c.id);
              const tafkidimsa = tafkidims.map(c => c.id);
               const workwaysa = workways.map(c => c.id);
@@ -245,7 +245,6 @@ async function nego() {
 let isOpen = false;
   async function afterwhy (){
         if (why.length > 20) {
-          
             isOpen = false;
  noofusersNo -= 1;
   noofusersWaiting -= 1;
