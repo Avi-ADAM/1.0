@@ -1035,7 +1035,7 @@ onMount(async () => {
     // registration failed
     console.log('Registration failed with ' + error);
   });
-}; 
+ }; 
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -1050,9 +1050,17 @@ onMount(async () => {
   .split('=')[1];
   idL = cookieValueId;
   token  = cookieValu; 
-  start ();
+  await start ();
   setInterval(start, tickSpeed);
-
+     let isSafari = window.safari !== undefined;
+if (isSafari) {
+  await start()
+  .then()
+  if ((/[\u0590-\u05FF]/).test(nam) || (/[\u0600-\u06FF]/).test(nam)) {
+ nam = reverseString(nam)
+  nam = nam        
+}
+  } 
   } else {
             goto ("/",)
     }
