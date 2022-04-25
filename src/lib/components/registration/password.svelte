@@ -93,9 +93,46 @@ dispatch ('progres',{
 		tx: 0,
 		txx: 0
 	} );
-    document.cookie = `jwt=${miDatan.data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
-        } catch (e) {
+	const id = miDatan.data.register.user.id
+    document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+      let token  = miDatan.data.register.jwt; 
+    let bearer1 = 'bearer' + ' ' + token;      
+	await fetch(linkg, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation { updateUser(
+    input: {
+      where: { id: "${id}" }
+      data: { 
+    skills: [${skills1_value}],
+	 tafkidims: [${roles2_val}],
+    work_ways: [${work_ways1}],
+    vallues: [${vallues}],
+	cuntries: [${contriesis}],
+	free_person: "${fpvall}"
+	   }
+    }
+  ){
+      user {
+          skills{
+              id 
+          }
+      }
+  }
+}`  
+        })
+})
+  .then(r => r.json())
+  .then(data => miDatan = data);
+            console.log(miDatan);
+} catch (e) {
             error1 = e
             console.log(error1);
 				errr.m = error1.response.data.message
