@@ -239,7 +239,7 @@ if (isSafari) {
   await start()
   .then()
   if ((/[\u0590-\u05FF]/).test(username) || (/[\u0600-\u06FF]/).test(username)) {
- username = reverseString(username)
+    username = reverseString(username)
   username = username        
 }
   } 

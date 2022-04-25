@@ -1025,7 +1025,9 @@ let sdsa = [];
 let miDataold = [];
 let mtahaold = [];
 let counter = 0;
-
+    function reverseString(str) {
+    return str.split("").reverse().join("");
+}
 onMount(async () => {
       if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function(reg) {
