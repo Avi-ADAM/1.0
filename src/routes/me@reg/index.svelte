@@ -234,7 +234,7 @@ async function start () {
     return str.split("").reverse().join("");
 }
   onMount(async () => {
-     let isSafari = window.navigator.userAgent.indexOf("Safari") > -1 ;
+ var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
 if (isSafari) {
   await start()
   .then()

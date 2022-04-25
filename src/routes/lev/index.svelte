@@ -1054,9 +1054,9 @@ onMount(async () => {
   token  = cookieValu; 
   await start ();
   setInterval(start, tickSpeed);
-     let isSafari = window.navigator.userAgent.indexOf("Safari") > -1 ;
-
-     if (isSafari) {
+ var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
+     if (isSafari === true) {
+       console.log("safari.. please use chrome for better experince")
   await start()
   .then()
   if ((/[\u0590-\u05FF]/).test(nam) || (/[\u0600-\u06FF]/).test(nam)) {
