@@ -239,7 +239,7 @@ if (isSafari) {
   if ((/[\u0590-\u05FF]/).test(username) || (/[\u0600-\u06FF]/).test(username)) {
    username.split("").reverse().join(""); 
         }
-  }
+  } 
    })
 let userName_value;
 let biog;
