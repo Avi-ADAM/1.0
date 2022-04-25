@@ -13,7 +13,7 @@ let second = "1❤️1                "
     return str.split("").reverse().join("");
 }
 onMount(async () =>{
-  let isSafari = window.safari !== undefined;
+     let isSafari = window.navigator.userAgent.indexOf("Safari") > -1 ;
 if (isSafari) {
 
   first = reverseString(first)

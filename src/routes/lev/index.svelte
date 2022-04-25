@@ -1054,8 +1054,9 @@ onMount(async () => {
   token  = cookieValu; 
   await start ();
   setInterval(start, tickSpeed);
-     let isSafari = window.safari !== undefined;
-if (isSafari) {
+     let isSafari = window.navigator.userAgent.indexOf("Safari") > -1 ;
+
+     if (isSafari) {
   await start()
   .then()
   if ((/[\u0590-\u05FF]/).test(nam) || (/[\u0600-\u06FF]/).test(nam)) {

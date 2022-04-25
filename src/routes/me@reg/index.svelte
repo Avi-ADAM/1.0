@@ -234,7 +234,7 @@ async function start () {
     return str.split("").reverse().join("");
 }
   onMount(async () => {
-   let isSafari = window.safari !== undefined;
+     let isSafari = window.navigator.userAgent.indexOf("Safari") > -1 ;
 if (isSafari) {
   await start()
   .then()
