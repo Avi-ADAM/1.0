@@ -84,7 +84,7 @@ function incremen() {
     })
 	};
   </script>
-  <div dir="rtl" >
+  <div dir="rtl" style="max-width: 100%" >
     <h1 >הוספת משאבים נדרשים לפרויקט</h1>
     <div class="items-center">
       <div class="gg w-min	">
@@ -95,7 +95,8 @@ function incremen() {
         on:blur={incremen}
         /></div>
      
-       <Addnewnee {addnee} on:newn={newn} color={"--barbi-pink"}/></div>
+       <Addnewnee {addnee} on:newn={newn} color={"--barbi-pink"}/>
+      </div>
      
     </div>
       <style>

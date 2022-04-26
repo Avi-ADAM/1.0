@@ -65,7 +65,7 @@ export let addnee = false;
 
       <button on:click={() => addnee = true} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">הוספת משאב שאינו ברשימה</button>
       {:else if addnee === true}
-      <div  class="border-2 border-gold rounded m-4">
+      <div  class="p-2 m-2 border-2 border-gold rounded">
   <button
   title="ביטול"
        on:click={() => addnee = false}
@@ -73,9 +73,9 @@ export let addnee = false;
         ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
          <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
      </svg></button>
-        <div dir="rtl"  class="flex flex-col items-center text-center">
+        <div dir="rtl"   class="flex flex-col items-center text-center">
     <h1 class="text-barbi text-2xl text-center">הוספת משאב חדש</h1>    
-   <div style="--the:{`var(${color})`};">
+   <div style="--the:{`var(${color})`}; width:100%;" class="flex flex-col items-center text-center">
       
 <div dir="rtl" class='textinput'>
   <input         bind:value={needName}
@@ -103,7 +103,7 @@ export let addnee = false;
 </div>
 
   
-   <div dir="rtl" style="width: {rr}rem;" class="mb-3 m-2">
+   <div dir="rtl"  style="width:80%">
    <h2 class="text-center text-barbi">סוג שווי</h2>
     <select bind:value={valued} class="round form-select appearance-none
       block
@@ -223,10 +223,10 @@ select.round:focus {
   top: 0;
 }
 
-@media (max-width:600px){
+@media (min-width:600px){
 .textinput {
   position: relative;
-  width: 100%;
+  width: 50%;
   display: block;
 }
  
