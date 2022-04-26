@@ -13,8 +13,7 @@ let second = "1❤️1                "
     return str.split("").reverse().join("");
 }
 onMount(async () =>{
- var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
-if (isSafari) {
+     if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
 
   first = reverseString(first)
   first = first

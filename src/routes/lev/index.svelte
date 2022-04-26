@@ -1053,8 +1053,7 @@ onMount(async () => {
   token  = cookieValu; 
   await start ();
   setInterval(start, tickSpeed);
- var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
-     if (isSafari === true) {
+     if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
        console.log("safari.. please use chrome for better experince")
   await start()
   .then()

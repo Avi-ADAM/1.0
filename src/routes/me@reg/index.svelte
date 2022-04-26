@@ -234,13 +234,12 @@ async function start () {
     return str.split("").reverse().join("");
 }
   onMount(async () => {
- var isSafari = /constructor/i.test(window.HTMLElement) || (function (p) { return p.toString() === "[object SafariRemoteNotification]"; })(!window['safari'] || (typeof safari !== 'undefined' && safari.pushNotification));
-if (isSafari) {
-  await start()
-  .then()
+     if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
+     await start()
+     .then()
   if ((/[\u0590-\u05FF]/).test(username) || (/[\u0600-\u06FF]/).test(username)) {
     username = reverseString(username)
-  username = username        
+    username = username        
 }
   } 
    })
