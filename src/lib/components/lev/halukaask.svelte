@@ -476,7 +476,6 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 <Swiper  dir="rtl" 
   on:swiper={setSwiperRef}
   effect={"flip"}
-
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}

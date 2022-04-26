@@ -87,16 +87,7 @@ errr.p = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-           			show.update(n => n + 1);
-
-dispatch ('progres',{
-		tx: 0,
-		txx: 0
-	} );
-	const id = miDatan.data.register.user.id
-    document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-    document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
-      let token  = miDatan.data.register.jwt; 
+			      let token  = miDatan.data.register.jwt; 
     let bearer1 = 'bearer' + ' ' + token;      
 	await fetch(linkg, {
               method: 'POST',
@@ -132,6 +123,16 @@ dispatch ('progres',{
   .then(r => r.json())
   .then(data => miDatan = data);
             console.log(miDatan);
+           			show.update(n => n + 1);
+
+dispatch ('progres',{
+		tx: 0,
+		txx: 0
+	} );
+	const id = miDatan.data.register.user.id
+    document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+
 } catch (e) {
             error1 = e
             console.log(error1);
