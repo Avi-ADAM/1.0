@@ -158,8 +158,9 @@ function back() {
 		        passwordx = e.target.value
 		const password = e.target.value;
 		validations = [
-			password.length > 5,
-			password.search(/[A-Z]/) > -1,
+			password.length > 8,
+			password.length > 1,
+		//	password.search(/[A-Z]/) > -1,
 			password.search(/[0-9]/) > -1,
 			password.search(/[$&+,:;=?@#]/) > -1,
 		];
@@ -224,14 +225,14 @@ function back() {
 
 		<ul dir="rtl">
 			<li>
-				{validations[0] ? "🏆" : "❌"} על הססמה להכיל לפחות חמש אותיות <!-- be at least 5 characters-->
+				{validations[0] ? "🏆" : "❌"} על הססמה להכיל לפחות 8 אותיות <!-- be at least 5 characters-->
 			</li>
-			<li>
-				{validations[1] ? "🏆" : "❌"} ולפחות אות אחת גדולה באנגלית<!-- must contain a capital letter -->
-			</li>
+			<!--<li>
+				{validations[1] ? "🏆" : "❌"} ולפחות אות אחת גדולה באנגלית must contain a capital letter 
+			</li>-->
 			<li>{validations[2] ? "🏆" : "❌"} ולפחות מספר אחד<!--must contain a number --></li>
 			<li>
-				{validations[3] ? "🏆" : "❌"} ולפחות סמל אחד ($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
+				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
 			</li>
 		</ul>
 	{#if errr.p === false}
