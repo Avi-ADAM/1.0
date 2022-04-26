@@ -16,11 +16,11 @@ import {
 const dispatch = createEventDispatcher();
 export let shows = false;
 export let deadline;
-export let projectName = "ONE";
-export let openmissionName = "do x";
-export let role = "programer";
-export let skills = ["html", "css"];
-export let useraplyname = "do x like y in z";
+export let projectName;
+export let openmissionName;
+export let role;
+export let skills;
+export let useraplyname;
 export let src = "coin.png";
 export let src2 = " ";
 export let projectId;
@@ -574,7 +574,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   > <SwiperSlide
     > <div  id="normSmll"
 >
-        {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{deadline}</h5>{/if}
+        {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{deadline.toLocaleDateString()}</h5>{/if}
          {#if missionDetails}   <h6 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="hslink bc">{missionDetails}</h6>{/if}
         
   <h5 on:mouseenter={()=>hover("תפקיד")} on:mouseleave={()=>hover("0")} class="hslink cd">{role}</h5>

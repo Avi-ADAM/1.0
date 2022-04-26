@@ -14,12 +14,12 @@ import {
 
 const dispatch = createEventDispatcher();
 export let deadline;
-export let projectName = "ONE";
-export let openmissionName = "do x";
+export let projectName;
+export let openmissionName;
 export let myp;
 export let easy;
 export let price;
-export let useraplyname = "do x like y in z";
+export let useraplyname;
 export let src = "coin.png";
 export let src2 = " ";
 export let projectId;
@@ -219,7 +219,7 @@ input: {
 
     }
     //add to pr users create missioninprogres, create welcom ballun;  first check for no of pr users and full consent ,(delete or save for refernce but put archive ) openM and asked 
-    if (noofpu === 1) {
+if (noofpu === 1) {
         
         try {
             await fetch(linkg, {
@@ -240,14 +240,14 @@ input: {
     }
   ) {maap{project{id }}}
 
-updateOpenMashaabim(
+  updateOpenMashaabim(
   input:  {
     where: {id: "${openMid}"}
   data: {archived: true}
-}
-) {openMashaabim{id archived}}
-${welcome}
-${adduser}
+ }
+ ) {openMashaabim{id archived}}
+ ${welcome}
+ ${adduser}
  updateAskm(
                             input:{
                                 where: {id: "${askId}" }
@@ -275,7 +275,7 @@ ${adduser}
             console.log(error1);
         }
 
-    } else if (noofpu - 1 === noofusersOk) {
+} else if (noofpu === noofusersOk) {
             console.log("create new as above and add vote and archive asked")
     
         try {
@@ -331,7 +331,7 @@ ${adduser2}
             error1 = e
             console.log(error1);
         }
-        } else {
+} else {
 
         console.log("just add vote to asked and update to not show for me again")
          try {
@@ -550,7 +550,13 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                                    <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
                                                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>
                                                    </button>
+
                                                 </foreignObject>
+                            <foreignObject x='-25' y='55' width='50px' height='20px' >
+                                             <p style="margin-top: 10px;"><span on:mouseenter={()=>hover("בעד")} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{noofusersOk} </span><span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")} style="color:aqua">{noofusersWaiting} </span><span on:mouseenter={()=>hover("נגד")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
+
+                            </foreignObject>
+
                                                   </svg>  
                                                     </div>
 
@@ -561,12 +567,11 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 >
 
 <div class="{`normSmll${askId}-noo`}"></div>
-         {#if missionDetails !== null}   <h6 on:mouseenter={()=>hover("פרטי הצעת ההשקעה")} on:mouseleave={()=>hover("0")}  class="hslink ab">{missionDetails}</h6>{/if}
-                 {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")}  class="hslink bc">{deadline}</h5>{/if}
-       <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="hslink cd" >{price}</h3>
-        <h3 class="hslink de" ><span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--gold)" >{myp}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy}</span> </h3>
-               <p class="vo ef"><span on:mouseenter={()=>hover("בעד")} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{noofusersOk} </span><span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")} style="color:aqua">{noofusersWaiting} </span><span on:mouseenter={()=>hover("נגד")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
-            {#if already === false}
+                 {#if deadline}    <p on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
+       <p on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="hslink bc" >{price}</p>
+        <p class="hslink cd" ><span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--gold)" >{myp}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy}</span> </p>
+                 {#if missionDetails !== null}   <p on:mouseenter={()=>hover("פרטי הצעת ההשקעה")} on:mouseleave={()=>hover("0")}  class="hslink de">{missionDetails}</p>{/if}   
+        {#if already === false}
             <button on:mouseenter={()=>hover("אישור")} on:mouseleave={()=>hover("0")} on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
             <button on:mouseenter={()=>hover("דחיה")} on:mouseleave={()=>hover("0")} on:click={decline}  class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
@@ -608,7 +613,8 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
  .de{
        grid-column: 1/3;
         grid-row: 4/ 5;
-
+      max-height: 55px;
+      overflow-y: auto;
  }
   .ef{
        grid-column: 1/3;
@@ -626,7 +632,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 
     }
    #normSmll{
-    background: url(https://res.cloudinary.com/love1/image/upload/v1647261055/spare_gv0gui.svg);
+    background: url(https://res.cloudinary.com/love1/image/upload/v1650979768/coinnn_oatfhw.svg);
 
         white-space: normal;
         text-align: center; 

@@ -236,6 +236,7 @@ function crMaap(hh){
   for (var i = 0; i < start.length; i++) {
             for (var j = 0; j < start[i].maaps.length; j++){
                 if(start[i].maaps.length > 0){
+                                             console.log("9090")
                       const rt = letters(start[i].maaps[j].sp.name); 
                     wegets.push({
                             uid: start[i].maaps[j].sp.users_permissions_user.id,
@@ -264,7 +265,7 @@ function crMaap(hh){
                             ani: "wegets",
                             pl: -1 + start[i].maaps[j].vots.length
                               });
-
+                           console.log("hguyg")
             }
         }
   }
@@ -307,8 +308,6 @@ function crMaap(hh){
 
     const noofusersWaiting = wegets[t].noof - wegets[t].users.length;
     wegets[t].noofusersWaiting = noofusersWaiting;
-                        console.log(wegets,"hguyg")
-
     }
     wegets = wegets
     maap = wegets.length;

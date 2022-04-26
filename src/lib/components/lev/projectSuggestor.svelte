@@ -5,12 +5,12 @@
 
  const dispatch = createEventDispatcher();
 
-    export let deadLine = "11.11.2022";
-    export let projectName = "ONE";
-    export let missionName = "do x";
-    export let role = "programer";
+    export let deadLine;
+    export let projectName;
+    export let missionName;
+    export let role;
     export let skills = [];
-    export let missionDetails = "do x like y in z";
+    export let missionDetails;
     export let src = "coin.png";
     export let projectId;
     export let linki = "/project/";
@@ -248,8 +248,8 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
           <h3 on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")} class="ltn ab" >{skills.map(d=> d.skillName).join(' ')}</h3>
 
    {#if deadLine} <h5 on:mouseenter={()=>hover("תאריך אחרון לביצוע")} on:mouseleave={()=>hover("0")} class="lt bc">{deadLine}</h5>{/if}
-    <h6 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd" style=" line-height: 0.7;">{missionDetails}</h6>
-    <h5 on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="lt de">{role.map(d=> d.roleDescription).join(' ')}</h5>
+    <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd" style=" line-height: 0.7;">{missionDetails}</p>
+    <p on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="lt de">{role.map(d=> d.roleDescription).join(' ')}</p>
 {#if already === false}
     <button on:mouseenter={()=>hover("אני רוצה")} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
    <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>

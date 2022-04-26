@@ -20,9 +20,9 @@ const dispatch = createEventDispatcher();
 export let mId;
 export let kindOf;
 export let myp = 0;
-export let projectName = "ONE";
-export let missionBName = "do x";
-export let useraplyname = "do x like y in z";
+export let projectName ;
+export let missionBName ;
+export let useraplyname;
 export let src = "coin.png";
 export let src2 = " ";
 export let projectId;
@@ -104,7 +104,7 @@ let tryot = "-10.5%";
 let tryoti = "-5.25%";
 let nut;
 async function xyz (){
-
+console.log(noofusersOk,noofpu,noofusersNo,noofusersWaiting)
 ok =  percentage(noofusersOk, noofpu)
 nook = percentage(noofusersNo, noofpu) 
 nut = percentage(noofusersWaiting, noofpu) 
