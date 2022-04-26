@@ -4,6 +4,8 @@ import { show } from './store-show.js';
 import { email } from './email.js';  
 import { contriesi } from './contries.js';
 import axios from 'axios';
+ import { RingLoader
+} from 'svelte-loading-spinners';
  import { createEventDispatcher } from 'svelte';
  import { skills1 } from './skills1.js';
 import { roles2 } from './roles2.js';
@@ -58,9 +60,11 @@ email.subscribe(new1Value => {
 });
 let linkg = 'https://onelovevone.onrender.com/graphql'
 let miDatan;
+let already = false;
 let errr = {k: false, m: "", p: false}
 async function increment() {    
 errr.p = true;
+already = true;
    try {
             await fetch(linkg, {
                     method: 'POST',
@@ -137,7 +141,7 @@ dispatch ('progres',{
 } catch (e) {
             error1 = e
             console.log(error1);
-				errr.m = error1.response.data.message
+				errr.m = error1.error.message
 				errr.k = true
         }
 
@@ -236,7 +240,7 @@ function back() {
 				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
 			</li>
 		</ul>
-	{#if errr.p === false}
+	{#if already === false}
 <div class="but">
 		  <button  class="button-in-1-2" class:non={strength < 4} on:click="{increment}"  disabled={strength < 4}>
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
@@ -245,6 +249,12 @@ function back() {
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg"/>
     </button>
 </div>
+{:else if already == true }
+          <div class="flex flex-col text-center">
+            <h3 class="text-barbi">רק רגע בבקשה</h3>
+          <br>
+         <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> 
 {:else if errr.k === true}
 <h2 class=" bg-white text-red">{errr.m}
 קרתה בעיה,<br>
