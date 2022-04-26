@@ -14,7 +14,7 @@
       import {  fly } from 'svelte/transition';
       import Tikun from './tikunolam.svelte';
             import TRan from './translatehe.svelte';
-
+  import { onMount } from 'svelte'
 // onMount(async () => {
 //  
 //
@@ -38,6 +38,43 @@
 //        fjs.parentNode.insertBefore(js, fjs);
 //      }(document, 'script', 'facebook-jssdk'));
 // })
+  let fpp = [];
+  let fppp = [];
+    let error1 = null;
+    onMount(async () => {
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+    
+        try {
+            const res = await fetch("https://onelovevone.onrender.com/graphql", {
+              method: "POST",
+              headers: {
+                 'Content-Type': 'application/json'
+              },body: JSON.stringify({
+                        query: `query {
+  chezins { name}
+}
+              `})
+            }).then(checkStatus)
+          .then(parseJSON);
+            fppp = res.data.chezins
+            fpp = fppp.map(c => c.name)
+        } catch (e) {
+            error1 = e
+        }
+        
+    });
+
 let g = false;
 
 function find_contry_id(contry_name_arr){
@@ -310,7 +347,7 @@ function find_contry_id(contry_name_arr){
                   ];
     const name = `countries`;
         let lang ="he";
-
+let nameuse = false;
     const placeholdr = {he: "", ar: "", en: ""};
     const pl = `${placeholdr}.${lang}`;
     const placeholder =`המקום שלי`;
@@ -338,6 +375,12 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
+  nameuse = false;
+  const jjj = $form.name
+if (fpp.includes(jjj)){
+  console.log("sssss")
+  nameuse = true;
+} else {
 g = true;
  if (selected.length < 1) {
  erorims = true
@@ -379,6 +422,7 @@ g = true;
           });
 
           }}
+        }
         });
 let dow;
 function show (){
@@ -507,6 +551,9 @@ function erorer(){
         /> 
      {#if $errors.name}
       <small style="color: red;">יש למלא שם</small>
+    {/if}
+    {#if nameuse}
+      <small style="color: red;">השם שנבחר כבר תפוס</small>
     {/if}
 </div>
 <div class="flexi1">

@@ -91,8 +91,9 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-				const id = miDatan.data.register.user.id
-			      let token  = miDatan.data.register.jwt; 
+				const id = miDatan.data.register.user.id;
+			      let token  = miDatan.data.register.jwt;
+
         document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
     document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
 				  let bearer1 = 'bearer' + ' ' + token;      
@@ -136,8 +137,6 @@ dispatch ('progres',{
 		tx: 0,
 		txx: 0
 	} );
-
-
 } catch (e) {
             error1 = e
             console.log(error1);
@@ -250,7 +249,7 @@ function back() {
     </button>
 </div>
 {:else if already == true }
-          <div class="flex flex-col text-center">
+          <div style="margin: 0 auto;" class="flex flex-col text-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
          <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
