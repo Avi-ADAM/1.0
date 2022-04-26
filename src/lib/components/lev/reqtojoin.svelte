@@ -284,7 +284,7 @@ ${adduser}
             console.log(error1);
         }
 
-    } else if (noofpu - 1 === noofusersOk) {
+    } else if (noofpu === noofusersOk) {
             console.log("create new as above and add vote and archive asked")
     
         try {

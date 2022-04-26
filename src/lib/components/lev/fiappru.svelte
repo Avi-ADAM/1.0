@@ -177,7 +177,7 @@ async function agree() {
     uids = uids;
     console.log(uids);
     //add rating for app +5 for declin -5, nego mean demends for apruval
-     if (noofpu - 1 === noofusersOk) {
+     if (noofpu === noofusersOk) {
             console.log("create new finnished and add vote and archive fiapp")
         try {
             await fetch(linkg, {
