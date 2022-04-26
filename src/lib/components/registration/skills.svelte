@@ -40,6 +40,7 @@
         } catch (e) {
             error1 = e
         }
+        
     });
 
 
@@ -119,7 +120,7 @@ selected = newSele;
   </script>
   
  <DialogOverlay {isOpen} onDismiss={close} >
-        <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"  aria-label="form">
       <div dir="rtl" >
              
