@@ -7,8 +7,14 @@ onMount(async () => {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
+  if(cookieValue !== null){
+      const tok = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
   .split('=')[1];
-    token  = cookieValue; 
+    token  = tok;     
+}
+    
 if (token){
     isAuthed = true
 }
