@@ -224,7 +224,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
 >
   <SwiperSlide
     ><div
-><div><span 	class="{`normSml${oid}`}" id="normSml" 
+><div id="normSml" ><span 	class="{`normSml${oid}`}" 
 ></span>
         <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
         <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  class="hover:scale-150 lt" >{projectName}</button>
