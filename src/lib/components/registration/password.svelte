@@ -249,7 +249,7 @@ function back() {
     </button>
 </div>
 {:else if already == true }
-          <div style="margin: 0 auto;" class="flex flex-col text-center">
+          <div style="margin: 0 auto;" class="flex flex-col text-center items-center justify-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
          <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
