@@ -1045,6 +1045,19 @@ onMount(async () => {
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
+  const cookieRe = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('when='))
+  if (cookieRe != null) {
+  const cookieR = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('when='))
+  .split('=')[1];
+  const today = Date.now()
+  if(cookieR +2592000000 < today ){
+    goto("login")
+  }
+  }
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))

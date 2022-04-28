@@ -1,7 +1,7 @@
 <script>
 
     import { fade } from "svelte/transition";
-    import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+    import { goto} from '$app/navigation';
     import axios from "axios";
     import { JWT } from '../../lib/stores/jwt.js';
     import { idM } from '../../lib/stores/idM.js';    
@@ -41,6 +41,7 @@
             .then(({ data }) => {
                 document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
                 document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+                document.cookie = `when=${Date.now}; expires=` + new Date(2023, 0, 1).toUTCString();
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);
