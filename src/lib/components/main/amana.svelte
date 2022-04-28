@@ -570,8 +570,9 @@ function erorer(){
     {/if}
    </div>    
 <div class="flexi2">
-  <h3        class="amanat" 
- style=" font-weight: 900;   white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.2em; line-height:normal;" dir="rtl">דואר L.</h3>
+  <h3 class="amanat" 
+ style=" font-weight: 900;   white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.2em; line-height:normal;" 
+ dir="rtl">דואר L.</h3>
   <input
  
     placeholder="המייל שלי"
