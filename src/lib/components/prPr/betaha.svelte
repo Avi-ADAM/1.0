@@ -35,13 +35,13 @@ function confirm (id) {
           </tr> <tr>
             <th>תיאור</th>
             {#each bmiData as data, i}
-            <td>{data.descrip}</td>
+            <td>{data.descrip !== null && data.descrip !== undefined && data.descrip !== "undefined" ? data.descrip : ""}</td>
               {/each}
             </tr>
          <tr>
               <th>תאריך ביצוע</th>
               {#each bmiData as data, i}
-            <td>              {#if data.Sqadualed  }
+            <td>              {#if data.Sqadualed !== undefined}
               {data.Sqadualed}
             {/if}
             </td>
@@ -50,8 +50,8 @@ function confirm (id) {
             <th>קישורים ציבוריים</th>
             {#each bmiData as data, i}
             <td>
-              {#if data.publicklinks}
-              {data.publicklinks}
+              {#if data.publicklinks !== undefined && data.publicklinks !== "undefined"}
+             <a target="_blank" href="{data.publicklinks}">קישור</a>
               {/if}
              </td>
              {/each}
@@ -59,7 +59,7 @@ function confirm (id) {
           <th>הערות יחודיות לריקמה שלי</th>
           {#each bmiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot}
+            {#if data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== "undefined"}
             {data.hearotMeyuchadot}
             {/if}
            </td>
@@ -67,9 +67,9 @@ function confirm (id) {
       </tr><tr>
         <th>קישורים יחודיים לריקמה שלי</th>
         {#each bmiData as data, i}
-        <td>          {#if data.privatlinks} 
-
-          {data.privatlinks} 
+        <td>       
+      {#if data.privatlinks !== undefined && data.privatlinks !== "undefined"} 
+             <a target="_blank" href="{data.privatlinks}">קישור</a>
           {/if}
          </td>
          {/each}
@@ -107,13 +107,20 @@ function confirm (id) {
       {/each}
     </tr>
     <tr style="display:''" id="total" >
-          <th>כבר בוצע</th>
+          <th>כבר בוצעו</th>
           {#each bmiData as data, i}
           <td dir="ltr">
   <h5 class="mn">{`${data.howmanyhoursalready  ? Math.round((data.howmanyhoursalready + Number.EPSILON) * 100) / 100 : 0} / ${data.hoursassinged} `}</h5>
           </td>
           {/each}
-        </tr>
+        </tr><tr>
+        <th>1</th>
+        {#each bmiData as data, i}
+        <td>       
+             <a target="_blank" href="/user/{data.users_permissions_user.id}">{data.users_permissions_user.username}</a>
+         </td>
+         {/each}
+    </tr>
               
 
     <tr class="ggd">
