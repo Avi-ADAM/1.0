@@ -286,7 +286,7 @@ ${adduser}
 
     } else if (noofpu === noofusersOk) {
             console.log("create new as above and add vote and archive asked")
-    
+    //arcive all other asks
         try {
             await fetch(linkg, {
                     method: 'POST',

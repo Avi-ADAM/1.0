@@ -557,8 +557,8 @@ function erorer(){
     {/if}
 </div>
 <div class="flexi1">
-  <h3        class="amanat " id="m" 
- style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1.2em;" dir="rtl">מ: </h3> 
+  <h3   class="amanat " id="m" 
+ style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1em;" dir="rtl">מ: </h3> 
       <MultiSelect
       bind:selected
       {name} 
@@ -598,16 +598,18 @@ function erorer(){
     </h1>
           <span>
               <span>
-                אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>      לעולם לא אנהג באלימות ולא אפגע באף אדם         
+                אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לעולם לא אנהג באלימות ולא אפגע באף אדם         
                    <br>
            כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח .
               <br>	
    אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
               <br>
-              כאשר כל  <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> תהיה חתומה על אמנה זו אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> ממנה בשמי
+              כאשר כל  <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> תסכים עם אמנה זו אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> ממנה בשמי
               <br>
-              אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> כאשר כל האנושות תהיה חתומה על האמנה הזו
-          </span>
+              אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> כאשר כל האנושות תסכים עם האמנה הזו
+        <br>
+         אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אפתור חילוקי דעות באתר 1❤️1 בהסכמה הדדית  
+            </span>
           </span>
     </div>
      
