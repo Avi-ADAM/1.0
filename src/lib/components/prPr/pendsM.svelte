@@ -80,7 +80,8 @@ function confirm (id) {
           </tr> <tr>
             <th>תיאור</th>
             {#each pmiData as data, i}
-            <td>{data.descrip}</td>
+            <td>
+              {data.descrip != undefined && data.descrip != "undefined" ? data.descrip : ""}</td>
               {/each}
             </tr> <tr>
               <th>כישורים נדרשים</th>
@@ -123,7 +124,7 @@ function confirm (id) {
             <th>קישורים ציבוריים</th>
             {#each pmiData as data, i}
             <td>
-              {#if data.publicklinks != undefined}
+              {#if data.publicklinks != undefined && data.publicklinks != "undefined" }
               {data.publicklinks}
               {/if}
              </td>
@@ -132,7 +133,7 @@ function confirm (id) {
           <th>הערות יחודיות לריקמה שלי</th>
           {#each pmiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot != undefined}
+            {#if data.hearotMeyuchadot != undefined && data.hearotMeyuchadot != "undefined"}
             {data.hearotMeyuchadot}
             {/if}
            </td>
@@ -140,7 +141,7 @@ function confirm (id) {
       </tr><tr>
         <th>קישורים יחודיים לריקמה שלי</th>
         {#each pmiData as data, i}
-        <td>          {#if data.privatlinks != undefined} 
+        <td>          {#if data.privatlinks != undefined && data.privatlinks != "undefined"} 
 
           {data.privatlinks} 
           {/if}
@@ -171,10 +172,9 @@ function confirm (id) {
       {#each pmiData as data, i}
       <td>
       {#if data.perhour > 0 & data.noofhours > 0}
-      
       {data.perhour * data.noofhours}
-      
-      {:else} <p>0</p>
+      {:else} 
+      <p>0</p>
       {/if}
       </td>
       {/each}
