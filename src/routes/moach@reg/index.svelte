@@ -199,8 +199,8 @@ JSON.stringify({query:
             finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id username}}
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
-              mesimabetahaliches {
-              hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks }
+              mesimabetahaliches (where:{finnished: false}) {
+              hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {id username}}
             open_missions (where:{archived: false }) { id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}
