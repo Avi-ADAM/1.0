@@ -286,7 +286,7 @@ ${adduser}
 
     } else if (noofpu === noofusersOk) {
             console.log("create new as above and add vote and archive asked")
-    //arcive all other asks
+    //arcive all other asks 
         try {
             await fetch(linkg, {
                     method: 'POST',
@@ -318,7 +318,7 @@ updateOpenMission(
     where: {id: "${openMid}"}
   data: {archived: true}
 }
-) {openMission{id archived}}
+) {openMission{id archived asks{id}}}
 ${welcome}
 ${adduser2}
  updateAsk(
@@ -339,6 +339,36 @@ ${adduser2}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            const otherasks = miDatan.data.openMission.asks
+            console.log(otherasks);
+            if (otherasks.length> 0){
+            let nextquery = ``
+            for (let i = 0; i < otherasks.length; i++){
+                nextquery = nextquery + `
+                updateAsk(
+                            input:{
+                                where: {id: "${otherasks.id}" }
+                                data: { archived: true
+                                  }
+                            }
+                        ){ask{id}}`
+            }
+            await fetch(linkg, {
+                    method: 'POST',
+                    headers: {
+                        'Authorization': bearer1,
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        query: `mutation { 
+                      ${nextquery}
+                        }`})
+                })
+                .then(r => r.json())
+                .then(data => miDatan = data);
+            console.log(miDatan);
+
+          }
             dispatch('acsept', {
                 asked: id
             })
