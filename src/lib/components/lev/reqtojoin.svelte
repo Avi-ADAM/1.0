@@ -339,7 +339,7 @@ ${adduser2}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            const otherasks = miDatan.data.openMission.asks
+            const otherasks = miDatan.data.updateOpenMission.openMission.asks
             console.log(otherasks);
             if (otherasks.length> 0){
             let nextquery = ``
