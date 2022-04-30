@@ -189,8 +189,7 @@ async function agree() {
      console.log(idL);
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
-    uids.push(userId);
-    uids = uids;
+
     console.log(uids);
     if (uids.includes(userId)){
         welcome = ``;
@@ -198,6 +197,8 @@ async function agree() {
         adduser = ``;
         console.log(welcome, "member");
     } else {
+          uids.push(userId);
+    uids = uids;
         welcome = `createWelcomTop(
   input: {
     data: {users_permissions_user: "${userId}",
