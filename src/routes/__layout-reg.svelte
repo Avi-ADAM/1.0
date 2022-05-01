@@ -4,6 +4,19 @@ import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 let isAuthed = false;
 let token;
 onMount(async () => {
+    const cookieRe = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('when='))
+  if (cookieRe != null) {
+  const cookieR = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('when='))
+  .split('=')[1];
+  const today = Date.now()
+  if(cookieR +2592000000 < today ){
+    goto("login")
+  }
+  }
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
