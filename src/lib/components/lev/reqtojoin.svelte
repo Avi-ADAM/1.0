@@ -343,13 +343,13 @@ ${adduser2}
             console.log(miDatan);
             const otherasks = miDatan.data.updateOpenMission.openMission.asks
             console.log(otherasks);
-            if (otherasks.length> 0){
+            if (otherasks.length> 1){
             let nextquery = ``
             for (let i = 0; i < otherasks.length; i++){
                 nextquery = nextquery + `
                 updateAsk(
                             input:{
-                                where: {id: "${otherasks.id}" }
+                                where: {id: "${otherasks[i].id}" }
                                 data: { archived: true
                                   }
                             }
