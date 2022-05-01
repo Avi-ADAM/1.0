@@ -39,6 +39,7 @@ export let missId;
 export let id;
 export let openMid;
 export let st = 188;
+export let pid;
 export let declined = [];
 export let noofusersWaiting;
 export let uids;
@@ -190,15 +191,15 @@ async function agree() {
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
 
-    console.log(uids);
-    if (uids.includes(userId)){
+    console.log(pid);
+    if (pid.includes(userId)){
         welcome = ``;
         adduser2 = ``;
         adduser = ``;
         console.log(welcome, "member");
     } else {
-          uids.push(userId);
-    uids = uids;
+          pid.push(userId);
+    pid = pid;
         welcome = `createWelcomTop(
   input: {
     data: {users_permissions_user: "${userId}",
@@ -214,7 +215,7 @@ input: {
         adduser2 = `updateProject(
 input: {
   where: {id: "${projectId}"}
- data: {user_1s: ${uids}}
+ data: {user_1s: [${pid}]}
 }
   ){project {user_1s {id}}}`
         console.log(welcome, "not member");

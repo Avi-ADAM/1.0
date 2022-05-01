@@ -405,6 +405,7 @@ async function createasked (da) {
                             noof: start[i].asks[j].project.user_1s.length,
                             src2: src21,
                             myid: da.data.user.id,
+                            pid: start[i].asks[j].project.user_1s.map(c => c.id),
                             ani: "askedcoin",
                             pl: 1 + i + j
                                //   uid: start[i].asks[j].users[k].id,
@@ -1859,6 +1860,7 @@ function hover(event){
             on:proj={proj}
      on:user={user}
             on:decline={delo}
+            pid={buble.pid}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
             what={buble.what}
