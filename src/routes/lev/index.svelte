@@ -20,6 +20,8 @@ import Mid from "../../lib/components/lev/midi.svelte"
         import Hevel from '../../lib/components/lev/hevel.svelte'
         import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
         import { fly } from 'svelte/transition';
+               import Levchat from '../../lib/components/lev/halukaask.svelte'
+
         let low = true;
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
               let isOpen = false;
@@ -507,6 +509,7 @@ async function createmask (da) {
                             noof: start[i].user_1s.length,
                             src2: src21,
                             myid: da.data.user.id,
+                            pid: start[i].askms[j].project.user_1s.map(c => c.id),
                             ani: "askedm",
                             pl: 2 + i + j
                               });
@@ -1899,6 +1902,7 @@ function hover(event){
                   on:hover={hover}
             on:proj={proj}
  on:user={user}
+            pid={buble.pid}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
             what={buble.what}

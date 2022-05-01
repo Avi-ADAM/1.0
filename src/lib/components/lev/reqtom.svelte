@@ -1,7 +1,7 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto, prefetch } from '$app/navigation';
-
+import Chaticon from '../../celim/chaticon.svelte'
 import {
     clickOutside
 } from './outsidclick.js';
@@ -47,6 +47,7 @@ export let noofusersNo;
 export let already = false;
 let resP = [];
 let lang;
+export let pid
 export let stylef = '24px';
 export let askId;
 export let users;
@@ -191,12 +192,14 @@ async function agree() {
     bearer1 = 'bearer' + ' ' + token;
   
     console.log(uids);
-    if (uids.includes(userId)){
+    if (pid.includes(userId)){
         welcome = ``;
         adduser2 = ``;
         adduser = ``;
         console.log(welcome, "member");
     } else {
+        pid.push(userId);
+    pid = pid;
         welcome = `createWelcomTop(
   input: {
     data: {users_permissions_user: "${userId}",
@@ -212,7 +215,7 @@ input: {
         adduser2 = `updateProject(
 input: {
   where: {id: "${projectId}"}
- data: {user_1s: ${uids}}
+ data: {user_1s: [${pid}]}
 }
   ){project {user_1s {id}}}`
         console.log(welcome, "not member");
@@ -444,7 +447,9 @@ updateAskm(
         }
 }
 let hovered = false;
-
+function tochat () {
+  dispatch("chat");
+}
  $: w = 0;
  let  u = "הצבעה על בקשה להצטרפות לרקמה"
 function hover (id){
@@ -571,7 +576,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
        <p on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="hslink bc" >{price}</p>
         <p class="hslink cd" ><span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--gold)" >{myp}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy}</span> </p>
                  {#if missionDetails !== null}   <p on:mouseenter={()=>hover("פרטי הצעת ההשקעה")} on:mouseleave={()=>hover("0")}  class="hslink de">{missionDetails}</p>{/if}   
-        {#if already === false}
+                 {#if already === false}
             <button on:mouseenter={()=>hover("אישור")} on:mouseleave={()=>hover("0")} on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
             <button on:mouseenter={()=>hover("דחיה")} on:mouseleave={()=>hover("0")} on:click={decline}  class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
