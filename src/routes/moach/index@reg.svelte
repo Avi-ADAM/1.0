@@ -1137,7 +1137,7 @@ function titlel (event){
    <p>{descripFor}</p>
   {/if}
   {#if linkP}
-  <a  href={linkP}>לינק לאתר</a>  
+  <a target="_blank" href={linkP}>לינק לאתר</a>  
   {/if}
   <div class="3  ">
   {#each projectUsers as user}
