@@ -68,6 +68,12 @@ function user(event){
  mode = 1
  isOpen = true
 }
+function chat(event){
+  isOpen = false
+ //eizeish = event.detail.id
+ mode = 3
+ isOpen = true
+}
 function proj(event){
   isOpen = false
  eizep = event.detail.id
@@ -509,7 +515,7 @@ async function createmask (da) {
                             noof: start[i].user_1s.length,
                             src2: src21,
                             myid: da.data.user.id,
-                            pid: start[i].askms[j].project.user_1s.map(c => c.id),
+                            pid: start[i].user_1s.map(c => c.id),
                             ani: "askedm",
                             pl: 2 + i + j
                               });
@@ -1633,6 +1639,8 @@ function hover(event){
     <Hevel userId={eizeish} on:proj={proj}/>
     {:else if mode == 2}
     <Rikma projectId={eizep} on:user={user}/>
+    {:else if mode == 3}
+    <Levchat/>
     {/if}
   </div>
   </DialogContent>
@@ -1902,6 +1910,7 @@ function hover(event){
                   on:hover={hover}
             on:proj={proj}
  on:user={user}
+ on:chat={chat}
             pid={buble.pid}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
