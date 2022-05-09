@@ -29,6 +29,7 @@ function percentage(partialValue, totalValue) {
     export let missId; //add in gr
     export let noofpu; //addtopr
     export let perhour;
+    export let usernames;
     let mstotal = hourstotal*3600000
      let idL;
 

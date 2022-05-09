@@ -20,7 +20,7 @@ import Mid from "../../lib/components/lev/midi.svelte"
         import Hevel from '../../lib/components/lev/hevel.svelte'
         import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
         import { fly } from 'svelte/transition';
-               import Levchat from '../../lib/components/lev/halukaask.svelte'
+               import Levchat from '../../lib/components/lev/levchat.svelte'
 
         let low = true;
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
@@ -84,8 +84,9 @@ function mesimabetahalicha (data) {
     const mtahan = data.data.user.mesimabetahaliches;
         for (var i = 0; i < mtahan.length; i++) {
             mtaha[i] = mtahan[i];
-            mtaha[i].ani = "mtaha"
-            mtaha[i].pl = 0 + i
+            mtaha[i].ani = "mtaha";
+            mtaha[i].pl = 0 + i;
+            mtaha[i].usernames = data.data.user.username;
     }
     beta = mtaha.length;
      if (!isEqual(mtaha,mtahaold) && counter > 1 ) {
@@ -523,7 +524,6 @@ async function createmask (da) {
 
   }
   askedm = askedm 
-  console.log(askedm) 
   if (askedm.length > 0){
   for (var k = 0; k < askedm.length; k++) {
      const x = askedm[k].users
@@ -1395,6 +1395,7 @@ function pmash (data) {
     pmashes[t].noofusersNo = 0;
     pmashes[t].whyno = [];
     pmashes[t].whyes = [];
+    pmashes[t].messege = []
     pmashes[t].mypos = null;
     if(allid.includes(myid)){
       pmashes[t].already = true;
@@ -1415,7 +1416,15 @@ function pmash (data) {
         }
     const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].users.length;
     pmashes[t].noofusersWaiting = noofusersWaiting;
-        
+               if (pmashes[t].users.length > 1){
+                 for (var x = 0; x < pmashes[t].users.length; x++){
+                   pmashes[t].messege.push({
+                    message: `${pmashes[t].users[x].users_permissions_user.username} הצביע ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד בנימוק : ${pmashes[t].users[x].why}`}`,
+                    what: pmashes[t].users[x].what
+                   })
+                 }
+               }
+ 
     }
     pmashd = pmashes.length;
     console.log(pmashes)
@@ -1519,8 +1528,9 @@ function createpends (data) {
                                    mdate: pend.sqadualed,
                                    pendId: pend.id,
                                     ani: "pends",
-                                  pl: 1 + pend.users.length
-                              });
+                                  pl: 1 + pend.users.length,
+                                  messege: []
+                                });
                
  }
  }
@@ -1559,7 +1569,14 @@ function createpends (data) {
         }
     const noofusersWaiting = pends[t].user_1s.length - pends[t].users.length;
     pends[t].noofusersWaiting = noofusersWaiting;
-        
+           if (pends[t].users.length > 1){
+                 for (var x = 0; x < pends[t].users.length; x++){
+                   pends[t].messege.push({
+                    message: `${pends[t].users[x].users_permissions_user.username} הצביע ${pends[t].users[x].what == true ? 'בעד' : ` נגד בנימוק : ${pends[t].users[x].why}`}`,
+                    what: pends[t].users[x].what
+                   })
+                 }
+               }  
     }
     pen = pends.length;
   //  bubleUiAngin(pends)
@@ -1683,6 +1700,7 @@ function hover(event){
   on:proj={proj}
  on:user={user}  
   on:hover={hover}
+    usernames={buble.usernames}
     noofpu={buble.project.user_1s.length}
     oldzman={buble.timer}
     stname={buble.stname}
@@ -1745,6 +1763,8 @@ function hover(event){
   on:proj={proj}
  on:user={user}
         on:coinLapach={coinLapach}
+         messege={buble.messege}
+
       descrip={buble.descrip}
       projectName = {buble.projectName}
       name = {buble.name}
@@ -1972,6 +1992,7 @@ function hover(event){
       on:hover={hover}
       on:proj={proj}
  on:user={user}
+ messege={buble.messege}
       i={i}
       askedarr={askedarr}
      declineddarra= {buble.declineddarra}
