@@ -141,6 +141,10 @@ function objToString (obj) {
     const diunim = objToString(diun);
 async function agree(alr) {
   if  (alr == "alr"){
+       noofusersOk += 1;
+  noofusersNo -= 1;
+  ser = xyz();
+  users.map(c => c.id)
         alert("soon")
       } else{
   already = true;
@@ -265,6 +269,9 @@ async function nego(alr) {
 function decline(alr) {
       if  (alr == "alr"){
         alert("soon")
+         noofusersNo += 1;
+  noofusersOk -= 1;
+  ser = xyz();
       } else{
       already = true;
       no = true;
@@ -280,7 +287,6 @@ let isOpen = false;
 let loading = false;
 async function afterwhy (event){
   why = event.detail.why
-  console.log(why)
            loading = true;
   noofusersNo += 1;
   noofusersWaiting -= 1;
