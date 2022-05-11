@@ -109,7 +109,7 @@ img {
          <div class="flex items-end" class:justify-end={sentByMe === true}>
             <div class="flex flex-col space-y-2 text-xs max-w-xs mx-2 " class:order-2={sentByMe === false} class:order-1={sentByMe === true} class:items-end={sentByMe === true} class:items-start={sentByMe === false}>
                <div><span class="px-4 py-2 rounded-lg inline-block" 
-				 class:text-gray-600={sentByMe === false && what === null} class:text-white={sentByMe === true && what === null} class:text-gold={what=== false} class:text-green-900={what=== true}
+				 class:text-gray-600={sentByMe === false && what === null} class:text-white={sentByMe === true && what === null} class:text-black={what !== null} 
 				 class:bg-gray-300={sentByMe === false && what === null} class:bg-blue-600={sentByMe === true && what === null} class:bg-barbi={what=== false} class:bg-green-300={what=== true}
 								 class:rounded-bl-none={sentByMe === true} class:rounded-br-none={sentByMe === false}
 				dir="rtl" >{message}</span></div>

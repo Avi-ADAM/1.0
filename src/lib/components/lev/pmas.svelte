@@ -136,21 +136,22 @@ function objToString (obj) {
     }}
     return str;
 }
-            let linkg = 'https://onelovevone.onrender.com/graphql';
+    let linkg = 'https://onelovevone.onrender.com/graphql';
     const userss = objToString(users);
     const diunim = objToString(diun);
 async function agree(alr) {
   if  (alr == "alr"){
+    
        noofusersOk += 1;
   noofusersNo -= 1;
   ser = xyz();
-  users.map(c => c.id)
-        alert("soon")
+  alert("soon")
       } else{
   already = true;
    noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
+     
     const date = (sqadualed !== undefined) ? `sqadualed: "${new Date(sqadualed).toISOString()}",` : ``;
         const sdate = (sqadualedf !== undefined) ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",` : ``;
     const cookieValue = document.cookie
@@ -256,7 +257,8 @@ archived: true
        
       }
           }
-	};
+        }
+	;
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
 async function nego(alr) {
   already = true;
@@ -268,10 +270,11 @@ async function nego(alr) {
 }
 function decline(alr) {
       if  (alr == "alr"){
-        alert("soon")
          noofusersNo += 1;
   noofusersOk -= 1;
   ser = xyz();
+  alert("soon")
+  //afterwhy()
       } else{
       already = true;
       no = true;
@@ -282,12 +285,13 @@ function decline(alr) {
         // send why with userss, create way to show why for all agreed users and for them to response.
 	}
 }
-  let why;
+  let why = "";
 let isOpen = false;
 let loading = false;
 async function afterwhy (event){
   why = event.detail.why
            loading = true;
+           if (why.length == 0 || why == null ){why = ""}
   noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();
@@ -802,12 +806,13 @@ input[type=text]:invalid {
       padding: 0px;
       background-color: #242526;
           margin: 0px;
-          max-width: 50vw;
+          max-width: 70vw;
+          margin-top: 20vh;
         }
     :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
-  @media (min-width: 568px){
+  @media (min-width: 600px){
         :global([data-svelte-dialog-content].chat) {
  width: fit-content;
        z-index: 1000;
@@ -815,6 +820,8 @@ input[type=text]:invalid {
       background-color: #242526;
       margin: 0px;
       max-width: 50vw;
+                margin-top: 10vh;
+
         }
           :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;

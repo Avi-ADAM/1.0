@@ -118,10 +118,14 @@ function click() {
 .input:focus ,.input:valid  {
   border: 0;
 }
-
+.t{
+    height: 90vh;
+ }
 
 @media (max-width:600px){
- 
+ .t{
+    height: 80vh;
+ }
 .textinput {
   position: relative;
   width: 100%;
@@ -130,7 +134,7 @@ function click() {
 }
 </style>
 
-<div style="background-color: #242526;" dir="rtl" class="flex-1 p:2 sm:p-6 justify-between flex flex-col h-screen">
+<div style="background-color: #242526;" dir="rtl" class="flex-1 p:2 sm:p-6 justify-between flex flex-col  t">
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
          <div class="relative">
