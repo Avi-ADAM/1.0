@@ -1,6 +1,6 @@
 <script>
 	import ChatMessage from '../../celim/messeges.svelte';
-	import TodayDivider from '../../celim/Todaydevider.svelte';
+	import TodayDivider from '../../celim/todaydevider.svelte';
 	
 
 	let nameMe='Me';
