@@ -2,7 +2,7 @@
       import { createEventDispatcher } from 'svelte';
 
 	import ChatMessage from '../../celim/messeges.svelte';
-	import TodayDivider from '../../celim/Todaydevider.svelte';
+	import TodayDivider from '../../celim/todaydevider.svelte';
 	  const dispatch = createEventDispatcher();
 
    export let rect, no = false
