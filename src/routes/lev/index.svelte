@@ -245,7 +245,6 @@ function crMaap(hh){
   for (var i = 0; i < start.length; i++) {
             for (var j = 0; j < start[i].maaps.length; j++){
                 if(start[i].maaps.length > 0){
-                                             console.log("9090")
                       const rt = letters(start[i].maaps[j].sp.name); 
                     wegets.push({
                             uid: start[i].maaps[j].sp.users_permissions_user.id,
@@ -274,7 +273,6 @@ function crMaap(hh){
                             ani: "wegets",
                             pl: -1 + start[i].maaps[j].vots.length
                               });
-                           console.log("hguyg")
             }
         }
   }
@@ -1150,7 +1148,7 @@ async function start () {
                                 pmashes (where:{archived: false }){ id hm project {projectName id 
                                         profilePic {url formats } 
                                         user_1s { id haskama}
-                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id} order}  users  {what why id users_permissions_user {id}}} 
+                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id username profilePic {url}} order }  users  { what why id users_permissions_user {id username profilePic {url}}}} 
                                 open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
                                 askms(where:{archived: false }){ id 
                                      vots  {what why id users_permissions_user {id}}
@@ -1176,7 +1174,7 @@ async function start () {
                                     work_ways {id workWayName} 
                                     mission { id}
                                     vallues { id}
-                                    users  {what why id users_permissions_user {id}} 
+                                    users  {what why id users_permissions_user {id username profilePic {url}}} 
                                    
                             }
                                      open_missions(where:{archived: false }) {id declined { id} users  {id} } 
@@ -1344,13 +1342,19 @@ let penm = 0;
 function pmash (data) {
     //rishonnnn so to create openM first avilable only to rishon then to rest of users..
     const myid = data.data.user.id;
+    let src24 = ""
+                  if(data.data.user.profilePic !== null){
+                    src24 = data.data.user.profilePic.url
+                  } else{
+                    src24 = ""
+                  }
     const projects = data.data.user.projects_1s;
     for (var i = 0; i < projects.length; i++) {
         for (var j = 0; j < projects[i].pmashes.length; j++) {
-            console.log("gi")
 
             const pend = projects[i].pmashes[j]
                     pmashes.push({
+                      mysrc: src24,
                                   name: pend.name,
                                   projectId: pend.project.id,
                                   hearotMeyuchadot: pend.spnot,
@@ -1372,7 +1376,8 @@ function pmash (data) {
                                    pendId: pend.id,
                                    diun: pend.diun,
                                     ani: "pmashes",
-                                  pl: 1 + pend.users.length
+                                  pl: 1 + pend.users.length,
+                                  messege: []
                               });
                
     }
@@ -1395,7 +1400,6 @@ function pmash (data) {
     pmashes[t].noofusersNo = 0;
     pmashes[t].whyno = [];
     pmashes[t].whyes = [];
-    pmashes[t].messege = []
     pmashes[t].mypos = null;
     if(allid.includes(myid)){
       pmashes[t].already = true;
@@ -1416,15 +1420,40 @@ function pmash (data) {
         }
     const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].users.length;
     pmashes[t].noofusersWaiting = noofusersWaiting;
-               if (pmashes[t].users.length > 1){
+               if (pmashes[t].users.length > 0){
                  for (var x = 0; x < pmashes[t].users.length; x++){
-                   pmashes[t].messege.push({
-                    message: `${pmashes[t].users[x].users_permissions_user.username} הצביע ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד בנימוק : ${pmashes[t].users[x].why}`}`,
-                    what: pmashes[t].users[x].what
-                   })
+                   let src22 = ""
+                  if(pmashes[t].users[x].users_permissions_user.profilePic !== null){
+                    src22 = pmashes[t].users[x].users_permissions_user.profilePic.url
+                  } else{
+                    src22 = ""
+                  }
+                  pmashes[t].messege.push({
+                    message: `${pmashes[t].users[x].users_permissions_user.username}  
+                     ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד בנימוק :
+                      ${pmashes[t].users[x].why}`}`,
+                    what: pmashes[t].users[x].what,
+                    pic:src22,
+                    sentByMe: pmashes[t].users[x].users_permissions_user.id === myid ? true : false,       
+                  })
                  }
                }
- 
+ if (pmashes[t].diun.length > 0){
+                 for (var x = 0; x < pmashes[t].diun.length; x++){
+                   let src22 = ""
+                  if(pmashes[t].diun[x].users_permissions_user.profilePic !== null){
+                    src22 = pmashes[t].diun[x].users_permissions_user.profilePic.url
+                  } else{
+                    src22 = ""
+                  }
+                  pmashes[t].messege.push({
+                    message: pmashes[t].diun[x].why,
+                    what: pmashes[t].diun[x].what,
+                    pic:src22,
+                    sentByMe: pmashes[t].diun[x].users_permissions_user.id === myid ? true : false,       
+                  })
+                 }
+               }
     }
     pmashd = pmashes.length;
     console.log(pmashes)
@@ -1569,14 +1598,25 @@ function createpends (data) {
         }
     const noofusersWaiting = pends[t].user_1s.length - pends[t].users.length;
     pends[t].noofusersWaiting = noofusersWaiting;
-           if (pends[t].users.length > 1){
+           if (pends[t].users.length > 0){
                  for (var x = 0; x < pends[t].users.length; x++){
-                   pends[t].messege.push({
-                    message: `${pends[t].users[x].users_permissions_user.username} הצביע ${pends[t].users[x].what == true ? 'בעד' : ` נגד בנימוק : ${pends[t].users[x].why}`}`,
-                    what: pends[t].users[x].what
+                  let src22 = ""
+                  if(pends[t].users[x].users_permissions_user.profilePic !== null){
+                    src22 = pends[t].users[x].users_permissions_user.profilePic.url
+                  } else{
+                    src22 = ""
+                  }
+                  pends[t].messege.push({
+                    message: `${pends[t].users[x].users_permissions_user.username} 
+                     ${pends[t].users[x].what == true ? 'בעד' : ` נגד בנימוק :
+                      ${pends[t].users[x].why}`}`,
+                    what: pends[t].users[x].what,
+                    pic: src22,
+                    sentByMe: pends[t].users[x].users_permissions_user.id === myid ? true : false,
                    })
                  }
                }  
+               
     }
     pen = pends.length;
   //  bubleUiAngin(pends)
@@ -1726,6 +1766,8 @@ function hover(event){
   on:proj={proj}
  on:user={user}
         on:coinLapach={coinLapach}
+                 messege={buble.messege}
+        mysrc={buble.mysrc}
         mypos={buble.mypos}
         diun={buble.diun}
         whyno={buble.whyno}

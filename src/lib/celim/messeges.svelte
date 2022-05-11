@@ -10,11 +10,12 @@
 		
 		// This should use timestamp, but its simplified for the demo.
 		export let isToday;
-	
+	export let what = null;
 	
 </script>
 
 <style>
+/*
 .direct-chat-msg,
 .direct-chat-text {
 	display: block;
@@ -102,16 +103,25 @@ img {
 	
 	.un-read-icon {
 				color: #8f8f8f8f;
-	}
+	}*/
 </style>
+ <div class="chat-message">
+         <div class="flex items-end" class:justify-end={sentByMe === true}>
+            <div class="flex flex-col space-y-2 text-xs max-w-xs mx-2 " class:order-2={sentByMe === false} class:order-1={sentByMe === true} class:items-end={sentByMe === true} class:items-start={sentByMe === false}>
+               <div><span class="px-4 py-2 rounded-lg inline-block" 
+				 class:text-gray-600={sentByMe === false && what === null} class:text-white={sentByMe === true && what === null} class:text-gold={what=== false} class:text-green-900={what=== true}
+				 class:bg-gray-300={sentByMe === false && what === null} class:bg-blue-600={sentByMe === true && what === null} class:bg-barbi={what=== false} class:bg-green-300={what=== true}
+								 class:rounded-bl-none={sentByMe === true} class:rounded-br-none={sentByMe === false}
+				dir="rtl" >{message}</span></div>
+            </div>
+            <img src="{profilePicChatPartner}" alt="pic" class="w-6 h-6 rounded-full order-1">
+         </div>
+      </div>
+     
 
-<div class="direct-chat-msg" class:right="{sentByMe}" class:left="{!sentByMe}">
-    <div class="direct-chat-infos clearfix">
+			<!--
+					       <span class="direct-chat-name" class:float-right="{sentByMe}" class:float-left="{!sentByMe}">{sentByMe==true?nameMe:nameChatPartner}</span> 
 
-<!-- 	No point in showing names on every message -->
-			<!--         <span class="direct-chat-name" class:float-right="{sentByMe}" class:float-left="{!sentByMe}">{sentByMe==true?nameMe:nameChatPartner}</span> -->
-			
-			
         <span class="direct-chat-timestamp" class:float-left="{sentByMe}" class:float-right="{!sentByMe}">
 					{#if isToday}
 							{ new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
@@ -137,4 +147,4 @@ img {
 
 		</div>
 	</div>
-</div>
+</div>-->
