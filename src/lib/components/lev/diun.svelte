@@ -202,7 +202,7 @@ function click() {
 				
 					
 		</div>
-    <div dir="rtl" class="border-t-2 border-gray-200 pr-2 pl-8 sm:px-4 pt-4 mb-2 sm:mb-0" >
+    <div dir="rtl" class="border-t-2 border-gray-200 pr-4 pl-8 sm:px-4 pt-4 mb-2 sm:mb-0" >
            {#if rect == true || no == true}
 
       <div class="relative flex ">

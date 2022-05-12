@@ -808,6 +808,8 @@ input[type=text]:invalid {
           margin: 0px;
           max-width: 70vw;
           margin-top: 20vh;
+                          border-radius: 10%;
+
         }
     :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
