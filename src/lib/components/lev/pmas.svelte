@@ -274,7 +274,7 @@ function decline(alr) {
   noofusersOk -= 1;
   ser = xyz();
   alert("soon")
-  //afterwhy()
+  //afterwhy() order
       } else{
       already = true;
       no = true;
@@ -821,7 +821,7 @@ input[type=text]:invalid {
       margin: 0px;
       max-width: 50vw;
                 margin-top: 10vh;
-
+                border-radius: 15%;
         }
           :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
