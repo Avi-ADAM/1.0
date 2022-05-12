@@ -23,7 +23,7 @@ function click() {
             alert("מינימום 27 תווים")
         }
       } else if (rect == true) {
-    if (why.length > 10) {
+    if (why.length > 27) {
             dispatch("rect",{why:why})
       } else{
             alert("מינימום 10 תווים")
@@ -147,13 +147,13 @@ function click() {
                   <circle cx="8" cy="8" r="8" fill={mypos === true ? "green":"red"}></circle>
                </svg>
             </span>
-         <img src={profilePicChatPartner}  alt="" class="w-10 sm:w-16 h-10 sm:h-16 rounded-full">
+         <img src={profilePicChatPartner}  alt="" class="w-10 sm:w-16 h-10 sm:h-16 pr-2 sm:pr-0 rounded-full">
          </div>
          <div class="flex flex-col leading-tight">
-            <div class="text-2xl mt-1 flex items-center">
+            <div class="sm:text-2xl text-lg mt-1 flex items-center">
                <span class="text-gray-200 mr-3">{nameChatPartner}</span>
             </div>
-            <span class="text-lg ml-3 text-gold">{smalldes}</span>
+            <span class="sm:text-lg text-md ml-3 text-gold">{smalldes}</span>
          </div>
       </div>
       <div class="flex items-center space-x-2">

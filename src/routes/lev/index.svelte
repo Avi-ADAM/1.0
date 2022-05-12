@@ -1141,32 +1141,31 @@ async function start () {
                             tafkidims {id}
                         } 
                         } 
-        projects_1s { projectName id user_1s {id haskamaz haskamac haskama} profilePic {url formats } 
-            tosplits (where: {finished: false}) {id name vots  {what why id users_permissions_user {id}}}              
-            maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
-                            open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
-                                pmashes (where:{archived: false }){ id hm project {projectName id 
-                                        profilePic {url formats } 
-                                        user_1s { id haskama}
-                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id username profilePic {url}} order }  users  { what order why id users_permissions_user {id username profilePic {url}}}} 
-                                open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
-                                askms(where:{archived: false }){ id 
+  projects_1s { projectName id 
+    user_1s {id haskamaz haskamac haskama} 
+    profilePic {url formats } 
+    tosplits (where: {finished: false}) {id name vots  {what why id users_permissions_user {id}}}              
+    maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
+                 open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
+    pmashes (where:{archived: false }){ id hm  sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id username profilePic {url}} order }  users  { what order why id users_permissions_user {id username profilePic {url}}}} 
+    open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
+    askms(where:{archived: false }){ id 
                                      vots  {what why id users_permissions_user {id}}
                                        users_permissions_user { username id profilePic {url formats } }
                         open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy }
                           sp { id price myp }}
-                                asks (where:{archived: false }){ id
+    asks (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
                                      open_mission { id mission {id} declined { id} sqadualed publicklinks noofhours perhour privatlinks descrip hearotMeyuchadot name}
                                       project {projectName id user_1s {id} profilePic {url formats }}
                                        users_permissions_user { username id profilePic {url formats } } }
-                                finiapruvals (where:{archived: false}) {
+    finiapruvals (where:{archived: false}) {
               id missname why what {url formats} noofhours mesimabetahalich {id perhour hearotMeyuchadot descrip mission {id} } vots  {what why id users_permissions_user {id}}
             project {projectName id 
                                         profilePic {url formats } 
                                         user_1s { id}
             } users_permissions_user { username id profilePic {url formats } } }
-                                       pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
+    pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}
                                     skills { id skillName}
@@ -1174,10 +1173,10 @@ async function start () {
                                     work_ways {id workWayName} 
                                     mission { id}
                                     vallues { id}
-                                    users  {what why id users_permissions_user {id username profilePic {url}}} 
-                                   
+                                    diun {what why id users_permissions_user {id username profilePic {url}} order }  
+                                    users  { what order why id users_permissions_user {id username profilePic {url}}}                                   
                             }
-                                     open_missions(where:{archived: false }) {id declined { id} users  {id} } 
+    open_missions(where:{archived: false }) {id declined { id} users  {id} } 
                                     } 
                                  }
 }`
@@ -1350,20 +1349,21 @@ function pmash (data) {
                   }
     const projects = data.data.user.projects_1s;
     for (var i = 0; i < projects.length; i++) {
+      const proj = projects[i];
         for (var j = 0; j < projects[i].pmashes.length; j++) {
 
             const pend = projects[i].pmashes[j]
                     pmashes.push({
                       mysrc: src24,
                                   name: pend.name,
-                                  projectId: pend.project.id,
+                                  projectId: proj.id,
                                   hearotMeyuchadot: pend.spnot,
                                   descrip: pend.descrip,
                                   kindOf: pend.kindOf,
                                   created_at: pend.created_at,
-                                  projectName: pend.project.projectName,
-                                  user_1s: pend.project.user_1s,
-                                  src: pend.project.profilePic.formats.thumbnail.url,
+                                  projectName: proj.projectName,
+                                  user_1s: proj.user_1s,
+                                  src: proj.profilePic.formats.thumbnail.url,
                                   users: pend.users,
                                   myid: myid,
                                   mshaabId: pend.mashaabim.id, 
@@ -1379,7 +1379,6 @@ function pmash (data) {
                                   pl: 1 + pend.users.length,
                                   messege: []
                               });
-               
     }
      }
    for (var k = 0; k < pmashes.length; k++) {
@@ -1387,24 +1386,19 @@ function pmash (data) {
              pmashes[k].uids = [];
      for (var z = 0; z < x.length; z++){
       pmashes[k].uids.push(x[z].users_permissions_user.id);
-              pmashes[k].what = [];
-   pmashes[k].what.push(x[z].what);
  }
  }    
-
-    for (var t = 0; t <pmashes.length; t++){
+  for (var t = 0; t <pmashes.length; t++){
     const allid = pmashes[t].uids;
     const myid = pmashes[t].myid;
     pmashes[t].already = false;
     pmashes[t].noofusersOk = 0;
     pmashes[t].noofusersNo = 0;
-    pmashes[t].whyno = [];
-    pmashes[t].whyes = [];
     pmashes[t].cv = 0
     pmashes[t].mypos = null;
     if(allid.includes(myid)){
       pmashes[t].already = true;
-            pmashes[t].pl += 48
+      pmashes[t].pl += 48
     for (var l=0; l< pmashes[t].users.length; l++){
         if (pmashes[t].users[l].users_permissions_user.id === myid)
         if (pmashes[t].users[l].order !== 1){
@@ -1417,10 +1411,8 @@ function pmash (data) {
                     pmashes[t].cv += 1
             if (pmashes[t].users[r].what === true) {
                 pmashes[t].noofusersOk += 1;
-                pmashes[t].whyes.push(pmashes[t].users[r].why)
             }else if (pmashes[t].users[r].what === false) {
                  pmashes[t].noofusersNo += 1;
-               pmashes[t].whyno.push(pmashes[t].users[r].why)
             }
           }
         }
@@ -1463,8 +1455,6 @@ function pmash (data) {
                }
     }
     pmashd = pmashes.length;
-    console.log(pmashes)
-   // bubleUiAngin(pends)
 }
 
 function sds (mta) {
@@ -1536,6 +1526,12 @@ function makeWalcom (ata) {
 
 let pends = [];
 function createpends (data) {
+      let src24 = ""
+                  if(data.data.user.profilePic !== null){
+                    src24 = data.data.user.profilePic.url
+                  } else{
+                    src24 = ""
+                  }
     //rishonnnn so to create openM first avilable only to rishon then to rest of users..
     const myid = data.data.user.id;
     const projects = data.data.user.projects_1s;
@@ -1543,6 +1539,7 @@ function createpends (data) {
         for (var j = 0; j < projects[i].pendms.length; j++) {
             const pend = projects[i].pendms[j]
                     pends.push({
+                      mysrc:src24,
                                   name: pend.name,
                                   projectId: projects[i].id,
                                   hearotMeyuchadot: pend.hearotMeyuchadot,
@@ -1554,6 +1551,7 @@ function createpends (data) {
                                   src: projects[i].profilePic.formats.thumbnail.url,
                                   users: pend.users,
                                   myid: myid,
+                                  diun: pend.diun,
                                   missionId: pend.mission.id, 
                                   skills: pend.skills,
                                   tafkidims: pend.tafkidims,
@@ -1569,61 +1567,78 @@ function createpends (data) {
                                 });
                
  }
- }
- for (var k = 0; k < pends.length; k++) {
+ }   for (var k = 0; k < pends.length; k++) {
      const x = pends[k].users
+             pends[k].uids = [];
      for (var z = 0; z < x.length; z++){
-        pends[k].uids = [];
       pends[k].uids.push(x[z].users_permissions_user.id);
-              pends[k].what = [];
-
-           pends[k].what.push(x[z].what);
  }
  }    
-
- for (var t = 0; t <pends.length; t++){
+  for (var t = 0; t <pends.length; t++){
     const allid = pends[t].uids;
     const myid = pends[t].myid;
     pends[t].already = false;
- pends[t].noofusersOk = 0;
- pends[t].noofusersNo = 0;
-
+    pends[t].noofusersOk = 0;
+    pends[t].noofusersNo = 0;
+    pends[t].cv = 0
+    pends[t].mypos = null;
     if(allid.includes(myid)){
       pends[t].already = true;
-       pends[t].pl = 25    
+      pends[t].pl += 48
+    for (var l=0; l< pends[t].users.length; l++){
+        if (pends[t].users[l].users_permissions_user.id === myid)
+        if (pends[t].users[l].order !== 1){
+      pends[t].mypos = pends[t].users[l].what;
+              }
+            }
     }
         for (var r=0; r< pends[t].users.length; r++){
+                  if (pends[t].users[r].order !== 1){
+                    pends[t].cv += 1
             if (pends[t].users[r].what === true) {
-                
-                 pends[t].noofusersOk += 1;
-               
+                pends[t].noofusersOk += 1;
             }else if (pends[t].users[r].what === false) {
-              
                  pends[t].noofusersNo += 1;
-               
             }
+          }
         }
-    const noofusersWaiting = pends[t].user_1s.length - pends[t].users.length;
+    const noofusersWaiting = pends[t].user_1s.length - pends[t].cv;
     pends[t].noofusersWaiting = noofusersWaiting;
-           if (pends[t].users.length > 0){
+               if (pends[t].users.length > 0){
                  for (var x = 0; x < pends[t].users.length; x++){
-                  let src22 = ""
+                   let src22 = ""
                   if(pends[t].users[x].users_permissions_user.profilePic !== null){
                     src22 = pends[t].users[x].users_permissions_user.profilePic.url
                   } else{
                     src22 = ""
                   }
                   pends[t].messege.push({
-                    message: `${pends[t].users[x].users_permissions_user.username} 
-                     ${pends[t].users[x].what == true ? 'בעד' : ` נגד בנימוק :
-                      ${pends[t].users[x].why}`}`,
+                    message: `${pends[t].users[x].users_permissions_user.username}  
+                     ${pends[t].users[x].what == true ? 'בעד' : ` נגד
+                      ${pends[t].users[x].why !== null ? `בנימוק: ${pends[t].users[x].why}` : ``}`}`,
                     what: pends[t].users[x].what,
-                    pic: src22,
+                    pic:src22,
                     sentByMe: pends[t].users[x].users_permissions_user.id === myid ? true : false,
-                   })
+                    changed: pends[t].users[x].order == 1 ? true : false,       
+                  })
                  }
-               }  
-               
+               }
+ if (pends[t].diun.length > 0){
+                 for (var x = 0; x < pends[t].diun.length; x++){
+                   let src22 = ""
+                  if(pends[t].diun[x].users_permissions_user.profilePic !== null){
+                    src22 = pends[t].diun[x].users_permissions_user.profilePic.url
+                  } else{
+                    src22 = ""
+                  }
+                  pends[t].messege.push({
+                    message: pends[t].diun[x].why,
+                    what: pends[t].diun[x].what,
+                    pic:src22,
+                    sentByMe: pends[t].diun[x].users_permissions_user.id === myid ? true : false,       
+                  })
+                 }
+               }
     }
     pen = pends.length;
   //  bubleUiAngin(pends)
@@ -1778,7 +1793,6 @@ function hover(event){
         mysrc={buble.mysrc}
         mypos={buble.mypos}
         diun={buble.diun}
-        whyno={buble.whyno}
       descrip={buble.descrip}
       projectName = {buble.projectName}
       name = {buble.name}
@@ -1787,8 +1801,6 @@ function hover(event){
               src = {buble.src}
                noofusersWaiting={buble.noofusersWaiting}
                 projectId={buble.projectId}
-                uids={buble.uids}
-                what={buble.what}
                 noofusersOk={buble.noofusersOk}
                 created_at={buble.created_at}
                 noofusersNo={buble.noofusersNo}
@@ -1803,7 +1815,6 @@ function hover(event){
                 linkto={buble.linkto}
                 pendId={buble.pendId}
                 users={buble.users}
-                shows={shows}
                 /></div>
 {:else if buble.ani === "pends" && milon.pend == true}
     <div  class="normSml pend" 
@@ -1813,8 +1824,9 @@ function hover(event){
   on:proj={proj}
  on:user={user}
         on:coinLapach={coinLapach}
-         messege={buble.messege}
-
+          messege={buble.messege}
+        mysrc={buble.mysrc}
+        mypos={buble.mypos}
       descrip={buble.descrip}
       projectName = {buble.projectName}
       name = {buble.name}
