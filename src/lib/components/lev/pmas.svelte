@@ -865,13 +865,13 @@ input[type=text]:invalid {
     }
   
    :global([data-svelte-dialog-content].chat) {
- width: fit-content;
        z-index: 1000;
       padding: 0px;
       background-color: #242526;
           margin: 0px;
-          max-width: 70vw;
-          margin-top: 20vh;
+                height: 70vh; 
+      aspect-ratio: 1/2;
+          margin-top: 30vh;
                           border-radius: 10%;
 
         }
@@ -880,13 +880,13 @@ input[type=text]:invalid {
   }
   @media (min-width: 600px){
         :global([data-svelte-dialog-content].chat) {
- width: fit-content;
        z-index: 1000;
       padding: 0px;
       background-color: #242526;
       margin: 0px;
-      max-width: 50vw;
-                margin-top: 10vh;
+            height: 80vh; 
+      aspect-ratio: 1/2;
+                margin-top: 20vh;
                 border-radius: 15%;
         }
           :global([data-svelte-dialog-overlay].overlay) {

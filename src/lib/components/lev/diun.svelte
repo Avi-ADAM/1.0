@@ -119,14 +119,14 @@ function click() {
   border: 0;
 }
 .t{
-    height: 90vh;
+    height: 75vh;
      width: 100%;
     border-radius: 10%;
  }
 
 @media (max-width:600px){
  .t{
-    height: 80vh;
+    height: 65vh;
     width: 100%;
     border-radius: 10%;
  }

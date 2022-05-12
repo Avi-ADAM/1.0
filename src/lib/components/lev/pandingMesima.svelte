@@ -867,14 +867,13 @@ input[type=text]:invalid {
   }
   
    :global([data-svelte-dialog-content].chat) {
- width: fit-content;
        z-index: 1000;
       padding: 0px;
       background-color: #242526;
           margin: 0px;
-          max-width: 70vw;
-                min-width: 55vw;
-          margin-top: 20vh;
+                height: 70vh; 
+      aspect-ratio: 1/2;
+          margin-top: 30vh;
                           border-radius: 10%;
 
         }
@@ -884,15 +883,13 @@ input[type=text]:invalid {
 }
   @media (min-width: 600px){
         :global([data-svelte-dialog-content].chat) {
- width: fit-content;
        z-index: 1000;
       padding: 0px;
       background-color: #242526;
       margin: 0px;
-      max-width: 50vw;
-      min-width: 35vw;
-      aspect-ratio: 2/1;
-                margin-top: 10vh;
+                      height: 80vh; 
+      aspect-ratio: 1.2/1;
+                margin-top: 20vh;
                 border-radius: 15%;
         }
           :global([data-svelte-dialog-overlay].overlay) {
@@ -902,9 +899,7 @@ input[type=text]:invalid {
   width: 24px;
   height: 24px;
   }
-        :global([data-svelte-dialog-content].content) {
-width:50vw;
-        }
+    
   }
 
 </style>
