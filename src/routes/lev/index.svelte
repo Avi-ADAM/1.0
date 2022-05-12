@@ -1148,7 +1148,7 @@ async function start () {
                                 pmashes (where:{archived: false }){ id hm project {projectName id 
                                         profilePic {url formats } 
                                         user_1s { id haskama}
-                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id username profilePic {url}} order }  users  { what why id users_permissions_user {id username profilePic {url}}}} 
+                                } sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id username profilePic {url}} order }  users  { what order why id users_permissions_user {id username profilePic {url}}}} 
                                 open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
                                 askms(where:{archived: false }){ id 
                                      vots  {what why id users_permissions_user {id}}
@@ -1400,16 +1400,21 @@ function pmash (data) {
     pmashes[t].noofusersNo = 0;
     pmashes[t].whyno = [];
     pmashes[t].whyes = [];
+    pmashes[t].cv = 0
     pmashes[t].mypos = null;
     if(allid.includes(myid)){
       pmashes[t].already = true;
             pmashes[t].pl += 48
     for (var l=0; l< pmashes[t].users.length; l++){
         if (pmashes[t].users[l].users_permissions_user.id === myid)
+        if (pmashes[t].users[l].order !== 1){
       pmashes[t].mypos = pmashes[t].users[l].what;
               }
+            }
     }
         for (var r=0; r< pmashes[t].users.length; r++){
+                  if (pmashes[t].users[r].order !== 1){
+                    pmashes[t].cv += 1
             if (pmashes[t].users[r].what === true) {
                 pmashes[t].noofusersOk += 1;
                 pmashes[t].whyes.push(pmashes[t].users[r].why)
@@ -1417,8 +1422,9 @@ function pmash (data) {
                  pmashes[t].noofusersNo += 1;
                pmashes[t].whyno.push(pmashes[t].users[r].why)
             }
+          }
         }
-    const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].users.length;
+    const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].cv;
     pmashes[t].noofusersWaiting = noofusersWaiting;
                if (pmashes[t].users.length > 0){
                  for (var x = 0; x < pmashes[t].users.length; x++){
@@ -1430,11 +1436,12 @@ function pmash (data) {
                   }
                   pmashes[t].messege.push({
                     message: `${pmashes[t].users[x].users_permissions_user.username}  
-                     ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד בנימוק :
-                      ${pmashes[t].users[x].why}`}`,
+                     ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד
+                      ${pmashes[t].users[x].why !== null ? `בנימוק: ${pmashes[t].users[x].why}` : ``}`}`,
                     what: pmashes[t].users[x].what,
                     pic:src22,
-                    sentByMe: pmashes[t].users[x].users_permissions_user.id === myid ? true : false,       
+                    sentByMe: pmashes[t].users[x].users_permissions_user.id === myid ? true : false,
+                    changed: pmashes[t].users[x].order == 1 ? true : false,       
                   })
                  }
                }
@@ -1648,7 +1655,8 @@ function show(event){
 
 function coinLapach (event){
  counter = 0;
-    start()}
+    start()
+  }
 
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
 

@@ -17,10 +17,10 @@
    let why;
 function click() {
  if (no == true) {
-    if (why.length > 20) {
+    if (why.length > 27) {
             dispatch("no",{why:why})
       } else{
-            alert("מינימום 20 תווים")
+            alert("מינימום 27 תווים")
         }
       } else if (rect == true) {
     if (why.length > 10) {
@@ -128,7 +128,7 @@ function click() {
  .t{
     height: 80vh;
     width: 100%;
-    border-radius: 100px;
+    border-radius: 10%;
  }
 .textinput {
   position: relative;
@@ -196,13 +196,14 @@ function click() {
 										sentByMe={message.sentByMe} 
 										timeRead={message.timeRead}
                               what={message.what}
+                              changed={message.changed}
 										/>
             {/each}
 					
 				
 					
 		</div>
-    <div dir="rtl" class="border-t-2 border-gray-200 pr-4 pl-8 sm:px-4 pt-4 mb-2 sm:mb-0" >
+    <div dir="rtl" class:pb-8={rect == false && no == false} class="border-t-2 border-gray-200 pr-4 pl-8 sm:px-4 pt-4 mb-2 sm:mb-0" >
            {#if rect == true || no == true}
 
       <div class="relative flex ">

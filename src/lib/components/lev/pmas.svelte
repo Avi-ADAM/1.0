@@ -102,13 +102,13 @@ if (nut > 0 && nook > 0 ){
 }
 
 ser = ser
+console.log(pendId,ser)
 return ser
 }
 
 let ser = xyz();
 
     onMount(async () => {
-xyz()
 var a = moment(sqadualedf);
 var b = moment(sqadualed);
 yers = a.diff(b, 'years', true).toFixed(2); 
@@ -128,16 +128,52 @@ function objToString (obj) {
     for (let i = 0; i < obj.length; i++) {
         
     for (const [p, val] of Object.entries(obj[i])) {
-        if (typeof(val) == "string"|"number"|"boolean") {
+        if (typeof(val) == "string") {
+        str += `{${p}:"${val}"\n},`;
+    } else if (typeof(val) == "number"|"boolean") {
         str += `{${p}:${val}\n},`;
-    } else if (typeof(val) == 'null'){
+    }else if (typeof(val) == 'null'){
                 str += `{${p}:${val.map(c => c.id)}\n},`;
     }
     }}
     return str;
 }
+function objToStringC (obj) {
+   const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    let str = '';
+    for (let i = 0; i < obj.length; i++) {
+      if(obj[i].users_permissions_user.id == idL) {
+        obj[i].order = 1
+      }
+        const length = Object.keys(obj[i]).length;
+        let t = 0;
+    for (const [p, val] of Object.entries(obj[i])) {
+      const last = t === length - 1; 
+        t++;
+        if (typeof(val) == "string") {
+        str += `${p}:"${val}"\n`;
+    } else if (typeof(val) == "number"|"boolean") {
+        str += `${p}:${val}\n`;
+    } else if (typeof(val) == 'null'){
+      str += `${p}:${val.map(c => c.id)}\n`;
+    }
+        if (last) {
+          str += "},"
+    }
+    if (t == 1){
+      str += "{"
+    }
+    }}
+    return str;
+}
+let whyy = ``
+let ordern = ``;
     let linkg = 'https://onelovevone.onrender.com/graphql';
-    const userss = objToString(users);
+    let userss = objToString(users);
     const diunim = objToString(diun);
 async function agree(alr) {
   if  (alr == "alr"){
@@ -145,13 +181,14 @@ async function agree(alr) {
        noofusersOk += 1;
   noofusersNo -= 1;
   ser = xyz();
-  alert("soon")
+    userss = objToStringC(users)
+    ordern = `order: 2`
       } else{
   already = true;
    noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
-     
+      }
     const date = (sqadualed !== undefined) ? `sqadualed: "${new Date(sqadualed).toISOString()}",` : ``;
         const sdate = (sqadualedf !== undefined) ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",` : ``;
     const cookieValue = document.cookie
@@ -197,10 +234,10 @@ async function agree(alr) {
       input: {
       where: {id: ${pendId}}
       data: { users:[  ${userss}, 
-         
      {
       what: true
       users_permissions_user: "${idL}"
+      ${ordern}
     }
   ],
 archived: true
@@ -218,11 +255,7 @@ archived: true
             error1 = e
             console.log(error1)
         }
-          
-        console.log("will create mission")
-
           } else {
-              console.log("will add vote")
  try {
              await fetch(linkg, {
               method: 'POST',
@@ -240,6 +273,7 @@ archived: true
      {
       what: true
       users_permissions_user: "${idL}"
+            ${ordern}
     }
   ]}
       }
@@ -250,15 +284,14 @@ archived: true
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+        dispatch("coinLapach")
         } catch (e) {
             error1 = e
             console.log(error1)
         }
        
       }
-          }
-        }
-	;
+          };
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
 async function nego(alr) {
   already = true;
@@ -270,11 +303,14 @@ async function nego(alr) {
 }
 function decline(alr) {
       if  (alr == "alr"){
+        isOpen = true
          noofusersNo += 1;
   noofusersOk -= 1;
   ser = xyz();
-  alert("soon")
-  //afterwhy() order
+   userss = objToStringC(users)
+    ordern = `order: 2`
+      afterwhy() 
+
       } else{
       already = true;
       no = true;
@@ -289,9 +325,12 @@ function decline(alr) {
 let isOpen = false;
 let loading = false;
 async function afterwhy (event){
+  if (event){
   why = event.detail.why
-           loading = true;
-           if (why.length == 0 || why == null ){why = ""}
+  whyy = `why: "${why}"`
+  }
+  
+  loading = true;
   noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();
@@ -321,8 +360,9 @@ async function afterwhy (event){
       data: { users:[  ${userss}, 
      {
       what: false
-      why: "${why}"
+      ${whyy}
       users_permissions_user: "${idL}"
+                  ${ordern}
     }
   ]}
       }
@@ -333,6 +373,7 @@ async function afterwhy (event){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+         loading = false
          isOpen = false
                  coinLapach()
         } catch (e) {
@@ -493,7 +534,7 @@ function hoverede(){
 
     <DialogOverlay {isOpen} onDismiss={close} class="overlay">
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="chat" aria-label="form">
+  <DialogContent class="chat" aria-label="form" >
       <div dir="rtl" class="grid items-center justify-center aling-center">
               <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
@@ -541,7 +582,7 @@ title="ביטול"
   users={users}
 />-->
   {:else if diunm === true}
- <Diun on:rect={afreact} on:no={afterwhy} {no} rect={whyno.length > 0 ? true : false} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos} profilePicChatPartner={src} messages={messege}/>
+ <Diun on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos} profilePicChatPartner={src} messages={messege}/>
 {/if}
       </div>
   </DialogContent>

@@ -7,7 +7,7 @@
 		export let message;
     export let timestamp;		
 	  export let timeRead;
-		
+		export let changed = false
 		// This should use timestamp, but its simplified for the demo.
 		export let isToday;
 	export let what = null;
@@ -112,6 +112,7 @@ img {
 				 class:text-gray-600={sentByMe === false && what === null} class:text-white={sentByMe === true && what === null} class:text-black={what !== null} 
 				 class:bg-gray-300={sentByMe === false && what === null} class:bg-blue-600={sentByMe === true && what === null} class:bg-barbi={what=== false} class:bg-green-300={what=== true}
 								 class:rounded-bl-none={sentByMe === true} class:rounded-br-none={sentByMe === false}
+								 class:line-through={changed == true}
 				dir="rtl" >{message}</span></div>
             </div>
             <img src="{profilePicChatPartner}" alt="pic" class="w-6 h-6 rounded-full order-1">
