@@ -302,13 +302,20 @@ function tochat (){
          loading = false;
             isOpen = true;
 }
-async function nego() {
+let masaalr = false;
+async function nego(alr) {
+  if (alr == "alr"){
+    allr = true;
+     no = false;
+         masa = true;
+            isOpen = true;
+            masaalr = true;
+  } else{
   already = true;
-        console.log("nego")   
         no = false;
          masa = true;
             isOpen = true;
-            console.log(no)
+  }
 }
 function decline(alr) {
       if  (alr == "alr"){
@@ -556,6 +563,7 @@ title="ביטול"
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 {:else if masa === true}
 <Nego
+{masaalr}
         on:close={afternego}
   descrip ={descrip}
   projectName ={projectName}

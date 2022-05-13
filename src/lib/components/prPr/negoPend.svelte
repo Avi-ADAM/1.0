@@ -255,17 +255,67 @@ function objToString (obj) {
     let str = '';
     for (let i = 0; i < obj.length; i++) {
         
+     const length = Object.keys(obj[i]).length;
+        let t = 0;
     for (const [p, val] of Object.entries(obj[i])) {
-        if (typeof(val) == "string"|"number"|"boolean") {
-        str += `{${p}:${val}\n},`;
+      const last = t === length - 1; 
+        t++;
+        if (typeof(val) == "string") {
+        str += `${p}:"${val}"\n`;
+    } else if (typeof(val) == "number"|"boolean") {
+        str += `${p}:${val}\n`;
     } else if (typeof(val) == 'null'){
-                str += `{${p}:${val.map(c => c.id)}\n},`;
+      str += `${p}:${val.map(c => c.id)}\n`;
+    }
+        if (last) {
+          str += "},"
+    }
+    if (t == 1){
+      str += "{"
     }
     }}
     return str;
 }
-    const userss = objToString(users)
+function objToStringC (obj) {
+   const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    let str = '';
+    for (let i = 0; i < obj.length; i++) {
+      if(obj[i].users_permissions_user.id == idL) {
+        obj[i].order = 1
+      }
+        const length = Object.keys(obj[i]).length;
+        let t = 0;
+    for (const [p, val] of Object.entries(obj[i])) {
+      const last = t === length - 1; 
+        t++;
+        if (typeof(val) == "string") {
+        str += `${p}:"${val}"\n`;
+    } else if (typeof(val) == "number"|"boolean") {
+        str += `${p}:${val}\n`;
+    } else if (typeof(val) == 'null'){
+      str += `${p}:${val.map(c => c.id)}\n`;
+    }
+        if (last) {
+          str += "},"
+    }
+    if (t == 1){
+      str += "{"
+    }
+    }}
+    return str;
+}
+export let masaalr = false;
+let userss;
 async function increment() {
+  if (masaalr == true){
+        userss = objToStringC(users)
+  } else{
+        userss = objToString(users)
+  }
       const date = (mdate2 !== undefined) ? ` sqadualed: ${mdate2}` : ``;
       const negoss = ``;
     const cookieValue = document.cookie
