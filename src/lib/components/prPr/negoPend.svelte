@@ -201,7 +201,7 @@ function myMission() {
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-rishon = idL;
+ rishon = idL;
 }
 let rishonves = 0;
 function myMissionH() {
@@ -210,8 +210,8 @@ function myMissionH() {
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-rishonves = idL;
-var checkBox = document.getElementById("done");
+ rishonves = idL;
+ var checkBox = document.getElementById("done");
   // Get the output text
   var text = document.getElementById("hoursC");
   var text2 = document.getElementById("vallueperhourC");
@@ -321,7 +321,6 @@ async function increment() {
      } else {
          perhour4 = `perhour: ${perhour2}`;
          what4 = false;
-
      }
      const skillsId = skills.map(c => c.id);
      const skills2Id = skills3.map(c => c.id);
@@ -381,13 +380,13 @@ async function increment() {
     ${rishon4}
     ${rishonves4}
 
-}
+ }
 
   ]
       }
     }
   ){pendm { users { users_permissions_user { id}}}}
-} `   
+ } `   
 // make coin desapire
 } )})
   .then(r => r.json())
@@ -442,18 +441,17 @@ onMount(async () => {
 <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">
         <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-            >עריכת פרטי המשימה</h1>
+            >הצעת שינוי ל{name1}</h1>
     </caption>
       <tr class="ggr">
-        <th class="ggr" > </th>
+        <th class="ggr" ></th>
         <td class="ggr">מקור</td>
         <td class="ggr">שינוי</td>
     </tr> 
-    <tr class="ggr">
-        <th class="ggr" >שם </th>
-        <td class="ggr">{name1}</td>
-        <td class="ggr">
-            <input type="text" >
+    <tr >
+        <th  >שם</th>
+        <td >{name1}</td>
+        <td >
                   <div dir="rtl" class='textinput'>
   <input type="text"  id="nam" name="nam" bind:value={name2} class='input' required>
   <label for="nam" class='label' >שם</label>
@@ -587,7 +585,9 @@ onMount(async () => {
   <span class='line'></span>
 </div>
                                     </td>
-                                </tr><tr>
+                                </tr>
+                                
+                                <!--<tr>
                                     <th>השמת המשימה לעצמי</th>
                                     <td></td>
                                     <td>
@@ -615,7 +615,7 @@ onMount(async () => {
   <span class='line'></span>
 </div>
                                     </td>
-                                </tr><tr style="display:none" id="vallueperhourC">
+                                </tr>--><tr style="display:none" id="vallueperhourC">
                                     <th>כמה שווה שעה? </th>
                                     <td>{perhour}</td>
                                     <td>
@@ -653,9 +653,9 @@ onMount(async () => {
                                 <div>
                                     <button
                                         on:click={increment}
-                                        class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold py-2 px-4 m-2 rounded-full"
+                                        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
                                         type="submit"
-                                        name="addm">פרסום משימות </button> </div>
+                                        name="addm">העלאת השינויים להצבעה</button> </div>
 <style>
      .gg{ 
      position: sticky;
@@ -670,8 +670,7 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
       color: rgb(132, 241, 223);
   }
    .ggd{ 
-     position: sticky;
-     bottom: 1px; 
+ 
 background-color: #6b0f1a;
 background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
@@ -684,8 +683,8 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
   }
   .ggr{ 
-     position: sticky;
-     top: 77px; 
+    position: sticky;
+     top: 1px; 
 background-color: #6b0f1a;
 background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
@@ -752,7 +751,7 @@ border-radius: 4%;
   margin: 0;
   padding: 10px 0;
   outline: none;
-  border-bottom: solid 1px var(--gold);
+  border-bottom: solid 1px var(--mturk);
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
@@ -770,7 +769,7 @@ border-radius: 4%;
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
-  color:var(--barbi-pink);
+  color:var(--mturk);
   user-select: none;
 }
 
@@ -791,7 +790,7 @@ border-radius: 4%;
 
 .input:focus ~ .label, .input:valid ~ .label {
   font-size: 11px;
-  color: var(--gold);
+  color: var(--barbi-pink);
   top: 0;
 } 
 </style>
