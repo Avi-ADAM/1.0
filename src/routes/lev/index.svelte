@@ -1173,6 +1173,7 @@ async function start () {
                                     work_ways {id workWayName} 
                                     mission { id}
                                     vallues { id}
+                                    nego { noofhours perhour users_permissions_user {id username profilePic {url}}}
                                     diun {what why id users_permissions_user {id username profilePic {url}} order }  
                                     users  { what order why id users_permissions_user {id username profilePic {url}}}                                   
                             }
@@ -1188,6 +1189,7 @@ async function start () {
   if (isEqual(miData,miDataold)) {
    console.log("nada")
    } else {
+     console.log(miDataold)
       console.log("tada")
    console.log (miData)
    miData = miData
@@ -1541,6 +1543,7 @@ function createpends (data) {
                     pends.push({
                       mysrc:src24,
                                   name: pend.name,
+                                  nego: pend.nego,
                                   projectId: projects[i].id,
                                   hearotMeyuchadot: pend.hearotMeyuchadot,
                                   descrip: pend.descrip,
@@ -1639,6 +1642,28 @@ function createpends (data) {
                   })
                  }
                }
+               if (pends[t].nego.length > 0){
+                 for (var x = 0; x < pends[t].nego.length; x++){
+                   let src22 = ""
+                  if(pends[t].nego[x].users_permissions_user.profilePic !== null){
+                    src22 = pends[t].nego[x].users_permissions_user.profilePic.url
+                  } else{
+                    src22 = ""
+                  }
+                  pends[t].messege.push({
+                    message:`${pends[t].nego[x].users_permissions_user.username}
+                     בעד בתנאי:
+                  ${pends[t].nego[x].noofhours !== pends[t].noofhours ? `שלמשימה יוגדרו ${pends[t].nego[x].noofhours} שעות במקום ${pends[t].noofhours} שעות`: ``}
+                  ${pends[t].nego[x].perhour !== pends[t].perhour ? `ושהשווי לשעה יהיה ${pends[t].nego[x].perhour} ולא ${pends[t].perhour}`: ``}
+ 
+                  `,
+                    what: true,
+                    pic:src22,
+                    sentByMe: pends[t].nego[x].users_permissions_user.id === myid ? true : false,       
+                  })
+                 }
+               }
+
     }
     pen = pends.length;
   //  bubleUiAngin(pends)
