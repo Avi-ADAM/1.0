@@ -888,7 +888,7 @@ input[type=text]:invalid {
       max-width: 94%;
     max-height: 94%;
   }
-  
+}
    :global([data-svelte-dialog-content].chat) {
        z-index: 1000;
       padding: 0px;
@@ -902,21 +902,23 @@ input[type=text]:invalid {
         }
         :global([data-svelte-dialog-content].nego) {
        z-index: 1000;
-      padding: 0px;
+      padding: 15px;
       background-color: #242526;
           margin: 0px;
+                margin-right: 25px;
+
                 height: 70vh; 
       width: fit-content;
           margin-top: 30vh;
-                          border-radius: 5%;
+          border-radius: 5%;
       overflow-y: auto;
         border-top-right-radius: 2%;
-                 border-bottom-right-radius: 2%;
+          border-bottom-right-radius: 2%;
         }
     :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
-}
+
   @media (min-width: 600px){
         :global([data-svelte-dialog-content].chat) {
                 overflow-y: auto;
