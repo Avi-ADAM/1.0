@@ -870,7 +870,7 @@ input[type=text]:invalid {
       background-color: #242526;
           margin: 0px;
                 height: 70vh; 
-      aspect-ratio: 1/2;
+      aspect-ratio: 1/1.7;
           margin-top: 30vh;
                           border-radius: 10%;
 
