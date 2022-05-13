@@ -396,12 +396,12 @@ const close = () => {
     allr = false;
 };
 
-  function afternego (event) {
+function afternego (event) {
   isOpen = false;
     no = false; 
     masa = false;
     //dispach or update  coin to negotiable state 
-  }
+}
   let rect = false;
 async function react (){
      allr = true;
@@ -413,7 +413,7 @@ async function afreact (event){
   let diunim = ``;
   if (diun !== null){
  const diu =  objToString(diun)
-diunim = ` ${diu},`
+ diunim = ` ${diu},`
   }
    why = event.detail.why
   console.log(why)
@@ -501,27 +501,27 @@ function linke (s){
   import { EffectFlip, Navigation } from "swiper";
    let swiperRef = null;
 
-  const setSwiperRef = ({ detail }) => {
+const setSwiperRef = ({ detail }) => {
     const [swiper] = detail;
     // set swiper instance
     setTimeout(() => {
       swiperRef = swiper;
     });
-  };
+};
 
   
-  const slideTo = (index) => {
+const slideTo = (index) => {
     swiperRef.slideTo(index , 400);
-  };
- function toggleShow (){
+};
+function toggleShow (){
   slideTo(0)
- }
+}
 $: w = 0;
  let u = "הצבעה על פרסום הצעת משימה לריקמה"
 let hovered = false;
 function hover (id){
   if (id == "0"){
-u = "הצבעה על פרסום הצעת משימה לריקמה"
+ u = "הצבעה על פרסום הצעת משימה לריקמה"
   } else {
     u = id
   }
@@ -533,10 +533,10 @@ function hoverede(){
     if (hovered == false){
     u = "לב המערכת"
   } else {
-u = "הצבעה על פרסום הצעת משימה לריקמה"
+ u = "הצבעה על פרסום הצעת משימה לריקמה"
   }
   dispatch("hover", {id: u});
- }
+}
 </script>
 {#await ser}
 <h1>..</h1>
@@ -545,7 +545,7 @@ u = "הצבעה על פרסום הצעת משימה לריקמה"
 
  <DialogOverlay {isOpen} onDismiss={close} class="overlay" >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form" class="chat">
+  <DialogContent aria-label="form" class="chat d">
       <div dir="rtl" class="grid items-center justify-center text-center">
               <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
@@ -724,7 +724,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
    margin: 2px;
     font-size: 8px; 
    line-height: 0.7; 
-    max-height: 85%;
+    max-height: 100%;
     overflow-y: auto;
   }
   .pn{
@@ -875,7 +875,7 @@ input[type=text]:invalid {
       aspect-ratio: 1/1.7;
           margin-top: 30vh;
                           border-radius: 10%;
-
+      overflow-y: auto;
         }
     :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
