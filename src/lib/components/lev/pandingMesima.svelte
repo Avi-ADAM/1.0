@@ -405,6 +405,7 @@ const close = () => {
 
 function afternego (event) {
   isOpen = false;
+  loading = false;
     no = false; 
     masa = false;
     //dispach or update  coin to negotiable state 
@@ -564,7 +565,8 @@ title="ביטול"
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 {:else}
 <Nego
-{masaalr}
+{masaalr} {mypos}
+on:load={()=>loading = true}
         on:close={afternego}
   descrip ={descrip}
   projectName ={projectName}

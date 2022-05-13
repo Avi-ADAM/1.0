@@ -27,7 +27,7 @@ export let noofusersWaiting;
 export let total = 0;
 export let noofusers;
 export let already;
-export let missionId;
+export let mypos;
 export let skills = [];
 export let tafkidims = [];
 export let workways = [];
@@ -311,6 +311,7 @@ function objToStringC (obj) {
 export let masaalr = false;
 let userss;
 async function increment() {
+  dispatch("load")
   if (masaalr == true){
         userss = objToStringC(users)
   } else{
@@ -399,6 +400,16 @@ async function increment() {
     } else {
         ww4 = ``;
     }
+    let another = ``
+ if (what4 == true && masaalr == true && mypos == false || what4 == true && masaalr == false || what4 == false){
+
+    if (what4 == false){
+    another = `,{
+      what: true
+      users_permissions_user: "${idL}"
+      order: 3
+    }`
+    } 
  try {
              await fetch(linkg, {
               method: 'POST',
@@ -415,8 +426,9 @@ async function increment() {
      {
       what: ${what4}
       users_permissions_user: "${idL}"
-      order: 3
+      order: 2
     }
+    ${another}
   ], nego:[  
 {
     users_permissions_user: "${idL}"  
@@ -447,7 +459,7 @@ async function increment() {
             error1 = e
             console.log(error1)
         }
-       
+      }
 }
 let linkg = "https://onelovevone.onrender.com/graphql"
 onMount(async () => {
