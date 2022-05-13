@@ -552,8 +552,9 @@ function hoverede(){
 
  <DialogOverlay {isOpen} onDismiss={close} class="overlay" >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form" class="chat d">
-      <div dir="rtl" class="grid items-center justify-center text-center">
+ {#if masa === true}
+          <DialogContent aria-label="form" class="nego d">
+<div dir="rtl" class="grid items-center justify-center text-center">
               <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -561,7 +562,7 @@ title="ביטול"
 </svg></button>
 {#if loading === true}
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
-{:else if masa === true}
+{:else}
 <Nego
 {masaalr}
         on:close={afternego}
@@ -584,11 +585,25 @@ title="ביטול"
   pendId={pendId}
   users={users}
 />
- {:else if diunm === true}
+{/if}
+      </div>
+  </DialogContent>
+{:else}
+          <DialogContent aria-label="form" class="chat d">
+      <div dir="rtl" class="grid items-center justify-center text-center">
+              <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+title="ביטול"
+><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+</svg></button>
+{#if loading === true}
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ {:else}
  <Diun on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos} profilePicChatPartner={src} messages={messege}/>
 {/if}
       </div>
   </DialogContent>
+  {/if}
   </div>
 </DialogOverlay>
 
@@ -885,12 +900,26 @@ input[type=text]:invalid {
                           border-radius: 10%;
       overflow-y: auto;
         }
+        :global([data-svelte-dialog-content].nego) {
+       z-index: 1000;
+      padding: 0px;
+      background-color: #242526;
+          margin: 0px;
+                height: 70vh; 
+      width: fit-content;
+          margin-top: 30vh;
+                          border-radius: 5%;
+      overflow-y: auto;
+        border-top-right-radius: 2%;
+                 border-bottom-right-radius: 2%;
+        }
     :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
 }
   @media (min-width: 600px){
         :global([data-svelte-dialog-content].chat) {
+                overflow-y: auto;
        z-index: 1000;
       padding: 0px;
       background-color: #242526;
@@ -899,6 +928,21 @@ input[type=text]:invalid {
       aspect-ratio: 1.2/1;
                 margin-top: 20vh;
                 border-radius: 15%;
+              
+        }
+          :global([data-svelte-dialog-content].nego) {
+                overflow-y: auto;
+       z-index: 1000;
+      padding: 15px;
+      margin-right: 25px;
+      background-color: #242526;
+      margin: 0px;
+                margin-top: 20vh;
+                height: 80vh;
+                width: fit-content;
+                border-radius: 5%;
+                border-top-right-radius: 2%;
+                 border-bottom-right-radius: 2%;
         }
           :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
