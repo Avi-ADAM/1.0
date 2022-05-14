@@ -284,7 +284,9 @@ function objToStringC (obj) {
   idL = cookieValueId;
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-      if(obj[i].users_permissions_user.id == idL) {
+      if(obj[i].users_permissions_user.id == idL && what4 == false) {
+        obj[i].order = 1
+      } else if (obj[i].users_permissions_user.id == idL && what4 == true) {
         obj[i].order = 1
       }
         const length = Object.keys(obj[i]).length;
@@ -312,11 +314,7 @@ export let masaalr = false;
 let userss;
 async function increment() {
   dispatch("load")
-  if (masaalr == true){
-        userss = objToStringC(users)
-  } else{
-        userss = objToString(users)
-  }
+ 
       const date = (mdate2 !== undefined) ? ` sqadualed: ${mdate2}` : ``;
       const negoss = ``;
     const cookieValue = document.cookie
@@ -407,9 +405,14 @@ async function increment() {
     another = `,{
       what: true
       users_permissions_user: "${idL}"
-      order: 3
+      order: 4
     }`
     } 
+     if (masaalr == true){
+        userss = objToStringC(users)
+  } else{
+        userss = objToString(users)
+  }
  try {
              await fetch(linkg, {
               method: 'POST',
@@ -422,11 +425,11 @@ async function increment() {
           `mutation { updatePendm(
       input: {
       where: {id: ${pendId}}
-      data:  { users:[  ${userss}, 
+      data:  { users:[ ${userss}, 
      {
       what: ${what4}
       users_permissions_user: "${idL}"
-      order: 2
+      order: ${what4 == true ? 2 : 3}
     }
     ${another}
   ], nego:[  

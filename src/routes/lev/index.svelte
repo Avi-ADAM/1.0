@@ -1617,7 +1617,10 @@ function createpends (data) {
                   }
                   pends[t].messege.push({
                     message: `${pends[t].users[x].users_permissions_user.username}  
-                     ${pends[t].users[x].what == true ? 'בעד' : ` נגד
+                     ${pends[t].users[x].what == true ? `בעד
+                         ${pends[t].users[x].order == 4 ? ` הצעה חילופית `: ``}
+                      ` : ` נגד
+                  ${pends[t].users[x].order == 3 ? `ההצעה המקורית `: ``}
                       ${pends[t].users[x].why !== null ? `בנימוק: ${pends[t].users[x].why}` : ``}`}`,
                     what: pends[t].users[x].what,
                     pic:src22,
@@ -1652,7 +1655,7 @@ function createpends (data) {
                   }
                   pends[t].messege.push({
                     message:`${pends[t].nego[x].users_permissions_user.username}
-                     בעד בתנאי:
+                     בעד ההצעה עם השינויים הבאים:
                   ${pends[t].nego[x].noofhours !== pends[t].noofhours ? `שלמשימה יוגדרו ${pends[t].nego[x].noofhours} שעות במקום ${pends[t].noofhours} שעות`: ``}
                   ${pends[t].nego[x].perhour !== pends[t].perhour ? `ושהשווי לשעה יהיה ${pends[t].nego[x].perhour} ולא ${pends[t].perhour}`: ``}
  
