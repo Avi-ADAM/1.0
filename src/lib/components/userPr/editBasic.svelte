@@ -142,11 +142,13 @@ function shaneh () {
 </div>-->
 
    <div dir="rtl" class='textinputi'>
-  <input name="s" on:change={ch}  bind:value={bi}     
- type='text' class='inputi' required>
+  <textarea name="s" on:change={ch}  bind:value={bi}     
+ type='textarea' class='inputi d' required></textarea>
   <label for="s" class='labeli'>ביוגרפיה</label>
   <span class='line'></span>
 </div>
+<div class="grid items-center justify-center"> 
+
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-barbi">היום החופשי שלי</h2>
     <select on:change={ch} bind:value={frd}
@@ -174,6 +176,8 @@ function shaneh () {
 <option value="shabat">שבת</option>
 </select>
 </div>
+<div class="grid items-center justify-center"> 
+
 {#if chan == true}
 <div>
 <button type="button" on:click={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שמירת שינויים</button>
@@ -260,11 +264,16 @@ function shaneh () {
     <button type="button" on:click={()=> change = true}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שינוי סיסמה</button>
 
     {/if}
-<div>
 	<button type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">הרשמה לקבלת התראות</button>
-<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
+<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
+</div>
 </div>
 <style>
+	 textarea::-webkit-resizer {
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent  transparent var(--gold)  var(--gold);
+}
 .inputi {
   font-size: 8px;
 
@@ -488,8 +497,7 @@ select{
     margin-right: auto;
 	}*/
 	button:disabled {
-		border-color: var(--gold);
-		color: rgb(153, 255, 0);
+		border-color: rgb(153, 255, 0);
 	}
 	.toggle-password {
 		position: absolute;

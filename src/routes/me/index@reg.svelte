@@ -1,5 +1,7 @@
 
 <script> 
+	import Close from '../../lib/celim/close.svelte'
+
   import { onMount } from 'svelte';
   import axios from 'axios'
 	import { draw } from 'svelte/transition';
@@ -508,7 +510,7 @@ async function han (){
   <DialogContent aria-label="form" class="content">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>ביטול</button>
+          on:click={closer}><Close/></button>
           {#if a == 0}
           <Addnewp on:message={callbackFunction}/>
 
@@ -1148,9 +1150,7 @@ class=" hover:scale-150 "
   on:click={() => addP = false}
   style="margin: 0 auto;"
   class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
-   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-    <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-  </svg></button>
+   ><Close/></button>
   <Addnew userName_value={meData.username}/> 
   {/if}
  <!-- המשימות שסיימתי-->         
