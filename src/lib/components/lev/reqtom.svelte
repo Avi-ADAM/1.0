@@ -572,6 +572,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 >
 
 <div class="{`normSmll${askId}-noo`}"></div>
+                      <button on:click={tochat}><Chaticon/></button>
                  {#if deadline}    <p on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
        <p on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="hslink bc" >{price}</p>
         <p class="hslink cd" ><span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--gold)" >{myp}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy}</span> </p>

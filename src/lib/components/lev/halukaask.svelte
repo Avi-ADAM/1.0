@@ -92,8 +92,7 @@ function objToString (obj) {
     return str;
 }
 let linkg = 'https://onelovevone.onrender.com/graphql';
-    const userss = objToString(users);
-    const diunim = objToString(diun);
+  
 async function agree(alr) {
   if  (alr == "alr"){
         alert("soon")
@@ -102,6 +101,8 @@ async function agree(alr) {
   noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
+    const userss = objToString(users);
+    const diunim = objToString(diun);
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -197,7 +198,9 @@ async function nego(alr) {
       if  (alr == "alr"){
         alert("soon")
       } else{
+
       already = true;
+
       no = true;
             isOpen = true;
         //create why alert (from smui) add validation for minimum 
@@ -214,7 +217,9 @@ async function afterwhy (){
   already = true;
    noofusersNo += 1;
   noofusersWaiting -= 1;
-  ser = xyz();        
+  ser = xyz();      
+    const userss = objToString(users);
+    const diunim = objToString(diun);  
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))

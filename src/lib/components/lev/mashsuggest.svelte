@@ -5,7 +5,7 @@
          import { clickOutside } from './outsidclick.js';
 
  const dispatch = createEventDispatcher();
-
+export let messege = []
 	  export let shows = true;
     export let kindOf;
     export let projectName;

@@ -292,8 +292,6 @@ function ask() {
 
 async function decline() {
         already = true;
-
-        console.log("decline0");
     // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב      
     const cookieValue = document.cookie
         .split('; ')

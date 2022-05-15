@@ -236,20 +236,20 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 ><div class="{`normSml${oid}-${projectId}`}"></div>
 
         <img on:click={()=>linke()} on:mouseenter={()=>hover(` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `)} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
-        <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  ><h3 class="hover:text-lturk lt" >{projectName}</h3></button>
-        <h1 on:mouseenter={()=>hover("שם המשימה המוצעת")} on:mouseleave={()=>hover("0")} style="color: rgb(87, 208, 248 ); " class="ltn">{missionName}</h1>
-        {#if total} <p>{total}</p>{/if}
+        <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  ><h7 class="hover:text-lturk pn" >{projectName}</h7></button>
+        <h1 on:mouseenter={()=>hover("שם המשימה המוצעת")} on:mouseleave={()=>hover("0")} style="color: rgb(87, 208, 248 ); " class="lt">{missionName}</h1>
+        {#if total} <p class="lt">{total}</p>{/if}
    
 </div>
 </SwiperSlide
   ><SwiperSlide
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-          <h3 on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")} class="ltn ab" >{skills.map(d=> d.skillName).join(' ')}</h3>
-
+    <div class="ltn ab d">  {#each skills as skill}<p on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  >{skill.skillName}</p>{/each}
+</div> 
    {#if deadLine} <h5 on:mouseenter={()=>hover("תאריך אחרון לביצוע")} on:mouseleave={()=>hover("0")} class="lt bc">{deadLine}</h5>{/if}
-    <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd" style=" line-height: 0.7;">{missionDetails}</p>
-    <p on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="lt de">{role.map(d=> d.roleDescription).join(' ')}</p>
+    <h4 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
+    <p on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="ltn de d">{role.map(d=> d.roleDescription).join(' ')}</p>
 {#if already === false}
     <button on:mouseenter={()=>hover("אני רוצה")} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
    <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
@@ -264,6 +264,12 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   .xyz{
             grid-column: 1/4;
 
+  }
+  .pn{
+     margin: 5px;
+    font-size: 7px;
+     line-height: 1; 
+     font-weight: bold;
   }
   .ab{
         grid-column: 1/4;
@@ -302,6 +308,8 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
     font-size: 8px;
      line-height: 1; 
      font-weight: bold;
+     height: 100%;
+     overflow-y: auto;
   }
   .lt{
    margin: 1px;
@@ -404,12 +412,20 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
       }
       .ltn{
          margin: 7px;
-    font-size: 13px;
+    font-size: 10px;
       }
       .lt{
    margin: 2px;
     font-size: 13px;
       }
+         .pn{
+   margin: 5px;
+   padding-left: 8px;
+   padding-right: 8px;
+    font-size: 10px;
+      }
+      
+      
     .img{
      width: 32px;
      height: 32px;
