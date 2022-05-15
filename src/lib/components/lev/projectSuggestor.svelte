@@ -245,7 +245,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   ><SwiperSlide
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-    <div class="ltn ab d">  {#each skills as skill}<p on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  >{skill.skillName}</p>{/each}
+    <div class="ltn ab d ">  {#each skills as skill}<p style="text-shadow:none;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-gold rounded-full pl-1 pr-1">{skill.skillName}</span></p>{/each}
 </div> 
    {#if deadLine} <h5 on:mouseenter={()=>hover("תאריך אחרון לביצוע")} on:mouseleave={()=>hover("0")} class="lt bc">{deadLine}</h5>{/if}
     <h4 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
@@ -274,7 +274,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   .ab{
         grid-column: 1/4;
         grid-row: 1/ 2;
-
+        margin-top: 18px;
     }
     .bc{
         grid-column: 1/4;
@@ -304,7 +304,6 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
       line-height: 1;
   }
   .ltn{
-     margin: 2px;
     font-size: 8px;
      line-height: 1; 
      font-weight: bold;
@@ -411,7 +410,6 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
      font-size: 17px; 
       }
       .ltn{
-         margin: 7px;
     font-size: 10px;
       }
       .lt{
