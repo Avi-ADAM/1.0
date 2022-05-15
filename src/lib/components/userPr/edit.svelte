@@ -365,15 +365,15 @@ let linkpp ="https://onelovevone.onrender.com/mashaabims?id_in=" + resultString 
        
 }
 function clodd (event) {
-const  id = event.detail.id
-const  name = event.detail.name
-const  skob = event.detail.skob
-const oldob = data;
-const x = oldob.map(c => c.id);
-const indexy = x.indexOf(id);
-oldob.splice(indexy, 1);
-data.push(skob)
-data = data
+  const  id = event.detail.id
+  const  name = event.detail.name
+  const  skob = event.detail.skob
+  const oldob = data;
+  const x = oldob.map(c => c.id);
+  const indexy = x.indexOf(id);
+  oldob.splice(indexy, 1);
+  data.push(skob)
+  data = data
   console.log(id)
 masss = false
 addSl = false
@@ -533,7 +533,7 @@ on:click={bitulm}
       {#if addSl == false}
       <div class="another" style="margin: auto"> 
  
-        <h6 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">ה{Valname} שלי</h6>
+        <h2 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">ה{Valname} שלי</h2>
        {#if data} <span class="d"> {#each data as dat, i}
            <p style="margin: 0; line-height: 1; color:aqua; padding: auto;" class="t">{dat[valc]}</p>
            {/each} </span>{/if}

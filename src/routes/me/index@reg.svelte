@@ -613,7 +613,7 @@ async function han (){
           
 <div class="another" dir="rtl">
   
-    <h6 class="cot">הרקמות שלי</h6>
+    <h2 class="cot">הרקמות שלי</h2>
 <span class="d">
            {#each myP as data, i}
            <div class="cont" >  
