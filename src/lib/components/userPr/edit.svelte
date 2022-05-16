@@ -586,7 +586,7 @@ on:click={edit(da.id)}
    {/if}
 <br>
  
-  <span > <p class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </p>  <MultiSelect
+  <span > <h3 class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </h3>  <MultiSelect
       bind:selected={data.selected2}
       {placeholder}
       options={allvn}
