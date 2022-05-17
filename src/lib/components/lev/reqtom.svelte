@@ -572,11 +572,11 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 >
 
 <div class="{`normSmll${askId}-noo`}"></div>
-                      <button on:click={tochat}><Chaticon/></button>
+                    <!--  <button on:click={tochat}><Chaticon/></button>-->
                  {#if deadline}    <p on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
        <p on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="hslink bc" >{price}</p>
         <p class="hslink cd" ><span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--gold)" >{myp}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy}</span> </p>
-                 {#if missionDetails !== null}   <p on:mouseenter={()=>hover("פרטי הצעת ההשקעה")} on:mouseleave={()=>hover("0")}  class="hslink de">{missionDetails}</p>{/if}   
+                 {#if missionDetails !== null}   <p on:mouseenter={()=>hover("פרטי הצעת ההשקעה")} on:mouseleave={()=>hover("0")}  class="hslink de d">{missionDetails}</p>{/if}   
                  {#if already === false}
             <button on:mouseenter={()=>hover("אישור")} on:mouseleave={()=>hover("0")} on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
