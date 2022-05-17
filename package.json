@@ -33,6 +33,7 @@
     "lodash.has": "^4.5.2",
     "lodash.isequal": "^4.5.0",
     "moment": "^2.29.2",
+    "node": "^17.7.2",
     "postcss": "^8.4.12",
     "prettier": "^2.6.2",
     "prettier-plugin-svelte": "^2.7.0",
