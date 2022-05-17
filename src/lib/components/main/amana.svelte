@@ -507,13 +507,17 @@ function erorer(){
   
     <div id="fb-customer-chat" class="fb-customerchat">
     </div>
-     
+     position: absolute;
+   top: -36px;
+        right: -36px;
+         height: 130px;
+        width: 130px;
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      --> <div class="all">
-       <a  sveltekit:prefetch href="/login" ><img title="התחברות ל-1❤️1" class="right translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150" alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
+       <a  sveltekit:prefetch href="/login" ><img title="התחברות ל-1❤️1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
-          <button on:click={tran}><img alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          <button on:click={tran}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
           <button on:click={tran} class=" text-barbi hover:text-gold p-0.5 "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -644,6 +648,38 @@ function erorer(){
   
 </div> </div>
   <style>
+.overlay{
+  background-color: #ff1a1a;
+background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
+  
+  /* position, height, width, etc as appropriate. */
+  z-index: 17;
+  opacity: 0.0;
+  animation-delay: 0.5s;
+  animation-duration: 15s;
+  animation-direction: normal;
+  animation-iteration-count: infinite;
+  animation-name: fireFlicker;
+  animation-timing-function: linear;
+}
+@keyframes fireFlicker {
+  0%, 10% { opacity: 0; }
+  15%,20% { opacity: 0.52; }
+  22%,23% { opacity: 0.104; }
+  25%,35% { opacity: 0.32; }
+  39%,42% { opacity: 0.88; }
+  44%,47% { opacity: 0.52; }
+  49%,50% { opacity: 0.104; }
+  52%,54% { opacity: 0.32; }
+  57%,58% { opacity: 0.96; }
+  60%,63% { opacity: 0.68; }
+  65%,72% { opacity: 0.64; }
+  77%,85% { opacity: 0.104; }
+  90%,95% { opacity: 0.68; }
+  100% { opacity: 0; }
+}
+
+
    :global([data-svelte-dialog-content].content) {
   background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
