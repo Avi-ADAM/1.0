@@ -2484,6 +2484,7 @@ dispatch("disp",{
 <path d="m70.548 477.07-38.318-5.8604c0.5118 6.2659 1.186 12.598 2.0188 18.993l33.299 17.868 3-31z" fill="url(#levlevii)"/>
 <path d="m54.194 578.6c0.9061 2.9202 1.8341 5.8479 2.7888 8.785l3.5653-3.3107-6.3541-5.4743z" fill="url(#levlevih)"/>
 </g>
+{#if mashs > 0}
   <g on:mouseenter={()=>hover("j")} on:mouseleave={()=>hover("j")} on:click={()=>disp(pmashs)} name="number " class="btn am" transform="{jj}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="#dfbbbb" opacity=".89224" stroke="url(#levlevs)"/>
@@ -2503,6 +2504,8 @@ dispatch("disp",{
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 47.887 117.55)" x="122.391" y="477.71" fill="url(#levlevdd)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{mashs}</text>
 </g>
+{/if}
+{#if maap > 0}
   <g on:mouseenter={()=>hover("q")} on:mouseleave={()=>hover("q")} on:click={()=>disp(pmaap)} name="number " class="btn aw" transform="{qq}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevbl)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -2522,6 +2525,8 @@ dispatch("disp",{
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{maap}</text>
 </g>
+{/if}
+{#if sug > 0}
        <g on:mouseenter={()=>hover("a")} on:mouseleave={()=>hover("a")} on:click={()=>disp(sugg)} name="number " class="btn a" transform="{aa2}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapd)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -2541,7 +2546,8 @@ dispatch("disp",{
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(37, 30, 30)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
 </g>
-
+{/if}
+{#if pen > 0}
 <g  on:mouseenter={()=>hover("b")} on:mouseleave={()=>hover("b")} on:click={() => disp(pend)}  class="btn"  name="number o"  transform="{bb}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="#fff" opacity=".89224" stroke="url(#levlevcn)"/>
@@ -2561,6 +2567,8 @@ dispatch("disp",{
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 48.562 116.2)" x="122.391" y="477.71" fill="rgb(247, 40, 130)" font-family="Shizuru" font-weight="700" stroke="url(#levlevch)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pen}</text>
 </g>
+{/if}
+{#if ask > 0}
 <g on:mouseenter={()=>hover("c")} on:mouseleave={()=>hover("c")} on:click={() => disp(asks)}  class="btn"  name="number of " transform="{cc}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdf)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -2580,6 +2588,8 @@ dispatch("disp",{
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(5, 5, 5)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
 </g>
+{/if}
+
 <g transform="matrix(1.1568 0 0 1.0803 -24.933 7.8349)" style="">
 
 <g transform="matrix(.63989 0 0 .63989 -153.63 -18.786)" style="">
@@ -3107,6 +3117,8 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 
 </g>
+{#if des > 0}
+
 <g on:mouseenter={()=>hover("d")} on:mouseleave={()=>hover("d")} on:click={() => disp(desi)} class="btn"  name="number of o" transform="{dd}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevej)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -3126,6 +3138,9 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{des}</text>
 </g>
+{/if}
+{#if beta > 0}
+
 <g on:mouseenter={()=>hover("e")} on:mouseleave={()=>hover("e")} on:click={() => disp(betaha)}  class="btn"  name="number of m" transform="{ee}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdt)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -3145,6 +3160,8 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{beta}</text>
 </g>
+{/if}
+
 <g on:mouseenter={()=>hover("h")} on:mouseleave={()=>hover("h")} transform="{hh}" style="">
   <a sveltekit:prefetch 
     href="/me" >
@@ -3152,6 +3169,8 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <text transform="matrix(.075915 0 0 .081691 -14.883 40.747)" fill="rgb(0, 81, 88)" font-family="Arial, sans-serif" font-size="28px" font-weight="700" letter-spacing="1.6px" text-anchor="middle" style="white-space:pre">{name}</text>
     </a>
 </g>
+{#if pmash > 0}
+
 <g on:mouseenter={()=>hover("y")} on:mouseleave={()=>hover("y")} on:click={()=>disp(ppmash)} name="number " class="btn ap" transform="{yy}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevav)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -3171,6 +3190,9 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(54, 59, 56)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pmash}</text>
 </g>
+{/if}
+{#if askma > 0}
+
  <g on:mouseenter={()=>hover("x")} on:mouseleave={()=>hover("x")} on:click={()=>disp(askmap)} name="number " class="btn amp" transform="{xx}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdc)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -3190,6 +3212,9 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevbw)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{askma}</text>
 </g>
+{/if}
+{#if wel > 0}
+
 <g on:mouseenter={()=>hover("f")} on:mouseleave={()=>hover("f")} on:click={() => disp(welc)}  class="btn"  name="number of op" transform="{ff}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevaqf)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -3209,6 +3234,9 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(62, 78, 77)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{wel}</text>
 </g>
+{/if}
+{#if fia > 0}
+
 <g on:mouseenter={()=>hover("g")} on:mouseleave={()=>hover("g")} on:click={() => disp(fiap)}  class="btn" name="number of p" transform="{gg}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapr)" opacity=".89224" stroke="url(#levlevs)"/>
@@ -3229,5 +3257,6 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(31, 25, 25)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{fia}</text>
 
 </g>
+{/if}
 </svg>
 
