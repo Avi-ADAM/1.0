@@ -1,4 +1,5 @@
 <script>
+  import Cardsui from '../../lib/components/lev/cards/cards.svelte'
            import Tooltip from './../../lib/celim/tooltip.svelte';
 import Mid from "../../lib/components/lev/midi.svelte"
   import MissionInProgress from "../../lib/components/lev/missionInProgress.svelte"
@@ -39,22 +40,22 @@ import Mid from "../../lib/components/lev/midi.svelte"
     let askedcoin = [];
 let error1 = null;
     let mtaha = [];  
-let pmashd = 0;
-let mashs = 0;
-let maap = 0; 
-    let sug =  0
-let pen = 0
-let ask = 0;
-let halu = 0;
-let wel = 0;
-let askma = 0;
-let beta = 0
-let des = 0
-let fia = 0;
+let pmashd = 17;
+let mashs = 17;
+let maap = 13; 
+    let sug =  13
+let pen = 13
+let ask = 13;
+let halu = 17;
+let wel = 17;
+let askma = 13;
+let beta = 13
+let des = 17
+let fia = 17;
 let fiapp = [];
 let askedm = [];
-let askm = 0;
-let ma = 0;
+let askm = 17;
+let ma = 13;
 let wegets = [];
 let arr1 = []
 function close() {
@@ -998,15 +999,17 @@ async function showOpenPro (mi) {
           meData[i].ani = "meData",
           meData[i].pl = 10 + i
         }
-         bubleUiAngin()
-        arr1 = arr1 
-        console.log(arr1)
+       
          } catch (e) {
             error1 = e
-        }} else{
+        }
+      } else{
           tyu = true
         }
         sug = meData.length;
+          bubleUiAngin()
+        arr1 = arr1 
+        console.log(arr1)
     };
     // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו 
 let tyu = false
@@ -1222,12 +1225,7 @@ async function start () {
           createmask(miData)
           crMaap(miData)
           rashbi(miData);
-          if (tyu = true){
-                 bubleUiAngin()
-        arr1 = arr1 
-          }
-                  low = false
-
+           low = false
   }
         } catch (e) {
             error1 = e
@@ -1726,8 +1724,10 @@ function bubleUiAngin(){
 }
 let u = "מסך הלב"
 function hover(event){
+  console.log(event.detail)
     u = event.detail.id
 }
+let cards = true;
 </script>
 
 <svelte:head>
@@ -1755,7 +1755,22 @@ function hover(event){
   </div>
 </DialogOverlay>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
-<Tooltip title="{u}" ispic="true">
+  {#if cards == true}
+  <Tooltip title="{u}" ispic="true">
+  {#if arr1.length > 0}
+<Cardsui 
+ {low} 
+ on:hover={hover} 
+ on:cards={()=> cards = false} 
+ {arr1}
+ {askedarr}
+ {declineddarr}
+ />
+{/if}
+  </Tooltip>
+  {:else}
+  <Tooltip title="{u}" ispic="true">
+
 <div class="screen" > 
     
 {#each adder as add }
@@ -1763,7 +1778,7 @@ function hover(event){
  {/each}
 
 {#each arr1 as buble, i}
-{#if buble.ani === "haluk"}
+{#if buble.ani === "haluk" && milon.desi == true} 
  <div class="normSml halu"><Hal    
     user_1s={buble.user_1s}
           on:hover={hover}
@@ -2143,6 +2158,7 @@ function hover(event){
     <div 
  class="midCom">
         <Mid 
+        on:cards={()=> cards = true}
         on:hover={hover}
 on:showall={showall}
 on:showonly={showonly}
@@ -2159,10 +2175,11 @@ pmash={pmashd}
 {mashs}
 {maap}
 {askma}
-des={0}  />
+des={halu}  />
     </div>
 </div> 
 </Tooltip>
+{/if}
 
 
 <style>

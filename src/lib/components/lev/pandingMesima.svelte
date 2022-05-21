@@ -545,6 +545,22 @@ function hoverede(){
   }
   dispatch("hover", {id: u});
 }
+
+function hoverc (event){
+   if (event.detail.x == "0"){
+ u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+}
+ import Cards from './cards/pending.svelte'
+export let cards = false;
+function claf (event){
+  let o = event.detail.alr
+  let d = event.detail.y
+  console.log(o,d)
+}
 </script>
 {#await ser}
 <h1>..</h1>
@@ -608,7 +624,7 @@ title="ביטול"
   {/if}
   </div>
 </DialogOverlay>
-
+{#if cards == false}
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
@@ -681,6 +697,25 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   >
 </Swiper>
 </div>
+{:else}
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  on:tochat={tochat}
+  {noofhours}
+  {perhour}
+  {hearotMeyuchadot}
+  {already} 
+  {projectName}
+   {src} 
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {name} 
+   {descrip} {mypos} {allr} {noofusersNo}
+   on:nego={claf}
+   />
+{/if}
 {/await}
 
 <style>

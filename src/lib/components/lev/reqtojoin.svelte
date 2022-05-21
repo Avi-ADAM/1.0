@@ -493,13 +493,21 @@ let hovered = false;
  $: w = 0;
  let   u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
 function hover (id){
-  if (id == "0"){
+   if (id == "0"){
  u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
   } else {
     u = id
   }
     dispatch("hover", {id: u});
-
+}
+function hoverc (event){
+   if (event.detail.x == "0"){
+ u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+    console.log(event.detail,u)
 }
 function hoverede(){
    hovered = !hovered
@@ -510,10 +518,14 @@ function hoverede(){
   }
   dispatch("hover", {id: u});
  }
+ import Card from './cards/reqtojoin.svelte'
+export let cards = false;
 </script>
+
 {#await ser}
 <h1>..</h1>
 {:then ser}
+{#if cards == false}
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
@@ -572,7 +584,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                                         width='56px'
                                                         height='56px'
                                                         alt={useraplyname}
-                                                        src={src}
+                                                        src={src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}
                                                         style="border-radius: 50%;"
                                                         /> 
                                                      </foreignObject>     
@@ -623,6 +635,21 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   >
 </Swiper>
 </div>
+{:else}
+<Card
+  on:agree={()=>agree()}
+  on:decline={()=>decline()}
+  on:hover={hoverc} 
+  {already} 
+  {projectName}
+   {src} 
+   {noofusersWaiting} 
+   {useraplyname} 
+   {noofusersOk} 
+   {src2} 
+   {openmissionName} 
+   {missionDetails} {noofusersNo}/>
+{/if}
 {/await}
 <style>
     .btin{

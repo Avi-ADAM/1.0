@@ -39,6 +39,7 @@ const config = {
 					sturk: '#CCFBF1',
 					lpink: 'rgb(251, 207, 232)', 
 					mpink: 'rgb(244, 114, 182)',
+				    wow: 'rgb(2, 255, 187)'
 		}
 		
 		

@@ -1,0 +1,493 @@
+<script>
+     import MissionInProgress from "../../../components/lev/missionInProgress.svelte"
+    import ProjectSuggestor from "../../../components/lev/projectSuggestor.svelte"
+    import Reqtojoin from '../../../components/lev/reqtojoin.svelte';
+    import PendingM from "../../../components/lev/pandingMesima.svelte";
+    import PendingMa from "../../../components/lev/pmas.svelte"
+    import Welcomt from "../../../components/lev/welcomTo.svelte";
+    import Fiappru from '../../../components/lev/fiappru.svelte';
+        import Mashsug from '../../../components/lev/mashsuggest.svelte'
+        import Reqtom from '../../../components/lev/reqtom.svelte'
+        import Weget from '../../../components/lev/weget.svelte'
+        import Hal from '../../../components/lev/halukaask.svelte'
+    import {
+    createEventDispatcher
+} from 'svelte';
+
+const dispatch = createEventDispatcher();
+  import { Swiper, SwiperSlide } from "swiper/svelte";
+
+  // Import Swiper styles
+  import "swiper/css";
+  import "swiper/css/navigation";
+
+  import "swiper/css/effect-cards";
+
+  import "./stylec.css";
+
+  // import required modules
+  import { EffectCards , Navigation} from "swiper";
+  export let low = false;
+  export let cards = "cards";
+   import Switch from './../../../celim/switch.svelte'
+$: if (cards == "קלפים"){
+    dispatch("cards")
+}
+export let askedarr, declineddarr, arr1 = [];
+
+                let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
+function delo (event){
+
+}
+function user (event) {
+
+}
+function coinLapach(event){
+
+}
+function hover (event) {
+    
+ dispatch("hover", {id: event.detail.id})
+
+}
+let hovered = false
+let u = "לב המערכת";
+function hoverede(){
+   hovered = !hovered
+    if (hovered == false){
+    u = "לב המערכת"
+  } 
+  dispatch("hover", {id: u});
+ }
+function proj (event){}
+function showonly (event){
+    const value = event.detail.data;
+ for (const key in milon) {
+        milon[key] = false
+    }
+    
+    milon[value] = true;
+
+}
+function showall (event){
+for (const key in milon) {
+        milon[key] = true
+    }
+
+}
+</script>
+<style>
+
+    .next{
+        position : absolute;
+        top: calc(50% - 15px);
+        left: calc(100% - 50px);
+        height: 30px;
+        width: 50px;
+    }
+      .perv{
+        position : absolute;
+        top: calc(50% - 15px);
+        right: calc(100% - 50px);
+        height: 30px;
+        width: 50px;
+    }
+        @media (min-width: 528px){
+    .next{
+        position : absolute;
+        top: calc(50% - 35px);
+        left: calc(100% - 90px);
+        height: 70px;
+        width: 90px;
+    }
+      .perv{
+        position : absolute;
+        top: calc(50% - 35px);
+        right: calc(100% - 90px);
+        height: 70px;
+        width: 90px;
+    }
+    }
+  .body{
+      height: 100vh;
+      width: 100vw;
+  }
+  .bg{
+        position: absolute;
+        top: calc(95% - 20px);
+        left: calc(50% - 70px);
+    }
+</style>
+       
+<div class="body">
+     <img  class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
+
+        <img class=" next" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg" alt="next "/>
+    <div style:visibility={low == true ? "hidden":  "visible"} class="bg">
+
+        
+        <Switch bind:value={cards}  design="multi" options={[ 'מטבעות','קלפים']} fontSize={13}/>                
+
+</div>
+
+<span on:mouseenter={()=> hoverede()} 
+on:mouseleave={()=> hoverede()} >
+<Swiper
+ dir="rtl"
+  effect={"cards"}
+  grabCursor={true}
+  modules={[EffectCards, Navigation]}
+  class="mySwiperc swiperc"
+    navigation={{
+    nextEl: ".next",
+    prevEl: ".perv",
+  }}
+>
+{#each arr1 as buble, i}
+<!--{#if buble.ani === "haluk" && milon.desi == true} 
+ <SwiperSlide class="swiper-slidec"><Hal    
+    user_1s={buble.user_1s}
+          on:hover={hover}
+ on:proj={proj}
+ on:user={user}
+    myid={buble.myid}
+    pendId={buble.pendId}
+    mypos={buble.mypos}
+    projectName={buble.projectName} 
+    name={buble.name} 
+    src={buble.src}
+    projectId={buble.projectId}
+    noofusersOk={buble.noofusersOk}
+    noofusersNo={buble.noofusersNo}
+    noofusersWaiting={buble.noofusersWaiting}
+    noofusers={buble.noofusers}
+    already={buble.already}
+    created_at={buble.created_at}
+    users={buble.users}
+    diun={buble.diun}
+    order={buble.order}
+                               /></SwiperSlide>
+{:else if buble.ani === "mtaha" &&  milon.betaha == true}
+ <SwiperSlide class="swiper-slidec"><MissionInProgress
+  on:proj={proj}
+ on:user={user}  
+  on:hover={hover}
+    usernames={buble.usernames}
+    noofpu={buble.project.user_1s.length}
+    oldzman={buble.timer}
+    stname={buble.stname}
+    mId={buble.id}
+    missId={buble.mission.id}
+    missionName={buble.name}
+    projectId={buble.project.id}
+    projectName={buble.project.projectName}
+    missionDetails={buble.descrip}
+    src={buble.project.profilePic.formats.thumbnail.url}
+    link={buble.privatlinks}
+    dueDateOrCountToDedline ={buble.admaticedai}
+    hoursdon ={buble.howmanyhoursalready}
+    hourstotal = {buble.hoursassinged}
+    perhour = {buble.perhour}
+    on:done={mdon}
+    /></SwiperSlide>
+{:else if buble.ani === "pmashes" && milon.ppmash == true}
+  <SwiperSlide class="swiper-slidec"><PendingMa
+        on:show={show}
+              on:hover={hover}
+  on:proj={proj}
+ on:user={user}
+        on:coinLapach={coinLapach}
+                 messege={buble.messege}
+        mysrc={buble.mysrc}
+        mypos={buble.mypos}
+        diun={buble.diun}
+      descrip={buble.descrip}
+      projectName = {buble.projectName}
+      name = {buble.name}
+              hearotMeyuchadot = {buble.hearotMeyuchadot}
+              kindOf = {buble.kindOf} 
+              src = {buble.src}
+               noofusersWaiting={buble.noofusersWaiting}
+                projectId={buble.projectId}
+                noofusersOk={buble.noofusersOk}
+                created_at={buble.created_at}
+                noofusersNo={buble.noofusersNo}
+                already={buble.already}
+                noofusers={buble.user_1s.length}
+                mshaabId={buble.mshaabId}
+                hm={buble.hm}
+                price={buble.price}
+                easy={buble.easy}
+                sqadualed={buble.sqadualed}
+                sqadualedf={buble.sqadualedf}
+                linkto={buble.linkto}
+                pendId={buble.pendId}
+                users={buble.users}
+                /></SwiperSlide>
+  -->{#if buble.ani === "pends" && milon.pend == true}
+  <SwiperSlide class="swiper-slidec"><PendingM
+              on:hover={hover}
+  on:proj={proj}
+ on:user={user}
+        on:coinLapach={coinLapach}
+          messege={buble.messege}
+        mysrc={buble.mysrc}
+        mypos={buble.mypos}
+      descrip={buble.descrip}
+      projectName = {buble.projectName}
+      name = {buble.name}
+              hearotMeyuchadot = {buble.hearotMeyuchadot}
+              noofhours = {buble.noofhours} 
+              src = {buble.src}
+               noofusersWaiting={buble.noofusersWaiting}
+                projectId={buble.projectId}
+                uids={buble.uids}
+                what={buble.what}
+                noofusersOk={buble.noofusersOk}
+                total={buble.noOfHours * buble.perhour}
+                perhour={buble.perhour}
+                noofusersNo={buble.noofusersNo}
+                already={buble.already}
+                noofusers={buble.user_1s.length}
+                missionId={buble.missionId}
+                skills={buble.skills}
+                tafkidims={buble.tafkidims}
+                workways={buble.workways}
+                mdate={buble.mdate}
+                vallues={buble.vallues}
+                pendId={buble.pendId}
+                users={buble.users}
+                cards="true"
+                /></SwiperSlide><!--
+{:else if buble.ani === "wegets" && milon.pmaap == true}
+    <SwiperSlide class="swiper-slidec"><Weget
+            on:acsept={deloid}
+            on:decline={deloid}
+                  on:hover={hover}
+          on:proj={proj}
+ on:user={user}
+            mId={buble.mId}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            kindOf={buble.kindOf}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            myp={buble.myp}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            spid = {buble.spid} 
+            src = {buble.src}
+            price={buble.price}
+            hm={buble.hm}
+            src2 = {buble.src2}
+            why={buble.why}
+            whatt={buble.whatt}
+            missionBName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            sqadualedf={buble.sqadualedf}
+             sqadualed={buble.sqadualed}
+            spnot={buble.spnot}
+            easy ={buble.easy}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
+                /></SwiperSlide>
+{:else if buble.ani === "fiapp" && milon.fiap == true}
+            <SwiperSlide class="swiper-slidec"><Fiappru
+            on:acsept={deloi}
+            on:decline={deloi}
+                  on:hover={hover}
+    on:proj={proj} 
+ on:user={user}
+             mId={buble.mId}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            missionDetails = {buble.descrip} 
+            src = {buble.src}
+            src2 = {buble.src2}
+            why={buble.why}
+            whatt={buble.whatt}
+            missionBName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            publicklinks={buble.publicklinks}
+             privatlinks={buble.privatlinks}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            valph ={buble.perhour}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
+                /></SwiperSlide>
+{:else if buble.ani === "walcomen" && milon.welc == true}
+   <SwiperSlide class="swiper-slidec"><Welcomt 
+    id={buble.id}
+          on:hover={hover}
+       username={buble.username}
+       projectName={buble.projectName}
+       /></SwiperSlide>
+   -->{:else if buble.ani === "askedcoin" && milon.asks == true}
+        <SwiperSlide class="swiper-slidec"><Reqtojoin
+            on:acsept={delo}
+                  on:hover={hover}
+            on:proj={proj}
+     on:user={user}
+            on:decline={delo}
+            cards="true"
+            pid={buble.pid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            missionDetails = {buble.descrip} 
+            src = {buble.src}
+            src2 = {buble.src2}
+            openmissionName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            publicklinks={buble.publicklinks}
+             privatlinks={buble.privatlinks}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            valph ={buble.perhour}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
+                /></SwiperSlide>
+<!--{:else if buble.ani === "askedm" && milon.askmap == true}
+        <SwiperSlide class="swiper-slidec"><Reqtom
+            on:acsept={delom}
+            on:decline={delom}
+                  on:hover={hover}
+            on:proj={proj}
+ on:user={user}
+ on:chat={chat}
+            pid={buble.pid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName = {buble.projectName}
+            useraplyname ={buble.username}
+            userId ={ buble.uid} 
+            missionDetails = {buble.descrip} 
+            src = {buble.src}
+            src2 = {buble.src2}
+            openmissionName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+               noofpu={buble.noof}
+            myp={buble.myp}
+             easy={buble.easy}
+            spnot={buble.spnot}
+            price ={buble.price}
+            deadline={buble.deadline}
+                missId={buble.missId}
+                id={buble.id}
+                openMid={buble.omid}
+                stylef={buble.stylef}
+                st={buble.st}
+                declined={buble.decid}
+                spid={buble.spid}
+                /></SwiperSlide>-->
+{:else if buble.ani === "meData" && milon.sugg == true}
+  <SwiperSlide class="swiper-slidec"><ProjectSuggestor
+      on:less={delo}
+            on:hover={hover}
+      on:proj={proj}
+ on:user={user}
+      askedarr={askedarr}
+      {declineddarr}
+      deadLine = {buble.sqadualed}
+      oid = {buble.id}
+              projectName = {buble.project.projectName}
+                role ={buble.tafkidims}
+              skills ={ buble.skills} 
+              missionDetails = {buble.descrip} 
+              notes = {buble.hearotMeyuchadot}
+              src = {buble.project.profilePic.formats.thumbnail.url}
+               missionName={buble.name}
+                projectId={buble.project.id}
+                workways={buble.workways}
+                noOfHours={buble.noofhours}
+                perhour={buble.perhour}
+                total={buble.noofhours * buble.perhour}
+                cards="true"
+                /></SwiperSlide><!--
+{:else if buble.ani === "huca" && milon.pmashs == true}
+    <SwiperSlide class="swiper-slidec"><Mashsug
+      on:less={lessi}
+      on:hover={hover}
+      on:proj={proj}
+ on:user={user}
+ messege={buble.messege}
+      i={i}
+      askedarr={askedarr}
+     declineddarra= {buble.declineddarra}
+      deadLine = {buble.sqadualed}
+      oid = {buble.oid}
+      id = {buble.id}
+      price= {buble.price}
+      myp={buble.myp}
+      already= {buble.already}
+              projectName = {buble.projectName}
+              missionDetails = {buble.descrip} 
+              notes = {buble.hearotMeyuchadot}
+              src = {buble.srcb}
+               mashName={buble.mashname}
+                projectId={buble.projectid}
+                descrip={buble.descrip}
+                spnot={buble.spnot}
+                easy={buble.easy}
+                /></SwiperSlide>-->
+{/if}
+{/each}
+ <!-- <SwiperSlide class="swiper-slidec">Slide 1</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 2</SwiperSlide
+  ><SwiperSlide class="swiper-slidec">Slide 3</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 4</SwiperSlide
+  ><SwiperSlide class="swiper-slidec">Slide 5</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 6</SwiperSlide
+  ><SwiperSlide class="swiper-slidec">Slide 7</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 8</SwiperSlide
+  ><SwiperSlide class="swiper-slidec">Slide 9</SwiperSlide>-->
+</Swiper>
+</span>
+</div>

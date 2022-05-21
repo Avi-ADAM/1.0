@@ -1,0 +1,119 @@
+#app { height: 100% }
+html,
+body {
+  position: relative;
+  height: 100%;
+}
+
+body {
+  background: #eee;
+  font-size: 14px;
+  color: #000;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: #fff;
+  font-size: 14px;
+  color: #000;
+  margin: 0;
+  padding: 0;
+}
+
+html,
+body {
+  position: relative;
+  height: 100%;
+}
+
+#app {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.swiperc{
+  position: absolute;
+  top: 10vh;
+  left: calc(50vw - 20vh);
+  height: 90vh !important;
+  width: 85vw !important;
+  border-radius: 0% !important;
+}
+
+.swiper-slidec {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px !important;
+  border: 1px solid var(--barbi-pink);
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  height: 80vh !important;
+  width: 60vw !important;
+}
+@media (min-width:528px){
+.swiperc{
+  position: absolute;
+  top: 10vh;
+  left: calc(50vw - 20vh);
+  height: 80vh !important;
+  width: 40vh !important;
+  border-radius: 0% !important;
+}
+
+.swiper-slidec {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px !important;
+  border: 1px solid var(--barbi-pink);
+  font-size: 22px;
+  font-weight: bold;
+  color: #fff;
+  height: 70vh !important;
+  width: 35vh !important;
+}
+}
+/**
+.swiper-slidec:nth-child(1n) {
+  background-color: rgb(206, 17, 17);
+}
+
+.swiper-slidec:nth-child(2n) {
+  background-color: rgb(0, 140, 255);
+}
+
+.swiper-slidec:nth-child(3n) {
+  background-color: rgb(10, 184, 111);
+}
+
+.swiper-slidec:nth-child(4n) {
+  background-color: rgb(211, 122, 7);
+}
+
+.swiper-slidec:nth-child(5n) {
+  background-color: rgb(118, 163, 12);
+}
+
+.swiper-slidec:nth-child(6n) {
+  background-color: rgb(180, 10, 47);
+}
+
+.swiper-slidec:nth-child(7n) {
+  background-color: rgb(35, 99, 19);
+}
+
+.swiper-slidec:nth-child(8n) {
+  background-color: rgb(0, 68, 255);
+}
+
+.swiper-slidec:nth-child(9n) {
+  background-color: rgb(218, 12, 218);
+}
+
+.swiper-slidec:nth-child(10n) {
+  background-color: rgb(54, 94, 77);
+}
+**/

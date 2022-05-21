@@ -206,8 +206,24 @@ function linke (){
         dispatch("proj", {id: projectId});
     }
 }
-  
+  function hoverc (event){
+   if (event.detail.x == "0"){
+ u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+    console.log(event.detail,u)
+}
+ import Cards from './cards/sugestmi.svelte'
+export let cards = false;
+function claf (event){
+  let o = event.detail.alr
+  let d = event.detail.y
+  console.log(o,d)
+}
 </script>
+{#if cards == false}
 <div
 style="position: relative;" 
 style:z-index={hovered === false ? 1 : 6} 
@@ -245,7 +261,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   ><SwiperSlide
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-    <div class="ltn ab d ">  {#each skills as skill}<p style="text-shadow:none;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-gold rounded-full pl-1 pr-1">{skill.skillName}</span></p>{/each}
+    <div class="ltn ab d ">  {#each skills as skill}<p style="text-shadow:none;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-gold rounded-full pl-1 pr-1 opacity-60">{skill.skillName}</span></p>{/each}
 </div> 
    {#if deadLine} <h5 on:mouseenter={()=>hover("תאריך אחרון לביצוע")} on:mouseleave={()=>hover("0")} class="lt bc">{deadLine}</h5>{/if}
     <h4 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
@@ -260,6 +276,22 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   >
 </Swiper>
 </div>
+{:else}
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  {missionName}
+  {noOfHours}
+  {perhour}
+  {already} 
+  {missionDetails}
+  {skills}
+  {role}
+  {projectName}
+   {src} 
+   />
+{/if}
 <style>
   .xyz{
             grid-column: 1/4;

@@ -10,27 +10,27 @@ let fir = "לב המערכת, לחיצה על היהלומים לסינון הפ
 let u = "לב המערכת, לחיצה על היהלומים לסינון הפעולות";
 
 export let name = "";
-export let sug = 0;
+export let sug = 13;
 let sugg =  "sugg";
-export let pen = 0;
+export let pen = 13;
 let pend = "pend";
-export let ask = 0;
+export let ask = 17;
 let asks = "asks";
-export let wel = 0;
+export let wel = 17;
 let welc = "welc";
-export let beta = 0;
+export let beta = 13;
 let betaha = "betaha";
-export let des = 0;
+export let des = 13;
 let desi = "desi";
-export let fia = 0;
+export let fia = 99;
 let fiap = "fiap";
-export let pmash = 0;
+export let pmash = 99;
  let ppmash = "ppmash";
-export let mashs = 0;
+export let mashs = 17;
  let pmashs = "pmashs";
-export let maap = 0;
+export let maap = 17;
  let pmaap = "pmaap";
-export let askma = 0;
+export let askma = 13;
  let askmap = "askmap";
 function disp (event) { 
 const value = event.detail.id
@@ -74,6 +74,7 @@ fiap = "fiap";
  pmashs = "pmashs";
  pmaap = "pmaap";
           askmap = "askmap";
+
   }
 
 
@@ -106,7 +107,7 @@ bb = "matrix(1.804202, 0, 0, 1.804202, 100.91, -749.63)"
    fir = "הצגת בקשות הצטרפות לרקמות בלבד"
 cc = " matrix(2.038709, 0, 0, 2.038709, -400, -849.63)"
 } else if (num === "d"){
-   fir = "הצגת החלטות ממתינות למענה בלבד"
+   fir = "הצגת בקשות לחלוקת כספים בלבד"
 dd = "matrix(1.713625, 0, 0, 1.713625, 58, -862)"
 } else if (num === "e"){
    fir = "הצגת פעולות בתהליך ביצוע בלבד"
@@ -177,7 +178,21 @@ u = "לב המערכת, לחיצה על היהלומים לסינון הפעול
   }
   dispatch("hover", {id: u});
  }
+  import Switch from './../../celim/switch.svelte'
+  export let cards = "מטבעות";
+$: if (cards == "קלפים"){
+    dispatch("cards")
+}
+
 </script>
+
+<style>
+    .bg{
+        position: absolute;
+        top: calc(30% - 20px);
+        left: calc(50% - 55px);
+    }
+</style>
 
 <div 
 style="position: relative;" 
@@ -185,6 +200,10 @@ style:z-index={hovered === false ? 1 : 6}   class="midCom hover:scale-150 durati
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 >
+<div style:visibility={low == true ? "hidden":  "visible"} class="bg">
+<Switch bind:value={cards}  design="multi" options={[ 'קלפים','מטבעות']} fontSize={13}/>
+</div>
+
 <Sv 
 {low}
 {name} 
