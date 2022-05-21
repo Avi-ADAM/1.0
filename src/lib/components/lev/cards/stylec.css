@@ -59,6 +59,8 @@ body {
   position: absolute;
   top: 10vh;
   left: calc(50vw - 20vh);
+    transform: none;
+
   height: 80vh !important;
   width: 40vh !important;
   border-radius: 0% !important;

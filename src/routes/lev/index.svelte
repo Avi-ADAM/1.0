@@ -1724,7 +1724,6 @@ function bubleUiAngin(){
 }
 let u = "מסך הלב"
 function hover(event){
-  console.log(event.detail)
     u = event.detail.id
 }
 let cards = false;
@@ -1755,7 +1754,7 @@ let cards = false;
   </div>
 </DialogOverlay>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
-  {#if cards == true}
+{#if cards == true}
   <Tooltip title="{u}" ispic="true">
   {#if arr1.length > 0}
 <Cardsui 
@@ -1768,7 +1767,7 @@ let cards = false;
  />
 {/if}
   </Tooltip>
-  {:else}
+{:else if cards == false}
   <Tooltip title="{u}" ispic="true">
 
 <div class="screen" > 
