@@ -34,9 +34,10 @@ body {
 }
 .swiperc{
   position: absolute;
-  top: 10vh;
-  left: calc(50vw - 20vh);
-  height: 90vh !important;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: 85vh !important;
   width: 85vw !important;
   border-radius: 0% !important;
 }
@@ -50,7 +51,7 @@ body {
   font-size: 22px;
   font-weight: bold;
   color: #fff;
-  height: 80vh !important;
+  height: 75vh !important;
   width: 60vw !important;
 }
 @media (min-width:528px){

@@ -1727,7 +1727,7 @@ function hover(event){
   console.log(event.detail)
     u = event.detail.id
 }
-let cards = true;
+let cards = false;
 </script>
 
 <svelte:head>
