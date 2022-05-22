@@ -56,13 +56,13 @@ dispatch("tochat");
      {/if}--> 
        {#if skills.length > 0}
             <small class="text-barbi text-sm ">כישורים נדרשים:</small>
-            <div class="border border-gold flex sm:flex-row flex-col d h-8 max-h-20 cd sm:h-20">  {#each skills as skill}<p class="m-0 p-0" style="line-height:1;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-barbi rounded-full sm:text-md text-sm p-1 pt-0 m-0" >{skill.skillName}</span></p>{/each}
+            <div class="border border-gold flex sm:flex-row flex-col d h-20 max-h-20 cd sm:h-8">  {#each skills as skill}<p class="m-0 p-0" style="line-height:1;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-barbi rounded-full sm:text-md text-sm p-1 pt-0 m-0" >{skill.skillName}</span></p>{/each}
     </div>{/if}
      {#if role.length > 0}  <small class="text-sm text-barbi">תפקידים נדרשים:</small>
-            <div class="border border-gold flex sm:flex-row  flex-col d h-8 max-h-20 cd sm:h-20">  {#each role as rol}<p on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="m-0" style="line-height:1;text-shadow:none;" ><span class="bg-wow rounded-full sm:text-md text-sm text-barbi p-1 pt-0">{rol.roleDescription}</span></p>{/each}
+            <div class="border border-gold flex sm:flex-row  flex-col d h-20 max-h-20 cd sm:h-8">  {#each role as rol}<p on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="m-0" style="line-height:1;text-shadow:none;" ><span class="bg-wow rounded-full sm:text-md text-sm text-barbi p-1 pt-0">{rol.roleDescription}</span></p>{/each}
     </div>{/if}
     {#if workways.length > 0}  <small class="text-sm text-barbi">דרכי העבודה:</small>
-            <div class="border border-gold flex sm:flex-row  flex-col d h-8 max-h-20 cd sm:h-20">  {#each workways as rol}<p on:mouseenter={()=>hover("דרכי עבודה מבוקשות")} on:mouseleave={()=>hover("0")} class="m-0" style="line-height:1;text-shadow:none;" ><span class="bg-gold text-barbi rounded-full sm:text-md text-sm p-1 pt-0">{rol.workWayName}</span></p>{/each}
+            <div class="border border-gold flex sm:flex-row  flex-col d h-20 max-h-20 cd sm:h-8">  {#each workways as rol}<p on:mouseenter={()=>hover("דרכי עבודה מבוקשות")} on:mouseleave={()=>hover("0")} class="m-0" style="line-height:1;text-shadow:none;" ><span class="bg-gold text-barbi rounded-full sm:text-md text-sm p-1 pt-0">{rol.workWayName}</span></p>{/each}
     </div>{/if}
     </div>
   
