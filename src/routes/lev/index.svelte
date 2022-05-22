@@ -986,7 +986,7 @@ async function showOpenPro (mi) {
             descrip
             hearotMeyuchadot
             name
-            work_ways {workWayName id}
+            work_ways {workWayName}
             noofhours perhour
             }
             }`

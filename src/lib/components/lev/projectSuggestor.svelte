@@ -15,7 +15,7 @@
     export let projectId;
     export let linki = "/project/";
     export let oid = 0;
-    export let workways= "";
+    export let workways= [];
     export let noOfHours = 0;
     export let perhour = 0;
     export let total = 0;
@@ -290,6 +290,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   {role}
   {projectName}
    {src} 
+ {workways}
    />
 {/if}
 <style>

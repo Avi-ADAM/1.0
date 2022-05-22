@@ -449,7 +449,7 @@ on:mouseleave={()=> hoverede()} >
               src = {buble.project.profilePic.formats.thumbnail.url}
                missionName={buble.name}
                 projectId={buble.project.id}
-                workways={buble.workways}
+                workways={buble.work_ways}
                 noOfHours={buble.noofhours}
                 perhour={buble.perhour}
                 total={buble.noofhours * buble.perhour}
