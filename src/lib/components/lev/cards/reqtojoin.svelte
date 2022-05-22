@@ -6,6 +6,7 @@
     export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting
     export let already = false;
     export let src2;
+    export let perhour = 0, noofhours = 0
 function hover(x){
 dispatch("hover",{x:x});
 }
@@ -30,19 +31,17 @@ dispatch("decline",{alr:alr});
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-sm text-sm">צירוף 1 לריקמה לביצוע משימה</span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">צירוף 1 לריקמה לביצוע משימה</span>
             </div>
-            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
+            <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
          </div>
          </div>
          </div>
   <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
-      <p class="text-sm text-gray-600 flex items-center">
-        <svg class="fill-current text-gray-500 w-3 h-3 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
-          <path d="M4 8V6a6 6 0 1 1 12 0v2h1a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2v-8c0-1.1.9-2 2-2h1zm5 6.73V17h2v-2.27a2 2 0 1 0-2 0zM7 6v2h6V6a3 3 0 0 0-6 0z" />
-        </svg>
-        {projectName}
+       <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
+            <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
+            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}> {noofhours * perhour} </span>
       </p>
       <div class="text-gray-900 font-bold text-xl mb-2">{openmissionName}</div>
      {#if missionDetails} <p class="text-gray-700 text-base">{missionDetails}</p>{/if}
