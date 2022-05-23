@@ -8,7 +8,7 @@
     export let label = "";
     export let design = 'inner label'
     export let options = [];
-		export let fontSize = 16;
+		export let fontSize = 13;
 	  export let value = 'on';
 
     let checked = true;
@@ -58,16 +58,15 @@
     <div role='radiogroup'
 				 class="group-container"
 				 aria-labelledby={`label-${uniqueID}`}
-				 style="font-size:{fontSize}px" 
-				 id={`group-${uniqueID}`}>
+				 id="ggddd" >
 {#if label.length > 0}    <div class='legend' id={`label-${uniqueID}`}>{label}</div>{/if}
         {#each options as option}
             <input type="radio" id={`${option}-${uniqueID}`} value={option} bind:group={value}>
             <label for={`${option}-${uniqueID}`}>
                 {#if option == "קלפים"}
-                <img alt="קלפים" style:height="20px" style:display="inherit" style:width="30px" src="https://res.cloudinary.com/love1/image/upload/v1653313408/credit-cards_vdsjnd.svg"/>
+                <img alt="קלפים" class="imgi" style:height="20px" style:display="inherit"  src="https://res.cloudinary.com/love1/image/upload/v1653313408/credit-cards_vdsjnd.svg"/>
                 {:else}
-                <img alt="מטבעות" style:height="20px" style:display="inherit" style:width="20px" src="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"/>
+                <img alt="מטבעות" class="imgin" style:height="20px" style:display="inherit" style:width="20px" src="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"/>
                 {/if}
             </label> 
         {/each}
@@ -77,11 +76,27 @@
 {/if}
 
 <style>
+    .imgi{
+        height: 20px;
+        width: 20px;
+    }
+    #ggdddd{
+        font-size: 6px;
+    }
+    @media (min-width:550px){
+         #ggdddd{
+        font-size: 13px;
+    }
+        .imgi{
+        height: 20px;
+        width: 30px;
+    } 
+    }
 			:root {
-		--accent-color: rgb(245, 160, 65);
+		--accent-color:rgb(87, 208, 248);
 		--gray: #ccc;
 	}
-    /* Inner Design Option */
+    /* Inner Design Option  rgb(245, 160, 65)*/
     .s--inner button {
         padding: 0.5em;
         background-color: #fff;

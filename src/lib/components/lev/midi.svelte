@@ -193,11 +193,22 @@ $: if (cards == "קלפים"){
 <style>
     .bg{
         position: absolute;
+        top: calc(30% - 14px);
+        left: calc(50% - 37px);
+        font-size: 6px;
+
+        border-radius: 50%;
+    }
+    @media (min-width: 550px){
+    .bg{
+        position: absolute;
         top: calc(30% - 20px);
         left: calc(50% - 63px);
         background-color: var(--gold);
         border-radius: 50%;
+        font-size: 13px;
     }
+}
 </style>
 
 <div 
@@ -210,7 +221,7 @@ on:mouseleave={()=> hoverede()}
 on:mouseenter={()=> hoverede("x")} 
 on:mouseleave={()=> hoverede()}
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
-<Switch bind:value={cards}  design="multi" options={[ 'קלפים','מטבעות']} fontSize={13}/>
+<Switch bind:value={cards}  design="multi" options={[ 'קלפים','מטבעות']} />
 </div>
 
 <Sv 
