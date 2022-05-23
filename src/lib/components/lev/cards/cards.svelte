@@ -119,25 +119,28 @@ for (const key in milon) {
     }
 </style>
        
-<div class="body">
+<div     dir="rtl"
+ class="body">
      <img  class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
 
         <img class=" next" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg" alt="next "/>
-    <div style:visibility={low == true ? "hidden":  "visible"} class="bg">
+    <div     dir="ltr"
+ style:visibility={low == true ? "hidden":  "visible"} class="bg">
 
         
         <Switch bind:value={cards}  design="multi" options={[ 'מטבעות','קלפים']} fontSize={13}/>                
 
 </div>
 
-<span on:mouseenter={()=> hoverede()} 
+<span dir="rtl" on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()} >
 <Swiper
- dir="rtl"
   effect={"cards"}
   grabCursor={true}
   modules={[EffectCards, Navigation]}
   class="mySwiperc swiperc"
+      dir="rtl"
+    loop="true"
     navigation={{
     nextEl: ".next",
     prevEl: ".perv",
@@ -303,13 +306,14 @@ on:mouseleave={()=> hoverede()} >
                 st={buble.st}
                 declined={buble.decid}
                 /></SwiperSlide>
-{:else if buble.ani === "fiapp" && milon.fiap == true}
+    -->{:else if buble.ani === "fiapp" && milon.fiap == true}
             <SwiperSlide class="swiper-slidec"><Fiappru
-            on:acsept={deloi}
-            on:decline={deloi}
+            on:acsept={delo}
+            on:decline={delo}
                   on:hover={hover}
     on:proj={proj} 
  on:user={user}
+ cards="true"
              mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
@@ -343,7 +347,7 @@ on:mouseleave={()=> hoverede()} >
                 stylef={buble.stylef}
                 st={buble.st}
                 declined={buble.decid}
-                /></SwiperSlide>
+                /></SwiperSlide><!--
 {:else if buble.ani === "walcomen" && milon.welc == true}
    <SwiperSlide class="swiper-slidec"><Welcomt 
     id={buble.id}

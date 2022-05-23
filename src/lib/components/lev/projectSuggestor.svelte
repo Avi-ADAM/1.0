@@ -213,7 +213,6 @@ function linke (){
     u = event.detail.x
   }
     dispatch("hover", {id: u});
-    console.log(event.detail,u)
 }
  import Cards from './cards/sugestmi.svelte'
 export let cards = false;

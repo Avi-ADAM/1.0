@@ -64,7 +64,11 @@
         {#each options as option}
             <input type="radio" id={`${option}-${uniqueID}`} value={option} bind:group={value}>
             <label for={`${option}-${uniqueID}`}>
-                {option}
+                {#if option == "קלפים"}
+                <img alt="קלפים" style:height="20px" style:display="inherit" style:width="30px" src="https://res.cloudinary.com/love1/image/upload/v1653313408/credit-cards_vdsjnd.svg"/>
+                {:else}
+                <img alt="מטבעות" style:height="20px" style:display="inherit" style:width="20px" src="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"/>
+                {/if}
             </label> 
         {/each}
     </div>

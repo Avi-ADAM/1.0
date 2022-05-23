@@ -405,6 +405,21 @@ function linke (s){
     goto("/moach")
     }
   };
+  function hoverc (event){
+   if (event.detail.x == "0"){
+u ="בקשה לאישור ביצוע משימה בהצלחה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+}
+   import Cards from './cards/fini.svelte'
+export let cards = false;
+function claf (event){
+  let o = event.detail.alr
+  let d = event.detail.y
+  console.log(o,d)
+}
 </script>
 {#await ser}
 <h1>..</h1>
@@ -432,6 +447,7 @@ title="ביטול"
   </DialogContent>
   </div>
 </DialogOverlay>
+{#if cards == false}
 
 <div 
 style="position: relative;" 
@@ -529,6 +545,26 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   >
 </Swiper>
 </div>
+{:else}
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  {why}
+  {useraplyname}
+  {src2}
+  {missionBName}
+  {already} 
+  {missionDetails}
+  {projectName}
+   {src} 
+   {nhours}
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {noofusersNo}
+   {valph}
+   />
+{/if}
 {/await}
 
 <style>

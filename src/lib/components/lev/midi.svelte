@@ -169,10 +169,14 @@ ee ="translate(3.8484 -18.405)";
 
 export let low = true;
 let hovered = false;
-function hoverede(){
+function hoverede(x){
+        let t = "לב המערכת"
+    if (x == "x"){
+        t = "שינוי התצוגה ממטבעות לקלפים"
+    }
    hovered = !hovered
     if (hovered == false){
-    u = "לב המערכת"
+    u = t
   } else {
 u = "לב המערכת, לחיצה על היהלומים לסינון הפעולות"
   }
@@ -190,7 +194,9 @@ $: if (cards == "קלפים"){
     .bg{
         position: absolute;
         top: calc(30% - 20px);
-        left: calc(50% - 55px);
+        left: calc(50% - 63px);
+        background-color: var(--gold);
+        border-radius: 50%;
     }
 </style>
 
@@ -200,7 +206,10 @@ style:z-index={hovered === false ? 1 : 6}   class="midCom hover:scale-150 durati
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 >
-<div style:visibility={low == true ? "hidden":  "visible"} class="bg">
+<div
+on:mouseenter={()=> hoverede("x")} 
+on:mouseleave={()=> hoverede()}
+ style:visibility={low == true ? "hidden":  "visible"} class="bg">
 <Switch bind:value={cards}  design="multi" options={[ 'קלפים','מטבעות']} fontSize={13}/>
 </div>
 

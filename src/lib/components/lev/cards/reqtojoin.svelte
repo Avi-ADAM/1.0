@@ -41,7 +41,7 @@ dispatch("decline",{alr:alr});
     <div  class="mb-8">
        <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}> {noofhours * perhour} </span>
+            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}> {(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div class="text-gray-900 font-bold text-xl mb-2">{openmissionName}</div>
      {#if missionDetails} <p class="text-gray-700 text-base">{missionDetails}</p>{/if}

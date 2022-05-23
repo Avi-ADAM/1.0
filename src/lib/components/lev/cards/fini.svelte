@@ -4,7 +4,7 @@
  const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
-    export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, perhour, noofhours
+    export let projectName, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours,useraplyname
     export let already, allr = false;
 function hover(x){
 dispatch("hover",{x:x});
@@ -33,11 +33,11 @@ dispatch("tochat");
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
       <div class="relative flex items-center space-x-1">
          <div class="relative">
-         <img src={src}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+         <img src={src2}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-sm text-sm"> הצבעה על אישור משימה חדשה </span>
+               <span class="text-barbi text-center mr-3 sm:text-xl text-sm"> הצבעה על אישור סיום משימה  </span>
             </div>
             <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
          </div>
@@ -47,17 +47,24 @@ dispatch("tochat");
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {valph} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {nhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(nhours * valph).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
-      <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{name}</div>
-     {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16 text-sm text-gray-700 text-base">{descrip}</p>{/if}
+      <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionBName}</div>
+     {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined" && missionDetails !== undefined} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
     {#if hearotMeyuchadot}
      <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if} 
-    </div>
-    <div class="flex items-center">
-        <p><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>
+     <div class="flex items-center border border-gold" >
+          <p on:mouseenter={()=>hover("מילות סיכום")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{why !== undefined && why !== null && why !== "undefined" ? why : ""}</p>
+   </div>
+        </div>
+     <div class="flex items-center">
+      <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
+      <div class="text-sm">
+        <p class="text-gray-900 leading-none">{useraplyname}</p>
+        <p class="vo ef"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>
       </div>
+    </div>
        </div>
  {#if already === false && allr === false}
                 <button on:mouseenter={()=>hover("אישור")}
@@ -81,7 +88,7 @@ dispatch("tochat");
               class = "btnb bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-red-400 hover:scale-110" 
               name="decline">
               <No/>
-            </button>
+            </button><!--
     {:else if already === true && mypos === true && noofusersNo > 0 && allr === false}
             <button on:mouseenter={()=>hover("משא ומתן")} on:mouseleave={()=>hover("0")}  
                 on:click={() => nego("alr")} 
@@ -131,7 +138,7 @@ dispatch("tochat");
       on:click={() => tochat()}
       ><Chaticon/>
         </button>
-
+    -->
         {/if}
 
 </div>

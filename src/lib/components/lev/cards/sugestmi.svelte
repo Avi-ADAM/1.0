@@ -47,7 +47,7 @@ dispatch("tochat");
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noOfHours} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{noOfHours * perhour} </span>
+            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noOfHours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noOfHours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionName}</div>
      {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
@@ -56,7 +56,7 @@ dispatch("tochat");
      {/if}--> 
        {#if skills.length > 0}
             <small class="text-barbi text-sm ">כישורים נדרשים:</small>
-            <div class="border border-gold flex sm:flex-row flex-col d h-20 max-h-20 cd sm:h-8">  {#each skills as skill}<p class="m-0 p-0" style="line-height:1;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-barbi rounded-full sm:text-md text-sm p-1 pt-0 m-0" >{skill.skillName}</span></p>{/each}
+            <div class="border border-gold flex sm:flex-row flex-col d h-20 max-h-20 cd sm:h-8">  {#each skills as skill}<p class="m-0 p-0" style="line-height:1;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-barbi rounded-full text-white sm:text-md text-sm p-1 pt-0 m-0" >{skill.skillName}</span></p>{/each}
     </div>{/if}
      {#if role.length > 0}  <small class="text-sm text-barbi">תפקידים נדרשים:</small>
             <div class="border border-gold flex sm:flex-row  flex-col d h-20 max-h-20 cd sm:h-8">  {#each role as rol}<p on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="m-0" style="line-height:1;text-shadow:none;" ><span class="bg-wow rounded-full sm:text-md text-sm text-barbi p-1 pt-0">{rol.roleDescription}</span></p>{/each}
