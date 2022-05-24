@@ -8,7 +8,6 @@
     export let label = "";
     export let design = 'inner label'
     export let options = [];
-		export let fontSize = 13;
 	  export let value = 'on';
   import {
     createEventDispatcher
