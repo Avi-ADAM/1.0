@@ -10,9 +10,16 @@
     export let options = [];
 		export let fontSize = 13;
 	  export let value = 'on';
+  import {
+    createEventDispatcher
+} from 'svelte';
 
+const dispatch = createEventDispatcher();
     let checked = true;
+function cardsi (){
 
+    dispatch("x")
+}
 
 		const uniqueID = Math.floor(Math.random() * 100)
 
@@ -31,29 +38,6 @@
 
 </script>
 
-{#if design == 'inner'}
-<div class="s s--inner">
-    <span id={`switch-${uniqueID}`}>{label}</span>
-    <button
-        role="switch"
-        aria-checked={checked}
-        aria-labelledby={`switch-${uniqueID}`}
-        on:click={handleClick}>
-            <span>on</span>
-            <span>off</span>
-    </button>
-</div>
-{:else if design == 'slider'}
-<div class="s s--slider" style="font-size:{fontSize}px">
-    <span id={`switch-${uniqueID}`}>{label}</span>
-    <button
-        role="switch"
-        aria-checked={checked}
-        aria-labelledby={`switch-${uniqueID}`}
-        on:click={handleClick}>
-    </button>
-</div>
-{:else}
 <div class="s s--multi">
     <div role='radiogroup'
 				 class="group-container"
@@ -61,9 +45,9 @@
 				 id="ggddd" >
 {#if label.length > 0}    <div class='legend' id={`label-${uniqueID}`}>{label}</div>{/if}
         {#each options as option}
-            <input type="radio" id={`${option}-${uniqueID}`} value={option} bind:group={value}>
+            <input type="radio" id={`${option}-${uniqueID}`} value={option} bind:group={value}/>
             <label for={`${option}-${uniqueID}`}>
-                {#if option == "קלפים"}
+                {#if option == true}
                 <img alt="קלפים" class="imgi" style:height="20px" style:display="inherit"  src="https://res.cloudinary.com/love1/image/upload/v1653313408/credit-cards_vdsjnd.svg"/>
                 {:else}
                 <img alt="מטבעות" class="imgin" style:height="20px" style:display="inherit" style:width="20px" src="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"/>
@@ -73,7 +57,6 @@
     </div>
 </div>
 
-{/if}
 
 <style>
     .imgi{
@@ -96,67 +79,7 @@
 		--accent-color:rgb(87, 208, 248);
 		--gray: #ccc;
 	}
-    /* Inner Design Option  rgb(245, 160, 65)*/
-    .s--inner button {
-        padding: 0.5em;
-        background-color: #fff;
-        border: 1px solid var(--gray);
-    }
-    [role='switch'][aria-checked='true'] :first-child,
-    [role='switch'][aria-checked='false'] :last-child {
-        display: none;
-        color: #fff;
-    }
-
-    .s--inner button span {
-        user-select: none;
-        pointer-events:none;
-        padding: 0.25em;
-    }
-
-    .s--inner button:focus {
-        outline: var(--accent-color) solid 1px;
-    }
-
-    /* Slider Design Option */
-
-    .s--slider {
-        display: flex;
-        align-items: center;
-    }
-
-    .s--slider button {
-        width: 3em;
-        height: 1.6em;
-        position: relative;
-        margin: 0 0 0 0.5em;
-        background: var(--gray);
-        border: none;
-    }
-
-    .s--slider button::before {
-        content: '';
-        position: absolute;
-        width: 1.3em;
-        height: 1.3em;
-        background: #fff;
-        top: 0.13em;
-        right: 1.5em;
-        transition: transform 0.3s;
-    }
-
-    .s--slider button[aria-checked='true']{
-        background-color: var(--accent-color)
-    }
-
-    .s--slider button[aria-checked='true']::before{
-        transform: translateX(1.3em);
-        transition: transform 0.3s;
-    }
-
-    .s--slider button:focus {
-        box-shadow: 0 0px 0px 1px var(--accent-color);
-    }
+  
 
     /* Multi Design Option */
 
@@ -169,11 +92,7 @@
         white-space: nowrap;
     }
 
-    /* .s--multi legend {
-    font-size: 2px;
-    opacity: 0;
-    position: absolute;
-    } */
+  
 
     .s--multi label {
         display: inline-block;
@@ -253,34 +172,5 @@
         border-radius: 1.5em;
     }
 
-    /* gravy */ 
-
-    /* Inner Design Option */
-    [role='switch'][aria-checked='true'] :first-child,
-    [role='switch'][aria-checked='false'] :last-child {
-        border-radius: 0.25em;
-        background: var(--accent-color);
-        display: inline-block;
-    }
-
-    .s--inner button:focus {
-        box-shadow: 0 0px 8px var(--accent-color);
-        border-radius: 0.1em;
-    }
-
-    /* Slider Design Option */
-    .s--slider button {
-        border-radius: 1.5em;
-    } 
-    
-    .s--slider button::before {
-        border-radius: 100%;
-    }
-
-    .s--slider button:focus {
-        box-shadow: 0 0px 8px var(--accent-color);
-        border-radius: 1.5em;
-    }
-   
 
 </style>

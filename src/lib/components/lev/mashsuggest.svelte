@@ -5,6 +5,7 @@
          import { clickOutside } from './outsidclick.js';
 
  const dispatch = createEventDispatcher();
+ export let coinlapach;
 export let messege = []
 	  export let shows = true;
     export let kindOf;
@@ -39,15 +40,18 @@ export let messege = []
   };
 
   
-  const slideTo = (index) => {
+ const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)
  }
 function less () {
     dispatch('less', {
-    id: i
+     ani: "mashsu",
+                coinlapach: coinlapach
     } );
 }
 let miData = [];

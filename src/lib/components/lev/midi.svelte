@@ -183,11 +183,12 @@ u = "לב המערכת, לחיצה על היהלומים לסינון הפעול
   dispatch("hover", {id: u});
  }
   import Switch from './../../celim/switch.svelte'
-  export let cards = "מטבעות";
-$: if (cards == "קלפים"){
-    dispatch("cards")
-}
+  export let cards = false;
 
+$: if (cards == true){
+   console.log(cards)
+        dispatch("cards",{cards:true})
+}
 </script>
 
 <style>
@@ -221,7 +222,7 @@ on:mouseleave={()=> hoverede()}
 on:mouseenter={()=> hoverede("x")} 
 on:mouseleave={()=> hoverede()}
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
-<Switch bind:value={cards}  design="multi" options={[ 'קלפים','מטבעות']} />
+<Switch bind:value={cards} design="multi" options={[false, true]} />
 </div>
 
 <Sv 

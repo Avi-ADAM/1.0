@@ -8,6 +8,7 @@ import { idPr } from '../../stores/idPr.js';
   import ProgressBar from "@okrad/svelte-progressbar";
  const dispatch = createEventDispatcher();
     export let mypos = null;
+    export let coinlapach;
     export let whyno = [];
     export let projectName = "";
     export let name = "";
@@ -74,7 +75,8 @@ let ser = xyz();
 function coinLapach() {
              isOpen = false;
         dispatch('coinLapach', {
-    data: pendId
+     ani: "halu",
+                coinlapach: coinlapach
     } );
 };
 
@@ -380,7 +382,9 @@ const setSwiperRef = ({ detail }) => {
 
   
 const slideTo = (index) => {
+  if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+  }
 };
 function toggleShow (){
   slideTo(0)
@@ -405,6 +409,21 @@ function hoverede(){
    u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
   }
   dispatch("hover", {id: u});
+}
+  function hoverc (event){
+   if (event.detail.x == "0"){
+   u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+}
+   import Cards from './cards/haluka.svelte'
+export let cards = false;
+function claf (event){
+  let o = event.detail.alr
+  let d = event.detail.y
+  console.log(o,d)
 }
 </script>
 {#await ser}
@@ -467,6 +486,7 @@ title="ביטול"
   </DialogContent>
   </div>
 </DialogOverlay>
+{#if cards == false}
 
 <div 
 use:clickOutside
@@ -567,6 +587,21 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
   >
 </Swiper>
 </div>
+{:else}
+
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  {why}
+  {already} 
+  {projectName}
+   {src} 
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {noofusersNo}
+   />
+{/if}
 {/await}
 <style>
   .j{

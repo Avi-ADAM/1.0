@@ -10,7 +10,8 @@
         import Reqtom from '../../../components/lev/reqtom.svelte'
         import Weget from '../../../components/lev/weget.svelte'
         import Hal from '../../../components/lev/halukaask.svelte'
-    import {
+      import { fly } from 'svelte/transition';
+        import {
     createEventDispatcher
 } from 'svelte';
 
@@ -28,27 +29,36 @@ const dispatch = createEventDispatcher();
   // import required modules
   import { EffectCards , Navigation} from "swiper";
   export let low = false;
-  export let cards = "cards";
+  export let cards = true;
    import Switch from './../../../celim/switch.svelte'
-$: if (cards == "קלפים"){
-    dispatch("cards")
+
+$: if (cards == false){
+        dispatch("cards",{cards:false})
 }
-export let askedarr, declineddarr, arr1 = [];
+export let askedarr = [], declineddarr = [], arr1 = [];
 
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
 function delo (event){
-
+ let oldob = arr1;
+ const x = oldob.map(c => c.coinlapach);
+ const indexy = x.indexOf(event.detail.coinlapach);
+ oldob.splice(indexy, 1); 
+ arr1 = oldob  
+ dispatch("start", {cards: false,ani:event.detail.ani})
 }
 function user (event) {
-
+ dispatch("user", {id: event.detail.id})
 }
-function coinLapach(event){
 
-}
 function hover (event) {
     
  dispatch("hover", {id: event.detail.id})
 
+}
+function chat(){}
+
+function proj (event){
+     dispatch("proj", {id: event.detail.id})
 }
 let hovered = false
 let u = "לב המערכת";
@@ -59,22 +69,7 @@ function hoverede(){
   } 
   dispatch("hover", {id: u});
  }
-function proj (event){}
-function showonly (event){
-    const value = event.detail.data;
- for (const key in milon) {
-        milon[key] = false
-    }
-    
-    milon[value] = true;
 
-}
-function showall (event){
-for (const key in milon) {
-        milon[key] = true
-    }
-
-}
 </script>
 <style>
 
@@ -128,7 +123,7 @@ for (const key in milon) {
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
 
         
-        <Switch bind:value={cards}  design="multi" options={[ 'מטבעות','קלפים']} fontSize={13}/>                
+        <Switch bind:value={cards}  design="multi" options={[true, false]} />                
 
 </div>
 
@@ -147,12 +142,14 @@ on:mouseleave={()=> hoverede()} >
   }}
 >
 {#each arr1 as buble, i}
-<!--{#if buble.ani === "haluk" && milon.desi == true} 
+{#if buble.ani === "haluk" && milon.desi == true} 
  <SwiperSlide class="swiper-slidec"><Hal    
     user_1s={buble.user_1s}
           on:hover={hover}
  on:proj={proj}
  on:user={user}
+ cards="true"
+     coinlapach={buble.coinlapach} 
     myid={buble.myid}
     pendId={buble.pendId}
     mypos={buble.mypos}
@@ -169,12 +166,13 @@ on:mouseleave={()=> hoverede()} >
     users={buble.users}
     diun={buble.diun}
     order={buble.order}
-                               /></SwiperSlide>
+                               /></SwiperSlide><!--
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
  <SwiperSlide class="swiper-slidec"><MissionInProgress
   on:proj={proj}
  on:user={user}  
   on:hover={hover}
+      coinlapach={buble.coinlapach} 
     usernames={buble.usernames}
     noofpu={buble.project.user_1s.length}
     oldzman={buble.timer}
@@ -195,11 +193,11 @@ on:mouseleave={()=> hoverede()} >
     /></SwiperSlide>
 {:else if buble.ani === "pmashes" && milon.ppmash == true}
   <SwiperSlide class="swiper-slidec"><PendingMa
-        on:show={show}
               on:hover={hover}
   on:proj={proj}
  on:user={user}
-        on:coinLapach={coinLapach}
+     coinlapach={buble.coinlapach} 
+        on:coinLapach={delo}
                  messege={buble.messege}
         mysrc={buble.mysrc}
         mypos={buble.mypos}
@@ -227,12 +225,13 @@ on:mouseleave={()=> hoverede()} >
                 pendId={buble.pendId}
                 users={buble.users}
                 /></SwiperSlide>
-  -->{#if buble.ani === "pends" && milon.pend == true}
+  -->{:else if buble.ani === "pends" && milon.pend == true}
   <SwiperSlide class="swiper-slidec"><PendingM
               on:hover={hover}
   on:proj={proj}
  on:user={user}
-        on:coinLapach={coinLapach}
+        on:coinLapach={delo}
+            coinlapach={buble.coinlapach} 
           messege={buble.messege}
         mysrc={buble.mysrc}
         mypos={buble.mypos}
@@ -269,6 +268,7 @@ on:mouseleave={()=> hoverede()} >
                   on:hover={hover}
           on:proj={proj}
  on:user={user}
+     coinlapach={buble.coinlapach} 
             mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
@@ -314,6 +314,7 @@ on:mouseleave={()=> hoverede()} >
     on:proj={proj} 
  on:user={user}
  cards="true"
+     coinlapach={buble.coinlapach} 
              mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
@@ -351,6 +352,8 @@ on:mouseleave={()=> hoverede()} >
 {:else if buble.ani === "walcomen" && milon.welc == true}
    <SwiperSlide class="swiper-slidec"><Welcomt 
     id={buble.id}
+        coinlapach={buble.coinlapach} 
+
           on:hover={hover}
        username={buble.username}
        projectName={buble.projectName}
@@ -363,6 +366,8 @@ on:mouseleave={()=> hoverede()} >
      on:user={user}
             on:decline={delo}
             cards="true"
+                coinlapach={buble.coinlapach} 
+
             pid={buble.pid}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
@@ -404,6 +409,8 @@ on:mouseleave={()=> hoverede()} >
  on:user={user}
  on:chat={chat}
             pid={buble.pid}
+                coinlapach={buble.coinlapach} 
+
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
             what={buble.what}
@@ -441,6 +448,8 @@ on:mouseleave={()=> hoverede()} >
             on:hover={hover}
       on:proj={proj}
  on:user={user}
+     coinlapach={buble.coinlapach} 
+
       askedarr={askedarr}
       {declineddarr}
       deadLine = {buble.sqadualed}
@@ -467,6 +476,8 @@ on:mouseleave={()=> hoverede()} >
  on:user={user}
  messege={buble.messege}
       i={i}
+          coinlapach={buble.coinlapach} 
+
       askedarr={askedarr}
      declineddarra= {buble.declineddarra}
       deadLine = {buble.sqadualed}

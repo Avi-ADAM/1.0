@@ -11,6 +11,7 @@ function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
  const dispatch = createEventDispatcher();
+ export let coinlapach
     export let stname;
     let show = true;
 	  export let shows = true
@@ -530,7 +531,9 @@ ${tofinished}
                 .then(data => miDatan = data);
             console.log(miDatan);
               isOpen = false;
-              dispatch("done")
+              dispatch("done",
+               {ani: "minp",
+                coinlapach: coinlapach})
         } catch (e) {
             error1 = e
             console.log(error1);
@@ -550,8 +553,10 @@ ${tofinished}
   };
 
   
-  const slideTo = (index) => {
+ const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)

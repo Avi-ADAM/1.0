@@ -61,8 +61,15 @@ dispatch("disp",{
      
     max-width: 550px;
     max-height: 550px;
-    aspect-ratio: 1/ 1;
 }	
+@media (min-width: 410px) {	
+
+.midCom{	
+    min-height: 200px;	
+    min-width: 200px;	
+}	
+}	
+
 @media (min-width: 550px) {	
 
 .midCom{	

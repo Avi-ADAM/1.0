@@ -14,8 +14,8 @@ import {
 } from 'svelte';
 
 const dispatch = createEventDispatcher();
-export let shows = false;
-export let deadline;
+export let coinlapach
+export let deadline
 export let projectName;
 export let openmissionName;
 export let role;
@@ -144,9 +144,11 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
     });
   };
 
-  
+ 
   const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)
@@ -278,7 +280,8 @@ ${adduser}
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
+                ani: "asked",
+                coinlapach: coinlapach
             })
 
         } catch (e) {
@@ -372,7 +375,8 @@ ${adduser2}
 
           }
             dispatch('acsept', {
-                asked: id
+                ani: "asked",
+                coinlapach: coinlapach
             })
 
         } catch (e) {
@@ -411,7 +415,8 @@ ${adduser2}
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
+                ani: "asked",
+                coinlapach: coinlapach
             })
 
         } catch (e) {
@@ -476,7 +481,8 @@ updateOpenMission(
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('decline', {
-                asked: id
+                ani: "asked",
+              coinlapach: coinlapach
             })
 
         } catch (e) {
@@ -507,7 +513,6 @@ function hoverc (event){
     u = event.detail.x
   }
     dispatch("hover", {id: u});
-    console.log(event.detail,u)
 }
 function hoverede(){
    hovered = !hovered

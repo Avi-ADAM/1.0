@@ -16,6 +16,7 @@ import {
 import { idPr } from './../../stores/idPr.js';
 
 const dispatch = createEventDispatcher();
+export let coinlapach;
 export let mId;
 export let why;
 export let what;
@@ -128,8 +129,10 @@ let ser = xyz();
   };
 
   
-  const slideTo = (index) => {
+ const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)
@@ -230,7 +233,8 @@ updateMesimabetahalich(
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
+                ani: "fini",
+                coinlapach: coinlapach
             })
 
         } catch (e) {
@@ -268,7 +272,8 @@ console.log("just add vote to asked and update to not show for me again")
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
+                 ani: "fini",
+                coinlapach: coinlapach
             })
 
         } catch (e) {
@@ -335,7 +340,8 @@ updateFiniapruval(
             console.log(miDatan);
             isOpen = false;
             dispatch('decline', {
-                asked: id
+                 ani: "fini",
+                coinlapach: coinlapach
             })
 
         } catch (e) {

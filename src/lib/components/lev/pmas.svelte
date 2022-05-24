@@ -13,6 +13,7 @@ import { idPr } from '../../stores/idPr.js';
   import ProgressBar from "@okrad/svelte-progressbar";
  import { onMount } from 'svelte';
   const dispatch = createEventDispatcher();
+  export let coinlapach;
     export let mypos = null;
     export let messege = [];
     export let descrip = "";
@@ -119,8 +120,8 @@ onMount(async () => {
 function coinLapach() {
              isOpen = false;
         dispatch('coinLapach', {
-    data: pendId
-    } );
+ ani: "pendma",
+                coinlapach: coinlapach    } );
 };
 
 function objToString (obj) {
@@ -294,7 +295,8 @@ async function agree(alr) {
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-        dispatch("coinLapach")
+        dispatch("coinLapach",{ ani: "pendma",
+                coinlapach: coinlapach})
         } catch (e) {
             error1 = e
             console.log(error1)
@@ -522,8 +524,10 @@ diunim = ` ${diu},`
   };
 
   
-  const slideTo = (index) => {
+ const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)

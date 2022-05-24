@@ -4,7 +4,7 @@
     import { createEventDispatcher } from 'svelte';
 
  const dispatch = createEventDispatcher();
-
+export let coinlapach;
     export let deadLine;
     export let projectName;
     export let missionName;
@@ -29,8 +29,8 @@ let already = false;
 function less (oid) {
     console.log("less")
     dispatch('less', {
-    id: oid
-    } );
+ ani: "prsug",
+                coinlapach: coinlapach    } );
 }
 let miData = [];
 
@@ -162,8 +162,10 @@ const cookieValue = document.cookie
   };
 
   
-  const slideTo = (index) => {
+ const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)

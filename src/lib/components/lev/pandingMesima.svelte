@@ -11,6 +11,7 @@ import { idPr } from '../../stores/idPr.js';
 import { RingLoader
 } from 'svelte-loading-spinners'
  const dispatch = createEventDispatcher();
+ export let coinlapach;
  export let mypos = null;
     export let messege = [];
     export let descrip = "";
@@ -100,7 +101,8 @@ let ser = xyz();
 
 function coinLapach() {
         dispatch('coinLapach', {
-    data: pendId
+     ani: "pendmi",
+                coinlapach: coinlapach
     } );
 };
 
@@ -519,8 +521,10 @@ const setSwiperRef = ({ detail }) => {
 
   
 const slideTo = (index) => {
+  if(index){
     swiperRef.slideTo(index , 400);
-};
+  }
+  };
 function toggleShow (){
   slideTo(0)
 }

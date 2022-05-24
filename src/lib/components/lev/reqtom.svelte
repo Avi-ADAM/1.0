@@ -13,6 +13,7 @@ import {
 } from 'svelte';
 
 const dispatch = createEventDispatcher();
+export let coinlapach;
 export let deadline;
 export let projectName;
 export let openmissionName;
@@ -78,8 +79,10 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
   };
 
   
-  const slideTo = (index) => {
+ const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)
@@ -270,8 +273,8 @@ if (noofpu === 1) {
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
-            })
+ ani: "askedma",
+                coinlapach: coinlapach            })
 
         } catch (e) {
             error1 = e
@@ -327,7 +330,8 @@ ${adduser2}
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
+                ani: "askedma",
+                coinlapach: coinlapach 
             })
 
         } catch (e) {
@@ -366,7 +370,8 @@ ${adduser2}
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
+               ani: "askedma",
+                coinlapach: coinlapach 
             })
 
         } catch (e) {
@@ -434,7 +439,8 @@ updateAskm(
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('decline', {
-                asked: id
+               ani: "askedma",
+                coinlapach: coinlapach 
             })
 
         } catch (e) {

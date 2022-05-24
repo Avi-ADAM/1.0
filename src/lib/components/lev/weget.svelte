@@ -17,6 +17,7 @@ import { idPr } from './../../stores/idPr.js';
   import { onMount } from 'svelte'; 
   import moment from 'moment';
 const dispatch = createEventDispatcher();
+export let coinlapach;
 export let mId;
 export let kindOf;
 export let myp = 0;
@@ -79,8 +80,10 @@ let token;
   };
 
   
-  const slideTo = (index) => {
+ const slideTo = (index) => {
+    if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
+    }
   };
  function toggleShow (){
   slideTo(0)
@@ -269,8 +272,8 @@ updateSp( input:  {
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
-            })
+ani: "finim",
+                coinlapach: coinlapach             })
 
         } catch (e) {
             error1 = e
@@ -307,8 +310,8 @@ console.log("just add vote to asked and update to not show for me again")
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('acsept', {
-                asked: id
-            })
+ani: "finim",
+                coinlapach: coinlapach             })
 
         } catch (e) {
             error1 = e
@@ -375,8 +378,8 @@ updateMaap(
             console.log(miDatan);
             isOpen = false;
             dispatch('decline', {
-                asked: id
-            })
+ani: "finim",
+                coinlapach: coinlapach             })
         } catch (e) {
             error1 = e
             console.log(error1);
