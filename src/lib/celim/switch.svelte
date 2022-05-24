@@ -40,9 +40,9 @@ function cardsi (){
 
 <div class="s s--multi">
     <div role='radiogroup'
-				 class="group-container"
+				 class="group-container ggg"
 				 aria-labelledby={`label-${uniqueID}`}
-				 id="ggddd" >
+				  id={`group-${uniqueID}`}>
 {#if label.length > 0}    <div class='legend' id={`label-${uniqueID}`}>{label}</div>{/if}
         {#each options as option}
             <input type="radio" id={`${option}-${uniqueID}`} value={option} bind:group={value}/>
@@ -63,11 +63,11 @@ function cardsi (){
         height: 20px;
         width: 20px;
     }
-    #ggdddd{
+    .ggg{
         font-size: 6px;
     }
     @media (min-width:550px){
-         #ggdddd{
+         .ggg{
         font-size: 13px;
     }
         .imgi{
