@@ -12,7 +12,7 @@
  
 </script>
 <div >
-<Swiper
+<Swiper dir="rtl"
   effect={"cards"}
     loop={true}
   loopFillGroupWithBlank={true}

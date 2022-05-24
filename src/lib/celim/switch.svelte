@@ -9,32 +9,13 @@
     export let design = 'inner label'
     export let options = [];
 	  export let value = 'on';
-  import {
-    createEventDispatcher
-} from 'svelte';
 
-const dispatch = createEventDispatcher();
     let checked = true;
-function cardsi (){
 
-    dispatch("x")
-}
 
 		const uniqueID = Math.floor(Math.random() * 100)
 
-    function handleClick(event){
-        const target = event.target
-
-        const state = target.getAttribute('aria-checked')
-
-        checked = state === 'true' ? false : true
-
-        value = checked === true ? 'on' : 'off'
-    }
-	
-	  const slugify = (str = "") =>
-    str.toLowerCase().replace(/ /g, "-").replace(/\./g, "");
-
+   
 </script>
 
 <div class="s s--multi">
