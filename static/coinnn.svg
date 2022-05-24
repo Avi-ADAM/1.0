@@ -1,0 +1,14 @@
+  <svg  version="1.1" viewBox="-106 -106 212 212" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+                <linearGradient id="lggm" x1="1" y1="1" spreadMethod="pad">
+                   <stop offset="0" style="stop-color: rgb(100, 71, 105);"/>
+                        <stop offset="1" style="stop-color: rgb(54, 241, 155);"/>
+                            </linearGradient>
+                            <linearGradient id="lgbgm" x1="1" y1="1">
+                                <stop offset="0" style="stop-color: rgb(125, 105, 155);"/>
+                                    <stop offset="1" style="stop-color: rgb(0, 100, 120);"/>
+                                        </linearGradient>
+                                        </defs>
+                                        <circle r="100" fill="url(#lggm)" transform="rotate(135)" stroke="url(#lgbgm)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
+                                         <circle r="80" fill="url(#lggm)" transform="rotate(315)" stroke="none"/>
+                                                  </svg>  
