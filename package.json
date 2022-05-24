@@ -48,9 +48,6 @@
     "topojson-client": "^3.1.0",
     "yup": "^0.32.11"
   },
-  "engines": {
-    "node": "16.x"
-  },
   "prettier": {
     "arrowParens": "always",
     "singleQuote": true,
