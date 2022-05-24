@@ -552,7 +552,7 @@ function hoverede(){
 
 function hoverc (event){
    if (event.detail.x == "0"){
- u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
+ u = "הצבעה על פרסום הצעת משימה לריקמה"
   } else {
     u = event.detail.x
   }
