@@ -55,14 +55,14 @@
     "estree-walker" "^2.0.1"
     "picomatch" "^2.2.2"
 
-"@sveltejs/adapter-vercel@1.0.0-next.47":
-  "integrity" "sha512-VV3vP8KqL9XOc7xfQLVhXTM5jrTme+r1qJy98u5/dhAhkdjqrGDwAKo/s7MoB3rTYxLb2b8I4QxAaoz2Y2aIBg=="
-  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-vercel/-/adapter-vercel-1.0.0-next.47.tgz"
-  "version" "1.0.0-next.47"
+"@sveltejs/adapter-vercel@1.0.0-next.55":
+  "integrity" "sha512-hmKbBw2o76j92gwrr+f7VccTwfYqg2wWliDvTbABywy0GQG3Y/QqCeowROoeaXqeMmolK6WtN8LC0Wef/Z5q5Q=="
+  "resolved" "https://registry.npmjs.org/@sveltejs/adapter-vercel/-/adapter-vercel-1.0.0-next.55.tgz"
+  "version" "1.0.0-next.55"
   dependencies:
-    "esbuild" "^0.14.21"
+    "esbuild" "^0.14.29"
 
-"@sveltejs/kit@^1.0.0-next.311":
+"@sveltejs/kit@^1.0.0-next.343":
   "integrity" "sha512-M+K2To/QdEBl8OZS1V7JzsV9zZUNJRAay1ZVtDnlC75UgHECHhu72E5BtJWFXtINezQaMgGl62LuAGHItQxPlA=="
   "resolved" "https://registry.npmjs.org/@sveltejs/kit/-/kit-1.0.0-next.343.tgz"
   "version" "1.0.0-next.343"
@@ -568,7 +568,7 @@
   "resolved" "https://registry.npmjs.org/esbuild-windows-64/-/esbuild-windows-64-0.14.39.tgz"
   "version" "0.14.39"
 
-"esbuild@^0.14.21", "esbuild@^0.14.27":
+"esbuild@^0.14.27", "esbuild@^0.14.29":
   "integrity" "sha512-2kKujuzvRWYtwvNjYDY444LQIA3TyJhJIX3Yo4+qkFlDDtGlSicWgeHVJqMUP/2sSfH10PGwfsj+O2ro1m10xQ=="
   "resolved" "https://registry.npmjs.org/esbuild/-/esbuild-0.14.39.tgz"
   "version" "0.14.39"
