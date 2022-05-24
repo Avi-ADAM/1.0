@@ -398,7 +398,7 @@ function erorer(){
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
-        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+        <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
