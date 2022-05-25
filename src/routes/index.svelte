@@ -8,7 +8,7 @@
 <svelte:head>
 	<title>הסכמה עולמית על ביטחון ושלום</title>
   <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
+<!--<script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
 </script>
 <script>
   window.dataLayer = window.dataLayer || [];
@@ -16,7 +16,7 @@
   gtag('js', new Date());
 
   gtag('config', 'UA-191152109-2');
-</script>
+</script>-->
 </svelte:head>
 
 <script>
@@ -36,6 +36,15 @@
 let error;
 onMount(async () => {
   //console.log(emaili)
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function(reg) {
+    // registration worked
+    console.log('Registration succeeded. Scope is ' + reg.scope);
+  }).catch(function(error) {
+    // registration failed
+    console.log('Registration failed with ' + error);
+  });
+ }; 
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {

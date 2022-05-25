@@ -1010,7 +1010,7 @@ let counter = 0;
 }
 onMount(async () => {
       if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function(reg) {
+  navigator.serviceWorker.register('service-worker.js', { scope: '.' }).then(function(reg) {
     // registration worked
     console.log('Registration succeeded. Scope is ' + reg.scope);
   }).catch(function(error) {
