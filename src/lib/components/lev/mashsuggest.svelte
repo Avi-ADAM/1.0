@@ -250,7 +250,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
 ><div id="normSml" ><span 	class="{`normSml${oid}`}" 
 ></span>
         <img on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
-        <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  class="hover:scale-150 lt" >{projectName}</button>
+        <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  class="hover:scale-110 lt" >{projectName}</button>
         <h1 on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} style="color: var(--barbi-pink); " class="ltn">{mashName}</h1>
         <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="ltn" >{price}</h3>
         <h3 class="ltn" ><span on:mouseenter={()=>hover("ההצעה שלי")} on:mouseleave={()=>hover("0")} style="color: var(--gold)">{easy}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {myp}</span> </h3>

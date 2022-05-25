@@ -960,6 +960,26 @@ async function showOpenPro (mi) {
           bubleUiAngin()
         arr1 = arr1 
         console.log(arr1)
+        if (!isEqual(meData,meDataold) && counter > 1 ) {
+        if (meDataold.length < meData.length){
+    // Create and show the notification
+  let rikn = "0"
+    if (meDataold.length - meData.length === -1){
+    rikn = meData[meData.length - 1].projectName
+    }
+    let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+    let text = `שלום ${usernames} ! יש לך הצעה חדשה: ביצוע משימה  ${rikn !== "0" ? `ברקמת ${rikn}` : "בריקמה"}` ;
+    navigator.serviceWorker.register('sw.js');
+ Notification.requestPermission(function(result) {
+  if (result === 'granted') {
+    navigator.serviceWorker.ready.then(function(registration) {
+      registration.showNotification('1❤️1', { body: text, icon: img });
+    });
+  }
+});
+
+    }
+  }
     };
     // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו 
 let tyu = false
@@ -1041,7 +1061,7 @@ onMount(async () => {
     }
 })
 
-let walcomenold= [], hucaold = [];
+let walcomenold= [], hucaold = [], meDataold = [];
 async function start () { 
   console.log("start");
   miDataold = miData
@@ -1157,6 +1177,7 @@ async function start () {
    askedcoin = [];
    mtahaold = mtaha;
    mtaha = [];
+   meDataold = meData
    meData = [];
     sdsa = [];
     pmashes = [];
