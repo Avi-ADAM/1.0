@@ -1,4 +1,6 @@
 <script>
+  import { RingLoader
+} from 'svelte-loading-spinners'
   import Cardsui from '../../lib/components/lev/cards/cards.svelte'
   import Tooltip from './../../lib/celim/tooltip.svelte';
   import Coinsui from "../../lib/components/lev/coinui.svelte"
@@ -47,7 +49,9 @@ let ma = 13;
 let wegets = [];
 let arr1 = []
 function close() {
+  if(mode !== 4){
   isOpen = false;
+  }
 }
 let eizeish, eizep
 let mode = 0;
@@ -1684,8 +1688,12 @@ function hover(event){
     u = event.detail.id
 }
 let cards = false;
-function cardsi (event){
-cards = event.detail.cards
+async function cardsi (event){
+  isOpen = true;
+  mode = 4
+  await start()
+  .then(() =>isOpen = false)
+  .then(() =>cards = event.detail.cards)
 console.log(cards, "from papa")
 }
 </script>
@@ -1709,6 +1717,8 @@ console.log(cards, "from papa")
     <Rikma projectId={eizep} on:user={user}/>
     {:else if mode == 3}
     <Levchat/>
+    {:else if mode == 4}
+    <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
     {/if}
   </div>
   </DialogContent>

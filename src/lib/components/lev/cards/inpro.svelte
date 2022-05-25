@@ -1,5 +1,5 @@
 <script>
-export let x,src,projectName,already,zman,dueDateOrCountToDedline, missionName,link,missionDetails, hoursdon, hourstotal,show,running,linkDescription,lapse
+export let x = 0,src,projectName,already,zman,dueDateOrCountToDedline, missionName,link,missionDetails, hoursdon, hourstotal,show,running,linkDescription,lapse = 0
     import { formatTime } from './../utils.js';
 
      // import Chaticon from '../../../celim/chaticon.svelte'
@@ -49,11 +49,9 @@ dispatch("hover",{x:x});
               <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionName}</div>
                 <h5  class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} שעות בוצעו`}</span> מתוך <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal} שעות סך הכל</span></h5>
                    {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{dueDateOrCountToDedline}</h5>{/if}
-         {#if lapse !== 0}
-       <div class="flex items-center justify-center"><span class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-wow p-2" style:font-family="Digital" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
+       <div class="flex items-center justify-center m-1"><span class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-wow p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
             {formatTime(zman)}
         </span></div> 
-        {/if}
          <!--<p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>

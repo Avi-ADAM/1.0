@@ -59,18 +59,24 @@ let zmani;
   let msdonf;
   $: msdonf = hoursdon * 3600000;
   export let zman;
-$:  zman = msdonf + lapse + x;
+$: zman = msdonf + lapse + x;
   export let oldzman;
 let miatan;
-  onMount(async () => {
+onMount(async () => {
     if (stname === "0") {
   } else if (stname === "stopi") {
     x = oldzman
   } else {
       const startTime = stname - lapse
       timer = setInterval(() => {
-        lapse = Date.now() - startTime
-        if (percentage(zman,mstotal) == 90){
+        lapse = Date.now() - startTime 
+      }, 1)
+        x = oldzman
+    running = true
+  }
+})
+
+$: if (percentage(zman,mstotal) == 90){
  let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -80,8 +86,7 @@ let miatan;
     });
   }
  });
-        } 
-         else if (percentage(zman,mstotal) == 95){
+        } else if (percentage(zman,mstotal) == 95){
  let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -92,7 +97,7 @@ let miatan;
   }
  });
         } 
-  if (mstotal-zman == 300000){
+$: if (mstotal-zman == 300000){
  let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
  Notification.requestPermission(function(result) {
@@ -101,8 +106,7 @@ let miatan;
       registration.showNotification('1❤️1', { body: text, icon: img });
     });
   }
- });
-        }else if (mstotal-zman == 60000){
+ })}else if (mstotal-zman == 60000){
           console.log("timer stop min")
  let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
@@ -114,7 +118,7 @@ let miatan;
   }
  });
         }
-          if (percentage(zman,mstotal) >= 100){
+$: if (percentage(zman,mstotal) >= 100){
            azor ()
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
     navigator.serviceWorker.register('sw.js');
@@ -125,20 +129,13 @@ let miatan;
     });
   }
  });
-        } 
-      }, 1)
-        x = oldzman
-    running = true
-  }
-})
+        }
 
-
-  import { onDestroy } from 'svelte'
   let timer;
   let running = false;
   let error1;
   
-  async function azor () {
+async function azor () {
       clearInterval(timer)
       running = false;
       zmani += lapse;
@@ -165,17 +162,17 @@ let miatan;
                     body: JSON.stringify({
                         query: `mutation 
                         { 
-updateMesimabetahalich(
+ updateMesimabetahalich(
   input: {
     where: {id: "${mId}"}
   data: {
-stname: "stopi",
-timer: ${x}
+ stname: "stopi",
+ timer: ${x}
   }
-}
-) {mesimabetahalich{id stname timer}}
-}
-`})
+ }
+ ) {mesimabetahalich{id stname timer}}
+ }
+ `})
                 })
                 .then(r => r.json())
                 .then(data => miCatan = data);
@@ -184,66 +181,11 @@ timer: ${x}
             error1 = e
             console.log(error1);
         }
-    } 
-    async function start () {
+} 
+async function start () {
       const startTime = Date.now() - lapse
       timer = setInterval(() => {
         lapse = Date.now() - startTime 
-         if (percentage(zman,mstotal) == 90){
- let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
-        } 
-         else if (percentage(zman,mstotal) == 95){
- let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
-        } 
-            if (mstotal-zman == 300000){
- let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
-        }else if (mstotal-zman == 60000){
- let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
-        }
-          if (percentage(zman,mstotal) == 100){
-                running = false;
-    let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
-        } 
       }, 1)
     
     running = true

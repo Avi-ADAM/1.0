@@ -34,6 +34,7 @@ const dispatch = createEventDispatcher();
 
 $: if (cards == false){
         dispatch("cards",{cards:false})
+        dispatch("start")
 }
 export let askedarr = [], declineddarr = [], arr1 = [];
 
@@ -156,8 +157,8 @@ on:mouseleave={()=> hoverede()} >
   }}
 >
 {#each arr1 as buble, i}
-{#if buble.ani === "haluk" && milon.desi == true} 
- <SwiperSlide class="swiper-slidec"><Hal    
+{#if buble.ani === "haluk" && milon.desi == true}
+<SwiperSlide class="swiper-slidec"><Hal    
     user_1s={buble.user_1s}
           on:hover={hover}
  on:proj={proj}

@@ -421,11 +421,7 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
 }
    import Cards from './cards/fini.svelte'
 export let cards = false;
-function claf (event){
-  let o = event.detail.alr
-  let d = event.detail.y
-  console.log(o,d)
-}
+
 </script>
 {#await ser}
 <h1>..</h1>
@@ -553,8 +549,8 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 </div>
 {:else}
 <Cards 
- on:agree={claf}
-  on:decline={claf}
+ on:agree={agree}
+  on:decline={decline}
   on:hover={hoverc}
   {why}
   {useraplyname}

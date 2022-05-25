@@ -186,8 +186,8 @@ u = "לב המערכת, לחיצה על היהלומים לסינון הפעול
   export let cards = false;
 
 $: if (cards == true){
-   console.log(cards)
         dispatch("cards",{cards:true})
+                dispatch("start")
 }
 </script>
 
