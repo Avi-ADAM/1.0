@@ -187,7 +187,6 @@ u = "לב המערכת, לחיצה על היהלומים לסינון הפעול
 
 $: if (cards == true){
         dispatch("cards",{cards:true})
-                dispatch("start")
 }
 </script>
 

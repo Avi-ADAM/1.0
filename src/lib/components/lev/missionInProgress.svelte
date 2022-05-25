@@ -11,7 +11,7 @@
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
-let tdtd
+let tdtd = []
 betha.subscribe(value => {
 		tdtd = value;
 	});
@@ -70,6 +70,11 @@ $: zman = msdonf + lapse + x;
 let miatan;
 onMount(async () => {
   console.log(tdtd[coinlapach-1])
+  if (tdtd[coinlapach-1].ch == true){
+    stname = tdtd[coinlapach-1].stname
+    timer = tdtd[coinlapach-1].timer
+    hoursdon = tdtd[coinlapach-1].hoursdon
+  }
     if (stname === "0") {
   } else if (stname === "stopi") {
     x = oldzman
@@ -148,7 +153,12 @@ async function azor () {
       zmani += lapse;
       x += lapse;
       lapse = 0;
-      const cookieValue = document.cookie
+        tdtd[coinlapach-1].stname = "stopi"
+        tdtd[coinlapach-1].timer = x
+        tdtd[coinlapach-1].hoursdon = hoursdon
+        tdtd[coinlapach-1].ch = true
+      betha.update(tdtd)
+        const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
         .split('=')[1];
@@ -194,9 +204,13 @@ async function start () {
       timer = setInterval(() => {
         lapse = Date.now() - startTime 
       }, 1)
-    
     running = true
     stname = Date.now()
+      tdtd[coinlapach-1].stname = stname
+        tdtd[coinlapach-1].timer = x
+        tdtd[coinlapach-1].hoursdon = hoursdon
+        tdtd[coinlapach-1].ch = true
+      betha.update(tdtd)
  const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -219,16 +233,16 @@ async function start () {
                     body: JSON.stringify({
                         query: `mutation 
                         { 
-updateMesimabetahalich(
+ updateMesimabetahalich(
   input: {
     where: {id: "${mId}"}
   data: {
-stname: "${stname}",
-timer: ${x}
+ stname: "${stname}",
+ timer: ${x}
   }
-}
-) {mesimabetahalich{id stname timer}}
-}
+ }
+ ) {mesimabetahalich{id stname timer}}
+ }
 `})
                 })
                 .then(r => r.json())
@@ -245,6 +259,11 @@ timer: ${x}
     lapse = 0
     x = 0;
     running = false
+      tdtd[coinlapach-1].stname = 0
+        tdtd[coinlapach-1].timer = 0
+        tdtd[coinlapach-1].hoursdon = hoursdon
+        tdtd[coinlapach-1].ch = true
+      betha.update(tdtd)
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -303,6 +322,11 @@ async function save() {
     lapse = 0
     x = 0
     running = false
+      tdtd[coinlapach-1].stname = 0
+        tdtd[coinlapach-1].timer = 0
+tdtd[coinlapach-1].hoursdon = hoursdon
+        tdtd[coinlapach-1].ch = true
+              betha.update(tdtd)
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))

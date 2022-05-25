@@ -1681,7 +1681,8 @@ function bubleUiAngin(){
  arr1.forEach((item, i) => {
   item.coinlapach = i + 1;
   xy.push({
-    id: i + 1
+    id: i + 1,
+    ch: false
   })
 });   
 xy = xy

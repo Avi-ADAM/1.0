@@ -34,7 +34,6 @@ const dispatch = createEventDispatcher();
 
 $: if (cards == false){
         dispatch("cards",{cards:false})
-        dispatch("start")
 }
 export let askedarr = [], declineddarr = [], arr1 = [];
 
