@@ -1,4 +1,5 @@
 <script>
+       import {betha} from '../../lib/components/lev/storess/betha.js'
   import { RingLoader
 } from 'svelte-loading-spinners'
   import Cardsui from '../../lib/components/lev/cards/cards.svelte'
@@ -1674,12 +1675,17 @@ function coinLapach (event){
 
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
 
-
+let xy = []
 function bubleUiAngin(){
  arr1 = [  ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask ].sort(({pl:a}, {pl:b}) => a - b)
  arr1.forEach((item, i) => {
   item.coinlapach = i + 1;
+  xy.push({
+    id: i + 1
+  })
 });   
+xy = xy
+betha.set(xy)
  createD()
      //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart 
 }
@@ -1689,11 +1695,7 @@ function hover(event){
 }
 let cards = false;
 async function cardsi (event){
-  isOpen = true;
-  mode = 4
-  await start()
-  .then(() =>isOpen = false)
-  .then(() =>cards = event.detail.cards)
+  cards = event.detail.cards
 console.log(cards, "from papa")
 }
 </script>

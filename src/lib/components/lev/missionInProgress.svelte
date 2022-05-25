@@ -7,9 +7,15 @@
     import { idPr } from '../../stores/idPr.js';
     import { onMount } from 'svelte';
      import { createEventDispatcher } from 'svelte';
+     import {betha} from './storess/betha.js'
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
+let tdtd
+betha.subscribe(value => {
+		tdtd = value;
+	});
+
  const dispatch = createEventDispatcher();
  export let coinlapach
     export let stname;
@@ -63,6 +69,7 @@ $: zman = msdonf + lapse + x;
   export let oldzman;
 let miatan;
 onMount(async () => {
+  console.log(tdtd[coinlapach-1])
     if (stname === "0") {
   } else if (stname === "stopi") {
     x = oldzman
