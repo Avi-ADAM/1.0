@@ -48,11 +48,11 @@
     }
     @media (min-width:550px){
          .ggg{
-        font-size: 13px;
+        font-size: 12px;
     }
         .imgi{
         height: 20px;
-        width: 30px;
+        width: 20px;
     } 
     }
 			:root {

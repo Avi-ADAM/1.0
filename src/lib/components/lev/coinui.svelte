@@ -583,6 +583,9 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 }.normSml:nth-child(11):hover{
    transform: translateX(75%);
    z-index: 998;
+}.normSml:nth-child(12):hover{
+   transform: translateX(0%);
+   z-index: 998;
 }.normSml:nth-child(14):hover{
    transform: translateX(-75%);
    z-index: 998;

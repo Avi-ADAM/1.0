@@ -113,6 +113,8 @@ function hoverc (id){
   .body{
       height: 100vh;
       width: 100vw;
+      background: #ffcba4;
+      background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%)
   }
   .bg{
         position: absolute;
@@ -480,10 +482,11 @@ on:mouseleave={()=> hoverede()} >
                 perhour={buble.perhour}
                 total={buble.noofhours * buble.perhour}
                 cards="true"
-                /></SwiperSlide><!--
+                /></SwiperSlide>
 {:else if buble.ani === "huca" && milon.pmashs == true}
     <SwiperSlide class="swiper-slidec"><Mashsug
-      on:less={lessi}
+      on:less={delo}
+      cards="true"
       on:hover={hover}
       on:proj={proj}
  on:user={user}
@@ -508,7 +511,7 @@ on:mouseleave={()=> hoverede()} >
                 descrip={buble.descrip}
                 spnot={buble.spnot}
                 easy={buble.easy}
-                /></SwiperSlide>-->
+                /></SwiperSlide>
 {/if}
 {/each}
  <!-- <SwiperSlide class="swiper-slidec">Slide 1</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 2</SwiperSlide

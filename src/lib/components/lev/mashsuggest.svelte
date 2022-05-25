@@ -195,16 +195,35 @@ const cookieValue = document.cookie
  let hovered = false;
  
  $: w = 0;
- let  u = "בקשה לאישור קבלת משאב בהצלחה"
+ let  u = "הצעה לשיתוף משאב והצטרפות לריקמה"
+
 function hover (id){
   if (id == "0"){
-u = "בקשה לאישור קבלת משאב בהצלחה"
+u = "הצעה לשיתוף משאב והצטרפות לריקמה"
   } else {
     u = id
   }
   dispatch("hover",{id:u})
 }
+
+  function hoverc (event){
+   if (event.detail.x == "0"){
+u = "הצעה לשיתוף משאב והצטרפות לריקמה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+}
+ import Cards from './cards/sugestma.svelte'
+export let cards = false;
+function claf (event){
+  let o = event.detail.alr
+  let d = event.detail.y
+  console.log(o,d)
+
+}
 </script>
+{#if cards == false}
 
 <div 
 style="position: relative;" 
@@ -256,6 +275,23 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
 </Swiper>
 </div>
 
+{:else}
+<Cards 
+ on:agree={()=>agree(oid)}
+  on:decline={()=>decline(oid)}
+  on:hover={hoverc}
+  {mashName}
+  {easy}
+  {myp}
+  {already} 
+  {price}
+  {total}
+  {descrip}
+  {projectName}
+   {src} 
+ {spnot}
+   />
+{/if}
 <style>
     .ab{
         grid-column: 1/3;

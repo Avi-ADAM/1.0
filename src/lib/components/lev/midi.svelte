@@ -203,11 +203,12 @@ $: if (cards == true){
     @media (min-width: 550px){
     .bg{
         position: absolute;
-        top: calc(30% - 20px);
-        left: calc(50% - 63px);
+        top: 27% ;
+        left: 50% ;
+        transform: translate(-50%, -50%);
         background-color: var(--gold);
         border-radius: 50%;
-        font-size: 13px;
+        font-size: 11px;
     }
 }
 </style>
