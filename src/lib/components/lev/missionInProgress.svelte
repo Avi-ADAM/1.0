@@ -14,7 +14,6 @@ function percentage(partialValue, totalValue) {
  export let coinlapach
     export let stname;
     let show = true;
-	  export let shows = true
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
     export let missionName = "do x" 
@@ -592,6 +591,22 @@ function hover (id){
 
   dispatch("hover", {id: u});
 }
+
+  function hoverc (event){
+   if (event.detail.x == "0"){
+   u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+}
+   import Cards from './cards/inpro.svelte'
+export let cards = false;
+function claf (event){
+  let o = event.detail.alr
+  let d = event.detail.y
+  console.log(o,d)
+}
 </script>
 
 <!--<svelte:window on:beforeunload={beforeUnload}/>-->
@@ -612,6 +627,7 @@ function hover (id){
   </DialogContent>
   </div>
 </DialogOverlay>
+{#if cards == false}
 
 <div 
 style="position: relative;" 
@@ -675,11 +691,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
             <circle r="7" fill="none" stroke="currentColor" stroke-width="0.4"></circle>
             <circle r="1" fill="none" stroke="currentColor" stroke-width="0.4"></circle>
         </g>
-        {#if lapse !== 0}
         <text font-family="Digital" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")} text-anchor="middle" fill="red" y="10" font-size="7" style="font-weight: 300; letter-spacing: 1px;">
             {formatTime(zman)}
         </text>
-        {/if}
                 <g style="overflow:hidden; text-anchor: middle;" on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  >
                   <text y='-8' style="filter: url(#glow); fill: var(--gold);"  text-anchor="middle" font-size="8" >{projectName}</text>
                   <text y='-8'  style="fill: black;"  text-anchor="middle" font-size="8" >{projectName}</text></g>
@@ -738,7 +752,34 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </SwiperSlide
   >
 </Swiper>
+
 </div>
+
+{:else}
+
+<Cards 
+on:start={start}
+ on:done={done}
+  on:save={save}
+  on:hover={hoverc}
+  on:azor={azor}
+  on:clear={handleClearClick}
+  {dueDateOrCountToDedline}
+{x}
+  {zman}
+  {already} 
+  {projectName}
+   {src} 
+   {missionDetails}
+   {link}
+   {missionName}
+   {linkDescription} 
+   {running} 
+   {show}
+   {hourstotal}
+   {hoursdon}
+   />
+{/if}
 <style>
   .di{
             grid-column: 1/4;

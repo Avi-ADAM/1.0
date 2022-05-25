@@ -166,10 +166,11 @@ on:mouseleave={()=> hoverede()} >
     users={buble.users}
     diun={buble.diun}
     order={buble.order}
-                               /></SwiperSlide><!--
+                               /></SwiperSlide>
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
  <SwiperSlide class="swiper-slidec"><MissionInProgress
   on:proj={proj}
+  cards="true"
  on:user={user}  
   on:hover={hover}
       coinlapach={buble.coinlapach} 
@@ -189,8 +190,8 @@ on:mouseleave={()=> hoverede()} >
     hoursdon ={buble.howmanyhoursalready}
     hourstotal = {buble.hoursassinged}
     perhour = {buble.perhour}
-    on:done={mdon}
-    /></SwiperSlide>
+    on:done={delo}
+    /></SwiperSlide><!--
 {:else if buble.ani === "pmashes" && milon.ppmash == true}
   <SwiperSlide class="swiper-slidec"><PendingMa
               on:hover={hover}
