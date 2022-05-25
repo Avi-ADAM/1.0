@@ -53,7 +53,6 @@ function user (event) {
 function hover (event) {
     
  dispatch("hover", {id: event.detail.id})
-
 }
 function chat(){}
 
@@ -69,7 +68,15 @@ function hoverede(){
   } 
   dispatch("hover", {id: u});
  }
+function hoverc (id){
+  if (id == "0"){
+        u = "לב המערכת"
+  } else {
+    u = id
+  }
 
+  dispatch("hover", {id: u});
+}
 </script>
 <style>
 
@@ -109,17 +116,22 @@ function hoverede(){
   }
   .bg{
         position: absolute;
-        top: calc(95% - 20px);
-        left: calc(50% - 70px);
+        top: 95% ;
+        left: 50%;
+      transform: translate(-50%, -50%);
     }
 </style>
        
 <div     dir="rtl"
  class="body">
-     <img  class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
+     <img on:mouseenter={()=> hoverc(" יאללה נקסט!")} 
+on:mouseleave={()=> hoverc("0")} class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
 
-        <img class=" next" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg" alt="next "/>
-    <div     dir="ltr"
+        <img on:mouseenter={()=> hoverc("רגע, מה זה היה?")} 
+on:mouseleave={()=> hoverc("0")} class=" next" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg" alt="next "/>
+    <div   
+      dir="ltr" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
+on:mouseleave={()=> hoverc("0")} 
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
 
         
@@ -137,8 +149,8 @@ on:mouseleave={()=> hoverede()} >
       dir="rtl"
     loop="true"
     navigation={{
-    nextEl: ".next",
-    prevEl: ".perv",
+    nextEl: ".perv",
+    prevEl: ".next",
   }}
 >
 {#each arr1 as buble, i}
