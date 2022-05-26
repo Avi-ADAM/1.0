@@ -528,7 +528,7 @@ export let cards = false;
 </script>
 
 {#await ser}
-<h1>..</h1>
+<h1>loop</h1>
 {:then ser}
 {#if cards == false}
 <div 

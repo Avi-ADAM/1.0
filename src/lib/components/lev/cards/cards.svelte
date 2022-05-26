@@ -418,12 +418,13 @@ on:mouseleave={()=> hoverede()} >
                 st={buble.st}
                 declined={buble.decid}
                 /></SwiperSlide>
-<!--{:else if buble.ani === "askedm" && milon.askmap == true}
+{:else if buble.ani === "askedm" && milon.askmap == true}
         <SwiperSlide class="swiper-slidec"><Reqtom
-            on:acsept={delom}
-            on:decline={delom}
+            on:acsept={delo}
+            on:decline={delo}
                   on:hover={hover}
             on:proj={proj}
+            cards="true"
  on:user={user}
  on:chat={chat}
             pid={buble.pid}
@@ -459,7 +460,7 @@ on:mouseleave={()=> hoverede()} >
                 st={buble.st}
                 declined={buble.decid}
                 spid={buble.spid}
-                /></SwiperSlide>-->
+                /></SwiperSlide>
 {:else if buble.ani === "meData" && milon.sugg == true}
   <SwiperSlide class="swiper-slidec"><ProjectSuggestor
       on:less={delo}
