@@ -275,11 +275,12 @@ on:mouseleave={()=> hoverede()} >
                 pendId={buble.pendId}
                 users={buble.users}
                 cards="true"
-                /></SwiperSlide><!--
+                /></SwiperSlide>
 {:else if buble.ani === "wegets" && milon.pmaap == true}
     <SwiperSlide class="swiper-slidec"><Weget
-            on:acsept={deloid}
-            on:decline={deloid}
+            on:acsept={delo}
+            cards="true"
+            on:decline={delo}
                   on:hover={hover}
           on:proj={proj}
  on:user={user}
@@ -321,7 +322,7 @@ on:mouseleave={()=> hoverede()} >
                 st={buble.st}
                 declined={buble.decid}
                 /></SwiperSlide>
-    -->{:else if buble.ani === "fiapp" && milon.fiap == true}
+    {:else if buble.ani === "fiapp" && milon.fiap == true}
             <SwiperSlide class="swiper-slidec"><Fiappru
             on:acsept={delo}
             on:decline={delo}

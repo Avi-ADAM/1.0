@@ -424,6 +424,18 @@ u = "בקשה לאישור קבלת משאב בהצלחה"
   }
   dispatch("hover", {id: u});
  }
+ 
+  function hoverc (event){
+   if (event.detail.x == "0"){
+u ="בקשה לאישור ביצוע משימה בהצלחה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+}
+   import Cards from './cards/dowegeot.svelte'
+export let cards = false;
+
 </script>
 {#await ser}
 <h1>..</h1>
@@ -450,6 +462,7 @@ title="ביטול"
   </DialogContent>
   </div>
 </DialogOverlay>
+{#if cards == false}
 
 <div 
 style="position: relative;" 
@@ -551,6 +564,29 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   >
 </Swiper>
 </div>
+
+{:else}
+<Cards 
+ on:agree={agree}
+  on:decline={open}
+  on:hover={hoverc}
+  {agprice}
+  {useraplyname}
+  {src2}
+  {missionBName}
+  {already} 
+  {yers}
+  {projectName}
+   {src} 
+   {kindOf}
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {noofusersNo}
+   {monts}
+   {hm}
+   {spnot}
+   />
+{/if}
 {/await}
 
 <style>
