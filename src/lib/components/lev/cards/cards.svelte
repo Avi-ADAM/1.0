@@ -205,12 +205,14 @@ on:mouseleave={()=> hoverede()} >
     hourstotal = {buble.hoursassinged}
     perhour = {buble.perhour}
     on:done={delo}
-    /></SwiperSlide><!--
+    /></SwiperSlide>
 {:else if buble.ani === "pmashes" && milon.ppmash == true}
   <SwiperSlide class="swiper-slidec"><PendingMa
               on:hover={hover}
   on:proj={proj}
  on:user={user}
+         cards="true"
+
      coinlapach={buble.coinlapach} 
         on:coinLapach={delo}
                  messege={buble.messege}
@@ -240,7 +242,7 @@ on:mouseleave={()=> hoverede()} >
                 pendId={buble.pendId}
                 users={buble.users}
                 /></SwiperSlide>
-  -->{:else if buble.ani === "pends" && milon.pend == true}
+  {:else if buble.ani === "pends" && milon.pend == true}
   <SwiperSlide class="swiper-slidec"><PendingM
               on:hover={hover}
   on:proj={proj}

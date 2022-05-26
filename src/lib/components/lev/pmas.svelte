@@ -552,6 +552,29 @@ function hoverede(){
   }
   dispatch("hover", {id: u});
  }
+ 
+function hoverc (event){
+   if (event.detail.x == "0"){
+ u = "הצבעה על פרסום הצעת משימה לריקמה"
+  } else {
+    u = event.detail.x
+  }
+    dispatch("hover", {id: u});
+}
+ import Cards from './cards/pma.svelte'
+export let cards = false;
+function claf (event){
+  let o = event.detail.alr
+  let d = event.detail.y
+   if (y=="a"){
+    agree(o)
+  } else if (y=="d"){
+    decline(o)
+  }else if (y=="n"){
+    nego(o)
+  }
+  console.log(o,d)
+}
 </script>
 {#await ser}
 <h1>..</h1>
@@ -613,6 +636,7 @@ title="ביטול"
   </DialogContent>
   </div>
 </DialogOverlay>
+{#if cards == false}
 
 <div 
 use:clickOutside
@@ -698,6 +722,30 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
   >
 </Swiper>
 </div>
+
+{:else}
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  on:tochat={tochat}
+  {kindOf}
+  {hm}
+  {monts}
+  {yers}
+  {easy}
+  {price}
+  {hearotMeyuchadot}
+  {already} 
+  {projectName}
+   {src} 
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {name} 
+   {descrip} {mypos} {allr} {noofusersNo}
+   on:nego={claf}
+   />
+{/if}
 {/await}
 <style>
   .re{
