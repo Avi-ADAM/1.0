@@ -51,7 +51,7 @@ function linke (s){
     
   }
 }
-                let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+  let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
 
   function project (id) {
       pmcli += 1;
@@ -65,20 +65,31 @@ let zmani;
   let msdonf;
   $: msdonf = hoursdon * 3600000;
   export let zman;
+    export let oldzman;
+
 $: zman = msdonf + lapse + x;
-  export let oldzman;
 let miatan;
 onMount(async () => {
   console.log(tdtd[coinlapach-1])
   if (tdtd[coinlapach-1].ch == true){
     stname = tdtd[coinlapach-1].stname
-    timer = tdtd[coinlapach-1].timer
+    if(tdtd[coinlapach-1].hoursdon !== false){
     hoursdon = tdtd[coinlapach-1].hoursdon
+    }
   }
     if (stname === "0") {
+      console.log(stname, lapse, x,"מאפס")
   } else if (stname === "stopi") {
+          console.log(stname, lapse ,x,"מסטופי")
+    if (tdtd[coinlapach-1].ch == true && tdtd[coinlapach-1].hoursdon == false){
+    oldzman = tdtd[coinlapach-1].timer
+  }
     x = oldzman
   } else {
+          console.log(stname, lapse,x,"מאחר")
+    if (tdtd[coinlapach-1].ch == true){
+    oldzman = tdtd[coinlapach-1].timer
+    }
       const startTime = stname - lapse
       timer = setInterval(() => {
         lapse = Date.now() - startTime 
@@ -155,9 +166,12 @@ async function azor () {
       lapse = 0;
         tdtd[coinlapach-1].stname = "stopi"
         tdtd[coinlapach-1].timer = x
-        tdtd[coinlapach-1].hoursdon = hoursdon
+        console.log("from azor",x)
+        tdtd[coinlapach-1].hoursdon = false
         tdtd[coinlapach-1].ch = true
-      betha.update(tdtd)
+        tdtd[coinlapach-1].x = x
+        tdtd[coinlapach-1].lapse = 0
+      betha.set(tdtd)
         const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -208,9 +222,12 @@ async function start () {
     stname = Date.now()
       tdtd[coinlapach-1].stname = stname
         tdtd[coinlapach-1].timer = x
-        tdtd[coinlapach-1].hoursdon = hoursdon
+        tdtd[coinlapach-1].hoursdon = false
         tdtd[coinlapach-1].ch = true
-      betha.update(tdtd)
+        tdtd[coinlapach-1].x = x
+        tdtd[coinlapach-1].lapse = lapse
+       tdtd[coinlapach-1].running = true
+      betha.set(tdtd)
  const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -259,11 +276,14 @@ async function start () {
     lapse = 0
     x = 0;
     running = false
-      tdtd[coinlapach-1].stname = 0
+      tdtd[coinlapach-1].stname = "0"
         tdtd[coinlapach-1].timer = 0
-        tdtd[coinlapach-1].hoursdon = hoursdon
+        tdtd[coinlapach-1].hoursdon = false
         tdtd[coinlapach-1].ch = true
-      betha.update(tdtd)
+         tdtd[coinlapach-1].x = 0
+        tdtd[coinlapach-1].lapse = 0
+       tdtd[coinlapach-1].running = false
+      betha.set(tdtd)
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -322,11 +342,17 @@ async function save() {
     lapse = 0
     x = 0
     running = false
-      tdtd[coinlapach-1].stname = 0
+      tdtd[coinlapach-1].stname = "0"
         tdtd[coinlapach-1].timer = 0
-tdtd[coinlapach-1].hoursdon = hoursdon
+     tdtd[coinlapach-1].hoursdon = hoursdon
         tdtd[coinlapach-1].ch = true
-              betha.update(tdtd)
+        tdtd[coinlapach-1].x = 0
+        tdtd[coinlapach-1].lapse = 0
+        tdtd[coinlapach-1].zman = msdon
+        tdtd[coinlapach-1].running = false
+          console.log("trynoww")
+                  console.log("trynow")
+
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -339,6 +365,7 @@ tdtd[coinlapach-1].hoursdon = hoursdon
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
         try {
+          console.log("try")
             await fetch(linkg, {
                     method: 'POST',
                     headers: {
@@ -349,29 +376,28 @@ tdtd[coinlapach-1].hoursdon = hoursdon
                     body: JSON.stringify({
                         query: `mutation 
                         { 
-updateMesimabetahalich(
+   updateMesimabetahalich(
   input: {
     where: {id: "${mId}"}
   data: {
-howmanyhoursalready: ${hoursdon},
-stname: "0",
-timer: 0
+   howmanyhoursalready: ${hoursdon},
+   stname: "0",
+    timer: 0
   }
-}
-) {mesimabetahalich{id howmanyhoursalready}}
-}
+ }
+ ) {mesimabetahalich{id howmanyhoursalready}}
+ }
 `})
                 })
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-          
+                        betha.set(tdtd)
 
         } catch (e) {
             error1 = e
             console.log(error1);
-        }
-}
+}}
     export let lapse = 0;
 
 
