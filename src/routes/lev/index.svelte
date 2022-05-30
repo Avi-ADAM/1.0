@@ -1729,8 +1729,9 @@ console.log(cards, "from papa")
 </DialogOverlay>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
 {#if cards == true}
-  <Tooltip title="{u}" ispic="true">
   {#if arr1.length > 0}
+    <Tooltip title="{u}" ispic="true">
+
 <Cardsui 
  {low} 
  on:hover={hover} 
@@ -1739,8 +1740,9 @@ console.log(cards, "from papa")
  {askedarr}
  {declineddarr}
  />
+   </Tooltip>
+
 {/if}
-  </Tooltip>
 {:else if cards == false}
   <Tooltip title="{u}" ispic="true">
     <Coinsui  on:hover={hover}

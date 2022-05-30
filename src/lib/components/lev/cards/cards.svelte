@@ -79,13 +79,22 @@ function hoverc (id){
 }
 </script>
 <style>
+ 
    .body{
       height: 100vh !important;
       width: 100vw !important;
+      border: none;
+      height: 100%;
+      width: 100%;
       background: #ffcba4;
       background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%)
   }
-
+.bg{
+        position: absolute;
+        top: 95% ;
+        left: 50%;
+      transform: translate(-50%, -50%);
+    }
     .next{
         position : absolute;
         top: calc(50% - 15px);
@@ -117,16 +126,11 @@ function hoverc (id){
     }
     }
  
-  .bg{
-        position: absolute;
-        top: 95% ;
-        left: 50%;
-      transform: translate(-50%, -50%);
-    }
+  
 </style>
        
 <div     dir="rtl"
- class="body">
+ class="body box-border h-screen">
      <img on:mouseenter={()=> hoverc(" יאללה נקסט!")} 
 on:mouseleave={()=> hoverc("0")} class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
 
@@ -142,7 +146,7 @@ on:mouseleave={()=> hoverc("0")}
 
 </div>
 
-<span dir="rtl" on:mouseenter={()=> hoverede()} 
+<span  on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()} >
 <Swiper
   effect={"cards"}
