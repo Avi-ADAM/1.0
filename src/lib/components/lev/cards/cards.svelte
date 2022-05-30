@@ -79,6 +79,12 @@ function hoverc (id){
 }
 </script>
 <style>
+   .body{
+      height: 100vh !important;
+      width: 100vw !important;
+      background: #ffcba4;
+      background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%)
+  }
 
     .next{
         position : absolute;
@@ -110,12 +116,7 @@ function hoverc (id){
         width: 90px;
     }
     }
-  .body{
-      height: 100vh;
-      width: 100vw;
-      background: #ffcba4;
-      background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%)
-  }
+ 
   .bg{
         position: absolute;
         top: 95% ;
