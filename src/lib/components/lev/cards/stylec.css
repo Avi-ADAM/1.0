@@ -4,7 +4,7 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  min-height: 70vh !important;
+  min-height: 78vh !important;
   max-height: 92vh !important;
   min-width: 50vw !important;
   max-width: 80vw !important;
@@ -19,7 +19,7 @@
   border: 1px solid var(--barbi-pink);
   font-size: 22px;
   font-weight: bold;
- min-height: 65vh !important;
+ min-height: 69vh !important;
   max-height: 88vh !important;
     min-width: 50vw !important;
   max-width: 60vw !important;
