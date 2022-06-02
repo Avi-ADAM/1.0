@@ -6,7 +6,7 @@
   transform: translate(-50%, -50%);
   
   height: 82% ;
-  width: 42% ;
+  width: 37% ;
   border-radius: 0% !important;
  /* overflow: hidden;*/
 }
@@ -21,6 +21,13 @@
   font-weight: bold;
   height: 100%;
   width: 100%;
+}
+
+@media (min-width:450px){
+.swiperc{
+  width: 46% ;
+
+}
 }
 @media (min-width:550px){
 .swiperc{
