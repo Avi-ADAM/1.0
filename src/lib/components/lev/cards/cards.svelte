@@ -87,8 +87,9 @@ function hoverc (id){
       height: 100%;
       width: 100%;
       background: #ffcba4;
-      background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%)
-  }
+      background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%);
+      overflow: hidden;
+    }
 .bg{
         position: absolute;
         top: 95% ;
@@ -523,7 +524,7 @@ on:mouseleave={()=> hoverede()} >
                 /></SwiperSlide>
 {/if}
 {/each}
- <!-- <SwiperSlide class="swiper-slidec">Slide 1</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 2</SwiperSlide
+ <!--- <SwiperSlide class="swiper-slidec">Slide 1</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 2</SwiperSlide
   ><SwiperSlide class="swiper-slidec">Slide 3</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 4</SwiperSlide
   ><SwiperSlide class="swiper-slidec">Slide 5</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 6</SwiperSlide
   ><SwiperSlide class="swiper-slidec">Slide 7</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 8</SwiperSlide
