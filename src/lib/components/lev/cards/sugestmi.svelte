@@ -102,36 +102,6 @@ dispatch("tochat");
     .cd{
     overflow-y: auto;
     }
-  .btna{
-    height: 44px;
-    width: 60px;
-    position: absolute;
-    top: calc(100% - 48px);
-    left: calc(100% - 64px);
-    border: 1px solid var(--barbi-pink);
-    border-radius: 25%;
-    padding: 9px 16px ;
-    
-  }
-   .btnb{
-    height: 44px;
-    width: 60px;
-    position: absolute;
-    top: calc(100% - 48px);
-    right: calc(100% - 64px);
-    border: 1px solid red;
-    border-radius: 25%;
-    padding: 9px 16px;
-  }
-     .btnc{
-    height: 44px;
-    width: 58px;
-    position: absolute;
-    top: calc(100% - 48px);
-    right: calc(50% - 29px);
-    border: 1px solid red;
-    border-radius: 25%;
-    padding: 9px 16px;
-  }
+
   
 </style>
