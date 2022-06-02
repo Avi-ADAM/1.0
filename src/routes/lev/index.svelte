@@ -1729,6 +1729,7 @@ console.log(cards, "from papa")
 </DialogOverlay>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
 {#if cards == true}
+<div class="cards-ui">
   {#if arr1.length > 0}
     <Tooltip title="{u}" ispic="true">
 
@@ -1743,6 +1744,7 @@ console.log(cards, "from papa")
    </Tooltip>
 
 {/if}
+  </div>
 {:else if cards == false}
   <Tooltip title="{u}" ispic="true">
     <Coinsui  on:hover={hover}
@@ -1774,5 +1776,10 @@ width:60vw;
           :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
+}
+.cards-ui{
+  max-height: 100vh;
+  max-width: 100vw;
+  overflow: hidden;
 }
 </style>

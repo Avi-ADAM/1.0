@@ -2,13 +2,13 @@
 
 
 
-.swiper {
+.swiperg {
   width: 85px;
   height: 85px;
   border-radius: 50%;
 }
 
-.swiper-slide {
+.swiper-slideg {
   background-position: center;
   background-size: cover;
   width: 85px;
@@ -17,20 +17,20 @@
 
 }
 
-.swiper-slide img {
+.swiper-slideg img {
   display: block;
   width: 100%;
       border-radius: 50%;
 
 }
 @media (min-width: 380px) {
-.swiper {
+.swiperg {
   width: 85px;
   height: 85px;
   border-radius: 50%;
 }
 
-.swiper-slide {
+.swiper-slideg {
   background-position: center;
   background-size: cover;
   width: 85px;
@@ -41,13 +41,13 @@
 }
 
 @media (min-width: 430px) {
-.swiper {
+.swiperg {
   width: 95px;
   height: 95px;
   border-radius: 50%;
 }
 
-.swiper-slide {
+.swiper-slideg {
   background-position: center;
   background-size: cover;
   width: 95px;
@@ -58,13 +58,13 @@
 }
 
 @media (min-width: 470px) {
-.swiper {
+.swiperg {
   width: 105px;
   height: 105px;
   border-radius: 50%;
 }
 
-.swiper-slide {
+.swiper-slideg {
   background-position: center;
   background-size: cover;
   width: 105px;
@@ -74,13 +74,13 @@
 }
 }
 @media (min-width: 550px) {
-.swiper {
+.swiperg {
   width: 125px;
   height: 125px;
   border-radius: 50%;
 }
 
-.swiper-slide {
+.swiper-slideg {
   background-position: center;
   background-size: cover;
   width: 125px;

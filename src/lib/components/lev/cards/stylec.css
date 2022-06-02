@@ -4,11 +4,11 @@
   top: 50%;
   left: 50%;
   transform: translate(-50%, -50%);
-  min-height: 78vh !important;
-  max-height: 92vh !important;
-  min-width: 50vw !important;
-  max-width: 80vw !important;
+  
+  height: 82% ;
+  width: 38% ;
   border-radius: 0% !important;
+ /* overflow: hidden;*/
 }
 
 .swiper-slidec {
@@ -19,11 +19,8 @@
   border: 1px solid var(--barbi-pink);
   font-size: 22px;
   font-weight: bold;
- min-height: 69vh !important;
-  max-height: 88vh !important;
-    min-width: 50vw !important;
-  max-width: 60vw !important;
-  
+  height: 100%;
+  width: 100%;
 }
 @media (min-width:550px){
 .swiperc{

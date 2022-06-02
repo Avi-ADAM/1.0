@@ -18,19 +18,19 @@
   loopFillGroupWithBlank={true}
   grabCursor={true}
   modules={[EffectCards, Navigation]}
-  class="mySwiper"
+  class="mySwiper swiperd"
   navigation={{
     nextEl: ".norm",
     prevEl: `.nor`,
   }}
 >
-  <SwiperSlide
+  <SwiperSlide class="swiper-slided"
     ><div
 	 id="normSml" 
 >
 <img src="https://res.cloudinary.com/love1/image/upload/v1647203723/%D7%9C%D7%91_1_%EF%B8%8F1_-_Google_Chrome_21_02_2022_12_07_43_yioobi.png" style="height:100%; width: 100%" alt="gr"/>
 </div> </SwiperSlide
-  ><SwiperSlide
+  ><SwiperSlide class="swiper-slided"
     ><div  id="normSmll"
 ><img src="https://res.cloudinary.com/love1/image/upload/v1647203724/%D7%9C%D7%91_1_%EF%B8%8F1_-_Google_Chrome_01_03_2022_14_37_30_aytir0.png" style="height:100%; width: 100%" alt="gr"/>
 

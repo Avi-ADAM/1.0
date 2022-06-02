@@ -11,9 +11,7 @@
         import Weget from '../../../components/lev/weget.svelte'
         import Hal from '../../../components/lev/halukaask.svelte'
       import { fly } from 'svelte/transition';
-        import {
-    createEventDispatcher
-} from 'svelte';
+      import { createEventDispatcher } from 'svelte';
 
 const dispatch = createEventDispatcher();
   import { Swiper, SwiperSlide } from "swiper/svelte";

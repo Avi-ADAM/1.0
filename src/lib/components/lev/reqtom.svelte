@@ -508,7 +508,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
-  class="mySwiper"
+  class="mySwiper swiperg"
   navigation={{
     nextEl: `.normSml${askId}-noo`,
     prevEl: `.normSmll${askId}-noo`,
@@ -528,7 +528,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   thickness={4}  
   style="radial"/>  
 </div>
-  <SwiperSlide
+  <SwiperSlide class="swiper-slideg"
     ><div
 	 id="normSml" 
 >
@@ -587,7 +587,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 
 </div>
 </SwiperSlide
-  ><SwiperSlide
+  ><SwiperSlide class="swiper-slideg"
     ><div  id="normSmll"
 >
 

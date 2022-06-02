@@ -650,7 +650,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
-  class="mySwiper"
+  class="mySwiper swiperg"
   navigation={{
     nextEl: `.normSml${pendId}`,
     prevEl: `.normSmll${pendId}`,
@@ -659,7 +659,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
 <div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryoti} style="position:absolute;">
   <ProgressBar cls="transition: all 1000ms ease-in-out;" series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
-  <SwiperSlide
+  <SwiperSlide class="swiper-slideg"
     ><div
 	 id="normSml" 
 >
@@ -673,7 +673,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
        <p class="p"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
 </div>
 </SwiperSlide
-  ><SwiperSlide
+  ><SwiperSlide class="swiper-slideg"
     ><div id="normSmll"
 ><div class="{`normSmll${pendId}`} "></div>
 <button on:click={()=>linke()} class="ab na" >

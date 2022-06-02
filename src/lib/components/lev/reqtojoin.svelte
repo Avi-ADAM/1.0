@@ -546,7 +546,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
-  class="mySwiper"
+  class="mySwiper swiperg"
   navigation={{
     nextEl: `.normSml${askId}-noo`,
     prevEl: `.normSmll${askId}-noo`,
@@ -565,7 +565,8 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   thickness={4}  
   style="radial"/>  
 </div>
-  <SwiperSlide ><div id="normSml" >
+  <SwiperSlide class="swiper-slideg"
+    ><div id="normSml" >
 <div
     style="--the:{stylef};">
         <svg  version="1.1" viewBox="-106 -106 212 212" xmlns="http://www.w3.org/2000/svg">
@@ -620,7 +621,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 
 </div>
 </SwiperSlide
-  > <SwiperSlide
+  > <SwiperSlide class="swiper-slideg"
     > <div  id="normSmll"
 >
         {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{deadline.toLocaleDateString()}</h5>{/if}

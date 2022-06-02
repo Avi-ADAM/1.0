@@ -239,13 +239,13 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
-  class="mySwiper"
+  class="mySwiper swiperg"
   navigation={{
     nextEl: `.normSml${oid}`,
     prevEl: `.normSmll${oid}`,
   }}
 >
-  <SwiperSlide
+  <SwiperSlide class="swiper-slideg"
     ><div
 ><div id="normSml" ><span 	class="{`normSml${oid}`}" 
 ></span>
@@ -257,7 +257,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
         {#if total} <p on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{total}</p>{/if}
    </div>
 </div> </SwiperSlide
-  ><SwiperSlide
+  ><SwiperSlide class="swiper-slideg"
     ><div  id="normSmll"
 ><span class="{`normSmll${oid}`}"></span>
 	

@@ -504,7 +504,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
-  class="mySwiper"
+  class="mySwiper swiperg"
   navigation={{
     nextEl: `.normSml${pendId}-${projectId}-hdh`,
     prevEl: `.normSmll${pendId}-${projectId}-hdh`,
@@ -513,7 +513,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 <div bind:clientWidth={w} style:width={tryo} style:top={tryot} style:left={tryoti} style="position:absolute;">
   <ProgressBar cls="transition: all 1000ms ease-in-out;" series={ser} width={w} textSize={0}  thickness={4}   style="radial"/>  
 </div>
-  <SwiperSlide
+  <SwiperSlide class="swiper-slideg"
     >  
 
     <div
@@ -541,7 +541,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 </div>
 
 </SwiperSlide
-  ><SwiperSlide
+  ><SwiperSlide class="swiper-slideg"
     ><div  id="normSmll"
  >
 

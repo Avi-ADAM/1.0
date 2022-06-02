@@ -644,13 +644,13 @@ out:scale={{duration: 2200, opacity: 0.5}}
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
-  class="mySwiper"
+  class="mySwiper swiperg"
   navigation={{
     nextEl: `.normSml${perhour}-${projectId}-${mId}`,
     prevEl: `.normSmll${perhour}-${projectId}-${mId}`,
   }}
 >
-  <SwiperSlide
+  <SwiperSlide class="swiper-slideg"
     ><div
 	 id="normSml" 
 >  
@@ -725,7 +725,8 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </div>
 </SwiperSlide >
 
-<SwiperSlide>
+<SwiperSlide class="swiper-slideg"
+    >
     <div id="normSmll" >
 <div on:mouseenter={()=>hover("זמן שכבר בוצע")} on:mouseleave={()=>hover("0")} class="mn ab  ">{formatTime(zman)}</div>
   {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="mn bc">{missionDetails}</p>{/if}

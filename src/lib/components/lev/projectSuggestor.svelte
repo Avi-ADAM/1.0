@@ -241,13 +241,13 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
-  class="mySwiper"
+  class="mySwiper swiperg"
   navigation={{
     nextEl: `.normSml${oid}-${projectId}`,
     prevEl: `.normSmll${oid}-${projectId}`,
   }}
 >
-  <SwiperSlide
+  <SwiperSlide class="swiper-slideg"
     ><div
 	 id="normSml" 
 ><div class="{`normSml${oid}-${projectId}`}"></div>
@@ -259,7 +259,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
    
 </div>
 </SwiperSlide
-  ><SwiperSlide
+  ><SwiperSlide class="swiper-slideg"
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
     <div class="ltn ab d ">  {#each skills as skill}<p style="text-shadow:none;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-gold rounded-full pl-1 pr-1 opacity-60">{skill.skillName}</span></p>{/each}
