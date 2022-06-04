@@ -650,8 +650,11 @@ function erorer(){
   <style>
 .overlay{
   background-color: #ff1a1a;
-background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
-  
+  background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
+  background-size: 110% 110%;
+      -webkit-animation: AnimationName 3s ease infinite;
+    -moz-animation: AnimationName 3s ease infinite;
+    animation: AnimationName 3s ease infinite;
   /* position, height, width, etc as appropriate. */
   z-index: 17;
   opacity: 0.0;
@@ -678,7 +681,26 @@ background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
   90%,95% { opacity: 0.68; }
   100% { opacity: 0; }
 }
+.css-selector {
 
+
+}
+
+@-webkit-keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-moz-keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
 
    :global([data-svelte-dialog-content].content) {
   background-color: #000000;
