@@ -681,11 +681,6 @@ function erorer(){
   90%,95% { opacity: 0.68; }
   100% { opacity: 0; }
 }
-.css-selector {
-
-
-}
-
 @-webkit-keyframes AnimationName {
     0%{background-position:0% 50%}
     50%{background-position:100% 50%}
@@ -705,7 +700,10 @@ function erorer(){
    :global([data-svelte-dialog-content].content) {
   background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 3s ease infinite;
+    -moz-animation: AnimationName 3s ease infinite;
+    animation: AnimationName 3s ease infinite;
       width: 80vw;
   }
   @media (min-width: 568px){
@@ -713,7 +711,10 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
         :global([data-svelte-dialog-content].content) {
  background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 3s ease infinite;
+    -moz-animation: AnimationName 3s ease infinite;
+    animation: AnimationName 3s ease infinite;
 width:78vw;
         }
   }
@@ -881,7 +882,11 @@ padding: 0 1rem;
     text-shadow: 1px 1px var(--barbi-pink) ;
 background-color: #bbf0f3;
 background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
-          opacity: 0.8;
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 3s ease infinite;
+    -moz-animation: AnimationName 3s ease infinite;
+    animation: AnimationName 3s ease infinite;       
+opacity: 0.8;
 
 }
 small{
@@ -978,7 +983,11 @@ background-color :var(--gold) ;
     height: 100vh;
 background-color: #bbf0f3;
 background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
-  }
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 30s ease infinite;
+    -moz-animation: AnimationName 30s ease infinite;
+    animation: AnimationName 30s ease infinite;  
+}
   .flexid{
     display: flex;
     flex-direction: column;
