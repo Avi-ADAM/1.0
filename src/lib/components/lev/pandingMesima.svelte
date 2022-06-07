@@ -166,7 +166,7 @@ function objToStringC (obj) {
 let whyy = ``;
 let allr = false;
 let ordern = ``;
-let linkg = 'https://onelovevone.onrender.com/graphql';
+let linkg = 'https://new-zuhk.onrender.com/graphql';
 let userss = objToString(users);
 async function agree(alr) {
   if  (alr == "alr"){

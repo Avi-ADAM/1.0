@@ -351,12 +351,12 @@ g = true;
  erorims = true
  } else {
 const passwordx = generatePassword()
-let linkg = 'https://onelovevone.onrender.com/graphql'
+let linkg = 'https://new-zuhk.onrender.com/graphql'
 let miDatan;
  erorims = false
  const mail = $form.email.toLowerCase()
  axios
- .post('https://onelovevone.onrender.com/chezins', {
+ .post('https://new-zuhk.onrender.com/chezins', {
      name: $form.name,
        email: mail,
         countries: find_contry_id(selected)

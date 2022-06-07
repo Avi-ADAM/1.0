@@ -5,7 +5,7 @@ import axios from 'axios';
 import { idr } from '../../stores/idr.js';
 let skillName_value;
     let desS;
-    let link ="https://onelovevone.onrender.com/skills";
+    let link ="https://new-zuhk.onrender.com/skills";
     let meData;
      export let rn = [];
     let shgi = false;

@@ -52,7 +52,6 @@ function showonly (event){
     }
     
     milon[value] = true;
-
 }
 function showall (event){
 for (const key in milon) {
@@ -606,7 +605,6 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
         display: grid;
         grid-template-columns: repeat(6, 1fr);
                 grid-template-rows: repeat(4, 1fr);
-
         grid-row: center;
         align-items: center;
         justify-content: center;

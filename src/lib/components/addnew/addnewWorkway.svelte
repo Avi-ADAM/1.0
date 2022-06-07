@@ -31,7 +31,7 @@
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-let link ="https://onelovevone.onrender.com/graphql" ;
+let link ="https://new-zuhk.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

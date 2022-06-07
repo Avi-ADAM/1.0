@@ -59,7 +59,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://onelovevone.onrender.com/chezins/count", {
+            const res = await fetch("https://new-zuhk.onrender.com/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

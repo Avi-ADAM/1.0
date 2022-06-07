@@ -89,7 +89,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://onelovevone.onrender.com/graphql';
+let linkg = 'https://new-zuhk.onrender.com/graphql';
 
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;

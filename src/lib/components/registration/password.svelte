@@ -58,7 +58,7 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'https://onelovevone.onrender.com/graphql'
+let linkg = 'https://new-zuhk.onrender.com/graphql'
 let miDatan;
 let already = false;
 let errr = {k: false, m: "", p: false}

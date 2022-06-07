@@ -93,7 +93,7 @@ function objToString (obj) {
     }}
     return str;
 }
-let linkg = 'https://onelovevone.onrender.com/graphql';
+let linkg = 'https://new-zuhk.onrender.com/graphql';
   
 async function agree(alr) {
   if  (alr == "alr"){

@@ -59,7 +59,7 @@ let vallues = [];
                  'Content-Type': 'application/json'      };
     
         try {
-           const res = await fetch("https://onelovevone.onrender.com/graphql", {
+           const res = await fetch("https://new-zuhk.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

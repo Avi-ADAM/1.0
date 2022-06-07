@@ -25,7 +25,7 @@
       };
     
         try {
-            const res = await fetch("https://onelovevone.onrender.com/graphql", {
+            const res = await fetch("https://new-zuhk.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

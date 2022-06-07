@@ -34,7 +34,7 @@
         loginError = null;
 
         axios
-            .post('https://onelovevone.onrender.com/auth/local', {
+            .post('https://new-zuhk.onrender.com/auth/local', {
                 identifier: email,
                 password,
             })
