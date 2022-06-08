@@ -12,7 +12,7 @@
         import Hal from '../../../components/lev/halukaask.svelte'
       import { fly } from 'svelte/transition';
       import { createEventDispatcher } from 'svelte';
-
+    import Header from './../../header/header.svelte'
 const dispatch = createEventDispatcher();
   import { Swiper, SwiperSlide } from "swiper/svelte";
 
@@ -29,7 +29,7 @@ const dispatch = createEventDispatcher();
   export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
-
+  let h ;
 $: if (cards == false){
         dispatch("cards",{cards:false})
 }
@@ -127,8 +127,11 @@ function hoverc (id){
  
   
 </style>
-       
-<div     dir="rtl"
+<span on:mouseenter={()=> hoverc(" ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל")} 
+on:mouseleave={()=> hoverc("0")}>
+       <Header second="./moach" secondTitle=""/>
+       </span>
+<div     dir="rtl" bind:clientWidth={h}
  class="body box-border h-screen">
      <img on:mouseenter={()=> hoverc(" יאללה נקסט!")} 
 on:mouseleave={()=> hoverc("0")} class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
@@ -145,10 +148,11 @@ on:mouseleave={()=> hoverc("0")}
 
 </div>
 
-<span  on:mouseenter={()=> hoverede()} 
+<span  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
-<Swiper
+<Swiper 
   effect={"cards"}
+    cardsEffect={{ rotate: h > 450 ? true : false }}
   grabCursor={true}
   modules={[EffectCards, Navigation]}
   class="mySwiperc swiperc"
