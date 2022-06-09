@@ -531,11 +531,11 @@ on:click={bitulm}
 {:else}
 
       {#if addSl == false}
-      <div class="another" style="margin: auto"> 
+      <div class="another " style="margin: auto"> 
  
         <h2 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">ה{Valname} שלי</h2>
        {#if data} <span class="d"> {#each data as dat, i}
-           <p style="margin: 0; line-height: 1; color:aqua; padding: auto;" class="t">{dat[valc]}</p>
+           <p style="margin: 0; line-height: 1;  padding: auto;" class="t">{dat[valc]}</p>
            {/each} </span>{/if}
 <button
 class=" hover:bg-barbi text-mturk rounded-full "
@@ -704,9 +704,8 @@ on:click={edit(da.id)}
    }
   }
    .another{
-              text-shadow: 1px 1px  #9900cd;
+              text-shadow: 1px 1px  aqua;
 padding: 1em;
-      border-radius: 15%;
       background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
 	background-image: linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
       /*
@@ -723,6 +722,9 @@ padding: 1em;
      min-height: 20vh;
      max-width: 25vW;
      min-width: 10vw;
+       filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
+       color: #9900cd;
+
     }
     .d{
        max-height: 20vh;

@@ -617,15 +617,9 @@ async function han (){
 <span class="d">
            {#each myP as data, i}
            <div class="cont" >  
-            <a  class="pt hover:text-gold" sveltekit:prefetch href={`/project/${data.id}`} >{data.projectName}</a>
-          <!--<h3 class="pt">{data.projectName}</h3> `http://localhost:3000/project/${data.id}`--> <button
-          class=" hover:bg-barbi text-mturk rounded-full"
-          title="עריכה"
-          on:click={project(data.id)}
-          ><svg class="sv" viewBox="0 0 24 24">
-           <path transition:draw|local="{{duration: 1000}}" fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
-          </svg>
-          </button>
+            <button          
+             on:click={project(data.id)}
+             class="pt  drop-shadow-lg">{data.projectName}</button>
            </div>
   {/each}</span>
 
@@ -1291,9 +1285,12 @@ class=" hover:scale-150 "
    text-shadow: 1px 1px  #feeb02;
     }
     .pt{
-      color:aqua;
-       text-shadow: 1px 1px  #9900cd;
+      color: #9900cd;
+       text-shadow: 1px 1px aqua ;
        font-size: 13px;
+    }
+    .pt:hover{ 
+             text-shadow: 1px 1px var(--gold) ;
     }
     .sp{
    display: grid;
@@ -1733,13 +1730,14 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
     
     .another{ background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
 	background-image: linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
+         filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
+
       /*
      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
      background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;*/
     padding: 1em;
-    border-radius: 15%;
       display:flex;
       flex-direction: column;
        align-items: center;
