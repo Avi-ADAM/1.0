@@ -1288,6 +1288,7 @@ class=" hover:scale-150 "
       color: #9900cd;
        text-shadow: 1px 1px aqua ;
        font-size: 13px;
+       text-align: start;
     }
     .pt:hover{ 
              text-shadow: 1px 1px var(--gold) ;
