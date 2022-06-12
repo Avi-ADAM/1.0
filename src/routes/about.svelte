@@ -27,8 +27,8 @@
 <br/>
  הארות הערות וכל דבר למייל ehad1one@gmail.com
  <br/>
-1❤️1
-</div>		
+ אודות 
+<span><a class="text-gold hover:text-mturk" href="https://shalom.1lev1.world">1❤️1</a></span></div>		
 <div class="rabi">
 <strong>תפילה לשלום / רבי נחמן מברסלב</strong><br/>
 אדון השלום, מלך שהשלום שלו, עושה שלום ובורא הכל. 
