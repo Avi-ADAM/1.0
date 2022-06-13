@@ -1,7 +1,7 @@
 <script>
   //	import { draw } from 'svelte/transition';
     //     import Tooltip from './../../lib/celim/tooltip.svelte'
-
+  import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
   import Header from '../../lib/components/header/header.svelte'
   import { RingLoader
 } from 'svelte-loading-spinners'
@@ -12,7 +12,6 @@
         import Handd from '../../lib/components/prPr/handd.svelte'
         import Mashman from '../../lib/components/prPr/mashmam.svelte'
     import Hamatanot from '../../lib/components/prPr/hamatanot.svelte'
-   import { onMount } from 'svelte'; 
    import { idPr } from '../../lib/stores/idPr.js';
   // import { idM } from '../../lib/stores/idM.js';
  import Mission from '../../lib/components/prPr/mission.svelte';
@@ -200,7 +199,7 @@ JSON.stringify({query:
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches (where:{finnished: false}) {
-              hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {id username}}
+             id created_at hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {id username}}
             open_missions (where:{archived: false }) { id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}
@@ -348,10 +347,17 @@ async function prog (){
         })
  })
   .then(r => r.json())
-  .then(data => user = data.data.user);
-            projects = user.projects_1s;
-        } catch (e) {
-            error1 = e
+  .then(data => user = data);
+   console.log(user)
+   if(user.errors){
+     if (user.errors[0].message === "Invalid token."){
+              goto("./login")
+            }
+          }
+    projects = user.data.user.projects_1s;
+    } catch (e) {
+            console.log(e)
+           
         }
   return projects
       } 
@@ -1181,6 +1187,8 @@ function titlel (event){
 {/if}
 
 </div>
+<div dir="ltr">
+<Gantt {bmiData}/></div>
 <div class=" m-4 ">
 
 {#if pmiData.length > 0}
@@ -1399,7 +1407,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
           
           <button
           class=" border  border-barbi hover:border-gold font-bold border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold p-0.5 m-2 rounded-full"
-          on:click={projectn(data.id)}
+          on:click={()=>projectn(data.id)}
           > {data.projectName}
           </button>
   {/each}
