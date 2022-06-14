@@ -21,6 +21,9 @@ function nego(alr){
 dispatch("nego",{alr:alr,y:"n"});
 
 }
+Function project () {
+Dispatch("project") 
+} 
 function tochat (){
 dispatch("tochat");
 }
@@ -50,7 +53,8 @@ dispatch("tochat");
             <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noOfHours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noOfHours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionName}</div>
-     {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
+       <button on:click={project} class="p-2 bg-gold rounded" >לצפיה בפרויקט </button >
+  {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
    <!-- {#if hearotMeyuchadot}
      <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if}--> 
