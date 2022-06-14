@@ -35,6 +35,15 @@ $: if (cards == false){
         dispatch("cards",{cards:false})
 }
 export let askedarr = [], declineddarr = [], arr1 = [];
+let swiperRef = null;
+
+  const setSwiperRef = ({ detail }) => {
+    const [swiper] = detail;
+    // set swiper instance
+    setTimeout(() => {
+      swiperRef = swiper;
+    });
+  };
 
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
 function delo (event){
@@ -42,7 +51,8 @@ function delo (event){
  const x = oldob.map(c => c.coinlapach);
  const indexy = x.indexOf(event.detail.coinlapach);
  oldob.splice(indexy, 1); 
- arr1 = oldob  
+ arr1 = oldob 
+ swiperRef.update()	 
  dispatch("start", {cards: false,ani:event.detail.ani})
 }
 function user (event) {
@@ -152,6 +162,8 @@ on:mouseleave={()=> hoverc("0")}
 <span  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
 <Swiper 
+  on:swiper={setSwiperRef}
+
   keyboard={{
     enabled: true,
   }}  
@@ -170,7 +182,7 @@ mousewheel={true}
 >
 {#each arr1 as buble, i}
 {#if buble.ani === "haluk" && milon.desi == true}
-<SwiperSlide class="swiper-slidec"><Hal    
+<SwiperSlide  class="swiper-slidec"><Hal    
     user_1s={buble.user_1s}
           on:hover={hover}
  on:proj={proj}

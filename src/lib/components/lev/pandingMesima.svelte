@@ -563,11 +563,11 @@ export let cards = false;
 function claf (event){
   let o = event.detail.alr
   let d = event.detail.y
-  if (y=="a"){
+  if (d=="a"){
     agree(o)
-  } else if (y=="d"){
+  } else if (d=="d"){
     decline(o)
-  }else if (y=="n"){
+  }else if (d=="n"){
     nego(o)
   }
   console.log(o,d)
