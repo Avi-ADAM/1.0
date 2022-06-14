@@ -50,13 +50,14 @@ function delo (event){
    dispatch("start", {cards: false,ani:event.detail.ani})
 
 // let oldob = arr1;
- const x = oldob.map(c => c.coinlapach);
+// const x = oldob.map(c => c.coinlapach);
 // const indexy = x.indexOf(event.detail.coinlapach);
 // oldob.splice(indexy, 1); 
 // arr1 = oldob 
- const slideIndex = x 
- swiperRef.removeSlide(slideIndex)
- swiperRef.update()	
+// const slideIndex = event.detail.coinlapach 
+//console.log(slideIndex)
+// swiperRef.removeSlide(slideIndex)
+// swiperRef.update()	
 // arr1 = [...arr1] 
 }
 function user (event) {
