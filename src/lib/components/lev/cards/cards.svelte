@@ -26,7 +26,7 @@ const dispatch = createEventDispatcher();
   import "./stylec.css";
 
   // import required modules
-  import {Mousewheel, Keyboard, EffectCards , Navigation} from "swiper";
+  import {Manipulation, Mousewheel, Keyboard, EffectCards , Navigation} from "swiper";
   export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
@@ -54,10 +54,10 @@ function delo (event){
 // const indexy = x.indexOf(event.detail.coinlapach);
 // oldob.splice(indexy, 1); 
 // arr1 = oldob 
-// const slideIndex = event.detail.coinlapach 
+ const slideIndex = event.detail.coinlapach 
 //console.log(slideIndex)
-// swiperRef.removeSlide(slideIndex)
-// swiperRef.update()	
+ swiperRef.removeSlide(slideIndex)
+ swiperRef.update()	
 // arr1 = [...arr1] 
 }
 function user (event) {
@@ -176,7 +176,7 @@ mousewheel={true}
   effect={"cards"}
     cardsEffect={{ rotate: h > 450 ? true : false }}
   grabCursor={true}
-  modules={[Mousewheel, Keyboard, EffectCards, Navigation]}
+  modules={[Manipulation, Mousewheel, Keyboard, EffectCards, Navigation]}
   class="mySwiperc swiperc"
       dir="rtl"
     loop="true"
