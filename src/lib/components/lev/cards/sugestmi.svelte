@@ -21,8 +21,8 @@ function nego(alr){
 dispatch("nego",{alr:alr,y:"n"});
 
 }
-Function project () {
-Dispatch("project") 
+function project () {
+dispatch("project") 
 } 
 function tochat (){
 dispatch("tochat");
