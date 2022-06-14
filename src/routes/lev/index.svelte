@@ -237,6 +237,7 @@ function crMaap(hh){
     const start = hh.data.user.projects_1s
       const myid = hh.data.user.id;
   for (var i = 0; i < start.length; i++) {
+              if(start[i].maaps){
             for (var j = 0; j < start[i].maaps.length; j++){
                 if(start[i].maaps.length > 0){
                       const rt = letters(start[i].maaps[j].sp.name); 
@@ -268,8 +269,11 @@ function crMaap(hh){
                             pl: -1 + start[i].maaps[j].vots.length
                               });
             }
+          }
         }
   }
+            console.log("sm")
+
  for (var k = 0; k < wegets.length; k++) {
      const x = wegets[k].users
              wegets[k].uids = [];
@@ -279,6 +283,7 @@ function crMaap(hh){
    wegets[k].what.push(x[z].what);
  }
  }    
+          console.log("sm")
 
     for (var t = 0; t <wegets.length; t++){
     const allid = wegets[t].uids;
@@ -309,9 +314,11 @@ function crMaap(hh){
 
     const noofusersWaiting = wegets[t].noof - wegets[t].users.length;
     wegets[t].noofusersWaiting = noofusersWaiting;
+
     }
     wegets = wegets
     maap = wegets.length;
+                  console.log("sm")
 
 }
 let orech;
@@ -890,14 +897,9 @@ async function showOpenPro (mi) {
         dictids[q[j].id] -= tafn.length; 
      }
     }
-  }
-    
- }
-   
-    
+  }   
+ }   
  sk[i] = [l, z, www, wwn, rate]; 
-
-
     } 
  let asanddec =  askedarr.concat(declineddarr);
  asanddec = [...new Set([...askedarr,...declineddarr])];
@@ -909,6 +911,8 @@ async function showOpenPro (mi) {
   }, {});
  var keysSorted = Object.keys(filteredw).sort(function(a,b){return filteredw[a]-filteredw[b]})
  // add declined filter add sort by value
+     console.log("showOpenPro")
+
  if (keysSorted.length > 0){
   var resultString = keysSorted.join(' , ');
     const cookieValue = document.cookie
@@ -1188,11 +1192,11 @@ async function start () {
     pmashes = [];
     hucaold = huca;
     huca = [];
-    wegets=[];
+    wegets = [];
     haluask = [];
+               showOpenPro (miData);
                  midd(miData);
             makeWalcom(miData);
-           showOpenPro (miData);
            createasked (miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
          createpends (miData);
            mesimabetahalicha (miData);
@@ -1203,6 +1207,7 @@ async function start () {
           createmask(miData)
           crMaap(miData)
           rashbi(miData);
+          bubleUiAngin()
            low = false
   }
         } catch (e) {
@@ -1213,6 +1218,7 @@ let pmashes = [];
 let huca = [];
 let haluask = [];
 function rashbi (data){
+  console.log("rashbi");
  const myid = data.data.user.id;
     const projects = data.data.user.projects_1s;
     for (var i = 0; i < projects.length; i++) {
