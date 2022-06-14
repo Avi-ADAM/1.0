@@ -75,11 +75,29 @@
         console.log(tasks,rows)
         return { rows, tasks };
     }
-    function onChangeOptions(event) {
-        const opts = event.detail;
+    function onUpdateOptions(opts) {
+      //  const opts = event.detail;
         Object.assign(options, opts);
         gantt.$set(options);
     }
+    function onSetNextDay() {
+        currentStart.add(1, 'year');
+        currentEnd.add(1, 'year');
+        console.log('set next year');
+        onUpdateOptions({
+            from: currentStart,
+            to: currentEnd
+        });
+    };
+    function onSetPreviousDay() {
+        currentStart.subtract(1, 'year');
+        currentEnd.subtract(1, 'year');
+        console.log('set previous year');
+        onUpdateOptions({
+            from: currentStart,
+            to: currentEnd
+        });
+    };
 </script>
 
 <style>
@@ -92,10 +110,27 @@
         overflow: auto;
         flex: 1;
     }
+    .btnr{
+        position: relative;
+        top: 1px;
+        right: 40%;
+        height: 16px;
+        color: var(--barbi-pink);
+    }
+ .btnl{
+        position: relative;
+        top: 1px;
+        left : 40%;
+        height: 16px;
+                color: var(--barbi-pink);
 
-
+    }
 </style>
-
+ <div width="100%">
+    <button class="btnl" on:click={()=>onSetNextDay()} value=">"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+        <button class="btnr" on:click={()=>onSetPreviousDay()} value="<"><svg width="16" height="16" style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+   </div>
 <div class="container">
-    <div id="example-gantt"></div>
+   
+        <div id="example-gantt"></div>
 </div>
