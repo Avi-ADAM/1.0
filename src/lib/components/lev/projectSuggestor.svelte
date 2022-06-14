@@ -222,6 +222,11 @@ function claf (event){
   let o = event.detail.alr
   let d = event.detail.y
   console.log(o,d)
+  if (d == "a"){
+    agree(oid)
+  } else if (d == "d"){
+    decline(oid)
+  }
 }
 </script>
 {#if cards == false}

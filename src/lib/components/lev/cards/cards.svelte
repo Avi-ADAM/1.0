@@ -47,13 +47,17 @@ let swiperRef = null;
 
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
 function delo (event){
- let oldob = arr1;
+   dispatch("start", {cards: false,ani:event.detail.ani})
+
+// let oldob = arr1;
  const x = oldob.map(c => c.coinlapach);
- const indexy = x.indexOf(event.detail.coinlapach);
- oldob.splice(indexy, 1); 
- arr1 = oldob 
- swiperRef.update()	 
- dispatch("start", {cards: false,ani:event.detail.ani})
+// const indexy = x.indexOf(event.detail.coinlapach);
+// oldob.splice(indexy, 1); 
+// arr1 = oldob 
+ const slideIndex = x 
+ swiperRef.removeSlide(slideIndex)
+ swiperRef.update()	
+// arr1 = [...arr1] 
 }
 function user (event) {
  dispatch("user", {id: event.detail.id})

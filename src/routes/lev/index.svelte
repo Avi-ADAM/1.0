@@ -1676,6 +1676,7 @@ function coinLapach (event){
     if(ani == "asked"){
       ask -= 1
     }
+    consol.log("im starting")
     start()
   }
 
