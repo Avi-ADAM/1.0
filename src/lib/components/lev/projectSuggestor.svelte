@@ -208,6 +208,10 @@ function linke (){
         dispatch("proj", {id: projectId});
     }
 }
+function project () {
+
+        dispatch("proj", {id: projectId});
+} 
   function hoverc (event){
    if (event.detail.x == "0"){
 u = " הצעה לביצוע משימה והצטרפות לריקמה"
@@ -284,6 +288,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 </div>
 {:else}
 <Cards 
+On:project={project} 
  on:agree={claf}
   on:decline={claf}
   on:hover={hoverc}
