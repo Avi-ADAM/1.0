@@ -1670,14 +1670,22 @@ function createpends (data) {
 }
 
 function coinLapach (event){
+      console.log("im starting")
+      
+ // let oldob = arr1;
+ //   const x = oldob.map(c => c.coinlapach);
+ //   const indexy = x.indexOf(event.detail.coinlapach);
+ //   oldob.splice(indexy, 1); 
+ //   arr1 = oldob 
  counter = 0;
   cards == event.detail.cards;
     let ani = event.detail.ani;
     if(ani == "asked"){
       ask -= 1
     }
-    consol.log("im starting")
-    start()
+    console.log("im starting 2")
+    start() 
+  
   }
 
 // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
@@ -1734,23 +1742,26 @@ console.log(cards, "from papa")
   </DialogContent>
   </div>
 </DialogOverlay>
-<!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם -->
+<!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם    {#if arr1.length > 0}
+-->
 {#if cards == true}
 <div class="cards-ui">
-  {#if arr1.length > 0}
     <Tooltip title="{u}" ispic="true">
 
 <Cardsui 
  {low} 
  on:hover={hover} 
  on:cards={cardsi} 
+  on:user={user}
+    on:proj={proj}
+    on:chat={chat}
+    on:start={coinLapach} 
  {arr1}
  {askedarr}
  {declineddarr}
  />
    </Tooltip>
 
-{/if}
   </div>
 {:else if cards == false}
   <Tooltip title="{u}" ispic="true">

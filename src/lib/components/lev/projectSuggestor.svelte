@@ -288,7 +288,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 </div>
 {:else}
 <Cards 
-On:project={project} 
+on:project={project} 
  on:agree={claf}
   on:decline={claf}
   on:hover={hoverc}

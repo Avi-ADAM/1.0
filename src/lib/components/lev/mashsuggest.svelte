@@ -55,7 +55,7 @@ function less () {
     } );
 }
 let miData = [];
-  
+  let error1 = null
 $: pcli = 0
 function linke (){
      pcli += 1;

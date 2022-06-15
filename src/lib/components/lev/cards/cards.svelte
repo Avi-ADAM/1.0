@@ -15,7 +15,7 @@
     import Header from './../../header/header.svelte'
 const dispatch = createEventDispatcher();
   import { Swiper, SwiperSlide } from "swiper/svelte";
-
+  import { afterUpdate } from 'svelte'
   // Import Swiper styles
   import "swiper/css";
   import "swiper/css/navigation";
@@ -31,9 +31,7 @@ const dispatch = createEventDispatcher();
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
   let h ;
-$: if (cards == false){
-        dispatch("cards",{cards:false})
-}
+
 export let askedarr = [], declineddarr = [], arr1 = [];
 let swiperRef = null;
 
@@ -44,20 +42,33 @@ let swiperRef = null;
       swiperRef = swiper;
     });
   };
+  $: if (cards == false){
+        dispatch("cards",{cards:false})
+}
+  let slideIndex;
 
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
-function delo (event){
-   dispatch("start", {cards: false,ani:event.detail.ani})
+afterUpdate(async () => {
+if (swiperRef !== null) {
+  swiperRef.update()
+}
+})
+                async function delo (event){
+    console.log("slideIndex")
+  slideIndex = event.detail.coinlapach 
 
+ // swiperRef.removeSlide(slideIndex)
+  //  	
+
+   dispatch("start", {cards: false,ani:event.detail.ani,coinlapach:event.detail.coinlapach})
 // let oldob = arr1;
 // const x = oldob.map(c => c.coinlapach);
 // const indexy = x.indexOf(event.detail.coinlapach);
 // oldob.splice(indexy, 1); 
 // arr1 = oldob 
- const slideIndex = event.detail.coinlapach 
-//console.log(slideIndex)
- swiperRef.removeSlide(slideIndex)
- swiperRef.update()	
+ 
+ 
+ 
 // arr1 = [...arr1] 
 }
 function user (event) {
@@ -71,6 +82,7 @@ function hover (event) {
 function chat(){}
 
 function proj (event){
+  console.log(event.detail.id)
      dispatch("proj", {id: event.detail.id})
 }
 let hovered = false
