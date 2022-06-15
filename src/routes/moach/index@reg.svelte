@@ -195,7 +195,7 @@ JSON.stringify({query:
             publicDescription
             sales {id in matanot {name id} users_permissions_user {id username}}
             matanotof { id name price quant kindOf }
-            finnished_missions {id missionName why total descrip hearotMeyuchadot users_permissions_user {id username}}
+            finnished_missions {id missionName mesimabetahalich {created_at} created_at why total descrip hearotMeyuchadot users_permissions_user {id username}}
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches (where:{finnished: false}) {
@@ -207,6 +207,7 @@ JSON.stringify({query:
                                     tafkidims {id roleDescription}
                                     work_ways {id workWayName} 
                                     mission { id}
+                                    created_at
                         } 
                         open_mashaabims (where: {archived: false }){id kindOf hm descrip price easy name spnot sqadualed sqadualedf }
              pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
@@ -216,6 +217,7 @@ JSON.stringify({query:
                                     tafkidims {id roleDescription}
                                     work_ways {id workWayName} 
                                     mission { id}
+                                    created_at
                                     users  {what why id users_permissions_user {id}} }
             vallues {valueName}
             linkToWebsite
@@ -1188,7 +1190,7 @@ function titlel (event){
 
 </div>
 <div dir="ltr">
-<Gantt {bmiData}/></div>
+<Gantt {bmiData} {pmiData}/></div>
 <div class=" m-4 ">
 
 {#if pmiData.length > 0}

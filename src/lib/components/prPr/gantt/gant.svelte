@@ -2,14 +2,13 @@
     import { SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter } from 'svelte-gantt';
     import { onMount } from 'svelte';
     import moment from 'moment';
-    export let bmiData = []
+    export let bmiData = [], pmiData = []; 
     const currentStart = moment().clone().startOf('year');
     const currentEnd = moment().clone().endOf('year');
     let generation = 0;
-    let rowCount = bmiData.length
+    let rowCount = bmiData.length + pmiData.length
     const colors = ['blue', 'green', 'orange']
     const data = generate();
-	console.log(bmiData)
 		let options = {
             resizeHandleWidth: 0,
         dateAdapter: new MomentSvelteGanttDateAdapter(moment),
@@ -17,8 +16,8 @@
         tasks: data.tasks,
 		columnUnit: 'month',
         columnOffset: 1,
-        rowHeight: 52,
-        rowPadding: 6,
+        rowHeight: 26,
+        rowPadding: 2,
         headers: [{ unit: 'year', format: 'YYYY' }, { unit: 'month', format: 'MMM' }], //, { unit: 'day', format: 'MMMM Do' } 
         fitWidth: true,
         minWidth: 400,
@@ -42,15 +41,16 @@
     }
 	
     function generate() {
-        const rows = [];
-        const tasks = [];
-        const ids = [...Array(rowCount).keys()];
+        let rows = [];
+        let tasks = [];
+      console.log("jj")
+       const ids = [...Array(rowCount).keys()];
         shuffle(ids);
-        for (let i = 0; i < rowCount; i++) {
+        for (let i = 0; i < bmiData.length; i++) {
             rows.push({
                 id: i,
                 enableDragging: false,
-                                age: (Math.random() * 80) | 0,
+                age: (Math.random() * 80) | 0,
                 generation
             });
 			
@@ -65,14 +65,49 @@
                 from,
                 enableDragging: false,
                 to,
-                classes: colors[(Math.random() * colors.length) | 0],
+                classes:'blue',
                 resizeHandleWidth: 0,
                 generation
             });            
 
         }
+        tasks = tasks
+        rows = rows
+
+        for (let i = 0; i < pmiData.length; i++) {
+            rows.push({
+                id: i + bmiData.length,
+                enableDragging: false,
+                age: (Math.random() * 80) | 0,
+                generation
+            });
+			
+			const from = moment(pmiData[i].created_at)
+            let rand_l = pmiData[i].noofhours / 2
+            const to = from.clone().add(rand_l, 'days')
+            tasks.push({
+                type: 'task',
+                id: `${pmiData[i].id}.3`,
+                resourceId: i + bmiData.length,
+                label: pmiData[i].name,
+                from,
+                enableDragging: false,
+                to,
+                classes: 'green',
+                resizeHandleWidth: 0,
+                generation
+            });            
+
+        }
+           tasks = tasks
+        rows = rows
+              console.log("jjf")
+
         generation += 1;
         console.log(tasks,rows)
+        
+
+
         return { rows, tasks };
     }
     function onUpdateOptions(opts) {
