@@ -7,7 +7,7 @@
     const currentEnd = moment().clone().endOf('year');
     let generation = 0;
     let rowCount = bmiData.length + pmiData.length + omiData.length
-    const colors = ['blue', 'green', 'orange']
+    const colors = ['blue', 'green', 'orange', 'pink']
     const data = generate();
 		let options = {
             resizeHandleWidth: 0,
