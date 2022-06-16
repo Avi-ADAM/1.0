@@ -1190,7 +1190,7 @@ function titlel (event){
 
 </div>
 <div dir="ltr">
-<Gantt {bmiData} {pmiData}/></div>
+<Gantt {bmiData} {pmiData} {omiData} {fmiData}/></div>
 <div class=" m-4 ">
 
 {#if pmiData.length > 0}

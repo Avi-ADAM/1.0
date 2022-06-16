@@ -2,11 +2,11 @@
     import { SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter } from 'svelte-gantt';
     import { onMount } from 'svelte';
     import moment from 'moment';
-    export let bmiData = [], pmiData = []; 
+    export let bmiData = [], pmiData = [], omiData = [], fmiData = []; 
     const currentStart = moment().clone().startOf('year');
     const currentEnd = moment().clone().endOf('year');
     let generation = 0;
-    let rowCount = bmiData.length + pmiData.length
+    let rowCount = bmiData.length + pmiData.length + omiData.length
     const colors = ['blue', 'green', 'orange']
     const data = generate();
 		let options = {
@@ -43,12 +43,36 @@
     function generate() {
         let rows = [];
         let tasks = [];
-      console.log("jj")
-       const ids = [...Array(rowCount).keys()];
-        shuffle(ids);
+                for (let i = 0; i < fmiData.length; i++) {
+            rows.push({
+                id: i ,
+                enableDragging: false,
+                age: (Math.random() * 80) | 0,
+                generation
+            });
+			
+			const from = moment(fmiData[i].mesimabetahalich.created_at)
+            
+            const to = moment(fmiData[i].created_at)
+            tasks.push({
+                type: 'task',
+                id: `${fmiData[i].id}.4`,
+                resourceId: i ,
+                label: fmiData[i].missionName,
+                from,
+                enableDragging: false,
+                to,
+                classes: 'pink',
+                resizeHandleWidth: 0,
+                generation
+            });            
+
+        }
+        tasks = tasks
+        rows = rows     
         for (let i = 0; i < bmiData.length; i++) {
             rows.push({
-                id: i,
+                id: i + fmiData.length,
                 enableDragging: false,
                 age: (Math.random() * 80) | 0,
                 generation
@@ -60,7 +84,7 @@
             tasks.push({
                 type: 'task',
                 id: bmiData[i].id,
-                resourceId: i,
+                resourceId: i + fmiData.length,
                 label: bmiData[i].name,
                 from,
                 enableDragging: false,
@@ -73,10 +97,37 @@
         }
         tasks = tasks
         rows = rows
+        for (let i = 0; i < omiData.length; i++) {
+            rows.push({
+                id: i + bmiData.length + fmiData.length,
+                enableDragging: false,
+                age: (Math.random() * 80) | 0,
+                generation
+            });
+			
+			const from = moment(omiData[i].created_at)
+            let rand_l = omiData[i].noofhours / 2
+            const to = from.clone().add(rand_l, 'days')
+            tasks.push({
+                type: 'task',
+                id: `${omiData[i].id}.2`,
+                resourceId: i + bmiData.length + fmiData.length,
+                label: omiData[i].name,
+                from,
+                enableDragging: false,
+                to,
+                classes:'orange',
+                resizeHandleWidth: 0,
+                generation
+            });            
+
+        }
+        tasks = tasks
+        rows = rows
 
         for (let i = 0; i < pmiData.length; i++) {
             rows.push({
-                id: i + bmiData.length,
+                id: i + bmiData.length + omiData.length + fmiData.length,
                 enableDragging: false,
                 age: (Math.random() * 80) | 0,
                 generation
@@ -88,7 +139,7 @@
             tasks.push({
                 type: 'task',
                 id: `${pmiData[i].id}.3`,
-                resourceId: i + bmiData.length,
+                resourceId: i + bmiData.length + omiData.length + fmiData.length,
                 label: pmiData[i].name,
                 from,
                 enableDragging: false,
@@ -101,6 +152,8 @@
         }
            tasks = tasks
         rows = rows
+
+
               console.log("jjf")
 
         generation += 1;
