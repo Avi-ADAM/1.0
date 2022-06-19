@@ -22,21 +22,23 @@ function DataURIToBlob(dataURI) {
         const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
         const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
         const ia = new Uint8Array(byteString.length)
-        for (let i = 0; i < byteString.length; i++)
-            ia[i] = byteString.charCodeAt(i)
+        for (let i = 0; i < byteString.length; i++){
+            ia[i] = byteString.charCodeAt(i)}
 
         return new Blob([ia], { type: mimeString })//
       }
 	
     const dispatch = createEventDispatcher();
-     async function sendP(data) { 
-               console.log( pixelCrop)
+  async function sendP(data) { 
+               console.log(pixelCrop)
         const formData = new FormData()
       //croppedImage = await getCroppedImg(image, pixelCrop)
-      
-      //  console.log(croppedImage),
-file = DataURIToBlob(data) 
-
+      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
+           file = imageFile
+        } else{
+      // console.log(croppedImage)
+   file = DataURIToBlob(data) 
+        }
 formData.append('files', file, 'image.jpg')
 
      // .then(
@@ -56,9 +58,9 @@ formData.append('files', file, 'image.jpg')
      let before = true;
 
 let files;
-
+let imageFile;
 	function onFileSelected(e) {
-  	let imageFile = e.target.files[0];
+  	 imageFile = e.target.files[0];
 		let reader = new FileReader();
 		reader.onload = e => {
 			image = e.target.result
@@ -77,7 +79,6 @@ let files;
 	
 	async function cropImage(){
 		 await getCroppedImg(image, pixelCrop).then(data =>  sendP(data)
-     
     )
 	}
 	

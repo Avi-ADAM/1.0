@@ -7,6 +7,23 @@
     const currentEnd = moment().clone().endOf('year');
     let generation = 0;
     let rowCount = bmiData.length + pmiData.length + omiData.length
+     const timeRanges = [
+        {
+            id: 0,
+            from: moment("02/01/2022"),
+            to: moment("07/03/2022"),
+            classes: null,
+            label: 'הקמה'
+        },
+        {
+            id: 1,
+            from: moment("07/07/2022"),
+            to: moment("12/09/2022"),
+            classes: null,
+            label: 'פעילות'
+        }
+    ];
+        console.log (timeRanges)
     const colors = ['blue', 'green', 'orange', 'pink']
     const data = generate();
 		let options = {
@@ -14,6 +31,7 @@
         dateAdapter: new MomentSvelteGanttDateAdapter(moment),
         rows: data.rows,
         tasks: data.tasks,
+                timeRanges,
 		columnUnit: 'month',
         columnOffset: 1,
         rowHeight: 26,

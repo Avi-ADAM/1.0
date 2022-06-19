@@ -223,6 +223,10 @@ async function start () {
             picLink =  $uPic;
             uPic.set(meData.profilePic.formats.small.url);
             picLink = $uPic;
+            let b = "/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max"
+            var output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
+            console.log(output)
+            picLink = output
             total = meData.hervachti;
           } else {
             goto("/login")
@@ -495,6 +499,7 @@ async function han (){
             error1 = e
         }
 }
+//
 </script>
 
   <svelte:head>
