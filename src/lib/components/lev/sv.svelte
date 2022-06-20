@@ -55,7 +55,7 @@ dispatch("disp",{
     </script>
     <style>
        .midCom{	
-
+        z-index:11;
     min-height: 170px;	
     min-width: 170px;	
      

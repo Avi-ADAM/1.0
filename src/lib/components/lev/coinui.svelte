@@ -63,7 +63,7 @@ let h = 500;
     </script>
 
 
-<div bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} > 
+<div id="scree" bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} > 
     
 {#each adder as add }
    {@html add}
@@ -854,7 +854,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 }
     .screen{
         padding:20px 20px;
-       background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) !important;
+       background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) ;
         background-size: cover;
         height: 100vh !important;
         display: grid;

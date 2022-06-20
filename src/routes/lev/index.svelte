@@ -968,7 +968,7 @@ async function showOpenPro (mi) {
         sug = meData.length;
           bubleUiAngin()
         arr1 = arr1 
-        console.log(arr1)
+        console.log("her",arr1)
         if (!isEqual(meData,meDataold) && counter > 1 ) {
         if (meDataold.length < meData.length){
     // Create and show the notification
@@ -1010,6 +1010,7 @@ function midd (min){
 }
     let tickSpeed = 60000 * 5;
 let sdsa = [];
+let tt = null;
 
 let miDataold = [];
 let mtahaold = [];
@@ -1017,6 +1018,47 @@ let counter = 0;
     function reverseString(str) {
     return str.split("").reverse().join("");
 }
+    let innerFlash = 'rgb(255,0,255)';
+    let outerFlash = 'rgb(255,55,255)';
+     let x = [],y = [],xyz = ['1,2'],c = 0;
+    function sortNumber(a,b) { return a - b;}
+    function prcnt(a,b) {return parseInt(a * b / 100, 10);}
+    let h, w,  initX = 0;
+
+    function gen() {
+        var xMax = prcnt(16,w); 
+        var yMin = prcnt(7,h);
+        var yMax = prcnt(25,h);
+        x = [];
+        y = [];
+        xyz = [];
+        var step = 0;
+        var a = w/2;
+        var b = w/1.5;
+        var e = b/2;
+        initX = a + Math.random() * b-e|0;
+        for (var i = 0; i < 50; i++) {
+            var g = 20 + Math.random() * yMax|0;
+            step += g;
+            y[i] = step|0;
+            if (step > h){break}
+        }
+        y.push(0);
+        y.sort(sortNumber);
+        x[0] = initX;
+        for (var i = 0; i < y.length; i++) {
+            if ((y[i+1] - y[i] < yMin)) {
+                x[i+1] = x[i] + Math.floor(Math.random() * 10-5);
+            }
+            else {
+                x[i+1] = x[i] + Math.floor(Math.random() * xMax - (xMax/2));
+            }
+            xyz[i] = x[i]+','+y[i]+' ';
+        }
+        console.log("f",xyz, h, w)
+        return xyz, initX;
+    }
+
 onMount(async () => {
       if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js', { scope: '.' }).then(function(reg) {
@@ -1054,8 +1096,50 @@ onMount(async () => {
   .split('=')[1];
   idL = cookieValueId;
   token  = cookieValu; 
+  console.log("here@")
+          const elem = document.getElementById('scree');
+    function flash() {
+      elem.style.backgroundImage = 'radial-gradient(ellipse farthest-corner at '+initX+'px top, #ffaaff 0%, #ee88ff 16%, #000 100%)';
+       var r = 30 + Math.random() * 70|0;
+       c++;
+       setTimeout(function(){flkr();}, r);
+    }
+    function flkr() {
+       elem.style.backgroundImage = 'radial-gradient(ellipse farthest-corner at '+initX+'px top, #000 0%, #000 100%)';
+        var r = 16 + Math.random() * 30|0;
+        if (c > 6) {
+            clear();
+        }  
+        else {
+           setTimeout(function(){flash();}, r); 
+        }
+    }
+
+    function clear() {
+      if(low == true){
+        elem.style.backgroundImage = 'radial-gradient(ellipse farthest-corner at center top, #000 0%, #000 100%)';
+      } else  {
+     elem.style.backgroundImage = '';
+ 
+      }
+    }
+      
+     if (low == true){
+  tt = setInterval(function(){ c=0;gen();flash();finito()}, 1400);
+   }
+   function finito () {  
+   if (low == false){
+      console.log("wehere")
+       elem.style.backgroundImage = ''
+            console.log("weheret")
+       clearInterval(tt)
+              elem.style.backgroundImage = ''
+
+   }
+  }
   await start ();
   setInterval(start, tickSpeed);
+  
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
        console.log("safari.. please use chrome for better experince")
   await start()
@@ -1719,6 +1803,44 @@ console.log(cards, "from papa")
 <svelte:head>
   <title>לב 1❤️1</title>
 </svelte:head>
+{#if low == true}
+<div bind:clientHeight={h} bind:clientWidth={w} style="display:block;
+    position:absolute;
+    height:100vh;
+    width:100vw;
+    margin:auto;
+    visability:hidden;
+    z-index:10;
+    top:0;left:0;right:0;bottom:0;
+    background-color: transparent;
+    overflow:hidden;">
+<svg xmlns="http://www.w3.org/2000/svg"  >
+        <defs>
+        <filter id="scatter" width="2" height="2" y="-.5" x="-.5" color-interpolation-filters="sRGB">
+        <feGaussianBlur stdDeviation="0.6" result="result1"/>
+        <feBlend in2="result1" result="fbSourceGraphic" mode="multiply"/>
+        <feTurbulence baseFrequency=".015" type="fractalNoise" numOctaves="6" result="result3"/>
+        <feDisplacementMap in="fbSourceGraphic" xChannelSelector="R" yChannelSelector="G" scale="60" result="result2" in2="result3"/>
+        <feMorphology radius="0" operator="dilate" result="result4"/>
+        <feBlend mode="screen" in2="result2"/>
+        </filter>
+        <filter id="glow" color-interpolation-filters="sRGB">
+        <feFlood flood-opacity="1" flood-color="{innerFlash}" result="flood"/>
+        <feComposite in="flood" in2="SourceGraphic" operator="in" result="composite1"/>
+        <feGaussianBlur in="composite1" stdDeviation="10" result="blur"/>
+        <feOffset dx="0" dy="0" result="offset"/>
+        <feComposite in="SourceGraphic" in2="offset" result="composite2"/>
+        </filter>
+        </defs>
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg"  width="100vw" height="100vh" style="position:absolute; top:0; left:0;visibility:visible;-webkit-filter: drop-shadow( 0 0 20px {outerFlash});">
+
+       <g id="mainBolt" filter="url(#scatter)">
+        <path d="M {xyz}" fill="none" stroke="#fff" stroke-width="{Math.round(1 + Math.random() * 7)|0}" filter="url(#glow)"/>
+        </g>
+        </svg>
+  </div>
+{/if}
 <DialogOverlay class="overlay" {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 1000}}>
   <DialogContent aria-label="form" class="content">
