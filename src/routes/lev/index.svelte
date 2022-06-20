@@ -1034,7 +1034,7 @@ let counter = 0;
         xyz = [];
         var step = 0;
         var a = w/2;
-        var b = w/1.5;
+        var b = w/4.5;
         var e = b/2;
         initX = a + Math.random() * b-e|0;
         for (var i = 0; i < 50; i++) {
@@ -1048,14 +1048,13 @@ let counter = 0;
         x[0] = initX;
         for (var i = 0; i < y.length; i++) {
             if ((y[i+1] - y[i] < yMin)) {
-                x[i+1] = x[i] + Math.floor(Math.random() * 10-5);
+                x[i+1] = x[i] + Math.floor(Math.random() * 10-8);
             }
             else {
                 x[i+1] = x[i] + Math.floor(Math.random() * xMax - (xMax/2));
             }
             xyz[i] = x[i]+','+y[i]+' ';
         }
-        console.log("f",xyz, h, w)
         return xyz, initX;
     }
 
@@ -1125,15 +1124,21 @@ onMount(async () => {
     }
       
      if (low == true){
+ document.getElementById("my_audio").play();
+
+
   tt = setInterval(function(){ c=0;gen();flash();finito()}, 1400);
    }
    function finito () {  
    if (low == false){
+    
+
       console.log("wehere")
        elem.style.backgroundImage = ''
             console.log("weheret")
        clearInterval(tt)
               elem.style.backgroundImage = ''
+    document.getElementById("my_audio").pause();
 
    }
   }
@@ -1804,6 +1809,7 @@ console.log(cards, "from papa")
   <title>לב 1❤️1</title>
 </svelte:head>
 {#if low == true}
+<audio id="my_audio" src="https://res.cloudinary.com/love1/video/upload/v1655748801/thunder-25689_taqapa.mp3" loop="loop"></audio>
 <div bind:clientHeight={h} bind:clientWidth={w} style="display:block;
     position:absolute;
     height:100vh;
