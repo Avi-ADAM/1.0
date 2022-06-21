@@ -153,7 +153,7 @@ function edit (id) {
       <td>
       {#if data.perhour > 0 & data.noofhours > 0}
       
-      {data.perhour * data.noofhours}
+      {(data.perhour * data.noofhours).toLocaleString('en-US', {maximumFractionDigits:2})}
       
       {:else} <p>0</p>
       {/if}

@@ -89,7 +89,7 @@ export let fmiData = [];
           <td>
             {#if data.noofhours > 0}
 
-           {data.noofhours}
+           {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})}
            {/if}
           </td>
           {/each}
@@ -99,7 +99,7 @@ export let fmiData = [];
           <td>
             {#if data.perhour > 0}
 
-            {data.perhour}
+            {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})}
             {/if}
           </td>
           {/each}
