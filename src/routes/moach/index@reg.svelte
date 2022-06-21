@@ -1069,6 +1069,27 @@ function openTheDesc(event){
       a = 7;
   }
 }
+let bmiss;
+let pendss;
+let openss;
+let finiss;
+function topends(){
+  pendS = true
+   		pendss.scrollIntoView(true);
+}
+function toopens(){
+  pendS = true
+   		openss.scrollIntoView(true);
+}
+function tobetha(){
+  tahaS = true
+	bmiss.scrollIntoView(true);
+
+}
+function tofinish(){
+  tahaS = true
+	finiss.scrollIntoView(true);
+}
     </script>
 <svelte:head>
   <title>מוח הריקמה 1❤️1</title>
@@ -1220,18 +1241,36 @@ function openTheDesc(event){
   {#await meData}
   <div>..</div>
   {:then meData}
-<Gantt {bmiData} {pmiData} {omiData} {fmiData} on:selected={openTheDesc}/>
+  
+  {#if pmiData.length > 0}
+    <button
+     class="border  border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
+    on:click={topends}> פעולות ממתינות לאישור</button>
+    {/if}
+    {#if bmiData.length > 0}
+    <button
+     class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg  text-barbi hover:text-barbi font-bold px-4 rounded"
+    on:click={tobetha}> פעולות בתהליך ביצוע</button>
+    {/if}
+      {#if omiData.length > 0}
+    <button
+     class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges  text-pinki hover:text-barbi font-bold px-4 rounded"
+    on:click={toopens}> פעולות פתוחות</button>
+    {/if}
+      {#if fmiData.length > 0}
+    <button
+     class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-mpink  text-pinki hover:text-barbi font-bold px-4 rounded"
+    on:click={tofinish}> פעולות שהסתיימו</button>
+    {/if}
+  <Gantt {bmiData} {pmiData} {omiData} {fmiData} on:selected={openTheDesc}/>
 {/await}
 </div>
 <div class=" m-4 ">
 
 {#if pmiData.length > 0}
-
-  {#if pendS === false}
-<button
- class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 m-4 rounded-full"
-on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
-{:else}
+<span bind:this={pendss}>
+  {#if pendS === true}
+  
 <button title={cencel1}
   on:click={() => pendS = false}
   class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
@@ -1240,15 +1279,13 @@ on:click={() => pendS = true}> פעולות ממתינות לאישור</button>
   </svg></button>
  <PendsM {pmiData} user_1s={projectUsers.length}/>
 {/if} 
+</span>
 {/if}
 <div >
 
 {#if bmiData.length > 0}
- {#if tahaS === false}
-<button
- class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
-{:else}
+<span bind:this={bmiss}>
+ {#if tahaS === true}
 <button title={cencel1}
   on:click={() => tahaS = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
@@ -1256,20 +1293,22 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button>
  <Betaha {bmiData} />
-{/if} 
+  {/if} 
+</span>
 {/if}
 </div>
   <div class=" m-4 ">
 
 {#if openMS === true && omiData.length > 0}
-
+    <span bind:this={openss}>
   <button title={cencel1}
   on:click={() => openMS = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button> 
-<OpenM omiData={omiData}/>
+  <OpenM omiData={omiData}/>
+  </span>
  {:else if openMS === true && omiData.length == 0}
   <button title={cencel1}
   on:click={() => openMS = false}
@@ -1395,7 +1434,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       <Hamatanot {trili} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>
       {#if fmiData.length > 0 || rikmashes.length > 0}
-        <div class="m-4 border-2  border-barbi rounded p-4" >
+        <div class="m-4 border-2  border-barbi rounded p-4" bind:this={finiss}>
 
     <Fini fmiData={fmiData} users={projectUsers} {rikmashes} on:tit={titlel}/>
     <br>

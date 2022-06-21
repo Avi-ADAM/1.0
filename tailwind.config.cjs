@@ -39,7 +39,10 @@ const config = {
 					sturk: '#CCFBF1',
 					lpink: 'rgb(251, 207, 232)', 
 					mpink: 'rgb(244, 114, 182)',
-				    wow: 'rgb(2, 255, 187)'
+				pinki: 'rgb(242, 229, 242)',
+				    wow: 'rgb(2, 255, 187)',
+				blueg: 'rgb(116, 191, 255)',
+				oranges: 'rgb(254, 172, 49);'
 		}
 		
 		
