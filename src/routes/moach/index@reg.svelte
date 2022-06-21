@@ -1248,15 +1248,16 @@ function tofinish(){
      class="border  border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
     on:click={topends}> פעולות ממתינות לאישור</button>
     {/if}
-    {#if bmiData.length > 0}
-    <button
-     class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg  text-barbi hover:text-barbi font-bold px-4 rounded"
-    on:click={tobetha}> פעולות בתהליך ביצוע</button>
-    {/if}
+  
       {#if omiData.length > 0}
     <button
      class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges  text-pinki hover:text-barbi font-bold px-4 rounded"
     on:click={toopens}> פעולות פתוחות</button>
+    {/if}
+      {#if bmiData.length > 0}
+    <button
+     class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg  text-barbi hover:text-barbi font-bold px-4 rounded"
+    on:click={tobetha}> פעולות בתהליך ביצוע</button>
     {/if}
       {#if fmiData.length > 0}
     <button
