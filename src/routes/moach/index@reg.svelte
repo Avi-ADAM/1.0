@@ -1087,7 +1087,7 @@ function openTheDesc(event){
          <!--   <Tooltip title="{ti}" >--> 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form">
+  <DialogContent aria-label="form" class="content">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}><Close/></button>
@@ -1494,7 +1494,7 @@ on:click={() => tahaS = true}> פעולות בתהליך ביצוע</button>
       background-size: cover;
       width: 80vw;
   }
-  @media (min-width: 568px){
+  @media (min-width: 768px){
         :global([data-svelte-dialog-content].content) {
 width:50vw;
         }
