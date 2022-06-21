@@ -1073,6 +1073,7 @@ let bmiss;
 let pendss;
 let openss;
 let finiss;
+let hagdel = false;
 function topends(){
   pendS = true
    		pendss.scrollIntoView(true);
@@ -1087,7 +1088,7 @@ function tobetha(){
 
 }
 function tofinish(){
-  tahaS = true
+  hagdel = true;
 	finiss.scrollIntoView(true);
 }
     </script>
@@ -1436,7 +1437,7 @@ function tofinish(){
       {#if fmiData.length > 0 || rikmashes.length > 0}
         <div class="m-4 border-2  border-barbi rounded p-4" bind:this={finiss}>
 
-    <Fini fmiData={fmiData} users={projectUsers} {rikmashes} on:tit={titlel}/>
+    <Fini fmiData={fmiData} {hagdel} users={projectUsers} {rikmashes} on:tit={titlel}/>
     <br>
     {#if hal === false}
     <button on:click={() => hal = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">

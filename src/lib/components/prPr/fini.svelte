@@ -308,7 +308,7 @@ let fir,ssec;
           <td>
             {#if data.hoursassinged > 0}
 
-           {data.hoursassinged}
+           {data.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}
            {/if}
           </td>
           {/each}
@@ -318,7 +318,7 @@ let fir,ssec;
           <td>
             {#if data.perhour > 0}
 
-            {data.perhour}
+            {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})}
             {/if}
           </td>
           {/each}
@@ -326,7 +326,7 @@ let fir,ssec;
       <th>שווי סך הכל למשימה </th>
       {#each fmiData as data, i}
       <td>
-      {data.total}
+      {data.total.toLocaleString('en-US', {maximumFractionDigits:2})}
       </td>
       {/each}
     </tr>
