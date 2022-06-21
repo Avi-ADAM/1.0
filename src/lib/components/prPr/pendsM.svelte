@@ -1,6 +1,8 @@
 <script>
   export let pmiData = [];
   export let user_1s = 1;
+  export let who = 0;
+  let isonly = false;
    import { onMount } from 'svelte';
    onMount(async () => {
  for (var k = 0; k < pmiData.length; k++) {
@@ -42,9 +44,14 @@ for (var t = 0; t <pmiData.length; t++){
         
     }
   console.log(pmiData );
-}
-    
-    )
+    if (who !== 0){
+      isonly = true
+      var filtered = pmiData.filter(function(event){
+    return event.id == who;
+});
+    pmiData = filtered;
+    }
+})
 function remove (id) {
   console.log(id)
 };
@@ -57,22 +64,25 @@ function confirm (id) {
 }
     </script>
 
-<div class="dd md:items-center border-2 border-gold rounded">
-  <div class="body items-center">
+<div class="dd md:items-center border-2 border-gold rounded d">
+  <div class="body items-center d" class:full={who == 0}>
   
-  <table dir="rtl" >
+  <table dir="rtl" class="d" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >פעולות בתהליך אישור</h1>
+      >{isonly == true ? "פעולה" : "פעולות"} בתהליך אישור</h1>
     </caption>
-        <tr class="gg">
+   {#if isonly == false}
+  <tr class="gg">
           <th class="gg">אפשרויות</th>
           {#each pmiData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
         </td>
           {/each}
-    </tr> <tr class="ggr">
+    </tr> 
+    {/if}
+     <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
       <th class="ggr">שם</th>
       {#each pmiData as data, i}
             <td class="ggr">{data.name}</td>
@@ -283,6 +293,7 @@ function confirm (id) {
   
    
   <style>
+
   .gg{ 
      position: sticky;
      top: 1px; 
@@ -311,7 +322,6 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
   }
   .ggr{ 
      position: sticky;
-     top: 77px; 
 background-color: #6b0f1a;
 background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
@@ -331,12 +341,14 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
     .body {
       overflow-x: auto;
       overflow-y: auto;
-     height: 100vh;
-     width: 100vw;
+
      padding-left: 0.5em;
      padding-right: 0.5em;
     }
-  
+      .full{
+        height: 100vh;
+     width: 97vw;
+    }
   table, th, td {
   border-collapse: collapse;
   border-width: 4px;

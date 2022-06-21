@@ -1,6 +1,18 @@
 <script>
   export let omiData = [];
-   
+     export let who = 0;
+  let isonly = false;
+   import { onMount } from 'svelte';
+   onMount(async () => {
+ if (who !== 0){
+      isonly = true
+      var filtered = omiData.filter(function(event){
+    return event.id == who;
+});
+    omiData = filtered;
+    }
+})
+
 function remove (id) {
   console.log(id)
 };
@@ -9,14 +21,16 @@ function edit (id) {
 }
     </script>
 
-<div class="dd md:items-center border-2 border-gold rounded">
-  <div class="body items-center">
+<div class="dd md:items-center border-2 border-gold rounded d">
+  <div class="body items-center d" class:full={who == 0}>
   
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >משימות פתוחות</h1>
+      >{isonly == true ? " פעולה פתוחה" : "פעולות פתוחות"}</h1>
     </caption>
+           {#if isonly == false}
+
         <tr class="gg">
           <th class="gg">משימה</th>
           {#each omiData as data, i}
@@ -37,7 +51,9 @@ function edit (id) {
           </button> -->
         </td>
           {/each}
-    </tr> <tr class="ggr">
+    </tr>
+  {/if}
+    <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
       <th class="ggr">שם</th>
       {#each omiData as data, i}
             <td class="ggr">{data.name}</td>
@@ -177,7 +193,6 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
   }
   .ggr{ 
      position: sticky;
-     top: 77px; 
 background-color: #6b0f1a;
 background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
@@ -197,12 +212,14 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
     .body {
       overflow-x: auto;
       overflow-y: auto;
-     height: 100vh;
-     width: 100vw;
+ 
      padding-left: 0.5em;
      padding-right: 0.5em;
     }
-  
+        .full{
+        height: 100vh;
+     width: 97vw;
+    }
   table, th, td {
   border-collapse: collapse;
   border-width: 4px;

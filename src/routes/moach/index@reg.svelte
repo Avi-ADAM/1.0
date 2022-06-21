@@ -1,6 +1,6 @@
 <script>
   //	import { draw } from 'svelte/transition';
-    //     import Tooltip from './../../lib/celim/tooltip.svelte'
+  import Close from './../../lib/celim/close.svelte'
   import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
   import Header from '../../lib/components/header/header.svelte'
   import { RingLoader
@@ -26,6 +26,7 @@
         import Betaha from '../../lib/components/prPr/betaha.svelte';
        import Fini from '../../lib/components/prPr/fini.svelte';
        import Hach from '../../lib/components/prPr/hachcal.svelte';
+       import Finisin from '../../lib/components/prPr/finisin.svelte';
 
 //import { validate_component } from 'svelte/internal';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -195,7 +196,7 @@ JSON.stringify({query:
             publicDescription
             sales {id in matanot {name id} users_permissions_user {id username}}
             matanotof { id name price quant kindOf }
-            finnished_missions {id missionName mesimabetahalich {created_at} created_at why total descrip hearotMeyuchadot users_permissions_user {id username}}
+            finnished_missions {id missionName mesimabetahalich {created_at} created_at why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {id username}}
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches (where:{finnished: false}) {
@@ -1048,6 +1049,26 @@ function masi(){
 function titlel (event){
   ti = event.detail.ti
 }
+let who;
+function openTheDesc(event){ 
+  const id = event.detail.id
+  const is = id[0].model.classes
+  who =  Math.floor(id[0].model.id)
+  console.log(id[0].model.classes, Math.floor(id[0].model.id))
+  if (is == "green"){
+      isOpen = true;
+      a = 4;
+  } else if (is == "blue"){
+      isOpen = true;
+      a = 5;
+  } else if (is == "orange"){
+      isOpen = true;
+      a = 6;
+  } else if (is == "pink"){
+      isOpen = true;
+      a = 7;
+  }
+}
     </script>
 <svelte:head>
   <title>מוח הריקמה 1❤️1</title>
@@ -1069,11 +1090,9 @@ function titlel (event){
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>ביטול</button>
+          on:click={closer}><Close/></button>
           {#if a == 0}
           <Uplad on:message={allbackFunction}/>
-
-
           {:else if a == 1}
         <Editb
         on:message={updete}
@@ -1092,6 +1111,14 @@ function titlel (event){
          {:else if a == 3}
          <h1> אירעה שגיאה</h1>
          <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
+         {:else if a == 4}
+           <PendsM {who} {pmiData} user_1s={projectUsers.length} />
+         {:else if a == 5}
+            <Betaha {who} {bmiData} />
+             {:else if a == 6}
+              <OpenM {who} omiData={omiData}/>
+             {:else if a == 7}
+              <Finisin {who} {fmiData} />
          {/if}
   </DialogContent>
   </div>
@@ -1193,7 +1220,7 @@ function titlel (event){
   {#await meData}
   <div>..</div>
   {:then meData}
-<Gantt {bmiData} {pmiData} {omiData} {fmiData}/>
+<Gantt {bmiData} {pmiData} {omiData} {fmiData} on:selected={openTheDesc}/>
 {/await}
 </div>
 <div class=" m-4 ">

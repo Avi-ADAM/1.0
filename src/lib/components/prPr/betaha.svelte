@@ -1,5 +1,18 @@
 <script>
   export let bmiData = [];
+   export let who = 0;
+  let isonly = false;
+   import { onMount } from 'svelte';
+   onMount(async () => {
+ if (who !== 0){
+      isonly = true
+      var filtered = bmiData.filter(function(event){
+    return event.id == who;
+});
+    bmiData = filtered;
+    }
+})
+
 function remove (id) {
   console.log(id)
 };
@@ -18,8 +31,9 @@ function confirm (id) {
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >פעולות בתהליך ביצוע</h1>
+      >{isonly == true ? "פעולה" : "פעולות"} בתהליך ביצוע</h1>
     </caption>
+       {#if isonly == false}
         <tr class="gg">
           <th class="gg "></th>
           {#each bmiData as data, i}
@@ -27,7 +41,9 @@ function confirm (id) {
             {i + 1}
         </td>
           {/each}
-    </tr> <tr class="ggr">
+    </tr> 
+    {/if}
+    <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
       <th class="ggr  font-bold">שם</th>
       {#each bmiData as data, i}
             <td class="ggr  font-bold">{data.name}</td>
@@ -175,7 +191,6 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
   }
   .ggr{ 
      position: sticky;
-     top: 77px; 
 background-color: #6b0f1a;
 background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
