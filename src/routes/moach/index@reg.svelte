@@ -3,6 +3,7 @@
   import Close from './../../lib/celim/close.svelte'
   import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
   import Header from '../../lib/components/header/header.svelte'
+  import Lowding from './../../lib/celim/lowding.svelte'
   import { RingLoader
 } from 'svelte-loading-spinners'
     import Uplad from '../../lib/components/userPr/uploadPic.svelte';
@@ -1103,7 +1104,8 @@ function tofinish(){
     {#if $idPr }
     {#await meData }
 <div class="alli grid items-center justify-center">
-         <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>
+       <!---  <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>-->
+         <Lowding/>
          </div> 
          {:then meData}
          <!--   <Tooltip title="{ti}" >--> 
@@ -1126,9 +1128,7 @@ function tofinish(){
           {linkP}/>
           {:else if a == 2}
           <div class="sp bg-gold">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
-          <br>
-         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+                    <Lowding/>
          </div> 
          {:else if a == 3}
          <h1> אירעה שגיאה</h1>
@@ -1378,7 +1378,7 @@ function tofinish(){
       {#if load === true}
         <div class="grid justify-center items-center border-2 border-barbi rounded p-4" >
 
-      <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         <Lowding/>
         </div>
                  {/if}
 {#if showvd == true}<Mission 
@@ -1422,7 +1422,7 @@ function tofinish(){
        {#if loadr === true}
         <div class="grid justify-center items-center border-2 border-barbi rounded p-4" >
 
-      <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         <Lowding/>
         </div>
                  {/if}
     {#if totalneed === true} 
@@ -1472,7 +1472,7 @@ function tofinish(){
  {:else }  
  {#await projects }
 <div class="alli grid items-center justify-center">
-         <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>
+         <Lowding/>
          </div> 
          {:then projects}
  <div class="flex text-center flex-col border-2  border-barbi rounded m-4">

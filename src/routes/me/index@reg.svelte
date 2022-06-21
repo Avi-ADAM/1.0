@@ -1,6 +1,7 @@
 
 <script> 
 	import Close from '../../lib/celim/close.svelte'
+  import Lowding from './../../lib/celim/lowding.svelte'
 
   import { onMount } from 'svelte';
   import axios from 'axios'
@@ -507,7 +508,7 @@ async function han (){
 </svelte:head>
 {#await meData}
 <div class="body grid items-center justify-center">
-         <RingLoader size="260" color="#EEE8AA" unit="px" duration="2s"></RingLoader>
+         <Lowding height="100vh" />
          </div> 
 {:then meData}
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >

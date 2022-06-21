@@ -80,6 +80,7 @@ dispatch("disp",{
 .sh{
   	animation: beat 2.75s infinite alternate;
 	transform-origin: center;
+
 }
 
 /* Heart beat animation */
