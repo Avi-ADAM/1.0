@@ -1079,7 +1079,7 @@ function topends(){
    		pendss.scrollIntoView(true);
 }
 function toopens(){
-  pendS = true
+  openMS = true
    		openss.scrollIntoView(true);
 }
 function tobetha(){
