@@ -1057,7 +1057,7 @@ let counter = 0;
         }
         return xyz, initX;
     }
-
+let repeater =  null;
 onMount(async () => {
       if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js', { scope: '.' }).then(function(reg) {
@@ -1127,7 +1127,20 @@ onMount(async () => {
  document.getElementById("my_audio").play();
 
 
-  tt = setInterval(function(){ c=0;gen();flash();finito()}, 1400);
+  var speed = 2400;
+var changeSpeed = speed;
+ repeater = setInterval(repeaterFn, speed);
+function repeaterFn(){
+  c=0;gen();flash();finito(); console.log("shit")
+    if( changeSpeed != speed ){
+     clearInterval(repeater);
+     speed = changeSpeed;
+     repeater = setInterval(repeaterFn, speed);
+    }
+}
+  setTimeout(function(){ changeSpeed = 1200 ;}, 12000);
+  setTimeout(function(){ changeSpeed = 600}, 24000);
+
    }
    function finito () {  
    if (low == false){
@@ -1136,7 +1149,7 @@ onMount(async () => {
       console.log("wehere")
        elem.style.backgroundImage = ''
             console.log("weheret")
-       clearInterval(tt)
+       clearInterval(repeater)
               elem.style.backgroundImage = ''
     document.getElementById("my_audio").pause();
 
