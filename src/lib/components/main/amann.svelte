@@ -598,8 +598,7 @@ function erorer(){
               <br>	
    אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית
               <br>
-              כאשר כל  <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> תהיה חתומה על אמנה זו אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> ממנה בשמי
-              <br>
+              כאשר כל  <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length > 1 ? selected.join(', ') : selected[0] + " ו" +selected[1] }` : "__"}
               אני <span style="color:black;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> כאשר כל האנושות תהיה חתומה על האמנה הזו
           </span>
           </span>
