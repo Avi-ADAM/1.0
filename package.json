@@ -1,13 +1,10 @@
 {
-  "name": "1lev1",
   "private": true,
   "type": "module",
   "scripts": {
     "dev": "svelte-kit dev",
     "build": "svelte-kit build --verbose",
-    "preview": "svelte-kit preview",
-    "postbuild": "yarn generate:sitemap",
-    "generate:sitemap": "svelte-sitemap --domain [https://www.1lev1.world]; cp build/sitemap.xml static/sitemap.xml"
+    "preview": "svelte-kit preview"
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "1.0.0-next.55",
