@@ -20,7 +20,7 @@
 </svelte:head>
 
 <script>
-   import { page } from '$app/stores'
+  // import { page } from '$app/stores'
     //const emaili = $page.url.searchParams.get('code')
       import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
 

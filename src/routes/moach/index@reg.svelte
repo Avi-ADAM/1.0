@@ -4,8 +4,7 @@
   import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
   import Header from '../../lib/components/header/header.svelte'
   import Lowding from './../../lib/celim/lowding.svelte'
-  import { RingLoader
-} from 'svelte-loading-spinners'
+
     import Uplad from '../../lib/components/userPr/uploadPic.svelte';
     import axios from 'axios';
     import Editb from '../../lib/components/prPr/editp.svelte'

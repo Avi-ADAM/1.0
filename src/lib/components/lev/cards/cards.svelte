@@ -46,7 +46,6 @@ let swiperRef = null;
         dispatch("cards",{cards:false})
 }
   let slideIndex;
-
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
 afterUpdate(async () => {
 if (swiperRef !== null) {
