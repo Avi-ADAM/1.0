@@ -6,7 +6,8 @@
     "dev": "svelte-kit dev",
     "build": "svelte-kit build --verbose",
     "preview": "svelte-kit preview",
-   "postbuild": "npx svelte-sitemap --domain https://www.1lev1.world"
+    "postbuild": "yarn generate:sitemap",
+    "generate:sitemap": "svelte-sitemap --domain [https://www.1lev1.world]; cp build/sitemap.xml static/sitemap.xml"
   },
   "devDependencies": {
     "@sveltejs/adapter-vercel": "1.0.0-next.55",
