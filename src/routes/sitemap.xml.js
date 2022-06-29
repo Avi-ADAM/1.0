@@ -92,7 +92,6 @@ export async function get() {
             <lastmod>2022-06-12T23:42:27+00:00</lastmod>
             <priority>0.80</priority>
             </url>
-        <!-- <url> elements go here -->
       </urlset>
     `.trim()
     };
