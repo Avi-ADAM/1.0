@@ -13,7 +13,7 @@ export async function get() {
         xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
         xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"
       >
-      <url>
+            <url>
             <loc>https://www.1lev1.world/</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>1.00</priority>
@@ -25,6 +25,48 @@ export async function get() {
             <changefreq>weekly</changefreq>
             <priority>0.99</priority>
             </url>
+            <url>
+            <loc>https://www.1lev1.world/love</loc>
+            <lastmod>2022-06-29T20:57:22+00:00</lastmod>
+            <priority>0.85</priority>
+            <changefreq>daily</changefreq>
+            </url>
+            <url>
+            <loc>https://www.1lev1.world/about</loc>
+            <lastmod>2022-06-29T20:57:22+00:00</lastmod>
+            <priority>0.95</priority>
+            <changefreq>weekly</changefreq>
+            </url>
+            <url>
+            <loc>https://www.1lev1.world/lev</loc>
+            <lastmod>2022-06-29T20:57:22+00:00</lastmod>
+            <priority>0.96</priority>
+            <changefreq>always</changefreq>
+            </url>     
+            <url>
+            <loc>https://www.1lev1.world/moach</loc>
+            <lastmod>2022-06-29T20:57:22+00:00</lastmod>
+            <priority>0.96</priority>
+            <changefreq>always</changefreq>
+            </url>  
+            <url>
+            <loc>https://www.1lev1.world/me</loc>
+            <lastmod>2022-06-29T20:57:22+00:00</lastmod>
+            <priority>1.00</priority>
+            <changefreq>always</changefreq>
+            </url>         
+            <url>
+            <loc>https://www.1lev1.world/en</loc>
+            <lastmod>2022-06-29T20:57:22+00:00</lastmod>
+            <priority>0.96</priority>
+            <changefreq>always</changefreq>
+            </url>    
+            <url>
+            <loc>https://www.1lev1.world/ar</loc>
+            <lastmod>2022-06-29T20:57:22+00:00</lastmod>
+            <priority>1.00</priority>
+            <changefreq>always</changefreq>
+            </url>                                                            
             <url>
             <loc>https://shalom.1lev1.world/</loc>
             <lastmod>2022-06-12T23:42:27+00:00</lastmod>
