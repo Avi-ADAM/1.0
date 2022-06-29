@@ -1,4 +1,3 @@
-import  { RequestHandler } from '@sveltejs/kit';
 import { url, pages } from '$lib/constants'; // or wherever your relevant data is
 
 export const get = async () => {
