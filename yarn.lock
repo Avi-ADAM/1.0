@@ -1513,6 +1513,11 @@
     "minimist" "^1.2.6"
     "xmlbuilder2" "^3.0.2"
 
+"svelte-tour@^1.0.7":
+  "integrity" "sha512-XXjteBRmlS0EZnoT76oWSH4R9viT39luihi++XmXWpQBu/Ng9qiw4Xd+fP1/dDKfZxWB2SfrYCXyThoDpRsr4g=="
+  "resolved" "https://registry.npmjs.org/svelte-tour/-/svelte-tour-1.0.7.tgz"
+  "version" "1.0.7"
+
 "svelte-viewport-info@^0.1.12":
   "integrity" "sha512-kBEK2TmafL/uG5fJYDF5jSYY/C3Rz9Sn4U9iOt76MLRabI3XkdsDmhQYEsBhtuuUcjTyNlK+uj9hLxX5vg/M8Q=="
   "resolved" "https://registry.npmjs.org/svelte-viewport-info/-/svelte-viewport-info-0.1.12.tgz"

@@ -1,6 +1,25 @@
 <script>
-import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+import { goto } from '$app/navigation';
+import { onMount } from 'svelte';
  import { createEventDispatcher } from 'svelte';
+let isGuidMe = false;
+ onMount(function(){
+	   const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('guidMe='))
+  if (cookieValue !== null){
+const trtrrt = document.cookie
+ .split('; ')
+  .find(row => row.startsWith('guidMe='))
+  .split('=')[1];
+  if (trtrrt == null || trtrrt == "again"){
+	  console.log("guid")
+	isGuidMe = true;
+  }
+} else {
+		isGuidMe = true;
+}
+})
     const dispatch = createEventDispatcher();
 
   function askNotificationPermission() {
@@ -124,6 +143,18 @@ function shaneh () {
     passwordx = e.target.value
 	}
     let change = false;
+	 function endGuid(){
+  console.log("guid")
+  isGuidMe = false;
+  document.cookie = `guidMe=done; expires=` + new Date(2026, 0, 1).toUTCString();
+ }
+ 	 function startGuid(){
+  console.log("guid")
+    isGuidMe = true;
+
+  document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
+ }
+ 
 </script>
 <h1 class="text-barbi text-center text-m">עריכת הפרטים שלי</h1>
  <div dir="rtl" class='textinputi'>
@@ -265,7 +296,12 @@ function shaneh () {
 
     {/if}
 	<button type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">הרשמה לקבלת התראות</button>
-<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
+{#if isGuidMe == true}
+	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">ביטול הצגת המדריך</button>
+{:else}
+	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"> החזרת הצגת המדריך</button>
+{/if}
+	<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
 </div>
 </div>
 <style>

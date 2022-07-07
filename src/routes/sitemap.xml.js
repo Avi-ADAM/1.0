@@ -11,7 +11,7 @@ export async function get() {
         xmlns:mobile="https://www.google.com/schemas/sitemap-mobile/1.0"
         xmlns:news="https://www.google.com/schemas/sitemap-news/0.9"
         xmlns:image="https://www.google.com/schemas/sitemap-image/1.1"
-        xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"
+        xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"  
       >
             <url>
             <loc>https://www.1lev1.world/</loc>

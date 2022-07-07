@@ -2,6 +2,10 @@
 <script> 
 	import Close from '../../lib/celim/close.svelte'
   import Lowding from './../../lib/celim/lowding.svelte'
+  import { TourItem } from 'svelte-tour';
+ import { run } from 'svelte-tour';
+    import { Tour } from 'svelte-tour';
+  import TourTip from '../../lib/components/tour/tourMeEnd.svelte';
 
   import { onMount } from 'svelte';
   import axios from 'axios'
@@ -229,6 +233,7 @@ async function start () {
             console.log(output)
             picLink = output
             total = meData.hervachti;
+
           } else {
             goto("/login")
           }
@@ -241,6 +246,22 @@ async function start () {
     return str.split("").reverse().join("");
 }
   onMount(async () => {
+    const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('guidMe='))
+  if (cookieValue !== null){
+const trtrrt = document.cookie
+ .split('; ')
+  .find(row => row.startsWith('guidMe='))
+  .split('=')[1];
+  if (trtrrt == null || trtrrt == "again"){
+    console.log("tog")
+    run()
+  }
+} else {
+      console.log("tog")
+    run()
+}
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
      await start()
      .then()
@@ -501,6 +522,7 @@ async function han (){
         }
 }
 //
+
 </script>
 
   <svelte:head>
@@ -541,14 +563,19 @@ async function han (){
 </DialogOverlay>
 
 {#if addP == false}
+
 <div class="body"  style="--the:{stylef};">
+
   <div >
-  <a  target="_self" href="/lev"><img
+  <a  target="_self" href="/lev">
+        <TourItem message="לחיצה על הכתר מובילה ללב המערכת, שם נמצאות ההצעות, ההצבעות והפעולות השונות">
+    <img
     title=" ללב המערכת"
     class="ceterr name"
     src='https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg'
-    alt="link"></a></div>
-
+    alt="link">
+    </TourItem>
+  </a></div>
   <div id="circular-text"  class="userName" >
     <svg width="45vw" height="9vw" viewBox="0 0 500 100">
     <path id="curve" d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" />
@@ -562,12 +589,34 @@ async function han (){
      
   {#if addNs1 == true} 
   {#key addSl}
-  <div class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}"><Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={"כישורים"} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={" בחירת כישורים"}/>  </div>
-  <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}"><Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={"תפקידים"} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={" בחירת תפקידים"}/>  </div>
-  <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}"><Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={" בחירת משאבים"}/> </div>
-  <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={"ערכים"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={" בחירת ערכים"}/>  </div>
-  <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}"><Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי היצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> </div>
-  {/key}
+  <div class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
+          <TourItem message="רשימת הכישורים שלך לחיצה על כפתור העריכה להוספת או הסרת כישורים">
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={"כישורים"} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={" בחירת כישורים"}/> 
+        </TourItem>
+ </div>
+  <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
+          <TourItem message="רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר">
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={"תפקידים"} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={" בחירת תפקידים"}/> 
+        </TourItem>
+ </div>
+           <TourItem message="רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת">
+  <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
+    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={" בחירת משאבים"}/> 
+</div>
+          </TourItem>
+
+        <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}">
+                <TourItem message="רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת">
+      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={"ערכים"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={" בחירת ערכים"}/> 
+          </TourItem>
+    </div>
+                          <TourItem message="רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת">
+        <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}">
+          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי היצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> 
+        </div>
+                            </TourItem>
+
+        {/key}
    {/if}
     <!-- או גלילה לעשות רינדור עד מקסימום מסויים  של תפקידים כישורים וכו'ואז ההמשך בהרחבה של זה-->
 
@@ -591,9 +640,11 @@ async function han (){
      on:click={openen}
      class=" hover:bg-barbi text-mturk rounded-full edit"
      title="עריכת תמונת פרופיל"
-     >  <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+     >                 <TourItem message="עריכת תמונת הפרופיל">
+<svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path transition:draw|local="{{duration: 1000}}" fill="currentColor" d="M22.7 14.3L21.7 15.3L19.7 13.3L20.7 12.3C20.8 12.2 20.9 12.1 21.1 12.1C21.2 12.1 21.4 12.2 21.5 12.3L22.8 13.6C22.9 13.8 22.9 14.1 22.7 14.3M13 19.9V22H15.1L21.2 15.9L19.2 13.9L13 19.9M11.21 15.83L9.25 13.47L6.5 17H13.12L15.66 14.55L13.96 12.29L11.21 15.83M11 19.9V19.05L11.05 19H5V5H19V11.31L21 9.38V5C21 3.9 20.11 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H11V19.9Z" />
-</svg>
+</svg>          </TourItem>
+
           </button>
         
   {/if}
@@ -602,6 +653,7 @@ async function han (){
 
     <div class="middleu"> 
   {#if addpic == 0}    
+                 <TourItem message="הוספת תמונת פרופיל">
     <button
       on:click={openen}
  class=" hover:bg-barbi text-mturk rounded-full haalaa"
@@ -609,14 +661,15 @@ async function han (){
     <path transition:draw|local="{{duration: 1000}}" fill="currentColor" d="M7 19L12 14L13.88 15.88C13.33 16.79 13 17.86 13 19H7M10 10.5C10 9.67 9.33 9 8.5 9S7 9.67 7 10.5 7.67 12 8.5 12 10 11.33 10 10.5M13.09 20H6V4H13V9H18V13.09C18.33 13.04 18.66 13 19 13C19.34 13 19.67 13.04 20 13.09V8L14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H13.81C13.46 21.39 13.21 20.72 13.09 20M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" />
 </svg>
     </button>
-
+                 </TourItem>
          
 {/if}
     </div>
 {/if}
         
          <div class="a6"  >
-          
+                         <TourItem message="רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה">
+
 <div class="another" dir="rtl">
   
     <h2 class="cot">הרקמות שלי</h2>
@@ -704,8 +757,10 @@ class=" hover:scale-150 "
                style="width:42px;height:42px;">
                   </lord-icon> -->
              
-    
+                         </TourItem>
 </div> 
+                           <TourItem message="כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן">
+
 <div class="anotheri">
   <svg class="svgg"  viewBox="10.359 38.373 262.893 179.464" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
   <defs>
@@ -1129,17 +1184,21 @@ class=" hover:scale-150 "
   <path d="M 310.778 152.849 L 406.216 171.904 L 406.216 210.013 L 310.778 229.067 L 215.34 210.013 L 215.34 171.904 Z" style="fill: url(#gradient-1); fill-opacity: 0.73;" transform="matrix(0.999813, 0.019346, -0.019346, 0.999813, -163.843097, -95.620727)" bx:shape="n-gon 310.778 190.958 110.202 38.109 6 0 1@0cc060df"/>
   <text style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 54.1178px; font-weight: 700; line-height: 288.628px; stroke: url(#gradient-3); text-anchor: middle; white-space: pre; filter: url(#drop-shadow-filter-0);" transform="matrix(0.627037, 0.018356, -0.018632, 0.636449, 145.136673, 107.674744)"><tspan>{total}<tspan x="0" dy="1em">​</tspan> </tspan><tspan x="0" dy="1em">​</tspan><tspan>💗</tspan></text>
 </svg> 
-  
 </div>
+                           </TourItem>
 {#if a == 0}
 <div class="anothere">
   <button 
   on:click={basic} 
   title="עריכת פרטים בסיסיים"
   class=" hover:bg-barbi text-mturk rounded-full"
-  ><svg  style="width:24px;height:24px" viewBox="0 0 24 24">
+  >
+                           <TourItem atEnd="false" message="עריכת פרטים והגדרות, הפעלת התראות במכשיר, בחירת יום חופשי וביטול הצגת המדריך" >
+  <svg  style="width:24px;height:24px" viewBox="0 0 24 24">
  <path transition:draw|local="{{duration: 1000}}" fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
-</svg></button>
+</svg>
+                           </TourItem>
+</button>
 </div>
 {/if}
 </div>
@@ -1155,8 +1214,9 @@ class=" hover:scale-150 "
   {/if}
  <!-- המשימות שסיימתי-->         
 {/await}
+
   <style>
- 
+
   .name { transition: all .2s ease-in-out;
     transform-origin: center;
 
@@ -1197,7 +1257,7 @@ class=" hover:scale-150 "
       left: 0;
       min-width: 99.9vw;
       min-height: 100vh;
-        z-index: 700;
+        z-index: 2;
       background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
     background-repeat: no-repeat;
     background-size: cover;
@@ -1371,7 +1431,7 @@ class=" hover:scale-150 "
           left: 54%;
     }
     .edit{
-    z-index: 20;
+    z-index: 3;
      margin-right:auto; 
      margin-left:auto ; 
      position: absolute ; 
@@ -1389,7 +1449,7 @@ class=" hover:scale-150 "
     transform: translate(-50%, -50%);
      top: 59.2%;
       left: 46%; 
-    z-index: 16; 
+    z-index: 3; 
     }
     .centr{
        max-height: 20.52vh;
@@ -1591,7 +1651,7 @@ class=" hover:scale-150 "
     transform: translate(-50%, -50%);
     left: 50%; 
    
-    z-index: 10;
+    z-index: 3;
     }
   
 
@@ -1642,7 +1702,7 @@ class=" hover:scale-150 "
 }
   }
 .selected {
-  z-index: 289;
+  z-index: 2;
 
   position: fixed;
   top: 0;
@@ -1664,7 +1724,7 @@ class=" hover:scale-150 "
     background-size: cover;
 }
 .selectedl {
-  z-index: 289;
+  z-index: 2;
 background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
      background-position: left center; 
     background-repeat: no-repeat; 
@@ -1720,14 +1780,14 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
     background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;
-    z-index: 6;
+    z-index: 2;
     }
     .name{
     
   position: absolute;
     transform: translate(-50%, -50%);
     left: 50%; 
-    z-index: 10;
+    z-index: 2;
   /*  background: url(ceter.png);
     background-position: center; 
     background-repeat: no-repeat; 
@@ -1806,7 +1866,7 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
     .anothere{
       position : absolute;
           transform: translate(-50%, -50%);
-                  z-index: 209;   
+                  z-index: 3;   
      background-position: center; 
     background-repeat: no-repeat; 
     background-size: cover;

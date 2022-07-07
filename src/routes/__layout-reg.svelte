@@ -1,6 +1,9 @@
 <script>
 import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
   import { onMount } from 'svelte';
+  import { Tour, TourTip } from 'svelte-tour';
+
+
 let isAuthed = false;
 let token;
 onMount(async () => {
@@ -42,7 +45,10 @@ function login () {
 
 
 {#if isAuthed}
-    <slot />
+<main >
+  <slot></slot>
+  <Tour TourTip={TourTip}></Tour>
+</main>
 {:else}
 <div class="a  bg-gradient-to-br from-gra to-grb">
     <div class="b border border-barbi">
@@ -53,6 +59,7 @@ function login () {
 </div></div></div>
 {/if}
 <style>
+ 
     .b{
         display: grid;
         align-items: center;

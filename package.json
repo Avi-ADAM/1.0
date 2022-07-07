@@ -46,6 +46,7 @@
     "svelte-gantt": "^4.0.6-beta",
     "svelte-multiselect": "^1.2.3",
     "svelte-preprocess": "^4.10.5",
+    "svelte-tour": "^1.0.7",
     "svelte-viewport-info": "^0.1.12",
     "sveltekit-i18n": "^2.1.4",
     "swiper": "^8.1.0",
