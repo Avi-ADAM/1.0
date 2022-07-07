@@ -245,23 +245,45 @@ async function start () {
     function reverseString(str) {
     return str.split("").reverse().join("");
 }
+function getCookie(name) {
+    var dc = document.cookie;
+    var prefix = name + "=";
+    var begin = dc.indexOf("; " + prefix);
+    if (begin == -1) {
+        begin = dc.indexOf(prefix);
+        if (begin != 0) return null;
+    }
+    else
+    {
+        begin += 2;
+        var end = document.cookie.indexOf(";", begin);
+        if (end == -1) {
+        end = dc.length;
+        }
+    }
+  
+    return decodeURI(dc.substring(begin + prefix.length, end));
+} 
   onMount(async () => {
-    const cookieValue = document.cookie
+    var myCookie = getCookie("guidMe");
+
+    if (myCookie == null) {
+	    document.cookie = `guidMe=again; expires=` + new Date(2023, 0, 1).toUTCString();			
+        run()
+    }
+    else {
+       const cookieValuet = document.cookie
   .split('; ')
   .find(row => row.startsWith('guidMe='))
-  if (cookieValue !== null){
-const trtrrt = document.cookie
- .split('; ')
-  .find(row => row.startsWith('guidMe='))
   .split('=')[1];
-  if (trtrrt == null || trtrrt == "again"){
+  if (cookieValuet == null || cookieValuet == "again"){
     console.log("tog")
     run()
   }
-} else {
-      console.log("tog")
-    run()
-}
+} 
+
+    
+   
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
      await start()
      .then()

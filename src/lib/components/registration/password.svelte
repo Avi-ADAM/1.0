@@ -96,7 +96,8 @@ already = true;
                 document.cookie = `when=${Date.now}; expires=` + new Date(2023, 0, 1).toUTCString();
         document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
     document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
-				  let bearer1 = 'bearer' + ' ' + token;      
+	    document.cookie = `guidMe=again; expires=` + new Date(2023, 0, 1).toUTCString();			
+	let bearer1 = 'bearer' + ' ' + token;      
 	await fetch(linkg, {
               method: 'POST',
        
