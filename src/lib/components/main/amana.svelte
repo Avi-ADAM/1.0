@@ -597,7 +597,7 @@ function erorer(){
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
-     הצהרת העצמאות האישית של 
+     הצהרת העצמאות של 
         <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>  
         :
     </h1>
