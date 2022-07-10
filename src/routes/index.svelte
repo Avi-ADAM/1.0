@@ -6,7 +6,7 @@
 
    
 <svelte:head>
-	<title>הסכמה עולמית על ביטחון ושלום</title>
+	<title>הסכמה עולמית על חירות </title>
   <!-- Global site tag (gtag.js) - Google Analytics -->
 <!--<script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
 </script>
