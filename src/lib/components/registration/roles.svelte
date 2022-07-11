@@ -164,7 +164,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 
       width: 80vw;
   }
-  @media (min-width: 568px){
+  @media (min-width: 501px){
   
         :global([data-svelte-dialog-content].content) {
  background-color: #000000;
@@ -193,13 +193,12 @@ text-shadow: 1px 1px purple;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 0.5rem ; 
+  padding-top: 1rem ; 
    -webkit-text-size-adjust: 100%; 
 }
- @media (max-width:567px){
+ @media (max-width:500px){
 	 .midscreenText-2 {
        font-size: 1.6rem;
-
 		   background-size: 15.25rem 5rem;
   height: 5rem;
   width: 15.25rem;

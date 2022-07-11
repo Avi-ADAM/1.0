@@ -163,13 +163,13 @@ selected = newSele;
   line-height: normal;
 text-shadow: 1px 1px purple;
   color: var(--barbi-pink);
-  margin-top: 59px;
+  margin-top: 68px;
   background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
  background-size: 29.5rem 9.75rem;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 0.5rem ; 
+  padding-top: 1rem ; 
    -webkit-text-size-adjust: 100%; 
 }
  @media (max-width:500px){
@@ -177,7 +177,7 @@ text-shadow: 1px 1px purple;
 		   background-size: 15.25rem 5rem;
   height: 5rem;
   width: 15.25rem;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   margin-top: 26vh;
 	 }
  .input-2{

@@ -168,7 +168,7 @@ text-shadow: 1px 1px purple;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 0.5rem ; 
+  padding-top: 1rem ; 
    -webkit-text-size-adjust: 100%; 
 }
  @media (max-width:500px){
@@ -176,7 +176,7 @@ text-shadow: 1px 1px purple;
 		   background-size: 15.25rem 5rem;
   height: 5rem;
   width: 15.25rem;
-  font-size: 1rem;
+  font-size: 0.9rem;
   margin-top: 26vh;
 	 }
  .input-2{

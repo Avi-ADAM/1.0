@@ -1,6 +1,7 @@
 <script>
     import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
+          import { lang } from '$lib/stores/lang.js'
     import { show } from './store-show.js';
     import { skills1 } from './skills1.js';
     import { onMount } from 'svelte';
@@ -171,7 +172,7 @@ text-shadow: 1px 1px purple;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 0.5rem ; 
+  padding-top: 1rem ; 
    -webkit-text-size-adjust: 100%; 
 }
  @media (min-width:501px){

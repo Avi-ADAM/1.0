@@ -399,7 +399,7 @@ text-shadow: 1px 1px purple;
       height: 9.75rem;
       width: 29.5rem;
 text-align: center; 
-padding-top: 8px;
+  padding-top: 1rem ; 
 padding-right: 25px;
 padding-left: 25px;
 }
