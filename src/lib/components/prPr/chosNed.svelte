@@ -33,7 +33,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/mashaabims?_limit=-1", {
+            const res = await fetch("https://i18.onrender.com/mashaabims?_limit=-1", {
               method: "GET",
               headers: {
                 'Authorization': bearer1,

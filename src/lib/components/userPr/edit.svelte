@@ -32,7 +32,7 @@ import { fly } from 'svelte/transition';
     export let kish;
 //  export let a = "";
     export let linkp = "skills";
-    let link =`https://new-zuhk.onrender.com/graphql?_limit=-1`;
+    let link =`https://i18.onrender.com/graphql?_limit=-1`;
     let error1 = null;
     export let addSl = false;
 let idLi;
@@ -59,7 +59,7 @@ let idLi;
         };
        
           try {
-              const res = await  fetch("https://new-zuhk.onrender.com/graphql", {
+              const res = await  fetch("https://i18.onrender.com/graphql", {
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -118,7 +118,7 @@ async function increment() {
   uid = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://new-zuhk.onrender.com/graphql" ;
+    let link ="https://i18.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -327,7 +327,7 @@ function bitulm (){
 }
 async function updi (){
 var resultString = needr.join('&id_in=');
-let linkpp ="https://new-zuhk.onrender.com/mashaabims?id_in=" + resultString ;
+let linkpp ="https://i18.onrender.com/mashaabims?id_in=" + resultString ;
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -467,7 +467,7 @@ async function edit (id){
         };
        
           try {
-              const res = await  fetch("https://new-zuhk.onrender.com/graphql", {
+              const res = await  fetch("https://i18.onrender.com/graphql", {
               method: "POST",
               headers: {
                 'Authorization': bearer1,

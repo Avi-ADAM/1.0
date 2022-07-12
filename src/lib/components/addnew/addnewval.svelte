@@ -10,7 +10,7 @@
    export let color = "--gold";
 
     let error1 = null;
-    let link ="https://new-zuhk.onrender.com/vallues";
+    let link ="https://i18.onrender.com/vallues";
 let meData;
 export let vallId;   
 export let rn = [];
@@ -21,7 +21,7 @@ async function addNewVall() {
 if (rn.includes(name_value)){
   shgi = true;
 } else {
-  let link ="https://new-zuhk.onrender.com/graphql" ;
+  let link ="https://i18.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

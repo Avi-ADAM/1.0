@@ -42,7 +42,7 @@ function pr (x){
       };
       const headers = {
         'Content-Type': 'application/json'   
-      }; let link ="https://new-zuhk.onrender.com/graphql" ;
+      }; let link ="https://i18.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

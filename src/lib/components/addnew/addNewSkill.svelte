@@ -22,7 +22,7 @@ let idk;
     let desS;
     let meData;
     let error1 = null;
-    let link ="https://new-zuhk.onrender.com/skills";
+    let link ="https://i18.onrender.com/skills";
     export let rn = [];
     let shgi = false;
     onMount(async () => {
@@ -39,7 +39,7 @@ let idk;
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("https://new-zuhk.onrender.com/graphql", {
+          const res = await fetch("https://i18.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

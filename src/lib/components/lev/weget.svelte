@@ -90,7 +90,7 @@ let token;
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://new-zuhk.onrender.com/graphql';
+let linkg = 'https://i18.onrender.com/graphql';
 
 
 let monts = 0

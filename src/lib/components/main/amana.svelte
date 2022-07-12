@@ -56,7 +56,7 @@
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/graphql", {
+            const res = await fetch("https://i18.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -388,7 +388,7 @@ g = true;
  erorims = false
  const mail = $form.email.toLowerCase()
   axios
-  .post('https://new-zuhk.onrender.com/chezins', {
+  .post('https://i18.onrender.com/chezins', {
      name: $form.name,
         email: mail,
         countries: find_contry_id(selected)
@@ -425,11 +425,11 @@ g = true;
         }
         });
 let dow;
-function show (){
+/*function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
   
-}
+}*/
 let trans = false;
 function tran (){
 trans = !trans;

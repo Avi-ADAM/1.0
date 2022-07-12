@@ -55,7 +55,7 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'https://new-zuhk.onrender.com/graphql'
+let linkg = 'https://i18.onrender.com/graphql'
 let miDatan;
 let errr = {k: false, m: "", p: false}
 async function increment() {    
@@ -71,9 +71,9 @@ errr.p = true;
  let uid = cookieValueId;
    let token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://new-zuhk.onrender.com/graphql" ;
+    let link ="https://i18.onrender.com/graphql" ;
      axios
-  .post('https://new-zuhk.onrender.com/password', {
+  .post('https://i18.onrender.com/password', {
      identifier: emailL,
     password: newpp,
     newPassword: passwordx,

@@ -8,7 +8,7 @@
     export let rn = [];
     let roleName_value;
         let desS;
-        let link ="https://new-zuhk.onrender.com/tafkidims";
+        let link ="https://i18.onrender.com/tafkidims";
         let meData;
         let shgi = false;
     function add () {

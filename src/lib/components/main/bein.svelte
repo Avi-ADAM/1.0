@@ -4,7 +4,7 @@
   import  Hello  from '../registration/hello.svelte'
   import  Password from '../registration/password.svelte'
    import { goto, prefetch } from '$app/navigation';
-
+    import { lang } from '$lib/stores/lang.js'
   import {
     scale,
     fly
@@ -37,9 +37,12 @@ function add (event){
   tx = event.detail.tx;
   txx = event.detail.txx;
 }
+let title = {"he": "הרשמה ל-1❤️1", "en": "registration to-1❤️1"};
+let tu = { "he": "תודה", "en": "thank you"};
+let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
 </script>
 <svelte:head>
-  <title>הרשמה ל-1❤️1</title>
+  <title>{title[$lang]}</title>
 </svelte:head>
 <div in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}" class="body" bind:clientWidth={w}>
 <div class="background">
@@ -48,7 +51,7 @@ function add (event){
 {#if show_value == 0}
 <div class="midscreen">
 
-<Hello {idx}/>
+<Hello {idx} />
 </div>
 {:else if show_value == 1}
 <div class="midscreen"
@@ -87,11 +90,12 @@ function add (event){
   <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
     <div dir="rtl" class="midscreenText-3"><h1>
-תודה
-<br>
+      {tu[$lang]}
+      <br>
 {userName_value}
 <br>
-ולהתראות בקרוב</h1>
+{see[$lang]}
+</h1>
     <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
   </div>
   </div>

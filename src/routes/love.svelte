@@ -33,7 +33,7 @@
       };
     
         try {
-            let res = await fetch("https://new-zuhk.onrender.com/cuntries?_limit=-1", {
+            let res = await fetch("https://i18.onrender.com/cuntries?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

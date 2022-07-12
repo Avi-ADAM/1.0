@@ -39,7 +39,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/skills?_limit=-1", {
+            const res = await fetch("https://i18.onrender.com/skills?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -67,7 +67,7 @@ onMount(async () => {
       }
       return arr;
      };
-let link = "https://new-zuhk.onrender.com/missions"
+let link = "https://i18.onrender.com/missions"
 let missionName_value;
     let selected;  
     let skillslist =[];

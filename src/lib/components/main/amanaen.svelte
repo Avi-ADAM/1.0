@@ -1,11 +1,13 @@
-﻿
-<script>
+﻿<script>
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
     import { email } from '../registration/email.js'
     import { regHelper } from '../../stores/regHelper.js';
-        import { goto,  prefetch } from '$app/navigation';
         import * as yup from "yup";
+                import axios from 'axios';
+
+          import { contriesi } from '../registration/contries.js';
+    import {fpval} from '../registration/fpval.js';
                     import { onMount } from 'svelte';
    import { RingLoader
 } from 'svelte-loading-spinners';
@@ -18,14 +20,49 @@ function find_contry_id(contry_name_arr){
      var  arr = [];
       for (let j = 0; j< contry_name_arr.length; j++ ){
       for (let i = 0; i< country.length; i++){
-        if(country[i].heb === contry_name_arr[j]){
+        if(country[i].label === contry_name_arr[j]){
           arr.push(country[i].value)  ;
         }
       }
       }
       return arr;
      };
+     let fpp = [];
+  let fppp = [];
+    let error1 = null;
+    onMount(async () => {
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
     
+        try {
+            const res = await fetch("https://i18.onrender.com/graphql", {
+              method: "POST",
+              headers: {
+                 'Content-Type': 'application/json'
+              },body: JSON.stringify({
+                        query: `query {
+  chezins { name}
+}
+              `})
+            }).then(checkStatus)
+          .then(parseJSON);
+            fppp = res.data.chezins
+            fpp = fppp.map(c => c.name)
+        } catch (e) {
+            error1 = e
+        }
+        
+    });
     const country =  [
                     { value: 104 , label: 'Israel', heb: 'ישראל'},
                     { value: 167 , label: 'Palestine jehuda & sumeria', heb: 'הרשות הפלסטינית יו"ש'},
@@ -285,19 +322,23 @@ function find_contry_id(contry_name_arr){
     const nameC = `country`;
     const placeholder = `My place`;
     const required = true;
-    
+    let nameuse = false;
+ let erorim = {st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "ehad1one@gmail.com"  }
     let selected = [];
        let already = false;
+       let erorims = false;
    let datar;
    let idx = 1;
    let data;
+   let g = false;
+
     import { createForm } from "svelte-forms-lib";
-    
+        let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
             name: "",
             email: "",
-            countries: []
+            countries: selected
           },
       validationSchema: yup.object().shape({
         name: yup.string().required(),
@@ -307,65 +348,68 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
-            fetch('https://new-zuhk.onrender.com/chezins', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        name: $form.name,
-        email: $form.email,
+  nameuse = false;
+  const jjj = $form.name
+if (fpp.includes(jjj)){
+  console.log("sssss")
+  nameuse = true;
+} else {
+g = true;
+ if (selected.length < 1) {
+ erorims = true
+ } else {
+ erorims = false
+ const mail = $form.email.toLowerCase()
+     console.log("t")
+  axios
+  .post('https://i18.onrender.com/chezins', {
+     name: $form.name,
+        email: mail,
         countries: find_contry_id(selected)
-      }),
-    }) 
-      .then(response => response.json())
-      .then(data => 
-      datar);
-            userName.set($form.name);
-            email.set($form.email);
+              },
+  {
+  headers: {
+        'Content-Type': 'application/json',
+            }})
+  .then(response => {
+    console.log("hhhh")
+    g = false;
+   already = true;
+   document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
+   document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
+   userName.set($form.name);
+            email.set(mail);
+            contriesi.set(find_contry_id(selected))
             regHelper.set(1);
+                    meData = response.data;
+                fpval.set(meData.id)
             datar = data;
-            already = true;
-          }
-        });
+              })
+  .catch(error => {
+    g = false;
+    erorim.st = true
+    if (error.response === undefined){
+        erorim.msg = "we trying again";
+       handleSubmit();
+    } else {
+        erorim.msg =  ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות לעולם חוזרת, הנה הפרטים היבשים `
+    }
+          });
 
-function show (){
+          }}
+        }
+        });
+/*function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
   
-}
+}*/
     let trans = false;
 function tran (){
 trans = !trans;
 }
 let error;
-onMount(async () => {
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch("https://new-zuhk.onrender.com/chezins/count", {
-              method: "GET",
-              headers: {
-                 'Content-Type': 'application/json'
-              },
-            }).then(checkStatus)
-          .then(parseJSON);
- idx = res + 2
-        } catch (e) {
-            error = e
-        }
-    });
+
     let dow;
     function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
@@ -524,8 +568,7 @@ I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : 
 <form on:submit={handleSubmit}>
 
 <div class="flexid">
-   {#if already == false}
-
+  <!-- {#if already == false}
     <button
      class="button hover:scale-150"
       on:submit="{handleSubmit}"
@@ -534,8 +577,27 @@ I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : 
       {:else if already == true}
   <h1 class="alredy" dir="rtl">{$form.name}
  Your signature has been received, you have reached the number {idx} place, an email will be sent when we expand, soon</h1>
- <!-- <button class="p-4 rounded-full bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>-->
+  <button class="p-4 rounded-full bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>
+  {/if}-->
+   {#if already == false}
+{#if g == false}
+    <button
+     class="button hover:scale-150"
+     title="click for freedom"
+      on:submit="{handleSubmit}"
+      type="submit"
+      ></button> 
+       {:else if g == true}
+          <div class="sp text-center">
+            <h3 class="text-barbi">on moment please</h3>
+          <br>
+         <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+         </div> {/if}
+      {#if erorim.st == true}
 
+      <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>
+      {/if}
+     
   {/if}
   </div>
   </form>

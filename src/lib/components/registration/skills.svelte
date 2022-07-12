@@ -9,7 +9,7 @@
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
     let skills2 = [];
-    let error1 = null;
+    let error1 = null; 
     let addskil = 0;
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -26,7 +26,7 @@
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/graphql", {
+            const res = await fetch("https://i18.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -37,13 +37,23 @@
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            skills2 = res.data.skills
+            skills2 = res.data.skills;
+            if ($lang == 'en') {
+              for (let i = 0; i <skills2.length; i++) {
+                    if (heb.test(skills2[i].skillName)){
+                                    console.log("trtr",skills2[i].skillName)
+
+                      skills2.splice(i, 1);
+                    }
+              }
+            }
+            skills2 = skills2
         } catch (e) {
             error1 = e
         }
         
     });
-
+const heb =/^[\u0590-\u05fe]/;
 
     function find_skill_id(skill_name_arr){
      var  arr = [];
@@ -80,8 +90,6 @@ function increment() {
 		txx: 16
 	} );
     skills1.set(find_skill_id(selected));
-    
-    
 	}
   
 function back() {
@@ -91,8 +99,6 @@ function back() {
 		txx: 20
 	} );
     skills1.set(find_skill_id(selected));
- 
-    
 	}
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
@@ -118,6 +124,7 @@ selected.push(newN);
 selected = newSele;
 
   }
+  const ws = {"he": "  ?  מה הן היכולות שלך","en": "What you can do?"}
   </script>
   
  <DialogOverlay {isOpen} onDismiss={close} >
@@ -132,9 +139,9 @@ selected = newSele;
   
     <h1 class="midscreenText-2">
       
-     {userName_value}
+     {userName_value} 
+     {ws[$lang]}
      <br/>
-  ?  מה הן היכולות שלך
   </h1>
 <div  class="input-2">
   <MultiSelect

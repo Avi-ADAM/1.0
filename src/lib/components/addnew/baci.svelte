@@ -13,7 +13,7 @@ let loading = false;
 let isOpen = false;
 let a = 0;
     let before = false;
-    let url1 = "https://new-zuhk.onrender.com/upload";
+    let url1 = "https://i18.onrender.com/upload";
     let linkP;
     let desP;
     let desPl;
@@ -55,7 +55,7 @@ if (files) {
                  imageId = data[0].id;
  
   axios
-  .post('https://new-zuhk.onrender.com/projects', {
+  .post('https://i18.onrender.com/projects', {
     user_1s: idL,
     projectName: projectName_value, 
     publicDescription: desP,
@@ -84,7 +84,7 @@ if (files) {
   console.log("hh")
 })} else {
   axios
-  .post('https://new-zuhk.onrender.com/projects', {
+  .post('https://i18.onrender.com/projects', {
     user_1s: idL,
         profilePic: imageId,
     projectName: projectName_value, 
@@ -141,7 +141,7 @@ let vallues = [];
         });
       };
         try {
-           const res = await fetch("https://new-zuhk.onrender.com/graphql", {
+           const res = await fetch("https://i18.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

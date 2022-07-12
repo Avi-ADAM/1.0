@@ -64,7 +64,7 @@ async function findM() {
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/missions?_limit=-1", {
+            const res = await fetch("https://i18.onrender.com/missions?_limit=-1", {
               method: "GET",
               headers: {
                 'Authorization': bearer1,
@@ -149,7 +149,7 @@ async function start () {
         'Content-Type': 'application/json',
       };
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch("https://i18.onrender.com/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -182,7 +182,7 @@ async function start () {
         'Content-Type': 'application/json',
       };
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch("https://i18.onrender.com/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -333,7 +333,7 @@ async function prog (){
       };
       const headers = {
         'Content-Type': 'application/json'   
-      }; let linkg ="https://new-zuhk.onrender.com/graphql" ;
+      }; let linkg ="https://i18.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -394,7 +394,7 @@ async function callbackFunction(event) {
 }
 async function findiM() {
   var resultString = li.join('&id_in=');
- let link ="https://new-zuhk.onrender.com/missions?id_in=" + resultString ;
+ let link ="https://i18.onrender.com/missions?id_in=" + resultString ;
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -445,7 +445,7 @@ async function findT ()  {
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/tafkidims?_limit=-1", {
+            const res = await fetch("https://i18.onrender.com/tafkidims?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -474,7 +474,7 @@ async function findZ ()  {
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/skills?_limit=-1", {
+            const res = await fetch("https://i18.onrender.com/skills?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -503,7 +503,7 @@ async function findX ()  {
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/work-ways?_limit=-1", {
+            const res = await fetch("https://i18.onrender.com/work-ways?_limit=-1", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -772,7 +772,7 @@ function close () {
 let meDatamm = [];
 async function updi (){
  var resultString = needr.join('&id_in=');
- let linkpp ="https://new-zuhk.onrender.com/mashaabims?id_in=" + resultString ;
+ let linkpp ="https://i18.onrender.com/mashaabims?id_in=" + resultString ;
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -868,7 +868,7 @@ function allbackFunction(event) {
     files = event.detail.files;
     sendP ();
 }
-let url1 = "https://new-zuhk.onrender.com/upload";
+let url1 = "https://i18.onrender.com/upload";
 let meDatap = [];
 let mecata = [];
 function sendP () {
@@ -883,7 +883,7 @@ function sendP () {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let linkdi ="https://new-zuhk.onrender.com/projects/" + $idPr ;
+    let linkdi ="https://i18.onrender.com/projects/" + $idPr ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -934,7 +934,7 @@ async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restim
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let linkdi ="https://new-zuhk.onrender.com/projects/" + $idPr ;
+    let linkdi ="https://i18.onrender.com/projects/" + $idPr ;
    await   axios
       .put(linkdi, {
     projectName: projectName_valuei, 

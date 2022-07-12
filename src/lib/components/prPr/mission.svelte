@@ -153,7 +153,7 @@ const dates = (element.dates !== undefined) ? ` sqadualed: "${new Date(element.d
 //publicklinks save to mission also othet new data
     // הפרדה של קישורים בפסיק
    
- let link = 'https://new-zuhk.onrender.com/graphql';
+ let link = 'https://i18.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',

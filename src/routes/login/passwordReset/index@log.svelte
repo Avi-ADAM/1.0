@@ -10,10 +10,10 @@
     function onSubmit () {   
 // Request API.
 axios
-  .post('https://new-zuhk.onrender.com/auth/forgot-password', {
+  .post('https://i18.onrender.com/auth/forgot-password', {
     email: email,
     url:
-      'https://new-zuhk.onrender.com/admin/plugins/users-permissions/auth/reset-password',
+      'https://i18.onrender.com/admin/plugins/users-permissions/auth/reset-password',
   })
   .then(response => {
     // Handle success.

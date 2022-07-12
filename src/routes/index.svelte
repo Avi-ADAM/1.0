@@ -1,28 +1,18 @@
-<script context="module">
 
-	export const prerender = true;
- 
-</script>
 
    
 <svelte:head>
 	<title>הסכמה עולמית על חירות </title>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-<!--<script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
-</script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
 
-  gtag('config', 'UA-191152109-2');
-</script>-->
 </svelte:head>
 
 <script>
+
+    import { lang, doesLang, langUs } from '../lib/stores/lang.js'
+import { session } from '$app/stores';
   // import { page } from '$app/stores'
     //const emaili = $page.url.searchParams.get('code')
-      import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+      import { goto } from '$app/navigation';
 
       import { userName } from '../lib/stores/store.js';
   import Amana1 from "../lib/components/main/amana.svelte"
@@ -34,6 +24,26 @@
 
   let idx = 1;
 let error;
+function getLang() {
+    let la;
+    const fromSe = $session.userAgent
+    if ($doesLang == false) {
+    if (fromSe.includes("he")){
+        la = "he"
+    } else if (fromSe.includes("ar")){
+        la = "ar"
+    } else{
+        la = "en"
+    }
+    }
+    else {
+        la = $langUs
+    }
+   // if (navigator.languages != undefined)
+   //     return navigator.languages[0];
+   // return navigator.language;
+    lang.set(la)
+}
 onMount(async () => {
   //console.log(emaili)
   if ('serviceWorker' in navigator) {
@@ -44,6 +54,16 @@ onMount(async () => {
     // registration failed
     console.log('Registration failed with ' + error);
   });
+  console.log("xf",$session.userAgent)
+  console.log('Registration', $lang)
+  getLang()
+    console.log('after', $lang)
+
+  if($lang != "he" && $lang != "ar"){
+    goto("/en")
+  } else if($lang == "ar"){
+    goto("/ar")
+  }
  }; 
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -59,7 +79,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://new-zuhk.onrender.com/chezins/count", {
+            const res = await fetch("https://i18.onrender.com/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -117,11 +137,11 @@ regHelper.subscribe(value => {
 });
 
 
-	function toggle() {
+	/*function toggle() {
 		regHelperL = 0;
     show.set(0);
     regHelper.set(0)
-	}
+	}*/
 </script>
 
 <div class="main">
@@ -182,19 +202,7 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
   --grey-dark: #6d7098;
   --red: #ff6b6b;
 }
-button:disabled {
-  background-color: var(--grey);
-}
 
-button:focus:not(:disabled) {
-  box-shadow: 0 0 0 4px var(--primary-light);
-}
-
-button:hover:not(:disabled) {
- 
-  background: radial-gradient(skyblue 20%, var(--barbi-pink))
-		skyblue ;
-}
 
 *, *:after, *:before {
 	box-sizing: border-box;

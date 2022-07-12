@@ -79,7 +79,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://new-zuhk.onrender.com/graphql';
+    let link = 'https://i18.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -147,7 +147,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://new-zuhk.onrender.com/graphql';
+    let link = 'https://i18.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',

@@ -6,34 +6,170 @@
 
    
 <svelte:head>
-	<title>WorldWide consensus for Security and Peace</title>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
-</script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-191152109-2');
-</script>
+	<title>WorldWide consensus for Freedom</title>
+ 
 </svelte:head>
 
 <script>
   import Amana1 from "../lib/components/main/amanaen.svelte"
  
+    import { lang, doesLang, langUs } from '../lib/stores/lang.js'
+import { session } from '$app/stores';
+  // import { page } from '$app/stores'
+    //const emaili = $page.url.searchParams.get('code')
+      import { goto } from '$app/navigation';
+
+      import { userName } from '../lib/stores/store.js';
+  import One from "../lib/components/main/bein.svelte"
+  import { show } from '../lib/components/registration/store-show.js';
+  import { regHelper } from '../lib/stores/regHelper.js';
+  import { onMount } from 'svelte';
+      import { email } from '../lib/components/registration/email.js'
+
+  let idx = 1;
+let error;
+function getLang() {
+    let la;
+    const fromSe = $session.userAgent
+    if ($doesLang == false) {
+    if (fromSe.includes("he")){
+        la = "he"
+    } else if (fromSe.includes("ar")){
+        la = "ar"
+    } else{
+        la = "en"
+    }
+    }
+    else {
+        la = $langUs
+    }
+   // if (navigator.languages != undefined)
+   //     return navigator.languages[0];
+   // return navigator.language;
+    lang.set(la)
+}
+onMount(async () => {
+  //console.log(emaili)
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function(reg) {
+    // registration worked
+    console.log('Registration succeeded. Scope is ' + reg.scope);
+  }).catch(function(error) {
+    // registration failed
+    console.log('Registration failed with ' + error);
+  });
+  console.log("xf",$session.userAgent)
+  console.log('Registration', $lang)
+  getLang()
+  if($lang == "he" ){
+    goto("/")
+  } else if($lang == "ar"){
+    goto("/ar")
+  }
+ }; 
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+    
+        try {
+            const res = await fetch("https://i18.onrender.com/chezins/count", {
+              method: "GET",
+              headers: {
+                 'Content-Type': 'application/json'
+              },
+            }).then(checkStatus)
+          .then(parseJSON);
+ idx = res + 2
+        } catch (e) {
+            error = e
+        }
+    });
+	let user;
+
+   let kvar;
+    onMount(async () => {
+    if (document.cookie) {
+     
+const unt = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('un='))
+  if (unt != null) {
+  const un = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('un='))
+  .split('=')[1];
+   userName.set(un);}
+const regt = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  if (regt != null) {
+  const reg = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+
+user = reg;}
+ const cookieValuet = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('email='))
+  if (cookieValuet != null){
+const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('email='))
+  .split('=')[1];    kvar  = cookieValue; 
+    email.set(cookieValue);
+}}
+    });
+
+
+  let regHelperL = 0;
+
+  
+regHelper.subscribe(value => {
+  regHelperL = value;
+});
+
+
+
 
   
 </script>
 
 <div class="main">
 
+{#if user > 0}
+{ goto("/lev", )}
+{:else}
+  {#if kvar}
+<One {idx}/>
 
-
-
-<Amana1/>
+<!--
+todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית לקחת פרטים מהקוקיות או מלוקלסטורג'--> 
+{:else}
+{#if regHelperL == 1}
+<One {idx}/>
 	
-   </div>
+{/if}
+
+
+{#if regHelperL == 0}
+<Amana1 {idx}/>
+	 
+{/if}
+  
+{/if}
+{/if}
+ </div>
+	
 <style>
 
 :global(.multiselect) {

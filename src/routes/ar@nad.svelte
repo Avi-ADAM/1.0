@@ -7,23 +7,10 @@
    
 <svelte:head>
 	<title>اتفاقية الأمن والسلام العالمي</title>
-  <!-- Global site tag (gtag.js) - Google Analytics -->
-<script async src="https://www.googletagmanager.com/gtag/js?id=UA-191152109-2">
-</script>
-<script>
-  window.dataLayer = window.dataLayer || [];
-  function gtag(){dataLayer.push(arguments);}
-  gtag('js', new Date());
-
-  gtag('config', 'UA-191152109-2');
-</script>
 </svelte:head>
 
 <script>
   import Amana1 from "../lib/components/main/amanar.svelte"
- 
-
-  
 </script>
 
 <div class="main">
@@ -65,19 +52,6 @@
   --grey: #e6e6ff;
   --grey-dark: #6d7098;
   --red: #ff6b6b;
-}
-button:disabled {
-  background-color: var(--grey);
-}
-
-button:focus:not(:disabled) {
-  box-shadow: 0 0 0 4px var(--primary-light);
-}
-
-button:hover:not(:disabled) {
- 
-  background: radial-gradient(skyblue 20%, var(--barbi-pink))
-		skyblue ;
 }
 
 *, *:after, *:before {
