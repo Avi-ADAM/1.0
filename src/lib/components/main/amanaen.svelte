@@ -5,6 +5,8 @@
     import { regHelper } from '../../stores/regHelper.js';
         import * as yup from "yup";
                 import axios from 'axios';
+    import {  doesLang, langUs } from '$lib/stores/lang.js'
+  import { goto, prefetch } from '$app/navigation';
 
           import { contriesi } from '../registration/contries.js';
     import {fpval} from '../registration/fpval.js';
@@ -354,13 +356,16 @@ if (fpp.includes(jjj)){
   console.log("sssss")
   nameuse = true;
 } else {
-g = true;
  if (selected.length < 1) {
  erorims = true
+ console.log("nonoonn")
  } else {
+   console.log("ppppnoonn")
+
+  g = true;
  erorims = false
- const mail = $form.email.toLowerCase()
-     console.log("t")
+ const mail = $form.email.toLowerCase().trim();
+console.log("t")
   axios
   .post('https://i18.onrender.com/chezins', {
      name: $form.name,
@@ -439,6 +444,13 @@ function erore(){
 function erorer(){
   a = 5;
 }
+function change(la){
+  if (la == "he"){
+    doesLang.set(true)
+    langUs.set("he")
+    goto("/")
+  }
+}
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -485,7 +497,7 @@ function erorer(){
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
-          <a style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/" >עברית</a>
+          <button on:click={()=>change("he")} title="למעבר לשפה העברית" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >עברית</button>
           <a class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
                            <button on:click={sell} title="ask for change in the text" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">suggest text change</button>
                           <button on:click={tr} title="translate to another language" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >translate</button>
@@ -526,7 +538,12 @@ function erorer(){
       {placeholder}
       options={country.map(c => c.label)}
        {required}
-       />  </div>    
+       /> 
+       {#if erorims == true}
+      <small style="color: red; ">Choose at least one place</small>
+    {/if}
+      </div> 
+
 <div class="flexi2">
   <h3        class="amanat" 
  style="font-weight: 700; white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1em; line-height:normal;" dir="ltr">Email:</h3>
@@ -653,7 +670,9 @@ width:78vw;
   -moz-animation:    ca3_fade_move_down 2s ease-in-out infinite;
   animation:         ca3_fade_move_down 2s ease-in-out infinite;
 }
-
+small{
+    background-color: white ;
+}
 
 /*animated scroll arrow animation*/
 @-webkit-keyframes ca3_fade_move_down {

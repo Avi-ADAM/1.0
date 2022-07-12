@@ -1,5 +1,8 @@
 ﻿
 <script>
+      import {  doesLang, langUs } from '$lib/stores/lang.js'
+  import { goto, prefetch } from '$app/navigation';
+
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
     import { email } from '../registration/email.js';
@@ -381,12 +384,15 @@ if (fpp.includes(jjj)){
   console.log("sssss")
   nameuse = true;
 } else {
-g = true;
  if (selected.length < 1) {
- erorims = true
+ console.log("uuuu")
+  erorims = true
  } else {
+   console.log("kkkk")
+
+  g = true;
  erorims = false
- const mail = $form.email.toLowerCase()
+ const mail = $form.email.toLowerCase().trim()
   axios
   .post('https://i18.onrender.com/chezins', {
      name: $form.name,
@@ -464,6 +470,13 @@ function erore(){
 function erorer(){
   a = 5;
 }
+function change(la){
+  if (la == "en"){
+    doesLang.set(true)
+    langUs.set("en")
+    goto("/en")
+  }
+}
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -523,8 +536,7 @@ function erorer(){
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
-
-          <a  class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/en" >English</a>
+                  <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >English</button>
           <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1❤️1 אודות "  sveltekit:prefetch href="/about" > אודות</a>
                   <button on:click={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
