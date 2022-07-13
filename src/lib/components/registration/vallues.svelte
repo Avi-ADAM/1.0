@@ -125,6 +125,8 @@ selected.push(newN);
 selected = newSele;
 
   }
+  const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
+
   const what = {"he": "אלו ערכים ומטרות ברצונך לקדם?","en": "which vallues you wish to promote?"}
   </script>
 
@@ -155,7 +157,7 @@ selected = newSele;
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
-      >הוספת ערך חדש</button>
+      >{addn[$lang]}</button>
     </div>
      <button class="button-in-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
