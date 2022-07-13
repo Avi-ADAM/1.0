@@ -71,7 +71,9 @@ function dispatchb () {
     } );
 };
 export let addS = false; 
-let cencel = 'ביטול';
+
+const cencel = {"he":"ביטול","en": "cencel"}
+
 const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
 const valn = {"he":"שם הערך", "en": "Vallue name"}
 const des = {"he": "תיאור קצר", "en": "Vallue short description"}
@@ -84,7 +86,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-2 rounded-full"
 on:click={() => addS = true}>{addn[$lang]}</button>
 {:else}
-<button title={cencel}
+<button title={cencel[$lang]}
 on:click={dispatchb}
 class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded-full text-center" ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -93,16 +95,16 @@ class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded-full text-c
 <div >
  <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{addn[$lang]}</h1>    
 </div>
-<div dir="rtl" class='textinput'>
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input  bind:value={name_value} type='text' class='input' required>
-  <label for="name" class='label'>{valn[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
 <br />
-<div dir="rtl" class='textinput'>
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input type='text' class='input' bind:value={desV} required>
-  <label for="descrip" class='label'>{des[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="descrip" class='label'>{des[$lang]}</label>
   <span class='line'></span>
 </div>
 
@@ -141,7 +143,6 @@ class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded-fu
 
   font-size: 15px;
   position: absolute;
-  right: 0;
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
