@@ -195,8 +195,10 @@ function back() {
     const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
   const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
   const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
-  const addnn = {"he":"יצירת סיסמה","en": "Create new password"}
-
+  const arr1 = {"he":"אם לא התקבל מייל הרשמה נא לפנות ל-","en": "if you didn't recive email, reach us at-"}
+  const arr2 = {"he":"יש לבדוק את המייל,","en": "please check your email,"}
+  const arr3 = {"he":"משהו השתבש,","en": "something is wrong,"}
+const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 </script>
 
 <main >
@@ -247,7 +249,7 @@ function back() {
 			</li>-->
 		</ul>
 	{#if already === false}
-<div class="but">
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="but">
 		  <button  class="button-in-1-2" class:non={strength < 4} on:click="{increment}"  disabled={strength < 4}>
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
     </button>
@@ -257,15 +259,15 @@ function back() {
 </div>
 {:else if already == true }
           <div style="margin: 0 auto;" class="flex flex-col text-center items-center justify-center">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
+            <h3 class="text-barbi">{om[$lang]}</h3>
           <br>
          <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> 
 {:else if errr.k === true}
 <h2 class=" bg-white text-red">{errr.m}
-קרתה בעיה,<br>
- יש לבדוק את המייל,<br>
- אם לא התקבל מייל הרשמה נא לפנות ל-ehad1one@gmail.com
+{arr3[$lang]}<br>
+ {arr2[$lang]}<br>
+ {arr1[$lang]}ehad1one@gmail.com
 </h2>
 {/if}
 	</form>
@@ -376,8 +378,8 @@ border: 1px solid red;
 		padding: 0;
 		font-size: 0.7rem;
 		text-align: center;
-		background-color: var(--barbi-pink);
-		color: var(--gold);
+		background-color: var(--mturk);
+		color: var(--barbi-pink);
 		opacity: 0.8;
 	}
 	/* Buttons */
@@ -405,9 +407,8 @@ text-shadow: 1px 1px purple;
       height: 9.75rem;
       width: 29.5rem;
 text-align: center; 
-  padding-top: 1rem ; 
-padding-right: 25px;
-padding-left: 25px;
+  padding: 1rem ; 
+
 }
  
 .button-in{
@@ -460,7 +461,7 @@ justify-content: space-between;
 		   background-size: 16.5rem 5rem;
   height: 5rem;
   width: 16.5rem;
-  font-size: 1rem;
+  font-size: 0.8rem;
     margin-top: 26vh;
 	 }
 .img-4{

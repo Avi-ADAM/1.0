@@ -45,12 +45,20 @@
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  tafkidims { id roleDescription}
+  tafkidims { id roleDescription  ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             roles1 = res.data.tafkidims
+            if ($lang == "he" ){
+              for (var i = 0; i < roles1.length; i++){
+                if (roles1[i].localizations.length > 0){
+                roles1[i].roleDescription = roles1[i].localizations[0].roleDescription
+                }
+              }
+            }
+            roles1 = roles1
         } catch (e) {
             error1 = e
         }
@@ -123,10 +131,11 @@ selected = newSele;
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"  aria-label="form">
-      <div class="a" dir="rtl" >
+  <DialogContent class="content"  aria-label="form">
+      <div class="a"dir="{$lang == "en" ? "ltr" : "rtl"}" >
            
-              <Addnewrole rn={roles1.map(c => c.roleDescription)} on:b={close} addR={true} on:addnewrole={addnew}/>
+              <Addnewrole rn={roles1.map(c => c.roleDescription)} on:b={close} 
+                addR={true} on:addnewrole={addnew}/>
   </DialogContent>
   </div>
 </DialogOverlay>
@@ -136,7 +145,7 @@ selected = newSele;
     <br/>
      {what[$lang]}
    </h1> 
-   <div  class="input-2">
+   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
      bind:selected
      {placeholder}
@@ -145,7 +154,7 @@ selected = newSele;
     <!-- 
            on:change={(e) => alert(`You ${e.detail.type}ed '${e.detail.token}'`)}
 -->
-      <div  class="input-2-2">
+      <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
@@ -196,16 +205,15 @@ text-shadow: 1px 1px purple;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 1rem ; 
+    padding: 1rem ; 
    -webkit-text-size-adjust: 100%; 
 }
  @media (max-width:500px){
 	 .midscreenText-2 {
-       font-size: 1.6rem;
+       font-size: 0.8rem;
 		   background-size: 15.25rem 5rem;
   height: 5rem;
   width: 15.25rem;
-  font-size: 1rem;
   margin-top: 26vh;
 	 }
  .input-2{
@@ -240,7 +248,5 @@ text-shadow: 1px 1px purple;
     grid-row: 5/6;
     text-align: center;
     }
-    .multiselect{
-      background-color: aqua;
-    }
+
     </style>

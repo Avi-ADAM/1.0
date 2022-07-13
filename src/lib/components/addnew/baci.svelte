@@ -1,5 +1,6 @@
 <script>
-  
+               import { lang } from '$lib/stores/lang.js'
+
     import { idPr } from '../../stores/idPr.js';
     import axios from 'axios';
     import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
@@ -177,7 +178,8 @@ let suc = false;
 
 
     let selected;
-    const placeholder = `ערכים ומטרות`;
+        const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
+
  function project (id) {
     idPr.set(resP.id);
     goto("/moach");

@@ -2,6 +2,7 @@
  let idNewNeed;
  import { createEventDispatcher } from 'svelte';
 
+           import { lang } from '$lib/stores/lang.js'
 
  const dispatch = createEventDispatcher();
 let token;

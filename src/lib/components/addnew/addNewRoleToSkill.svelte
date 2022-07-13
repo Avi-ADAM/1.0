@@ -3,6 +3,7 @@
  const dispatch = createEventDispatcher();
     import axios from 'axios';
     import { idd } from '../../stores/idd.js';
+           import { lang } from '$lib/stores/lang.js'
 
     export let color = "--gold"
     export let rn = [];
@@ -41,31 +42,36 @@
     name: roleName_value
     } );
        };
+const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
+const valn = {"he":"שם התפקיד", "en": "Role name"}
+const des = {"he": "תיאור קצר", "en": "Role short description"}
+const btnTitles = {"he": "הוספה", "en": "Add"}
+const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
     </script>
     
-        <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">הוספת תפקיד חדש</h1>    
+        <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{addn[$lang]}</h1>    
     
    
-<div style="--the:{`var(${color})`};" dir="rtl" class='textinput'>
+<div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input    bind:value={roleName_value}
  type='text' class='input' required>
-  <label for="name" class='label'>שם</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">התפקיד כבר קיים</small>{/if}
+{#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
 
-           <div dir="rtl" class='textinput'>
+           <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input bind:value={desS}  
  type='text' class='input' required>
-  <label for="des" class='label'>תיאור קצר</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{des[$lang]}</label>
   <span class='line'></span>
 </div>
           
           
-          <div dir="rtl" >
+          <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
 
           <button on:click={add}
-          title="הוספת תפקיד חדש"
+          title="{btnTitles[$lang]}"
           class=" hover:bg-barbi hover:text-mturk text-gold font-bold  rounded-full" 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
             <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
@@ -102,7 +108,6 @@
 
   font-size: 15px;
   position: absolute;
-  right: 0;
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;

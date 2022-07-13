@@ -33,12 +33,20 @@
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  workWays { id workWayName}
+  workWays { id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             workways2 = res.data.workWays
+                       if ($lang == "he" ){
+              for (var i = 0; i < workways2.length; i++){
+                if (workways2[i].localizations.length > 0){
+                workways2[i].workWayName = workways2[i].localizations[0].workWayName
+                }
+              }
+            }
+            workways2 = workways2
         } catch (e) {
             error1 = e
         }
@@ -117,11 +125,11 @@ let isOpen = false;
     selected = newSele;
 }
     const addn = {"he":"הוספת דרך חדשה","en": "Add new way"}
-    const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How you preffer to Create?"}
+    const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"   aria-label="form">
+  <DialogContent class="content"   aria-label="form">
       <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
  <Addneww rn={workways2.map(c => c.workWayName)} on:b={close} addW={true} on:addww={addnew}/>
       
@@ -170,7 +178,8 @@ text-shadow: 1px 1px purple;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 1rem ; 
+    padding: 1rem 1rem 0rem 1rem; 
+ 
    -webkit-text-size-adjust: 100%; 
 }
  @media (max-width:500px){

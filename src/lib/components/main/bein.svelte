@@ -37,40 +37,40 @@ function add (event){
   tx = event.detail.tx;
   txx = event.detail.txx;
 }
-let title = {"he": "הרשמה ל-1❤️1", "en": "registration to-1❤️1"};
+let title = {"he": "הרשמה ל-1❤️1", "en": "1❤️1 registration"};
 let tu = { "he": "תודה", "en": "thank you"};
 let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
 </svelte:head>
-<div in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}" class="body" bind:clientWidth={w}>
-<div class="background">
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}" class="body" bind:clientWidth={w}>
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="background">
 
 
 {#if show_value == 0}
-<div class="midscreen">
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="midscreen">
 
 <Hello {idx} />
 </div>
 {:else if show_value == 1}
-<div class="midscreen"
+<div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"
  out:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
 <Vallues on:progres={add}/>
 </div>
 {:else if show_value == 2}
-<div class="midscreen"
+<div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
 <Skills on:progres={add}/>
 </div>
 {:else if show_value == 3}
-<div class="midscreen"
+<div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 130, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
  <Roles on:progres={add}/>
 </div>
   {:else if show_value == 4}
-  <div class="midscreen"
+  <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
   <Workways on:progres={add}/>
   </div>
@@ -82,14 +82,14 @@ let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
    <Scree on:progres={add}/> 
    </div>  -->
   {:else if show_value == 5}
-    <div class="midscreen"
+    <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
    <Password on:progres={add}/> 
    </div>  
   {:else if show_value == 6}
-  <div class="midscreen"
+  <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-    <div dir="rtl" class="midscreenText-3"><h1>
+    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="midscreenText-3"><h1>
       {tu[$lang]}
       <br>
 {userName_value}

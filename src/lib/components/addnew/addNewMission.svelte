@@ -1,5 +1,7 @@
 <script>
 import Addnewskil from './addNewSkill.svelte';
+           import { lang } from '$lib/stores/lang.js'
+
 let addskil = false;
 import Addnewro from './addNewRole.svelte';
 let addro = false;

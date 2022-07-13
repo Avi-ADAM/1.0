@@ -181,7 +181,7 @@ text-shadow: 1px 1px purple;
   height: 9.75rem;
   width: 29.5rem;
   text-align: center;
-  padding-top: 1rem ; 
+    padding: 1rem 1rem 0rem 1rem; 
    -webkit-text-size-adjust: 100%; 
 }
  @media (max-width:500px){

@@ -3,6 +3,8 @@ import MultiSelect from 'svelte-multiselect';
 import { missionNew } from '../../stores/missionNew';
   import { onMount } from 'svelte';
   import { createEventDispatcher } from 'svelte';
+             import { lang } from '$lib/stores/lang.js'
+
  const dispatch = createEventDispatcher();
   function inc() {
 
@@ -53,13 +55,14 @@ import { missionNew } from '../../stores/missionNew';
   });
 
   let selected;
-  const placeholder = `בחירת תפקידים נדרשים`;
+      const placeholder = `${$lang == "he" ? "בחירת תפקידים נדרשים" : "needed roles"}`;
 
+const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}
 </script>
 
 
-<div>
-  <lebel for="choos">בחירת תפקידים נדרשים</lebel>
+<div dir="{$lang == "en" ? "ltr" : "rtl"}">
+  <lebel for="choos">{adds[$lang]}</lebel>
 <MultiSelect
 id="choos"
   on:change={inc}

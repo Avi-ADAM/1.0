@@ -3,6 +3,8 @@
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
     import axios from 'axios';
+               import { lang } from '$lib/stores/lang.js'
+
     import { idd } from '../../stores/idd.js';
  //   import { skillIdStore } from './store/skillIdStore.js'
     import { createEventDispatcher } from 'svelte';
@@ -11,7 +13,8 @@ export let roles1 = [];
 export let mid = -1;
  let selected;
  let id;
-const placeholder = `קישור לתפקיד`;
+     const placeholder = `${$lang == "he" ? "תפקידים קשורים" : "related Roles"}`;
+
     let addro = false;    
 let idk;
     idd.subscribe(newwork => {
@@ -45,12 +48,20 @@ let idk;
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  tafkidims { id roleDescription}
+  tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             roles1 = res.data.tafkidims
+                       if ($lang == "he" ){
+              for (var i = 0; i < roles1.length; i++){
+                if (roles1[i].localizations.length > 0){
+                roles1[i].roleDescription = roles1[i].localizations[0].roleDescription
+                }
+              }
+            }
+            roles1 = roles1
       } catch (e) {
           error1 = e
       }
@@ -105,7 +116,14 @@ if (rn.includes(skillName_value)){
     };    
 
 export let addS = false;
-let cencel = " ביטול"
+       const cencel = {"he":"ביטול","en": "cencel"}
+const adds = {"he":"הוספת כישור חדש","en": "Add new Skill"}
+
+const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
+const valn = {"he":"שם הכישור", "en": "Skill name"}
+const des = {"he": "תיאור קצר", "en": "Skill short description"}
+const btnTitles = {"he": "הוספה", "en": "Add"}
+const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
 let newrole;
 function finnish (event) {
   addro = event.detail.addro;
@@ -118,13 +136,13 @@ function dispatchb () {
 };
 export let color = "--gold";
   </script>
-  <div style="--the:{`var(${color})`};">
+  <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
 {#if addS == false}
 <button style="--the:{color};"
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-on:click={() => addS = true}>הוספת כישור שאינו ברשימה</button>
+on:click={() => addS = true}>{adds[$lang]}</button>
 {:else}
-<button title={cencel}
+<button title={cencel[$lang]}
 on:click={dispatchb}
               class=" hover:bg-barbi text-gold hover:text-lturk font-bold py-1 px-1 rounded-full text-center"
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -133,26 +151,26 @@ on:click={dispatchb}
 
 
 
- <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); "> הוספת כישור חדש</h1>    
+ <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{adds[$lang]}</h1>    
 
   
-  <div dir="rtl" class='textinput'>
+  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input    bind:value={skillName_value}
  type='text' class='input' required>
-  <label for="name" class='label'>שם הכישור</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="name" class='label'>{valn[$lang]}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
+{#if shgi == true}<small class="text-red-600">{errmsg[$lang]}</small>{/if}
 
-           <div dir="rtl" class='textinput'>
+           <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input bind:value={desS}  
  type='text' class='input' required>
-  <label for="des" class='label'>תיאור קצר</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{des[$lang]}</label>
   <span class='line'></span>
 </div>
       
      
-<div>
+<div dir="{$lang == "en" ? "ltr" : "rtl"}">
   <MultiSelect
   bind:selected
   {placeholder}
@@ -164,17 +182,17 @@ on:click={dispatchb}
   <button
    on:click={() => addro = true} 
    class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-1 px-1 rounded-full"
-   >הוספת תפקיד אחר</button>
+   >{addn[$lang]}</button>
    <br/>
 <button on:click={addNewSkill}
-title="הוספת כישור חדש"
+title="{btnTitles[$lang]}"
 class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
 </svg></button>
 
   {:else} 
-  <button title={cencel}
+  <button title={cencel[$lang]}
 on:click={() => addro = false}
  class=" hover:bg-barbi hover:text-mturk text-gold font-bold p-1 rounded-full"
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -213,7 +231,6 @@ on:click={() => addro = false}
 
   font-size: 15px;
   position: absolute;
-  right: 0;
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
