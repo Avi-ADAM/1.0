@@ -162,7 +162,7 @@ text-shadow: 1px 1px black;
 
 	 }
     .a2 {
-  font-size: 16px;
+  font-size: 12px;
   }
   .a1 {
    font-size: 13px;
