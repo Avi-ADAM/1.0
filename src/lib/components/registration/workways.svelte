@@ -61,8 +61,8 @@
 
     let selected = [];
  
-  const placeholder= `דרכי עבודה מתאימות`;
- 
+     const placeholder = `${$lang == "he" ? "דרכי יצירה מתאימות" : "ways of creation"}`;
+
   
  
 let userName_value;
@@ -116,6 +116,8 @@ let isOpen = false;
     selected.push(newN);
     selected = newSele;
 }
+    const addn = {"he":"הוספת דרך חדשה","en": "Add new way"}
+    const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How you preffer to Create?"}
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -130,8 +132,7 @@ let isOpen = false;
 <h1 class="midscreenText-2">
     {userName_value}
 <br/>
- מה הם
-  העדפות היצירה שלך
+ {ws[$lang]}
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
@@ -143,7 +144,7 @@ let isOpen = false;
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
-      >הוספת חדשה</button>
+      >{addn[$lang]}</button>
     </div>
   <button class="button-in-1-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>

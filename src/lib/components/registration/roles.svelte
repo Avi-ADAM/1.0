@@ -61,7 +61,7 @@
 
 
     let selected = [];
-    const placeholder = ` תפקידים מועדפים`;
+     const placeholder = `${$lang == "he" ? "תפקידים מועדפים" : "preferred roles"}`;
 
  
 let userName_value;
