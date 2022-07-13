@@ -4,14 +4,15 @@
     import { show } from './store-show.js';
     import { valluss } from './valluss.js';
     import { onMount } from 'svelte';
+              import { lang } from '$lib/stores/lang.js'
+
     import AddnewVal from '../addnew/addnewval.svelte';
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher(); 
-    let vallues = [{valueName: "שלום"}];
+    let vallues = [];
     let error1 = null;
     let addval = false;
-    
-    onMount(async () => {
+onMount(async () =>{
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -32,12 +33,20 @@
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues { id valueName}
+  vallues { id valueName ${$lang == 'en' ? 'localizations{valueName }' : ""}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             vallues = res.data.vallues 
+            if ($lang == "en" ){
+              for (var i = 0; i < vallues.length; i++){
+                if (vallues[i].localizations.length > 0){
+                vallues[i].valueName = vallues[i].localizations[0].valueName
+                }
+              }
+            }
+            vallues = vallues
         } catch (e) {
             error1 = e
         }
@@ -58,7 +67,7 @@
 
 
     let selected = [];
-    const placeholder = `ערכים ומטרות`;
+    const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
 
  
 export let userName_value;
@@ -115,6 +124,7 @@ selected.push(newN);
 selected = newSele;
 
   }
+  const what = {"he": "אלו ערכים ומטרות ברצונך לקדם?","en": "which vallues you wish to promote?"}
   </script>
 
  <DialogOverlay {isOpen} onDismiss={close} >
@@ -127,13 +137,13 @@ selected = newSele;
   </div>
 </DialogOverlay>
   
-<h1 class="midscreenText-2">
+<h1 class="midscreenText-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
   {userName_value}
   <br/>
-   ?אלו ערכים ומטרות ברצונך לקדם
-  </h1> 
+{what[$lang]}
+</h1> 
   {#key vallues}
-   <div  class="input-2">
+   <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
      bind:selected
      {placeholder}
@@ -210,7 +220,5 @@ text-shadow: 1px 1px purple;
     grid-row: 5/6;
     text-align: center;
     }
-    .multiselect{
-      background-color: aqua;
-    }
+
     </style>
