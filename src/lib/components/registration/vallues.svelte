@@ -33,13 +33,13 @@ onMount(async () =>{
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues { id valueName ${$lang == 'en' ? 'localizations{valueName }' : ""}}
+  vallues { id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             vallues = res.data.vallues 
-            if ($lang == "en" ){
+            if ($lang == "he" ){
               for (var i = 0; i < vallues.length; i++){
                 if (vallues[i].localizations.length > 0){
                 vallues[i].valueName = vallues[i].localizations[0].valueName
@@ -83,6 +83,7 @@ show.subscribe(newValue => {
 
 function increment() {
 		show.update(n => n + 1);
+    console.log(find_value_id(selected));
     valluss.set(find_value_id(selected));
     dispatch ('progres',{
 		tx: 0,
