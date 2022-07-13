@@ -713,8 +713,8 @@ function change(la){
   background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
  background-size: 400% 400%;
-      -webkit-animation: AnimationName 3s ease infinite;
-    -moz-animation: AnimationName 3s ease infinite;
+      -webkit-animation: AnimationName 13s ease infinite;
+    -moz-animation: AnimationName 13s ease infinite;
     animation: AnimationName 3s ease infinite;
       width: 80vw;
   }
@@ -724,9 +724,9 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
  background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
  background-size: 400% 400%;
-      -webkit-animation: AnimationName 3s ease infinite;
-    -moz-animation: AnimationName 3s ease infinite;
-    animation: AnimationName 3s ease infinite;
+      -webkit-animation: AnimationName 13s ease infinite;
+    -moz-animation: AnimationName 13s ease infinite;
+    animation: AnimationName 13s ease infinite;
 width:78vw;
         }
   }

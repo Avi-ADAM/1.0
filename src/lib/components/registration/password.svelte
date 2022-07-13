@@ -3,7 +3,7 @@ import { userName } from '../../stores/store.js';
 import { show } from './store-show.js';
 import { email } from './email.js';  
 import { contriesi } from './contries.js';
-import axios from 'axios';
+          import { lang } from '$lib/stores/lang.js'
  import { RingLoader
 } from 'svelte-loading-spinners';
  import { createEventDispatcher } from 'svelte';
@@ -165,9 +165,9 @@ function back() {
 		validations = [
 			password.length > 8,
 			password.length > 1,
-		//	password.search(/[A-Z]/) > -1,
+			password.search(/[A-Z]/) > -1,
 			password.search(/[0-9]/) > -1,
-			password.search(/[$&+,:;=?@#]/) > -1,
+		//	password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
 		if (validations[0] == true){dispatch ('progres',{
@@ -190,15 +190,21 @@ function back() {
 	function getV (e){
     passwordx = e.target.value
 	}
+  const addn = {"he":"יצירת סיסמה","en": "Create new password"}
+  const what = {"he": "מה היא מילת הקסם שלך?","en": "what is Your magic word?"}
+    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
+  const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
+  const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
+  const addnn = {"he":"יצירת סיסמה","en": "Create new password"}
 
 </script>
 
 <main >
 	<form on:submit|preventDefault>
-		 <h1 title="מהי הסיסמה שלך" class="midscreenText-2">
+		 <h1 title="{addn[$lang]}" class="midscreenText-2">
         {userName_value}
       <br>
-    מה היא מילת הקסם שלך
+	  {what[$lang]}
        </h1>
     <div style="display: none;"><input type="text" style="display: none;" autocomplete="username" name="userName" bind:value={userName_value}></div>
 		<div class="field">
@@ -207,7 +213,7 @@ function back() {
    				type={showPassword ? "text" : "password"}
 				name="email"
 				class="input"
-				placeholder="יצירת סיסמה"
+				placeholder="{addn[$lang]}"
 				on:input={validatePassword}
 				on:blur={getV}
 			/>
@@ -230,15 +236,15 @@ function back() {
 
 		<ul dir="rtl">
 			<li>
-				{validations[0] ? "🏆" : "❌"} על הססמה להכיל לפחות 8 אותיות <!-- be at least 5 characters-->
+				{validations[0] ? "🏆" : "❌"} {val1[$lang]}
 			</li>
-			<!--<li>
-				{validations[1] ? "🏆" : "❌"} ולפחות אות אחת גדולה באנגלית must contain a capital letter 
-			</li>-->
-			<li>{validations[2] ? "🏆" : "❌"} ולפחות מספר אחד<!--must contain a number --></li>
 			<li>
-				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
+				{validations[1] ? "🏆" : "❌"} {val2[$lang]}
 			</li>
+			<li>{validations[2] ? "🏆" : "❌"} {val3[$lang]}</li>
+			<!--<li>
+				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) must contain one symbol ($&+,:;=?@#)
+			</li>-->
 		</ul>
 	{#if already === false}
 <div class="but">

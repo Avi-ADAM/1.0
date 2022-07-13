@@ -12,7 +12,7 @@
     let vallues = [];
     let error1 = null;
     let addval = false;
-onMount(async () =>{
+ onMount(async () =>{
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -126,13 +126,12 @@ selected = newSele;
 
   }
   const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
-
   const what = {"he": "אלו ערכים ומטרות ברצונך לקדם?","en": "which vallues you wish to promote?"}
   </script>
 
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"   aria-label="form">
+  <DialogContent class="content"  aria-label="form">
       <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
   <AddnewVal  rn={vallues.map(c => c.valueName)} addS={true} on:b={close} on:addnew={addnew}/>
       

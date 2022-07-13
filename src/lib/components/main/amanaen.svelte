@@ -632,7 +632,6 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
         :global([data-svelte-dialog-content].content) {
  background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-
 width:78vw;
         }
   }

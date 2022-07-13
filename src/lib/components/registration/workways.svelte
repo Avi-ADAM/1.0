@@ -7,7 +7,8 @@
     import Addneww from '../addnew/addnewWorkway.svelte';
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
-    
+              import { lang } from '$lib/stores/lang.js'
+
     let workways2 = [];
     let error1 = null
     
@@ -119,7 +120,7 @@ let isOpen = false;
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"   aria-label="form">
-      <div dir="rtl" >
+      <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
  <Addneww rn={workways2.map(c => c.workWayName)} on:b={close} addW={true} on:addww={addnew}/>
       
   </DialogContent>
@@ -132,13 +133,13 @@ let isOpen = false;
  מה הם
   העדפות היצירה שלך
    </h1> 
-   <div  class="input-2">
+   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
      bind:selected
      {placeholder}
      options={workways2.map(c => c.workWayName)}
      /></div>
-    <div  class="input-2-2">
+    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"

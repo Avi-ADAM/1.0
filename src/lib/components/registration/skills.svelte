@@ -32,19 +32,17 @@
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  skills { id skillName}
+  skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             skills2 = res.data.skills;
-            if ($lang == 'en') {
-              for (let i = 0; i <skills2.length; i++) {
-                    if (heb.test(skills2[i].skillName)){
-                                    console.log("trtr",skills2[i].skillName)
-
-                      skills2.splice(i, 1);
-                    }
+             if ($lang == "he" ){
+              for (var i = 0; i < skills2.length; i++){
+                if (skills2[i].localizations.length > 0){
+                skills2[i].skillName = skills2[i].localizations[0].skillName
+                }
               }
             }
             skills2 = skills2
@@ -53,7 +51,6 @@
         }
         
     });
-const heb =/^[\u0590-\u05fe]/;
 
     function find_skill_id(skill_name_arr){
      var  arr = [];
@@ -69,8 +66,8 @@ const heb =/^[\u0590-\u05fe]/;
 
 
     let selected = [];  
+    const placeholder = `${$lang == "he" ? "הכישורים שלי" : "My skills"}`;
 
-    const placeholder = `הכישורים שלי`;
 	
     let userName_value;
     let show_value = 0;
@@ -124,13 +121,15 @@ selected.push(newN);
 selected = newSele;
 
   }
+    const addn = {"he":"הוספת כישור חדש","en": "Add new Skill"}
+
   const ws = {"he": "  ?  מה הן היכולות שלך","en": "What you can do?"}
   </script>
   
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="content" style="background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);  background-position: center; background-size: cover;"  aria-label="form">
-      <div dir="rtl" >
+  <DialogContent class="content"  aria-label="form">
+      <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
              
       <Addnewskill rn={skills2.map(c => c.skillName)} addS={true} on:b={close} on:addnewskill={addnew}/>
   </DialogContent>
@@ -140,20 +139,20 @@ selected = newSele;
     <h1 class="midscreenText-2">
       
      {userName_value} 
-     {ws[$lang]}
      <br/>
+    {ws[$lang]}
   </h1>
-<div  class="input-2">
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
   <MultiSelect
   bind:selected
   {placeholder}
   options={skills2.map(c => c.skillName)}
   /></div>
-<div  class="input-2-2">
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
   <button
   on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
-  >הוספת כישור שאינו ברשימה</button>
+  >{addn[$lang]}</button>
   </div>
     <button class="button-in-1-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>

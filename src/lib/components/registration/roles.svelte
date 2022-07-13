@@ -6,6 +6,8 @@
     import { onMount } from 'svelte';
     import Addnewrole from '../addnew/addNewRole.svelte';
  import { createEventDispatcher } from 'svelte';
+           import { lang } from '$lib/stores/lang.js'
+
  const dispatch = createEventDispatcher();
     let roles1 = [];
     let error1 = null;
@@ -116,6 +118,8 @@ selected.push(newN);
 selected = newSele;
 
   }
+    const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
+  const what = {"he": "יש לך תפקיד מועדף?","en": "Do you have a preferred role?"}
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -130,8 +134,7 @@ selected = newSele;
 <h1 class="midscreenText-2">
     {userName_value}
     <br/>
-     ?
-  יש לך תפקיד מועדף
+     {what[$lang]}
    </h1> 
    <div  class="input-2">
      <MultiSelect
@@ -146,7 +149,7 @@ selected = newSele;
       <button
       on:click={() => isOpen = true} 
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
-      >הוספת תפקיד שאינו ברשימה</button>
+      >{addn[$lang]}</button>
     </div>
     <button class="button-in-1-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
