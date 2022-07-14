@@ -578,6 +578,12 @@ const rl = {"he": "תפקידים", "en": "roles"}
 const ms = {"he": "משאבים","en": "resources"}
 const ar = {"he":"ערכים", "en": "Vallues"}
 const ww = {"he": "דרכי היצירה", "en" : "ways of creation"}
+const plv = {"he": "בחירת ערכים", "en": "choose Vallues"}
+const pls = {"he": "בחירת כישורים", "en": "choose skills"}
+const plm = {"he": "בחירת משאבים", "en": "choose resources"}
+const plw = {"he": "בחירת דרכי יצירה", "en": "choose ways of creation"}
+const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
+
 </script>
 
   <svelte:head>
@@ -646,28 +652,28 @@ const ww = {"he": "דרכי היצירה", "en" : "ways of creation"}
   {#key addSl}
   <div class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
           <TourItem message={message2[$lang]}>
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={" בחירת כישורים"}/> 
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/> 
         </TourItem>
  </div>
   <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
           <TourItem message={message3[$lang]}>
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={"בחירת תפקידים"}/> 
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/> 
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
   <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
-    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={"בחירת משאבים"}/> 
+    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/> 
 </div>
           </TourItem>
 
         <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}">
                 <TourItem message={message5[$lang]}>
-      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={" בחירת ערכים"}/> 
+      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/> 
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
         <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}">
-          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> 
+          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/> 
         </div>
                             </TourItem>
 
