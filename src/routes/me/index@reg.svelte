@@ -6,7 +6,7 @@
  import { run } from 'svelte-tour';
     import { Tour } from 'svelte-tour';
   import TourTip from '../../lib/components/tour/tourMeEnd.svelte';
-
+  import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
   import axios from 'axios'
 	import { draw } from 'svelte/transition';
@@ -496,7 +496,7 @@ function delm ( event){
   a = 3
   const nj = event.detail.nj;
   spid = event.detail.id
-  messege = `המשאב ${nj} ימחק האם להמשיך?`
+  messege = $lang == "he" ? `המשאב ${nj} ימחק האם להמשיך?` : `the resource ${nj} will be deleted, do you want to continue?`;
 }
 let miDa = [];
 async function han (){
@@ -544,11 +544,22 @@ async function han (){
         }
 }
 //
-
+const title = {"he": "פרופיל והגדרות 1❤️1", "en": "1❤️1 profile and settings"}
+const deletew = {"he": "מחיקה" , "en": "delete"};
+const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
+const message1 = {"he":"לחיצה על הכתר מובילה ללב 1❤️1, שם נמצאות ההצעות, ההצבעות והפעולות השונות",
+                  "en":"click on the crown to move to the heart of 1❤️1, there are offers, voting and various actions"}
+const levtitle = {"he": "ללב 1❤️1", "en": "to the heart of 1❤️1"}
+const message2 = {"he": "רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים",
+                   "en": "list of your skills, press the edit button below to add more skills or to remove some from your list"}
+const message3 = {"he": "רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר", 
+                "en": "youre roles list, after adding or removing remember to press the button below to save your edit"}
+const message4 = {"he":"רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת",
+              "en": "Bottom right is youre resource list, on the heart you'll get offers from freemates who need them"}
 </script>
 
   <svelte:head>
-  <title>פרופיל והגדרות 1❤️1</title>
+  <title>{title[$lang]}</title>
 </svelte:head>
 {#await meData}
 <div class="body grid items-center justify-center">
@@ -572,11 +583,11 @@ async function han (){
           <button 
   class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
   on:click={han}
-  >מחיקה</button>
+  >{deletew[$lang]}</button>
           </div>
           {:else if a == 2}
           <div class="sp bg-gold">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
+            <h3 class="text-barbi">{om[$lang]}</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> {/if}
@@ -590,9 +601,9 @@ async function han (){
 
   <div >
   <a  target="_self" href="/lev">
-        <TourItem message="לחיצה על הכתר מובילה ללב המערכת, שם נמצאות ההצעות, ההצבעות והפעולות השונות">
+        <TourItem message={message1[$lang]}>
     <img
-    title=" ללב המערכת"
+    title={levtitle[$lang]}
     class="ceterr name"
     src='https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg'
     alt="link">
@@ -612,18 +623,18 @@ async function han (){
   {#if addNs1 == true} 
   {#key addSl}
   <div class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
-          <TourItem message="רשימת הכישורים שלך לחיצה על כפתור העריכה להוספת או הסרת כישורים">
+          <TourItem message={message2[$lang]}>
     <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={"כישורים"} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={" בחירת כישורים"}/> 
         </TourItem>
  </div>
   <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
-          <TourItem message="רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר">
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={"תפקידים"} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={" בחירת תפקידים"}/> 
+          <TourItem message={message3[$lang]}>
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={"תפקידים"} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={"בחירת תפקידים"}/> 
         </TourItem>
  </div>
-           <TourItem message="רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת">
+           <TourItem message={message4[$lang]}>
   <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
-    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={" בחירת משאבים"}/> 
+    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={"בחירת משאבים"}/> 
 </div>
           </TourItem>
 
