@@ -1,7 +1,8 @@
 ﻿<script>
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
-    import { email } from '../registration/email.js'
+    import { email } from '../registration/email.js';
+    import { show } from '../registration/store-show.js'
     import { regHelper } from '../../stores/regHelper.js';
         import * as yup from "yup";
                 import axios from 'axios';
@@ -388,6 +389,8 @@ console.log("t")
             regHelper.set(1);
                     meData = response.data;
                 fpval.set(meData.id)
+                show.set(0)
+                console.log($fpval, $contriesi, "from after")
             datar = data;
               })
   .catch(error => {

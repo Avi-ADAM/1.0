@@ -555,11 +555,16 @@ const message2 = {"he": "רשימת הכישורים שלך, לחיצה על כ�
 const message3 = {"he": "רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר", 
                 "en": "youre roles list, after adding or removing remember to press the button below to save your edit"}
 const message4 = {"he":"רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת",
-              "en": "Bottom right is youre resource list, on the heart you'll get offers from freemates who need them"}
+              "en": "Bottom right is youre resource list, on the heart you'll get offers from FreeMates who need them"}
 const message5 = {"he":"רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת", 
-                  "en":"list of your Vallues, we will offer you freemates who promoting those vallues"};
+                  "en":"list of your Vallues, we will offer you FreeMates who promoting those vallues"};
 const message6 = {"he":"רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת",
                   "en": "Bottom left are your ways of creation list, we will offer you missions that accsept those terms"}
+const message7 = {"he":"עריכת תמונת הפרופיל", "en": "edit your profile picture"}
+const message8 = {"he":" העלאת תמונת פרופיל חדשה", "en": "upload new profile picture"}
+const message9 = {"he":"רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה",
+                  "en":"your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates"}
+const myfr = {"he": "הרקמות שלי", "en": "My FreeMates"}
 </script>
 
   <svelte:head>
@@ -676,8 +681,8 @@ const message6 = {"he":"רשימת דרכי היצירה שלך (למטה משמ
    <button
      on:click={openen}
      class=" hover:bg-barbi text-mturk rounded-full edit"
-     title="עריכת תמונת פרופיל"
-     >                 <TourItem message="עריכת תמונת הפרופיל">
+     title={message7[$lang]}
+     >                 <TourItem message={message7[$lang]}>
 <svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path transition:draw|local="{{duration: 1000}}" fill="currentColor" d="M22.7 14.3L21.7 15.3L19.7 13.3L20.7 12.3C20.8 12.2 20.9 12.1 21.1 12.1C21.2 12.1 21.4 12.2 21.5 12.3L22.8 13.6C22.9 13.8 22.9 14.1 22.7 14.3M13 19.9V22H15.1L21.2 15.9L19.2 13.9L13 19.9M11.21 15.83L9.25 13.47L6.5 17H13.12L15.66 14.55L13.96 12.29L11.21 15.83M11 19.9V19.05L11.05 19H5V5H19V11.31L21 9.38V5C21 3.9 20.11 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H11V19.9Z" />
 </svg>          </TourItem>
@@ -690,26 +695,28 @@ const message6 = {"he":"רשימת דרכי היצירה שלך (למטה משמ
 
     <div class="middleu"> 
   {#if addpic == 0}    
-                 <TourItem message="הוספת תמונת פרופיל">
+                 
     <button
       on:click={openen}
  class=" hover:bg-barbi text-mturk rounded-full haalaa"
-     title=" העלאת תמונת פרופיל" > <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+     title={message8[$lang]} > 
+     <TourItem message={message8[$lang]}>
+     <svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path transition:draw|local="{{duration: 1000}}" fill="currentColor" d="M7 19L12 14L13.88 15.88C13.33 16.79 13 17.86 13 19H7M10 10.5C10 9.67 9.33 9 8.5 9S7 9.67 7 10.5 7.67 12 8.5 12 10 11.33 10 10.5M13.09 20H6V4H13V9H18V13.09C18.33 13.04 18.66 13 19 13C19.34 13 19.67 13.04 20 13.09V8L14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H13.81C13.46 21.39 13.21 20.72 13.09 20M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" />
 </svg>
+</TourItem>
     </button>
-                 </TourItem>
-         
+
 {/if}
     </div>
 {/if}
         
          <div class="a6"  >
-                         <TourItem message="רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה">
+          <TourItem message={message9[$lang]}>
 
 <div class="another" dir="rtl">
   
-    <h2 class="cot">הרקמות שלי</h2>
+    <h2 class="cot">{myfr[$lang]}</h2>
 <span class="d">
            {#each myP as data, i}
            <div class="cont" >  
