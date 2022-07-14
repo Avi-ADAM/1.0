@@ -514,6 +514,13 @@ const cencel = {"he":"ביטול","en": "cencel"}
 const less = {"he":"הסרה", "en": "remove"}
 const bef = {"he":"ה" , "en": "My "}
 const aft = {"he": " שלי", "en": ""}
+const edito = {"he":"עריכה", "en":"edit"}
+const edbef = {"he": "עריכת ה", "en": "edit My "}
+const edaft = {"he": " שלי ", "en": ""} 
+const rem = {"he": "הסרת " , "en": "remove "} 
+const adbf = {"he":" בחירת ", "en": "choose more "}
+const adaf = {"he":" נוספים", "en": ""}
+const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
   </script>
 {#if masss === true}
 
@@ -542,7 +549,7 @@ on:click={bitulm}
            {/each} </span>{/if}
 <button
 class=" hover:bg-barbi text-mturk rounded-full "
-title="עריכה"
+title="{edito[$lang]}"
 on:click={open} 
 ><svg  class="e" viewBox="0 0 24 24">
  <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
@@ -553,13 +560,13 @@ on:click={open}
 {#if g == false}
 <div class="anotherE"  transition:fly|local={{x: 350, y: 200 ,opacity: 0.5}}>
 <button class=" hover:bg-barbi text-gold  font-bold rounded-full"
-title="ביטול"
+title="{cencel[$lang]}"
 on:click={bitul}
 ><svg  style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
  
-   <p class="text-center text-sm text-barbi">עריכת ה{Valname} שלי </p>
+   <p class="text-center text-sm text-barbi">{edbef[$lang]}{Valname}{edaft[$lang]}</p>
      {#if data} {#each data as da, i}
   <div class="text-center text-sm text-lturk">
        <button class="text-gold hover:text-barbi"  title={less} on:click={min(da.id , da[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
@@ -567,7 +574,7 @@ on:click={bitul}
     </svg></button>
     {#if datan === "mash"}<button
 class=" hover:bg-barbi text-mturk rounded-full "
-title="עריכה"
+title="{edito[$lang]}"
 on:click={edit(da.id)} 
 ><svg  style="width:17px;height:17px" viewBox="0 0 24 24">
  <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
@@ -579,7 +586,7 @@ on:click={edit(da.id)}
    {#if datan === "mash" && yy == 2}
    <button
         on:click={increment} 
-         title="הסרת {Valname} "
+         title="{rem[$lang]}{Valname} "
     class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150" 
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
@@ -589,7 +596,7 @@ on:click={edit(da.id)}
    {/if}
 <br>
  
-  <span > <h3 class="text-center text-sm text-barbi">  בחירת {Valname } נוספים </h3>  <MultiSelect
+  <span > <h3 class="text-center text-sm text-barbi">{adbf[$lang]}{Valname }{adaf[$lang]}</h3>  <MultiSelect
       bind:selected={data.selected2}
       {placeholder}
       options={allvn}
@@ -618,7 +625,7 @@ on:click={edit(da.id)}
   {#if datan !== "mash" && yy > 0}
       <button
         on:click={increment} 
-         title="הוספת {Valname} חדשים"
+         title="{adbf[$lang]}{Valname}{adaf[$lang]}"
     class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150" 
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
@@ -627,7 +634,7 @@ on:click={edit(da.id)}
     {/if}
      {:else if g == true}
           <div class="sp ">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
+            <h3 class="text-barbi">{om[$lang]}</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div>
