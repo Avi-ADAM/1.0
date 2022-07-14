@@ -59,6 +59,10 @@ let idLi;
         };
        
           try {
+            let more = ``
+            if ($lang == "he"){
+              more =  `localizations{ ${valc} }`
+            }
               const res = await  fetch("https://i18.onrender.com/graphql", {
               method: "POST",
               headers: {
@@ -66,13 +70,22 @@ let idLi;
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  ${linkp} { id ${valc}}
+  ${linkp} { id ${valc} ${more}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
               meData = res.data[linkp];
+                             if ($lang == "he" ){
+              for (var i = 0; i < meData.length; i++){
+                if (meData[i].localizations.length > 0){
+                meData[i][valc] = meData[i].localizations[0][valc]
+                }
+              }
+            }
+            meData = meData
               allvn = meData.map(c => c[valc]);
+
               console.log(res);
           } catch (e) {
               error1 = e

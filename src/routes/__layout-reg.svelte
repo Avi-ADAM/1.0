@@ -2,11 +2,32 @@
 import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
   import { onMount } from 'svelte';
   import { Tour, TourTip } from 'svelte-tour';
-
-
+    import { lang, doesLang, langUs } from '../lib/stores/lang.js'
+import { session } from '$app/stores';
+function getLang() {
+    let la;
+    const fromSe = $session.userAgent
+    if ($doesLang == false) {
+    if (fromSe.includes("he")){
+        la = "he"
+    } else if (fromSe.includes("ar")){
+        la = "ar"
+    } else{
+        la = "en"
+    }
+    }
+    else {
+        la = $langUs
+    }
+   // if (navigator.languages != undefined)
+   //     return navigator.languages[0];
+   // return navigator.language;
+    lang.set(la)
+}
 let isAuthed = false;
 let token;
 onMount(async () => {
+   getLang()
     const cookieRe = document.cookie
   .split('; ')
   .find(row => row.startsWith('when='))

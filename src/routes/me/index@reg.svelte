@@ -200,11 +200,11 @@ async function start () {
             hervachti
             profilePic {url formats }
             projects_1s { id projectName} 
-            skills { id skillName} 
+            skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}} 
             sps (where: {archived: false }) {id  name}
-            tafkidims { id roleDescription}
-            vallues {id valueName}
-            work_ways {id workWayName}
+            tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+            vallues {id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
+            work_ways {id workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
           } me { id }
  } `   
  } )})
@@ -219,6 +219,13 @@ async function start () {
             skil = meData.skills;
             taf = meData.tafkidims;
             val = meData.vallues;
+            if ($lang == "he"){
+              for (var i = 0; i < val.length; i++){
+                if (val[i].localizations.length > 0){
+                val[i].valueName = val[i].localizations[0].valueName
+                }
+              }
+            }
             mash = meData.sps;
             work = meData.work_ways;         
         //    roundText (meData.username);
