@@ -40,6 +40,7 @@ function add (event){
 let title = {"he": "הרשמה ל-1❤️1", "en": "1❤️1 registration"};
 let tu = { "he": "תודה", "en": "thank you"};
 let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
+const buttn = { "he": "לחיצה למעבר לעמוד הפרופיל","en": "click to go to your new profile page"}
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -96,7 +97,7 @@ let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
 <br>
 {see[$lang]}
 </h1>
-    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
+    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={()=>goto('/me',)}>{buttn[$lang]}</button>
   </div>
   </div>
 {/if}

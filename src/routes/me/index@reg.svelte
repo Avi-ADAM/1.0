@@ -556,6 +556,10 @@ const message3 = {"he": "רשימת התפקידים, עריכה להוספת א
                 "en": "youre roles list, after adding or removing remember to press the button below to save your edit"}
 const message4 = {"he":"רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת",
               "en": "Bottom right is youre resource list, on the heart you'll get offers from freemates who need them"}
+const message5 = {"he":"רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת", 
+                  "en":"list of your Vallues, we will offer you freemates who promoting those vallues"};
+const message6 = {"he":"רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת",
+                  "en": "Bottom left are your ways of creation list, we will offer you missions that accsept those terms"}
 </script>
 
   <svelte:head>
@@ -639,11 +643,11 @@ const message4 = {"he":"רשימת המשאבים שלך (למטה מימין), 
           </TourItem>
 
         <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}">
-                <TourItem message="רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת">
+                <TourItem message={message5[$lang]}>
       <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={"ערכים"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={" בחירת ערכים"}/> 
           </TourItem>
     </div>
-                          <TourItem message="רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת">
+                          <TourItem message={message6[$lang]}>
         <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}">
           <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי היצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> 
         </div>
