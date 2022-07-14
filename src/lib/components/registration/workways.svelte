@@ -123,7 +123,9 @@ let isOpen = false;
     const newSele = selected;
     selected.push(newN);
     selected = newSele;
-}
+}   
+    const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
+    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const addn = {"he":"הוספת דרך חדשה","en": "Add new way"}
     const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
   </script>
@@ -154,11 +156,11 @@ let isOpen = false;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
       >{addn[$lang]}</button>
     </div>
-  <button class="button-in-1-2" on:click="{increment}">
-    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
+  <button class="button-in-1-2" on:click="{$lang == "he" ? increment : back}">
+    <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
-  <button class="button-2" on:click="{back}">
-    <img alt="go" style="height:15vh;" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg"/>
+  <button class="button-2" on:click="{$lang == "en" ? increment : back}">
+    <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
 
 
