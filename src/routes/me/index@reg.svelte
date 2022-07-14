@@ -566,6 +566,18 @@ const message9 = {"he":"רשימת הרקמות שלך, ריקמה היא קבו
                   "en":"your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates"}
 const myfr = {"he": "הרקמות שלי", "en": "My FreeMates"};
 const crnfr = {"he": "יצירת ריקמה חדשה", "en": "create a new FreeMates"}
+const message10 = {"he" :"כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן",
+                    "en": "The Diamond down shows how much you earn from FreeMates so far"}
+const sofartit = {"he": "סך הכל הרווחתי", "en": "total earnings"}
+const editbas = {"he": "עריכת פרטים בסיסיים והגדרות", "en":"Edit Basic Information and Settings"}
+const message11 ={"he": "עריכת פרטים והגדרות, הפעלת התראות במכשיר, בחירת יום חופשי וביטול הצגת המדריך" ,
+                   "en": "edit your info, settings, add device alerts, choosing a free day and cencel guid"}
+const cencel = {"he":"ביטול","en": "cencel"}
+const sk = {"he":"כישורים", "en": "skills"}
+const rl = {"he": "תפקידים", "en": "roles"}
+const ms = {"he": "משאבים","en": "resources"}
+const ar = {"he":"ערכים", "en": "Vallues"}
+const ww = {"he": "דרכי היצירה", "en" : "ways of creation"}
 </script>
 
   <svelte:head>
@@ -634,28 +646,28 @@ const crnfr = {"he": "יצירת ריקמה חדשה", "en": "create a new FreeM
   {#key addSl}
   <div class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
           <TourItem message={message2[$lang]}>
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={"כישורים"} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={" בחירת כישורים"}/> 
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={" בחירת כישורים"}/> 
         </TourItem>
  </div>
   <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
           <TourItem message={message3[$lang]}>
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={"תפקידים"} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={"בחירת תפקידים"}/> 
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={"בחירת תפקידים"}/> 
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
   <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
-    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={"משאבים"} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={"בחירת משאבים"}/> 
+    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={"בחירת משאבים"}/> 
 </div>
           </TourItem>
 
         <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}">
                 <TourItem message={message5[$lang]}>
-      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={"ערכים"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={" בחירת ערכים"}/> 
+      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={" בחירת ערכים"}/> 
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
         <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}">
-          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={"דרכי היצירה"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> 
+          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={" בחירת דרכים"}/> 
         </div>
                             </TourItem>
 
@@ -800,7 +812,7 @@ class=" hover:scale-150 "
              
                          </TourItem>
 </div> 
-                           <TourItem message="כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן">
+                           <TourItem message={message10[$lang]}>
 
 <div class="anotheri">
   <svg class="svgg"  viewBox="10.359 38.373 262.893 179.464" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
@@ -1091,7 +1103,7 @@ class=" hover:scale-150 "
       <stop offset="1" style="stop-color: rgb(221, 209, 94);"/>
     </radialGradient>
   </defs>
-      <title>סך הכל הרווחתי</title>
+      <title>{sofartit[$lang]}</title>
   <g id="imagebot_2" style="" transform="matrix(1.133505, 0, 0, 1, -5.338863, -2.934956)">
     <g filter="url(#imagebot_164_blur)" id="imagebot_164" transform="translate(0.000976563 0) matrix(1 0 0 1 -349.55 -446.51)">
       <path stroke-width="0" id="imagebot_165" d="M493.61,508.95L459.228,518.7949L431.708,512.5018L493.61,508.95z" style="fill: url(#gradient-44);"/>
@@ -1220,7 +1232,7 @@ class=" hover:scale-150 "
         <path d="M464.84,551.19L526.741,547.6382L479.225,530.0752L464.84,551.19z" id="imagebot_8" fill="url(#imagebot_9)"/>
       </g>
     </g>
-    <title>סך הכל הרווחתי</title>
+    <title>{sofartit[$lang]}</title>
   </g>
   <path d="M 310.778 152.849 L 406.216 171.904 L 406.216 210.013 L 310.778 229.067 L 215.34 210.013 L 215.34 171.904 Z" style="fill: url(#gradient-1); fill-opacity: 0.73;" transform="matrix(0.999813, 0.019346, -0.019346, 0.999813, -163.843097, -95.620727)" bx:shape="n-gon 310.778 190.958 110.202 38.109 6 0 1@0cc060df"/>
   <text style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 54.1178px; font-weight: 700; line-height: 288.628px; stroke: url(#gradient-3); text-anchor: middle; white-space: pre; filter: url(#drop-shadow-filter-0);" transform="matrix(0.627037, 0.018356, -0.018632, 0.636449, 145.136673, 107.674744)"><tspan>{total}<tspan x="0" dy="1em">​</tspan> </tspan><tspan x="0" dy="1em">​</tspan><tspan>💗</tspan></text>
@@ -1231,10 +1243,10 @@ class=" hover:scale-150 "
 <div class="anothere">
   <button 
   on:click={basic} 
-  title="עריכת פרטים בסיסיים"
+  title={editbas[$lang]}
   class=" hover:bg-barbi text-mturk rounded-full"
   >
-                           <TourItem atEnd="false" message="עריכת פרטים והגדרות, הפעלת התראות במכשיר, בחירת יום חופשי וביטול הצגת המדריך" >
+                           <TourItem message={message11[$lang]}>
   <svg  style="width:24px;height:24px" viewBox="0 0 24 24">
  <path transition:draw|local="{{duration: 1000}}" fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
 </svg>
@@ -1246,7 +1258,7 @@ class=" hover:scale-150 "
 
 </div>
 {:else if addP == true}
-<button title="ביטול"
+<button title="{cencel[$lang]}"
   on:click={() => addP = false}
   style="margin: 0 auto;"
   class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"

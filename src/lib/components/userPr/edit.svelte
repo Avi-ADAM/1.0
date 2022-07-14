@@ -1,7 +1,7 @@
 
 <script> 
    
-    import { onMount } from 'svelte';
+              import { lang } from '$lib/stores/lang.js'
    // import AddSkil from './addSkil.svelte';
     import { skillsNew } from '../../stores/skillsNew.js';
     import MultiSelect from 'svelte-multiselect';
@@ -190,7 +190,6 @@ function find_name(arra){
       }
       return arr;
      };
-let less = "הסרה";
 
 const filterByReference = (allob, id)=> {
   console.log(id)
@@ -511,13 +510,17 @@ async function edit (id){
 
 }
 //style="margin:auto; overflow:auto;"
+const cencel = {"he":"ביטול","en": "cencel"}
+const less = {"he":"הסרה", "en": "remove"}
+const bef = {"he":"ה" , "en": "My "}
+const aft = {"he": " שלי", "en": ""}
   </script>
 {#if masss === true}
 
 <div class="grid items-center align-center justify-center" >
 <button class=" hover:bg-barbi text-gold font-bold rounded-full" 
 style="width:24px; height:24px; margin: 0 auto;"
-title="ביטול"
+title="{cencel[$lang]}"
 on:click={bitulm}
 ><svg  style="width:24px; height:24px;" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -533,7 +536,7 @@ on:click={bitulm}
       {#if addSl == false}
       <div class="another " style="margin: auto"> 
  
-        <h2 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">ה{Valname} שלי</h2>
+        <h2 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">{bef[$lang]}{Valname}{aft[$lang]}</h2>
        {#if data} <span class="d"> {#each data as dat, i}
            <p style="margin: 0; line-height: 1;  padding: auto;" class="t">{dat[valc]}</p>
            {/each} </span>{/if}
