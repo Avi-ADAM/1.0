@@ -115,7 +115,10 @@ let needr = [];
 
 async function increment() {
       g = true;
-     
+       let more = ``
+            if ($lang == "he"){
+              more =  `localizations{ ${valc} }`
+            }
      if (datan !== "mash"){
        console.log(datan,"dd")
        let list = data.map(c => c.id);
@@ -150,7 +153,7 @@ async function increment() {
   ){
       user {
           ${kish}{
-              id ${valc}
+              id ${valc} ${more}
           }
       }
   }
@@ -160,11 +163,18 @@ async function increment() {
   .then(r => r.json())
   .then(data => miData = data);
          console.log(miData)
+                    if ($lang == "he" ){
+              for (var i = 0; i < miData.length; i++){
+                if (miData[i].localizations.length > 0){
+                miData[i][valc] = miData[i].localizations[0][valc]
+                }
+              }
+            }
+            miData = miData
          addSl = false;
  dispatch('close', {
     linkp: linkp,
     list: miData.data.updateUser.user[kish]
-
     } );
     g = false;
         } catch (e) {

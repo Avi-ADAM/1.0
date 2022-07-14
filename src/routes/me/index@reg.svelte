@@ -396,7 +396,6 @@ async function addnew (event) {
  const skob = event.detail.skob;
  const miDatanew = event.detail.data;
  miDatanew.push(skob);
- console.log (miDatanew);
  addNs1 = false;
  const meDatanew = meData;
  meDatanew[linkp] = miDatanew;
@@ -468,6 +467,13 @@ function close (event){
   }
   else if (a == "vallues"){
   val = event.detail.list;
+      if ($lang == "he" ){
+              for (var i = 0; i < val.length; i++){
+                if (val[i].localizations.length > 0){
+                val[i].valueName = val[i].localizations[0].valueName
+                }
+              }
+            }
   }
   else if (a == "mashaabims"){
    mash = event.detail.list;
