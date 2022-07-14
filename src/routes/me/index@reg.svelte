@@ -564,7 +564,8 @@ const message7 = {"he":"עריכת תמונת הפרופיל", "en": "edit your 
 const message8 = {"he":" העלאת תמונת פרופיל חדשה", "en": "upload new profile picture"}
 const message9 = {"he":"רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה",
                   "en":"your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates"}
-const myfr = {"he": "הרקמות שלי", "en": "My FreeMates"}
+const myfr = {"he": "הרקמות שלי", "en": "My FreeMates"};
+const crnfr = {"he": "יצירת ריקמה חדשה", "en": "create a new FreeMates"}
 </script>
 
   <svelte:head>
@@ -730,14 +731,10 @@ const myfr = {"he": "הרקמות שלי", "en": "My FreeMates"}
 style="    z-index: 7;"
 class=" hover:scale-150 "     
     on:click={() => addP = true} 
-    title="יצירת ריקמה חדשה">
+    title={crnfr[$lang]} >
 <svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
-<style type="text/css">
-	
-</style>
-
-<g class="n svgh" >
+  <g class="n svgh" >
 	<path   class="st2 svgh"  d="M626.407,50.022c-7.193-0.778-14.386-0.539-21.585-0.225c-7.199-0.314-14.392-0.553-21.585,0.225
 		C251.878,55.423,34.711,353.506,78.035,650.425c23.893,167.215,115.647,257.266,171.46,316.006
 		c120.016,126.058,98.977,162.49,139.248,225.625c-21.847,28.048-24.026,71.245-1.648,99.612
