@@ -248,7 +248,7 @@ const hrex = {"he": "לאחר זמן זה חוסר מענה יחשב כהסכמ�
 const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en":"time to respond to FreeMates voting"}
 const teure = {"he": "תיאור קצר שיהיה גלוי לכל", "en": "short description with public visibility"} 
 const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMates members"}
-const wel = {"he":"לינק לאתר (אם יש(" ,"en":"link to a website (if any)"}
+const wel = {"he":"לינק לאתר (אם יש)" ,"en":"link to a website (if any)"}
 const naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
 const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMates will promote"}
 const ladd = {"he":"הוסף לוגו", "en": "add Logo"} 
@@ -337,7 +337,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
   <br>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
-    <select bind:value={restime} class="round form-select appearance-none
+    <select class:text-center={$lang == "en"} bind:value={restime} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -361,7 +361,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 </div>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
-    <select bind:value={timeToP} class="round form-select appearance-none
+    <select class:text-center={$lang == "en"} bind:value={timeToP} class="round form-select appearance-none
       block
       w-full
       px-3
