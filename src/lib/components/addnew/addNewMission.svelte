@@ -26,7 +26,7 @@ function dis () {
     } );
 };      
     
-onMount(async () => {
+    onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -41,34 +41,31 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/skills?_limit=-1", {
-              method: "GET",
+            const res = await fetch("https://i18.onrender.com/graphql", {
+              method: "POST",
               headers: {
                  'Content-Type': 'application/json'
-              },
+              },body: JSON.stringify({
+                        query: `query {
+  skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+}
+              `})
             }).then(checkStatus)
           .then(parseJSON);
-            skills2 = res
+            skills2 = res.data.skills;
+             if ($lang == "he" ){
+              for (var i = 0; i < skills2.length; i++){
+                if (skills2[i].localizations.length > 0){
+                skills2[i].skillName = skills2[i].localizations[0].skillName
+                }
+              }
+            }
+            skills2 = skills2
         } catch (e) {
             error1 = e
         }
+        
     });
-    let tafkidimslist = [];
-   missionNew.subscribe(newwork => {
-    tafkidimslist = newwork;
-        });
-
-    function find_skill_id(skill_name_arr){
-     var  arr = [];
-      for (let j = 0; j< skill_name_arr.length; j++ ){
-      for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].skillName === skill_name_arr[j]){
-          arr.push(skills2[i].id);
-        }
-      }
-      }
-      return arr;
-     };
 let link = "https://i18.onrender.com/missions"
 let missionName_value;
     let selected;  
