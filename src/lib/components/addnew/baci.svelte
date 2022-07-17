@@ -357,7 +357,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 <option value="sevend">{week[$lang]}</option>
 
 </select>
-<small style="color: turquoise;">{hrx[$lang]}</small>
+<small style="color: turquoise;">{hrex[$lang]}</small>
 </div>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
