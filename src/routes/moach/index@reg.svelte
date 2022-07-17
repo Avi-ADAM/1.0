@@ -754,6 +754,7 @@ let openMS = false;
 function close () {
   showvd = false;
   addM = false;
+  blabla = []
 }
 let meDatamm = [];
 async function updi (){
@@ -1078,6 +1079,7 @@ function tofinish(){
 	finiss.scrollIntoView(true);
 }
 const title = {"he": "מוח הריקמה 1❤️1","en": "1❤️1 FreeMates Brain"}
+const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding missions"}
     </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -1232,7 +1234,7 @@ const title = {"he": "מוח הריקמה 1❤️1","en": "1❤️1 FreeMates Br
   {#if pmiData.length > 0}
     <button
      class="border  border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
-    on:click={topends}> פעולות ממתינות לאישור</button>
+    on:click={topends}>{mwa[$lang]}</button>
     {/if}
   
       {#if omiData.length > 0}

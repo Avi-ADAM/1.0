@@ -13,7 +13,28 @@
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
   import Levchat from '../../lib/components/lev/levchat.svelte'
-
+ import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+import { session } from '$app/stores';
+function getLang() {
+    let la;
+    const fromSe = $session.userAgent
+    if ($doesLang == false) {
+    if (fromSe.includes("he")){
+        la = "he"
+    } else if (fromSe.includes("ar")){
+        la = "ar"
+    } else{
+        la = "en"
+    }
+    }
+    else {
+        la = $langUs
+    }
+   // if (navigator.languages != undefined)
+   //     return navigator.languages[0];
+   // return navigator.language;
+    lang.set(la)
+}
         let low = true;
         let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
         let isOpen = false;
@@ -940,12 +961,12 @@ async function showOpenPro (mi) {
             `{openMissions (where: {id_in: [${resultString}]}){ id
             project { id projectName profilePic {url formats }}
             sqadualed
-            tafkidims {roleDescription}
-            skills {skillName}
+            tafkidims {roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+            skills {skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
             descrip
             hearotMeyuchadot
             name
-            work_ways {workWayName}
+            work_ways {workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
             noofhours perhour
             }
             }`
@@ -1059,6 +1080,7 @@ let counter = 0;
     }
 let repeater =  null;
 onMount(async () => {
+  getLang()
       if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js', { scope: '.' }).then(function(reg) {
     // registration worked
@@ -1131,7 +1153,8 @@ onMount(async () => {
 var changeSpeed = speed;
  repeater = setInterval(repeaterFn, speed);
 function repeaterFn(){
-  c=0;gen();flash();finito(); console.log("shit")
+  c=0;gen();flash();finito(); 
+  console.log("shit")
     if( changeSpeed != speed ){
      clearInterval(repeater);
      speed = changeSpeed;
@@ -1174,7 +1197,7 @@ function repeaterFn(){
 
 let walcomenold= [], hucaold = [], meDataold = [];
 async function start () { 
-  console.log("start");
+  console.log($lang,"start");
   miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
     let link ="https://i18.onrender.com/graphql" ;

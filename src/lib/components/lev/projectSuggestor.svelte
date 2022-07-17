@@ -2,13 +2,15 @@
      import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte'
+                   import { lang } from '$lib/stores/lang.js'
 
  const dispatch = createEventDispatcher();
 export let coinlapach;
     export let deadLine;
     export let projectName;
     export let missionName;
-    export let role;
+    export let role = [];
     export let skills = [];
     export let missionDetails;
     export let src = "coin.png";
@@ -212,6 +214,28 @@ function project () {
 
         dispatch("proj", {id: projectId});
 } 
+ onMount(function(){
+ if ($lang == "he" ){
+              for (var i = 0; i < skills.length; i++){
+                if (skills[i].localizations.length > 0){
+                skills[i].skillName = skills[i].localizations[0].skillName
+                }
+              }
+              for (var i = 0; i < role.length; i++){
+                if (role[i].localizations.length > 0){
+                role[i].roleDescription = role[i].localizations[0].roleDescription
+                }
+              }
+              for (var i = 0; i < workways.length; i++){
+                if (workways[i].localizations.length > 0){
+                workways[i].workWayName = workways[i].localizations[0].workWayName
+                }
+              }
+            }
+            role = role
+            skills = skills
+            workways = workways;
+})
   function hoverc (event){
    if (event.detail.x == "0"){
 u = " הצעה לביצוע משימה והצטרפות לריקמה"

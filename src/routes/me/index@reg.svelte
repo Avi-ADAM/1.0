@@ -6,7 +6,7 @@
  import { run } from 'svelte-tour';
     import { Tour } from 'svelte-tour';
   import TourTip from '../../lib/components/tour/tourMeEnd.svelte';
-  import { lang } from '$lib/stores/lang.js'
+ import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
   import axios from 'axios'
 	import { draw } from 'svelte/transition';
@@ -220,6 +220,8 @@ async function start () {
             lango = meData.lang;
             if (lango == "en" || lango == "he") {
               lang.set(lango)
+              doesLang.set(true)
+              langUs.set(lango)
             }
             val = meData.vallues;
             if ($lang == "he"){
@@ -337,6 +339,8 @@ function sendD () {
   //todo refresh data if lang changed
   if (lango == "en" || lango == "he") {
               lang.set(lango)
+              doesLang.set(true)
+              langUs.set(lango)
             } else {
               lango = "ar"
             }
