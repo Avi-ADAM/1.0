@@ -437,8 +437,11 @@ async function findiM() {
 
 let error8;
 let roles = [];
+let skills2 = [];
+
+let workways2 =[];
 async function findT ()  {
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
           return resp;
@@ -452,81 +455,57 @@ async function findT ()  {
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/tafkidims?_limit=-1", {
-              method: "GET",
+            const res = await fetch("https://i18.onrender.com/graphql", {
+              method: "POST",
               headers: {
                  'Content-Type': 'application/json'
-              },
+              },body: JSON.stringify({
+                        query: `query {
+  skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+
+  tafkidims { id roleDescription  ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+
+  workWays { id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
+}
+              `})
             }).then(checkStatus)
           .then(parseJSON);
-            roles = res;
+            skills2 = res.data.skills
+              if ($lang == "he" ){
+              for (var i = 0; i < skills2.length; i++){
+                if (skills2[i].localizations.length > 0){
+                skills2[i].skillName = skills2[i].localizations[0].skillName
+                }
+              }
+            }
+            skills2 = skills2
+            roles = res.data.tafkidims
+            if ($lang == "he" ){
+              for (var i = 0; i < roles.length; i++){
+                if (roles[i].localizations.length > 0){
+                roles[i].roleDescription = roles[i].localizations[0].roleDescription
+                }
+              }
+            }
+            roles = roles;
+             workways2 = res.data.workWays
+                       if ($lang == "he" ){
+              for (var i = 0; i < workways2.length; i++){
+                if (workways2[i].localizations.length > 0){
+                workways2[i].workWayName = workways2[i].localizations[0].workWayName
+                }
+              }
+            }
+            workways2 = workways2;
         } catch (e) {
             error8 = e
+            console.log(error8)
         }
 };
-let error4 = null;
-let skills2 = [];
-async function findZ ()  {
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch("https://i18.onrender.com/skills?_limit=-1", {
-              method: "GET",
-              headers: {
-                 'Content-Type': 'application/json'
-              },
-            }).then(checkStatus)
-          .then(parseJSON);
-            skills2 = res;
-        } catch (e) {
-            error4 = e;
-        }
-};
-let workways2 =[];
-let error27 = null;
-async function findX ()  {
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch("https://i18.onrender.com/work-ways?_limit=-1", {
-              method: "GET",
-              headers: {
-                 'Content-Type': 'application/json'
-              },
-            }).then(checkStatus)
-          .then(parseJSON);
-            workways2 = res;
-        } catch (e) {
-            error27 = e;
-            console.log(error27);
-        }
-};
+
+
 async function refreshM () {
   console.log("הצליח");
-  findX ();
-  findZ ();
   findT ();
   console.log("עדכנתי מידע");
 };

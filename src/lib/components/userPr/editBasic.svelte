@@ -159,12 +159,22 @@ function shaneh () {
   document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
  }
  const pr = {"he":"שפה מועדפת", "en": "prefferd Language"}
+ const myfd = {"he":"היום החופשי שלי", "en": "My free day"}
+ const sun = {"he":"ראשון", "en": "Sunday"}
+ const mon = {"he": "שני", "en": "Monday"}
+ const the = {"he": "שלישי", "en": "Tuesday"}
+ const fo = {"he": "רביעי", "en": "Wednesday"}
+ const to = {"he": "חמישי", "en": "Thursday"}
+ const fri = {"he": "שישי", "en": "Friday"}
+ const shabat = {"he": "שבת", "en": "Saturday"}
+ const head = {"he": "עריכת הפרטים שלי", "en": "Edit My Profile"}
+ const nm = {"he": "שם","en": "name"}
 </script>
-<h1 class="text-barbi text-center text-m">עריכת הפרטים שלי</h1>
+<h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
  <div dir="rtl" class='textinputi'>
   <input name="des" on:change={ch} bind:value={un}  
  type='text' class='inputi'required >
-  <label for="des" class='labeli'>שם </label>
+  <label for="des" class='labeli'>{nm[$lang]}</label>
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
@@ -185,7 +195,7 @@ function shaneh () {
 <div class="grid items-center justify-center"> 
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
-      <h2 class="text-center text-barbi">היום החופשי שלי</h2>
+      <h2 class="text-center text-barbi">{myfd[$lang]}</h2>
     <select on:change={ch} bind:value={frd}
 	 class="round form-select appearance-none
       block
@@ -201,14 +211,14 @@ function shaneh () {
       ease-in-out
       m-0
       focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
-<option  value="na" selected>היום החופשי שלי</option>
-<option value="sun">ראשון</option>
-<option value="mon">שני</option>
-<option value="thu">שלישי</option>
-<option value="wen">רביעי</option>
-<option value="teh">חמישי</option>
-<option value="fri">שישי</option>
-<option value="shabat">שבת</option>
+<option  value="na" selected>{myfd[$lang]}</option>
+<option value="sun">{sun[$lang]}</option>
+<option value="mon">{mon[$lang]}</option>
+<option value="thu">{the[$lang]}</option>
+<option value="wen">{fo[$lang]}</option>
+<option value="teh">{to[$lang]}</option>
+<option value="fri">{fri[$lang]}</option>
+<option value="shabat">{shabat[$lang]}</option>
 </select>
 </div>
 
@@ -252,10 +262,6 @@ function shaneh () {
                         >{errorl} </h1>
        {/if} 
     </div>
-
-
-
-
 <main>
 	<form on:submit|preventDefault={shaneh}>
 		 <div class="field">
