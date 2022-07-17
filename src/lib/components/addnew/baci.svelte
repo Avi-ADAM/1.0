@@ -234,15 +234,21 @@ const never = {"he": "לעולם לא", "en": "never"}
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const cencel = {"he":"ביטול","en": "cencel"}
 const crn = {"he":"יצירת ריקמה חדשה", "en": "Create new FreeMate"}
-const frn = {"he":"שם הריקמה", "en":"FreeMate name"}
+const frn = {"he":"שם הריקמה", "en":"FreeMates name"}
 const hours = {"he": "שעות", "en": "hours"}
 const hrex = {"he": "לאחר זמן זה חוסר מענה יחשב כהסכמה", "en": "after that: non-voting will consider as agreement"}
-const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en":"time to respond to FreeMate voting"}
+const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en":"time to respond to FreeMates voting"}
 const teure = {"he": "תיאור קצר שיהיה גלוי לכל", "en": "short description with public visibility"} 
-const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMate members"}
+const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMates members"}
 const wel = {"he":"לינק לאתר (אם יש(" ,"en":"link to a website (if any)"}
 const naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
-const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMate will promote"}
+const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMates will promote"}
+const ladd = {"he":"הוסף לוגו", "en": "add Logo"} 
+const su = {"he": "לוגו נוסף בהצלחה", "en": "logo has successfully added"}
+const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
+const cree = {"he": "ליצור ולפרסם ריקמה", "en": "Create new FreeMate"}
+const sur = {"he":"הריקמה נוצרה בהצלחה", "en":"new FreeMates has created"}
+const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
  </script>  
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -298,8 +304,8 @@ const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en"
   <span class='line'></span>
 </div>
 <br>
-<button on:click={openen} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >הוסף לוגו</button>
-{#if suc == true}<small class="text-barbi">לוגו נבחר בהצלחה</small>{/if}
+<button on:click={openen} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >{ladd[$lang]}</button>
+{#if suc == true}<small class="text-barbi">{su[$lang]}</small>{/if}
          
 <h1 class="midscreenText-2 text-center text-gold">
   {userName_value} 
@@ -318,7 +324,7 @@ const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en"
     <button
     on:click={() => addval = true} 
     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-    >הוספת ערך חדש</button>
+    >{addn[$lang]}</button>
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
@@ -378,14 +384,14 @@ const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en"
 <button 
     class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
      on:click="{sendP}"
-     name="addm">ליצור ולפרסם ריקמה </button>
+     name="addm">{cree[$lang]}</button>
        {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 {/if}</div>
 {:else}
 <div class="aft">
-  <h1>הריקמה נוצרה בהצלחה</h1>
+  <h1>{sur[$lang]}</h1>
   <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={project} >למוח הריקמה</button>
+ on:click={project} >{tob[$lang]}</button>
 </div>
 {/if}
 
