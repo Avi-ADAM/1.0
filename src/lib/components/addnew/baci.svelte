@@ -288,7 +288,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
         <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input name="des" bind:value={projectName_value}  
  type='text' class='input'required >
-  <label for="des" class='label'>{frn[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{frn[$lang]}</label>
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600">{naex[$lang]}</small>{/if}
