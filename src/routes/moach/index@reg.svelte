@@ -4,7 +4,7 @@
   import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
   import Header from '../../lib/components/header/header.svelte'
   import Lowding from './../../lib/celim/lowding.svelte'
-
+                 import { lang } from '$lib/stores/lang.js'
     import Uplad from '../../lib/components/userPr/uploadPic.svelte';
     import axios from 'axios';
     import Editb from '../../lib/components/prPr/editp.svelte'
@@ -220,7 +220,7 @@ JSON.stringify({query:
                                     mission { id}
                                     created_at
                                     users  {what why id users_permissions_user {id}} }
-            vallues {valueName}
+            vallues {valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
             linkToWebsite
             profilePic {url  formats }
             restime
@@ -284,6 +284,13 @@ JSON.stringify({query:
             pmiData = pmiData;
             bmiData = bmiData;
             vallues = project.vallues;
+            if ($lang == "he"){
+              for (var i = 0; i < vallues.length; i++){
+                if (vallues[i].localizations.length > 0){
+                vallues[i].valueName = vallues[i].localizations[0].valueName
+                }
+              }
+            }
             valit = vallues.map(c => c.valueName);
             linkP = meData.linkToWebsite;
              noofopenm = opmash.length;
@@ -1091,9 +1098,10 @@ function tofinish(){
   hagdel = true;
 	finiss.scrollIntoView(true);
 }
+const title = {"he": "מוח הריקמה 1❤️1","en": "1❤️1 FreeMates Brain"}
     </script>
 <svelte:head>
-  <title>מוח הריקמה 1❤️1</title>
+  <title>{title[$lang]}</title>
       <link rel="preload" as="image" href="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"  />
        <link rel="preload" as="image" href=" https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"  />
 
