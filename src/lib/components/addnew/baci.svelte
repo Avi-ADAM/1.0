@@ -3,7 +3,7 @@
 
     import { idPr } from '../../stores/idPr.js';
     import axios from 'axios';
-    import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+    import { goto } from '$app/navigation';
     import AddnewVal from './addnewval.svelte';
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';

@@ -2,6 +2,8 @@
  import { createEventDispatcher } from 'svelte';
  import Cropper from "svelte-easy-crop";
 	import { getCroppedImg } from "./canvasUtils"
+                 import { lang } from '$lib/stores/lang.js'
+
 	      let file;
 let dataU;
 	let image, fileinput, pixelCrop, croppedImage;
@@ -86,16 +88,18 @@ let imageFile;
 		croppedImage = null;
 		image = null;
 	}
+ const up = {"he":"העלאת תמונה", "en": "upload picture"} 
+const adj = {"he":"התאמת גודל התמונה", "en": "adjust picture size"}
 </script>
 
 {#if !image}
 	<h2>
-העלאת תמונה
-	</h2>
+{up[$lang]}
+  </h2>
 	<input class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full a" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
 
 {:else}
-	<h2>התאמת גודל התמונה</h2>
+	<h2>{adj[$lang]}</h2>
 	<div id="cr" >
 		<Cropper
 			{image}
