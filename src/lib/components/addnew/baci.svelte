@@ -231,20 +231,31 @@ const year = {"he": "שנה" , "en": "year"}
 const toyers = {"he": "שנתיים", "en": "two years"}
 const more = {"he": "יותר משנתיים", "en": "more then 2 years" }
 const never = {"he": "לעולם לא", "en": "never"}
-
-  </script>  
+const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
+const cencel = {"he":"ביטול","en": "cencel"}
+const crn = {"he":"יצירת ריקמה חדשה", "en": "Create new FreeMate"}
+const frn = {"he":"שם הריקמה", "en":"FreeMate name"}
+const hours = {"he": "שעות", "en": "hours"}
+const hrex = {"he": "לאחר זמן זה חוסר מענה יחשב כהסכמה", "en": "after that: non-voting will consider as agreement"}
+const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en":"time to respond to FreeMate voting"}
+const teure = {"he": "תיאור קצר שיהיה גלוי לכל", "en": "short description with public visibility"} 
+const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMate members"}
+const wel = {"he":"לינק לאתר (אם יש(" ,"en":"link to a website (if any)"}
+const naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
+const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMate will promote"}
+ </script>  
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>ביטול</button>
+          on:click={closer}>{cencel[$lang]}</button>
           {#if a == 0}
           <Uplad on:message={callbackFunction}/>
 
           {:else if a == 2}
           <div class="sp bg-gold">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
+            <h3 class="text-barbi">{om[$lang]}</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> {/if}
@@ -257,34 +268,33 @@ const never = {"he": "לעולם לא", "en": "never"}
   {#if before == false}
 
 <div dir="rtl" class="jho flex flex-col items-center text-center justify-center">
-  <h1 class="text-gold">יצירת ריקמה חדשה</h1>
+  <h1 class="text-gold">{crn[$lang]}</h1>
 <br>
 
         <div dir="rtl" class='textinput'>
   <input name="des" bind:value={projectName_value}  
  type='text' class='input'required >
-  <label for="des" class='label'>שם הריקמה</label>
+  <label for="des" class='label'>{frn[$lang]}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
+{#if shgi == true}<small class="text-red-600">{naex[$lang]}</small>{/if}
 
     <div dir="rtl" class='textinput'>
   <textarea name="es"  bind:value={desP}    
  type='text' class='input d' required ></textarea>
-  <label for="es" class='label'>תיאור קצר הגלוי לכול</label>
+  <label for="es" class='label'>{teure[$lang]}</label>
   <span class='line'></span>
 </div>
    <div dir="rtl" class='textinput'>
   <textarea name="s"  bind:value={desPl}     
  type='text' class='input d' required></textarea>
-  <label for="s" class='label'>תיאור מפורט עם נראות סלקטיבית</label>
+  <label for="s" class='label'>{prte[$lang]}</label>
   <span class='line'></span>
 </div>
  <div dir="rtl" class='textinput'>
   <input name="de"    bind:value={linkP}     
  type='text' class='input' required>
-  <label for="de" class='label'>
-לינק לאתר</label>
+  <label for="de" class='label'>{wel[$lang]}</label>
   <span class='line'></span>
 </div>
 <br>
@@ -293,7 +303,7 @@ const never = {"he": "לעולם לא", "en": "never"}
          
 <h1 class="midscreenText-2 text-center text-gold">
   {userName_value} 
- אלו ערכים ומטרות הריקמה תקדם
+  {whva[$lang]}
 ?
 </h1> 
 
@@ -312,7 +322,7 @@ const never = {"he": "לעולם לא", "en": "never"}
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 m-2">
-      <h2 class="text-center text-gold">זמן תגובה לקבלת החלטות בריקמה</h2>
+      <h2 class="text-center text-gold">{hre[$lang]}</h2>
     <select bind:value={restime} class="round form-select appearance-none
       block
       w-full
@@ -327,13 +337,13 @@ const never = {"he": "לעולם לא", "en": "never"}
       ease-in-out
       m-0
       focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
-<option value="feh" selected>שעות 48</option>
-<option value="sth">שעות 72</option>
-<option value="nsh">שעות 96</option>
-<option value="sevend">שבוע</option>
+<option value="feh" selected> 48 {hours[$lang]} </option>
+<option value="sth">72 {hours[$lang]} </option>
+<option value="nsh">96 {hours[$lang]} </option>
+<option value="sevend">{week[$lang]}</option>
 
 </select>
-<small style="color: turquoise;">לאחר זמן זה חוסר מענה יחשב כהסכמה</small>
+<small style="color: turquoise;">{hrx[$lang]}</small>
 </div>
 <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
