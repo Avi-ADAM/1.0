@@ -151,14 +151,22 @@ let vallues = [];
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues { id valueName}
+  vallues { id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
   projects { projectName}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             vallues = res.data.vallues;
-           const runi = res.data.projects;
+            if ($lang == "he" ){
+              for (var i = 0; i < vallues.length; i++){
+                if (vallues[i].localizations.length > 0){
+                vallues[i].valueName = vallues[i].localizations[0].valueName
+                }
+              }
+            }          
+            vallues = vallues
+            const runi = res.data.projects;
            run = runi.map(c => c.projectName)
         } catch (e) {
             error1 = e
@@ -273,11 +281,11 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 
   {#if before == false}
 
-<div dir="rtl" class="jho flex flex-col items-center text-center justify-center">
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="jho flex flex-col items-center text-center justify-center">
   <h1 class="text-gold">{crn[$lang]}</h1>
 <br>
 
-        <div dir="rtl" class='textinput'>
+        <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input name="des" bind:value={projectName_value}  
  type='text' class='input'required >
   <label for="des" class='label'>{frn[$lang]}</label>
@@ -285,22 +293,22 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 </div>
 {#if shgi == true}<small class="text-red-600">{naex[$lang]}</small>{/if}
 
-    <div dir="rtl" class='textinput'>
+    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <textarea name="es"  bind:value={desP}    
  type='text' class='input d' required ></textarea>
-  <label for="es" class='label'>{teure[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{teure[$lang]}</label>
   <span class='line'></span>
 </div>
-   <div dir="rtl" class='textinput'>
+   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <textarea name="s"  bind:value={desPl}     
  type='text' class='input d' required></textarea>
-  <label for="s" class='label'>{prte[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="s" class='label'>{prte[$lang]}</label>
   <span class='line'></span>
 </div>
- <div dir="rtl" class='textinput'>
+ <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input name="de"    bind:value={linkP}     
  type='text' class='input' required>
-  <label for="de" class='label'>{wel[$lang]}</label>
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="de" class='label'>{wel[$lang]}</label>
   <span class='line'></span>
 </div>
 <br>
@@ -327,7 +335,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
     >{addn[$lang]}</button>
   {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
   <br>
- <div dir="rtl" class="mb-3 xl:w-96 m-2">
+ <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
     <select bind:value={restime} class="round form-select appearance-none
       block
@@ -351,7 +359,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 </select>
 <small style="color: turquoise;">{hrx[$lang]}</small>
 </div>
-<div dir="rtl" class="mb-3 xl:w-96 m-2">
+<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
     <select bind:value={timeToP} class="round form-select appearance-none
       block
@@ -511,7 +519,6 @@ select.round:focus {
 
   font-size: 15px;
   position: absolute;
-  right: 0;
   top: 22px;
   transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
   pointer-events: none;
