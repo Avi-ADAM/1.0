@@ -230,7 +230,7 @@ addval == false;
   }
 const timeto = {"he":"כמה זמן עד שהריקמה תכניס כסף", "en":"how much time until the FreeMates will be profitable"}
 const timetoex = {"he":"חישוב הזמן עד שניתן יהיה לחלק כסף מרגע שאוישו כל המשימות ונתקבלו כל המשאבים הנדרשים", "en" : "the time until money can be splited from when all of the missions has asigned and all the resources has accepted" }
-const cvar = {"he":"הריקמה כבר רווחית", "en": "the FreeMates already profitable"}
+const cvar = {"he":"הריקמה כבר רווחית", "en": "the FreeMates is already profitable"}
 const week = {"he":"שבוע" , "en": "week"}
 const month = {"he": "חודש", "en": "month"}
 const threemonth = {"he": "שלושה חודשים", "en": "three months"}
@@ -241,7 +241,7 @@ const more = {"he": "יותר משנתיים", "en": "more then 2 years" }
 const never = {"he": "לעולם לא", "en": "never"}
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const cencel = {"he":"ביטול","en": "cencel"}
-const crn = {"he":"יצירת ריקמה חדשה", "en": "Create new FreeMate"}
+const crn = {"he":"יצירת ריקמה חדשה", "en": "Create new FreeMates"}
 const frn = {"he":"שם הריקמה", "en":"FreeMates name"}
 const hours = {"he": "שעות", "en": "hours"}
 const hrex = {"he": "לאחר זמן זה חוסר מענה יחשב כהסכמה", "en": "after that: non-voting will consider as agreement"}
