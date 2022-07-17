@@ -217,13 +217,11 @@ async function start () {
        username = meData.username;
           letters(meData.username);
             myP = meData.projects_1s;
-            skil = meData.skills;
-            taf = meData.tafkidims;
-            val = meData.vallues;
             lango = meData.lang;
             if (lango == "en" || lango == "he") {
               lang.set(lango)
             }
+            val = meData.vallues;
             if ($lang == "he"){
               for (var i = 0; i < val.length; i++){
                 if (val[i].localizations.length > 0){
@@ -231,8 +229,35 @@ async function start () {
                 }
               }
             }
+            val = val
+            skil = meData.skills;
+              if ($lang == "he"){
+              for (var i = 0; i < skil.length; i++){
+                if (skil[i].localizations.length > 0){
+                skil[i].skillName = skil[i].localizations[0].skillName
+                }
+              }
+            }       
+            skil = skil   
+            taf = meData.tafkidims;
+                        if ($lang == "he"){
+              for (var i = 0; i < taf.length; i++){
+                if (taf[i].localizations.length > 0){
+                taf[i].roleDescription = taf[i].localizations[0].roleDescription
+                }
+              }
+            }
+            taf = taf
             mash = meData.sps;
-            work = meData.work_ways;         
+            work = meData.work_ways;  
+            if ($lang == "he"){
+              for (var i = 0; i < work.length; i++){
+                if (work[i].localizations.length > 0){
+                work[i].workWayName = work[i].localizations[0].workWayName
+                }
+              }
+            }    
+              work = work
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
             total = meData.hervachti ? meData.hervachti : 0;
