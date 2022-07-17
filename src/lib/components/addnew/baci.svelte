@@ -21,6 +21,7 @@ let a = 0;
     let resP;
     let projectName_value;
     let token; 
+    let timeToP = "already";
    let idL;
 let run = [];
 let imageId = 50;
@@ -64,7 +65,8 @@ if (files) {
     linkToWebsite: linkP,
     descripFor: desPl,
     vallues: find_value_id(selected),
-     restime: restime
+     restime: restime,
+     timeToP:timeToP
               },
   {
   headers: {
@@ -218,6 +220,18 @@ selected.push(newN);
 selected = newSele;
 addval == false;
   }
+const timeto = {"he":"כמה זמן עד שהריקמה תכניס כסף", "en":"how much time until the FreeMates will be profitable"}
+const timetoex = {"he":"חישוב הזמן עד שניתן יהיה לחלק כסף מרגע שאוישו כל המשימות ונתקבלו כל המשאבים הנדרשים", "en" : "the time until money can be splited from when all of the missions has asigned and all the resources has accepted" }
+const cvar = {"he":"הריקמה כבר רווחית", "en": "the FreeMates already profitable"}
+const week = {"he":"שבוע" , "en": "week"}
+const month = {"he": "חודש", "en": "month"}
+const threemonth = {"he": "שלושה חודשים", "en": "three months"}
+const halt = {"he": "חצי שנה" , "en": "half a year"}
+const year = {"he": "שנה" , "en": "year"}
+const toyers = {"he": "שנתיים", "en": "two years"}
+const more = {"he": "יותר משנתיים", "en": "more then 2 years" }
+const never = {"he": "לעולם לא", "en": "never"}
+
   </script>  
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -320,6 +334,34 @@ addval == false;
 
 </select>
 <small style="color: turquoise;">לאחר זמן זה חוסר מענה יחשב כהסכמה</small>
+</div>
+<div dir="rtl" class="mb-3 xl:w-96 m-2">
+      <h2 class="text-center text-gold">{timeto[$lang]}</h2>
+    <select bind:value={timeToP} class="round form-select appearance-none
+      block
+      w-full
+      px-3
+      py-1.5
+      text-barbi
+      font-normal
+      bg-white bg-clip-padding bg-no-repeat
+      border border-solid border-gold
+      rounded
+      transition
+      ease-in-out
+      m-0
+      focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
+<option value="already" selected>{cvar[$lang]}</option>
+<option value="week">{week[$lang]}</option>
+<option value="month">{month[$lang]}</option>
+<option value="threeM">{threemonth[$lang]}</option>
+<option value="sixM">{halt[$lang]}</option>
+<option value="oneY">{year[$lang]}</option>
+<option value="twoY">{toyers[$lang]}</option>
+<option value="more">{more[$lang]}</option>
+<option value="never">{never[$lang]}</option>
+</select>
+<small style="color: turquoise;">{timetoex[$lang]}</small>
 </div>
   {#if loading == false}
 

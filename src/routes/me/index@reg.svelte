@@ -309,6 +309,7 @@ let userName_value;
 let biog;
 let frd;
 function sendD () {
+  //todo refresh data if lang changed
   if (lango == "en" || lango == "he") {
               lang.set(lango)
             } else {
