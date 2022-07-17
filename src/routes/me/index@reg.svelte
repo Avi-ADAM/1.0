@@ -167,7 +167,7 @@ function project (id) {
     idPr.set(id);
     goto("/moach");
   };
-let mail;
+let mail,lango;
 
 async function start () {
     const cookieValue = document.cookie
@@ -195,6 +195,7 @@ async function start () {
           `query { user( id: ${idL}) 
           { frd
             bio
+            lang
             email 
             username 
             hervachti
@@ -219,6 +220,10 @@ async function start () {
             skil = meData.skills;
             taf = meData.tafkidims;
             val = meData.vallues;
+            lango = meData.lang;
+            if (lango == "en" || lango == "he") {
+              lang.set(lango)
+            }
             if ($lang == "he"){
               for (var i = 0; i < val.length; i++){
                 if (val[i].localizations.length > 0){
@@ -304,6 +309,11 @@ let userName_value;
 let biog;
 let frd;
 function sendD () {
+  if (lango == "en" || lango == "he") {
+              lang.set(lango)
+            } else {
+              lango = "ar"
+            }
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -320,7 +330,8 @@ function sendD () {
       .put(link, {
         username: userName_value, 
     bio: biog,
-    frd: frd
+    frd: frd,
+    lang: lango
                   },
       {
       headers: {
@@ -353,6 +364,7 @@ function callbackFunction(event) {
    // emailL = event.detail.em;
     biog = event.detail.bi;
     frd = event.detail.frd;
+    lango = event.detail.lango; 
     sendD ();
 }
 

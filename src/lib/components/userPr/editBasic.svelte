@@ -1,6 +1,8 @@
 <script>
 import { goto } from '$app/navigation';
 import { onMount } from 'svelte';
+  import { lang } from '$lib/stores/lang.js'
+
  import { createEventDispatcher } from 'svelte';
 let isGuidMe = false;
  onMount(function(){
@@ -87,6 +89,7 @@ function save (){
 	bi : bi,
 	un: un,
 	em: mail,
+	lango: lango,
     })
   };
 
@@ -99,6 +102,7 @@ export let mail;
 export let un;
 export let bi;
 export let frd;
+export let lango;
 let passi;  
 
 function shaneh () {
@@ -154,7 +158,7 @@ function shaneh () {
 
   document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
  }
- 
+ const pr = {"he":"שפה מועדפת", "en": "prefferd Language"}
 </script>
 <h1 class="text-barbi text-center text-m">עריכת הפרטים שלי</h1>
  <div dir="rtl" class='textinputi'>
@@ -205,6 +209,29 @@ function shaneh () {
 <option value="teh">חמישי</option>
 <option value="fri">שישי</option>
 <option value="shabat">שבת</option>
+</select>
+</div>
+
+   <div dir="rtl" class="mb-3 xl:w-96 m-2">
+      <h2 class="text-center text-barbi">{pr[$lang]}</h2>
+    <select on:change={ch} bind:value={lango}
+	 class="round form-select appearance-none
+      block
+      w-full
+      px-3
+      py-1.5
+      text-barbi
+      font-normal
+      bg-white bg-clip-padding bg-no-repeat
+      border border-solid border-gold
+      rounded
+      transition
+      ease-in-out
+      m-0
+      focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
+<option  value="na" selected>{pr[$lang]}</option>
+<option value="he">עברית</option>
+<option value="en">English</option>
 </select>
 </div>
 <div class="grid items-center justify-center"> 
