@@ -1816,7 +1816,7 @@ class=" hover:scale-150 "
 }
   }
 .selected {
-  z-index: 2;
+  z-index: 77;
 
   position: fixed;
   top: 0;
@@ -1838,7 +1838,7 @@ class=" hover:scale-150 "
     background-size: cover;
 }
 .selectedl {
-  z-index: 2;
+  z-index: 77;
 background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
      background-position: left center; 
     background-repeat: no-repeat; 

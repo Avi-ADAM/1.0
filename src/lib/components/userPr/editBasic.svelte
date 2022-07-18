@@ -239,7 +239,7 @@ function shaneh () {
       ease-in-out
       m-0
       focus:text-barbi focus:bg-lturk focus:border-barbi focus:outline-none">
-<option  value="na" selected>{pr[$lang]}</option>
+<option  value="na" selected></option>
 <option value="he">עברית</option>
 <option value="en">English</option>
 </select>

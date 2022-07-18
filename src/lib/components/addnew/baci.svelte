@@ -337,7 +337,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
   <br>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
-    <select class:text-center={$lang == "en"} bind:value={restime} class="round form-select appearance-none
+    <select  bind:value={restime} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -361,7 +361,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 </div>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
-    <select class:text-center={$lang == "en"} bind:value={timeToP} class="round form-select appearance-none
+    <select  bind:value={timeToP} class="round form-select appearance-none
       block
       w-full
       px-3
