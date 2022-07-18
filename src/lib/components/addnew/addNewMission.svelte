@@ -70,7 +70,23 @@ let link = "https://i18.onrender.com/missions"
 let missionName_value;
     let selected;  
     let skillslist =[];
-let desM;
+    let tafkidimslist = [];
+   missionNew.subscribe(newwork => {
+    tafkidimslist = newwork;
+        });
+
+    function find_skill_id(skill_name_arr){
+     var  arr = [];
+      for (let j = 0; j< skill_name_arr.length; j++ ){
+      for (let i = 0; i< skills2.length; i++){
+        if(skills2[i].skillName === skill_name_arr[j]){
+          arr.push(skills2[i].id);
+        }
+      }
+      }
+      return arr;
+     };
+     let desM;
     const placeholder = `בחירת כישורים נדרשים`;
 
 function subm() {
