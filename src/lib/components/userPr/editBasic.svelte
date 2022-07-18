@@ -196,8 +196,8 @@ function shaneh () {
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-barbi">{myfd[$lang]}</h2>
-    <select on:change={ch} bind:value={frd}
-	 class="round form-select appearance-none
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} on:change={ch} bind:value={frd}
+	 class=" form-select appearance-none
       block
       w-full
       px-3
@@ -224,8 +224,8 @@ function shaneh () {
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-barbi">{pr[$lang]}</h2>
-    <select on:change={ch} bind:value={lango}
-	 class="round form-select appearance-none
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} on:change={ch} bind:value={lango}
+	 class=" form-select appearance-none
       block
       w-full
       px-3
@@ -346,6 +346,39 @@ function shaneh () {
 .inputi {
   font-size: 8px;
 
+}
+select.rounden {
+  background-image:
+    linear-gradient(45deg, transparent 50%, gray 50%),
+    linear-gradient(135deg, gray 50%, transparent 50%),
+    radial-gradient(#ddd 70%, transparent 72%);
+  background-position:
+    calc(100% - 20px) calc(1em + 2px),
+    calc(100% - 15px) calc(1em + 2px),
+    calc(100% - .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+}
+
+select.rounden:focus {
+  background-image:
+    linear-gradient(45deg, white 50%, transparent 50%),
+    linear-gradient(135deg, transparent 50%, white 50%),
+    radial-gradient(gray 70%, transparent 72%);
+  background-position:
+    calc(100% - 15px) 1em,
+    calc(100% - 20px) 1em,
+    calc(100% - .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+  border-color: green;
+  outline: 0;
 }
 select{
 	font-size: 100%;

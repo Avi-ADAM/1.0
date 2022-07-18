@@ -337,7 +337,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
   <br>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
-    <select  bind:value={restime} class="round form-select appearance-none
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={restime} class=" form-select appearance-none
       block
       w-full
       px-3
@@ -361,7 +361,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 </div>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{timeto[$lang]}</h2>
-    <select  bind:value={timeToP} class="round form-select appearance-none
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} bind:value={timeToP} class=" form-select appearance-none
       block
       w-full
       px-3
@@ -467,6 +467,39 @@ select.round:focus {
     calc(0% + 15px) 1em,
     calc(0% + 20px) 1em,
     calc(0% + .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+  border-color: green;
+  outline: 0;
+}
+select.rounden {
+  background-image:
+    linear-gradient(45deg, transparent 50%, gray 50%),
+    linear-gradient(135deg, gray 50%, transparent 50%),
+    radial-gradient(#ddd 70%, transparent 72%);
+  background-position:
+    calc(100% - 20px) calc(1em + 2px),
+    calc(100% - 15px) calc(1em + 2px),
+    calc(100% - .5em) .5em;
+  background-size:
+    5px 5px,
+    5px 5px,
+    1.5em 1.5em;
+  background-repeat: no-repeat;
+}
+
+select.rounden:focus {
+  background-image:
+    linear-gradient(45deg, white 50%, transparent 50%),
+    linear-gradient(135deg, transparent 50%, white 50%),
+    radial-gradient(gray 70%, transparent 72%);
+  background-position:
+    calc(100% - 15px) 1em,
+    calc(100% - 20px) 1em,
+    calc(100% - .5em) .5em;
   background-size:
     5px 5px,
     5px 5px,
