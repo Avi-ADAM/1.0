@@ -306,9 +306,9 @@ let fir,ssec;
           <th >כמה שעות זה  לקח </th>
           {#each fmiData as data, i}
           <td>
-            {#if data.hoursassinged > 0}
+            {#if data.noofhours > 0}
 
-           {data.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}
+           {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})}
            {/if}
           </td>
           {/each}

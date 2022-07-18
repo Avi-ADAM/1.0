@@ -13,6 +13,7 @@ export let fmiData = [];
     fmiData = filtered;
     }
 })
+    console.log(fmiData)
 
   
     </script>

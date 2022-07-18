@@ -269,9 +269,9 @@ async function start () {
             error1 = e
             console.log(error1);
         }
-  }
+}
 
- async function handleClearClick () {
+async function handleClearClick () {
     clearInterval(timer)
     lapse = 0
     x = 0;
@@ -457,6 +457,7 @@ const cookieValue = document.cookie
     activE = errorM.timer
   } else {
 if (noofpu === 1) {
+  console.log(hoursdon)
   tofinished1 = `finnished: true`;
   tofinished2 = `finnished: true`;
   appi = ``
