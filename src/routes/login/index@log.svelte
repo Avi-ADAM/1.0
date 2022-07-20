@@ -83,7 +83,7 @@ onMount(async () => {
                 if (err.response) {
                     loginError = "";
                     for (let message of err.response.data.message[0].messages) {
-                        loginError += `${message.message}\n`;
+                        loginError[$lang] += `${message.message}\n`;
                     }
                 } else loginError = err;
             });
@@ -108,7 +108,7 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
                 <form class="fr" on:submit|preventDefault={login} in:fade >
                     <div>
                     {#if loginError}
-                        <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError[$lang]} </h1>
+                        <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
                         <button
                          on:click={handleclick} 
                          title={buttonForgot[$lang]}  

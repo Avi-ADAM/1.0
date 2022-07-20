@@ -34,11 +34,11 @@ axios
 </svelte:head>
 {#if before}
 <div dir="rtl" class="flex items-center text-center flex-col">
-<h3 style="text-align:center; font-size: 1em;">{heading}</h3>
+<!--<h3 style="text-align:center; font-size: 1em;">{heading}</h3>-->
 {#if erori} <small style="color: red; ">{erori}</small>{/if}
 <form class="flex items-center text-center" style="margin: 0 auto;"    on:submit|preventDefault={onSubmit}>
   <div>
-    <h1 class="text-center text-barbi">{tempmessege[$lang]}</h1>
+    <p class="text-center text-barbi">{tempmessege[$lang]}</p>
     <!--<div class="text-center">label>
       מייל
       <input placeholder="mail@mail.com" type="email" bind:value={email} />
