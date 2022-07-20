@@ -492,6 +492,8 @@ function change(la){
 </DialogOverlay>
    
       <div class="all">
+               <a  sveltekit:prefetch href="/login" ><img title=" login to-1❤️1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
+
           <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
           <button on:click={tran}><img alt="translation-by-bar-sultan" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
@@ -624,6 +626,65 @@ I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : 
   
 </div> </div>
   <style>
+.overlay{
+  background-color: #ff1a1a;
+  background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
+  background-size: 110% 110%;
+      -webkit-animation: AnimationName 3s ease infinite;
+    -moz-animation: AnimationName 3s ease infinite;
+    animation: AnimationName 3s ease infinite;
+  /* position, height, width, etc as appropriate. */
+  z-index: 17;
+  opacity: 0.0;
+  animation-delay: 0.5s;
+  animation-duration: 15s;
+  animation-direction: normal;
+  animation-iteration-count: infinite;
+  animation-name: fireFlicker;
+  animation-timing-function: linear;
+}
+@keyframes fireFlicker {
+  0%, 10% { opacity: 0; }
+  15%,20% { opacity: 0.52; }
+  22%,23% { opacity: 0.104; }
+  25%,35% { opacity: 0.32; }
+  39%,42% { opacity: 0.88; }
+  44%,47% { opacity: 0.52; }
+  49%,50% { opacity: 0.104; }
+  52%,54% { opacity: 0.32; }
+  57%,58% { opacity: 0.96; }
+  60%,63% { opacity: 0.68; }
+  65%,72% { opacity: 0.64; }
+  77%,85% { opacity: 0.104; }
+  90%,95% { opacity: 0.68; }
+  100% { opacity: 0; }
+}
+@-webkit-keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@-moz-keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+@keyframes AnimationName {
+    0%{background-position:0% 50%}
+    50%{background-position:100% 50%}
+    100%{background-position:0% 50%}
+}
+     .right {
+        position: absolute;
+        top: 50px;
+        right: 50px;
+        height: 50px;
+        width: 50px;
+        z-index: 14;
+                aspect-ratio: 1/1;
+
+    }
+
     :global([data-svelte-dialog-content].content) {
   background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
