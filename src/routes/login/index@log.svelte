@@ -1,4 +1,6 @@
 <script>
+    import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+    import { session } from '$app/stores';
 
     import { fade } from "svelte/transition";
     import { goto} from '$app/navigation';
@@ -7,7 +9,31 @@
     import { idM } from '../../lib/stores/idM.js';    
     import { liUN } from '../../lib/stores/liUN.js';
     import { serialize } from 'cookie';
-   
+    import { onMount } from 'svelte'
+
+   function getLang() {
+    let la;
+    const fromSe = $session.userAgent
+    if ($doesLang == false) {
+    if (fromSe.includes("he")){
+        la = "he"
+    } else if (fromSe.includes("ar")){
+        la = "ar"
+    } else{
+        la = "en"
+    }
+    }
+    else {
+        la = $langUs
+    }
+   // if (navigator.languages != undefined)
+   //     return navigator.languages[0];
+   // return navigator.language;
+    lang.set(la)
+}
+onMount(async () => {
+    getLang()
+})
     let active = false;
     let loginError = null;
     let email = "";
@@ -15,12 +41,12 @@
     let username = "";
     let fillFilds ;
     let emailenter = {
-        "eng" : "Enter your email",
-        "heb": "כתובת מייל"
+        "en" : "Enter your email",
+        "he": "כתובת מייל"
     };
     let passenter = {
-        "eng" : "Enter your password",
-        "heb": "סיסמה"
+        "en" : "Enter your password",
+        "he": "סיסמה"
     }
     function login() {
         active = true;
@@ -28,7 +54,10 @@
         password = password.trim();
 
         if (!email || !password) {
-            loginError = "יש למלא את כל השדות";
+            loginError = {
+        "en" : "Please fill all lines",
+        "he": "יש למלא את כל השדות"
+    } ;
             return;
         }
         loginError = null;
@@ -62,7 +91,8 @@
 function handleclick () {
     goto("/login/passwordReset", )
 };    
-let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש ללחוץ";
+let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון יש ללחוץ",
+                    "en": "if lost password please press me"};
 
 	import { emailValidator, requiredValidator } from '../../lib/celim/validators.js'
   import { createFieldValidator } from '../../lib/celim/validation.js'
@@ -73,13 +103,13 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
 
 <div class="body">
  <div class="login">            
-                <form on:submit|preventDefault={login} in:fade >
+                <form class="fr" on:submit|preventDefault={login} in:fade >
                     <div>
                     {#if loginError}
-                        <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
+                        <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError[$lang]} </h1>
                         <button
                          on:click={handleclick} 
-                         title={buttonForgot}  
+                         title={buttonForgot[$lang]}  
                          in:fade  
                                 style=" position: fixed;
                                 top: 80%;
@@ -101,7 +131,7 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
                 		class:field-danger={!$validity.valid}
 	            		class:field-success={$validity.valid}
                         use:validate={email}
-                            placeholder={emailenter.heb}
+                            placeholder={emailenter[$lang]}
                             id="email"
                             autocomplete="username"
                              />
@@ -110,7 +140,7 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
                         <input
                             type="password"
                             bind:value={password}
-                            placeholder={passenter.heb}
+                            placeholder={passenter[$lang]}
                             id="password"
                             autocomplete="current-password"
                            />
@@ -136,9 +166,6 @@ let buttonForgot = "במקרה של סיסמה שאבדה מהזיכרון יש 
             width: 126%;
         }
            
-input{
-    
-}
     .center{
         margin: 0 auto;
     }
@@ -225,5 +252,10 @@ margin: 0 auto;
  align-self: center;
 
 }
-
+.fr{
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+}
 </style>
