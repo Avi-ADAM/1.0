@@ -1,6 +1,6 @@
 <script>
  import axios from 'axios';
-
+  import { lang } from '$lib/stores/lang.js'
     let heading = "יש למלא כתובת מייל אליה ישלח לינק לאיפוס הסיסמה";
     let email;
     let before = true;
@@ -26,9 +26,11 @@ axios
     console.log('An error occurred:', error.response);
   });
     }
+    const title = {"he": "התחברות ל-1❤️1", "en":"login to 1❤️1"}
+    const tempmessege = {"he": " עקב תקלה במערכת שליחת המיילים אין באפשרותינו לחדש סיסמה מכאן, נא לפנות למייל ehad1one@gmail.com ", "en":"do to problem in the mail system we unable to change password from here , please contact us in ehad1one@gmail.com to chang it manually"}
 </script>
 <svelte:head>
-  <title>התחברות ל-1❤️1</title>
+  <title>{title[$lang]}</title>
 </svelte:head>
 {#if before}
 <div dir="rtl" class="flex items-center text-center flex-col">
@@ -36,12 +38,13 @@ axios
 {#if erori} <small style="color: red; ">{erori}</small>{/if}
 <form class="flex items-center text-center" style="margin: 0 auto;"    on:submit|preventDefault={onSubmit}>
   <div>
-    <label>
+    <h1 class="text-center text-barbi">{tempmessege[$lang]}</h1>
+    <!--<div class="text-center">label>
       מייל
       <input placeholder="mail@mail.com" type="email" bind:value={email} />
-    </label>
+    </label>-->
   </div>
-  <button class="bg-barbi text-gold hover:bg-gold hover:text-barbi p-2 rounded-full" style="margin: 1em">Send</button>
+ <!---<button class="bg-barbi text-gold hover:bg-gold hover:text-barbi p-2 rounded-full" style="margin: 1em">Send</button>-->
 </form></div>
 {:else}
 <h1>{after}</h1>
