@@ -71,6 +71,8 @@ const trtrrt = document.cookie
 let password;
 let shgi;
 function logout() {
+    localStorage.clear();
+
     var cookies = document.cookie.split(";");
 
     for (var i = 0; i < cookies.length; i++) {
