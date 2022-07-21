@@ -1028,6 +1028,9 @@ function midd (min){
         } else if (dd.profilePic.url){
                  picLink = dd.profilePic.url
         }}
+      localStorage.setItem("nam", JSON.stringify(nam));
+      localStorage.setItem("picLink", JSON.stringify(picLink));
+
 }
     let tickSpeed = 60000 * 5;
 let sdsa = [];
@@ -1080,6 +1083,23 @@ let counter = 0;
     }
 let repeater =  null;
 onMount(async () => {
+  if (localStorage.getItem("miDataLM") !== null) {
+  arr1 = JSON.parse(localStorage.getItem("miDataLM"))
+  }
+    if (localStorage.getItem("nam") !== null) {
+  nam = JSON.parse(localStorage.getItem("nam"))
+    }
+      if (localStorage.getItem("picLink") !== null) {
+  picLink = JSON.parse(localStorage.getItem("picLink"))
+      }
+        if (localStorage.getItem("picLink") !== null) {
+  betha.set(JSON.parse(localStorage.getItem("picLink")))
+        }
+          if (localStorage.getItem("miDataL") !== null) {
+
+  miData = JSON.parse(localStorage.getItem("miDataL"))
+          }
+
   getLang()
       if ('serviceWorker' in navigator) {
   navigator.serviceWorker.register('service-worker.js', { scope: '.' }).then(function(reg) {
@@ -1117,7 +1137,6 @@ onMount(async () => {
   .split('=')[1];
   idL = cookieValueId;
   token  = cookieValu; 
-  console.log("here@")
           const elem = document.getElementById('scree');
     function flash() {
       elem.style.backgroundImage = 'radial-gradient(ellipse farthest-corner at '+initX+'px top, #ffaaff 0%, #ee88ff 16%, #000 100%)';
@@ -1147,10 +1166,8 @@ onMount(async () => {
       
      if (low == true){
  document.getElementById("my_audio").play();
-
-
-  var speed = 2400;
-var changeSpeed = speed;
+ var speed = 2400;
+ var changeSpeed = speed;
  repeater = setInterval(repeaterFn, speed);
 function repeaterFn(){
   c=0;gen();flash();finito(); 
@@ -1167,26 +1184,25 @@ function repeaterFn(){
    }
    function finito () {  
    if (low == false){
-    
-
-      console.log("wehere")
-       elem.style.backgroundImage = ''
-            console.log("weheret")
+  elem.style.backgroundImage = ''
        clearInterval(repeater)
-              elem.style.backgroundImage = ''
+        elem.style.backgroundImage = ''
     document.getElementById("my_audio").pause();
 
    }
   }
   await start ();
   setInterval(start, tickSpeed);
-  
-     if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
-       console.log("safari.. please use chrome for better experince")
-  await start()
+   if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
+     if ((/[\u0590-\u05FF]/).test(nam) || (/[\u0600-\u06FF]/).test(nam)) {
+     nam = reverseString(nam)
+      nam = nam   
+     }  
+    console.log("safari.. please use chrome for better experince")
+     await start()
   .then()
   if ((/[\u0590-\u05FF]/).test(nam) || (/[\u0600-\u06FF]/).test(nam)) {
- nam = reverseString(nam)
+   nam = reverseString(nam)
   nam = nam        
 }
   } 
@@ -1294,8 +1310,10 @@ async function start () {
   .then(r => r.json())
   .then(data => miData = data);
   counter += 1;
+  localStorage.setItem("miDataL", JSON.stringify(miData));
   if (isEqual(miData,miDataold)) {
    console.log("nada")
+    low = false
    } else {
      console.log(miDataold)
       console.log("tada")
@@ -1824,9 +1842,12 @@ function bubleUiAngin(){
     id: i + 1,
     ch: false
   })
-});   
-xy = xy
-betha.set(xy)
+    });   
+    xy = xy
+    betha.set(xy)
+    localStorage.setItem("miDataLM", JSON.stringify(arr1));
+    localStorage.setItem("betha", JSON.stringify(xy));
+
  createD()
      //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart 
 }
@@ -1908,6 +1929,7 @@ console.log(cards, "from papa")
 </DialogOverlay>
 <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם    {#if arr1.length > 0}
 -->
+{#key arr1}
 {#if cards == true}
 <div class="cards-ui">
     <Tooltip title="{u}" ispic="true">
@@ -1939,7 +1961,7 @@ console.log(cards, "from papa")
 
 </Tooltip>
 {/if}
-
+{/key}
 
 <style>
    :global([data-svelte-dialog-content].content) {

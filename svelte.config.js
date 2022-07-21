@@ -27,9 +27,6 @@ if (process.env.VITE_ENVI == "versel") {
         fallback: null,
         precompress: false
       }),
-      preprocess: [preprocess({
-        "postcss": true
-      })],
       prerender: {
         // This can be false if you're using a fallback (i.e. SPA mode)
         default: true
