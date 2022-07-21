@@ -4,7 +4,7 @@ import preprocess from "svelte-preprocess";
 
 /** @type {import('@sveltejs/kit').Config} */
 let config;
-if (import.meta.env.VITE_ENVI == "versel") {
+if (process.env.VITE_ENVI == "versel") {
   config = {
     kit: {
       adapter: vercel({
