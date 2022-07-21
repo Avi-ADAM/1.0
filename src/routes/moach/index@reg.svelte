@@ -78,13 +78,12 @@ async function findM() {
             error2 = e;
         }
 };
-let ti = ""
 let bmimData = [];
     let addN = false;
     let addM =  false;
-    let hosafa = "הוספת פעולות נדרשות לריקמה";
-    let hosafat = "הוספת משאבים נדרשים לריקמה";
-    let cencel = "ביטול";
+    let hosafa = {"he":"הוספת פעולות נדרשות לריקמה","en":"add needed missions to FreeMates"};
+    let hosafat = {"he":"הוספת משאבים נדרשים לריקמה", "en": "add needed resources to FreeMates"};
+    let cencel = {"he":"ביטול", "en": "cencel"};
     let showvd = false;
 
    let totalneed = false;
@@ -119,7 +118,6 @@ let projects = prog();
 let meData = start ();
 
 //sale {id in}
-let users;
 async function start () {
   if ($idPr !== 0){
   // ולידציה שהיוזר חבר ברקמה
@@ -134,7 +132,6 @@ async function start () {
  let idL = cookieValueId;
   let  token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    const idpree = 0;
  const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -143,10 +140,6 @@ async function start () {
         return parseJSON(resp).then((resp) => {
           throw resp;
         });
-      };
-      const headers = {
-        'Authorization': bearer1,
-        'Content-Type': 'application/json',
       };
         try {
             const res = await fetch("https://i18.onrender.com/graphql" , {//+ $idPr
@@ -177,10 +170,6 @@ async function start () {
           throw resp;
         });
       };
-      const headers = {
-        'Authorization': bearer1,
-        'Content-Type': 'application/json',
-      };
         try {
             const res = await fetch("https://i18.onrender.com/graphql" , {//+ $idPr
               method: "POST",
@@ -204,9 +193,9 @@ JSON.stringify({query:
             open_missions (where:{archived: false }) { id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}
-                                    skills { id skillName}
-                                    tafkidims {id roleDescription}
-                                    work_ways {id workWayName} 
+                                    skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+                                    tafkidims {id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+                                    work_ways {id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}} 
                                     mission { id}
                                     created_at
                         } 
@@ -214,9 +203,9 @@ JSON.stringify({query:
              pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}
-                                    skills { id skillName}
-                                    tafkidims {id roleDescription}
-                                    work_ways {id workWayName} 
+                                    skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+                                    tafkidims {id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+                                    work_ways {id workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}} 
                                     mission { id}
                                     created_at
                                     users  {what why id users_permissions_user {id}} }
@@ -372,9 +361,7 @@ async function prog (){
   return projects
       } 
 }
-    function pre(projectUsers, fmiData){
 
-    }
 
    let li = [];
    let miData = [];
@@ -417,9 +404,6 @@ async function findiM() {
           throw resp;
         });
       };
-      const headers = {
-        'Content-Type': 'application/json'   
-      };
         try {
             const res = await fetch(link, {
               method: 'GET',
@@ -450,10 +434,6 @@ async function findT ()  {
           throw resp;
         });
       };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
         try {
             const res = await fetch("https://i18.onrender.com/graphql", {
               method: "POST",
@@ -505,9 +485,7 @@ async function findT ()  {
 
 
 async function refreshM () {
-  console.log("הצליח");
   findT ();
-  console.log("עדכנתי מידע");
 };
 
 async function hosa () {
@@ -747,7 +725,7 @@ async function addneww (event) {
   addM = true;
 };
 let openMA = false;
-let cencel1 = "סגירה";
+let cencel1 = {"he":"סגירה", "en":"close"};
 
 let openMS = false;
 
@@ -818,7 +796,8 @@ function addp () {
       a = 0;
             isOpen = true;
   }  else {
-    alert("בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+    const toalart = {"he": "בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות","en":"if number of users in freemates is greater than 1 you need everyone to agree, this feature will be released soon"}
+    alert(toalart[$lang])
   }
 //if project users more then 1
 }
@@ -827,7 +806,7 @@ function editp () {
       a = 0;
             isOpen = true;
   } else {
-    alert("בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+    alert(toalart[$lang])
   }
 //if project users more then 1
 } 
@@ -837,7 +816,7 @@ function editb () {
       a = 1;
             isOpen = true;
   } else {
-    alert("בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות")
+    alert(toalart[$lang])
   }
 }
 
@@ -907,7 +886,6 @@ function sendP () {
                 });
       
 })};
-let ataN = [];
   
 async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
     const cookieValue = document.cookie
@@ -1019,7 +997,6 @@ async function wdwd (event) {
  }
 }
 let hal = false;
-let pir = false;
 function trym(){
    openMS = true
 }
@@ -1080,7 +1057,12 @@ function tofinish(){
 }
 const title = {"he": "מוח הריקמה 1❤️1","en": "1❤️1 FreeMates Brain"}
 const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding missions"}
-    </script>
+const errmsg = {"he": " אירעה שגיאה","en": "error"}
+const editpic = {"he":"עריכת תמונת הפרופיל של הריקמה", "en":"edit FreeMates logo"}
+   const upload = {"he": "העלאת תמונת פרופיל לריקמה" , "en":"upload logo for your FreeMates"}
+ const editd = {"he": "עריכת פרטי ריקמה", "en":"edit FreeMates details"}
+const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view FreeMates public page"}
+</script>
 <svelte:head>
   <title>{title[$lang]}</title>
       <link rel="preload" as="image" href="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"  />
@@ -1119,7 +1101,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
                     <Lowding/>
          </div> 
          {:else if a == 3}
-         <h1> אירעה שגיאה</h1>
+         <h1>{errmsg[$lang]}</h1>
          <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
          {:else if a == 4}
            <PendsM {who} {pmiData} user_1s={projectUsers.length} />
@@ -1149,7 +1131,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
       alt="profilePic">
       <button
           class="text-barbi hover:bg-barbi hover:text-mturk rounded-full"
-          title="עריכת תמונת הפרופיל של הריקמה"
+          title={editpic[$lang]}
           on:click={editp} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M22.7 14.3L21.7 15.3L19.7 13.3L20.7 12.3C20.8 12.2 20.9 12.1 21.1 12.1C21.2 12.1 21.4 12.2 21.5 12.3L22.8 13.6C22.9 13.8 22.9 14.1 22.7 14.3M13 19.9V22H15.1L21.2 15.9L19.2 13.9L13 19.9M11.21 15.83L9.25 13.47L6.5 17H13.12L15.66 14.55L13.96 12.29L11.21 15.83M11 19.9V19.05L11.05 19H5V5H19V11.31L21 9.38V5C21 3.9 20.11 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H11V19.9Z" />
@@ -1158,7 +1140,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
           {:else}
            <button
           class="bg-barbi hover:bg-mturk text-barbi rounded-full"
-          title="העלאת תמונת פרופיל לריקמה"
+          title={upload[$lang]}
           on:click={addp} 
           >
           <svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1168,15 +1150,16 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
 {/if}
            <button
           class=" hover:bg-mturk text-barbi rounded-full"
-          title="עריכת פרטי ריקמה"
+          title={editd[$lang]}
           on:click={editb} 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
            <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
           </svg>
           </button>
+          <!--change to modal with the project component-->
                      <button
           class=" hover:bg-mturk text-barbi rounded-full"
-          title="העמוד הציבורי של הריקמה"
+          title={publicp[$lang]}
           on:click={goto(`/project/${$idPr}`)}
           >
           <svg class="sv"  style="width:24px;height:24px" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path
@@ -1212,16 +1195,16 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
 
 <div class=" hhh">
    {#if hovered}
-  <button on:click={hosa} on:mouseleave={bighand} ><img title={hosafa}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"></button> 
+  <button on:click={hosa} on:mouseleave={bighand} ><img title={hosafa[$lang]}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"></button> 
 
   {:else}
- <Hand on:hosa={hosa} on:progres={bighand} on:trym={trym}  {noofopen} {openMS} {addM} {hosafa}/>
+ <Hand on:hosa={hosa} on:progres={bighand} on:trym={trym}  {noofopen} {openMS} {addM} hosafa={hosafa[$lang]}/>
 {/if}
   {#if hoveredd}
-  <button on:click={masi} on:mouseleave={bighandd} ><img title={hosafat}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"></button> 
+  <button on:click={masi} on:mouseleave={bighandd} ><img title={hosafat[$lang]}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"></button> 
 
   {:else}
-   <Handd on:trym={tryma} on:masi={masi} on:bighandd={bighandd} {noofopenm} {openMA} {addN} {hosafat}/>
+   <Handd on:trym={tryma} on:masi={masi} on:bighandd={bighandd} {noofopenm} {openMA} {addN} hosafat={hosafat[$lang]}/>
 
 {/if}
 
@@ -1261,7 +1244,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
 <span bind:this={pendss}>
   {#if pendS === true}
   
-<button title={cencel1}
+<button title={cencel1[$lang]}
   on:click={() => pendS = false}
   class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1276,7 +1259,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
 {#if bmiData.length > 0}
 <span bind:this={bmiss}>
  {#if tahaS === true}
-<button title={cencel1}
+<button title={cencel1[$lang]}
   on:click={() => tahaS = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1291,7 +1274,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
 
 {#if openMS === true && omiData.length > 0}
     <span bind:this={openss}>
-  <button title={cencel1}
+  <button title={cencel1[$lang]}
   on:click={() => openMS = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1300,7 +1283,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
   <OpenM omiData={omiData}/>
   </span>
  {:else if openMS === true && omiData.length == 0}
-  <button title={cencel1}
+  <button title={cencel1[$lang]}
   on:click={() => openMS = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1316,7 +1299,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
 
 {#if openMA === true && opmash.length > 0}
 
-  <button title={cencel1}
+  <button title={cencel1[$lang]}
   on:click={() => openMA = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1324,7 +1307,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
   </svg></button> 
 <Mashman meData={opmash}/>
  {:else if openMA === true && opmash.length == 0}
-  <button title={cencel1}
+  <button title={cencel1[$lang]}
   on:click={() => openMA = false}
   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold  p-0.5 rounded-full"
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1344,7 +1327,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
  {#if addM === true}
    <div bind:this={hosaf}   class=" m-4 border-2 border-barbi rounded" >
 <button
- title={cencel}
+ title={cencel[$lang]}
       on:click={closeM}
        class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1396,7 +1379,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
       {#if addN == true}
       <div id="hosafn" class="m-4 border-2 border-barbi rounded"  >
       <button
-      title={cencel}
+      title={cencel[$lang]}
       on:click={() => addN = false}
        class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -1434,7 +1417,7 @@ const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding mi
   </button>
       {:else if hal === true}
        <button
-      title={cencel}
+      title={cencel[$lang]}
       on:click={() => hal = false}
        class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
