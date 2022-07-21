@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">1lev1</string>
+    <string name="title_activity_main">1lev1</string>
+    <string name="package_name">world.1lev1.app</string>
+    <string name="custom_url_scheme">world.1lev1.app</string>
+</resources>

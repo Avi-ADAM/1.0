@@ -18,9 +18,13 @@
     "tailwindcss": "^3.0.24"
   },
   "dependencies": {
+    "@capacitor/android": "^3.6.0",
+    "@capacitor/cli": "^3.6.0",
+    "@capacitor/core": "^3.6.0",
     "@fontsource/fira-mono": "^4.5.7",
     "@lottiefiles/svelte-lottie-player": "^0.2.0",
     "@okrad/svelte-progressbar": "^1.11.3",
+    "@sveltejs/adapter-static": "^1.0.0-next.38",
     "axios": "^0.24.0",
     "blueimp-canvas-to-blob": "^3.29.0",
     "buffer": "^6.0.3",
