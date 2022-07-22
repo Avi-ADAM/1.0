@@ -3,6 +3,8 @@ import axios from 'axios';
     import { goto} from '$app/navigation';
  import { page } from '$app/stores'
     const email = $page.url.searchParams.get('code')
+	          import { lang } from '$lib/stores/lang.js'
+
 let passwordx;
 let errorl = null;
 let before = true;
@@ -50,6 +52,14 @@ axios
 	function getV (e){
     passwordx = e.target.value
 	}
+	const crnp = {"he":"יצירת סיסמה חדשה","en":"create new password"}
+	    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
+  const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
+  const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
+  const arr1 = {"he":"אם לא התקבל מייל הרשמה נא לפנות ל-","en": "if you didn't recive email, reach us at-"}
+  const arr2 = {"he":"הסיסמה שונתה בהצלחה","en": "the password has been changed"}
+  const arr3 = {"he":"משהו השתבש,","en": "something is wrong,"}
+const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 </script>
 {#if before}
 <div>
@@ -73,9 +83,9 @@ axios
 			<input
 				autocomplete="new-password"
    				type={showPassword ? "text" : "password"}
-				name="email"
+				name="password"
 				class="input"
-				placeholder=" יצירת סיסמה חדשה"
+				placeholder={crnp[$lang]}
 				on:input={validatePassword}
 				on:blur={getV}
 			/>
@@ -98,25 +108,25 @@ axios
 
 		<ul dir="rtl">
 			<li>
-				{validations[0] ? "🏆" : "❌"} על הססמה להכיל לפחות חמש אותיות <!-- be at least 5 characters-->
+				{validations[0] ? "🏆" : "❌"} {val1[$lang]}
 			</li>
 			<li>
-				{validations[1] ? "🏆" : "❌"} ולפחות אות אחת גדולה באנגלית<!-- must contain a capital letter -->
+				{validations[1] ? "🏆" : "❌"} {val2[$lang]}
 			</li>
-			<li>{validations[2] ? "🏆" : "❌"} ולפחות מספר אחד<!--must contain a number --></li>
-			<li>
-				{validations[3] ? "🏆" : "❌"} ולפחות סמל אחד ($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
-			</li>
+			<li>{validations[2] ? "🏆" : "❌"} {val3[$lang]}</li>
+			<!--<li>
+				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) must contain one symbol ($&+,:;=?@#)
+			</li>-->
 		</ul>
 
-		<button on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
+		<button on:click={shaneh} disabled={strength < 4}>{crnp[$lang]}</button>
 	</form>
 </main>
 
 
     </div>
     {:else }
-<h1>הסיסמה שונתה בהצלחה</h1>
+<h1 class="text-center text-barbi">{arr2[$lang]}</h1>
 
     {/if}
 <style>
@@ -136,7 +146,7 @@ axios
 		border: none;
 		overflow: hidden;
 		margin: 0;
-		width: 100%;
+		width: 50%;
 		margin: 0 auto;
 		padding: 0.25rem 0;
 		background-color: white;
