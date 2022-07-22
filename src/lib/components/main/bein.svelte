@@ -97,7 +97,7 @@ const buttn = { "he": "נא לבדוק את המייל, אם לא הגיע מי�
 <br>
 {see[$lang]}
 </h1>
-    <a href="mailto:ehad1one@gmail.com" class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full">{buttn[$lang]}</a>
+    <a href="mailto:ehad1one@gmail.com" class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi px-2 rounded-full">{buttn[$lang]}</a>
   </div>
   </div>
 {/if}

@@ -12,7 +12,7 @@ import { roles2 } from './roles2.js';
 import { workways1 } from './workways1.js';
 import { valluss } from './valluss.js';
 import {fpval} from './fpval.js';
-
+import axios from 'axios';
 let skills1_value;
 let roles2_val;
 let work_ways1;
@@ -65,8 +65,26 @@ let errr = {k: false, m: "", p: false}
 async function increment() {    
 errr.p = true;
 already = true;
-   try {
-            await fetch(linkg, {
+	axios
+  .post('https://i18.onrender.com/auth/local/register', {
+    username: userName_value, 
+    email: emailL,
+    password: passwordx,
+	 skills: skills1_value,
+    tafkidims: roles2_val,
+    work_ways: work_ways1,
+    vallues: vallues,
+	cuntries: contriesis,
+	free_person: fpvall
+  }, {
+  headers: {
+	         'Content-Type': 'application/json'
+            }})
+  .then(response => {
+			show.update(n => n + 1);
+	  data = response.data;
+	  	console.log(data);
+          /*  await fetch(linkg, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json'
@@ -96,8 +114,7 @@ already = true;
                 })
                 .then(r => r.json())
                 .then(data => miDatan = data);
-            console.log(miDatan);
-			show.update(n => n + 1);
+            console.log(miDatan);*/
 
  dispatch ('progres',{
 		tx: 0,
@@ -144,15 +161,17 @@ already = true;
   .then(r => r.json())
   .then(data => miDatan = data);
             console.log(miDatan);
-    */       			
-} catch (e) {
+    */       	
+})	
+.catch(error => {
             error1 = e
             console.log(error1);
 				errr.m = error1.error.message
 				errr.k = true
-        }
-
+        });
 	}
+
+
 
   
 function back() {
