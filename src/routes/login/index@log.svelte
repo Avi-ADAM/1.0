@@ -54,10 +54,7 @@ onMount(async () => {
         password = password.trim();
 
         if (!email || !password) {
-            loginError = {
-        "en" : "Please fill all lines",
-        "he": "יש למלא את כל השדות"
-    } ;
+            loginError = `${$lang == "en" ? "Please fill all lines" :  "יש למלא את כל השדות"} ` ;
             return;
         }
         loginError = null;
@@ -83,7 +80,7 @@ onMount(async () => {
                 if (err.response) {
                     loginError = "";
                     for (let message of err.response.data.message[0].messages) {
-                        loginError[$lang] += `${message.message}\n`;
+                        loginError += `${message.message}\n`;
                     }
                 } else loginError = err;
             });
