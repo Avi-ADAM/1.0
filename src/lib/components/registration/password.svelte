@@ -76,7 +76,13 @@ already = true;
   register(input: { 
 	  username: "${userName_value}",
    email: "${emailL}",
-    password: "${passwordx}"
+    password: "${passwordx}",
+	 skills: [${skills1_value}],
+	 tafkidims: [${roles2_val}],
+    work_ways: [${work_ways1}],
+    vallues: [${vallues}],
+	cuntries: [${contriesis}],
+	free_person: "${fpvall}"
  }) {
 	 jwt
     user {
@@ -91,16 +97,22 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-				const id = miDatan.data.register.user.id;
-			      let token  = miDatan.data.register.jwt;
-                document.cookie = `when=${Date.now}; expires=` + new Date(2023, 0, 1).toUTCString();
-        document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
+			show.update(n => n + 1);
+
+ dispatch ('progres',{
+		tx: 0,
+		txx: 0
+	} );
+/*	const id = miDatan.data.register.user.id;
+	let token  = miDatan.data.register.jwt;
+	document.cookie = `await=${Date.now}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `when=${Date.now}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
     document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
-	    document.cookie = `guidMe=again; expires=` + new Date(2023, 0, 1).toUTCString();			
+	document.cookie = `guidMe=again; expires=` + new Date(2023, 0, 1).toUTCString();			
 	let bearer1 = 'bearer' + ' ' + token;      
 	await fetch(linkg, {
               method: 'POST',
-       
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
@@ -132,12 +144,7 @@ already = true;
   .then(r => r.json())
   .then(data => miDatan = data);
             console.log(miDatan);
-           			show.update(n => n + 1);
-
-dispatch ('progres',{
-		tx: 0,
-		txx: 0
-	} );
+    */       			
 } catch (e) {
             error1 = e
             console.log(error1);
