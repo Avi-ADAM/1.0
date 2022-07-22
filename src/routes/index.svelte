@@ -115,17 +115,31 @@ const regt = document.cookie
   .find(row => row.startsWith('id='))
   .split('=')[1];
 
-user = reg;}
+  user = reg;}
  const cookieValuet = document.cookie
   .split('; ')
   .find(row => row.startsWith('email='))
   if (cookieValuet != null){
-const cookieValue = document.cookie
+  const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('email='))
-  .split('=')[1];    kvar  = cookieValue; 
+  .split('=')[1];   
+   kvar  = cookieValue; 
     email.set(cookieValue);
-}}
+}
+const cookieValueti = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('await='))
+  if (cookieValueti != null){
+  const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('await='))
+  .split('=')[1];    
+  kvar = true
+  show.set(6)
+}
+}
+
     });
 
 
@@ -156,11 +170,9 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
 {:else}
 {#if regHelperL == 1}
 <One {idx}/>
-	
-{/if}
 
 
-{#if regHelperL == 0}
+{:else if regHelperL == 0}
 <Amana1 {idx}/>
 	 
 {/if}
