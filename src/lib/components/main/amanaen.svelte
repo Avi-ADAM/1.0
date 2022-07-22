@@ -572,7 +572,7 @@ function change(la){
     <div class="aab" bind:this={dow}>
 <div dir="ltr" class="amana" id="amana-show">
  <h1 dir="ltr" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
-       <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>'s Declaration of Independent:
+       <span style=" text-shadow: 1px 1px var(--mturk); 	font-family: 'Gan','Rubik' ;">{$form.name ? $form.name : "__"}</span>'s Declaration of Independent:
     </h1>
           <span>
               <span>

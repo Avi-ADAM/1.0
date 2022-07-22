@@ -1,10 +1,3 @@
-<script context="module">
-
-	export const prerender = true;
- 
-</script>
-
-   
 <svelte:head>
 	<title>WorldWide consensus for Freedom</title>
  
@@ -61,6 +54,8 @@ onMount(async () => {
   console.log("xf",$session.userAgent)
   console.log('Registration', $lang)
   getLang()
+      console.log('after', $lang)
+
   if($lang == "he" ){
     goto("/")
   } else if($lang == "ar"){
