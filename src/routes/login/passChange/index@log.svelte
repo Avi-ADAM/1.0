@@ -1,6 +1,6 @@
 <script>
 import axios from 'axios';
-    import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+    import { goto} from '$app/navigation';
  import { page } from '$app/stores'
     const email = $page.query.get('code')
 let passwordx;
