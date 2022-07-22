@@ -50,5 +50,7 @@ axios
  <button class="bg-barbi text-gold hover:bg-gold hover:text-barbi p-2 rounded-full" style="margin: 1em">{se[$lang]}</button>
 </form></div>
 {:else}
-<p>{after[$lang]}</p>
+<div class="w-full h-full text-center items-center justify-center display-grid bg-gold">
+<p class="text-center text-barbi">{after[$lang]}</p>
+</div>
 {/if}

@@ -2,7 +2,7 @@
 import axios from 'axios';
     import { goto} from '$app/navigation';
  import { page } from '$app/stores'
-    const email = $page.query.get('code')
+    const email = $page.url.searchParams.get('code')
 let passwordx;
 let errorl = null;
 let before = true;
