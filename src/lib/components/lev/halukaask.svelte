@@ -6,7 +6,11 @@
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
   import ProgressBar from "@okrad/svelte-progressbar";
+  import Lowbtn from '$lib/celim/lowbtn.svelte'
+
  const dispatch = createEventDispatcher();
+     export let low = false;
+
     export let mypos = null;
     export let coinlapach;
     export let whyno = [];
@@ -492,7 +496,7 @@ title="ביטול"
 use:clickOutside
 on:click_outside={toggleShow} 
 style="position: relative;" 
-style:z-index={hovered === false ? 1 : 6} 
+style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 class="hover:scale-290 duration-1000 ease-in" 
@@ -558,7 +562,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
        on:mouseenter={()=>hover("טענת הנגד האחרונה שעלתה")} 
             on:mouseleave={()=>hover("0")} 
        >{whyno.join(' ~ ')}</h4>{/if} 
-   
+   {#if low == false}
      {#if already === false}
    <button on:mouseenter={()=>hover("אישור")} 
             on:mouseleave={()=>hover("0")}  on:click={agree} style="margin: 0;" class = "btn a" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
@@ -581,7 +585,9 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
         <button on:mouseenter={()=>hover("תגובה")} 
             on:mouseleave={()=>hover("0")} class="c" on:click={() => react()}>תגובה</button>
         {/if}
-    
+     {:else if low == true}
+          <Lowbtn/>
+        {/if}
 </div>
 </SwiperSlide
   >

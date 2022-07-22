@@ -2,9 +2,11 @@
       import Chaticon from '../../../celim/chaticon.svelte'
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
+     export let low = false;
+import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
-    export let projectName, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours,useraplyname
+    export let projectName, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours ,useraplyname
     export let already, allr = false;
 function hover(x){
 dispatch("hover",{x:x});
@@ -54,6 +56,7 @@ dispatch("tochat");
         <p ><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>
     </div>
        </div>
+       {#if low == false}
  {#if already === false && allr === false}
                 <button on:mouseenter={()=>hover("אישור")}
                on:mouseleave={()=>hover("0")} 
@@ -128,7 +131,9 @@ dispatch("tochat");
         </button>
     -->
         {/if}
-
+ {:else if low == true}
+          <Lowbtn isCart="true"/>
+        {/if}
 </div>
 
 <style>

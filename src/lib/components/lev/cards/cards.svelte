@@ -203,6 +203,7 @@ mousewheel={true}
           on:hover={hover}
  on:proj={proj}
  on:user={user}
+ {low}
  cards="true"
      coinlapach={buble.coinlapach} 
     myid={buble.myid}
@@ -228,6 +229,7 @@ mousewheel={true}
   cards="true"
  on:user={user}  
   on:hover={hover}
+  {low}
       coinlapach={buble.coinlapach} 
     usernames={buble.usernames}
     noofpu={buble.project.user_1s.length}
@@ -253,7 +255,7 @@ mousewheel={true}
   on:proj={proj}
  on:user={user}
          cards="true"
-
+{low}
      coinlapach={buble.coinlapach} 
         on:coinLapach={delo}
                  messege={buble.messege}
@@ -289,6 +291,7 @@ mousewheel={true}
   on:proj={proj}
  on:user={user}
         on:coinLapach={delo}
+        {low}
             coinlapach={buble.coinlapach} 
           messege={buble.messege}
         mysrc={buble.mysrc}
@@ -327,6 +330,7 @@ mousewheel={true}
                   on:hover={hover}
           on:proj={proj}
  on:user={user}
+ {low}
      coinlapach={buble.coinlapach} 
             mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
@@ -373,6 +377,7 @@ mousewheel={true}
     on:proj={proj} 
  on:user={user}
  cards="true"
+ {low}
      coinlapach={buble.coinlapach} 
              mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
@@ -426,7 +431,7 @@ mousewheel={true}
             on:decline={delo}
             cards="true"
                 coinlapach={buble.coinlapach} 
-
+            {low}
             pid={buble.pid}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
@@ -468,9 +473,9 @@ mousewheel={true}
             cards="true"
  on:user={user}
  on:chat={chat}
+ {low}
             pid={buble.pid}
                 coinlapach={buble.coinlapach} 
-
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
             what={buble.what}
@@ -509,7 +514,7 @@ mousewheel={true}
       on:proj={proj}
  on:user={user}
      coinlapach={buble.coinlapach} 
-
+    {low}
       askedarr={askedarr}
       {declineddarr}
       deadLine = {buble.sqadualed}
@@ -538,7 +543,7 @@ mousewheel={true}
  messege={buble.messege}
       i={i}
           coinlapach={buble.coinlapach} 
-
+      {low}
       askedarr={askedarr}
      declineddarra= {buble.declineddarra}
       deadLine = {buble.sqadualed}

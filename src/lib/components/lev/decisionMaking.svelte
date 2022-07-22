@@ -11,7 +11,8 @@
     export let src = "coin.png";
     export let projectId;
     export let linkP = "/project/"
-
+    export let low = false;
+import Lowbtn from '$lib/celim/lowbtn.svelte'
 
 	function toggleShow() {
 		shows = !shows
@@ -50,10 +51,13 @@ use:clickOutside on:click_outside={toggleShow}>
  <p style="margin: 7px; font-size: 13px;">{decisionDetails}</p>
     <a style="margin: 7px; font-size: 13px; font-weight: bold;" href={link}>{linkDescription}</a>
     <br>
+    {#if low == false}
         <button1 style="margin: 7px" class="btn"><i class="far fa-check-circle"></i></button1>
         <button3 name="negotiate"  class="btn"><i class="far fa-comments"></i></button3>
         <button2 name="no"  class="btn"><i class="far fa-times-circle"></i></button2>
-        
+     {:else if low == true}
+          <Lowbtn/>
+        {/if}   
    
 </div>
 

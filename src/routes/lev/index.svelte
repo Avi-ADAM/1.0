@@ -1952,12 +1952,13 @@ console.log(cards, "from papa")
 {:else if cards == false}
   <Tooltip title="{u}" ispic="true">
     <Coinsui  on:hover={hover}
+    {low}
     on:user={user}
     on:proj={proj}
     on:chat={chat}
     on:start={coinLapach} 
      on:cards={cardsi} 
- {adder}  {arr1} {askedarr}  {declineddarr} {halu}  {askma} {maap} {mashs} {pmashd}  {fia}  {beta}  {pen} {sug} {low} {nam} {wel} {ask} {picLink} {total}/>
+ {adder}  {arr1} {askedarr}  {declineddarr} {halu}  {askma} {maap} {mashs} {pmashd}  {fia}  {beta}  {pen} {sug}  {nam} {wel} {ask} {picLink} {total}/>
 
 </Tooltip>
 {/if}

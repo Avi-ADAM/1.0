@@ -93,6 +93,7 @@ let h = 500;
     users={buble.users}
     diun={buble.diun}
     order={buble.order}
+    {low}
                                /></div>
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
  <div   class="betaha normSml" ><MissionInProgress
@@ -117,6 +118,7 @@ let h = 500;
     hourstotal = {buble.hoursassinged}
     perhour = {buble.perhour}
     on:done={delo}
+    {low}
     /></div>
 {:else if buble.ani === "pmashes" && milon.ppmash == true}
     <div class="normSml ppmash" 
@@ -152,6 +154,7 @@ let h = 500;
                 linkto={buble.linkto}
                 pendId={buble.pendId}
                 users={buble.users}
+                {low}
                 /></div>
 {:else if buble.ani === "pends" && milon.pend == true}
     <div  class="normSml pend" 
@@ -188,6 +191,7 @@ let h = 500;
                 vallues={buble.vallues}
                 pendId={buble.pendId}
                 users={buble.users}
+                {low}
                 /></div>
 {:else if buble.ani === "wegets" && milon.pmaap == true}
         <div class="pmaap normSml" ><Weget
@@ -233,6 +237,7 @@ let h = 500;
                 stylef={buble.stylef}
                 st={buble.st}
                 declined={buble.decid}
+                {low}
                 /></div>
 {:else if buble.ani === "fiapp" && milon.fiap == true}
             <div  class="fiap normSml" ><Fiappru
@@ -275,6 +280,7 @@ let h = 500;
                 stylef={buble.stylef}
                 st={buble.st}
                 declined={buble.decid}
+                {low}
                 /></div>
 {:else if buble.ani === "walcomen" && milon.welc == true}
    <div  class="welc normSml" ><Welcomt 
@@ -323,6 +329,7 @@ let h = 500;
                 stylef={buble.stylef}
                 st={buble.st}
                 declined={buble.decid}
+               {low}
                 /></div>
 {:else if buble.ani === "askedm" && milon.askmap == true}
         <div  class="askmap normSml" ><Reqtom
@@ -364,6 +371,8 @@ let h = 500;
                 st={buble.st}
                 declined={buble.decid}
                 spid={buble.spid}
+                                {low}
+
                 /></div>
 {:else if buble.ani === "meData" && milon.sugg == true}
     <div class="sugg normSml" ><ProjectSuggestor
@@ -388,6 +397,7 @@ let h = 500;
                 noOfHours={buble.noofhours}
                 perhour={buble.perhour}
                 total={buble.noofhours * buble.perhour}
+                {low}
                 /></div>
 {:else if buble.ani === "huca" && milon.pmashs == true}
     <div  class="pmashs normSml" ><Mashsug
@@ -415,6 +425,7 @@ let h = 500;
                 descrip={buble.descrip}
                 spnot={buble.spnot}
                 easy={buble.easy}
+                {low}
                 /></div>
 {/if}
 {/each}

@@ -37,7 +37,7 @@ u = "קבלת פנים לרגל הצטרפותך לריקמה חדשה"
 </script>
 <div
 style="position: relative;" 
-style:z-index={hovered === false ? 1 : 6} 
+style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000}}>

@@ -1,6 +1,8 @@
 <script>
       import Chaticon from '../../../celim/chaticon.svelte'
   import { createEventDispatcher } from 'svelte';
+      export let low = false;
+import Lowbtn from '$lib/celim/lowbtn.svelte'
  const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
@@ -66,6 +68,7 @@ dispatch("tochat");
       </div>
     </div>
        </div>
+       {#if low == false}
  {#if already === false && allr === false}
                 <button on:mouseenter={()=>hover("אישור")}
                on:mouseleave={()=>hover("0")} 
@@ -140,7 +143,9 @@ dispatch("tochat");
         </button>
     -->
         {/if}
-
+ {:else if low == true}
+          <Lowbtn isCart="true"/>
+        {/if}
 </div>
 
 <style>

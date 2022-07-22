@@ -6,9 +6,7 @@
 	export let z = 15;
 	export let ispic = false;
 	export let islink = false;
-	function gotop(){
-		console.log(title);
-	}
+
 	function mouseOver(event) {
 		isHovered = true;
 		x = event.pageX + 5;

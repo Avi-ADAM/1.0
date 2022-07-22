@@ -4,8 +4,10 @@
     import axios from 'axios';
     import { createEventDispatcher } from 'svelte';
      import { onMount } from 'svelte';
+import Lowbtn from '$lib/celim/lowbtn.svelte'
 
  const dispatch = createEventDispatcher();
+    export let low = false;
 
 	  export let shows = true;
     export let deadLine = "11.11.2022";

@@ -8,6 +8,7 @@
     import { onMount } from 'svelte';
      import { createEventDispatcher } from 'svelte';
      import {betha} from './storess/betha.js'
+     import Lowbtn from '$lib/celim/lowbtn.svelte'
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -20,6 +21,8 @@ betha.subscribe(value => {
  export let coinlapach
     export let stname;
     let show = true;
+        export let low = false;
+
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
     export let missionName = "do x" 
@@ -631,7 +634,7 @@ function claf (event){
 
 <div 
 style="position: relative;" 
-style:z-index={hovered === false ? 1 : 6} 
+style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
@@ -737,7 +740,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
 
   <a on:mouseenter={()=>hover("לינק לביצוע המשימה")} on:mouseleave={()=>hover("0")} class="mn de text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
 <div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div>
-
+{#if low == false}
 {#if lapse !== 0 || x !== 0}
 <button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
 <button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" on:click={save}> הוספה</button>
@@ -747,6 +750,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
      {/if} 
      {#if show === true}  <button on:mouseenter={()=>hover(`${running ? "עצירת הטיימר" : "הפעלת טיימר"}`)} on:mouseleave={()=>hover("0")} on:click={running ? azor : start} class="btn b" name="start timer" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
    {/if}
+    {:else if low == true}
+          <Lowbtn/>
+        {/if}
         <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
  </div>
@@ -765,6 +771,7 @@ on:start={start}
   on:hover={hoverc}
   on:azor={azor}
   on:clear={handleClearClick}
+  {low}
   {dueDateOrCountToDedline}
 {x}
   {zman}

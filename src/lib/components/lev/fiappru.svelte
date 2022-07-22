@@ -1,5 +1,4 @@
 <script>
-      import Tooltip from './../../celim/tooltip.svelte';
   import ProgressBar from "@okrad/svelte-progressbar";
 import {
     clickOutside
@@ -14,6 +13,8 @@ import {
 } from 'svelte-accessible-dialog';
  import { goto } from '$app/navigation';
 import { idPr } from './../../stores/idPr.js';
+    export let low = false;
+import Lowbtn from '$lib/celim/lowbtn.svelte'
 
 const dispatch = createEventDispatcher();
 export let coinlapach;
@@ -453,7 +454,7 @@ title="ביטול"
 
 <div 
 style="position: relative;" 
-style:z-index={hovered === false ? 1 : 6} 
+style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()} 
 use:clickOutside on:click_outside={toggleShow}
@@ -536,11 +537,14 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 
             <h5 on:mouseenter={()=>hover("טקסט אישור של סיום משימה")} on:mouseleave={()=>hover("0")}  class="bc pnn" >{why}</h5>
           {#if missionDetails}  <h6 class="cd pnn" on:mouseenter={()=>hover("פרטי משימה")} on:mouseleave={()=>hover("0")}  >{missionDetails}</h6>{/if}
-         
+         {#if low == false}
             {#if already == false}
             <button on:mouseenter={()=>hover(" אישור")} on:mouseleave={()=>hover("0")}  on:click={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
         <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>--> 
             <button on:mouseenter={()=>hover(" התנגדות")} on:mouseleave={()=>hover("0")}  on:click={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+        {/if}
+         {:else if low == true}
+          <Lowbtn/>
         {/if}
           </div>
 </SwiperSlide

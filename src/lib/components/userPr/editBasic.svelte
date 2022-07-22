@@ -88,10 +88,10 @@ function save (){
 	
     dispatch('message', {
     frd: frd,
-	bi : bi,
-	un: un,
-	em: mail,
-	lango: lango,
+	  bi : bi,
+	  un: un,
+	  em: mail,
+	  lango: lango,
     })
   };
 
