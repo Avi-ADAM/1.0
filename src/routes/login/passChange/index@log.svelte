@@ -1,9 +1,9 @@
 <script>
-import axios from 'axios';
+	import axios from 'axios';
     import { goto} from '$app/navigation';
- import { page } from '$app/stores'
+ 	import { page } from '$app/stores'
     const email = $page.url.searchParams.get('code')
-	          import { lang } from '$lib/stores/lang.js'
+	import { lang } from '$lib/stores/lang.js'
 
 let passwordx;
 let errorl = null;
@@ -56,10 +56,8 @@ axios
 	    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
   const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
   const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
-  const arr1 = {"he":"אם לא התקבל מייל הרשמה נא לפנות ל-","en": "if you didn't recive email, reach us at-"}
   const arr2 = {"he":"הסיסמה שונתה בהצלחה","en": "the password has been changed"}
-  const arr3 = {"he":"משהו השתבש,","en": "something is wrong,"}
-const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
+ 
 </script>
 {#if before}
 <div>

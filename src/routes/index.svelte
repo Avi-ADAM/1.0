@@ -3,7 +3,13 @@
    
 <svelte:head>
 	<title>הסכמה עולמית על חירות </title>
-
+<script>
+nl_pos = "br";
+nl_color = "pink";
+nl_compact = "1";
+nl_accordion = "1";
+</script>
+<script src="https://www.1lev1.world/nagishli.js?v=2.3" charset="utf-8" defer></script>
 </svelte:head>
 
 <script>
