@@ -9,7 +9,7 @@ nl_color = "pink";
 nl_compact = "1";
 nl_accordion = "1";
 </script>
-<script src="https://res.cloudinary.com/love1/raw/upload/v1658585281/nagishli_e249ju.js?v=2.3" charset="utf-8" defer></script>
+<script src="https://1lev1.world/nagishli.js?v=2.3" charset="utf-8" defer></script>
 </svelte:head>
 
 <script>
