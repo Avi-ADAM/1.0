@@ -1358,7 +1358,7 @@ position: absolute;
 
   .amana{
     width: 100vw;
-    padding: 0px 120px;
+    padding: 0px 100px;
     font-size:22px;
     font-family: 'StamSefarad', serif;
     text-align:center;
@@ -1425,8 +1425,8 @@ position: absolute;
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 @media(min-width:1200px) {
    .amana{
-    padding: 0 110px;
-    background-size: 1400px  ;
+    padding: 0 80px;
+    background-size: 1424px  ;
   }
    .centeron{
    left: 48%;
