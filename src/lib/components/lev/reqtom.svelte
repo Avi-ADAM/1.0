@@ -41,7 +41,7 @@ export let valph = 0;
 export let missId;
 export let id;
 export let openMid;
-export let st = 188;
+export let st = 275;
 export let declined = [];
 export let noofusersWaiting;
 export let uids;
