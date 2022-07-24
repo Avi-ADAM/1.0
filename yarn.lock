@@ -345,6 +345,11 @@
   dependencies:
     "sprintf-js" "~1.0.2"
 
+"as-toast@^1.1.0":
+  "integrity" "sha512-4pwF4PaLN5uDHzKCtA8FJsfzfG46jpeihrz5fsSmIlfOgTIGwotLRrCk5OcjsjPu4MCwqm6Mx93bB/H5rAlBGQ=="
+  "resolved" "https://registry.npmjs.org/as-toast/-/as-toast-1.1.0.tgz"
+  "version" "1.1.0"
+
 "astral-regex@^2.0.0":
   "integrity" "sha512-Z7tMw1ytTXt5jqMcOP+OQteU1VuNK9Y02uuJtKQ1Sv69jXQKKg5cibLwGJow8yzZP+eAc18EmLGPal0bp36rvQ=="
   "resolved" "https://registry.npmjs.org/astral-regex/-/astral-regex-2.0.0.tgz"

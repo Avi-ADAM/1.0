@@ -90,6 +90,8 @@ let imageFile;
 	}
  const up = {"he":"העלאת תמונה", "en": "upload picture"} 
 const adj = {"he":"התאמת גודל התמונה", "en": "adjust picture size"}
+const cut = {"he":"לחתוך!","en": "cut!"}
+const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 </script>
 
 {#if !image}
@@ -122,9 +124,9 @@ const adj = {"he":"התאמת גודל התמונה", "en": "adjust picture size
 	
 	<br>
   <div dir="rtl">
-  <button type="button" on:click={cropImage} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full bt">לחתוך!</button>
+  <button type="button" on:click={cropImage} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full bt">{cut[$lang]}</button>
 
-	<button type="button" class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full" on:click={reset}>להתחיל הכל מהתחלה?</button>
+	<button type="button" class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full" on:click={reset}>{re[$lang]}</button>
 </div>{/if}
 
 <style>

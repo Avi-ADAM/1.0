@@ -4,7 +4,7 @@
   import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
   import Header from '../../lib/components/header/header.svelte'
   import Lowding from './../../lib/celim/lowding.svelte'
-                 import { lang } from '$lib/stores/lang.js'
+  import { lang } from '$lib/stores/lang.js'
     import Uplad from '../../lib/components/userPr/uploadPic.svelte';
     import axios from 'axios';
     import Editb from '../../lib/components/prPr/editp.svelte'
@@ -327,9 +327,7 @@ async function prog (){
           throw resp;
         });
       };
-      const headers = {
-        'Content-Type': 'application/json'   
-      }; let linkg ="https://i18.onrender.com/graphql" ;
+      let linkg ="https://i18.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -446,7 +444,7 @@ async function findT ()  {
   tafkidims { id roleDescription  ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
 
   workWays { id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
-}
+ }
               `})
             }).then(checkStatus)
           .then(parseJSON);
@@ -796,15 +794,16 @@ function addp () {
       a = 0;
             isOpen = true;
   }  else {
-    const toalart = {"he": "בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות","en":"if number of users in freemates is greater than 1 you need everyone to agree, this feature will be released soon"}
     alert(toalart[$lang])
   }
 //if project users more then 1
 }
+    const toalart = {"he": "בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות","en":"if number of users in freemates is greater than 1 you need everyone to agree, this feature will be released soon"}
+
 function editp () {
   if (projectUsers.length == 1) {
       a = 0;
-            isOpen = true;
+      isOpen = true;
   } else {
     alert(toalart[$lang])
   }
@@ -814,7 +813,7 @@ function editb () {
 //if project users more then 1
  if (projectUsers.length == 1) {
       a = 1;
-            isOpen = true;
+      isOpen = true;
   } else {
     alert(toalart[$lang])
   }
@@ -837,7 +836,7 @@ function allbackFunction(event) {
 let url1 = "https://i18.onrender.com/upload";
 let meDatap = [];
 let mecata = [];
-function sendP () {
+async function sendP () {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -858,9 +857,10 @@ function sendP () {
                         Authorization: bearer1,
                     },
                 })
-                .then(({ data }) => {
-                    const imageId = data[0].id;  
-      axios
+        .then(({ data }) => {
+        const imageId = data[0].id;  
+        if (projectUsers.length == 1) {
+       axios
       .put(linkdi, {
         profilePic: imageId,
                   },
@@ -870,10 +870,8 @@ function sendP () {
                 }})
       .then(response => {
         meDatap = response.data;
-       
           srcP = meDatap.profilePic.formats.thumbnail.url;
                     srcP = meDatap.profilePic.formats.small.url;
-
         srcP = meDatap.profilePic.url;
     isOpen = false;
     a = 0;
@@ -884,7 +882,50 @@ function sendP () {
           a = 3;
         }
                 });
-      
+                } else {
+         let linkg ="https://i18.onrender.com/graphql" ;
+        try {
+              fetch(linkg, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+          ` mutation { createDecision(
+    input: {
+       data: {
+        projects: ${$idPr},
+         newpic: ${imageId},
+        kind: pic,
+          vots: [
+        {what: true,
+        users_permissions_user: ${idL}
+        }
+      ]
+        
+       }
+    }
+  ){
+         decision{
+              id 
+          }
+  }
+ }`
+        })
+ })
+  .then(r => r.json())
+  .then(data => meDatap = data);
+           isOpen = false;
+        a = 0;
+        //success toast
+    } catch (e) {
+            console.log(e)
+        }
+           
+                }
 })};
   
 async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
