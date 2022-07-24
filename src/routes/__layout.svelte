@@ -17,10 +17,13 @@
 <script>
   
 import "../app.postcss";
+	import { Toasts } from 'as-toast';
 
 </script>
 
 
 <main>
 	<slot />
+  
+<Toasts />
 </main>

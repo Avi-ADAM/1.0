@@ -2,6 +2,7 @@
 import { goto } from '$app/navigation';
 import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js'
+  import { addToast } from 'as-toast';
 
  import { createEventDispatcher } from 'svelte';
 let isGuidMe = false;
@@ -153,13 +154,18 @@ function shaneh () {
   console.log("guid")
   isGuidMe = false;
   document.cookie = `guidMe=done; expires=` + new Date(2026, 0, 1).toUTCString();
- }
+             addToast(`${guidend[$lang]}`, 'info');
+}
  	 function startGuid(){
   console.log("guid")
     isGuidMe = true;
 
   document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
- }
+                 addToast(`${guidback[$lang]}`, 'info');
+
+}
+const guidend = {"he": "המדריך לא יוצג יותר במכשיר זה, ניתן להחזירו בכל עת בתפריט זה","en": "the guid will not show up again in this device, you can return it back from here"}
+const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כדי לראותו","en": "the guid ia back! refreach the page to see it"}
  const pr = {"he":"שפה מועדפת", "en": "prefferd Language"}
  const myfd = {"he":"היום החופשי שלי", "en": "My free day"}
  const sun = {"he":"ראשון", "en": "Sunday"}

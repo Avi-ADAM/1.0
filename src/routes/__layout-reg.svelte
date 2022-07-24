@@ -2,6 +2,8 @@
 import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
   import { onMount } from 'svelte';
   import { Tour, TourTip } from 'svelte-tour';
+  	import { Toasts } from 'as-toast';
+
     import { lang, doesLang, langUs } from '../lib/stores/lang.js'
 import { session } from '$app/stores';
 function getLang() {
@@ -69,6 +71,8 @@ function login () {
 <main >
   <slot></slot>
   <Tour TourTip={TourTip}></Tour>
+  <Toasts />
+
 </main>
 {:else}
 <div class="a  bg-gradient-to-br from-gra to-grb">

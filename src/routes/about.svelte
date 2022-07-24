@@ -28,7 +28,7 @@
  הארות הערות וכל דבר למייל ehad1one@gmail.com
  <br/>
  אודות 
-<span><a class="text-gold hover:text-mturk" href="https://shalom.1lev1.world">1❤️1</a></span></div>		
+<span><a target=”_blank” class="text-gold hover:text-mturk" href="https://shalom.1lev1.world">1❤️1</a></span></div>		
 <div class="rabi">
 <strong>תפילה לשלום / רבי נחמן מברסלב</strong><br/>
 אדון השלום, מלך שהשלום שלו, עושה שלום ובורא הכל. 
@@ -43,20 +43,20 @@
 		</div>
 	<div class="fli" dir="rtl">
 		<span class="sec">
-		<div style="white-space: nowrap; padding: 5px;">	<a  href="https://www.facebook.com/onehHart1"  class="text-barbi" > 1❤️1 
+		<div style="white-space: nowrap; padding: 5px;">	<a target=”_blank”  href="https://www.facebook.com/onehHart1"  class="text-barbi" > 1❤️1 
 	ב
 -<img align="left" height="32" width="32" alt="facebook" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>	
 	</div> 
-<div style="white-space: nowrap; padding: 5px;"> <a href="https://www.facebook.com/worldnonviolent" class="text-barbi">האמנה העולמית לשלום וביטחון ב
+<div style="white-space: nowrap; padding: 5px;"> <a target=”_blank” href="https://www.facebook.com/worldnonviolent" class="text-barbi">האמנה העולמית לשלום וביטחון ב
 -<img align="left" height="32" width="32" alt="facebook" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>
 	</div>  <div class="th">
-<div style="white-space: nowrap; padding: 5px;"> <a href="https://opensea.io/1love1" class="text-barbi"> לקולקציית ה
+<div style="white-space: nowrap; padding: 5px;"> <a target=”_blank” href="https://opensea.io/1love1" class="text-barbi"> לקולקציית ה
 -<img align="left" height="32" width="32" alt="NFT" src="https://res.cloudinary.com/love1/image/upload/v1640604252/nft-sign-svgrepo-com_a5xvx7.svg"></a>
 	</div></div> </span > <span class="sec">
-	<div style="white-space: nowrap; padding: 5px;"> <a href="https://payboxapp.page.link/mXnKCtYiWADBgAcB8" class="text-barbi" style="padding-top:16px;">לתמוך בנו עם
+	<div style="white-space: nowrap; padding: 5px;"> <a target=”_blank” href="https://payboxapp.page.link/mXnKCtYiWADBgAcB8" class="text-barbi" style="padding-top:16px;">לתמוך בנו עם
 -<img align="left" id="pb" height="32" width="64" alt="payBox" src="https://res.cloudinary.com/love1/image/upload/v1641485170/PBr_hdbfuv.png"></a>
 	</div> <div class="th">
-	<div style="white-space: nowrap; padding: 5px;"> <a href="https://discord.gg/DNaMwrXzyS" class="text-barbi">לערוץ ה
+	<div style="white-space: nowrap; padding: 5px;"> <a target=”_blank” href="https://discord.gg/DNaMwrXzyS" class="text-barbi">לערוץ ה
 -<img align="left" height="32" width="64" alt="Discord" src="https://res.cloudinary.com/love1/image/upload/v1641482980/discord-seeklogo.com_tkftet.svg"></a>
 	</div></div>
 </span>

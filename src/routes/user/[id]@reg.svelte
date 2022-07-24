@@ -133,8 +133,8 @@ let error1 = null;
     {/each} 
   
   </div>
-<a href="https://www.facebook.com/worldnonviolent" class="text-barbi"><img align="left" height="32" width="32" alt="facebook" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>
-<a href="https://discord.gg/DNaMwrXzyS" class="text-barbi"><img align="left" height="32" width="64" alt="Discord" src="https://res.cloudinary.com/love1/image/upload/v1641482980/discord-seeklogo.com_tkftet.svg"></a> 
+<a target=”_blank” href="https://www.facebook.com/worldnonviolent" class="text-barbi"><img align="left" height="32" width="32" alt="facebook" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>
+<a target=”_blank” href="https://discord.gg/DNaMwrXzyS" class="text-barbi"><img align="left" height="32" width="64" alt="Discord" src="https://res.cloudinary.com/love1/image/upload/v1641482980/discord-seeklogo.com_tkftet.svg"></a> 
 </div> 
 <!--סקשן של תעודות וקורות חיים 
 סקשן של משימות שסיימתי
