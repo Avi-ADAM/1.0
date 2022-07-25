@@ -1269,13 +1269,13 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
 
 <div class=" hhh">
    {#if hovered}
-  <button on:click={hosa} on:mouseleave={bighand} ><img title={hosafa[$lang]}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"></button> 
+  <button on:click={hosa} on:mouseleave={bighand} ><img title={hosafa[$lang]} style="max-width:45vw; max-height:45vw;" width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg" alt="cheked"></button> 
 
   {:else}
  <Hand on:hosa={hosa} on:progres={bighand} on:trym={trym}  {noofopen} {openMS} {addM} hosafa={hosafa[$lang]}/>
 {/if}
   {#if hoveredd}
-  <button on:click={masi} on:mouseleave={bighandd} ><img title={hosafat[$lang]}  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"></button> 
+  <button on:click={masi} on:mouseleave={bighandd} ><img title={hosafat[$lang]} style="max-width:45vw; max-height:45vw;"  width="240px" height="240px" src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg" alt="cheked"></button> 
 
   {:else}
    <Handd on:trym={tryma} on:masi={masi} on:bighandd={bighandd} {noofopenm} {openMA} {addN} hosafat={hosafat[$lang]}/>
@@ -1549,7 +1549,6 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
    }
    .hhh{
      display: flex;
-     flex-direction: column;
      align-items: center;
      justify-content: center;
    }

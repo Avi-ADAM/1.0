@@ -16,7 +16,7 @@ function trym (){
     dispatch('trym' );
 }
 </script>
-<svg width="240" height="240" viewBox="304.017 285.449 844.373 823.956" id="svg2" version="1.1"  >
+<svg style="max-width:45vw; max-height:45vw;" width="240" height="240" viewBox="304.017 285.449 844.373 823.956" id="svg2" version="1.1"  >
   <defs id="defs4">
     <linearGradient id="linearGradient4328">
       <stop style="stop-color:#000000;stop-opacity:1;" offset="0" id="stop4330"/>
