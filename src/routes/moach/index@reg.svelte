@@ -1,4 +1,6 @@
 <script>
+  import { addToast } from 'as-toast';
+
   //	import { draw } from 'svelte/transition';
   import Close from './../../lib/celim/close.svelte'
   import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
@@ -223,7 +225,8 @@ JSON.stringify({query:
             projectname = res.data.project.projectName;
             desP = project.publicDescription
             linkP = res.data.project.linkToWebsite
-            meData.descripFor = descPri;
+            descPri = meData.descripFor ;
+            descripFor = meData.descripFor ;
             projectUsers = project.user_1s;
             restime = project.restime;
             if (project.mesimabetahaliches.length > 0){
@@ -792,12 +795,15 @@ function bighandd() {
 function addp () {
   if (projectUsers.length == 1) {
       a = 0;
-            isOpen = true;
+      isOpen = true;
   }  else {
-    alert(toalart[$lang])
+    addToast(tovote[$lang], 'info');
+      a = 0;
+      isOpen = true;
   }
 //if project users more then 1
 }
+const tovote={"he":"התמונה שתיבחר תועלה להצבעה ולאחר אישורה תחליף את הקיימת","en":"the Logo you choose will be waiting for the approval of all FreeMates members"}
     const toalart = {"he": "בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות","en":"if number of users in freemates is greater than 1 you need everyone to agree, this feature will be released soon"}
 
 function editp () {
@@ -805,7 +811,9 @@ function editp () {
       a = 0;
       isOpen = true;
   } else {
-    alert(toalart[$lang])
+     addToast(`${tovote[$lang]}`, 'info');
+     a = 0;
+     isOpen = true;
   }
 //if project users more then 1
 } 
@@ -875,6 +883,8 @@ async function sendP () {
         srcP = meDatap.profilePic.url;
     isOpen = false;
     a = 0;
+         addToast(`${picupsu[$lang]}`, 'info');
+
                   })
       .catch(error => {
         console.log('צריך לתקן:', error.response);
@@ -920,14 +930,15 @@ async function sendP () {
   .then(data => meDatap = data);
            isOpen = false;
         a = 0;
-        //success toast
+        addToast(`${picvots[$lang]}`, 'info');
     } catch (e) {
             console.log(e)
         }
            
                 }
 })};
-  
+  const picupsu = {"he":"הלוגו עודכן בהצלחה", "en": "Logo has updated successfully"}
+  const picvots = {"he":"הלוגו הועלה להצבעה בהצלחה", "en":"vote on new Logo has created successfully"}
 async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
     const cookieValue = document.cookie
   .split('; ')
@@ -1208,11 +1219,16 @@ const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view
           </button>
   <h1 class="1 ">{projectname}</h1>
   {#if project.publicDescription}
-   <p class="2 ">{desP}</p>
-  {/if}
+    <div class="border-2 border-gold rounded m-2 p-2"> 
+   <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d h-24 p-2">{desP}</pre>
+    </div>
+   {/if}
   {#if project.descripFor}
-   <p>{descripFor}</p>
-  {/if}
+    <div class="border-2 border-gold rounded m-2 p-2"> 
+   <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d h-24 p-2 ">{descripFor}</pre>
+    </div>
+
+   {/if}
   {#if linkP}
   <a target="_blank" href={linkP}>לינק לאתר</a>  
   {/if}
