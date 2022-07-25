@@ -1220,12 +1220,12 @@ const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view
   <h1 class="1 ">{projectname}</h1>
   {#if project.publicDescription}
     <div class="border-2 border-gold rounded m-2 p-2"> 
-   <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d h-24 p-2">{desP}</pre>
+   <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>
     </div>
    {/if}
   {#if project.descripFor}
     <div class="border-2 border-gold rounded m-2 p-2"> 
-   <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d h-24 p-2 ">{descripFor}</pre>
+   <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>
     </div>
 
    {/if}
