@@ -1,6 +1,6 @@
 <script>
   import { addToast } from 'as-toast';
-
+  import Pub from '$lib/celim/icons/pub.svelte'
   //	import { draw } from 'svelte/transition';
   import Close from './../../lib/celim/close.svelte'
   import Gantt from '../../lib/components/prPr/gantt/gant.svelte'
@@ -1085,6 +1085,7 @@ function openTheDesc(event){
       a = 7;
   }
 }
+let hover = false;
 let bmiss;
 let pendss;
 let openss;
@@ -1114,6 +1115,7 @@ const editpic = {"he":"עריכת תמונת הפרופיל של הריקמה", 
    const upload = {"he": "העלאת תמונת פרופיל לריקמה" , "en":"upload logo for your FreeMates"}
  const editd = {"he": "עריכת פרטי ריקמה", "en":"edit FreeMates details"}
 const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view FreeMates public page"}
+const tower = {"he": "לינק לאתר", "en": "link to website"}
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -1174,13 +1176,16 @@ const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view
 <div dir="rtl" class="all  text-barbi text-center">
   <Header/>
   
-  <div>
+  <div >
 {#if project.profilePic !== null}
       <img
       width="100" height="100" 
       style="border-radius: 50%; margin-right:auto; margin-left:auto ;"  
       src={srcP}
       alt="profilePic">
+      {/if}
+      <div class="flex flex-row items-center justify-center">
+        {#if project.profilePic !== null}
       <button
           class="text-barbi hover:bg-barbi hover:text-mturk rounded-full"
           title={editpic[$lang]}
@@ -1200,6 +1205,7 @@ const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view
  </svg>
  </button>
 {/if}
+  {#if linkP}
            <button
           class=" hover:bg-mturk text-barbi rounded-full"
           title={editd[$lang]}
@@ -1208,15 +1214,24 @@ const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view
            <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
           </svg>
           </button>
+            {/if}
           <!--change to modal with the project component-->
-                     <button
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-mturk text-barbi rounded-full"
+          title={tower[$lang]}
+          >
+          <svg class="sv"  style="width:24px;height:24px" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path
+           fill="currentColor" d="M14.851 11.923c-.179-.641-.521-1.246-1.025-1.749-1.562-1.562-4.095-1.563-5.657 0l-4.998 4.998c-1.562 1.563-1.563 4.095 0 5.657 1.562 1.563 4.096 1.561 5.656 0l3.842-3.841.333.009c.404 0 .802-.04 1.189-.117l-4.657 4.656c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-1.952-1.951-1.952-5.12 0-7.071l4.998-4.998c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464.493.493.861 1.063 1.105 1.672l-.787.784zm-5.703.147c.178.643.521 1.25 1.026 1.756 1.562 1.563 4.096 1.561 5.656 0l4.999-4.998c1.563-1.562 1.563-4.095 0-5.657-1.562-1.562-4.095-1.563-5.657 0l-3.841 3.841-.333-.009c-.404 0-.802.04-1.189.117l4.656-4.656c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464 1.951 1.951 1.951 5.119 0 7.071l-4.999 4.998c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-.494-.495-.863-1.067-1.107-1.678l.788-.785z"/></svg>
+          </a>
+           <button
           class=" hover:bg-mturk text-barbi rounded-full"
           title={publicp[$lang]}
           on:click={goto(`/project/${$idPr}`)}
           >
-          <svg class="sv"  style="width:24px;height:24px" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path
-           fill="currentColor" d="M14.851 11.923c-.179-.641-.521-1.246-1.025-1.749-1.562-1.562-4.095-1.563-5.657 0l-4.998 4.998c-1.562 1.563-1.563 4.095 0 5.657 1.562 1.563 4.096 1.561 5.656 0l3.842-3.841.333.009c.404 0 .802-.04 1.189-.117l-4.657 4.656c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-1.952-1.951-1.952-5.12 0-7.071l4.998-4.998c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464.493.493.861 1.063 1.105 1.672l-.787.784zm-5.703.147c.178.643.521 1.25 1.026 1.756 1.562 1.563 4.096 1.561 5.656 0l4.999-4.998c1.563-1.562 1.563-4.095 0-5.657-1.562-1.562-4.095-1.563-5.657 0l-3.841 3.841-.333-.009c-.404 0-.802.04-1.189.117l4.656-4.656c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464 1.951 1.951 1.951 5.119 0 7.071l-4.999 4.998c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-.494-.495-.863-1.067-1.107-1.678l.788-.785z"/></svg>
+          <Pub/>
           </button>
+          </div>
   <h1 class="1 ">{projectname}</h1>
   {#if project.publicDescription}
     <div class="border-2 border-gold rounded m-2 p-2"> 
@@ -1229,16 +1244,18 @@ const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view
     </div>
 
    {/if}
-  {#if linkP}
-  <a target="_blank" href={linkP}>לינק לאתר</a>  
-  {/if}
-  <div class="3  ">
-  {#each projectUsers as user}
-  
-  <a class="textlink hover:text-scale-150 hover:text-gold"
-   sveltekit:prefetch href={`/user/${user.id}`}>  <h6 class="textlink hover:text-scale-150 hover:text-gold">{user.username}</h6></a>
- 
+
+  <div dir="ltr" class="flex items-center justify-center">
+    <div dir="ltr" class="flex -space-x-2 overflow-hidden">
+        {#each projectUsers as user}
+  <button title="{user.username}" on:click={()=>goto(`/user/${user.id}`)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.profilePic.url}" alt=""></button>
+  <!--{#if hover}
+    <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
+    {/if}-->
   {/each}
+    </div>
+    </div>
+    <div>
   <div class="border-2 border-barbi m-2"> 
     <h2 class="text-barbi text-bold underline decoration-mturk">ערכים ומטרות</h2>
   <div class="flex flex-row flex-wrap justify-between"> 
