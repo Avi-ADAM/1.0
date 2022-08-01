@@ -134,7 +134,7 @@ function proj(event) {
 function txx(na){
   let tx = 680
   if (na.length < 10 ){
-    tx = 480
+    tx = 440
   } else if (na.length < 20){ 
     tx = 580
   } else if (na.length < 28){ 

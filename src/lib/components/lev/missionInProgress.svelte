@@ -968,8 +968,8 @@ out:scale={{duration: 2200, opacity: 0.5}}
     </foreignObject> 
   
         <g style="overflow:hidden; text-anchor: middle;" on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  >
-                  <text x="300" y='210' style="filter: url(#glow); fill: var(--gold);"  text-anchor="middle" font-size="52" >{projectName}</text>
-                  <text x="300" y='210'  style="fill: black;"  text-anchor="middle" font-size="52" >{projectName}</text></g>
+                  <text x="300" y='210' style="filter: url(#glow); fill: var(--gold);"  text-anchor="middle" font-size="42" >{projectName}</text>
+                  <text x="300" y='210'  style="fill: black;"  text-anchor="middle" font-size="42" >{projectName}</text></g>
 
      <path transform="matrix(1.4, 0, 0, 1.4 , 20, 280)" fill="transparent" stroke="transparent" id="curveooo" d=" M 0 0 A 200 200 0 0 0 400 0" />
             <text x="{tx}">
