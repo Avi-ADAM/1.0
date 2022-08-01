@@ -189,6 +189,8 @@ u = "לב המערכת, לחיצה על היהלומים לסינון הפעול
 $: if (cards == true){
         dispatch("cards",{cards:true})
 }
+console.log(mashs)
+
 </script>
 
 <style>

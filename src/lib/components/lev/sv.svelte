@@ -40,7 +40,7 @@ export let pmaap = "pmaap";
 export let askma = 100;
 export let askmap = "askmap";
 export let low = true;
-
+console.log(mashs)
 function hover (id){
 dispatch("hover",{
     id: id
@@ -82,6 +82,14 @@ dispatch("disp",{
 	transform-origin: center;
 
 }
+.tt { 
+  fill: cyan;
+  font-family: "Lobster Two", Arial;
+   font-size: 40px; 
+   font-weight: 700; 
+   stroke: purple;
+    stroke-width: 1.75px !important;
+   }
 
 /* Heart beat animation */
 @keyframes beat{
@@ -2510,7 +2518,7 @@ dispatch("disp",{
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevbt)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevbv)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 47.887 117.55)" x="122.391" y="477.71" fill="url(#levlevdd)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{mashs}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 47.887 117.55)" x="122.391" y="477.71" fill="url(#levlevdd)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{mashs}</text>
 </g>
 {/if}
 {#if maap > 0}
@@ -2531,7 +2539,7 @@ dispatch("disp",{
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevdv)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levleveq)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{maap}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{maap}</text>
 </g>
 {/if}
 {#if sug > 0}
@@ -2552,7 +2560,7 @@ dispatch("disp",{
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevaoz)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevaoy)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(37, 30, 30)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(37, 30, 30)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{sug}</text>
 </g>
 {/if}
 {#if pen > 0}
@@ -2573,7 +2581,7 @@ dispatch("disp",{
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevbf)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevcj)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevbh)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevci)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 48.562 116.2)" x="122.391" y="477.71" fill="rgb(247, 40, 130)" font-family="Shizuru" font-weight="700" stroke="url(#levlevch)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pen}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 48.562 116.2)" x="122.391" y="477.71" fill="rgb(247, 40, 130)" class="tt" font-weight="700" stroke="url(#levlevch)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pen}</text>
 </g>
 {/if}
 {#if ask > 0}
@@ -2594,7 +2602,7 @@ dispatch("disp",{
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevdr)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevds)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(5, 5, 5)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(5, 5, 5)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{ask}</text>
 </g>
 {/if}
 
@@ -3144,7 +3152,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevew)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevex)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{des}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{des}</text>
 </g>
 {/if}
 {#if beta > 0}
@@ -3166,7 +3174,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levleveh)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevei)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{beta}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevag)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{beta}</text>
 </g>
 {/if}
 
@@ -3196,7 +3204,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevar)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevaq)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(54, 59, 56)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pmash}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(54, 59, 56)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{pmash}</text>
 </g>
 {/if}
 {#if askma > 0}
@@ -3218,7 +3226,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevcy)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevcx)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevbw)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{askma}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="url(#levlevbw)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{askma}</text>
 </g>
 {/if}
 {#if wel > 0}
@@ -3240,7 +3248,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevaqb)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevaqa)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(62, 78, 77)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{wel}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(62, 78, 77)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{wel}</text>
 </g>
 {/if}
 {#if fia > 0}
@@ -3262,7 +3270,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 <path d="m261.59 614.76-5.8538 7.2384 3.0363-6.0785c1.0074-0.39432 1.9148-0.79157 2.8174-1.1598z" fill="url(#levlevapn)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevae)" stroke-width=".16015px"/>
 <path d="m261.59 614.76-5.8538 7.2384 7.5363-8.766z" fill="url(#levlevapm)" fill-rule="evenodd" opacity=".76724" stroke="url(#levlevaf)" stroke-width=".16015px"/>
 </g>
-<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(31, 25, 25)" font-family="Shizuru" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{fia}</text>
+<text transform="matrix(1.4297 -.001037 -.12436 .70816 51.887 117.55)" x="122.391" y="477.71" fill="rgb(31, 25, 25)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">{fia}</text>
 
 </g>
 {/if}

@@ -1,4 +1,5 @@
 <script>
+   import Desi from './decisionMaking.svelte'
     import Mid from "./midi.svelte"
      import MissionInProgress from "./missionInProgress.svelte"
     import ProjectSuggestor from "./projectSuggestor.svelte"
@@ -18,9 +19,8 @@
 } from 'svelte';
 
 const dispatch = createEventDispatcher();
- 
 export let adder = [], arr1 = [], askedarr = [], declineddarr = [],halu = 17, askma = 17,maap = 13,mashs = 13,pmashd = 13, fia = 13, beta = 13, pen = 17, sug = 17, low = false, nam,wel = 13, ask = 13,picLink,total
-   let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
+   let milon = {hachla: true, fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
 function delo (event){
  let oldob = arr1;
  const x = oldob.map(c => c.coinlapach);
@@ -32,6 +32,7 @@ function delo (event){
 function user (event) {
  dispatch("user", {id: event.detail.id})
 }
+ console.log(beta)
 
 function hover (event) {
     
@@ -100,6 +101,7 @@ let h = 500;
   on:proj={proj}
  on:user={user}  
   on:hover={hover}
+  tx={buble.tx}
       coinlapach={buble.coinlapach} 
     usernames={buble.usernames}
     noofpu={buble.project.user_1s.length}
@@ -374,6 +376,37 @@ let h = 500;
                                 {low}
 
                 /></div>
+{:else if buble.ani === "hachla" && milon.hachla == true}
+        <div  class="hachla normSml" ><Desi
+            on:acsept={delo}
+            on:decline={delo}
+            on:hover={hover}
+            on:proj={proj}
+            on:chat={chat}
+            coinlapach={buble.coinlapach} 
+            created_at={buble.created_at}
+            kind={buble.kind}
+            messege={buble.messege}
+            myid={buble.myid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.mypos}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.pendId}
+            projectName = {buble.projectName}
+            projectId ={buble.projectId}
+            userId ={ buble.uid} 
+            src = {buble.src}
+            src2 = {buble.newpic}
+            noofpu={buble.noof}
+                stylef={buble.stylef}
+                st={buble.st}
+                spid={buble.spid}
+               {low}
+                /></div>                
 {:else if buble.ani === "meData" && milon.sugg == true}
     <div class="sugg normSml" ><ProjectSuggestor
       on:less={delo}
@@ -505,7 +538,7 @@ des={halu}  />
     }
 } */
 .normSml{
-       transition: all 1000ms ease-in-out;
+       transition: all 500ms ease-in-out;
 }
 .normSml:nth-child(1):hover{
    transform: translate(75%,75%);

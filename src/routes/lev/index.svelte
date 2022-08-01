@@ -90,7 +90,7 @@ let maap = 13;
 let sug = 13
 let pen = 13
 let ask = 13;
-let halu = 17;
+let halu = 0;
 let wel = 17;
 let askma = 13;
 let beta = 13
@@ -131,16 +131,30 @@ function proj(event) {
     mode = 2
     isOpen = true
 }
-
+function txx(na){
+  let tx = 680
+  if (na.length < 10 ){
+    tx = 480
+  } else if (na.length < 20){ 
+    tx = 580
+  } else if (na.length < 28){ 
+    tx = 680
+  } else if (na.length > 28){ 
+    tx = 780
+  }
+  return (tx)
+}
 function mesimabetahalicha(data) {
     const mtahan = data.data.user.mesimabetahaliches;
     for (var i = 0; i < mtahan.length; i++) {
         mtaha[i] = mtahan[i];
+        mtaha[i].tx = txx(mtaha[i].name)
         mtaha[i].ani = "mtaha";
         mtaha[i].pl = 0 + i;
         mtaha[i].usernames = data.data.user.username;
     }
     beta = mtaha.length;
+    localStorage.setItem("beta", beta);
     if (!isEqual(mtaha, mtahaold) && counter > 1) {
         if (mtahaold.length < mtaha.length) {
             // Create and show the notification
@@ -294,6 +308,7 @@ function ishursium(dati) {
     }
     fiapp = fiapp
     fia = fiapp.length;
+    localStorage.setItem("fia", fia);
     //createD()
 }
 
@@ -336,8 +351,6 @@ function crMaap(hh) {
             }
         }
     }
-    console.log("sm")
-
     for (var k = 0; k < wegets.length; k++) {
         const x = wegets[k].users
         wegets[k].uids = [];
@@ -347,8 +360,6 @@ function crMaap(hh) {
             wegets[k].what.push(x[z].what);
         }
     }
-    console.log("sm")
-
     for (var t = 0; t < wegets.length; t++) {
         const allid = wegets[t].uids;
         const myid = wegets[t].myid;
@@ -382,8 +393,7 @@ function crMaap(hh) {
     }
     wegets = wegets
     maap = wegets.length;
-    console.log("sm")
-
+    localStorage.setItem("maap", maap);
 }
 let orech;
 let adder = [];
@@ -540,6 +550,7 @@ async function createasked(da) {
     dictasked = result
     askedcoin = dictasked;
     ask = askedcoin.length;
+    localStorage.setItem("ask", ask);
 }
 
 async function createmask(da) {
@@ -640,6 +651,7 @@ async function createmask(da) {
     askedm = result
     askedm = askedm;
     askma = askedm.length;
+    localStorage.setItem("askma", askma);
 }
 
 function letters(data) {
@@ -1032,6 +1044,7 @@ async function showOpenPro(mi) {
         tyu = true
     }
     sug = meData.length;
+    localStorage.setItem("sug", sug);
     bubleUiAngin()
     arr1 = arr1
     console.log("her", arr1)
@@ -1157,10 +1170,41 @@ onMount(async () => {
         betha.set(JSON.parse(localStorage.getItem("picLink")))
     }
     if (localStorage.getItem("miDataL") !== null) {
-
         miData = JSON.parse(localStorage.getItem("miDataL"))
     }
-
+    if (localStorage.getItem("pmashd") !== null) {
+        pmashd = localStorage.getItem("pmashd")
+    } 
+    if (localStorage.getItem("fia") !== null) {
+        fia = localStorage.getItem("fia")
+    }     
+    if (localStorage.getItem("beta") !== null) {
+        beta = localStorage.getItem("beta")
+    }     
+    if (localStorage.getItem("askma") !== null) {
+        askma = localStorage.getItem("askma")
+    }     
+    if (localStorage.getItem("wel") !== null) {
+        wel = localStorage.getItem("wel")
+    }     
+    if (localStorage.getItem("halu") !== null) {
+        halu = localStorage.getItem("halu")
+    }     
+    if (localStorage.getItem("ask") !== null) {
+        ask = localStorage.getItem("ask")
+    }     
+    if (localStorage.getItem("pen") !== null) {
+        pen = localStorage.getItem("pen")
+    }     
+    if (localStorage.getItem("sug") !== null) {
+        sug = localStorage.getItem("sug")
+    }     
+    if (localStorage.getItem("maap") !== null) {
+        maap = localStorage.getItem("maap")
+    }     
+    if (localStorage.getItem("mashs") !== null) {
+        mashs = localStorage.getItem("mashs")
+    }     
     getLang()
     if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', {
@@ -1551,12 +1595,12 @@ function hachla(data) {
                          }
                        }*/
     }
-    des = hachlatot.length;
+    halu += hachlatot.length;
+    localStorage.setItem("halu", halu);
     console.log(hachlatot)
 }
 
 function rashbi(data) {
-    console.log("rashbi");
     const myid = data.data.user.id;
     const projects = data.data.user.projects_1s;
     for (var i = 0; i < projects.length; i++) {
@@ -1615,8 +1659,8 @@ function rashbi(data) {
         haluask[t].noofusersWaiting = noofusersWaiting;
 
     }
-    halu = haluask.length;
-    console.log(haluask);
+    halu += haluask.length;
+    localStorage.setItem("halu", halu);
 }
 
 function sps(pp) {
@@ -1624,8 +1668,6 @@ function sps(pp) {
     for (let i = 0; i < pp.data.user.sps.length; i++) {
         const y = pp.data.user.sps[i];
         if (y.mashaabim.open_mashaabims.length > 0) {
-            console.log("pp", huca)
-
             for (let t = 0; t < pp.data.user.sps[i].mashaabim.open_mashaabims.length; t++) {
                 const x = pp.data.user.sps[i].mashaabim.open_mashaabims[t]
                 const z = pp.data.user.sps[i].mashaabim.open_mashaabims[t].project;
@@ -1655,6 +1697,7 @@ function sps(pp) {
     }
     huca = huca
     mashs = huca.length
+    localStorage.setItem("mashs", mashs);
     if (!isEqual(huca, hucaold) && counter > 1) {
         if (hucaold.length < huca.length) {
             // Create and show the notification
@@ -1798,6 +1841,8 @@ function pmash(data) {
         }
     }
     pmashd = pmashes.length;
+  localStorage.setItem("pmashd", pmashd);
+
 }
 
 function sds(mta) {
@@ -1827,7 +1872,7 @@ function sds(mta) {
         }
     }
     sdsa = sdsa
-    console.log(sdsa, "u")
+                localStorage.setItem("sdsa", sdsa);
 }
 let walcomen = [];
 
@@ -1846,6 +1891,8 @@ function makeWalcom(ata) {
     }
     walcomen = walcomen;
     wel = walcomen.length;
+            localStorage.setItem("wel", wel);
+
     if (!isEqual(walcomen, walcomenold) && counter > 1) {
         if (walcomenold.length < walcomen.length) {
             // Create and show the notification
@@ -2016,6 +2063,7 @@ function createpends(data) {
 
     }
     pen = pends.length;
+        localStorage.setItem("pen", pen);
     //  bubleUiAngin(pends)
 }
 
@@ -2043,7 +2091,7 @@ function coinLapach(event) {
 let xy = []
 
 function bubleUiAngin() {
-    arr1 = [...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask].sort(({
+    arr1 = [...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask, ...hachlatot].sort(({
         pl: a
     }, {
         pl: b
@@ -2141,7 +2189,6 @@ async function cardsi(event) {
 </DialogOverlay>
  <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם    {#if arr1.length > 0}
  -->
-{#key arr1}
   {#if cards == true}
     <div class="cards-ui">
       <Tooltip title="{u}" ispic="true">
@@ -2171,7 +2218,6 @@ async function cardsi(event) {
             {adder}  {arr1} {askedarr}  {declineddarr} {halu}  {askma} {maap} {mashs} {pmashd}  {fia}  {beta}  {pen} {sug}  {nam} {wel} {ask} {picLink} {total}/>
       </Tooltip>
   {/if}
-{/key}
 
 <style>
 :global([data-svelte-dialog-content].content) {
