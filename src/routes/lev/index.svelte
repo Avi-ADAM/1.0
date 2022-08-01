@@ -1390,7 +1390,7 @@ async function start() {
   projects_1s { projectName id 
     user_1s {id haskamaz haskamac haskama} 
     profilePic {url formats } 
-    decisions (where: {archived: false}) {id kind created_at newpic {url formats } vots  {what why id order users_permissions_user {id}}}
+    decisions (where: {archived: false}) {id kind created_at newpic {url formats id } vots  {what why id order users_permissions_user {id}}}
     tosplits (where: {finished: false}) {id name vots  {what why id users_permissions_user {id}}}              
     maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
                  open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
@@ -1499,7 +1499,14 @@ function hachla(data) {
         const proj = projects[i];
         for (var j = 0; j < projects[i].decisions.length; j++) {
             const pend = projects[i].decisions[j]
+              let newpicid;
+              let newpic;
+            if(pend.kind == "pic" ){
+                newpicid = pend.newpic.id;
+                newpic =pend.newpic.url
+            }
             hachlatot.push({
+              newpicid:newpicid ,
                 mysrc: src24,
                 projectId: proj.id,
                 kind: pend.kind,
@@ -1509,7 +1516,7 @@ function hachla(data) {
                 src: proj.profilePic.formats.thumbnail.url,
                 users: pend.vots,
                 myid: myid,
-                newpic: pend.newpic.url,
+                newpic: newpic,
                 pendId: pend.id,
                 //   diun: pend.diun,
                 ani: "hachla",

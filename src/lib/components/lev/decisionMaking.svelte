@@ -1,7 +1,9 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto, prefetch } from '$app/navigation';
+ import { lang } from '$lib/stores/lang.js';
 import Chaticon from '../../celim/chaticon.svelte'
+import { onMount }from 'svelte'
 import {
     clickOutside
 } from './outsidclick.js';
@@ -14,7 +16,8 @@ import {
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
 const dispatch = createEventDispatcher();
-    export let low = false, kind, messege, myid, userId  
+    export let low = false, kind, messege, myid, userId;
+    export let newpicid;  
 export let coinlapach;
 export let deadline;
 export let projectName;
@@ -39,7 +42,11 @@ export let stylef = '24px';
 export let askId;
 export let users;
     
-
+onMount(async () => {
+  if (kind == "pic"){
+    openmissionName = {"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"}
+  }
+})
 let idL;
 let bearer1; 
 let token;
@@ -79,6 +86,7 @@ let linkg = 'https://i18.onrender.com/graphql';
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
+
 let ok;
 let nook;
 let tryo = "115%";
@@ -178,7 +186,10 @@ async function agree() {
      console.log(idL);
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
-  
+    let update = ``
+  if (kind == 'pic'){
+    update = `ProfilePic: "${newpicid}"`
+  }
     console.log(uids);
  if (noofpu === noofusersOk) {    
         try {
@@ -194,10 +205,11 @@ async function agree() {
     input: {
        where: {id: "${projectId}"}
       data: {
+        ${update}
                   }
     }
   ) {project{id }}
- updateAskm(
+ updateDecision(
                             input:{
                                 where: {id: "${askId}" }
                                 data: { archived: true,
@@ -208,7 +220,7 @@ async function agree() {
                                       }
                                     ]}
                             }
-                        ){askm{id}}
+                        ){decision{id}}
 }
 `})
                 })
@@ -237,7 +249,7 @@ async function agree() {
                     body: JSON.stringify({
                         query: `mutation 
                         {
-                            updateAskm(
+                            updateDecision(
                             input:{
                                 where: {id: "${askId}" }
                                 data: { vots: [${userss}, 
@@ -247,7 +259,7 @@ async function agree() {
                                       }
                                     ]}
                             }
-                        ){askm{id}}
+                        ){decision{id}}
                      
                     }
 `})
@@ -274,8 +286,7 @@ async function decline() {
      noofusersNo += 1;
   noofusersWaiting -= 1;
   ser = xyz();
-const declineda = declined.map(c => c.id)
-    declineda.push(userId)
+
    
 }
 
@@ -392,7 +403,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                                 <path id="curvee" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                                                     <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
                                                         <textPath on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
-                                                            {openmissionName}
+                                                            {openmissionName[$lang]}
                                                         </textPath>
                                                     </text>
                                               <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40" >

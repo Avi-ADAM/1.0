@@ -1233,6 +1233,16 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
           </button>
           </div>
   <h1 class="1 ">{projectname}</h1>
+    <div dir="ltr" class="flex items-center justify-center">
+    <div dir="ltr" class="flex -space-x-2 overflow-hidden">
+        {#each projectUsers as user}
+  <button title="{user.username}" on:click={()=>goto(`/user/${user.id}`)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.profilePic.url}" alt=""></button>
+  <!--{#if hover}
+    <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
+    {/if}-->
+  {/each}
+    </div>
+    </div>
   {#if project.publicDescription}
     <div class="border-2 border-gold rounded m-2 p-2"> 
    <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>
@@ -1245,16 +1255,7 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
 
    {/if}
 
-  <div dir="ltr" class="flex items-center justify-center">
-    <div dir="ltr" class="flex -space-x-2 overflow-hidden">
-        {#each projectUsers as user}
-  <button title="{user.username}" on:click={()=>goto(`/user/${user.id}`)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.profilePic.url}" alt=""></button>
-  <!--{#if hover}
-    <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
-    {/if}-->
-  {/each}
-    </div>
-    </div>
+
     <div>
   <div class="border-2 border-barbi m-2"> 
     <h2 class="text-barbi text-bold underline decoration-mturk">ערכים ומטרות</h2>
