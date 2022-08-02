@@ -1,4 +1,5 @@
 <script>
+  import { lang } from '$lib/stores/lang.js'
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto, prefetch } from '$app/navigation';
 import Chaticon from '../../celim/chaticon.svelte'
@@ -50,7 +51,6 @@ export let noofusersOk;
 export let noofusersNo;
 export let already = false;
 let resP = [];
-let lang;
 export let pid
 export let stylef = '24px';
 export let askId;
@@ -460,37 +460,44 @@ function tochat () {
   dispatch("chat");
 }
  $: w = 0;
- let   u = "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה"
-
+ const u = {"he":"הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה","en":"vote on request to join the FreeMate and share a resorce "}
+const levi = {"he":"לב 1❤️1", "en":"the heart of 1❤️1"}
 function hover (id){
+  let ut;
   if (id == "0"){
- u = "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה"
+ ut = u[$lang]
   } else {
-    u = id
+  ut = id
   }
-    dispatch("hover", {id: u});
+    dispatch("hover", {id: ut});
 
 }
 function hoverede(){
    hovered = !hovered
+   let ut
     if (hovered == false){
-    u = "לב המערכת"
+    ut = levi[$lang]
   } else {
- u = "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה"
+ ut = u[$lang]
   }
-  dispatch("hover", {id: u});
+  dispatch("hover", {id: ut});
  }
  
 function hoverc (event){
+  let ut
    if (event.detail.x == "0"){
- u = "הצבעה על בקשה לשיתוף משאב ברקמה"
+ ut = u[$lang]
   } else {
-    u = event.detail.x
+    ut = event.detail.x
   }
-    dispatch("hover", {id: u});
+    dispatch("hover", {id: ut});
 }
  import Card from './cards/rektom.svelte'
 export let cards = false;
+const clicktoup = {"he":` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`,"en":`click twice to see ${useraplyname} profile`}
+const resorcename = {"he":" שם המשאב המוצע","en":"name of the suggested resorce"}
+const clicktofree = {"he":"לחיצה למעבר לעמוד הציבורי של הריקמה","en":"click twice to see FreeMate public page"}
+const clicktobrain = {"he":` לחיצה למעבר למוח הריקמה ${projectName}`,"en":`click twice to go to the ${projectName} Brain`}
 </script>
 {#await ser}
 <h1>loop</h1>
@@ -552,7 +559,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                         <circle r="100" fill="url(#lggm)" transform="rotate(135)" stroke="url(#lgbgm)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
                                          <circle r="80" fill="url(#lggm)" transform="rotate(315)" stroke="none"/>
                                                
-                                                         <g on:click={()=>linke("u")} on:mouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
+                                                         <g on:click={()=>linke("u")} on:mouseenter={()=>hover(clicktoup[$lang])} on:mouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
                                                 <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                                                   <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
@@ -567,15 +574,15 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                                     </g>         
                                                 <path id="curvee" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                                                     <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
-                                                        <textPath on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
+                                                        <textPath on:mouseenter={()=>hover(resorcename[$lang])} on:mouseleave={()=>hover("0")} color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
                                                             {openmissionName}
                                                         </textPath>
                                                     </text>
-                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40" >
+                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover(clicktofree[$lang])} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40" >
                                                     <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                                               </g>  
                                                     <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(clicktobrain[$lang])} on:mouseleave={()=>hover("0")}>
                                                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>
                                                    </button>
 
@@ -597,7 +604,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 <div class="{`normSmll${askId}-noo`}"></div>
                     <!--  <button on:click={tochat}><Chaticon/></button>-->
                  {#if deadline}    <p on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
-       <p on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="hslink bc" >{price}</p>
+       <p on:m ouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="hslink bc" >{price}</p>
         <p class="hslink cd" ><span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--gold)" >{myp}</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy}</span> </p>
                  {#if missionDetails !== null}   <p on:mouseenter={()=>hover("פרטי ההצעה ")} on:mouseleave={()=>hover("0")}  class="hslink de d">{missionDetails}</p>{/if}   
               {#if low == false}
