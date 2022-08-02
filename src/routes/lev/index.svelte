@@ -1166,8 +1166,8 @@ onMount(async () => {
     if (localStorage.getItem("picLink") !== null) {
         picLink = JSON.parse(localStorage.getItem("picLink"))
     }
-    if (localStorage.getItem("picLink") !== null) {
-        betha.set(JSON.parse(localStorage.getItem("picLink")))
+    if (localStorage.getItem("betha") !== null) {
+        betha.set(JSON.parse(localStorage.getItem("betha")))
     }
     if (localStorage.getItem("miDataL") !== null) {
         miData = JSON.parse(localStorage.getItem("miDataL"))

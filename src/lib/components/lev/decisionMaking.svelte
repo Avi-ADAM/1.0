@@ -30,7 +30,7 @@ export let missionDetails = "";
 export let noofpu = 0;
 export let id;
 export let openMid;
-export let st = 275;
+export let st = 205;
 export let declined = [];
 export let noofusersWaiting;
 export let uids;
@@ -45,6 +45,7 @@ export let users;
 onMount(async () => {
   if (kind == "pic"){
     openmissionName = {"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"}
+    st = 295
   }
 })
 let idL;
@@ -326,6 +327,8 @@ function hoverc (event){
 }
  import Card from './cards/hachlata.svelte'
 export let cards = false;
+const newlogo = {"he":"הלוגו החדש שמוצע","en":"new Logo offered"}
+const oldob = {"he":"הלוגו העכשווי"}
 </script>
 {#await ser}
 <h1>loop</h1>
@@ -379,16 +382,16 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                    <stop offset="0" style="stop-color: rgb(100, 71, 105);"/>
                         <stop offset="1" style="stop-color: rgb(54, 241, 155);"/>
                             </linearGradient>
-                            <linearGradient id="lgbgm" x1="1" y1="1">
-                                <stop offset="0" style="stop-color: rgb(125, 105, 155);"/>
-                                    <stop offset="1" style="stop-color: rgb(0, 100, 120);"/>
+                            <linearGradient id="desrrr" x1="1" y1="1">
+                                <stop offset="0" style="stop-color: rgb(100, 100, 10);"/>
+                                    <stop offset="1" style="stop-color: rgb(10, 10, 13);"/>
                                         </linearGradient>
                                         </defs>
-                                        <circle r="100" fill="url(#lggm)" transform="rotate(135)" stroke="url(#lgbgm)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
-                                         <circle r="80" fill="url(#lggm)" transform="rotate(315)" stroke="none"/>
+                                        <circle r="100" fill="url(#desrrr)" transform="rotate(135)" stroke="url(#desrrr)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
+                                         <circle r="80" fill="url(#desrrr)" transform="rotate(315)" stroke="none"/>
                                                
                                                          <g on:click={()=>linke("u")} on:mouseenter={()=>hover(` `)} on:mouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
-                                                <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
+                                                <foreignObject x='50' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                                                   <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
                                                         width='56px'
@@ -409,9 +412,15 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                               <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40" >
                                                     <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                                               </g>  
-                                                    <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                                                    <foreignObject x='-50' y='0 ' width='56px' height='56px' transform="translate(-28,-28)" >
+                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(newlogo[$lang])} on:mouseleave={()=>hover("0")}>
                                                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>
+                                                   </button>
+
+                                                </foreignObject>
+                                                                                                    <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
+                                                   <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                                                        <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="40" height="40" alt="projectlogo" title={projectName}>
                                                    </button>
 
                                                 </foreignObject>
