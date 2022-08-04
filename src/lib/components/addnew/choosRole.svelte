@@ -27,7 +27,7 @@ import { missionNew } from '../../stores/missionNew';
 
 
   onMount(async () => {
-      const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       const checkStatus = (resp) => {
       if (resp.status >= 200 && resp.status < 300) {
         return resp;
@@ -39,16 +39,27 @@ import { missionNew } from '../../stores/missionNew';
     const headers = {
       'Content-Type': 'application/json',
     };
-  
       try {
-          const res = await fetch("https://i18.onrender.com/tafkidims?_limit=-1", {
-            method: "GET",
-            headers: {
-               'Content-Type': 'application/json'
-            },
-          }).then(checkStatus)
-        .then(parseJSON);
-          roles1 = res
+          const res = await fetch("https://i18.onrender.com/graphql", {
+              method: "POST",
+              headers: {
+                 'Content-Type': 'application/json'
+              },body: JSON.stringify({
+                        query: `query {
+  tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+}
+              `})
+            }).then(checkStatus)
+          .then(parseJSON);
+            roles1 = res.data.tafkidims
+                       if ($lang == "he" ){
+              for (var i = 0; i < roles1.length; i++){
+                if (roles1[i].localizations.length > 0){
+                roles1[i].roleDescription = roles1[i].localizations[0].roleDescription
+                }
+              }
+            }
+            roles1 = roles1
       } catch (e) {
           error1 = e
       }
