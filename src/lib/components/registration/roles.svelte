@@ -7,7 +7,8 @@
     import Addnewrole from '../addnew/addNewRole.svelte';
  import { createEventDispatcher } from 'svelte';
            import { lang } from '$lib/stores/lang.js'
-
+    import jroles from '$lib/data/tafkidim.json'
+    import enjrole from '$lib/data/tafkidimEn.json'
  const dispatch = createEventDispatcher();
     let roles1 = [];
     let error1 = null;
@@ -26,6 +27,11 @@
       let newcontent = true
 
     onMount(async () => {
+       if ($lang == "he" ){
+        roles1 = jroles
+            } else if (lang == "en"){
+              roles1 = enjrole
+            }
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -129,8 +135,8 @@ selected.push(newN);
 selected = newSele;
 
   }
-      const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
-    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
+      const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
+    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
   const what = {"he": "יש לך תפקיד מועדף?","en": "Do you have a preferred role?"}
   </script>
@@ -166,10 +172,10 @@ selected = newSele;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
       >{addn[$lang]}</button>
     </div>
-    <button class="button-in-1-2" on:click="{$lang == "he" ? increment : back}">
+    <button class="button-in-1-2" on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
-  <button class="button-2" on:click="{$lang == "en" ? increment : back}">
+  <button class="button-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
 

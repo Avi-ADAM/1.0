@@ -1,0 +1,330 @@
+[
+    {
+        "id": "51",
+        "skillName": "music"
+    },
+    {
+        "id": "12",
+        "skillName": "painting"
+    },
+    {
+        "id": "47",
+        "skillName": "Car driving license"
+    },
+    {
+        "id": "17",
+        "skillName": "Logo Design"
+    },
+    {
+        "id": "62",
+        "skillName": "Working with children and horses"
+    },
+    {
+        "id": "38",
+        "skillName": "Writing business plans"
+    },
+    {
+        "id": "28",
+        "skillName": "Writing content"
+    },
+    {
+        "id": "1",
+        "skillName": "Svelte"
+    },
+    {
+        "id": "24",
+        "skillName": "Javascript"
+    },
+    {
+        "id": "4",
+        "skillName": "Angular"
+    },
+    {
+        "id": "114",
+        "skillName": "Preparation of homemade jam"
+    },
+    {
+        "id": "36",
+        "skillName": "Driving a motorcycle"
+    },
+    {
+        "id": "134",
+        "skillName": "טכנאות מעבדה סמארטפונים"
+    },
+    {
+        "id": "133",
+        "skillName": "חקר שוק"
+    },
+    {
+        "id": "135",
+        "skillName": "בישול אוכל הודי"
+    },
+    {
+        "id": "25",
+        "skillName": "neo4j"
+    },
+    {
+        "id": "18",
+        "skillName": "html"
+    },
+    {
+        "id": "37",
+        "skillName": "boxy svg"
+    },
+    {
+        "id": "21",
+        "skillName": "python"
+    },
+    {
+        "id": "30",
+        "skillName": "netlify"
+    },
+    {
+        "id": "10",
+        "skillName": "strapi"
+    },
+    {
+        "id": "19",
+        "skillName": "css"
+    },
+    {
+        "id": "41",
+        "skillName": "D3"
+    },
+    {
+        "id": "29",
+        "skillName": "svg"
+    },
+    {
+        "id": "8",
+        "skillName": "postgreSQL"
+    },
+    {
+        "id": "22",
+        "skillName": "c++"
+    },
+    {
+        "id": "42",
+        "skillName": "versel"
+    },
+    {
+        "id": "2",
+        "skillName": "React"
+    },
+    {
+        "id": "53",
+        "skillName": "wordpress"
+    },
+    {
+        "id": "54",
+        "skillName": "elementor"
+    },
+    {
+        "id": "55",
+        "skillName": "canva"
+    },
+    {
+        "id": "59",
+        "skillName": "Deep learning "
+    },
+    {
+        "id": "60",
+        "skillName": "Blockchain"
+    },
+    {
+        "id": "3",
+        "skillName": "Vue"
+    },
+    {
+        "id": "23",
+        "skillName": "c#"
+    },
+    {
+        "id": "44",
+        "skillName": "graphQl"
+    },
+    {
+        "id": "70",
+        "skillName": "Sveltekit"
+    },
+    {
+        "id": "74",
+        "skillName": "Swiper"
+    },
+    {
+        "id": "75",
+        "skillName": "Jira api"
+    },
+    {
+        "id": "76",
+        "skillName": "NodeJs"
+    },
+    {
+        "id": "77",
+        "skillName": "Webrtc"
+    },
+    {
+        "id": "7",
+        "skillName": "Photography, stills"
+    },
+    {
+        "id": "73",
+        "skillName": "Ux User experience"
+    },
+    {
+        "id": "5",
+        "skillName": "Video shooting"
+    },
+    {
+        "id": "43",
+        "skillName": "Hebrew to English translation"
+    },
+    {
+        "id": "16",
+        "skillName": "Project planning on 1❤️1"
+    },
+    {
+        "id": "15",
+        "skillName": "Planning trips in India"
+    },
+    {
+        "id": "52",
+        "skillName": "planning"
+    },
+    {
+        "id": "34",
+        "skillName": "singing"
+    },
+    {
+        "id": "57",
+        "skillName": "Organic Marketing Facebook"
+    },
+    {
+        "id": "61",
+        "skillName": "Concept"
+    },
+    {
+        "id": "67",
+        "skillName": "porterage"
+    },
+    {
+        "id": "56",
+        "skillName": "Facebook page management"
+    },
+    {
+        "id": "66",
+        "skillName": "Event Management"
+    },
+    {
+        "id": "64",
+        "skillName": "Cooking Hummus"
+    },
+    {
+        "id": "33",
+        "skillName": "Hair Design"
+    },
+    {
+        "id": "35",
+        "skillName": "Acting"
+    },
+    {
+        "id": "14",
+        "skillName": "Advertising on Google"
+    },
+    {
+        "id": "69",
+        "skillName": "personal trainer"
+    },
+    {
+        "id": "40",
+        "skillName": "Barista, Coffee making"
+    },
+    {
+        "id": "26",
+        "skillName": "Interior design"
+    },
+    {
+        "id": "9",
+        "skillName": "Marketing writing"
+    },
+    {
+        "id": "49",
+        "skillName": "football"
+    },
+    {
+        "id": "11",
+        "skillName": "Literary writing"
+    },
+    {
+        "id": "27",
+        "skillName": "Writing a script"
+    },
+    {
+        "id": "20",
+        "skillName": "instagram advertising"
+    },
+    {
+        "id": "72",
+        "skillName": "Business development and sales"
+    },
+    {
+        "id": "31",
+        "skillName": "jewelry design"
+    },
+    {
+        "id": "6",
+        "skillName": "Dress design"
+    },
+    {
+        "id": "68",
+        "skillName": "Event Production"
+    },
+    {
+        "id": "71",
+        "skillName": "Making tiktok videos"
+    },
+    {
+        "id": "32",
+        "skillName": "Yoga instruction"
+    },
+    {
+        "id": "39",
+        "skillName": "Nail construction"
+    },
+    {
+        "id": "63",
+        "skillName": "Choosing suitable products for cooking"
+    },
+    {
+        "id": "79",
+        "skillName": "Speech"
+    },
+    {
+        "id": "78",
+        "skillName": "nature hikes"
+    },
+    {
+        "id": "13",
+        "skillName": "Facebook Advertising"
+    },
+    {
+        "id": "50",
+        "skillName": "Research"
+    },
+    {
+        "id": "80",
+        "skillName": "2d animation"
+    },
+    {
+        "id": "58",
+        "skillName": "Completely lacking in talent"
+    },
+    {
+        "id": "48",
+        "skillName": " bore"
+    },
+    {
+        "id": "45",
+        "skillName": "Intense madness"
+    }
+]

@@ -1,0 +1,209 @@
+[
+    {
+        "id": "7",
+        "workWayName": "מחקר משותף",
+        "localizations": [
+            {
+                "workWayName": "מחקר משותף"
+            }
+        ]
+    },
+    {
+        "id": "31",
+        "workWayName": "דמיון וזמן",
+        "localizations": [
+            {
+                "workWayName": "דמיון וזמן"
+            }
+        ]
+    },
+    {
+        "id": "15",
+        "workWayName": "מהבית",
+        "localizations": [
+            {
+                "workWayName": "מהבית"
+            }
+        ]
+    },
+    {
+        "id": "28",
+        "workWayName": "אירועים חברתיים, אירועי תרבות ואומנות, חיבור ריגשי, יצירה",
+        "localizations": [
+            {
+                "workWayName": "אירועים חברתיים, אירועי תרבות ואומנות, חיבור ריגשי, יצירה"
+            }
+        ]
+    },
+    {
+        "id": "10",
+        "workWayName": "התנדבות",
+        "localizations": [
+            {
+                "workWayName": "התנדבות"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "workWayName": "במשרד",
+        "localizations": [
+            {
+                "workWayName": "במשרד"
+            }
+        ]
+    },
+    {
+        "id": "24",
+        "workWayName": "בסופי שבוע",
+        "localizations": [
+            {
+                "workWayName": "בסופי שבוע"
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "workWayName": "בשטח",
+        "localizations": [
+            {
+                "workWayName": "בשטח"
+            }
+        ]
+    },
+    {
+        "id": "18",
+        "workWayName": "סטרטאפ",
+        "localizations": [
+            {
+                "workWayName": "סטרטאפ"
+            }
+        ]
+    },
+    {
+        "id": "23",
+        "workWayName": "גמיש",
+        "localizations": [
+            {
+                "workWayName": "גמיש"
+            }
+        ]
+    },
+    {
+        "id": "25",
+        "workWayName": "כמה שעות בשבוע ",
+        "localizations": [
+            {
+                "workWayName": "כמה שעות בשבוע "
+            }
+        ]
+    },
+    {
+        "id": "20",
+        "workWayName": "דינמי",
+        "localizations": [
+            {
+                "workWayName": "דינמי"
+            }
+        ]
+    },
+    {
+        "id": "22",
+        "workWayName": "עם אנשים",
+        "localizations": [
+            {
+                "workWayName": "עם אנשים"
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "workWayName": "מהאינטרנט",
+        "localizations": [
+            {
+                "workWayName": "מהאינטרנט"
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "workWayName": "פרוייקטים קצרים",
+        "localizations": [
+            {
+                "workWayName": "פרוייקטים קצרים"
+            }
+        ]
+    },
+    {
+        "id": "1",
+        "workWayName": "משרה מלאה",
+        "localizations": [
+            {
+                "workWayName": "משרה מלאה"
+            }
+        ]
+    },
+    {
+        "id": "29",
+        "workWayName": "נסיעות עירוניות",
+        "localizations": [
+            {
+                "workWayName": "נסיעות עירוניות"
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "workWayName": "משרה חלקית",
+        "localizations": [
+            {
+                "workWayName": "משרה חלקית"
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "workWayName": "מסביב לעולם",
+        "localizations": [
+            {
+                "workWayName": "מסביב לעולם"
+            }
+        ]
+    },
+    {
+        "id": "21",
+        "workWayName": "כשאני רוצה ללא מחויבות",
+        "localizations": [
+            {
+                "workWayName": "כשאני רוצה ללא מחויבות"
+            }
+        ]
+    },
+    {
+        "id": "9",
+        "workWayName": "נסיעות בינעירוניות",
+        "localizations": [
+            {
+                "workWayName": "נסיעות בינעירוניות"
+            }
+        ]
+    },
+    {
+        "id": "30",
+        "workWayName": "מבית העסק",
+        "localizations": [
+            {
+                "workWayName": "מבית העסק"
+            }
+        ]
+    },
+    {
+        "id": "19",
+        "workWayName": "קהילה יוצרת",
+        "localizations": [
+            {
+                "workWayName": "קהילה יוצרת"
+            }
+        ]
+    }
+]

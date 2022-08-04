@@ -6,13 +6,20 @@
     import { onMount } from 'svelte';
     import Addneww from '../addnew/addnewWorkway.svelte';
  import { createEventDispatcher } from 'svelte';
+   import jwork from '$lib/data/workways.json'
+    import enjwork from '$lib/data/workwaysEn.json'
  const dispatch = createEventDispatcher();
               import { lang } from '$lib/stores/lang.js'
-
+    let newcontent = true
     let workways2 = [];
     let error1 = null
     
     onMount(async () => {
+       if ($lang == "he" ){
+        workways2 = jwork
+            } else if (lang == "en"){
+              workways2 = enjwork
+            }
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -47,6 +54,7 @@
               }
             }
             workways2 = workways2
+            newcontent = false
         } catch (e) {
             error1 = e
         }
@@ -124,8 +132,8 @@ let isOpen = false;
     selected.push(newN);
     selected = newSele;
 }   
-    const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
-    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
+    const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
+    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const addn = {"he":"הוספת דרך חדשה","en": "Add new way"}
     const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
   </script>
@@ -146,6 +154,7 @@ let isOpen = false;
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
+     loading={newcontent}
      bind:selected
      {placeholder}
      options={workways2.map(c => c.workWayName)}
@@ -156,10 +165,10 @@ let isOpen = false;
       class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
       >{addn[$lang]}</button>
     </div>
-  <button class="button-in-1-2" on:click="{$lang == "he" ? increment : back}">
+  <button class="button-in-1-2" on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
-  <button class="button-2" on:click="{$lang == "en" ? increment : back}">
+  <button class="button-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
 

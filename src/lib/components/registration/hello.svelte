@@ -143,13 +143,13 @@ text-shadow: 1px 1px black;
 }
 @media (min-width: 701px){
   .a2 {
-  font-size: 22px;
+  font-size: 20px;
   }
   .a1 {
   font-size: 32px;
 }
 .a3{
-  font-size: 29px;
+  font-size: 27px;
 }
 }
  @media (max-width:500px){

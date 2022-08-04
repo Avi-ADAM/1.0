@@ -1,0 +1,326 @@
+[
+    {
+        "id": "52",
+        "valueName": "אמת",
+        "localizations": [
+            {
+                "valueName": "אמת"
+            }
+        ]
+    },
+    {
+        "id": "15",
+        "valueName": "נתינה",
+        "localizations": [
+            {
+                "valueName": "נתינה"
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "valueName": "יופי",
+        "localizations": [
+            {
+                "valueName": "יופי"
+            }
+        ]
+    },
+    {
+        "id": "48",
+        "valueName": "קהילה",
+        "localizations": [
+            {
+                "valueName": "קהילה"
+            }
+        ]
+    },
+    {
+        "id": "22",
+        "valueName": "נועם",
+        "localizations": [
+            {
+                "valueName": "נועם"
+            }
+        ]
+    },
+    {
+        "id": "57",
+        "valueName": " גאולה",
+        "localizations": [
+            {
+                "valueName": " גאולה"
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "valueName": "שלום",
+        "localizations": [
+            {
+                "valueName": "שלום"
+            }
+        ]
+    },
+    {
+        "id": "23",
+        "valueName": "הבנה",
+        "localizations": [
+            {
+                "valueName": "הבנה"
+            }
+        ]
+    },
+    {
+        "id": "53",
+        "valueName": "אנושיות בריאה",
+        "localizations": [
+            {
+                "valueName": "אנושיות בריאה"
+            }
+        ]
+    },
+    {
+        "id": "2",
+        "valueName": "אהבה",
+        "localizations": [
+            {
+                "valueName": "אהבה"
+            }
+        ]
+    },
+    {
+        "id": "58",
+        "valueName": "דיבור",
+        "localizations": [
+            {
+                "valueName": "דיבור"
+            }
+        ]
+    },
+    {
+        "id": "11",
+        "valueName": "אי-אפליה",
+        "localizations": [
+            {
+                "valueName": "אי-אפליה"
+            }
+        ]
+    },
+    {
+        "id": "9",
+        "valueName": "בריאות",
+        "localizations": [
+            {
+                "valueName": "בריאות"
+            }
+        ]
+    },
+    {
+        "id": "13",
+        "valueName": "הגשמה",
+        "localizations": [
+            {
+                "valueName": "הגשמה"
+            }
+        ]
+    },
+    {
+        "id": "46",
+        "valueName": "דמוקרטיה",
+        "localizations": [
+            {
+                "valueName": "דמוקרטיה"
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "valueName": "חיים",
+        "localizations": [
+            {
+                "valueName": "חיים"
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "valueName": "הדדיות",
+        "localizations": [
+            {
+                "valueName": "הדדיות"
+            }
+        ]
+    },
+    {
+        "id": "54",
+        "valueName": "קונצנזוס",
+        "localizations": [
+            {
+                "valueName": "קונצנזוס"
+            }
+        ]
+    },
+    {
+        "id": "45",
+        "valueName": "חדשנות",
+        "localizations": [
+            {
+                "valueName": "חדשנות"
+            }
+        ]
+    },
+    {
+        "id": "21",
+        "valueName": "עזרה לזולת",
+        "localizations": [
+            {
+                "valueName": "עזרה לזולת"
+            }
+        ]
+    },
+    {
+        "id": "19",
+        "valueName": "חופש",
+        "localizations": [
+            {
+                "valueName": "חופש"
+            }
+        ]
+    },
+    {
+        "id": "14",
+        "valueName": "הוקרה",
+        "localizations": [
+            {
+                "valueName": "הוקרה"
+            }
+        ]
+    },
+    {
+        "id": "17",
+        "valueName": "חמלה",
+        "localizations": [
+            {
+                "valueName": "חמלה"
+            }
+        ]
+    },
+    {
+        "id": "49",
+        "valueName": "קיימות",
+        "localizations": [
+            {
+                "valueName": "קיימות"
+            }
+        ]
+    },
+    {
+        "id": "50",
+        "valueName": "תקווה",
+        "localizations": [
+            {
+                "valueName": "תקווה"
+            }
+        ]
+    },
+    {
+        "id": "55",
+        "valueName": "חסד",
+        "localizations": [
+            {
+                "valueName": "חסד"
+            }
+        ]
+    },
+    {
+        "id": "18",
+        "valueName": "כסף",
+        "localizations": [
+            {
+                "valueName": "כסף"
+            }
+        ]
+    },
+    {
+        "id": "44",
+        "valueName": "יצירה",
+        "localizations": [
+            {
+                "valueName": "יצירה"
+            }
+        ]
+    },
+    {
+        "id": "10",
+        "valueName": "ידע",
+        "localizations": [
+            {
+                "valueName": "ידע"
+            }
+        ]
+    },
+    {
+        "id": "47",
+        "valueName": "טוב",
+        "localizations": [
+            {
+                "valueName": "טוב"
+            }
+        ]
+    },
+    {
+        "id": "16",
+        "valueName": "קירוב לבבות",
+        "localizations": [
+            {
+                "valueName": "קירוב לבבות"
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "valueName": "שמחה",
+        "localizations": [
+            {
+                "valueName": "שמחה"
+            }
+        ]
+    },
+    {
+        "id": "12",
+        "valueName": "רוחניות",
+        "localizations": [
+            {
+                "valueName": "רוחניות"
+            }
+        ]
+    },
+    {
+        "id": "7",
+        "valueName": "שלווה",
+        "localizations": [
+            {
+                "valueName": "שלווה"
+            }
+        ]
+    },
+    {
+        "id": "24",
+        "valueName": "תיקון",
+        "localizations": [
+            {
+                "valueName": "תיקון"
+            }
+        ]
+    },
+    {
+        "id": "97",
+        "valueName": "טעם טוב",
+        "localizations": [
+            {
+                "valueName": "טעם טוב"
+            }
+        ]
+    }
+]

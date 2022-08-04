@@ -1,0 +1,381 @@
+[
+    {
+        "id": "2",
+        "roleDescription": "תכנות",
+        "localizations": [
+            {
+                "roleDescription": "תכנות"
+            }
+        ]
+    },
+    {
+        "id": "46",
+        "roleDescription": " Tiktok ניהול עמוד  ",
+        "localizations": [
+            {
+                "roleDescription": " Tiktok ניהול עמוד  "
+            }
+        ]
+    },
+    {
+        "id": "38",
+        "roleDescription": "שיווק באינטרנט",
+        "localizations": [
+            {
+                "roleDescription": "שיווק באינטרנט"
+            }
+        ]
+    },
+    {
+        "id": "17",
+        "roleDescription": "קריאייטיב",
+        "localizations": [
+            {
+                "roleDescription": "קריאייטיב"
+            }
+        ]
+    },
+    {
+        "id": "1",
+        "roleDescription": "פרסום",
+        "localizations": [
+            {
+                "roleDescription": "פרסום"
+            }
+        ]
+    },
+    {
+        "id": "12",
+        "roleDescription": "ציור",
+        "localizations": [
+            {
+                "roleDescription": "ציור"
+            }
+        ]
+    },
+    {
+        "id": "13",
+        "roleDescription": "פרסום ברשתות חברתיות",
+        "localizations": [
+            {
+                "roleDescription": "פרסום ברשתות חברתיות"
+            }
+        ]
+    },
+    {
+        "id": "42",
+        "roleDescription": "הפקה וניהול פרוייקטים",
+        "localizations": [
+            {
+                "roleDescription": "הפקה וניהול פרוייקטים"
+            }
+        ]
+    },
+    {
+        "id": "15",
+        "roleDescription": "ניהול",
+        "localizations": [
+            {
+                "roleDescription": "ניהול"
+            }
+        ]
+    },
+    {
+        "id": "26",
+        "roleDescription": "צבעות",
+        "localizations": [
+            {
+                "roleDescription": "צבעות"
+            }
+        ]
+    },
+    {
+        "id": "35",
+        "roleDescription": "נהיגה",
+        "localizations": [
+            {
+                "roleDescription": "נהיגה"
+            }
+        ]
+    },
+    {
+        "id": "8",
+        "roleDescription": "עיצוב אופנה",
+        "localizations": [
+            {
+                "roleDescription": "עיצוב אופנה"
+            }
+        ]
+    },
+    {
+        "id": "7",
+        "roleDescription": "צילום וידאו",
+        "localizations": [
+            {
+                "roleDescription": "צילום וידאו"
+            }
+        ]
+    },
+    {
+        "id": "4",
+        "roleDescription": "מכירות",
+        "localizations": [
+            {
+                "roleDescription": "מכירות"
+            }
+        ]
+    },
+    {
+        "id": "11",
+        "roleDescription": "כתיבה",
+        "localizations": [
+            {
+                "roleDescription": "כתיבה"
+            }
+        ]
+    },
+    {
+        "id": "22",
+        "roleDescription": "הנחייה",
+        "localizations": [
+            {
+                "roleDescription": "הנחייה"
+            }
+        ]
+    },
+    {
+        "id": "19",
+        "roleDescription": "עיצוב אתרי אינטרנט",
+        "localizations": [
+            {
+                "roleDescription": "עיצוב אתרי אינטרנט"
+            }
+        ]
+    },
+    {
+        "id": "43",
+        "roleDescription": "בישול",
+        "localizations": [
+            {
+                "roleDescription": "בישול"
+            }
+        ]
+    },
+    {
+        "id": "14",
+        "roleDescription": "הדרכת טיולים",
+        "localizations": [
+            {
+                "roleDescription": "הדרכת טיולים"
+            }
+        ]
+    },
+    {
+        "id": "5",
+        "roleDescription": "תכנות צד שרת",
+        "localizations": [
+            {
+                "roleDescription": "תכנות צד שרת"
+            }
+        ]
+    },
+    {
+        "id": "6",
+        "roleDescription": "בניית אתרי אינטרנט",
+        "localizations": [
+            {
+                "roleDescription": "בניית אתרי אינטרנט"
+            }
+        ]
+    },
+    {
+        "id": "9",
+        "roleDescription": "דאטהבייס",
+        "localizations": [
+            {
+                "roleDescription": "דאטהבייס"
+            }
+        ]
+    },
+    {
+        "id": "36",
+        "roleDescription": "הגשה לקרנות",
+        "localizations": [
+            {
+                "roleDescription": "הגשה לקרנות"
+            }
+        ]
+    },
+    {
+        "id": "21",
+        "roleDescription": "עיצוב",
+        "localizations": [
+            {
+                "roleDescription": "עיצוב"
+            }
+        ]
+    },
+    {
+        "id": "39",
+        "roleDescription": "בניית מוסיקה לסרטונים",
+        "localizations": [
+            {
+                "roleDescription": "בניית מוסיקה לסרטונים"
+            }
+        ]
+    },
+    {
+        "id": "20",
+        "roleDescription": "בניית אתרים מתקדמת",
+        "localizations": [
+            {
+                "roleDescription": "בניית אתרים מתקדמת"
+            }
+        ]
+    },
+    {
+        "id": "16",
+        "roleDescription": "בניית דפי נחיתה",
+        "localizations": [
+            {
+                "roleDescription": "בניית דפי נחיתה"
+            }
+        ]
+    },
+    {
+        "id": "3",
+        "roleDescription": "צילום סטילס",
+        "localizations": [
+            {
+                "roleDescription": "צילום סטילס"
+            }
+        ]
+    },
+    {
+        "id": "24",
+        "roleDescription": "שחקנות",
+        "localizations": [
+            {
+                "roleDescription": "שחקנות"
+            }
+        ]
+    },
+    {
+        "id": "10",
+        "roleDescription": "צילום",
+        "localizations": [
+            {
+                "roleDescription": "צילום"
+            }
+        ]
+    },
+    {
+        "id": "44",
+        "roleDescription": "סבלות",
+        "localizations": [
+            {
+                "roleDescription": "סבלות"
+            }
+        ]
+    },
+    {
+        "id": "29",
+        "roleDescription": "נגרות",
+        "localizations": [
+            {
+                "roleDescription": "נגרות"
+            }
+        ]
+    },
+    {
+        "id": "31",
+        "roleDescription": "מתורגמנות",
+        "localizations": [
+            {
+                "roleDescription": "מתורגמנות"
+            }
+        ]
+    },
+    {
+        "id": "30",
+        "roleDescription": "מרצה",
+        "localizations": [
+            {
+                "roleDescription": "מרצה"
+            }
+        ]
+    },
+    {
+        "id": "37",
+        "roleDescription": "יזמות",
+        "localizations": [
+            {
+                "roleDescription": "יזמות"
+            }
+        ]
+    },
+    {
+        "id": "27",
+        "roleDescription": "מנהל עסקים",
+        "localizations": [
+            {
+                "roleDescription": "מנהל עסקים"
+            }
+        ]
+    },
+    {
+        "id": "18",
+        "roleDescription": "עיצוב גרפיקה ",
+        "localizations": [
+            {
+                "roleDescription": "עיצוב גרפיקה "
+            }
+        ]
+    },
+    {
+        "id": "28",
+        "roleDescription": "הנדסת אוויר",
+        "localizations": [
+            {
+                "roleDescription": "הנדסת אוויר"
+            }
+        ]
+    },
+    {
+        "id": "23",
+        "roleDescription": "זמרות",
+        "localizations": [
+            {
+                "roleDescription": "זמרות"
+            }
+        ]
+    },
+    {
+        "id": "91",
+        "roleDescription": "טכנאות אלקטרוניקה",
+        "localizations": []
+    },
+    {
+        "id": "47",
+        "roleDescription": "Business development manager",
+        "localizations": []
+    },
+    {
+        "id": "45",
+        "roleDescription": "אדריכלות פנים",
+        "localizations": [
+            {
+                "roleDescription": "אדריכלות פנים"
+            }
+        ]
+    },
+    {
+        "id": "48",
+        "roleDescription": "מנהל.ת קהילה",
+        "localizations": [
+            {
+                "roleDescription": "מנהל.ת קהילה"
+            }
+        ]
+    }
+]

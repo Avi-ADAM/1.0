@@ -216,8 +216,8 @@ function back() {
 	function getV (e){
     passwordx = e.target.value
 	}
-	    const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
-    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
+	    const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
+    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
   const addn = {"he":"יצירת סיסמה","en": "Create new password"}
   const what = {"he": "מה היא מילת הקסם שלך?","en": "what is Your magic word?"}
     const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
@@ -278,10 +278,10 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 		</ul>
 	{#if already === false}
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="but">
-		  <button class:button-2={$lang == "en"} class:button-in-1-2={$lang == "he"} class:non={strength < 4 && $lang == "he"} on:click="{$lang == "he" ? increment : back}"  disabled={strength < 4 && $lang == "he"}>
+		  <button class="button-2"   on:click="{back}"  >
     <img alt="go"  class="img-4"  src="{srca[$lang]}"/>
     </button>
-  <button disabled={strength < 4 && $lang == "en"} class:button-in-1-2={$lang == "en"} class:non={strength < 4 && $lang == "en"} class:button-2={$lang == "he"} on:click="{$lang == "en" ? increment : back}">
+  <button disabled={strength < 4} class="button-in-1-2" class:non={strength < 4 }  on:click="{increment}">
     <img alt="go" class="img-4"  src="{srcb[$lang]}"/>
     </button>
 </div>
