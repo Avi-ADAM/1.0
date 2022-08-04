@@ -864,7 +864,7 @@ justify-self: center;
           border: 1px var(--lturk);
    }
 
-   :global(.multiselect) {
+   :global(div.multiselect) {
     background-color: var(--gold) !important ;
   /* top-level wrapper div */
 }

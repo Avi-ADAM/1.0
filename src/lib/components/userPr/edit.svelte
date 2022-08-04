@@ -85,7 +85,7 @@ let idLi;
             }
             meData = meData
               allvn = meData.map(c => c[valc]);
-
+              newcontent = false
               console.log(res);
           } catch (e) {
               error1 = e
@@ -467,6 +467,7 @@ if (miDatanew.length > 0) {
           })
 }
 }
+let newcontent = true;
 let xd = []
 let ed = false;
 async function edit (id){
@@ -625,8 +626,9 @@ on:click={edit(da.id)}
       options={allvn}
       on:change={addSK(data.selected2)}
       on:blur={adm(data.selected2)}
+      loading={newcontent}
       /></span>
-       
+       <!--      allowUserOptions={"append"}-->
      
       {#if datan == "skil"} 
 <Addnewsk rn={allvn} on:addnewskill={addnew} addS={addS}/>
@@ -669,7 +671,10 @@ on:click={edit(da.id)}
 {/if} {/if}
 
  <style>
-   
+   :global(div.multiselect){
+    background-color: var(--gold);
+    color: var(--barbi-pink)
+   }
     .bt{
     animation: changeColor 2s infinite ease;
   }

@@ -12,6 +12,7 @@
     let vallues = [];
     let error1 = null;
     let addval = false;
+    let newcontent = true
  onMount(async () =>{
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -47,6 +48,7 @@
               }
             }
             vallues = vallues
+            newcontent = false
         } catch (e) {
             error1 = e
         }
@@ -149,6 +151,7 @@ selected = newSele;
   {#key vallues}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
+           loading={newcontent}
      bind:selected
      {placeholder}
      options={vallues.map(c => c.valueName)}

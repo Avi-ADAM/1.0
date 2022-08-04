@@ -11,6 +11,7 @@
     let skills2 = [];
     let error1 = null; 
     let addskil = 0;
+    let newcontent = true
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -46,6 +47,7 @@
               }
             }
             skills2 = skills2
+            newcontent = false
         } catch (e) {
             error1 = e
         }
@@ -145,6 +147,7 @@ selected = newSele;
   </h1>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
   <MultiSelect
+        loading={newcontent}
   bind:selected
   {placeholder}
   options={skills2.map(c => c.skillName)}

@@ -208,7 +208,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 	 class=" form-select appearance-none
       block
       w-full
-      px-3
+      px-8
       py-1.5
       text-barbi
       font-normal
@@ -236,7 +236,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 	 class=" form-select appearance-none
       block
       w-full
-      px-3
+      px-8
       py-1.5
       text-barbi
       font-normal

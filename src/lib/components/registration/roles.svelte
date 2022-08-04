@@ -23,6 +23,7 @@
       }
       return arr;
      };
+      let newcontent = true
 
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -59,6 +60,8 @@
               }
             }
             roles1 = roles1
+            newcontent = false
+
         } catch (e) {
             error1 = e
         }
@@ -149,6 +152,7 @@ selected = newSele;
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
+           loading={newcontent}
      bind:selected
      {placeholder}
      options={roles1.map(c => c.roleDescription)}
