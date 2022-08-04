@@ -533,7 +533,7 @@ function change(la){
         width: 130px;
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      --> 
-     <button style="position: absolute; color: var(--barbi-pink); font-weight:bold; height:20px width:20px;" on:click={()=>info()} class="ww" >?</button>
+     <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px;" on:click={()=>info()} class="ww" >?</button>
      <div class="all">
        <a  sveltekit:prefetch href="/login" ><img title="התחברות ל-1❤️1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
@@ -671,8 +671,33 @@ function change(la){
   <style>
     .ww{
       top: calc(100% - 40px); 
-      right: calc(100% - 20px);
+      right: calc(100% - 40px);
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      	background: rgb(26, 188, 156);
+	background: -moz-linear-gradient(-45deg, rgba(26, 188, 156, 1) 0%, rgba(142, 68, 173, 1) 100%);
+	background: -webkit-linear-gradient(-45deg, rgba(26, 188, 156, 1) 0%, rgba(142, 68, 173, 1) 100%);
+	background: linear-gradient(135deg, rgba(26, 188, 156, 1) 0%, rgba(142, 68, 173, 1) 100%);
+
+      box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+	transform: translatey(0px);
+	animation: float 6s ease-in-out infinite;
     }
+    @keyframes float {
+	0% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+	50% {
+		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
+		transform: translatey(-20px);
+	}
+	100% {
+		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+		transform: translatey(0px);
+	}
+}
 .overlay{
   background-color: #ff1a1a;
   background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
