@@ -99,7 +99,9 @@ let bmimData = [];
   let token; 
   let linkP;
   
- 
+ let newcontent = true;
+ let newcontentR = true;
+ let newcontentW = true
   let descPri;
   let omiData = [];
   let pmiData = [];
@@ -291,7 +293,7 @@ JSON.stringify({query:
             srcP = project.profilePic.url;
             }
             trili = meData.tosplits;
-           pre(projectUsers, fmiData)
+          // pre(projectUsers, fmiData)
         } catch (e) {
             error1 = e;
             console.log(error1);
@@ -369,6 +371,7 @@ async function prog (){
  let blabla = [];
  let load = false;
 async function callbackFunction(event) {
+  console.log("shit its me")
     		cow.scrollIntoView(true);
  load = true;
   const  lim = event.detail.li;
@@ -478,6 +481,9 @@ async function findT ()  {
               }
             }
             workways2 = workways2;
+            newcontent = false
+            newcontentR = false
+            newcontentW = false
         } catch (e) {
             error8 = e
             console.log(error8)
@@ -1428,6 +1434,7 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
         </div>
                  {/if}
 {#if showvd == true}<Mission 
+{newcontent} {newcontentR} {newcontentW} 
                                 userslength={projectUsers.length}
                                  workways2 ={workways2}
                                  skills2={skills2}

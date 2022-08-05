@@ -9,6 +9,9 @@ import { RingLoader
 } from 'svelte-loading-spinners'
 
  const dispatch = createEventDispatcher();
+export let newcontent = true;
+export let newcontentR = true;
+export let newcontentW = true;
 
 let token; 
 
@@ -480,10 +483,11 @@ dispatch('addneww', {
             <th>בחירת כישורים נוספים </th>
             {#each miData as data, i}
             <td> <MultiSelect
+              loading={newcontent}
               bind:selected={data.selected2}
               {placeholder1}
               options={skills2.map(c => c.skillName)}
-              on:blur={addSK(data.selected2, data.id)}
+              on:change={addSK(data.selected2, data.id)}
               />
               <AddNewSkill color={"--barbi-pink"} mid={data.id} on:addnewskill={addnewsk} addS={addS} roles1={roles} />
                 </td>
@@ -504,11 +508,12 @@ dispatch('addneww', {
             <th>בחירת תפקידים אחרים </th>
             {#each miData as data, i}
             <td> <MultiSelect
+              loading={newcontentR}
               bind:selected={data.selected3}
               on:add={(event) => console.log(event)}
               {placeholder4}
               options={roles.map(c => c.roleDescription)}
-              on:blur={addR(data.selected3, data.id)}
+              on:change={addR(data.selected3, data.id)}
               />
               <Addnewro color={"--barbi-pink"} mid={data.id} on:addnewrole={addnewrole}   />
             </td>
@@ -529,10 +534,11 @@ dispatch('addneww', {
             <th>סוג המשימה</th>
             {#each miData as data, i}
             <td><MultiSelect
+              loading={newcontentW}
               bind:selected={data.selected1} 
               {placeholder}
               options={workways2.map(c => c.workWayName)}
-              on:blur={addW(data.selected1, data.id)}
+              on:change={addW(data.selected1, data.id)}
               />
               <AddNewWorkway color={"--barbi-pink"} mid={data.id} on:addww={addww}/>
             </td>

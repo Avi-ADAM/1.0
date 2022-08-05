@@ -26,7 +26,7 @@ let moving = [];
 let ids;
 const placeholder = `בחירה מרשימה`;
 function handl() {
-
+  console.log("its handl")
     if (selected.length > 0) {
     
     dispatch('message', {
@@ -45,6 +45,7 @@ function handl() {
 let cencel = " ביטול הוספת פעולה חדשה";
 
 function newM (event) {
+  console.log("its newm")
   const myids = find_mission_id(selected);
   const newId = event.detail.id;
  const allm = myids.concat(newId);
@@ -72,7 +73,7 @@ function newM (event) {
           bind:selected
           {placeholder}
           options={mission1.map(c => c.missionName)}
-         on:blur={handl}
+         on:change={handl}
           /></div>
         
         
