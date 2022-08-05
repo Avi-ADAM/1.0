@@ -1236,7 +1236,7 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
     <div dir="ltr" class="flex items-center justify-center">
     <div dir="ltr" class="flex -space-x-2 overflow-hidden">
         {#each projectUsers as user}
-  <button title="{user.username}" on:click={()=>goto(`/user/${user.id}`)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.profilePic.url}" alt=""></button>
+  <button title="{user.username}" on:click={()=>goto(`/user/${user.id}`)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.profilePic != null ? user.profilePic.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
   <!--{#if hover}
     <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
     {/if}-->
