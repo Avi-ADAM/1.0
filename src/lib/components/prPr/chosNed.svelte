@@ -92,7 +92,7 @@ function incremen() {
         bind:selected
         {placeholder}
         options={needss.map(c => c.name)}
-        on:blur={incremen}
+        on:change={incremen}
         /></div>
      
        <Addnewnee {addnee} on:newn={newn} color={"--barbi-pink"}/>

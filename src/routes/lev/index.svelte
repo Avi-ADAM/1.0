@@ -90,7 +90,7 @@ let maap = 13;
 let sug = 13
 let pen = 13
 let ask = 13;
-let halu = 0;
+let halu = 1;
 let wel = 17;
 let askma = 13;
 let beta = 13
@@ -1473,8 +1473,11 @@ async function start() {
             sps(miData)
             createmask(miData)
             crMaap(miData)
+            console.log("every rashbi")
             rashbi(miData);
+            console.log("every hachla")
             hachla(miData);
+            console.log("every")
             bubleUiAngin()
             low = false
         }
@@ -1524,7 +1527,7 @@ function hachla(data) {
                 messege: []
             });
         }
-                              console.log("mihggd", hachlatot)
+        console.log("mihggd", hachlatot)
 
     }
     console.log("mid", hachlatot)
@@ -1602,7 +1605,8 @@ function hachla(data) {
                          }
                        }*/
     }
-    halu += hachlatot.length;
+
+    halu += hachlatot.length - 1;
     localStorage.setItem("halu", halu);
     console.log(hachlatot)
 }
@@ -1612,19 +1616,19 @@ function rashbi(data) {
     const projects = data.data.user.projects_1s;
     for (var i = 0; i < projects.length; i++) {
         for (var j = 0; j < projects[i].tosplits.length; j++) {
-            const halu = projects[i].tosplits[j]
+            const halug = projects[i].tosplits[j]
             haluask.push({
-                name: halu.name,
+                name: halug.name,
                 projectId: projects[i].id,
                 projectName: projects[i].projectName,
                 user_1s: projects[i].user_1s,
                 src: projects[i].profilePic.formats.thumbnail.url,
-                users: halu.vots,
+                users: halug.vots,
                 myid: myid,
-                pendId: halu.id,
+                pendId: halug.id,
                 noofusers: projects[i].user_1s.length,
                 ani: "haluk",
-                pl: 1 + halu.vots.length
+                pl: 1 + halug.vots.length
             });
 
         }

@@ -460,7 +460,7 @@ function tochat () {
   dispatch("chat");
 }
  $: w = 0;
- const u = {"he":"הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה","en":"vote on request to join the FreeMate and share a resorce "}
+ const u = {"he":"הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה","en":"vote on request to join the FreeMates and share a resorce "}
 const levi = {"he":"לב 1❤️1", "en":"the heart of 1❤️1"}
 function hover (id){
   let ut;
@@ -496,7 +496,7 @@ function hoverc (event){
 export let cards = false;
 const clicktoup = {"he":` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`,"en":`click twice to see ${useraplyname} profile`}
 const resorcename = {"he":" שם המשאב המוצע","en":"name of the suggested resorce"}
-const clicktofree = {"he":"לחיצה למעבר לעמוד הציבורי של הריקמה","en":"click twice to see FreeMate public page"}
+const clicktofree = {"he":"לחיצה למעבר לעמוד הציבורי של הריקמה","en":"click twice to see FreeMates public page"}
 const clicktobrain = {"he":` לחיצה למעבר למוח הריקמה ${projectName}`,"en":`click twice to go to the ${projectName} Brain`}
 </script>
 {#await ser}

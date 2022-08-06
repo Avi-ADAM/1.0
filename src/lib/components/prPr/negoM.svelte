@@ -489,7 +489,7 @@ onMount(async () => {
             bind:selected={selected2}
             {placeholder1}
             options={skills2.map(c => c.skillName)}
-            on:blur={add(selected2, skills3, skills2)}
+            on:change={add(selected2, skills3, skills2)}
             />
             <AddNewSkill on:addnewskill={addnew} addS={addS} roles1={roles} />
             </td>
@@ -514,7 +514,7 @@ onMount(async () => {
                     on:add={(event) => console.log(event)}
                     {placeholder4}
                     options={roles.map(c => c.roleDescription)}
-                    on:blur={addR(selected3, tafkidims2, roles)}
+                    on:change={addR(selected3, tafkidims2, roles)}
                     />
                     <Addnewro  on:addnewrole={addnewR}   />
                     </td>
@@ -538,7 +538,7 @@ onMount(async () => {
                             bind:selected={selected1}
                             {placeholder}
                             options={workways2.map(c => c.workWayName)}
-                            on:blur={addW(selected1, workways3, workways2 )}
+                            on:change={addW(selected1, workways3, workways2 )}
                             />
                             <AddNewWorkway  on:addww={addnewW}/>
                                 </td>
