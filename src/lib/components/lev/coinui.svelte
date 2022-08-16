@@ -1,5 +1,5 @@
 <script>
-   import Desi from './decisionMaking.svelte'
+  import Desi from './decisionMaking.svelte'
     import Mid from "./midi.svelte"
      import MissionInProgress from "./missionInProgress.svelte"
     import ProjectSuggestor from "./projectSuggestor.svelte"
@@ -21,7 +21,8 @@
 const dispatch = createEventDispatcher();
 export let adder = [], arr1 = [], askedarr = [], declineddarr = [],halu = 17, askma = 17,maap = 13,mashs = 13,pmashd = 13, fia = 13, beta = 13, pen = 17, sug = 17, low = false, nam,wel = 13, ask = 13,picLink,total
    let milon = {hachla: true, fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
-function delo (event){
+let modal = false;
+   function delo (event){
  let oldob = arr1;
  const x = oldob.map(c => c.coinlapach);
  const indexy = x.indexOf(event.detail.coinlapach);
@@ -72,7 +73,8 @@ let h = 500;
 
 {#each arr1 as buble, i}
 {#if buble.ani === "haluk" && milon.desi == true} 
- <div class="normSml halu"><Hal    
+ <div class:normSml={modal == false} class=" halu"><Hal  
+   on:modal={() =>modal = true}  
     user_1s={buble.user_1s}
           on:hover={hover}
  on:proj={proj}
@@ -97,10 +99,12 @@ let h = 500;
     {low}
                                /></div>
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
- <div   class="betaha normSml" ><MissionInProgress
+ <div class:normSml={modal == false}  class="betaha " ><MissionInProgress
   on:proj={proj}
  on:user={user}  
   on:hover={hover}
+     on:modal={() =>modal = true}  
+
   tx={buble.tx}
       coinlapach={buble.coinlapach} 
     usernames={buble.usernames}
@@ -129,6 +133,8 @@ let h = 500;
   on:proj={proj}
  on:user={user}
         on:coinLapach={delo}
+           on:modal={() =>modal == true}  
+
             coinlapach={buble.coinlapach} 
                  messege={buble.messege}
         mysrc={buble.mysrc}
@@ -162,6 +168,8 @@ let h = 500;
     <div  class="normSml pend" 
  ><PendingM
               on:hover={hover}
+                 on:modal={() =>modal == true}  
+
   on:proj={proj}
  on:user={user}
         on:coinLapach={delo}
@@ -200,6 +208,8 @@ let h = 500;
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
+                     on:modal={() =>modal == true}  
+
           on:proj={proj}
  on:user={user}
      coinlapach={buble.coinlapach} 
@@ -246,6 +256,8 @@ let h = 500;
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
+                     on:modal={() =>modal == true}  
+
     on:proj={proj} 
  on:user={user}
      coinlapach={buble.coinlapach} 
@@ -296,6 +308,8 @@ let h = 500;
         <div  class="asks normSml" ><Reqtojoin
             on:acsept={delo}
                   on:hover={hover}
+                     on:modal={() =>modal == true}  
+
             on:proj={proj}
      on:user={user}
             on:decline={delo}
@@ -338,6 +352,8 @@ let h = 500;
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
+                     on:modal={() =>modal == true}  
+
             on:proj={proj}
  on:user={user}
  on:chat={chat}
@@ -377,10 +393,12 @@ let h = 500;
 
                 /></div>
 {:else if buble.ani === "hachla" && milon.hachla == true}
-        <div  class="hachla normSml" ><Desi
+        <div class:normSml={modal = false} class="hachla " ><Desi
             on:acsept={delo}
             on:decline={delo}
             on:hover={hover}
+               on:modal={() =>modal == true}  
+
             on:proj={proj}
             on:chat={chat}
                         noofpu={buble.user_1s.length}
@@ -645,6 +663,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
    z-index: 998;
 }
     .screen{
+      perspective: 1000px;
 background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
         display: grid;

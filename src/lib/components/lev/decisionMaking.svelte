@@ -1,8 +1,11 @@
 <script>
+    import { pinch } from 'svelte-gestures';
+  import * as animateScroll from "svelte-scrollto";
+
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto, prefetch } from '$app/navigation';
  import { lang } from '$lib/stores/lang.js';
-import Chaticon from '../../celim/chaticon.svelte'
+import Close from '../../celim/close.svelte'
 import { onMount }from 'svelte'
 import {
     clickOutside
@@ -296,6 +299,7 @@ function tochat () {
   dispatch("chat");
 }
  $: w = 0;
+ $:h = 0
  let   u = "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה"
 
 function hover (id){
@@ -330,6 +334,41 @@ export let cards = false;
 export let tx = 200;
 const newlogo = {"he":"הלוגו החדש שמוצע","en":"new Logo offered"}
 const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
+let modal = true;
+let top;
+function tomodal(){
+  modal = false;
+  animateScroll.scrollToTop()
+  dispatch("modal")
+console.log("oh")
+}
+function handler (event){
+  console.log(event.detail)
+}
+$: ww = 0
+  let scale = 1
+ $: if (ww < h){
+    if(ww < 380){
+      scale = ww/92
+    } else if(ww < 430){
+      scale = ww/102
+    } else if(ww < 470){
+      scale = ww/112
+    } else {
+      scale = ww/132
+    } 
+  } else {
+    if(ww < 380){
+      scale = h/92
+    } else if(ww < 430){
+      scale = h/102
+    } else if(ww < 470){
+      scale = h/112
+    } else {
+      scale = h/132
+    } 
+  }
+
 </script>
 {#await ser}
 <h1>loop</h1>
@@ -337,12 +376,30 @@ const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
 {#if cards == false}
 
 <div 
+
+on:dblclick={tomodal}
+ bind:clientWidth={ww}
+ bind:clientHeight={h}
+use:pinch 
+  on:pinch="{handler}"
+class:coinmodal={modal == false}
 style="position: relative;" 
-style:z-index={hovered === false ? 11 : 16}  
+style:z-index={hovered === false && modal == true ? 11 : 58}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow}
-class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
+class:hover:scale-290={modal == true}
+class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
+<div bind:this={top}
+ class="top"></div>
+{#if modal == false}
+<div 
+ style="position: absolute; top: 24px; left:50%; transform: translate(-50%,-50%); z-index:99999;">
+  <button  class="text-barbi hover:text-gold" on:click={()=> modal = true}><Close /></button>
+</div>
+{/if}
+<span use:clickOutside on:click_outside={() =>modal = true}
+ style:transform={modal == false ? `scale(${scale})` : ""}>
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
@@ -372,6 +429,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 </div>
   <SwiperSlide class="swiper-slideg"
     ><div
+    
 	 id="normSml" 
 >
 <div
@@ -614,6 +672,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 </SwiperSlide
   >
 </Swiper>
+</span>
 </div>
 {:else}
 <Card

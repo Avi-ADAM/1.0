@@ -1,4 +1,5 @@
 <script>
+import { addToast } from 'as-toast';
 import {
     betha
 } from '../../lib/components/lev/storess/betha.js'
@@ -1277,7 +1278,7 @@ onMount(async () => {
         }
 
         if (low == true) {
-            document.getElementById("my_audio").play();
+          //  document.getElementById("my_audio").play();
             var speed = 2400;
             var changeSpeed = speed;
             repeater = setInterval(repeaterFn, speed);
@@ -1307,7 +1308,7 @@ onMount(async () => {
                 elem.style.backgroundImage = ''
                 clearInterval(repeater)
                 elem.style.backgroundImage = ''
-                document.getElementById("my_audio").pause();
+              //  document.getElementById("my_audio").pause();
 
             }
         }
@@ -1330,7 +1331,7 @@ onMount(async () => {
         goto("/", )
     }
 })
-
+const tolog = {"he": "תוקף ההתחברות שלך פג, אנו מעבירים אותך להתחברות מחדש", "en":"your connection is outdated you being redirected to login"}
 let walcomenold = [],
     hucaold = [],
     meDataold = [],
@@ -1432,6 +1433,10 @@ async function start() {
             })
             .then(r => r.json())
             .then(data => miData = data);
+            if(miData.data.user == null) {
+                addToast(`${tolog[$lang]}`, 'info');
+                goto("./login")
+            }
         counter += 1;
         localStorage.setItem("miDataL", JSON.stringify(miData));
         if (isEqual(miData, miDataold)) {
@@ -2138,7 +2143,7 @@ async function cardsi(event) {
     <title>לב 1❤️1</title>
 </svelte:head>
 {#if low == true}
-    <audio id="my_audio" src="https://res.cloudinary.com/love1/video/upload/v1655748801/thunder-25689_taqapa.mp3" loop="loop"></audio>
+  <!--  <audio id="my_audio" src="https://res.cloudinary.com/love1/video/upload/v1655748801/thunder-25689_taqapa.mp3" loop="loop"></audio>-->
     <div bind:clientHeight={h} bind:clientWidth={w} style="display:block;
         position:absolute;
         height:100vh;
