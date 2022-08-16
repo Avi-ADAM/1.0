@@ -1611,7 +1611,7 @@ function hachla(data) {
                        }*/
     }
 
-    halu += hachlatot.length - 1;
+    halu = hachlatot.length ;
     localStorage.setItem("halu", halu);
     console.log(hachlatot)
 }
@@ -1675,7 +1675,7 @@ function rashbi(data) {
         haluask[t].noofusersWaiting = noofusersWaiting;
 
     }
-    halu += haluask.length;
+    halu = haluask.length;
     localStorage.setItem("halu", halu);
 }
 
