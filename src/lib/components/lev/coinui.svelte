@@ -1,4 +1,6 @@
 <script>
+     import * as animateScroll from "svelte-scrollto";
+
   import Desi from './decisionMaking.svelte'
     import Mid from "./midi.svelte"
      import MissionInProgress from "./missionInProgress.svelte"
@@ -22,6 +24,10 @@ const dispatch = createEventDispatcher();
 export let adder = [], arr1 = [], askedarr = [], declineddarr = [],halu = 17, askma = 17,maap = 13,mashs = 13,pmashd = 13, fia = 13, beta = 13, pen = 17, sug = 17, low = false, nam,wel = 13, ask = 13,picLink,total
    let milon = {hachla: true, fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
 let modal = false;
+function modali(){
+   modal = true;
+     animateScroll.scrollToTop()
+}
    function delo (event){
  let oldob = arr1;
  const x = oldob.map(c => c.coinlapach);
@@ -33,7 +39,6 @@ let modal = false;
 function user (event) {
  dispatch("user", {id: event.detail.id})
 }
- console.log(beta)
 
 function hover (event) {
     
@@ -133,7 +138,7 @@ let h = 500;
   on:proj={proj}
  on:user={user}
         on:coinLapach={delo}
-           on:modal={() =>modal == true}  
+           on:modal={modali}  
 
             coinlapach={buble.coinlapach} 
                  messege={buble.messege}
@@ -168,7 +173,7 @@ let h = 500;
     <div  class="normSml pend" 
  ><PendingM
               on:hover={hover}
-                 on:modal={() =>modal == true}  
+                 on:modal={modali}  
 
   on:proj={proj}
  on:user={user}
@@ -208,7 +213,7 @@ let h = 500;
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
-                     on:modal={() =>modal == true}  
+                     on:modal={modali}  
 
           on:proj={proj}
  on:user={user}
@@ -256,7 +261,7 @@ let h = 500;
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
-                     on:modal={() =>modal == true}  
+                     on:modal={modali}  
 
     on:proj={proj} 
  on:user={user}
@@ -308,7 +313,7 @@ let h = 500;
         <div  class="asks normSml" ><Reqtojoin
             on:acsept={delo}
                   on:hover={hover}
-                     on:modal={() =>modal == true}  
+                     on:modal={modali}  
 
             on:proj={proj}
      on:user={user}
@@ -352,7 +357,7 @@ let h = 500;
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
-                     on:modal={() =>modal == true}  
+                     on:modal={modali}  
 
             on:proj={proj}
  on:user={user}
@@ -397,7 +402,7 @@ let h = 500;
             on:acsept={delo}
             on:decline={delo}
             on:hover={hover}
-               on:modal={() =>modal == true}  
+               on:modal={modali}  
 
             on:proj={proj}
             on:chat={chat}

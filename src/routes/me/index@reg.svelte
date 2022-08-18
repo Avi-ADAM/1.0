@@ -1371,7 +1371,7 @@ class=" hover:scale-150 "
       left: 0;
       min-width: 99.9vw;
       min-height: 100vh;
-        z-index: 2;
+        z-index: 4;
       background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
     background-repeat: no-repeat;
     background-size: cover;
