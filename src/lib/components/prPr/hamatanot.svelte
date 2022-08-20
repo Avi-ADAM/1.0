@@ -54,21 +54,22 @@ const objIndex = arrt.findIndex((obj => obj.date == datea));
 arrt[objIndex][key] = value
 }
   }
+  //get all keys
   const keys = arrt.reduce(
   (acc, curr) => (Object.keys(curr).forEach((key) => acc.add(key)), acc),
   new Set()
 );
-
+//add all matanot to all objects
 const output = arrt.map((item) =>
   [...keys].reduce((acc, key) => ((acc[key] = item[key] ?? ""), acc), {})
 );
-
+//sort by date
 output.sort(function(a,b){
   return new Date(a.date) - new Date(b.date)
 })
 //formate to readble local date
 const x = output.map(obj => {
-  return {...obj, date: dayjs(obj.date).format('D.M.YYYY')};
+  return {...obj, date: dayjs(obj.date).format('D.M.YY')};
 });
 arrt = x
 console.log(arrt)
