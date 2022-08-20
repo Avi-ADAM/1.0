@@ -345,9 +345,11 @@ function bitulm (){
             mass: false
           })
           needr = []
+          data.selected2 = []
           meDatamm = []
 }
 async function updi (){
+  console.log("updi")
 var resultString = needr.join('&id_in=');
 let linkpp ="https://i18.onrender.com/mashaabims?id_in=" + resultString ;
     const cookieValue = document.cookie

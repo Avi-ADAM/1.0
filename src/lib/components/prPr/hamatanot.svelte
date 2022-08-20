@@ -1,7 +1,10 @@
 <script>
 //טבלת מתנות כפתור מכירה מקפיץ תפריט של איפה הכסף יושב
+import Col from './column/main.svelte'
 import New from './newmatana.svelte';
 import Sale from './sale.svelte';
+	import dayjs from 'dayjs';
+
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
       import Halu from './whowhat.svelte';
@@ -16,25 +19,70 @@ export let bmiData = [];
  import { RingLoader
 } from 'svelte-loading-spinners';
 let fermatana = {};
+let ferdate = {};
 let arr =[];
+let arrt=[];
 export let salee = [];
 $: for (let i = 0; i < salee.length; i++){
-  console.log(fermatana);
-
    if (salee[i].matanot.name in fermatana) {
                     fermatana[salee[i].matanot.name] += salee[i].in
                    } else {
                     fermatana[salee[i].matanot.name] = salee[i].in
                    }
 }
-console.log(fermatana);
+$: for (let i = 0; i < salee.length; i++){
+   if (dayjs(salee[i].date) in ferdate) {
+       if (salee[i].matanot.name in ferdate[dayjs(salee[i].date)]) {
+                    ferdate[dayjs(salee[i].date)][salee[i].matanot.name] += salee[i].in
+                   } else {
+                    ferdate[dayjs(salee[i].date)][salee[i].matanot.name] = salee[i].in
+                   }
+                   } else {
+                    ferdate[dayjs(salee[i].date)] = {[salee[i].matanot.name]: salee[i].in}
+                   }
+console.log(ferdate)
+}
+$: if (salee.length > 0) {
+  for (const [key, value] of Object.entries(ferdate)) {
+    const datea = key
+    const ano = value
+    arrt.push({date:datea})
+    arrt = arrt
+const objIndex = arrt.findIndex((obj => obj.date == datea));
+
+    for (const [key, value] of Object.entries(ano)) {
+arrt[objIndex][key] = value
+}
+  }
+  const keys = arrt.reduce(
+  (acc, curr) => (Object.keys(curr).forEach((key) => acc.add(key)), acc),
+  new Set()
+);
+
+const output = arrt.map((item) =>
+  [...keys].reduce((acc, key) => ((acc[key] = item[key] ?? ""), acc), {})
+);
+
+output.sort(function(a,b){
+  return new Date(a.date) - new Date(b.date)
+})
+//formate to readble local date
+const x = output.map(obj => {
+  return {...obj, date: dayjs(obj.date).format('D.M.YYYY')};
+});
+arrt = x
+console.log(arrt)
+
+}
+arr = arr;
+
 $: if (salee.length > 0) {
 for (let key in fermatana) {
     if (fermatana.hasOwnProperty(key)) {
         arr.push( { key: key, value: fermatana[key] } );
     }
 }}
-arr = arr;
+
 export let projectUsers = [];
 let quant, each, maid;
 function sell(id, v, z){
@@ -78,7 +126,7 @@ let allin = 0;
 $: for (let i = 0; i < salee.length; i++){
   allin += salee[i].in
 }
-
+let arrc = [{year:2019,bananas:3840,cherries:1920,dates:960},{year:2020,bananas:380,cherries:920,dates:1960}]
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -310,21 +358,35 @@ $: for (let i = 0; i < salee.length; i++){
 <Halu  {trili} {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
 {/if}
     {/if}
+      </div>
+  </div>
+
  {#if salee.length > 0} 
  <div class="border-barbi border">
-   <h1 class="text-center text-barbi text-bold underline decoration-mturk">התפלגות המכירות</h1>
+   <h1 class="text-center text-barbi text-bold underline decoration-mturk">התפלגות המכירות לפי מוצר</h1>
 
 <div class="dff m-4">
- <Cir data={arr}/></div></div>
- {/if}
-  </div>
+ <Cir data={arr}/></div>
 
-  </div>
+</div>
+<div class="border-barbi border">
+   <h1 class="text-center text-barbi text-bold underline decoration-mturk">  התפלגות המכירות לפי תאריך</h1>
+
+<div class="dff m-2">
+ <Col data={arrt}/></div>
+</div>
+ {/if}
+
 
 
    
   <style>
     .dff{
+      width: 290px;
+      height: 290px;
+      margin: 0 auto;
+    }
+    .kff{
       width: 290px;
       height: 290px;
       margin: 0 auto;
@@ -441,8 +503,15 @@ border-radius: 4%;
 
   @media (min-width: 768px) {
      .dff{
-      width: 400px;
-      height: 400px;
+   
+            width: 82vw;
+      max-height: 100vh;
+      margin: 0 auto;
+    }
+     .kff{
+      min-width: 450px;
+      min-height: 450px;
+      max-width: 100vw;
       margin: 0 auto;
     }
   }

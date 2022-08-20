@@ -12,6 +12,11 @@ import preprocess from "svelte-preprocess";
       }
       )
     },
+   vite: {
+     optimizeDeps: {
+       include: ['just-throttle', 'dayjs']
+     }
+   },
     preprocess: [preprocess({
       "postcss": true
     })]

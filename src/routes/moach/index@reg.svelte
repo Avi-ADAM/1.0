@@ -187,7 +187,7 @@ JSON.stringify({query:
             projectName
             descripFor
             publicDescription
-            sales {id in matanot {name id} users_permissions_user {id username}}
+            sales {id in date matanot {name id} users_permissions_user {id username}}
             matanotof { id name price quant kindOf }
             finnished_missions {id missionName mesimabetahalich {created_at} created_at why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {id username}}
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
@@ -785,6 +785,7 @@ function clo () {
   totalneed = false
   addN = false;
   meDatamm = [];
+  needr = []
 }
 let noofopen = 2;
 

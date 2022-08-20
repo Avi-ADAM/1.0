@@ -728,6 +728,11 @@
   dependencies:
     "d3-color" "1 - 3"
 
+"d3-path@1 - 3":
+  "integrity" "sha512-gq6gZom9AFZby0YLduxT1qmrp4xpBA1YZr19OI717WIdKE2OM5ETq5qrHLb301IgxhLwcuxvGZVLeeWc/k1I6w=="
+  "resolved" "https://registry.npmjs.org/d3-path/-/d3-path-3.0.1.tgz"
+  "version" "3.0.1"
+
 "d3-scale@^4.0.2":
   "integrity" "sha512-GZW464g1SH7ag3Y7hXjf8RoUuAFIqklOAq3MRl4OaWabTFJY9PN/E1YklhXLh+OQ3fM9yS2nOkCoS+WLZ6kvxQ=="
   "resolved" "https://registry.npmjs.org/d3-scale/-/d3-scale-4.0.2.tgz"
@@ -738,6 +743,13 @@
     "d3-interpolate" "1.2.0 - 3"
     "d3-time" "2.1.1 - 3"
     "d3-time-format" "2 - 4"
+
+"d3-shape@^3.1.0":
+  "integrity" "sha512-tGDh1Muf8kWjEDT/LswZJ8WF85yDZLvVJpYU9Nq+8+yW1Z5enxrmXOhTArlkaElU+CTn0OTVNli+/i+HP45QEQ=="
+  "resolved" "https://registry.npmjs.org/d3-shape/-/d3-shape-3.1.0.tgz"
+  "version" "3.1.0"
+  dependencies:
+    "d3-path" "1 - 3"
 
 "d3-time-format@2 - 4":
   "integrity" "sha512-dJxPBlzC7NugB2PDLwo9Q8JiTR3M3e4/XANkreKSUxF8vvXKqm1Yfq4Q5dl8budlunRVlUUaDUgFt7eA8D6NLg=="
@@ -752,6 +764,11 @@
   "version" "3.0.0"
   dependencies:
     "d3-array" "2 - 3"
+
+"dayjs@^1.10.6":
+  "integrity" "sha512-CAdX5Q3YW3Gclyo5Vpqkgpj8fSdLQcRuzfX6mC6Phy0nfJ0eGYOeS7m4mt2plDWLAtA4TqTakvbboHvUxfe4iA=="
+  "resolved" "https://registry.npmjs.org/dayjs/-/dayjs-1.11.5.tgz"
+  "version" "1.11.5"
 
 "debug@^4.0.0", "debug@^4.2.0", "debug@^4.3.2", "debug@^4.3.4", "debug@~4.3.1", "debug@~4.3.2":
   "integrity" "sha512-PRWFHuSU3eDtQJPvnNY7Jcket1j0t5OuOsFzPPzsekD52Zl8qUfFIPEiswXqIvHWGVHOgX+7G/vCNNhehwxfkQ=="
@@ -1180,6 +1197,11 @@
     "universalify" "^2.0.0"
   optionalDependencies:
     "graceful-fs" "^4.1.6"
+
+"just-throttle@^2.3.1":
+  "integrity" "sha512-0H4miIAWZYpnpg7oD/Y/PBb77ISSHAETif5xK9EnwIgYCO6oC8ErkJxDumMUTR44shSOwptRIArRuvNuvN/hOw=="
+  "resolved" "https://registry.npmjs.org/just-throttle/-/just-throttle-2.3.1.tgz"
+  "version" "2.3.1"
 
 "kit-sw-workbox@^1.0.2":
   "integrity" "sha512-NOlJQFdmBpIhExfQSzv8vCS220CWFtSbnI2Xznu1Z3GfhXk3pmDHxaRsX53U3bvRAd+0qf6p8w0GJfxBCL9G5Q=="
@@ -2063,6 +2085,14 @@
   "integrity" "sha512-W3JVaPgLznHn297uTF32Ybp5FUYr7Mm9Geiu8zhQvOTIkLdo/iLpOeytTaD7U/8CdNFx8YWJayBCnAXJvxdLew=="
   "resolved" "https://registry.npmjs.org/svelte-accessible-dialog/-/svelte-accessible-dialog-2.1.3.tgz"
   "version" "2.1.3"
+
+"svelte-calendar@^3.1.6":
+  "integrity" "sha512-jOHiPlxBAa1LGVFQZoczdAGnCSI2RKcuQQHj32TjLbXO/P2Povx4JphPEcP7XjKj/s/jimBC6xQyFhyjD0vxbg=="
+  "resolved" "https://registry.npmjs.org/svelte-calendar/-/svelte-calendar-3.1.6.tgz"
+  "version" "3.1.6"
+  dependencies:
+    "dayjs" "^1.10.6"
+    "just-throttle" "^2.3.1"
 
 "svelte-cloudinary@^0.2.5":
   "integrity" "sha512-zKTuv/AmHOFVvdFLvp9hDJP1hYW/XVJ7JbCK80u93BWWNhHVOmJaSSgonfrxjfmVoV6Uu6h6LWzclzaMzLHqUg=="
