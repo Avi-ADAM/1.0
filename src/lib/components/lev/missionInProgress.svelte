@@ -664,7 +664,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
 >  
 <svg class="svgg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
    <style bx:fonts="Lobster Two">@import url("https://fonts.googleapis.com/css?family=Lobster+Two:700");</style>
-  <style type="text/css">#hours { stroke: cyan; }#hhand { fill: cyan; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } #texti { fill: cyan; stroke: purple; stroke-width: 0.75px; }</style>
+  <style type="text/css">#hours { stroke: cyan; }#hhand { fill: cyan; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: cyan; stroke: purple; stroke-width: 0.75px; }</style>
   <defs>
    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
     <feGaussianBlur stdDeviation="2 2" result="glow"/>

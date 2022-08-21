@@ -264,6 +264,7 @@ function ishursium(dati) {
                 pl: -2
             });
         }
+  console.log("ishursium",fiapp)
     }
     for (var k = 0; k < fiapp.length; k++) {
         const x = fiapp[k].users
@@ -1331,6 +1332,7 @@ onMount(async () => {
         goto("/", )
     }
 })
+let usernames
 const tolog = {"he": "תוקף ההתחברות שלך פג, אנו מעבירים אותך להתחברות מחדש", "en":"your connection is outdated you being redirected to login"}
 let walcomenold = [],
     hucaold = [],
@@ -1466,13 +1468,16 @@ async function start() {
             wegets = [];
             haluask = [];
             hachlatot = [];
+             usernames = miData.data.user.username;
             showOpenPro(miData);
             midd(miData);
             makeWalcom(miData);
             createasked(miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
             createpends(miData);
             mesimabetahalicha(miData);
+                                    console.log("mtaha")
             ishursium(miData);
+                        console.log("ishursium")
             sds(miData);
             pmash(miData)
             sps(miData)
@@ -2084,7 +2089,6 @@ function createpends(data) {
 }
 
 function coinLapach(event) {
-    console.log("im starting")
 
     // let oldob = arr1;
     //   const x = oldob.map(c => c.coinlapach);
@@ -2127,7 +2131,8 @@ function bubleUiAngin() {
     createD()
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart 
 }
-let u = "מסך הלב"
+const defaulti = {"he": "מסך הלב", "en": "heart of 1❤️1"}
+let u = defaulti[$lang]
 
 function hover(event) {
     u = event.detail.id
@@ -2137,10 +2142,11 @@ async function cardsi(event) {
     cards = event.detail.cards
     console.log(cards, "from papa")
 }
+const title = {"he": "לב 1❤️1", "en":"heart of 1❤️1"}
 </script>
 
 <svelte:head>
-    <title>לב 1❤️1</title>
+    <title>{title[$lang]}</title>
 </svelte:head>
 {#if low == true}
   <!--  <audio id="my_audio" src="https://res.cloudinary.com/love1/video/upload/v1655748801/thunder-25689_taqapa.mp3" loop="loop"></audio>-->

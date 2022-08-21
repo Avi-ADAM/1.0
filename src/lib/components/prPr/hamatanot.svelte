@@ -4,7 +4,7 @@ import Col from './column/main.svelte'
 import New from './newmatana.svelte';
 import Sale from './sale.svelte';
 	import dayjs from 'dayjs';
-
+  import { lang } from '$lib/stores/lang.js'
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
       import Halu from './whowhat.svelte';
@@ -128,6 +128,10 @@ $: for (let i = 0; i < salee.length; i++){
   allin += salee[i].in
 }
 let arrc = [{year:2019,bananas:3840,cherries:1920,dates:960},{year:2020,bananas:380,cherries:920,dates:1960}]
+const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
+const cencel = {"he":"ביטול","en": "cencel"}
+const errmsg = {"he": " אירעה שגיאה", "en":"error"}
+const trya = {"he": "לנסות שוב", "en":"try again"}
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -135,7 +139,7 @@ let arrc = [{year:2019,bananas:3840,cherries:1920,dates:960},{year:2020,bananas:
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>ביטול</button>
+          on:click={closer}>{cencel[$lang]}</button>
           {#if a == 0}
  <Sale {projectUsers} {each} {quant} {maid} on:doner={closer} on:done={sale} on:eror={()=>a=3}/>
           {:else if a == 1}
@@ -144,13 +148,13 @@ let arrc = [{year:2019,bananas:3840,cherries:1920,dates:960},{year:2020,bananas:
                     {:else if a == 2}
 
           <div class="sp bg-gold">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
+            <h3 class="text-barbi">{om[$lang]}</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> 
          {:else if a == 3}
-         <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
+         <h1>{errmsg[$lang]}</h1>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>{trya[$lang]}</button>
          {/if}
   </DialogContent>
   </div>
