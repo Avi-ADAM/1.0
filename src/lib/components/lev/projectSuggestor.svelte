@@ -193,7 +193,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    dispatch("hover", {id: u[$lang]});
 
 }
 function hoverede(){
@@ -245,7 +245,7 @@ function project () {
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    dispatch("hover", {id: u[$lang]});
 }
  import Cards from './cards/sugestmi.svelte'
 export let cards = false;
