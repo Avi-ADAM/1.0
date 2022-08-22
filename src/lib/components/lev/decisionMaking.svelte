@@ -300,11 +300,11 @@ function tochat () {
 }
  $: w = 0;
  $:h = 0
- let   u = "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה"
+ let u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
 
 function hover (id){
   if (id == "0"){
- u = "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה"
+ u = {"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
   } else {
     u = id
   }
@@ -314,20 +314,21 @@ function hover (id){
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
-    u = "לב המערכת"
+    u = {"he":"לב המערכת","en":"heart of 1❤️1"}
   } else {
- u = "הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה"
+ u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
+
   }
   dispatch("hover", {id: u});
  }
  
 function hoverc (event){
    if (event.detail.x == "0"){
- u = "הצבעה על בקשה לשיתוף משאב ברקמה"
+ u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    dispatch("hover", {id: u[$lang]});
 }
  import Card from './cards/hachlata.svelte'
 export let cards = false;
@@ -544,7 +545,6 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
                 <linearGradient gradientUnits="userSpaceOnUse" x1="1213.249935" y1="793.903076" x2="1213.249935" y2="811.70492" id="desgradient-8-10" xlink:href="#desgradient-8"/>
         </defs>
         <g transform="matrix(19.066547393799, 0, 0, 19.066547393799, 1419.042602539063, 424.105255126953)" style="">
-                <title>Blue round button</title>
                 <circle r="111.181753" transform="matrix(-0.026223942637, 0.026223942637, -0.026223942637, -0.026223942637, -7.506175056504, 22.850618366566)" style="fill: url(#desgradient-8-0); stroke: url(#deslinearGradient4172-4); stroke-linecap: round; stroke-width: 4.24264px; stroke-miterlimit: 13;"/>
                 <circle r="82.529025" transform="matrix(0.026223942637, -0.026223942637, 0.026223942637, 0.026223942637, -7.506175056504, 22.850618366566)" style="fill: url(#desgradient-8-1); stroke: url(#deslinearGradient4172-2);"/>
         </g>
@@ -563,7 +563,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
                 </g>
         </g>
         <path d="M 1275.254748 881.616379 Q 1277.371544 881.308248 1279.48834 881.616379 L 1280.975819 881.832903 Q 1283.092615 882.141034 1285.002205 883.035265 L 1286.344079 883.663644 Q 1288.253668 884.557875 1289.769127 885.950672 L 1290.834044 886.929395 Q 1292.349503 888.322192 1293.322488 890.077219 L 1294.006207 891.310481 Q 1294.979191 893.065508 1295.314459 895.010971 L 1295.550052 896.378053 Q 1295.88532 898.323515 1295.550052 900.268977 L 1295.314459 901.636059 Q 1294.979191 903.581522 1294.006207 905.336549 L 1293.322488 906.569811 Q 1292.349503 908.324838 1290.834044 909.717635 L 1289.769127 910.696358 Q 1288.253668 912.089155 1286.344079 912.983386 L 1285.002205 913.611765 Q 1283.092615 914.505996 1280.975819 914.814127 L 1279.48834 915.030651 Q 1277.371544 915.338782 1275.254748 915.030651 L 1273.767269 914.814127 Q 1271.650473 914.505996 1269.740883 913.611765 L 1268.399009 912.983386 Q 1266.48942 912.089155 1264.973961 910.696358 L 1263.909044 909.717635 Q 1262.393585 908.324838 1261.4206 906.569811 L 1260.736881 905.336549 Q 1259.763897 903.581522 1259.428629 901.636059 L 1259.193036 900.268977 Q 1258.857768 898.323515 1259.193036 896.378053 L 1259.428629 895.010971 Q 1259.763897 893.065508 1260.736881 891.310481 L 1261.4206 890.077219 Q 1262.393585 888.322192 1263.909044 886.929395 L 1264.973961 885.950672 Q 1266.48942 884.557875 1268.399009 883.663644 L 1269.740883 883.035265 Q 1271.650473 882.141034 1273.767269 881.832903 Z" style="stroke: url(#desgradient-2); stroke-miterlimit: 17; fill: url(#desgradient-1); stroke-width: 2px;" transform="matrix(-1, 1e-12, 2e-12, -1, 2553.297363280778, 1717.467407226184)" bx:shape="n-gon 1277.371544 898.323515 18.513776 17.015267 20 0.37 1@f7764595"/>
-           <foreignObject on:click={()=>linke("u")} on:mouseenter={()=>hover(oldob[$lang])} on:mouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
+           <foreignObject on:click={()=>linke("u")} on:mouseenter={()=>hover({"he":"הלוגו העכשווי", "en":"old Logo"})} on:mouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
                                                   <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
                                                         width='38px'
@@ -578,7 +578,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
             </foreignObject>
         <path transform="matrix(0.90,0,0,0.90,1275,872)" id="curveeuu" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
         <text  style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;" >
-            <textPath on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")} style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;"  class="curved-text" startOffset={st} xlink:href="#curveeuu">
+            <textPath on:mouseenter={()=>hover({"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"})} on:mouseleave={()=>hover("0")} style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;"  class="curved-text" startOffset={st} xlink:href="#curveeuu">
                 {openmissionName[$lang]}
             </textPath>
         </text>
@@ -654,15 +654,15 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 >
 
 <div class="{`normSmll${askId}-noo`}"></div>
-             <p style="margin-top: 10px;"><span on:mouseenter={()=>hover("בעד")} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{noofusersOk} </span><span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")} style="color:aqua">{noofusersWaiting} </span><span on:mouseenter={()=>hover("נגד")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" title="נגד">{noofusersNo} </span></p>
+             <p style="margin-top: 10px;"><span on:mouseenter={()=>hover({"he":"בעד", "en":"in favor"})} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{noofusersOk} </span><span on:mouseenter={()=>hover({"he":"לא הצביעו","en":"not voted yet"})} on:mouseleave={()=>hover("0")} style="color:aqua">{noofusersWaiting} </span><span on:mouseenter={()=>hover({"he":"נגד","en": "against"})} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{noofusersNo} </span></p>
 
                     <!--  <button on:click={tochat}><Chaticon/></button>-->
-                 {#if deadline}    <p on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
+                 {#if deadline}    <p on:mouseenter={()=>hover({"he":"תאריך הביצוע", "en": "date"})} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
               {#if low == false}
                  {#if already === false}
-            <button on:mouseenter={()=>hover("אישור")} on:mouseleave={()=>hover("0")} on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+            <button on:mouseenter={()=>hover({"he":"אישור", "en":"approve"})} on:mouseleave={()=>hover("0")} on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
-            <button on:mouseenter={()=>hover("דחיה")} on:mouseleave={()=>hover("0")} on:click={decline}  class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+            <button on:mouseenter={()=>hover({"he":"דחיה","en": "reject"})} on:mouseleave={()=>hover("0")} on:click={decline}  class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
          {:else if low == true}
           <Lowbtn/>

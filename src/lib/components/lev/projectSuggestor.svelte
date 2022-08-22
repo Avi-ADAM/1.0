@@ -185,11 +185,11 @@ const cookieValue = document.cookie
 
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
-let u = "הצעה להצטרפות לריקמה"
+let u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
 let hovered = false;
 function hover (id){
   if (id == "0"){
-u = "הצעה להצטרפות לריקמה"
+     u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
   } else {
     u = id
   }
@@ -199,11 +199,11 @@ u = "הצעה להצטרפות לריקמה"
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
-    u = "לב המערכת"
+    u = {"he":"לב המערכת","en": "heart of 1❤️1"}
   } else {
-u = "הצעה להצטרפות לריקמה"
+     u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
   }
-  dispatch("hover", {id: u});
+  dispatch("hover", {id: u[$lang]});
  }
  
 $: pcli = 0
@@ -241,7 +241,7 @@ function project () {
 })
   function hoverc (event){
    if (event.detail.x == "0"){
-u = " הצעה לביצוע משימה והצטרפות לריקמה"
+     u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
   } else {
     u = event.detail.x
   }
@@ -288,9 +288,9 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 	 id="normSml" 
 ><div class="{`normSml${oid}-${projectId}`}"></div>
 
-        <img on:click={()=>linke()} on:mouseenter={()=>hover(` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `)} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
-        <button on:click={()=>linke()} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  ><h7 class="hover:text-lturk pn" >{projectName}</h7></button>
-        <h1 on:mouseenter={()=>hover("שם המשימה המוצעת")} on:mouseleave={()=>hover("0")} style="color: rgb(87, 208, 248 ); " class="lt">{missionName}</h1>
+        <img on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
+        <button on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")}  ><h7 class="hover:text-lturk pn" >{projectName}</h7></button>
+        <h1 on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")} style="color: rgb(87, 208, 248 ); " class="lt">{missionName}</h1>
         {#if total} <p class="lt">{total}</p>{/if}
    
 </div>
@@ -298,16 +298,16 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   ><SwiperSlide class="swiper-slideg"
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-    <div class="ltn ab d ">  {#each skills as skill}<p style="text-shadow:none;" on:mouseenter={()=>hover("הכישורים הנדרשים")} on:mouseleave={()=>hover("0")}  ><span class="bg-gold rounded-full pl-1 pr-1 opacity-60">{skill.skillName}</span></p>{/each}
+    <div class="ltn ab d ">  {#each skills as skill}<p style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")}  ><span class="bg-gold rounded-full pl-1 pr-1 opacity-60">{skill.skillName}</span></p>{/each}
 </div> 
-   {#if deadLine} <h5 on:mouseenter={()=>hover("תאריך אחרון לביצוע")} on:mouseleave={()=>hover("0")} class="lt bc">{deadLine}</h5>{/if}
-    <h4 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
-    <p on:mouseenter={()=>hover("תפקיד מבוקש")} on:mouseleave={()=>hover("0")} class="ltn de d">{role.map(d=> d.roleDescription).join(' ')}</p>
+   {#if deadLine} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{deadLine}</h5>{/if}
+    <h4 on:mouseenter={()=>hover({"he":"פרטי המשימה","en":"mission details"})} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
+    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="ltn de d">{role.map(d=> d.roleDescription).join(' ')}</p>
 {#if low == false}
     {#if already === false}
-    <button on:mouseenter={()=>hover("אני רוצה")} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+    <button on:mouseenter={()=>hover({"he":"אני רוצה","en":"yes I want"})} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
    <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
-   -->  <button on:mouseenter={()=>hover("לא מתאים לי")} on:mouseleave={()=>hover("0")}  on:click={decline(oid)} class="btn b" name="decline" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+   -->  <button on:mouseenter={()=>hover({"he":"לא מתאים לי", "en": "not for me"})} on:mouseleave={()=>hover("0")}  on:click={decline(oid)} class="btn b" name="decline" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
     {/if}
      {:else if low == true}
           <Lowbtn/>
