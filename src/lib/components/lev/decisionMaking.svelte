@@ -308,7 +308,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    dispatch("hover", {id: u[$lang]});
 
 }
 function hoverede(){
@@ -319,7 +319,7 @@ function hoverede(){
  u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
 
   }
-  dispatch("hover", {id: u});
+  dispatch("hover", {id: u[$lang]});
  }
  
 function hoverc (event){
