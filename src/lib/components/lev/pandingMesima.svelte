@@ -186,7 +186,7 @@ async function agree(alr) {
   noofusersWaiting -= 1;
   ser = xyz();
       }
-    const date = (mdate !== undefined) ? ` sqadualed: ${mdate}` : ``;
+    const date = (mdate !== undefined) ? ` sqadualed: "${mdate}"` : ``;
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -683,9 +683,9 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
 	         <h3 class="ab na"
  on:mouseenter={()=>hover("לחיצה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}>{projectName}</h3>
 </button>   
- <p on:mouseenter={()=>hover("תיאור")} on:mouseleave={()=>hover("0")} class="pnn bc d">{descrip !== undefined && descrip !== null ? descrip : ""}</p>
+ <p on:mouseenter={()=>hover("תיאור")} on:mouseleave={()=>hover("0")} class="pnn bc d">{descrip !== undefined && descrip != null  && descrip != "null" ? descrip : ""}</p>
    {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="pnn cd d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
+     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="pnn cd d">{hearotMeyuchadot !== undefined && hearotMeyuchadot != null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if}
     {#if low == false}
       {#if already === false && allr === false}

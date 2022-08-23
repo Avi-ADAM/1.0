@@ -202,7 +202,7 @@ async function start () {
             profilePic {url formats }
             projects_1s { id projectName} 
             skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}} 
-            sps (where: {archived: false }) {id  name}
+            sps (where: {archived: false }) {id  name panui}
             tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
             vallues {id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
             work_ways {id workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}}

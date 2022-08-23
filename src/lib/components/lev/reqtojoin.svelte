@@ -1,6 +1,7 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto, prefetch } from '$app/navigation';
+	import dayjs from 'dayjs';
 
   import {
     clickOutside
@@ -182,7 +183,7 @@ async function agree() {
      noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
-    const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
+    const date = (deadline !== undefined) ? ` admaticedai: "${deadline}"` : ``;
         const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -627,7 +628,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   > <SwiperSlide class="swiper-slideg"
     > <div  id="normSmll"
 >
-        {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{deadline.toLocaleDateString()}</h5>{/if}
+        {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{dayjs(deadline).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
          {#if missionDetails}   <h6 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="hslink bc">{missionDetails}</h6>{/if}
         
   <h5 on:mouseenter={()=>hover("תפקיד")} on:mouseleave={()=>hover("0")} class="hslink cd">{role}</h5>

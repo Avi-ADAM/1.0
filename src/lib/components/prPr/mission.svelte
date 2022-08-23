@@ -151,7 +151,7 @@ pendq = ` users: [
 const nhours = (element.nhours > 0) ? element.nhours : 0;
 const valph = (element.valph > 0) ? element.valph : 0;
 const date = (element.date !== undefined) ? ` sqadualed: "${new Date(element.date).toISOString()}",` : ``;
-const dates = (element.dates !== undefined) ? ` sqadualed: "${new Date(element.dates).toISOString()}",` : ``;
+const dates = (element.dates !== undefined) ? ` dates: "${new Date(element.dates).toISOString()}",` : ``;
 const pb = (element.publicklinks !== undefined || element.publicklinks !== "undefined") ? element.publicklinks : "";
 const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefined") ? element.privatlinks : "";
 
@@ -197,7 +197,7 @@ const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefi
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-             dispatch('close');
+             dispatch('close',{md:miDatan});
         } catch (e) {
             error1 = e
         }

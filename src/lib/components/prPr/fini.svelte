@@ -185,8 +185,8 @@ meData[i].totaltotal =  meData[i].easy;
                  meData[i].m = false;
           meData[i].r = false;
     kc = true;
-    meData[i].total = meData[i].hm * meData[i].price;
-meData[i].totaltotal = meData[i].hm * meData[i].easy;
+   // meData[i].total = meData[i].hm * meData[i].price;
+//meData[i].totaltotal = meData[i].hm * meData[i].easy;
   } else if (meData[i].kindOf === "total"){
         meData[i].y = false;
     meData[i].kc = false;
@@ -407,25 +407,25 @@ let fir,ssec;
       <td>{#if data.spnot}
  {data.spnot}{/if}</td>
         {/each}
-  </tr> <tr>
+  </tr><!-- <tr>
       <th>עלות</th>
       {#each meData as data, i}
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
-  <h2>{data.price}</h2>  
+  <h2>{data.price.toFixed(2)}</h2>  
   {/each}
-    </tr><tr>
+    </tr>--><tr>
       <th>שווי מקסימלי לחישוב בריקמה</th>
       {#each meData as data, i}
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
-        {data.agprice}
+        {data.agprice.toFixed(2)}
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >
       <th>עלות סה"כ</th>
       {#each meData as data, i}
       <td  >
-      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.total}</h3>
+      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.total.toFixed(2)}</h3>
       {/each}
     </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>

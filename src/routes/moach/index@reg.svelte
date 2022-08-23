@@ -189,7 +189,7 @@ JSON.stringify({query:
             publicDescription
             sales {id in date matanot {name id} users_permissions_user {id username}}
             matanotof { id name price quant kindOf }
-            finnished_missions {id missionName mesimabetahalich {created_at} created_at why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {id username}}
+            finnished_missions {id missionName start finish mesimabetahalich {created_at} created_at why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {id username}}
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches (where:{finnished: false}) {
@@ -735,11 +735,12 @@ let openMA = false;
 let cencel1 = {"he":"סגירה", "en":"close"};
 
 let openMS = false;
-
+const fnnn = {"he": "המשימה נשלחה בהצלחה","en":"mission has sent "}
 function close () {
   showvd = false;
   addM = false;
   blabla = []
+   addToast(`${fnnn[$lang]}`, 'info');
 }
 let meDatamm = [];
 async function updi (){
