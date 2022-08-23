@@ -72,9 +72,9 @@
                 generation
             });
 			
-			const from = moment(fmiData[i].mesimabetahalich.created_at)
+			const from = moment(fmiData[i].mesimabetahalich.created_at)//todo first timer start
             
-            const to = moment(fmiData[i].created_at)
+            const to = moment(fmiData[i].created_at)//todo last timer end
             tasks.push({
                 type: 'task',
                 id: `${fmiData[i].id}.4`,

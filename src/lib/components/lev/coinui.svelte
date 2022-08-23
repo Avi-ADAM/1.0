@@ -75,7 +75,7 @@ let h = 500;
 {#each adder as add }
    {@html add}
  {/each}
-
+{#key arr1}
 {#each arr1 as buble, i}
 {#if buble.ani === "haluk" && milon.desi == true} 
  <div class:normSml={modal == false} class=" halu"><Hal  
@@ -139,9 +139,8 @@ let h = 500;
  on:user={user}
         on:coinLapach={delo}
            on:modal={modali}  
-
-            coinlapach={buble.coinlapach} 
-                 messege={buble.messege}
+    coinlapach={buble.coinlapach} 
+   messege={buble.messege}
         mysrc={buble.mysrc}
         mypos={buble.mypos}
         diun={buble.diun}
@@ -486,7 +485,7 @@ let h = 500;
                 /></div>
 {/if}
 {/each}
-
+{/key}
 <!--
         <div  class="normSml desi" style="display:'';"><DecisionMaking  decisionName={"?לפתוח קבוצת ווצאפ"} projectName={"פסיפס"} projectId={6}/></div> 
     <div class="normSml desi"><DecisionMaking decisionName={"?מה לבנות קודם"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"} deadLine={"10.7.2021"}/></div> 

@@ -331,6 +331,7 @@ function crMaap(hh) {
                         omid: start[i].maaps[j].open_mashaabim.id,
                         askId: start[i].maaps[j].id,
                         users: start[i].maaps[j].vots,
+                        hm: start[i].maaps[j].sp.unit,
                         openName: start[i].maaps[j].sp.name,
                         easy: start[i].maaps[j].open_mashaabim.easy,
                         price: start[i].maaps[j].open_mashaabim.price,
@@ -1360,7 +1361,7 @@ async function start() {
                                      open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy }
                                       project {projectName id user_1s {id} profilePic {url formats }}
                                        users_permissions_user {haskama username id profilePic {url formats } } }
-              sps {id name price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ declinedsps { id } id price descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
+              sps {id name unit price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ declinedsps { id } id price hm descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
                             profilePic {url formats }}}}} 
               mesimabetahaliches  (where:{forappruval: false, finnished: false }){
              id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai mission {id}
@@ -1395,7 +1396,7 @@ async function start() {
     profilePic {url formats } 
     decisions (where: {archived: false}) {id kind created_at newpic {url formats id } vots  {what why id order users_permissions_user {id}}}
     tosplits (where: {finished: false}) {id name vots  {what why id users_permissions_user {id}}}              
-    maaps(where:{archived: false }){id created_at name  sp{id name myp users_permissions_user { username id profilePic {url formats } }}
+    maaps(where:{archived: false }){id created_at name  sp{id name myp unit users_permissions_user { username id profilePic {url formats } }}
                  open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
     pmashes (where:{archived: false }){ id hm  sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id username profilePic {url}} order }  users  { what order why id users_permissions_user {id username profilePic {url}}}} 
     open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
@@ -1694,6 +1695,7 @@ function sps(pp) {
                 const z = pp.data.user.sps[i].mashaabim.open_mashaabims[t].project;
                 const declineddarra = pp.data.user.sps[i].mashaabim.open_mashaabims[t].declinedsps.map(c => c.id)
                 if (!declineddarra.includes(y.id)) {
+                    if(x.hm <= y.unit){
                     huca.push({
                         declineddarra: declineddarra,
                         projectid: z.id,
@@ -1713,6 +1715,7 @@ function sps(pp) {
                         pl: 6
                     })
                 }
+            }
             }
         }
     }
@@ -1863,7 +1866,7 @@ function pmash(data) {
     }
     pmashd = pmashes.length;
   localStorage.setItem("pmashd", pmashd);
-
+    console.log(pmashes)
 }
 
 function sds(mta) {
@@ -2129,6 +2132,7 @@ function bubleUiAngin() {
     localStorage.setItem("betha", JSON.stringify(xy));
 
     createD()
+    console.log(arr1)
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart 
 }
 const defaulti = {"he": "מסך הלב", "en": "heart of 1❤️1"}
