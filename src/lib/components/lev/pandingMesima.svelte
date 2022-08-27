@@ -797,7 +797,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
     grid-template-rows: auto auto auto auto auto;
     }
   .pnn{
-  color:aqua;
+  color:rgb(233, 239, 239);
    margin: 2px;
     font-size: 8px; 
    line-height: 0.7; 
@@ -809,7 +809,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
      font-size: 8px; 
      line-height: 1; 
      font-weight: bold;
-     color: aqua;
+     color: rgb(233, 239, 239);
   }
   .p{
     margin: 2px;
@@ -819,11 +819,11 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   margin: 2px;
    font-size: 9px;
     font-weight: bold;
-     color: rgb(87, 208, 248 ); 
+     color: rgb(233, 239, 239); 
     line-height: 0.7; 
   }
   .na{
-    color:aqua;
+    color:rgb(233, 239, 239);
       font-size: 8px;
        line-height: 1;
      font-weight: bold;

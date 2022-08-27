@@ -650,7 +650,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 
     }
   .pnn{
-  color:aqua;
+  color:var(--gold);
 
     font-weight: bold; 
    line-height: 0.7; 
@@ -659,7 +659,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
       padding: 0 9px;
 
      font-weight: bold;
-     color: aqua;
+     color: var(--gold);
   }
   .p{
     font-weight: bold;

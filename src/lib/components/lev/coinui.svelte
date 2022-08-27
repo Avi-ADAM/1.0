@@ -667,9 +667,14 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
    z-index: 998;
 }
     .screen{
-      perspective: 1000px;
+   /*   perspective: 1000px;
 background-color: #000000;
-background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);*/
+/* Created with https://www.css-gradient.com */
+background: #60B9B6;
+background: -webkit-radial-gradient(center, #60B9B6, #0F0248, #050117 );
+background: -moz-radial-gradient(center, #60B9B6, #0F0248, #050117);
+background: radial-gradient(ellipse at center, #60B9B6, #0F0248, #050117);
         display: grid;
         grid-template-columns: repeat(6, 1fr);
                 grid-template-rows: repeat(4, 1fr);
@@ -922,8 +927,8 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 }
     .screen{
         padding:20px 20px;
-       background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) ;
-        background-size: cover;
+    /*   background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) ;
+        background-size: cover;*/
         height: 100vh !important;
         display: grid;
         grid-template-columns: repeat(8, 1fr);

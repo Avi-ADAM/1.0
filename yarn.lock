@@ -43,6 +43,37 @@
   dependencies:
     "tslib" "^2.1.0"
 
+"@event-calendar/common@^0.11.2", "@event-calendar/common@~0.11.2":
+  "integrity" "sha512-UGo4PsgeAG1xIhlonUFfRRXC9tC+aqhV2qdg6qRzzRxxx2UBtoRkvmyqj2ip4SpBj32aB3QS8Y9oJGUZeakp7A=="
+  "resolved" "https://registry.npmjs.org/@event-calendar/common/-/common-0.11.2.tgz"
+  "version" "0.11.2"
+  dependencies:
+    "svelte" "^3.47.0"
+
+"@event-calendar/core@^0.11.2":
+  "integrity" "sha512-BBQ+K1tE92VfASzD5d36rH5WZRD02dMR5aD/mPoJ8fQ1IM7ccxH4mHm7NHK3JYTmtBKCjhhIM/Q0Ri6BawFdOA=="
+  "resolved" "https://registry.npmjs.org/@event-calendar/core/-/core-0.11.2.tgz"
+  "version" "0.11.2"
+  dependencies:
+    "@event-calendar/common" "~0.11.2"
+    "svelte" "^3.47.0"
+
+"@event-calendar/day-grid@^0.11.2":
+  "integrity" "sha512-z5Zk/HMJAy4+Br5bdHn8EelNVzih5QSPz0vQ4NGAcjMfiwcOLpGu+utJ4Jez2KW+8AYpyp93yAaIkSrPkaXn9g=="
+  "resolved" "https://registry.npmjs.org/@event-calendar/day-grid/-/day-grid-0.11.2.tgz"
+  "version" "0.11.2"
+  dependencies:
+    "@event-calendar/common" "~0.11.2"
+    "svelte" "^3.47.0"
+
+"@event-calendar/time-grid@^0.11.2":
+  "integrity" "sha512-EK8kFc87kTUjB1t7bu9LpK+CrSs1tiRLB5EUGrh1gJExXQmsxtuBZWNOgusoyq1GgusruO7kh590RugYeuI7jQ=="
+  "resolved" "https://registry.npmjs.org/@event-calendar/time-grid/-/time-grid-0.11.2.tgz"
+  "version" "0.11.2"
+  dependencies:
+    "@event-calendar/common" "~0.11.2"
+    "svelte" "^3.47.0"
+
 "@fontsource/fira-mono@^4.5.7":
   "integrity" "sha512-sFuSPB/Km8B1fy3CH0NqO5Nb4GmVMzp3XFaw6MwK293xhm3OnB68QJawwTTjLewcrS78wOTAhTUB058qxurJoQ=="
   "resolved" "https://registry.npmjs.org/@fontsource/fira-mono/-/fira-mono-4.5.8.tgz"
@@ -2190,6 +2221,11 @@
   dependencies:
     "@sveltekit-i18n/base" "1.2.1"
     "@sveltekit-i18n/parser-default" "1.0.3"
+
+"svelty-picker@^3.0.0":
+  "integrity" "sha512-Qn3ie5LyeQwPiDHSOxVp+bNl09sVFbhFK6ALIaTOUcqlpK8hOPEdpup2ND5SOpfMamw4Ubqpa02hlRRNmgMA0A=="
+  "resolved" "https://registry.npmjs.org/svelty-picker/-/svelty-picker-3.0.0.tgz"
+  "version" "3.0.0"
 
 "svgo@^2.7.0":
   "integrity" "sha512-+N/Q9kV1+F+UeWYoSiULYo4xYSDQlTgb+ayMobAXPwMnLvop7oxKMo9OzIrX5x3eS4L4f2UHhc9axXwY8DpChg=="

@@ -290,8 +290,8 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 ><div class="{`normSml${oid}-${projectId}`}"></div>
 
         <img on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")} class="img" src={src}  alt="logo">
-        <button on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")}  ><h7 class="hover:text-lturk pn" >{projectName}</h7></button>
-        <h1 on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")} style="color: rgb(87, 208, 248 ); " class="lt">{missionName}</h1>
+        <button on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")}  ><h7 class="text-lturk pn" >{projectName}</h7></button>
+        <h1 on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")} style="color: rgb(233, 239, 239); " class="lt">{missionName}</h1>
         {#if total} <p class="lt">{total}</p>{/if}
    
 </div>

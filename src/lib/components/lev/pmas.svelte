@@ -799,7 +799,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
 
     }
   .pnn{
-  color:aqua;
+  color:rgb(233, 239, 239);
 
     font-weight: bold; 
    line-height: 0.7; 
@@ -808,7 +808,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
       padding: 0 9px;
 
      font-weight: bold;
-     color: aqua;
+     color: rgb(233, 239, 239);
   }
   .p{
     font-weight: bold;
@@ -816,11 +816,11 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
   }
   .mn{
     font-weight: bold;
-     color: rgb(87, 208, 248 ); 
+     color: rgb(233, 239, 239); 
     line-height: 0.7; 
   }
   .na{
-    color:aqua;
+    color:rgb(233, 239, 239);
        line-height: 1;
      font-weight: bold;
   }

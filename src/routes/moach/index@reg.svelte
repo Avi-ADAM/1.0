@@ -1,4 +1,5 @@
 <script>
+  import Sidur from '$lib/components/prPr/sidur/sidur.svelte'
   import { addToast } from 'as-toast';
   import Pub from '$lib/celim/icons/pub.svelte'
   //	import { draw } from 'svelte/transition';
@@ -391,8 +392,7 @@ async function callbackFunction(event) {
 	};    
 }
 async function findiM() {
-  var resultString = li.join('&id_in=');
- let link ="https://i18.onrender.com/missions?id_in=" + resultString ;
+  let res = []
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -408,18 +408,35 @@ async function findiM() {
           throw resp;
         });
       };
+      let linkg ="https://i18.onrender.com/graphql" ;
         try {
-            const res = await fetch(link, {
-              method: 'GET',
+             await fetch(linkg, {
+              method: 'POST',
+       
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-            }).then(checkStatus)
-          .then(parseJSON);
-            miData = res;
-        } catch (e) {
-            error1 = e
+        body: 
+        JSON.stringify({query: 
+          `{  missions (where:{id: ${li}}){ id
+          descrip missionName 
+         skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+
+  tafkidims { id roleDescription  ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+
+  work_ways { id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
+
+        } }`
+        })
+ })
+  .then(r => r.json())
+  .then(data => res = data);
+   miData = res.data.missions
+               console.log(miData)  
+
+    } catch (e) {
+            console.log(e)  
         }
 };
 
@@ -1124,6 +1141,8 @@ const editpic = {"he":"עריכת תמונת הפרופיל של הריקמה", 
  const editd = {"he": "עריכת פרטי ריקמה", "en":"edit FreeMates details"}
 const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view FreeMates public page"}
 const tower = {"he": "לינק לאתר", "en": "link to website"}
+const sidd = {"he": "סידור משמרות","en": "shifts sqadual"}
+let sid = false
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -1487,6 +1506,14 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
                                      on:remove={wdwd}
     />{/if}</div>
 </div>
+{#if sid == false}
+<button on:click={()=>sid = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via">{sidd[$lang]}</button>
+{:else if sid == true}
+<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 80vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 186, 222, 0.8); " class="d">
+<Sidur />
+</div>
+{/if}
+
     <div class=" p-2">
       <Hamatanot {trili} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>

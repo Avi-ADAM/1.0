@@ -1,7 +1,13 @@
 <script>
+  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+      import {  fly } from 'svelte/transition';
+        import Close from '$lib/celim/close.svelte'
+  import SveltyPicker from 'svelty-picker'
+  
+  let myDate = '11:00';
     import MultiSelect from 'svelte-multiselect';
-   import axios from 'axios';
-   import Addnewro from '../addnew/addNewRole.svelte';
+    import { lang } from '$lib/stores/lang.js'
+    import Addnewro from '../addnew/addNewRole.svelte';
    import { createEventDispatcher } from 'svelte';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   import AddNewWorkway from '../addnew/addnewWorkway.svelte';
@@ -70,6 +76,8 @@ export let roles = [];
      };
     export let vallues = [];
     let idL;
+    console.log(miData);
+
     let miDatan = [];
 let linkop;
 let pendq = '';
@@ -227,6 +235,10 @@ function myMission ()  {
   idL = cookieValueId;
   rishon = idL;
 }    
+function shifter ()  {
+  isOpen = true;
+  console.log("", days)
+}
 function myMissionH ()  {
  // Get the checkbox
  var checkBox = document.getElementById("done");
@@ -420,9 +432,137 @@ dispatch('addneww', {
     skob: skob,
     } );
 };
+let isOpen = false;
+const closer = () => {
+    isOpen = false;
+};
+const isshi = {"he":"האם זו משימת משמרות?","en":"is it shifts mission? "}
+const editsi = {"he":"עריכת סידור המשמרות", "en": "edit shifts"}
+let days = [{"name" :{"he": "ראשון", "en": "Sunday"}, id: 1, st: "11:00", cl: "17:00", shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
+            ,{"name" :{"he": "שני", "en": "Monday"}, id: 2, st: "11:00", cl: "17:00",shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
+            ,{"name" :{"he": "שלישי", "en": "Tuesday"}, id: 3, st: "11:00", cl: "17:00",shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
+            ,{"name" :{"he": "רביעי", "en": "Wednesday"}, id: 4, st: "11:00", cl: "17:00",shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
+            ,{"name" :{"he": "חמישי", "en": "Thursday"}, id: 5, st: "11:00", cl: "17:00", shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
+            ,{"name" :{"he": "שישי", "en": "Friday"}, id: 6, st: "11:00", cl: "17:00", shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
+            ,{"name" :{"he": "שבת", "en": "Saturday"}, id: 7, st: null, cl: null, shiftp:0, shifts:[]}];
+const headingd = {"he":"יום בשבוע","en": "week day"};
+const headinga = {"he":"שעת פתיחה","en": "opening hour"};
+const headingb = {"he":"שעת סגירה","en": "closing hour"};
+const headingc = {"he":"מספר המשמרות","en": "number of shifts"};
+const headinge = {"he":"שעת פתיחת משמרת","en": "starting hour for shift"};
+const headingf = {"he":"שעת סגירת משמרת","en": "finishing hour for shift"};
+const headingr = {"he":"מספר הפרטים במשמרת","en": "shift partisipant number"};
+let shift = [{"ii": 1}];
+let shifts = 1
+function shifterr (o){
+    days[o].shifts.push({st: "11:00", cl: "17:00",ii:1})
+  days = days
 
+ for (let i = 0; i< days.length; i++ ){
+    if (days[i].shiftp > shifts){
+      shifts = days[i].shiftp
+      shift = [...Array(shifts).fill(0).map(x => ({ ii: ''}))]
+
+    }
+  }
+   shift = shift
+  console.log(days,shift)
+}
 
   </script>
+
+  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+        <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 1000}}>
+  <DialogContent aria-label="form" class="contenti">
+      <div style="z-index: 400; overflow-x: auto;" dir="rtl" class="d" >
+             <button class=" hover:bg-barbi text-mturk rounded-full"
+          on:click={closer}><Close/></button>
+  
+ <table dir="rtl" class="d" style="overflow-x: auto; font-size: 95%;">
+    <caption class="sm:text-right md:text-center text-right ">  
+      <h1 class="md:text-center text-2xl md:text-2xl font-bold"
+      >{editsi[$lang]}</h1>
+    </caption>
+       <tr class="gg">
+          <th class="gg ddd">{headingd[$lang]}</th>
+                    {#each days as day}
+          <td class="gg" style="font-size: 1rem">{day.name[$lang]}</td>
+          {/each}
+        </tr>
+        
+         <tr >
+          <th class="ddd">{headinga[$lang]}</th>
+                              {#each days as day}
+
+          <td  ><SveltyPicker inputClasses="form-control" format="hh:ii" bind:value={day.st}></SveltyPicker>
+</td>
+          {/each}
+        </tr>
+         <tr >
+          <th class="ddd">{headingb[$lang]}</th>
+                              {#each days as day}
+
+          <td ><SveltyPicker inputClasses="form-control" format="hh:ii" bind:value={day.cl}></SveltyPicker></td>
+{/each}
+        </tr>
+        <tr >
+          <th class="ddd">{headingc[$lang]}</th>
+                              {#each days as day, i}
+
+          <td > <div dir="rtl" class='textinput'>
+  <input type="number"  id={`shif${i}`} on:change="{()=>shifterr(i)}" name="parti" bind:value={day.shiftp} class='input' required>
+  <label for="{`shif${i}`}" class='label'>{headingc[$lang]}</label>
+  <span class='line'></span>
+</div></td>
+{/each}
+        </tr>
+
+       {#each shift as shi, t}
+  <tr >
+          <th class="ddd">{headinge[$lang]}</th>
+                              {#each days as day, i}
+          {#if day.shifts[t] != undefined}
+
+          <td  ><SveltyPicker inputClasses="form-control" format="hh:ii" bind:value={day.shifts[t].st}></SveltyPicker></td>
+          {:else}
+          <td  ></td>      
+          {/if}
+   {/each}
+        </tr>
+         <tr >
+          <th class="ddd">{headingf[$lang]}</th>
+                              {#each days as day, i}
+                    {#if day.shifts[t] != undefined}
+     <td ><SveltyPicker inputClasses="form-control" format="hh:ii" bind:value={day.shifts[t].cl}></SveltyPicker></td>
+       {:else}
+          <td  ></td>  
+     {/if}
+          {/each}
+        </tr>
+        <tr >
+          <th class="ddd">{headingr[$lang]}</th>
+                              {#each days as day, i}
+                    {#if day.shifts[t] != undefined}
+          <td style="font-size: 3rem">
+             <div dir="rtl" class='textinput'>
+  <input type="number"  id={`part${i}`} name="part"  bind:value={day.shifts[t].ii} class='input' required>
+  <label for="{`part${i}`}" class='label'>{headingr[$lang]}</label>
+  <span class='line'></span>
+</div>
+          </td>
+            {:else}
+          <td  ></td>  
+                    {/if}
+{/each}
+        </tr>
+
+        {/each}
+
+</table>
+</DialogContent>
+  </div>
+</DialogOverlay>
+
 
   {#if error1 !== null}
   {error1}
@@ -475,7 +615,7 @@ dispatch('addneww', {
               {#each data.skills as da, i}
                <button class="p-2 m-1" title={less} on:click={minSkill(da.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{da.skillName}   </button>
+            </svg>{$lang == "en" ? da.skillName : da.localizations[0].skillName}</button>
               {/each}
               </td>
             {/each}
@@ -499,7 +639,7 @@ dispatch('addneww', {
               {#each data.tafkidims as ta, i}
               <button class="p-2 m-1" title={less} on:click={minrole(ta.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{ta.roleDescription}</button>
+            </svg>{$lang == "en" ? ta.roleDescription : ta.localizations[0].roleDescription}</button>
             {/each}
             </td>
             {/each}
@@ -525,7 +665,7 @@ dispatch('addneww', {
               {#each data.work_ways as dm, i}
                <button class="p-2 m-1" title={less} on:click={minww(dm.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{dm.workWayName}   </button>
+            </svg>{$lang == "en" ? dm.workWayName : dm.localizations[0].workWayName}   </button>
               {/each}
               </td>
             {/each}
@@ -591,7 +731,7 @@ dispatch('addneww', {
           {#each miData as data, i}
           <td>
                                              <div dir="rtl" class='textinput'>
-  <input type="number" placeholder="0" id="hoursn" name="hoursn"  bind:value={data.nhours} class='input' required>
+  <input type="number"  id="hoursn" name="hoursn"  bind:value={data.nhours} class='input' required>
   <label for="hoursn" class='label'>כמה שעות זה אמור לקחת? </label>
   <span class='line'></span>
 </div>
@@ -602,14 +742,34 @@ dispatch('addneww', {
           {#each miData as data, i}
           <td>
                            <div dir="rtl" class='textinput'>
-  <input type="number"  id="vallueperhourn" name="vallueperhourn" placeholder="0"
+  <input type="number"  id="vallueperhourn" name="vallueperhourn" 
                                             bind:value={data.valph} class='input' required>
   <label for="vallueperhourn" class='label'>כמה שווה שעה? </label>
   <span class='line'></span>
 </div>
           </td>
           {/each}
-        </tr><!--<tr>
+        </tr>
+        <tr>
+          <th>{isshi[$lang]}</th>
+          {#each miData as data, i}
+          <td>
+            <input
+            bind:checked={data.isshif} 
+            type="checkbox" id="isss" name="is" value="no" on:click={()=> shifter()}>
+            <label for="isss">{isshi[$lang]}</label>
+          </td>
+          {/each}
+    </tr>
+    <tr style="display:''" id="ophour">
+          <th >כמה שעות זה אמור לקחת? </th>
+          {#each miData as data, i}
+          <td>
+        <button >{editsi[$lang]}</button>
+          </td>
+          {/each}
+        </tr>
+        <!--<tr>
           <th>השמת המשימה לעצמי</th>
           {#each miData as data, i}
           <td>
@@ -693,7 +853,19 @@ dispatch('addneww', {
   
    
   <style>
-    
+    .ddd{
+       position: sticky;
+     right: 1px ; 
+    }
+       :global([data-svelte-dialog-content].contenti) {
+      background-color:rgba(rgb(247, 250, 36), 0.5);
+      width: 90vw;
+  }
+  @media (min-width: 768px){
+        :global([data-svelte-dialog-content].contenti) {
+width:90vw;
+        }
+        }
   textarea::-webkit-resizer {
   border-width: 8px;
   border-style: solid;
