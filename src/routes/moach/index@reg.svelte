@@ -1165,7 +1165,7 @@ let sid = false
   <DialogContent aria-label="form" class="content">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}><Close/></button>
+          on:click={closer} title={cencel1[$lang]}><Close/></button>
           {#if a == 0}
           <Uplad on:message={allbackFunction}/>
           {:else if a == 1}
@@ -1509,6 +1509,8 @@ let sid = false
 {#if sid == false}
 <button on:click={()=>sid = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via">{sidd[$lang]}</button>
 {:else if sid == true}
+  <button class=" hover:bg-barbi text-mturk rounded-full"
+          on:click={()=>sid = false} title={cencel1[$lang]}><Close/></button>
 <div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 80vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 186, 222, 0.8); " class="d">
 <Sidur />
 </div>

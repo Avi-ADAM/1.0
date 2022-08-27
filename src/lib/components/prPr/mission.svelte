@@ -455,6 +455,7 @@ const headingr = {"he":"מספר הפרטים במשמרת","en": "shift partisi
 let shift = [{"ii": 1}];
 let shifts = 1
 function shifterr (o){
+  //todo reduce and adding 2 together, not to mention v a l i d a t i o n
     days[o].shifts.push({st: "11:00", cl: "17:00",ii:1})
   days = days
 
@@ -519,7 +520,7 @@ function shifterr (o){
 
        {#each shift as shi, t}
   <tr >
-          <th class="ddd">{headinge[$lang]}</th>
+          <th class="ddd">{headinge[$lang]} {t+1}</th>
                               {#each days as day, i}
           {#if day.shifts[t] != undefined}
 
@@ -530,7 +531,7 @@ function shifterr (o){
    {/each}
         </tr>
          <tr >
-          <th class="ddd">{headingf[$lang]}</th>
+          <th class="ddd">{headingf[$lang]} {t+1}</th>
                               {#each days as day, i}
                     {#if day.shifts[t] != undefined}
      <td ><SveltyPicker inputClasses="form-control" format="hh:ii" bind:value={day.shifts[t].cl}></SveltyPicker></td>
@@ -540,7 +541,7 @@ function shifterr (o){
           {/each}
         </tr>
         <tr >
-          <th class="ddd">{headingr[$lang]}</th>
+          <th class="ddd">{headingr[$lang]} {t+1}</th>
                               {#each days as day, i}
                     {#if day.shifts[t] != undefined}
           <td style="font-size: 3rem">
@@ -555,7 +556,7 @@ function shifterr (o){
                     {/if}
 {/each}
         </tr>
-
+<hr>
         {/each}
 
 </table>
