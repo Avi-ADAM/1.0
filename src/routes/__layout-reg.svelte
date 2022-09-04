@@ -71,8 +71,9 @@ function login () {
 <main >
   <slot></slot>
   <Tour TourTip={TourTip}></Tour>
+<span style:z-index="9999">
   <Toasts />
-
+</span>
 </main>
 {:else}
 <div class="a  bg-gradient-to-br from-gra to-grb">

@@ -1455,7 +1455,7 @@ let sid = false
         </div>
                  {/if}
 {#if showvd == true}<Mission 
-{newcontent} {newcontentR} {newcontentW} 
+{newcontent} {newcontentR} {newcontentW} pu={projectUsers}
                                 userslength={projectUsers.length}
                                  workways2 ={workways2}
                                  skills2={skills2}
@@ -1511,7 +1511,7 @@ let sid = false
 {:else if sid == true}
   <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={()=>sid = false} title={cencel1[$lang]}><Close/></button>
-<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 80vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 186, 222, 0.8); " class="d">
+<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 242, 222, 0.8); " class="d">
 <Sidur />
 </div>
 {/if}

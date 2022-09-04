@@ -54,15 +54,25 @@ function find_workway_id(workway_arr){
       }
       return arr;
      };
-
+ function find_user_id(user_name_arr){
+     var  id = 0;
+      for (let i = 0; i< pu.length; i++){
+        if(pu[i].username === user_name_arr[0]){
+          id = pu[i].id
+        }
+      }
+      return id;
+     };
 const placeholder = `סוג המשימה`;
 let selected = [];
-const placeholder1 = `בחירת כל הכישורים הרלוונטיים`;
+const placeholder1 = {"he":"בחירת כל הכישורים הרלוונטיים","en":"choose more skills"};
 export let skills2 = [];
 let selected1 = [];
 export let roles = [];
     let selected3;
-   const placeholder4 = 'בחירת תפקידים נדרשים';
+   const placeholder5 ={"he": 'בחירת תפקיד', "en": "choose mission role"};
+      const pll ={"he": 'בחירה של 1', "en": "choose FreeMates member"};
+
    function find_skill_id(skill_name_arr){
      var  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
@@ -77,7 +87,7 @@ export let roles = [];
     export let vallues = [];
     let idL;
     console.log(miData);
-
+let miDatana = [];
     let miDatan = [];
 let linkop;
 let pendq = '';
@@ -105,7 +115,9 @@ console.log(miData);
   console.log(idL);
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-  if (userslength > 1) {
+
+  for (const element of miData) {
+      if (userslength > 1) {
 linkop = "createPendm";
  qwerys = "pendm";
 pendq = ` users: [
@@ -118,12 +130,15 @@ pendq = ` users: [
   linkop = "createOpenMission"; 
   qwerys = "openMission";
 }
-  for (const element of miData) {
-     if (element.myM === true){
-        rishon4= `rishon: "${rishon}"`
+     if (element.myM === true && userslength > 1){
+        rishon4= `rishon: "${element.rishon}",
+                  archived: true`
+          linkop = "createOpenMission"; 
+        qwerys = "openMission";
+        pendq = ``
         //create asked or in progres if alone
         //as
-        if (userslength === 1) {
+      /*  if (userslength === 1) {
          
         } else {
           //ליצור אופן ואז לחלץ אידי וליצור אסקד
@@ -138,7 +153,7 @@ pendq = ` users: [
   ){
     ask {id}
   }`
-        }
+        }*/
     } else {
         rishon4 = ``;
     }
@@ -195,7 +210,7 @@ const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefi
              ${dates}
              ${rishon4}
              ${rishonves4}
-                         ${pendq} 
+             ${pendq} 
 
       }
     }
@@ -205,6 +220,48 @@ const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefi
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+                  console.log(element.myM,userslength )
+
+         if(element.myM === true && userslength > 1){
+                   console.log("miDatan")
+
+          let lechaletz = miDatan.data.createOpenMission.openMission.id
+          let link = 'https://i18.onrender.com/graphql';
+    try {
+             await fetch(link, {
+              method: 'POST',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query:
+          `mutation {  
+  createAsk(
+    input: {
+      data:{ open_mission: ${lechaletz},
+            project: ${projectId},
+            users_permissions_user: ${element.rishon},
+            vots: [
+     {
+      what: true
+      users_permissions_user: "${idL}"
+    }
+  ]
+    }
+    }
+  ){
+    ask {id}
+  }
+  }`    
+} )})
+  .then(r => r.json())
+  .then(data => miDatana = data);
+         console.log(miDatana)
+                } catch (e) {
+            error1 = e
+        }
+         }
              dispatch('close',{md:miDatan});
         } catch (e) {
             error1 = e
@@ -214,30 +271,36 @@ const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefi
 
 };
 
+export let pu = [];
 
 let cencel = " ביטול"
 let addS = false;
 let rishon = 0;
 let rishonves = 0;
-function myMission ()  {
- var checkBox = document.getElementById("tomeC");
-  var text = document.getElementById("doneC");
-  console.log(text);
-  if (text.style.display == "none"){
-    text.style.display = "";
-  } else {
-    text.style.display = "none";
+function myMission (mid,use)  {
+  if (use != idL){
+
   }
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
-  rishon = idL;
+ //var checkBox = document.getElementById("tomeC");
+ // var text = document.getElementById("doneC");
+ // console.log(text);
+ // if (text.style.display == "none"){
+ //   text.style.display = "";
+ // } else {
+ //   text.style.display = "none";
+ // }
+ // const cookieValueId = document.cookie
+ // .split('; ')
+ // .find(row => row.startsWith('id='))
+ // .split('=')[1];
+ // idL = cookieValueId;
+ // rishon = idL;
 }    
-function shifter ()  {
+function shifter (a)  {
+  if (a == true){
   isOpen = true;
   console.log("", days)
+  }
 }
 function myMissionH ()  {
  // Get the checkbox
@@ -616,7 +679,7 @@ function shifterr (o){
               {#each data.skills as da, i}
                <button class="p-2 m-1" title={less} on:click={minSkill(da.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{$lang == "en" ? da.skillName : da.localizations[0].skillName}</button>
+            </svg>{$lang == "en" ? da.skillName : da.localizations.length > 0 ?  da.localizations[0].skillName :  da.skillName }</button>
               {/each}
               </td>
             {/each}
@@ -626,7 +689,7 @@ function shifterr (o){
             <td> <MultiSelect
               loading={newcontent}
               bind:selected={data.selected2}
-              {placeholder1}
+              placeholder={placeholder1[$lang]}
               options={skills2.map(c => c.skillName)}
               on:change={addSK(data.selected2, data.id)}
               />
@@ -640,7 +703,7 @@ function shifterr (o){
               {#each data.tafkidims as ta, i}
               <button class="p-2 m-1" title={less} on:click={minrole(ta.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{$lang == "en" ? ta.roleDescription : ta.localizations[0].roleDescription}</button>
+            </svg>{$lang == "en" ? ta.roleDescription : ta.localizations.length > 0 ?  ta.localizations[0].roleDescription : ta.roleDescription }</button>
             {/each}
             </td>
             {/each}
@@ -652,7 +715,7 @@ function shifterr (o){
               loading={newcontentR}
               bind:selected={data.selected3}
               on:add={(event) => console.log(event)}
-              {placeholder4}
+              placeholder={placeholder5[$lang]}
               options={roles.map(c => c.roleDescription)}
               on:change={addR(data.selected3, data.id)}
               />
@@ -666,7 +729,7 @@ function shifterr (o){
               {#each data.work_ways as dm, i}
                <button class="p-2 m-1" title={less} on:click={minww(dm.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{$lang == "en" ? dm.workWayName : dm.localizations[0].workWayName}   </button>
+            </svg>{$lang == "en" ? dm.workWayName : dm.localizations.length > 0 ?  dm.localizations[0].workWayName : dm.workWayName}   </button>
               {/each}
               </td>
             {/each}
@@ -757,40 +820,56 @@ function shifterr (o){
           <td>
             <input
             bind:checked={data.isshif} 
-            type="checkbox" id="isss" name="is" value="no" on:click={()=> shifter()}>
+            type="checkbox" id="isss" name="is" value="no" on:change={()=> shifter(data.isshif)}>
             <label for="isss">{isshi[$lang]}</label>
           </td>
           {/each}
     </tr>
-    <tr style="display:''" id="ophour">
-          <th >כמה שעות זה אמור לקחת? </th>
+    <tr >
+          <th > {editsi[$lang]}</th>
           {#each miData as data, i}
-          <td>
-        <button >{editsi[$lang]}</button>
+          {#if data.isshif == true}
+          <td style="display:''" id="ophour">
+        <button on:click={()=> shifter(data.isshif)}>{editsi[$lang]}</button>
           </td>
+          {/if}
           {/each}
         </tr>
-        <!--<tr>
-          <th>השמת המשימה לעצמי</th>
+       <!-- <tr>
+          <th>להשים את המשימה או לחפש</th>
           {#each miData as data, i}
           <td>
             <input
             bind:checked={data.myM} 
-            type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
-            <label for="tome">השמת המשימה לעצמי</label>
+            type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> data.rishon == idL}>
+            <label for="tome">השמת המשימה</label>
           </td>
           {/each}
-    </tr><tr>
-          <th>השמת המשימה ל-1 מהריקמה שלי</th>
+    </tr>-->
+    {#if userslength > 1}
+    <tr>
+          <th>השמת המשימה ל- <br> אם ריק: תיווצר לריקמה משרה פנויה</th>
           {#each miData as data, i}
           <td>
+             <MultiSelect
+              bind:selected={data.rishoni}
+              placeholder={pll[$lang]}
+              options={pu.map(c => c.username)}
+              maxSelect={1}
+              on:change={function(){
+                data.rishon = find_user_id(data.rishoni) 
+                data.myM = true
+              }}
+              /><!--
             <input
             bind:checked={data.myM} 
             type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
-            <label for="tome">השמת המשימה ל-1 </label>
+            <label for="tome">השמת המשימה ל-1 </label>-->
           </td>
           {/each}
-    </tr><tr style="display:none" id="doneC" >
+    </tr>
+    {/if}
+    <!--<tr style="display:none" id="doneC" >
       <th>ביצעתי כבר את המשימה</th>
       {#each miData as data, i}
       <td>
