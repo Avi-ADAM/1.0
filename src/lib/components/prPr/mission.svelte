@@ -95,6 +95,7 @@ let qwerys =``;
 let rishon4 = ``;
 let rishonves4 = ``;
 let already = false;
+let toadd = ``;
 async function increment() {
   already = true;
   // ולידציה שהיוזר חבר ברקמה מהקוקיות ומאקספורט של רשימת חברים
@@ -129,10 +130,12 @@ pendq = ` users: [
 } else if (userslength === 1) {
   linkop = "createOpenMission"; 
   qwerys = "openMission";
+  toadd = `isRishon: false`
 }
      if (element.myM === true && userslength > 1){
         rishon4= `rishon: "${element.rishon}",
-                  archived: true`
+                  archived: true,
+                  isRishon: true`
           linkop = "createOpenMission"; 
         qwerys = "openMission";
         pendq = ``
@@ -211,7 +214,7 @@ const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefi
              ${rishon4}
              ${rishonves4}
              ${pendq} 
-
+            ${toadd}
       }
     }
   ) {${qwerys}{id project{id }}}

@@ -1019,7 +1019,7 @@ async function showOpenPro(mi) {
                     },
                     body: JSON.stringify({
                         query: `{openMissions (where: {id_in: [${resultString}]}){ id
-            project { id projectName profilePic {url formats }}
+            project { id projectName timeToP profilePic {url formats }}
             sqadualed
             tafkidims {roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
             skills {skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
@@ -1364,7 +1364,7 @@ async function start() {
               sps {id name unit price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ declinedsps { id } id price hm descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
                             profilePic {url formats }}}}} 
               mesimabetahaliches  (where:{forappruval: false, finnished: false }){
-             id stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai mission {id}
+             id status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai mission {id}
               project{projectName id user_1s {id}
                             profilePic {url formats }}}
             welcom_tops (where:{clicked: false }){

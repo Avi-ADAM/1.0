@@ -8,7 +8,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 	import dayjs from 'dayjs';
 
  const dispatch = createEventDispatcher();
-     export let low = false;
+     export let low = false
+     export let timeToP = "more"
 
 export let coinlapach;
     export let deadLine;
@@ -260,6 +261,16 @@ function claf (event){
     decline(oid)
   }
 }
+const ttal = {"he":"נכנס כבר כסף","en":"already has income"}
+const ttwe = {"he":"צפי רווח: שבוע","en":"exp income: one week "}
+const ttmo = {"he":"צפי רווח: חודש","en":"exp income: one month "}
+const tt3mo = {"he":"צפי רווח: 3 חודשים","en":"exp income: three months"}
+const tt6mo = {"he":"צפי רווח: חצי שנה","en":"exp income: 6 months "}
+const tt1y = {"he":"צפי רווח: שנה","en":"exp income: 1 year"}
+const tt2y = {"he":"צפי רווח: שנתיים","en":"exp income: 2 years "}
+const ttmor = {"he":"צפי רווח: ארוך טווח","en":"exp income: long term"}
+const ttne = {"he":"ללא רווח","en":"not profitable"}
+
 </script>
 {#if cards == false}
 <div
@@ -293,6 +304,25 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
         <button on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")}  ><h7 class="text-lturk pn" >{projectName}</h7></button>
         <h1 on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")} style="color: rgb(233, 239, 239); " class="lt">{missionName}</h1>
         {#if total} <p class="lt">{total}</p>{/if}
+        {#if timeToP == "alreadi"}
+          <p>{ttal[$lang]}</p>
+         {:else if timeToP == "week"} 
+          <p>{ttwe[$lang]}</p>
+          {:else if timeToP == "month"} 
+          <p>{ttmo[$lang]}</p>
+           {:else if timeToP == "threeM"} 
+          <p>{tt3mo[$lang]}</p>
+           {:else if timeToP == "sixM"} 
+          <p>{tt6mo[$lang]}</p>   
+           {:else if timeToP == "oneY"} 
+          <p>{tt1y[$lang]}</p> 
+         {:else if timeToP == "twoY"} 
+          <p>{tt2y[$lang]}</p>   
+         {:else if timeToP == "more"} 
+          <p>{ttmor[$lang]}</p>   
+          {:else if timeToP == "never"} 
+          <p>{ttne[$lang]}</p>                      
+        {/if}
    
 </div>
 </SwiperSlide

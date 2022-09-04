@@ -1142,7 +1142,10 @@ const editpic = {"he":"עריכת תמונת הפרופיל של הריקמה", 
 const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view FreeMates public page"}
 const tower = {"he": "לינק לאתר", "en": "link to website"}
 const sidd = {"he": "סידור משמרות","en": "shifts sqadual"}
+const gann = {"he": "לוח המשימות שלנו ","en": "our mission board"}
+
 let sid = false
+let gan = false
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -1315,7 +1318,11 @@ let sid = false
   {#await meData}
   <div>..</div>
   {:then meData}
-  
+   {#if gan == false}
+<button on:click={()=>gan = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via">{gann[$lang]}</button>
+{:else if gan == true}
+  <button class="bg-gold hover:bg-barbi text-barbi hover:text-gold border  border-barbi  font-bold  rounded"
+          on:click={()=>gan = false} title={cencel1[$lang]}><Close inl={true}/></button>
   {#if pmiData.length > 0}
     <button
      class="border  border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
@@ -1337,7 +1344,10 @@ let sid = false
      class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-mpink  text-pinki hover:text-barbi font-bold px-4 rounded"
     on:click={tofinish}> פעולות שהסתיימו</button>
     {/if}
+   <div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 242, 222, 0.8); " class="d">
   <Gantt {bmiData} {pmiData} {omiData} {fmiData} on:selected={openTheDesc}/>
+</div>
+{/if}
 {/await}
 </div>
 <div class=" m-4 ">

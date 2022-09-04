@@ -109,7 +109,7 @@ let h = 500;
  on:user={user}  
   on:hover={hover}
      on:modal={() =>modal = true}  
-
+   status={buble.status}
   tx={buble.tx}
       coinlapach={buble.coinlapach} 
     usernames={buble.usernames}
@@ -436,6 +436,7 @@ let h = 500;
             on:hover={hover}
       on:proj={proj}
  on:user={user}
+ timeToP={buble.timeToP}
      coinlapach={buble.coinlapach} 
       askedarr={askedarr}
       {declineddarr}
