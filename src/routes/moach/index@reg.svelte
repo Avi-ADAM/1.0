@@ -1,4 +1,5 @@
 <script>
+  import Bethas from '$lib/components/prPr/bethas.svelte'
   import Sidur from '$lib/components/prPr/sidur/sidur.svelte'
   import { addToast } from 'as-toast';
   import Pub from '$lib/celim/icons/pub.svelte'
@@ -194,7 +195,9 @@ JSON.stringify({query:
             rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
              user_1s {id username profilePic {url formats}}
               mesimabetahaliches (where:{finnished: false}) {
-             id created_at hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {id username}}
+             id status                          
+              tafkidims {id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+               created_at hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {id username profilePic {url }}}
             open_missions (where:{archived: false }) { id name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {id}
@@ -1143,9 +1146,11 @@ const publicp = {"he":"לעמוד הציבורי של הריקמה", "en": "view
 const tower = {"he": "לינק לאתר", "en": "link to website"}
 const sidd = {"he": "סידור משמרות","en": "shifts sqadual"}
 const gann = {"he": "לוח המשימות שלנו ","en": "our mission board"}
+    const bet = {"he":"משימות בתהליך ביצוע","en":"mission in progress"}
 
 let sid = false
 let gan = false
+let bett = false;
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -1525,7 +1530,16 @@ let gan = false
 <Sidur />
 </div>
 {/if}
-
+<br> <br>
+{#if bett == false}
+<button on:click={()=>bett = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via">{bet[$lang]}</button>
+{:else if bett == true}
+  <button class=" hover:bg-barbi text-mturk rounded-full"
+          on:click={()=>bett = false} title={cencel1[$lang]}><Close/></button>
+<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 94vh; overflow-y: auto; overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); " class="d">
+<Bethas {bmiData} />
+</div>
+{/if}
     <div class=" p-2">
       <Hamatanot {trili} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>

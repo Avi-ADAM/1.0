@@ -1,0 +1,125 @@
+<script>
+    import { lang } from '$lib/stores/lang.js'
+    import Tile from '$lib/celim/tile.svelte'
+    export let bmiData = [];
+    
+    console.log (bmiData);
+    const hed = {"he":"משימות בתהליך ביצוע","en":"mission in progress"}
+    const nam = {"he":"שם המשימה ", "en":"mission name"}
+    const who = {"he":" על ידי", "en":"by"}
+    const pro = {"he":"אחוז ביצוע", "en":"progress"}
+    const hd = {"he":"שעות שהושמו/ בוצעו", "en":"hours asigned/ done"}
+    const sho = {"he": "שווי המשימה", "en": "mission vallue"}
+    const ro = {"he": "תפקיד", "en": "role"}
+</script>
+
+<section dir={$lang == "he" ? "rtl": "ltr"}>
+  <h1>{hed[$lang]}</h1>
+  <div class="tbl-header">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <thead>
+        <tr>
+          <th>{nam[$lang]}</th>
+          <th>{who[$lang]}</th>
+          <th>{pro[$lang]}</th>
+          <th>{hd[$lang]}</th>
+          <th>{sho[$lang]}</th>
+            <th>{ro[$lang]}</th>
+        </tr>
+      </thead>
+    </table>
+  </div>
+  <div class="tbl-content d">
+    <table cellpadding="0" cellspacing="0" border="0">
+      <tbody>
+        {#each bmiData as data, i}
+        <tr>
+          <td>{data.name}</td>
+          <td> 
+        <div class="flex items-center space-x-4">
+           <img data-tooltip-target="tooltip-jese" class="w-10 h-10 rounded-full" src="{data.users_permissions_user.profilePic.url}" alt="Medium avatar">
+        <div class="font-large dark:text-white">
+        <div>{data.users_permissions_user.username}</div>
+    </div>    
+        </div>
+        </td>
+          <td>
+              <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+    <div class="bg-barbi text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {data.status == null ? 0 : data.status}%">{data.status == null ? 0 : data.status}%</div>
+  </div>
+          </td>
+          <td>{data.howmanyhoursalready == null ? 0 : data.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})}/{data.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</td>
+          <td>{(data.hoursassinged * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</td>
+          <td>
+            {#each data.tafkidims as taf, i} 
+            <Tile bg="green" word="{taf.roleDescription}"/>
+            {/each}
+</td>
+        </tr>
+       {/each}
+      </tbody>
+    </table>
+  </div>
+</section>
+
+
+
+<style>
+    
+h1{
+  font-size: 30px;
+  color: #fff;
+  text-transform: uppercase;
+  font-weight: 300;
+  text-align: center;
+  margin-bottom: 15px;
+}
+table{
+  width:100%;
+  table-layout: fixed;
+}
+.tbl-header{
+  background-color: rgba(255,255,255,0.3);
+ }
+.tbl-content{
+  height:300px;
+  overflow-x:auto;
+  margin-top: 0px;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+th{
+  padding: 20px 15px;
+  text-align: center;
+  font-weight: 500;
+  font-family: gan,powerr;
+  font-size: 12px;
+  color: #fff;
+  text-transform: uppercase;
+}
+td{
+  padding: 15px;
+  text-align: center;
+  vertical-align:middle;
+  font-weight: 300;
+  font-size: 12px;
+  color: #fff;
+  border-bottom: solid 1px rgba(255,255,255,0.1);
+}
+
+
+/* demo styles */
+
+@import url(https://fonts.googleapis.com/css?family=Roboto:400,500,300,700);
+/*
+section{
+  margin: 50px;
+}*/
+
+
+
+
+
+
+/* for custom scrollbar for webkit browser*/
+
+</style>

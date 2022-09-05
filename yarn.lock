@@ -2183,6 +2183,11 @@
     "sorcery" "^0.10.0"
     "strip-indent" "^3.0.0"
 
+"svelte-range-slider-pips@^2.0.3":
+  "integrity" "sha512-43zYhIZtGZywiS0nJPAFDfQipDz8Hs2lpj6gVU8WbC+NSu0Lu8VINHjDazeLpoa9X/3rMlaVGT2lPO2aTfLc6w=="
+  "resolved" "https://registry.npmjs.org/svelte-range-slider-pips/-/svelte-range-slider-pips-2.0.3.tgz"
+  "version" "2.0.3"
+
 "svelte-scrollto@^0.2.0":
   "integrity" "sha512-l4K2E4jr6dXCODtZDCkpp/TzknVVoq8gecHM0UOOmihvLosczdyLuyDUhZ+U2HkhLWi7nnimuOstZSFKtXSpmA=="
   "resolved" "https://registry.npmjs.org/svelte-scrollto/-/svelte-scrollto-0.2.0.tgz"

@@ -24,6 +24,7 @@ import "../app.postcss";
 
 <main>
 	<slot />
-  
+ <span style:z-index="99999">
 <Toasts />
+ </span>
 </main>

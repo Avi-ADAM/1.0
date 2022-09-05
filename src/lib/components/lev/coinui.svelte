@@ -442,6 +442,8 @@ let h = 500;
       {declineddarr}
       deadLine = {buble.sqadualed}
       oid = {buble.id}
+      hst = {buble.hst}
+      stb = {buble.stb}
               projectName = {buble.project.projectName}
                 role ={buble.tafkidims}
               skills ={ buble.skills} 

@@ -1037,7 +1037,9 @@ async function showOpenPro(mi) {
             meData.data
             for (var i = 0; i < meData.length; i++) {
                 meData[i].ani = "meData",
-                    meData[i].pl = 10 + i
+                    meData[i].pl = 10 + i,
+                    meData[i].hst = checkHst(meData[i].project.projectName)
+                    meData[i].stb = checkStb(meData[i].name)
             }
 
         } catch (e) {
@@ -1075,6 +1077,42 @@ async function showOpenPro(mi) {
         }
     }
 };
+function checkStb (dat){
+    let hst
+    if (dat.length < 4){
+        hst = 165
+    } else if (dat.length < 5){
+        hst = 180
+    } else if (dat.length < 8){
+        hst = 185
+    } else if (dat.length < 16){
+        hst = 200
+    } else if (dat.length < 24){
+        hst = 240
+    } else if (dat.length < 32){
+        hst = 250
+    }
+    return hst
+}
+function checkHst (dat){
+    let hst
+    if (dat.length < 4){
+        hst = 160
+    } else if (dat.length < 5){
+        hst = 170
+    } else if (dat.length < 8){
+        hst = 190
+    } else if (dat.length < 16){
+        hst = 195
+    } else if (dat.length < 24){
+        hst = 260
+    } else if (dat.length < 32){
+        hst = 285
+    }
+    return hst
+}
+
+
 // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו 
 let tyu = false
 let nam = ""

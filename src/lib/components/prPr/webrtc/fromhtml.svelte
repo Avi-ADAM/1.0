@@ -10,6 +10,7 @@
         </style>
 
         <script>
+            //sepback C:\\Users\\babay\\OneDrive\\BED7~1\\septback
             import { io } from "socket.io-client";
             import { browser } from '$app/env';
             /** CONFIG **/
