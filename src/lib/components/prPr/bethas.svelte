@@ -1,6 +1,25 @@
 <script>
     import { lang } from '$lib/stores/lang.js'
     import Tile from '$lib/celim/tile.svelte'
+    import { onMount } from 'svelte';
+    let xx = {}
+onMount(async () => {
+    let counter = 0;
+    let colors = ["blue", "green", "yellow", "red", "purple", "indigo","pink" , "gray"];
+    for (var i = 0; i <bmiData.length; i++){
+        for (var j = 0; j < bmiData[i].tafkidims.length; j++){
+            if (bmiData[i].tafkidims[j].id in xx) {
+                  bmiData[i].tafkidims[j].color =  xx[bmiData[i].tafkidims[j].id] 
+                   } else {
+                    xx[bmiData[i].tafkidims[j].id] = colors[counter]
+                    bmiData[i].tafkidims[j].color =  colors[counter]
+
+                    counter < 8 ? counter += 1 : counter = 0;
+                   }
+        }
+    }
+})
+
     export let bmiData = [];
     
     console.log (bmiData);
@@ -52,7 +71,7 @@
           <td>{(data.hoursassinged * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</td>
           <td>
             {#each data.tafkidims as taf, i} 
-            <Tile bg="green" word="{taf.roleDescription}"/>
+            <Tile bg={taf.color} word="{$lang == "en" ? taf.roleDescription : taf.localizations.length > 0 ?  taf.localizations[0].roleDescription : taf.roleDescription }"/>
             {/each}
 </td>
         </tr>
