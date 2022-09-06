@@ -317,6 +317,7 @@ let h = 500;
             on:proj={proj}
      on:user={user}
             on:decline={delo}
+            role={buble.role}
                 coinlapach={buble.coinlapach} 
             pid={buble.pid}
             noofusersWaiting={buble.noofusersWaiting}

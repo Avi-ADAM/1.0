@@ -22,7 +22,7 @@ export let coinlapach
 export let deadline
 export let projectName;
 export let openmissionName;
-export let role;
+export let role = [];
 export let skills;
 export let useraplyname;
 export let src = "coin.png";
@@ -183,6 +183,8 @@ async function agree() {
      noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
+               const tafkidimsa = role.map(c => c.id);
+
     const date = (deadline !== undefined) ? ` admaticedai: "${deadline}"` : ``;
         const cookieValue = document.cookie
         .split('; ')
@@ -252,6 +254,7 @@ input: {
              privatlinks: "${privatlinks}",
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
+              tafkidims: [${tafkidimsa}],
             ${date}
                   }
     }
@@ -317,6 +320,7 @@ ${adduser}
              privatlinks: "${privatlinks}",
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
+             tafkidims: [${tafkidimsa}],
             ${date}
                   }
     }

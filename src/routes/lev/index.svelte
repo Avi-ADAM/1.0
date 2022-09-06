@@ -476,6 +476,7 @@ async function createasked(da) {
                 missionDetails: start[i].asks[j].open_mission.descrip,
                 nhours: start[i].asks[j].open_mission.noofhours,
                 perhour: start[i].asks[j].open_mission.perhour,
+                role: start[i].asks[j].open_mission.tafkidims,
                 missId: start[i].asks[j].open_mission.mission.id,
                 deadline: start[i].asks[j].open_mission.sqadualed,
                 openName: start[i].asks[j].open_mission.name,
@@ -1445,7 +1446,7 @@ async function start() {
                           sp { id price myp }}
     asks (where:{archived: false }){ id
                                     vots  {what why id users_permissions_user {id}}
-                                     open_mission { id mission {id} declined { id} sqadualed publicklinks noofhours perhour privatlinks descrip hearotMeyuchadot name}
+                                     open_mission { id mission {id} declined { id} sqadualed publicklinks tafkidims { id } noofhours perhour privatlinks descrip hearotMeyuchadot name}
                                       project {projectName id user_1s {id} profilePic {url formats }}
                                        users_permissions_user { username id profilePic {url formats } } }
     finiapruvals (where:{archived: false}) {
