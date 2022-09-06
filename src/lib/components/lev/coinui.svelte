@@ -437,7 +437,7 @@ let h = 500;
             on:hover={hover}
       on:proj={proj}
  on:user={user}
- timeToP={buble.timeToP}
+ timeToP={buble.project.timeToP}
      coinlapach={buble.coinlapach} 
       askedarr={askedarr}
       {declineddarr}
