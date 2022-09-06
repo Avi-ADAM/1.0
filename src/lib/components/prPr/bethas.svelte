@@ -109,7 +109,7 @@ onMount(async () => {
           <td>{data.name}</td>
           <td> 
         <div class="flex items-center space-x-4">
-           <img data-tooltip-target="tooltip-jese" class="w-10 h-10 rounded-full" src="{data.users_permissions_user.profilePic.url}" alt="Medium avatar">
+           <img data-tooltip-target="tooltip-jese" class="sm:w-10 sm:h-10 w-7 h-7 rounded-full" src="{data.users_permissions_user.profilePic.url}" alt="Medium avatar">
         <div class="font-large dark:text-white">
         <div>{data.users_permissions_user.username}</div>
     </div>    
