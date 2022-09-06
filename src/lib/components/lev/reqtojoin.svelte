@@ -185,7 +185,7 @@ async function agree() {
   ser = xyz();
                const tafkidimsa = role.map(c => c.id);
 
-    const date = (deadline !== undefined) ? ` admaticedai: "${deadline}"` : ``;
+    const date = (deadline !== undefined && deadline != null) ? ` admaticedai: "${deadline}"` : ``;
         const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))

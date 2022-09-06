@@ -980,7 +980,8 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   ><SwiperSlide class="swiper-slideg"
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-    <div class="ltn ab d ">  {#each skills as skill}<p style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")}  ><span class="bg-gold rounded-full pl-1 pr-1 opacity-60">{skill.skillName}</span></p>{/each}
+    <div class="ltn ab d " style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")} >  
+      {#each skills as skill}<span class="bg-gold font-semibold opacity-80 inline-flex items-center mr-2 px-2.5 py-0.5 rounded">{skill.skillName}</span>{/each}
 </div> 
    {#if deadLine != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
     <h4 on:mouseenter={()=>hover({"he":"פרטי המשימה","en":"mission details"})} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
@@ -1032,7 +1033,11 @@ on:project={project}
   .ab{
         grid-column: 1/4;
         grid-row: 1/ 2;
-        margin-top: 18px;
+        margin-top: 10px;
+        max-height: 70%;
+        max-width: 100%;
+        padding: 0 10%;
+        overflow-y: auto;
     }
     .bc{
         grid-column: 1/4;
