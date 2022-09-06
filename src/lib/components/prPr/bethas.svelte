@@ -39,18 +39,19 @@ onMount(async () => {
     let ohh = false;
     function sot(x , y){
         if (y == true && ohh == false|| ohh == true && y == false){
-            ohh = true;
         let soret = soter.map(c => c.id)
         let index = soret.indexOf(x)
         soter[index].closei = false;
         soter[index].openi = true;
+        if (y == true && ohh == false){
         for (var i = 0; i <soter.length; i++) {
             if (i != index){
             soter[i].openi = false;
             soter[i].closei = true;
             }
         }
-       
+        }
+        ohh = true;
         const asort = soret.slice(index, index+1)
         console.log(asort, sodata)
         const newar = bmiData.filter(val => val.tid.includes(asort[0]))
