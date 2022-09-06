@@ -61,6 +61,11 @@ onMount(async () => {
             const arr3 = sodata.concat(newar) 
             sodata = arr3
             }
+        } else if (ohh == true && y == true){
+            if(bmiData.length == sodata.length){
+                ohh = false;
+                sot(x,y)
+            }
         }
        
     }
