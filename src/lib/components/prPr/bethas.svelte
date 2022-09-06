@@ -3,26 +3,66 @@
     import Tile from '$lib/celim/tile.svelte'
     import { onMount } from 'svelte';
     let xx = {}
+    let sodata = [];
+    let soter = []
 onMount(async () => {
     let counter = 0;
     let colors = ["blue", "green", "yellow", "red", "purple", "indigo","pink" , "gray"];
     for (var i = 0; i <bmiData.length; i++){
+        bmiData[i].tid = []
         for (var j = 0; j < bmiData[i].tafkidims.length; j++){
+            bmiData[i].tid.push(bmiData[i].tafkidims[j].id)
             if (bmiData[i].tafkidims[j].id in xx) {
                   bmiData[i].tafkidims[j].color =  xx[bmiData[i].tafkidims[j].id] 
                    } else {
                     xx[bmiData[i].tafkidims[j].id] = colors[counter]
                     bmiData[i].tafkidims[j].color =  colors[counter]
-
+           const word = $lang == "en" ? bmiData[i].tafkidims[j].roleDescription : bmiData[i].tafkidims[j].localizations.length > 0 ?  bmiData[i].tafkidims[j].localizations[0].roleDescription : bmiData[i].tafkidims[j].roleDescription                      
+              soter.push({
+                id: bmiData[i].tafkidims[j].id, 
+                color: colors[counter],
+                word: word,
+                closei: false,
+                openi: true
+            })
                     counter < 8 ? counter += 1 : counter = 0;
+                
                    }
         }
     }
+        sodata = bmiData;
+        soter = soter
+
 })
 
     export let bmiData = [];
-    
-    console.log (bmiData);
+    let ohh = false;
+    function sot(x , y){
+        if (y == true && ohh == false|| ohh == true && y == false){
+            ohh = true;
+        let soret = soter.map(c => c.id)
+        let index = soret.indexOf(x)
+        soter[index].closei = false;
+        soter[index].openi = true;
+        for (var i = 0; i <soter.length; i++) {
+            if (i != index){
+            soter[i].openi = false;
+            soter[i].closei = true;
+            }
+        }
+       
+        const asort = soret.slice(index, index+1)
+        console.log(asort, sodata)
+        const newar = bmiData.filter(val => val.tid.includes(asort[0]))
+            if (sodata.length == bmiData.length){
+            sodata = newar
+            } else {
+            const arr3 = sodata.concat(newar) 
+            sodata = arr3
+            }
+        }
+       
+    }
     const hed = {"he":"משימות בתהליך ביצוע","en":"mission in progress"}
     const nam = {"he":"שם המשימה ", "en":"mission name"}
     const who = {"he":" על ידי", "en":"by"}
@@ -34,6 +74,13 @@ onMount(async () => {
 
 <section dir={$lang == "he" ? "rtl": "ltr"}>
   <h1>{hed[$lang]}</h1>
+  <div>
+    {#each soter as x, i}
+    <button on:click={() =>sot(x.id, x.openi)}>
+    <Tile bg="{x.color}" word={x.word} closei={x.closei} openi={x.openi}/>
+    </button>
+    {/each}
+  </div>
   <div class="tbl-header">
     <table cellpadding="0" cellspacing="0" border="0">
       <thead>
@@ -51,7 +98,7 @@ onMount(async () => {
   <div class="tbl-content d">
     <table cellpadding="0" cellspacing="0" border="0">
       <tbody>
-        {#each bmiData as data, i}
+        {#each sodata as data, i}
         <tr>
           <td>{data.name}</td>
           <td> 
@@ -80,8 +127,6 @@ onMount(async () => {
     </table>
   </div>
 </section>
-
-
 
 <style>
     
