@@ -116,7 +116,7 @@ onMount(async () => {
         </div>
         </td>
           <td>
-              <div class="w-full bg-gray-200 rounded-full dark:bg-gray-700">
+              <div class="w-full  rounded-full bg-gray-700">
     <div class="bg-barbi text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {data.status == null ? 0 : data.status}%">{data.status == null ? 0 : data.status}%</div>
   </div>
           </td>
