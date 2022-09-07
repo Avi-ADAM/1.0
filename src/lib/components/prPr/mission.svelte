@@ -209,6 +209,7 @@ const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefi
              perhour: ${valph},   
              privatlinks: "${pv}",
              publicklinks: "${pb}",
+             iskvua: ${element.iskvua},
              ${date} 
              ${dates}
              ${rishon4}
@@ -518,6 +519,12 @@ const headingc = {"he":"מספר המשמרות","en": "number of shifts"};
 const headinge = {"he":"שעת פתיחת משמרת","en": "starting hour for shift"};
 const headingf = {"he":"שעת סגירת משמרת","en": "finishing hour for shift"};
 const headingr = {"he":"מספר הפרטים במשמרת","en": "shift partisipant number"};
+const iskvua = {"he":"האם זו משרה קבועה","en": "is that a constant job"};
+const iskvu = {"he":"משרה קבועה","en": "constant job"};
+const hmh = {"he":" כמה שעות זה אמור לקחת בסך הכל?", "en":"how many hours should it take?"}
+const hms = {"he":"כמה שעות בחודש?", "en": "how many hours per month"}
+const htt = {"he":"מספר השעות","en": "number of hours"}
+const leho = {"he":"לחודש:", "en": "per month:"}
 let shift = [{"ii": 1}];
 let shifts = 1
 function shifterr (o){
@@ -753,12 +760,12 @@ function shifterr (o){
             </tr> <tr>
               <th>תאריך התחלה</th>
               {#each miData as data, i}
-            <td><input type="datetime-local" bind:value={data.date}  ></td>
+            <td> <SveltyPicker inputClasses="form-control" format=" hh:ii dd/mm/yyyy" bind:value={data.date}></SveltyPicker></td>
             {/each}
           </tr><tr>
               <th>תאריך סיום</th>
               {#each miData as data, i}
-            <td><input type="datetime-local" bind:value={data.dates}  ></td>
+            <td> <SveltyPicker inputClasses="form-control" format="hh:ii dd/mm/yyyy " bind:value={data.dates}></SveltyPicker></td>
             {/each}
           </tr> <tr>
             <th>קישורים ציבוריים</th>
@@ -793,13 +800,25 @@ function shifterr (o){
 </div>
          </td>
          {/each}
-    </tr><tr style="display:''" id="hoursD">
-          <th >כמה שעות זה אמור לקחת? </th>
+    </tr>
+     <tr>
+          <th>{iskvua[$lang]}</th>
+          {#each miData as data, i}
+          <td>
+            <input
+            bind:checked={data.iskvua} 
+            type="checkbox" id="isk" name="isk" value="no" on:change={()=> kova(data.iskvua)}>
+            <label for="isk">{iskvu[$lang]}</label>
+          </td>
+          {/each}
+    </tr>
+    <tr style="display:''" id="hoursD">
+          <th >{htt[$lang]}</th>
           {#each miData as data, i}
           <td>
                                              <div dir="rtl" class='textinput'>
   <input type="number"  id="hoursn" name="hoursn"  bind:value={data.nhours} class='input' required>
-  <label for="hoursn" class='label'>כמה שעות זה אמור לקחת? </label>
+  <label for="hoursn" class='label'>{data.iskvua == true ? hms[$lang] : hmh[$lang]}</label>
   <span class='line'></span>
 </div>
           </td>
@@ -817,6 +836,7 @@ function shifterr (o){
           </td>
           {/each}
         </tr>
+         
         <tr>
           <th>{isshi[$lang]}</th>
           {#each miData as data, i}
@@ -829,7 +849,7 @@ function shifterr (o){
           {/each}
     </tr>
     <tr >
-          <th > {editsi[$lang]}</th>
+          <th >{editsi[$lang]}</th>
           {#each miData as data, i}
           {#if data.isshif == true}
           <td style="display:''" id="ophour">
@@ -909,7 +929,7 @@ function shifterr (o){
       {#each miData as data, i}
       <td>
       {#if data.valph > 0 & data.nhours > 0}
-      
+      {data.iskvua == true ? leho[$lang] : ""}
       {data.valph * data.nhours}
       
       {:else} <p>0</p>

@@ -14,7 +14,7 @@
 
 
 <script>
-  
+  import { lang } from '$lib/stores/lang.js'
   export let userId; 
   import { onMount } from 'svelte';
   import Header from '../../lib/components/header/header.svelte'
@@ -86,7 +86,9 @@ let error1 = null;
             error1 = e
         }
     });
-    
+    let linkP = "https://www.google.co.il" 
+const towel = {"he":"לינק","en":"link"}
+
   </script>
   <svelte:head>
   <title>פרופיל 1❤️1</title>
@@ -103,6 +105,53 @@ let error1 = null;
   alt="profilePicAvatar" />
 {/if}
       </div>
+            <div class="flex flex-row items-center justify-center">
+         {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-mturk text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1662563246/discord-icon-svgrepo-com_d4vk6m.svg" alt="Discord"/>
+          </a>
+                      {/if}
+                         {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://visualpharm.com/assets/700/Twitter-595b40b65ba036ed117d4613.svg" alt="Twitter"/>
+          </a>
+                      {/if}
+                       {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://tochat.be/whatsapp-icon-white.png" alt="WhatsApp"/>
+          </a>
+                      {/if}
+                        {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg" alt="GitHub"/>
+          </a>
+                      {/if}
+                       {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png" alt="Facebook"/>
+          </a>
+                      {/if}
+            </div>
          <div class="flexi">
            <div class="q">
 <h3 >{user.username}</h3></div>

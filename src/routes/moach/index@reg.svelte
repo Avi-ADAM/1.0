@@ -1147,7 +1147,7 @@ const tower = {"he": "לינק לאתר", "en": "link to website"}
 const sidd = {"he": "סידור משמרות","en": "shifts sqadual"}
 const gann = {"he": "לוח המשימות שלנו ","en": "our mission board"}
     const bet = {"he":"משימות בתהליך ביצוע","en":"mission in progress"}
-
+const towel = {"he":"לינק לגוגל דרייב המשותף","en": "link to a shared Google Drive"}
 let sid = false
 let gan = false
 let bett = false;
@@ -1253,14 +1253,68 @@ let bett = false;
                      <a
                      target="_blank" href={linkP}
           class=" hover:bg-mturk text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1662563246/discord-icon-svgrepo-com_d4vk6m.svg" alt="Discord"/>
+          </a>
+                      {/if}
+            {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-mturk text-barbi rounded-full"
           title={tower[$lang]}
           >
           <svg class="sv"  style="width:24px;height:24px" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path
            fill="currentColor" d="M14.851 11.923c-.179-.641-.521-1.246-1.025-1.749-1.562-1.562-4.095-1.563-5.657 0l-4.998 4.998c-1.562 1.563-1.563 4.095 0 5.657 1.562 1.563 4.096 1.561 5.656 0l3.842-3.841.333.009c.404 0 .802-.04 1.189-.117l-4.657 4.656c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-1.952-1.951-1.952-5.12 0-7.071l4.998-4.998c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464.493.493.861 1.063 1.105 1.672l-.787.784zm-5.703.147c.178.643.521 1.25 1.026 1.756 1.562 1.563 4.096 1.561 5.656 0l4.999-4.998c1.563-1.562 1.563-4.095 0-5.657-1.562-1.562-4.095-1.563-5.657 0l-3.841 3.841-.333-.009c-.404 0-.802.04-1.189.117l4.656-4.656c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464 1.951 1.951 1.951 5.119 0 7.071l-4.999 4.998c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-.494-.495-.863-1.067-1.107-1.678l.788-.785z"/></svg>
           </a>
                       {/if}
-           <button
+                          {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
           class=" hover:bg-mturk text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1662560567/icon-google-drive-new_jxv2oz.avif" alt="Google Drive"/>
+          </a>
+                      {/if}
+                         {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://visualpharm.com/assets/700/Twitter-595b40b65ba036ed117d4613.svg" alt="Twitter"/>
+          </a>
+                      {/if}
+                       {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://tochat.be/whatsapp-icon-white.png" alt="WhatsApp"/>
+          </a>
+                      {/if}
+                        {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg" alt="GitHub"/>
+          </a>
+                      {/if}
+                       {#if linkP}
+                     <a
+                     target="_blank" href={linkP}
+          class=" hover:bg-white text-barbi rounded-full"
+          title={towel[$lang]}
+          >
+          <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png" alt="Facebook"/>
+          </a>
+                      {/if}
+           <button
+          class=" hover:bg-white text-barbi rounded-full"
           title={publicp[$lang]}
           on:click={goto(`/project/${$idPr}`)}
           >
@@ -1530,6 +1584,7 @@ let bett = false;
 <Sidur />
 </div>
 {/if}
+{#if bmiData.length > 0 }
 <br> <br>
 {#if bett == false}
 <button on:click={()=>bett = true} class="border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via">{bet[$lang]}</button>
@@ -1539,6 +1594,7 @@ let bett = false;
 <div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 94vh; overflow-y: auto; overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); " class="d">
 <Bethas {bmiData} />
 </div>
+{/if}
 {/if}
     <div class=" p-2">
       <Hamatanot {trili} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
