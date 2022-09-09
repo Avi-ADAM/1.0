@@ -1,4 +1,7 @@
 <script>
+  import {
+    isEqual
+} from 'lodash';
   import Bethas from '$lib/components/prPr/bethas.svelte'
   import Sidur from '$lib/components/prPr/sidur/sidur.svelte'
   import { addToast } from 'as-toast';
@@ -99,7 +102,7 @@ let bmimData = [];
    let desP;
    let projectname;
   let token; 
-  let linkP;
+  let linkP, githublink, fblink, discordlink,drivelink,twiterlink,watsapplink;
   
  let newcontent = true;
  let newcontentR = true;
@@ -122,7 +125,7 @@ let salee = [];
 let trili = [];
 let projects = prog();
 let meData = start ();
-
+let alit = [];
 //sale {id in}
 async function start () {
   if ($idPr !== 0){
@@ -220,7 +223,7 @@ JSON.stringify({query:
             vallues {valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
             linkToWebsite
             profilePic {url  formats }
-            restime
+            restime githublink fblink discordlink drivelink twiterlink watsapplink
           } 
         me{id}}
           `} )
@@ -290,7 +293,14 @@ JSON.stringify({query:
               }
             }
             valit = vallues.map(c => c.valueName);
+            alit = vallues.map(c => c.id)
             linkP = meData.linkToWebsite;
+            githublink = meData.githubLink;
+             fblink = meData.fblink;
+              discordlink = meData.discordLink;
+              drivelink= meData.drivelink;
+              twiterlink= meData.twiterLink;
+              watsapplink = meData.watsapplink;
              noofopenm = opmash.length;
             noofopen = project.open_missions.length;
             if (project.profilePic !== null){
@@ -965,10 +975,76 @@ async function sendP () {
            
                 }
 })};
+ const editfix = {"he": "המידע עודכן בהצלחה!" , "en": "info has updated successfully"}
   const picupsu = {"he":"הלוגו עודכן בהצלחה", "en": "Logo has updated successfully"}
   const picvots = {"he":"הלוגו הועלה להצבעה בהצלחה", "en":"vote on new Logo has created successfully"}
-async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restimei) {
-    const cookieValue = document.cookie
+async function updete (event) {
+  console.log(event.detail.valit)
+    a = 2;
+    let counter = false;
+    let projectnamei = ``;
+    let despi = ``
+    let linkPii = ``
+    let desPlii = ``;
+    let valluesii = ``;
+    let restimeii = ``;
+    let githublinkii = ``;
+    let fblinkii = ``;
+    let discordlinkii  = ``;
+    let drivelinkii = ``;
+    let twiterlinkii = ``;
+    let watsapplinkii = ``;
+    if (event.detail.projectName_value != projectname){
+        projectnamei = `projectName: "${event.detail.projectName_value}",`
+        counter = true
+    }
+   if (event.detail.desP != desP && event.detail.desP != null ){
+        despi = `publicDescription: "${event.detail.desP}",`
+        counter = true
+    }
+       if (event.detail.linkP != linkP && event.detail.linkP != null){
+        linkPii = `linkToWebsite: "${event.detail.linkP}",`
+        counter = true
+    }
+   if (event.detail.desPl != descripFor && event.detail.desPl != null){
+        desPlii = `descripFor: "${event.detail.desPl}",`
+        counter = true
+    }
+    const x = event.detail.valit.sort(function(a, b){return a-b});
+    const y = alit.sort(function(a, b){return a-b});
+   if (!isEqual(x, y)  ){
+        valluesii = `vallues: [${event.detail.valit}],`
+        counter = true
+    }    //array
+   if (event.detail.restime != restime && event.detail.restime != null){
+        restimeii = `restime: ${event.detail.restime},`
+        counter = true
+    }    
+     if (event.detail.githublink != githublink && event.detail.githublink != null){
+        githublinkii = `githublink: "${event.detail.githublink}",`
+        counter = true
+    }   
+     if (event.detail.fblink != fblink && event.detail.fblink != null){
+        fblinkii = `fblink: "${event.detail.fblink}",`
+        counter = true
+    }   
+     if (event.detail.discordlink != discordlink && event.detail.discordlink != null){
+       discordlinkii = `discordlink: "${event.detail.discordlink}",`
+        counter = true
+    }   
+     if (event.detail.drivelink != drivelink && event.detail.drivelink != null){
+        drivelinkii = `drivelink: "${event.detail.drivelink}",`
+        counter = true
+    }   
+     if (event.detail.twiterlink != projectname && event.detail.twiterlink != null){
+        twiterlinkii = `twiterlink: "${event.detail.twiterlink}",`
+        counter = true
+    }   
+     if (event.detail.watsapplink != watsapplink && event.detail.watsapplink != null){
+        watsapplinkii = `watsapplink: "${event.detail.watsapplink}",`
+        counter = true
+    }        
+        const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
@@ -979,44 +1055,72 @@ async function upd (projectName_valuei, desPi, linkPi, desPli, selectedi, restim
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let linkdi ="https://i18.onrender.com/projects/" + $idPr ;
-   await   axios
-      .put(linkdi, {
-    projectName: projectName_valuei, 
-    publicDescription: desPi,
-    linkToWebsite: linkPi,
-    descripFor: desPli,
-    vallues: selectedi,
-    restime: restimei,
-                    },
-      {
-      headers: {
-        'Authorization': bearer1
-                }})
-      .then(resp => {
-        mecata = resp.data;
+ let linkg ="https://i18.onrender.com/graphql" ;
+        try {
+              fetch(linkg, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+          ` mutation { updateProject(
+    input: {
+      where: {id: ${$idPr}}
+       data: {
+        ${projectnamei}
+        ${despi}
+        ${linkPii}
+        ${desPlii}
+        ${valluesii}
+        ${restimeii}
+        ${githublinkii}
+         ${fblinkii} 
+         ${discordlinkii}
+         ${drivelinkii}
+         ${twiterlinkii}
+         ${watsapplinkii}
+       }
+    }
+  ){
+         project{
+           linkToWebsite descripFor projectName publicDescription restime 
+           githublink fblink discordlink drivelink twiterlink watsapplink vallues {valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
+          }
+  }
+ }`
+        })
+ })
+  .then(r => r.json())
+  .then(data => mecata = data);
+  mecata = mecata.updateProject.project
       console.log(mecata);
        projectname  = mecata.projectName;
        desP = mecata.publicDescription;
        restime  = mecata.restime ;
        vallues  = mecata.vallues;
        linkP  = mecata.linkP;
+        githublink = mecata.githubLink;
+             fblink = mecata.fblink;
+              discordlink = mecata.discordLink;
+              drivelink= mecata.drivelink;
+              twiterlink= mecata.twiterLink;
+              watsapplink = mecata.watsapplink;
         descripFor = mecata.descripFor;
     isOpen = false;
     a = 0;
-                  })
-      .catch(error => {
-        console.log('צריך לתקן:', error.response);
-        if (error.response != undefined) {
+        addToast(`${editfix[$lang]}`, 'info');
+    } catch (e) {
+            console.log(e)
+             if (e.response != undefined) {
           a = 3;
         }
-                });
+        } 
       
     };
-    function updete (event) {
-    a = 2;
-upd (event.detail.projectName_value, event.detail.desP, event.detail.linkP, event.detail.desPl, event.detail.valit, event.detail.restime)
-    }
+  
     
    
 async function projectn (id) {
@@ -1148,7 +1252,12 @@ const sidd = {"he": "סידור משמרות","en": "shifts sqadual"}
 const gann = {"he": "לוח המשימות שלנו ","en": "our mission board"}
     const bet = {"he":"משימות בתהליך ביצוע","en":"mission in progress"}
 const towel = {"he":"לינק לגוגל דרייב המשותף","en": "link to a shared Google Drive"}
-let sid = false
+  const githublinkde = {"he":"לינק לגיטהב של הריקמה","en":"link to the FreeMates GitHub"}
+   const fblinkde = {"he":"לינק לפייסבוק של הריקמה","en":"link to the FreeMates Facebook"}
+   const discordlinkde = {"he":"לינק לדיסקורד של הריקמה","en":"link to the FreeMates Discord"}
+   const twiterlinkde = {"he":"לינק לטוויטר של הריקמה","en":"link to the FreeMates twitter"}
+   const watsapplinkde = {"he":"לינק לווטסאפ של הריקמה","en":"link to the FreeMates WhatsApp"}
+   let sid = false
 let gan = false
 let bett = false;
 </script>
@@ -1180,6 +1289,7 @@ let bett = false;
         <Editb
         on:message={updete}
         selected={valit}
+      {githublink} {fblink} {discordlink}{drivelink}{twiterlink}{watsapplink}
         {restime}
          {desP}
           projectName_value={projectname}
@@ -1249,11 +1359,11 @@ let bett = false;
           </svg>
           </button>
           <!--change to modal with the project component-->
-            {#if linkP}
+            {#if discordlink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={discordlink}
           class=" hover:bg-mturk text-barbi rounded-full"
-          title={towel[$lang]}
+          title={discordlinkde[$lang]}
           >
           <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1662563246/discord-icon-svgrepo-com_d4vk6m.svg" alt="Discord"/>
           </a>
@@ -1268,47 +1378,47 @@ let bett = false;
            fill="currentColor" d="M14.851 11.923c-.179-.641-.521-1.246-1.025-1.749-1.562-1.562-4.095-1.563-5.657 0l-4.998 4.998c-1.562 1.563-1.563 4.095 0 5.657 1.562 1.563 4.096 1.561 5.656 0l3.842-3.841.333.009c.404 0 .802-.04 1.189-.117l-4.657 4.656c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-1.952-1.951-1.952-5.12 0-7.071l4.998-4.998c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464.493.493.861 1.063 1.105 1.672l-.787.784zm-5.703.147c.178.643.521 1.25 1.026 1.756 1.562 1.563 4.096 1.561 5.656 0l4.999-4.998c1.563-1.562 1.563-4.095 0-5.657-1.562-1.562-4.095-1.563-5.657 0l-3.841 3.841-.333-.009c-.404 0-.802.04-1.189.117l4.656-4.656c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464 1.951 1.951 1.951 5.119 0 7.071l-4.999 4.998c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-.494-.495-.863-1.067-1.107-1.678l.788-.785z"/></svg>
           </a>
                       {/if}
-                          {#if linkP}
+                          {#if drivelink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={drivelink}
           class=" hover:bg-mturk text-barbi rounded-full"
           title={towel[$lang]}
           >
           <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1662560567/icon-google-drive-new_jxv2oz.avif" alt="Google Drive"/>
           </a>
                       {/if}
-                         {#if linkP}
+                         {#if twiterlink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={twiterlink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={twiterlinkde[$lang]}
           >
           <img style="width:24px;height:24px" src="https://visualpharm.com/assets/700/Twitter-595b40b65ba036ed117d4613.svg" alt="Twitter"/>
           </a>
                       {/if}
-                       {#if linkP}
+                       {#if watsapplink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={watsapplink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={watsapplinkde[$lang]}
           >
           <img style="width:24px;height:24px" src="https://tochat.be/whatsapp-icon-white.png" alt="WhatsApp"/>
           </a>
                       {/if}
-                        {#if linkP}
+                        {#if githublink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={githublink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={githublinkde[$lang]}
           >
           <img style="width:24px;height:24px" src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg" alt="GitHub"/>
           </a>
                       {/if}
-                       {#if linkP}
+                       {#if fblink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={fblink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={fblinkde[$lang]}
           >
           <img style="width:24px;height:24px" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png" alt="Facebook"/>
           </a>
@@ -1693,9 +1803,10 @@ let bett = false;
   align-items: center; 
   }
     :global([data-svelte-dialog-content].content) {
-     background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg);
-      background-position: center;
-      background-size: cover;
+background: #60B9B6;
+background: -webkit-radial-gradient(center,   #050117 , #0F0248, #60B9B6);
+background: -moz-radial-gradient(center,   #050117, #0F0248, #60B9B6);
+background: radial-gradient(ellipse at center,   #050117,#0F0248, #60B9B6);
       width: 80vw;
   }
   @media (min-width: 768px){
