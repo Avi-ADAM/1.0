@@ -3,7 +3,8 @@
       import {  fly } from 'svelte/transition';
         import Close from '$lib/celim/close.svelte'
   import SveltyPicker from 'svelty-picker'
-  
+    import moment from 'moment';
+
   let myDate = '11:00';
     import MultiSelect from 'svelte-multiselect';
     import { lang } from '$lib/stores/lang.js'
@@ -176,8 +177,10 @@ pendq = ` users: [
     const tafkidims = element.tafkidims.map(c => c.id);
 const nhours = (element.nhours > 0) ? element.nhours : 0;
 const valph = (element.valph > 0) ? element.valph : 0;
-const date = (element.date !== undefined) ? ` sqadualed: "${new Date(element.date).toISOString()}",` : ``;
-const dates = (element.dates !== undefined) ? ` dates: "${new Date(element.dates).toISOString()}",` : ``;
+ let momentx = moment(element.date, "HH:mm DD/MM/YYYY ")
+        let momebtt =moment(element.dates, "HH:mm DD/MM/YYYY ")
+const date = (element.date !== undefined) ? ` sqadualed: "${momentx.toISOString()}",` : ``;
+const dates = (element.dates !== undefined) ? ` dates: "${momebtt.toISOString()}",` : ``;
 const pb = (element.publicklinks !== undefined || element.publicklinks !== "undefined") ? element.publicklinks : "";
 const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefined") ? element.privatlinks : "";
 
@@ -542,7 +545,9 @@ function shifterr (o){
    shift = shift
   console.log(days,shift)
 }
+function kova(){
 
+}
   </script>
 
   <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
