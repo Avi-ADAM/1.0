@@ -162,6 +162,7 @@ function pr (x){
 }
 let user = [
 ];
+let fblink, twiterlink, discordlink, githublink
 let load = false
 let projects =[];
 let uskill =[];
@@ -243,8 +244,7 @@ let error1 = null;
                    }
               }
          for (const [key, value] of Object.entries(fermatana)) {
-            const datea = key
-            const ano = value
+
             fmm.push({
               missionName: `${$lang == "en" ?  key : ""}${value > 1 ? ` ${$lang == "en" ?  ":" : ""}${value}${$lang == "he" ?  ":" : ""}` : ""}${$lang == "he" ?  key : ""}`
             })
@@ -290,13 +290,23 @@ let error1 = null;
             }    
               uww = uww
             srcU =`${user.profilePic.formats.thumbnail.url}`
+            fblink = user.fblink
+            twiterlink = user.twiterlink
+             discordlink = user.discordlink
+               githublink = user.githublink
             srcU =`${user.profilePic.formats.small.url}`
+
         } catch (e) {
             error1 = e
         }
     });
     let linkP = "https://www.google.co.il" 
 const towel = {"he":"לינק","en":"link"}
+const todis = {"he":"לינק לדיסקורד","en":"link to discord"}
+const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
+const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
+const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
+
 let h,w, height,width;
 $:if(h > w){
 
@@ -316,10 +326,11 @@ const re = {"he": "רקמות", "en": "FreeMates"}
 const vv = {"he": "ערכים", "en": "vallues"}
 const rr = {"he": "משאבים", "en": "resources"}
 const mm = {"he": "משימות","en":"missions"}
+
   </script>
  <span style=" position:absolute;
         height:100vh;
-        width:100vw; top:0; left:0;" bind:clientHeight="{h}" bind:clientWidth="{w}"></span>
+        width:100vw; top:0; left:0; z-index:-1;" bind:clientHeight="{h}" bind:clientWidth="{w}"></span>
 
   <div dir="rtl" >
       <div class="middle" >
@@ -411,28 +422,30 @@ const mm = {"he": "משימות","en":"missions"}
     <foreignObject x="710" y="957" height="280" width="500">
         <div class="flexi">
            <div class="q">
+            {#if load == true}
 <h3 >{user.username}</h3>
+{/if}
 </div></div>
  <div class="flex flex-row items-center justify-center">
-         {#if linkP}
+         {#if discordlink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={discordlink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={todis[$lang]}
           >
           <img style="width:48px;height:48px" src="https://res.cloudinary.com/love1/image/upload/v1662563246/discord-icon-svgrepo-com_d4vk6m.svg" alt="Discord"/>
           </a>
                       {/if}
-                         {#if linkP}
+                         {#if twiterlink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={twiterlink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={totwi[$lang]}
           >
           <img style="width:48px;height:48px" src="https://visualpharm.com/assets/700/Twitter-595b40b65ba036ed117d4613.svg" alt="Twitter"/>
           </a>
                       {/if}
-                       {#if linkP}
+                    <!--   {#if linkP}
                      <a
                      target="_blank" href={linkP}
           class=" hover:bg-white text-barbi rounded-full"
@@ -440,21 +453,21 @@ const mm = {"he": "משימות","en":"missions"}
           >
           <img style="width:48px;height:48px" src="https://tochat.be/whatsapp-icon-white.png" alt="WhatsApp"/>
           </a>
-                      {/if}
-                        {#if linkP}
+                      {/if}-->
+                        {#if githublink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={githublink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={togit[$lang]}
           >
           <img style="width:48px;height:48px" src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg" alt="GitHub"/>
           </a>
                       {/if}
-                       {#if linkP}
+                       {#if fblink}
                      <a
-                     target="_blank" href={linkP}
+                     target="_blank" href={fblink}
           class=" hover:bg-white text-barbi rounded-full"
-          title={towel[$lang]}
+          title={tofac[$lang]}
           >
           <img style="width:48px;height:48px" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png" alt="Facebook"/>
           </a>
