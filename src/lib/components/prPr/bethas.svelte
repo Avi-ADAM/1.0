@@ -1,7 +1,13 @@
 <script>
-    import { lang } from '$lib/stores/lang.js'
+    import { lang } from '$lib/stores/lang.js';
+    import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
+     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+     import Plus from '$lib/celim/plus.svelte'
+     import Close from '$lib/celim/close.svelte'
+      import {  fly } from 'svelte/transition';
     import Tile from '$lib/celim/tile.svelte'
     import { onMount } from 'svelte';
+    let isOpen = false;
     let xx = {}
     let sodata = [];
     let soter = []
@@ -34,7 +40,13 @@ onMount(async () => {
         soter = soter
 
 })
-
+  const closer = () => {
+    isOpen = false;
+  }
+  function done() {
+    isOpen = false;
+    //toast email add to table
+  }
     export let bmiData = [];
     let ohh = false;
     function sot(x , y){
@@ -77,9 +89,21 @@ onMount(async () => {
     const sho = {"he": "שווי המשימה", "en": "mission vallue"}
     const ro = {"he": "תפקיד", "en": "role"}
 </script>
-
+   
+<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+        <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent class="formi" aria-label="form">
+      <div style="z-index: 400;" dir="rtl" >
+             <button class=" hover:bg-barbi text-mturk rounded-full"
+          on:click={closer}><Close/></button>
+          <Crtask {bmiData} on:done={done}/>
+      </div>
+  </DialogContent>
+  </div>
+</DialogOverlay>
 <section dir={$lang == "he" ? "rtl": "ltr"}>
-  <h1>{hed[$lang]}</h1>
+  <h1>{hed[$lang]}</h1> 
+  <button on:click={() =>isOpen = true} ><Plus/></button>
   <div>
     {#each soter as x, i}
     <button on:click={() =>sot(x.id, x.openi)}>
@@ -136,6 +160,27 @@ onMount(async () => {
 
 <style>
     
+   :global([data-svelte-dialog-content].formi) {
+  background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 13s ease infinite;
+    -moz-animation: AnimationName 13s ease infinite;
+    animation: AnimationName 3s ease infinite;
+      width: 80vw;
+  }
+  @media (min-width: 568px){
+  
+        :global([data-svelte-dialog-content].formi) {
+ background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 13s ease infinite;
+    -moz-animation: AnimationName 13s ease infinite;
+    animation: AnimationName 13s ease infinite;
+width:50vw;
+        }
+  }
 h1{
   font-size: 30px;
   color: #fff;
