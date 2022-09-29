@@ -916,7 +916,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 
 <text fill="url(#sugzzs)" font-size="17px" stroke="url(#sugzzy)" stroke-miterlimit="0" stroke-width=".62511px" style="white-space:pre; fill:white; font-family: Gan, Powerr; stroke-width: 0;"><textPath startOffset="{stb}" xlink:href="#sugzzl" on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")}>{missionName}</textPath></text>
 
-<text x="503.31" y="223.099" fill="url(#sugzzx)" font-family='"Lobster Two"' font-size="27px" stroke="url(#sugzzw)" stroke-miterlimit="0" stroke-width=".62511px" text-anchor="middle" style="white-space:pre">{total.toLocaleString('en-US', {maximumFractionDigits:2})}</text>
+<text x="503.31" y="223.099" fill="url(#sugzzx)" font-family='"Lobster Two"' font-size="27px" stroke="url(#sugzzw)" stroke-miterlimit="0" stroke-width=".2511px" text-anchor="middle" style="white-space:pre">{total.toLocaleString('en-US', {maximumFractionDigits:2})}</text>
 
 <g>
 <path d="m503.92 247.08 83.779 36.861s-27.955 50.743-83.36 51.943c-49.464 1.072-82.103-53.618-82.103-53.618l81.684-35.186z" fill="rgba(216, 216, 216, 0)" stroke="rgba(0, 0, 0, 0)">

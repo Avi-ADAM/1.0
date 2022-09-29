@@ -1,5 +1,7 @@
 ﻿
 <script>
+      import { liUN } from '$lib/stores/liUN.js';
+
       import {  doesLang, langUs } from '$lib/stores/lang.js'
   import { goto, prefetch } from '$app/navigation';
   import Maze from './maze.svelte'
@@ -409,6 +411,7 @@ if (fpp.includes(jjj)){
    document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
    document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
    userName.set($form.name);
+           liUN.set($form.name);
             email.set(mail);
             contriesi.set(find_contry_id(selected))
             regHelper.set(1);
@@ -535,7 +538,7 @@ function change(la){
      --> 
      <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px;" on:click={()=>info()} class="ww" >?</button>
      <div class="all">
-       <a  sveltekit:prefetch href="/login" ><img title="התחברות ל-1❤️1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
+       <a   data-sveltekit-prefetch href="/login" ><img title="התחברות ל-1❤️1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1❤️1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
           <button on:click={tran}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
@@ -545,12 +548,12 @@ function change(la){
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
                   <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >English</button>
-          <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/ar">العربية</a>
-                  <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1❤️1 אודות "  sveltekit:prefetch href="/about" > אודות</a>
+          <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
+                  <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1❤️1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
                   <button on:click={info} title="הסבר ומידע" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >הסבר ומידע</button>
                   <button on:click={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
                   <button on:click={tr} title="תרגום לשפות נוספות" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >תרגום לשפות נוספות</button>
-                  <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " sveltekit:prefetch href="/love">מפת ההסכמה</a>
+                  <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">מפת ההסכמה</a>
           {/if}
           </div>
       <div class="mobile">
@@ -584,7 +587,7 @@ function change(la){
 <div class="flexi1">
   <h3   class="amanat " id="m" 
  style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1em;" dir="rtl">מ: </h3> 
-      <MultiSelect
+     <MultiSelect
       bind:selected
       {name} 
       {placeholder}

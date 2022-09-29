@@ -69,7 +69,7 @@ function increment() {
   {sh5[$lang]}
     1❤️1
  </h1></div>
-  <!--  <a class="midscreen-link" sveltekit:prefetch href="/aboutOne">אודות 1❤️1</a>
+  <!--  <a class="midscreen-link"  data-sveltekit-prefetch href="/aboutOne">אודות 1❤️1</a>
  -->
 <button out:fly={{y: -600, x: 2000,  opacity: 0.6, duration: 2200}} title={sh6[$lang]} class="button" on:click="{increment}">
 <svg class="key" height="80%" width="80%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`600 80 2222 918.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">

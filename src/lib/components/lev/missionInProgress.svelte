@@ -32,7 +32,7 @@ betha.subscribe(value => {
     export let missionName = "do x" 
     export let missionDetails = "do x in y"
     export let src = "coin.png"
-    export let link = "https://www.free-mates.com"
+    export let link = "https://www.1lev1.world"
     export let linkDescription = "לביצוע"
     export let projectId;
     export let linkP = "/project/"
@@ -1124,11 +1124,15 @@ out:scale={{duration: 2200, opacity: 0.5}}
 
   <h5 dir="ltr" class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0}`}</span> / <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal}</span></h5>
   
-  <button class="de border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb to-gr-c" on:click={function(){
+  <button
+  on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
+  class="de border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" on:click={function(){
     a = 2;
     isOpen = true}}>{status != null ? status[0] : "0"}%</button>
+    {#if link != null && link != undefined && link != "undefined"}
   <a on:mouseenter={()=>hover("לינק לביצוע המשימה")} on:mouseleave={()=>hover("0")} class="mn ef text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
-<div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div>
+    {/if}
+  <div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div>
 {#if low == false}
 {#if lapse !== 0 || x !== 0}
 <button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>

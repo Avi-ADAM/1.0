@@ -51,6 +51,78 @@
     width: 10px;
 }
 }
+
+
+  textarea::-webkit-resizer {
+  border-width: 8px;
+  border-style: solid;
+  border-color: transparent  transparent var(--gold)  var(--gold);
+}
+
+   .textinput {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+
+.input {
+  border: none;
+  margin: 0;
+  padding: 10px 0;
+  outline: none;
+  border-bottom: solid 1px var(--gold);
+  font-size: 15px;
+  margin-top: 12px;
+  width: 100%;
+ color:  var(--gold);
+  -webkit-tap-highlight-color: transparent;
+  background: transparent;
+}
+
+
+.label {
+
+  font-size: 15px;
+  position: absolute;
+  top: 22px;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  pointer-events: none;
+  color:var(--gold);
+  user-select: none;
+}
+
+.line {
+  height: 2px;
+  background-color: #2196F3;
+  position: absolute;
+  transform: translateX(-50%);
+  left: 50%;
+  bottom: 0;
+  width: 0;
+  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+}
+
+.input:focus ~ .line, .input:valid ~ .line {
+  width: 100%;
+}
+
+.input:focus ~ .label, .input:valid ~ .label {
+  font-size: 14px;
+  color: turquoise;
+  top: 0;
+}
+.input:focus ,.input:valid  {
+  border: 0;
+}
+
+@media (max-width:600px){
+ 
+.textinput {
+  position: relative;
+  width: 100%;
+  display: block;
+}
+}
 .d::-webkit-scrollbar-track {
     background-color: #e4e4e4;
     border-radius: 100px;
