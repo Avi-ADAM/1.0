@@ -9,6 +9,8 @@
    export let indigo = false;
    export let purple = false;
    export let pink = false;
+      export let wow = false;
+     export let gold = false;
    export let word = "word";
    export let bg = "blue"
    $: if (bg == "blue"){
@@ -27,19 +29,28 @@
     red = true;
    } else if (bg == "purple"){
     purple = true;
+   } else if (bg == "wow"){
+     wow = true;
+   }else if (bg == "gold"){
+     gold = true;
    }
    //gray red green yellow indigo purple pink
 </script>
 <span class:line-through={closei == true}
 class:hover:bg-blue-400={blue == true} 
+class:hover:from-gold={gold == true}
+class:hover:to-gold={gold == true}
+
+        class:hover:bg-wow2={wow == true} 
         class:hover:bg-gray-400={gray == true} 
         class:hover:bg-red-400={red == true} 
         class:hover:bg-green-400={green == true} 
         class:hover:bg-yellow-400={yellow == true} 
         class:hover:bg-indigo-400={indigo == true} 
         class:hover:bg-purple-400={purple == true} 
-        class:hover:bg-pink-400={pink == true} 
+        class:hover:bg-pink-300={pink == true} 
         class:bg-blue-200={blue == true} class:text-blue-800={blue == true}
+        class:bg-wow={wow == true} class:text-wowt={wow == true}
         class:bg-gray-200={gray == true} class:text-gray-800={gray == true}
         class:bg-red-200={red == true} class:text-red-800={red == true}
         class:bg-green-200={green == true} class:text-green-800={green == true}
@@ -47,6 +58,13 @@ class:hover:bg-blue-400={blue == true}
         class:bg-indigo-200={indigo == true} class:text-indigo-800={indigo == true}
         class:bg-purple-200={purple == true} class:text-purple-800={purple == true}
         class:bg-pink-200={pink == true} class:text-pink-800={pink == true}
+        class:from-gra={gold == true} 
+class:via-grb={gold == true} 
+class:via-gr-c={gold == true} 
+class:via-grd={gold == true} 
+class:to-gre={gold == true} 
+class:bg-gradient-to-br={gold == true} 
+class:text-stgold={gold == true} 
  class="decoration-slate-100 text-xs font-semibold inline-flex items-center mr-2 px-2.5 py-0.5 rounded">
  {word}
  {#if closei}

@@ -220,8 +220,8 @@ const mm = {"he": "משימות","en":"missions"}
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{re[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
         {#each projects as data, i}
-       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">
-          <button class="text-gold hover:text-mturk hover:scale-150"   on:click={pr(data.id)} >{data.projectName}</button>
+       <span style="font-size:25px;" class="font-bold hover:scale-110 text-gold bg-barbi rounded-lg px-1 my-1 ">
+          <button class="text-gold hover:text-mturk "   on:click={pr(data.id)} >{data.projectName}</button>
        </span>
        {/each}
     </div>

@@ -25,6 +25,7 @@ const config = {
 		  },
 		extend: {
 			colors: {
+				stgold: "#574010",
 					gra: "#BF953F",
 					grb: "#FCF6BA",
 					grc: "#B38728",
@@ -41,8 +42,11 @@ const config = {
 					mpink: 'rgb(244, 114, 182)',
 				pinki: 'rgb(242, 229, 242)',
 				    wow: 'rgb(2, 255, 187)',
+				wow2: 'rgb(50, 99, 86)',
+
 				blueg: 'rgb(116, 191, 255)',
-				oranges: 'rgb(254, 172, 49);'
+				oranges: 'rgb(254, 172, 49);',
+				wowt: "rgb(3, 55, 47)"
 		}
 		
 		
