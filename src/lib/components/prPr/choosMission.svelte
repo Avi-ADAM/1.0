@@ -70,6 +70,7 @@ function newM (event) {
         
       
           <MultiSelect
+                        loading={mission1.length > 0 ? false : true}
           bind:selected
           {placeholder}
           options={mission1.map(c => c.missionName)}

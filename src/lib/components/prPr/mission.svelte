@@ -102,10 +102,7 @@ async function increment() {
   // ולידציה שהיוזר חבר ברקמה מהקוקיות ומאקספורט של רשימת חברים
 // א השמה של לעצמי אם לבד לעשות קוורי למיסיון אין פרוגרס ריקמה גדול לאסקד
 // סיימתי את המשימה אם לבד השמה של קוורי לפינישד מיסיון אם עוד לפיניאפרובל 
-  
-console.log(miData);
-  console.log("xke", miData.map(c => c.selected1));
-  const cookieValue = document.cookie
+    const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
@@ -177,12 +174,14 @@ pendq = ` users: [
     const tafkidims = element.tafkidims.map(c => c.id);
 const nhours = (element.nhours > 0) ? element.nhours : 0;
 const valph = (element.valph > 0) ? element.valph : 0;
- let momentx = moment(element.date, "HH:mm DD/MM/YYYY ")
-        let momebtt =moment(element.dates, "HH:mm DD/MM/YYYY ")
-const date = (element.date !== undefined) ? ` sqadualed: "${momentx.toISOString()}",` : ``;
-const dates = (element.dates !== undefined) ? ` dates: "${momebtt.toISOString()}",` : ``;
-const pb = (element.publicklinks !== undefined || element.publicklinks !== "undefined") ? element.publicklinks : "";
-const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefined") ? element.privatlinks : "";
+let momentx = moment(element.date, "HH:mm DD/MM/YYYY ")
+let momebtt =moment(element.dates, "HH:mm DD/MM/YYYY ")
+const date = (element.date !== undefined && element.date !== "undefined" && element.date !== null) ? ` sqadualed: "${momentx.toISOString()}",` : ``;
+const dates = (element.dates !== undefined && element.dates !== "undefined" && element.dates !== null) ? ` dates: "${momebtt.toISOString()}",` : ``;
+const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `privatlinks: "${element.publicklinks}",` : ``;
+const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${element.privatlinks}",` : "";
+const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${element.spnot}",` : "";
+const deee = (element.descrip !== undefined && element.descrip !== "undefined") ? `descrip: "${element.descrip}",` : "";
 
 //publicklinks save to mission also othet new data
     // הפרדה של קישורים בפסיק
@@ -202,16 +201,16 @@ const pv = (element.privatlinks !== undefined || element.privatlinks !== "undefi
       data: {project: "${projectId}",
              mission:  "${element.id}",
              work_ways: [${work_ways}],
-             hearotMeyuchadot: "${element.spnot}",
              name: "${element.missionName}",
-             descrip: "${element.descrip}",
              skills: [${skills}], 
              tafkidims: [${tafkidims}],
              vallues:  [${vallues}],
              noofhours: ${nhours},
              perhour: ${valph},   
-             privatlinks: "${pv}",
-             publicklinks: "${pb}",
+             ${deee}
+              ${pb}
+              ${pv}
+              ${heee}
              iskvua: ${element.iskvua},
              ${date} 
              ${dates}
@@ -528,6 +527,7 @@ const hmh = {"he":" כמה שעות זה אמור לקחת בסך הכל?", "en"
 const hms = {"he":"כמה שעות בחודש?", "en": "how many hours per month"}
 const htt = {"he":"מספר השעות","en": "number of hours"}
 const leho = {"he":"לחודש:", "en": "per month:"}
+const acti = {"he":"פרסום", "en": "publish"}
 let shift = [{"ii": 1}];
 let shifts = 1
 function shifterr (o){
@@ -950,10 +950,12 @@ function kova(){
   on:click={increment}
   class=" m-4 border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
   type="submit" 
-  name="addm">פרסום משימות </button>
+  name="addm">{acti[$lang]}</button>
       {:else}
+
            <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>
   {/if}
+  <!--confety-->
   </div> 
 </div>
 
@@ -1178,6 +1180,9 @@ border-radius: 4%;
 .input:focus, .input:valid, #inputii:valid ~ #labelii, #inputii:focus ~ #labelii   {
  border : 0;
 }
+:global(div.multiselect > ul.selected) {
+    z-index: unset !important;
+  }
   </style>
       
         
