@@ -95,7 +95,7 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 </script>
 
 {#if !image}
-	<h2>
+	<h2 class="text-barbi">
 {up[$lang]}
   </h2>
 	<input class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full a" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >

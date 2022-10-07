@@ -88,6 +88,10 @@ function logout() {
 function save (){
 	
     dispatch('message', {
+     fblink: fblink,
+      twiterlink: twiterlink,
+      discordlink: discordlink,
+      githublink: githublink,
     frd: frd,
 	  bi : bi,
 	  un: un,
@@ -101,11 +105,13 @@ import axios from 'axios';
 let passwordx;
 let errorl = null;
 let before = true;
+export let fblink, twiterlink,discordlink,githublink;
 export let mail;
 export let un;
 export let bi;
 export let frd;
 export let lango;
+export let cards = false;
 let passi;  
 
 function shaneh () {
@@ -137,7 +143,7 @@ function shaneh () {
 			password.length > 5,
 			password.search(/[A-Z]/) > -1,
 			password.search(/[0-9]/) > -1,
-			password.search(/[$&+,:;=?@#]/) > -1,
+		//	password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
 		
@@ -159,11 +165,11 @@ function shaneh () {
  	 function startGuid(){
   console.log("guid")
     isGuidMe = true;
-
-  document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
+ document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
                  addToast(`${guidback[$lang]}`, 'info');
 
 }
+const svbt = {"he": "שמירת שינויים","en": "save changes"}
 const guidend = {"he": "המדריך לא יוצג יותר במכשיר זה, ניתן להחזירו בכל עת בתפריט זה","en": "the guid will not show up again in this device, you can return it back from here"}
 const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כדי לראותו","en": "the guid ia back! refreach the page to see it"}
  const pr = {"he":"שפה מועדפת", "en": "prefferd Language"}
@@ -177,15 +183,27 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
  const shabat = {"he": "שבת", "en": "Saturday"}
  const head = {"he": "עריכת הפרטים שלי", "en": "Edit My Profile"}
  const nm = {"he": "שם","en": "name"}
+  const githublinkde = {"he":"לינק לגיטהב שלי","en":"link to my GitHub"}
+   const fblinkde = {"he":"לינק לפייסבוק שלי","en":"link to my Facebook"}
+   const discordlinkde = {"he":"לינק לדיסקורד שלי","en":"link to my Discord"}
+   const twiterlinkde = {"he":"לינק לטוויטר שלי","en":"link to my twitter"}
+  const nameal = {"he":"השם כבר קיים נא לבחור שם אחר","en": "name already exists please choose another name"}
+  const biot = {"he": "ביוגרפיה", "en": "biography"}
+  const addn = {"he":" יצירת סיסמה חדשה","en": "Create new password"}
+  const changti = {"he": " שנה סיסמה","en": "change password"}
+    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
+  const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
+  const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
+  const oldps = {"he": "הסיסמה הקודמת", "en":"old password" }
 </script>
 <h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
- <div dir="rtl" class='textinputi'>
+ <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
   <input name="des" on:change={ch} bind:value={un}  
  type='text' class='inputi'required >
   <label for="des" class='labeli'>{nm[$lang]}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
+{#if shgi == true}<small class="text-red-600">{nameal[$lang]}</small>{/if}
 <!--
     <div dir="rtl" class='textinputi'>
   <input name="es" on:change={ch}  bind:value={mail}    
@@ -194,10 +212,34 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
   <span class='line'></span>
 </div>-->
 
-   <div dir="rtl" class='textinputi'>
+   <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
   <textarea name="s" on:change={ch}  bind:value={bi}     
  type='textarea' class='inputi d' required></textarea>
-  <label for="s" class='labeli'>ביוגרפיה</label>
+  <label for="s" class='labeli'>{biot[$lang]}</label>
+  <span class='line'></span>
+</div>
+<div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
+  <input name="de" on:change={ch}    bind:value={githublink}     
+ type='text' class='input' required>
+  <label for="de" class='label'>{githublinkde[$lang]}</label>
+  <span class='line'></span>
+</div>
+<div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
+  <input name="de"  on:change={ch}   bind:value={twiterlink}     
+ type='text' class='input' required>
+  <label for="de" class='label'>{twiterlinkde[$lang]}</label>
+  <span class='line'></span>
+</div>
+<div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
+  <input name="de"  on:change={ch}   bind:value={discordlink}     
+ type='text' class='input' required>
+  <label for="de" class='label'>{discordlinkde[$lang]}</label>
+  <span class='line'></span>
+</div>
+<div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
+  <input name="de"  on:change={ch}   bind:value={fblink}     
+ type='text' class='input' required>
+  <label for="de" class='label'>{fblinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div class="grid items-center justify-center"> 
@@ -256,7 +298,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 
 {#if chan == true}
 <div>
-<button type="button" on:click={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שמירת שינויים</button>
+<button type="button" on:click={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{svbt[$lang]}</button>
 </div>
 {/if}
 {#if change}
@@ -277,7 +319,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 				autocomplete="old-password"
 				name="email"
 				class="input"
-				placeholder=" הסיסמה הקודמת"
+				placeholder="{oldps[$lang]}"
                 bind:value={passi}
 				/>
 		</div>
@@ -288,7 +330,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
    				type={showPassword ? "text" : "password"}
 				name="email"
 				class="input"
-				placeholder=" יצירת סיסמה חדשה"
+				placeholder="{addn[$lang]}"
 				on:input={validatePassword}
 				on:blur={getV}
 			/>
@@ -309,20 +351,20 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 			<span class="bar bar-4" class:bar-show={strength > 3} />
 		</div>
 
-		<ul dir="rtl">
+	<ul dir="rtl">
 			<li>
-				{validations[0] ? "🏆" : "❌"} על הססמה להכיל לפחות חמש אותיות <!-- be at least 5 characters-->
+				{validations[0] ? "🏆" : "❌"} {val1[$lang]}
 			</li>
 			<li>
-				{validations[1] ? "🏆" : "❌"} ולפחות אות אחת גדולה באנגלית<!-- must contain a capital letter -->
+				{validations[1] ? "🏆" : "❌"} {val2[$lang]}
 			</li>
-			<li>{validations[2] ? "🏆" : "❌"} ולפחות מספר אחד<!--must contain a number --></li>
-			<li>
-				{validations[3] ? "🏆" : "❌"} ולפחות סמל אחד ($&+,:;=?@#) <!--must contain one symbol ($&+,:;=?@#)-->
-			</li>
+			<li>{validations[2] ? "🏆" : "❌"} {val3[$lang]}</li>
+			<!--<li>
+				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) must contain one symbol ($&+,:;=?@#)
+			</li>-->
 		</ul>
 
-		<button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full" on:click={shaneh} disabled={strength < 4}>שינוי סיסמה</button>
+		<button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full" on:click={shaneh} disabled={strength < 4}>{changti[$lang]}</button>
 	</form>
 </main>
 
