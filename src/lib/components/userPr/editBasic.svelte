@@ -199,7 +199,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 <h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
  <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
   <input name="des" on:change={ch} bind:value={un}  
- type='text' class='inputi'required >
+ type='text' class='inputi' required >
   <label for="des" class='labeli'>{nm[$lang]}</label>
   <span class='line'></span>
 </div>
@@ -211,7 +211,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
   <label for="es" class='labeli'>מייל</label>
   <span class='line'></span>
 </div>-->
-
+<!--
    <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
   <textarea name="s" on:change={ch}  bind:value={bi}     
  type='textarea' class='inputi d' required></textarea>
@@ -220,28 +220,28 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
   <input name="de" on:change={ch}    bind:value={githublink}     
- type='text' class='input' required>
-  <label for="de" class='label'>{githublinkde[$lang]}</label>
+ type='text' class='inputi' required>
+  <label for="de" class='labeli'>{githublinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
   <input name="de"  on:change={ch}   bind:value={twiterlink}     
- type='text' class='input' required>
-  <label for="de" class='label'>{twiterlinkde[$lang]}</label>
+ type='text' class='inputi' required>
+  <label for="de" class='labeli'>{twiterlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
   <input name="de"  on:change={ch}   bind:value={discordlink}     
- type='text' class='input' required>
-  <label for="de" class='label'>{discordlinkde[$lang]}</label>
+ type='text' class='inputi' required>
+  <label for="de" class='labeli'>{discordlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
   <input name="de"  on:change={ch}   bind:value={fblink}     
- type='text' class='input' required>
-  <label for="de" class='label'>{fblinkde[$lang]}</label>
+ type='text' class='inputi' required>
+  <label for="de" class='labeli'>{fblinkde[$lang]}</label>
   <span class='line'></span>
-</div>
+</div>-->
 <div class="grid items-center justify-center"> 
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
