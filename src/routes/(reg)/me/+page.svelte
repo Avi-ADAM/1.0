@@ -729,23 +729,23 @@ const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
  </div>
   <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
           <TourItem message={message3[$lang]}>
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/> 
+    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/> 
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
   <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
-    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn}  Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/> 
+    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/> 
 </div>
           </TourItem>
 
         <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}">
                 <TourItem message={message5[$lang]}>
-      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/> 
+      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/> 
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
         <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}">
-          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/> 
+          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/> 
         </div>
                             </TourItem>
 
@@ -814,7 +814,7 @@ const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
            <div class="cont"  >  
             <button          
              on:click={project(data.id)}
-             class="pt  drop-shadow-lg"> <div class="cont"  >{data.projectName}<span style="margin-top: 2px ;"><Arrow/></span></div></button>
+             class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center mt-1 mr-2 px-2.5 py-0.5 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.projectName}<span style="margin-top: 2px ;"><Arrow/></span></div></button>
              
            </div>
   {/each}
@@ -1495,6 +1495,7 @@ class=" hover:scale-150 "
        text-align: start;
     }
     .pt:hover{ 
+              color:#574010;
              text-shadow: 1px 1px var(--gold) ;
     }
     .cont{
@@ -1571,8 +1572,8 @@ class=" hover:scale-150 "
     .another{
  max-height: 20vh;
   min-height: 20vh;
-         max-width: 35vw;
-     
+         max-width: 30vw;
+      min-width: 25vw;
   }
 }
     .anothere{
@@ -1958,6 +1959,7 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
        align-items: center;
       justify-content: center;
       z-index: -1;
+       max-height: 29vh;
     }
       .middle{
       /*  grid-row: 1 / 3;

@@ -1,5 +1,7 @@
 
 <script> 
+  import Tile from '$lib/celim/tile.svelte'
+
    import Grow from '$lib/celim/icons/grow.svelte' 
               import { lang } from '$lib/stores/lang.js'
    // import AddSkil from './addSkil.svelte';
@@ -20,6 +22,7 @@ import { fly } from 'svelte/transition';
 
  const dispatch = createEventDispatcher();
 //export let addNs;
+export let bgi = "wow"
     export let valc = "skillName";
     export let data = [];
     export let meData = [];
@@ -572,9 +575,19 @@ on:click={bitulm}
       <div class="another " style="margin: auto"> 
  
         <h2 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">{bef[$lang]}{Valname}{aft[$lang]}</h2>
-       {#if data} <span class="d"> {#each data as dat, i}
+     {#if data}
+        <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"> 
+               {#each data as dat, i}<p 
+          class="m-0 " style="text-shadow:none;" >
+              <Tile bg="{bgi}"   word={dat[valc]}/></p>{/each}
+    </div>
+    {/if}
+    
+        <!-- 
+        מובייל , רקמות? להוסיף חץ כאייקון? צבע שונה לכל דבר??
+          {#if data} <span class="d"> {#each data as dat, i}
            <p style="margin: 0; line-height: 1;  padding: auto;" class="t">{dat[valc]}</p>
-           {/each} </span>{/if}
+           {/each} </span>{/if}-->
 <button
 class=" hover:bg-barbi text-mturk rounded-full "
 title="{edito[$lang]}"
@@ -722,7 +735,7 @@ title="{onin[$lang]}">
         .another{
     max-height: 20vh;
      min-height: 20vh;
-     max-width: 25vW;
+     max-width: 30vw;
         }
           .e{
  width:17px;
@@ -777,8 +790,8 @@ padding: 1em;
       text-align: center;
         max-height: 29vh;
      min-height: 20vh;
-     max-width: 25vW;
-     min-width: 10vw;
+     max-width: 30vw;
+     min-width: 25vw;
        filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
        color: #9900cd;
 
@@ -787,6 +800,12 @@ padding: 1em;
        max-height: 20vh;
        overflow-y: scroll;
      }
-    
+       @media (min-width: 528px){
+
+        .another{
+          max-width: 25vw;
+        }
+       }
+
   
  </style>
