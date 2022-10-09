@@ -3,8 +3,8 @@
   "type": "module",
   "scripts": {
     "dev": "vite dev ",
-    "build": "svelte-kit build --verbose",
-    "preview": "svelte-kit preview"
+    "build": "vite build --verbose",
+    "preview": "vite preview"
   },
   "devDependencies": {
     "@event-calendar/core": "^0.11.2",
