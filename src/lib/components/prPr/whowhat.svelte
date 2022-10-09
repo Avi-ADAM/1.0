@@ -13,6 +13,7 @@ let meca = [];
 let miDatan = [];
 let noten = [];
 // what about hours alrerady done to  mission in progres 
+ // matbea: Matbea,
 function remove (id) {
   console.log(id)
 };
@@ -68,12 +69,46 @@ async function ask (){
     }
   ]}
       }
-  ){tosplit { vots { users_permissions_user { id}}}}
+  ){tosplit { id vots { users_permissions_user { id}}}}
 } `   
 } )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+         let qurer = ``
+         for (let i = 0; i < ulist.length; i++){ 
+        qurer +=  `createHaluka(
+      input: {
+      data: { 
+        usersend: ${uid},
+        userrecive: UsersPermissionsUser,
+        amount: Float,
+      
+        confirmed: null,
+        tosplit: ${miDatan.data.createTosplit.id}
+      }
+  ){tosplit {  }}`
+         }
+        try{
+         await fetch(linkg, {
+              method: 'POST',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query:
+          `mutation { 
+
+} `   
+} )})
+  .then(r => r.json())
+  .then(data => miDatan = data);
+         console.log(miDatan)
+        } catch (e) {
+            error1 = e
+            console.log(error1)
+}
         } catch (e) {
             error1 = e
             console.log(error1)

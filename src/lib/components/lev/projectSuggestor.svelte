@@ -14,6 +14,7 @@ export let hst = 187;
 export let stb = 180;
 export let coinlapach;
     export let deadLine;
+        export let deadLinefi;
     export let projectName;
     export let missionName;
     export let role = [];
@@ -208,10 +209,19 @@ function hoverede(){
   }
   dispatch("hover", {id: u[$lang]});
  }
- 
+ $: pclim = 0
+function mesima (){
+  console.log("jjj")
+    pclim += 1;
+    setTimeout(function() {pclim = 0},6000)
+    if(pclim >= 2){
+        dispatch("mesima", {id: oid});
+    }
+}
 $: pcli = 0
 function linke (){
     pcli += 1;
+    setTimeout(function() {pcli = 0},6000)
     if(pcli >= 2){
         dispatch("proj", {id: projectId});
     }
@@ -221,7 +231,7 @@ function project () {
         dispatch("proj", {id: projectId});
 } 
  onMount(function(){
- if ($lang == "he" ){
+ if ($lang != "en" ){
               for (var i = 0; i < skills.length; i++){
                 if (skills[i].localizations.length > 0){
                 skills[i].skillName = skills[i].localizations[0].skillName
@@ -914,7 +924,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   </g>
 <text transform="matrix(1.005 0 0 1.005 -.7373 -6.4393)" fill="url(#sugzzt)"  font-size="17px" stroke="url(#sugzzz)" stroke-miterlimit="0" stroke-width=".62511px" on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")}  style="white-space:pre; stroke-width: 0 !important; fill: url(#sugzzt) !important; font-weight:bold; font-family: gan, Powerr; " bx:origin="0.5 -0.369851"><textPath startOffset="{hst}" xlink:href="#sugzzm">{projectName}</textPath></text>
 
-<text fill="url(#sugzzs)" font-size="17px" stroke="url(#sugzzy)" stroke-miterlimit="0" stroke-width=".62511px" style="white-space:pre; fill:white; font-family: Gan, Powerr; stroke-width: 0;"><textPath startOffset="{stb}" xlink:href="#sugzzl" on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")}>{missionName}</textPath></text>
+<text on:click={mesima} fill="url(#sugzzs)" font-size="17px" stroke="url(#sugzzy)" stroke-miterlimit="0" stroke-width=".62511px" style="white-space:pre; fill:white; font-family: Gan, Powerr; stroke-width: 0; cursor: pointer;"><textPath startOffset="{stb}" xlink:href="#sugzzl" on:mouseenter={()=>hover({"he":"המשימה המוצעת","en": "suggested mission"})} on:mouseleave={()=>hover("0")}>{missionName}</textPath></text>
 
 <text x="503.31" y="223.099" fill="url(#sugzzx)" font-family='"Lobster Two"' font-size="27px" stroke="url(#sugzzw)" stroke-miterlimit="0" stroke-width=".2511px" text-anchor="middle" style="white-space:pre">{total.toLocaleString('en-US', {maximumFractionDigits:2})}</text>
 
@@ -984,6 +994,8 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
       {#each skills as skill}<span class="bg-gold font-semibold opacity-80 inline-flex items-center mr-2 px-2.5 py-0.5 rounded">{skill.skillName}</span>{/each}
 </div> 
    {#if deadLine != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
+      {#if deadLinefi != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
+
     <h4 on:mouseenter={()=>hover({"he":"פרטי המשימה","en":"mission details"})} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
     <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="ltn de d">{role.map(d=> d.roleDescription).join(' ')}</p>
 {#if low == false}

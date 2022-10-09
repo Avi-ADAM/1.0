@@ -4,6 +4,7 @@
 import axios from 'axios';
 import { idr } from '../../stores/idr.js';
            import { lang } from '$lib/stores/lang.js'
+    import { liUN } from '$lib/stores/liUN.js';
 
 let skillName_value;
     let desS;
@@ -28,6 +29,24 @@ if (rn.includes(skillName_value)){
     meData = response.data;
     finnish (meData.id);
          idr.set(meData.id);
+          let userName_value = liUN.get()
+         let data = {"name": userName_value, "action": "יצר כישור חדש בשם:", "det": `${skillName_value} והתיאור: ${desS} `}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
               })
   .catch(error => {
     console.log('צריך לתקן:', error);

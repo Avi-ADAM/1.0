@@ -4,6 +4,7 @@
     import axios from 'axios';
     import { idd } from '../../stores/idd.js';
            import { lang } from '$lib/stores/lang.js'
+    import { liUN } from '$lib/stores/liUN.js';
 
     export let color = "--gold"
     export let rn = [];
@@ -29,6 +30,24 @@
         meData = response.data;
          idd.set(meData.id);
          finnish (meData.id);
+          let userName_value = liUN.get()
+         let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desS}` }
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
                   })
       .catch(error => {
         console.log('צריך לתקן:', error);

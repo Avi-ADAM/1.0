@@ -1,5 +1,6 @@
 <script>
       import Chaticon from '../../../celim/chaticon.svelte'
+      import {lang} from '$lib/stores/lang.js'
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
      export let low = false;
@@ -29,6 +30,8 @@ dispatch("project")
 function tochat (){
 dispatch("tochat");
 }
+    const headi = {"he":"הצעה למשימה", "en":"suggested mission"}
+
 </script>
 
 
@@ -42,7 +45,7 @@ dispatch("tochat");
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">הצעה לביצוע משימה בריקמה</span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{headi[$lang]}</span>
             </div>
             <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
          </div>

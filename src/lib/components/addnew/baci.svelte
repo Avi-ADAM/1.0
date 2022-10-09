@@ -28,6 +28,7 @@ let imageId = 50;
 let files;
   let shgi = false;
     let restime;
+    let nam;
 function sendP () {
     if (run.includes(projectName_value)){
   shgi = true; 
@@ -41,6 +42,7 @@ function sendP () {
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
+  
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
@@ -108,6 +110,23 @@ if (files) {
         before = true;
             loading = false;
    goto("/moach", );
+    let data = {"name": userName_value, "action": "יצר ריקמה חדשה בשם:", "det": `${projectName_value} והתיאור: ${desP}` }
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
               })
   .catch(error => {
     console.log('צריך לתקן:', error.response);

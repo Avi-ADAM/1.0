@@ -145,3 +145,59 @@ async function sub(){
     {/if}
 <button class="text-barbi bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:text-gold hover:bg-gradient-to-br hover:from-barbi hober:via-mpink hober:to-lpink px-4 py-1 rounded-xl mt-2" type="submit" on:click|preventDefault={sub}>{sedes[$lang]}</button>
     </div>
+
+    <style>
+          :global(.multiselect) {
+    background-color: var(--gold) !important ;
+  /* top-level wrapper div */
+}
+  :global(.multiselect:focus){
+    border: 1px solid var(--barbi-pink) !important;
+  }
+  :global(.multiselect span.token) {
+  color: var(--gold);
+  background: var(--barbi-pink) ;
+    /* selected options */
+  }
+ /* :global(.multiselect span.token button),
+  :global(.multiselect .remove-all) {
+
+    /* buttons to remove a single or all selected options at once */
+ /* } 
+  :global(.multiselect ul) {
+    /* dropdown options */
+ /* }
+  :global(.multiselect ul li) {
+    /* dropdown options */
+ /* } */
+ :global(li.selected) {
+    border: var(--sms-focus-border, 1pt solid var( cornflowerblue));
+    color: var(--gold);
+    /* selected options in the dropdown list */
+  }
+  :global(li:not(.selected):hover) {
+ color: var(--barbi-pink);
+    background-color:var(--lturk);    /* unselected but hovered options in the dropdown list */
+  }
+  :global(ul.tokens > li){
+    background-color: var(--barbi-pink);
+    color:var(--lturk);
+  }
+  :global(ul.tokens > li):hover{
+    color: var(--barbi-pink);
+background-color:var(--lturk);  
+  }
+  /*
+  :global(li.selected:hover) {
+    /* selected and hovered options in the dropdown list */
+    /* probably not necessary to style this state in most cases */
+ /* } */
+  :global(li.active) {
+    color:var(--barbi-pink) !important;
+    /* active means element was navigated to with up/down arrow keys */
+    /* ready to be selected by pressing enter */
+  }
+ /* :global(li.selected.active) {
+  } */
+  
+    </style>

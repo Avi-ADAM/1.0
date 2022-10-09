@@ -2,6 +2,7 @@
 <script>
     import { createEventDispatcher } from 'svelte';
                import { lang } from '$lib/stores/lang.js'
+               import { liUN } from '$lib/stores/liUN.js';
 
      const dispatch = createEventDispatcher();
     
@@ -58,7 +59,26 @@ let link ="https://i18.onrender.com/graphql" ;
   .then(data => meData = data);
 
             dispatchww (meData, id);
-            addW = false;}
+            addW = false;
+          let userName_value = liUN.get()
+         let data = {"name": userName_value, "action": "create דרך יצירה חדשה בשם:", "det": `${Name_value}`}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+          }
       catch(error) {
         console.log('צריך לתקן:', error);
                 };}

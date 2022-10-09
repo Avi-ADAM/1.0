@@ -2,6 +2,8 @@
      import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
+               import { liUN } from '$lib/stores/liUN.js';
+
  let vallues = [];
 // דף של השראה כפתור להוסיף את ההשראה שלך, כפתור לתיקונים  
     let name_value;
@@ -48,6 +50,24 @@ if (rn.includes(name_value)){
   .then(r => r.json())
   .then(data => meData = data);
    dispatchvall ( meData);
+    let userName_value = liUN.get()
+         let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${name_value} והתיאור: ${desV} `}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
                   }
       catch(error) {
         console.log('צריך לתקן:', error.response);

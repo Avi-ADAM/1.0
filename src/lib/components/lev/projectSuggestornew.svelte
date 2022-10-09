@@ -822,7 +822,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
     in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 >
         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="32" height="32" alt="logo">
-        <a sveltekit:prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 class="hover:text-lturk" style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName}</h3></a>
+        <a  data-sveltekit-prefetch style="margin-top: 2px; margin-bottom: 2px" href={`${link}${projectId}`}><h3 class="hover:text-lturk" style="margin: 2px; font-size: 13px; line-height: 1; font-weight: bold;">{projectName}</h3></a>
         <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: rgb(87, 208, 248 ); line-height: 0.7; ">{missionName}</h1>
         <p style="margin-top: 7px; margin-bottom: 13px; font-size: 13px; margin-right:auto; margin-left: auto; line-height: 0.7">{skills.join(' ')}</p>
         {#if total} <p>{total}</p>{/if}
@@ -839,7 +839,7 @@ in:scale="{{ duration: 1000, opacity: 0.5, start: 0.64 }}"
 use:clickOutside on:click_outside={toggleShow}>
 	
     <img style=" margin-top: 0px; margin-bottom: 0px;  margin-right:auto; margin-left: auto; border-radius: 50%;" src={src} width="35" height="35"   alt="project logo">
-    <a sveltekit:prefetch  href={`${link}${projectId}`}><h3 class="hover:text-lturk" style="margin: 0px; font-size: 17px; font-weight: bold; line-height: 1;">{projectName}</h3></a>
+    <a  data-sveltekit-prefetch  href={`${link}${projectId}`}><h3 class="hover:text-lturk" style="margin: 0px; font-size: 17px; font-weight: bold; line-height: 1;">{projectName}</h3></a>
     <h3 style=" margin: 2px; font-size: 13px; font-weight: bold; line-height: 1;">{missionName}</h3>
    {#if deadLine} <h5 style=" margin: 2px; font-size: 13px; font-weight: bold;">{deadLine}</h5>{/if}
     <h6 style="margin: 7px; font-size: 13px; font-weight: bold; line-height: 0.7;">{missionDetails}</h6>

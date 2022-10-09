@@ -3179,7 +3179,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 
 <g on:mouseenter={()=>hover("h")} on:mouseleave={()=>hover("h")} transform="{hh}" style="">
-  <a sveltekit:prefetch 
+  <a  data-sveltekit-prefetch 
     href="/me" >
 <path d="m-24.698 44.139h20v1.219h-20v-1.219zm0-8.536 5 1.828 5-3.657 5 3.657 5-1.828v7.316h-20v-7.316z" fill="url(#levlevaw)" stroke="url(#levlevfb)" stroke-miterlimit="5" stroke-width=".57906px"/>
 <text transform="matrix(.075915 0 0 .081691 -14.883 40.747)" fill="rgb(0, 81, 88)" font-family="Arial, sans-serif" font-size="28px" font-weight="700" letter-spacing="1.6px" text-anchor="middle" style="white-space:pre">{name}</text>

@@ -1,8 +1,8 @@
 
 <script>
 import { onMount } from 'svelte';
-           import { lang } from '$lib/stores/lang.js'
-
+import { lang } from '$lib/stores/lang.js'
+    import { liUN } from '$lib/stores/liUN.js';
 import axios from 'axios';
 import { idr } from '../../stores/idr.js';
 import Addnewskil from './addNewSkillToRole.svelte';
@@ -101,6 +101,24 @@ axios
     id = meData.id;
         dispatchrole (meData, id);
         addR = false;
+        let userName_value = liUN.get()
+         let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desR} והכישורים: ${selected.join(" , ")}` }
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
               })
   .catch(error => {
     console.log('צריך לתקן:', error);

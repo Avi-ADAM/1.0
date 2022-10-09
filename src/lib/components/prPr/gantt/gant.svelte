@@ -1,8 +1,8 @@
 <script>
-    import { SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter } from 'svelte-gantt';
     import { onMount } from 'svelte';
     import moment from 'moment';
       import { createEventDispatcher } from 'svelte';
+    let SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter;
 
  const dispatch = createEventDispatcher();
     export let bmiData = [], pmiData = [], omiData = [], fmiData = []; 
@@ -28,7 +28,13 @@
     ];
         console.log (timeRanges)
     const colors = ['blue', 'green', 'orange', 'pink']
-    const data = generate();
+   let data
+    let gantt;
+    onMount(async() => {
+        SvelteGantt = (await import ('svelte-gantt')).SvelteGantt
+        SvelteGanttTable = (await import ('svelte-gantt')).SvelteGanttTable
+        MomentSvelteGanttDateAdapter = (await import ('svelte-gantt')).MomentSvelteGanttDateAdapter
+          data = generate();
 		let options = {
             resizeHandleWidth: 0,
         dateAdapter: new MomentSvelteGanttDateAdapter(moment),
@@ -45,8 +51,6 @@
         from: currentStart,
         to: currentEnd,
     }
-    let gantt;
-    onMount(() => {
         window.gantt = gantt = new SvelteGantt({ target: document.getElementById('example-gantt'), props: options });
     	gantt.api.tasks.on.select((task) => dispatch('selected', { id:task}));
         

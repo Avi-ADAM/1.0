@@ -198,7 +198,7 @@ async function agree() {
      console.log(idL);
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
-
+    let newnew = false
     console.log(pid);
     if (pid.includes(userId)){
         welcome = ``;
@@ -206,6 +206,7 @@ async function agree() {
         adduser = ``;
         console.log(welcome, "member");
     } else {
+        newnew = true;
           pid.push(userId);
     pid = pid;
         welcome = `createWelcomTop(
@@ -255,6 +256,7 @@ input: {
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
               tafkidims: [${tafkidimsa}],
+              
             ${date}
                   }
     }
@@ -286,6 +288,23 @@ ${adduser}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            if (newnew == true){
+            let data = {"name": `${useraplyname}`}//username email projectname projectsrc lang
+            fetch(`/api/sma`, {
+            method: 'POST',  
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response)
+            .then((data) => {
+              console.log('Success:', data);            
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+          }
             dispatch('acsept', {
                 ani: "asked",
                 coinlapach: coinlapach

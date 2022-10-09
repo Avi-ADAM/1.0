@@ -3,20 +3,21 @@
 import {
     createEventDispatcher
 } from 'svelte';
+import { Confetti } from "svelte-confetti"
+
 import {
     idPr
 } from './../../stores/idPr.js';
 export let id;
 export let username;
 export let projectName;
+export let projectSrc;
 import {
-    goto,
-    invalidate,
-    prefetch,
-    prefetchRoutes
-} from '$app/navigation';
-
+    goto } from '$app/navigation';
+let confe = false
 function project(id) {
+    confe = false
+    confe = true
     idPr.set(id);
     goto("/moach",);
     //make it desapire for good
@@ -26,6 +27,7 @@ let hovered = false;
 let u = "קבלת פנים לרגל הצטרפותך לריקמה חדשה"
 
 function hoverede(){
+    confe = !confe
    hovered = !hovered
     if (hovered == false){
     u = "לב המערכת"
@@ -34,6 +36,7 @@ u = "קבלת פנים לרגל הצטרפותך לריקמה חדשה"
   }
   dispatch("hover", {id: u});
  }
+
 </script>
 <div
 style="position: relative;" 
@@ -41,7 +44,13 @@ style:z-index={hovered === false ? 11 : 16}
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000}}>
-
+{#if confe}
+<div class="absolute   w-full h-full" style="top: 50%; left: 50%; transform: translate(-50, -50)"> 
+<Confetti rounded size=30 x={[-1, 1]} y={[-1, 1]} delay={[0, 50]} duration=10000 colorArray={["url(https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png)"]} /><!--colorRange={[0, 120]}-->
+<Confetti noGravity x={[-1, 1]} y={[-1, 1]} delay={[550, 550]} duration=10000 colorRange={[120, 240]} />
+<Confetti noGravity x={[-1, 1]} y={[-1, 1]} delay={[1000, 1050]} duration=10000 colorRange={[240, 360]} />
+</div>
+{/if}
 <svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 class="a" viewBox="-1 0 59 58" enable-background="new 0 0 57 57" xml:space="preserve">
 
@@ -99,11 +108,12 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
 <circle cx="28.5" cy="28.5" r="18" class="rou">
    
     </circle>
-     <text text-anchor="middle" width="16" overflow="scroll"  x="28.5" y="18" fill="#FF0092" style="font-size:4px;" >{username}</text>
- <text text-anchor="middle"  x="28.5" y="24" fill="#FF0092" style="font-size:4px;" >הצטרפת לרקמת</text>
-        <text text-anchor="middle" width="21" overflow="scroll"  x="28.5" y="30" fill="#FF0092" style="font-size:4px;" >{projectName}</text>
+     <text text-anchor="middle" width="16" overflow="scroll"  x="28.5" y="18" fill="#FF0092" style="font-size:4px; fill: #FF0092; stroke-width: 0.1px;" >{username}</text>
+ <text text-anchor="middle"  x="28.5" y="24" fill="#FF0092" style="font-size:4px; fill: #FF0092; stroke-width: 0.1px;" >הצטרפת לרקמת</text>
+        <text text-anchor="middle" width="21" overflow="scroll"  x="28.5" y="30" fill="#FF0092" style="font-size:4px; fill: #FF0092; stroke-width: 0.1px;" >{projectName}</text>
       <text  x="28.5" y="38" text-anchor="middle"  class="btn" style="font-size:4px;" on:click={() =>project(id)}>למוח הריקמה</text>
 </svg>
+
 <!--
     <button class="bg-lturk p-0.5 te" on:click={project(id)}>למוח הריקמה</button>-->
 </div>
@@ -168,7 +178,7 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
     -webkit-animation-name: pulse;
     -webkit-animation-iteration-count: infinite;
     animation-duration: 3s;
-    animation-name: pulse;
+    animation-name: pulset;
     animation-iteration-count: infinite;
 }
 .spark_1 {
@@ -182,6 +192,48 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
 .spark_3 {
     -webkit-animation-delay: 0.31s;
     animation-delay: 0.31s;
+}
+@-webkit-keyframes pulset {
+    0% {  
+        stroke: #FFF5A5;
+        fill: #5efaf2; 
+    }
+    25% { 
+        stroke: #FFD4DA;
+        fill: #FFF5A5; 
+    }
+    50% { 
+        stroke: #99D2E4;
+        fill: #FFD4DA; 
+    }
+    75% { 
+        stroke: #5bf875;
+        fill: #99D2E4; }
+    100% {
+        stroke: #5efaf2;
+        fill: #5bf875; 
+    }
+}
+@keyframes pulset {
+    0% {  
+        stroke: none;
+        fill: none; 
+    }
+    25% { 
+        stroke: none;
+        fill: #FFF5A5; 
+    }
+    50% { 
+        stroke: #99D2E4;
+        fill: #FFD4DA; 
+    }
+    75% { 
+        stroke: #5bf875;
+        fill: none; }
+    100% {
+        stroke: none;
+        fill: none; 
+    }
 }
 .te{
     font-size: 10px;

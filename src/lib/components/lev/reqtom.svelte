@@ -578,7 +578,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                                                             {openmissionName}
                                                         </textPath>
                                                     </text>
-                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover(clicktofree[$lang])} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40" >
+                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover(clicktofree[$lang])} on:mouseleave={()=>hover("0")}  data-sveltekit-prefetch x="0" y="-40" >
                                                     <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                                               </g>  
                                                     <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >

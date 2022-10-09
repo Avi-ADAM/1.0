@@ -211,7 +211,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
   <label for="es" class='labeli'>מייל</label>
   <span class='line'></span>
 </div>-->
-<!--
+
    <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
   <textarea name="s" on:change={ch}  bind:value={bi}     
  type='textarea' class='inputi d' required></textarea>
@@ -241,7 +241,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{fblinkde[$lang]}</label>
   <span class='line'></span>
-</div>-->
+</div>
 <div class="grid items-center justify-center"> 
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">

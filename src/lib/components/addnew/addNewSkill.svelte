@@ -4,6 +4,7 @@
     import { onMount } from 'svelte';
     import axios from 'axios';
                import { lang } from '$lib/stores/lang.js'
+    import { liUN } from '$lib/stores/liUN.js';
 
     import { idd } from '../../stores/idd.js';
  //   import { skillIdStore } from './store/skillIdStore.js'
@@ -109,6 +110,24 @@ if (rn.includes(skillName_value)){
         id = meData.id;
         dispatchskillid (meData, id);
         addS = false;
+               let userName_value = liUN.get()
+         let data = {"name": userName_value, "action": "יצר כישור חדש בשם:", "det": `${skillName_value} והתיאור: ${desS} והתפקידים: ${tafkidimslist.join(", ")}`}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
                   })
       .catch(error => {
         console.log('צריך לתקן:', error);

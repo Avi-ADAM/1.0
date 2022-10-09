@@ -624,7 +624,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
                                                             {openmissionName[$lang]}
                                                         </textPath>
                                                     </text>
-                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")} sveltekit:prefetch x="0" y="-40" >
+                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  data-sveltekit-prefetch x="0" y="-40" >
                                                     <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                                               </g>  
                                                     <foreignObject x='-50' y='0 ' width='56px' height='56px' transform="translate(-28,-28)" >
