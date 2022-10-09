@@ -59,8 +59,8 @@ let askedarr = [];
 let declineddarr = [];
 let d = [];
 let sk = [];
-var dictids = {};
-var dictasked = [];
+let dictids = {};
+let dictasked = [];
 let askedcoin = [];
 let error1 = null;
 let mtaha = [];
@@ -133,7 +133,7 @@ function txx(na){
 }
 function mesimabetahalicha(data) {
     const mtahan = data.data.user.mesimabetahaliches;
-    for (var i = 0; i < mtahan.length; i++) {
+    for (let i = 0; i < mtahan.length; i++) {
         mtaha[i] = mtahan[i];
         mtaha[i].tx = txx(mtaha[i].name)
         mtaha[i].ani = "mtaha";
@@ -168,17 +168,17 @@ function mesimabetahalicha(data) {
 }
 
 function gvots(data) {
-    for (var k = 0; k < data.length; k++) {
+    for (let k = 0; k < data.length; k++) {
         const x = data[k].users //בעיה לפעמים זה vots
         data[k].uids = [];
-        for (var z = 0; z < x.length; z++) {
+        for (let z = 0; z < x.length; z++) {
             data[k].uids.push(x[z].users_permissions_user.id);
             data[k].what = [];
             data[k].what.push(x[z].what);
         }
     }
 
-    for (var t = 0; t < data.length; t++) {
+    for (let t = 0; t < data.length; t++) {
         const allid = data[t].uids;
         const myid = data[t].myid;
         data[t].already = false;
@@ -190,13 +190,13 @@ function gvots(data) {
         if (allid.includes(myid)) {
             data[t].already = true;
             data[t].pl = 20;
-            for (var l = 0; l < data[t].users.length; l++) {
+            for (let l = 0; l < data[t].users.length; l++) {
                 if (data[t].users[l].users_permissions_user.id === myid)
                     fiapp[t].mypos = fiapp[t].users[l].what;
             }
         }
 
-        for (var r = 0; r < fiapp[t].users.length; r++) {
+        for (let r = 0; r < fiapp[t].users.length; r++) {
             if (fiapp[t].users[r].what === true) {
                 fiapp[t].noofusersOk += 1;
                 fiapp[t].whyes.push(fiapp[t].users[r].why)
@@ -214,8 +214,8 @@ function gvots(data) {
 function ishursium(dati) {
     const start = dati.data.user.projects_1s
     const myid = dati.data.user.id;
-    for (var i = 0; i < start.length; i++) {
-        for (var j = 0; j < start[i].finiapruvals.length; j++) {
+    for (let i = 0; i < start.length; i++) {
+        for (let j = 0; j < start[i].finiapruvals.length; j++) {
             const rt = letters(start[i].finiapruvals[j].missname);
             let src22 = "";
             if (start[i].finiapruvals[j].users_permissions_user.profilePic !== null) {
@@ -252,17 +252,17 @@ function ishursium(dati) {
         }
   console.log("ishursium",fiapp)
     }
-    for (var k = 0; k < fiapp.length; k++) {
+    for (let k = 0; k < fiapp.length; k++) {
         const x = fiapp[k].users
         fiapp[k].uids = [];
-        for (var z = 0; z < x.length; z++) {
+        for (let z = 0; z < x.length; z++) {
             fiapp[k].uids.push(x[z].users_permissions_user.id);
             fiapp[k].what = [];
             fiapp[k].what.push(x[z].what);
         }
     }
 
-    for (var t = 0; t < fiapp.length; t++) {
+    for (let t = 0; t < fiapp.length; t++) {
         const allid = fiapp[t].uids;
         const myid = fiapp[t].myid;
         fiapp[t].already = false;
@@ -275,13 +275,13 @@ function ishursium(dati) {
             fiapp[t].already = true;
             fiapp[t].pl += 20;
 
-            for (var l = 0; l < fiapp[t].users.length; l++) {
+            for (let l = 0; l < fiapp[t].users.length; l++) {
                 if (fiapp[t].users[l].users_permissions_user.id === myid)
                     fiapp[t].mypos = fiapp[t].users[l].what;
             }
         }
 
-        for (var r = 0; r < fiapp[t].users.length; r++) {
+        for (let r = 0; r < fiapp[t].users.length; r++) {
             if (fiapp[t].users[r].what === true) {
                 fiapp[t].noofusersOk += 1;
                 fiapp[t].whyes.push(fiapp[t].users[r].why)
@@ -303,9 +303,9 @@ function ishursium(dati) {
 function crMaap(hh) {
     const start = hh.data.user.projects_1s
     const myid = hh.data.user.id;
-    for (var i = 0; i < start.length; i++) {
+    for (let i = 0; i < start.length; i++) {
         if (start[i].maaps) {
-            for (var j = 0; j < start[i].maaps.length; j++) {
+            for (let j = 0; j < start[i].maaps.length; j++) {
                 if (start[i].maaps.length > 0) {
                     const rt = letters(start[i].maaps[j].sp.name);
                     wegets.push({
@@ -340,16 +340,16 @@ function crMaap(hh) {
             }
         }
     }
-    for (var k = 0; k < wegets.length; k++) {
+    for (let k = 0; k < wegets.length; k++) {
         const x = wegets[k].users
         wegets[k].uids = [];
-        for (var z = 0; z < x.length; z++) {
+        for (let z = 0; z < x.length; z++) {
             wegets[k].uids.push(x[z].users_permissions_user.id);
             wegets[k].what = [];
             wegets[k].what.push(x[z].what);
         }
     }
-    for (var t = 0; t < wegets.length; t++) {
+    for (let t = 0; t < wegets.length; t++) {
         const allid = wegets[t].uids;
         const myid = wegets[t].myid;
         wegets[t].already = false;
@@ -360,13 +360,13 @@ function crMaap(hh) {
         wegets[t].mypos = null;
         if (allid.includes(myid)) {
             wegets[t].already = true;
-            for (var l = 0; l < wegets[t].users.length; l++) {
+            for (let l = 0; l < wegets[t].users.length; l++) {
                 if (wegets[t].users[l].users_permissions_user.id === myid)
                     wegets[t].mypos = wegets[t].users[l].what;
             }
         }
 
-        for (var r = 0; r < wegets[t].users.length; r++) {
+        for (let r = 0; r < wegets[t].users.length; r++) {
             if (wegets[t].users[r].what === true) {
                 wegets[t].noofusersOk += 1;
                 wegets[t].whyes.push(wegets[t].users[r].why)
@@ -427,7 +427,7 @@ function createD() {
     check = 4
     orech = arr1.lenght;
     if (orech < check && adder.length === 0) {
-        for (var i = orech; i < check; i++) {
+        for (let i = orech; i < check; i++) {
             adder.push(
                 `<svg class="svggg" viewBox="0 0 100 100" >
   <circle fill="none" id="d" cx="50" cy="50" r="50"/>
@@ -439,8 +439,8 @@ function createD() {
 }
 async function createasked(da) {
     const start = da.data.user.projects_1s
-    for (var i = 0; i < start.length; i++) {
-        for (var j = 0; j < start[i].asks.length; j++) {
+    for (let i = 0; i < start.length; i++) {
+        for (let j = 0; j < start[i].asks.length; j++) {
             const rt = letters(start[i].asks[j].open_mission.name);
             let src21 = ``;
             if (start[i].asks[j].project.profilePic) {
@@ -491,17 +491,17 @@ async function createasked(da) {
     dictasked = dictasked
     console.log(dictasked)
     if (dictasked.length > 0) {
-        for (var k = 0; k < dictasked.length; k++) {
+        for (let k = 0; k < dictasked.length; k++) {
             const x = dictasked[k].users
             dictasked[k].uids = [];
             dictasked[k].what = [];
-            for (var z = 0; z < x.length; z++) {
+            for (let z = 0; z < x.length; z++) {
                 dictasked[k].uids.push(x[z].users_permissions_user.id);
                 dictasked[k].what.push(x[z].what);
             }
         }
 
-        for (var t = 0; t < dictasked.length; t++) {
+        for (let t = 0; t < dictasked.length; t++) {
             const allid = dictasked[t].uids;
             const myid = dictasked[t].myid;
             dictasked[t].already = false;
@@ -514,7 +514,7 @@ async function createasked(da) {
                 //  dictasked. = dictasked
             }
             if (dictasked.length > 0) {
-                for (var r = 0; r < dictasked[t].users.length; r++) {
+                for (let r = 0; r < dictasked[t].users.length; r++) {
                     if (dictasked[t].users[r].what === true) {
 
                         dictasked[t].noofusersOk += 1;
@@ -534,9 +534,9 @@ async function createasked(da) {
             }
         }
     }
-    var filters = [false];
+    let filters = [false];
 
-    var result = dictasked.filter(val => filters.includes(val.already));
+    let result = dictasked.filter(val => filters.includes(val.already));
     dictasked = result
     askedcoin = dictasked;
     ask = askedcoin.length;
@@ -545,8 +545,8 @@ async function createasked(da) {
 
 async function createmask(da) {
     const start = da.data.user.projects_1s
-    for (var i = 0; i < start.length; i++) {
-        for (var j = 0; j < start[i].askms.length; j++) {
+    for (let i = 0; i < start.length; i++) {
+        for (let j = 0; j < start[i].askms.length; j++) {
             const rt = letters(start[i].askms[j].open_mashaabim.name);
             let src21 = ``;
             if (start[i].profilePic) {
@@ -592,17 +592,17 @@ async function createmask(da) {
     }
     askedm = askedm
     if (askedm.length > 0) {
-        for (var k = 0; k < askedm.length; k++) {
+        for (let k = 0; k < askedm.length; k++) {
             const x = askedm[k].users
             askedm[k].uids = [];
             askedm[k].what = [];
-            for (var z = 0; z < x.length; z++) {
+            for (let z = 0; z < x.length; z++) {
                 askedm[k].uids.push(x[z].users_permissions_user.id);
                 askedm[k].what.push(x[z].what);
             }
         }
 
-        for (var t = 0; t < askedm.length; t++) {
+        for (let t = 0; t < askedm.length; t++) {
             const allid = askedm[t].uids;
             const myid = askedm[t].myid;
             askedm[t].already = false;
@@ -615,7 +615,7 @@ async function createmask(da) {
                 //  dictasked. = dictasked
             }
             if (askedm.length > 0) {
-                for (var r = 0; r < askedm[t].users.length; r++) {
+                for (let r = 0; r < askedm[t].users.length; r++) {
                     if (askedm[t].users[r].what === true) {
 
                         askedm[t].noofusersOk += 1;
@@ -635,9 +635,9 @@ async function createmask(da) {
             }
         }
     }
-    var filters = [false];
+    let filters = [false];
 
-    var result = askedm.filter(val => filters.includes(val.already));
+    let result = askedm.filter(val => filters.includes(val.already));
     askedm = result
     askedm = askedm;
     askma = askedm.length;
@@ -744,11 +744,13 @@ const filterArray = (arr1, arr2) => {
     return filterede;
 };
 async function showOpenPro(mi) {
+    //req
     const r = mi.data.user.askeds;
     if (r.length > 0) {
         const p = r.map(c => c.id);
         askedarr = p;
     }
+    //dec
     const r1 = mi.data.user.declined;
     if (r1.length > 0) {
         const p1 = r1.map(c => c.id);
@@ -759,17 +761,17 @@ async function showOpenPro(mi) {
     const y = mi.data.user.tafkidims;
     const mytaf = y.map(c => c.id);
     const mysk = x.map(c => c.id);
-
-    for (var i = 0; i < y.length; i++) {
+//check taf
+    for (let i = 0; i < y.length; i++) {
         const q = y[i].open_missions;
-        var l = [];
-        var z = [];
-        var www = [];
-        var wwn = [];
-        var rate = [];
-        var mtaf = [];
-        var msk = [];
-        for (var j = 0; j < q.length; j++) {
+        let l = [];
+        let z = [];
+        let www = [];
+        let wwn = [];
+        let rate = [];
+        let mtaf = [];
+        let msk = [];
+        for (let j = 0; j < q.length; j++) {
             l[j] = q[j].id;
             z[j] = q[j].work_ways.map(c => c.id);
             mtaf[j] = q[j].tafkidims.map(c => c.id);
@@ -777,7 +779,7 @@ async function showOpenPro(mi) {
             const tafn = filterArrayd(mtaf[j], mytaf);
             const skn = filterArrayd(msk[j], mysk);
             if (t.length > 0) {
-                var s = t.map(c => c.id);
+                let s = t.map(c => c.id);
                 www[j] = filterArray(z[j], s);
                 wwn[j] = filterArrayd(z[j], s);
                 if (www[j].length > 0 && wwn[j].length === 0) {
@@ -892,21 +894,21 @@ async function showOpenPro(mi) {
 
     }
 
-    for (var i = 0; i < x.length; i++) {
+    for (let i = 0; i < x.length; i++) {
         const q = x[i].open_missions;
-        var l = [];
-        var z = [];
-        var www = [];
-        var wwn = [];
-        var rate = [];
-        var mtaf = [];
-        var msk = [];
-        for (var j = 0; j < q.length; j++) {
+        let l = [];
+        let z = [];
+        let www = [];
+        let wwn = [];
+        let rate = [];
+        let mtaf = [];
+        let msk = [];
+        for (let j = 0; j < q.length; j++) {
             l[j] = q[j].id;
             z[j] = q[j].work_ways.map(c => c.id);
             mtaf[j] = q[j].tafkidims.map(c => c.id);
             msk[j] = q[j].skills.map(c => c.id);
-            var s = t.map(c => c.id);
+            let s = t.map(c => c.id);
             const tafn = filterArrayd(mtaf[j], mytaf);
             const skn = filterArrayd(msk[j], mysk);
             www[j] = filterArray(z[j], s);
@@ -976,14 +978,14 @@ async function showOpenPro(mi) {
             obj[key] = dictids[key];
             return obj;
         }, {});
-    var keysSorted = Object.keys(filteredw).sort(function(a, b) {
+    let keysSorted = Object.keys(filteredw).sort(function(a, b) {
         return filteredw[a] - filteredw[b]
     })
     // add declined filter add sort by value
     console.log("showOpenPro")
 
     if (keysSorted.length > 0) {
-        var resultString = keysSorted.join(' , ');
+        let resultString = keysSorted.join(' , ');
         const cookieValue = document.cookie
             .split('; ')
             .find(row => row.startsWith('jwt='))
@@ -1022,7 +1024,7 @@ async function showOpenPro(mi) {
                 .then(r => r.json())
                 .then(data => meData = data.data.openMissions);
             meData.data
-            for (var i = 0; i < meData.length; i++) {
+            for (let i = 0; i < meData.length; i++) {
                 meData[i].ani = "meData",
                     meData[i].pl = 10 + i,
                     meData[i].hst = checkHst(meData[i].project.projectName)
@@ -1151,19 +1153,19 @@ function prcnt(a, b) {
 let h, w, initX = 0;
 
 function gen() {
-    var xMax = prcnt(16, w);
-    var yMin = prcnt(7, h);
-    var yMax = prcnt(25, h);
+    let xMax = prcnt(16, w);
+    let yMin = prcnt(7, h);
+    let yMax = prcnt(25, h);
     x = [];
     y = [];
     xyz = [];
-    var step = 0;
-    var a = w / 2;
-    var b = w / 4.5;
-    var e = b / 2;
+    let step = 0;
+    let a = w / 2;
+    let b = w / 4.5;
+    let e = b / 2;
     initX = a + Math.random() * b - e | 0;
-    for (var i = 0; i < 50; i++) {
-        var g = 20 + Math.random() * yMax | 0;
+    for (let i = 0; i < 50; i++) {
+        let g = 20 + Math.random() * yMax | 0;
         step += g;
         y[i] = step | 0;
         if (step > h) {
@@ -1173,7 +1175,7 @@ function gen() {
     y.push(0);
     y.sort(sortNumber);
     x[0] = initX;
-    for (var i = 0; i < y.length; i++) {
+    for (let i = 0; i < y.length; i++) {
         if ((y[i + 1] - y[i] < yMin)) {
             x[i + 1] = x[i] + Math.floor(Math.random() * 10 - 8);
         } else {
@@ -1275,7 +1277,7 @@ onMount(async () => {
 
         function flash() {
             elem.style.backgroundImage = 'radial-gradient(ellipse farthest-corner at ' + initX + 'px top, #ffaaff 0%, #ee88ff 16%, #000 100%)';
-            var r = 30 + Math.random() * 70 | 0;
+            let r = 30 + Math.random() * 70 | 0;
             c++;
             setTimeout(function() {
                 flkr();
@@ -1284,7 +1286,7 @@ onMount(async () => {
 
         function flkr() {
             elem.style.backgroundImage = 'radial-gradient(ellipse farthest-corner at ' + initX + 'px top, #000 0%, #000 100%)';
-            var r = 16 + Math.random() * 30 | 0;
+            let r = 16 + Math.random() * 30 | 0;
             if (c > 6) {
                 clear();
             } else {
@@ -1305,8 +1307,8 @@ onMount(async () => {
 
         if (low == true) {
           //  document.getElementById("my_audio").play();
-            var speed = 2400;
-            var changeSpeed = speed;
+            let speed = 2400;
+            let changeSpeed = speed;
             repeater = setInterval(repeaterFn, speed);
 
             function repeaterFn() {
@@ -1533,9 +1535,9 @@ function hachla(data) {
         src24 = ""
     }
     const projects = data.data.user.projects_1s;
-    for (var i = 0; i < projects.length; i++) {
+    for (let i = 0; i < projects.length; i++) {
         const proj = projects[i];
-        for (var j = 0; j < projects[i].decisions.length; j++) {
+        for (let j = 0; j < projects[i].decisions.length; j++) {
             const pend = projects[i].decisions[j]
               let newpicid;
               let newpic;
@@ -1566,14 +1568,14 @@ function hachla(data) {
 
     }
     console.log("mid", hachlatot)
-    for (var k = 0; k < hachlatot.length; k++) {
+    for (let k = 0; k < hachlatot.length; k++) {
         const x = hachlatot[k].users
         hachlatot[k].uids = [];
-        for (var z = 0; z < x.length; z++) {
+        for (let z = 0; z < x.length; z++) {
             hachlatot[k].uids.push(x[z].users_permissions_user.id);
         }
     }
-    for (var t = 0; t < hachlatot.length; t++) {
+    for (let t = 0; t < hachlatot.length; t++) {
         const allid = hachlatot[t].uids;
         const myid = hachlatot[t].myid;
         hachlatot[t].already = false;
@@ -1584,14 +1586,14 @@ function hachla(data) {
         if (allid.includes(myid)) {
             hachlatot[t].already = true;
             hachlatot[t].pl += 48
-            for (var l = 0; l < hachlatot[t].users.length; l++) {
+            for (let l = 0; l < hachlatot[t].users.length; l++) {
                 if (hachlatot[t].users[l].users_permissions_user.id === myid)
                     if (hachlatot[t].users[l].order !== 1) {
                         hachlatot[t].mypos = hachlatot[t].users[l].what;
                     }
             }
         }
-        for (var r = 0; r < hachlatot[t].users.length; r++) {
+        for (let r = 0; r < hachlatot[t].users.length; r++) {
             if (hachlatot[t].users[r].order !== 1) {
                 hachlatot[t].cv += 1
                 if (hachlatot[t].users[r].what === true) {
@@ -1604,7 +1606,7 @@ function hachla(data) {
         const noofusersWaiting = hachlatot[t].user_1s.length - hachlatot[t].cv;
         hachlatot[t].noofusersWaiting = noofusersWaiting;
         if (hachlatot[t].users.length > 0) {
-            for (var x = 0; x < hachlatot[t].users.length; x++) {
+            for (let x = 0; x < hachlatot[t].users.length; x++) {
                 let src22 = ""
                 /*  if(hachlatot[t].users[x].users_permissions_user.profilePic !== null){
                     src22 = hachlatot[t].users[x].users_permissions_user.profilePic.url
@@ -1624,7 +1626,7 @@ function hachla(data) {
         }
         /*
          if (pmashes[t].diun.length > 0){
-                         for (var x = 0; x < pmashes[t].diun.length; x++){
+                         for (let x = 0; x < pmashes[t].diun.length; x++){
                            let src22 = ""
                           if(pmashes[t].diun[x].users_permissions_user.profilePic !== null){
                             src22 = pmashes[t].diun[x].users_permissions_user.profilePic.url
@@ -1649,8 +1651,8 @@ function hachla(data) {
 function rashbi(data) {
     const myid = data.data.user.id;
     const projects = data.data.user.projects_1s;
-    for (var i = 0; i < projects.length; i++) {
-        for (var j = 0; j < projects[i].tosplits.length; j++) {
+    for (let i = 0; i < projects.length; i++) {
+        for (let j = 0; j < projects[i].tosplits.length; j++) {
             const halug = projects[i].tosplits[j]
             haluask.push({
                 name: halug.name,
@@ -1668,9 +1670,9 @@ function rashbi(data) {
 
         }
     }
-    for (var k = 0; k < haluask.length; k++) {
+    for (let k = 0; k < haluask.length; k++) {
         const x = haluask[k].users
-        for (var z = 0; z < x.length; z++) {
+        for (let z = 0; z < x.length; z++) {
             haluask[k].uids = [];
             haluask[k].uids.push(x[z].users_permissions_user.id);
             haluask[k].what = [];
@@ -1679,7 +1681,7 @@ function rashbi(data) {
         }
     }
 
-    for (var t = 0; t < haluask.length; t++) {
+    for (let t = 0; t < haluask.length; t++) {
         const allid = haluask[t].uids;
         const myid = haluask[t].myid;
         haluask[t].already = false;
@@ -1690,7 +1692,7 @@ function rashbi(data) {
             haluask[t].already = true;
             haluask[t].pl += 25
         }
-        for (var r = 0; r < haluask[t].users.length; r++) {
+        for (let r = 0; r < haluask[t].users.length; r++) {
             if (haluask[t].users[r].what === true) {
 
                 haluask[t].noofusersOk += 1;
@@ -1782,9 +1784,9 @@ function pmash(data) {
         src24 = ""
     }
     const projects = data.data.user.projects_1s;
-    for (var i = 0; i < projects.length; i++) {
+    for (let i = 0; i < projects.length; i++) {
         const proj = projects[i];
-        for (var j = 0; j < projects[i].pmashes.length; j++) {
+        for (let j = 0; j < projects[i].pmashes.length; j++) {
 
             const pend = projects[i].pmashes[j]
             pmashes.push({
@@ -1815,14 +1817,14 @@ function pmash(data) {
             });
         }
     }
-    for (var k = 0; k < pmashes.length; k++) {
+    for (let k = 0; k < pmashes.length; k++) {
         const x = pmashes[k].users
         pmashes[k].uids = [];
-        for (var z = 0; z < x.length; z++) {
+        for (let z = 0; z < x.length; z++) {
             pmashes[k].uids.push(x[z].users_permissions_user.id);
         }
     }
-    for (var t = 0; t < pmashes.length; t++) {
+    for (let t = 0; t < pmashes.length; t++) {
         const allid = pmashes[t].uids;
         const myid = pmashes[t].myid;
         pmashes[t].already = false;
@@ -1833,14 +1835,14 @@ function pmash(data) {
         if (allid.includes(myid)) {
             pmashes[t].already = true;
             pmashes[t].pl += 48
-            for (var l = 0; l < pmashes[t].users.length; l++) {
+            for (let l = 0; l < pmashes[t].users.length; l++) {
                 if (pmashes[t].users[l].users_permissions_user.id === myid)
                     if (pmashes[t].users[l].order !== 1) {
                         pmashes[t].mypos = pmashes[t].users[l].what;
                     }
             }
         }
-        for (var r = 0; r < pmashes[t].users.length; r++) {
+        for (let r = 0; r < pmashes[t].users.length; r++) {
             if (pmashes[t].users[r].order !== 1) {
                 pmashes[t].cv += 1
                 if (pmashes[t].users[r].what === true) {
@@ -1853,7 +1855,7 @@ function pmash(data) {
         const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].cv;
         pmashes[t].noofusersWaiting = noofusersWaiting;
         if (pmashes[t].users.length > 0) {
-            for (var x = 0; x < pmashes[t].users.length; x++) {
+            for (let x = 0; x < pmashes[t].users.length; x++) {
                 let src22 = ""
                 if (pmashes[t].users[x].users_permissions_user.profilePic !== null) {
                     src22 = pmashes[t].users[x].users_permissions_user.profilePic.url
@@ -1872,7 +1874,7 @@ function pmash(data) {
             }
         }
         if (pmashes[t].diun.length > 0) {
-            for (var x = 0; x < pmashes[t].diun.length; x++) {
+            for (let x = 0; x < pmashes[t].diun.length; x++) {
                 let src22 = ""
                 if (pmashes[t].diun[x].users_permissions_user.profilePic !== null) {
                     src22 = pmashes[t].diun[x].users_permissions_user.profilePic.url
@@ -1927,7 +1929,7 @@ let walcomen = [];
 function makeWalcom(ata) {
     const usernames = ata.data.user.username;
 
-    for (var i = 0; i < ata.data.user.welcom_tops.length; i++) {
+    for (let i = 0; i < ata.data.user.welcom_tops.length; i++) {
         const wal = ata.data.user.welcom_tops[i];
         walcomen.push({
             id: wal.project.id,
@@ -1978,8 +1980,8 @@ function createpends(data) {
     //rishonnnn so to create openM first avilable only to rishon then to rest of users..
     const myid = data.data.user.id;
     const projects = data.data.user.projects_1s;
-    for (var i = 0; i < projects.length; i++) {
-        for (var j = 0; j < projects[i].pendms.length; j++) {
+    for (let i = 0; i < projects.length; i++) {
+        for (let j = 0; j < projects[i].pendms.length; j++) {
             const pend = projects[i].pendms[j]
             pends.push({
                 mysrc: src24,
@@ -2012,14 +2014,14 @@ function createpends(data) {
 
         }
     }
-    for (var k = 0; k < pends.length; k++) {
+    for (let k = 0; k < pends.length; k++) {
         const x = pends[k].users
         pends[k].uids = [];
-        for (var z = 0; z < x.length; z++) {
+        for (let z = 0; z < x.length; z++) {
             pends[k].uids.push(x[z].users_permissions_user.id);
         }
     }
-    for (var t = 0; t < pends.length; t++) {
+    for (let t = 0; t < pends.length; t++) {
         const allid = pends[t].uids;
         const myid = pends[t].myid;
         pends[t].already = false;
@@ -2030,14 +2032,14 @@ function createpends(data) {
         if (allid.includes(myid)) {
             pends[t].already = true;
             pends[t].pl += 48
-            for (var l = 0; l < pends[t].users.length; l++) {
+            for (let l = 0; l < pends[t].users.length; l++) {
                 if (pends[t].users[l].users_permissions_user.id === myid)
                     if (pends[t].users[l].order !== 1) {
                         pends[t].mypos = pends[t].users[l].what;
                     }
             }
         }
-        for (var r = 0; r < pends[t].users.length; r++) {
+        for (let r = 0; r < pends[t].users.length; r++) {
             if (pends[t].users[r].order !== 1) {
                 pends[t].cv += 1
                 if (pends[t].users[r].what === true) {
@@ -2050,7 +2052,7 @@ function createpends(data) {
         const noofusersWaiting = pends[t].user_1s.length - pends[t].cv;
         pends[t].noofusersWaiting = noofusersWaiting;
         if (pends[t].users.length > 0) {
-            for (var x = 0; x < pends[t].users.length; x++) {
+            for (let x = 0; x < pends[t].users.length; x++) {
                 let src22 = ""
                 if (pends[t].users[x].users_permissions_user.profilePic !== null) {
                     src22 = pends[t].users[x].users_permissions_user.profilePic.url
@@ -2072,7 +2074,7 @@ function createpends(data) {
             }
         }
         if (pends[t].diun.length > 0) {
-            for (var x = 0; x < pends[t].diun.length; x++) {
+            for (let x = 0; x < pends[t].diun.length; x++) {
                 let src22 = ""
                 if (pends[t].diun[x].users_permissions_user.profilePic !== null) {
                     src22 = pends[t].diun[x].users_permissions_user.profilePic.url
@@ -2088,7 +2090,7 @@ function createpends(data) {
             }
         }
         if (pends[t].nego.length > 0) {
-            for (var x = 0; x < pends[t].nego.length; x++) {
+            for (let x = 0; x < pends[t].nego.length; x++) {
                 let src22 = ""
                 if (pends[t].nego[x].users_permissions_user.profilePic !== null) {
                     src22 = pends[t].nego[x].users_permissions_user.profilePic.url

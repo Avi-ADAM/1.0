@@ -42,7 +42,7 @@ const config = {
 					mpink: 'rgb(244, 114, 182)',
 				pinki: 'rgb(242, 229, 242)',
 				    wow: 'rgb(2, 255, 187)',
-				wow2: 'rgb(50, 99, 86)',
+				wow2: 'rgb(144, 255, 17)',
 
 				blueg: 'rgb(116, 191, 255)',
 				oranges: 'rgb(254, 172, 49);',

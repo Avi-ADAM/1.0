@@ -176,7 +176,7 @@ async function xyd () {
  
 <h1 class="q">{project.projectName}</h1>
  {#if project.publicDescription !== null}
-    <div class="border-2 border-gold rounded m-2 p-2"> 
+    <div class="border border-gold rounded m-2 p-2"> 
    <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2 text-gold">{project.publicDescription}</pre>
     </div>
    {/if}
@@ -190,12 +190,16 @@ async function xyd () {
   {/each}
     </div>
     </div>
+     {#if vallues.length > 0}
+     <div style="margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--mturk);"  class="drop-shadow-xl shadow-gold">
 
-     {#if vallues.length > 0}  <h2 class="text-sm text-barbi">{vap[$lang]}</h2>
-            <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
+     <h2 class="mt-2 text-sm text-barbi text-center " style="text-shadow: 1px 1px var(--gold);">{vap[$lang]}</h2>
+            <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 m-1"> 
                 {#each vallues as vallue}<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold"   word={vallue.valueName}/></p>{/each}
-    </div>{/if}
+    </div>
+    </div>
+    {/if}
 
 <!--<div style="background-color: var(--mturk); margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--gold);" class="3 drop-shadow-xl">
     <h2 style="color: var(--barbi-pink);
@@ -205,13 +209,13 @@ async function xyd () {
 <br>
 {/each}
 </div>-->
-
 <div style="margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--mturk);"  class="drop-shadow-xl ">
-<h3 style="color: var(--barbi-pink);
-" class="5">{frm[$lang]}</h3>
-{#each projecto as om }
-<p class="text-gold bg-barbi font-bold hover:text-barbi hover:bg-gold px-2 rounded-xl mb-2 cursor-pointer	"  on:click={mesima(om.id)}>{om.name}</p>
-{/each}
+<h3 style="color: var(--barbi-pink) ;text-shadow: 1px 1px var(--gold);" class="5">{frm[$lang]}</h3>
+<div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
+                {#each projecto as om }<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})}
+                   on:mouseleave={()=>hover("0")} class="m-0 cursor-pointer hover:scale-105	" style="text-shadow:none;" on:click={mesima(om.id)}>
+              <Tile bg="wow"   word={om.name}/></p>{/each}
+    </div>
 </div>
 </div>
 {/await}
