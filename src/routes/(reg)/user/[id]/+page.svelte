@@ -152,12 +152,16 @@ let error1 = null;
     let linkP = "https://www.google.co.il" 
 const towel = {"he":"לינק","en":"link"}
 let h,w;
+let issm = false
 let viewBox="0 0 1920 1080"
 $: if (w/h < 1.3 && w/h > 1){
+    issm = true
   viewBox="320 280 1220 480"
 } else if (w/h < 1 ){
+    issm = true
  viewBox="450 280 1020 480"
 } else {
+    issm = false
   viewBox="0 0 1920 1080"
 }
 const sk = {"he": "כישורים", "en":"skills"}
@@ -191,7 +195,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
   src={srcU} 
   alt="profilePicAvatar" /></foreignObject>
 {/if}
-<foreignObject class:rou={load == false} x='820' y='60' width='280' height='280'  >
+<foreignObject class:iss={issm == true} class:rou={load == false} x='820' y='60' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row  bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="padding: 0 10px; text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{sk[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
@@ -201,7 +205,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
       </div>
       </div>
 </foreignObject>
-<foreignObject class:rou={load == false} fill="#d2d555" x='546' y='184' width='280' height='280'  >
+<foreignObject class:iss={issm == true} class:rou={load == false} fill="#d2d555" x='546' y='184' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{ro[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
@@ -211,7 +215,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
       </div>
       </div>
 </foreignObject>
-<foreignObject class:rou={load == false} fill="#d2d555" x='1094' y='184' width='280' height='280'  >
+<foreignObject class:iss={issm == true} class:rou={load == false} fill="#d2d555" x='1094' y='184' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{re[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
@@ -223,7 +227,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
     </div>
       </div>
 </foreignObject>
-<foreignObject class:rou={load == false} fill="#d2d555" x='486' y='469' width='280' height='280'  >
+<foreignObject class:iss={issm == true} class:rou={load == false} fill="#d2d555" x='486' y='469' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px; text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{ww[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
@@ -233,7 +237,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
       </div>
       </div>
 </foreignObject>
-<foreignObject class:rou={load == false} fill="#d2d555" x='1166' y='469' width='280' height='280'  >
+<foreignObject class:iss={issm == true} class:rou={load == false} fill="#d2d555" x='1166' y='469' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{vv[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
@@ -243,7 +247,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
       </div>
       </div>
 </foreignObject>
-<foreignObject class:rou={load == false} fill="#d2d555" x='677' y='707' width='280' height='280'  >
+<foreignObject class:iss={issm == true} class:rou={load == false} fill="#d2d555" x='677' y='707' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{rr[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
@@ -253,7 +257,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
       </div>
       </div>
 </foreignObject>
-<foreignObject class:rou={load == false} fill="#d2d555" x='982' y='707' width='280' height='280'  >
+<foreignObject class:iss={issm == true} class:rou={load == false} fill="#d2d555" x='982' y='707' width='280' height='280'  >
   <div class="  h-full  max-w-full flex-row bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre " style="padding: 0 10px;  text-align:center;  border-radius:50%; border: 2px solid var(--gold);" >
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{mm[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
@@ -394,9 +398,9 @@ color: var(--barbi-pink);
     animation-name: pulsen;
     animation-iteration-count: infinite;
       transform-origin: 50% 50%;
-
   }
-  .aa{
+  .iss{
+      transform-origin: 960px 110% !important;
 
   }
   .bb{
