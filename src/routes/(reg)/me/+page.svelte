@@ -669,8 +669,8 @@ const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
-      <div style="z-index: 400;" dir="rtl" >
-             <button class=" hover:bg-barbi text-mturk rounded-full"
+    <div  style="z-index: 400;" dir="rtl" class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
+             <button style="margin: 0 auto;" class=" hover:bg-barbi text-mturk rounded-full p-2"
           on:click={closer}><Close/></button>
           {#if a == 0}
           <Addnewp on:message={callbackFunction}/>
@@ -1388,6 +1388,7 @@ class=" hover:scale-150 "
       :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
                 width: 80vw;
+                padding: 0px;
   }
     .whole{
       position: absolute;
@@ -1775,7 +1776,9 @@ class=" hover:scale-150 "
              top: 20%;
            }
 }
-
+     :global([data-svelte-dialog-content].content) {
+    padding: 0px;
+  }
      :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
                 width: 80vw;

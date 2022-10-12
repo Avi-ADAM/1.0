@@ -2,7 +2,7 @@
  import { createEventDispatcher } from 'svelte';
  import Cropper from "svelte-easy-crop";
 	import { getCroppedImg } from "./canvasUtils"
-                 import { lang } from '$lib/stores/lang.js'
+  import { lang } from '$lib/stores/lang.js'
 
 	      let file;
 let dataU;
