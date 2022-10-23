@@ -18,7 +18,7 @@
     "svelte": "^3.47.0",
     "svelte-calendar": "^3.1.6",
     "svelte-loading-spinners": "^0.1.7",
-    "svelte-multiselect": "6.0.0",
+    "svelte-multiselect": "6.1.0",
     "svelte-range-slider-pips": "^2.0.3",
     "svelte-scrollto": "^0.2.0",
     "svelte-sitemap": "^2.5.1",

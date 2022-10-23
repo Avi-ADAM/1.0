@@ -13,9 +13,10 @@ nl_accordion = "1";
 </svelte:head>
 
 <script>
+        import { liUN } from '$lib/stores/liUN.js';
 
     import { lang } from '$lib/stores/lang.js'
-  // import { page } from '$app/stores'
+   import { page } from '$app/stores'
     //const emaili = $page.url.searchParams.get('code')
       import { goto } from '$app/navigation';
 
@@ -23,6 +24,8 @@ nl_accordion = "1";
   import Amana1 from "$lib/components/main/amana.svelte"
   import One from "$lib/components/main/bein.svelte"
   import { show } from '$lib/components/registration/store-show.js';
+     import { contriesi } from '$lib/components/registration/contries.js';
+    import {fpval} from '$lib/components/registration/fpval.js';
   import { regHelper } from '$lib/stores/regHelper.js';
   import { onMount } from 'svelte';
       import { email } from '$lib/components/registration/email.js'
@@ -30,55 +33,26 @@ nl_accordion = "1";
   let idx = 1;
 let error;
 
-onMount(async () => {
-  //console.log(emaili)
-  if ('serviceWorker' in navigator) {
-  navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function(reg) {
-    // registration worked
-    console.log('Registration succeeded. Scope is ' + reg.scope);
-  }).catch(function(error) {
-    // registration failed
-    console.log('Registration failed with ' + error);
-  });
-  console.log('Registration', $lang)
-    console.log('after', $lang)
 
-  if($lang != "he" && $lang != "ar"){
-    goto("/en")
-  } else if($lang == "ar"){
-    goto("/ar")
-  }
- }; 
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch("https://i18.onrender.com/chezins/count", {
-              method: "GET",
-              headers: {
-                 'Content-Type': 'application/json'
-              },
-            }).then(checkStatus)
-          .then(parseJSON);
- idx = res + 2
-        } catch (e) {
-            error = e
-        }
-    });
-	let user;
+	let user = 0;
 
    let kvar;
     onMount(async () => {
+        const x = $page.url.searchParams.get('ref')
+    if (x != null ){
+      userName.set($page.url.searchParams.get('un'))
+       kvar  = $page.url.searchParams.get('em'); 
+    email.set($page.url.searchParams.get('em'));
+    //cuontry freeppid
+       document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2023, 0, 1).toUTCString();
+   document.cookie = `un=${$page.url.searchParams.get('un')}; expires=` + new Date(2023, 0, 1).toUTCString();
+           liUN.set($page.url.searchParams.get('un'));
+            contriesi.set($page.url.searchParams.get('con'))
+            regHelper.set(1);
+                fpval.set($page.url.searchParams.get('id'))
+                      console.log(x,kvar,user, $contriesi)
+
+    }
     if (document.cookie) {
      
 const unt = document.cookie
@@ -99,7 +73,8 @@ const regt = document.cookie
   .find(row => row.startsWith('id='))
   .split('=')[1];
 
-  user = reg;}
+  user = reg;
+}
  const cookieValuet = document.cookie
   .split('; ')
   .find(row => row.startsWith('email='))
@@ -123,7 +98,45 @@ const cookieValueti = document.cookie
   show.set(6)
 }
 }
+  if(user > 0){
+    goto("/lev", )
+  }
+  //console.log(emaili)
+  if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('service-worker.js', { scope: '/' }).then(function(reg) {
+    // registration worked
+    console.log('Registration succeeded. Scope is ' + reg.scope);
+  }).catch(function(error) {
+    // registration failed
+    console.log('Registration failed with ' + error);
+  });
 
+ }; 
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
+    
+        try {
+            const res = await fetch("https://i18.onrender.com/chezins/count", {
+              method: "GET",
+              headers: {
+                 'Content-Type': 'application/json'
+              },
+            }).then(checkStatus)
+          .then(parseJSON);
+          idx = res + 2
+        } catch (e) {
+            error = e
+        }
     });
 
 
@@ -143,9 +156,9 @@ regHelper.subscribe(value => {
 </script>
 
 <div class="main">
-{#if user > 0}
+<!--{#if user > 0}
 { goto("/lev", )}
-{:else}
+{:else}-->
   {#if kvar}
 <One {idx} />
 
@@ -161,7 +174,6 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
 	 
 {/if}
   
-{/if}
 {/if}
  </div>
 

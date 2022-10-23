@@ -164,7 +164,7 @@ already = true;
     */       	
 })	
 .catch(error => {
-            error1 = e
+            error1 = error
             console.log(error1);
 				errr.m = error1.error.message
 				errr.k = true
@@ -189,8 +189,8 @@ function back() {
 		        passwordx = e.target.value
 		const password = e.target.value;
 		validations = [
-			password.length > 8,
 			password.length > 1,
+			password.length > 8,
 			password.search(/[A-Z]/) > -1,
 			password.search(/[0-9]/) > -1,
 		//	password.search(/[$&+,:;=?@#]/) > -1,
@@ -220,7 +220,7 @@ function back() {
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
   const addn = {"he":"יצירת סיסמה","en": "Create new password"}
   const what = {"he": "מה היא מילת הקסם שלך?","en": "what is Your magic word?"}
-    const val1 = {"he":"על הססמה להכיל לפחות 8 אותיות","en": "be at least 8 characters"}
+    const val1 = {"he":"על הססמה להכיל לפחות 8 תווים","en": "be at least 8 characters"}
   const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
   const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
   const arr1 = {"he":"אם לא התקבל מייל הרשמה נא לפנות ל-","en": "if you didn't recive email, reach us at-"}
@@ -266,12 +266,12 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 
 		<ul dir="rtl">
 			<li>
-				{validations[0] ? "🏆" : "❌"} {val1[$lang]}
+				{validations[1] ? "🏆" : "❌"} {val1[$lang]}
 			</li>
 			<li>
-				{validations[1] ? "🏆" : "❌"} {val2[$lang]}
+				{validations[2] ? "🏆" : "❌"} {val2[$lang]}
 			</li>
-			<li>{validations[2] ? "🏆" : "❌"} {val3[$lang]}</li>
+			<li>{validations[3] ? "🏆" : "❌"} {val3[$lang]}</li>
 			<!--<li>
 				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) must contain one symbol ($&+,:;=?@#)
 			</li>-->

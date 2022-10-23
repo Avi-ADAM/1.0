@@ -1,5 +1,4 @@
-﻿
-<script>
+﻿<script>
       import { liUN } from '$lib/stores/liUN.js';
 
       import {  doesLang, langUs } from '$lib/stores/lang.js'
@@ -418,6 +417,9 @@ if (fpp.includes(jjj)){
                     meData = response.data;
                 fpval.set(meData.id)
             datar = data;
+            let linko = `https://1lev1.world?ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`
+            console.log(linko)
+            //id con un em ref
               })
   .catch(error => {
     g = false;

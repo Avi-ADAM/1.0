@@ -98,7 +98,7 @@ const gtl = {"he":"לאחר האישור במייל לחיצה לעמוד ההת
 <br>
 {see[$lang]}
 </h1>
-    <a href="mailto:ehad1one@gmail.com" ><h3 class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi px-2 rounded-full">{buttn[$lang]}</h3></a>
+    <a href="mailto:ehad1one@gmail.com" ><p class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi px-2 rounded-full">{buttn[$lang]}</p></a>
     <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={() =>goto("./login") }>{gtl[$lang]}</button>
   </div>
   </div>

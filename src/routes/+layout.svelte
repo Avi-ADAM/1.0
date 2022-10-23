@@ -49,6 +49,15 @@ function getLang() {
 
 onMount(async () => {
    getLang()
+   if($lang != "he" && $lang != "ar" && x == null && user == 0){
+        console.log('after', $lang)
+    goto("/en")
+  } else if($lang == "ar" && x == null && user == 0){
+      console.log('Registration', $lang)
+
+    goto("/ar")
+  }
+  
 })
 </script>
 
