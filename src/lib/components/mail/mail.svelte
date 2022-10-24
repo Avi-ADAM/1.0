@@ -1,11 +1,14 @@
 <script>
-import { lang } from '$lib/stores/lang.js'    
 export let user;
 export let projectName = "1💗1";
 export let missionName = "create something nice";
 export let projectSrc ="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png";
-export let msgk = "text"
-export let msg2 = "text"
+const msgk = { "he": "המשימה שלך אושרה פה אחד והנך עכשיו חלק מריקמת:", "en": "your mission was appruved Unanimously, you are now part of the FreeMates:" }
+const msg2 = { "he": "לחיצה כדי להתחיל את המשימה: ", "en": "start your new mission: " }
+export let lang = "he"
+const hallo = {"he":"!","en":"Hello, "}
+const shalom = {"he":"שלום","en":"!"}
+
 </script>
 
 <style>
@@ -48,11 +51,11 @@ h2{
     </style>
     <div>
 <img id="top" alt="logo"  src={projectSrc}>
-<strong>Hello, {user}</strong>
-<h2>{msgk}</h2>
+<strong>{hallo[lang]}{user}{shalom[lang]}</strong>
+<h2>{msgk[lang]}</h2>
 <h2 id="pn">{projectName}</h2>
 <img id="buttom" alt="logo"  src="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png">
 <br>
-<a href="https://www.1lev1.world/lev" alt="todo">{msg2}{missionName}</a>
+<a href="https://www.1lev1.world/lev" alt="todo">{msg2[lang]}{missionName}</a>
 
 </div>

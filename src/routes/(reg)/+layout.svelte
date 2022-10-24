@@ -52,9 +52,9 @@ function reg (){
 function login () { 
     goto ("/login",)
 }
-const info ={"he": "הגעת לעמוד הדורש הרשמה","en":"this page is for registred users only" }
-const registratio = { "he": "להרשמה", "en": "to Registration"} 
-const logi = { "he": "להתחברות", "en":"to Login"} 
+const info ={"he": "הגעת לעמוד הדורש הרשמה","en":"This page is for registred users only" }
+const registratio = { "he": "להרשמה", "en": "To Registration"} 
+const logi = { "he": "להתחברות", "en":"To Login"} 
 </script>
 
 

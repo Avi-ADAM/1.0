@@ -6,8 +6,8 @@
 <div class="wall container">
     <div class="row">
     <div class="rock">אני מאמין באמונה שלמה בביאת המשיח! ואף על פי שיתמהמה עם כל זה אחכה לו בכל יום שיבוא.</div>
-    <div class="rock">a</div>
-    <div class="rock">a</div>
+    <div class="rock">שוהה בקרוב למודעות, אישית מקושרת וחי יחד עם הצל מים זורמים יקחו אותנו</div>
+    <div class="rock">התבונן בהשתתפות ונשוב להשיל ולתת, לתת לתנועה להעצים את העצמי</div>
     <div class="rock">a</div>
     <div class="rock">a</div>
     <div class="rock">a</div>
