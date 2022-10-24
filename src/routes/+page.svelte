@@ -47,7 +47,9 @@ let error;
        document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2023, 0, 1).toUTCString();
    document.cookie = `un=${$page.url.searchParams.get('un')}; expires=` + new Date(2023, 0, 1).toUTCString();
            liUN.set($page.url.searchParams.get('un'));
-            contriesi.set($page.url.searchParams.get('con'))
+           const array = $page.url.searchParams.get('con').split(',');
+
+            contriesi.set(array)
             regHelper.set(1);
                 fpval.set($page.url.searchParams.get('id'))
                       console.log(x,kvar,user, $contriesi)

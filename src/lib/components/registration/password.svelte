@@ -82,8 +82,7 @@ already = true;
             }})
   .then(response => {
 			show.update(n => n + 1);
-	  data = response.data;
-	  	console.log(data);
+	const data = response.data;
           /*  await fetch(linkg, {
                     method: 'POST',
                     headers: {

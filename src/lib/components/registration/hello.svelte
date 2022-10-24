@@ -9,8 +9,8 @@
 } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 import { onMount } from 'svelte';
-let first = {"he":"לחיצה לפתיחת          ", "en": "click to open          "}
-let second = {"he":"1❤️1                ", "en": "1❤️1               "}
+let first = {"he":"         לחיצה לפתיחת ", "en": "click to open          "}
+let second = {"he":"               1❤️1", "en": "1❤️1               "}
 let sh = {"he":"שלום", "en": "Hello"}
 let sh2 = {"he":" הסכמתך התקבלה!", "en": ""}
 let sh3 = {"he":"הגעת למקום ה-", "en": "You are the "}
