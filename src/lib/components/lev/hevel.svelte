@@ -156,10 +156,8 @@ const todis = {"he":"לינק לדיסקורד","en":"link to discord"}
 const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
 const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
 const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
-
 let h,w, height,width;
 $:if(h > w){
-
   height = "90vw"
   width = "90vw"
 } else if (h < w){

@@ -2,7 +2,7 @@
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto, prefetch } from '$app/navigation';
 	import dayjs from 'dayjs';
-
+  import {lang} from '$lib/stores/lang.js'
   import {
     clickOutside
 } from './outsidclick.js';
@@ -17,7 +17,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 
 const dispatch = createEventDispatcher();
     export let low = false;
-
+export let email;
 export let coinlapach
 export let deadline
 export let projectName;
@@ -52,7 +52,6 @@ export let noofusersOk;
 export let noofusersNo;
 export let already = false;
 let resP = [];
-let lang;
 export let stylef = '24px';
 export let askId;
 export let users;
@@ -220,7 +219,7 @@ input: {
   where: {id: "${projectId}"}
  data: {user_1s: ["${idL}","${userId}"]}
 }
-  ){project {user_1s {id}}}`;
+  ){project {user_1s {id email}}}`;
         adduser2 = `updateProject(
 input: {
   where: {id: "${projectId}"}
@@ -288,9 +287,19 @@ ${adduser}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            
             if (newnew == true){
-            let data = {"name": `${useraplyname}`}//username email projectname projectsrc lang
-            fetch(`/api/sma`, {
+              let emailt;
+              let ema = miDatan.data.updateProject.project.user_1s
+              for (let i = 0; i <ema.length; i++){
+                if (ema[i].id == userId){
+                  emailt = ema[i].email
+                }
+              }
+              const langi = $lang
+                            console.log(langi)
+            let data = {user: useraplyname, projectName :projectName, projectSrc:  src2, missionName: openmissionName, email: emailt, lang: langi}//username email projectname projectsrc lang openmissionName
+            fetch('/api/sma', {
             method: 'POST',  
             headers: {
               'Content-Type': 'application/json',
@@ -654,9 +663,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
         {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{dayjs(deadline).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
          {#if missionDetails}   <h6 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="hslink bc">{missionDetails}</h6>{/if}
         
-  <h5 on:mouseenter={()=>hover("תפקיד")} on:mouseleave={()=>hover("0")} class="hslink cd">{role}</h5>
+ <!-- <h5 on:mouseenter={()=>hover("תפקיד")} on:mouseleave={()=>hover("0")} class="hslink cd">{role}</h5>
 
-            <h6 on:mouseenter={()=>hover("כישורים נדרשים")} on:mouseleave={()=>hover("0")} class="hslink de">{skills}</h6>
+            <h6 on:mouseenter={()=>hover("כישורים נדרשים")} on:mouseleave={()=>hover("0")} class="hslink de">{skills}</h6>-->
                    <p class="vo ef"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
             {#if low == false}
                    {#if already === false}

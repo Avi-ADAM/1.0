@@ -211,7 +211,7 @@ const deee = (element.descrip !== undefined && element.descrip !== "undefined") 
               ${pb}
               ${pv}
               ${heee}
-             iskvua: ${element.iskvua},
+             iskvua: ${element.iskvua != true ? false : true},
              ${date} 
              ${dates}
              ${rishon4}
