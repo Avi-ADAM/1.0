@@ -219,7 +219,7 @@ input: {
   where: {id: "${projectId}"}
  data: {user_1s: ["${idL}","${userId}"]}
 }
-  ){project {user_1s {id email}}}`;
+  ){project {user_1s {id email lang}}}`;
         adduser2 = `updateProject(
 input: {
   where: {id: "${projectId}"}
@@ -291,12 +291,17 @@ ${adduser}
             if (newnew == true){
               let emailt;
               let ema = miDatan.data.updateProject.project.user_1s
+              let la; 
               for (let i = 0; i <ema.length; i++){
                 if (ema[i].id == userId){
                   emailt = ema[i].email
+                  la = ema[i].lang
                 }
               }
-              const langi = $lang
+              let langi = $lang
+              if (la == "he" || la == "en"){
+                langi = la
+              }
                             console.log(langi)
             let data = {user: useraplyname, projectName :projectName, projectSrc:  src2, missionName: openmissionName, email: emailt, lang: langi}//username email projectname projectsrc lang openmissionName
             fetch('/api/sma', {
