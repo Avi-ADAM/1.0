@@ -303,7 +303,7 @@ ${adduser}
                 langi = la
               }
                             console.log(langi)
-            let data = {user: useraplyname, projectName :projectName, projectSrc:  src2, missionName: openmissionName, email: emailt, lang: langi}//username email projectname projectsrc lang openmissionName
+            let data = {user: useraplyname, projectName :projectName, projectSrc:  src2, missionName: openmissionName, email: emailt, lang: langi , kind: "exeptedMission"}//username email projectname projectsrc lang openmissionName
             fetch('/api/sma', {
             method: 'POST',  
             headers: {

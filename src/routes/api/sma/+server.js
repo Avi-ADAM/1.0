@@ -11,21 +11,24 @@ export async function POST({ request }) {
     const projectName = data.projectName
  const projectSrc = data.projectSrc
  const lango = data.lang 
-   const missionName = data.missionName
+ const kind = data.kind
+
     const user = data.user
     const email = data.email
+  if (kind == "exeptedMission") {
+    const missionName = data.missionName
     const { html, text } = await renderMail(MailExept, { data: { user: user, lang: lango, projectName: projectName, projectSrc: projectSrc, missionName: missionName } });
     let subject = head[lango]
     const msg = {
-        to: email,
-        from: "ehad1one@gmail.com",
-        subject: subject,
-        text: text,
-        html: html
+      to: email,
+      from: "ehad1one@gmail.com",
+      subject: subject,
+      text: text,
+      html: html
     };
-
-    console.log("Form submitted",msg);
     const output = await sgMail.send(msg);
+    console.log("Form submitted", msg);
     console.log(output)
+  }
     return new Response;
 }

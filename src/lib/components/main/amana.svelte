@@ -586,15 +586,19 @@ function change(la){
       <small style="color: red;">השם שנבחר כבר תפוס</small>
     {/if}
 </div>
-<div class="flexi1">
+<div class="flexi1" style="white-space:nowrap;">
+  <div>
   <h3   class="amanat " id="m" 
  style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1em;" dir="rtl">מ: </h3> 
+ </div>
+ <div>
      <MultiSelect
       bind:selected
       {name} 
       {placeholder}
       options={country.map(c => c.heb)}
        /> 
+       </div>
    {#if erorims == true}
       <small style="color: red;">יש לבחור לפחות מקום 1</small>
     {/if}
@@ -987,9 +991,7 @@ position: absolute;
     font-size: 0.8em;
   padding: 1.8em 1.8em;
     }
-    #m{
-      margin-bottom: -20px;
-    }
+
     :global(.multiselect) {
     max-width: 200px !important;
   }
