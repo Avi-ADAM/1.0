@@ -1320,7 +1320,7 @@ class=" hover:scale-150 "
     <title>{sofartit[$lang]}</title>
   </g>
   <path d="M 310.778 152.849 L 406.216 171.904 L 406.216 210.013 L 310.778 229.067 L 215.34 210.013 L 215.34 171.904 Z" style="fill: url(#gradient-1); fill-opacity: 0.73;" transform="matrix(0.999813, 0.019346, -0.019346, 0.999813, -163.843097, -95.620727)" bx:shape="n-gon 310.778 190.958 110.202 38.109 6 0 1@0cc060df"/>
-  <text style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 54.1178px; font-weight: 700; line-height: 288.628px; stroke: url(#gradient-3); text-anchor: middle; white-space: pre; filter: url(#drop-shadow-filter-0);" transform="matrix(0.627037, 0.018356, -0.018632, 0.636449, 145.136673, 107.674744)"><tspan>{total}<tspan x="0" dy="1em">​</tspan> </tspan><tspan x="0" dy="1em">​</tspan><tspan>💗</tspan></text>
+  <text style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 54.1178px; font-weight: 700; line-height: 288.628px; stroke: url(#gradient-3); text-anchor: middle; white-space: pre; filter: url(#drop-shadow-filter-0);" transform="matrix(0.627037, 0.018356, -0.018632, 0.636449, 145.136673, 107.674744)"><tspan>{total != null ? total : 0}<tspan x="0" dy="1em">​</tspan> </tspan><tspan x="0" dy="1em">​</tspan><tspan>💗</tspan></text>
 </svg> 
 </div>
                            </TourItem>
