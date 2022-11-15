@@ -1267,6 +1267,8 @@ const towel = {"he":"לינק לגוגל דרייב המשותף","en": "link to
    const twiterlinkde = {"he":"לינק לטוויטר של הריקמה","en":"link to the FreeMates twitter"}
    const watsapplinkde = {"he":"לינק לווטסאפ של הריקמה","en":"link to the FreeMates WhatsApp"}
    const vap = {"he": "ערכים ומטרות", "en": "vallues and objectives"}
+  const opmi = {"he": "משימות פנויות","en": "open mission's"}
+  const noopen = {"he": "אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו", "en": ""}
    let sid = false
 let gan = false
 let bett = false;
@@ -1387,6 +1389,7 @@ pointer-events: none;">
           <!--change to modal with the project component-->
             {#if discordlink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={discordlink}
           class=" hover:bg-mturk text-barbi rounded-full"
           title={discordlinkde[$lang]}
@@ -1396,6 +1399,7 @@ pointer-events: none;">
                       {/if}
             {#if linkP}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={linkP}
           class=" hover:bg-mturk text-barbi rounded-full"
           title={tower[$lang]}
@@ -1406,6 +1410,7 @@ pointer-events: none;">
                       {/if}
                           {#if drivelink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={drivelink}
           class=" hover:bg-mturk text-barbi rounded-full"
           title={towel[$lang]}
@@ -1415,6 +1420,7 @@ pointer-events: none;">
                       {/if}
                          {#if twiterlink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={twiterlink}
           class=" hover:bg-white text-barbi rounded-full"
           title={twiterlinkde[$lang]}
@@ -1424,6 +1430,7 @@ pointer-events: none;">
                       {/if}
                        {#if watsapplink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={watsapplink}
           class=" hover:bg-white text-barbi rounded-full"
           title={watsapplinkde[$lang]}
@@ -1433,6 +1440,7 @@ pointer-events: none;">
                       {/if}
                         {#if githublink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={githublink}
           class=" hover:bg-white text-barbi rounded-full"
           title={githublinkde[$lang]}
@@ -1442,6 +1450,7 @@ pointer-events: none;">
                       {/if}
                        {#if fblink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={fblink}
           class=" hover:bg-white text-barbi rounded-full"
           title={fblinkde[$lang]}
@@ -1551,7 +1560,7 @@ pointer-events: none;">
       {#if omiData.length > 0}
     <button
      class="border  border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges  text-pinki hover:text-barbi font-bold px-4 rounded"
-    on:click={toopens}> פעולות פתוחות</button>
+    on:click={toopens}>{opmi[$lang]}</button>
     {/if}
       {#if bmiData.length > 0}
     <button

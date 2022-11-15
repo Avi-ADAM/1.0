@@ -50,7 +50,23 @@ async function ask (){
  let idL = cookieValueId;
   let  token  = cookieValue; 
    let  bearer1 = 'bearer' + ' ' + token;
-        try {
+   let qurer = ``
+   let naminator = []
+         for (let i = 0; i < ulist.length; i++){ 
+          console.log(qurer, ulist[i])
+          if (ulist[i].noten > 0){
+         for (let x = 0; x < ulist[i].le.length; x++){ 
+        qurer =  ` createHaluka(
+      input: {
+      data: { usersend: "${ulist[i].uid}",
+        userrecive: "${ulist[i].le[x].leid}",
+        amount: ${ulist[i].le[x].cama.toFixed(2)},
+        matbea: "2",
+        confirmed: false 
+      }
+    }
+    ){haluka{ id  }} `
+ try {
              await fetch(linkg, {
               method: 'POST',
         headers: {
@@ -59,9 +75,39 @@ async function ask (){
                   },
         body: 
         JSON.stringify({query:
-          `mutation { createTosplit(
+          `mutation 
+          { ${qurer}
+}`   
+} )})
+  .then(r => r.json())
+  .then(data => miDatan = data);
+            console.log(miDatan)
+            naminator.push(`${miDatan.data.createHaluka.haluka.id},`)
+        } catch (e) {
+            error1 = e
+            console.log(error1)
+}
+         }
+        }
+        }
+        
+        console.log(naminator)
+         let c = false
+        if (c == true) {
+        try{
+         await fetch(linkg, {
+              method: 'POST',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query:
+          `mutation
+           { createTosplit(
       input: {
-      data: { project: "${$idPr}"
+      data: { 
+        project: "${$idPr}"
       vots: [
      {
       what: true
@@ -75,47 +121,17 @@ async function ask (){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-         let qurer = ``
-         for (let i = 0; i < ulist.length; i++){ 
-        qurer +=  `createHaluka(
-      input: {
-      data: { 
-        usersend: ${uid},
-        userrecive: UsersPermissionsUser,
-        amount: Float,
-      
-        confirmed: null,
-        tosplit: ${miDatan.data.createTosplit.id}
-      }
-  ){tosplit {  }}`
-         }
-        try{
-         await fetch(linkg, {
-              method: 'POST',
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query:
-          `mutation { 
-
-} `   
-} )})
-  .then(r => r.json())
-  .then(data => miDatan = data);
-         console.log(miDatan)
+         //get ids put in tosplitname for now
         } catch (e) {
             error1 = e
             console.log(error1)
 }
-        } catch (e) {
-            error1 = e
+        }
+       
             console.log(error1)
 }
-            console.log(error1)
 
-}
+
 let hatzaa = false;
 let noofok, noofw, noofno = 0;
 onMount(async () => {
@@ -266,7 +282,7 @@ for (let t=0; t<ulist.length; t++){
       ulist[t].le = []
     ulist[t].le.push({
        le: ulist[z].username,
-    leid: ulist[z].id,
+    leid: ulist[z].uid,
     cama: ulist[z].meca
     }) 
      ulist[z].kibal = true;
@@ -284,6 +300,7 @@ for (let t=0; t<ulist.length; t++){
  if (ulist[n].latet >= ulist[z].meca && ulist[z].kibal != true && ulist[z].meca > 0){
    ulist[n].le.push({
        le: ulist[z].username,
+         leid: ulist[z].uid,
     cama: ulist[z].meca
     }) 
      ulist[z].kibal = true;
@@ -388,7 +405,7 @@ for (let t=0; t<ulist.length; t++){
          
     </table>
 
-     {#if hal === false && already === false}
+     {#if  already === true && hal === false}<!--//hal === false &&-->
    <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>אישור חלוקה</button>
 {/if}

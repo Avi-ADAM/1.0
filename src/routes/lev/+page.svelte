@@ -1,4 +1,5 @@
 <script>
+    import Yahalomim from '$lib/components/lev/yahalomim.svelte'
 import { addToast } from 'as-toast';
 import Mesima from '$lib/components/lev/mesima.svelte'
 import {
@@ -36,19 +37,7 @@ import {
 } from '$lib/stores/lang.js'
 
 let low = true;
-let milon = {
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-}
+
 let isOpen = false;
 //  import Viewport from 'svelte-viewport-info'
 let idL;
@@ -137,6 +126,7 @@ function mesimabetahalicha(data) {
         mtaha[i] = mtahan[i];
         mtaha[i].tx = txx(mtaha[i].name)
         mtaha[i].ani = "mtaha";
+        mtaha[i].azmi = "mesima";        
         mtaha[i].pl = 0 + i;
         mtaha[i].usernames = data.data.user.username;
     }
@@ -247,6 +237,7 @@ function ishursium(dati) {
                 src2: start[i].finiapruvals[j].project.profilePic.formats.thumbnail.url,
                 myid: dati.data.user.id,
                 ani: "fiapp",
+                azmi: "ishrur",
                 pl: -2
             });
         }
@@ -334,6 +325,7 @@ function crMaap(hh) {
                         src2: start[i].profilePic.formats.thumbnail.url,
                         myid: hh.data.user.id,
                         ani: "wegets",
+                        azmi: "ishrur",
                         pl: -1 + start[i].maaps[j].vots.length
                     });
                 }
@@ -456,6 +448,7 @@ async function createasked(da) {
                 uid: start[i].asks[j].users_permissions_user.id,
                 username: start[i].asks[j].users_permissions_user.username,
                 src: src22,
+                email: start[i].asks[j].users_permissions_user.email,
                 publicklinks: start[i].asks[j].open_mission.publicklinks,
                 privatlinks: start[i].asks[j].open_mission.privatlinks,
                 hearotMeyuchadot: start[i].asks[j].open_mission.hearotMeyuchadot,
@@ -480,6 +473,7 @@ async function createasked(da) {
                 myid: da.data.user.id,
                 pid: start[i].asks[j].project.user_1s.map(c => c.id),
                 ani: "askedcoin",
+                azmi: "ziruf",
                 pl: 1 + i + j
                 //   uid: start[i].asks[j].users[k].id,
                 //  omid: start[i].open_missions[j].id,
@@ -585,6 +579,7 @@ async function createmask(da) {
                 myid: da.data.user.id,
                 pid: start[i].user_1s.map(c => c.id),
                 ani: "askedm",
+                azmi: "ziruf",
                 pl: 2 + i + j
             });
         }
@@ -1026,7 +1021,8 @@ async function showOpenPro(mi) {
             meData.data
             for (let i = 0; i < meData.length; i++) {
                 meData[i].ani = "meData",
-                    meData[i].pl = 10 + i,
+                meData[i].azmi = "hazaa",               
+                meData[i].pl = 10 + i,
                     meData[i].hst = checkHst(meData[i].project.projectName)
                     meData[i].stb = checkStb(meData[i].name)
             }
@@ -1435,7 +1431,7 @@ async function start() {
                                     vots  {what why id users_permissions_user {id}}
                                      open_mission { id mission {id} declined { id} sqadualed publicklinks tafkidims { id } noofhours perhour privatlinks descrip hearotMeyuchadot name}
                                       project {projectName id user_1s {id} profilePic {url formats }}
-                                       users_permissions_user { username id profilePic {url formats } } }
+                                       users_permissions_user { username id email profilePic {url formats } } }
     finiapruvals (where:{archived: false}) {
               id missname why what {url formats} noofhours mesimabetahalich {id perhour hearotMeyuchadot descrip mission {id} } vots  {what why id users_permissions_user {id}}
             project {projectName id 
@@ -1560,6 +1556,7 @@ function hachla(data) {
                 pendId: pend.id,
                 //   diun: pend.diun,
                 ani: "hachla",
+                azmi: "hachla",
                 pl: 1 + pend.vots.length,
                 messege: []
             });
@@ -1665,6 +1662,7 @@ function rashbi(data) {
                 pendId: halug.id,
                 noofusers: projects[i].user_1s.length,
                 ani: "haluk",
+                azmi: "hachla",
                 pl: 1 + halug.vots.length
             });
 
@@ -1738,6 +1736,7 @@ function sps(pp) {
                         oid: y.id,
                         already: false,
                         ani: "huca",
+                        azmi: "hazaa",
                         pl: 6
                     })
                 }
@@ -1787,8 +1786,7 @@ function pmash(data) {
     for (let i = 0; i < projects.length; i++) {
         const proj = projects[i];
         for (let j = 0; j < projects[i].pmashes.length; j++) {
-
-            const pend = projects[i].pmashes[j]
+             const pend = projects[i].pmashes[j]
             pmashes.push({
                 mysrc: src24,
                 name: pend.name,
@@ -1812,6 +1810,7 @@ function pmash(data) {
                 pendId: pend.id,
                 diun: pend.diun,
                 ani: "pmashes",
+                azmi: "harchava",
                 pl: 1 + pend.users.length,
                 messege: []
             });
@@ -1928,7 +1927,6 @@ let walcomen = [];
 
 function makeWalcom(ata) {
     const usernames = ata.data.user.username;
-
     for (let i = 0; i < ata.data.user.welcom_tops.length; i++) {
         const wal = ata.data.user.welcom_tops[i];
         walcomen.push({
@@ -1936,6 +1934,7 @@ function makeWalcom(ata) {
             username: usernames,
             projectName: wal.project.projectName,
             ani: "walcomen",
+            azmi: "mesima",
             pl: 1
         })
     }
@@ -2008,6 +2007,7 @@ function createpends(data) {
                 mdate: pend.sqadualed,
                 pendId: pend.id,
                 ani: "pends",
+                azmi: "harchava",
                 pl: 1 + pend.users.length,
                 messege: []
             });
@@ -2130,6 +2130,7 @@ function coinLapach(event) {
     if (ani == "asked") {
         ask -= 1
     }
+    //harchava mesima ishrur ziruf hazaa hachla
     console.log("im starting 2")
     start()
 
@@ -2173,6 +2174,48 @@ async function cardsi(event) {
     console.log(cards, "from papa")
 }
 const title = {"he": "לב 1❤️1", "en":"heart of 1❤️1"}
+ let milon = {
+    hachla: true,
+    fiap: true,
+    welc: true,
+    sugg: true,
+    pend: true,
+    asks: true,
+    betaha: true,
+    desi: true,
+    ppmash: true,
+    pmashs: true,
+    pmaap: true,
+    askmap: true
+}
+
+
+
+
+function cardsYaron() {
+  //  dispatch("cards", {
+  //      cards: true
+  //  })
+}
+
+let toCoin = true
+
+function showonly(event) {
+    const value = event.detail.data;
+    for (const key in milon) {
+        milon[key] = false
+    }
+
+    milon[value] = true;
+    toCoin = true
+}
+
+function showall(event) {
+    for (const key in milon) {
+        milon[key] = true
+    }
+
+}
 </script>
 
 <svelte:head>
@@ -2244,6 +2287,7 @@ const title = {"he": "לב 1❤️1", "en":"heart of 1❤️1"}
 </DialogOverlay>
  <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם    {#if arr1.length > 0}
  -->
+ {#if toCoin == true}
   {#if cards == true}
     <div class="cards-ui">
       <Tooltip title="{u}" ispic="true">
@@ -2265,6 +2309,7 @@ const title = {"he": "לב 1❤️1", "en":"heart of 1❤️1"}
     <Tooltip title="{u}" ispic="true">
         <Coinsui  on:hover={hover}
             {low}
+            {milon}
             on:mesima={mesima}
             on:user={user}
             on:proj={proj}
@@ -2273,6 +2318,13 @@ const title = {"he": "לב 1❤️1", "en":"heart of 1❤️1"}
             on:cards={cardsi}
             {adder}  {arr1} {askedarr}  {declineddarr} {halu}  {askma} {maap} {mashs} {pmashd}  {fia}  {beta}  {pen} {sug}  {nam} {wel} {ask} {picLink} {total}/>
       </Tooltip>
+  {/if}
+  {:else}
+<Yahalomim low={false} {adder}  {arr1} {askedarr}  {declineddarr} {halu}  {askma} {maap} {mashs} {pmashd}  {fia}  {beta}  {pen} {sug}  {nam} {wel} {ask} {picLink} {total} 
+     on:cards={cardsYaron}                                                                    
+     on:showall={showall}
+    on:showonly={showonly}
+/>
   {/if}
 
 <style>

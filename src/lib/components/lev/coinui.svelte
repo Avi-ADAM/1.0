@@ -40,7 +40,7 @@ export let adder = [],
     nam, wel = 13,
     ask = 13,
     picLink, total
-let milon = {
+export let milon = {
     hachla: true,
     fiap: true,
     welc: true,
@@ -123,6 +123,7 @@ function showall(event) {
 
 }
 let h = 500;
+export let sml = false
 </script>
 
 <div id="scree" bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} >
@@ -372,6 +373,7 @@ let h = 500;
                                             on:proj={proj}
                                             on:user={user}
                                             on:decline={delo}
+                                            email={buble.email}
                                             role={buble.role}
                                             coinlapach={buble.coinlapach}
                                             pid={buble.pid}
@@ -582,6 +584,7 @@ let h = 500;
                                                             <div
                                                                 class="midCom">
                                                                 <Mid
+                                                                {sml}
                                                                     on:cards={cards}
                                                                     on:hover={hover}
                                                                     on:showall={showall}

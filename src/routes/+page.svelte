@@ -155,7 +155,32 @@ regHelper.subscribe(value => {
     show.set(0);
     regHelper.set(0)
 	}*/
+   function beforeUnload(event) {
+    // Cancel the event as stated by the standard.
+
+    // Chrome requires returnValue to be set.
+    event.returnValue = null;
+     let data = {user: "avi" , email: "aviadam.segel@gmail.com", lang: $lang , kind: "nonreg"}//username email projectname projectsrc lang openmissionName
+            fetch('/api/sma', {
+            method: 'POST',  
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response)
+            .then((data) => {
+              console.log('Success:', data);            
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+          
+    // more compatibility
+    return null
+  }
 </script>
+  <svelte:window on:beforeunload|preventDefault={beforeUnload}/>
 
 <div class="main">
 <!--{#if user > 0}
