@@ -296,7 +296,7 @@ function find_contry_id(contry_name_arr){
       }
       return arr;
      };
-    
+    let uid = 5679070
 </script>
 
 <button on:click={onSubmiti}>tttt</button>
@@ -314,3 +314,4 @@ function find_contry_id(contry_name_arr){
        /> 
   <button type="submit">Submit</button>
 </form>
+<a href="{`https://telegram.me/onelevone_bot?start=${uid}`}" alt="telegramjoin">tele</a>
