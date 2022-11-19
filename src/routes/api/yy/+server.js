@@ -5,6 +5,7 @@ export const POST = async ({ request }) => {
     const messegeText = data.message.text
     const isReg = messegeText.startsWith('/getnotification')
     const isShow = messegeText.startsWith('/showaddress')
+    const isStart = messegeText.startsWith('/start')
     console.log()
     let name,det,action;
     if (isReg == true){
@@ -15,6 +16,12 @@ export const POST = async ({ request }) => {
         name = ""
         det = ""
         action = "www.1lev1.world"
+    } else if (isStart == true){
+        const id = messegeText.split('=')[1]
+        console.log(id)
+        name = ""
+        det = ""
+        action = "הרשמתך לעדכונים התקבלה בהצלחה!"
     }
     const botMessage = `${name} %0A 
      ${action} %0A 

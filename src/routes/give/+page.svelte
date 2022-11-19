@@ -314,4 +314,4 @@ function find_contry_id(contry_name_arr){
        /> 
   <button type="submit">Submit</button>
 </form>
-<a href="{`https://telegram.me/onelevone_bot?getnutifiction=${uid}`}" alt="telegramjoin">tele</a>
+<a href="{`https://telegram.me/onelevone_bot?start=${uid}`}" alt="telegramjoin">tele</a>
