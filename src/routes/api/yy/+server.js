@@ -17,7 +17,7 @@ export const POST = async ({ request }) => {
         det = ""
         action = "www.1lev1.world"
     } else if (isStart == true){
-        const id = messegeText.split('=')[1]
+        const id = messegeText.split(' ')[1]
         console.log(id)
         name = ""
         det = ""
