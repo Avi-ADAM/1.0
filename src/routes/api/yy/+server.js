@@ -3,13 +3,14 @@ export const POST = async ({ request }) => {
     const data = await request.json()
     console.log("gg", data)
     const messegeText = data.message.text
-    const isReg = messegeText.startsWith('/getnutification')
+    const isReg = messegeText.startsWith('/getnotification')
     const isShow = messegeText.startsWith('/showaddress')
+    console.log()
     let name,det,action;
     if (isReg == true){
      name =""
      det =""
-     action = "הרשמתך לעדכונים  התקבלה בהצלחה!"
+     action = "הרשמתך לעדכונים התקבלה בהצלחה!"
     } else if (isShow == true){
         name = ""
         det = ""
