@@ -37,15 +37,15 @@
         loginError = null;
 
         axios
-            .post('https://i18.onrender.com/auth/local', {
+            .post('https://i18.onrender.com/auth/local', {//http://localhost:1337/api/auth/local
                 identifier: email,
                 password,
             })
             .then(({ data }) => {
-                document.cookie = `jwt=${data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-                document.cookie = `id=${data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
-                document.cookie = `when=${Date.now}; expires=` + new Date(2023, 0, 1).toUTCString();
-               	    document.cookie = `guidMe=again; expires=` + new Date(2023, 0, 1).toUTCString();			
+                document.cookie = `jwt=${data.jwt}; expires=` + new Date(2024, 0, 1).toUTCString();
+                document.cookie = `id=${data.user.id}; expires=` + new Date(2024, 0, 1).toUTCString();
+                document.cookie = `when=${Date.now}; expires=` + new Date(2024, 0, 1).toUTCString();
+               	    document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();			
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);
