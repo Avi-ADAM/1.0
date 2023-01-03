@@ -44,8 +44,8 @@ let error;
        kvar  = $page.url.searchParams.get('em'); 
     email.set($page.url.searchParams.get('em'));
     //cuontry freeppid
-       document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2023, 0, 1).toUTCString();
-   document.cookie = `un=${$page.url.searchParams.get('un')}; expires=` + new Date(2023, 0, 1).toUTCString();
+       document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2024, 0, 1).toUTCString();
+   document.cookie = `un=${$page.url.searchParams.get('un')}; expires=` + new Date(2024, 0, 1).toUTCString();
            liUN.set($page.url.searchParams.get('un'));
            const array = $page.url.searchParams.get('con').split(',');
 

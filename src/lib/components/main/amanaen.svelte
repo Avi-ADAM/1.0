@@ -383,8 +383,8 @@ console.log("t")
     console.log("hhhh")
     g = false;
    already = true;
-   document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
-   document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
+   document.cookie = `email=${mail}; expires=` + new Date(2024, 0, 1).toUTCString();
+   document.cookie = `un=${$form.name}; expires=` + new Date(2024, 0, 1).toUTCString();
    userName.set($form.name);
            liUN.set($form.name);
             email.set(mail);

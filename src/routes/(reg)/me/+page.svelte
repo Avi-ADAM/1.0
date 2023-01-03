@@ -314,7 +314,7 @@ function getCookie(name) {
     var myCookie = getCookie("guidMe");
 
     if (myCookie == null) {
-	    document.cookie = `guidMe=again; expires=` + new Date(2023, 0, 1).toUTCString();			
+	    document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();			
         run()
     }
     else {

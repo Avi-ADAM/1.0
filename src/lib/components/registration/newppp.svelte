@@ -121,8 +121,8 @@ errr.p = true;
 		tx: 0,
 		txx: 0
 	} );
-    document.cookie = `jwt=${miDatan.data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `jwt=${miDatan.data.jwt}; expires=` + new Date(2024, 0, 1).toUTCString();
+    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2024, 0, 1).toUTCString();
 } catch (e) {
             error1 = e
             console.log(error1);

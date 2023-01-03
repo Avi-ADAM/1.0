@@ -403,10 +403,10 @@ newp.set(passwordx)
     userName.set($form.name);
             email.set(mail);
             contriesi.set(find_contry_id(selected))
-   document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
-   document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
-       document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-    document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+   document.cookie = `email=${mail}; expires=` + new Date(2024, 0, 1).toUTCString();
+   document.cookie = `un=${$form.name}; expires=` + new Date(2024, 0, 1).toUTCString();
+       document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2024, 0, 1).toUTCString();
+    document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2024, 0, 1).toUTCString();
                                     liUN.set($form.name);
 
             regHelper.set(1);          
