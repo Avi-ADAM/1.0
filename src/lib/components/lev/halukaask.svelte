@@ -2,7 +2,7 @@
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
    import { createEventDispatcher } from 'svelte';
- import { goto, prefetch } from '$app/navigation';
+ import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
   import ProgressBar from "@okrad/svelte-progressbar";
@@ -97,7 +97,7 @@ function objToString (obj) {
     }}
     return str;
 }
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'http://localhost:1337/graphql';
   
 async function agree(alr) {
   if  (alr == "alr"){

@@ -55,7 +55,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/chezins/count", {
+            const res = await fetch("http://localhost:1337/api/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

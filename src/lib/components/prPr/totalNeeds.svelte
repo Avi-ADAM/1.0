@@ -62,13 +62,14 @@ pendq = ` users: [
   qwerys = "openMashaabim";
 }
   for (const element of meData) {
+    let d = new Date
     const spnot = element.spnot !== undefined ? element.spnot : "";
   const hm = (element.hm > 0) ? element.hm : 1;
   const price = (element.price > 0) ? element.price : 0;
   const easy = (element.easy > 0) ? element.easy : 0;
   const sdate = (element.dates !== undefined) ? `sqadualed: "${new Date(element.dates).toISOString()}",` : ``;
    const fdate = (element.datef !== undefined) ? ` sqadualedf: "${new Date(element.datef).toISOString()}" ,` : ``;
- let link = 'https://i18.onrender.com/graphql';
+ let link = 'http://localhost:1337/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -79,7 +80,6 @@ pendq = ` users: [
         body: 
         JSON.stringify({query:
           `mutation { ${linkop}(
-    input: {
       data: { 
         name: "${element.name}",
       descrip: "${element.descrip}",
@@ -91,12 +91,13 @@ pendq = ` users: [
              easy: ${easy},   
              linkto: "${element.linkto}",
              mashaabim: "${element.id}",
+                          publishedAt: "${d.toISOString()}",
              ${sdate} 
              ${fdate}
             ${pendq}
-      }
+      
     }
-  ) {${qwerys}{id project{id }}}
+  ) {data{id attributes{ project{data{ id }}}}}
 } `   
 } )})
   .then(r => r.json())
@@ -140,9 +141,9 @@ function myMissionH ()  {
       console.log(i,"toeg3e to")
 
 for (var i = 0; i <meData.length; i++) {
-  if (meData[i].kindOf === "monthly"){
-    var a = moment(meData[i].datef);
-var b = moment(meData[i].dates);
+  if (meData[i].attributes.kindOf === "monthly"){
+    var a = moment(meData[i].attributes.datef);
+var b = moment(meData[i].attributes.dates);
 meData[i].monts = a.diff(b, 'months', true).toFixed(2); 
     console.log(i,"to to")
     ky = true;
@@ -151,11 +152,11 @@ meData[i].monts = a.diff(b, 'months', true).toFixed(2);
          meData[i].kc = false;
                    meData[i].r = false;
     meData[i].y = false;
-   meData[i].total = meData[i].monts * meData[i].price;
-meData[i].totaltotal = meData[i].monts * meData[i].easy;
-  } else if (meData[i].kindOf === "yearly"){
-     var a = moment(meData[i].datef);
-var b = moment(meData[i].dates);
+   meData[i].total = meData[i].monts * meData[i].attributes.price;
+meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
+  } else if (meData[i].attributes.kindOf === "yearly"){
+     var a = moment(meData[i].attributes.datef);
+var b = moment(meData[i].attributes.dates);
 meData[i].years = a.diff(b, 'years', true).toFixed(2);
     ky = true;
     meData[i].y = true;
@@ -163,34 +164,34 @@ meData[i].years = a.diff(b, 'years', true).toFixed(2);
           meData[i].r = false;
      meData[i].ky = true;
               meData[i].kc = false;
-   meData[i].total = (meData[i].years * meData[i].price).toFixed(2);
-meData[i].totaltotal = (meData[i].years * meData[i].easy).toFixed(2);
-    } else if (meData[i].kindOf === "rent"){
+   meData[i].total = (meData[i].years * meData[i].attributes.price).toFixed(2);
+meData[i].totaltotal = (meData[i].years * meData[i].attributes.easy).toFixed(2);
+    } else if (meData[i].attributes.kindOf === "rent"){
             meData[i].y = false;
     ky = true;
     meData[i].r = true;
      meData[i].ky = true;
              meData[i].m = false;
          meData[i].kc = false;
-   meData[i].total =  meData[i].price;
-meData[i].totaltotal =  meData[i].easy;
-    } else if (meData[i].kindOf === "perUnit"){
+   meData[i].total =  meData[i].attributes.price;
+meData[i].totaltotal =  meData[i].attributes.easy;
+    } else if (meData[i].attributes.kindOf === "perUnit"){
     meData[i].y = false;
     meData[i].kc = true;
          meData[i].ky = false;
                  meData[i].m = false;
           meData[i].r = false;
     kc = true;
-    meData[i].total = meData[i].hm * meData[i].price;
-meData[i].totaltotal = meData[i].hm * meData[i].easy;
+    meData[i].total = meData[i].attributes.hm * meData[i].attributes.price;
+meData[i].totaltotal = meData[i].attributes.hm * meData[i].attributes.easy;
   } else {
         meData[i].y = false;
     meData[i].kc = false;
          meData[i].ky = false;
                  meData[i].m = false;
                      meData[i].r = false;
-   meData[i].total =  meData[i].price;
-meData[i].totaltotal =  meData[i].easy;
+   meData[i].total =  meData[i].attributes.price;
+meData[i].totaltotal =  meData[i].attributes.easy;
   }
 }
 };
@@ -225,7 +226,7 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
             <td class="ggr">
                 <div dir="rtl" class='textinput'>
-  <input type="text"  id="inputi" name="inputi" bind:value={data.name} class='input' required>
+  <input type="text"  id="inputi" name="inputi" bind:value={data.attributes.name} class='input' required>
   <label for="nam" id="labeli" class='label' >שם</label>
   <span class='line'></span>
 </div>
@@ -237,7 +238,7 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td>
        <div dir="rtl" class='textinput'>
-  <textarea     bind:value={data.descrip}
+  <textarea     bind:value={data.attributes.descrip}
  type="text" class='input d' required></textarea>
   <label for="name" class='label'>תיאור</label>
   <span class='line'></span>
@@ -249,7 +250,7 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td>
       
-        <select  bind:value={data.kindOf} on:change={() => myMissionH()} class="round form-select appearance-none
+        <select  bind:value={data.attributes.kindOf} on:change={() => myMissionH()} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -276,7 +277,7 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td >
         <div style="display:{meData[i].kc ? "" : "none"};" dir="rtl" class='textinput'>
-  <input on:change={() => myMissionH()}  bind:value={data.hm}
+  <input on:change={() => myMissionH()}  bind:value={data.attributes.hm}
  type="number"  class='input' required>
   <label for="name" class='label'>כמות</label>
   <span class='line'></span>
@@ -285,19 +286,19 @@ meData[i].totaltotal =  meData[i].easy;
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>
       {#each meData as data, i}
-      <td ><input on:change={() => myMissionH()} class="bg-gold hover:bg-mtork border-2 border-barbi rounded" type="datetime-local" style="display:{ meData[i].ky  ? "" : "none"};"  placeholder="הוספת תאריך התחלה" bind:value={data.dates}></td>
+      <td ><input on:change={() => myMissionH()} class="bg-gold hover:bg-mtork border-2 border-barbi rounded" type="datetime-local" style="display:{ meData[i].ky  ? "" : "none"};"  placeholder="הוספת תאריך התחלה" bind:value={data.attributes.dates}></td>
       {/each}
     </tr> <tr style="display:{ ky  ? "" : "none"};" >
       <th >תאריך סיום </th>
       {#each meData as data, i}
-      <td ><input on:change={() => myMissionH()} class="bg-gold hover:bg-mtork border-2 border-barbi rounded" style="display:{ meData[i].ky  ? "" : "none"};" type="datetime-local" placeholder="הוספת תאריך סיום" bind:value={data.datef}></td>
+      <td ><input on:change={() => myMissionH()} class="bg-gold hover:bg-mtork border-2 border-barbi rounded" style="display:{ meData[i].ky  ? "" : "none"};" type="datetime-local" placeholder="הוספת תאריך סיום" bind:value={data.attributes.datef}></td>
       {/each}
     </tr> <tr>
       <th>הערות מיוחדות</th>
       {#each meData as data, i}
       <td>
   <div dir="rtl" class='textinput'>
-  <textarea         bind:value={data.spnot}
+  <textarea         bind:value={data.attributes.spnot}
  type="text" class='input d' required></textarea>
   <label for="name" class='label'>הערות מיוחדות</label>
   <span class='line'></span>
@@ -309,7 +310,7 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td>
         <div dir="rtl" class='textinput'>
-  <input  on:change={() => myMissionH()}    bind:value={data.price}
+  <input  on:change={() => myMissionH()}    bind:value={data.attributes.price}
  type="number" class='input' required>
   <label for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
@@ -320,7 +321,7 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td>
         <div dir="rtl" class='textinput'>
-  <input  on:change={() => myMissionH()}  bind:value={data.easy}
+  <input  on:change={() => myMissionH()}  bind:value={data.attributes.easy}
  type="number" class='input' required>
   <label for="name" class='label'>שווי מוצע <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
@@ -343,7 +344,7 @@ meData[i].totaltotal =  meData[i].easy;
       {#each meData as data, i}
       <td>
   <div dir="rtl" class='textinput'>
-  <input         bind:value={data.linkto}
+  <input         bind:value={data.attributes.linkto}
  type='text' class='input' required>
   <label for="name" class='label'>לינק</label>
   <span class='line'></span>

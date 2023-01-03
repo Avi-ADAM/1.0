@@ -82,7 +82,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://i18.onrender.com/graphql';
+    let link = 'http://localhost:1337/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -150,7 +150,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://i18.onrender.com/graphql';
+    let link = 'http://localhost:1337/graphql';
     try {
              await fetch(link, {
               method: 'POST',

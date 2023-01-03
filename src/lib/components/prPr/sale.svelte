@@ -16,16 +16,22 @@ export let quant;
 let selected;
 let total = 0;
 export let each = 0;
+export let kindUlimit = false 
 let hm = 0;
 let where = [];
 let placeholder = `אצל מי הכסף`;
 let already = false;
 export let maid;
 let valid = true;
-$: if (hm > quant){
+$: if (kindUlimit = false ){ 
+        if (hm > quant){
   valid = false;
-} else {
+        } else {
     valid = true;
+        }
+} else if (kindUlimit = true ){
+    valid = true;
+    quant = -1
 }
 $: if (hm > 0 && each > 0 ){
   total = hm * each;
@@ -40,11 +46,11 @@ let token;
 let error1;
 let idL;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'http://localhost:1337/graphql';
     function find_user_id(user_name_arr){
      var  id = 0;
       for (let i = 0; i< projectUsers.length; i++){
-        if(projectUsers[i].username === user_name_arr[0]){
+        if(projectUsers[i].attributes.username === user_name_arr[0]){
           id = projectUsers[i].id
         }
       }
@@ -87,14 +93,13 @@ already = true;
 let quanter = ``
 if (hm > 0){
   const quantnew = quant - hm;
-  quanter = `updateMatanot(  input: {
-      where: {id: ${maid}}
-      data:  {quant: ${quantnew} } }){
-        matanot{quant id}
+  quanter = `updateMatanot( id: ${maid}
+      data:  {quant: ${quantnew} } ){
+        data {id attributes{ quant}}
       }
 `
 }
-
+let d = new Date
  const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -116,16 +121,15 @@ if (hm > 0){
                     body: JSON.stringify({
                         query: `mutation 
                         { createSale(
-    input: {
       data: {project: "${$idPr}",
              matanot:  "${maid}",
              users_permissions_user: "${find_user_id(selected)}",
              in: ${total},
              unit: ${hm},
-             date: "${dayjs($store?.selected).toISOString()}"
-                  }
+             date: "${dayjs($store?.selected).toISOString()}",
+                          publishedAt: "${d.toISOString()}"
     }
-  ) {sale{id in}}
+  ) {data{id attributes{ in}}}
   ${quanter}
 }
 `})
@@ -134,9 +138,9 @@ if (hm > 0){
                 .then(data => miDatan = data);
             if(hm > 0){
             dispatch('done', {
-                id: miDatan.data.updateMatanot.matanot.id,
-                in:  miDatan.data.createSale.in,
-                un: miDatan.data.updateMatanot.matanot.quant
+                id: miDatan.data.updateMatanot.data.id,
+                in:  miDatan.data.createSale.data.attributes.in,
+                un: miDatan.data.updateMatanot.data.attributes.quant
             })
           } else {
               dispatch('doners')
@@ -180,7 +184,7 @@ if (hm > 0){
       maxSelect={1}
       bind:selected
       {placeholder}
-      options={projectUsers.map(c => c.username)}
+      options={projectUsers.map(c => c.attributes.username)}
       />
      </div>
 {#if already == false}

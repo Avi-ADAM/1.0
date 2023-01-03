@@ -2,6 +2,7 @@
      import MultiSelect from 'svelte-multiselect';
     import Addnewm from '../addnew/addNewMission.svelte';
     import { createEventDispatcher } from 'svelte';
+    import {lang } from '$lib/stores/lang.js' 
  const dispatch = createEventDispatcher();
  
 export let selected = [];
@@ -15,7 +16,7 @@ export let mission1 = [];
      var  arr = [];
       for (let j = 0; j< mission_name_arr.length; j++ ){
       for (let i = 0; i< mission1.length; i++){
-        if(mission1[i].missionName === mission_name_arr[j]){
+        if(mission1[i].attributes.missionName === mission_name_arr[j]){
           arr.push(mission1[i].id);
         }
       }
@@ -61,19 +62,21 @@ function newM (event) {
     } );
   addmission = false;
 }
+const head = {"he":"הוספת פעולות הנדרשות להקמה או לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
   </script>
 
 <div dir="rtl" >
-<h1 class="text-barbi font-bold">הוספת פעולות הנדרשות להקמה או\ו לתפקוד הריקמה</h1>
+<h1 class="text-barbi font-bold">{head[$lang]}</h1>
   
            <div class="inline-block relative w-min	">
         
       
           <MultiSelect
+          --sms-selected-bg="white"
                         loading={mission1.length > 0 ? false : true}
           bind:selected
           {placeholder}
-          options={mission1.map(c => c.missionName)}
+          options={mission1.map(c => c.attributes.missionName)}
          on:change={handl}
           /></div>
         
@@ -89,10 +92,10 @@ function newM (event) {
           {/if}-->
 <button
  on:click={() => addmission = true}
-  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-1 px-2 rounded-full"
+  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold  px-2 rounded-full"
   >הוספת פעולה שאינה ברשימה</button>
   {:else if addmission == true}
-  <div  class="border-2 border-gold rounded m-4">
+  <div  class="bg-neutral-800 border border-barbi rounded m-4">
   <button
   title={cencel}
        on:click={() => addmission = false}
@@ -108,5 +111,8 @@ function newM (event) {
   h1{
       font-size: 29px;  
      
+    }
+    :global(div.multiselect > ul.selected > li) {
+      background: whitesmoke;
     }
   </style> 

@@ -11,7 +11,7 @@
    export let color = "--gold";
 
     let error1 = null;
-    let link ="https://i18.onrender.com/vallues";
+    let link ="http://localhost:1337/api/vallues";
 let meData;
 export let vallId;   
 export let rn = [];
@@ -22,7 +22,8 @@ async function addNewVall() {
 if (rn.includes(name_value)){
   shgi = true;
 } else {
-  let link ="https://i18.onrender.com/graphql" ;
+  let link ="http://localhost:1337/graphql" ;
+  let d = new Date
         try {
              await fetch(link, {
               method: 'POST',
@@ -32,26 +33,26 @@ if (rn.includes(name_value)){
                   },
         body: 
         JSON.stringify({query: 
-           `mutation { createVallue(
-    input: {
-       data: {
-         valueName: "${name_value}",
-          descrip: "${desV}"
+           `mutation  createVallue {
+  createVallue(data: {  valueName: "${name_value}",
+          descrip: "${desV}",
+        publishedAt: "${d.toISOString()}"}) {
+    data {
+      id
+      attributes {
+        valueName
+      } 
+
        }
     }
-  ){
-          vallue{
-              id valueName
-          }
-  }
 }`   
         })
 })
   .then(r => r.json())
   .then(data => meData = data);
-   dispatchvall ( meData);
-    let userName_value = liUN.get()
-         let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${name_value} והתיאור: ${desV} `}
+   dispatchvall (meData);
+    let userName_value = $liUN
+     let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${name_value} והתיאור: ${desV} `}
    fetch("/api/ste", {
   method: 'POST', // or 'PUT'
   headers: {
@@ -79,8 +80,8 @@ if (rn.includes(name_value)){
  
 function dispatchvall (meData) {
   dispatch('addnew', {
-    id: meData.data.createVallue.vallue.id,
-    skob: meData.data.createVallue.vallue
+    id: meData.data.createVallue.data.id,
+    skob: meData.data.createVallue.data
     } );
     addS = false
 };

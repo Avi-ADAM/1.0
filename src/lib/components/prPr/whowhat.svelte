@@ -1,4 +1,5 @@
 <script>
+  import {lang } from '$lib/stores/lang.js'
           import pic from './../../celim/pic.js'
    import { idPr } from '../../stores/idPr.js';
 export let fmiData = [];
@@ -12,7 +13,7 @@ let x = [];
 let meca = [];
 let miDatan = [];
 let noten = [];
-// what about hours alrerady done to  mission in progres 
+// what about hours alrerady done to mission in progres 
  // matbea: Matbea,
 function remove (id) {
   console.log(id)
@@ -31,7 +32,7 @@ let ulist = [
 ]; 
 export let trili;
 export let users;
-let linkg = "https://i18.onrender.com/graphql";
+let linkg = "http://localhost:1337/graphql";
 let dictid = {};
 let dictidi = {};
 let hal = false;
@@ -39,6 +40,7 @@ let error1 = null;
 export let already = false;
 async function ask (){
   already = true;
+  let d = new Date
    const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -56,16 +58,18 @@ async function ask (){
           console.log(qurer, ulist[i])
           if (ulist[i].noten > 0){
          for (let x = 0; x < ulist[i].le.length; x++){ 
-        qurer =  ` createHaluka(
-      input: {
+        qurer =  `  
+createHaluka( 
       data: { usersend: "${ulist[i].uid}",
         userrecive: "${ulist[i].le[x].leid}",
         amount: ${ulist[i].le[x].cama.toFixed(2)},
         matbea: "2",
-        confirmed: false 
+        confirmed: false,
+                     publishedAt: "${d.toISOString()}",
       }
-    }
-    ){haluka{ id  }} `
+    
+    ){data{ id  }} `
+         
  try {
              await fetch(linkg, {
               method: 'POST',
@@ -82,18 +86,17 @@ async function ask (){
   .then(r => r.json())
   .then(data => miDatan = data);
             console.log(miDatan)
-            naminator.push(`${miDatan.data.createHaluka.haluka.id},`)
+            naminator.push(`${miDatan.data.createHaluka.data.id}`)
         } catch (e) {
             error1 = e
             console.log(error1)
 }
          }
         }
-        }
+      }
         
         console.log(naminator)
-         let c = false
-        if (c == true) {
+      
         try{
          await fetch(linkg, {
               method: 'POST',
@@ -105,17 +108,19 @@ async function ask (){
         JSON.stringify({query:
           `mutation
            { createTosplit(
-      input: {
       data: { 
+                     publishedAt: "${d.toISOString()}",
         project: "${$idPr}"
       vots: [
      {
       what: true
       users_permissions_user: "${idL}"
     }
-  ]}
-      }
-  ){tosplit { id vots { users_permissions_user { id}}}}
+  ],
+    halukas: [${naminator}]
+}
+    
+  ){data { id }}
 } `   
 } )})
   .then(r => r.json())
@@ -128,8 +133,7 @@ async function ask (){
 }
         }
        
-            console.log(error1)
-}
+
 
 
 let hatzaa = false;
@@ -141,7 +145,7 @@ pre ()
 if (trili.length > 0){
   already = true;
   hatzaa = true;
-  const vots = trili[0].vots
+  const vots = trili[0].attributes.vots
   for (let i = 0; i < vots.length; i++){
     if (vots[i].what == true) {
       noofok += 1
@@ -155,44 +159,40 @@ if (trili.length > 0){
 function cal (){
       for (let i = 0; i < users.length; i++){
         for (let j = 0; j <salee.length; j++){
-                        if (salee[j].users_permissions_user.id === users[i].id){
-                 if (salee[j].users_permissions_user.id in dictidi) {
-                    dictidi[salee[j].users_permissions_user.id] += salee[j].in
+                        if (salee[j].attributes.users_permissions_user.data.id === users[i].id){
+                 if (salee[j].attributes.users_permissions_user.data.id in dictidi) {
+                    dictidi[salee[j].attributes.users_permissions_user.data.id] += salee[j].attributes.in
                    } else {
-                      dictidi[salee[j].users_permissions_user.id] = salee[j].in
+                      dictidi[salee[j].attributes.users_permissions_user.data.id] = salee[j].attributes.in
                    }
                         }
         }         if (users[i].id in dictidi)  {          
-                    console.log(users[i].id)
       }
       else {
           dictidi[users[i].id] = 0;
-                    console.log(users[i].id)
       }
     }
-    console.log(dictidi)
 }
 function pre (){
-    console.log(users, fmiData)
   for (let i = 0; i < users.length; i++){
         for (let j = 0; j <fmiData.length; j++){
           
-            if (fmiData[j].users_permissions_user.id === users[i].id){
-                   if (fmiData[j].users_permissions_user.id in dictid) {
-                    dictid[fmiData[j].users_permissions_user.id] += fmiData[j].total
+            if (fmiData[j].attributes.users_permissions_user.data.id === users[i].id){
+                   if (fmiData[j].attributes.users_permissions_user.data.id  in dictid) {
+                    dictid[fmiData[j].attributes.users_permissions_user.data.id] += fmiData[j].attributes.total
                    } else {
-                    dictid[fmiData[j].users_permissions_user.id] = fmiData[j].total
+                    dictid[fmiData[j].attributes.users_permissions_user.data.id] = fmiData[j].attributes.total
 
                    }
             }
         }
         for (let j = 0; j <rikmashes.length; j++){
           
-            if (rikmashes[j].users_permissions_user.id === users[i].id){
-                   if (rikmashes[j].users_permissions_user.id in dictid) {
-                    dictid[rikmashes[j].users_permissions_user.id] += rikmashes[j].total
+            if (rikmashes[j].attributes.users_permissions_user.data.id === users[i].id){
+                   if (rikmashes[j].attributes.users_permissions_user.data.id in dictid) {
+                    dictid[rikmashes[j].attributes.users_permissions_user.data.id] += rikmashes[j].attributes.total
                    } else {
-                    dictid[rikmashes[j].users_permissions_user.id] = rikmashes[j].total
+                    dictid[rikmashes[j].attributes.users_permissions_user.data.id] = rikmashes[j].attributes.total
 
                    }
             }
@@ -200,22 +200,20 @@ function pre (){
     }
     for (let j = 0; j <fmiData.length; j++){
            if ("net" in dictid) {
-            dictid["net"] += fmiData[j].total   
+            dictid["net"] += fmiData[j].attributes.total   
                           } else {
-                    dictid["net"] = fmiData[j].total
+                    dictid["net"] = fmiData[j].attributes.total
                    }
                   }
                   for (let j = 0; j <rikmashes.length; j++){
            if ("net" in dictid) {
-            dictid["net"] += rikmashes[j].total   
+            dictid["net"] += rikmashes[j].attributes.total   
                           } else {
-                    dictid["net"] = rikmashes[j].total
+                    dictid["net"] = rikmashes[j].attributes.total
                    }
                   }
-    console.log(dictid)
       const filteredw = Object.keys(dictid)
       const filtered = Object.keys(dictidi)
-     console.log(filteredw)
 
   
         for (let i = 0; i < users.length; i++){
@@ -237,8 +235,8 @@ function pre (){
                     dictid["pmcounter"] = 0
                    }
                     let src22 = ``;
-                   if (users[i].profilePic !== null){
-                     src22 = users[i].profilePic.url
+                   if (users[i].attributes.profilePic.data !== null){
+                     src22 = users[i].attributes.profilePic.data.attributes.url
                    } else {
                      src22 = pic
                    }
@@ -246,7 +244,7 @@ function pre (){
           ihave: dictidi[filtered[m]],
                total: dictid[filteredw[t]],
                 uid: users[i].id,
-                   username : users[i].username,
+                   username : users[i].attributes.username,
                    src: src22,
                    p: percentage(dictid[filteredw[t]], dictid["net"]),
                    un: users[i].username,
@@ -305,18 +303,31 @@ for (let t=0; t<ulist.length; t++){
     }) 
      ulist[z].kibal = true;
     ulist[n].latet -= ulist[z].meca;
-    console.log("here with",ulist[z].username )
     }
  }
     }
  }
-
-    console.log(ulist)
     ulist = ulist
 
 }
-
-
+const head = {"he": "טבלת חישוב", "en": "coculation table"}
+const name = {"he": "שם", "en":"name"}
+const pres = {"he":"החלק מהרווח", "en":"profit precentage"}
+const amho = {"he": "הסכום שממתין אצלי", "en": "amount that I guard"}
+const amtog = {"he": "סכום להעביר", "en": "amount to give"}
+const amtor = {"he":"סכום לקבל","en":"amount to recive"}
+const movto = {"he": " להעביר אל:","en": "give to:"}
+const perof = {"he": "אחוז ברקמה", "en": "precentage in the FreeMate"}
+const appbu = {"he": "אישור ובקשת חלוקה", "en": "confirm split"}
+const ft = {"he": "הוגשה הצעה לחלוקה והיא בתהליך אישור:", "en": "suggestion to split has been requested and its in appruval process:"}
+const sofar = {"he": "עד כה", "en": "so far"}
+const there = {"he": "ישנן", "en": "there are"}
+const vots = {"he": "הצבעות", "en": "vots"}
+const onvo = {"he": "ישנה הצבעה אחת","en":"there is one vote"}
+const toap = {"he": "בעד", "en": "in favor"}
+const ag = {"he": "נגד", "en": "against"}
+const and = {"he": "ו", "en": "and"}
+const noy = {"he": "שעוד לא הצביעו", "en": "that didnt vote yet"}
 </script>
 
 <div class="dd md:items-center">
@@ -325,7 +336,7 @@ for (let t=0; t<ulist.length; t++){
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >טבלת חישוב </h1>
+      >{head[$lang]}</h1>
     </caption>
         <tr class="gg">
           <th class="gg"></th>
@@ -335,12 +346,12 @@ for (let t=0; t<ulist.length; t++){
         </td>
           {/each}
     </tr> <tr class="ggr">
-      <th class="ggr">שם</th>
+      <th class="ggr">{name[$lang]}</th>
       {#each ulist as data, i}
             <td class="ggr">{data.username}</td>
             {/each}
           </tr> <tr>
-          <th> החלק מהרווח</th>
+          <th>{pres[$lang]}</th>
           {#each ulist as data, i}
           <td>
             {#if  revach > 0}
@@ -351,7 +362,7 @@ for (let t=0; t<ulist.length; t++){
            </td>
            {/each}
       </tr><tr>
-          <th>הסכום שממתין אצלי</th>
+          <th>{amho[$lang]}</th>
           {#each ulist as data, i}
           <td>
             {#if  data.ihave > 0}
@@ -362,7 +373,7 @@ for (let t=0; t<ulist.length; t++){
            </td>
            {/each}
       </tr><tr>
-          <th>סכום להעביר</th>
+          <th>{amtog[$lang]}</th>
           {#each ulist as data, i}
           <td>
             {#if  revach > 0 &&  (data.ihave-data.x) > 0 }
@@ -373,7 +384,7 @@ for (let t=0; t<ulist.length; t++){
            </td>
            {/each}
       </tr> <tr >
-      <th > להעביר אל:</th>
+      <th >{movto[$lang]}</th>
       {#each ulist as data, i}
       <td>
         {#if data.le}
@@ -386,7 +397,7 @@ for (let t=0; t<ulist.length; t++){
             {/each}
           </tr> 
       <tr>
-          <th>סכום לקבל</th>
+          <th>{amtor[$lang]}</th>
           {#each ulist as data, i}
           <td>
             {#if  revach > 0 && (data.ihave-data.x) < 0 }
@@ -397,7 +408,7 @@ for (let t=0; t<ulist.length; t++){
            </td>
            {/each}
       </tr><tr >
-      <th >אחוז ברקמה</th>
+      <th >{perof[$lang]}</th>
       {#each ulist as data, i}
             <td >{data.p.toFixed(2)}</td>
             {/each}
@@ -405,14 +416,14 @@ for (let t=0; t<ulist.length; t++){
          
     </table>
 
-     {#if  already === true && hal === false}<!--//hal === false &&-->
+     {#if  already === false }<!--//hal === false &&-->
    <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
- on:click={ask}>אישור חלוקה</button>
+ on:click={ask}>{appbu[$lang]}</button>
 {/if}
 {#if hatzaa == true}
 <div class="border border-barbi m-2 p-2">
-<h1 class="font-bold">הוגשה הצעה לחלוקה והיא בתהליך אישור:<br>
-  {` עד כה ${noofok > 1 ? `ישנן ${noofok} הצבעות`: "ישנה הצבעה אחת" } בעד ${noofno > 0 ? `, ${noofno} נגד `: ""} ${noofw > 0 ? `ו-${noofw} שעוד לא הצביעו`: ""}`}</h1>
+<h1 class="font-bold">{ft[$lang]}<br>
+  {` ${sofar[$lang]} ${noofok > 1 ? `${there[$lang]} ${noofok} ${vots[$lang]}`: onvo[$lang] } ${toap[$lang]} ${noofno > 0 ? `, ${noofno} ${ag[$lang]} `: ""} ${noofw > 0 ? `${and[$lang]}-${noofw} ${noy[$lang]}`: ""}`}</h1>
 </div>{/if}
   </div>
   </div>

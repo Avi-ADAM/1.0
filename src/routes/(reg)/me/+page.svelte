@@ -20,15 +20,15 @@ import EditB from '$lib/components/userPr/editBasic.svelte';
 //import Profile from '../../lib/components/userPr/new.svelte';
 //import { addS } from '../../lib/stores/addS.js';
 import { idPr } from '$lib/stores/idPr.js';
-    import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+    import { goto} from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-      import {  fly } from 'svelte/transition';
+      import {  fly, scale } from 'svelte/transition';
 
 let isOpen = false;
 
     let current = "";
 
-    let url1 = "https://i18.onrender.com/upload";
+    let url1 = "http://localhost:1337/upload";
     let updX = 0;
   let token; 
   let files;
@@ -127,7 +127,7 @@ function letters(data){
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://i18.onrender.com/users/" + idLi ;
+    let link ="http://localhost:1337/api/users/" + idLi ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -184,7 +184,7 @@ async function start () {
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-      let linkgra = 'https://i18.onrender.com/graphql';
+      let linkgra = 'http://localhost:1337/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -194,71 +194,78 @@ async function start () {
                   },
         body: 
         JSON.stringify({query:
-          `query { user( id: ${idL}) 
-          { frd
+          `query { usersPermissionsUser (id: ${idL}){
+    data {
+      id attributes{ 
+           frd
             fblink twiterlink discordlink githublink
             bio
             lang
             email 
             username 
             hervachti
-            profilePic {url formats }
-            projects_1s { id projectName} 
-            skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}} 
-            sps (where: {archived: false }) {id  name panui}
-            tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-            vallues {id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
-            work_ways {id workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
-          } me { id }
+            profilePic { data{ attributes{url formats} }}
+            projects_1s {data{ id attributes {projectName}} }
+            skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}}}         
+            sps (filters: { archived: { ne: true } }) { data{id attributes{ name panui}}}
+            tafkidims { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ""}}}}
+            vallues {data{ id attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ""}}}}
+            work_ways {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ""}}}}
+          } 
+        }
+      }me { id }
  } `   
  } )})
   .then(r => r.json())
   .then(data => meDataa = data);
          if (meDataa.data.me.id === idL && meDataa.data.me != null){
-   meData =  meDataa.data.user
+
+   meData =  meDataa.data.usersPermissionsUser.data.attributes
        mail = meData.email;
        username = meData.username;
           letters(meData.username);
-            myP = meData.projects_1s;
+            myP = meData.projects_1s.data ;
             lango = meData.lang;
             if (lango == "en" || lango == "he") {
               lang.set(lango)
               doesLang.set(true)
               langUs.set(lango)
             }
-            val = meData.vallues;
+            val = meData.vallues.data;
             if ($lang == "he"){
               for (var i = 0; i < val.length; i++){
-                if (val[i].localizations.length > 0){
-                val[i].valueName = val[i].localizations[0].valueName
+                if (val[i].attributes.localizations.data.length > 0){
+                val[i].attributes.valueName = val[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
             val = val
-            skil = meData.skills;
+            skil = meData.skills.data;
               if ($lang == "he"){
-              for (var i = 0; i < skil.length; i++){
-                if (skil[i].localizations.length > 0){
-                skil[i].skillName = skil[i].localizations[0].skillName
+             for (var i = 0; i < skil.length; i++){
+                if (skil[i].attributes.localizations.data.length > 0){
+                skil[i].attributes.skillName = skil[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }       
-            skil = skil   
-            taf = meData.tafkidims;
+            skil = skil 
+                        console.log(skil)
+ 
+            taf = meData.tafkidims.data;
                         if ($lang == "he"){
-              for (var i = 0; i < taf.length; i++){
-                if (taf[i].localizations.length > 0){
-                taf[i].roleDescription = taf[i].localizations[0].roleDescription
+             for (var i = 0; i < taf.length; i++){
+                if (taf[i].attributes.localizations.data.length > 0){
+                taf[i].attributes.roleDescription = taf[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
             taf = taf
-            mash = meData.sps;
-            work = meData.work_ways;  
+            mash = meData.sps.data;
+            work = meData.work_ways.data;  
             if ($lang == "he"){
-              for (var i = 0; i < work.length; i++){
-                if (work[i].localizations.length > 0){
-                work[i].workWayName = work[i].localizations[0].workWayName
+             for (var i = 0; i < work.length; i++){
+                if (work[i].attributes.localizations.data.length > 0){
+                work[i].attributes.workWayName = work[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }    
@@ -270,14 +277,19 @@ async function start () {
             twiterlink = meData.twiterlink
             discordlink = meData.discordlink
             githublink = meData.githublink;
-            uPic.set(meData.profilePic.formats.thumbnail.url);
+            if (meData.profilePic.data != null){
+            uPic.set(meData.profilePic.data.attributes.formats.thumbnail.url);
             picLink =  $uPic;
-            uPic.set(meData.profilePic.formats.small.url);
+            uPic.set(meData.profilePic.data.attributes.formats.small.url);
             picLink = $uPic;
             let b = "/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max"
             var output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
-            console.log(output)
             picLink = output
+            } else {
+              console.log(meData)
+              picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
+            }
+            console.log(meData)
             total = meData.hervachti;
 
           } else {
@@ -312,9 +324,9 @@ function getCookie(name) {
 } 
   onMount(async () => {
     var myCookie = getCookie("guidMe");
-
+    console.log(myCookie)
     if (myCookie == null) {
-	    document.cookie = `guidMe=again; expires=` + new Date(2023, 0, 1).toUTCString();			
+	    document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();			
         run()
     }
     else {
@@ -363,7 +375,7 @@ function sendD () {
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://i18.onrender.com/users/" + idLi 
+    let link ="http://localhost:1337/api/users/" + idLi 
       axios
       .put(link, {
         username: userName_value, 
@@ -580,7 +592,7 @@ async function han (){
   .split('=')[1];
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
- let linkgra = 'https://i18.onrender.com/graphql';
+ let linkgra = 'http://localhost:1337/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -655,7 +667,7 @@ const pls = {"he": "בחירת כישורים", "en": "choose skills"}
 const plm = {"he": "בחירת משאבים", "en": "choose resources"}
 const plw = {"he": "בחירת דרכי יצירה", "en": "choose ways of creation"}
 const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
-
+let width,height
 </script>
 
   <svelte:head>
@@ -697,7 +709,7 @@ const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
 
 {#if addP == false}
 
-<div class="body"  style="--the:{stylef};">
+<div bind:clientWidth={width} bind:clientHeight={height}  class="body"  style="--the:{stylef};">
 
   <div >
   <a data-sveltekit-prefetch target="_self" href="/lev">
@@ -722,30 +734,30 @@ const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
      
   {#if addNs1 == true} 
   {#key addSl}
-  <div class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
+  <div   class="d" class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
           <TourItem message={message2[$lang]}>
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/> 
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/> 
         </TourItem>
  </div>
-  <div class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
+  <div class="d" class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
           <TourItem message={message3[$lang]}>
-    <Edit   on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/> 
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/> 
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
-  <div class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
-    <Edit on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/> 
+  <div class="d" class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
+    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/> 
 </div>
           </TourItem>
 
-        <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}">
+        <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}" class="d">
                 <TourItem message={message5[$lang]}>
-      <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/> 
+      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/> 
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
-        <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}">
-          <Edit  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/> 
+        <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}" class="d">
+          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/> 
         </div>
                             </TourItem>
 
@@ -805,16 +817,16 @@ const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
          <div class="a6"  >
           <TourItem message={message9[$lang]}>
 
-<div class="another" dir="rtl">
+<div in:fly|local={{x: -(width/2),opacity: 0.5}} out:scale|local={{opacity: 0.5, start: 0.1}} class="another button-perl" dir="rtl">
   
     <h2 class="cot">{myfr[$lang]}</h2>
   {#if load == false}
-  <span class="d">
+  <span class="d pro">
            {#each myP as data, i}
            <div class="cont"  >  
             <button          
              on:click={project(data.id)}
-             class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center mt-1 mr-2 px-2.5 py-0.5 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.projectName}<span style="margin-top: 2px ;"><Arrow/></span></div></button>
+             class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center mt-1 mr-2 px-2.5 py-0.5 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow/></span></div></button>
              
            </div>
   {/each}
@@ -1360,7 +1372,7 @@ class=" hover:scale-150 "
 
   }
 .name:hover { transform: scale(1.5) translateY(-25%) translateX(-37.5%); }
-     .d{
+     .pro{
        max-height: 15vh;
        overflow-y: scroll;
      }
@@ -1537,8 +1549,8 @@ class=" hover:scale-150 "
     .pt{
       font-size: 13px;
     }
-    .d{
-       max-height: 15vh;
+    .pro{
+       max-height: 15vh ;
        overflow-y: scroll;
      }
 /*    .a1 {
@@ -1571,10 +1583,10 @@ class=" hover:scale-150 "
 
 }*/
     .another{
- max-height: 20vh;
-  min-height: 20vh;
-         max-width: 30vw;
-      min-width: 25vw;
+ max-height: 25vh;
+  min-height: 25vh;
+         max-width: 27vw;
+      min-width: 27vw;
   }
 }
     .anothere{
@@ -1811,8 +1823,9 @@ class=" hover:scale-150 "
   position: absolute;
     transform: translate(-50%, -50%);
     top:20%;
-    left: 70%;
+    left: 80%;
     overflow: auto;
+    transition: all 1s;
 }
 .a2{
   position: absolute;
@@ -1824,13 +1837,13 @@ class=" hover:scale-150 "
   position: absolute;
     transform: translate(-50%, -50%);
     top:80%;
-    left: 70%;
+    left: 80%;
 }
 .a6{
   position: absolute;
     transform: translate(-50%, -50%);
     top:20%;
-    left: 30%;
+    left: 20%;
 }
 .a4{
   position: absolute;
@@ -1842,7 +1855,7 @@ class=" hover:scale-150 "
   position: absolute;
     transform: translate(-50%, -50%);
     top:80%;
-    left: 30%;
+    left: 20%;
 } 
   @media (min-width: 348px) {
  .a2  {
@@ -1916,9 +1929,13 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
    /*  background: url(https://res.cloudinary.com/love1/image/upload/v1640438668/amana_kocsdt.svg) !important;
       background-position: center; 
       background-size: cover !important;
-      background-repeat: no-repeat !important; */
+      background-repeat: no-repeat !important; 
 background-color: #fff000;
-background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
+background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);*/
+background: #000000;  /* fallback for old browsers */
+background: -webkit-linear-gradient(to right, #434343, #000000);  /* Chrome 10-25, Safari 5.1-6 */
+background: linear-gradient(to right, #434343, #000000); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+
     }
     .centr{
       position: absolute;
@@ -1947,11 +1964,11 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
     
     }
     
-    .another{ background: -webkit-linear-gradient( #8f6B29, #FDE08D, #DF9F28);
+   .another{ /*background: -webkit-linear-gradient( #8f6B29, #FDE08D, #DF9F28);
 	background-image: linear-gradient( #8f6B29, #FDE08D, #DF9F28);
          filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
 
-      /*
+      
      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
      background-position: center; 
     background-repeat: no-repeat; 
@@ -1962,7 +1979,8 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);
        align-items: center;
       justify-content: center;
       z-index: -1;
-       max-height: 29vh;
+       height: 27vh;
+       width: 27vw;
     }
       .middle{
       /*  grid-row: 1 / 3;

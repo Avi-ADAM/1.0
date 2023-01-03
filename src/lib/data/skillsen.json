@@ -1,330 +1,518 @@
 [
     {
         "id": "51",
-        "skillName": "music"
+        "attributes": {
+            "skillName": "music"
+        }
     },
     {
         "id": "12",
-        "skillName": "painting"
+        "attributes": {
+            "skillName": "painting"
+        }
     },
     {
         "id": "47",
-        "skillName": "Car driving license"
+        "attributes": {
+            "skillName": "Car driving license"
+        }
     },
     {
         "id": "17",
-        "skillName": "Logo Design"
+        "attributes": {
+            "skillName": "Logo Design"
+        }
     },
     {
         "id": "62",
-        "skillName": "Working with children and horses"
+        "attributes": {
+            "skillName": "Working with children and horses"
+        }
     },
     {
         "id": "38",
-        "skillName": "Writing business plans"
+        "attributes": {
+            "skillName": "Writing business plans"
+        }
     },
     {
         "id": "28",
-        "skillName": "Writing content"
+        "attributes": {
+            "skillName": "Writing content"
+        }
     },
     {
         "id": "1",
-        "skillName": "Svelte"
+        "attributes": {
+            "skillName": "Svelte"
+        }
     },
     {
         "id": "24",
-        "skillName": "Javascript"
+        "attributes": {
+            "skillName": "Javascript"
+        }
     },
     {
         "id": "4",
-        "skillName": "Angular"
+        "attributes": {
+            "skillName": "Angular"
+        }
     },
     {
         "id": "114",
-        "skillName": "Preparation of homemade jam"
+        "attributes": {
+            "skillName": "Preparation of homemade jam"
+        }
     },
     {
         "id": "36",
-        "skillName": "Driving a motorcycle"
-    },
-    {
-        "id": "134",
-        "skillName": "טכנאות מעבדה סמארטפונים"
-    },
-    {
-        "id": "133",
-        "skillName": "חקר שוק"
-    },
-    {
-        "id": "135",
-        "skillName": "בישול אוכל הודי"
+        "attributes": {
+            "skillName": "Driving a motorcycle"
+        }
     },
     {
         "id": "25",
-        "skillName": "neo4j"
+        "attributes": {
+            "skillName": "neo4j"
+        }
     },
     {
         "id": "18",
-        "skillName": "html"
+        "attributes": {
+            "skillName": "html"
+        }
     },
     {
         "id": "37",
-        "skillName": "boxy svg"
+        "attributes": {
+            "skillName": "boxy svg"
+        }
     },
     {
         "id": "21",
-        "skillName": "python"
+        "attributes": {
+            "skillName": "python"
+        }
     },
     {
         "id": "30",
-        "skillName": "netlify"
+        "attributes": {
+            "skillName": "netlify"
+        }
     },
     {
         "id": "10",
-        "skillName": "strapi"
+        "attributes": {
+            "skillName": "strapi"
+        }
     },
     {
         "id": "19",
-        "skillName": "css"
+        "attributes": {
+            "skillName": "css"
+        }
     },
     {
         "id": "41",
-        "skillName": "D3"
+        "attributes": {
+            "skillName": "D3"
+        }
     },
     {
         "id": "29",
-        "skillName": "svg"
+        "attributes": {
+            "skillName": "svg"
+        }
     },
     {
         "id": "8",
-        "skillName": "postgreSQL"
+        "attributes": {
+            "skillName": "postgreSQL"
+        }
     },
     {
         "id": "22",
-        "skillName": "c++"
-    },
-    {
-        "id": "42",
-        "skillName": "versel"
-    },
-    {
-        "id": "2",
-        "skillName": "React"
-    },
-    {
-        "id": "53",
-        "skillName": "wordpress"
-    },
-    {
-        "id": "54",
-        "skillName": "elementor"
-    },
-    {
-        "id": "55",
-        "skillName": "canva"
-    },
-    {
-        "id": "59",
-        "skillName": "Deep learning "
-    },
-    {
-        "id": "60",
-        "skillName": "Blockchain"
-    },
-    {
-        "id": "3",
-        "skillName": "Vue"
-    },
-    {
-        "id": "23",
-        "skillName": "c#"
-    },
-    {
-        "id": "44",
-        "skillName": "graphQl"
-    },
-    {
-        "id": "70",
-        "skillName": "Sveltekit"
-    },
-    {
-        "id": "74",
-        "skillName": "Swiper"
-    },
-    {
-        "id": "75",
-        "skillName": "Jira api"
-    },
-    {
-        "id": "76",
-        "skillName": "NodeJs"
-    },
-    {
-        "id": "77",
-        "skillName": "Webrtc"
-    },
-    {
-        "id": "7",
-        "skillName": "Photography, stills"
-    },
-    {
-        "id": "73",
-        "skillName": "Ux User experience"
-    },
-    {
-        "id": "5",
-        "skillName": "Video shooting"
-    },
-    {
-        "id": "43",
-        "skillName": "Hebrew to English translation"
-    },
-    {
-        "id": "16",
-        "skillName": "Project planning on 1❤️1"
-    },
-    {
-        "id": "15",
-        "skillName": "Planning trips in India"
-    },
-    {
-        "id": "52",
-        "skillName": "planning"
-    },
-    {
-        "id": "34",
-        "skillName": "singing"
-    },
-    {
-        "id": "57",
-        "skillName": "Organic Marketing Facebook"
-    },
-    {
-        "id": "61",
-        "skillName": "Concept"
-    },
-    {
-        "id": "67",
-        "skillName": "porterage"
+        "attributes": {
+            "skillName": "c++"
+        }
     },
     {
         "id": "56",
-        "skillName": "Facebook page management"
+        "attributes": {
+            "skillName": "Facebook page management"
+        }
     },
     {
         "id": "66",
-        "skillName": "Event Management"
+        "attributes": {
+            "skillName": "Event Management"
+        }
     },
     {
         "id": "64",
-        "skillName": "Cooking Hummus"
+        "attributes": {
+            "skillName": "Cooking Hummus"
+        }
     },
     {
         "id": "33",
-        "skillName": "Hair Design"
+        "attributes": {
+            "skillName": "Hair Design"
+        }
     },
     {
         "id": "35",
-        "skillName": "Acting"
+        "attributes": {
+            "skillName": "Acting"
+        }
     },
     {
         "id": "14",
-        "skillName": "Advertising on Google"
+        "attributes": {
+            "skillName": "Advertising on Google"
+        }
     },
     {
         "id": "69",
-        "skillName": "personal trainer"
+        "attributes": {
+            "skillName": "personal trainer"
+        }
     },
     {
         "id": "40",
-        "skillName": "Barista, Coffee making"
+        "attributes": {
+            "skillName": "Barista, Coffee making"
+        }
     },
     {
         "id": "26",
-        "skillName": "Interior design"
+        "attributes": {
+            "skillName": "Interior design"
+        }
     },
     {
         "id": "9",
-        "skillName": "Marketing writing"
+        "attributes": {
+            "skillName": "Marketing writing"
+        }
     },
     {
         "id": "49",
-        "skillName": "football"
+        "attributes": {
+            "skillName": "football"
+        }
     },
     {
         "id": "11",
-        "skillName": "Literary writing"
+        "attributes": {
+            "skillName": "Literary writing"
+        }
     },
     {
         "id": "27",
-        "skillName": "Writing a script"
+        "attributes": {
+            "skillName": "Writing a script"
+        }
     },
     {
         "id": "20",
-        "skillName": "instagram advertising"
+        "attributes": {
+            "skillName": "instagram advertising"
+        }
     },
     {
         "id": "72",
-        "skillName": "Business development and sales"
+        "attributes": {
+            "skillName": "Business development and sales"
+        }
     },
     {
         "id": "31",
-        "skillName": "jewelry design"
+        "attributes": {
+            "skillName": "jewelry design"
+        }
     },
     {
         "id": "6",
-        "skillName": "Dress design"
+        "attributes": {
+            "skillName": "Dress design"
+        }
     },
     {
         "id": "68",
-        "skillName": "Event Production"
+        "attributes": {
+            "skillName": "Event Production"
+        }
     },
     {
         "id": "71",
-        "skillName": "Making tiktok videos"
+        "attributes": {
+            "skillName": "Making tiktok videos"
+        }
     },
     {
         "id": "32",
-        "skillName": "Yoga instruction"
+        "attributes": {
+            "skillName": "Yoga instruction"
+        }
     },
     {
         "id": "39",
-        "skillName": "Nail construction"
+        "attributes": {
+            "skillName": "Nail construction"
+        }
     },
     {
         "id": "63",
-        "skillName": "Choosing suitable products for cooking"
+        "attributes": {
+            "skillName": "Choosing suitable products for cooking"
+        }
     },
     {
         "id": "79",
-        "skillName": "Speech"
+        "attributes": {
+            "skillName": "Speech"
+        }
+    },
+    {
+        "id": "42",
+        "attributes": {
+            "skillName": "vercel"
+        }
+    },
+    {
+        "id": "135",
+        "attributes": {
+            "skillName": "cooking Indian food"
+        }
+    },
+    {
+        "id": "133",
+        "attributes": {
+            "skillName": "Market Research"
+        }
+    },
+    {
+        "id": "134",
+        "attributes": {
+            "skillName": "Smartphones' laboratory fixing "
+        }
+    },
+    {
+        "id": "192",
+        "attributes": {
+            "skillName": "Tiktok page management"
+        }
+    },
+    {
+        "id": "2",
+        "attributes": {
+            "skillName": "React"
+        }
+    },
+    {
+        "id": "53",
+        "attributes": {
+            "skillName": "wordpress"
+        }
+    },
+    {
+        "id": "54",
+        "attributes": {
+            "skillName": "elementor"
+        }
+    },
+    {
+        "id": "55",
+        "attributes": {
+            "skillName": "canva"
+        }
+    },
+    {
+        "id": "59",
+        "attributes": {
+            "skillName": "Deep learning "
+        }
+    },
+    {
+        "id": "60",
+        "attributes": {
+            "skillName": "Blockchain"
+        }
+    },
+    {
+        "id": "3",
+        "attributes": {
+            "skillName": "Vue"
+        }
+    },
+    {
+        "id": "23",
+        "attributes": {
+            "skillName": "c#"
+        }
+    },
+    {
+        "id": "44",
+        "attributes": {
+            "skillName": "graphQl"
+        }
+    },
+    {
+        "id": "70",
+        "attributes": {
+            "skillName": "Sveltekit"
+        }
+    },
+    {
+        "id": "74",
+        "attributes": {
+            "skillName": "Swiper"
+        }
+    },
+    {
+        "id": "75",
+        "attributes": {
+            "skillName": "Jira api"
+        }
+    },
+    {
+        "id": "76",
+        "attributes": {
+            "skillName": "NodeJs"
+        }
+    },
+    {
+        "id": "77",
+        "attributes": {
+            "skillName": "Webrtc"
+        }
+    },
+    {
+        "id": "7",
+        "attributes": {
+            "skillName": "Photography, stills"
+        }
+    },
+    {
+        "id": "73",
+        "attributes": {
+            "skillName": "Ux User experience"
+        }
+    },
+    {
+        "id": "5",
+        "attributes": {
+            "skillName": "Video shooting"
+        }
+    },
+    {
+        "id": "43",
+        "attributes": {
+            "skillName": "Hebrew to English translation"
+        }
+    },
+    {
+        "id": "15",
+        "attributes": {
+            "skillName": "Planning trips in India"
+        }
+    },
+    {
+        "id": "52",
+        "attributes": {
+            "skillName": "planning"
+        }
+    },
+    {
+        "id": "34",
+        "attributes": {
+            "skillName": "singing"
+        }
+    },
+    {
+        "id": "57",
+        "attributes": {
+            "skillName": "Organic Marketing Facebook"
+        }
+    },
+    {
+        "id": "61",
+        "attributes": {
+            "skillName": "Concept"
+        }
+    },
+    {
+        "id": "67",
+        "attributes": {
+            "skillName": "porterage"
+        }
+    },
+    {
+        "id": "16",
+        "attributes": {
+            "skillName": "FreeMates planning on 1💗1"
+        }
     },
     {
         "id": "78",
-        "skillName": "nature hikes"
+        "attributes": {
+            "skillName": "nature hikes"
+        }
     },
     {
         "id": "13",
-        "skillName": "Facebook Advertising"
+        "attributes": {
+            "skillName": "Facebook Advertising"
+        }
     },
     {
         "id": "50",
-        "skillName": "Research"
+        "attributes": {
+            "skillName": "Research"
+        }
     },
     {
         "id": "80",
-        "skillName": "2d animation"
+        "attributes": {
+            "skillName": "2d animation"
+        }
     },
     {
         "id": "58",
-        "skillName": "Completely lacking in talent"
+        "attributes": {
+            "skillName": "Completely lacking in talent"
+        }
     },
     {
         "id": "48",
-        "skillName": " bore"
+        "attributes": {
+            "skillName": " bore"
+        }
     },
     {
         "id": "45",
-        "skillName": "Intense madness"
+        "attributes": {
+            "skillName": "Intense madness"
+        }
+    },
+    {
+        "id": "136",
+        "attributes": {
+            "skillName": "here and there"
+        }
+    },
+    {
+        "id": "190",
+        "attributes": {
+            "skillName": "Creating a music for videos"
+        }
+    },
+    {
+        "id": "194",
+        "attributes": {
+            "skillName": "ניתוחים סטטיסטיים- SPSS"
+        }
     }
 ]

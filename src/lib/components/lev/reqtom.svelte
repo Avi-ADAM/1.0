@@ -1,7 +1,7 @@
 <script>
   import { lang } from '$lib/stores/lang.js'
   import ProgressBar from "@okrad/svelte-progressbar";
- import { goto, prefetch } from '$app/navigation';
+ import { goto } from '$app/navigation';
 import Chaticon from '../../celim/chaticon.svelte'
 import {
     clickOutside
@@ -92,7 +92,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'http://localhost:1337/graphql';
 
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;

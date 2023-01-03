@@ -1,174 +1,278 @@
 [
     {
         "id": "2",
-        "roleDescription": "Programming "
-    },
-    {
-        "id": "46",
-        "roleDescription": "Tiktok page management"
+        "attributes": {
+            "roleDescription": "Programming "
+        }
     },
     {
         "id": "38",
-        "roleDescription": "Digital marketing "
+        "attributes": {
+            "roleDescription": "Digital marketing "
+        }
     },
     {
         "id": "17",
-        "roleDescription": "Creative"
+        "attributes": {
+            "roleDescription": "Creative"
+        }
     },
     {
         "id": "1",
-        "roleDescription": "Advertising"
-    },
-    {
-        "id": "12",
-        "roleDescription": "Painting"
+        "attributes": {
+            "roleDescription": "Advertising"
+        }
     },
     {
         "id": "13",
-        "roleDescription": "Advertising on social networks"
+        "attributes": {
+            "roleDescription": "Advertising on social networks"
+        }
     },
     {
         "id": "42",
-        "roleDescription": "Production and project management"
+        "attributes": {
+            "roleDescription": "Production and project management"
+        }
     },
     {
         "id": "15",
-        "roleDescription": "Management"
+        "attributes": {
+            "roleDescription": "Management"
+        }
     },
     {
         "id": "26",
-        "roleDescription": "painter"
+        "attributes": {
+            "roleDescription": "painter"
+        }
     },
     {
         "id": "35",
-        "roleDescription": "Driving"
+        "attributes": {
+            "roleDescription": "Driving"
+        }
     },
     {
         "id": "8",
-        "roleDescription": "Fashion Design "
+        "attributes": {
+            "roleDescription": "Fashion Design "
+        }
     },
     {
         "id": "7",
-        "roleDescription": "Video shooting"
+        "attributes": {
+            "roleDescription": "Video shooting"
+        }
     },
     {
         "id": "4",
-        "roleDescription": "Sales"
+        "attributes": {
+            "roleDescription": "Sales"
+        }
     },
     {
         "id": "11",
-        "roleDescription": "writing"
+        "attributes": {
+            "roleDescription": "writing"
+        }
     },
     {
         "id": "22",
-        "roleDescription": "Guidance"
+        "attributes": {
+            "roleDescription": "Guidance"
+        }
     },
     {
         "id": "19",
-        "roleDescription": "Websites Design "
+        "attributes": {
+            "roleDescription": "Websites Design "
+        }
     },
     {
         "id": "43",
-        "roleDescription": "Cook"
+        "attributes": {
+            "roleDescription": "Cook"
+        }
     },
     {
         "id": "14",
-        "roleDescription": "Travel Guide"
+        "attributes": {
+            "roleDescription": "Travel Guide"
+        }
     },
     {
         "id": "5",
-        "roleDescription": " Server side programming"
+        "attributes": {
+            "roleDescription": " Server side programming"
+        }
     },
     {
         "id": "6",
-        "roleDescription": "Website building"
+        "attributes": {
+            "roleDescription": "Website building"
+        }
     },
     {
         "id": "9",
-        "roleDescription": "Database"
+        "attributes": {
+            "roleDescription": "Database"
+        }
     },
     {
         "id": "36",
-        "roleDescription": "Submission to funds"
+        "attributes": {
+            "roleDescription": "Submission to funds"
+        }
     },
     {
         "id": "21",
-        "roleDescription": "Design "
-    },
-    {
-        "id": "39",
-        "roleDescription": "Creating a music for videos"
+        "attributes": {
+            "roleDescription": "Design "
+        }
     },
     {
         "id": "20",
-        "roleDescription": "Advanced website building"
+        "attributes": {
+            "roleDescription": "Advanced website building"
+        }
     },
     {
         "id": "16",
-        "roleDescription": "Building landing pages"
+        "attributes": {
+            "roleDescription": "Building landing pages"
+        }
     },
     {
         "id": "3",
-        "roleDescription": "Photographer, stills "
+        "attributes": {
+            "roleDescription": "Photographer, stills "
+        }
     },
     {
         "id": "24",
-        "roleDescription": "actor"
+        "attributes": {
+            "roleDescription": "actor"
+        }
     },
     {
         "id": "10",
-        "roleDescription": "Photographer "
+        "attributes": {
+            "roleDescription": "Photographer "
+        }
     },
     {
         "id": "44",
-        "roleDescription": "porterage"
+        "attributes": {
+            "roleDescription": "porterage"
+        }
     },
     {
         "id": "29",
-        "roleDescription": "Carpentry"
+        "attributes": {
+            "roleDescription": "Carpentry"
+        }
     },
     {
         "id": "31",
-        "roleDescription": "Translation"
+        "attributes": {
+            "roleDescription": "Translation"
+        }
     },
     {
         "id": "30",
-        "roleDescription": "lecturer"
+        "attributes": {
+            "roleDescription": "lecturer"
+        }
     },
     {
         "id": "37",
-        "roleDescription": "Entrepreneurship"
+        "attributes": {
+            "roleDescription": "Entrepreneurship"
+        }
     },
     {
         "id": "27",
-        "roleDescription": "Business Administration"
+        "attributes": {
+            "roleDescription": "Business Administration"
+        }
     },
     {
         "id": "18",
-        "roleDescription": "Graphic design"
+        "attributes": {
+            "roleDescription": "Graphic design"
+        }
     },
     {
         "id": "28",
-        "roleDescription": "Air Engineering"
+        "attributes": {
+            "roleDescription": "Air Engineering"
+        }
     },
     {
-        "id": "23",
-        "roleDescription": "Singers"
-    },
-    {
-        "id": "91",
-        "roleDescription": "טכנאות אלקטרוניקה"
+        "id": "12",
+        "attributes": {
+            "roleDescription": "whitewasher"
+        }
     },
     {
         "id": "47",
-        "roleDescription": "Business development manager"
+        "attributes": {
+            "roleDescription": "Business development manager"
+        }
     },
     {
         "id": "45",
-        "roleDescription": "Interior architecture"
+        "attributes": {
+            "roleDescription": "Interior architecture"
+        }
+    },
+    {
+        "id": "92",
+        "attributes": {
+            "roleDescription": "the guest"
+        }
     },
     {
         "id": "48",
-        "roleDescription": "Community Manager"
+        "attributes": {
+            "roleDescription": "Community Manager"
+        }
+    },
+    {
+        "id": "96",
+        "attributes": {
+            "roleDescription": "content"
+        }
+    },
+    {
+        "id": "99",
+        "attributes": {
+            "roleDescription": "Vegan and vegetarian and gluten free cooking"
+        }
+    },
+    {
+        "id": "91",
+        "attributes": {
+            "roleDescription": "electronic technician "
+        }
+    },
+    {
+        "id": "23",
+        "attributes": {
+            "roleDescription": "Singer"
+        }
+    },
+    {
+        "id": "94",
+        "attributes": {
+            "roleDescription": "nurture food"
+        }
+    },
+    {
+        "id": "145",
+        "attributes": {
+            "roleDescription": "ביורוקרטיה"
+        }
     }
 ]

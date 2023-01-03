@@ -29,26 +29,25 @@ pre ()
 })
 
 function pre (){
-    console.log(users, fmiData)
   for (let i = 0; i < users.length; i++){
         for (let j = 0; j <fmiData.length; j++){
           
-            if (fmiData[j].users_permissions_user.id === users[i].id){
-                   if (fmiData[j].users_permissions_user.id in dictid) {
-                    dictid[fmiData[j].users_permissions_user.id] += fmiData[j].total
+            if (fmiData[j].attributes.users_permissions_user.data.id === users[i].id){
+                   if (fmiData[j].attributes.users_permissions_user.data.id in dictid) {
+                    dictid[fmiData[j].attributes.users_permissions_user.data.id] += fmiData[j].attributes.total
                    } else {
-                    dictid[fmiData[j].users_permissions_user.id] = fmiData[j].total
+                    dictid[fmiData[j].attributes.users_permissions_user.data.id] = fmiData[j].attributes.total
 
                    }
             }
         }
         for (let j = 0; j <rikmashes.length; j++){
           
-            if (rikmashes[j].users_permissions_user.id === users[i].id){
-                   if (rikmashes[j].users_permissions_user.id in dictid) {
-                    dictid[rikmashes[j].users_permissions_user.id] += rikmashes[j].total
+            if (rikmashes[j].attributes.users_permissions_user.data.id === users[i].id){
+                   if (rikmashes[j].attributes.users_permissions_user.data.id in dictid) {
+                    dictid[rikmashes[j].attributes.users_permissions_user.data.id] += rikmashes[j].attributes.total
                    } else {
-                    dictid[rikmashes[j].users_permissions_user.id] = rikmashes[j].total
+                    dictid[rikmashes[j].attributes.users_permissions_user.data.id] = rikmashes[j].attributes.total
 
                    }
             }
@@ -56,16 +55,16 @@ function pre (){
     }
     for (let j = 0; j <fmiData.length; j++){
            if ("net" in dictid) {
-            dictid["net"] += fmiData[j].total   
+            dictid["net"] += fmiData[j].attributes.total   
                           } else {
-                    dictid["net"] = fmiData[j].total
+                    dictid["net"] = fmiData[j].attributes.total
                    }
                   }
                   for (let j = 0; j <rikmashes.length; j++){
            if ("net" in dictid) {
-            dictid["net"] += rikmashes[j].total   
+            dictid["net"] += rikmashes[j].attributes.total   
                           } else {
-                    dictid["net"] = rikmashes[j].total
+                    dictid["net"] = rikmashes[j].attributes.total
                    }
                   }
     console.log(dictid)
@@ -89,18 +88,18 @@ function pre (){
                     dictid["pmcounter"] = 0
                    }
                    let src22 = ``;
-                   if (users[i].profilePic !== null){
-                     src22 = users[i].profilePic.url
+                   if (users[i].attributes.profilePic.data !== null){
+                     src22 = users[i].attributes.profilePic.data.attributes.url
                    } else {
                      src22 = pic
                    }
       ulist.push({
                total: dictid[filteredw[t]],
                 uid: users[i].id,
-                   username : users[i].username,
+                   username : users[i].attributes.username,
                    src: src22,
                    p: percentage(dictid[filteredw[t]], dictid["net"]),
-                   un: users[i].username,
+                   un: users[i].attributes.username,
                    s: percentage(dictid[filteredw[t]], dictid["net"]),
                     s2: 100,
                       d: dictid["pmcounter"],
@@ -114,14 +113,14 @@ function pre (){
 //each for any user to create his circle
 // so get the total of p get total fmision and mashaabims for each user then do presenteg save as obj arr and show with circle to each
 }
-    console.log(ulist)
     ulist = ulist
 
 }
-let revach = 0;
+$: revach = 0;
 let x = [];
 $: for (let i = 0; i <ulist.length; i++) {
-x[i] = (ulist[i].p / 100) * revach
+  console.log(ulist)
+x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
 }
 </script>
 
@@ -150,7 +149,7 @@ x[i] = (ulist[i].p / 100) * revach
             {/each}
           </tr> <tr>
           <th> החלק מהרווח</th>
-          {#each fmiData as data, i}
+          {#each ulist as data, i}
           <td>
             {#if  revach > 0}
  {x[i]}
@@ -162,7 +161,7 @@ x[i] = (ulist[i].p / 100) * revach
       </tr><tr >
       <th >אחוז בפרויקט</th>
       {#each ulist as data, i}
-            <td >{data.p}</td>
+            <td >{data.p.toFixed(2)}%</td>
             {/each}
           </tr> 
     </table>

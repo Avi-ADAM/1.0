@@ -1,6 +1,6 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
- import { goto, prefetch } from '$app/navigation';
+ import { goto } from '$app/navigation';
 	import dayjs from 'dayjs';
   import {lang} from '$lib/stores/lang.js'
   import {
@@ -158,7 +158,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'http://localhost:1337/graphql';
 
 function objToString (obj) {
     let str = '';

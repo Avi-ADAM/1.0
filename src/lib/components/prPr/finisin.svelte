@@ -13,7 +13,6 @@ export let fmiData = [];
     fmiData = filtered;
     }
 })
-    console.log(fmiData)
 
   
     </script>
@@ -41,19 +40,19 @@ export let fmiData = [];
     <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
       <th class="ggr">שם</th>
       {#each fmiData as data, i}
-            <td class="ggr">{data.missionName}</td>
+            <td class="ggr">{data.attributes.missionName}</td>
             {/each}
           </tr> <tr>
             <th>תיאור</th>
             {#each fmiData as data, i}
-            <td>{data.descrip}</td>
+            <td>{data.attributes.descrip}</td>
               {/each}
             </tr>
          <tr>
               <th>תאריך ביצוע</th>
               {#each fmiData as data, i}
-            <td>              {#if data.Sqadualed}
-              {data.Sqadualed}
+            <td>              {#if data.attributes.Sqadualed}
+              {data.attributes.Sqadualed}
             {/if}
             </td>
             {/each}
@@ -61,8 +60,8 @@ export let fmiData = [];
             <th>קישורים ציבוריים</th>
             {#each fmiData as data, i}
             <td>
-              {#if data.publicklinks}
-              {data.publicklinks}
+              {#if data.attributes.publicklinks}
+              {data.attributes.publicklinks}
               {/if}
              </td>
              {/each}
@@ -70,17 +69,17 @@ export let fmiData = [];
           <th>הערות יחודיות לריקמה שלי</th>
           {#each fmiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot}
-            {data.hearotMeyuchadot}
+            {#if data.attributes.hearotMeyuchadot}
+            {data.attributes.hearotMeyuchadot}
             {/if}
            </td>
            {/each}
       </tr><tr>
         <th>קישורים יחודיים לריקמה שלי</th>
         {#each fmiData as data, i}
-        <td>          {#if data.privatlinks} 
+        <td>          {#if data.attributes.privatlinks} 
 
-          {data.privatlinks} 
+          {data.attributes.privatlinks} 
           {/if}
          </td>
          {/each}
@@ -88,9 +87,9 @@ export let fmiData = [];
           <th >כמה שעות זה  לקח </th>
           {#each fmiData as data, i}
           <td>
-            {#if data.noofhours > 0}
+            {#if data.attributes.noofhours > 0}
 
-           {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})}
+           {data.attributes.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})}
            {/if}
           </td>
           {/each}
@@ -98,9 +97,9 @@ export let fmiData = [];
           <th>כמה שווה שעה</th>
           {#each fmiData as data, i}
           <td>
-            {#if data.perhour > 0}
+            {#if data.attributes.perhour > 0}
 
-            {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})}
+            {data.attributes.perhour.toLocaleString('en-US', {maximumFractionDigits:2})}
             {/if}
           </td>
           {/each}
@@ -108,7 +107,7 @@ export let fmiData = [];
       <th>שווי סך הכל למשימה </th>
       {#each fmiData as data, i}
       <td>
-      {data.total}
+      {data.attributes.total}
       </td>
       {/each}
     </tr>
@@ -116,8 +115,8 @@ export let fmiData = [];
             <th> הערות סיום</th>
             {#each fmiData as data, i}
             <td>
-              {#if data.why}
-              {data.why}
+              {#if data.attributes.why}
+              {data.attributes.why}
               {/if}
              </td>
              {/each}
@@ -126,7 +125,7 @@ export let fmiData = [];
             <th>בוצע על ידי</th>
             {#each fmiData as data, i}
             <td>
-              {data.users_permissions_user.username}
+              {data.attributes.users_permissions_user.data.attributes.username}
              </td>
              {/each}
         </tr>

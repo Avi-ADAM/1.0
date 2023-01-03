@@ -37,7 +37,7 @@
         loginError = null;
 
         axios
-            .post('https://i18.onrender.com/auth/local', {//http://localhost:1337/api/auth/local
+            .post('http://localhost:1337/api/auth/local', {//
                 identifier: email,
                 password,
             })

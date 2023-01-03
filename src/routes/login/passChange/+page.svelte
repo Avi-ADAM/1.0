@@ -17,7 +17,7 @@ function shaneh () {
 
   // Request API.
 axios
-  .post('https://i18.onrender.com/auth/reset-password', {
+  .post('http://localhost:1337/auth/reset-password', {
     code: email,
     password: passwordx,
     passwordConfirmation: passwordx,

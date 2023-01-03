@@ -33,7 +33,7 @@
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-let link ="https://i18.onrender.com/graphql" ;
+let link ="http://localhost:1337/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

@@ -6,7 +6,7 @@
     import { clickOutside } from './outsidclick.js';
     import { formatTime } from './utils.js';
     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-    import { goto, prefetch } from '$app/navigation';
+    import { goto } from '$app/navigation';
     import { idPr } from '../../stores/idPr.js';
     import { onMount } from 'svelte';
      import { createEventDispatcher } from 'svelte';
@@ -25,7 +25,7 @@ betha.subscribe(value => {
     export let stname;
     let show = true;
         export let low = false;
-        export let status = 0;
+        export let status = 0;//tween store
     export let tx = 680;
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
@@ -210,14 +210,12 @@ async function azor () {
                         query: `mutation 
                         { 
  updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+    id:${mId}
   data: {
  stname: "stopi",
  timer: ${x}
   }
- }
- ) {mesimabetahalich{id stname timer}}
+ ) { data{id attributes{ stname timer}}}
  }
  `})
                 })
@@ -347,7 +345,7 @@ timer: 0
   let miDatan;
  let token;
  let bearer1;
- let linkg = "https://i18.onrender.com/graphql"
+ let linkg = "http://localhost:1337/graphql"
 async function save() {
     const saved = lapse * 2.7777777777778E-7 + x * 2.7777777777778E-7;
     const noofnew = hoursdon + saved;

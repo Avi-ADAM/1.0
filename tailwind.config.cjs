@@ -25,6 +25,7 @@ const config = {
 		  },
 		extend: {
 			colors: {
+				silver: "#BBC2CC",
 				stgold: "#574010",
 					gra: "#BF953F",
 					grb: "#FCF6BA",

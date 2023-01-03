@@ -41,22 +41,22 @@ function dis () {
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("http://localhost:1337/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+  skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data{attributes{ skillName }}}' : ""}}}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            skills2 = res.data.skills;
+            skills2 = res.data.skills.data;
              if ($lang == "he" ){
               for (var i = 0; i < skills2.length; i++){
-                if (skills2[i].localizations.length > 0){
-                skills2[i].skillName = skills2[i].localizations[0].skillName
+                if (skills2[i].attributes.localizations.data.length > 0){
+                skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }
@@ -66,7 +66,7 @@ function dis () {
         }
         
     });
-let link = "https://i18.onrender.com/missions"
+let link = "http://localhost:1337/api/missions"
 let missionName_value;
     let selected;  
     let skillslist =[];
@@ -79,7 +79,7 @@ let missionName_value;
      var  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
       for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].skillName === skill_name_arr[j]){
+        if(skills2[i].attributes.skillName === skill_name_arr[j]){
           arr.push(skills2[i].id);
         }
       }
@@ -99,42 +99,56 @@ function subm() {
     let bearer1 = 'bearer' + ' ' + token;
 console.log(",p", tafkidimslist)
   skillslist = find_skill_id(selected);
-	axios
-      .post(link, {
-        missionName: missionName_value,
-        skills: skillslist,
-        descrip: desM,
-       tafkidims: tafkidimslist
+  let d = new Date
+   let linkg ="http://localhost:1337/graphql" ;
+        try {
+              fetch(linkg, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
                   },
-      {
-      headers: {
-        'Authorization': bearer1
-                }})
-      .then(response => {
-        console.log('הצליח', response.data);
-        meData = response.data;
-        missionNewId = meData.id;
-        newName = meData.missionName;
+        body: 
+        JSON.stringify({query: 
+          ` mutation { createMission(
+       data: {
+        missionName: "${missionName_value}",
+         skills: [${skillslist}],
+        tafkidims: [${tafkidimslist}],
+        descrip: "${desM}",
+        publishedAt: "${d.toISOString()}"       
+    }
+  ){
+         data{
+              id attributes{missionName}
+          }
+  }
+ }`
+        })
+ })
+  .then(r => r.json())
+  .then(data => meData = data);
+        missionNewId = meData.data.id;
+        newName = meData.data.attributes.missionName;
           dis ();
-                  })
-      .catch(error => {
-        console.log('צריך לתקן:', error);
-                });
-      console.log("hh")
+    } catch (e) {
+            console.log(e)
+        }
     };
     
 let cencel = "ביטול"
 </script>
  
     
-  <div class="grid items-center text-center justify-items-center">
-    <h1 class="text-center">הוספת פעולה חדשה</h1>
+  <div class="grid items-center text-center justify-items-center ">
+    <h1 class="text-center">הוספת משימה חדשה</h1>
 </div>
 <div style="width: 50%; margin: 0 auto;">
   
      <div dir="rtl" class='textinput'>
   <input type="text"  id="nam" name="nam"   bind:value={missionName_value}  class='input' required>
-  <label for="nam" class='label'  >שם הפעולה</label>
+  <label for="nam" class='label'  >שם המשימה</label>
   <span class='line'></span>
 </div>
   
@@ -148,12 +162,12 @@ let cencel = "ביטול"
         <MultiSelect
       bind:selected
       {placeholder}
-      options={skills2.map(c => c.skillName)}
+      options={skills2.map(c => c.attributes.skillName)}
       id="selectskill"
       />
     
      
-     <Addnewskil color={"--barbi-pink"} />
+     <Addnewskil nobr={false} color={"--barbi-pink"} />
 
     <ChoosRole/>
 
@@ -190,7 +204,7 @@ let cencel = "ביטול"
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
- color:  var(--barbi-pink);
+ color:  var(--gold);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }

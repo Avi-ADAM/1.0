@@ -11,11 +11,11 @@ let bearer1;
 let token;
 let error1;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'http://localhost:1337/graphql';
 async function add (){
 quant = quant > 0 ? quant : 0;
 price = price > 0 ? price : 0;
-
+let d = new Date
 already = true;
  const cookieValue = document.cookie
         .split('; ')
@@ -33,15 +33,15 @@ already = true;
                     body: JSON.stringify({
                         query: `mutation 
                         { createMatanot(
-    input: {
       data: {projectcreate: "${$idPr}",
              name:  "${name}",
              price: ${price},
              quant: ${quant},
+            publishedAt: "${d.toISOString()}",
              kindOf: ${kindOf}
                   }
-    }
-  ) {matanot{id name price quant kindOf}}
+    
+  ) {data{id attributes{ name price quant kindOf}}}
 
 }
 `})
@@ -50,7 +50,7 @@ already = true;
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch('done', {
-                matana: miDatan.data.createMatanot.matanot
+                matana: miDatan.data.createMatanot.data
             })
 
         } catch (e) {

@@ -1,6 +1,6 @@
 <script>
   import Tooltip from './../../celim/tooltipb.svelte'
-
+  import { lang } from '$lib/stores/lang.js'
   import {
     createEventDispatcher
 } from 'svelte';
@@ -42,22 +42,22 @@ function pre (){
     for (let i = 0; i < users.length; i++){
         for (let j = 0; j <fmiData.length; j++){
           
-            if (fmiData[j].users_permissions_user.id === users[i].id){
-                   if (fmiData[j].users_permissions_user.id in dictid) {
-                    dictid[fmiData[j].users_permissions_user.id] += fmiData[j].total
+            if (fmiData[j].attributes.users_permissions_user.data.id === users[i].id){
+                   if (fmiData[j].attributes.users_permissions_user.data.id in dictid) {
+                    dictid[fmiData[j].attributes.users_permissions_user.data.id] += fmiData[j].attributes.total
                    } else {
-                    dictid[fmiData[j].users_permissions_user.id] = fmiData[j].total
+                    dictid[fmiData[j].attributes.users_permissions_user.data.id] = fmiData[j].attributes.total
 
                    }
             }
         }
         for (let j = 0; j <rikmashes.length; j++){
           
-            if (rikmashes[j].users_permissions_user.id === users[i].id){
-                   if (rikmashes[j].users_permissions_user.id in dictid) {
-                    dictid[rikmashes[j].users_permissions_user.id] += rikmashes[j].total
+            if (rikmashes[j].attributes.users_permissions_user.data.id === users[i].id){
+                   if (rikmashes[j].attributes.users_permissions_user.data.id in dictid) {
+                    dictid[rikmashes[j].attributes.users_permissions_user.data.id] += rikmashes[j].attributes.total
                    } else {
-                    dictid[rikmashes[j].users_permissions_user.id] = rikmashes[j].total
+                    dictid[rikmashes[j].attributes.users_permissions_user.data.id] = rikmashes[j].attributes.total
 
                    }
             }
@@ -65,22 +65,20 @@ function pre (){
     }
     for (let j = 0; j <fmiData.length; j++){
            if ("net" in dictid) {
-            dictid["net"] += fmiData[j].total   
+            dictid["net"] += fmiData[j].attributes.total   
                           } else {
-                    dictid["net"] = fmiData[j].total
+                    dictid["net"] = fmiData[j].attributes.total
                    }
                   }
                   for (let j = 0; j <rikmashes.length; j++){
            if ("net" in dictid) {
-            dictid["net"] += rikmashes[j].total   
+            dictid["net"] += rikmashes[j].attributes.total   
                           } else {
-                    dictid["net"] = rikmashes[j].total
+                    dictid["net"] = rikmashes[j].attributes.total
                    }
                   }
                   
-    console.log(dictid)
       const filteredw = Object.keys(dictid)
-     console.log(filteredw)
 
   
         for (let i = 0; i < users.length; i++){
@@ -99,18 +97,18 @@ function pre (){
                     dictid["pmcounter"] = 0
                    }
                      let src22 = ``;
-                   if (users[i].profilePic !== null){
-                     src22 = users[i].profilePic.url
+                   if (users[i].attributes.profilePic.data !== null){
+                     src22 = users[i].attributes.profilePic.data.attributes.url
                    } else {
                      src22 = pic
                    }
       ulist.push({
                total: dictid[filteredw[t]],
                 uid: users[i].id,
-                   username : users[i].username,
+                   username : users[i].attributes.username,
                    src: src22,
                    p: percentage(dictid[filteredw[t]], dictid["net"]),
-                   un: users[i].username,
+                   un: users[i].attributes.username,
                    s: percentage(dictid[filteredw[t]], dictid["net"]),
                     s2: 101,
                       d: dictid["pmcounter"],
@@ -150,7 +148,7 @@ function myMissionH ()  {
   let is = [];
 console.log(meData)
 for (var i = 0; i <meData.length; i++) {
-  if (meData[i].kindOf === "monthly"){
+  if (meData[i].attributes.kindOf === "monthly"){
   
     console.log(i,"to to")
     ky = true;
@@ -160,7 +158,7 @@ for (var i = 0; i <meData.length; i++) {
                    meData[i].r = false;
     meData[i].y = false;
  
-  } else if (meData[i].kindOf === "yearly"){
+  } else if (meData[i].attributes.kindOf === "yearly"){
   
     ky = true;
     meData[i].y = true;
@@ -169,7 +167,7 @@ for (var i = 0; i <meData.length; i++) {
      meData[i].ky = true;
               meData[i].kc = false;
 
-    } else if (meData[i].kindOf === "rent"){
+    } else if (meData[i].attributes.kindOf === "rent"){
             meData[i].y = false;
     ky = true;
     meData[i].r = true;
@@ -178,7 +176,7 @@ for (var i = 0; i <meData.length; i++) {
          meData[i].kc = false;
    meData[i].total =  meData[i].price;
 meData[i].totaltotal =  meData[i].easy;
-    } else if (meData[i].kindOf === "perUnit"){
+    } else if (meData[i].attributes.kindOf === "perUnit"){
     meData[i].y = false;
     meData[i].kc = true;
          meData[i].ky = false;
@@ -187,7 +185,7 @@ meData[i].totaltotal =  meData[i].easy;
     kc = true;
    // meData[i].total = meData[i].hm * meData[i].price;
 //meData[i].totaltotal = meData[i].hm * meData[i].easy;
-  } else if (meData[i].kindOf === "total"){
+  } else if (meData[i].attributes.kindOf === "total"){
         meData[i].y = false;
     meData[i].kc = false;
          meData[i].ky = false;
@@ -208,11 +206,14 @@ let fir,ssec;
    } 
  }
  let xy = false;
+ const hea = {"he":"חלוקת שווי הריקמה", "en": "FreeMate value distribution"}
+ const cl = {"he": "סגירת הפירוט", "en": "close the details"}
+ const pehe = {"he": "פעולות שבוצעו ואושרו", "en": "approved missions"}
     </script>
 
     {#if hagdel === false}
     <div style =" margin-left: auto; margin-right:auto;" >
-      <h1 style =" margin-top: 20px ;" class="text-barbi text-bold text-2xl">חלוקת שווי הריקמה</h1>
+      <h1 style =" margin-top: 20px ;" class="text-barbi text-bold text-2xl">{hea[$lang]}</h1>
          <div class="yy">       
            <Tooltip title="{fir}: {ssec}%">
 
@@ -235,7 +236,7 @@ let fir,ssec;
    
 {:else}
      <button
-      title="סגירת הפירוט"
+      title="{cl[$lang]}"
       on:click={() => hagdel = false}
        class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -247,7 +248,7 @@ let fir,ssec;
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >פעולות שבוצעו ואושרו</h1>
+      >{pehe[$lang]}</h1>
     </caption>
         <tr class="gg">
           <th class="gg">אפשרויות</th>
@@ -259,19 +260,19 @@ let fir,ssec;
     </tr> <tr class="ggr">
       <th class="ggr">שם</th>
       {#each fmiData as data, i}
-            <td class="ggr">{data.missionName}</td>
+            <td class="ggr">{data.attributes.missionName}</td>
             {/each}
           </tr> <tr>
             <th>תיאור</th>
             {#each fmiData as data, i}
-            <td>{data.descrip}</td>
+            <td>{#if data.attributes.descrip != "undefined"}{data.attributes.descrip}{/if}</td>
               {/each}
             </tr>
          <tr>
               <th>תאריך ביצוע</th>
               {#each fmiData as data, i}
-            <td>              {#if data.Sqadualed}
-              {data.Sqadualed}
+            <td>              {#if data.attributes.Sqadualed}
+              {data.attributes.Sqadualed}
             {/if}
             </td>
             {/each}
@@ -279,8 +280,8 @@ let fir,ssec;
             <th>קישורים ציבוריים</th>
             {#each fmiData as data, i}
             <td>
-              {#if data.publicklinks}
-              {data.publicklinks}
+              {#if data.attributes.publicklinks}
+              {data.attributes.publicklinks}
               {/if}
              </td>
              {/each}
@@ -288,17 +289,17 @@ let fir,ssec;
           <th>הערות יחודיות לריקמה שלי</th>
           {#each fmiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot}
-            {data.hearotMeyuchadot}
+            {#if data.attributes.hearotMeyuchadot != "undefined" && data.attributes.hearotMeyuchadot != null}
+            {data.attributes.hearotMeyuchadot}
             {/if}
            </td>
            {/each}
       </tr><tr>
         <th>קישורים יחודיים לריקמה שלי</th>
         {#each fmiData as data, i}
-        <td>          {#if data.privatlinks} 
+        <td>          {#if data.attributes.privatlinks} 
 
-          {data.privatlinks} 
+          {data.attributes.privatlinks} 
           {/if}
          </td>
          {/each}
@@ -306,9 +307,9 @@ let fir,ssec;
           <th >כמה שעות זה  לקח </th>
           {#each fmiData as data, i}
           <td>
-            {#if data.noofhours > 0}
+            {#if data.attributes.noofhours > 0}
 
-           {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})}
+           {data.attributes.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})}
            {/if}
           </td>
           {/each}
@@ -316,9 +317,9 @@ let fir,ssec;
           <th>כמה שווה שעה</th>
           {#each fmiData as data, i}
           <td>
-            {#if data.perhour > 0}
+            {#if data.attributes.perhour > 0}
 
-            {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})}
+            {data.attributes.perhour.toLocaleString('en-US', {maximumFractionDigits:2})}
             {/if}
           </td>
           {/each}
@@ -326,7 +327,7 @@ let fir,ssec;
       <th>שווי סך הכל למשימה </th>
       {#each fmiData as data, i}
       <td>
-      {data.total.toLocaleString('en-US', {maximumFractionDigits:2})}
+      {data.attributes.total.toLocaleString('en-US', {maximumFractionDigits:2})}
       </td>
       {/each}
     </tr>
@@ -334,8 +335,8 @@ let fir,ssec;
             <th> הערות סיום</th>
             {#each fmiData as data, i}
             <td>
-              {#if data.why}
-              {data.why}
+              {#if data.attributes.why}
+              {data.attributes.why}
               {/if}
              </td>
              {/each}
@@ -344,7 +345,7 @@ let fir,ssec;
             <th>בוצע על ידי</th>
             {#each fmiData as data, i}
             <td>
-              {data.users_permissions_user.username}
+              {data.attributes.users_permissions_user.data.attributes.username}
              </td>
              {/each}
         </tr>
@@ -368,44 +369,44 @@ let fir,ssec;
       <th class="ggr">שם</th>
       {#each meData as data, i}
             <td class="ggr">
-                {data.name}
+                {data.attributes.name}
             </td>
             {/each}
           </tr>
   <tr>
       <th>תיאור</th>
       {#each meData as data, i}
-      <td> {#if data.deskrip} {data.deskrip}{/if}
+      <td> {#if data.attributes.deskrip} {data.attributes.deskrip}{/if}
 </td>
         {/each}
     </tr> <tr>
       <th>סוג</th>
       {#each meData as data, i}
       <td>
-      <h1>{data.kindOf}</h1>
+      <h1>{data.attributes.kindOf}</h1>
         </td>
       {/each}
     </tr> <tr style="display:{kc ? "" : "none"};">
       <th>כמות</th>
       {#each meData as data, i}
       <td >
-       {data.hm}
+       {data.attributes.hm}
       {/each}
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>
       {#each meData as data, i}
-      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.attributes.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr style="display:{ ky  ? "" : "none"};" >
       <th >תאריך סיום </th>
       {#each meData as data, i}
-      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.attributes.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr>
       <th>הערות מיוחדות</th>
       {#each meData as data, i}
-      <td>{#if data.spnot}
- {data.spnot}{/if}</td>
+      <td>{#if data.attributes.spnot}
+ {data.attributes.spnot}{/if}</td>
         {/each}
   </tr><!-- <tr>
       <th>עלות</th>
@@ -419,25 +420,25 @@ let fir,ssec;
       {#each meData as data, i}
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
-        {data.agprice.toFixed(2)}
+        {data.attributes.agprice.toFixed(2)}
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >
       <th>עלות סה"כ</th>
       {#each meData as data, i}
       <td  >
-      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.total.toFixed(2)}</h3>
+      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.attributes.total.toFixed(2)}</h3>
       {/each}
     </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
       {#each meData as data, i}
-      <td>{#if data.linkto}{data.linkto}{/if}
+      <td>{#if data.attributes.linkto}{data.attributes.linkto}{/if}
 </td>
         {/each}
   </tr><tr>
             <th>שותף על ידי</th>
             {#each meData as data, i}
             <td>
-              {data.users_permissions_user.username}
+              {data.attributes.users_permissions_user.data.attributes.username}
              </td>
              {/each}
         </tr>

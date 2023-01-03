@@ -9,8 +9,7 @@
   import { onMount } from 'svelte';
   import Header from '$lib/components/header/header.svelte'
 
-let user = [
-];
+let user;
 let load = false
 let projects =[];
 let uskill =[];
@@ -18,7 +17,7 @@ let token;
 let fblink, twiterlink, discordlink, githublink
 
 let idL;
-let srcU;
+let srcU = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
 let uww = [];
 let fmm = [];
 let ur = [];
@@ -48,7 +47,7 @@ let error1 = null;
       };
       const headers = {
         'Content-Type': 'application/json'   
-      }; let link ="https://i18.onrender.com/graphql" ;
+      }; let link ="http://localhost:1337/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -59,41 +58,41 @@ let error1 = null;
                   },
         body: 
         JSON.stringify({query: 
-          `{  user (id:${userId}) { 
+          `{  usersPermissionsUser (id:${userId}) { data{attributes{
              fblink twiterlink discordlink githublink
             bio
             username 
-                        finnished_missions { missionName }
-            profilePic {url formats }
-            projects_1s { id projectName} 
-            sps (where: {archived: false }) {id  name panui}
-            skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}} 
-            tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-            vallues {id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
-            work_ways {id workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
-                            }
+                        finnished_missions { data{attributes{ missionName }}}
+            profilePic { data{attributes{url formats }}}
+            projects_1s {data{ id attributes{ projectName}}} 
+            sps (filters: {archived:{eq: false }}) {data{id attributes { name panui}}}
+            skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{  data{attributes{skillName }}}' : ""}} }}
+            tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{ data{attributes{roleDescription }}}' : ""}}}}
+            vallues {data{ id attributes{ valueName ${$lang == 'he' ? 'localizations{ data{attributes{valueName }}}' : ""}}}}
+            work_ways {data{ id attributes{workWayName ${$lang == 'he' ? 'localizations{ data{attributes{workWayName }}}' : ""}}}}
+                            }}}
         }`
         })
 })
   .then(r => r.json())
-  .then(data => user = data.data.user);
+  .then(data => user = data.data.usersPermissionsUser.data.attributes);
             console.log(user);
-            projects = user.projects_1s;
+            projects = user.projects_1s.data;
             load = true
-            uskill = user.skills;
+            uskill = user.skills.data;
               fblink = user.fblink
             twiterlink = user.twiterlink
              discordlink = user.discordlink
                githublink = user.githublink
             let fermatana = {}
             let fnn = []
-            fnn = user.finnished_missions;
+            fnn = user.finnished_missions.data;
             if (fnn.length > 1){
              for (let i = 0; i < fnn.length; i++){
-              if (fnn[i].missionName in fermatana) {
-                    fermatana[fnn[i].missionName] += 1
+              if (fnn[i].attributes.missionName in fermatana) {
+                    fermatana[fnn[i].attributes.missionName] += 1
                    } else {
-                    fermatana[fnn[i].missionName] = 1
+                    fermatana[fnn[i].attributes.missionName] = 1
                    }
               }
          for (const [key, value] of Object.entries(fermatana)) {
@@ -105,46 +104,48 @@ let error1 = null;
          }
         }
         fmm = fmm
-            ur =  user.tafkidims;
-              val = user.vallues;
+            ur =  user.tafkidims.data;
+              val = user.vallues.data;
             if ($lang == "he"){
               for (var i = 0; i < val.length; i++){
-                if (val[i].localizations.length > 0){
-                val[i].valueName = val[i].localizations[0].valueName
+                if (val[i].attributes.localizations.data.length > 0){
+                val[i].attributes.valueName = val[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
             val = val
-            uskill = user.skills;
+            uskill = user.skills.data;
               if ($lang == "he"){
               for (var i = 0; i < uskill.length; i++){
-                if (uskill[i].localizations.length > 0){
-                uskill[i].skillName = uskill[i].localizations[0].skillName
+                if (uskill[i].attributes.localizations.data.length > 0){
+                uskill[i].attributes.skillName = uskill[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }       
             uskill = uskill   
-            ur = user.tafkidims;
+            ur = user.tafkidims.data;
                         if ($lang == "he"){
               for (var i = 0; i < ur.length; i++){
-                if (ur[i].localizations.length > 0){
-                ur[i].roleDescription = ur[i].localizations[0].roleDescription
+                if (ur[i].attributes.localizations.data.length > 0){
+                ur[i].attributes.roleDescription = ur[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
             ur = ur
-            mash = user.sps;
-            uww = user.work_ways;  
+            mash = user.sps.data;
+            uww = user.work_ways.data;  
             if ($lang == "he"){
               for (var i = 0; i < uww.length; i++){
-                if (uww[i].localizations.length > 0){
-                uww[i].workWayName = uww[i].localizations[0].workWayName
+                if (uww[i].attributes.localizations.data.length > 0){
+                uww[i].attributes.workWayName = uww[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }    
               uww = uww
-            srcU =`${user.profilePic.formats.thumbnail.url}`
-            srcU =`${user.profilePic.formats.small.url}`
+              if (user.profilePic.data !=null){
+            srcU =user.profilePic.data.attributes.formats.thumbnail.url
+            srcU =user.profilePic.data.attributes.formats.small.url
+              }
         } catch (e) {
             error1 = e
         }
@@ -175,9 +176,10 @@ const todis = {"he":"לינק לדיסקורד","en":"link to discord"}
 const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
 const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
 const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
+$: title = {"he": `${user ? user.username : "פרופיל" } | 1❤️1`, "en": `${user ? user.username : "" } profile | 1❤️1`}
   </script>
   <svelte:head>
-  <title>פרופיל 1❤️1</title>
+  <title>{title[$lang]}</title>
 </svelte:head>
 
   <div dir="rtl" >
@@ -200,7 +202,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{sk[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each uskill as dat, i}
-       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.skillName}</span>
+       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.skillName}</span>
        {/each}
       </div>
       </div>
@@ -210,7 +212,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{ro[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each ur as dat, i}
-       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.roleDescription}</span>
+       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.roleDescription}</span>
        {/each}
       </div>
       </div>
@@ -221,7 +223,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
         {#each projects as data, i}
        <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 hover:scale-110">
-          <a class="text-gold hover:text-mturk "  data-sveltekit-prefetch href={`/project/${data.id}`} >{data.projectName}</a>
+          <a class="text-gold hover:text-mturk "  data-sveltekit-prefetch href={`/project/${data.id}`} >{data.attributes.projectName}</a>
        </span>
        {/each}
     </div>
@@ -232,7 +234,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{ww[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each uww as dat, i}
-       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.workWayName}</span>
+       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.workWayName}</span>
        {/each}
       </div>
       </div>
@@ -242,7 +244,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{vv[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each val as dat, i}
-       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.valueName}</span>
+       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.valueName}</span>
        {/each}
       </div>
       </div>
@@ -252,7 +254,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
     <h6 class="mt-6 " style="font-size:28px; color:var(--barbi-pink); ">{rr[$lang]}</h6>
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
     {#each mash as dat, i}
-       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.name}</span>
+       <span style="font-size:25px;" class="font-bold text-gold bg-barbi rounded-lg px-1 my-1 ">{dat.attributes.name}</span>
        {/each}
       </div>
       </div>
@@ -278,6 +280,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
  <div class="flex flex-row items-center justify-center">
          {#if discordlink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={discordlink}
           class=" hover:bg-white text-barbi rounded-full"
           title={todis[$lang]}
@@ -287,6 +290,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
                       {/if}
                          {#if twiterlink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={twiterlink}
           class=" hover:bg-white text-barbi rounded-full"
           title={totwi[$lang]}
@@ -305,6 +309,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
                       {/if}-->
                         {#if githublink}
                      <a
+                     rel="noreferrer"
                      target="_blank" href={githublink}
           class=" hover:bg-white text-barbi rounded-full"
           title={togit[$lang]}
@@ -314,6 +319,7 @@ const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
                       {/if}
                        {#if fblink}
                      <a
+                      rel="noreferrer"
                      target="_blank" href={fblink}
           class=" hover:bg-white text-barbi rounded-full"
           title={tofac[$lang]}

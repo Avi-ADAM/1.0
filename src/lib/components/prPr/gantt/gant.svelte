@@ -6,8 +6,10 @@
 
  const dispatch = createEventDispatcher();
     export let bmiData = [], pmiData = [], omiData = [], fmiData = []; 
-    const currentStart = moment().clone().startOf('year');
-    const currentEnd = moment().clone().endOf('year');
+    let options = {}
+
+    let currentStart ;
+    let currentEnd ;
     let generation = 0;
     let rowCount = bmiData.length + pmiData.length + omiData.length
      const timeRanges = [
@@ -34,23 +36,30 @@
         SvelteGantt = (await import ('svelte-gantt')).SvelteGantt
         SvelteGanttTable = (await import ('svelte-gantt')).SvelteGanttTable
         MomentSvelteGanttDateAdapter = (await import ('svelte-gantt')).MomentSvelteGanttDateAdapter
-          data = generate();
-		let options = {
-            resizeHandleWidth: 0,
+       let  zoomLevels = [ { headers: [ { unit: 'year', format: 'YYYY' }, { unit: 'month', format: 'MMM' } ], minWidth: 300, fitWidth: true }, { headers: [ { unit: 'month', format: 'MMMM' }, { unit: 'day', format: 'DD', offset: 5 } ], minWidth: 300, fitWidth: true } ];
+        currentStart = moment().clone().startOf('year');
+         currentEnd = moment().clone().endOf('year');
+         console.log(currentStart,currentEnd) 
+         
+        data = generate();
+		 options = {
+            resizeHandleWidth: 5,
         dateAdapter: new MomentSvelteGanttDateAdapter(moment),
         rows: data.rows,
         tasks: data.tasks,
-                timeRanges,
+      //          timeRanges,
+      //      zoomLevels,
 		columnUnit: 'month',
         columnOffset: 1,
         rowHeight: 26,
         rowPadding: 2,
-        headers: [{ unit: 'year', format: 'YYYY' }, { unit: 'month', format: 'MMM' }], //, { unit: 'day', format: 'MMMM Do' } 
+       headers:[{ unit: 'year', format: 'YYYY' }, { unit: 'month', format: 'M',offset: 1 }],
+        minWidth: 300,
         fitWidth: true,
-        minWidth: 400,
         from: currentStart,
         to: currentEnd,
     }
+    console.log(options)
         window.gantt = gantt = new SvelteGantt({ target: document.getElementById('example-gantt'), props: options });
     	gantt.api.tasks.on.select((task) => dispatch('selected', { id:task}));
         
@@ -76,14 +85,14 @@
                 generation
             });
 			
-			const from = fmiData[i].start == null ? moment(fmiData[i].mesimabetahalich.created_at) : moment(fmiData[i].start)//todo first timer start
+			const from = fmiData[i].attributes.start == null ? moment(fmiData[i].attributes.mesimabetahalich.data.attributes.createdAt) : moment(fmiData[i].attributes.start)//todo first timer start
             
-            const to = fmiData[i].finnish == null ? moment(fmiData[i].created_at) : moment(fmiData[i].finnish)//todo last timer end
+            const to = fmiData[i].attributes.finnish == null ? moment(fmiData[i].attributes.createdAt) : moment(fmiData[i].attributes.finnish)//todo last timer end
             tasks.push({
                 type: 'task',
                 id: `${fmiData[i].id}.4`,
                 resourceId: i ,
-                label: fmiData[i].missionName,
+                label: fmiData[i].attributes.missionName,
                 from,
                 enableDragging: false,
                 to,
@@ -103,14 +112,14 @@
                 generation
             });
 			
-			const from = moment(bmiData[i].created_at)
-            let rand_l = bmiData[i].hoursassinged / 2
+			const from = moment(bmiData[i].attributes.createdAt)
+            let rand_l = bmiData[i].attributes.hoursassinged / 2
             const to = from.clone().add(rand_l, 'days')
             tasks.push({
                 type: 'task',
                 id: bmiData[i].id,
                 resourceId: i + fmiData.length,
-                label: bmiData[i].name,
+                label: bmiData[i].attributes.name,
                 from,
                 enableDragging: false,
                 to,
@@ -130,14 +139,14 @@
                 generation
             });
 			
-			const from = moment(omiData[i].created_at)
-            let rand_l = omiData[i].noofhours / 2
+			const from = moment(omiData[i].attributes.createdAt)
+            let rand_l = omiData[i].attributes.noofhours / 2
             const to = from.clone().add(rand_l, 'days')
             tasks.push({
                 type: 'task',
                 id: `${omiData[i].id}.2`,
                 resourceId: i + bmiData.length + fmiData.length,
-                label: omiData[i].name,
+                label: omiData[i].attributes.name,
                 from,
                 enableDragging: false,
                 to,
@@ -158,14 +167,14 @@
                 generation
             });
 			
-			const from = moment(pmiData[i].created_at)
-            let rand_l = pmiData[i].noofhours / 2
-            const to = from.clone().add(rand_l, 'days')
+			const from = pmiData[i].attributes.sqadualed ? pmiData[i].attributes.sqadualed : moment(pmiData[i].attributes.createdAt)
+            let rand_l = pmiData[i].attributes.noofhours / 2
+            const to = pmiData[i].attributes.dates ? pmiData[i].attributes.dates : from.clone().add(rand_l, 'days')
             tasks.push({
                 type: 'task',
                 id: `${pmiData[i].id}.3`,
                 resourceId: i + bmiData.length + omiData.length + fmiData.length,
-                label: pmiData[i].name,
+                label: pmiData[i].attributes.name,
                 from,
                 enableDragging: false,
                 to,
@@ -222,6 +231,7 @@
         display: flex;
         overflow: auto;
         flex: 1;
+        min-width: 100%;
     }
     .btnr{
         position: relative;

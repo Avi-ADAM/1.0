@@ -9,7 +9,7 @@
 
                 import axios from 'axios';
     import { lang, doesLang, langUs } from '$lib/stores/lang.js'
-  import { goto, prefetch } from '$app/navigation';
+  import { goto } from '$app/navigation';
 
           import { contriesi } from '../registration/contries.js';
     import {fpval} from '../registration/fpval.js';
@@ -32,7 +32,7 @@ function find_contry_id(contry_name_arr){
       }
       return arr;
      };
-     let fpp = [];
+   let fpp = [];
   let fppp = [];
     let error1 = null;
     onMount(async () => {
@@ -50,24 +50,36 @@ function find_contry_id(contry_name_arr){
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("http://localhost:1337/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  chezins { name}
+  chezins { 
+     data {
+      attributes {
+        name
+      }
+      }
+   meta {
+      pagination {
+        total
+      }
+    }
+  }
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             fppp = res.data.chezins
-            fpp = fppp.map(c => c.name)
+            fpp = fppp.data.map(c => c.attributes.name)
         } catch (e) {
             error1 = e
         }
         
     });
+
     const country =  [
                     { value: 104 , label: 'Israel', heb: 'ישראל'},
                     { value: 167 , label: 'Palestine jehuda & sumeria', heb: 'הרשות הפלסטינית יו"ש'},
@@ -370,11 +382,13 @@ if (fpp.includes(jjj)){
  const mail = $form.email.toLowerCase().trim();
 console.log("t")
   axios
-  .post('https://i18.onrender.com/chezins', {
-     name: $form.name,
+  .post('http://localhost:1337/api/chezins', {
+      "data": {
+        name: $form.name,
         email: mail,
         countries: find_contry_id(selected)
-              },
+      }        
+      },
   {
   headers: {
         'Content-Type': 'application/json',
@@ -383,15 +397,15 @@ console.log("t")
     console.log("hhhh")
     g = false;
    already = true;
-   document.cookie = `email=${mail}; expires=` + new Date(2023, 0, 1).toUTCString();
-   document.cookie = `un=${$form.name}; expires=` + new Date(2023, 0, 1).toUTCString();
+   document.cookie = `email=${mail}; expires=` + new Date(2024, 0, 1).toUTCString();
+   document.cookie = `un=${$form.name}; expires=` + new Date(2024, 0, 1).toUTCString();
    userName.set($form.name);
            liUN.set($form.name);
             email.set(mail);
             contriesi.set(find_contry_id(selected))
             regHelper.set(1);
                     meData = response.data;
-                fpval.set(meData.id)
+                fpval.set(meData.data.id)
                 show.set(0)
                 console.log($fpval, $contriesi, "from after")
             datar = data;
@@ -1347,9 +1361,15 @@ background-position: center;
    .amana{
     padding: 0 210px;
     background-size: 1888px  ;
+   font-size: 29px;
   }
    .centeron{
    left: 48%;
+  }
+  .button{
+    background-size: 170px;
+    min-height: 170px;
+    min-width: 170px;
   }
 }
  :global(.multiselect) {

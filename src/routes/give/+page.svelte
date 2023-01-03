@@ -1,6 +1,7 @@
 <script>
   let fpval, selected, liUN, email;
       import MultiSelect from 'svelte-multiselect';
+  import { userName } from '$lib/stores/store.js';
 
     const country =  [
      { value: 104 , label: 'Israel', heb: 'ישראל'},
@@ -297,6 +298,29 @@ function find_contry_id(contry_name_arr){
       return arr;
      };
     let uid = 5679070
+
+    function rrrr (){
+       let userName_value = $userName
+       let newN = "vrvr"
+         let datau = {name:"userName_value", action: "create", det:"newN"}
+   fetch("https://www.1lev1.world/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(datau),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data,datau);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  
+    }
 </script>
 
 <button on:click={onSubmiti}>tttt</button>
@@ -315,3 +339,4 @@ function find_contry_id(contry_name_arr){
   <button type="submit">Submit</button>
 </form>
 <a href="{`https://telegram.me/onelevone_bot?start=${uid}`}" alt="telegramjoin">tele</a>
+<button on:click={rrrr}>cervrvr</button>

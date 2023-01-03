@@ -16,16 +16,16 @@ onMount(async () => {
     let colors = ["blue", "green", "yellow", "red", "purple", "indigo","pink" , "gray"];
     for (var i = 0; i <bmiData.length; i++){
         bmiData[i].tid = []
-        for (var j = 0; j < bmiData[i].tafkidims.length; j++){
-            bmiData[i].tid.push(bmiData[i].tafkidims[j].id)
-            if (bmiData[i].tafkidims[j].id in xx) {
-                  bmiData[i].tafkidims[j].color =  xx[bmiData[i].tafkidims[j].id] 
+        for (var j = 0; j < bmiData[i].attributes.tafkidims.data.length; j++){
+            bmiData[i].tid.push(bmiData[i].attributes.tafkidims.data[j].id)
+            if (bmiData[i].attributes.tafkidims.data[j].id in xx) {
+                  bmiData[i].attributes.tafkidims.data[j].color =  xx[bmiData[i].attributes.tafkidims.data[j].id] 
                    } else {
-                    xx[bmiData[i].tafkidims[j].id] = colors[counter]
-                    bmiData[i].tafkidims[j].color =  colors[counter]
-           const word = $lang == "en" ? bmiData[i].tafkidims[j].roleDescription : bmiData[i].tafkidims[j].localizations.length > 0 ?  bmiData[i].tafkidims[j].localizations[0].roleDescription : bmiData[i].tafkidims[j].roleDescription                      
+                    xx[bmiData[i].attributes.tafkidims.data[j].id] = colors[counter]
+                    bmiData[i].attributes.tafkidims.data[j].color =  colors[counter]
+           const word = $lang == "en" ? bmiData[i].attributes.tafkidims.data[j].attributes.roleDescription : bmiData[i].attributes.tafkidims.data[j].attributes.localizations.data.length > 0 ?  bmiData[i].attributes.tafkidims.data[j].attributes.localizations.data[0].attributes.roleDescription : bmiData[i].attributes.tafkidims.data[j].attributes.roleDescription
               soter.push({
-                id: bmiData[i].tafkidims[j].id, 
+                id: bmiData[i].attributes.tafkidims.data[j].id, 
                 color: colors[counter],
                 word: word,
                 closei: false,
@@ -130,25 +130,25 @@ onMount(async () => {
       <tbody>
         {#each sodata as data, i}
         <tr>
-          <td>{data.name}</td>
+          <td>{data.attributes.name}</td>
           <td> 
         <div class="flex items-center space-x-4">
-           <img data-tooltip-target="tooltip-jese" class="sm:w-10 sm:h-10 w-7 h-7 rounded-full" src="{data.users_permissions_user.profilePic.url}" alt="Medium avatar">
+           <img data-tooltip-target="tooltip-jese" class="sm:w-10 sm:h-10 w-7 h-7 rounded-full" src="{data.attributes.users_permissions_user.data.attributes.profilePic.data != null ? data.attributes.users_permissions_user.data.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="Medium avatar">
         <div class="font-large dark:text-white">
-        <div>{data.users_permissions_user.username}</div>
+        <div>{data.attributes.users_permissions_user.data.attributes.username}</div>
     </div>    
         </div>
         </td>
           <td>
               <div class="w-full  rounded-full bg-gray-700">
-    <div class="bg-barbi text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {data.status == null ? 0 : data.status}%">{data.status == null ? 0 : data.status}%</div>
+    <div class="bg-barbi text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {data.attributes.status == null ? 0 : data.attributes.status}%">{data.attributes.status == null ? 0 : data.attributes.status}%</div>
   </div>
           </td>
-          <td>{data.howmanyhoursalready == null ? 0 : data.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})}/{data.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</td>
-          <td>{(data.hoursassinged * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</td>
+          <td>{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})}/{data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</td>
+          <td>{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</td>
           <td>
-            {#each data.tafkidims as taf, i} 
-            <Tile bg={taf.color} word="{$lang == "en" ? taf.roleDescription : taf.localizations.length > 0 ?  taf.localizations[0].roleDescription : taf.roleDescription }"/>
+            {#each data.attributes.tafkidims.data as taf, i} 
+            <Tile bg={taf.attributes.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
             {/each}
 </td>
         </tr>

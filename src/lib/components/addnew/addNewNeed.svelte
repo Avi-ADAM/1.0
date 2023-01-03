@@ -22,7 +22,7 @@ async function subm() {
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     try {
-           const res = await fetch("https://i18.onrender.com/graphql", {
+           const res = await fetch("http://localhost:1337/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

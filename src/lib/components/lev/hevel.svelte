@@ -48,7 +48,7 @@ let error1 = null;
       };
       const headers = {
         'Content-Type': 'application/json'   
-      }; let link ="https://i18.onrender.com/graphql" ;
+      }; let link ="http://localhost:1337/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

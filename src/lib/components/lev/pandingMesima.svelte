@@ -169,7 +169,7 @@ function objToStringC (obj) {
 let whyy = ``;
 let allr = false;
 let ordern = ``;
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'http://localhost:1337/graphql';
 let userss = objToString(users);
 async function agree(alr) {
   if  (alr == "alr"){

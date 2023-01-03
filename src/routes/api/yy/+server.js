@@ -6,9 +6,9 @@ export const POST = async ({ request }) => {
     const isReg = messegeText.startsWith('/getnotification')
     const isShow = messegeText.startsWith('/showaddress')
     const isStart = messegeText.startsWith('/start')
-    console.log()
     let name,det,action;
     if (isReg == true){
+        //check if chatid is already in use else:
      name =""
      det =""
      action = "הרשמתך לעדכונים התקבלה בהצלחה!"

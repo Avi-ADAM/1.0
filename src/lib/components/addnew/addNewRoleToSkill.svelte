@@ -1,8 +1,6 @@
 <script>
     import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
-    import axios from 'axios';
-    import { idd } from '../../stores/idd.js';
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
 
@@ -10,26 +8,43 @@
     export let rn = [];
     let roleName_value;
         let desS;
-        let link ="https://i18.onrender.com/tafkidims";
+        let link ="http://localhost:1337/api/tafkidims";
         let meData;
         let shgi = false;
-    function add () {
+  async function add () {
       if (rn.includes(roleName_value)){
   shgi = true;
 } else {
-        axios
-      .post(link, {
-        roleDescription: roleName_value,
-        descrip: desS
+  let d = new Date
+      let link ="http://localhost:1337/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
                   },
-      {
-      headers: {
+        body: 
+        JSON.stringify({query: 
+           `mutation  createTafkidim {
+  createTafkidim (data: {  roleDescription: "${roleName_value}",
+          descrip: "${desS}",
+                publishedAt: "${d.toISOString()}"
+}) {
+    data {
+      id
+      attributes {
+        roleDescription
+      } 
 
-                }})
-      .then(response => {
-        meData = response.data;
-         idd.set(meData.id);
-         finnish (meData.id);
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+         finnish (meData.data.createTafkidim.data.id,meData.data.createTafkidim.data);
           let userName_value = liUN.get()
          let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desS}` }
    fetch("/api/ste", {
@@ -44,20 +59,25 @@
     console.log('Success:', data);
 
   })
+
   .catch((error) => {
     console.error('Error:', error);
   
   })
-                  })
-      .catch(error => {
-        console.log('צריך לתקן:', error);
-                });}
-    }; 
-       function finnish (id) {
+              }
+      catch(error) {
+        let error1;
+        console.log('צריך לתקן:', error.response);
+        error = error1 
+        console.log(error1)
+                };}
+    };     
+       function finnish (id , sec) {
   dispatch('finnish', {
     id: id,
     addro: false,
     rob: meData,
+    skob: sec,
     name: roleName_value
     } );
        };

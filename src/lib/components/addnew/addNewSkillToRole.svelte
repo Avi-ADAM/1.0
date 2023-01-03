@@ -1,34 +1,52 @@
 <script>
     import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
-import axios from 'axios';
-import { idr } from '../../stores/idr.js';
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
 
 let skillName_value;
     let desS;
-    let link ="https://i18.onrender.com/skills";
+    let link ="http://localhost:1337/api/skills";
     let meData;
      export let rn = [];
     let shgi = false;
-function addNewSkill () {
+async function addNewSkill () {
    shgi = false;
 if (rn.includes(skillName_value)){
   shgi = true;
 } else {
-    axios
-  .post(link, {
-    skillName: skillName_value,
-    descrip: desS
-              },
-  {
-  headers: {
-            }})
-  .then(response => {
-    meData = response.data;
-    finnish (meData.id);
-         idr.set(meData.id);
+  let d = new Date
+   let link ="http://localhost:1337/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation  createSkill {
+  createSkill(data: {  skillName: "${skillName_value}",
+          descrip: "${desS}",
+                publishedAt: "${d.toISOString()}"
+        }
+          ) {
+    data {
+      id
+      attributes {
+        skillName
+      } 
+
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+     const id = meData.data.createSkill.data.id;
+    finnish (id,meData.data.createSkill.data);
           let userName_value = liUN.get()
          let data = {"name": userName_value, "action": "יצר כישור חדש בשם:", "det": `${skillName_value} והתיאור: ${desS} `}
    fetch("/api/ste", {
@@ -47,19 +65,20 @@ if (rn.includes(skillName_value)){
     console.error('Error:', error);
   
   })
-              })
-  .catch(error => {
-    console.log('צריך לתקן:', error);
-            });}
-};    
+              }
+      catch(error) {
+        console.log('צריך לתקן:', error.response)
+                };}
+    };   
 
 
-function finnish (id) {
+function finnish (id,sec) {
   dispatch('finnish', {
     id: id,
     addsk: false,
+    scob: sec,
     rob: meData,
-    new: skillName_value
+    name: skillName_value
     } );
        };
        export let color = "--gold"

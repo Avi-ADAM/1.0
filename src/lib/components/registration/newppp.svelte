@@ -55,7 +55,7 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'https://i18.onrender.com/graphql'
+let linkg = 'http://localhost:1337/graphql'
 let miDatan;
 let errr = {k: false, m: "", p: false}
 async function increment() {    
@@ -71,9 +71,9 @@ errr.p = true;
  let uid = cookieValueId;
    let token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://i18.onrender.com/graphql" ;
+    let link ="http://localhost:1337/graphql" ;
      axios
-  .post('https://i18.onrender.com/password', {
+  .post('http://localhost:1337/password', {
      identifier: emailL,
     password: newpp,
     newPassword: passwordx,
@@ -121,8 +121,8 @@ errr.p = true;
 		tx: 0,
 		txx: 0
 	} );
-    document.cookie = `jwt=${miDatan.data.jwt}; expires=` + new Date(2023, 0, 1).toUTCString();
-    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2023, 0, 1).toUTCString();
+    document.cookie = `jwt=${miDatan.data.jwt}; expires=` + new Date(2024, 0, 1).toUTCString();
+    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2024, 0, 1).toUTCString();
 } catch (e) {
             error1 = e
             console.log(error1);

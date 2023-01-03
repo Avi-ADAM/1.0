@@ -92,7 +92,7 @@ let token;
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'http://localhost:1337/graphql';
 
 
 let monts = 0

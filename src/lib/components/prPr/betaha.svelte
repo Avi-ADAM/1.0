@@ -46,19 +46,19 @@ function confirm (id) {
     <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
       <th class="ggr  font-bold">שם</th>
       {#each bmiData as data, i}
-            <td class="ggr  font-bold">{data.name}</td>
+            <td class="ggr  font-bold">{data.attributes.name}</td>
             {/each}
           </tr> <tr>
             <th>תיאור</th>
             {#each bmiData as data, i}
-            <td>{data.descrip !== null && data.descrip !== undefined && data.descrip !== "undefined" ? data.descrip : ""}</td>
+            <td>{data.attributes.descrip !== null && data.attributes.descrip !== undefined && data.attributes.descrip !== "undefined" ? data.attributes.descrip : ""}</td>
               {/each}
             </tr>
          <tr>
               <th>תאריך ביצוע</th>
               {#each bmiData as data, i}
-            <td>              {#if data.Sqadualed !== undefined}
-              {data.Sqadualed}
+            <td>              {#if data.attributes.Sqadualed !== undefined}
+              {data.attributes.Sqadualed}
             {/if}
             </td>
             {/each}
@@ -66,8 +66,8 @@ function confirm (id) {
             <th>קישורים ציבוריים</th>
             {#each bmiData as data, i}
             <td>
-              {#if data.publicklinks !== undefined && data.publicklinks !== "undefined"}
-             <a target="_blank" href="{data.publicklinks}">קישור</a>
+              {#if data.attributes.publicklinks !== undefined && data.attributes.publicklinks !== "undefined"}
+             <a target="_blank" rel="noreferrer" href="{data.attributes.publicklinks}">קישור</a>
               {/if}
              </td>
              {/each}
@@ -75,8 +75,8 @@ function confirm (id) {
           <th>הערות יחודיות לריקמה שלי</th>
           {#each bmiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== "undefined"}
-            {data.hearotMeyuchadot}
+            {#if data.attributes.hearotMeyuchadot !== undefined && data.attributes.hearotMeyuchadot !== "undefined"}
+            {data.attributes.hearotMeyuchadot}
             {/if}
            </td>
            {/each}
@@ -84,8 +84,8 @@ function confirm (id) {
         <th>קישורים יחודיים לריקמה שלי</th>
         {#each bmiData as data, i}
         <td>       
-      {#if data.privatlinks !== undefined && data.privatlinks !== "undefined"} 
-             <a target="_blank" href="{data.privatlinks}">קישור</a>
+      {#if data.attributes.privatlinks !== undefined && data.attributes.privatlinks !== "undefined"} 
+             <a rel="noreferrer" target="_blank" href="{data.attributes.privatlinks}">קישור</a>
           {/if}
          </td>
          {/each}
@@ -93,9 +93,9 @@ function confirm (id) {
           <th >כמה שעות זה אמור לקחת? </th>
           {#each bmiData as data, i}
           <td>
-            {#if data.hoursassinged > 0}
+            {#if data.attributes.hoursassinged > 0}
 
-           {data.hoursassinged}
+           {data.attributes.hoursassinged}
            {/if}
           </td>
           {/each}
@@ -103,9 +103,9 @@ function confirm (id) {
           <th>כמה שווה שעה ?</th>
           {#each bmiData as data, i}
           <td>
-            {#if data.perhour > 0}
+            {#if data.attributes.perhour > 0}
 
-            {data.perhour}
+            {data.attributes.perhour}
             {/if}
           </td>
           {/each}
@@ -113,9 +113,9 @@ function confirm (id) {
       <th>שווי סך הכל למשימה </th>
       {#each bmiData as data, i}
       <td>
-      {#if data.perhour > 0 & data.hoursassinged > 0}
+      {#if data.attributes.perhour > 0 & data.attributes.hoursassinged > 0}
       
-      {data.perhour * data.hoursassinged}
+      {data.attributes.perhour * data.attributes.hoursassinged}
       
       {:else} <p>0</p>
       {/if}
@@ -126,14 +126,14 @@ function confirm (id) {
           <th>כבר בוצעו</th>
           {#each bmiData as data, i}
           <td dir="ltr">
-  <h5 class="mn">{`${data.howmanyhoursalready  ? Math.round((data.howmanyhoursalready + Number.EPSILON) * 100) / 100 : 0} / ${data.hoursassinged} `}</h5>
+  <h5 class="mn">{`${data.attributes.howmanyhoursalready  ? Math.round((data.attributes.howmanyhoursalready + Number.EPSILON) * 100) / 100 : 0} / ${data.attributes.hoursassinged} `}</h5>
           </td>
           {/each}
         </tr><tr>
         <th>1</th>
         {#each bmiData as data, i}
         <td>       
-             <a target="_blank" href="/user/{data.users_permissions_user.id}">{data.users_permissions_user.username}</a>
+             <a rel="noreferrer" target="_blank" href="/user/{data.attributes.users_permissions_user.data.id}">{data.attributes.users_permissions_user.data.attributes.username}</a>
          </td>
          {/each}
     </tr>

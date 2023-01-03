@@ -1,6 +1,7 @@
 <script>
     import { lang } from '$lib/stores/lang.js'
     import { Confetti } from "svelte-confetti"
+   import { quintOut } from "svelte/easing";
 
     import { idPr } from '../../stores/idPr.js';
     import axios from 'axios';
@@ -10,13 +11,13 @@
     import { onMount } from 'svelte';
     import Uplad from '../userPr/uploadPic.svelte';
      import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-      import {  fly } from 'svelte/transition';
+      import {  fly, scale } from 'svelte/transition';
 let loading = false;
 let isOpen = false;
 let a = 0;
 let success = false
     let before = false;
-    let url1 = "https://i18.onrender.com/upload";
+    let url1 = "http://localhost:1337/upload";
     let linkP;
     let desP;
     let desPl;
@@ -61,7 +62,7 @@ if (files) {
                  imageId = data[0].id;
  
   axios
-  .post('https://i18.onrender.com/projects', {
+  .post('http://localhost:1337/api/projects', {
     user_1s: idL,
     projectName: projectName_value, 
     publicDescription: desP,
@@ -91,7 +92,7 @@ if (files) {
   console.log("hh")
 })} else {
   axios
-  .post('https://i18.onrender.com/projects', {
+  .post('http://localhost:1337/api/projects', {
     user_1s: idL,
         profilePic: imageId,
     projectName: projectName_value, 
@@ -165,7 +166,7 @@ let vallues = [];
         });
       };
         try {
-           const res = await fetch("https://i18.onrender.com/graphql", {
+           const res = await fetch("http://localhost:1337/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,
@@ -297,12 +298,12 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
   </DialogContent>
   </div>
 </DialogOverlay>
-<div class="a"></div>
+<div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} class="a"></div>
 
 
   {#if before == false}
 
-<div dir="{$lang == "en" ? "ltr" : "rtl"}" class="jho flex flex-col items-center text-center justify-center">
+<div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} dir="{$lang == "en" ? "ltr" : "rtl"}" class="jho flex flex-col items-center text-center justify-center">
   <h1 class="text-gold">{crn[$lang]}</h1>
 <br>
 

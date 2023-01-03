@@ -28,7 +28,7 @@ let desR;
 export let skills2 = [];
 let error1 = null;
 let shgi = false;
-let link ="https://i18.onrender.com/tafkidims";
+let link ="http://localhost:1337/api/tafkidims";
 
 onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -45,22 +45,22 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("http://localhost:1337/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+  skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}
 }
-              `})
+} }`})
             }).then(checkStatus)
           .then(parseJSON);
-            skills2 = res.data.skills
-              if ($lang == "he" ){
+            skills2 = res.data.skills.data
+            if ($lang == "he" ){
               for (var i = 0; i < skills2.length; i++){
-                if (skills2[i].localizations.length > 0){
-                skills2[i].skillName = skills2[i].localizations[0].skillName
+                if (skills2[i].attributes.localizations.data.length > 0){
+                skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }
@@ -79,27 +79,47 @@ onMount(async () => {
     } );
 };
 
-function addrole () {
+async function addrole () {
   shgi = false;
 if (rn.includes(roleName_value)){
   shgi = true;
 } else {
+  let d = new Date
 skillslist = find_skill_id(selected);
-skillslist.push(idro);
-axios
-  .post(link, {
-    roleDescription: roleName_value,
-    descrip: desR,
-    skills: skillslist
-              },
-  {
-  headers: {
-   
-            }})
-  .then(response => {
-    meData = response.data;
-    id = meData.id;
-        dispatchrole (meData, id);
+   let link ="http://localhost:1337/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation  createTafkidim {
+  createTafkidim(data: {  roleDescription: "${roleName_value}",
+          descrip: "${desR}",
+          skills: [${skillslist}],
+          publishedAt: "${d.toISOString()}"
+        }
+          ) {
+    data {
+      id
+      attributes {
+        roleDescription
+      } 
+
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+      //  skillIdStore.set(meData.id);
+        id = meData.data.createTafkidim.data.id;
+  //  skillslist.push(idro);
+        dispatchrole (meData.data.createTafkidim.data, id);
         addR = false;
         let userName_value = liUN.get()
          let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desR} והכישורים: ${selected.join(" , ")}` }
@@ -119,12 +139,13 @@ axios
     console.error('Error:', error);
   
   })
-              })
-  .catch(error => {
-    console.log('צריך לתקן:', error);
-            });}
-};    
-
+             }
+      catch(error) {
+        console.log('צריך לתקן:', error.response);
+        error = error1 
+        console.log(error1)
+                };}
+    };     
 
 
 
@@ -132,7 +153,7 @@ axios
      var  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
       for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].skillName === skill_name_arr[j]){
+        if(skills2[i].attributes.skillName === skill_name_arr[j]){
           arr.push(skills2[i].id);
         }
       }
@@ -149,10 +170,21 @@ const valn = {"he":"שם התפקיד", "en": "Role name"}
 const des = {"he": "תיאור קצר", "en": "Role short description"}
 const btnTitles = {"he": "הוספה", "en": "Add"}
 const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
+const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת כישור חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new skill\" button bellow"}
 let addsk = false;
 let newsk;
 function finnish (event) {
-  newsk = event.detail.new;
+   const newOb = event.detail.skob;
+   const newN = event.detail.name;
+    const newValues = skillslist;
+        newValues.push(newOb);
+
+        skillslist = newValues;
+       const newSele = selected;
+
+    selected.push(newN);
+
+    selected = newSele;
   addsk = false;
 };
 function dispatchb () {
@@ -166,7 +198,7 @@ function dispatchb () {
 <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
 {#if addR == false}
 <button 
-class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
 on:click={() => addR = true}>{addn[$lang]}</button>
 {:else}
 
@@ -194,29 +226,31 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
   <label  style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{des[$lang]}</label>
   <span class='line'></span>
 </div>
-
+<br>
    <div dir="{$lang == "en" ? "ltr" : "rtl"}">
       <MultiSelect
+        noMatchingOptionsMsg={nom[$lang]}
       bind:selected
       {placeholder}
-      options={skills2.map(c => c.skillName)}
+      options={skills2.map(c => c.attributes.skillName)}
       />
      </div>
      <div>
+      <br>
       {#if addsk == false}
- {#if newsk} <p>{newsk}</p> {/if}
       <button
        on:click={() => addsk = true} 
-       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-1 px-1 rounded-full"
+       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-1 rounded-full"
        >{adds[$lang]}</button>
        <br/>
+       <div class="grid items-center justify-center">
     <button on:click={addrole}
     title="{btnTitles[$lang]}"
     class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
     </svg></button>
-    
+    </div>
       {:else} 
       <button title={cencel[$lang]}
     on:click={() => addsk = false}
@@ -224,7 +258,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
-      <Addnewskil {color} rn={skills2.map(c => c.skillName)} on:finnish={finnish}/>{/if}</div>
+      <Addnewskil {color} rn={skills2.map(c => c.attributes.skillName)} on:finnish={finnish}/>{/if}</div>
   
     {/if}
    
