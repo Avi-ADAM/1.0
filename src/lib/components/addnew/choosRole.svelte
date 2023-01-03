@@ -17,7 +17,7 @@ import { missionNew } from '../../stores/missionNew';
    var  arr = [];
     for (let j = 0; j< role_name_arr.length; j++ ){
     for (let i = 0; i< roles1.length; i++){
-      if(roles1[i].roleDescription === role_name_arr[j]){
+      if(roles1[i].attributes.roleDescription === role_name_arr[j]){
         arr.push(roles1[i].id);
       }
     }
@@ -46,16 +46,16 @@ const parseJSON = (resp) => (resp.json ? resp.json() : resp);
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+  tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ""}}}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            roles1 = res.data.tafkidims
+            roles1 = res.data.tafkidims.data
                        if ($lang == "he" ){
               for (var i = 0; i < roles1.length; i++){
-                if (roles1[i].localizations.length > 0){
-                roles1[i].roleDescription = roles1[i].localizations[0].roleDescription
+                if (roles1[i].attributes.localizations.data.length > 0){
+                roles1[i].attributes.roleDescription = roles1[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
@@ -79,5 +79,5 @@ id="choos"
   on:change={inc}
 bind:selected
 {placeholder}
-options={roles1.map(c => c.roleDescription)}
+options={roles1.map(c => c.attributes.roleDescription)}
 /> </div>
