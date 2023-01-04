@@ -110,7 +110,7 @@ if (rn.includes(skillName_value)){
     data {
       id
       attributes {
-        skillName
+        skillName ${$lang == 'he' ? 'localizations {data {attributes{skillName } }}' : ""}
       } 
 
        }

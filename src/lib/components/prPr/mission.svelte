@@ -4,6 +4,7 @@
         import Close from '$lib/celim/close.svelte'
   import SveltyPicker from 'svelty-picker'
     import moment from 'moment';
+  import { userName } from '$lib/stores/store.js';
 
   let myDate = '11:00';
     import MultiSelect from 'svelte-multiselect';
@@ -11,7 +12,7 @@
     import Addnewro from '../addnew/addNewRole.svelte';
    import { createEventDispatcher } from 'svelte';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
-  import AddNewWorkway from '../addnew/addnewWorkway.svelte';
+  //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
 import { RingLoader
 } from 'svelte-loading-spinners'
 
@@ -404,7 +405,9 @@ dispatch('addroles', {
   
 }; 
 
-function addW (id, mid) {
+async function addW (id, mid) {
+  await newnew()
+  .then()
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
 const oldwwob = miData[index].attributes.work_ways.data;
@@ -478,6 +481,79 @@ dispatch('addnewr', {
     } );
 };
 
+//add new workway option 
+let meDataw = []
+async function newnew (){
+  console.log(selected,workways2)
+  for (let i = 0; i<selected.length ;i++){
+    if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
+      //create new and update workways2
+        let d = new Date
+       let link ="http://localhost:1337/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation  createWorkWay {
+  createWorkWay(data: {  workWayName: "${selected[i]}",
+        publishedAt: "${d.toISOString()}"
+           }) {
+    data {
+      id
+      attributes {
+        workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ""}
+      } 
+
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meDataw = data);
+   const newOb = meDataw.data.createWorkWay.data;
+    const newValues = workways2 ;
+    newValues.push(newOb);
+       
+    workways2 = newValues;
+       const newN = meData.data.createWorkWay.data.attributes.workWayName;
+
+    let userName_value = $userName
+         let datau = {"name": userName_value, "action": "create דרך יצירה חדשה בשם:", "det":newN}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(datau),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data,datau);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  }
+      catch(error) {
+        console.log('צריך לתקן:', error.response);
+        error = error1 
+        console.log(error1)
+                };
+              }
+    }
+ 
+  //workways1.set(find_workway_id(selected));
+
+}
+$: searchText = ``
 
 function addww (event) {
   console.log(event.detail.id);
@@ -503,6 +579,8 @@ let isOpen = false;
 const closer = () => {
     isOpen = false;
 };
+  $: addn = {"he":`הוספת "${searchText}"`,"en": `Create "${searchText}"`}
+
 const isshi = {"he":"האם זו משימת משמרות?","en":"is it shifts mission? "}
 const editsi = {"he":"עריכת סידור המשמרות", "en": "edit shifts"}
 let days = [{"name" :{"he": "ראשון", "en": "Sunday"}, id: 1, st: "11:00", cl: "17:00", shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
@@ -752,13 +830,16 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
             <th>סוג המשימה</th>
             {#each miData as data, i}
             <td><MultiSelect
+               addOptionMsg={addn[$lang]}
+               allowUserOptions={"append"}
+               bind:searchText
               loading={newcontentW}
               bind:selected={data.selected1} 
               {placeholder}
               options={workways2.map(c => c.attributes.workWayName)}
               on:change={addW(data.selected1, data.id)}
               />
-              <AddNewWorkway color={"--barbi-pink"} mid={data.id} on:addww={addww}/>
+             <!-- <AddNewWorkway color={"--barbi-pink"} mid={data.id} on:addww={addww}/>-->
             </td>
               {/each}
             </tr> <tr>

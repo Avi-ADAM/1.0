@@ -83,6 +83,7 @@ async function addrole () {
   shgi = false;
 if (rn.includes(roleName_value)){
   shgi = true;
+  console.log("shgia")
 } else {
   let d = new Date
 skillslist = find_skill_id(selected);
@@ -106,7 +107,7 @@ skillslist = find_skill_id(selected);
     data {
       id
       attributes {
-        roleDescription
+        roleDescription ${$lang == 'he' ? 'localizations { data {attributes{roleDescription} }}' : ""}
       } 
 
        }

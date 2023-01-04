@@ -135,7 +135,7 @@ async function newnew (){
     data {
       id
       attributes {
-        workWayName
+        workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ""}
       } 
 
        }

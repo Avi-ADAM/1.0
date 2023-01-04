@@ -6,7 +6,6 @@
 
 let skillName_value;
     let desS;
-    let link ="http://localhost:1337/api/skills";
     let meData;
      export let rn = [];
     let shgi = false;
@@ -15,7 +14,7 @@ async function addNewSkill () {
 if (rn.includes(skillName_value)){
   shgi = true;
 } else {
-  let d = new Date
+  let d = new Date;
    let link ="http://localhost:1337/graphql" ;
         try {
              await fetch(link, {
@@ -47,7 +46,10 @@ if (rn.includes(skillName_value)){
   .then(data => meData = data);
      const id = meData.data.createSkill.data.id;
     finnish (id,meData.data.createSkill.data);
+      console.log("some")
           let userName_value = liUN.get()
+                console.log("some דםצק")
+
          let data = {"name": userName_value, "action": "יצר כישור חדש בשם:", "det": `${skillName_value} והתיאור: ${desS} `}
    fetch("/api/ste", {
   method: 'POST', // or 'PUT'
@@ -67,12 +69,13 @@ if (rn.includes(skillName_value)){
   })
               }
       catch(error) {
-        console.log('צריך לתקן:', error.response)
+        console.log('צריך לתקן:', error)
                 };}
     };   
 
 
 function finnish (id,sec) {
+  console.log("ugu")
   dispatch('finnish', {
     id: id,
     addsk: false,

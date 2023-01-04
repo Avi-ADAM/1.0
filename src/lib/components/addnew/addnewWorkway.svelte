@@ -44,13 +44,12 @@ let link ="http://localhost:1337/graphql" ;
         body: 
         JSON.stringify({query: 
            `mutation { createWorkWay(
-    input: {
        data: {workWayName: "${Name_value}" }
-    }
+  
   ){
-          workWay{
-              id workWayName
-          }
+          data{
+              id attributes{ workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ""}
+          }}
   }
 }`   
         })

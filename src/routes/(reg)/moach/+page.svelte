@@ -635,7 +635,7 @@ async function addskills (event) {
    return res;
 }
 const resp = filterByReference(skills2, id);
- miDatanew[index].attributes.skills = resp;
+ miDatanew[index].attributes.skills.data = resp;
  miDatanew[index].selected2 = [];
  console.log (miDatanew);
  showvd = false;
@@ -668,7 +668,7 @@ async function addroles (event) {
    return res;
 }
 const resp = filterByReference(roles, id);
- miDatanew[index].attributes.tafkidims = resp;
+ miDatanew[index].attributes.tafkidims.data = resp;
  miDatanew[index].selected3 = [];
  console.log (miDatanew);
  showvd = false;
@@ -698,7 +698,7 @@ async function adwww (event) {
    return res;
 }
 const resp = filterByReference(workways2, id);
- miDatanew[index].attributes.work_ways = resp;
+ miDatanew[index].attributes.work_ways.data = resp;
  miDatanew[index].selected1 = [];
  console.log (miDatanew);
  showvd = false;
@@ -720,7 +720,7 @@ async function addnewsk (event) {
  const miDatanew = event.detail.data;
  const y = miDatanew.map(c => c.id);
  const index = y.indexOf(mid);
- miDatanew[index].attributes.skills.push(skob);
+ miDatanew[index].attributes.skills.data.push(skob);
  console.log (miDatanew);
  showvd = false;
   await refreshM ()
@@ -739,7 +739,7 @@ async function addnewr (event) {
   const miDatanew = event.detail.data;
   const y = miDatanew.map(c => c.id);
   const index = y.indexOf(mid);
-  miDatanew[index].attributes.tafkidims.push(skob);
+  miDatanew[index].attributes.tafkidims.data.push(skob);
   showvd = false;
    await refreshM ()
    .then() 
@@ -766,7 +766,7 @@ async function addneww (event) {
   const miDatanew = event.detail.data;
   const y = miDatanew.map(c => c.id);
   const index = y.indexOf(mid);
-  miDatanew[index].attributes.work_ways.push(skob);
+  miDatanew[index].attributes.work_ways.data.push(skob);
   showvd = false;
    await refreshM ()
    .then() 

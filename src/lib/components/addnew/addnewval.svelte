@@ -40,7 +40,7 @@ if (rn.includes(name_value)){
     data {
       id
       attributes {
-        valueName
+        valueName ${$lang == 'he' ? 'localizations { data {attributes{valueName} }}' : ""}
       } 
 
        }
