@@ -407,7 +407,7 @@ async function prog (){
  let blabla = [];
  let load = false;
 async function callbackFunction(event) {
-  console.log("shit its me")
+  console.log("shit its me",event.detail.li)
     		cow.scrollIntoView(true);
  load = true;
   const  lim = event.detail.li;
@@ -454,7 +454,7 @@ async function findiM() {
                   },
         body: 
         JSON.stringify({query: 
-          `{  missions (filters:{id: {in:${li}}}){data{ id attributes{
+          `{  missions (filters:{id: {in:[${li}]}}){data{ id attributes{
           descrip missionName 
           skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ""} }}}
           tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""}}}}

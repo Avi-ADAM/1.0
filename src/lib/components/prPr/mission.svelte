@@ -15,7 +15,7 @@
   //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
 import { RingLoader
 } from 'svelte-loading-spinners'
-
+import {addslashes} from '$lib/func/uti/string.svelte'
  const dispatch = createEventDispatcher();
 export let newcontent = true;
 export let newcontentR = true;
@@ -179,11 +179,10 @@ let momentx = moment(element.date, "HH:mm DD/MM/YYYY ")
 let momebtt =moment(element.dates, "HH:mm DD/MM/YYYY ")
 const date = (element.date !== undefined && element.date !== "undefined" && element.date !== null) ? ` sqadualed: "${momentx.toISOString()}",` : ``;
 const dates = (element.dates !== undefined && element.dates !== "undefined" && element.dates !== null) ? ` dates: "${momebtt.toISOString()}",` : ``;
-const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `privatlinks: "${element.publicklinks}",` : ``;
-const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${element.privatlinks}",` : "";
-const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${element.spnot}",` : "";
-const deee = (element.attributes.descrip !== undefined && element.attributes.descrip !== "undefined") ? `descrip: "${element.attributes.descrip}",` : "";
-
+const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `privatlinks: "${addslashes(element.publicklinks)}",` : ``;
+const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${addslashes(element.privatlinks)}",` : "";
+const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${addslashes(element.spnot)}",` : "";
+const deee = (element.attributes.descrip !== undefined && element.attributes.descrip !== "undefined") ? `descrip: "${addslashes(element.attributes.descrip)}",` : "";
 //publicklinks save to mission also othet new data
     // הפרדה של קישורים בפסיק
    let d = new Date
@@ -201,7 +200,7 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
       data: {project: "${projectId}",
              mission:  "${element.id}",
              work_ways: [${work_ways}],
-             name: "${element.attributes.missionName}",
+             name: "${addslashes(element.attributes.missionName)}",
              skills: [${skills}], 
              tafkidims: [${tafkidims}],
              vallues:  [${vallues}],
@@ -221,7 +220,7 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
             ${toadd}
       
     }
-  ) {data{id attributes{ project{id }}}}
+  ) {data{id attributes{ project{data{ id} }}}}
 } `   
 } )})
   .then(r => r.json())
@@ -366,7 +365,7 @@ dispatch('removeR', {
 function minSkill (id, mid) {
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldskills = miData[index].attributes.skills;
+const oldskills = miData[index].attributes.skills.data;
 const x = oldskills.map(c => c.id);
 const indexy = x.indexOf(id);
 console.log(indexy);
@@ -405,12 +404,16 @@ dispatch('addroles', {
   
 }; 
 
-async function addW (id, mid) {
-  await newnew()
+async function addW (id, mid,e) {
+     if (e.detail)
+   if (e.detail.type === 'add')
+  console.log(id)
+  await newnew(id)
   .then()
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
 const oldwwob = miData[index].attributes.work_ways.data;
+console.log(miData[index])
 const oldww = oldwwob.map(c => c.id);
 const neww = find_workway_id(id);
 let array3 = oldww.concat(neww);
@@ -422,7 +425,7 @@ dispatch('adwww', {
     data: miData,
     mid: mid
     } );
-  
+
 }; 
 
 function addSK (id , mid) {
@@ -483,7 +486,7 @@ dispatch('addnewr', {
 
 //add new workway option 
 let meDataw = []
-async function newnew (){
+async function newnew (selected){
   console.log(selected,workways2)
   for (let i = 0; i<selected.length ;i++){
     if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
@@ -831,13 +834,13 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
             {#each miData as data, i}
             <td><MultiSelect
                addOptionMsg={addn[$lang]}
-               allowUserOptions={"append"}
+               allowUserOptions={true}
                bind:searchText
               loading={newcontentW}
               bind:selected={data.selected1} 
               {placeholder}
               options={workways2.map(c => c.attributes.workWayName)}
-              on:change={addW(data.selected1, data.id)}
+               on:change={(e) => {addW(data.selected1, data.id,e)}}
               />
              <!-- <AddNewWorkway color={"--barbi-pink"} mid={data.id} on:addww={addww}/>-->
             </td>
