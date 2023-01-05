@@ -905,10 +905,13 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
           {#each miData as data, i}
           <td>
                                              <div dir="rtl" class='textinput'>
-  <input type="number"  id="hoursn" name="hoursn"  bind:value={data.nhours} class='input' required>
+  <input type="number"  id="hoursn" name="hoursn"  bind:value={data.nhours} class='input' 
+  required on:change={data.nhours >= 0 ? data.nhours : data.nhours = 0}>
   <label for="hoursn" class='label'>{data.iskvua == true ? hms[$lang] : hmh[$lang]}</label>
   <span class='line'></span>
 </div>
+                    {#if data.nhours < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכול להיות קטן מ-0</small>{/if}
+
           </td>
           {/each}
         </tr><tr style="display:''" id="vallueperhourN" >
@@ -917,10 +920,13 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
           <td>
                            <div dir="rtl" class='textinput'>
   <input type="number"  id="vallueperhourn" name="vallueperhourn" 
+      on:change={data.valph  < 0 ? data.valph = 0: data.valph }
                                             bind:value={data.valph} class='input' required>
   <label for="vallueperhourn" class='label'>כמה שווה שעה? </label>
   <span class='line'></span>
 </div>
+                    {#if data.valph < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכול להיות קטן מ-0</small>{/if}
+
           </td>
           {/each}
         </tr>

@@ -48,6 +48,7 @@ onMount(async () => {
   .then(r => r.json())
   .then(data => needss = data.data.mashaabims.data);
    console.log(needss)
+   dispatch("str")
     isLow = false
     } catch (e) {
             console.log(e)
@@ -70,7 +71,7 @@ onMount(async () => {
 
 export let selctedi = [];
 export let selected = [];
-    const placeholder = `הוספת משאבים נדרשים לפרוייקט`;
+    const placeholder = `הוספת משאבים נדרשים `;
 
 function newn(event) {
   addnee = false;
@@ -92,9 +93,9 @@ function incremen() {
 	};
   </script>
   <div dir="rtl" style="max-width: 100%" >
-    <h1 >הוספת משאבים נדרשים לפרויקט</h1>
+    <h1 >הוספת משאבים נדרשים </h1>
     <div class="items-center">
-      <div class="gg w-min	">
+      <div class="gg w-min	pb-1">
         <MultiSelect
         bind:selected
         {placeholder}
@@ -102,8 +103,8 @@ function incremen() {
         options={needss.map(c => c.attributes.name)}
         on:change={incremen}
         /></div>
-     
-       <Addnewnee {addnee} on:newn={newn} color={"--barbi-pink"}/>
+      
+       <Addnewnee {addnee} on:newn={newn} onmo={true} color={"--barbi-pink"}/>
       </div>
      
     </div>

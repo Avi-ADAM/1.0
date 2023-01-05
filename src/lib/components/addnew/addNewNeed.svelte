@@ -13,7 +13,7 @@ let valued;
 let linkto = "";
 let meData = [];
 // cando choose
-
+export let onmo = false
 async function subm() {
    const cookieValue = document.cookie
   .split('; ')
@@ -21,6 +21,7 @@ async function subm() {
   .split('=')[1];
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
+    let d = new Date
     try {
            const res = await fetch("http://localhost:1337/graphql", {
               method: "POST",
@@ -29,17 +30,17 @@ async function subm() {
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `mutation { createMashaabim(
-    input: {
        data: {
          name: "${needName}",
         price: ${price},
         descrip: "${desN}",
         kindOf: ${valued},
+        publishedAt: "${d.toISOString()}",
         linkto: "${linkto}"
         }
-    }
+    
   ){
-  mashaabim { id name}
+  data { id attributes{ name}}
 }
 }
               `})
@@ -48,9 +49,9 @@ async function subm() {
   .then(data => meData = data);
         console.log(meData)
     dispatch("newn",{
-  id: meData.data.createMashaabim.mashaabim.id,
-  skob: meData.data.createMashaabim.mashaabim,
-  name: meData.data.createMashaabim.mashaabim.name,
+  id: meData.data.createMashaabim.data.id,
+  skob: meData.data.createMashaabim.data,
+  name: meData.data.createMashaabim.data.attributes.name,
        })
 addnee = false
                   }
@@ -64,9 +65,10 @@ export let addnee = false;
   </script>
  {#if addnee === false}
 
-      <button on:click={() => addnee = true} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full">הוספת משאב שאינו ברשימה</button>
+      <button on:click={() => addnee = true} 
+        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full">הוספת משאב שאינו ברשימה</button>
       {:else if addnee === true}
-      <div  class="p-2 m-2 border-2 border-gold rounded">
+      <div  class="p-2 m-2 border-2 border-gold rounded " class:bg-slate-900={onmo == true}>
   <button
   title="ביטול"
        on:click={() => addnee = false}
@@ -186,7 +188,7 @@ select.round:focus {
   font-size: 15px;
   margin-top: 12px;
   width: 100%;
-  color:var( --the, var(--gold));
+  color:  var(--gold);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }

@@ -820,14 +820,14 @@ async function updi (){
                   },
         body: 
         JSON.stringify({query: 
-          `{  mashaabims (filters:{id: {in:${needr}}}){data{ id attributes{
-          name descrip kindOf hm price linkto 
+          `{  mashaabims (filters:{id: {in:[${needr}]}}){data{ id attributes{
+          name descrip kindOf  price linkto 
         } }}}`
         })
  })
   .then(r => r.json())
   .then(data => res = data);
-    meDatamm = res.data.mashabims.data
+    meDatamm = res.data.mashaabims.data
                console.log(meDatamm)
 
     } catch (e) {
@@ -841,6 +841,7 @@ function clo () {
   addN = false;
   meDatamm = [];
   needr = []
+      addToast(cloma[$lang], 'info');
 }
 let noofopen = 2;
 
@@ -996,6 +997,7 @@ async function sendP () {
            
                 }
 })};
+const cloma = {"he":"יצירת המשאב הושלמה בהצלחה", "en": "new need has created successfully"}
  const editfix = {"he": "המידע עודכן בהצלחה!" , "en": "info has updated successfully"}
   const picupsu = {"he":"הלוגו עודכן בהצלחה", "en": "Logo has updated successfully"}
   const picvots = {"he":"הלוגו הועלה להצבעה בהצלחה", "en":"vote on new Logo has created successfully"}
@@ -1189,6 +1191,9 @@ async function needadm (event){
   totalneed = true
 		dow.scrollIntoView(true);
 
+  } else{
+      totalneed = false
+
   }
 }
 
@@ -1216,10 +1221,12 @@ function trym(){
 function tryma(){
    openMA = true
 }
-function masi(){
-  loadr = true;
+let fff
+async function masi(){
    addN = true;
-   		lll.scrollIntoView(true);
+  loadr = true;
+  //if (addN == true)
+   	//	fff.scrollIntoView(true);
 
 }
 
@@ -1753,7 +1760,7 @@ pointer-events: none;">
 <div class=" m-4" bind:this={dow}>
  
       {#if addN == true}
-      <div id="hosafn" class="m-4 border-2 border-barbi rounded"  >
+      <div bind:this={fff} id="hosafn" class="m-4 border-2 border-barbi rounded"  >
       <button
       title={cencel[$lang]}
       on:click={() => addN = false}
@@ -1765,7 +1772,7 @@ pointer-events: none;">
       </div>
       {/if}    
    
-    <div class=" m-4" bind:this={lll} >
+    <div class=" m-4"  bind:this={lll}>
        {#if loadr === true}
         <div class="grid justify-center items-center border-2 border-barbi rounded p-4" >
 
