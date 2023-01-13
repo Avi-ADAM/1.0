@@ -21,7 +21,7 @@ function find_contry_id(contry_name_arr){
      var  arr = [];
       for (let j = 0; j< contry_name_arr.length; j++ ){
       for (let i = 0; i< country.length; i++){
-        if(country[i].heb === contry_name_arr[j]){
+        if(country[i].ar === contry_name_arr[j]){
           arr.push(country[i].value)  ;
         }
       }

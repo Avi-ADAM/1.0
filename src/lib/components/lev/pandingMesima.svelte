@@ -213,7 +213,6 @@ async function agree(alr) {
         body: 
         JSON.stringify({query:
           `mutation { createOpenMission(
-    input: {
       data: {project: "${projectId}",
              mission:  "${missionId}",
              work_ways: [${workwaysa}],
@@ -228,12 +227,10 @@ async function agree(alr) {
              privatlinks: "${privatlinks}",
              publicklinks: "${publicklinks}",
              ${date} 
-      }
     }
-  ) {openMission {project{id }}}
+  ) {data{attributes {project{data{ id} }}}}
   updatePendm(
-      input: {
-      where: {id: ${pendId}}
+   id: ${pendId}
       data: { users:[  ${userss}, 
          
      {
@@ -244,8 +241,7 @@ async function agree(alr) {
   ],
  archived: true
  }
-      }
-  ){pendm { users { users_permissions_user { id}}}}
+  ){data{attributes{ users { users_permissions_user {data{ id}}}}}}
  } `   
  //update pendm add consent from second and  archived,,, make coin desapire
  } )})
@@ -272,8 +268,7 @@ async function agree(alr) {
         body: 
         JSON.stringify({query:
           `mutation { updatePendm(
-      input: {
-      where: {id: ${pendId}}
+     id: ${pendId}
       data: { users:[  ${userss}, 
          
      {
@@ -282,8 +277,7 @@ async function agree(alr) {
       ${ordern}
     }
   ]}
-      }
-  ){pendm { users { users_permissions_user { id}}}}
+  ){data {attributes{ users { users_permissions_user{data { id}}}}}}
  } `   
  // make coin desapire
  } )})
@@ -373,8 +367,7 @@ async function afterwhy (event){
         body: 
         JSON.stringify({query:
           `mutation { updatePendm(
-      input: {
-      where: {id: ${pendId}}
+     id: ${pendId}
       data: { 
        ${archivedtru}
         users:[  ${userss}, 
@@ -384,8 +377,7 @@ async function afterwhy (event){
       users_permissions_user: "${idL}"
     }
   ]}
-      }
-  ){pendm { users { users_permissions_user { id}}}}
+  ){data {attributes{ users { users_permissions_user{data { id}}}}}}
 } `   
 // make coin desapire
 } )})
@@ -452,8 +444,7 @@ async function afreact (event){
         body: 
         JSON.stringify({query:
           `mutation { updatePendm(
-      input: {
-      where: {id: ${pendId}}
+  id: ${pendId}
       data: { diun:[  
          ${diunim}
      {
@@ -463,8 +454,7 @@ async function afreact (event){
       order: ${order+=1}
     }
   ]}
-      }
-  ){pendm { users { users_permissions_user { id}}}}
+  ){data {attributes{ users { users_permissions_user{data { id}}}}}}
  } `   
  // make coin desapire
  } )})

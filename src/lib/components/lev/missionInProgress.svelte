@@ -265,14 +265,12 @@ async function start () {
                         query: `mutation 
                         { 
  updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+  id: "${mId}"
   data: {
  stname: "${stname}",
  timer: ${x}
   }
- }
- ) {mesimabetahalich{id stname timer}}
+ ) {data{id attributes{ stname timer}}}
  }
 `})
                 })
@@ -321,14 +319,12 @@ async function handleClearClick () {
                         query: `mutation 
                         { 
 updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+   id: "${mId}"
   data: {
 stname: "0",
 timer: 0
   }
-}
-) {mesimabetahalich{id stname timer}}
+) {data{id attributes{ stname timer}}}
 }
 `})
                 })
@@ -391,15 +387,13 @@ async function save() {
                         query: `mutation 
                         { 
    updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+   id: "${mId}"
   data: {
    howmanyhoursalready: ${hoursdon},
    stname: "0",
     timer: 0
-  }
  }
- ) {mesimabetahalich{id howmanyhoursalready}}
+ ) {data{id attributes{ howmanyhoursalready}}}
  }
 `})
                 })
@@ -478,7 +472,6 @@ if (noofpu === 1) {
   appi = ``
   tofinished = `
    createFinnishedMission(
-           input: { 
              data: {
               missionName: "${missionName}",
               why: "${why}",
@@ -491,12 +484,11 @@ if (noofpu === 1) {
               users_permissions_user: "${idL}",
               mission: ${missId}
    }
-}){finnishedMission {id }}`
+){data {id }}`
 } else if (noofpu > 1) {
     toapprove1 = `forappruval: true`;
     appi =`
 createFiniapruval(
-   input: { 
      data: {
       missname: "${missionName}",
       why: "${why}",
@@ -510,8 +502,7 @@ createFiniapruval(
       users_permissions_user: "${idL}"
     }
   ]
-   }
-}){finiapruval {id }}`
+}){data {id }}`
 }
 //files shit from updatepic
     //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש 
@@ -528,14 +519,12 @@ createFiniapruval(
                         query: `mutation 
                         { 
 updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+ id: "${mId}"
   data: {
     ${toapprove1}
 ${tofinished1}
   }
-}
-) {mesimabetahalich{id forappruval finnished howmanyhoursalready}}
+) {data{id attributes{ forappruval finnished howmanyhoursalready}}}
 ${appi}
 ${tofinished}
 }
@@ -649,13 +638,11 @@ function claf (event){
                         query: `mutation 
                         { 
    updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+    id: "${mId}"
   data: {
    status: ${status[0]},
   }
- }
- ) {mesimabetahalich{id }}
+ ) {data{id }}
  }
 `})
                 })

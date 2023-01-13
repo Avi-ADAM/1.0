@@ -193,7 +193,6 @@ async function agree() {
                     body: JSON.stringify({
                         query: `mutation 
                         { createFinnishedMission(
-           input: { 
              data: {
               missionName: "${missionBName}",
               why: "${why}",
@@ -207,17 +206,14 @@ async function agree() {
               users_permissions_user: "${userId}",
               finiapruval: "${askId}",
               mission: ${missId}
-   }
-}){finnishedMission {id }}
+   
+}){data {id }}
 updateMesimabetahalich(
-  input:  {
-    where: {id: "${mId}"}
+    id: "${mId}"
   data: {finnished: true}
-}
-) {mesimabetahalich{id finnished}}
+) {data{id attributes{ finnished}}}
  updateFiniapruval(
-                input:{
-                    where: {id: "${askId}" }
+                id: "${askId}" 
                     data: { archived: true,
     vots: [${userss}, 
        {
@@ -225,8 +221,8 @@ updateMesimabetahalich(
         users_permissions_user: "${idL}"
       }
     ]}
-        }
-    ){finiapruval{id}}
+        
+    ){data{id}}
 }
 `})
                 })
@@ -255,16 +251,15 @@ console.log("just add vote to asked and update to not show for me again")
                         query: `mutation 
                         {
                             updateFiniapruval(
-                            input:{
-                                where: {id: "${askId}" }
+              id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){finiapruval{id}}
+                            
+                        ){data{id}}
                      
                     }
 `})
@@ -321,21 +316,20 @@ async function decline() {
                     body: JSON.stringify({
                         query: `mutation 
                         { 
-updateFiniapruval(
-  input: {
-    where: {id: "${askId}"}
+    updateFiniapruval(
+    id: "${askId}"
   data: {vots: [${userss}, 
                                        {
                                            why: "${whyy}"
                                         what: false
                                         users_permissions_user: "${idL}"
                                       }
-                                    ] }
+                                    ] 
 }
-) {finiapruval {id vots {id}}}
+) {data {id }}
 }
 `})
-                })
+                })//attributes{ vots {id}}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);

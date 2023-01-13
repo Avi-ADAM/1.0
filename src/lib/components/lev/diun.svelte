@@ -20,13 +20,13 @@ function click() {
     if (why.length > 27) {
             dispatch("no",{why:why})
       } else{
-            alert("מינימום 27 תווים")
+            alert("מינימום 27 תווים")//todo lang
         }
       } else if (rect == true) {
     if (why.length > 27) {
             dispatch("rect",{why:why})
       } else{
-            alert("מינימום 10 תווים")
+            alert("מינימום 10 תווים")//lang
         }
       }
 }

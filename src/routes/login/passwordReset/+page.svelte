@@ -8,10 +8,8 @@
     function onSubmit () {   
 // Request API.
 axios
-  .post('http://localhost:1337/auth/forgot-password', {
+  .post('http://localhost:1337/api/auth/forgot-password', {
     email: email,
-    url:
-      'http://localhost:1337/admin/plugins/users-permissions/auth/reset-password',
   })
   .then(response => {
     // Handle success.

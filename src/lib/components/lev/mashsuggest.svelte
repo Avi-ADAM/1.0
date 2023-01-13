@@ -71,6 +71,7 @@ async function agree(oid) {
   already = true;
      const ds = declineddarra;
  ds.push(`${id}`);
+ let d = new Date
 const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -94,26 +95,28 @@ const cookieValue = document.cookie
         JSON.stringify({query:
           `mutation { 
   createAskm(
-    input: {
-      data:{ open_mashaabim: ${id},
+      data:{ 
+        publishedAt: "${d.toISOString()}",
+        open_mashaabim: ${id},
             project: ${projectId},
             sp: ${oid},
             users_permissions_user: ${uId}
     }
-    }
   ){
-    askm {id}
+    data {id}
   }
   updateSp(
-    input: {
-      where: { id: "${oid}" }
+ id: "${oid}" 
       data: {declinedm: "${id}" }
-    }
   ){
-      sp {
+      data {
+        attributes{
           declinedm{
+            data{
               id
+            }
           }
+        }
       }
   }
 }`   
@@ -161,15 +164,17 @@ const cookieValue = document.cookie
         body: 
         JSON.stringify({query:
           `mutation { updateSp(
-    input: {
-      where: { id: "${oid}" }
+   id: "${oid}" 
       data: {declinedm: "${id}" }
-    }
   ){
-      sp {
+      data {
+        attributes{
           declinedm{
+            data{
               id
+            }
           }
+        }
       }
   }
 }`   

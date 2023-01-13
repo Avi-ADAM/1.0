@@ -232,7 +232,6 @@ async function agree() {
                     body: JSON.stringify({
                         query: `mutation 
                         { createRikmash(
-           input: { 
              data: {
                  total: ${total},
               name: "${missionBName}",
@@ -248,12 +247,9 @@ async function agree() {
               sp: "${spid}",
               ${date}
                ${sdate}
-
-   }
-}){rikmash {id }}
+}){data {id }}
 updateMaap(
-  input:  {
-    where: {id: "${askId}"}
+ id: "${askId}"
   data: {archived: true,
 vots: [${userss}, 
        {
@@ -261,12 +257,11 @@ vots: [${userss},
         users_permissions_user: "${idL}"
       }
     ]}
-}
-) {maap{id archived}}
-updateSp( input:  {
-    where: {id: "${spid}"}
-  data: {panui: false}}
-){sp{id}}
+) {data{id attributes{ archived}}}
+updateSp( 
+  id: "${spid}"
+  data: {panui: false}
+){data{id}}
 }
 `})
                 })
@@ -294,16 +289,14 @@ console.log("just add vote to asked and update to not show for me again")
                         query: `mutation 
                         {
                             updateMaap(
-                            input:{
-                                where: {id: "${askId}" }
+                           id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){maap{id}}
+                        ){data{id}}
                      
                     }
 `})
@@ -361,8 +354,7 @@ async function decline() {
                         query: `mutation 
                         { 
 updateMaap(
-  input: {
-    where: {id: "${askId}"}
+   id: "${askId}"
   data: {vots: [${userss}, 
                                        {
                                            why: "${whyy}"
@@ -370,8 +362,7 @@ updateMaap(
                                         users_permissions_user: "${idL}"
                                       }
                                     ] }
-}
-) {maap {id vots {id}}}
+) {data {id attributes{vots {id}}}}
 }
 `})
                 })

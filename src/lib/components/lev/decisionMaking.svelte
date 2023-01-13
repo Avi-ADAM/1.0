@@ -206,16 +206,13 @@ async function agree() {
                     body: JSON.stringify({
                         query: `mutation 
                         { updateproject(
-    input: {
-       where: {id: "${projectId}"}
+     id: "${projectId}"
       data: {
         ${update}
                   }
-    }
-  ) {project{id }}
+  ) {data{id }}
  updateDecision(
-                            input:{
-                                where: {id: "${askId}" }
+              id: "${askId}"
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -223,8 +220,7 @@ async function agree() {
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){decision{id}}
+                        ){data{id}}
 }
 `})
                 })
@@ -254,16 +250,14 @@ async function agree() {
                         query: `mutation 
                         {
                             updateDecision(
-                            input:{
-                                where: {id: "${askId}" }
+id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){decision{id}}
+                        ){data{id}}
                      
                     }
 `})

@@ -11,6 +11,10 @@ export let meData = [];
     let error1 = null;
 
   onMount(async () => {
+    const id = meData.id
+    meData = meData.attributes
+    meData.push({id:id})
+    meData = meData
    myMissionH()
    myMi ()
               });
@@ -53,8 +57,7 @@ async function han (){
         body: 
         JSON.stringify({query:
           `mutation { updateSp(
-    input: {
-        where : {id: "${meData.id}"},
+    id: ${meData.id}
       data: { 
           name: "${meData.name}",
              descrip: "${meData.descrip}",
@@ -67,18 +70,17 @@ async function han (){
              users_permissions_user: "${idL}",
              ${sdate} 
              ${fdate}
-      }
     }
-  ) {sp {id name}}
+  ) {sp {data{id attributes{ name}}}}
 } `   
 } )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
              dispatch('close', {
-                 id: miDatan.data.updateSp.sp.id,
-                 name: miDatan.data.updateSp.sp.name,
-                 skob: miDatan.data.updateSp.sp
+                 id: miDatan.data.updateSp.data.id,
+                 name: miDatan.data.updateSp.data.attributes.name,
+                 skob: miDatan.data.updateSp.data
              });
         } catch (e) {
             error1 = e

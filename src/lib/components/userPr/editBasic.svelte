@@ -117,11 +117,10 @@ let passi;
 function shaneh () {
           passwordx = passwordx.trim();
    axios
-  .post('http://localhost:1337/password', {
-     identifier: mail,
-    password: passi,
-    newPassword: passwordx,
-    onfirmPassword: passwordx
+  .post('http://localhost:1337/api/auth/change-password', {
+    currentPassword: passi,
+    password: passwordx,
+    passwordConfirmation: passwordx
   })
   .then(response => {
         console.log('Your password has been changed.', response);

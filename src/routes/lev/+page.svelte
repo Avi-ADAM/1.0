@@ -206,6 +206,7 @@ function ishursium(dati) {
         for (let j = 0; j < start[i].attributes.finiapruvals.data.length; j++) {
             const rt = letters(start[i].attributes.finiapruvals.data[j].attributes.missname);
             let src22 = getProjectData(start[i].id,"upic",start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id);
+           console.log(start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id)
             fiapp.push({
                 uid: start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id,
                 username: getProjectData(start[i].id,"un",start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id),
@@ -213,7 +214,7 @@ function ishursium(dati) {
                 hearotMeyuchadot: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.hearotMeyuchadot,
                 missionDetails: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.descrip,
                 nhours: start[i].attributes.finiapruvals.data[j].attributes.noofhours,
-                mId: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.id,
+                mId: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.id,
                 perhour: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.perhour,
                 missId: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.mission.data.id,
                 // deadline: start[i].asks[j].open_mission.sqadualed,
@@ -242,7 +243,7 @@ function ishursium(dati) {
         const x = fiapp[k].users
         fiapp[k].uids = [];
         for (let z = 0; z < x.length; z++) {
-            fiapp[k].uids.push(x[z].users_permissions_user.id);
+            fiapp[k].uids.push(x[z].users_permissions_user.data.id);
             fiapp[k].what = [];
             fiapp[k].what.push(x[z].what);
         }
@@ -302,7 +303,7 @@ function crMaap(hh) {
                     }
                     wegets.push({
                         uid: v.users_permissions_user.data.id,
-                        username: v.users_permissions_user.username,
+                        username: v.users_permissions_user.data.attributes.username,
                         src: src27,
                         myp: v.myp,
                         spid: y.sp.data.id,
@@ -355,7 +356,7 @@ function crMaap(hh) {
         if (allid.includes(myid)) {
             wegets[t].already = true;
             for (let l = 0; l < wegets[t].users.length; l++) {
-                if (wegets[t].users[l].users_permissions_user.id === myid)
+                if (wegets[t].users[l].users_permissions_user.data.id === myid)
                     wegets[t].mypos = wegets[t].users[l].what;
             }
         }
@@ -1223,7 +1224,7 @@ onMount(async () => {
     if (localStorage.getItem("mashs") !== null) {
         mashs = localStorage.getItem("mashs")
     }     
-    if ('serviceWorker' in navigator) {
+  /*  if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', {
             scope: '.'
         }).then(function(reg) {
@@ -1233,7 +1234,7 @@ onMount(async () => {
             // registration failed
             console.log('Registration failed with ' + error);
         });
-    };
+    };*/
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -1412,7 +1413,7 @@ async function start() {
         													}}}
      									 }}} 
   	projects_1s {data{id attributes{ projectName 
-    			user_1s {data{id attributes{ haskamaz haskamac haskama profilePic {data{attributes{ url formats }}}}}} 
+    			user_1s {data{id attributes{username haskamaz haskamac haskama profilePic {data{attributes{ url formats }}}}}} 
     			profilePic {data{attributes{ url formats }}} 
     			decisions (filters: { archived: { eq: false } }){ data{ id attributes{ 
         					kind createdAt 
@@ -1578,10 +1579,11 @@ function hachla(data) {
                 mysrc: src24,
                 projectId: proj.id,
                 kind: pend.kind,
-                created_at: pend.created_at,
+                created_at: pend.createdAt,
                 projectName: getProjectData(proj.id,"pn"),
                 user_1s: getProjectData(proj.id,"us"),
                 src: getProjectData(proj.id,"pp"),
+                noofpu: getProjectData(proj.id,"noof"),
                 users: pend.vots,
                 myid: myid,
                 newpic: newpic,
@@ -1815,10 +1817,11 @@ function pmash(data) {
                 hearotMeyuchadot: pend.spnot,
                 descrip: pend.descrip,
                 kindOf: pend.kindOf,
-                created_at: pend.created_at,
+                created_at: pend.createdAt,
                 projectName: getProjectData(proj.id,"pn"),
                 user_1s:getProjectData(proj.id,"us"),
                 src: getProjectData(proj.id,"pp"),
+                noofusers: getProjectData(proj.id,"noof"),
                 users: pend.users,
                 myid: myid,
                 mshaabId: pend.mashaabim.data.id,
@@ -2063,6 +2066,7 @@ function createpends(data) {
                 projectName: getProjectData(projects[i].id,"pn"),
                 user_1s: getProjectData(projects[i].id,"us"),
                 src: getProjectData(projects[i].id,"pp"),
+                noofusers:getProjectData(projects[i].id,"noof"),
                 users: pend.attributes.users,
                 myid: myid,
                 diun: pend.attributes.diun,
@@ -2089,7 +2093,7 @@ function createpends(data) {
         const x = pends[k].users
         pends[k].uids = [];
         for (let z = 0; z < x.length; z++) {
-            pends[k].uids.push(x[z].data.attributes.users_permissions_user.data.id);
+            pends[k].uids.push(x[z].users_permissions_user.data.id);
         }
     }
     for (let t = 0; t < pends.length; t++) {
@@ -2104,7 +2108,7 @@ function createpends(data) {
             pends[t].already = true;
             pends[t].pl += 48
             for (let l = 0; l < pends[t].users.length; l++) {
-                if (pends[t].users[l].users_permissions_user.id === myid)
+                if (pends[t].users[l].users_permissions_user.data.id === myid)
                     if (pends[t].users[l].order !== 1) {
                         pends[t].mypos = pends[t].users[l].what;
                     }
@@ -2124,9 +2128,9 @@ function createpends(data) {
         pends[t].noofusersWaiting = noofusersWaiting;
         if (pends[t].users.length > 0) {
             for (let x = 0; x < pends[t].users.length; x++) {
-                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].users[x].users_permissions_user.id)
+                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].users[x].users_permissions_user.data.id)
                 pends[t].messege.push({
-                    message: `${getProjectData(pends[t].projectId,"un",pends[t].users[x].users_permissions_user.id)}  
+                    message: `${getProjectData(pends[t].projectId,"un",pends[t].users[x].users_permissions_user.data.id)}  
                      ${pends[t].users[x].what == true ? `בעד
                          ${pends[t].users[x].order == 4 ? ` הצעה חילופית `: ``}
                       ` : ` נגד
@@ -2134,27 +2138,27 @@ function createpends(data) {
                       ${pends[t].users[x].why !== null ? `בנימוק: ${pends[t].users[x].why}` : ``}`}`,
                     what: pends[t].users[x].what,
                     pic: src22,
-                    sentByMe: pends[t].users[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pends[t].users[x].users_permissions_user.data.id === myid ? true : false,
                     changed: pends[t].users[x].order == 1 ? true : false,
                 })
             }
         }
         if (pends[t].diun.length > 0) {
             for (let x = 0; x < pends[t].diun.length; x++) {
-                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].diun[x].users_permissions_user.id)
+                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].diun[x].users_permissions_user.data.id)
                 pends[t].messege.push({
                     message: pends[t].diun[x].why,
                     what: pends[t].diun[x].what,
                     pic: src22,
-                    sentByMe: pends[t].diun[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pends[t].diun[x].users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }
         if (pends[t].nego.length > 0) {
             for (let x = 0; x < pends[t].nego.length; x++) {
-                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].nego[x].users_permissions_user.id)
+                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].nego[x].users_permissions_user.data.id)
                 pends[t].messege.push({
-                    message: `${getProjectData(pends[t].projectId,"un",pends[t].nego[x].users_permissions_user.id)}
+                    message: `${getProjectData(pends[t].projectId,"un",pends[t].nego[x].users_permissions_user.data.id)}
                      בעד ההצעה עם השינויים הבאים:
                   ${pends[t].nego[x].noofhours !== pends[t].noofhours ? `שלמשימה יוגדרו ${pends[t].nego[x].noofhours} שעות במקום ${pends[t].noofhours} שעות`: ``}
                   ${pends[t].nego[x].perhour !== pends[t].perhour ? `ושהשווי לשעה יהיה ${pends[t].nego[x].perhour} ולא ${pends[t].perhour}`: ``}
@@ -2162,7 +2166,7 @@ function createpends(data) {
                   `,
                     what: true,
                     pic: src22,
-                    sentByMe: pends[t].nego[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pends[t].nego[x].users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }

@@ -29,7 +29,6 @@ already = true;
                     body: JSON.stringify({
                         query: `mutation 
                         { createTikunolam(
-    input: {
       data: {amort: "${amort}",
              name:  "${name}",
              amorts: "${amorts}",
@@ -40,8 +39,7 @@ already = true;
              notes: "${come}",
              email: "${email}",
                   }
-    }
-  ) {tikunolam{id name}}
+  ) {data{id }}
 
 }
 `})

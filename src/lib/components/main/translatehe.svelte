@@ -29,7 +29,6 @@ already = true;
                     body: JSON.stringify({
                         query: `mutation 
                         { createTranslate(
-    input: {
       data: {amort: "${amort}",
              name:  "${name}",
              amorts: "${amorts}",
@@ -40,9 +39,8 @@ already = true;
               from:" עברית",
              notes: "${come}",
              email:"${email}",
-            }
     }
-  ) {translate{id name}}
+  ) {data{id }}
 }
 `})
                 })
@@ -50,6 +48,7 @@ already = true;
                 .then(data => miDatan = data);
             console.log(miDatan);
             dispatch("done")
+            //התראה
         } catch (e) {
             error1 = e
             console.log(error1);

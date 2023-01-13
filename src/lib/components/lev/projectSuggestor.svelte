@@ -70,26 +70,27 @@ const cookieValue = document.cookie
         body: 
         JSON.stringify({query:
           `mutation { updateUser(
-    input: {
-      where: { id: "${uId}" }
+    id: "${uId}" 
       data: { askeds: [${as}] }
     }
   ){
-      user {
+      data {
+        attributes{
           askeds{
+            data{
               id
+            }
           }
+        }
       }
   }
   createAsk(
-    input: {
       data:{ open_mission: ${oid},
             project: ${projectId},
             users_permissions_user: ${uId}
     }
-    }
   ){
-    ask {id}
+    data {id}
   }
 }`   
 } )})
@@ -136,14 +137,15 @@ const cookieValue = document.cookie
         body: 
         JSON.stringify({query:
           `mutation { updateUser(
-    input: {
-      where: { id: "${uId}" }
+    id: "${uId}" 
       data: {declined: [${ds}] }
-    }
   ){
-      user {
+      data {
+        attributes{
           askeds{
+            data{
               id
+            }
           }
       }
   }
@@ -232,19 +234,19 @@ function project () {
 } 
  onMount(function(){
  if ($lang != "en" ){
-              for (var i = 0; i < skills.length; i++){
-                if (skills[i].localizations.length > 0){
-                skills[i].skillName = skills[i].localizations[0].skillName
+              for (var i = 0; i < skills.data.length; i++){
+                if (skills.data[i].attributes.localizations.data.length > 0){
+                skills.data[i].attributes.skillName = skills.data[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
-              for (var i = 0; i < role.length; i++){
-                if (role[i].localizations.length > 0){
-                role[i].roleDescription = role[i].localizations[0].roleDescription
+              for (var i = 0; i < role.data.length; i++){
+                if (role.data[i].attributes.localizations.data.length > 0){
+                role.data[i].attributes.roleDescription = role.data[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
-              for (var i = 0; i < workways.length; i++){
-                if (workways[i].localizations.length > 0){
-                workways[i].workWayName = workways[i].localizations[0].workWayName
+              for (var i = 0; i < workways.data.length; i++){
+                if (workways.data[i].attributes.localizations.data.length > 0){
+                workways.data[i].attributes.workWayName = workways.data[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }
@@ -410,7 +412,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
     </clipPath>
   </defs>
   <path d="m28.476 172.78s16.516-49.799 63.258-49.052c43.29 0.692 59.774 49.179 59.774 49.179" fill="rgba(216, 216, 216, 0)" stroke="rgba(0, 0, 0, 0)">
-  <title>telemala</title>
+  <title></title>
   </path>
 
   <g transform="matrix(.68728 0 0 .68728 -256.98 19.011)" style="">

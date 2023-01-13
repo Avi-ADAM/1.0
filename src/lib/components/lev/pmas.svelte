@@ -227,7 +227,6 @@ async function agree(alr) {
         body: 
         JSON.stringify({query:
           `mutation { createOpenMashaabim(
-    input: {
       data: {project: "${projectId}",
              spnot: "${hearotMeyuchadot}",
              name: "${name}",
@@ -241,12 +240,10 @@ async function agree(alr) {
              mashaabim: "${mshaabId}"
              ${date} 
              ${sdate}
-      }
     }
-  ) {openMashaabim {project{id }}}
+  ) {data{attributes {project{data{ id }}}}}
   updatePmash(
-      input: {
-      where: {id: ${pendId}}
+  id: ${pendId}
       data: { users:[  ${userss}, 
      {
       what: true
@@ -256,8 +253,7 @@ async function agree(alr) {
   ],
  archived: true
  }
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
  } `   
 //update pendm add consent from second and  archived,,, make coin desapire
 } )})
@@ -280,8 +276,7 @@ async function agree(alr) {
         body: 
         JSON.stringify({query:
           `mutation { updatePmash(
-      input: {
-      where: {id: ${pendId}}
+      id: ${pendId}
       data: { users:[  ${userss}, 
          
      {
@@ -290,8 +285,7 @@ async function agree(alr) {
             ${ordern}
     }
   ]}
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
 } `   
 // make coin desapire
 } )})
@@ -372,8 +366,7 @@ async function afterwhy (event){
         body: 
         JSON.stringify({query:
           `mutation { updatePmash(
-      input: {
-      where: {id: ${pendId}}
+     id: ${pendId}
       data: { 
         ${archivedtru}
         users:[  ${userss}, 
@@ -384,8 +377,7 @@ async function afterwhy (event){
                   ${ordern}
     }
   ]}
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
 } `   
 // make coin desapire
 } )})
@@ -473,8 +465,7 @@ diunim = ` ${diu},`
         body: 
         JSON.stringify({query:
           `mutation { updatePmash(
-      input: {
-      where: {id: ${pendId}}
+      id: ${pendId}
       data: { diun:[  
         ${diunim}  
      {
@@ -484,8 +475,7 @@ diunim = ` ${diu},`
       order: ${order+=1}
     }
   ]}
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
  } `   
  // make coin desapire
  } )})

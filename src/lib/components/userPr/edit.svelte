@@ -351,10 +351,8 @@ function bitulm (){
           meDatamm = []
 }
 async function updi (){
-  console.log("updi")
-var resultString = needr.join('&id_in=');
-let linkpp ="http://localhost:1337/mashaabims?id_in=" + resultString ;
-    const cookieValue = document.cookie
+   let res = []
+  const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
@@ -369,26 +367,33 @@ let linkpp ="http://localhost:1337/mashaabims?id_in=" + resultString ;
           throw resp;
         });
       };
+      let linkg ="http://localhost:1337/graphql" ;
         try {
-            const res = await fetch(linkpp, {
-              method: 'GET',
+             await fetch(linkg, {
+              method: 'POST',
        
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-            }).then(checkStatus)
-          .then(parseJSON);
-            meDatamm = res;
+        body: 
+        JSON.stringify({query: 
+          `{  mashaabims (filters:{id: {in:[${needr}]}}){data{ id attributes{
+          name descrip kindOf  price linkto 
+        } }}}`
+        })
+ })
+  .then(r => r.json())
+  .then(data => res = data);
+    meDatamm = res.data.mashaabims.data
             g = false;
               masss = true;
              dispatch('massss', {
             mass: true
           })
-        } catch (e) {
-            error1 = e
+    } catch (e) {
+            console.log(e)  
         }
-       
 }
 function clodd (event) {
   const  id = event.detail.id
@@ -502,8 +507,8 @@ async function edit (id){
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  sp (id: "${id}") {
-     id 
+  sp (id: "${id}") {data{
+     id  attributes{
      name
        descrip
              kindOf
@@ -512,18 +517,18 @@ async function edit (id){
              price
              myp   
              linkto
-             users_permissions_user {id}
+             users_permissions_user {data{id}}
              sdate
              fdate
-     }
+     }}}
      me {id}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-              xd = res.data.sp;
+              xd = res.data.sp.data;
               console.log(res);
-              if (xd.users_permissions_user.id = res.data.me.id){
+              if (xd.attributes.users_permissions_user.data.id = res.data.me.id){//
                               console.log(xd);
                   ed = true;
             g = false;
@@ -616,7 +621,7 @@ on:click={bitul}
     
     {#if datan === "mash" }
     {#if da.panui != false}
-       <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+       <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg></button>
     <button
@@ -634,7 +639,7 @@ title="{onin[$lang]}">
 <Grow width="17" height="17"/></button>
 {/if}
 {:else}
-   <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+   <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg></button>
 {/if}{da.attributes[valc]}

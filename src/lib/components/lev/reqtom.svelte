@@ -207,23 +207,17 @@ async function agree() {
         pid.push(userId);
     pid = pid;
         welcome = `createWelcomTop(
-  input: {
     data: {users_permissions_user: "${userId}",
           project: "${projectId}"}
-        }
-) {welcomTop{id}}`;
+) {data{id}}`;
 adduser = `updateProject(
-input: {
-  where: {id: "${projectId}"}
+  id: "${projectId}"
  data: {user_1s: ["${idL}","${userId}"]}
-}
-  ){project {user_1s {id}}}`;
+  ){data{ttributes {user_1s {data{id}}}}}`;
         adduser2 = `updateProject(
-input: {
-  where: {id: "${projectId}"}
+  id: "${projectId}"
  data: {user_1s: [${pid}]}
-}
-  ){project {user_1s {id}}}`
+  ){data {attributes{user_1s {data{id}}}}}`
         console.log(welcome, "not member");
 
     }
@@ -240,26 +234,21 @@ if (noofpu === 1) {
                     body: JSON.stringify({ 
                         query: `mutation 
                         { createMaap(
-    input: {
       data: {project: "${projectId}",
              name: "${openmissionName}",
              sp: "${spid}",
              open_mashaabim: ${omid}
                   }
-    }
-  ) {maap{project{id }}}
+  ) {data{attributes{project{data{id }}}}}
 
   updateOpenMashaabim(
-  input:  {
-    where: {id: "${openMid}"}
+  id: "${openMid}"
   data: {archived: true}
- }
- ) {openMashaabim{id archived}}
+ ) {data{id attributes{ archived}}}
  ${welcome}
  ${adduser}
  updateAskm(
-                            input:{
-                                where: {id: "${askId}" }
+               id: "${askId}" 
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -267,8 +256,7 @@ if (noofpu === 1) {
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){askm{id}}
+                        ){data{id}}
 }
 `})
                 })
@@ -297,26 +285,21 @@ if (noofpu === 1) {
                     body: JSON.stringify({
                         query: `mutation 
                         { createMaap(
-    input: {
       data: {project: "${projectId}",
              name: "${openmissionName}",
              sp: "${spid}",
              open_mashaabim: ${openMid}
                   }
-    }
-  ) {maap{project{id }}}
+  ) {data{attributes{project{data{id}} }}}
 
 updateOpenMashaabim(
-  input:  {
-    where: {id: "${openMid}"}
+  id: "${openMid}"
   data: {archived: true}
-}
-) {openMashaabim{id archived}}
+) {data{id attributes{ archived}}}
 ${welcome}
 ${adduser2}
  updateAskm(
-                            input:{
-                                where: {id: "${askId}" }
+            id: "${askId}" 
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -324,8 +307,7 @@ ${adduser2}
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){askm{id}}
+                        ){data{id}}
 }
 `})
                 })
@@ -355,8 +337,7 @@ ${adduser2}
                         query: `mutation 
                         {
                             updateAskm(
-                            input:{
-                                where: {id: "${askId}" }
+                          id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
@@ -364,7 +345,7 @@ ${adduser2}
                                       }
                                     ]}
                             }
-                        ){askm{id}}
+                        ){data{id}}
                      
                     }
 `})
@@ -423,8 +404,7 @@ const declineda = declined.map(c => c.id)
                         query: `mutation 
                         { 
 updateAskm(
-  input: {
-    where: {id: "${id}"}
+  id: "${id}"
   data: {vots: [${userss}, 
                                        {
                                         what: false
@@ -433,8 +413,7 @@ updateAskm(
                                     ],
                                   archived: true
 }
-}
-) {askm{id }}
+) {data{id }}
 }
 `})
                 })

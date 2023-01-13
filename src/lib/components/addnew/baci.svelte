@@ -17,7 +17,7 @@ let isOpen = false;
 let a = 0;
 let success = false
     let before = false;
-    let url1 = "http://localhost:1337/upload";
+    let url1 = "http://localhost:1337/api/upload";
     let linkP;
     let desP;
     let desPl;
@@ -32,7 +32,7 @@ let files;
   let shgi = false;
     let restime;
     let nam;
-function sendP () {
+async function sendP () {
     if (run.includes(projectName_value)){
   shgi = true; 
 } else{
@@ -60,57 +60,62 @@ if (files) {
             })
             .then(({ data }) => {
                  imageId = data[0].id;
- 
-  axios
-  .post('http://localhost:1337/api/projects', {
-    user_1s: idL,
-    projectName: projectName_value, 
-    publicDescription: desP,
-    profilePic: imageId,
-    linkToWebsite: linkP,
-    descripFor: desPl,
-    vallues: find_value_id(selected),
-     restime: restime,
-     timeToP:timeToP
-              },
-  {
-  headers: {
-    'Authorization': bearer1
-            }})
-  .then(response => {
-    console.log('הצליח', response.data);
-    resP = response.data; 
-    idPr.set(resP.id);
-    before = true;
-    loading = false;
-   goto("/moach", );
-              })
-  .catch(error => {
+                 sendPP()
+            })
+            .catch(error => {
     console.log('צריך לתקן:', error.response);
         loading = false;
             });
-  console.log("hh")
-})} else {
-  axios
-  .post('http://localhost:1337/api/projects', {
-    user_1s: idL,
-        profilePic: imageId,
-    projectName: projectName_value, 
-    publicDescription: desP,
-    linkToWebsite: linkP,
-    descripFor: desPl,
-    vallues: find_value_id(selected),
-    restime: restime
-              },
-  {
-  headers: {
-    'Authorization': bearer1
-            }})
-  .then(response => {
-    console.log('הצליח', response.data);
-    success = true
-    resP = response.data; 
-    idPr.set(resP.id);
+          } else {
+            sendPP()
+          }
+  }
+}
+async function sendPP(){
+   let d = new Date;
+     const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  
+  idL = cookieValueId;
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+    try {
+           const res = await fetch("http://localhost:1337/graphql", {
+              method: "POST",
+              headers: {
+                   'Authorization': bearer1,
+                 'Content-Type': 'application/json'
+              },  body: JSON.stringify({
+                        query: `mutation { createProject(
+       data: {
+         user_1s: ${idL},
+        projectName: "${projectName_value}",
+        publishedAt: "${d.toISOString()}",
+        publicDescription: "${desP}",
+        linkToWebsite: "${linkP}",
+        descripFor: "${desPl}",
+        vallues:${find_value_id(selected)},
+        restime: ${restime},
+        timeToP:${timeToP},
+         profilePic: ${imageId},        
+        }  
+  ){
+  data { id attributes{ projectName}}
+}
+}
+              `})
+})
+             .then(r => r.json())
+  .then(data => resP = data);
+        console.log(resP)
+         success = true
+         idPr.set(resP.data.createProject.data.id);
         before = true;
             loading = false;
     let data = {"name": userName_value, "action": "יצר ריקמה חדשה בשם:", "det": `${projectName_value} והתיאור: ${desP}` }
@@ -130,20 +135,11 @@ if (files) {
     console.error('Error:', error);
   
   })
-              })
-  .catch(error => {
-    console.log('צריך לתקן:', error.response);
-        loading = false;
-            });
-  console.log("hh")
-
-
-
+                  }
+      catch(error) {
+        console.log('צריך לתקן:', error);
+                }
 }
-  }
-}
-;
-
 
 let vallues = [];
     let error1 = null;
@@ -173,23 +169,23 @@ let vallues = [];
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues { id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
-  projects { projectName}
+  vallues {data{ id attributes{  valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName}} }' : ""}}}}
+  projects{data{attributes{  projectName}}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            vallues = res.data.vallues;
+            vallues = res.data.vallues.data;
             if ($lang == "he" ){
               for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].localizations.length > 0){
-                vallues[i].valueName = vallues[i].localizations[0].valueName
+                if (vallues[i].attributes.localizations.length > 0){
+                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }          
             vallues = vallues
-            const runi = res.data.projects;
-           run = runi.map(c => c.projectName)
+            const runi = res.data.projects.data;
+           run = runi.map(c => c.attributes.projectName)
         } catch (e) {
             error1 = e
         }
@@ -200,7 +196,7 @@ let suc = false;
      var  arr = [];
       for (let j = 0; j< value_name_arr.length; j++ ){
       for (let i = 0; i< vallues.length; i++){
-        if(vallues[i].valueName === value_name_arr[j]){
+        if(vallues[i].attributes.valueName === value_name_arr[j]){
           arr.push(vallues[i].id);
         }
       }
@@ -213,7 +209,7 @@ let suc = false;
         const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
 
  function project (id) {
-    idPr.set(resP.id);
+         idPr.set(resP.data.createProject.data.id);
     goto("/moach");
   };
 export let userName_value;
@@ -238,7 +234,7 @@ export let userName_value;
   function addnew (event){
     
     const newOb = event.detail.skob;
-    const newN = event.detail.skob.valueName;
+    const newN = event.detail.skob.attributes.valueName;
     const newValues = vallues;
     newValues.push(newOb);
        
@@ -278,7 +274,7 @@ const su = {"he": "לוגו נוסף בהצלחה", "en": "logo has successfully
 const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
 const cree = {"he": "ליצור ולפרסם ריקמה", "en": "Create new FreeMate"}
 const sur = {"he":"הריקמה נוצרה בהצלחה", "en":"new FreeMates has created"}
-const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
+const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "en":"to the FreeMates brain"}
  </script>  
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -347,7 +343,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
    <MultiSelect
    bind:selected
    {placeholder}
-   options={vallues.map(c => c.valueName)}
+   options={vallues.map(c => c.attributes.valueName)}
    /></div>
    <div  class="input-2-2">
    {#if addval == false}
@@ -355,7 +351,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
     on:click={() => addval = true} 
     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >{addn[$lang]}</button>
-  {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
+  {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
   <br>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
@@ -419,7 +415,7 @@ const tob = {"he":"למוח הריקמה", "en":"to the FreeMates brain"}
 {/if}</div>
 {:else}
 <div class="aft">
-  <h1>{sur[$lang]}</h1>
+  <h1 class="text-barbi">{sur[$lang]}</h1>
   <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
  on:click={project} >{tob[$lang]}</button>
 </div>

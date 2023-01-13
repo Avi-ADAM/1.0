@@ -58,7 +58,6 @@ async function han (){
         body: 
         JSON.stringify({query:
           `mutation { createSp(
-    input: {
       data: { 
           name: "${element.name}",
              descrip: "${element.descrip}",
@@ -72,18 +71,17 @@ async function han (){
              mashaabim: "${element.id}", 
              ${sdate} 
              ${fdate}
-      }
     }
-  ) {sp {id name}}
+  )  {data{id attributes{ name}}}
 } `   
 } )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
              dispatch('close', {
-                 id: miDatan.data.createSp.sp.id,
-                 name: miDatan.data.createSp.sp.name,
-                 skob: miDatan.data.createSp.sp
+                 id: miDatan.data.createSp.data.id,
+                 name: miDatan.data.createSp.data.attributes.name,
+                 skob: miDatan.data.createSp.data
              });
         } catch (e) {
             error1 = e

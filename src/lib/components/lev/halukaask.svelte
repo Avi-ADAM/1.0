@@ -133,8 +133,7 @@ if (noofusersOk  === noofusers){
             //create splits coin for each giver and reciver, archive haluask.
           `mutation { 
   updateTosplit(
-      input: {
-      where: {id: ${pendId}}
+      id: ${pendId}
       data: { vots:[  ${userss},      
      {
       what: true
@@ -143,8 +142,7 @@ if (noofusersOk  === noofusers){
   ],
  archived: true
  }
-      }
-  ){tosplit { vots { users_permissions_user { id}}}}
+  ){data { vots { users_permissions_user {data{ id}}}}}
  } `   
  } )})
   .then(r => r.json())
@@ -175,8 +173,7 @@ if (noofusersOk  === noofusers){
     }
   ],
  }
-      }
-  ){tosplit { vots { users_permissions_user { id}}}}
+  ){data { vots { users_permissions_user {data{ id}}}}}
  } `   
 // make coin desapire
 } )})
@@ -247,8 +244,7 @@ async function afterwhy (){
         body: 
         JSON.stringify({query:
           `mutation {  updateTosplit(
-      input: {
-      where: {id: ${pendId}}
+id: ${pendId}
       data: { vots:[  ${userss},      
      {
       what: false
@@ -257,8 +253,7 @@ async function afterwhy (){
     }
   ],
  }
-      }
-  ){tosplit { vots { users_permissions_user { id}}}}
+  ){data { vots { users_permissions_user {data{ id}}}}}
 } `   
 // make coin desapire
 } )})
@@ -339,8 +334,7 @@ async function afreact (){
         body: 
         JSON.stringify({query:
           `mutation { updatePmash(
-      input: {
-      where: {id: ${pendId}}
+id: ${pendId}
       data: { diun:[  ${diunim}, 
          
      {
@@ -350,8 +344,7 @@ async function afreact (){
       order: ${order+=1}
     }
   ]}
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data { users { users_permissions_user {data{ id}}}}}
 } `   
 // make coin desapire
  } )})

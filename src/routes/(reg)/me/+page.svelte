@@ -28,7 +28,7 @@ let isOpen = false;
 
     let current = "";
 
-    let url1 = "http://localhost:1337/upload";
+    let url1 = "http://localhost:1337/api/upload";
     let updX = 0;
   let token; 
   let files;
@@ -148,9 +148,9 @@ function letters(data){
                 }})
       .then(response => {
         meData = response.data;
-        uPic.set(meData.profilePic.formats.thumbnail.url);
+        uPic.set(meData.attributes.profilePic.data.attributes.formats.thumbnail.url);
             picLink =  $uPic;
-            uPic.set(meData.profilePic.formats.small.url);
+            uPic.set(meData.attributes.profilePic.data.attributes.formats.small.url);
             picLink =  $uPic;
     updX = 0;
     isOpen = false;
@@ -396,7 +396,7 @@ function sendD () {
        
     isOpen = false;
     a = 0;
-    
+    start()
   //  updpic.set(0);
                   })
       .catch(error => {
@@ -433,11 +433,11 @@ function remove (event) {
   const linkp = event.detail.linkp;
   addNs1 = false;
   meData[linkp] = miDatanew;
-  skil = meData.skills;
-            taf = meData.tafkidims;
-            val = meData.vallues;
-            mash = meData.sps;
-            work = meData.work_ways;
+  skil = meData.skills.data;
+            taf = meData.tafkidims.data;
+            val = meData.vallues.data;
+            mash = meData.sps.data;
+            work = meData.work_ways.data;
             addNs1 = true;
 };
 
@@ -453,11 +453,11 @@ async function add (event) {
  meDatanew[linkp] = miDatanew;
  console.log (meDatanew);
  meData = meDatanew;
- skil = meData.skills;
-            taf = meData.tafkidims;
-            val = meData.vallues;
-            mash = meData.sps;
-            work = meData.work_ways;
+ skil = meData.skills.data;
+            taf = meData.tafkidims.data;
+            val = meData.vallues.data;
+            mash = meData.sps.data;
+            work = meData.work_ways.data;
   addNs1 = true;
   console.log(a)
 };
@@ -472,11 +472,11 @@ async function addnew (event) {
  meDatanew[linkp] = miDatanew;
  console.log (meDatanew);
  meData = meDatanew;
- skil = meData.skills;
-            taf = meData.tafkidims;
-            val = meData.vallues;
-            mash = meData.sps;
-            work = meData.work_ways;
+ skil = meData.skills.data;
+            taf = meData.tafkidims.data;
+            val = meData.vallues.data;
+            mash = meData.sps.data;
+            work = meData.work_ways.data;
   addNs1 = true;
 };
 const closer = () => {
@@ -540,8 +540,8 @@ function close (event){
   val = event.detail.list;
       if ($lang == "he" ){
               for (var i = 0; i < val.length; i++){
-                if (val[i].localizations.length > 0){
-                val[i].valueName = val[i].localizations[0].valueName
+                if (val.data[i].attributes.localizations.data.length > 0){
+                val.data[i].attributes.valueName = val.data[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
@@ -603,19 +603,17 @@ async function han (){
         body: 
         JSON.stringify({query:
           `mutation { updateSp(
-    input: {
-      where: {id: ${spid} }
+   {id: ${spid}
       data: { 
         archived: true
       }
-    }
-  ) {sp {id }}
+  ) {data {id }}
  } `   
  } )})
   .then(r => r.json())
   .then(data => miDa = data);
          console.log(miDa)
-        const tor = miDa.data.updateSp.sp.id
+        const tor = miDa.data.updateSp.data.id
         const oldob = mash
         const x = oldob.map(c => c.id);
         const indexy = x.indexOf(tor);

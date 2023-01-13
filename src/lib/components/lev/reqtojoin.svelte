@@ -342,7 +342,6 @@ ${adduser}
                     body: JSON.stringify({
                         query: `mutation 
                         { createMesimabetahalich(
-    input: {
       data: {project: "${projectId}",
              mission:  "${missId}",
              hearotMeyuchadot: "${hearotMeyuchadot}",
@@ -356,20 +355,16 @@ ${adduser}
              tafkidims: [${tafkidimsa}],
             ${date}
                   }
-    }
-  ) {mesimabetahalich{project{id }}}
+  ) {data{attributes{project{data{id }}}}}
 
 updateOpenMission(
-  input:  {
-    where: {id: "${openMid}"}
+  id: "${openMid}"
   data: {archived: true}
-}
-) {openMission{id archived asks{id}}}
+) {data{id attributes{ archived asks{data{id}}}}}
 ${welcome}
 ${adduser2}
  updateAsk(
-                            input:{
-                                where: {id: "${askId}" }
+            id: "${askId}"
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -377,29 +372,25 @@ ${adduser2}
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){ask{id}}
+                        ){data{id}}
 }
 `})
                 })
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            const otherasks = miDatan.data.updateOpenMission.openMission.asks
+            const otherasks = miDatan.data.updateOpenMission.data.attributes.asks.data
             console.log(otherasks);
             if (otherasks.length> 1){
             let nextquery = ``
             for (let i = 0; i < otherasks.length; i++){
-                nextquery = nextquery + `
+                nextquery =  `
                 updateAsk(
-                            input:{
-                                where: {id: "${otherasks[i].id}" }
+                       id: "${otherasks[i].id}" 
                                 data: { archived: true
-                                  }
                             }
-                        ){ask{id}}`
-            }
-            await fetch(linkg, {
+                        ){data{id}}`
+                        await fetch(linkg, {
                     method: 'POST',
                     headers: {
                         'Authorization': bearer1,
@@ -415,6 +406,7 @@ ${adduser2}
             console.log(miDatan);
 
           }
+        }
             dispatch('acsept', {
                 ani: "asked",
                 coinlapach: coinlapach
@@ -438,16 +430,14 @@ ${adduser2}
                         query: `mutation 
                         {
                             updateAsk(
-                            input:{
-                                where: {id: "${askId}" }
+                         id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){ask{id}}
+                        ){data{id}}
                      
                     }
 `})
@@ -510,11 +500,9 @@ const declineda = declined.map(c => c.id)
                         query: `mutation 
                         { 
 updateOpenMission(
-  input: {
-    where: {id: "${openMid}"}
+ id: "${openMid}"
   data: {declined: [${declineda}]}
-}
-) {openMission{id declined {id}}}
+) {data{id attributes{ declined {data{id}}}}}
 }
 `})
                 })

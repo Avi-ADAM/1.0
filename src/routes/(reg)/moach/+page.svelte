@@ -184,9 +184,10 @@ async function start () {
             }).then(checkStatus)
           .then(parseJSON);
             ata = res.data.project.data.attributes;
+            console.log(res)
             const users = ata.user_1s.data;
              const x = users.map(c => c.id)
-             if (x.includes(idL)){
+             if (x.includes(res.data.meData.id)){//me from server
                       
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {

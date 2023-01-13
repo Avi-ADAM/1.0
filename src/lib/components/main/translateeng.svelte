@@ -29,7 +29,6 @@ already = true;
                     body: JSON.stringify({
                query: `mutation 
                         { createTranslate(
-    input: {
       data: {amort: "${amort}",
              name:  "${name}",
              amorts: "${amorts}",
@@ -40,9 +39,8 @@ already = true;
              from: "english",
              notes: "${come}",
              email: "${email}",
-                  }
     }
-  ) {translate{id name}}
+  ) {data{id }}
                 
       
 }
