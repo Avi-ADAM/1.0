@@ -24,7 +24,7 @@ export let coinlapach;
     export let projectId;
     export let linki = "/project/";
     export let oid = 0;
-    export let workways= [];
+    export let workways= {data:[]};
     export let noOfHours = 0;
     export let perhour = 0;
     export let total = 0;
@@ -48,6 +48,7 @@ async function agree(oid) {
 const as = askedarr;
  as.push(`${oid}`);
  console.log(as)
+  //todo if project member voted yes
 const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -59,6 +60,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
+    let d = new Date
     let link = 'http://localhost:1337/graphql';
     try {
              await fetch(link, {
@@ -69,10 +71,10 @@ const cookieValue = document.cookie
                   },
         body: 
         JSON.stringify({query:
-          `mutation { updateUser(
+          `mutation { updateUsersPermissionsUser(
     id: "${uId}" 
       data: { askeds: [${as}] }
-    }
+    
   ){
       data {
         attributes{
@@ -87,7 +89,8 @@ const cookieValue = document.cookie
   createAsk(
       data:{ open_mission: ${oid},
             project: ${projectId},
-            users_permissions_user: ${uId}
+            users_permissions_user: ${uId},
+            publishedAt: "${d.toISOString()}",
     }
   ){
     data {id}
@@ -136,7 +139,7 @@ const cookieValue = document.cookie
                   },
         body: 
         JSON.stringify({query:
-          `mutation { updateUser(
+          `mutation { updateUsersPermissionsUser(
     id: "${uId}" 
       data: {declined: [${ds}] }
   ){
@@ -149,6 +152,7 @@ const cookieValue = document.cookie
           }
       }
   }
+}
 }`   
 } )})
   .then(r => r.json())

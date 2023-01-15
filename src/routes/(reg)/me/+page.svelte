@@ -1,5 +1,7 @@
 
-<script> 
+<script>
+    import { liUN } from '$lib/stores/liUN.js';
+
 import Arrow from '$lib/celim/icons/arrow.svelte'
 	import Close from '$lib/celim/close.svelte'
   import Lowding from '$lib/celim/lowding.svelte'
@@ -223,6 +225,7 @@ async function start () {
    meData =  meDataa.data.usersPermissionsUser.data.attributes
        mail = meData.email;
        username = meData.username;
+       liUN.set(username)
           letters(meData.username);
             myP = meData.projects_1s.data ;
             lango = meData.lang;
@@ -603,7 +606,7 @@ async function han (){
         body: 
         JSON.stringify({query:
           `mutation { updateSp(
-   {id: ${spid}
+   id: ${spid}
       data: { 
         archived: true
       }

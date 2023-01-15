@@ -45,7 +45,7 @@
                 document.cookie = `jwt=${data.jwt}; expires=` + new Date(2024, 0, 1).toUTCString();
                 document.cookie = `id=${data.user.id}; expires=` + new Date(2024, 0, 1).toUTCString();
                 document.cookie = `when=${Date.now}; expires=` + new Date(2024, 0, 1).toUTCString();
-               	    document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();			
+               	   // document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();			
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);

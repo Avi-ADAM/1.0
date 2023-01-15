@@ -993,7 +993,7 @@ async function showOpenPro(mi) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        query: `{openMissions (filters: {id:{in: [${resultString}]}}){data{ id attributes{
+                        query: `{openMissions (filters: {id:{in: [${keysSorted}]}}){data{ id attributes{
             project {data{ id attributes{ projectName timeToP profilePic{data{attributes {url formats }}}}}}
             sqadualed
             tafkidims{data {attributes {roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
@@ -1014,8 +1014,8 @@ async function showOpenPro(mi) {
                 meData[i].ani = "meData",
                 meData[i].azmi = "hazaa",               
                 meData[i].pl = 10 + i,
-                    meData[i].hst = checkHst(meData[i].project.projectName)
-                    meData[i].stb = checkStb(meData[i].name)
+                    meData[i].hst = checkHst(meData[i].attributes.project.data.attributes.projectName)
+                    meData[i].stb = checkStb(meData[i].attributes.name)
             }
 
         } catch (e) {
@@ -1844,7 +1844,7 @@ function pmash(data) {
         const x = pmashes[k].users
         pmashes[k].uids = [];
         for (let z = 0; z < x.length; z++) {
-            pmashes[k].uids.push(x[z].users_permissions_user.id);
+            pmashes[k].uids.push(x[z].users_permissions_user.data.id);
         }
     }
     for (let t = 0; t < pmashes.length; t++) {
@@ -1859,7 +1859,7 @@ function pmash(data) {
             pmashes[t].already = true;
             pmashes[t].pl += 48
             for (let l = 0; l < pmashes[t].users.length; l++) {
-                if (pmashes[t].users[l].users_permissions_user.id === myid)
+                if (pmashes[t].users[l].users_permissions_user.data.id === myid)
                     if (pmashes[t].users[l].order !== 1) {
                         pmashes[t].mypos = pmashes[t].users[l].what;
                     }
@@ -1879,27 +1879,27 @@ function pmash(data) {
         pmashes[t].noofusersWaiting = noofusersWaiting;
         if (pmashes[t].users.length > 0) {
             for (let x = 0; x < pmashes[t].users.length; x++) {
-                let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].users[x].users_permissions_user.id)
+                let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].users[x].users_permissions_user.data.id)
                 pmashes[t].messege.push({
-                    message: `${getProjectData(pmashes[t].projectId,"un",pmashes[t].users[x].users_permissions_user.id)}  
+                    message: `${getProjectData(pmashes[t].projectId,"un",pmashes[t].users[x].users_permissions_user.data.id)}  
                      ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד
                       ${pmashes[t].users[x].why !== null ? `בנימוק: ${pmashes[t].users[x].why}` : ``}`}`,
                     what: pmashes[t].users[x].what,
                     pic: src22,
-                    sentByMe: pmashes[t].users[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pmashes[t].users[x].users_permissions_user.data.id === myid ? true : false,
                     changed: pmashes[t].users[x].order == 1 ? true : false,
                 })
             }
         }
         if (pmashes[t].diun.length > 0) {
             for (let x = 0; x < pmashes[t].diun.length; x++) {
-                let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].diun[x].users_permissions_user.id)
+                let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].diun[x].users_permissions_user.data.id)
 
                 pmashes[t].messege.push({
                     message: pmashes[t].diun[x].why,
                     what: pmashes[t].diun[x].what,
                     pic: src22,
-                    sentByMe: pmashes[t].diun[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pmashes[t].diun[x].users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }
@@ -1943,7 +1943,7 @@ function getProjectData(id,thing,uid){
     const projects = miData.data.usersPermissionsUser.data.attributes.projects_1s.data;
     if (projects.length > 0){
         for (let i = 0; i < projects.length ; i++){
-            if (projects[i].id = id){
+            if (projects[i].id == id){
                 if(thing == "pn"){
                     return projects[i].attributes.projectName
                 } else if (thing == "pp"){
@@ -2008,10 +2008,9 @@ function makeWalcom(ata) {
     walcomen = walcomen;
     wel = walcomen.length;
     walcomenold = []
-    counter = 8
             localStorage.setItem("wel", wel);
-    //if (!isEqual(walcomen, walcomenold) && counter > 1) {
-    //    if (walcomenold.length < walcomen.length) {
+    if (!isEqual(walcomen, walcomenold) && counter > 1) {
+        if (walcomenold.length < walcomen.length) {
 
             // Create and show the notification
             const rikn = walcomen[walcomen.length - 1].projectName
@@ -2034,8 +2033,8 @@ function makeWalcom(ata) {
             });*/
 
             // let notification = new Notification('1❤️1', { body: text, icon: img });
-    //    }
-    //}
+       }
+    }
 
 }
 

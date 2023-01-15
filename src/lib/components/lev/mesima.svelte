@@ -118,7 +118,7 @@ async function xyd () {
             <div class="sm:text-sm text-md mt-1 flex items-center">
                <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{headi[$lang]}</span>
             </div>
-            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{data.project.attributes.projectName}</span>
+            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{data.project.data.attributes.projectName}</span>
          </div>
          </div>
          </div>
@@ -152,7 +152,7 @@ async function xyd () {
                 {#each data.work_ways as rol}<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold"   word={rol.attributes.workWayName}/></p>{/each}
     </div>{/if}
-           <button on:click={()=>project(data.project.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >
+           <button on:click={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >
 
     </div>
   

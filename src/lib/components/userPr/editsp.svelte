@@ -13,7 +13,7 @@ export let meData = [];
   onMount(async () => {
     const id = meData.id
     meData = meData.attributes
-    meData.push({id:id})
+    meData.id = id
     meData = meData
    myMissionH()
    myMi ()
@@ -71,7 +71,7 @@ async function han (){
              ${sdate} 
              ${fdate}
     }
-  ) {sp {data{id attributes{ name}}}}
+  )  {data{id attributes{ name}}}
 } `   
 } )})
   .then(r => r.json())

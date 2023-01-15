@@ -321,7 +321,32 @@ function find_contry_id(contry_name_arr){
   })
                   
     }
+    function tverya (){
+      let i = 36
+      while (i < 313) {
+                 let datau = {data:{name:`userName_value${i}`,email: `ggg${i}@kkk.hh` }}
+
+        fetch("http://localhost:1337/api/chezins", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(datau),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data,datau);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+  i++
+      }
+    }
 </script>
+<button on:click={tverya}>tverya</button>
 
 <button on:click={onSubmiti}>tttt</button>
 <form on:submit|preventDefault={submitForm}>

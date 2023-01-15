@@ -15,7 +15,16 @@ async function upd (){
             
       
 }
+function vfor(){
+  for (let i = 0; i < meData.length; i++) {
+    const id = meData[i].id
+    meData[i] = meData[i].attributes;
+    meData[i].id = id
+    
+  }
+}
   onMount(async () => {
+    vfor()
    myMissionH()
               myMi ()  
               });

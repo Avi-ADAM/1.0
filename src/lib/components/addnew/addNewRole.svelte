@@ -122,7 +122,7 @@ skillslist = find_skill_id(selected);
   //  skillslist.push(idro);
         dispatchrole (meData.data.createTafkidim.data, id);
         addR = false;
-        let userName_value = liUN.get()
+        let userName_value = $liUN
          let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desR} והכישורים: ${selected.join(" , ")}` }
    fetch("/api/ste", {
   method: 'POST', // or 'PUT'

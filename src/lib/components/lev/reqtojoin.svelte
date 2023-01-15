@@ -182,7 +182,7 @@ async function agree() {
      noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
-               const tafkidimsa = role.map(c => c.id);
+               const tafkidimsa = role.data.map(c => c.id);
 
     const date = (deadline !== undefined && deadline != null) ? ` admaticedai: "${deadline}"` : ``;
         const cookieValue = document.cookie
@@ -209,23 +209,17 @@ async function agree() {
           pid.push(userId);
     pid = pid;
         welcome = `createWelcomTop(
-  input: {
     data: {users_permissions_user: "${userId}",
           project: "${projectId}"}
-        }
-) {welcomTop{id}}`;
+) {data{id}}`;
 adduser = `updateProject(
-input: {
-  where: {id: "${projectId}"}
+  id: "${projectId}"
  data: {user_1s: ["${idL}","${userId}"]}
-}
-  ){project {user_1s {id email lang}}}`;
+  ){data{attributes {user_1s{data {id{attributes email lang}}}}}}`;
         adduser2 = `updateProject(
-input: {
-  where: {id: "${projectId}"}
+  id: "${projectId}"
  data: {user_1s: [${pid}]}
-}
-  ){project {user_1s {id}}}`
+  ){data{attributes {user_1s{data {id}}}}}`
         console.log(welcome, "not member");
 
     }
@@ -243,7 +237,6 @@ input: {
                     body: JSON.stringify({
                         query: `mutation 
                         { createMesimabetahalich(
-    input: {
       data: {project: "${projectId}",
              mission:  "${missId}",
              hearotMeyuchadot: "${hearotMeyuchadot}",
@@ -258,20 +251,16 @@ input: {
               
             ${date}
                   }
-    }
-  ) {mesimabetahalich{project{id }}}
+  ) {data{attributes{project{data{id }}}}}
 
 updateOpenMission(
-  input:  {
-    where: {id: "${openMid}"}
+  id: "${openMid}"
   data: {archived: true}
-}
-) {openMission{id archived}}
+) {data{id attributes{archived}}}
 ${welcome}
 ${adduser}
  updateAsk(
-                            input:{
-                                where: {id: "${askId}" }
+                 id: "${askId}" 
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -279,8 +268,7 @@ ${adduser}
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){ask{id}}
+                        ){data{id}}
 }
 `})
                 })
@@ -290,12 +278,12 @@ ${adduser}
             
             if (newnew == true){
               let emailt;
-              let ema = miDatan.data.updateProject.project.user_1s
+              let ema = miDatan.data.updateProject.data.attributes.user_1s.data
               let la; 
               for (let i = 0; i <ema.length; i++){
                 if (ema[i].id == userId){
-                  emailt = ema[i].email
-                  la = ema[i].lang
+                  emailt = ema[i].attributes.email
+                  la = ema[i].attributes.lang
                 }
               }
               let langi = $lang
@@ -520,7 +508,7 @@ updateOpenMission(
         }
         } else if (noofpu > 1 ) { 
     console.log("if another uprove explain why you decline")
-
+//todo
         }
 }
 let hovered = false;

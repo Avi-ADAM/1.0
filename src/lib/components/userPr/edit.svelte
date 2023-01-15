@@ -164,7 +164,7 @@ async function increment() {
 })
   .then(r => r.json())
   .then(data => miData = data.data);
-         console.log(miData,miData.data.updateUser.user[kish])
+         console.log(miData,miData.data.updateUsersPermissionsUser.data.attributes[kish])
            if ($lang == "he" ){
               for (var i = 0; i < miData.length; i++){
                 if (miData[i].attributes.localizations.data.length > 0){
@@ -176,7 +176,7 @@ async function increment() {
          addSl = false;
  dispatch('close', {
     linkp: linkp,
-    list: miData.data.updateUser.user[kish]
+    list: miData.data.updateUsersPermissionsUser.data.attributes[kish]
     } );
     g = false;
         } catch (e) {
