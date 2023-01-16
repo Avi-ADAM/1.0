@@ -448,6 +448,7 @@ let toapprove = ``;
 let appi = ``;
 async function afterwhy () {
   already = true;
+  let d = new Date
 const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -482,6 +483,7 @@ if (noofpu === 1) {
               project: ${projectId},
               descrip: "${missionDetails}",
               users_permissions_user: "${idL}",
+                     publishedAt: "${d.toISOString()}", 
               mission: ${missId}
    }
 ){data {id }}`
@@ -495,6 +497,7 @@ createFiniapruval(
       noofhours: ${hoursdon},
       mesimabetahalich: ${mId},
       project: "${projectId}",
+              publishedAt: "${d.toISOString()}",
             users_permissions_user: "${idL}",
        vots:[ 
     {

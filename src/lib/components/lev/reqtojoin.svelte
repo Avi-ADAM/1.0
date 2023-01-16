@@ -182,6 +182,7 @@ async function agree() {
      noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
+  const d = new Date
                const tafkidimsa = role.data.map(c => c.id);
 
     const date = (deadline !== undefined && deadline != null) ? ` admaticedai: "${deadline}"` : ``;
@@ -210,7 +211,9 @@ async function agree() {
     pid = pid;
         welcome = `createWelcomTop(
     data: {users_permissions_user: "${userId}",
-          project: "${projectId}"}
+          project: "${projectId}"
+                publishedAt: "${d.toISOString()}",
+        }
 ) {data{id}}`;
 adduser = `updateProject(
   id: "${projectId}"
@@ -248,7 +251,7 @@ adduser = `updateProject(
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
               tafkidims: [${tafkidimsa}],
-              
+                      publishedAt: "${d.toISOString()}",
             ${date}
                   }
   ) {data{attributes{project{data{id }}}}}
@@ -341,6 +344,7 @@ ${adduser}
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
              tafkidims: [${tafkidimsa}],
+                     publishedAt: "${d.toISOString()}",
             ${date}
                   }
   ) {data{attributes{project{data{id }}}}}

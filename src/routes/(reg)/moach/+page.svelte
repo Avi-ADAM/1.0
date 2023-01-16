@@ -909,6 +909,7 @@ let url1 = "http://localhost:1337/api/upload";
 let meDatap = [];
 let mecata = [];
 async function sendP () {
+  let d = new Date
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -971,6 +972,7 @@ async function sendP () {
           ` mutation { createDecision(
        data: {
         projects: ${$idPr},
+                publishedAt: "${d.toISOString()}",
          newpic: ${imageId},
         kind: pic,
           vots: [

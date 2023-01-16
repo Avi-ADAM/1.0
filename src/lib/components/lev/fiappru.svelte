@@ -165,6 +165,7 @@ async function agree() {
     noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
+  let d = new Date
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
     const cookieValue = document.cookie
         .split('; ')
@@ -205,6 +206,7 @@ async function agree() {
               descrip: "${missionDetails}",
               users_permissions_user: "${userId}",
               finiapruval: "${askId}",
+                      publishedAt: "${d.toISOString()}",
               mission: ${missId}
    
 }){data {id }}

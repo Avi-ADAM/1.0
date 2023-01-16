@@ -37,6 +37,7 @@ function vfor(){
 
 async function han (){
     console.log(meData)
+    let d = new Date
     already = true;
  const cookieValue = document.cookie
   .split('; ')
@@ -78,6 +79,7 @@ async function han (){
              linkto: "${element.linkto}",
              users_permissions_user: "${idL}",
              mashaabim: "${element.id}", 
+             publishedAt: "${d.toISOString()}",        
              ${sdate} 
              ${fdate}
     }

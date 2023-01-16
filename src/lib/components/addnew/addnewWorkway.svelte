@@ -29,6 +29,7 @@
     };
     
    async function addww () {
+    let d = new Date
        shgi = false;
 if (rn.includes(Name_value)){
   shgi = true;
@@ -44,7 +45,9 @@ let link ="http://localhost:1337/graphql" ;
         body: 
         JSON.stringify({query: 
            `mutation { createWorkWay(
-       data: {workWayName: "${Name_value}" }
+       data: {workWayName: "${Name_value}" 
+              publishedAt: "${d.toISOString()}",
+      }
   
   ){
           data{

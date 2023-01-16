@@ -172,6 +172,7 @@ let ordern = ``;
 let linkg = 'http://localhost:1337/graphql';
 let userss = objToString(users);
 async function agree(alr) {
+  let d = new Date
   if  (alr == "alr"){
         allr = true;
            already = true;
@@ -218,6 +219,7 @@ async function agree(alr) {
              work_ways: [${workwaysa}],
              hearotMeyuchadot: "${hearotMeyuchadot}",
              name: "${name}",
+                     publishedAt: "${d.toISOString()}",
              descrip: "${descrip}",
              skills: [${skillsa}], 
              tafkidims: [${tafkidimsa}],

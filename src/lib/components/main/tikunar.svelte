@@ -19,7 +19,7 @@ let miDatan = [];
 let linkg = 'http://localhost:1337/graphql';
 async function add (){
 already = true;
- 
+ let d = new Date
         try {
             await fetch(linkg, {
                     method: 'POST',
@@ -38,6 +38,7 @@ already = true;
              more: "${more}",
              notes: "${come}",
              email: "${email}",
+                     publishedAt: "${d.toISOString()}",
                   }
   ) {data{id }}
 

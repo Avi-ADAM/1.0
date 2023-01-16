@@ -179,6 +179,7 @@ let welcome = ``;
 let adduser = ``;
 let adduser2 = ``;
 async function agree() {
+  let d = new Date
     already = true;
      noofusersOk += 1;
   noofusersWaiting -= 1;
@@ -208,7 +209,9 @@ async function agree() {
     pid = pid;
         welcome = `createWelcomTop(
     data: {users_permissions_user: "${userId}",
-          project: "${projectId}"}
+          project: "${projectId}",
+          publishedAt: "${d.toISOString()}",      
+        }
 ) {data{id}}`;
 adduser = `updateProject(
   id: "${projectId}"
@@ -237,6 +240,7 @@ if (noofpu === 1) {
       data: {project: "${projectId}",
              name: "${openmissionName}",
              sp: "${spid}",
+            publishedAt: "${d.toISOString()}",         
              open_mashaabim: ${omid}
                   }
   ) {data{attributes{project{data{id }}}}}
@@ -288,6 +292,7 @@ if (noofpu === 1) {
       data: {project: "${projectId}",
              name: "${openmissionName}",
              sp: "${spid}",
+                     publishedAt: "${d.toISOString()}",
              open_mashaabim: ${openMid}
                   }
   ) {data{attributes{project{data{id}} }}}

@@ -244,7 +244,9 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
         JSON.stringify({query:
           `mutation {  
   createAsk(
-      data:{ open_mission: ${lechaletz},
+      data:{ 
+                publishedAt: "${d.toISOString()}",
+        open_mission: ${lechaletz},
             project: ${projectId},
             users_permissions_user: ${element.rishon},
             vots: [

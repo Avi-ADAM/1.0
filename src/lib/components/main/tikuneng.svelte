@@ -19,7 +19,7 @@ let miDatan = [];
 let linkg = 'http://localhost:1337/graphql';
 async function add (){
 already = true;
- 
+ let d = new Date
         try {
             await fetch(linkg, {
                     method: 'POST',
@@ -29,7 +29,9 @@ already = true;
                     body: JSON.stringify({
                         query: `mutation 
                         { createTikunolam(
-      data: {amort: "${amort}",
+      data: {
+                publishedAt: "${d.toISOString()}",
+        amort: "${amort}",
              name:  "${name}",
              amorts: "${amorts}",
              amortt: "${amortt}",

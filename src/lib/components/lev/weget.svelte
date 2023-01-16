@@ -190,6 +190,7 @@ function objToString (obj) {
     const userss = objToString(users)
 
 async function agree() {
+  let d = new Date
   already = true;
    noofusersOk += 1;
   noofusersWaiting -= 1;
@@ -233,6 +234,7 @@ async function agree() {
                         query: `mutation 
                         { createRikmash(
              data: {
+                      publishedAt: "${d.toISOString()}",
                  total: ${total},
               name: "${missionBName}",
               kindOf: ${kindOf},
