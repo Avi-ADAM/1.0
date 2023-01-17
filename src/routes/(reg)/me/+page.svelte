@@ -435,7 +435,8 @@ function remove (event) {
   const miDatanew = event.detail.data;
   const linkp = event.detail.linkp;
   addNs1 = false;
-  meData[linkp] = miDatanew;
+  meData[linkp].data = miDatanew;
+  console.log(miDatanew,meData)
   skil = meData.skills.data;
             taf = meData.tafkidims.data;
             val = meData.vallues.data;
@@ -450,10 +451,10 @@ async function add (event) {
  const valc = event.detail.valc;
  const a = event.detail.a;
  miDatanew.selected2 = [];
- console.log (miDatanew);
+  console.log(miDatanew,meData)
  addNs1 = false;
  const meDatanew = meData;
- meDatanew[linkp] = miDatanew;
+ meDatanew[linkp].data = miDatanew;
  console.log (meDatanew);
  meData = meDatanew;
  skil = meData.skills.data;
@@ -472,7 +473,7 @@ async function addnew (event) {
  miDatanew.push(skob);
  addNs1 = false;
  const meDatanew = meData;
- meDatanew[linkp] = miDatanew;
+ meDatanew[linkp].data = miDatanew;
  console.log (meDatanew);
  meData = meDatanew;
  skil = meData.skills.data;
@@ -533,6 +534,7 @@ function open (event){
 
 function close (event){
   const a = event.detail.linkp;
+
   if (a == "tafkidims"){
     taf = event.detail.list
   }
@@ -541,13 +543,7 @@ function close (event){
   }
   else if (a == "vallues"){
   val = event.detail.list;
-      if ($lang == "he" ){
-              for (var i = 0; i < val.length; i++){
-                if (val.data[i].attributes.localizations.data.length > 0){
-                val.data[i].attributes.valueName = val.data[i].attributes.localizations.data[0].attributes.valueName
-                }
-              }
-            }
+    console.log(a, val)
   }
   else if (a == "mashaabims"){
    mash = event.detail.list;

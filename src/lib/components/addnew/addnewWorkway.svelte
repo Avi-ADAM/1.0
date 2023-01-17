@@ -21,10 +21,10 @@
         function dispatchww (meData) {
           console.log(meData);
       dispatch('addww', {
-        id: meData.data.createWorkWay.workWay.id,
+        id: meData.data.createWorkWay.data.id,
         mid: mid,
-        skob: meData.data.createWorkWay.workWay,
-        name: meData.data.createWorkWay.workWay.workwayName,
+        skob: meData.data.createWorkWay.data,
+        name: meData.data.createWorkWay.data.attributes.workwayName,
         } );
     };
     

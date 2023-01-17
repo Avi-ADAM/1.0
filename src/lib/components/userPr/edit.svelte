@@ -158,17 +158,19 @@ async function increment() {
           }
       }
   }
-  }
+}
+}
 `   
         })
 })
   .then(r => r.json())
   .then(data => miData = data.data);
-         console.log(miData,miData.data.updateUsersPermissionsUser.data.attributes[kish])
+         console.log(miData,miData.updateUsersPermissionsUser.data.attributes[kish])
            if ($lang == "he" ){
-              for (var i = 0; i < miData.length; i++){
-                if (miData[i].attributes.localizations.data.length > 0){
-                miData[i].attributes[valc] = miData[i].attributes.localizations.data[0].attributes[valc]
+              for (var i = 0; i < miData.updateUsersPermissionsUser.data.attributes[kish].data.length; i++){
+                const t = miData.updateUsersPermissionsUser.data.attributes[kish].data
+                if (t[i].attributes.localizations.data.length > 0){
+                t[i].attributes[valc] = t[i].attributes.localizations.data[0].attributes[valc]
                 }
               }
             }
@@ -176,7 +178,7 @@ async function increment() {
          addSl = false;
  dispatch('close', {
     linkp: linkp,
-    list: miData.data.updateUsersPermissionsUser.data.attributes[kish]
+    list: miData.updateUsersPermissionsUser.data.attributes[kish].data
     } );
     g = false;
         } catch (e) {
@@ -233,7 +235,7 @@ function addSK (id){
   yy = 1;
   listt = data;
 const oldob = data;
-const old = oldob.map(c => c.id).map(String);
+const old = oldob.map(c => c.id);//.map(String)
 const neww = find_id(id);
 let array3 = old.concat(neww);
 array3 = [...new Set([...old,...neww])];
@@ -556,6 +558,10 @@ const adbf = {"he":" בחירת ", "en": "choose more "}
 const adaf = {"he":" נוספים", "en": ""}
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const onin = {"he":"מושקע בריקמה", "en": "invested on FreeMates"}
+//add new msg 
+$: searchText = ``
+  $: addn = {"he": ` \"${searchText}\" לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור  \"הוספת חדש\" שלמטה`,"en":`\"${searchText}\" Not on the list yet , add it with the \"Add new\" button bellow`}
+
 export let width = 1
 $: anim = datan == "work" || datan == "val" ? -(width/2) : width/2
   </script>
@@ -620,7 +626,7 @@ on:click={bitul}
   <div transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" class="text-center text-sm text-lturk">
     
     {#if datan === "mash" }
-    {#if da.panui != false}
+    {#if da.attributes.panui != false}
        <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg></button>
@@ -661,6 +667,8 @@ title="{onin[$lang]}">
  
   <div > <h3 class="text-center text-sm text-barbi">{adbf[$lang]}{Valname }{adaf[$lang]}</h3>  <MultiSelect
       bind:selected={data.selected2}
+           bind:searchText
+                noMatchingOptionsMsg={addn[$lang]}
       {placeholder}
       options={allvn}
       --sms-width={"200px"}

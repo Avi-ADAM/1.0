@@ -25,7 +25,7 @@ if (rn.includes(skillName_value)){
                   },
         body: 
         JSON.stringify({query: 
-           `mutation  createSkill {
+           `mutation   {
   createSkill(data: {  skillName: "${skillName_value}",
           descrip: "${desS}",
                 publishedAt: "${d.toISOString()}"
