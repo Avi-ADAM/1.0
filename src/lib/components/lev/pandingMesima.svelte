@@ -318,6 +318,7 @@ async function nego(alr) {
             isOpen = true;
   }
 }
+let archivedtru = ``
 function decline(alr) {
       if  (alr == "alr"){
         allr = true;

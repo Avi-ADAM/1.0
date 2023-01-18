@@ -587,11 +587,10 @@ async function createmask(da) {
             askedm[k].uids = [];
             askedm[k].what = [];
             for (let z = 0; z < x.length; z++) {
-                askedm[k].uids.push(x[z].users_permissions_user.id);
+                askedm[k].uids.push(x[z].users_permissions_user.data.id);
                 askedm[k].what.push(x[z].what);
             }
         }
-
         for (let t = 0; t < askedm.length; t++) {
             const allid = askedm[t].uids;
             const myid = askedm[t].myid;
@@ -604,6 +603,7 @@ async function createmask(da) {
                 //  dictasked.splice(t, 1);
                 //  dictasked. = dictasked
             }
+
             if (askedm.length > 0) {
                 for (let r = 0; r < askedm[t].users.length; r++) {
                     if (askedm[t].users[r].what === true) {
@@ -615,14 +615,12 @@ async function createmask(da) {
                         askedm[t].noofusersNo += 1;
 
                     }
+          
                 }
-            }
-            if (askedm.length > 0) {
-
-                const noofusersWaiting = askedm[t].noof - askedm[t].users.length;
+                      const noofusersWaiting = askedm[t].noof - askedm[t].users.length;
                 askedm[t].noofusersWaiting = noofusersWaiting;
-
             }
+
         }
     }
     let filters = [false];
@@ -881,7 +879,7 @@ async function showOpenPro(mi) {
     }
 
     for (let i = 0; i < x.length; i++) {
-        const q = x[i].open_missions.data.attributes;
+        const q = x[i].attributes.open_missions.data;
         let l = [];
         let z = [];
         let www = [];

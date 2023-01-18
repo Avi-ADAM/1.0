@@ -446,7 +446,9 @@ let tofinished2 = ``;
 let toapprove1 = ``; 
 let toapprove = ``; 
 let appi = ``;
+let butt = false
 async function afterwhy () {
+   butt = true
   already = true;
   let d = new Date
 const cookieValue = document.cookie
@@ -682,8 +684,9 @@ function claf (event){
              {#if a == 1}
               <h5>יש להעלות קובץ סיום משימה או לתאר במילים</h5>
       <input  type="file" bind:files={what}>
-      <input  type="text" bind:value={why} placeholder="יש לתאר במילים את סיום המשימה">
-            <button on:click={afterwhy}>אישור</button>
+      <input class="border border-gold" type="text" bind:value={why} placeholder="יש לתאר במילים את סיום המשימה">
+          {#if butt == false}  <button class="bg-gold p-2 m-1 rounded-xl" on:click={afterwhy}>אישור</button>
+           {:else} <small>כמה שניות בבקשה</small>{/if}
       <br/> {#if activE}<small>{activE}</small>{/if}
         {:else if a == 2}
         <div dir="ltr" class="flex flex-col justify-center items-center w-full">

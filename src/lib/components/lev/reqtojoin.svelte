@@ -166,7 +166,7 @@ function objToString (obj) {
         
     for (const [p, val] of Object.entries(obj[i])) {
         if (typeof(val) == "string"|"number"|"boolean") {
-        str += `{${p}:${val}\n},`;
+        str += `{${p}:"${val}"\n},`;
     } else if (typeof(val) == 'null'){
                 str += `{${p}:${val.map(c => c.id)}\n},`;
     }

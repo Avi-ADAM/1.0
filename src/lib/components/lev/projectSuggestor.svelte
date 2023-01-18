@@ -24,7 +24,7 @@ export let coinlapach;
     export let projectId;
     export let linki = "/project/";
     export let oid = 0;
-    export let workways= {data:[]};
+    export let workways = [];
     export let noOfHours = 0;
     export let perhour = 0;
     export let total = 0;
@@ -248,7 +248,8 @@ function project () {
                 role.data[i].attributes.roleDescription = role.data[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
-              for (var i = 0; i < workways.data.length; i++){
+              console.log(workways)
+              for (var i = 0; i < workways?.data.length; i++){
                 if (workways.data[i].attributes.localizations.data.length > 0){
                 workways.data[i].attributes.workWayName = workways.data[i].attributes.localizations.data[0].attributes.workWayName
                 }
