@@ -187,7 +187,7 @@ async function start () {
             console.log(res)
             const users = ata.user_1s.data;
              const x = users.map(c => c.id)
-             if (x.includes(res.data.meData.id)){//me from server
+             if (x.includes(res.data.me.id)){//me from server
                       
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {

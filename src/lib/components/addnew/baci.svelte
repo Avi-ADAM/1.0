@@ -2,7 +2,7 @@
     import { lang } from '$lib/stores/lang.js'
     import { Confetti } from "svelte-confetti"
    import { quintOut } from "svelte/easing";
-
+    import {addslashes} from '$lib/func/uti/string.svelte'
     import { idPr } from '../../stores/idPr.js';
     import axios from 'axios';
     import { goto } from '$app/navigation';
@@ -97,10 +97,10 @@ async function sendPP(){
          user_1s: ${idL},
         projectName: "${projectName_value}",
         publishedAt: "${d.toISOString()}",
-        publicDescription: "${desP}",
-        linkToWebsite: "${linkP}",
-        descripFor: "${desPl}",
-        vallues:${find_value_id(selected)},
+        publicDescription: """${addslashes(desP)}""",
+        linkToWebsite: """${addslashes(linkP)}""",
+        descripFor: """${addslashes(desPl)}""",
+        vallues:[${find_value_id(selected)}],
         restime: ${restime},
         timeToP:${timeToP},
          profilePic: ${imageId},        
@@ -178,7 +178,7 @@ let vallues = [];
             vallues = res.data.vallues.data;
             if ($lang == "he" ){
               for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].attributes.localizations.length > 0){
+                if (vallues[i].attributes.localizations.data.length > 0){
                 vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
                 }
               }

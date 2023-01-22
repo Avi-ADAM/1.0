@@ -44,7 +44,7 @@ let isOpen = false;
   let total = 0;
   let odata = [];
     let allvn;
-  let picLink;
+  let picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
   let idL; 
   let addSl = false;
 let addSl1 = false;
@@ -289,7 +289,6 @@ async function start () {
             var output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
             picLink = output
             } else {
-              console.log(meData)
               picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
             }
             console.log(meData)
@@ -774,7 +773,7 @@ let width,height
     <img
     class="imgpr"
   
-    src={picLink}
+    src={picLink != null ? picLink : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}
     alt="profilePic">
     </div>
    {#if updX == 0}
@@ -792,7 +791,15 @@ let width,height
   {/if}
   {:else}
       <div class="centr"></div>
-
+ <div
+  class="imgpr"
+  >
+    <img
+    class="imgpr"
+  
+    src={picLink != null ? picLink : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}
+    alt="profilePic">
+    </div>
     <div class="middleu"> 
   {#if addpic == 0}    
                  
@@ -1672,22 +1679,22 @@ class=" hover:scale-150 "
   .haalaa {
     position: absolute;
     transform: translate(-50%, -50%);
-    top: 65.2%;
+    top: 62.2%;
     left: 48%;
     }
   .anothere{
-      top: 65.2%;
+      top: 62.2%;
           left: 52%;
           }
   .edit{
-        top: 65.2%;
+        top: 62.2%;
       left: 48%; 
   }
     .centr{
-       max-height: 36.36vh;
-    max-width: 35.2vh;
-    min-height: 36.36vh;
-    min-width: 35.2vh;
+       max-height: 56.36vh;
+    max-width: 55.2vh;
+    min-height: 35.2vw;
+    min-width: 35.2vw;
 }
 .middle{
     
@@ -1697,15 +1704,15 @@ class=" hover:scale-150 "
     
       }
       .imgpr{
-        height: 27.2vh;
-        width: 27.2vh;
-    top:47%;
+          height: 32.2vw;
+    width: 32.2vw;
+    top:48%;
       }
          .userName{
-    top: 60.5%;
+    top: 57.5%;
        }
         .name{
-             top: 29%;
+             top: 39%;
            }
 
 }
@@ -1780,9 +1787,9 @@ class=" hover:scale-150 "
          margin: 0 auto;
            }
 }
-@media (min-height: 620px) and (min-width: 520px) {
+@media (min-height: 620px) and (min-width: 520px) and (max-width: 650px) {
     .name{
-             top: 20%;
+             top: 34%;
            }
 }
      :global([data-svelte-dialog-content].content) {

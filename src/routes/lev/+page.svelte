@@ -1889,6 +1889,7 @@ function pmash(data) {
                 })
             }
         }
+        //todo diun should be orgenized by order so diun order 1 be before users order 2
         if (pmashes[t].diun.length > 0) {
             for (let x = 0; x < pmashes[t].diun.length; x++) {
                 let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].diun[x].users_permissions_user.data.id)
@@ -1953,7 +1954,7 @@ function getProjectData(id,thing,uid){
                             srcP = projects[i].attributes.url
                             }
                         } else {
-                            srcP = projects[i].attributes.profilePic.data
+                            srcP = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
                         }
                     return srcP      
                 } else if (thing == "noof"){

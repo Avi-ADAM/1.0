@@ -160,7 +160,7 @@ function objToStringC (obj) {
   idL = cookieValueId;
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-      if(obj[i].users_permissions_user.id == idL) {
+      if(obj[i].users_permissions_user.data.id == idL) {
         obj[i].order = 1
       }
         const length = Object.keys(obj[i]).length;

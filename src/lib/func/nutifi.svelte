@@ -13,4 +13,5 @@ export function nutifi(head,text,link) {
 });
   }
 }
+//todo if nutifi and press add nutifi to true and do not notifi again
 </script>
