@@ -981,7 +981,7 @@ async function showOpenPro(mi) {
         idL = cookieValueId;
         token = cookieValue;
         let bearer1 = 'bearer' + ' ' + token;
-        let link = "http://localhost:1337/graphql";
+        let link = "https://strapi-87gh.onrender.com/graphql";
         try {
             await fetch(link, {
                     method: 'POST',
@@ -1356,7 +1356,7 @@ async function start() {
     console.log($lang, "start");
     miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
-    let link = "http://localhost:1337/graphql";
+    let link = "https://strapi-87gh.onrender.com/graphql";
     try {
         await fetch(link, {
                 method: 'POST',
@@ -1745,13 +1745,14 @@ function sps(pp) {
     for (let i = 0; i < pp.data.usersPermissionsUser.data.attributes.sps.data.length; i++) {
         const y = pp.data.usersPermissionsUser.data.attributes.sps.data[i].attributes;
         if (y.mashaabim.data.attributes.open_mashaabims.data.length > 0) {
+            console.log("here and now",y)
             for (let t = 0; t < y.mashaabim.data.attributes.open_mashaabims.data.length; t++) {
                 const x = y.mashaabim.data.attributes.open_mashaabims.data[t].attributes
-                const z = x.attributes.project.data.attributes;
+                const z = x.project.data.attributes;
                 const declineddarra = x.declinedsps.data.map(c => c.id)
                 console.log("klkl")
-                if (!declineddarra.includes(y.id)) {
-                    if(x.hm <= y.unit){
+                if (!declineddarra.includes(y.mashaabim.data.attributes.open_mashaabims.data[t].id)) {
+                   // if(x.hm <= y.unit){
                     huca.push({
                         declineddarra: declineddarra,
                         projectid: x.project.data.id,
@@ -1765,20 +1766,22 @@ function sps(pp) {
                         kindOf: x.kindOf,
                         spnot: x.spnot,
                         descrip: x.descrip,
-                        oid: pp.data.usersPermissionsUser.data.attributes.sps.data[i] .id,
+                        oid: pp.data.usersPermissionsUser.data.attributes.sps.data[i].id,
                         already: false,
                         ani: "huca",
                         azmi: "hazaa",
                         pl: 6
                     })
-                }
+            //    }
             }
             }
         }
     }
+                    console.log("koooooo")
     huca = huca
     mashs = huca.length
     localStorage.setItem("mashs", mashs);
+    //todo hm vs hm 
     if (!isEqual(huca, hucaold) && counter > 1) {
         if (hucaold.length < huca.length) {
             // Create and show the notification

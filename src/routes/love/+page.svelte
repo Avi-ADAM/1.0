@@ -33,7 +33,7 @@
       };
     
         try {
-            let res = await fetch("http://localhost:1337/graphql", {//api/cuntries?pagination[page]=1&pagination[pageSize]=280
+            let res = await fetch("https://strapi-87gh.onrender.com/graphql", {//api/cuntries?pagination[page]=1&pagination[pageSize]=280
              method: "POST",
               headers: {
                  'Content-Type': 'application/json'

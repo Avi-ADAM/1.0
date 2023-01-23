@@ -46,7 +46,7 @@ let token;
 let error1;
 let idL;
 let miDatan = [];
-let linkg = 'http://localhost:1337/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
     function find_user_id(user_name_arr){
      var  id = 0;
       for (let i = 0; i< projectUsers.length; i++){

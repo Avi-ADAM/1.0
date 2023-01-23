@@ -29,7 +29,7 @@ onMount(async () => {
           throw resp;
         });
       };
-      let linkg ="http://localhost:1337/graphql" ;
+      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',

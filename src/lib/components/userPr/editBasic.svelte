@@ -117,7 +117,7 @@ let passi;
 function shaneh () {
           passwordx = passwordx.trim();
    axios
-  .post('http://localhost:1337/api/auth/change-password', {
+  .post('https://strapi-87gh.onrender.com/api/auth/change-password', {
     currentPassword: passi,
     password: passwordx,
     passwordConfirmation: passwordx

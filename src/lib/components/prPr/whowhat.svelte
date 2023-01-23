@@ -32,7 +32,7 @@ let ulist = [
 ]; 
 export let trili;
 export let users;
-let linkg = "http://localhost:1337/graphql";
+let linkg = "https://strapi-87gh.onrender.com/graphql";
 let dictid = {};
 let dictidi = {};
 let hal = false;

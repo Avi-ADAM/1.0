@@ -58,7 +58,7 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'http://localhost:1337/graphql'
+let linkg = 'https://strapi-87gh.onrender.com/graphql'
 let miDatan;
 let already = false;
 let errr = {k: false, m: "", p: false}
@@ -66,7 +66,7 @@ async function increment() {
 errr.p = true;
 already = true;
 	axios
-  .post('http://localhost:1337/api/auth/local/register', {
+  .post('https://strapi-87gh.onrender.com/api/auth/local/register', {
     username: userName_value, 
     email: emailL,
     password: passwordx,

@@ -326,7 +326,7 @@ function find_contry_id(contry_name_arr){
       while (i < 313) {
                  let datau = {data:{name:`userName_value${i}`,email: `ggg${i}@kkk.hh` }}
 
-        fetch("http://localhost:1337/api/chezins", {
+        fetch("https://strapi-87gh.onrender.com/api/chezins", {
   method: 'POST', // or 'PUT'
   headers: {
     'Content-Type': 'application/json',

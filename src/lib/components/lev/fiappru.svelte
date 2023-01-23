@@ -140,7 +140,7 @@ let ser = xyz();
  }
 let error1;
 let miDatan = [];
-let linkg = 'http://localhost:1337/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 
 function objToString (obj) {
     let str = '';

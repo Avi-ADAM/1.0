@@ -22,7 +22,7 @@
       return [id ,uid];
      };
      let miDatan = [];
-let linkg = 'http://localhost:1337/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 async function sub(){
     if (selected.length < 1){
         seEr = true

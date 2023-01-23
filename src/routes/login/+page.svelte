@@ -37,7 +37,7 @@
         loginError = null;
 
         axios
-            .post('http://localhost:1337/api/auth/local', {//
+            .post('https://strapi-87gh.onrender.com/api/auth/local', {//
                 identifier: email,
                 password,
             })

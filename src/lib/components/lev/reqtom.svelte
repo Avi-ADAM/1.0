@@ -92,7 +92,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'http://localhost:1337/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
@@ -241,7 +241,7 @@ if (noofpu === 1) {
              name: "${openmissionName}",
              sp: "${spid}",
             publishedAt: "${d.toISOString()}",         
-             open_mashaabim: ${omid}
+             open_mashaabim: ${openMid}
                   }
   ) {data{attributes{project{data{id }}}}}
 

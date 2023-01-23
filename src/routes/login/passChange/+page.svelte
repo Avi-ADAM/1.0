@@ -17,7 +17,7 @@ function shaneh () {
 
   // Request API.
 axios
-  .post('http://localhost:1337/api/auth/reset-password', {
+  .post('https://strapi-87gh.onrender.com/api/auth/reset-password', {
     code: email,
     password: passwordx,
     passwordConfirmation: passwordx,

@@ -65,7 +65,7 @@ let vallues = [];
                  'Content-Type': 'application/json'      };
     
         try {
-           const res = await fetch("http://localhost:1337/graphql", {
+           const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

@@ -46,7 +46,7 @@ function find_contry_id(contry_name_arr){
       };
     
         try {
-            const res = await fetch("http://localhost:1337/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -357,7 +357,7 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
-            fetch('http://localhost:1337/api/chezins', {
+            fetch('https://strapi-87gh.onrender.com/api/chezins', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -409,7 +409,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("http://localhost:1337/api/chezins/count", {
+            const res = await fetch("https://strapi-87gh.onrender.com/api/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

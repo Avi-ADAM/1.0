@@ -464,7 +464,7 @@ async function increment() {
         }
       }
 }
-let linkg = "http://localhost:1337/graphql"
+let linkg = "https://strapi-87gh.onrender.com/graphql"
 onMount(async () => {
     const cookieValue = document.cookie
         .split('; ')

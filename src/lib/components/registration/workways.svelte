@@ -33,7 +33,7 @@
       };
     
         try {
-            const res = await fetch("http://localhost:1337/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -118,7 +118,7 @@ async function newnew (){
     if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
       //create new and update workways2
         let d = new Date
-       let link ="http://localhost:1337/graphql" ;
+       let link ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

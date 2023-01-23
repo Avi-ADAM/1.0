@@ -11,7 +11,7 @@ let bearer1;
 let token;
 let error1;
 let miDatan = [];
-let linkg = 'http://localhost:1337/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 async function add (){
 quant = quant > 0 ? quant : 0;
 price = price > 0 ? price : 0;

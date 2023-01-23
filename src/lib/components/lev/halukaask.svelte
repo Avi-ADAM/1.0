@@ -97,7 +97,7 @@ function objToString (obj) {
     }}
     return str;
 }
-let linkg = 'http://localhost:1337/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
   
 async function agree(alr) {
   if  (alr == "alr"){

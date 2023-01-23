@@ -30,7 +30,7 @@ let isOpen = false;
 
     let current = "";
 
-    let url1 = "http://localhost:1337/api/upload";
+    let url1 = "https://strapi-87gh.onrender.com/api/upload";
     let updX = 0;
   let token; 
   let files;
@@ -129,7 +129,7 @@ function letters(data){
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="http://localhost:1337/api/users/" + idLi ;
+    let link ="https://strapi-87gh.onrender.com/api/users/" + idLi ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -186,7 +186,7 @@ async function start () {
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-      let linkgra = 'http://localhost:1337/graphql';
+      let linkgra = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -377,7 +377,7 @@ function sendD () {
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="http://localhost:1337/api/users/" + idLi 
+    let link ="https://strapi-87gh.onrender.com/api/users/" + idLi 
       axios
       .put(link, {
         username: userName_value, 
@@ -590,7 +590,7 @@ async function han (){
   .split('=')[1];
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
- let linkgra = 'http://localhost:1337/graphql';
+ let linkgra = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',

@@ -55,7 +55,7 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'http://localhost:1337/graphql'
+let linkg = 'https://strapi-87gh.onrender.com/graphql'
 let miDatan;
 let errr = {k: false, m: "", p: false}
 async function increment() {    
@@ -71,9 +71,9 @@ errr.p = true;
  let uid = cookieValueId;
    let token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="http://localhost:1337/graphql" ;
+    let link ="https://strapi-87gh.onrender.com/graphql" ;
      axios
-  .post('http://localhost:1337/password', {
+  .post('https://strapi-87gh.onrender.com/password', {
      identifier: emailL,
     password: newpp,
     newPassword: passwordx,

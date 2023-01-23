@@ -17,7 +17,7 @@ let isOpen = false;
 let a = 0;
 let success = false
     let before = false;
-    let url1 = "http://localhost:1337/api/upload";
+    let url1 = "https://strapi-87gh.onrender.com/api/upload";
     let linkP;
     let desP;
     let desPl;
@@ -86,7 +86,7 @@ async function sendPP(){
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     try {
-           const res = await fetch("http://localhost:1337/graphql", {
+           const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,
@@ -162,7 +162,7 @@ let vallues = [];
         });
       };
         try {
-           const res = await fetch("http://localhost:1337/graphql", {
+           const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,
