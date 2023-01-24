@@ -117,7 +117,7 @@ function letters(data){
     //  }
 }
 //
-    function sendP () {
+   function sendP () {
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -139,31 +139,72 @@ function letters(data){
                     },
                 })
                 .then(({ data }) => {
-                    const imageId = data[0].id;  
-      axios
-      .put(link, {
-        profilePic: imageId,
-                  },
-      {
-      headers: {
-        'Authorization': bearer1
-                }})
-      .then(response => {
-        meData = response.data;
-        uPic.set(meData.attributes.profilePic.data.attributes.formats.thumbnail.url);
-            picLink =  $uPic;
-            uPic.set(meData.attributes.profilePic.data.attributes.formats.small.url);
-            picLink =  $uPic;
-    updX = 0;
-    isOpen = false;
-    a = 0;
-  //  updpic.set(0);
-                  })
+                    const imageId = data[0].id; 
+                    sendpg(imageId)
+     })
       .catch(error => {
         console.log('צריך לתקן:', error.response);
                 });
       
-    })};
+  };
+  
+ 
+      
+    async function sendpg(imageId){
+       const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idLi = cookieValueId;
+    token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
+       let res
+    let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+        try {
+           await fetch(linkg, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation { updateUsersPermissionsUser(
+    id:${idLi} 
+      data: {profilePic: ${imageId} }
+    
+  ){
+      data {
+        attributes{
+        profilePic { data {
+               attributes{ url formats}}
+          }
+      }
+  }
+}
+}
+`   
+        })
+})
+  .then(r => r.json())
+  .then(data => res = data.data.updateUsersPermissionsUser.data);
+  console.log(res)
+            uPic.set(res.attributes.profilePic.data.attributes.formats.thumbnail.url);
+            picLink =  $uPic;
+            uPic.set(res.attributes.profilePic.data.attributes.formats.small.url);
+            picLink =  $uPic;
+    updX = 0;
+    isOpen = false;
+    a = 0;
+        } catch (e) {
+            error1 = e
+        }
+    }
     let meDataa = [];
 let load = false
 function project (id) {
