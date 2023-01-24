@@ -1877,11 +1877,11 @@ class=" hover:scale-150 "
   top: 0;
   right: 0;
   height: 100vh;
-  padding: 5rem 1rem 0.6rem;
+  padding: 2rem 8px 0.6rem;
   border-left: 1px solid #aaa;
   overflow-y: auto;
   overflow-x: auto;
-	width: 17rem;
+	width: 230px;
   display:flex;
       flex-direction: column;
       align-items: center;
