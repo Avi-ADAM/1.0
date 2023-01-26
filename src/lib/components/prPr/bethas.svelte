@@ -7,11 +7,16 @@
       import {  fly } from 'svelte/transition';
     import Tile from '$lib/celim/tile.svelte'
     import { onMount } from 'svelte';
+    import { slide } from 'svelte/transition';
+  	import { quintOut } from 'svelte/easing';
+
+    export let actdata = []
     let isOpen = false;
     let xx = {}
     let sodata = [];
     let soter = []
 onMount(async () => {
+  console.log(bmiData)
     let counter = 0;
     let colors = ["blue", "green", "yellow", "red", "purple", "indigo","pink" , "gray"];
     for (var i = 0; i <bmiData.length; i++){
@@ -35,8 +40,30 @@ onMount(async () => {
                 
                    }
         }
+        bmiData = bmiData
+        if (bmiData[i].attributes.acts){
+        for (let t = 0; t < bmiData[i].attributes.acts.data.length; t++) {
+          sodata.push({
+            tid: bmiData[i].tid,
+            id:bmiData[i].attributes.acts.data[t].id,
+            attributes:{
+              name:bmiData[i].attributes.acts.data[t].attributes.shem,
+              users_permissions_user: bmiData[i].attributes.acts.data[t].attributes.my,
+              status: bmiData[i].attributes.acts.data[t].attributes.status,
+              tafkidims: bmiData[i].attributes.tafkidims,
+              howmanyhoursalready:bmiData[i].attributes.howmanyhoursalready,
+              perhour: bmiData[i].attributes.perhour,
+              hoursassinged: bmiData[i].attributes.hoursassinged,
+              
+            }
+          })
+        }
+      }
     }
-        sodata = bmiData;
+    let m = [...sodata,...bmiData]
+
+        sodata = m
+        bmiData = m;
         soter = soter
 
 })
@@ -65,7 +92,6 @@ onMount(async () => {
         }
         ohh = true;
         const asort = soret.slice(index, index+1)
-        console.log(asort, sodata)
         const newar = bmiData.filter(val => val.tid.includes(asort[0]))
             if (sodata.length == bmiData.length){
             sodata = newar
@@ -128,8 +154,9 @@ onMount(async () => {
   <div class="tbl-content d">
     <table cellpadding="0" cellspacing="0" border="0">
       <tbody>
+        {#key sodata}
         {#each sodata as data, i}
-        <tr>
+        <tr transition:slide="{{ duration: 1000, easing: quintOut }}">
           <td>{data.attributes.name}</td>
           <td> 
         <div class="flex items-center space-x-4">
@@ -153,6 +180,7 @@ onMount(async () => {
 </td>
         </tr>
        {/each}
+       {/key}
       </tbody>
     </table>
   </div>
@@ -194,10 +222,11 @@ table{
   table-layout: fixed;
 }
 .tbl-header{
+  position: sticky;
   background-color: rgba(255,255,255,0.3);
  }
 .tbl-content{
-  height:300px;
+  max-height:calc(94vh - 173px);
   overflow-x:auto;
   margin-top: 0px;
   border: 1px solid rgba(255,255,255,0.3);

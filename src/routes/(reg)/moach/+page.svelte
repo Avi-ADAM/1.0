@@ -138,6 +138,7 @@ let user = [];
 let rikmashes = [];
 let lll;
 let opmash = [];
+let actdata = []
 let noofopenm = 0;
 let salee = [];
 let trili = [];
@@ -218,7 +219,8 @@ JSON.stringify({query:
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
              user_1s {data{ id attributes{ username profilePic {data{attributes{ url formats}}}}}}
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
-             id attributes{ status                          
+             id attributes{ status     
+            acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
               tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""} }}}
                createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
             open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
@@ -264,7 +266,7 @@ JSON.stringify({query:
             } else if (project.mesimabetahaliches.data.length == null) {
             bmiData.push(project.mesimabetahaliches.data);
             }
-              if (project.sales.data.length > 0){
+                          if (project.sales.data.length > 0){
             salee = project.sales.data;
             } else if (project.sales.data.length == null) {
             salee.push(project.sales.data);
@@ -1617,8 +1619,8 @@ pointer-events: none;">
 {#if bett == true}
   <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={()=>bett = false} title={cencel1[$lang]}><Close/></button>
-<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 94vh; overflow-y: auto; overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); " class="d">
-<Bethas {bmiData} />
+<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 94vh;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); " >
+<Bethas {bmiData}  />
 </div>
 {/if}
 </div>
