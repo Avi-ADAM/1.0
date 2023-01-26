@@ -441,7 +441,7 @@ async function createasked(da) {
             let src21 = getProjectData(start[i].attributes.asks.data[j].attributes.project.data.id,"pp");
             let src22 = "";
             if (start[i].attributes.asks.data[j].attributes.users_permissions_user.data.attributes.profilePic.data !== null) {
-                src22 = start[i].attributes.asks.data[j].attributes.users_permissions_user.profilePic.data.attributes.formats.thumbnail.url
+                src22 = start[i].attributes.asks.data[j].attributes.users_permissions_user.data.attributes.profilePic.data.attributes.formats.thumbnail.url ?? "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
             }
             let t = start[i].attributes.asks.data[j].attributes
             dictasked.push({
@@ -1106,7 +1106,9 @@ function midd(min) {
             picLink = dd.profilePic.data.attributes.small.thumbnail.url
         } else if (dd.profilePic.data.attributes.url) {
             picLink = dd.profilePic.data.attributes.url
-        }
+        } 
+    } else{
+        picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
     }
     localStorage.setItem("nam", JSON.stringify(nam));
     localStorage.setItem("picLink", JSON.stringify(picLink));
