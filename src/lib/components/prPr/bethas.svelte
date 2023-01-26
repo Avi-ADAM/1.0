@@ -148,7 +148,7 @@ onMount(async () => {
           <td>{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</td>
           <td>
             {#each data.attributes.tafkidims.data as taf, i} 
-            <Tile bg={taf.attributes.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
+            <Tile bg={taf.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
             {/each}
 </td>
         </tr>

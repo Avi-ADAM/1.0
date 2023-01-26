@@ -14,9 +14,9 @@
     function find_se_id(lebel){
      let id , uid;
        for (let i = 0; i< bmiData.length; i++){
-        if((bmiData[i].users_permissions_user.username + " - " + bmiData[i].name) == lebel){
+        if((bmiData[i].attributes.users_permissions_user.data.attributes.username + " - " + bmiData[i].attributes.name) == lebel){
           id = bmiData[i].id;
-          uid = bmiData[i].users_permissions_user.id
+          uid = bmiData[i].attributes.users_permissions_user.data.id
         }
       }
       return [id ,uid];
@@ -39,9 +39,9 @@ async function sub(){
         console.log(moment(mimatai, "HH:mm DD/MM/YYYY"))
         let momentx = moment(mimatai, "HH:mm DD/MM/YYYY ")
         let momebtt =moment(adMatai, "HH:mm DD/MM/YYYY ")
-        const st = mimatai !== undefined ?  `dateS: "${momentx.toISOString()}",`: "";
+        const st = mimatai !== undefined &&  mimatai !== null ? `dateS: "${momentx.toISOString()}",`: ``;
        ///is before?
-        const fd = adMatai !== undefined ?  `dateF: "${momebtt.toISOString()}",`: "";
+        const fd = adMatai !== undefined && adMatai !== null ?  `dateF: "${momebtt.toISOString()}",`: ``;
         const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -51,7 +51,7 @@ async function sub(){
         .find(row => row.startsWith('id='))
         .split('=')[1];
     userMevakeshId = cookieValueId;
-            const tt = userMevatzeaId == userMevakeshId ? ` myIshur: true,`:""; 
+            const tt = userMevatzeaId == userMevakeshId ? ` myIshur: true,`:``; 
     let token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
         try {
@@ -139,7 +139,7 @@ async function sub(){
       bind:selected={selected}
       maxSelect={1}
       placeholder={placeholder[$lang]}
-      options={bmiData.map(it=>it.users_permissions_user.attributes.username + " - " + it.name)}
+      options={bmiData.map(it=>it.attributes.users_permissions_user.data.attributes.username + " - " + it.attributes.name)}
       />
     {#if seEr == true}
         <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>

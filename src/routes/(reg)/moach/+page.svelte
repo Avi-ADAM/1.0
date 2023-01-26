@@ -231,14 +231,14 @@ JSON.stringify({query:
                                     createdAt
   } }}
                         open_mashaabims (filters: {archived:{eq: false }}){data{id attributes{ kindOf hm descrip price easy name spnot sqadualed sqadualedf }}}
-             pendms (filters: {archived:{eq: false }}) {data{id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
+             pendms (filters: {archived:{eq: false }}) {data{id attributes{createdAt dates name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {data{ id}}
                                     skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ""} }}}
                                     tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""}}}}
                                     work_ways {data{ id attributes{ workWayName  ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ""}} }}
                                     mission {data{ id}}
-                                    createdAt
+                                    
                                     users  {what why id users_permissions_user {data{ id}} }}}}
             vallues {data{ id attributes { valueName ${$lang == 'he' ? 'localizations{data {attributes{ valueName}} }' : ""}}}}
             linkToWebsite

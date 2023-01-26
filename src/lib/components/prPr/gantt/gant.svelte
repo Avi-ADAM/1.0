@@ -141,6 +141,8 @@
 			
 			const from = moment(omiData[i].attributes.createdAt)
             let rand_l = omiData[i].attributes.noofhours / 2
+                        console.log(from,"f")
+
             const to = from.clone().add(rand_l, 'days')
             tasks.push({
                 type: 'task',
@@ -167,8 +169,9 @@
                 generation
             });
 			
-			const from = pmiData[i].attributes.sqadualed ? pmiData[i].attributes.sqadualed : moment(pmiData[i].attributes.createdAt)
+			const from = pmiData[i].attributes.sqadualed ?  moment(pmiData[i].attributes.sqadualed) : moment(pmiData[i].attributes.createdAt)
             let rand_l = pmiData[i].attributes.noofhours / 2
+            console.log(from,"p",pmiData[i])
             const to = pmiData[i].attributes.dates ? pmiData[i].attributes.dates : from.clone().add(rand_l, 'days')
             tasks.push({
                 type: 'task',
