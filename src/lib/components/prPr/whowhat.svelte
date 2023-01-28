@@ -65,7 +65,7 @@ createHaluka(
         amount: ${ulist[i].le[x].cama.toFixed(2)},
         matbea: "2",
         confirmed: false,
-                     publishedAt: "${d.toISOString()}",
+        publishedAt: "${d.toISOString()}",
       }
     
     ){data{ id  }} `
@@ -96,7 +96,42 @@ createHaluka(
       }
         
         console.log(naminator)
-      
+      //create hervachti compo
+      let hervachti = ``
+      let counter = 0
+      let mored = ``
+      for (let c = 0; c < ulist.length; c++) {
+        const amount = ulist[c].x;
+        const user = ulist[c].uid
+        if (amount > 0){
+
+            counter += 1
+          if (counter == 1){
+             mored = `
+             {
+              users_permissions_user: ${user},
+              amount: ${amount},
+              ${ulist[c].meca > 0 ? "mekabel:true," : ``}
+              ${ulist[c].noten > 0 ? "noten:true" : ``}
+             },
+             `
+            hervachti = `hervachti:[${mored}]`
+          } else{
+             mored += `
+             {
+              users_permissions_user: ${user},
+              amount: ${amount},
+              ${ulist[c].meca > 0 ? "mekabel:true," : ``}
+              ${ulist[c].noten > 0 ? "noten:true" : ``}
+             },
+            `
+            hervachti = `hervachti:[${mored}]`
+            console.log("here",hervachti)
+          }
+        }
+        
+      }
+      hervachti = hervachti
         try{
          await fetch(linkg, {
               method: 'POST',
@@ -117,7 +152,8 @@ createHaluka(
       users_permissions_user: "${idL}"
     }
   ],
-    halukas: [${naminator}]
+    halukas: [${naminator}],
+    ${hervachti}
 }
     
   ){data { id }}

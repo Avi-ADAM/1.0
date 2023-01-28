@@ -135,7 +135,7 @@ function getSrc (id){
   for (let i = 0; i < projectUsers.length; i++ ){
     if (projectUsers[i].id == id){
       if(projectUsers[i].attributes.profilePic.data != null){
-        src = user.attributes.profilePic.data.attributes.url 
+        src = projectUsers[i].attributes.profilePic.data.attributes.url 
       } else {
         src =  "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png" 
       }
@@ -360,7 +360,7 @@ const sbd = {"he": "התפלגות המכירות לפי תאריך", "en": "sal
  <div class=" text-center  border-2  border-barbi rounded m-4 flex flex-col">
    <h1 class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
       >{erhe[$lang]}</h1>
-      <div class="flex">
+      <div class="flex max-w-full d overflow-auto ">
           {#each salee as data, i}
       
         <div class=" button-whitegold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow">
