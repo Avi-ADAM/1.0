@@ -1,7 +1,7 @@
 <script>
 import Addnewskil from './addNewSkill.svelte';
            import { lang } from '$lib/stores/lang.js'
-
+const baseUrl = import.meta.env.VITE_URL
 let addskil = false;
 import Addnewro from './addNewRole.svelte';
 let addro = false;
@@ -40,7 +40,7 @@ let selectedrole = []
       };
     
         try {
-            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
+            const res = await fetch(`${baseUrl}/graphql`, {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -120,7 +120,7 @@ async function subm() {
 tafkidimslist= find_role_id(selectedrole)
   skillslist = find_skill_id(selected);
   let d = new Date
-   let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+   let linkg =`${baseUrl}/graphql` ;
               try {
              await fetch(linkg, {
               method: 'POST',

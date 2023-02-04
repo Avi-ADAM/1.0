@@ -10,7 +10,8 @@ import { idPr } from '../../stores/idPr.js';
 
  const dispatch = createEventDispatcher();
      export let low = false;
-
+    export let halukot = []
+    export let hervach = []
     export let mypos = null;
     export let coinlapach;
     export let whyno = [];
@@ -89,8 +90,10 @@ function objToString (obj) {
     for (let i = 0; i < obj.length; i++) {
         
     for (const [p, val] of Object.entries(obj[i])) {
-        if (typeof(val) == "string"|"number"|"boolean") {
+        if (typeof(val) == "number"|"boolean") {
         str += `{${p}:${val}\n},`;
+        } else if (typeof(val) == "string"){
+                  str += `{${p}:"${val}"\n},`;
     } else if (typeof(val) == 'null'){
                 str += `{${p}:${val.map(c => c.id)}\n},`;
     }
@@ -103,6 +106,7 @@ async function agree(alr) {
   if  (alr == "alr"){
         alert("soon")
       } else{
+        let miDatani = []
   already = true;
   noofusersOk += 1;
   noofusersWaiting -= 1;
@@ -140,14 +144,83 @@ if (noofusersOk  === noofusers){
       users_permissions_user: "${idL}"
     }
   ],
- archived: true
+ finished: true
  }
-  ){data { vots { users_permissions_user {data{ id}}}}}
+  ){data {attributes{ vots { users_permissions_user {data{ id}}}}}}
  } `   
  } )})
   .then(r => r.json())
   .then(data => miDatan = data); 
         console.log(miDatan)
+        for (let t = 0; t < halukot.length; t++) {
+          const idd = halukot[t].id;
+          //send apruved for each haluka
+         const qurer =  `  
+updateHaluka( id:${idd}
+      data: { ushar:true
+      }
+    
+    ){data{ id  }} `
+         
+ try {
+             await fetch(linkg, {
+              method: 'POST',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query:
+          `mutation 
+          { ${qurer}
+}`   
+} )})
+  .then(r => r.json())
+  .then(data => miDatani = data);
+            console.log(miDatani)
+        } catch (e) {
+            error1 = e
+            console.log(error1)
+}
+//if hervach has user with resiv and giv fls then update his hervachti
+for (let o = 0; o < hervach.length; o++) {
+  const element = hervach[o];
+  console.log(element.noten,element.mekabel,element.users_permissions_user.data.id,element.users_permissions_user.data.attributes.hervachti,element.amount)
+  if (element.noten != true && element.mekabel != true){
+    const iduse = element.users_permissions_user.data.id
+    const amount = element.users_permissions_user.data.attributes.hervachti + element.amount
+     try {
+             await fetch(linkg, {
+              method: 'POST',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query:
+          `mutation 
+          { updateUsersPermissionsUser(
+    id:${iduse} 
+      data: { hervachti: ${amount} }
+    
+  ){
+      data {
+        id
+  }
+}
+}`   
+} )})
+  .then(r => r.json())
+  .then(data => miDatani = data);
+            console.log(miDatani)
+        } catch (e) {
+            error1 = e
+            console.log(error1)
+}
+  }
+}
+
+        }
         coinLapach()
         } catch (e) {
             error1 = e
@@ -545,7 +618,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
        <button on:click={()=>linke()}
         on:mouseenter={()=>hover("לחיצה למעבר לדף הציבורי של הריקמה")} 
             on:mouseleave={()=>hover("0")}   class="ab pn" 
-        ><h3 class="ab pn">{projectName}</h3></button>
+        ><h3 class="ab pn pt-8 px-2">{projectName}</h3></button>
         <div class="{`normSmll${pendId}-${projectId}-hdh`}">    </div>
 
     {#if whyno.length > 0}<h4
@@ -649,10 +722,10 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
    line-height: 0.7; 
   }
   .pn{
-      padding: 0 9px;
+             text-shadow: 1px 1px  var(--gold);
 
      font-weight: bold;
-     color: var(--gold);
+     color: var(--barbi-pink);
   }
   .p{
     font-weight: bold;
@@ -798,9 +871,7 @@ width:50vw;
     font-size: 13px; 
     
   }
-  .pn{
-    padding: 0 15px;
-  }
+  
       .p{
     font-size: 26px;
   }

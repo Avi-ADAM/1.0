@@ -1422,8 +1422,13 @@ async function start() {
       							}}}
     			tosplits (filters: { finished: { eq: false } }){ data{ id attributes{ 
         					name 
+                            halukas {data {id}}
         					vots  {what why id users_permissions_user {data {id}}}
+                            hervachti {amount noten mekabel users_permissions_user {data {id attributes{hervachti}}}}
       							}}}
+                halukas (filters: {and:[{ ushar: { eq: true } } { confirmed: { eq: false }}]}){ data{ id attributes{ 
+                    amount senderconf chatre {freetext send {data{id}}when seen} usersend {data {id}} userrecive {data{id}}
+                }}} 
     			maaps(filters: { archived: { eq: false } }){ data{ id attributes{ 
         					createdAt name  
         					sp{data {id attributes{ name myp unit 
@@ -1542,6 +1547,8 @@ async function start() {
             console.log("rashbi")
             hachla(miData);
             console.log("hachla")
+            tveria(miData)
+            console.log("tveria")
             bubleUiAngin()
             low = false
         }
@@ -1552,7 +1559,46 @@ async function start() {
 let pmashes = [];
 let huca = [];
 let haluask = [];
-
+let tverias = [];
+function tveria (data){
+    const myid = data.data.usersPermissionsUser.data.id;
+     const projects = data.data.usersPermissionsUser.data.attributes.projects_1s.data;
+    for (let i = 0; i < projects.length; i++) {
+        const proj = projects[i];
+        for (let j = 0; j < projects[i].attributes.halukas.data.length; j++) {
+            const el = projects[i].attributes.halukas.data[j]
+            if (el.attributes.usersend.data.id == myid ||  el.attributes.userrecive.data.id == myid){
+                            console.log(projects[i].attributes.halukas.data[j], "oooo")
+                tverias.push({
+                sendpropic:getProjectData(proj.id,"upic",el.attributes.usersend.data.id),
+                sendname:getProjectData(proj.id,"un",el.attributes.usersend.data.id),    
+                respropic:getProjectData(proj.id,"upic",el.attributes.userrecive.data.id),
+                resname:getProjectData(proj.id,"un",el.attributes.userrecive.data.id),    
+                projectId: proj.id,
+                kind: el.attributes.usersend.data.id == myid ? "send" : "recive",
+          //      created_at: pend.createdAt,
+                projectName: getProjectData(proj.id,"pn"),
+            //    user_1s: getProjectData(proj.id,"us"),
+                src: getProjectData(proj.id,"pp"),
+             //   noofpu: getProjectData(proj.id,"noof"),
+                myid: myid,
+                pendId: projects[i].attributes.halukas.data[j].id,
+                chat: el.attributes.chatre,
+                amount: el.attributes.amount,
+                send: el.attributes.usersend.data.id,
+                recive: el.attributes.userrecive.data.id,
+                senderconf:el.attributes.senderconf,
+                ani: "vidu",
+                azmi: "vidu",
+                pl: 1,
+                messege: []
+            });
+            }
+        }
+    }
+    tverias = tverias
+    console.log(tverias)
+}
 function hachla(data) {
     const myid = data.data.usersPermissionsUser.data.id;
     let src24 = ""
@@ -1670,7 +1716,7 @@ function hachla(data) {
                           })
                          }
                        }*/
-    }
+    } 
 
     halu = hachlatot.length ;
     localStorage.setItem("halu", halu);
@@ -1693,6 +1739,8 @@ function rashbi(data) {
                 myid: myid,
                 pendId: projects[i].attributes.tosplits.data[j].id,
                 noofusers: getProjectData(projects[i].id,"noof"),
+                halukot: halug.halukas.data,
+                hervach: halug.hervachti,
                 ani: "haluk",
                 azmi: "hachla",
                 pl: 1 + halug.vots.length
@@ -1704,7 +1752,7 @@ function rashbi(data) {
         const x = haluask[k].users
         for (let z = 0; z < x.length; z++) {
             haluask[k].uids = [];
-            haluask[k].uids.push(x[z].users_permissions_user.id);
+            haluask[k].uids.push(x[z].users_permissions_user.data.id);
             haluask[k].what = [];
 
             haluask[k].what.push(x[z].what);
@@ -2204,7 +2252,7 @@ function coinLapach(event) {
 let xy = []
 
 function bubleUiAngin() {
-    arr1 = [...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask, ...hachlatot].sort(({
+    arr1 = [...tverias, ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask, ...hachlatot].sort(({
         pl: a
     }, {
         pl: b

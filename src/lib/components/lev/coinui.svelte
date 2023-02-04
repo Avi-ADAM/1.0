@@ -1,6 +1,6 @@
 <script>
 import * as animateScroll from "svelte-scrollto";
-
+import Vid from './didiget.svelte'
 import Desi from './decisionMaking.svelte'
 import Mid from "./midi.svelte"
 import MissionInProgress from "./missionInProgress.svelte"
@@ -133,13 +133,41 @@ export let sml = false
     {/each}
     {#key arr1}
     {#each arr1 as buble, i}
-    {#if buble.ani === "haluk" && milon.desi == true}
-    <div class:normSml={modal == false} class=" halu"><Hal
+    {#if buble.ani === "vidu" && milon.desi == true}
+    <div class:normSml={modal == false} class="vidu normSml"><Vid
+        on:modal={() =>modal = true}
+        on:hover={hover}
+        on:proj={proj}
+        on:user={user}
+         sendpropic={buble.sendpropic}
+                sendname={buble.sendname}    
+                respropic={buble.respropic}
+                resname={buble.resname}   
+                projectId={buble.projectId}
+                kind={buble.kind}
+                projectName={buble.projectName}
+                src={buble.src}
+                myid={buble.myid}
+                pendId={buble.pendId}
+                chat={buble.chat}
+                amount={buble.amount}
+                send={buble.send}
+                recive={buble.recive}
+                sendcon={buble.senderconf}
+        coinlapach={buble.coinlapach}
+       
+        already={buble.already}
+        {low}
+        /></div>
+    {:else if buble.ani === "haluk" && milon.desi == true}
+    <div class:normSml={modal == false} class=" halu normSml"><Hal
         on:modal={() =>modal = true}
         user_1s={buble.user_1s}
         on:hover={hover}
         on:proj={proj}
         on:user={user}
+        hervach={buble.hervach}
+        halukot={buble.halukot}
         coinlapach={buble.coinlapach}
         myid={buble.myid}
         pendId={buble.pendId}
@@ -160,7 +188,7 @@ export let sml = false
         {low}
         /></div>
         {:else if buble.ani === "mtaha" &&  milon.betaha == true}
-        <div class:normSml={modal == false}  class="betaha " ><MissionInProgress
+        <div class:normSml={modal == false}  class="betaha normSml" ><MissionInProgress
             on:proj={proj}
             on:user={user}
             on:hover={hover}
@@ -454,7 +482,7 @@ export let sml = false
 
                                                 /></div>
                                                 {:else if buble.ani === "hachla" && milon.hachla == true}
-                                                <div class:normSml={modal = false} class="hachla " ><Desi
+                                                <div class:normSml={modal == false} class="hachla normSml" ><Desi
                                                     on:acsept={delo}
                                                     on:decline={delo}
                                                     on:hover={hover}

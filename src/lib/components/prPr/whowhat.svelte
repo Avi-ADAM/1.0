@@ -60,7 +60,9 @@ async function ask (){
          for (let x = 0; x < ulist[i].le.length; x++){ 
         qurer =  `  
 createHaluka( 
-      data: { usersend: "${ulist[i].uid}",
+      data: { 
+                project: "${$idPr}",
+        usersend: "${ulist[i].uid}",
         userrecive: "${ulist[i].le[x].leid}",
         amount: ${ulist[i].le[x].cama.toFixed(2)},
         matbea: "2",
@@ -144,8 +146,8 @@ createHaluka(
           `mutation
            { createTosplit(
       data: { 
-                     publishedAt: "${d.toISOString()}",
-        project: "${$idPr}"
+        publishedAt: "${d.toISOString()}",
+        project: "${$idPr}",
       vots: [
      {
       what: true

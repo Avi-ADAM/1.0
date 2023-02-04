@@ -1,6 +1,7 @@
 <script>
  let idNewNeed;
  import { createEventDispatcher } from 'svelte';
+const baseUrl = import.meta.env.VITE_URL
 
            import { lang } from '$lib/stores/lang.js'
 
@@ -23,7 +24,7 @@ async function subm() {
     let bearer1 = 'bearer' + ' ' + token;
     let d = new Date
     try {
-           const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
+           const res = await fetch(`${baseUrl}/graphql`, {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

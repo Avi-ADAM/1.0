@@ -18,7 +18,7 @@ import Addnewp from '$lib/components/userPr/uploadPic.svelte';
 import { uPic } from  '$lib/stores/uPic.js';
 import Edit from '$lib/components/userPr/edit.svelte';
 import EditB from '$lib/components/userPr/editBasic.svelte';
-
+const baseUrl = import.meta.env.VITE_URL
 //import Profile from '../../lib/components/userPr/new.svelte';
 //import { addS } from '../../lib/stores/addS.js';
 import { idPr } from '$lib/stores/idPr.js';
@@ -30,7 +30,7 @@ let isOpen = false;
 
     let current = "";
 
-    let url1 = "https://strapi-87gh.onrender.com/api/upload";
+    let url1 = `${baseUrl}/api/upload`;
     let updX = 0;
   let token; 
   let files;
@@ -129,7 +129,7 @@ function letters(data){
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://strapi-87gh.onrender.com/api/users/" + idLi ;
+    let link =`${baseUrl}/api/users/${idLi}` ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -163,7 +163,7 @@ function letters(data){
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
        let res
-    let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+    let linkg =`${baseUrl}/graphql` ;
         try {
            await fetch(linkg, {
               method: 'POST',
@@ -227,7 +227,7 @@ async function start () {
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-      let linkgra = 'https://strapi-87gh.onrender.com/graphql';
+      let linkgra = `${baseUrl}/graphql`;
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -418,7 +418,7 @@ function sendD () {
   idLi = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://strapi-87gh.onrender.com/api/users/" + idLi 
+    let link =`${baseUrl}/api/users/${idLi}` 
       axios
       .put(link, {
         username: userName_value, 
@@ -631,7 +631,7 @@ async function han (){
   .split('=')[1];
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
- let linkgra = 'https://strapi-87gh.onrender.com/graphql';
+ let linkgra = `${baseUrl}/graphql`;
     try {
              await fetch(linkgra, {
               method: 'POST',

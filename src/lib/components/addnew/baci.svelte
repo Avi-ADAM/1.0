@@ -22,7 +22,7 @@ let success = false
     let desP;
     let desPl;
     let resP;
-    let projectName_value;
+    let projectName_value = "";
     let token; 
     let timeToP = "already";
    let idL;
@@ -33,7 +33,12 @@ let files;
     let restime;
     let nam;
 async function sendP () {
+  if(projectName_value.length < 1){
+    naex = {"he": "שם הריקמה חייב להיות ארוך יותר", "en": "please choose name for the FreeMate"}
+    shgi = true 
+  }else{
     if (run.includes(projectName_value)){
+   naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
   shgi = true; 
 } else{
   loading = true;
@@ -139,6 +144,7 @@ async function sendPP(){
       catch(error) {
         console.log('צריך לתקן:', error);
                 }
+              }
 }
 
 let vallues = [];
@@ -267,7 +273,7 @@ const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en"
 const teure = {"he": "תיאור קצר שיהיה גלוי לכל", "en": "short description with public visibility"} 
 const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMates members"}
 const wel = {"he":"לינק לאתר (אם יש)" ,"en":"link to a website (if any)"}
-const naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
+let naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
 const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMates will promote"}
 const ladd = {"he":"הוסף לוגו", "en": "add Logo"} 
 const su = {"he": "לוגו נוסף בהצלחה", "en": "logo has successfully added"}
@@ -309,7 +315,7 @@ const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "e
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{frn[$lang]}</label>
   <span class='line'></span>
 </div>
-{#if shgi == true}<small class="text-red-600">{naex[$lang]}</small>{/if}
+{#if shgi == true}<small class="text-red-600 bg-slate-50">{naex[$lang]}</small>{/if}
 
     <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <textarea name="es"  bind:value={desP}    
