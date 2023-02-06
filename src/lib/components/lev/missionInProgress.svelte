@@ -1,4 +1,5 @@
 <script>
+    import {nutifi } from '$lib/func/nutifi.svelte'
     import { addToast } from 'as-toast';
   import RangeSlider from "svelte-range-slider-pips";
     import { lang } from '$lib/stores/lang.js'
@@ -117,57 +118,26 @@ onMount(async () => {
 
 $: if (percentage(zman,mstotal) == 90){
  let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+          nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+
         } else if (percentage(zman,mstotal) == 95){
  let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+          nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+
         } 
 $: if (mstotal-zman == 300000){
  let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- })}else if (mstotal-zman == 60000){
+         nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+  }else if (mstotal-zman == 60000){
           console.log("timer stop min")
  let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+        nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+
         }
-$: if (percentage(zman,mstotal) >= 100){
+$: if (percentage(zman,mstotal) >= 100 && running == true){
            azor ()
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+    nutifi("1❤️1 טיימר נעצר",text,"lev" )
         }
 
   let timer;
