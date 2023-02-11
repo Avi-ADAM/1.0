@@ -198,7 +198,7 @@ const newOb = meData.data.createVallue.data;
   {#key vallues}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
-      addOptionMsg={addn[$lang]}
+      createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
       loading={newcontent}
       bind:searchText={ugug}

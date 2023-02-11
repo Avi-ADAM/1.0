@@ -646,8 +646,8 @@ function change(la){
         <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>  
         :
     </h1>
-          <span style="font-family:StamSefarad;">
-              <span  style="font-family:StamSefarad;">
+          <span style="font-family:David;" class="font-bold">
+              <span  style="font-family:David;">
                 אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לעולם לא אנהג באלימות ולא אפגע באף אדם.         
                    <br>
            כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח.

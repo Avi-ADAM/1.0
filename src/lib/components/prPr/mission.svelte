@@ -67,9 +67,8 @@ function find_workway_id(workway_arr){
      };
 const placeholder = `סוג המשימה`;
 let selected = [];
-const placeholder1 = {"he":"בחירת כל הכישורים הרלוונטיים","en":"choose more skills"};
+const placeholder1 = {"he":'בחירת כל הכישורים הרלוונטיים',"en":'choose more skills'};
 export let skills2 = [];
-let selected1 = [];
 export let roles = [];
     let selected3;
    const placeholder5 ={"he": 'בחירת תפקיד', "en": "choose mission role"};
@@ -429,15 +428,20 @@ dispatch('adwww', {
     } );
 
 }; 
-
-function addSK (id , mid) {
+let tt = []
+async function addSK (id , mid,event) {
+  console.log(id,mid, event)
+  tt = event
+  console.log(tt)
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
 const oldskillsob = miData[index].attributes.skills.data;
 const oldskills = oldskillsob.map(c => c.id);
 const newskills = find_skill_id(id);
+console.log(newskills, id)
 let array3 = oldskills.concat(newskills);
 array3 = [...new Set([...oldskills,...newskills])];
+console.log(array3)
 dispatch('addskills', {
     id: array3,
     data: miData,
@@ -629,6 +633,8 @@ function shifterr (o){
 function kova(){
 
 }
+      const nom = {"he":"חסר ברשימה, ניתן להוסיפו עם הכפתור \"הוספת כישור חדש\" למטה","en": "Missing, you can use the \"Add new Skill\" button bellow to add it"}
+
 const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
   </script>
 
@@ -788,7 +794,8 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
               bind:selected={data.selected2}
               placeholder={placeholder1[$lang]}
               options={skills2.map(c => c.attributes.skillName)}
-              on:change={addSK(data.selected2, data.id)}
+              on:change={(event)=>addSK(data.selected2, data.id,event)}
+                noMatchingOptionsMsg={nom[$lang]}
               />
               <AddNewSkill color={"--barbi-pink"} mid={data.id} on:addnewskill={addnewsk} addS={addS} roles1={roles} />
                 </td>
@@ -835,7 +842,7 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
             <th>סוג המשימה</th>
             {#each miData as data, i}
             <td><MultiSelect
-               addOptionMsg={addn[$lang]}
+               createOptionMsg={addn[$lang]}
                allowUserOptions={true}
                bind:searchText
               loading={newcontentW}

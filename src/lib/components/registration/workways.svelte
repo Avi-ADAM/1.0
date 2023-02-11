@@ -197,7 +197,7 @@ $: searchText = ``
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
-     addOptionMsg={addn[$lang]}
+     createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
      loading={newcontent}
      bind:searchText

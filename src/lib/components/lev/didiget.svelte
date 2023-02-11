@@ -1,5 +1,6 @@
 <script>
     import Chaticon from '../../celim/chaticon.svelte'
+ import Diun from './diun.svelte';
 
     export let low = false;
       export let sendpropic= ""
@@ -437,19 +438,8 @@ title="ביטול"
       <input minlength="26"  type="text" bind:value={why} placeholder="יש לנמק מדוע ההצעה נדחית על ידך">
             <button on:click={afterwhy}>אישור</button>
             {:else if rect === true}
-            <div class="text-center">
-  <h1>  ניתן להגיב ולנמק מדוע 
-   <!-- {mypos === false ? "לדחות" : " לאשר "}  -->
-     את ההצעה
-                     <br>
-                        נא להתייחס לתגובה הקודמת ולהשיב על הטענות שעלו בה
-                        </h1>
-                        <small style="color: red;">התגובה הקודמת</small>
-    {#if whyno.length > 0}<h4 style="color:var(--barbi-pink); font-size: 13px;">{whyno.join(' ~ ')}</h4>{/if}
-    <br> 
-    <lebel for="yu">התגובה שלך</lebel>   
-    <input id="yu" minlength="26"  type="text" bind:value={why} placeholder="התשובה שלך">
-            <button on:click={afreact}>אישור</button>  </div> 
+            <Diun on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`צ'אט על העברת כסף`} mypos={true} profilePicChatPartner={src} messages={chat}/>
+
 {:else if masa === true}
 <h2 class="bg-gold text-barbi text-center">   .יבנה במהרה בימינו אמן 
 בנתיים יש להגיב לא ולנמק ואז ליצור משאב חדש עם המאפיינים הרצויים </h2>

@@ -638,6 +638,7 @@ async function addskills (event) {
    return res;
 }
 const resp = filterByReference(skills2, id);
+console.log(resp)
  miDatanew[index].attributes.skills.data = resp;
  miDatanew[index].selected2 = [];
  console.log (miDatanew);
