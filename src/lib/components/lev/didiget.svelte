@@ -425,9 +425,9 @@ let noo = {"he":``,"en":``}
 <h1>..</h1>
 {:then ser}
 
-    <DialogOverlay {isOpen} onDismiss={close} >
+    <DialogOverlay class="overlay" {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="content" aria-label="form">
+  <DialogContent class="chat d" aria-label="form">
       <div dir="rtl" class="grid items-center justify-center aling-center">
               <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
@@ -438,7 +438,7 @@ title="ביטול"
       <input minlength="26"  type="text" bind:value={why} placeholder="יש לנמק מדוע ההצעה נדחית על ידך">
             <button on:click={afterwhy}>אישור</button>
             {:else if rect === true}
-            <Diun on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`צ'אט על העברת כסף`} mypos={true} profilePicChatPartner={src} messages={chat}/>
+            <Diun on:rect={afreact} on:no={afterwhy} money={true} {no} rect={true} smalldes={projectName} nameChatPartner={`צ'אט על העברת כסף`} mypos={true} profilePicChatPartner={src} messages={chat}/>
 
 {:else if masa === true}
 <h2 class="bg-gold text-barbi text-center">   .יבנה במהרה בימינו אמן 
@@ -871,9 +871,7 @@ input[type=text]:invalid {
   width: 24px;
   height: 24px;
   }
-        :global([data-svelte-dialog-content].content) {
-width:50vw;
-        }
+    
   }
     @media  (min-width: 550px) {
        #normSml{
@@ -917,5 +915,64 @@ width:50vw;
         width: 195px;
    }
     }
-    
+      :global([data-svelte-dialog-content].chat) {
+       z-index: 1000;
+      padding: 0px;
+      background-color: #242526;
+          margin: 0px;
+                height: 70vh; 
+      aspect-ratio: 1/1.7;
+          margin-top: 30vh;
+                          border-radius: 10%;
+      overflow-y: auto;
+        }
+        :global([data-svelte-dialog-content].nego) {
+       z-index: 1000;
+      padding: 15px;
+      background-color: #242526;
+          margin: 0px;
+                margin-right: 25px;
+
+                height: 70vh; 
+      width: fit-content;
+          margin-top: 30vh;
+          border-radius: 5%;
+      overflow-y: auto;
+        border-top-right-radius: 2%;
+          border-bottom-right-radius: 2%;
+        }
+    :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 1000;
+  }
+
+  @media (min-width: 600px){
+        :global([data-svelte-dialog-content].chat) {
+                overflow-y: auto;
+       z-index: 1000;
+      padding: 0px;
+      background-color: #242526;
+      margin: 0px;
+                      height: 80vh; 
+                margin-top: 20vh;
+                border-radius: 5%;
+              
+        }
+          :global([data-svelte-dialog-content].nego) {
+                overflow-y: auto;
+       z-index: 1000;
+      padding: 15px;
+      margin-right: 25px;
+      background-color: #242526;
+      margin: 0px;
+                margin-top: 20vh;
+                height: 80vh;
+                width: fit-content;
+                border-radius: 5%;
+                border-top-right-radius: 2%;
+                 border-bottom-right-radius: 2%;
+        }
+          :global([data-svelte-dialog-overlay].overlay) {
+    z-index: 1000;
+  }
+}
 </style>    

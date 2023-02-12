@@ -974,10 +974,9 @@ input[type=text]:invalid {
       background-color: #242526;
       margin: 0px;
                       height: 80vh; 
-      aspect-ratio: 1.2/1;
                 margin-top: 20vh;
-                border-radius: 15%;
-              
+                border-radius: 5%;
+              width: auto !important;
         }
           :global([data-svelte-dialog-content].nego) {
                 overflow-y: auto;
