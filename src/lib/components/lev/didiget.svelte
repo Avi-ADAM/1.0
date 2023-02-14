@@ -1,6 +1,7 @@
 <script>
     import Chaticon from '../../celim/chaticon.svelte'
  import Diun from './diun.svelte';
+  import { addToast } from 'as-toast';
 
     export let low = false;
       export let sendpropic= ""
@@ -328,19 +329,26 @@ id: ${pendId}
       data: { chatre:[  ${diunim}, 
          
      {
-      when: ${d.toISOString()}
+      when: "${d.toISOString()}"
       send: "${idL}"
       freetext: "${why}"
-      order: ${order+=1}
     }
   ]}
-  ){data {id}}
+  ){data {id attributes{chatre{freetext send {data{id attributes{username profilePic{data{attributes{url}}}}}}when seen} }}}
 } `   
 // make coin desapire
  } )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+         if (miDatan.data?.updateHaluka.data.attributes.chatre){
+          chat = miDatan.data?.updateHaluka.data.attributes.chatre
+             addToast(`${fnnn[$lang]}`, 'info');
+
+           setTimeout(function(){ 
+             isOpen = false},15000)
+}
+         
         } catch (e) {
             error1 = e
             console.log(error1)
@@ -420,6 +428,7 @@ function claf (event){
 let apru = {"he":`אישור ${kind == "send" ? "שהעברתי" : "שקיבלתי"} את הכסף`,"en":`I already ${kind == "send" ? "send": "recive"} the money`}
 let mes = {"he":``,"en":``}
 let noo = {"he":``,"en":``}
+const fnnn = {"he":"ההודעה נשלחה בהצלחה", "en": "messege send sucsessfully"}
 </script>
 {#await ser}
 <h1>..</h1>
