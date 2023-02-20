@@ -155,7 +155,7 @@ export let sml = false
                 recive={buble.recive}
                 sendcon={buble.senderconf}
         coinlapach={buble.coinlapach}
-       
+        messege={buble.messege}
         already={buble.already}
         {low}
         /></div>

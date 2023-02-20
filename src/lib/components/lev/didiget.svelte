@@ -40,8 +40,8 @@ import { idPr } from '../../stores/idPr.js';
     export let whyno = [];
    
     export let created_at;
-
-    export let order = chat.length;
+    export let messege = []
+    export let order = messege.length;
     let miDatan = [];
     let error1;
     let bearer1;
@@ -300,7 +300,8 @@ async function react (){
       rect = true;
       isOpen = true;
 }
-async function afreact (){
+async function afreact (event){
+  why = event.detail.why
       const diunim = objToString(chat);
 
        const cookieValue = document.cookie
@@ -342,13 +343,24 @@ id: ${pendId}
   .then(data => miDatan = data);
          console.log(miDatan)
          if (miDatan.data?.updateHaluka.data.attributes.chatre){
-          chat = miDatan.data?.updateHaluka.data.attributes.chatre
-             addToast(`${fnnn[$lang]}`, 'info');
+     const chati = miDatan.data?.updateHaluka.data.attributes.chatre
+     messege = []
+      for(let t = 0; t < chati.length ; t++ ){
+              messege.push({
+                    message: chati.freetext,
+                    when: chati.when,
+                    pic: chati.send.data.attributes.profilePic?.data.attributes.url,
+                    sentByMe: chati.send.data.id === idL ? true : false,
+                    seen: chati.seen,
+                })
+            } 
+            messege = messege 
+     addToast(`${fnnn[$lang]}`, 'info');
 
            setTimeout(function(){ 
              isOpen = false},15000)
 }
-         
+         //todo send mail to secund one
         } catch (e) {
             error1 = e
             console.log(error1)
@@ -447,7 +459,7 @@ title="ביטול"
       <input minlength="26"  type="text" bind:value={why} placeholder="יש לנמק מדוע ההצעה נדחית על ידך">
             <button on:click={afterwhy}>אישור</button>
             {:else if rect === true}
-            <Diun on:rect={afreact} on:no={afterwhy} money={true} {no} rect={true} smalldes={projectName} nameChatPartner={`צ'אט על העברת כסף`} mypos={true} profilePicChatPartner={src} messages={chat}/>
+            <Diun on:rect={afreact} on:no={afterwhy} money={true} {no} rect={true} smalldes={projectName} nameChatPartner={`צ'אט על העברת כסף`} mypos={true} profilePicChatPartner={src} messages={messege}/>
 
 {:else if masa === true}
 <h2 class="bg-gold text-barbi text-center">   .יבנה במהרה בימינו אמן 

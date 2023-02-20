@@ -1427,7 +1427,7 @@ async function start() {
                             hervachti {amount noten mekabel users_permissions_user {data {id attributes{hervachti}}}}
       							}}}
                 halukas (filters: {and:[{ ushar: { eq: true } } { confirmed: { eq: false }}]}){ data{ id attributes{ 
-                    amount senderconf chatre {freetext send {data{id}}when seen} usersend {data {id}} userrecive {data{id}}
+                    amount senderconf chatre {freetext send {data{id}} when seen} usersend {data {id}} userrecive {data{id}}
                 }}} 
     			maaps(filters: { archived: { eq: false } }){ data{ id attributes{ 
         					createdAt name  
@@ -1593,9 +1593,21 @@ function tveria (data){
                 pl: 1,
                 messege: []
             });
-            }
         }
     }
+};
+        for(let s = 0; s < tverias.length ; s++){
+            for(let t = 0; t < tverias[s].chat.length ; t++ ){
+              tverias[s].messege.push({
+                    message: tverias[s].chat[t].freetext,
+                    when: tverias[s].chat[t].when,
+                    pic: getProjectData(tverias[s].projectId,"upic",tverias[s].chat[t].send.data.id),
+                    sentByMe: tverias[s].chat[t].send.data.id === myid ? true : false,
+                    seen: tverias[s].chat[t].seen,
+                })
+            }
+        }
+    
     tverias = tverias
     console.log(tverias)
 }
