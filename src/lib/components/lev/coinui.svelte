@@ -1,6 +1,6 @@
 <script>
 import * as animateScroll from "svelte-scrollto";
-
+import Vid from './didiget.svelte'
 import Desi from './decisionMaking.svelte'
 import Mid from "./midi.svelte"
 import MissionInProgress from "./missionInProgress.svelte"
@@ -133,13 +133,41 @@ export let sml = false
     {/each}
     {#key arr1}
     {#each arr1 as buble, i}
-    {#if buble.ani === "haluk" && milon.desi == true}
-    <div class:normSml={modal == false} class=" halu"><Hal
+    {#if buble.ani === "vidu" && milon.desi == true}
+    <div class:normSml={modal == false} class="vidu normSml"><Vid
+        on:modal={() =>modal = true}
+        on:hover={hover}
+        on:proj={proj}
+        on:user={user}
+         sendpropic={buble.sendpropic}
+                sendname={buble.sendname}    
+                respropic={buble.respropic}
+                resname={buble.resname}   
+                projectId={buble.projectId}
+                kind={buble.kind}
+                projectName={buble.projectName}
+                src={buble.src}
+                myid={buble.myid}
+                pendId={buble.pendId}
+                chat={buble.chat}
+                amount={buble.amount}
+                send={buble.send}
+                recive={buble.recive}
+                sendcon={buble.senderconf}
+        coinlapach={buble.coinlapach}
+        messege={buble.messege}
+        already={buble.already}
+        {low}
+        /></div>
+    {:else if buble.ani === "haluk" && milon.desi == true}
+    <div class:normSml={modal == false} class=" halu normSml"><Hal
         on:modal={() =>modal = true}
         user_1s={buble.user_1s}
         on:hover={hover}
         on:proj={proj}
         on:user={user}
+        hervach={buble.hervach}
+        halukot={buble.halukot}
         coinlapach={buble.coinlapach}
         myid={buble.myid}
         pendId={buble.pendId}
@@ -160,25 +188,26 @@ export let sml = false
         {low}
         /></div>
         {:else if buble.ani === "mtaha" &&  milon.betaha == true}
-        <div class:normSml={modal == false}  class="betaha " ><MissionInProgress
+        <div class:normSml={modal == false}  class="betaha normSml" ><MissionInProgress
             on:proj={proj}
             on:user={user}
             on:hover={hover}
             on:modal={() =>modal = true}
+            tasks={buble.acts.data}
             status={buble.status}
             tx={buble.tx}
             coinlapach={buble.coinlapach}
             usernames={buble.usernames}
-            noofpu={buble.project.user_1s.length}
+            noofpu={buble.noofpu}
             oldzman={buble.timer}
             stname={buble.stname}
             mId={buble.id}
-            missId={buble.mission.id}
+            missId={buble.mission.data.id}
             missionName={buble.name}
-            projectId={buble.project.id}
-            projectName={buble.project.projectName}
+            projectId={buble.project.data.id}
+            projectName={buble.projectName}
             missionDetails={buble.descrip}
-            src={buble.project.profilePic.formats.thumbnail.url}
+            src={buble.src}
             link={buble.privatlinks}
             dueDateOrCountToDedline ={buble.admaticedai}
             hoursdon ={buble.howmanyhoursalready}
@@ -212,7 +241,7 @@ export let sml = false
                     created_at={buble.created_at}
                     noofusersNo={buble.noofusersNo}
                     already={buble.already}
-                    noofusers={buble.user_1s.length}
+                    noofusers={buble.noofusers}
                     mshaabId={buble.mshaabId}
                     hm={buble.hm}
                     price={buble.price}
@@ -252,7 +281,7 @@ export let sml = false
                             perhour={buble.perhour}
                             noofusersNo={buble.noofusersNo}
                             already={buble.already}
-                            noofusers={buble.user_1s.length}
+                            noofusers={buble.noofusers}
                             missionId={buble.missionId}
                             skills={buble.skills}
                             tafkidims={buble.tafkidims}
@@ -454,7 +483,7 @@ export let sml = false
 
                                                 /></div>
                                                 {:else if buble.ani === "hachla" && milon.hachla == true}
-                                                <div class:normSml={modal = false} class="hachla " ><Desi
+                                                <div class:normSml={modal == false} class="hachla normSml" ><Desi
                                                     on:acsept={delo}
                                                     on:decline={delo}
                                                     on:hover={hover}
@@ -462,7 +491,7 @@ export let sml = false
 
                                                     on:proj={proj}
                                                     on:chat={chat}
-                                                    noofpu={buble.user_1s.length}
+                                                    noofpu={buble.noofpu}
                                                     newpicid={buble.newpicid}
                                                     coinlapach={buble.coinlapach}
                                                     created_at={buble.created_at}
@@ -494,26 +523,26 @@ export let sml = false
                                                         on:proj={proj}
                                                         on:user={user}
                                                         on:mesima={mesima}
-                                                        timeToP={buble.project.timeToP}
+                                                        timeToP={buble.attributes.project.data.attributes.timeToP}
                                                         coinlapach={buble.coinlapach}
                                                         askedarr={askedarr}
                                                         {declineddarr}
-                                                        deadLine = {buble.sqadualed}
+                                                        deadLine = {buble.attributes.sqadualed}
                                                         oid = {buble.id}
                                                         hst = {buble.hst}
                                                         stb = {buble.stb}
-                                                        projectName = {buble.project.projectName}
-                                                        role ={buble.tafkidims}
-                                                        skills ={ buble.skills}
-                                                        missionDetails = {buble.descrip}
-                                                        notes = {buble.hearotMeyuchadot}
-                                                        src = {buble.project.profilePic.formats.thumbnail.url}
-                                                        missionName={buble.name}
-                                                        projectId={buble.project.id}
-                                                        workways={buble.workways}
-                                                        noOfHours={buble.noofhours}
-                                                        perhour={buble.perhour}
-                                                        total={buble.noofhours * buble.perhour}
+                                                        projectName = {buble.attributes.project.data.attributes.projectName}
+                                                        role ={buble.attributes.tafkidims}
+                                                        skills ={ buble.attributes.skills}
+                                                        missionDetails = {buble.attributes.descrip}
+                                                        notes = {buble.attributes.hearotMeyuchadot}
+                                                        src = {buble.attributes.project.data.attributes.profilePic.data?.attributes.formats.thumbnail.url}
+                                                        missionName={buble.attributes.name}
+                                                        projectId={buble.attributes.project.data.id}
+                                                        workways={buble.attributes.work_ways}
+                                                        noOfHours={buble.attributes.noofhours}
+                                                        perhour={buble.attributes.perhour}
+                                                        total={buble.attributes.noofhours * buble.attributes.perhour}
                                                         {low}
                                                         /></div>
                                                         {:else if buble.ani === "huca" && milon.pmashs == true}

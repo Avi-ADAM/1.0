@@ -1,209 +1,215 @@
 [
     {
-        "id": "7",
-        "workWayName": "מחקר משותף",
-        "localizations": [
-            {
-                "workWayName": "מחקר משותף"
+        "id": "18",
+        "attributes": {
+            "workWayName": "startup",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
+    },
+    {
+        "id": "7",
+        "attributes": {
+            "workWayName": "Joint research",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "31",
-        "workWayName": "דמיון וזמן",
-        "localizations": [
-            {
-                "workWayName": "דמיון וזמן"
+        "attributes": {
+            "workWayName": "Imagination and time",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "15",
-        "workWayName": "מהבית",
-        "localizations": [
-            {
-                "workWayName": "מהבית"
+        "attributes": {
+            "workWayName": "from home",
+            "localizations": {
+                "data": []
             }
-        ]
-    },
-    {
-        "id": "28",
-        "workWayName": "אירועים חברתיים, אירועי תרבות ואומנות, חיבור ריגשי, יצירה",
-        "localizations": [
-            {
-                "workWayName": "אירועים חברתיים, אירועי תרבות ואומנות, חיבור ריגשי, יצירה"
-            }
-        ]
+        }
     },
     {
         "id": "10",
-        "workWayName": "התנדבות",
-        "localizations": [
-            {
-                "workWayName": "התנדבות"
+        "attributes": {
+            "workWayName": "volunteering",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "2",
-        "workWayName": "במשרד",
-        "localizations": [
-            {
-                "workWayName": "במשרד"
+        "attributes": {
+            "workWayName": "In the office",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "24",
-        "workWayName": "בסופי שבוע",
-        "localizations": [
-            {
-                "workWayName": "בסופי שבוע"
+        "attributes": {
+            "workWayName": "at weekends",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "5",
-        "workWayName": "בשטח",
-        "localizations": [
-            {
-                "workWayName": "בשטח"
+        "attributes": {
+            "workWayName": "In the field",
+            "localizations": {
+                "data": []
             }
-        ]
-    },
-    {
-        "id": "18",
-        "workWayName": "סטרטאפ",
-        "localizations": [
-            {
-                "workWayName": "סטרטאפ"
-            }
-        ]
+        }
     },
     {
         "id": "23",
-        "workWayName": "גמיש",
-        "localizations": [
-            {
-                "workWayName": "גמיש"
+        "attributes": {
+            "workWayName": "flexible",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "25",
-        "workWayName": "כמה שעות בשבוע ",
-        "localizations": [
-            {
-                "workWayName": "כמה שעות בשבוע "
+        "attributes": {
+            "workWayName": "A few hours a week",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "20",
-        "workWayName": "דינמי",
-        "localizations": [
-            {
-                "workWayName": "דינמי"
+        "attributes": {
+            "workWayName": "dynamic",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "22",
-        "workWayName": "עם אנשים",
-        "localizations": [
-            {
-                "workWayName": "עם אנשים"
+        "attributes": {
+            "workWayName": "with people",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "6",
-        "workWayName": "מהאינטרנט",
-        "localizations": [
-            {
-                "workWayName": "מהאינטרנט"
+        "attributes": {
+            "workWayName": "From the Internet",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "4",
-        "workWayName": "פרוייקטים קצרים",
-        "localizations": [
-            {
-                "workWayName": "פרוייקטים קצרים"
+        "attributes": {
+            "workWayName": "Short projects",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "1",
-        "workWayName": "משרה מלאה",
-        "localizations": [
-            {
-                "workWayName": "משרה מלאה"
+        "attributes": {
+            "workWayName": "Full-time",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "29",
-        "workWayName": "נסיעות עירוניות",
-        "localizations": [
-            {
-                "workWayName": "נסיעות עירוניות"
+        "attributes": {
+            "workWayName": "Driving within the city",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "3",
-        "workWayName": "משרה חלקית",
-        "localizations": [
-            {
-                "workWayName": "משרה חלקית"
+        "attributes": {
+            "workWayName": "Part time",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "8",
-        "workWayName": "מסביב לעולם",
-        "localizations": [
-            {
-                "workWayName": "מסביב לעולם"
+        "attributes": {
+            "workWayName": "Around the world",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "21",
-        "workWayName": "כשאני רוצה ללא מחויבות",
-        "localizations": [
-            {
-                "workWayName": "כשאני רוצה ללא מחויבות"
+        "attributes": {
+            "workWayName": "When I want without commitment",
+            "localizations": {
+                "data": []
             }
-        ]
-    },
-    {
-        "id": "9",
-        "workWayName": "נסיעות בינעירוניות",
-        "localizations": [
-            {
-                "workWayName": "נסיעות בינעירוניות"
-            }
-        ]
+        }
     },
     {
         "id": "30",
-        "workWayName": "מבית העסק",
-        "localizations": [
-            {
-                "workWayName": "מבית העסק"
+        "attributes": {
+            "workWayName": "From the business",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "19",
-        "workWayName": "קהילה יוצרת",
-        "localizations": [
-            {
-                "workWayName": "קהילה יוצרת"
+        "attributes": {
+            "workWayName": "A creative community",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
+    },
+    {
+        "id": "9",
+        "attributes": {
+            "workWayName": "Long-distance drive",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "28",
+        "attributes": {
+            "workWayName": "אירועים חברתיים, אירועי תרבות ואומנות, חיבור ריגשי, יצירה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "workWayName": "אירועים חברתיים, אירועי תרבות ואומנות, חיבור ריגשי, יצירה"
+                        }
+                    }
+                ]
+            }
+        }
     }
 ]

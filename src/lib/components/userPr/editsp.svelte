@@ -11,6 +11,10 @@ export let meData = [];
     let error1 = null;
 
   onMount(async () => {
+    const id = meData.id
+    meData = meData.attributes
+    meData.id = id
+    meData = meData
    myMissionH()
    myMi ()
               });
@@ -42,7 +46,7 @@ async function han (){
   const easy = (meData.myp > 0) ? meData.myp : 0;
   const sdate = (meData.dates !== undefined) ? `sdate: "${new Date(meData.dates).toISOString()}",` : ``;
    const fdate = (meData.datef !== undefined) ? `fdate: "${new Date(meData.datef).toISOString()}" ,` : ``;
- let linkgra = 'https://i18.onrender.com/graphql';
+ let linkgra = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -53,8 +57,7 @@ async function han (){
         body: 
         JSON.stringify({query:
           `mutation { updateSp(
-    input: {
-        where : {id: "${meData.id}"},
+    id: ${meData.id}
       data: { 
           name: "${meData.name}",
              descrip: "${meData.descrip}",
@@ -67,18 +70,17 @@ async function han (){
              users_permissions_user: "${idL}",
              ${sdate} 
              ${fdate}
-      }
     }
-  ) {sp {id name}}
+  )  {data{id attributes{ name}}}
 } `   
 } )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
              dispatch('close', {
-                 id: miDatan.data.updateSp.sp.id,
-                 name: miDatan.data.updateSp.sp.name,
-                 skob: miDatan.data.updateSp.sp
+                 id: miDatan.data.updateSp.data.id,
+                 name: miDatan.data.updateSp.data.attributes.name,
+                 skob: miDatan.data.updateSp.data
              });
         } catch (e) {
             error1 = e

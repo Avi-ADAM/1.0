@@ -117,11 +117,10 @@ let passi;
 function shaneh () {
           passwordx = passwordx.trim();
    axios
-  .post('https://i18.onrender.com/password', {
-     identifier: mail,
-    password: passi,
-    newPassword: passwordx,
-    onfirmPassword: passwordx
+  .post('https://strapi-87gh.onrender.com/api/auth/change-password', {
+    currentPassword: passi,
+    password: passwordx,
+    passwordConfirmation: passwordx
   })
   .then(response => {
         console.log('Your password has been changed.', response);
@@ -157,7 +156,7 @@ function shaneh () {
 	}
     let change = false;
 	 function endGuid(){
-  console.log("guid")
+  console.log("guid סיום")
   isGuidMe = false;
   document.cookie = `guidMe=done; expires=` + new Date(2026, 0, 1).toUTCString();
              addToast(`${guidend[$lang]}`, 'info');
@@ -304,7 +303,6 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 {#if change}
 {#if before}
 <div>
-    <form>
         <div>
             {#if errorl}
                         <h1 

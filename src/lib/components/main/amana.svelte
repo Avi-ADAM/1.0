@@ -2,7 +2,7 @@
       import { liUN } from '$lib/stores/liUN.js';
 
       import {  doesLang, langUs } from '$lib/stores/lang.js'
-  import { goto, prefetch } from '$app/navigation';
+  import { goto } from '$app/navigation';
   import Maze from './maze.svelte'
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
@@ -19,6 +19,9 @@
       import Tikun from './tikunolam.svelte';
             import TRan from './translatehe.svelte';
   import { onMount } from 'svelte'
+  import { linkos } from '$lib/stores/linkos.js';
+
+
 // onMount(async () => {
 //  
 //
@@ -60,19 +63,30 @@
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  chezins { name}
+  chezins { 
+     data {
+      attributes {
+        name
+      }
+      }
+   meta {
+      pagination {
+        total
+      }
+    }
+  }
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
             fppp = res.data.chezins
-            fpp = fppp.map(c => c.name)
+            fpp = fppp.data.map(c => c.attributes.name)
         } catch (e) {
             error1 = e
         }
@@ -395,11 +409,13 @@ if (fpp.includes(jjj)){
  erorims = false
  const mail = $form.email.toLowerCase().trim()
   axios
-  .post('https://i18.onrender.com/chezins', {
+  .post('https://strapi-87gh.onrender.com/api/chezins', {
+      "data": {
      name: $form.name,
         email: mail,
         countries: find_contry_id(selected)
-              },
+              }
+            },
   {
   headers: {
         'Content-Type': 'application/json',
@@ -415,10 +431,11 @@ if (fpp.includes(jjj)){
             contriesi.set(find_contry_id(selected))
             regHelper.set(1);
                     meData = response.data;
-                fpval.set(meData.id)
+                fpval.set(meData.data.id)
             datar = data;
             let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`
-      console.log(`https://1lev1.world?${encodeURIComponent(linko)}`)            //id con un em ref
+      console.log(`https://1lev1.world?${encodeURIComponent(linko)}`) 
+      linkos.set(linko)           //id con un em ref
               })
   .catch(error => {
     g = false;
@@ -629,8 +646,8 @@ function change(la){
         <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>  
         :
     </h1>
-          <span style="font-family:StamSefarad;">
-              <span  style="font-family:StamSefarad;">
+          <span style="font-family:David;" class="font-bold">
+              <span  style="font-family:David;">
                 אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לעולם לא אנהג באלימות ולא אפגע באף אדם.         
                    <br>
            כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח.
@@ -758,9 +775,9 @@ function change(la){
   background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
  background-size: 400% 400%;
-      -webkit-animation: AnimationName 13s ease infinite;
+     /* -webkit-animation: AnimationName 13s ease infinite;
     -moz-animation: AnimationName 13s ease infinite;
-    animation: AnimationName 3s ease infinite;
+    animation: AnimationName 3s ease infinite;*/
       width: 80vw;
   }
   @media (min-width: 568px){
@@ -769,9 +786,9 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
  background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
  background-size: 400% 400%;
-      -webkit-animation: AnimationName 13s ease infinite;
+    /*  -webkit-animation: AnimationName 13s ease infinite;
     -moz-animation: AnimationName 13s ease infinite;
-    animation: AnimationName 13s ease infinite;
+    animation: AnimationName 13s ease infinite;*/
 width:78vw;
         }
   }
@@ -1499,9 +1516,15 @@ position: absolute;
    .amana{
     padding: 0 210px;
     background-size: 1888px  ;
+    font-size: 29px;
   }
    .centeron{
    left: 48%;
+  }
+  .button{
+    background-size: 170px;
+    min-height: 170px;
+    min-width: 170px;
   }
 }
  :global(.multiselect) {

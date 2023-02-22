@@ -150,15 +150,15 @@
     white-space: nowrap;
     pointer-events: none;
     cursor: pointer;
-    line-height: 13px;
+    line-height: 22px;
   }
   .text {
-    width: 100%;
-    font-size: 11px;
+    max-width: 100%;
+    font-size: 100%;
     /* text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff; */
   }
   .text.value{
-    font-size: 11px;
+    font-size: 22px;
   }
   .circle {
     border-radius: 50%;

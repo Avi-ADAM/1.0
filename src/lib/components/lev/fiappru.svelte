@@ -140,7 +140,7 @@ let ser = xyz();
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 
 function objToString (obj) {
     let str = '';
@@ -165,6 +165,7 @@ async function agree() {
     noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
+  let d = new Date
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
     const cookieValue = document.cookie
         .split('; ')
@@ -193,7 +194,6 @@ async function agree() {
                     body: JSON.stringify({
                         query: `mutation 
                         { createFinnishedMission(
-           input: { 
              data: {
               missionName: "${missionBName}",
               why: "${why}",
@@ -206,18 +206,16 @@ async function agree() {
               descrip: "${missionDetails}",
               users_permissions_user: "${userId}",
               finiapruval: "${askId}",
+                      publishedAt: "${d.toISOString()}",
               mission: ${missId}
-   }
-}){finnishedMission {id }}
+   
+}){data {id }}
 updateMesimabetahalich(
-  input:  {
-    where: {id: "${mId}"}
+    id: "${mId}"
   data: {finnished: true}
-}
-) {mesimabetahalich{id finnished}}
+) {data{id attributes{ finnished}}}
  updateFiniapruval(
-                input:{
-                    where: {id: "${askId}" }
+                id: "${askId}" 
                     data: { archived: true,
     vots: [${userss}, 
        {
@@ -225,8 +223,8 @@ updateMesimabetahalich(
         users_permissions_user: "${idL}"
       }
     ]}
-        }
-    ){finiapruval{id}}
+        
+    ){data{id}}
 }
 `})
                 })
@@ -255,16 +253,15 @@ console.log("just add vote to asked and update to not show for me again")
                         query: `mutation 
                         {
                             updateFiniapruval(
-                            input:{
-                                where: {id: "${askId}" }
+              id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){finiapruval{id}}
+                            
+                        ){data{id}}
                      
                     }
 `})
@@ -321,21 +318,20 @@ async function decline() {
                     body: JSON.stringify({
                         query: `mutation 
                         { 
-updateFiniapruval(
-  input: {
-    where: {id: "${askId}"}
+    updateFiniapruval(
+    id: "${askId}"
   data: {vots: [${userss}, 
                                        {
                                            why: "${whyy}"
                                         what: false
                                         users_permissions_user: "${idL}"
                                       }
-                                    ] }
+                                    ] 
 }
-) {finiapruval {id vots {id}}}
+) {data {id }}
 }
 `})
-                })
+                })//attributes{ vots {id}}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);

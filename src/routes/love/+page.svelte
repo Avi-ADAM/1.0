@@ -33,29 +33,40 @@
       };
     
         try {
-            let res = await fetch("https://i18.onrender.com/cuntries?_limit=-1", {
-              method: "GET",
+            let res = await fetch("https://strapi-87gh.onrender.com/graphql", {//api/cuntries?pagination[page]=1&pagination[pageSize]=280
+             method: "POST",
               headers: {
                  'Content-Type': 'application/json'
-              },
+              },  body: JSON.stringify({
+                        query: `query {
+  cuntries {
+    data{
+      id
+      attributes {name free_people{data{id
+    }
+    }
+    } 
+    }
+}
+}   `})
             }).then(checkStatus)
           .then(parseJSON);
-            country = res
+            country = res.data.cuntries.data
              data = datai;
             for (let j = 0; j< country.length; j++){
       for (let i = 0; i< data.length; i++){
-        if(data[i].name === country[j].name){
-          data[i].agrees = country[j].free_people.length 
+        if(data[i].name === country[j].attributes.name){
+          data[i].agrees = country[j].attributes.free_people.data.length 
         }else if (data[i].name === "Palestine" && country[j].id === 167 || data[i].name === "Palestine" && country[j].id ===  246){
             if (data[i].agrees > 0){
-                data[i].agrees += country[j].free_people.length
+                data[i].agrees += country[j].attributes.free_people.data.length
         }else{
-                data[i].agrees = country[j].free_people.length
+                data[i].agrees = country[j].attributes.free_people.data.length
         }}
-         else if (data[i].name === "Russia"  && country[j].name ==="Russian Federation"){
-             data[i].agrees = country[j].free_people.length
-        }else if (data[i].name === "United States of America"  && country[j].name ==="United States"){
-             data[i].agrees = country[j].free_people.length
+         else if (data[i].name === "Russia"  && country[j].attributes.name ==="Russian Federation"){
+             data[i].agrees = country[j].attributes.free_people.data.length
+        }else if (data[i].name === "United States of America"  && country[j].attributes.name ==="United States"){
+             data[i].agrees = country[j].attributes.free_people.data.length
         }
             }
         }
@@ -64,6 +75,7 @@
   });
         } catch (e) {
             error = e
+            console.log(error)
         }
         return data
     }

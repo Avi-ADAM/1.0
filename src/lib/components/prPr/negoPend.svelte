@@ -112,7 +112,7 @@ const filterByReference = (allob, id)=> {
      var  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
       for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].skillName === skill_name_arr[j]){
+        if(skills2[i].attributes.skillName === skill_name_arr[j]){
           arr.push(skills2[i].id);
         }
       }
@@ -464,7 +464,7 @@ async function increment() {
         }
       }
 }
-let linkg = "https://i18.onrender.com/graphql"
+let linkg = "https://strapi-87gh.onrender.com/graphql"
 onMount(async () => {
     const cookieValue = document.cookie
         .split('; ')

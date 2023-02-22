@@ -4,7 +4,7 @@
     import { userName } from '../../stores/store.js';
     import { email } from '../registration/email.js'
     import { regHelper } from '../../stores/regHelper.js';
-        import { goto,  prefetch } from '$app/navigation';
+        import { goto } from '$app/navigation';
         import * as yup from "yup";
             import { liUN } from '$lib/stores/liUN.js';
 
@@ -21,14 +21,61 @@ function find_contry_id(contry_name_arr){
      var  arr = [];
       for (let j = 0; j< contry_name_arr.length; j++ ){
       for (let i = 0; i< country.length; i++){
-        if(country[i].heb === contry_name_arr[j]){
+        if(country[i].ar === contry_name_arr[j]){
           arr.push(country[i].value)  ;
         }
       }
       }
       return arr;
      };
+     let fpp = [];
+  let fppp = [];
+    let error1 = null;
+    onMount(async () => {
+        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+        const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      const headers = {
+        'Content-Type': 'application/json',
+      };
     
+        try {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
+              method: "POST",
+              headers: {
+                 'Content-Type': 'application/json'
+              },body: JSON.stringify({
+                        query: `query {
+  chezins { 
+     data {
+      attributes {
+        name
+      }
+      }
+   meta {
+      pagination {
+        total
+      }
+    }
+  }
+}
+              `})
+            }).then(checkStatus)
+          .then(parseJSON);
+            fppp = res.data.chezins
+            fpp = fppp.data.map(c => c.attributes.name)
+        } catch (e) {
+            error1 = e
+        }
+        
+    });
+
     const country =  [
                     { value: 104 , label: 'Israel', heb: 'ישראל', ar: "إسرائيل	"},
                     { value: 167 , label: 'Palestine jehuda & sumeria', heb: 'הרשות הפלסטינית יו"ש', ar: "دولة فلسطين	"},
@@ -310,16 +357,17 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
-            fetch('https://i18.onrender.com/chezins', {
+            fetch('https://strapi-87gh.onrender.com/api/chezins', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
+      "data": {
         name: $form.name,
         email: $form.email,
         countries: find_contry_id(selected)
-      }),
+      }}),
     }) 
       .then(response => response.json())
       .then(data => 
@@ -361,7 +409,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/chezins/count", {
+            const res = await fetch("https://strapi-87gh.onrender.com/api/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'
@@ -1208,9 +1256,15 @@ background-position: center;
    .amana{
     padding: 0 210px;
     background-size: 1888px  ;
+   font-size: 29px;
   }
    .centeron{
    left: 48%;
+  }
+  .button{
+    background-size: 170px;
+    min-height: 170px;
+    min-width: 170px;
   }
 }
  :global(.multiselect) {

@@ -1,612 +1,782 @@
 [
     {
         "id": "51",
-        "skillName": "מוסיקה",
-        "localizations": [
-            {
-                "skillName": "מוסיקה"
+        "attributes": {
+            "skillName": "music",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "12",
-        "skillName": "ציור",
-        "localizations": [
-            {
-                "skillName": "ציור"
+        "attributes": {
+            "skillName": "painting",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "47",
-        "skillName": "רישיון נהיגה B",
-        "localizations": [
-            {
-                "skillName": "רישיון נהיגה B"
+        "attributes": {
+            "skillName": "Car driving license",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "17",
-        "skillName": "עיצוב לוגו",
-        "localizations": [
-            {
-                "skillName": "עיצוב לוגו"
+        "attributes": {
+            "skillName": "Logo Design",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "62",
-        "skillName": "עבודה עם ילדים וסוסים",
-        "localizations": [
-            {
-                "skillName": "עבודה עם ילדים וסוסים"
+        "attributes": {
+            "skillName": "Working with children and horses",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "38",
-        "skillName": "כתיבת תכניות עסקיות",
-        "localizations": [
-            {
-                "skillName": "כתיבת תכניות עסקיות"
+        "attributes": {
+            "skillName": "Writing business plans",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "28",
-        "skillName": "כתיבת תוכן",
-        "localizations": [
-            {
-                "skillName": "כתיבת תוכן"
+        "attributes": {
+            "skillName": "Writing content",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "1",
-        "skillName": "Svelte",
-        "localizations": []
+        "attributes": {
+            "skillName": "Svelte",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "24",
-        "skillName": "Javascript",
-        "localizations": []
+        "attributes": {
+            "skillName": "Javascript",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "4",
-        "skillName": "Angular",
-        "localizations": []
+        "attributes": {
+            "skillName": "Angular",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "114",
-        "skillName": "הכנת ריבה ביתית",
-        "localizations": [
-            {
-                "skillName": "הכנת ריבה ביתית"
+        "attributes": {
+            "skillName": "Preparation of homemade jam",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "36",
-        "skillName": "נהיגה על אופנוע",
-        "localizations": [
-            {
-                "skillName": "נהיגה על אופנוע"
+        "attributes": {
+            "skillName": "Driving a motorcycle",
+            "localizations": {
+                "data": []
             }
-        ]
-    },
-    {
-        "id": "134",
-        "skillName": "טכנאות מעבדה סמארטפונים",
-        "localizations": []
-    },
-    {
-        "id": "133",
-        "skillName": "חקר שוק",
-        "localizations": []
-    },
-    {
-        "id": "135",
-        "skillName": "בישול אוכל הודי",
-        "localizations": []
+        }
     },
     {
         "id": "25",
-        "skillName": "neo4j",
-        "localizations": []
+        "attributes": {
+            "skillName": "neo4j",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "18",
-        "skillName": "html",
-        "localizations": []
+        "attributes": {
+            "skillName": "html",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "37",
-        "skillName": "boxy svg",
-        "localizations": []
+        "attributes": {
+            "skillName": "boxy svg",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "21",
-        "skillName": "python",
-        "localizations": []
+        "attributes": {
+            "skillName": "python",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "30",
-        "skillName": "netlify",
-        "localizations": []
+        "attributes": {
+            "skillName": "netlify",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "10",
-        "skillName": "strapi",
-        "localizations": []
+        "attributes": {
+            "skillName": "strapi",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "19",
-        "skillName": "css",
-        "localizations": []
+        "attributes": {
+            "skillName": "css",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "41",
-        "skillName": "D3",
-        "localizations": []
+        "attributes": {
+            "skillName": "D3",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "29",
-        "skillName": "svg",
-        "localizations": []
+        "attributes": {
+            "skillName": "svg",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "8",
-        "skillName": "postgreSQL",
-        "localizations": []
+        "attributes": {
+            "skillName": "postgreSQL",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "22",
-        "skillName": "c++",
-        "localizations": []
-    },
-    {
-        "id": "42",
-        "skillName": "versel",
-        "localizations": []
-    },
-    {
-        "id": "2",
-        "skillName": "React",
-        "localizations": []
-    },
-    {
-        "id": "53",
-        "skillName": "wordpress",
-        "localizations": []
-    },
-    {
-        "id": "54",
-        "skillName": "elementor",
-        "localizations": []
-    },
-    {
-        "id": "55",
-        "skillName": "canva",
-        "localizations": []
-    },
-    {
-        "id": "59",
-        "skillName": "Deep learning ",
-        "localizations": []
-    },
-    {
-        "id": "60",
-        "skillName": "Blockchain",
-        "localizations": []
-    },
-    {
-        "id": "3",
-        "skillName": "Vue",
-        "localizations": []
-    },
-    {
-        "id": "23",
-        "skillName": "c#",
-        "localizations": []
-    },
-    {
-        "id": "44",
-        "skillName": "graphQl",
-        "localizations": []
-    },
-    {
-        "id": "70",
-        "skillName": "Sveltekit",
-        "localizations": []
-    },
-    {
-        "id": "74",
-        "skillName": "Swiper",
-        "localizations": []
-    },
-    {
-        "id": "75",
-        "skillName": "Jira api",
-        "localizations": []
-    },
-    {
-        "id": "76",
-        "skillName": "NodeJs",
-        "localizations": []
-    },
-    {
-        "id": "77",
-        "skillName": "Webrtc",
-        "localizations": []
-    },
-    {
-        "id": "7",
-        "skillName": "צילום, סטילס",
-        "localizations": [
-            {
-                "skillName": "צילום, סטילס"
+        "attributes": {
+            "skillName": "c++",
+            "localizations": {
+                "data": []
             }
-        ]
-    },
-    {
-        "id": "73",
-        "skillName": "Ux  חוויית משתמש",
-        "localizations": [
-            {
-                "skillName": "Ux  חוויית משתמש"
-            }
-        ]
-    },
-    {
-        "id": "5",
-        "skillName": "צילום וידאו",
-        "localizations": [
-            {
-                "skillName": "צילום וידאו"
-            }
-        ]
-    },
-    {
-        "id": "43",
-        "skillName": "תרגום עברית לאנגלית ",
-        "localizations": [
-            {
-                "skillName": "תרגום עברית לאנגלית "
-            }
-        ]
-    },
-    {
-        "id": "16",
-        "skillName": "תכנון פרויקט באתר 1❤️1 ",
-        "localizations": [
-            {
-                "skillName": "תכנון פרויקט באתר 1❤️1 "
-            }
-        ]
-    },
-    {
-        "id": "15",
-        "skillName": "תכנון טיולים בהודו",
-        "localizations": [
-            {
-                "skillName": "תכנון טיולים בהודו"
-            }
-        ]
-    },
-    {
-        "id": "52",
-        "skillName": "תכנון",
-        "localizations": [
-            {
-                "skillName": "תכנון"
-            }
-        ]
-    },
-    {
-        "id": "34",
-        "skillName": "שירה",
-        "localizations": [
-            {
-                "skillName": "שירה"
-            }
-        ]
-    },
-    {
-        "id": "57",
-        "skillName": "שיווק אורגני בפייסבוק",
-        "localizations": [
-            {
-                "skillName": "שיווק אורגני בפייסבוק"
-            }
-        ]
-    },
-    {
-        "id": "61",
-        "skillName": "קונספט",
-        "localizations": [
-            {
-                "skillName": "קונספט"
-            }
-        ]
-    },
-    {
-        "id": "67",
-        "skillName": "סבלות",
-        "localizations": [
-            {
-                "skillName": "סבלות"
-            }
-        ]
+        }
     },
     {
         "id": "56",
-        "skillName": "ניהול דפי פייסבוק",
-        "localizations": [
-            {
-                "skillName": "ניהול דפי פייסבוק"
+        "attributes": {
+            "skillName": "Facebook page management",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "66",
-        "skillName": "ניהול אירוע",
-        "localizations": [
-            {
-                "skillName": "ניהול אירוע"
+        "attributes": {
+            "skillName": "Event Management",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "64",
-        "skillName": "בישול חומוס",
-        "localizations": [
-            {
-                "skillName": "בישול חומוס"
+        "attributes": {
+            "skillName": "Cooking Hummus",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "33",
-        "skillName": "עיצוב שיער",
-        "localizations": [
-            {
-                "skillName": "עיצוב שיער"
+        "attributes": {
+            "skillName": "Hair Design",
+            "localizations": {
+                "data": []
             }
-        ]
-    },
-    {
-        "id": "35",
-        "skillName": "משחק",
-        "localizations": [
-            {
-                "skillName": "משחק"
-            }
-        ]
+        }
     },
     {
         "id": "14",
-        "skillName": " Google - פרסום ב",
-        "localizations": [
-            {
-                "skillName": " Google - פרסום ב"
+        "attributes": {
+            "skillName": "Advertising on Google",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "69",
-        "skillName": "מאמן כושר",
-        "localizations": [
-            {
-                "skillName": "מאמן כושר"
+        "attributes": {
+            "skillName": "personal trainer",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "40",
-        "skillName": "הכנת קפה, בריסטה",
-        "localizations": [
-            {
-                "skillName": "הכנת קפה, בריסטה"
+        "attributes": {
+            "skillName": "Barista, Coffee making",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "26",
-        "skillName": "עיצוב פנים",
-        "localizations": [
-            {
-                "skillName": "עיצוב פנים"
+        "attributes": {
+            "skillName": "Interior design",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "9",
-        "skillName": "כתיבה שיווקית",
-        "localizations": [
-            {
-                "skillName": "כתיבה שיווקית"
+        "attributes": {
+            "skillName": "Marketing writing",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "49",
-        "skillName": "כדורגל",
-        "localizations": [
-            {
-                "skillName": "כדורגל"
+        "attributes": {
+            "skillName": "football",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "11",
-        "skillName": "כתיבה ספרותית",
-        "localizations": [
-            {
-                "skillName": "כתיבה ספרותית"
+        "attributes": {
+            "skillName": "Literary writing",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "27",
-        "skillName": "כתיבת תסריט",
-        "localizations": [
-            {
-                "skillName": "כתיבת תסריט"
+        "attributes": {
+            "skillName": "Writing a script",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "20",
-        "skillName": "Instagram -פרסום ב",
-        "localizations": [
-            {
-                "skillName": "Instagram -פרסום ב"
+        "attributes": {
+            "skillName": "instagram advertising",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "72",
-        "skillName": "פיתוח עסקי ומכירות",
-        "localizations": [
-            {
-                "skillName": "פיתוח עסקי ומכירות"
+        "attributes": {
+            "skillName": "Business development and sales",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "31",
-        "skillName": "עיצוב תכשיטים",
-        "localizations": [
-            {
-                "skillName": "עיצוב תכשיטים"
+        "attributes": {
+            "skillName": "jewelry design",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "6",
-        "skillName": "עיצוב שמלות",
-        "localizations": [
-            {
-                "skillName": "עיצוב שמלות"
+        "attributes": {
+            "skillName": "Dress design",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "68",
-        "skillName": "הפקת אירוע",
-        "localizations": [
-            {
-                "skillName": "הפקת אירוע"
+        "attributes": {
+            "skillName": "Event Production",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "71",
-        "skillName": "  tiktok הכנת סרטוני ",
-        "localizations": [
-            {
-                "skillName": "  tiktok הכנת סרטוני "
+        "attributes": {
+            "skillName": "Making tiktok videos",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "32",
-        "skillName": "הדרכת יוגה",
-        "localizations": [
-            {
-                "skillName": "הדרכת יוגה"
+        "attributes": {
+            "skillName": "Yoga instruction",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "39",
-        "skillName": "בניית ציפורניים",
-        "localizations": [
-            {
-                "skillName": "בניית ציפורניים"
+        "attributes": {
+            "skillName": "Nail construction",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "63",
-        "skillName": "בחירת מוצרים מתאימים לבישול",
-        "localizations": [
-            {
-                "skillName": "בחירת מוצרים מתאימים לבישול"
+        "attributes": {
+            "skillName": "Choosing suitable products for cooking",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "79",
-        "skillName": "דיבור",
-        "localizations": [
-            {
-                "skillName": "דיבור"
+        "attributes": {
+            "skillName": "Speech",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
+    },
+    {
+        "id": "42",
+        "attributes": {
+            "skillName": "vercel",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "135",
+        "attributes": {
+            "skillName": "cooking Indian food",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "133",
+        "attributes": {
+            "skillName": "Market Research",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "134",
+        "attributes": {
+            "skillName": "Smartphones' laboratory fixing ",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "192",
+        "attributes": {
+            "skillName": "Tiktok page management",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "2",
+        "attributes": {
+            "skillName": "React",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "53",
+        "attributes": {
+            "skillName": "wordpress",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "54",
+        "attributes": {
+            "skillName": "elementor",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "55",
+        "attributes": {
+            "skillName": "canva",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "59",
+        "attributes": {
+            "skillName": "Deep learning ",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "60",
+        "attributes": {
+            "skillName": "Blockchain",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "3",
+        "attributes": {
+            "skillName": "Vue",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "23",
+        "attributes": {
+            "skillName": "c#",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "44",
+        "attributes": {
+            "skillName": "graphQl",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "70",
+        "attributes": {
+            "skillName": "Sveltekit",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "74",
+        "attributes": {
+            "skillName": "Swiper",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "35",
+        "attributes": {
+            "skillName": "משחק",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "skillName": "משחק"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "id": "75",
+        "attributes": {
+            "skillName": "Jira api",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "76",
+        "attributes": {
+            "skillName": "NodeJs",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "77",
+        "attributes": {
+            "skillName": "Webrtc",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "7",
+        "attributes": {
+            "skillName": "Photography, stills",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "73",
+        "attributes": {
+            "skillName": "Ux User experience",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "5",
+        "attributes": {
+            "skillName": "Video shooting",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "43",
+        "attributes": {
+            "skillName": "Hebrew to English translation",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "15",
+        "attributes": {
+            "skillName": "Planning trips in India",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "52",
+        "attributes": {
+            "skillName": "planning",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "34",
+        "attributes": {
+            "skillName": "singing",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "57",
+        "attributes": {
+            "skillName": "Organic Marketing Facebook",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "61",
+        "attributes": {
+            "skillName": "Concept",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "67",
+        "attributes": {
+            "skillName": "porterage",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "16",
+        "attributes": {
+            "skillName": "FreeMates planning on 1💗1",
+            "localizations": {
+                "data": []
+            }
+        }
     },
     {
         "id": "78",
-        "skillName": "טיולים בטבע",
-        "localizations": [
-            {
-                "skillName": "טיולים בטבע"
+        "attributes": {
+            "skillName": "nature hikes",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "13",
-        "skillName": "Facebook -פרסום ב ",
-        "localizations": [
-            {
-                "skillName": "Facebook -פרסום ב "
+        "attributes": {
+            "skillName": "Facebook Advertising",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "50",
-        "skillName": "חקירה",
-        "localizations": [
-            {
-                "skillName": "חקירה"
+        "attributes": {
+            "skillName": "Research",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "80",
-        "skillName": "D2 אנימציה ",
-        "localizations": [
-            {
-                "skillName": "D2 אנימציה "
+        "attributes": {
+            "skillName": "2d animation",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "58",
-        "skillName": "חסר כישרון לגמרי",
-        "localizations": [
-            {
-                "skillName": "חסר כישרון לגמרי"
+        "attributes": {
+            "skillName": "Completely lacking in talent",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "48",
-        "skillName": "לייבש את המוח",
-        "localizations": [
-            {
-                "skillName": "לייבש את המוח"
+        "attributes": {
+            "skillName": " bore",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
     },
     {
         "id": "45",
-        "skillName": "טירוף עז",
-        "localizations": [
-            {
-                "skillName": "טירוף עז"
+        "attributes": {
+            "skillName": "Intense madness",
+            "localizations": {
+                "data": []
             }
-        ]
+        }
+    },
+    {
+        "id": "136",
+        "attributes": {
+            "skillName": "here and there",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "190",
+        "attributes": {
+            "skillName": "Creating a music for videos",
+            "localizations": {
+                "data": []
+            }
+        }
+    },
+    {
+        "id": "194",
+        "attributes": {
+            "skillName": "ניתוחים סטטיסטיים- SPSS",
+            "localizations": {
+                "data": []
+            }
+        }
     }
 ]

@@ -15,7 +15,16 @@ async function upd (){
             
       
 }
+function vfor(){
+  for (let i = 0; i < meData.length; i++) {
+    const id = meData[i].id
+    meData[i] = meData[i].attributes;
+    meData[i].id = id
+    
+  }
+}
   onMount(async () => {
+    vfor()
    myMissionH()
               myMi ()  
               });
@@ -28,6 +37,7 @@ async function upd (){
 
 async function han (){
     console.log(meData)
+    let d = new Date
     already = true;
  const cookieValue = document.cookie
   .split('; ')
@@ -47,7 +57,7 @@ async function han (){
   const easy = (element.easy > 0) ? element.easy : 0;
   const sdate = (element.dates !== undefined) ? `sdate: "${new Date(element.dates).toISOString()}",` : ``;
    const fdate = (element.datef !== undefined) ? `fdate: "${new Date(element.datef).toISOString()}" ,` : ``;
- let linkgra = 'https://i18.onrender.com/graphql';
+ let linkgra = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
@@ -58,7 +68,6 @@ async function han (){
         body: 
         JSON.stringify({query:
           `mutation { createSp(
-    input: {
       data: { 
           name: "${element.name}",
              descrip: "${element.descrip}",
@@ -70,20 +79,20 @@ async function han (){
              linkto: "${element.linkto}",
              users_permissions_user: "${idL}",
              mashaabim: "${element.id}", 
+             publishedAt: "${d.toISOString()}",        
              ${sdate} 
              ${fdate}
-      }
     }
-  ) {sp {id name}}
+  )  {data{id attributes{ name}}}
 } `   
 } )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
              dispatch('close', {
-                 id: miDatan.data.createSp.sp.id,
-                 name: miDatan.data.createSp.sp.name,
-                 skob: miDatan.data.createSp.sp
+                 id: miDatan.data.createSp.data.id,
+                 name: miDatan.data.createSp.data.attributes.name,
+                 skob: miDatan.data.createSp.data
              });
         } catch (e) {
             error1 = e

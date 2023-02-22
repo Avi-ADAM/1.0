@@ -25,9 +25,9 @@ function myMissionH ()  {
   let is = [];
 
 for (var i = 0; i <meData.length; i++) {
-  if (meData[i].kindOf === "monthly"){
-    var b = moment(meData[i].sqadualed);
-var a = moment(meData[i].sqadualedf);
+  if (meData[i].attributes.kindOf === "monthly"){
+    var b = moment(meData[i].attributes.sqadualed);
+var a = moment(meData[i].attributes.sqadualedf);
 meData[i].monts = a.diff(b, 'months', true).toFixed(2); 
     console.log(i,"to to")
     ky = true;
@@ -36,11 +36,11 @@ meData[i].monts = a.diff(b, 'months', true).toFixed(2);
          meData[i].kc = false;
                    meData[i].r = false;
     meData[i].y = false;
-   meData[i].total = meData[i].monts * meData[i].price;
-meData[i].totaltotal = meData[i].monts * meData[i].easy;
-  } else if (meData[i].kindOf === "yearly"){
-     var b = moment(meData[i].sqadualed);
-var a = moment(meData[i].sqadualedf);
+   meData[i].total = meData[i].monts * meData[i].attributes.price;
+meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
+  } else if (meData[i].attributes.kindOf === "yearly"){
+     var b = moment(meData[i].attributes.sqadualed);
+var a = moment(meData[i].attributes.sqadualedf);
 meData[i].years = a.diff(b, 'years', true).toFixed(2);
     ky = true;
     meData[i].y = true;
@@ -48,34 +48,35 @@ meData[i].years = a.diff(b, 'years', true).toFixed(2);
           meData[i].r = false;
      meData[i].ky = true;
               meData[i].kc = false;
-   meData[i].total = (meData[i].years * meData[i].price).toFixed(2);
-meData[i].totaltotal = (meData[i].years * meData[i].easy).toFixed(2);
-    } else if (meData[i].kindOf === "rent"){
+   meData[i].total = (meData[i].years * meData[i].attributes.price).toFixed(2);
+meData[i].totaltotal = (meData[i].years * meData[i].attributes.easy).toFixed(2);
+    } else if (meData[i].attributes.kindOf === "rent"){
             meData[i].y = false;
     ky = true;
     meData[i].r = true;
      meData[i].ky = true;
              meData[i].m = false;
          meData[i].kc = false;
-   meData[i].total =  meData[i].price;
-meData[i].totaltotal =  meData[i].easy;
-    } else if (meData[i].kindOf === "perUnit"){
+   meData[i].total =  meData[i].attributes.price;
+meData[i].totaltotal =  meData[i].attributes.easy;
+    } else if (meData[i].attributes.kindOf === "perUnit"){
     meData[i].y = false;
     meData[i].kc = true;
          meData[i].ky = false;
                  meData[i].m = false;
           meData[i].r = false;
     kc = true;
-    meData[i].total = meData[i].hm * meData[i].price;
-meData[i].totaltotal = meData[i].hm * meData[i].easy;
-  } else if (meData[i].kindOf === "total"){
+    meData[i].total = meData[i].attributes.hm * meData[i].attributes.price;
+meData[i].totaltotal = meData[i].attributes.hm * meData[i].attributes.easy;
+  } else if (meData[i].attributes.kindOf === "total"){
         meData[i].y = false;
     meData[i].kc = false;
          meData[i].ky = false;
                  meData[i].m = false;
                      meData[i].r = false;
-   meData[i].total =  meData[i].price;
-meData[i].totaltotal =  meData[i].easy;
+                     meData[i].to = true;
+   meData[i].total =  meData[i].attributes.price;
+meData[i].totaltotal =  meData[i].attributes.easy;
   }
 }
 };
@@ -86,7 +87,7 @@ meData[i].totaltotal =  meData[i].easy;
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >משאבים שנבחרו</h1>
+      >משאבים נדרשים שפורסמו</h1>
     </caption>
         <tr class="gg">
           <th class="gg"> </th>
@@ -99,75 +100,75 @@ meData[i].totaltotal =  meData[i].easy;
       <th class="ggr">שם</th>
       {#each meData as data, i}
             <td class="ggr">
-                {data.name}
+                {data.attributes.name}
             </td>
             {/each}
           </tr>
   <tr>
       <th>תיאור</th>
       {#each meData as data, i}
-      <td> {#if data.deskrip} {data.deskrip}{/if}
+      <td> {#if data.attributes.deskrip} {data.attributes.deskrip}{/if}
 </td>
         {/each}
     </tr> <tr>
       <th>סוג</th>
       {#each meData as data, i}
       <td>
-      <h1>{data.kindOf}</h1>
+      <h1>{data.attributes.kindOf}</h1>
         </td>
       {/each}
     </tr> <tr style="display:{kc ? "" : "none"};">
       <th>כמות</th>
       {#each meData as data, i}
       <td >
-       {data.hm}
+       {data.attributes.hm}
       {/each}
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>
       {#each meData as data, i}
-      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.attributes.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr style="display:{ ky  ? "" : "none"};" >
       <th >תאריך סיום </th>
       {#each meData as data, i}
-      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.attributes.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr>
       <th>הערות מיוחדות</th>
       {#each meData as data, i}
-      <td>{#if data.spnot}
- {data.spnot}{/if}</td>
+      <td>{#if data.attributes.spnot}
+ {data.attributes.spnot}{/if}</td>
         {/each}
   </tr> <tr>
       <th>עלות</th>
       {#each meData as data, i}
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
-  <h2>{data.price}</h2>  
+  <h2>{data.attributes.price}</h2>  
   {/each}
     </tr><tr>
       <th>שווי מקסימלי לחישוב בריקמה</th>
       {#each meData as data, i}
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
-        {data.easy}
+        {data.attributes.easy}
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >
       <th>עלות סה"כ</th>
       {#each meData as data, i}
       <td  >
-      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.total}</h3>
+      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ||  meData[i].to ? "" : "none"};">{data.total}</h3>
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};">
       <th>שווי מקסימלי סה"כ</th>
       {#each meData as data, i}
       <td   >
-       <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.totaltotal}</h3>
+       <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ||  meData[i].to ? "" : "none"};">{data.totaltotal}</h3>
       {/each}
     </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
       {#each meData as data, i}
-      <td>{#if data.linkto}{data.linkto}{/if}
+      <td>{#if data.attributes.linkto}{data.attributes.linkto}{/if}
 </td>
         {/each}
   </tr>

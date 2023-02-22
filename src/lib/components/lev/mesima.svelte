@@ -40,7 +40,7 @@ async function xyd () {
       const headers = {
         'Content-Type': 'application/json'   
       };
-        let link ="https://i18.onrender.com/graphql" ;
+        let link ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -51,34 +51,34 @@ async function xyd () {
                   },
         body: 
         JSON.stringify({query: 
-          `{  openMission (id:${missionId}) { sqadualed
-             project { id projectName timeToP profilePic {url  }}
-            tafkidims {roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-            skills {skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+          `{  openMission (id:${missionId}) {data{attributes{ sqadualed
+             project {data{ id attributes{ projectName timeToP profilePic {data{ attributes{url  }}}}}}
+            tafkidims {data{attributes{roleDescription ${$lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ""}}}}
+            skills {data{attributes{skillName ${$lang == 'he' ? 'localizations{data{attributes{skillName }}}' : ""}}}}
             descrip
             hearotMeyuchadot
             name dates
-            work_ways {workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
-            noofhours perhour   }
+            work_ways {data{attributes{workWayName ${$lang == 'he' ? 'localizations{data{attributes{workWayName }}}' : ""}}}}
+            noofhours perhour   }}}
         }`
         })
 })
   .then(r => r.json())
-  .then(data => datar = data.data.openMission);
+  .then(data => datar = data.data.openMission.data.attributes);
   if ($lang != "en" ){
-              for (var i = 0; i < datar.skills.length; i++){
-                if (datar.skills[i].localizations.length > 0){
-                datar.skills[i].skillName = datar.skills[i].localizations[0].skillName
+              for (var i = 0; i < datar.skills.data.length; i++){
+                if (datar.skills.data[i].attributes.localizations.data.length > 0){
+                datar.skills.data[i].attributes.skillName = datar.skills.data[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
-              for (var i = 0; i < datar.tafkidims.length; i++){
-                if (datar.tafkidims[i].localizations.length > 0){
-                datar.tafkidims[i].roleDescription = datar.tafkidims[i].localizations[0].roleDescription
+              for (var i = 0; i < datar.tafkidims.data.length; i++){
+                if (datar.tafkidims.data[i].attributes.localizations.data.length > 0){
+                datar.tafkidims.data[i].attributes.roleDescription = datar.tafkidims.data[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
-              for (var i = 0; i < datar.work_ways.length; i++){
-                if (datar.work_ways[i].localizations.length > 0){
-                datar.work_ways[i].workWayName = datar.work_ways[i].localizations[0].workWayName
+              for (var i = 0; i < datar.work_ways.data.length; i++){
+                if (datar.work_ways.data[i].attributes.localizations.data.length > 0){
+                datar.work_ways.data[i].attributes.workWayName = datar.work_ways.data[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }
@@ -112,13 +112,13 @@ async function xyd () {
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
       <div class="relative flex items-center space-x-1">
          <div class="relative">
-         <img src={data.project.profilePic.url}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+         <img src={data.project.data.attributes.profilePic.data?.attributes.url}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
                <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{headi[$lang]}</span>
             </div>
-            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{data.project.projectName}</span>
+            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{data.project.data.attributes.projectName}</span>
          </div>
          </div>
          </div>
@@ -137,7 +137,7 @@ async function xyd () {
             <small class="text-barbi text-sm ">כישורים נדרשים:</small>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                {#each data.skills as skill}<p on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")}  >
-                <Tile pink={true} word={skill.skillName}/></p>
+                <Tile pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
     </div>
     {/if}
@@ -145,14 +145,14 @@ async function xyd () {
             <div class="border border-gold flex flex-row  flex-wrap justify-center align-middle d  cd p-2">  
               {#each data.tafkidims as rol}
               <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-        <Tile word={rol.roleDescription} wow={true}/></p>{/each}
+        <Tile word={rol.attributes.roleDescription} wow={true}/></p>{/each}
     </div>{/if}
     {#if data.work_ways.length > 0}  <small class="text-sm text-barbi">דרכי העבודה:</small>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                 {#each data.work_ways as rol}<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold"   word={rol.workWayName}/></p>{/each}
+              <Tile bg="gold"   word={rol.attributes.workWayName}/></p>{/each}
     </div>{/if}
-           <button on:click={()=>project(data.project.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >
+           <button on:click={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >
 
     </div>
   

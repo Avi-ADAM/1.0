@@ -16,10 +16,10 @@ let error1;
  const dispatch = createEventDispatcher();
 
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 async function add (){
 already = true;
- 
+ let d = new Date
         try {
             await fetch(linkg, {
                     method: 'POST',
@@ -29,8 +29,9 @@ already = true;
                     body: JSON.stringify({
                         query: `mutation 
                         { createTikunolam(
-    input: {
-      data: {amort: "${amort}",
+      data: {
+         publishedAt: "${d.toISOString()}",       
+        amort: "${amort}",
              name:  "${name}",
              amorts: "${amorts}",
              amortt: "${amortt}",
@@ -40,8 +41,7 @@ already = true;
              notes: "${come}",
              email: ${email}",
                   }
-    }
-  ) {tikunolam{id name}}
+  ) {data{id }}
 
 }
 `})

@@ -29,6 +29,7 @@ nl_accordion = "1";
   import { regHelper } from '$lib/stores/regHelper.js';
   import { onMount } from 'svelte';
       import { email } from '$lib/components/registration/email.js'
+  import { linkos } from '$lib/stores/linkos.js'
 
   let idx = 1;
 let error;
@@ -114,7 +115,8 @@ const cookieValueti = document.cookie
   });
 
  }; 
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+ let error1, fppp
+      const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
           return resp;
@@ -128,17 +130,30 @@ const cookieValueti = document.cookie
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/chezins/count", {
-              method: "GET",
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
+              method: "POST",
               headers: {
                  'Content-Type': 'application/json'
-              },
+              },body: JSON.stringify({
+                        query: `query {
+  chezins { 
+   meta {
+      pagination {
+        total
+      }
+    }
+  }
+}
+              `})
             }).then(checkStatus)
           .then(parseJSON);
-          idx = res + 2
+            fppp = res.data.chezins
+          
+          idx = fppp.meta.pagination.total 
         } catch (e) {
-            error = e
+            error1 = e
         }
+        
     });
 
 
@@ -159,8 +174,10 @@ regHelper.subscribe(value => {
     // Cancel the event as stated by the standard.
 
     // Chrome requires returnValue to be set.
+    let fgf = false
+    if (fgf == true){
     event.returnValue = null;
-     let data = {user: "avi" , email: "aviadam.segel@gmail.com", lang: $lang , kind: "nonreg"}//username email projectname projectsrc lang openmissionName
+     let data = {user: "avi" , email:  "aviadam.segel@gmail.com", lang: $lang , kind: "nonreg", link: $linkos }//username email projectname projectsrc lang openmissionName
             fetch('/api/sma', {
             method: 'POST',  
             headers: {
@@ -175,10 +192,11 @@ regHelper.subscribe(value => {
             .catch((error) => {
               console.error('Error:', error);
             });
-          
+    }
     // more compatibility
     return null
   }
+
 </script>
   <svelte:window on:beforeunload|preventDefault={beforeUnload}/>
 
@@ -197,7 +215,7 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
 
 
 {:else if regHelperL == 0}
-<Amana1 {idx}/>
+<Amana1  {idx}/>
 	 
 {/if}
   

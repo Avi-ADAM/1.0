@@ -1,5 +1,5 @@
 <script>
-import { goto, invalidate, prefetch, prefetchRoutes } from '$app/navigation';
+import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { Tour, TourTip } from 'svelte-tour';
   	import { Toasts } from 'as-toast';
@@ -68,8 +68,8 @@ const logi = { "he": "להתחברות", "en":"To Login"}
 </main>
 {:else}
 <div class="a  bg-gradient-to-br from-gra to-grb">
-    <div class="b border border-barbi">
-<h1 class="text-lturk font-bold text-2xl p-2">{info[$lang]}</h1>
+    <div class="b border border-barbi button-bronze">
+<h1 class=" font-bold text-2xl p-2">{info[$lang]}</h1>
 <div class="flex flex-row flex-auto justify-between">
 <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 rounded-full" on:click={reg}>{registratio[$lang]}</button>
 <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 rounded-full" on:click={login}>{logi[$lang]}</button>

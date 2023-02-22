@@ -37,7 +37,7 @@ export let data = [];
         valueKey={valueKey}
         fill='#ff0092'
         stroke='#9f0080'
-        textColor='#EEE8AA'
+        textColor='white'
         textStroke='#ffdbf8'
         textStrokeWidth={0}
       />

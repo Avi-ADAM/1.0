@@ -4,6 +4,7 @@
         import Close from '$lib/celim/close.svelte'
   import SveltyPicker from 'svelty-picker'
     import moment from 'moment';
+  import { userName } from '$lib/stores/store.js';
 
   let myDate = '11:00';
     import MultiSelect from 'svelte-multiselect';
@@ -11,10 +12,10 @@
     import Addnewro from '../addnew/addNewRole.svelte';
    import { createEventDispatcher } from 'svelte';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
-  import AddNewWorkway from '../addnew/addnewWorkway.svelte';
+  //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
 import { RingLoader
 } from 'svelte-loading-spinners'
-
+import {addslashes} from '$lib/func/uti/string.svelte'
  const dispatch = createEventDispatcher();
 export let newcontent = true;
 export let newcontentR = true;
@@ -36,7 +37,7 @@ export let workways2 = [];
      var  arr = [];
       for (let j = 0; j< role_name_arr.length; j++ ){
       for (let i = 0; i< roles1.length; i++){
-        if(roles1[i].roleDescription === role_name_arr[j]){
+        if(roles1[i].attributes.roleDescription === role_name_arr[j]){
           arr.push(roles1[i].id);
         }
       }
@@ -48,7 +49,7 @@ function find_workway_id(workway_arr){
      var  arr = [];
       for (let j = 0; j< workway_arr.length; j++ ){
       for (let i = 0; i< workways2.length; i++){
-        if(workways2[i].workWayName === workway_arr[j]){
+        if(workways2[i].attributes.workWayName === workway_arr[j]){
           arr.push(workways2[i].id);
         }
       }
@@ -58,7 +59,7 @@ function find_workway_id(workway_arr){
  function find_user_id(user_name_arr){
      var  id = 0;
       for (let i = 0; i< pu.length; i++){
-        if(pu[i].username === user_name_arr[0]){
+        if(pu[i].attributes.username === user_name_arr[0]){
           id = pu[i].id
         }
       }
@@ -66,9 +67,8 @@ function find_workway_id(workway_arr){
      };
 const placeholder = `סוג המשימה`;
 let selected = [];
-const placeholder1 = {"he":"בחירת כל הכישורים הרלוונטיים","en":"choose more skills"};
+const placeholder1 = {"he":'בחירת כל הכישורים הרלוונטיים',"en":'choose more skills'};
 export let skills2 = [];
-let selected1 = [];
 export let roles = [];
     let selected3;
    const placeholder5 ={"he": 'בחירת תפקיד', "en": "choose mission role"};
@@ -78,7 +78,7 @@ export let roles = [];
      var  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
       for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].skillName === skill_name_arr[j]){
+        if(skills2[i].attributes.skillName === skill_name_arr[j]){
           arr.push(skills2[i].id);
         }
       }
@@ -169,24 +169,23 @@ pendq = ` users: [
     } else {
         rishonves4 = ``;
     }
-    const skills = element.skills.map(c => c.id);
-        const work_ways = element.work_ways.map(c => c.id);
-    const tafkidims = element.tafkidims.map(c => c.id);
+    const skills = element.attributes.skills.data.map(c => c.id);
+        const work_ways = element.attributes.work_ways.data.map(c => c.id);
+    const tafkidims = element.attributes.tafkidims.data.map(c => c.id);
 const nhours = (element.nhours > 0) ? element.nhours : 0;
 const valph = (element.valph > 0) ? element.valph : 0;
 let momentx = moment(element.date, "HH:mm DD/MM/YYYY ")
 let momebtt =moment(element.dates, "HH:mm DD/MM/YYYY ")
 const date = (element.date !== undefined && element.date !== "undefined" && element.date !== null) ? ` sqadualed: "${momentx.toISOString()}",` : ``;
 const dates = (element.dates !== undefined && element.dates !== "undefined" && element.dates !== null) ? ` dates: "${momebtt.toISOString()}",` : ``;
-const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `privatlinks: "${element.publicklinks}",` : ``;
-const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${element.privatlinks}",` : "";
-const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${element.spnot}",` : "";
-const deee = (element.descrip !== undefined && element.descrip !== "undefined") ? `descrip: "${element.descrip}",` : "";
-
+const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `privatlinks: "${addslashes(element.publicklinks)}",` : ``;
+const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${addslashes(element.privatlinks)}",` : "";
+const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${addslashes(element.spnot)}",` : "";
+const deee = (element.attributes.descrip !== undefined && element.attributes.descrip !== "undefined") ? `descrip: "${addslashes(element.attributes.descrip)}",` : "";
 //publicklinks save to mission also othet new data
     // הפרדה של קישורים בפסיק
-   
- let link = 'https://i18.onrender.com/graphql';
+   let d = new Date
+ let link = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -197,16 +196,16 @@ const deee = (element.descrip !== undefined && element.descrip !== "undefined") 
         body: 
         JSON.stringify({query:
           `mutation { ${linkop}(
-    input: {
       data: {project: "${projectId}",
              mission:  "${element.id}",
              work_ways: [${work_ways}],
-             name: "${element.missionName}",
+             name: "${addslashes(element.attributes.missionName)}",
              skills: [${skills}], 
              tafkidims: [${tafkidims}],
              vallues:  [${vallues}],
              noofhours: ${nhours},
-             perhour: ${valph},   
+             perhour: ${valph},
+             publishedAt: "${d.toISOString()}",
              ${deee}
               ${pb}
               ${pv}
@@ -218,9 +217,9 @@ const deee = (element.descrip !== undefined && element.descrip !== "undefined") 
              ${rishonves4}
              ${pendq} 
             ${toadd}
-      }
+      
     }
-  ) {${qwerys}{id project{id }}}
+  ) {data{id attributes{ project{data{ id} }}}}
 } `   
 } )})
   .then(r => r.json())
@@ -231,8 +230,8 @@ const deee = (element.descrip !== undefined && element.descrip !== "undefined") 
          if(element.myM === true && userslength > 1){
                    console.log("miDatan")
 
-          let lechaletz = miDatan.data.createOpenMission.openMission.id
-          let link = 'https://i18.onrender.com/graphql';
+          let lechaletz = miDatan.data.createOpenMission.data.id
+          let link = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -244,8 +243,9 @@ const deee = (element.descrip !== undefined && element.descrip !== "undefined") 
         JSON.stringify({query:
           `mutation {  
   createAsk(
-    input: {
-      data:{ open_mission: ${lechaletz},
+      data:{ 
+                publishedAt: "${d.toISOString()}",
+        open_mission: ${lechaletz},
             project: ${projectId},
             users_permissions_user: ${element.rishon},
             vots: [
@@ -255,9 +255,9 @@ const deee = (element.descrip !== undefined && element.descrip !== "undefined") 
     }
   ]
     }
-    }
+    
   ){
-    ask {id}
+    data {id}
   }
   }`    
 } )})
@@ -342,10 +342,10 @@ function myMissionH ()  {
 function minww (id, mid) {
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldww = miData[index].work_ways;
+const oldww = miData[index].attributes.work_ways.data;
 const x = oldww.map(c => c.id);
 const indexy = x.indexOf(id);
-miData[index].work_ways.splice(indexy, 1);
+miData[index].attributes.work_ways.data.splice(indexy, 1);
 dispatch('removeW', {
     data: miData
     } );
@@ -354,10 +354,10 @@ dispatch('removeW', {
 function minrole (id, mid) {
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldroles = miData[index].tafkidims;
+const oldroles = miData[index].attributes.tafkidims.data;
 const x = oldroles.map(c => c.id);
 const indexy = x.indexOf(id);
-miData[index].tafkidims.splice(indexy, 1);
+miData[index].attributes.tafkidims.data.splice(indexy, 1);
 dispatch('removeR', {
     data: miData
     } );
@@ -366,12 +366,11 @@ dispatch('removeR', {
 function minSkill (id, mid) {
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldskills = miData[index].skills;
+const oldskills = miData[index].attributes.skills.data;
 const x = oldskills.map(c => c.id);
 const indexy = x.indexOf(id);
 console.log(indexy);
-miData[index].skills.splice(indexy, 1);
-console.log(miData[index].skills);
+miData[index].attributes.skills.data.splice(indexy, 1);
 dispatch('removeS', {
     data: miData
     } );
@@ -393,7 +392,7 @@ function addR (id, mid) {
   console.log(id, mid);
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldrolesob = miData[index].tafkidims;
+const oldrolesob = miData[index].attributes.tafkidims.data;
 const oldroles = oldrolesob.map(c => c.id);
 const newroles = find_role_id(id);
 let array3 = oldroles.concat(newroles);
@@ -406,10 +405,16 @@ dispatch('addroles', {
   
 }; 
 
-function addW (id, mid) {
+async function addW (id, mid,e) {
+     if (e.detail)
+   if (e.detail.type === 'add')
+  console.log(id)
+  await newnew(id)
+  .then()
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldwwob = miData[index].work_ways;
+const oldwwob = miData[index].attributes.work_ways.data;
+console.log(miData[index])
 const oldww = oldwwob.map(c => c.id);
 const neww = find_workway_id(id);
 let array3 = oldww.concat(neww);
@@ -421,17 +426,22 @@ dispatch('adwww', {
     data: miData,
     mid: mid
     } );
-  
-}; 
 
-function addSK (id , mid) {
+}; 
+let tt = []
+async function addSK (id , mid,event) {
+  console.log(id,mid, event)
+  tt = event
+  console.log(tt)
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldskillsob = miData[index].skills;
+const oldskillsob = miData[index].attributes.skills.data;
 const oldskills = oldskillsob.map(c => c.id);
 const newskills = find_skill_id(id);
+console.log(newskills, id)
 let array3 = oldskills.concat(newskills);
 array3 = [...new Set([...oldskills,...newskills])];
+console.log(array3)
 dispatch('addskills', {
     id: array3,
     data: miData,
@@ -446,7 +456,7 @@ const id = event.detail.id;
 const mid = event.detail.mid;
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldskillsob = miData[index].skills;
+const oldskillsob = miData[index].attributes.skills.data;
 const oldskills = oldskillsob.map(c => c.id);
 const newskills = [id];
 let array3 = oldskills.concat(newskills);
@@ -466,7 +476,7 @@ const id = event.detail.id;
 const mid = event.detail.mid;
 const y = miData.map(c => c.id);
 const index = y.indexOf(mid);
-const oldtafkidimsob = miData[index].tafkidims;
+const oldtafkidimsob = miData[index].attributes.tafkidims.data;
 const oldtafkidims = oldtafkidimsob.map(c => c.id);
 const newtafkidims = [id];
 let array3 = oldtafkidims.concat(newtafkidims);
@@ -480,6 +490,79 @@ dispatch('addnewr', {
     } );
 };
 
+//add new workway option 
+let meDataw = []
+async function newnew (selected){
+  console.log(selected,workways2)
+  for (let i = 0; i<selected.length ;i++){
+    if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
+      //create new and update workways2
+        let d = new Date
+       let link ="https://strapi-87gh.onrender.com/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation  createWorkWay {
+  createWorkWay(data: {  workWayName: "${selected[i]}",
+        publishedAt: "${d.toISOString()}"
+           }) {
+    data {
+      id
+      attributes {
+        workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ""}
+      } 
+
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meDataw = data);
+   const newOb = meDataw.data.createWorkWay.data;
+    const newValues = workways2 ;
+    newValues.push(newOb);
+       
+    workways2 = newValues;
+       const newN = meData.data.createWorkWay.data.attributes.workWayName;
+
+    let userName_value = $userName
+         let datau = {"name": userName_value, "action": "create דרך יצירה חדשה בשם:", "det":newN}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(datau),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data,datau);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  }
+      catch(error) {
+        console.log('צריך לתקן:', error.response);
+        error = error1 
+        console.log(error1)
+                };
+              }
+    }
+ 
+  //workways1.set(find_workway_id(selected));
+
+}
+$: searchText = ``
 
 function addww (event) {
   console.log(event.detail.id);
@@ -505,6 +588,8 @@ let isOpen = false;
 const closer = () => {
     isOpen = false;
 };
+  $: addn = {"he":`הוספת "${searchText}"`,"en": `Create "${searchText}"`}
+
 const isshi = {"he":"האם זו משימת משמרות?","en":"is it shifts mission? "}
 const editsi = {"he":"עריכת סידור המשמרות", "en": "edit shifts"}
 let days = [{"name" :{"he": "ראשון", "en": "Sunday"}, id: 1, st: "11:00", cl: "17:00", shiftp:1, shifts:[{st: "11:00", cl: "17:00",ii:1}]}
@@ -548,6 +633,9 @@ function shifterr (o){
 function kova(){
 
 }
+      const nom = {"he":"חסר ברשימה, ניתן להוסיפו עם הכפתור \"הוספת כישור חדש\" למטה","en": "Missing, you can use the \"Add new Skill\" button bellow to add it"}
+
+const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
   </script>
 
   <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -652,7 +740,7 @@ function kova(){
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >משימות שנבחרו</h1>
+      >{cm[$lang]}</h1>
     </caption>
         <tr class="gg">
           <th class="gg">הסרת המשימה שנבחרה</th>
@@ -670,7 +758,7 @@ function kova(){
       {#each miData as data, i}
             <td class="ggr">
                 <div dir="rtl" class='textinput'>
-  <input type="text"  id="inputii" name="nam" bind:value={data.missionName} class='input' required>
+  <input type="text"  id="inputii" name="nam" bind:value={data.attributes.missionName} class='input' required>
   <label for="nam" id="labelii" class='label' >שם</label>
   <span class='line'></span>
 </div>
@@ -681,7 +769,7 @@ function kova(){
             {#each miData as data, i}
             <td>
                       <div dir="rtl" class='textinput'>
-  <textarea type="text"  id="des" name="des"  bind:value={data.descrip} class='input d' required></textarea>
+  <textarea type="text"  id="des" name="des"  bind:value={data.attributes.descrip} class='input d' required></textarea>
   <label for="des" class='label' >תיאור</label>
   <span class='line'></span>
 </div>
@@ -691,10 +779,10 @@ function kova(){
               <th>כישורים נדרשים</th>
               {#each miData as data, i}
             <td>
-              {#each data.skills as da, i}
+              {#each data.attributes.skills.data as da, i}
                <button class="p-2 m-1" title={less} on:click={minSkill(da.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{$lang == "en" ? da.skillName : da.localizations.length > 0 ?  da.localizations[0].skillName :  da.skillName }</button>
+            </svg>{$lang == "en" ? da.attributes.skillName : da.attributes.localizations.data.length > 0 ?  da.attributes.localizations.data[0].attributes.skillName :  da.attributes.skillName }</button>
               {/each}
               </td>
             {/each}
@@ -705,8 +793,9 @@ function kova(){
               loading={newcontent}
               bind:selected={data.selected2}
               placeholder={placeholder1[$lang]}
-              options={skills2.map(c => c.skillName)}
-              on:change={addSK(data.selected2, data.id)}
+              options={skills2.map(c => c.attributes.skillName)}
+              on:change={(event)=>addSK(data.selected2, data.id,event)}
+                noMatchingOptionsMsg={nom[$lang]}
               />
               <AddNewSkill color={"--barbi-pink"} mid={data.id} on:addnewskill={addnewsk} addS={addS} roles1={roles} />
                 </td>
@@ -715,10 +804,10 @@ function kova(){
               <th>הגדרת תפקיד</th>
               {#each miData as data, i}
             <td>
-              {#each data.tafkidims as ta, i}
+              {#each data.attributes.tafkidims.data as ta, i}
               <button class="p-2 m-1" title={less} on:click={minrole(ta.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{$lang == "en" ? ta.roleDescription : ta.localizations.length > 0 ?  ta.localizations[0].roleDescription : ta.roleDescription }</button>
+            </svg>{$lang == "en" ? ta.attributes.roleDescription : ta.attributes.localizations.data.length > 0 ?  ta.attributes.localizations.data[0].attributes.roleDescription : ta.attributes.roleDescription }</button>
             {/each}
             </td>
             {/each}
@@ -731,7 +820,7 @@ function kova(){
               bind:selected={data.selected3}
               on:add={(event) => console.log(event)}
               placeholder={placeholder5[$lang]}
-              options={roles.map(c => c.roleDescription)}
+              options={roles.map(c => c.attributes.roleDescription)}
               on:change={addR(data.selected3, data.id)}
               />
               <Addnewro color={"--barbi-pink"} mid={data.id} on:addnewrole={addnewrole}   />
@@ -741,10 +830,10 @@ function kova(){
               <th>סוג משימה</th>
               {#each miData as data, i}
             <td>
-              {#each data.work_ways as dm, i}
+              {#each data.attributes.work_ways.data as dm, i}
                <button class="p-2 m-1" title={less} on:click={minww(dm.id, data.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
                 <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{$lang == "en" ? dm.workWayName : dm.localizations.length > 0 ?  dm.localizations[0].workWayName : dm.workWayName}   </button>
+            </svg>{$lang == "en" ? dm.attributes.workWayName : dm.attributes.localizations.data.length > 0 ?  dm.attributes.localizations.data[0].attributes.workWayName : dm.attributes.workWayName}   </button>
               {/each}
               </td>
             {/each}
@@ -753,13 +842,16 @@ function kova(){
             <th>סוג המשימה</th>
             {#each miData as data, i}
             <td><MultiSelect
+               createOptionMsg={addn[$lang]}
+               allowUserOptions={true}
+               bind:searchText
               loading={newcontentW}
               bind:selected={data.selected1} 
               {placeholder}
-              options={workways2.map(c => c.workWayName)}
-              on:change={addW(data.selected1, data.id)}
+              options={workways2.map(c => c.attributes.workWayName)}
+               on:change={(e) => {addW(data.selected1, data.id,e)}}
               />
-              <AddNewWorkway color={"--barbi-pink"} mid={data.id} on:addww={addww}/>
+             <!-- <AddNewWorkway color={"--barbi-pink"} mid={data.id} on:addww={addww}/>-->
             </td>
               {/each}
             </tr> <tr>
@@ -822,10 +914,13 @@ function kova(){
           {#each miData as data, i}
           <td>
                                              <div dir="rtl" class='textinput'>
-  <input type="number"  id="hoursn" name="hoursn"  bind:value={data.nhours} class='input' required>
+  <input type="number"  id="hoursn" name="hoursn"  bind:value={data.nhours} class='input' 
+  required on:change={data.nhours >= 0 ? data.nhours : data.nhours = 0}>
   <label for="hoursn" class='label'>{data.iskvua == true ? hms[$lang] : hmh[$lang]}</label>
   <span class='line'></span>
 </div>
+                    {#if data.nhours < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכול להיות קטן מ-0</small>{/if}
+
           </td>
           {/each}
         </tr><tr style="display:''" id="vallueperhourN" >
@@ -834,10 +929,13 @@ function kova(){
           <td>
                            <div dir="rtl" class='textinput'>
   <input type="number"  id="vallueperhourn" name="vallueperhourn" 
+      on:change={data.valph  < 0 ? data.valph = 0: data.valph }
                                             bind:value={data.valph} class='input' required>
   <label for="vallueperhourn" class='label'>כמה שווה שעה? </label>
   <span class='line'></span>
 </div>
+                    {#if data.valph < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכול להיות קטן מ-0</small>{/if}
+
           </td>
           {/each}
         </tr>
@@ -882,7 +980,7 @@ function kova(){
              <MultiSelect
               bind:selected={data.rishoni}
               placeholder={pll[$lang]}
-              options={pu.map(c => c.username)}
+              options={pu.map(c => c.attributes.username)}
               maxSelect={1}
               on:change={function(){
                 data.rishon = find_user_id(data.rishoni) 

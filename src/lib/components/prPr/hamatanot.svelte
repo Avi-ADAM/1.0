@@ -24,21 +24,21 @@ let arr =[];
 let arrt=[];
 export let salee = [];
 $: for (let i = 0; i < salee.length; i++){
-   if (salee[i].matanot.name in fermatana) {
-                    fermatana[salee[i].matanot.name] += salee[i].in
+   if (salee[i].attributes.matanot.data.attributes.name in fermatana) {
+                    fermatana[salee[i].attributes.matanot.data.attributes.name] += salee[i].attributes.in
                    } else {
-                    fermatana[salee[i].matanot.name] = salee[i].in
+                    fermatana[salee[i].attributes.matanot.data.attributes.name] = salee[i].attributes.in
                    }
 }
 $: for (let i = 0; i < salee.length; i++){
-   if (dayjs(salee[i].date) in ferdate) {
-       if (salee[i].matanot.name in ferdate[dayjs(salee[i].date)]) {
-                    ferdate[dayjs(salee[i].date)][salee[i].matanot.name] += salee[i].in
+   if (dayjs(salee[i].attributes.date) in ferdate) {
+       if (salee[i].attributes.matanot.data.attributes.name in ferdate[dayjs(salee[i].attributes.date)]) {
+                    ferdate[dayjs(salee[i].attributes.date)][salee[i].attributes.matanot.data.attributes.name] += salee[i].attributes.in
                    } else {
-                    ferdate[dayjs(salee[i].date)][salee[i].matanot.name] = salee[i].in
+                    ferdate[dayjs(salee[i].attributes.date)][salee[i].attributes.matanot.data.attributes.name] = salee[i].attributes.in
                    }
                    } else {
-                    ferdate[dayjs(salee[i].date)] = {[salee[i].matanot.name]: salee[i].in}
+                    ferdate[dayjs(salee[i].attributes.date)] = {[salee[i].attributes.matanot.data.attributes.name]: salee[i].attributes.in}
                    }
 console.log(ferdate)
 }
@@ -83,13 +83,16 @@ for (let key in fermatana) {
         arr.push( { key: key, value: fermatana[key] } );
     }
 }}
-
+let kindUlimit = false
 export let projectUsers = [];
 let quant, each, maid;
-function sell(id, v, z){
+function sell(id, v, z,isto){
   maid = id;
   each = v;
   quant = z;
+  if (isto == "unlimited"){
+    kindUlimit = true
+  }
 isOpen = true;
 a = 0;
 }
@@ -125,13 +128,48 @@ hal = true;
 }
 let allin = 0;
 $: for (let i = 0; i < salee.length; i++){
-  allin += salee[i].in
+  allin += salee[i].attributes.in
+}
+function getSrc (id){
+  let src;
+  for (let i = 0; i < projectUsers.length; i++ ){
+    if (projectUsers[i].id == id){
+      if(projectUsers[i].attributes.profilePic.data != null){
+        src = projectUsers[i].attributes.profilePic.data.attributes.url 
+      } else {
+        src =  "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png" 
+      }
+      return src
+    }
+
+  }
+  return  "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png" 
 }
 let arrc = [{year:2019,bananas:3840,cherries:1920,dates:960},{year:2020,bananas:380,cherries:920,dates:1960}]
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const cencel = {"he":"ביטול","en": "cencel"}
 const errmsg = {"he": " אירעה שגיאה", "en":"error"}
 const trya = {"he": "לנסות שוב", "en":"try again"}
+const erhe = {"he":"הכנסות ממתינות לחלוקה","en":"awited spliting earnings"}
+const our = {"he": "המתנות שלנו", "en": "our gift's"}
+const nm = {"he": "שם","en": "name"}
+const pric = {"he": "מחיר", "en": "price"}
+const quanti = {"he": "כמות מצויה", "en": "available quantity"}
+const kinde = {"he": "סוג", "en":"kind"}
+const py = {"he":"ליחידה", "en": "per unit"}
+const pm = {"he": "חודשי","en": "monthly"}
+const pye = {"he": "שנתי", "en": "yearly"}
+const unl = {"he": "ללא הגבלה", "en": "unlimited"}
+const res = {"he": "דיווח על מכירה", "en": "report sale"}
+const cr = {"he": " יצירת מתנה חדשה", "en": "create new gift"}
+const gn = {"he": "שם המתנה", "en": "gift name"}
+const qu = {"he": "סכום", "en": "amount"}
+const whoo = {"he": "הכסף ממתין אצל: ", "en": "who guard the money"}
+const tot = {"he": "סך הכל:", "en": "total:"}
+const req = {"he": "בקשת חלוקה", "en": "request money spliting"}
+const see = {"he": "צפיה בהצעת החלוקה", "en": "see existed sppliting offer"}
+const sbp = {"he": "התפלגות המכירות לפי מוצר", "en": "sales by product"}
+const sbd = {"he": "התפלגות המכירות לפי תאריך", "en": "sales by date"}
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -141,7 +179,7 @@ const trya = {"he": "לנסות שוב", "en":"try again"}
              <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}>{cencel[$lang]}</button>
           {#if a == 0}
- <Sale {projectUsers} {each} {quant} {maid} on:doner={closer} on:done={sale} on:eror={()=>a=3}/>
+ <Sale {projectUsers} {each} {quant} {kindUlimit} {maid} on:doner={closer} on:done={sale} on:eror={()=>a=3}/>
           {:else if a == 1}
  <New {projectId} on:done={done}/>
 
@@ -167,8 +205,8 @@ const trya = {"he": "לנסות שוב", "en":"try again"}
 
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
-      <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >המתנות שלנו</h1>
+      <h1 class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
+      >{our[$lang]}</h1>
     </caption>
         <tr class="gg">
           <th class="gg"></th>
@@ -179,38 +217,38 @@ const trya = {"he": "לנסות שוב", "en":"try again"}
         </td>
           {/each}
     </tr> <tr>
-      <th >שם</th>
+      <th >{nm[$lang]}</th>
       {#each bmiData as data, i}
-            <td >{data.name}
+            <td >{data.attributes.name}
             </td>
             {/each}
           </tr> <tr>
-            <th>מחיר</th>
+            <th>{pric[$lang]}</th>
             {#each bmiData as data, i}
-            <td>{data.price}</td>
+            <td>{data.attributes.price}</td>
               {/each}
             </tr>
          <tr >
-              <th >כמות מצויה </th>
+              <th >{quanti[$lang]}</th>
               {#each bmiData as data, i}
             <td >              
-              {#if data.quant > 0}
-            <p style="display:{data.kindOf == "unlimited" ? "none" : ""} ;">{data.quant}</p> 
+              {#if data.attributes.quant > 0}
+            <p style="display:{data.attributes.kindOf == "unlimited" ? "none" : ""} ;">{data.attributes.quant}</p> 
             {/if}
             </td>
             {/each}
           </tr><tr>
-          <th> סוג </th>
+          <th>{kinde[$lang]}</th>
           {#each bmiData as data, i}
           <td>
-            {#if data.kindOf == "total"}
-            ליחידה
-          {:else if data.kindOf == "monthly"}
-          חודשי
-          {:else if data.kindOf == "yearly"}
-            שנתי
-         {:else if data.kindOf == "unlimited"}
-          ללא הגבלה
+            {#if data.attributes.kindOf == "total"}
+            {py[$lang]}
+          {:else if data.attributes.kindOf == "monthly"}
+          {pm[$lang]}
+          {:else if data.attributes.kindOf == "yearly"}
+            {pye[$lang]}
+         {:else if data.attributes.kindOf == "unlimited"}
+          {unl[$lang]}
          {/if}
            </td>
            {/each}
@@ -238,14 +276,14 @@ const trya = {"he": "לנסות שוב", "en":"try again"}
     </tr>-->
 
     <tr class="ggd">
-          <th class="ggd">דיווח על מכירה</th>
+          <th class="ggd">{res[$lang]}</th>
           {#each bmiData as data, i}
           <td class="ggd" style="font-size: 3rem">
            
           <button
           class=" hover:bg-gold  rounded-full p-0.5"
-          title="דיווח על מכירה"
-          on:click={sell(data.id, data.price, data.quant)} 
+          title="{res[$lang]}"
+          on:click={sell(data.id, data.attributes.price, data.attributes.quant, data.attributes.kindOf)} 
           ><svg class="svggg"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 496 496" style=" width:24px;height:24px;" xml:space="preserve">
 <g>
@@ -317,65 +355,53 @@ const trya = {"he": "לנסות שוב", "en":"try again"}
     {/if}
 
    <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink  text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
- on:click={addnew}>יצירת מתנה </button>
+ on:click={addnew}>{cr[$lang]}</button>
      {#if salee.length > 0}
-
-  <table dir="rtl" >
-    <caption class="sm:text-right md:text-center text-right ">  
-      <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      > מכירות ממתינות לחלוקה</h1>
-    </caption>
-        <tr class="gg">
-          <th class="gg"></th>
-          <th class="gg">שם המתנה</th>
-            <th class="gg">סכום</th>
-            <th class="gg">הכסף ממתין אצל: </th>
-</tr>          
+ <div class=" text-center  border-2  border-barbi rounded m-4 flex flex-col">
+   <h1 class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
+      >{erhe[$lang]}</h1>
+      <div class="flex max-w-full d overflow-auto ">
           {#each salee as data, i}
-          <tr>
-                      <th class="ggr" style="font-size: 1.5rem">
-            {i + 1}
-                    <!--    <button>מחיקה</button>-->
-        </th>
-            <td >{data.matanot.name}
-            </td>
-            <td>{data.in}</td>
-           
-            <td >              
-              {data.users_permissions_user.username}
-            </td>
-         </tr>
+      
+        <div class=" button-whitegold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow">
+            <h3 title="{gn[$lang]}" >{data.attributes.matanot.data.attributes.name}
+            </h3>
+            <p title="{qu[$lang]}">{data.attributes.in}</p>
+           <span class="flex flex-row">
+            <h5 class="text-barbi font-bold" title="{whoo[$lang]}">              
+              {data.attributes.users_permissions_user.data.attributes.username}
+            </h5>
+            <img class=" h-4 w-4 rounded-full ring-2 ring-gold" src="{getSrc(data.attributes.users_permissions_user.data.id)}" alt="">
+         </span>
+        </div>
             {/each}
-        <tr>
-             <td class="gg" style="font-size: 1.5rem">
-             סך הכל
-        </td>
-                <td></td>
-        <td>{allin}</td>
-                        <td></td>
-
-          </tr>
-    </table> 
+ </div>
+ <div class="button-silver m-1 mt-2 py-4 px-8 mx-auto text-barbi rounded">
+                       <h2>  {tot[$lang]}</h2>
+              <p class="font-bold">{allin}</p></div>
+  
     {#if hal === false}
-   <button id="haluk"  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
- on:click={ask}>{trili.length == 0 ? "בקשת חלוקה" : "צפיה בהצעת החלוקה" }</button>
+   <button id="haluk"  class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+ on:click={ask}>{trili.length == 0 ? see[$lang]:req[$lang] }</button>
 {:else}
 <Halu  {trili} {salee} {allin} meData={rikmashes} fmiData={fmiData} users={projectUsers} {rikmashes} />
 {/if}
-    {/if}
       </div>
+
+    {/if}
   </div>
+            </div> 
 
  {#if salee.length > 0} 
  <div class="border-barbi border">
-   <h1 class="text-center text-barbi text-bold underline decoration-mturk">התפלגות המכירות לפי מוצר</h1>
+   <h1 class="text-center text-barbi text-bold underline decoration-mturk">{sbp[$lang]}</h1>
 
 <div class="dff m-4">
  <Cir data={arr}/></div>
 
 </div>
 <div class="border-barbi border">
-   <h1 class="text-center text-barbi text-bold underline decoration-mturk">  התפלגות המכירות לפי תאריך</h1>
+   <h1 class="text-center text-barbi text-bold underline decoration-mturk">{sbd[$lang]}</h1>
 
 <div class="dff m-2">
  <Col data={arrt}/></div>

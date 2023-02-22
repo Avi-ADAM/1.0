@@ -4,7 +4,7 @@ export const POST = async ({ request }) => {
     const data = await request.json()
 
     const name = data.name;
-    const action = data.action;
+    const action = data.action.replace("\n", "%0A");
     const det = data.det
     // const email = (form.get('email'));
     // const contact = (form.get('contact'));

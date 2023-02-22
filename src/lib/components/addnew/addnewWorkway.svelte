@@ -21,19 +21,20 @@
         function dispatchww (meData) {
           console.log(meData);
       dispatch('addww', {
-        id: meData.data.createWorkWay.workWay.id,
+        id: meData.data.createWorkWay.data.id,
         mid: mid,
-        skob: meData.data.createWorkWay.workWay,
-        name: meData.data.createWorkWay.workWay.workwayName,
+        skob: meData.data.createWorkWay.data,
+        name: meData.data.createWorkWay.data.attributes.workwayName,
         } );
     };
     
    async function addww () {
+    let d = new Date
        shgi = false;
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-let link ="https://i18.onrender.com/graphql" ;
+let link ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -44,13 +45,14 @@ let link ="https://i18.onrender.com/graphql" ;
         body: 
         JSON.stringify({query: 
            `mutation { createWorkWay(
-    input: {
-       data: {workWayName: "${Name_value}" }
-    }
+       data: {workWayName: "${Name_value}" 
+              publishedAt: "${d.toISOString()}",
+      }
+  
   ){
-          workWay{
-              id workWayName
-          }
+          data{
+              id attributes{ workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ""}
+          }}
   }
 }`   
         })

@@ -1,4 +1,5 @@
 <script>
+    import {nutifi } from '$lib/func/nutifi.svelte'
     import { addToast } from 'as-toast';
   import RangeSlider from "svelte-range-slider-pips";
     import { lang } from '$lib/stores/lang.js'
@@ -6,7 +7,7 @@
     import { clickOutside } from './outsidclick.js';
     import { formatTime } from './utils.js';
     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-    import { goto, prefetch } from '$app/navigation';
+    import { goto } from '$app/navigation';
     import { idPr } from '../../stores/idPr.js';
     import { onMount } from 'svelte';
      import { createEventDispatcher } from 'svelte';
@@ -25,7 +26,8 @@ betha.subscribe(value => {
     export let stname;
     let show = true;
         export let low = false;
-        export let status = 0;
+        export let status = 0;//tween store
+        export let tasks = []
     export let tx = 680;
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
@@ -117,57 +119,26 @@ onMount(async () => {
 
 $: if (percentage(zman,mstotal) == 90){
  let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+          nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+
         } else if (percentage(zman,mstotal) == 95){
  let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+          nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+
         } 
 $: if (mstotal-zman == 300000){
  let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- })}else if (mstotal-zman == 60000){
+         nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+  }else if (mstotal-zman == 60000){
           console.log("timer stop min")
  let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+        nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+
         }
-$: if (percentage(zman,mstotal) >= 100){
+$: if (percentage(zman,mstotal) >= 100 && running == true){
            azor ()
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
-    navigator.serviceWorker.register('sw.js');
- Notification.requestPermission(function(result) {
-  if (result === 'granted') {
-    navigator.serviceWorker.ready.then(function(registration) {
-      registration.showNotification('1❤️1', { body: text, icon: img });
-    });
-  }
- });
+    nutifi("1❤️1 טיימר נעצר",text,"lev" )
         }
 
   let timer;
@@ -210,14 +181,12 @@ async function azor () {
                         query: `mutation 
                         { 
  updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+    id:${mId}
   data: {
  stname: "stopi",
  timer: ${x}
   }
- }
- ) {mesimabetahalich{id stname timer}}
+ ) { data{id attributes{ stname timer}}}
  }
  `})
                 })
@@ -267,14 +236,12 @@ async function start () {
                         query: `mutation 
                         { 
  updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+  id: "${mId}"
   data: {
  stname: "${stname}",
  timer: ${x}
   }
- }
- ) {mesimabetahalich{id stname timer}}
+ ) {data{id attributes{ stname timer}}}
  }
 `})
                 })
@@ -323,14 +290,12 @@ async function handleClearClick () {
                         query: `mutation 
                         { 
 updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+   id: "${mId}"
   data: {
 stname: "0",
 timer: 0
   }
-}
-) {mesimabetahalich{id stname timer}}
+) {data{id attributes{ stname timer}}}
 }
 `})
                 })
@@ -347,7 +312,7 @@ timer: 0
   let miDatan;
  let token;
  let bearer1;
- let linkg = "https://i18.onrender.com/graphql"
+ let linkg = "https://strapi-87gh.onrender.com/graphql"
 async function save() {
     const saved = lapse * 2.7777777777778E-7 + x * 2.7777777777778E-7;
     const noofnew = hoursdon + saved;
@@ -393,15 +358,13 @@ async function save() {
                         query: `mutation 
                         { 
    updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+   id: "${mId}"
   data: {
    howmanyhoursalready: ${hoursdon},
    stname: "0",
     timer: 0
-  }
  }
- ) {mesimabetahalich{id howmanyhoursalready}}
+ ) {data{id attributes{ howmanyhoursalready}}}
  }
 `})
                 })
@@ -438,6 +401,10 @@ function done() {
   //file upload in a chlon kofetz and then archived,, future build smart contracts on blockchain
   isOpen = true;
 }
+function opentask(){
+  a = 4
+  isOpen = true;
+}
 let isOpen = false;
 function close() {
   isOpen = false;
@@ -454,8 +421,11 @@ let tofinished2 = ``;
 let toapprove1 = ``; 
 let toapprove = ``; 
 let appi = ``;
+let butt = false
 async function afterwhy () {
+   butt = true
   already = true;
+  let d = new Date
 const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -480,7 +450,6 @@ if (noofpu === 1) {
   appi = ``
   tofinished = `
    createFinnishedMission(
-           input: { 
              data: {
               missionName: "${missionName}",
               why: "${why}",
@@ -491,20 +460,21 @@ if (noofpu === 1) {
               project: ${projectId},
               descrip: "${missionDetails}",
               users_permissions_user: "${idL}",
+                     publishedAt: "${d.toISOString()}", 
               mission: ${missId}
    }
-}){finnishedMission {id }}`
+){data {id }}`
 } else if (noofpu > 1) {
     toapprove1 = `forappruval: true`;
     appi =`
 createFiniapruval(
-   input: { 
      data: {
       missname: "${missionName}",
       why: "${why}",
       noofhours: ${hoursdon},
       mesimabetahalich: ${mId},
       project: "${projectId}",
+              publishedAt: "${d.toISOString()}",
             users_permissions_user: "${idL}",
        vots:[ 
     {
@@ -512,8 +482,7 @@ createFiniapruval(
       users_permissions_user: "${idL}"
     }
   ]
-   }
-}){finiapruval {id }}`
+}){data {id }}`
 }
 //files shit from updatepic
     //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש 
@@ -530,14 +499,12 @@ createFiniapruval(
                         query: `mutation 
                         { 
 updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+ id: "${mId}"
   data: {
     ${toapprove1}
 ${tofinished1}
   }
-}
-) {mesimabetahalich{id forappruval finnished howmanyhoursalready}}
+) {data{id attributes{ forappruval finnished howmanyhoursalready}}}
 ${appi}
 ${tofinished}
 }
@@ -651,13 +618,11 @@ function claf (event){
                         query: `mutation 
                         { 
    updateMesimabetahalich(
-  input: {
-    where: {id: "${mId}"}
+    id: "${mId}"
   data: {
    status: ${status[0]},
   }
- }
- ) {mesimabetahalich{id }}
+ ) {data{id }}
  }
 `})
                 })
@@ -694,8 +659,9 @@ function claf (event){
              {#if a == 1}
               <h5>יש להעלות קובץ סיום משימה או לתאר במילים</h5>
       <input  type="file" bind:files={what}>
-      <input  type="text" bind:value={why} placeholder="יש לתאר במילים את סיום המשימה">
-            <button on:click={afterwhy}>אישור</button>
+      <input class="border border-gold" type="text" bind:value={why} placeholder="יש לתאר במילים את סיום המשימה">
+          {#if butt == false}  <button class="bg-gold p-2 m-1 rounded-xl" on:click={afterwhy}>אישור</button>
+           {:else} <small>כמה שניות בבקשה</small>{/if}
       <br/> {#if activE}<small>{activE}</small>{/if}
         {:else if a == 2}
         <div dir="ltr" class="flex flex-col justify-center items-center w-full">
@@ -707,6 +673,26 @@ function claf (event){
 </div> 
 {:else if a == 3}
 <h2>{rega[$lang]}</h2> 
+{:else if a == 4}
+<div>
+  {#each tasks as task}
+<h2>{task.attributes.shem}</h2>
+<h5>{task.attributes.des}</h5>
+ <div
+  on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
+  class=" border rounded-2xl border-barbi hover:border-gold " on:click={function(){
+    a = 2;
+    isOpen = true}}
+    on:keypress={function(){
+    a = 2;
+    isOpen = true}}
+    >
+<div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {task.attributes.status == null ? 0 : task.attributes.status}%">{task.attributes.status != null ? task.attributes.status : "0"}%</div>
+    </div> 
+
+<RangeSlider bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
+{/each}
+</div>
 {/if}
   </DialogContent>
   </div>
@@ -739,6 +725,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
     ><div
 	 id="normSml" 
 >  
+{#if tasks.length > 0}
+  <div on:click={opentask} class="absolute inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-red-500 border-2 border-white rounded-full top-0 right-0 dark:border-gray-900">{tasks.length}</div>
+  {/if}
 <svg class="svgg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
    <style bx:fonts="Lobster Two">@import url("https://fonts.googleapis.com/css?family=Lobster+Two:700");</style>
   <style type="text/css">#hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }</style>
@@ -1124,11 +1113,15 @@ out:scale={{duration: 2200, opacity: 0.5}}
 
   <h5 dir="ltr" class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0}`}</span> / <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal}</span></h5>
   
-  <button
+  <div
   on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
-  class="de border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" on:click={function(){
+  class="de border rounded-2xl border-barbi hover:border-gold " on:click={function(){
     a = 2;
-    isOpen = true}}>{status != null ? status[0] : "0"}%</button>
+    isOpen = true}}
+    on:keypress={function(){
+    a = 2;
+    isOpen = true}}
+    ><div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {status == null ? 0 : status[0]}%">{status != null ? status[0] : "0"}%</div></div>
     {#if link != null && link != undefined && link != "undefined"}
   <a on:mouseenter={()=>hover("לינק לביצוע המשימה")} on:mouseleave={()=>hover("0")} class="mn ef text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
     {/if}

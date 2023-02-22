@@ -1,94 +1,140 @@
 [
     {
+        "id": "18",
+        "attributes": {
+            "workWayName": "startup"
+        }
+    },
+    {
         "id": "7",
-        "workWayName": "Joint research"
+        "attributes": {
+            "workWayName": "Joint research"
+        }
     },
     {
         "id": "31",
-        "workWayName": "Imagination and time"
+        "attributes": {
+            "workWayName": "Imagination and time"
+        }
     },
     {
         "id": "15",
-        "workWayName": "from home"
+        "attributes": {
+            "workWayName": "from home"
+        }
     },
     {
         "id": "28",
-        "workWayName": "Social events, cultural and art events, emotional connection, creation"
+        "attributes": {
+            "workWayName": "Social events, cultural and art events, emotional connection, creation"
+        }
     },
     {
         "id": "10",
-        "workWayName": "volunteering"
+        "attributes": {
+            "workWayName": "volunteering"
+        }
     },
     {
         "id": "2",
-        "workWayName": "In the office"
+        "attributes": {
+            "workWayName": "In the office"
+        }
     },
     {
         "id": "24",
-        "workWayName": "at weekends"
+        "attributes": {
+            "workWayName": "at weekends"
+        }
     },
     {
         "id": "5",
-        "workWayName": "In the field"
-    },
-    {
-        "id": "18",
-        "workWayName": "start up"
+        "attributes": {
+            "workWayName": "In the field"
+        }
     },
     {
         "id": "23",
-        "workWayName": "flexible"
+        "attributes": {
+            "workWayName": "flexible"
+        }
     },
     {
         "id": "25",
-        "workWayName": "A few hours a week"
+        "attributes": {
+            "workWayName": "A few hours a week"
+        }
     },
     {
         "id": "20",
-        "workWayName": "dynamic"
+        "attributes": {
+            "workWayName": "dynamic"
+        }
     },
     {
         "id": "22",
-        "workWayName": "with people"
+        "attributes": {
+            "workWayName": "with people"
+        }
     },
     {
         "id": "6",
-        "workWayName": "From the Internet"
+        "attributes": {
+            "workWayName": "From the Internet"
+        }
     },
     {
         "id": "4",
-        "workWayName": "Short projects"
+        "attributes": {
+            "workWayName": "Short projects"
+        }
     },
     {
         "id": "1",
-        "workWayName": "Full-time"
+        "attributes": {
+            "workWayName": "Full-time"
+        }
     },
     {
         "id": "29",
-        "workWayName": "Driving within the city"
+        "attributes": {
+            "workWayName": "Driving within the city"
+        }
     },
     {
         "id": "3",
-        "workWayName": "Part time"
+        "attributes": {
+            "workWayName": "Part time"
+        }
     },
     {
         "id": "8",
-        "workWayName": "Around the world"
+        "attributes": {
+            "workWayName": "Around the world"
+        }
     },
     {
         "id": "21",
-        "workWayName": "When I want without commitment"
-    },
-    {
-        "id": "9",
-        "workWayName": "Long-distance travel"
+        "attributes": {
+            "workWayName": "When I want without commitment"
+        }
     },
     {
         "id": "30",
-        "workWayName": "From the business"
+        "attributes": {
+            "workWayName": "From the business"
+        }
     },
     {
         "id": "19",
-        "workWayName": "A creative community"
+        "attributes": {
+            "workWayName": "A creative community"
+        }
+    },
+    {
+        "id": "9",
+        "attributes": {
+            "workWayName": "Long-distance drive"
+        }
     }
 ]

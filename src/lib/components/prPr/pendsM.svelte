@@ -6,11 +6,12 @@
    import { onMount } from 'svelte';
    onMount(async () => {
  for (var k = 0; k < pmiData.length; k++) {
-     const x = pmiData[k].users
-     for (var z = 0; z < x.length; z++){
-        pmiData[k].uids = [];
-      pmiData[k].uids.push(x[z].users_permissions_user.id);
+     const x = pmiData[k].attributes.users
+             pmiData[k].uids = [];
               pmiData[k].what = [];
+
+     for (var z = 0; z < x.length; z++){
+      pmiData[k].uids.push(x[z].users_permissions_user.data.id);
 
            pmiData[k].what.push(x[z].what);
  }
@@ -26,20 +27,20 @@ for (var t = 0; t <pmiData.length; t++){
     if(allid.includes(myid)){
       pmiData[t].already = true;
     }
-        for (var r=0; r< pmiData[t].users.length; r++){
-            if (pmiData[t].users[r].what === true) {
+        for (var r=0; r< pmiData[t].attributes.users.length; r++){
+            if (pmiData[t].attributes.users[r].what === true) {
                 
                  pmiData[t].noofusersOk += 1;
                
-            }else if (pmiData[t].users[r].what === false) {
+            }else if (pmiData[t].attributes.users[r].what === false) {
               
                  pmiData[t].noofusersNo += 1;
                
             }
         }
-        console.log(pmiData[t].users);
+        console.log(pmiData[t].attributes.users);
      pmiData[t].noofusersWaiting = 0
-    const noofusersWaiting = user_1s - pmiData[t].users.length;
+    const noofusersWaiting = user_1s - pmiData[t].attributes.users.length;
     pmiData[t].noofusersWaiting = noofusersWaiting;
         
     }
@@ -85,20 +86,20 @@ function confirm (id) {
      <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
       <th class="ggr">שם</th>
       {#each pmiData as data, i}
-            <td class="ggr">{data.name}</td>
+            <td class="ggr">{data.attributes.name}</td>
             {/each}
           </tr> <tr>
             <th>תיאור</th>
             {#each pmiData as data, i}
             <td>
-              {data.descrip != undefined && data.descrip != "undefined" ? data.descrip : ""}</td>
+              {data.attributes.descrip != undefined && data.attributes.descrip != "undefined" ? data.attributes.descrip : ""}</td>
               {/each}
             </tr> <tr>
               <th>כישורים נדרשים</th>
               {#each pmiData as data, i}
             <td>
-              {#each data.skills as da}
-                 {` ${da.skillName} `}
+              {#each data.attributes.skills.data as da}
+                 {` ${da.attributes.skillName} `}
               {/each}
               </td>
             {/each}
@@ -106,8 +107,8 @@ function confirm (id) {
               <th>הגדרת תפקיד</th>
               {#each pmiData as data, i}
             <td>
-              {#each data.tafkidims as ta, i}
-                 {` ${ta.roleDescription} `}
+              {#each data.attributes.tafkidims.data as ta, i}
+                 {` ${ta.attributes.roleDescription} `}
             {/each}
             </td>
             {/each}
@@ -116,8 +117,8 @@ function confirm (id) {
               <th>סוג משימה</th>
               {#each pmiData as data, i}
             <td>
-              {#each data.work_ways as dm, i}
-                  {` ${dm.workWayName} `}  
+              {#each data.attributes.work_ways.data as dm, i}
+                  {` ${dm.attributes.workWayName} `}  
               {/each}
               </td>
             {/each}
@@ -125,8 +126,8 @@ function confirm (id) {
          <tr>
               <th>תאריך ביצוע</th>
               {#each pmiData as data, i}
-            <td>              {#if data.Sqadualed != undefined}
-              {data.Sqadualed}
+            <td>              {#if data.attributes.Sqadualed != undefined}
+              {data.attributes.Sqadualed}
             {/if}
             </td>
             {/each}
@@ -134,8 +135,8 @@ function confirm (id) {
             <th>קישורים ציבוריים</th>
             {#each pmiData as data, i}
             <td>
-              {#if data.publicklinks != undefined && data.publicklinks != "undefined" }
-              {data.publicklinks}
+              {#if data.attributes.publicklinks != undefined && data.attributes.publicklinks != "undefined" }
+              {data.attributes.publicklinks}
               {/if}
              </td>
              {/each}
@@ -143,17 +144,17 @@ function confirm (id) {
           <th>הערות יחודיות לריקמה שלי</th>
           {#each pmiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot != undefined && data.hearotMeyuchadot != "undefined"}
-            {data.hearotMeyuchadot}
+            {#if data.attributes.hearotMeyuchadot != undefined && data.attributes.hearotMeyuchadot != "undefined"}
+            {data.attributes.hearotMeyuchadot}
             {/if}
            </td>
            {/each}
       </tr><tr>
         <th>קישורים יחודיים לריקמה שלי</th>
         {#each pmiData as data, i}
-        <td>          {#if data.privatlinks != undefined && data.privatlinks != "undefined"} 
+        <td>          {#if data.attributes.privatlinks != undefined && data.attributes.privatlinks != "undefined"} 
 
-          {data.privatlinks} 
+          {data.attributes.privatlinks} 
           {/if}
          </td>
          {/each}
@@ -161,9 +162,9 @@ function confirm (id) {
           <th >כמה שעות זה אמור לקחת? </th>
           {#each pmiData as data, i}
           <td>
-            {#if data.noofhours > 0}
+            {#if data.attributes.noofhours > 0}
 
-           {data.noofhours}
+           {data.attributes.noofhours}
            {/if}
           </td>
           {/each}
@@ -171,9 +172,9 @@ function confirm (id) {
           <th>כמה שווה שעה ?</th>
           {#each pmiData as data, i}
           <td>
-            {#if data.perhour > 0}
+            {#if data.attributes.perhour > 0}
 
-            {data.perhour}
+            {data.attributes.perhour}
             {/if}
           </td>
           {/each}
@@ -181,8 +182,8 @@ function confirm (id) {
       <th>שווי סך הכל למשימה </th>
       {#each pmiData as data, i}
       <td>
-      {#if data.perhour > 0 & data.noofhours > 0}
-      {data.perhour * data.noofhours}
+      {#if data.attributes.perhour > 0 & data.attributes.noofhours > 0}
+      {data.attributes.perhour * data.attributes.noofhours}
       {:else} 
       <p>0</p>
       {/if}
@@ -192,7 +193,7 @@ function confirm (id) {
     <tr class="ggd">
           <th class="ggd"><span style="color:green;"> בעד </span><span style="color:yellow;"> בהמתנה </span><span style="color:red;"> נגד </span></th>
           {#each pmiData as data, i}
-          <td class="ggd" style="font-size: 3rem ">
+          <td  style="font-size: 3rem ">
             
 <svg style="margin: 0 auto;" height="189.605px" width="60.88px" version="1.1" viewBox="60 -35.561 295.207 956.131" xmlns="http://www.w3.org/2000/svg">
   <defs>
@@ -341,7 +342,7 @@ background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
     .body {
       overflow-x: auto;
       overflow-y: auto;
-
+      max-width: 100%;
      padding-left: 0.5em;
      padding-right: 0.5em;
     }

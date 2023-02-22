@@ -17,14 +17,13 @@ function shaneh () {
 
   // Request API.
 axios
-  .post('https://i18.onrender.com/auth/reset-password', {
+  .post('https://strapi-87gh.onrender.com/api/auth/reset-password', {
     code: email,
     password: passwordx,
     passwordConfirmation: passwordx,
   })
   .then(response => {
     // Handle success.
-        console.log('Your user\'s password has been changed.', response);
                     goto("/login", )
     before = false;
   })
@@ -61,7 +60,6 @@ axios
 </script>
 {#if before}
 <div>
-    <form>
         <div>
             {#if errorl}
                         <h1 

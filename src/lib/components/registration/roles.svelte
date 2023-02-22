@@ -17,7 +17,7 @@
      var  arr = [];
       for (let j = 0; j< role_name_arr.length; j++ ){
       for (let i = 0; i< roles1.length; i++){
-        if(roles1[i].roleDescription === role_name_arr[j]){
+        if(roles1[i].attributes.roleDescription === role_name_arr[j]){
           arr.push(roles1[i].id);
         }
       }
@@ -27,11 +27,11 @@
       let newcontent = true
 
     onMount(async () => {
-       if ($lang == "he" ){
-        roles1 = jroles
-            } else if (lang == "en"){
-              roles1 = enjrole
-            }
+     if ($lang == "he" ){
+      roles1 = jroles
+          } else if (lang == "en"){
+            roles1 = enjrole
+          }
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -46,28 +46,29 @@
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  tafkidims { id roleDescription  ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+  tafkidims { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ""}}
+}
+}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            roles1 = res.data.tafkidims
+            roles1 = res.data.tafkidims.data
             if ($lang == "he" ){
               for (var i = 0; i < roles1.length; i++){
-                if (roles1[i].localizations.length > 0){
-                roles1[i].roleDescription = roles1[i].localizations[0].roleDescription
+                if (roles1[i].attributes.localizations.data.length > 0){
+                roles1[i].attributes.roleDescription = roles1[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
             roles1 = roles1
             newcontent = false
-
         } catch (e) {
             error1 = e
         }
@@ -122,7 +123,7 @@ let isOpen = false;
    function addnew (event){
     
     const newOb = event.detail.skob;
-    const newN = event.detail.skob.roleDescription;
+    const newN = event.detail.skob.attributes.roleDescription;
     isOpen = false;
     const newValues = roles1 ;
     newValues.push(newOb);
@@ -135,6 +136,7 @@ selected.push(newN);
 selected = newSele;
 
   }
+  const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
       const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
@@ -145,7 +147,7 @@ selected = newSele;
   <DialogContent class="content"  aria-label="form">
       <div class="a"dir="{$lang == "en" ? "ltr" : "rtl"}" >
            
-              <Addnewrole rn={roles1.map(c => c.roleDescription)} on:b={close} 
+              <Addnewrole rn={roles1.map(c => c.attributes.roleDescription)} on:b={close} 
                 addR={true} on:addnewrole={addnew}/>
   </DialogContent>
   </div>
@@ -158,10 +160,12 @@ selected = newSele;
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
+       --sms-max-width={"60vw"}
+          noMatchingOptionsMsg={nom[$lang]}
            loading={newcontent}
      bind:selected
      {placeholder}
-     options={roles1.map(c => c.roleDescription)}
+     options={roles1.map(c => c.attributes.roleDescription)}
      /></div>
     <!-- 
            on:change={(e) => alert(`You ${e.detail.type}ed '${e.detail.token}'`)}
@@ -169,7 +173,7 @@ selected = newSele;
       <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
       <button
       on:click={() => isOpen = true} 
-      class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
+      class="button-silver hover:text-barbi font-bold py-1 px-1 rounded-full"
       >{addn[$lang]}</button>
     </div>
     <button class="button-in-1-2" on:click="{back}">

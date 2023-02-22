@@ -15,11 +15,11 @@
     let addskil = 0;
     let newcontent = true
     onMount(async () => {
-            if ($lang == "he" ){
-        skills2 = jskill
-            } else if (lang == "en"){
-              skills2 = enjskill
-            }
+           if ($lang == "he" ){
+       skills2 = jskill
+           } else if (lang == "en"){
+             skills2 = enjskill
+           }
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -34,26 +34,29 @@
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+  skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}
 }
+} }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            skills2 = res.data.skills;
+            skills2 = res.data.skills.data;
              if ($lang == "he" ){
               for (var i = 0; i < skills2.length; i++){
-                if (skills2[i].localizations.length > 0){
-                skills2[i].skillName = skills2[i].localizations[0].skillName
+                if (skills2[i].attributes.localizations.data.length > 0){
+                skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }
             skills2 = skills2
+                         console.log(skills2)
+
             newcontent = false
         } catch (e) {
             error1 = e
@@ -65,7 +68,7 @@
      var  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
       for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].skillName === skill_name_arr[j]){
+        if(skills2[i].attributes.skillName === skill_name_arr[j]){
           arr.push(skills2[i].id);
         }
       }
@@ -112,24 +115,20 @@ function back() {
 let isOpen = false;
  const close = () => {
     isOpen = false;
-   
   };
-   function addnew (event){
-    
+   function addnew (event){ 
     const newOb = event.detail.skob;
-    const newN = event.detail.skob.skillName;
+    const newN = event.detail.skob.attributes.skillName;
     isOpen = false;
     const newValues = skills2 ;
-    newValues.push(newOb);
-       
+    newValues.push(newOb);   
     skills2 = newValues;
    const newSele = selected;
-
 selected.push(newN);
-
 selected = newSele;
-
   }
+      const nom = {"he":"חסר ברשימה, ניתן להוסיפו עם הכפתור \"הוספת כישור חדש\" למטה","en": "Missing, you can use the \"Add new Skill\" button bellow to add it"}
+
     const addn = {"he":"הוספת כישור חדש","en": "Add new Skill"}
     const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
@@ -141,7 +140,7 @@ selected = newSele;
   <DialogContent class="content"  aria-label="form">
       <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
              
-      <Addnewskill rn={skills2.map(c => c.skillName)} addS={true} on:b={close} on:addnewskill={addnew}/>
+      <Addnewskill rn={skills2.map(c => c.attributes.skillName)} addS={true} on:b={close} on:addnewskill={addnew}/>
   </DialogContent>
   </div>
 </DialogOverlay>
@@ -156,13 +155,14 @@ selected = newSele;
   <MultiSelect
         loading={newcontent}
   bind:selected
+  noMatchingOptionsMsg={nom[$lang]}
   {placeholder}
-  options={skills2.map(c => c.skillName)}
+  options={skills2.map(c => c.attributes.skillName)}
   /></div>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
   <button
   on:click={() => isOpen = true} 
-      class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
+      class="button-silver hover:text-barbi font-bold py-1 px-2 rounded-full"
   >{addn[$lang]}</button>
   </div>
     <button class="button-in-1-2" on:click="{back}">

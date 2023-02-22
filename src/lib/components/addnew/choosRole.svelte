@@ -6,18 +6,17 @@ import { missionNew } from '../../stores/missionNew';
              import { lang } from '$lib/stores/lang.js'
 
  const dispatch = createEventDispatcher();
-  function inc() {
-
-    missionNew.set(find_role_id(selected));
+function inc() {
+     missionNew.set(find_role_id(selected));
   };
   let roles1 = [];
   let error1 = null;
-   
+   let loading = true
   function find_role_id(role_name_arr){
    var  arr = [];
     for (let j = 0; j< role_name_arr.length; j++ ){
     for (let i = 0; i< roles1.length; i++){
-      if(roles1[i].roleDescription === role_name_arr[j]){
+      if(roles1[i].attributes.roleDescription === role_name_arr[j]){
         arr.push(roles1[i].id);
       }
     }
@@ -40,35 +39,38 @@ const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("https://i18.onrender.com/graphql", {
+          const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  tafkidims { id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
+  tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ""}}}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            roles1 = res.data.tafkidims
+            roles1 = res.data.tafkidims.data
                        if ($lang == "he" ){
               for (var i = 0; i < roles1.length; i++){
-                if (roles1[i].localizations.length > 0){
-                roles1[i].roleDescription = roles1[i].localizations[0].roleDescription
+                if (roles1[i].attributes.localizations.data.length > 0){
+                roles1[i].attributes.roleDescription = roles1[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
             roles1 = roles1
+            loading = false
       } catch (e) {
           error1 = e
       }
   });
 
-  let selected;
+export let selected = [];
       const placeholder = `${$lang == "he" ? "בחירת תפקידים נדרשים" : "needed roles"}`;
 
 const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}
+  const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
+
 </script>
 
 
@@ -79,5 +81,7 @@ id="choos"
   on:change={inc}
 bind:selected
 {placeholder}
-options={roles1.map(c => c.roleDescription)}
+          noMatchingOptionsMsg={nom[$lang]}
+{loading}
+options={roles1.map(c => c.attributes.roleDescription)}
 /> </div>

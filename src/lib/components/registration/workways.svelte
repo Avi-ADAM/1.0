@@ -4,7 +4,6 @@
     import { show } from './store-show.js';
     import { workways1 } from './workways1.js';
     import { onMount } from 'svelte';
-    import Addneww from '../addnew/addnewWorkway.svelte';
  import { createEventDispatcher } from 'svelte';
    import jwork from '$lib/data/workways.json'
     import enjwork from '$lib/data/workwaysEn.json'
@@ -15,11 +14,11 @@
     let error1 = null
     
     onMount(async () => {
-       if ($lang == "he" ){
-        workways2 = jwork
-            } else if (lang == "en"){
-              workways2 = enjwork
-            }
+      if ($lang == "he" ){
+       workways2 = jwork
+           } else if (lang == "en"){
+             workways2 = enjwork
+           }
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -34,27 +33,28 @@
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  workWays { id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
-}
+  workWays {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ""}}
+}}}
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            workways2 = res.data.workWays
+            workways2 = res.data.workWays.data
                        if ($lang == "he" ){
               for (var i = 0; i < workways2.length; i++){
-                if (workways2[i].localizations.length > 0){
-                workways2[i].workWayName = workways2[i].localizations[0].workWayName
+                if (workways2[i].attributes.localizations.data.length > 0){
+                workways2[i].attributes.workWayName = workways2[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }
             workways2 = workways2
             newcontent = false
+            console.log(workways2)
         } catch (e) {
             error1 = e
         }
@@ -65,7 +65,7 @@
      var  arr = [];
       for (let j = 0; j< workway_arr.length; j++ ){
       for (let i = 0; i< workways2.length; i++){
-        if(workways2[i].workWayName === workway_arr[j]){
+        if(workways2[i].attributes.workWayName === workway_arr[j]){
           arr.push(workways2[i].id);
         }
       }
@@ -98,8 +98,7 @@ function increment() {
 		tx: 0,
 		txx: 8
 	} );
-    workways1.set(find_workway_id(selected));
-   
+   newnew()
 	}
 function back() {
 		show.update(n => n - 1);
@@ -107,45 +106,89 @@ function back() {
 		tx: 0,
 		txx: 16
 	} );
-    workways1.set(find_workway_id(selected));
-   
+  newnew()   
 	}
 
 
+//add new option and update store
+let meData = []
+async function newnew (){
+  console.log(selected,workways2)
+  for (let i = 0; i<selected.length ;i++){
+    if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
+      //create new and update workways2
+        let d = new Date
+       let link ="https://strapi-87gh.onrender.com/graphql" ;
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation  createWorkWay {
+  createWorkWay(data: {  workWayName: "${selected[i]}",
+        publishedAt: "${d.toISOString()}"
+           }) {
+    data {
+      id
+      attributes {
+        workWayName ${$lang == 'he' ? 'localizations { data {attributes{workWayName} }}' : ""}
+      } 
 
- import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-      import {  fly } from 'svelte/transition';
-
-let isOpen = false;
- const close = () => {
-    isOpen = false;
-   
-  };
-    function addnew (event){
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.workWayName;
-    isOpen = false;
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+   const newOb = meData.data.createWorkWay.data;
     const newValues = workways2 ;
     newValues.push(newOb);
+       
     workways2 = newValues;
-    const newSele = selected;
-    selected.push(newN);
-    selected = newSele;
-}   
+       const newN = meData.data.createWorkWay.data.attributes.workWayName;
+
+    let userName_value = $userName
+         let datau = {"name": userName_value, "action": "create דרך יצירה חדשה בשם:", "det":newN}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(datau),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data,datau);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  }
+      catch(error) {
+        console.log('צריך לתקן:', error.response);
+        error = error1 
+        console.log(error1)
+                };
+              }
+    }
+ 
+  workways1.set(find_workway_id(selected));
+
+}
+$: searchText = ``
     const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
-    const addn = {"he":"הוספת דרך חדשה","en": "Add new way"}
+  $: addn = {"he":`הוספת "${searchText}"`,"en": `Create "${searchText}"`}
     const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
+  
   </script>
- <DialogOverlay {isOpen} onDismiss={close} >
-        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="content"   aria-label="form">
-      <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
- <Addneww rn={workways2.map(c => c.workWayName)} on:b={close} addW={true} on:addww={addnew}/>
-      
-  </DialogContent>
-  </div>
-</DialogOverlay>
 
 <h1 class="midscreenText-2">
     {userName_value}
@@ -154,17 +197,15 @@ let isOpen = false;
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
+     createOptionMsg={addn[$lang]}
+     allowUserOptions={"append"}
      loading={newcontent}
+     bind:searchText
      bind:selected
      {placeholder}
-     options={workways2.map(c => c.workWayName)}
+     options={workways2.map(c => c.attributes.workWayName)}
      /></div>
-    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
-      <button
-      on:click={() => isOpen = true} 
-      class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
-      >{addn[$lang]}</button>
-    </div>
+   
   <button class="button-in-1-2" on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>

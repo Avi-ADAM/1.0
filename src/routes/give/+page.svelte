@@ -1,6 +1,7 @@
 <script>
   let fpval, selected, liUN, email;
       import MultiSelect from 'svelte-multiselect';
+  import { userName } from '$lib/stores/store.js';
 
     const country =  [
      { value: 104 , label: 'Israel', heb: 'ישראל'},
@@ -297,7 +298,55 @@ function find_contry_id(contry_name_arr){
       return arr;
      };
     let uid = 5679070
+
+    function rrrr (){
+       let userName_value = $userName
+       let newN = "vrvr"
+         let datau = {name:"userName_value", action: "create", det:"newN"}
+   fetch("https://www.1lev1.world/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(datau),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data,datau);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  
+    }
+    function tverya (){
+      let i = 36
+      while (i < 313) {
+                 let datau = {data:{name:`userName_value${i}`,email: `ggg${i}@kkk.hh` }}
+
+        fetch("https://strapi-87gh.onrender.com/api/chezins", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(datau),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data,datau);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+  i++
+      }
+    }
 </script>
+<button on:click={tverya}>tverya</button>
 
 <button on:click={onSubmiti}>tttt</button>
 <form on:submit|preventDefault={submitForm}>
@@ -315,3 +364,4 @@ function find_contry_id(contry_name_arr){
   <button type="submit">Submit</button>
 </form>
 <a href="{`https://telegram.me/onelevone_bot?start=${uid}`}" alt="telegramjoin">tele</a>
+<button on:click={rrrr}>cervrvr</button>

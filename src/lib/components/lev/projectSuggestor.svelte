@@ -24,7 +24,7 @@ export let coinlapach;
     export let projectId;
     export let linki = "/project/";
     export let oid = 0;
-    export let workways= [];
+    export let workways = [];
     export let noOfHours = 0;
     export let perhour = 0;
     export let total = 0;
@@ -48,6 +48,7 @@ async function agree(oid) {
 const as = askedarr;
  as.push(`${oid}`);
  console.log(as)
+  //todo if project member voted yes
 const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -59,7 +60,8 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://i18.onrender.com/graphql';
+    let d = new Date
+    let link = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -69,27 +71,29 @@ const cookieValue = document.cookie
                   },
         body: 
         JSON.stringify({query:
-          `mutation { updateUser(
-    input: {
-      where: { id: "${uId}" }
+          `mutation { updateUsersPermissionsUser(
+    id: "${uId}" 
       data: { askeds: [${as}] }
-    }
+    
   ){
-      user {
+      data {
+        attributes{
           askeds{
+            data{
               id
+            }
           }
+        }
       }
   }
   createAsk(
-    input: {
       data:{ open_mission: ${oid},
             project: ${projectId},
-            users_permissions_user: ${uId}
-    }
+            users_permissions_user: ${uId},
+            publishedAt: "${d.toISOString()}",
     }
   ){
-    ask {id}
+    data {id}
   }
 }`   
 } )})
@@ -125,7 +129,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://i18.onrender.com/graphql';
+    let link = 'https://strapi-87gh.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -135,18 +139,20 @@ const cookieValue = document.cookie
                   },
         body: 
         JSON.stringify({query:
-          `mutation { updateUser(
-    input: {
-      where: { id: "${uId}" }
+          `mutation { updateUsersPermissionsUser(
+    id: "${uId}" 
       data: {declined: [${ds}] }
-    }
   ){
-      user {
+      data {
+        attributes{
           askeds{
+            data{
               id
+            }
           }
       }
   }
+}
 }`   
 } )})
   .then(r => r.json())
@@ -232,19 +238,20 @@ function project () {
 } 
  onMount(function(){
  if ($lang != "en" ){
-              for (var i = 0; i < skills.length; i++){
-                if (skills[i].localizations.length > 0){
-                skills[i].skillName = skills[i].localizations[0].skillName
+              for (var i = 0; i < skills.data.length; i++){
+                if (skills.data[i].attributes.localizations.data.length > 0){
+                skills.data[i].attributes.skillName = skills.data[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
-              for (var i = 0; i < role.length; i++){
-                if (role[i].localizations.length > 0){
-                role[i].roleDescription = role[i].localizations[0].roleDescription
+              for (var i = 0; i < role.data.length; i++){
+                if (role.data[i].attributes.localizations.data.length > 0){
+                role.data[i].attributes.roleDescription = role.data[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
-              for (var i = 0; i < workways.length; i++){
-                if (workways[i].localizations.length > 0){
-                workways[i].workWayName = workways[i].localizations[0].workWayName
+              console.log(workways)
+              for (var i = 0; i < workways?.data.length; i++){
+                if (workways.data[i].attributes.localizations.data.length > 0){
+                workways.data[i].attributes.workWayName = workways.data[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }
@@ -410,7 +417,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
     </clipPath>
   </defs>
   <path d="m28.476 172.78s16.516-49.799 63.258-49.052c43.29 0.692 59.774 49.179 59.774 49.179" fill="rgba(216, 216, 216, 0)" stroke="rgba(0, 0, 0, 0)">
-  <title>telemala</title>
+  <title></title>
   </path>
 
   <g transform="matrix(.68728 0 0 .68728 -256.98 19.011)" style="">
@@ -991,16 +998,16 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
     <div class="ltn ab d " style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")} >  
-      {#each skills as skill}<span class="bg-gold font-semibold opacity-80 inline-flex items-center mr-2 px-2.5 py-0.5 rounded">{skill.skillName}</span>{/each}
+      {#each skills.data as skill}<span class="bg-gold font-semibold opacity-80 inline-flex items-center mr-2 px-2.5 py-0.5 rounded">{skill.attributes.skillName}</span>{/each}
 </div> 
    {#if deadLine != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
       {#if deadLinefi != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
 
     <h4 on:mouseenter={()=>hover({"he":"פרטי המשימה","en":"mission details"})} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
-    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="ltn de d">{role.map(d=> d.roleDescription).join(' ')}</p>
+    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="ltn de d">{role.data.map(d=> d.attributes.roleDescription).join(' ')}</p>
 {#if low == false}
     {#if already === false}
-    <button on:mouseenter={()=>hover({"he":"אני רוצה","en":"yes I want"})} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+    <button on:mouseenter={()=>hover({"he":"אני רוצה","en":"Yes I want"})} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
    <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
    -->  <button on:mouseenter={()=>hover({"he":"לא מתאים לי", "en": "not for me"})} on:mouseleave={()=>hover("0")}  on:click={decline(oid)} class="btn b" name="decline" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
     {/if}

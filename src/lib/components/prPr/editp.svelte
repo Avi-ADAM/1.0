@@ -65,30 +65,30 @@ let vallues = [];
                  'Content-Type': 'application/json'      };
     
         try {
-           const res = await fetch("https://i18.onrender.com/graphql", {
+           const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
- vallues { id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
-  projects { projectName}
+ vallues {data{ id attributes { valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName}} }' : ""}}}}
+  projects { data{ attributes{ projectName}}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            vallues = res.data.vallues;
+            vallues = res.data.vallues.data;
              if ($lang == "he" ){
               for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].localizations.length > 0){
-                vallues[i].valueName = vallues[i].localizations[0].valueName
+                if (vallues[i].attributes.localizations.data.length > 0){
+                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
             vallues = vallues
-           const runi = res.data.projects;
-           run = runi.map(c => c.projectName)
+           const runi = res.data.projects.data;
+           run = runi.map(c => c.attributes.projectName)
         } catch (e) {
             error1 = e
         }
@@ -99,7 +99,7 @@ let suc = false;
      var  arr = [];
       for (let j = 0; j< value_name_arr.length; j++ ){
       for (let i = 0; i< vallues.length; i++){
-        if(vallues[i].valueName === value_name_arr[j]){
+        if(vallues[i].attributes.valueName === value_name_arr[j]){
           arr.push(vallues[i].id);
         }
       }
@@ -143,7 +143,7 @@ addval == false;
  </script>  
 
 <div dir="rtl" class="jho">
-  <h1> עריכת ריקמה</h1>
+  <h1>עריכת ריקמה</h1>
 <br>
 
         <div dir="rtl" class='textinput'>
@@ -218,7 +218,7 @@ addval == false;
    bind:selected
    on:change={ch} 
    {placeholder}
-   options={vallues.map(c => c.valueName)}
+   options={vallues.map(c => c.attributes.valueName)}
    --sms-li-selected-bg="var(--gold)"
    /></div>
    <div  >
@@ -227,7 +227,7 @@ addval == false;
     on:click={() => addval = true} 
     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
-  {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.valueName)}/>{/if}</div>
+  {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 ">
    <h2 class=" text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>

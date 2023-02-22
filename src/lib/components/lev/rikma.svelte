@@ -44,7 +44,7 @@ async function xyd () {
       const headers = {
         'Content-Type': 'application/json'   
       };
-        let link ="https://i18.onrender.com/graphql" ;
+        let link ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -55,33 +55,34 @@ async function xyd () {
                   },
         body: 
         JSON.stringify({query: 
-          `{  project (id:${projectId}) {projectName  user_1s {id username profilePic {url}}
+          `{  project (id:${projectId}) {data{attributes{ projectName  user_1s {data{ id attributes{ username profilePic {data{attributes{ url}}}}}}
           linkToWebsite     
-           githublink fblink discordlink  twiterlink  vallues {valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
-                        publicDescription    profilePic {url formats }   open_missions (where:{archived: false }) { id name}}
-        }`
+           githublink fblink discordlink  twiterlink  vallues {data{attributes{ valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName }}}' : ""}}}}
+                        publicDescription    profilePic {data{attributes{ url formats }}}   open_missions (filters:{archived:{eq: false} }) {data{ id attributes{ name}}}}
+        }}}`
         })
 })
   .then(r => r.json())
-  .then(data => project = data.data.project);
-            projectUsers = project.user_1s;
-            projecto = project.open_missions;
-                vallues = project.vallues;
+  .then(data => project = data.data.project.data);
+            projectUsers = project.attributes.user_1s.data;
+            projecto = project.attributes.open_missions.data;
+                vallues = project.attributes.vallues.data;
             if ($lang == "he"){
               for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].localizations.length > 0){
-                vallues[i].valueName = vallues[i].localizations[0].valueName
+                if (vallues[i].attributes.localizations.data.length > 0){
+                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
             vallues = vallues
-            srcP =`${project.profilePic.formats.small.url}`
-       linkP = project.linkToWebsite;
-        githublink = project.githubLink;
-             fblink = project.fblink;
-              discordlink = project.discordLink;
-              twiterlink= project.twiterLink;
-            srcP =`${project.profilePic.formats.small.url}`
+            srcP =`${project.attributes.profilePic.data.attributes.formats.small.url}`
+       linkP = project.attributes.linkToWebsite;
+        githublink = project.attributes.githubLink;
+             fblink = project.attributes.fblink;
+              discordlink = project.attributes.discordLink;
+              twiterlink= project.attributes.twiterLink;
+            srcP =`${project.attributes.profilePic.data.attributes.formats.small.url}`
+           
         } catch (e) {
             error1 = e
         }
@@ -125,6 +126,7 @@ async function xyd () {
         <div class="flex flex-row items-center justify-center">
             {#if discordlink}
                      <a
+                               rel="noreferrer"
                      target="_blank" href={discordlink}
           class=" hover:bg-mturk text-barbi rounded-full"
           title={discordlinkde[$lang]}
@@ -134,6 +136,7 @@ async function xyd () {
                       {/if}
             {#if linkP}
                      <a
+                               rel="noreferrer"
                      target="_blank" href={linkP}
           class=" hover:bg-mturk text-barbi rounded-full"
           title={tower[$lang]}
@@ -145,6 +148,7 @@ async function xyd () {
                           
                          {#if twiterlink}
                      <a
+                               rel="noreferrer"
                      target="_blank" href={twiterlink}
           class=" hover:bg-white text-barbi rounded-full"
           title={twiterlinkde[$lang]}
@@ -155,6 +159,7 @@ async function xyd () {
                       
                         {#if githublink}
                      <a
+                               rel="noreferrer"
                      target="_blank" href={githublink}
           class=" hover:bg-white text-barbi rounded-full"
           title={githublinkde[$lang]}
@@ -164,6 +169,7 @@ async function xyd () {
                       {/if}
                        {#if fblink}
                      <a
+                               rel="noreferrer"
                      target="_blank" href={fblink}
           class=" hover:bg-white text-barbi rounded-full"
           title={fblinkde[$lang]}
@@ -174,16 +180,16 @@ async function xyd () {
 </div>
   </div>
  
-<h1 class="q">{project.projectName}</h1>
- {#if project.publicDescription !== null}
+<h1 class="q">{project.attributes.projectName}</h1>
+ {#if project.attributes.publicDescription !== null}
     <div class="border border-gold rounded m-2 p-2"> 
-   <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2 text-gold">{project.publicDescription}</pre>
+   <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2 text-gold">{project.attributes.publicDescription}</pre>
     </div>
    {/if}
  <div dir="ltr" class="flex items-center justify-center">
     <div dir="ltr" class="flex -space-x-2 ">
         {#each projectUsers as user}
-  <button title="{user.username}" on:click={()=>us(user.id)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.profilePic != null ? user.profilePic.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
+  <button title="{user.attributes.username}" on:click={()=>us(user.id)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.attributes.profilePic.data != null ? user.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
   <!--{#if hover}
     <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
     {/if}-->
@@ -196,7 +202,7 @@ async function xyd () {
      <h2 class="mt-2 text-sm text-barbi text-center " style="text-shadow: 1px 1px var(--gold);">{vap[$lang]}</h2>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 m-1"> 
                 {#each vallues as vallue}<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold"   word={vallue.valueName}/></p>{/each}
+              <Tile bg="gold"   word={vallue.attributes.valueName}/></p>{/each}
     </div>
     </div>
     {/if}
@@ -214,7 +220,7 @@ async function xyd () {
 <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                 {#each projecto as om }<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})}
                    on:mouseleave={()=>hover("0")} class="m-0 cursor-pointer hover:scale-105	" style="text-shadow:none;" on:click={mesima(om.id)}>
-              <Tile bg="wow"   word={om.name}/></p>{/each}
+              <Tile bg="wow"   word={om.attributes.name}/></p>{/each}
     </div>
 </div>
 </div>

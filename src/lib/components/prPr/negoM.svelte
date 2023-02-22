@@ -112,7 +112,7 @@ const filterByReference = (allob, id)=> {
      var  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
       for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].skillName === skill_name_arr[j]){
+        if(skills2[i].attributes.skillName === skill_name_arr[j]){
           arr.push(skills2[i].id);
         }
       }
@@ -152,7 +152,7 @@ workways3 = resp;
  function addnewW (event){
     
     const newOb = event.detail.skob;
-    const newN = event.detail.skob.workWayName;
+    const newN = event.detail.skob.attributes.workWayName;
     const newValues = workways2 ;
     newValues.push(newOb);
     workways2 = newValues;
@@ -164,7 +164,7 @@ workways3 = resp;
  function addnew (event){
     
     const newOb = event.detail.skob;
-    const newN = event.detail.skob.skillName;
+    const newN = event.detail.skob.attributes.skillName;
     const newValues = skills2 ;
     newValues.push(newOb);
     skills2 = newValues;
@@ -176,7 +176,7 @@ workways3 = resp;
    function addnewR (event){
     
     const newOb = event.detail.skob;
-    const newN = event.detail.skob.roleDescription;
+    const newN = event.detail.skob.attributes.roleDescription;
     const newValues = roles ;
     newValues.push(newOb);
     roles = newValues;
@@ -360,8 +360,7 @@ async function increment() {
         body: //${negoss} {rishons} {rishonveses}?
         JSON.stringify({query:
           `mutation { updatePendm(
-      input: {
-      where: {id: ${pendId}}
+     id: ${pendId}
       data:  { users:[  ${userss}, 
      {
       what: ${what4}
@@ -385,8 +384,8 @@ async function increment() {
 
   ]
       }
-    }
-  ){pendm { users { users_permissions_user { id}}}}
+    
+  ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
 } `   
 // make coin desapire
 } )})
@@ -400,7 +399,7 @@ async function increment() {
         }
        
 }
-let linkg = "https://i18.onrender.com/graphql"
+let linkg = "https://strapi-87gh.onrender.com/graphql"
 onMount(async () => {
     const cookieValue = document.cookie
         .split('; ')

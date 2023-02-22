@@ -56,19 +56,19 @@ function edit (id) {
     <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
       <th class="ggr">שם</th>
       {#each omiData as data, i}
-            <td class="ggr">{data.name}</td>
+            <td class="ggr">{data.attributes.name}</td>
             {/each}
           </tr> <tr>
             <th>תיאור</th>
             {#each omiData as data, i}
-            <td>{data.descrip}</td>
+            <td>{data.attributes.descrip}</td>
               {/each}
             </tr> <tr>
               <th>כישורים נדרשים</th>
               {#each omiData as data, i}
             <td>
-              {#each data.skills as da, i}
-                 {` ${da.skillName} `}
+              {#each data.attributes.skills.data as da, i}
+                 {` ${da.attributes.skillName} `}
               {/each}
               </td>
             {/each}
@@ -76,8 +76,8 @@ function edit (id) {
               <th>הגדרת תפקיד</th>
               {#each omiData as data, i}
             <td>
-              {#each data.tafkidims as ta, i}
-                {` ${ta.roleDescription} `}
+              {#each data.attributes.tafkidims.data as ta, i}
+                {` ${ta.attributes.roleDescription} `}
             {/each}
             </td>
             {/each}
@@ -86,8 +86,8 @@ function edit (id) {
               <th>סוג משימה</th>
               {#each omiData as data, i}
             <td>
-              {#each data.work_ways as dm, i}
-                  {` ${dm.workWayName} `}  
+              {#each data.attributes.work_ways.data as dm, i}
+                  {` ${dm.attributes.workWayName} `}  
               {/each}
               </td>
             {/each}
@@ -95,8 +95,8 @@ function edit (id) {
          <tr>
               <th>תאריך ביצוע</th>
               {#each omiData as data, i}
-            <td>              {#if data.Sqadualed}
-              {data.Sqadualed}
+            <td>              {#if data.attributes.Sqadualed}
+              {data.attributes.Sqadualed}
             {/if}
             </td>
             {/each}
@@ -104,8 +104,8 @@ function edit (id) {
             <th>קישורים ציבוריים</th>
             {#each omiData as data, i}
             <td>
-              {#if data.publicklinks}
-              {data.publicklinks}
+              {#if data.attributes.publicklinks}
+              {data.attributes.publicklinks}
               {/if}
              </td>
              {/each}
@@ -113,17 +113,17 @@ function edit (id) {
           <th>הערות יחודיות לריקמה שלי</th>
           {#each omiData as data, i}
           <td>
-            {#if data.hearotMeyuchadot != "undefined"}
-            {data.hearotMeyuchadot}
+            {#if data.attributes.hearotMeyuchadot != "undefined"}
+            {data.attributes.hearotMeyuchadot}
             {/if}
            </td>
            {/each}
       </tr><tr>
         <th>קישורים יחודיים לריקמה שלי</th>
         {#each omiData as data, i}
-        <td>          {#if data.privatlinks != "undefined"} 
+        <td>          {#if data.attributes.privatlinks != "undefined"} 
 
-          {data.privatlinks} 
+          {data.attributes.privatlinks} 
           {/if}
          </td>
          {/each}
@@ -131,9 +131,9 @@ function edit (id) {
           <th >כמה שעות זה אמור לקחת? </th>
           {#each omiData as data, i}
           <td>
-            {#if data.noofhours > 0}
+            {#if data.attributes.noofhours > 0}
 
-           {data.noofhours}
+           {data.attributes.noofhours}
            {/if}
           </td>
           {/each}
@@ -141,9 +141,9 @@ function edit (id) {
           <th>כמה שווה שעה ?</th>
           {#each omiData as data, i}
           <td>
-            {#if data.perhour > 0}
+            {#if data.attributes.perhour > 0}
 
-            {data.perhour}
+            {data.attributes.perhour}
             {/if}
           </td>
           {/each}
@@ -151,9 +151,9 @@ function edit (id) {
       <th>שווי סך הכל למשימה </th>
       {#each omiData as data, i}
       <td>
-      {#if data.perhour > 0 & data.noofhours > 0}
+      {#if data.attributes.perhour > 0 & data.attributes.noofhours > 0}
       
-      {(data.perhour * data.noofhours).toLocaleString('en-US', {maximumFractionDigits:2})}
+      {(data.attributes.perhour * data.attributes.noofhours).toLocaleString('en-US', {maximumFractionDigits:2})}
       
       {:else} <p>0</p>
       {/if}

@@ -1,381 +1,686 @@
 [
     {
         "id": "2",
-        "roleDescription": "תכנות",
-        "localizations": [
-            {
-                "roleDescription": "תכנות"
+        "attributes": {
+            "roleDescription": "תכנות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "תכנות"
+                        }
+                    }
+                ]
             }
-        ]
-    },
-    {
-        "id": "46",
-        "roleDescription": " Tiktok ניהול עמוד  ",
-        "localizations": [
-            {
-                "roleDescription": " Tiktok ניהול עמוד  "
-            }
-        ]
+        }
     },
     {
         "id": "38",
-        "roleDescription": "שיווק באינטרנט",
-        "localizations": [
-            {
-                "roleDescription": "שיווק באינטרנט"
+        "attributes": {
+            "roleDescription": "שיווק דיגיטלי",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "שיווק דיגיטלי"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "17",
-        "roleDescription": "קריאייטיב",
-        "localizations": [
-            {
-                "roleDescription": "קריאייטיב"
+        "attributes": {
+            "roleDescription": "קריאיטיב",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "קריאיטיב"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "1",
-        "roleDescription": "פרסום",
-        "localizations": [
-            {
-                "roleDescription": "פרסום"
+        "attributes": {
+            "roleDescription": "פרסום",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "פרסום"
+                        }
+                    }
+                ]
             }
-        ]
-    },
-    {
-        "id": "12",
-        "roleDescription": "ציור",
-        "localizations": [
-            {
-                "roleDescription": "ציור"
-            }
-        ]
+        }
     },
     {
         "id": "13",
-        "roleDescription": "פרסום ברשתות חברתיות",
-        "localizations": [
-            {
-                "roleDescription": "פרסום ברשתות חברתיות"
+        "attributes": {
+            "roleDescription": "שיווק ברשתות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "שיווק ברשתות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "42",
-        "roleDescription": "הפקה וניהול פרוייקטים",
-        "localizations": [
-            {
-                "roleDescription": "הפקה וניהול פרוייקטים"
+        "attributes": {
+            "roleDescription": "הפקת וניהול פרויקטים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "הפקת וניהול פרויקטים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "15",
-        "roleDescription": "ניהול",
-        "localizations": [
-            {
-                "roleDescription": "ניהול"
+        "attributes": {
+            "roleDescription": "ניהול",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "ניהול"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "26",
-        "roleDescription": "צבעות",
-        "localizations": [
-            {
-                "roleDescription": "צבעות"
+        "attributes": {
+            "roleDescription": "ציור",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "ציור"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "35",
-        "roleDescription": "נהיגה",
-        "localizations": [
-            {
-                "roleDescription": "נהיגה"
+        "attributes": {
+            "roleDescription": "נהיגה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "נהיגה"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "8",
-        "roleDescription": "עיצוב אופנה",
-        "localizations": [
-            {
-                "roleDescription": "עיצוב אופנה"
+        "attributes": {
+            "roleDescription": "עיצוב אופנה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "עיצוב אופנה"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "7",
-        "roleDescription": "צילום וידאו",
-        "localizations": [
-            {
-                "roleDescription": "צילום וידאו"
+        "attributes": {
+            "roleDescription": "צילום סרטים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "צילום סרטים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "4",
-        "roleDescription": "מכירות",
-        "localizations": [
-            {
-                "roleDescription": "מכירות"
+        "attributes": {
+            "roleDescription": "מכירות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "מכירות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "11",
-        "roleDescription": "כתיבה",
-        "localizations": [
-            {
-                "roleDescription": "כתיבה"
+        "attributes": {
+            "roleDescription": "כתיבה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "כתיבה"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "22",
-        "roleDescription": "הנחייה",
-        "localizations": [
-            {
-                "roleDescription": "הנחייה"
+        "attributes": {
+            "roleDescription": "הנחייה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "הנחייה"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "19",
-        "roleDescription": "עיצוב אתרי אינטרנט",
-        "localizations": [
-            {
-                "roleDescription": "עיצוב אתרי אינטרנט"
+        "attributes": {
+            "roleDescription": "עיצוב אתרים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "עיצוב אתרים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "43",
-        "roleDescription": "בישול",
-        "localizations": [
-            {
-                "roleDescription": "בישול"
+        "attributes": {
+            "roleDescription": "בישול",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "בישול"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "14",
-        "roleDescription": "הדרכת טיולים",
-        "localizations": [
-            {
-                "roleDescription": "הדרכת טיולים"
+        "attributes": {
+            "roleDescription": "הדרכת טיולים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "הדרכת טיולים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "5",
-        "roleDescription": "תכנות צד שרת",
-        "localizations": [
-            {
-                "roleDescription": "תכנות צד שרת"
+        "attributes": {
+            "roleDescription": "תכנות צד שרת",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "תכנות צד שרת"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "6",
-        "roleDescription": "בניית אתרי אינטרנט",
-        "localizations": [
-            {
-                "roleDescription": "בניית אתרי אינטרנט"
+        "attributes": {
+            "roleDescription": "בניית אתרים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "בניית אתרים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "9",
-        "roleDescription": "דאטהבייס",
-        "localizations": [
-            {
-                "roleDescription": "דאטהבייס"
+        "attributes": {
+            "roleDescription": "מסדי נתונים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "מסדי נתונים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "36",
-        "roleDescription": "הגשה לקרנות",
-        "localizations": [
-            {
-                "roleDescription": "הגשה לקרנות"
+        "attributes": {
+            "roleDescription": "הגשה לקרנות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "הגשה לקרנות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "21",
-        "roleDescription": "עיצוב",
-        "localizations": [
-            {
-                "roleDescription": "עיצוב"
+        "attributes": {
+            "roleDescription": "עיצוב",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "עיצוב"
+                        }
+                    }
+                ]
             }
-        ]
-    },
-    {
-        "id": "39",
-        "roleDescription": "בניית מוסיקה לסרטונים",
-        "localizations": [
-            {
-                "roleDescription": "בניית מוסיקה לסרטונים"
-            }
-        ]
+        }
     },
     {
         "id": "20",
-        "roleDescription": "בניית אתרים מתקדמת",
-        "localizations": [
-            {
-                "roleDescription": "בניית אתרים מתקדמת"
+        "attributes": {
+            "roleDescription": "בניית אתרים מתקדמת",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "בניית אתרים מתקדמת"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "16",
-        "roleDescription": "בניית דפי נחיתה",
-        "localizations": [
-            {
-                "roleDescription": "בניית דפי נחיתה"
+        "attributes": {
+            "roleDescription": "בניית דפי נחיתה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "בניית דפי נחיתה"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "3",
-        "roleDescription": "צילום סטילס",
-        "localizations": [
-            {
-                "roleDescription": "צילום סטילס"
+        "attributes": {
+            "roleDescription": "צילום סטילס",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "צילום סטילס"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "24",
-        "roleDescription": "שחקנות",
-        "localizations": [
-            {
-                "roleDescription": "שחקנות"
+        "attributes": {
+            "roleDescription": "שחקנות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "שחקנות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "10",
-        "roleDescription": "צילום",
-        "localizations": [
-            {
-                "roleDescription": "צילום"
+        "attributes": {
+            "roleDescription": "צילום",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "צילום"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "44",
-        "roleDescription": "סבלות",
-        "localizations": [
-            {
-                "roleDescription": "סבלות"
+        "attributes": {
+            "roleDescription": "סבלות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "סבלות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "29",
-        "roleDescription": "נגרות",
-        "localizations": [
-            {
-                "roleDescription": "נגרות"
+        "attributes": {
+            "roleDescription": "נגרות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "נגרות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "31",
-        "roleDescription": "מתורגמנות",
-        "localizations": [
-            {
-                "roleDescription": "מתורגמנות"
+        "attributes": {
+            "roleDescription": "מתורגמנות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "מתורגמנות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "30",
-        "roleDescription": "מרצה",
-        "localizations": [
-            {
-                "roleDescription": "מרצה"
+        "attributes": {
+            "roleDescription": "מרצה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "מרצה"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "37",
-        "roleDescription": "יזמות",
-        "localizations": [
-            {
-                "roleDescription": "יזמות"
+        "attributes": {
+            "roleDescription": "יזמות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "יזמות"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "27",
-        "roleDescription": "מנהל עסקים",
-        "localizations": [
-            {
-                "roleDescription": "מנהל עסקים"
+        "attributes": {
+            "roleDescription": "מנהל עסקים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "מנהל עסקים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "18",
-        "roleDescription": "עיצוב גרפיקה ",
-        "localizations": [
-            {
-                "roleDescription": "עיצוב גרפיקה "
+        "attributes": {
+            "roleDescription": "עיצוב גרפי",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "עיצוב גרפי"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
         "id": "28",
-        "roleDescription": "הנדסת אוויר",
-        "localizations": [
-            {
-                "roleDescription": "הנדסת אוויר"
+        "attributes": {
+            "roleDescription": "הנדסת אוויר",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "הנדסת אוויר"
+                        }
+                    }
+                ]
             }
-        ]
+        }
     },
     {
-        "id": "23",
-        "roleDescription": "זמרות",
-        "localizations": [
-            {
-                "roleDescription": "זמרות"
+        "id": "12",
+        "attributes": {
+            "roleDescription": "צבעות",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "צבעות"
+                        }
+                    }
+                ]
             }
-        ]
-    },
-    {
-        "id": "91",
-        "roleDescription": "טכנאות אלקטרוניקה",
-        "localizations": []
+        }
     },
     {
         "id": "47",
-        "roleDescription": "Business development manager",
-        "localizations": []
+        "attributes": {
+            "roleDescription": "פיתוח עסקי",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "פיתוח עסקי"
+                        }
+                    }
+                ]
+            }
+        }
     },
     {
         "id": "45",
-        "roleDescription": "אדריכלות פנים",
-        "localizations": [
-            {
-                "roleDescription": "אדריכלות פנים"
+        "attributes": {
+            "roleDescription": "אדריכלות פנים",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "אדריכלות פנים"
+                        }
+                    }
+                ]
             }
-        ]
+        }
+    },
+    {
+        "id": "92",
+        "attributes": {
+            "roleDescription": "אורח \\ אורחת",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "אורח \\ אורחת"
+                        }
+                    }
+                ]
+            }
+        }
     },
     {
         "id": "48",
-        "roleDescription": "מנהל.ת קהילה",
-        "localizations": [
-            {
-                "roleDescription": "מנהל.ת קהילה"
+        "attributes": {
+            "roleDescription": "ניהול קהילה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "ניהול קהילה"
+                        }
+                    }
+                ]
             }
-        ]
+        }
+    },
+    {
+        "id": "96",
+        "attributes": {
+            "roleDescription": "תוכן",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "תוכן"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "id": "99",
+        "attributes": {
+            "roleDescription": "בישול צמחוני, טבעוני וללא גלוטן",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "בישול צמחוני, טבעוני וללא גלוטן"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "id": "91",
+        "attributes": {
+            "roleDescription": "טכנאות אלקטרוניקה",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "טכנאות אלקטרוניקה"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "id": "23",
+        "attributes": {
+            "roleDescription": "זמר \\ זמרת",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "זמר \\ זמרת"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "id": "94",
+        "attributes": {
+            "roleDescription": "טיפוח אוכל",
+            "localizations": {
+                "data": [
+                    {
+                        "attributes": {
+                            "roleDescription": "טיפוח אוכל"
+                        }
+                    }
+                ]
+            }
+        }
+    },
+    {
+        "id": "145",
+        "attributes": {
+            "roleDescription": "ביורוקרטיה",
+            "localizations": {
+                "data": []
+            }
+        }
     }
 ]

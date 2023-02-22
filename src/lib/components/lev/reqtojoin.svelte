@@ -1,6 +1,6 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
- import { goto, prefetch } from '$app/navigation';
+ import { goto } from '$app/navigation';
 	import dayjs from 'dayjs';
   import {lang} from '$lib/stores/lang.js'
   import {
@@ -158,7 +158,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 
 function objToString (obj) {
     let str = '';
@@ -166,7 +166,7 @@ function objToString (obj) {
         
     for (const [p, val] of Object.entries(obj[i])) {
         if (typeof(val) == "string"|"number"|"boolean") {
-        str += `{${p}:${val}\n},`;
+        str += `{${p}:"${val}"\n},`;
     } else if (typeof(val) == 'null'){
                 str += `{${p}:${val.map(c => c.id)}\n},`;
     }
@@ -182,7 +182,8 @@ async function agree() {
      noofusersOk += 1;
   noofusersWaiting -= 1;
   ser = xyz();
-               const tafkidimsa = role.map(c => c.id);
+  const d = new Date
+               const tafkidimsa = role.data.map(c => c.id);
 
     const date = (deadline !== undefined && deadline != null) ? ` admaticedai: "${deadline}"` : ``;
         const cookieValue = document.cookie
@@ -209,23 +210,19 @@ async function agree() {
           pid.push(userId);
     pid = pid;
         welcome = `createWelcomTop(
-  input: {
     data: {users_permissions_user: "${userId}",
-          project: "${projectId}"}
+          project: "${projectId}"
+                publishedAt: "${d.toISOString()}",
         }
-) {welcomTop{id}}`;
+) {data{id}}`;
 adduser = `updateProject(
-input: {
-  where: {id: "${projectId}"}
+  id: "${projectId}"
  data: {user_1s: ["${idL}","${userId}"]}
-}
-  ){project {user_1s {id email lang}}}`;
+  ){data{attributes {user_1s{data {id{attributes email lang}}}}}}`;
         adduser2 = `updateProject(
-input: {
-  where: {id: "${projectId}"}
+  id: "${projectId}"
  data: {user_1s: [${pid}]}
-}
-  ){project {user_1s {id}}}`
+  ){data{attributes {user_1s{data {id}}}}}`
         console.log(welcome, "not member");
 
     }
@@ -243,7 +240,6 @@ input: {
                     body: JSON.stringify({
                         query: `mutation 
                         { createMesimabetahalich(
-    input: {
       data: {project: "${projectId}",
              mission:  "${missId}",
              hearotMeyuchadot: "${hearotMeyuchadot}",
@@ -255,23 +251,19 @@ input: {
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
               tafkidims: [${tafkidimsa}],
-              
+                      publishedAt: "${d.toISOString()}",
             ${date}
                   }
-    }
-  ) {mesimabetahalich{project{id }}}
+  ) {data{attributes{project{data{id }}}}}
 
 updateOpenMission(
-  input:  {
-    where: {id: "${openMid}"}
+  id: "${openMid}"
   data: {archived: true}
-}
-) {openMission{id archived}}
+) {data{id attributes{archived}}}
 ${welcome}
 ${adduser}
  updateAsk(
-                            input:{
-                                where: {id: "${askId}" }
+                 id: "${askId}" 
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -279,8 +271,7 @@ ${adduser}
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){ask{id}}
+                        ){data{id}}
 }
 `})
                 })
@@ -290,12 +281,12 @@ ${adduser}
             
             if (newnew == true){
               let emailt;
-              let ema = miDatan.data.updateProject.project.user_1s
+              let ema = miDatan.data.updateProject.data.attributes.user_1s.data
               let la; 
               for (let i = 0; i <ema.length; i++){
                 if (ema[i].id == userId){
-                  emailt = ema[i].email
-                  la = ema[i].lang
+                  emailt = ema[i].attributes.email
+                  la = ema[i].attributes.lang
                 }
               }
               let langi = $lang
@@ -342,7 +333,6 @@ ${adduser}
                     body: JSON.stringify({
                         query: `mutation 
                         { createMesimabetahalich(
-    input: {
       data: {project: "${projectId}",
              mission:  "${missId}",
              hearotMeyuchadot: "${hearotMeyuchadot}",
@@ -354,22 +344,19 @@ ${adduser}
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
              tafkidims: [${tafkidimsa}],
+                     publishedAt: "${d.toISOString()}",
             ${date}
                   }
-    }
-  ) {mesimabetahalich{project{id }}}
+  ) {data{attributes{project{data{id }}}}}
 
 updateOpenMission(
-  input:  {
-    where: {id: "${openMid}"}
+  id: "${openMid}"
   data: {archived: true}
-}
-) {openMission{id archived asks{id}}}
+) {data{id attributes{ archived asks{data{id}}}}}
 ${welcome}
 ${adduser2}
  updateAsk(
-                            input:{
-                                where: {id: "${askId}" }
+            id: "${askId}"
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -377,29 +364,25 @@ ${adduser2}
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){ask{id}}
+                        ){data{id}}
 }
 `})
                 })
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            const otherasks = miDatan.data.updateOpenMission.openMission.asks
+            const otherasks = miDatan.data.updateOpenMission.data.attributes.asks.data
             console.log(otherasks);
             if (otherasks.length> 1){
             let nextquery = ``
             for (let i = 0; i < otherasks.length; i++){
-                nextquery = nextquery + `
+                nextquery =  `
                 updateAsk(
-                            input:{
-                                where: {id: "${otherasks[i].id}" }
+                       id: "${otherasks[i].id}" 
                                 data: { archived: true
-                                  }
                             }
-                        ){ask{id}}`
-            }
-            await fetch(linkg, {
+                        ){data{id}}`
+                        await fetch(linkg, {
                     method: 'POST',
                     headers: {
                         'Authorization': bearer1,
@@ -415,6 +398,7 @@ ${adduser2}
             console.log(miDatan);
 
           }
+        }
             dispatch('acsept', {
                 ani: "asked",
                 coinlapach: coinlapach
@@ -438,16 +422,14 @@ ${adduser2}
                         query: `mutation 
                         {
                             updateAsk(
-                            input:{
-                                where: {id: "${askId}" }
+                         id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){ask{id}}
+                        ){data{id}}
                      
                     }
 `})
@@ -510,11 +492,9 @@ const declineda = declined.map(c => c.id)
                         query: `mutation 
                         { 
 updateOpenMission(
-  input: {
-    where: {id: "${openMid}"}
+ id: "${openMid}"
   data: {declined: [${declineda}]}
-}
-) {openMission{id declined {id}}}
+) {data{id attributes{ declined {data{id}}}}}
 }
 `})
                 })
@@ -532,7 +512,7 @@ updateOpenMission(
         }
         } else if (noofpu > 1 ) { 
     console.log("if another uprove explain why you decline")
-
+//todo
         }
 }
 let hovered = false;

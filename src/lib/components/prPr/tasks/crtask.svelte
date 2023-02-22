@@ -14,15 +14,15 @@
     function find_se_id(lebel){
      let id , uid;
        for (let i = 0; i< bmiData.length; i++){
-        if((bmiData[i].users_permissions_user.username + " - " + bmiData[i].name) == lebel){
+        if((bmiData[i].attributes.users_permissions_user.data.attributes.username + " - " + bmiData[i].attributes.name) == lebel){
           id = bmiData[i].id;
-          uid = bmiData[i].users_permissions_user.id
+          uid = bmiData[i].attributes.users_permissions_user.data.id
         }
       }
       return [id ,uid];
      };
      let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 async function sub(){
     if (selected.length < 1){
         seEr = true
@@ -30,6 +30,7 @@ async function sub(){
         if(name.length < 1){
               neEr = true
                  } else {
+                  let d = new Date
               neEr = false
              seEr = false
              const ob = find_se_id(selected)
@@ -38,9 +39,9 @@ async function sub(){
         console.log(moment(mimatai, "HH:mm DD/MM/YYYY"))
         let momentx = moment(mimatai, "HH:mm DD/MM/YYYY ")
         let momebtt =moment(adMatai, "HH:mm DD/MM/YYYY ")
-        const st = mimatai !== undefined ?  `dateS: "${momentx.toISOString()}",`: "";
+        const st = mimatai !== undefined &&  mimatai !== null ? `dateS: "${momentx.toISOString()}",`: ``;
        ///is before?
-        const fd = adMatai !== undefined ?  `dateF: "${momebtt.toISOString()}",`: "";
+        const fd = adMatai !== undefined && adMatai !== null ?  `dateF: "${momebtt.toISOString()}",`: ``;
         const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -50,7 +51,7 @@ async function sub(){
         .find(row => row.startsWith('id='))
         .split('=')[1];
     userMevakeshId = cookieValueId;
-            const tt = userMevatzeaId == userMevakeshId ? ` myIshur: true,`:""; 
+            const tt = userMevatzeaId == userMevakeshId ? ` myIshur: true,`:``; 
     let token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
         try {
@@ -63,7 +64,6 @@ async function sub(){
                     body: JSON.stringify({
                         query: `mutation 
                         { createAct(
-    input: {
       data: {project: "${$idPr}",
              des:  "${teur}",
              my: "${userMevatzeaId}",
@@ -71,12 +71,13 @@ async function sub(){
              vali: "${userMevakeshId}",
              mesimabetahalich: "${mtaha}",
              link: "${link}",
+             publishedAt: "${d.toISOString()}",
             ${tt}
              ${st}
              ${fd}
                   }
-    }
-  ) {act{id shem}}
+    
+  ) {data{id attributes{ shem my {data{id}}}}}
 }
 `})
                 })
@@ -84,9 +85,9 @@ async function sub(){
                 .then(data => miDatan = data);
 
             dispatch('done', {
-                id: miDatan.data.createAct.id,
-                name:  miDatan.data.createAct.shem,
-                user: miDatan.data.createAct.my.id
+                id: miDatan.data.createAct.data.id,
+                name:  miDatan.data.createAct.data.attributes.shem,
+                user: miDatan.data.createAct.data.attributes.my.data.id
             })
           
         } catch (e) {
@@ -138,7 +139,7 @@ async function sub(){
       bind:selected={selected}
       maxSelect={1}
       placeholder={placeholder[$lang]}
-      options={bmiData.map(it=>it.users_permissions_user.username + " - " + it.name)}
+      options={bmiData.map(it=>it.attributes.users_permissions_user.data.attributes.username + " - " + it.attributes.name)}
       />
     {#if seEr == true}
         <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>

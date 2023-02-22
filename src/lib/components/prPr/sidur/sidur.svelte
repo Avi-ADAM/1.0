@@ -3,7 +3,7 @@
     import TimeGrid from '@event-calendar/time-grid';
     import { lang } from '$lib/stores/lang.js';
       import { addToast } from 'as-toast';
-
+    import '@event-calendar/core/index.css';
     let ec;
     let count = 0;
     let eve = [
@@ -54,6 +54,7 @@
         },
         eventStartEditable: true
     };
+    console.log(options)
 </script>
 <h1>בפיתוח נמרץ בקרוב ניתן יהיה לראות ולסדר משמרות כאן</h1>
 <Calendar bind:this={ec} {plugins} {options} />

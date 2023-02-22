@@ -7,7 +7,7 @@ import { RingLoader
     import {  fly } from 'svelte/transition';
    import { createEventDispatcher } from 'svelte';
   import Nego from '../prPr/negoM.svelte';
-  import { goto, prefetch } from '$app/navigation';
+  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
   import ProgressBar from "@okrad/svelte-progressbar";
@@ -26,7 +26,7 @@ import { idPr } from '../../stores/idPr.js';
     export let kindOf = "";
     export let src = "coin.png";
     export let projectId;
-    export let link = "https://i18.onrender.com/project/";
+    export let link = "https://strapi-87gh.onrender.com/api/project/";
     export let noofusersOk;
     export let noofusersNo;
     export let noofusersWaiting;
@@ -160,7 +160,7 @@ function objToStringC (obj) {
   idL = cookieValueId;
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-      if(obj[i].users_permissions_user.id == idL) {
+      if(obj[i].users_permissions_user.data.id == idL) {
         obj[i].order = 1
       }
         const length = Object.keys(obj[i]).length;
@@ -186,9 +186,10 @@ function objToStringC (obj) {
 }
 let whyy = ``
 let ordern = ``;
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 let userss = objToString(users);
 async function agree(alr) {
+  let d = new Date
   if  (alr == "alr"){
         allr = true;
           already = true;
@@ -227,7 +228,6 @@ async function agree(alr) {
         body: 
         JSON.stringify({query:
           `mutation { createOpenMashaabim(
-    input: {
       data: {project: "${projectId}",
              spnot: "${hearotMeyuchadot}",
              name: "${name}",
@@ -238,15 +238,14 @@ async function agree(alr) {
              easy: ${easy},
              linkto: "${linkto}",
              pmash: "${pendId}",
+                     publishedAt: "${d.toISOString()}",
              mashaabim: "${mshaabId}"
              ${date} 
              ${sdate}
-      }
     }
-  ) {openMashaabim {project{id }}}
+  ) {data{attributes {project{data{ id }}}}}
   updatePmash(
-      input: {
-      where: {id: ${pendId}}
+  id: ${pendId}
       data: { users:[  ${userss}, 
      {
       what: true
@@ -256,8 +255,7 @@ async function agree(alr) {
   ],
  archived: true
  }
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
  } `   
 //update pendm add consent from second and  archived,,, make coin desapire
 } )})
@@ -280,8 +278,7 @@ async function agree(alr) {
         body: 
         JSON.stringify({query:
           `mutation { updatePmash(
-      input: {
-      where: {id: ${pendId}}
+      id: ${pendId}
       data: { users:[  ${userss}, 
          
      {
@@ -290,8 +287,7 @@ async function agree(alr) {
             ${ordern}
     }
   ]}
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
 } `   
 // make coin desapire
 } )})
@@ -372,8 +368,7 @@ async function afterwhy (event){
         body: 
         JSON.stringify({query:
           `mutation { updatePmash(
-      input: {
-      where: {id: ${pendId}}
+     id: ${pendId}
       data: { 
         ${archivedtru}
         users:[  ${userss}, 
@@ -384,8 +379,7 @@ async function afterwhy (event){
                   ${ordern}
     }
   ]}
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
 } `   
 // make coin desapire
 } )})
@@ -473,8 +467,7 @@ diunim = ` ${diu},`
         body: 
         JSON.stringify({query:
           `mutation { updatePmash(
-      input: {
-      where: {id: ${pendId}}
+      id: ${pendId}
       data: { diun:[  
         ${diunim}  
      {
@@ -484,8 +477,7 @@ diunim = ` ${diu},`
       order: ${order+=1}
     }
   ]}
-      }
-  ){pmash { users { users_permissions_user { id}}}}
+  ){data{attributes { users { users_permissions_user {data{ id}}}}}}
  } `   
  // make coin desapire
  } )})

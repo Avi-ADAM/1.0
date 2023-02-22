@@ -1,7 +1,13 @@
 
 <script> 
   import Tile from '$lib/celim/tile.svelte'
-
+	import { crossfade } from 'svelte/transition';
+	import { quintOut } from 'svelte/easing';
+  
+	const [send, receive] = crossfade({
+		duration:1500,
+		easing: quintOut
+	});
    import Grow from '$lib/celim/icons/grow.svelte' 
               import { lang } from '$lib/stores/lang.js'
    // import AddSkil from './addSkil.svelte';
@@ -17,9 +23,9 @@
     import Edsp from './editsp.svelte'
 
 
-import { fly } from 'svelte/transition';
+import { slide, fly } from 'svelte/transition';
 
-
+let newskillslist, idLi, name
  const dispatch = createEventDispatcher();
 //export let addNs;
 export let bgi = "wow"
@@ -28,17 +34,14 @@ export let bgi = "wow"
     export let meData = [];
     export let datan ="";
     let token; 
+    //for the options of multiselect
     let allvn = []
      export let addS = false;
-    let list = [];
     let listt = [];
     export let kish;
-//  export let a = "";
     export let linkp = "skills";
-    let link =`https://i18.onrender.com/graphql?_limit=-1`;
     let error1 = null;
     export let addSl = false;
-let idLi;
    async function get  () {
       const cookieValue = document.cookie
   .split('; ')
@@ -64,46 +67,43 @@ let idLi;
           try {
             let more = ``
             if ($lang == "he"){
-              more =  `localizations{ ${valc} }`
+              more =  `localizations{ data {attributes{ ${valc} }}}`
             }
-              const res = await  fetch("https://i18.onrender.com/graphql", {
+              const res = await  fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                 'Authorization': bearer1,
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  ${linkp} { id ${valc} ${more}}
+  ${linkp} {data{ id attributes {${valc} ${more}}}}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-              meData = res.data[linkp];
+              meData = res.data[linkp].data;
                              if ($lang == "he" ){
               for (var i = 0; i < meData.length; i++){
-                if (meData[i].localizations.length > 0){
-                meData[i][valc] = meData[i].localizations[0][valc]
+                if (meData[i].attributes.localizations.data.length > 0){
+                meData[i].attributes[valc] = meData[i].attributes.localizations.data[0].attributes[valc]
                 }
               }
             }
             meData = meData
-              allvn = meData.map(c => c[valc]);
+              allvn = meData.map(c => c.attributes[valc]);
               newcontent = false
-              console.log(res);
           } catch (e) {
               error1 = e
               console.log(error1);
           }
       };
- 
-  let name;
-  let newskillslist;
+
   export let placeholder =" בחירת כישורים" ;
   skillsNew.subscribe(newwork => {
     newskillslist  = newwork;
     });
 let uid;
-
+/*
 function deleteitem (skillId){
   console.log(skillId);
     const index = skillslist.indexOf(skillId);
@@ -111,7 +111,7 @@ if (index > -1) {
   skillslist.splice(index, 1);
   };
 console.log("skillslist",skillslist);
-};    
+};    */
 let miData = [];
 let g = false;
 let needr = [];
@@ -120,12 +120,10 @@ async function increment() {
       g = true;
        let more = ``
             if ($lang == "he"){
-              more =  `localizations{ ${valc} }`
+              more =  `localizations { data{attributes{ ${valc} }}}`
             }
      if (datan !== "mash"){
-       console.log(datan,"dd")
        let list = data.map(c => c.id);
-     const linkpe = linkp;
   const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -137,7 +135,7 @@ async function increment() {
   uid = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://i18.onrender.com/graphql" ;
+    let link ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -148,28 +146,31 @@ async function increment() {
                   },
         body: 
         JSON.stringify({query: 
-           `mutation { updateUser(
-    input: {
-      where: { id: "${uid}" }
+           `mutation { updateUsersPermissionsUser(
+    id:${uid} 
       data: { ${kish}: [${list}] }
-    }
+    
   ){
-      user {
-          ${kish}{
-              id ${valc} ${more}
+      data {
+        attributes{
+          ${kish}{ data {
+              id attributes{ ${valc} ${more}}}
           }
       }
   }
-}`   
+}
+}
+`   
         })
 })
   .then(r => r.json())
-  .then(data => miData = data);
-         console.log(miData)
-                    if ($lang == "he" ){
-              for (var i = 0; i < miData.length; i++){
-                if (miData[i].localizations.length > 0){
-                miData[i][valc] = miData[i].localizations[0][valc]
+  .then(data => miData = data.data);
+         console.log(miData,miData.updateUsersPermissionsUser.data.attributes[kish])
+           if ($lang == "he" ){
+              for (var i = 0; i < miData.updateUsersPermissionsUser.data.attributes[kish].data.length; i++){
+                const t = miData.updateUsersPermissionsUser.data.attributes[kish].data
+                if (t[i].attributes.localizations.data.length > 0){
+                t[i].attributes[valc] = t[i].attributes.localizations.data[0].attributes[valc]
                 }
               }
             }
@@ -177,7 +178,7 @@ async function increment() {
          addSl = false;
  dispatch('close', {
     linkp: linkp,
-    list: miData.data.updateUser.user[kish]
+    list: miData.updateUsersPermissionsUser.data.attributes[kish].data
     } );
     g = false;
         } catch (e) {
@@ -198,7 +199,7 @@ function find_id(arra){
      var  arr = [];
       for (let j = 0; j< arra.length; j++ ){
       for (let i = 0; i< meData.length; i++){
-        if(meData[i][valc] === arra[j]){
+        if(meData[i].attributes[valc] === arra[j]){
           arr.push(meData[i].id);
         }
       }
@@ -210,7 +211,7 @@ function find_name(arra){
       for (let j = 0; j< arra.length; j++ ){
       for (let i = 0; i< meData.length; i++){
         if(meData[i].id === arra[j]){
-          arr.push(meData[i][valc]);
+          arr.push(meData[i].attributes[valc]);
         }
       }
       }
@@ -234,7 +235,7 @@ function addSK (id){
   yy = 1;
   listt = data;
 const oldob = data;
-const old = oldob.map(c => c.id).map(String);
+const old = oldob.map(c => c.id);//.map(String)
 const neww = find_id(id);
 let array3 = old.concat(neww);
 array3 = [...new Set([...old,...neww])];
@@ -311,7 +312,7 @@ const skob = event.detail.skob;
 const slectednew = meData;
 slectednew.push(skob);
 meData = slectednew
- allvn = meData.map(c => c[valc]);
+ allvn = meData.map(c => c.attributes[valc]);
   needr = array3;
   const oldsel = data.selected2
   oldsel.push(event.detail.name);
@@ -352,10 +353,8 @@ function bitulm (){
           meDatamm = []
 }
 async function updi (){
-  console.log("updi")
-var resultString = needr.join('&id_in=');
-let linkpp ="https://i18.onrender.com/mashaabims?id_in=" + resultString ;
-    const cookieValue = document.cookie
+   let res = []
+  const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
@@ -370,26 +369,33 @@ let linkpp ="https://i18.onrender.com/mashaabims?id_in=" + resultString ;
           throw resp;
         });
       };
+      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try {
-            const res = await fetch(linkpp, {
-              method: 'GET',
+             await fetch(linkg, {
+              method: 'POST',
        
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-            }).then(checkStatus)
-          .then(parseJSON);
-            meDatamm = res;
+        body: 
+        JSON.stringify({query: 
+          `{  mashaabims (filters:{id: {in:[${needr}]}}){data{ id attributes{
+          name descrip kindOf  price linkto 
+        } }}}`
+        })
+ })
+  .then(r => r.json())
+  .then(data => res = data);
+    meDatamm = res.data.mashaabims.data
             g = false;
               masss = true;
              dispatch('massss', {
             mass: true
           })
-        } catch (e) {
-            error1 = e
+    } catch (e) {
+            console.log(e)  
         }
-       
 }
 function clodd (event) {
   const  id = event.detail.id
@@ -413,6 +419,7 @@ addSl = false
             mass: false
           })
         }
+
 function clohh (event) {
 const  id = event.detail.id
 const  name = event.detail.name
@@ -495,15 +502,15 @@ async function edit (id){
         };
        
           try {
-              const res = await  fetch("https://i18.onrender.com/graphql", {
+              const res = await  fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                 'Authorization': bearer1,
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  sp (id: "${id}") {
-     id 
+  sp (id: "${id}") {data{
+     id  attributes{
      name
        descrip
              kindOf
@@ -512,18 +519,18 @@ async function edit (id){
              price
              myp   
              linkto
-             users_permissions_user {id}
+             users_permissions_user {data{id}}
              sdate
              fdate
-     }
+     }}}
      me {id}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-              xd = res.data.sp;
+              xd = res.data.sp.data;
               console.log(res);
-              if (xd.users_permissions_user.id = res.data.me.id){
+              if (xd.attributes.users_permissions_user.data.id = res.data.me.id){//
                               console.log(xd);
                   ed = true;
             g = false;
@@ -551,7 +558,12 @@ const adbf = {"he":" בחירת ", "en": "choose more "}
 const adaf = {"he":" נוספים", "en": ""}
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const onin = {"he":"מושקע בריקמה", "en": "invested on FreeMates"}
+//add new msg 
+$: searchText = ``
+  $: addn = {"he": ` \"${searchText}\" לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור  \"הוספת חדש\" שלמטה`,"en":`\"${searchText}\" Not on the list yet , add it with the \"Add new\" button bellow`}
 
+export let width = 1
+$: anim = datan == "work" || datan == "val" ? -(width/2) : width/2
   </script>
 {#if masss === true}
 
@@ -572,14 +584,15 @@ on:click={bitulm}
 {:else}
 
       {#if addSl == false}
-      <div class="another " style="margin: auto"> 
+      <div class="another button-perl " style="margin: auto" 
+				in:fly={{x: anim , duration: 1500}} out:fly={{x: anim-(width/5) ,y: -100, duration: 1500, opacity: 0.5}}> 
  
         <h2 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">{bef[$lang]}{Valname}{aft[$lang]}</h2>
-     {#if data}
-        <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"> 
-               {#each data as dat, i}<p 
+     {#if data.length > 0}
+        <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1">   
+          {#each data as dat, i}<p 
           class="m-0 " style="text-shadow:none;" >
-              <Tile bg="{bgi}"   word={dat[valc]}/></p>{/each}
+              <Tile bg="{bgi}"   word={dat.attributes[valc]}/></p>{/each}
     </div>
     {/if}
     
@@ -599,7 +612,7 @@ on:click={open}
 </div>
 {:else if  addSl == true}
 {#if g == false}
-<div class="anotherE"  transition:fly|local={{x: 350, y: 200 ,opacity: 0.5}}>
+<div>
 <button class=" hover:bg-barbi text-gold  font-bold rounded-full"
 title="{cencel[$lang]}"
 on:click={bitul}
@@ -607,14 +620,14 @@ on:click={bitul}
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
  
-   <p class="text-center text-sm text-barbi">{edbef[$lang]}{Valname}{edaft[$lang]}</p>
+   <p class="text-center text-md text-white">{edbef[$lang]}{Valname}{edaft[$lang]}</p>
      {#if data}
       {#each data as da, i}
-  <div class="text-center text-sm text-lturk">
+  <div transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" class="text-center text-sm text-lturk">
     
     {#if datan === "mash" }
-    {#if da.panui != false}
-       <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+    {#if da.attributes.panui != false}
+       <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg></button>
     <button
@@ -632,10 +645,10 @@ title="{onin[$lang]}">
 <Grow width="17" height="17"/></button>
 {/if}
 {:else}
-   <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+   <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg></button>
-{/if}{da[valc]}
+{/if}{da.attributes[valc]}
   </div>
  
    {/each} 
@@ -652,14 +665,17 @@ title="{onin[$lang]}">
    {/if}
 <br>
  
-  <span > <h3 class="text-center text-sm text-barbi">{adbf[$lang]}{Valname }{adaf[$lang]}</h3>  <MultiSelect
+  <div > <h3 class="text-center text-sm text-barbi">{adbf[$lang]}{Valname }{adaf[$lang]}</h3>  <MultiSelect
       bind:selected={data.selected2}
+           bind:searchText
+                noMatchingOptionsMsg={addn[$lang]}
       {placeholder}
       options={allvn}
+      --sms-width={"200px"}
       on:change={addSK(data.selected2)}
       on:blur={adm(data.selected2)}
       loading={newcontent}
-      /></span>
+      /></div>
        <!--      allowUserOptions={"append"}-->
      
       {#if datan == "skil"} 
@@ -735,7 +751,7 @@ title="{onin[$lang]}">
         .another{
     max-height: 20vh;
      min-height: 20vh;
-     max-width: 30vw;
+     width: 27vw;
         }
           .e{
  width:17px;
@@ -776,23 +792,25 @@ title="{onin[$lang]}">
    .another{
               text-shadow: 1px 1px  aqua;
 padding: 1em;
-      background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
+     /* background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
 	background-image: linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
-      /*
+      
      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
      background-position: center; 
     background-repeat: no-repeat; 
-    background-size: cover;*/
+    background-size: cover;
+           filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
+
+    */
       display:flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
       text-align: center;
-        max-height: 29vh;
-     min-height: 20vh;
-     max-width: 30vw;
-     min-width: 25vw;
-       filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
+        max-height: 25vh;
+     min-height: 25vh;
+     max-width: 37vw;
+     min-width: 27vw;
        color: #9900cd;
 
     }

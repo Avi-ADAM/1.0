@@ -61,7 +61,7 @@ dispatch("tochat");
    </div>
         </div>
      <div class="flex items-center">
-      <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
+      <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src ??  "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
       <div class="text-sm">
         <p class="text-gray-900 leading-none">{useraplyname}</p>
         <p class="vo ef"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>

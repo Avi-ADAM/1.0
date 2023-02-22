@@ -4,22 +4,20 @@
     import { show } from './store-show.js';
     import { valluss } from './valluss.js';
     import { onMount } from 'svelte';
-    import { lang } from '$lib/stores/lang.js'
+   import { lang } from '$lib/stores/lang.js'
     import jvals from '$lib/data/vallues.json'
     import enjvals from '$lib/data/valluesEn.json'
-    import AddnewVal from '../addnew/addnewval.svelte';
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher(); 
     let vallues = [];
     let error1 = null;
-    let addval = false;
     let newcontent = true
  onMount(async () =>{
-      if ($lang == "he" ){
-        vallues = jvals
-            } else if (lang == "en"){
-              vallues = enjvals
-            }
+     if ($lang == "he" ){
+       vallues = jvals
+           } else if (lang == "en"){
+             vallues = enjvals
+           }
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -34,22 +32,27 @@
       };
     
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues { id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
+  vallues {
+    data{
+      id
+      attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ""}}
+}
+}
 }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            vallues = res.data.vallues 
+            vallues = res.data.vallues.data
             if ($lang == "he" ){
               for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].localizations.length > 0){
-                vallues[i].valueName = vallues[i].localizations[0].valueName
+                if (vallues[i].attributes.localizations.data.length > 0){
+                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
@@ -65,7 +68,7 @@
      var  arr = [];
       for (let j = 0; j< value_name_arr.length; j++ ){
       for (let i = 0; i< vallues.length; i++){
-        if(vallues[i].valueName === value_name_arr[j]){
+        if(vallues[i].attributes.valueName === value_name_arr[j]){
           arr.push(vallues[i].id);
         }
       }
@@ -90,9 +93,8 @@ show.subscribe(newValue => {
 });
 
 function increment() {
+  newnew()
 		show.update(n => n + 1);
-    console.log(find_value_id(selected));
-    valluss.set(find_value_id(selected));
     dispatch ('progres',{
 		tx: 0,
 		txx: 20
@@ -100,54 +102,93 @@ function increment() {
 	}
 
   function back() {
+    newnew()
 		show.update(n => n - 1);
-    valluss.set(find_value_id(selected));
     dispatch ('progres',{
 		tx: 600,
 		txx: 20
 	} )
 	}
 
-  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-      import {  fly } from 'svelte/transition';
+ 
+  let meData = []
+async function newnew (){
+  for (let i = 0; i<selected.length ;i++){
+    if (!vallues.map(c => c.attributes.valueName).includes(selected[i])){
+      //create new and update vallues
+        console.log(selected,vallues)
+  let link ="https://strapi-87gh.onrender.com/graphql" ;
+  let d = new Date
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation  createVallue {
+  createVallue(data: {  valueName: "${selected[i]}",
+        publishedAt: "${d.toISOString()}"}) {
+    data {
+      id
+      attributes {
+        valueName
+      } 
 
-let isOpen = false;
- const close = () => {
-    isOpen = false;
-   
-  };
-
-  function addnew (event){
-    
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.valueName;
-    isOpen = false;
-    const newValues = vallues;
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+const newOb = meData.data.createVallue.data;
+    const newValues = vallues ;
     newValues.push(newOb);
        
     vallues = newValues;
-   const newSele = selected;
+    let userName_value = $userName
+    let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${selected[i]}`}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
 
-selected.push(newN);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  }
+      catch(error) {
+        console.log('צריך לתקן:', error.response);
+        error = error1 
+        console.log(error1)
+                };}
+              }
+                  valluss.set(find_value_id(selected));
+                      console.log($valluss)
 
-selected = newSele;
+            }
 
-  }
+  
+
+  $: ugug = ``;
       const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
-  const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
+  $: addn = {"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`}
   const what = {"he": "אלו ערכים ומטרות ברצונך לקדם?","en": "which vallues you wish to promote?"}
   </script>
 
- <DialogOverlay {isOpen} onDismiss={close} >
-        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="content"  aria-label="form">
-      <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
-  <AddnewVal  rn={vallues.map(c => c.valueName)} addS={true} on:b={close} on:addnew={addnew}/>
-      
-  </DialogContent>
-  </div>
-</DialogOverlay>
+
   
 <h1 class="midscreenText-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
   {userName_value}
@@ -157,19 +198,18 @@ selected = newSele;
   {#key vallues}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
+      createOptionMsg={addn[$lang]}
+     allowUserOptions={"append"}
       loading={newcontent}
+      bind:searchText={ugug}
      bind:selected
      {placeholder}
-     options={vallues.map(c => c.valueName)}
-     /></div>
-     {/key}
-  <div  class="input-2-2">
-      <button
-      on:click={() => isOpen = true} 
-      class="bg-lturk hover:bg-barbi text-barbi hover:text-lturk font-bold py-1 px-1 rounded-full"
-      >{addn[$lang]}</button>
+     options={vallues.map(c => c.attributes.valueName)}
+     />
     </div>
-     <button class="button-in-2" on:click="{back}">
+     {/key}
+ 
+     <button class="button-in-2 " on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
   <button class="button-2" on:click="{increment}">

@@ -34,7 +34,7 @@
    import TotalNeeds from '$lib/components/prPr/totalNeeds.svelte';
    //import { total } from '$lib/stores/total.js';
  //   import { beforeUpdate, tick } from 'svelte';
-    import { goto } from '$app/navigation';
+    import { goto,invalidateAll } from '$app/navigation';
    import OpenM from '$lib/components/prPr/openM.svelte';
     import PendsM from '$lib/components/prPr/pendsM.svelte';
         import Betaha from '$lib/components/prPr/betaha.svelte';
@@ -58,10 +58,15 @@ let a = 0;
       let hosaf;
   let error2 = null;
 async function findM() {
-      const cookieValue = document.cookie
+  const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -73,23 +78,29 @@ async function findM() {
           throw resp;
         });
       };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
+      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try {
-            const res = await fetch("https://i18.onrender.com/missions?_limit=-1", {
-              method: "GET",
-              headers: {
-                'Authorization': bearer1,
-                 'Content-Type': 'application/json'
-              },
-            }).then(checkStatus)
-          .then(parseJSON);
-            mission1 = res;
-            console.log(res); 
-        } catch (e) {
-            error2 = e;
+             await fetch(linkg, {
+              method: 'POST',
+       
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+          `{  missions {data{id attributes{
+                           missionName
+                            } }}}`
+        })
+ })
+  .then(r => r.json())
+  .then(data => mission1 = data.data.missions.data);
+   console.log(mission1)
+
+    } catch (e) {
+            console.log(e)
+           
         }
 };
 let bmimData = [];
@@ -127,11 +138,12 @@ let user = [];
 let rikmashes = [];
 let lll;
 let opmash = [];
+let actdata = []
 let noofopenm = 0;
 let salee = [];
 let trili = [];
 let projects = prog();
-let meData = start ();
+let meData = start();
 let alit = [];
 //sale {id in}
 async function start () {
@@ -158,24 +170,25 @@ async function start () {
         });
       };
         try {
-            const res = await fetch("https://i18.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
                  'Content-Type': 'application/json'
               }, body: 
         JSON.stringify({query:
-          `{project(id:"${$idPr}"){
+          `{project(id:"${$idPr}"){data { attributes{
             projectName 
-             user_1s {id}}
+             user_1s { data{id}}}}}
             me{id}}
               `} )
             }).then(checkStatus)
           .then(parseJSON);
-            ata = res.data.project;
-             projectUsers = ata.user_1s;
-             const x = projectUsers.map(c => c.id)
-             if (x.includes(idL)){
+            ata = res.data.project.data.attributes;
+            console.log(res)
+            const users = ata.user_1s.data;
+             const x = users.map(c => c.id)
+             if (x.includes(res.data.me.id)){//me from server
                       
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -187,119 +200,122 @@ async function start () {
         });
       };
         try {
-            const res = await fetch("https://i18.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
                  'Content-Type': 'application/json'
               }, body: 
 JSON.stringify({query:
-          `{project(id:"${$idPr}"){
-            tosplits (where:{finished : false}){prectentage vots {what users_permissions_user {id}}}
+          `
+        {project(id:${$idPr}){ data{attributes{
+            tosplits (filters: { finished: { eq: false } }){data{attributes{  prectentage vots {what users_permissions_user {data{ id}}}}}}
             projectName
             descripFor
             publicDescription
-            sales {id in date matanot {name id} users_permissions_user {id username}}
-            matanotof { id name price quant kindOf }
-            finnished_missions {id missionName start finish mesimabetahalich {created_at} created_at why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {id username}}
-            rikmashes{id name kindOf total hm price agprice sp {id } spnot users_permissions_user {id username}}
-             user_1s {id username profilePic {url formats}}
-            mesimabetahaliches (where:{finnished: false}) {
-             id status                          
-              tafkidims {id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-               created_at hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {id username profilePic {url }}}
-            open_missions (where:{archived: false }) { id name hearotMeyuchadot descrip noofhours perhour sqadualed
+            sales {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
+            matanotof {data{ id attributes{ name price quant kindOf }}}
+            finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
+            rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
+             user_1s {data{ id attributes{ username profilePic {data{attributes{ url formats}}}}}}
+            mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
+             id attributes{ status     
+            acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
+              tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""} }}}
+               createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
+            open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
-                                    rishon {id}
-                                    skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
-                                    tafkidims {id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-                                    work_ways {id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}} 
-                                    mission { id}
-                                    created_at
-                        } 
-                        open_mashaabims (where: {archived: false }){id kindOf hm descrip price easy name spnot sqadualed sqadualedf }
-             pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
+                                    rishon {data{ id}}
+                                    skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ""} }}}
+                                    tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""}}}}
+                                    work_ways {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ""} } }}
+                                    mission {data{ id}}
+                                    createdAt
+  } }}
+                        open_mashaabims (filters: {archived:{eq: false }}){data{id attributes{ kindOf hm descrip price easy name spnot sqadualed sqadualedf }}}
+             pendms (filters: {archived:{eq: false }}) {data{id attributes{createdAt dates name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
-                                    rishon {id}
-                                    skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
-                                    tafkidims {id roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-                                    work_ways {id workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}} 
-                                    mission { id}
-                                    created_at
-                                    users  {what why id users_permissions_user {id}} }
-            vallues {id valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
+                                    rishon {data{ id}}
+                                    skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ""} }}}
+                                    tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""}}}}
+                                    work_ways {data{ id attributes{ workWayName  ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ""}} }}
+                                    mission {data{ id}}
+                                    
+                                    users  {what why id users_permissions_user {data{ id}} }}}}
+            vallues {data{ id attributes { valueName ${$lang == 'he' ? 'localizations{data {attributes{ valueName}} }' : ""}}}}
             linkToWebsite
-            profilePic {url  formats }
+            profilePic {data{attributes{ url  formats }}}
             restime githublink fblink discordlink drivelink twiterlink watsapplink
-          } 
+  } }}
         me{id}}
           `} )
 }).then(checkStatus)
           .then(parseJSON);
-            meData = res.data.project;
-            project = res.data.project;
-            projectname = res.data.project.projectName;
+            console.log(res)
+            meData = res.data.project.data.attributes;
+            project = res.data.project.data.attributes;
+            projectname = res.data.project.data.attributes.projectName;
             desP = project.publicDescription
-            linkP = res.data.project.linkToWebsite
+            linkP = res.data.project.data.attributes.linkToWebsite
             descPri = meData.descripFor ;
             descripFor = meData.descripFor ;
-            projectUsers = project.user_1s;
+            projectUsers = project.user_1s.data;
             restime = project.restime;
-            if (project.mesimabetahaliches.length > 0){
-            bmiData = project.mesimabetahaliches;
-            } else if (project.mesimabetahaliches.length == null) {
-            bmiData.push(project.mesimabetahaliches);
+            if (project.mesimabetahaliches.data.length > 0){
+            bmiData = project.mesimabetahaliches.data;
+            } else if (project.mesimabetahaliches.data.length == null) {
+            bmiData.push(project.mesimabetahaliches.data);
             }
-              if (project.sales.length > 0){
-            salee = project.sales;
-            } else if (project.sales.length == null) {
-            salee.push(project.sales);
+                          if (project.sales.data.length > 0){
+            salee = project.sales.data;
+            } else if (project.sales.data.length == null) {
+            salee.push(project.sales.data);
             }
             salee = salee
-              if (project.matanotof.length > 0){
-            bmimData = project.matanotof;
-            } else if (project.matanotof.length == null) {
-            bmimData.push(project.matanotof);
+              if (project.matanotof.data.length > 0){
+            bmimData = project.matanotof.data;
+            } else if (project.matanotof.data.length == null) {
+            bmimData.push(project.matanotof.data);
             }
-             if (project.open_mashaabims.length > 0){
-            opmash = project.open_mashaabims;
-            } else if (project.open_mashaabims.length == null) {
-            opmash.push(project.open_mashaabims);
+             if (project.open_mashaabims.data.length > 0){
+            opmash = project.open_mashaabims.data;
+            } else if (project.open_mashaabims.data.length == null) {
+            opmash.push(project.open_mashaabims.data);
             }
-            if (project.finnished_missions.length > 0){
-            fmiData = project.finnished_missions;
-            } else if (project.finnished_missions.length == null) {
-            fmiData.push(project.finnished_missions);
+            if (project.finnished_missions.data.length > 0){
+            fmiData = project.finnished_missions.data;
+            } else if (project.finnished_missions.data.length == null) {
+            fmiData.push(project.finnished_missions.data);
             }
-             if (project.rikmashes.length > 0){
-            rikmashes = project.rikmashes;
-            } else if (project.rikmashes.length == null) {
-            rikmashes.push(project.rikmashes);
+             if (project.rikmashes.data.length > 0){
+            rikmashes = project.rikmashes.data;
+            } else if (project.rikmashes.data.length == null) {
+            rikmashes.push(project.rikmashes.data);
             }
             rikmashes = rikmashes
           //  if (project.open_missions.length > 1){
             bmimData = bmimData
-            omiData = project.open_missions;
+            omiData = project.open_missions.data;
           //  } else if (project.open_missions.length == null){
           //  omiData.push(project.open_missions);
           //  }
-            if (project.pendms.length > 0){
-            pmiData = project.pendms;
-            } else if (project.pendms.length == null){
-            pmiData.push(project.pendms);
+            if (project.pendms.data.length > 0){
+            pmiData = project.pendms.data;
+            } else if (project.pendms.data.length == null){
+            pmiData.push(project.pendms.data);
             }
         //    omiData = omiData;
             pmiData = pmiData;
             bmiData = bmiData;
-            vallues = project.vallues;
+            vallues = project.vallues.data;
             if ($lang == "he"){
               for (var i = 0; i < vallues.length; i++){
-                if (vallues[i].localizations.length > 0){
-                vallues[i].valueName = vallues[i].localizations[0].valueName
+                if (vallues[i].attributes.localizations.data.length > 0){
+                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
-            valit = vallues.map(c => c.valueName);
+            valit = vallues.map(c => c.attributes.valueName);
             alit = vallues.map(c => c.id)
             linkP = meData.linkToWebsite;
             githublink = meData.githubLink;
@@ -309,11 +325,11 @@ JSON.stringify({query:
               twiterlink= meData.twiterLink;
               watsapplink = meData.watsapplink;
              noofopenm = opmash.length;
-            noofopen = project.open_missions.length;
-            if (project.profilePic !== null){
-            srcP = project.profilePic.url;
+            noofopen = project.open_missions.data.length;
+            if (project.profilePic.data !== null){
+            srcP = project.profilePic.data.attributes.url;
             }
-            trili = meData.tosplits;
+            trili = meData.tosplits.data;
           // pre(projectUsers, fmiData)
         } catch (e) {
             error1 = e;
@@ -328,8 +344,10 @@ JSON.stringify({query:
             error1 = e;
             console.log(error1);
   } 
-  return meData
-} 
+    return meData
+
+}         
+
 };
 async function prog (){
     if ($idPr == 0){
@@ -353,7 +371,7 @@ async function prog (){
           throw resp;
         });
       };
-      let linkg ="https://i18.onrender.com/graphql" ;
+      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -364,9 +382,9 @@ async function prog (){
                   },
         body: 
         JSON.stringify({query: 
-          `{  user (id:${idL}) {
-                            projects_1s {id projectName }
-                            } }`
+          `{  usersPermissionsUser (id:${idL}) {data{ attributes{
+                            projects_1s {data {id attributes{ projectName }}}
+                            } }}}`
         })
  })
   .then(r => r.json())
@@ -377,7 +395,7 @@ async function prog (){
               goto("./login")
             }
           }
-    projects = user.data.user.projects_1s;
+    projects = user.data.usersPermissionsUser.data.attributes.projects_1s.data;
     } catch (e) {
             console.log(e)
            
@@ -392,7 +410,7 @@ async function prog (){
  let blabla = [];
  let load = false;
 async function callbackFunction(event) {
-  console.log("shit its me")
+  console.log("shit its me",event.detail.li)
     		cow.scrollIntoView(true);
  load = true;
   const  lim = event.detail.li;
@@ -428,7 +446,7 @@ async function findiM() {
           throw resp;
         });
       };
-      let linkg ="https://i18.onrender.com/graphql" ;
+      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -439,21 +457,18 @@ async function findiM() {
                   },
         body: 
         JSON.stringify({query: 
-          `{  missions (where:{id: ${li}}){ id
+          `{  missions (filters:{id: {in:[${li}]}}){data{ id attributes{
           descrip missionName 
-         skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
-
-  tafkidims { id roleDescription  ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-
-  work_ways { id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
-
-        } }`
+          skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ""} }}}
+          tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""}}}}
+          work_ways {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ""} } }}
+        } }}}`
         })
  })
   .then(r => r.json())
   .then(data => res = data);
-   miData = res.data.missions
-               console.log(miData)  
+   miData = res.data.missions.data
+               console.log(miData)
 
     } catch (e) {
             console.log(e)  
@@ -476,44 +491,42 @@ async function findT ()  {
         });
       };
         try {
-            const res = await fetch("https://i18.onrender.com/graphql", {
+            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  skills { id skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
-
-  tafkidims { id roleDescription  ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-
-  workWays { id workWayName  ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
+    skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ""} }}}
+     tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""}}}}
+     workWays {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ""} } }}
  }
               `})
             }).then(checkStatus)
           .then(parseJSON);
-            skills2 = res.data.skills
+            skills2 = res.data.skills.data
               if ($lang == "he" ){
               for (var i = 0; i < skills2.length; i++){
-                if (skills2[i].localizations.length > 0){
-                skills2[i].skillName = skills2[i].localizations[0].skillName
+                if (skills2[i].attributes.localizations.data.length > 0){
+                skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }
             skills2 = skills2
-            roles = res.data.tafkidims
+            roles = res.data.tafkidims.data
             if ($lang == "he" ){
               for (var i = 0; i < roles.length; i++){
-                if (roles[i].localizations.length > 0){
-                roles[i].roleDescription = roles[i].localizations[0].roleDescription
+                if (roles[i].attributes.localizations.data.length > 0){
+                roles[i].attributes.roleDescription = roles[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
             roles = roles;
-             workways2 = res.data.workWays
+             workways2 = res.data.workWays.data
                        if ($lang == "he" ){
               for (var i = 0; i < workways2.length; i++){
-                if (workways2[i].localizations.length > 0){
-                workways2[i].workWayName = workways2[i].localizations[0].workWayName
+                if (workways2[i].attributes.localizations.data.length > 0){
+                workways2[i].attributes.workWayName = workways2[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }
@@ -553,13 +566,13 @@ async function removeF (event) {
    addM = false;
    miData = miDatanew;
   showvd = true; 
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
   console.log(blabla, miData);
 
   addM = true;
  } else { 
   miData = miDatanew;
- blabla = miData.map(c => c.missionName);
+ blabla = miData.map(c => c.attributes.missionName);
  showvd = false;
 
  }
@@ -574,7 +587,7 @@ async function removeS (event) {
  miData = miDatanew;
   showvd = true; 
   addM = false;
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
   await findM ()
  .then ()
  addM = true;
@@ -588,7 +601,7 @@ async function removeR (event) {
  miData = miDatanew;
   showvd = true; 
   addM = false;
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
   await findM ()
  .then ()
  addM = true;
@@ -602,7 +615,7 @@ async function removeW (event) {
  miData = miDatanew;
   showvd = true; 
   addM = false;
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
    await findM ()
  .then ()
  addM = true;
@@ -625,7 +638,8 @@ async function addskills (event) {
    return res;
 }
 const resp = filterByReference(skills2, id);
- miDatanew[index].skills = resp;
+console.log(resp)
+ miDatanew[index].attributes.skills.data = resp;
  miDatanew[index].selected2 = [];
  console.log (miDatanew);
  showvd = false;
@@ -634,7 +648,7 @@ const resp = filterByReference(skills2, id);
  miData = miDatanew;
    showvd = true; 
    addM = false;
-    blabla = miData.map(c => c.missionName);
+    blabla = miData.map(c => c.attributes.missionName);
    await findM ()
  .then ()
  addM = true;
@@ -658,14 +672,14 @@ async function addroles (event) {
    return res;
 }
 const resp = filterByReference(roles, id);
- miDatanew[index].tafkidims = resp;
+ miDatanew[index].attributes.tafkidims.data = resp;
  miDatanew[index].selected3 = [];
  console.log (miDatanew);
  showvd = false;
  miData = miDatanew;
   showvd = true; 
   addM = false;
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
  addM = true;
 };
 
@@ -688,7 +702,7 @@ async function adwww (event) {
    return res;
 }
 const resp = filterByReference(workways2, id);
- miDatanew[index].work_ways = resp;
+ miDatanew[index].attributes.work_ways.data = resp;
  miDatanew[index].selected1 = [];
  console.log (miDatanew);
  showvd = false;
@@ -697,7 +711,7 @@ const resp = filterByReference(workways2, id);
  miData = miDatanew;
   showvd = true; 
   addM = false;
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
   await findM ()
  .then ()
  addM = true;
@@ -710,7 +724,7 @@ async function addnewsk (event) {
  const miDatanew = event.detail.data;
  const y = miDatanew.map(c => c.id);
  const index = y.indexOf(mid);
- miDatanew[index].skills.push(skob);
+ miDatanew[index].attributes.skills.data.push(skob);
  console.log (miDatanew);
  showvd = false;
   await refreshM ()
@@ -718,7 +732,7 @@ async function addnewsk (event) {
  miData = miDatanew;
   showvd = true; 
   addM = false;
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
   await findM ()
  .then ()
  addM = true;
@@ -729,14 +743,14 @@ async function addnewr (event) {
   const miDatanew = event.detail.data;
   const y = miDatanew.map(c => c.id);
   const index = y.indexOf(mid);
-  miDatanew[index].tafkidims.push(skob);
+  miDatanew[index].attributes.tafkidims.data.push(skob);
   showvd = false;
    await refreshM ()
    .then() 
   miData = miDatanew;
     showvd = true; 
     addM = false;
-     blabla = miData.map(c => c.missionName);
+     blabla = miData.map(c => c.attributes.missionName);
     await findM ()
   .then ()
   addM = true;
@@ -756,14 +770,14 @@ async function addneww (event) {
   const miDatanew = event.detail.data;
   const y = miDatanew.map(c => c.id);
   const index = y.indexOf(mid);
-  miDatanew[index].work_ways.push(skob);
+  miDatanew[index].attributes.work_ways.data.push(skob);
   showvd = false;
    await refreshM ()
    .then() 
   miData = miDatanew;
   showvd = true; 
   addM = false;
-   blabla = miData.map(c => c.missionName);
+   blabla = miData.map(c => c.attributes.missionName);
   await findM ()
   .then ()
   addM = true;
@@ -783,9 +797,8 @@ function close () {
 }
 let meDatamm = [];
 async function updi (){
- var resultString = needr.join('&id_in=');
- let linkpp ="https://i18.onrender.com/mashaabims?id_in=" + resultString ;
-    const cookieValue = document.cookie
+   let res = []
+  const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
@@ -800,23 +813,29 @@ async function updi (){
           throw resp;
         });
       };
-      const headers = {
-        'Content-Type': 'application/json'   
-      };
+      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try {
-            const res = await fetch(linkpp, {
-              method: 'GET',
+             await fetch(linkg, {
+              method: 'POST',
        
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-            }).then(checkStatus)
-          .then(parseJSON);
-            meDatamm = res;
-            
-        } catch (e) {
-            error1 = e
+        body: 
+        JSON.stringify({query: 
+          `{  mashaabims (filters:{id: {in:[${needr}]}}){data{ id attributes{
+          name descrip kindOf  price linkto 
+        } }}}`
+        })
+ })
+  .then(r => r.json())
+  .then(data => res = data);
+    meDatamm = res.data.mashaabims.data
+               console.log(meDatamm)
+
+    } catch (e) {
+            console.log(e)  
         }
        
 }
@@ -826,6 +845,7 @@ function clo () {
   addN = false;
   meDatamm = [];
   needr = []
+      addToast(cloma[$lang], 'info');
 }
 let noofopen = 2;
 
@@ -888,10 +908,11 @@ function allbackFunction(event) {
     files = event.detail.files;
     sendP ();
 }
-let url1 = "https://i18.onrender.com/upload";
+let url1 = "https://strapi-87gh.onrender.com/api/upload";
 let meDatap = [];
 let mecata = [];
 async function sendP () {
+  let d = new Date
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -903,7 +924,7 @@ async function sendP () {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let linkdi ="https://i18.onrender.com/projects/" + $idPr ;
+    let linkdi ="https://strapi-87gh.onrender.com/api/projects/" + $idPr ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -940,7 +961,7 @@ async function sendP () {
         }
                 });
                 } else {
-         let linkg ="https://i18.onrender.com/graphql" ;
+         let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try {
               fetch(linkg, {
               method: 'POST',
@@ -952,9 +973,9 @@ async function sendP () {
         body: 
         JSON.stringify({query: 
           ` mutation { createDecision(
-    input: {
        data: {
         projects: ${$idPr},
+                publishedAt: "${d.toISOString()}",
          newpic: ${imageId},
         kind: pic,
           vots: [
@@ -962,11 +983,9 @@ async function sendP () {
         users_permissions_user: ${idL}
         }
       ]
-        
-       }
     }
   ){
-         decision{
+         data{
               id 
           }
   }
@@ -984,6 +1003,7 @@ async function sendP () {
            
                 }
 })};
+const cloma = {"he":"יצירת המשאב הושלמה בהצלחה", "en": "new need has created successfully"}
  const editfix = {"he": "המידע עודכן בהצלחה!" , "en": "info has updated successfully"}
   const picupsu = {"he":"הלוגו עודכן בהצלחה", "en": "Logo has updated successfully"}
   const picvots = {"he":"הלוגו הועלה להצבעה בהצלחה", "en":"vote on new Logo has created successfully"}
@@ -1064,7 +1084,7 @@ async function updete (event) {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
- let linkg ="https://i18.onrender.com/graphql" ;
+ let linkg ="https://strapi-87gh.onrender.com/graphql" ;
         try { await
               fetch(linkg, {
               method: 'POST',
@@ -1076,8 +1096,7 @@ async function updete (event) {
         body: 
         JSON.stringify({query: 
           ` mutation { updateProject(
-    input: {
-      where: {id: ${$idPr}}
+     id: ${$idPr}
        data: {
         ${projectnamei}
         ${despi}
@@ -1092,24 +1111,33 @@ async function updete (event) {
          ${twiterlinkii}
          ${watsapplinkii}
        }
-    }
+    
   ){
-         project{
+         data{attributes{
            linkToWebsite descripFor projectName publicDescription restime 
-           githublink fblink discordlink drivelink twiterlink watsapplink vallues {valueName ${$lang == 'he' ? 'localizations{valueName }' : ""}}
-          }
+           githublink fblink discordlink drivelink twiterlink watsapplink vallues {data{ attributes{ valueName ${$lang == 'he' ? 'localizations{data{attributes{valueName }}}' : ""}}}}
+          }}}
   }
- }`
+ `
         })
  })
   .then(r => r.json())
   .then(data => mecata = data);
-  mecata = mecata.updateProject.project
+  mecata = mecata.data.updateProject.data.attributes
       console.log(mecata);
        projectname  = mecata.projectName;
        desP = mecata.publicDescription;
        restime  = mecata.restime ;
-       vallues  = mecata.vallues;
+       vallues  = mecata.vallues.data;
+              if ($lang == "he"){
+              for (var i = 0; i < vallues.length; i++){
+                if (vallues[i].attributes.localizations.data.length > 0){
+                vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
+                }
+              }
+            }
+            valit = vallues.map(c => c.attributes.valueName);
+            alit = vallues.map(c => c.id)
        linkP  = mecata.linkToWebsite;
         githublink = mecata.githubLink;
              fblink = mecata.fblink;
@@ -1134,8 +1162,8 @@ async function updete (event) {
    
 async function projectn (id) {
     idPr.set(id);
-    await  goto("/moach");
-    meData = await start()
+    goto('/moach')
+   meData = await start() 
 };
 let needr = [];
 let loadr = false;
@@ -1169,6 +1197,9 @@ async function needadm (event){
   totalneed = true
 		dow.scrollIntoView(true);
 
+  } else{
+      totalneed = false
+
   }
 }
 
@@ -1196,10 +1227,12 @@ function trym(){
 function tryma(){
    openMA = true
 }
-function masi(){
-  loadr = true;
+let fff
+async function masi(){
    addN = true;
-   		lll.scrollIntoView(true);
+  loadr = true;
+  //if (addN == true)
+   	//	fff.scrollIntoView(true);
 
 }
 
@@ -1269,7 +1302,8 @@ const towel = {"he":"לינק לגוגל דרייב המשותף","en": "link to
    const vap = {"he": "ערכים ומטרות", "en": "vallues and objectives"}
   const opmi = {"he": "משימות פנויות","en": "open mission's"}
   const noopen = {"he": "אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו", "en": ""}
-   let sid = false
+  const choo = {"he": "בחירת ריקמה", "en": "choose FreeMate"}
+  let sid = false
 let gan = false
 let bett = false;
 </script>
@@ -1282,7 +1316,7 @@ let bett = false;
 <div class="alli"></div>
 
     {#if $idPr }
-    {#await meData }
+    {#await meData}
 <div class="alli grid items-center justify-center">
        <!---  <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>-->
          <Lowding/>
@@ -1350,7 +1384,7 @@ pointer-events: none;">
 </div>
 {/if}
   <div >
-{#if project.profilePic !== null}
+{#if srcP !== null}
       <img
       width="100" height="100" 
       style="border-radius: 50%; margin-right:auto; margin-left:auto ;"  
@@ -1358,7 +1392,7 @@ pointer-events: none;">
       alt="profilePic">
       {/if}
       <div class="flex flex-row items-center justify-center">
-        {#if project.profilePic !== null}
+        {#if srcP !== null}
       <button
           class="text-barbi hover:bg-barbi hover:text-mturk rounded-full"
           title={editpic[$lang]}
@@ -1470,19 +1504,19 @@ pointer-events: none;">
     <div dir="ltr" class="flex items-center justify-center">
     <div dir="ltr" class="flex -space-x-2 overflow-hidden">
         {#each projectUsers as user}
-  <button title="{user.username}" on:click={()=>goto(`/user/${user.id}`)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.profilePic != null ? user.profilePic.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
+  <button title="{user.attributes.username}" on:click={()=>goto(`/user/${user.id}`)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.attributes.profilePic.data != null ? user.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
   <!--{#if hover}
     <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
     {/if}-->
   {/each}
     </div>
     </div>
-  {#if project.publicDescription}
+  {#if project.publicDescription != "undefined" && project.publicDescription !=  null}
     <div class="border-2 border-gold rounded m-2 p-2"> 
    <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>
     </div>
    {/if}
-  {#if project.descripFor}
+  {#if project.descripFor != "undefined" && project.descripFor != null}
     <div class="border-2 border-gold rounded m-2 p-2"> 
    <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>
     </div>
@@ -1494,7 +1528,7 @@ pointer-events: none;">
     {#if vallues.length > 0}  <h2 class="text-sm text-barbi">{vap[$lang]}</h2>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                 {#each vallues as vallue}<p  class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold"   word={vallue.valueName}/></p>{/each}
+              <Tile bg="gold"   word={vallue.attributes.valueName}/></p>{/each}
     </div>{/if}
   <!--
   <div>
@@ -1586,8 +1620,8 @@ pointer-events: none;">
 {#if bett == true}
   <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={()=>bett = false} title={cencel1[$lang]}><Close/></button>
-<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 94vh; overflow-y: auto; overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); " class="d">
-<Bethas {bmiData} />
+<div dir="ltr" style="width: 95vw; margin: 20px auto; max-height: 94vh;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); " >
+<Bethas {bmiData}  />
 </div>
 {/if}
 </div>
@@ -1732,7 +1766,7 @@ pointer-events: none;">
 <div class=" m-4" bind:this={dow}>
  
       {#if addN == true}
-      <div id="hosafn" class="m-4 border-2 border-barbi rounded"  >
+      <div bind:this={fff} id="hosafn" class="m-4 border-2 border-barbi rounded"  >
       <button
       title={cencel[$lang]}
       on:click={() => addN = false}
@@ -1744,7 +1778,7 @@ pointer-events: none;">
       </div>
       {/if}    
    
-    <div class=" m-4" bind:this={lll} >
+    <div class=" m-4"  bind:this={lll}>
        {#if loadr === true}
         <div class="grid justify-center items-center border-2 border-barbi rounded p-4" >
 
@@ -1801,15 +1835,15 @@ pointer-events: none;">
          <Lowding/>
          </div> 
          {:then projects}
- <div class="flex text-center flex-col border-2  border-barbi rounded m-4">
-<h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">בחירת ריקמה</h1>
+ <div class=" text-center  border-2  border-barbi rounded m-4">
+<h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">{choo[$lang]}</h1>
  
            {#each projects as data, i}
           
           <button
-          class=" border  border-barbi hover:border-gold font-bold border  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold p-0.5 m-2 rounded-full"
+          class=" border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
           on:click={()=>projectn(data.id)}
-          > {data.projectName}
+          > {data.attributes.projectName}
           </button>
   {/each}
 

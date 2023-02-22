@@ -3,7 +3,7 @@
   import * as animateScroll from "svelte-scrollto";
 
   import ProgressBar from "@okrad/svelte-progressbar";
- import { goto, prefetch } from '$app/navigation';
+ import { goto } from '$app/navigation';
  import { lang } from '$lib/stores/lang.js';
 import Close from '../../celim/close.svelte'
 import { onMount }from 'svelte'
@@ -85,7 +85,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://i18.onrender.com/graphql';
+let linkg = 'https://strapi-87gh.onrender.com/graphql';
 
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
@@ -206,16 +206,13 @@ async function agree() {
                     body: JSON.stringify({
                         query: `mutation 
                         { updateproject(
-    input: {
-       where: {id: "${projectId}"}
+     id: "${projectId}"
       data: {
         ${update}
                   }
-    }
-  ) {project{id }}
+  ) {data{id }}
  updateDecision(
-                            input:{
-                                where: {id: "${askId}" }
+              id: "${askId}"
                                 data: { archived: true,
                                     vots: [${userss}, 
                                        {
@@ -223,8 +220,7 @@ async function agree() {
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){decision{id}}
+                        ){data{id}}
 }
 `})
                 })
@@ -254,16 +250,14 @@ async function agree() {
                         query: `mutation 
                         {
                             updateDecision(
-                            input:{
-                                where: {id: "${askId}" }
+id: "${askId}" 
                                 data: { vots: [${userss}, 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
-                        ){decision{id}}
+                        ){data{id}}
                      
                     }
 `})

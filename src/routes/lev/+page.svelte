@@ -1,7 +1,9 @@
 <script>
+    import {nutifi } from '$lib/func/nutifi.svelte'
     import Yahalomim from '$lib/components/lev/yahalomim.svelte'
 import { addToast } from 'as-toast';
 import Mesima from '$lib/components/lev/mesima.svelte'
+import {sendEror} from '$lib/func/sendEror.svelte'
 import {
     betha
 } from '../../lib/components/lev/storess/betha.js'
@@ -121,40 +123,35 @@ function txx(na){
   return (tx)
 }
 function mesimabetahalicha(data) {
-    const mtahan = data.data.user.mesimabetahaliches;
+    const mtahan = data.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data;
+   
     for (let i = 0; i < mtahan.length; i++) {
-        mtaha[i] = mtahan[i];
-        mtaha[i].tx = txx(mtaha[i].name)
-        mtaha[i].ani = "mtaha";
-        mtaha[i].azmi = "mesima";        
-        mtaha[i].pl = 0 + i;
-        mtaha[i].usernames = data.data.user.username;
-    }
+        mtaha[i] = {...mtahan[i].attributes};
+            mtaha[i].id = mtahan[i].id
+            mtaha[i].tx = txx(mtahan[i].attributes.name)
+            mtaha[i].ani = "mtaha"
+            mtaha[i].azmi = "mesima"      
+            mtaha[i].pl = 0 + i
+            mtaha[i].usernames = data.data.usersPermissionsUser.data.attributes.username
+            mtaha[i].noofpu = getProjectData(mtahan[i].attributes.project.data.id,"noof")
+            mtaha[i].projectName = getProjectData(mtahan[i].attributes.project.data.id,"pn")
+            mtaha[i].src = getProjectData(mtahan[i].attributes.project.data.id,"pp")
+       
+        }
+            mtaha = mtaha
+
     beta = mtaha.length;
     localStorage.setItem("beta", beta);
     if (!isEqual(mtaha, mtahaold) && counter > 1) {
         if (mtahaold.length < mtaha.length) {
-            // Create and show the notification
-            const usernames = data.data.user.username;
-            const rikn = mtaha[mtaha.length - 1].project.projectName
-
-            let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+            const usernames =  data.data.usersPermissionsUser.data.attributes.username;
+            const rikn = getProjectData(mtaha[mtaha.length - 1].project.data.id,"pn")
             let text = `שלום ${usernames} !יש לך משימה חדשה לביצוע ברקמת ${rikn}`;
-            navigator.serviceWorker.register('sw.js');
-            Notification.requestPermission(function(result) {
-                if (result === 'granted') {
-                    navigator.serviceWorker.ready.then(function(registration) {
-                        registration.showNotification('1❤️1', {
-                            body: text,
-                            icon: img
-                        });
-                    });
-                }
-            });
-
-            // let notification = new Notification('1❤️1', { body: text, icon: img });
+            let linkop = "lev"      
+            nutifi("1❤️1 משימה חדשה",text,linkop )
         }
     }
+
 }
 
 function gvots(data) {
@@ -202,40 +199,38 @@ function gvots(data) {
 }
 
 function ishursium(dati) {
-    const start = dati.data.user.projects_1s
-    const myid = dati.data.user.id;
+    const start = dati.data.usersPermissionsUser.data.attributes.projects_1s.data
+    const myid = dati.data.usersPermissionsUser.data.id;
     for (let i = 0; i < start.length; i++) {
-        for (let j = 0; j < start[i].finiapruvals.length; j++) {
-            const rt = letters(start[i].finiapruvals[j].missname);
-            let src22 = "";
-            if (start[i].finiapruvals[j].users_permissions_user.profilePic !== null) {
-                src22 = start[i].finiapruvals[j].users_permissions_user.profilePic.formats.thumbnail.url
-            }
+        for (let j = 0; j < start[i].attributes.finiapruvals.data.length; j++) {
+            const rt = letters(start[i].attributes.finiapruvals.data[j].attributes.missname);
+            let src22 = getProjectData(start[i].id,"upic",start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id);
+           console.log(start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id)
             fiapp.push({
-                uid: start[i].finiapruvals[j].users_permissions_user.id,
-                username: start[i].finiapruvals[j].users_permissions_user.username,
+                uid: start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id,
+                username: getProjectData(start[i].id,"un",start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id),
                 src: src22,
-                hearotMeyuchadot: start[i].finiapruvals[j].mesimabetahalich.hearotMeyuchadot,
-                missionDetails: start[i].finiapruvals[j].mesimabetahalich.descrip,
-                nhours: start[i].finiapruvals[j].noofhours,
-                mId: start[i].finiapruvals[j].mesimabetahalich.id,
-                perhour: start[i].finiapruvals[j].mesimabetahalich.perhour,
-                missId: start[i].finiapruvals[j].mesimabetahalich.mission.id,
+                hearotMeyuchadot: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.hearotMeyuchadot,
+                missionDetails: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.descrip,
+                nhours: start[i].attributes.finiapruvals.data[j].attributes.noofhours,
+                mId: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.id,
+                perhour: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.perhour,
+                missId: start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich.data.attributes.mission.data.id,
                 // deadline: start[i].asks[j].open_mission.sqadualed,
-                openName: start[i].finiapruvals[j].missname,
-                omid: start[i].finiapruvals[j].id,
-                askId: start[i].finiapruvals[j].id,
-                why: start[i].finiapruvals[j].why,
-                whatt: start[i].finiapruvals[j].what,
-                users: start[i].finiapruvals[j].vots,
+                openName: start[i].attributes.finiapruvals.data[j].attributes.missname,
+                omid: start[i].attributes.finiapruvals.data[j].id,
+                askId: start[i].attributes.finiapruvals.data[j].id,
+                why: start[i].attributes.finiapruvals.data[j].attributes.why,
+                whatt: start[i].attributes.finiapruvals.data[j].attributes.what,
+                users: start[i].attributes.finiapruvals.data[j].attributes.vots,
                 name: rt[0],
                 stylef: rt[1],
                 st: rt[2],
-                projectId: start[i].finiapruvals[j].project.id,
-                projectName: start[i].finiapruvals[j].project.projectName,
-                noof: start[i].finiapruvals[j].project.user_1s.length,
-                src2: start[i].finiapruvals[j].project.profilePic.formats.thumbnail.url,
-                myid: dati.data.user.id,
+                projectId: start[i].attributes.finiapruvals.data[j].attributes.project.data.id,
+                projectName: getProjectData(start[i].id,"pn"),
+                noof: getProjectData(start[i].id,"noof"),
+                src2: getProjectData(start[i].id,"pp"),
+                myid: myid,
                 ani: "fiapp",
                 azmi: "ishrur",
                 pl: -2
@@ -247,7 +242,7 @@ function ishursium(dati) {
         const x = fiapp[k].users
         fiapp[k].uids = [];
         for (let z = 0; z < x.length; z++) {
-            fiapp[k].uids.push(x[z].users_permissions_user.id);
+            fiapp[k].uids.push(x[z].users_permissions_user.data.id);
             fiapp[k].what = [];
             fiapp[k].what.push(x[z].what);
         }
@@ -292,46 +287,53 @@ function ishursium(dati) {
 }
 
 function crMaap(hh) {
-    const start = hh.data.user.projects_1s
-    const myid = hh.data.user.id;
+    const start = hh.data.usersPermissionsUser.data.attributes.projects_1s.data
+    const myid = hh.data.usersPermissionsUser.data.id;
     for (let i = 0; i < start.length; i++) {
-        if (start[i].maaps) {
-            for (let j = 0; j < start[i].maaps.length; j++) {
-                if (start[i].maaps.length > 0) {
-                    const rt = letters(start[i].maaps[j].sp.name);
+        if (start[i].attributes.maaps.data) {
+            for (let j = 0; j < start[i].attributes.maaps.data.length; j++) {
+                if (start[i].attributes.maaps.data.length > 0) {
+                    const rt = letters(start[i].attributes.maaps.data[j].attributes.sp.data.attributes.name);
+                    const y = start[i].attributes.maaps.data[j].attributes
+                    const v = y.sp.data.attributes
+                    let src27 = ""
+                    if (v.users_permissions_user.data.attributes.profilePic.data != null){
+                        src27 = v.users_permissions_user.data.attributes.profilePic.data.attributes.formats.thumbnail.url
+                    }
                     wegets.push({
-                        uid: start[i].maaps[j].sp.users_permissions_user.id,
-                        username: start[i].maaps[j].sp.users_permissions_user.username,
-                        src: start[i].maaps[j].sp.users_permissions_user.profilePic.formats.thumbnail.url,
-                        myp: start[i].maaps[j].sp.myp,
-                        spid: start[i].maaps[j].sp.id,
-                        omid: start[i].maaps[j].open_mashaabim.id,
-                        askId: start[i].maaps[j].id,
-                        users: start[i].maaps[j].vots,
-                        hm: start[i].maaps[j].sp.unit,
-                        openName: start[i].maaps[j].sp.name,
-                        easy: start[i].maaps[j].open_mashaabim.easy,
-                        price: start[i].maaps[j].open_mashaabim.price,
-                        sqadualed: start[i].maaps[j].open_mashaabim.sqadualed,
-                        sqadualedf: start[i].maaps[j].open_mashaabim.sqadualedf,
-                        spnot: start[i].maaps[j].open_mashaabim.spnot,
-                        kindOf: start[i].maaps[j].open_mashaabim.kindOf,
+                        uid: v.users_permissions_user.data.id,
+                        username: v.users_permissions_user.data.attributes.username,
+                        src: src27,
+                        myp: v.myp,
+                        spid: y.sp.data.id,
+                        omid: y.open_mashaabim.data.id,
+                        askId: start[i].attributes.maaps.data[j].id,
+                        users: y.vots,
+                        hm: v.unit,
+                        openName: v.name,
+                        easy: y.open_mashaabim.data.attributes.easy,
+                        price: y.open_mashaabim.data.attributes.price,
+                        sqadualed: y.open_mashaabim.data.attributes.sqadualed,
+                        sqadualedf: y.open_mashaabim.data.attributes.sqadualedf,
+                        spnot: y.open_mashaabim.data.attributes.spnot,
+                        kindOf: y.open_mashaabim.data.attributes.kindOf,
                         name: rt[0],
                         stylef: rt[1],
                         st: rt[2],
                         projectId: start[i].id,
-                        projectName: start[i].projectName,
-                        noof: start[i].user_1s.length,
-                        src2: start[i].profilePic.formats.thumbnail.url,
-                        myid: hh.data.user.id,
+                        projectName: getProjectData(start[i].id,"pn"),
+                        noof: getProjectData(start[i].id,"noof"),
+                        src2: getProjectData(start[i].id,"pp"),
+                        myid: myid,
                         ani: "wegets",
                         azmi: "ishrur",
-                        pl: -1 + start[i].maaps[j].vots.length
+                        pl: -1 + y.vots.length
                     });
                 }
             }
         }
     }
+    console.log("a")
     for (let k = 0; k < wegets.length; k++) {
         const x = wegets[k].users
         wegets[k].uids = [];
@@ -353,7 +355,7 @@ function crMaap(hh) {
         if (allid.includes(myid)) {
             wegets[t].already = true;
             for (let l = 0; l < wegets[t].users.length; l++) {
-                if (wegets[t].users[l].users_permissions_user.id === myid)
+                if (wegets[t].users[l].users_permissions_user.data.id === myid)
                     wegets[t].mypos = wegets[t].users[l].what;
             }
         }
@@ -430,48 +432,45 @@ function createD() {
     }
 }
 async function createasked(da) {
-    const start = da.data.user.projects_1s
+    const start = da.data.usersPermissionsUser.data.attributes.projects_1s.data
     for (let i = 0; i < start.length; i++) {
-        for (let j = 0; j < start[i].asks.length; j++) {
-            const rt = letters(start[i].asks[j].open_mission.name);
-            let src21 = ``;
-            if (start[i].asks[j].project.profilePic) {
-                src21 = start[i].asks[j].project.profilePic.formats.thumbnail.url
-            } else {
-                src21 = start[i].asks[j].project.profilePic
-            }
+        console.log(start[i])
+        for (let j = 0; j < start[i].attributes.asks.data.length; j++) {
+            const rt = letters(start[i].attributes.asks.data[j].attributes.open_mission.data.attributes.name);
+            let src21 = getProjectData(start[i].attributes.asks.data[j].attributes.project.data.id,"pp");
             let src22 = "";
-            if (start[i].asks[j].users_permissions_user.profilePic !== null) {
-                src22 = start[i].asks[j].users_permissions_user.profilePic.formats.thumbnail.url
+            if (start[i].attributes.asks.data[j].attributes.users_permissions_user.data.attributes.profilePic.data !== null) {
+                src22 = start[i].attributes.asks.data[j].attributes.users_permissions_user.data.attributes.profilePic.data.attributes.formats.thumbnail.url ?? "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
             }
+            let t = start[i].attributes.asks.data[j].attributes
             dictasked.push({
-                uid: start[i].asks[j].users_permissions_user.id,
-                username: start[i].asks[j].users_permissions_user.username,
+                uid: t.users_permissions_user.data.id,
+                username: t.users_permissions_user.data.attributes.username,
                 src: src22,
-                email: start[i].asks[j].users_permissions_user.email,
-                publicklinks: start[i].asks[j].open_mission.publicklinks,
-                privatlinks: start[i].asks[j].open_mission.privatlinks,
-                hearotMeyuchadot: start[i].asks[j].open_mission.hearotMeyuchadot,
-                missionDetails: start[i].asks[j].open_mission.descrip,
-                nhours: start[i].asks[j].open_mission.noofhours,
-                perhour: start[i].asks[j].open_mission.perhour,
-                role: start[i].asks[j].open_mission.tafkidims,
-                missId: start[i].asks[j].open_mission.mission.id,
-                deadline: start[i].asks[j].open_mission.sqadualed,
-                openName: start[i].asks[j].open_mission.name,
-                omid: start[i].asks[j].open_mission.id,
-                askId: start[i].asks[j].id,
-                users: start[i].asks[j].vots,
-                decid: start[i].asks[j].open_mission.declined,
+                email: t.users_permissions_user.data.attributes.email,
+                publicklinks: t.open_mission.data.attributes.publicklinks,
+                privatlinks: t.open_mission.data.attributes.privatlinks,
+                hearotMeyuchadot: t.open_mission.data.attributes.hearotMeyuchadot,
+                missionDetails: t.open_mission.data.attributes.descrip,
+                nhours: t.open_mission.data.attributes.noofhours,
+                perhour: t.open_mission.data.attributes.perhour,
+                role: t.open_mission.data.attributes.tafkidims,
+                missId: t.open_mission.data.attributes.mission.data.id,
+                deadline: t.open_mission.data.attributes.sqadualed,
+                openName: t.open_mission.data.attributes.name,
+                omid: t.open_mission.data.id,
+                askId: start[i].attributes.asks.data[j].id,
+                users: t.vots,
+                decid: t.open_mission.data.attributes.declined.data,
                 name: rt[0],
                 stylef: rt[1],
                 st: rt[2],
-                projectId: start[i].asks[j].project.id,
-                projectName: start[i].asks[j].project.projectName,
-                noof: start[i].asks[j].project.user_1s.length,
+                projectId: t.project.data.id,
+                projectName: getProjectData(t.project.data.id,"pn"),
+                noof: getProjectData(t.project.data.id,"noof"),
                 src2: src21,
-                myid: da.data.user.id,
-                pid: start[i].asks[j].project.user_1s.map(c => c.id),
+                myid: da.data.usersPermissionsUser.data.id,
+                pid: getProjectData(t.project.data.id,"uids"),
                 ani: "askedcoin",
                 azmi: "ziruf",
                 pl: 1 + i + j
@@ -483,14 +482,13 @@ async function createasked(da) {
 
     }
     dictasked = dictasked
-    console.log(dictasked)
     if (dictasked.length > 0) {
         for (let k = 0; k < dictasked.length; k++) {
             const x = dictasked[k].users
             dictasked[k].uids = [];
             dictasked[k].what = [];
             for (let z = 0; z < x.length; z++) {
-                dictasked[k].uids.push(x[z].users_permissions_user.id);
+                dictasked[k].uids.push(x[z].users_permissions_user.data.id);
                 dictasked[k].what.push(x[z].what);
             }
         }
@@ -538,46 +536,42 @@ async function createasked(da) {
 }
 
 async function createmask(da) {
-    const start = da.data.user.projects_1s
-    for (let i = 0; i < start.length; i++) {
-        for (let j = 0; j < start[i].askms.length; j++) {
-            const rt = letters(start[i].askms[j].open_mashaabim.name);
-            let src21 = ``;
-            if (start[i].profilePic) {
-                src21 = start[i].profilePic.formats.thumbnail.url
-            } else {
-                src21 = start[i].profilePic
-            }
+    const start = da.data.usersPermissionsUser.data.attributes.projects_1s.data
+    for (let i = 0; i < start.length; i++)    {
+        for (let j = 0; j < start[i].attributes.askms.data.length; j++) {
+            const rt = letters(start[i].attributes.askms.data[j].attributes.open_mashaabim.data.attributes.name);
+            let src21 = getProjectData(start[i].id,"pp");
             let src22 = "";
-            if (start[i].askms[j].users_permissions_user.profilePic !== null) {
-                src22 = start[i].askms[j].users_permissions_user.profilePic.formats.thumbnail.url
+            if (start[i].attributes.askms.data[j].attributes.users_permissions_user.data.attributes.profilePic.data !== null) {
+                src22 = start[i].attributes.askms.data[j].attributes.users_permissions_user.data.attributes.profilePic.data.attributes.formats.thumbnail.url
             }
+            let a = start[i].attributes.askms.data[j].attributes
             askedm.push({
-                uid: start[i].askms[j].users_permissions_user.id,
-                username: start[i].askms[j].users_permissions_user.username,
+                uid: a.users_permissions_user.data.id,
+                username: a.users_permissions_user.data.attributes.username,
                 src: src22,
-                price: start[i].askms[j].open_mashaabim.price,
-                easy: start[i].askms[j].open_mashaabim.easy,
-                spnot: start[i].askms[j].open_mashaabim.spnot,
-                descrip: start[i].askms[j].open_mashaabim.descrip,
-                hm: start[i].askms[j].open_mashaabim.hm,
-                myp: start[i].askms[j].sp.myp,
-                kindOf: start[i].askms[j].open_mashaabim.kindOf,
-                spid: start[i].askms[j].sp.id,
-                deadline: start[i].askms[j].open_mashaabim.sqadualed,
-                openName: start[i].askms[j].open_mashaabim.name,
-                omid: start[i].askms[j].open_mashaabim.id,
-                askId: start[i].askms[j].id,
-                users: start[i].askms[j].vots,
+                price: a.open_mashaabim.data.attributes.price,
+                easy: a.open_mashaabim.data.attributes.easy,
+                spnot: a.open_mashaabim.data.attributes.spnot,
+                descrip: a.open_mashaabim.data.attributes.descrip,
+                hm: a.open_mashaabim.data.attributes.hm,
+                myp: a.sp.data.attributes.myp,
+                kindOf: a.open_mashaabim.data.attributes.kindOf,
+                spid: a.sp.data.id,
+                deadline: a.open_mashaabim.data.attributes.sqadualed,
+                openName: a.open_mashaabim.data.attributes.name,
+                omid: a.open_mashaabim.data.id,
+                askId: start[i].attributes.askms.data[j].id,
+                users: a.vots,
                 name: rt[0],
                 stylef: rt[1],
                 st: rt[2],
                 projectId: start[i].id,
-                projectName: start[i].projectName,
-                noof: start[i].user_1s.length,
+                projectName: getProjectData( start[i].id, "pn"),
+                noof: getProjectData( start[i].id, "noof"),
                 src2: src21,
-                myid: da.data.user.id,
-                pid: start[i].user_1s.map(c => c.id),
+                myid:  da.data.usersPermissionsUser.data.id,
+                pid: getProjectData( start[i].id, "uids"),
                 ani: "askedm",
                 azmi: "ziruf",
                 pl: 2 + i + j
@@ -592,11 +586,10 @@ async function createmask(da) {
             askedm[k].uids = [];
             askedm[k].what = [];
             for (let z = 0; z < x.length; z++) {
-                askedm[k].uids.push(x[z].users_permissions_user.id);
+                askedm[k].uids.push(x[z].users_permissions_user.data.id);
                 askedm[k].what.push(x[z].what);
             }
         }
-
         for (let t = 0; t < askedm.length; t++) {
             const allid = askedm[t].uids;
             const myid = askedm[t].myid;
@@ -609,6 +602,7 @@ async function createmask(da) {
                 //  dictasked.splice(t, 1);
                 //  dictasked. = dictasked
             }
+
             if (askedm.length > 0) {
                 for (let r = 0; r < askedm[t].users.length; r++) {
                     if (askedm[t].users[r].what === true) {
@@ -620,14 +614,12 @@ async function createmask(da) {
                         askedm[t].noofusersNo += 1;
 
                     }
+          
                 }
-            }
-            if (askedm.length > 0) {
-
-                const noofusersWaiting = askedm[t].noof - askedm[t].users.length;
+                      const noofusersWaiting = askedm[t].noof - askedm[t].users.length;
                 askedm[t].noofusersWaiting = noofusersWaiting;
-
             }
+
         }
     }
     let filters = [false];
@@ -740,25 +732,25 @@ const filterArray = (arr1, arr2) => {
 };
 async function showOpenPro(mi) {
     //req
-    const r = mi.data.user.askeds;
+    const r = mi.data.usersPermissionsUser.data.attributes.askeds.data;
     if (r.length > 0) {
         const p = r.map(c => c.id);
         askedarr = p;
     }
     //dec
-    const r1 = mi.data.user.declined;
+    const r1 = mi.data.usersPermissionsUser.data.attributes.declined.data;
     if (r1.length > 0) {
         const p1 = r1.map(c => c.id);
         declineddarr = p1;
     }
-    const x = mi.data.user.skills;
-    const t = mi.data.user.work_ways;
-    const y = mi.data.user.tafkidims;
+    const x = mi.data.usersPermissionsUser.data.attributes.skills.data;
+    const t = mi.data.usersPermissionsUser.data.attributes.work_ways.data;
+    const y = mi.data.usersPermissionsUser.data.attributes.tafkidims.data;
     const mytaf = y.map(c => c.id);
     const mysk = x.map(c => c.id);
-//check taf
+ //check taf
     for (let i = 0; i < y.length; i++) {
-        const q = y[i].open_missions;
+        const q = y[i].attributes.open_missions.data
         let l = [];
         let z = [];
         let www = [];
@@ -768,9 +760,9 @@ async function showOpenPro(mi) {
         let msk = [];
         for (let j = 0; j < q.length; j++) {
             l[j] = q[j].id;
-            z[j] = q[j].work_ways.map(c => c.id);
-            mtaf[j] = q[j].tafkidims.map(c => c.id);
-            msk[j] = q[j].skills.map(c => c.id);
+            z[j] = q[j].attributes.work_ways.data.map(c => c.id);
+            mtaf[j] = q[j].attributes.tafkidims.data.map(c => c.id);
+            msk[j] = q[j].attributes.skills.data.map(c => c.id);
             const tafn = filterArrayd(mtaf[j], mytaf);
             const skn = filterArrayd(msk[j], mysk);
             if (t.length > 0) {
@@ -831,10 +823,6 @@ async function showOpenPro(mi) {
                                 dictids[q[j].id] -= (msk[j].length * 2);
                             }
                         }
-
-                        // [500,300,100] // need to split 
-                        // a = 100
-                        // ["500",400]
                         if (mtaf[j].length > 0) {
                             if (tafn.length > 0) {
                                 dictids[q[j].id] -= tafn.length;
@@ -890,7 +878,7 @@ async function showOpenPro(mi) {
     }
 
     for (let i = 0; i < x.length; i++) {
-        const q = x[i].open_missions;
+        const q = x[i].attributes.open_missions.data;
         let l = [];
         let z = [];
         let www = [];
@@ -900,9 +888,9 @@ async function showOpenPro(mi) {
         let msk = [];
         for (let j = 0; j < q.length; j++) {
             l[j] = q[j].id;
-            z[j] = q[j].work_ways.map(c => c.id);
-            mtaf[j] = q[j].tafkidims.map(c => c.id);
-            msk[j] = q[j].skills.map(c => c.id);
+            z[j] = q[j].attributes.work_ways.data.map(c => c.id);
+            mtaf[j] = q[j].attributes.tafkidims.data.map(c => c.id);
+            msk[j] = q[j].attributes.skills.data.map(c => c.id);
             let s = t.map(c => c.id);
             const tafn = filterArrayd(mtaf[j], mytaf);
             const skn = filterArrayd(msk[j], mysk);
@@ -977,7 +965,7 @@ async function showOpenPro(mi) {
         return filteredw[a] - filteredw[b]
     })
     // add declined filter add sort by value
-    console.log("showOpenPro")
+    console.log("showOpenPro",keysSorted)
 
     if (keysSorted.length > 0) {
         let resultString = keysSorted.join(' , ');
@@ -992,7 +980,7 @@ async function showOpenPro(mi) {
         idL = cookieValueId;
         token = cookieValue;
         let bearer1 = 'bearer' + ' ' + token;
-        let link = "https://i18.onrender.com/graphql";
+        let link = "https://strapi-87gh.onrender.com/graphql";
         try {
             await fetch(link, {
                     method: 'POST',
@@ -1002,29 +990,29 @@ async function showOpenPro(mi) {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        query: `{openMissions (where: {id_in: [${resultString}]}){ id
-            project { id projectName timeToP profilePic {url formats }}
+                        query: `{openMissions (filters: {id:{in: [${keysSorted}]}}){data{ id attributes{
+            project {data{ id attributes{ projectName timeToP profilePic{data{attributes {url formats }}}}}}
             sqadualed
-            tafkidims {roleDescription ${$lang == 'he' ? 'localizations{roleDescription }' : ""}}
-            skills {skillName ${$lang == 'he' ? 'localizations{skillName }' : ""}}
+            tafkidims{data {attributes {roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
+            skills {data{attributes{skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
             descrip
             hearotMeyuchadot
             name dates
-            work_ways {workWayName ${$lang == 'he' ? 'localizations{workWayName }' : ""}}
+            work_ways {data{attributes{workWayName ${$lang == 'he' ? 'localizations{data{attributes{workWayName }}}' : ""}}}}
             noofhours perhour
             }
-            }`
+            }
+                }}`
                     })
                 })
                 .then(r => r.json())
-                .then(data => meData = data.data.openMissions);
-            meData.data
+                .then(data => meData = data.data.openMissions.data);
             for (let i = 0; i < meData.length; i++) {
                 meData[i].ani = "meData",
                 meData[i].azmi = "hazaa",               
                 meData[i].pl = 10 + i,
-                    meData[i].hst = checkHst(meData[i].project.projectName)
-                    meData[i].stb = checkStb(meData[i].name)
+                    meData[i].hst = checkHst(meData[i].attributes.project.data.attributes.projectName)
+                    meData[i].stb = checkStb(meData[i].attributes.name)
             }
 
         } catch (e) {
@@ -1045,9 +1033,11 @@ async function showOpenPro(mi) {
             if (meDataold.length - meData.length === -1) {
                 rikn = meData[meData.length - 1].projectName
             }
-            let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
             let text = `שלום ${usernames} ! יש לך הצעה חדשה: ביצוע משימה  ${rikn !== "0" ? `ברקמת ${rikn}` : "בריקמה"}`;
-            navigator.serviceWorker.register('sw.js');
+            const head = {"he":"1❤️1 הצעה חדשה","en":"1❤️1 new suggestion"}
+            nutifi(head[$lang],text,"lev" )
+
+            /*    navigator.serviceWorker.register('sw.js');
             Notification.requestPermission(function(result) {
                 if (result === 'granted') {
                     navigator.serviceWorker.ready.then(function(registration) {
@@ -1057,7 +1047,7 @@ async function showOpenPro(mi) {
                         });
                     });
                 }
-            });
+            });*/
 
         }
     }
@@ -1105,17 +1095,19 @@ let total = ""
 let picLink = ""
 
 function midd(min) {
-    const dd = min.data.user
+    const dd = min.data.usersPermissionsUser.data.attributes
     nam = dd.username
     total = dd.total
-    if (dd.profilePic !== null) {
-        if (dd.profilePic.formats.thumbnail.url) {
-            picLink = dd.profilePic.formats.thumbnail.url
-        } else if (dd.profilePic.small.thumbnail.url) {
-            picLink = dd.profilePic.small.thumbnail.url
-        } else if (dd.profilePic.url) {
-            picLink = dd.profilePic.url
-        }
+    if (dd.profilePic.data !== null) {
+        if (dd.profilePic.data.attributes.formats.thumbnail.url) {
+            picLink = dd.profilePic.data.attributes.formats.thumbnail.url
+        } else if (dd.profilePic.data.attributes.small.thumbnail.url) {
+            picLink = dd.profilePic.data.attributes.small.thumbnail.url
+        } else if (dd.profilePic.data.attributes.url) {
+            picLink = dd.profilePic.data.attributes.url
+        } 
+    } else{
+        picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
     }
     localStorage.setItem("nam", JSON.stringify(nam));
     localStorage.setItem("picLink", JSON.stringify(picLink));
@@ -1231,7 +1223,7 @@ onMount(async () => {
     if (localStorage.getItem("mashs") !== null) {
         mashs = localStorage.getItem("mashs")
     }     
-    if ('serviceWorker' in navigator) {
+  /*  if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', {
             scope: '.'
         }).then(function(reg) {
@@ -1241,7 +1233,7 @@ onMount(async () => {
             // registration failed
             console.log('Registration failed with ' + error);
         });
-    };
+    };*/
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -1365,7 +1357,7 @@ async function start() {
     console.log($lang, "start");
     miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
-    let link = "https://i18.onrender.com/graphql";
+    let link = "https://strapi-87gh.onrender.com/graphql";
     try {
         await fetch(link, {
                 method: 'POST',
@@ -1375,96 +1367,137 @@ async function start() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    query: `{ user (id:${idL})  
-          { 
-              haskama
-          askms (where:{archived: false }){ id
-                                    vots  {what why id users_permissions_user {id}}
-                                     open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy }
-                                      project {projectName id user_1s {id} profilePic {url formats }}
-                                       users_permissions_user {haskama username id profilePic {url formats } } }
-              sps {id name unit price myp mashaabim {id price open_mashaabims (where:{archived: false } ){ declinedsps { id } id price hm descrip spnot kindOf users { id }  sqadualedf sqadualed linkto created_at hm name easy project {projectName id user_1s {id}
-                            profilePic {url formats }}}}} 
-              mesimabetahaliches  (where:{forappruval: false, finnished: false }){
-             id status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai mission {id}
-              project{projectName id user_1s {id}
-                            profilePic {url formats }}}
-            welcom_tops (where:{clicked: false }){
-                project { id projectName}
-            }
-              skills 
-            { id open_missions(where:{archived: false }) 
-                { id skills { id } 
-                    tafkidims {id}  
-                    work_ways { id} 
-                } 
-                }
-                id
-                username
-                hervachti
-                 profilePic {url formats }  
-                     askeds  { id} 
-                     declined { id} 
-                     work_ways { id } 
-                     tafkidims { id 
-                        open_missions (where:{archived: false }) { id 
-                            skills { id } 
-                            work_ways { id } 
-                            tafkidims {id}
-                        } 
-                        } 
-  projects_1s { projectName id 
-    user_1s {id haskamaz haskamac haskama} 
-    profilePic {url formats } 
-    decisions (where: {archived: false}) {id kind created_at newpic {url formats id } vots  {what why id order users_permissions_user {id}}}
-    tosplits (where: {finished: false}) {id name vots  {what why id users_permissions_user {id}}}              
-    maaps(where:{archived: false }){id created_at name  sp{id name myp unit users_permissions_user { username id profilePic {url formats } }}
-                 open_mashaabim{id name sqadualed sqadualedf kindOf spnot easy} vots {what why id users_permissions_user { id}}}
-    pmashes (where:{archived: false }){ id hm  sqadualedf sqadualed linkto created_at name descrip easy price kindOf spnot mashaabim {id} diun {what why id users_permissions_user {id username profilePic {url}} order }  users  { what order why id users_permissions_user {id username profilePic {url}}}} 
-    open_mashaabims { id name project { id } mashaabim { sps {name price kindOf spnot id myp users_permissions_user {username id profilePic {url formats }}}}}  
-    askms(where:{archived: false }){ id 
-                                     vots  {what why id users_permissions_user {id}}
-                                       users_permissions_user { username id profilePic {url formats } }
-                        open_mashaabim { id  price descrip spnot kindOf  sqadualedf sqadualed linkto created_at hm name easy }
-                          sp { id price myp }}
-    asks (where:{archived: false }){ id
-                                    vots  {what why id users_permissions_user {id}}
-                                     open_mission { id mission {id} declined { id} sqadualed publicklinks tafkidims { id } noofhours perhour privatlinks descrip hearotMeyuchadot name}
-                                      project {projectName id user_1s {id} profilePic {url formats }}
-                                       users_permissions_user { username id email profilePic {url formats } } }
-    finiapruvals (where:{archived: false}) {
-              id missname why what {url formats} noofhours mesimabetahalich {id perhour hearotMeyuchadot descrip mission {id} } vots  {what why id users_permissions_user {id}}
-            project {projectName id 
-                                        profilePic {url formats } 
-                                        user_1s { id}
-            } users_permissions_user { username id profilePic {url formats } } }
-    pendms (where:{archived: false }) {id name hearotMeyuchadot descrip noofhours perhour sqadualed
-                                    privatlinks publicklinks
-                                    rishon {id}
-                                    skills { id skillName}
-                                    tafkidims {id roleDescription}
-                                    work_ways {id workWayName} 
-                                    mission { id}
-                                    vallues { id}
-                                    nego { noofhours perhour users_permissions_user {id username profilePic {url}}}
-                                    diun {what why id users_permissions_user {id username profilePic {url}} order }  
-                                    users  { what order why id users_permissions_user {id username profilePic {url}}}                                   
-                            }
-    open_missions(where:{archived: false }) {id declined { id} users  {id} } 
-                                    } 
-                                 }
+                    query: `{ usersPermissionsUser (id: ${idL}){
+    data {
+      id attributes{ 
+      haskama
+      askms (filters: { archived: { eq: false } }){ data{ id attributes{
+                    vots  {what why id users_permissions_user {data{id}}}
+                    open_mashaabim { data {id attributes{  price descrip spnot kindOf  sqadualedf sqadualed linkto createdAt hm name easy }}}
+                    project {data {id attributes{ projectName user_1s {data{id}} profilePic {data{ attributes{url formats }}}}}}
+                    users_permissions_user{data {id attributes {haskama username profilePic {data{attributes{url formats }}}}}}
+                      }}}
+      sps {data{id attributes{ name unit price myp 
+                		mashaabim {data{id attributes{ price 
+                              open_mashaabims (filters: { archived: { eq: false } }){ data{ id attributes{
+                                        declinedsps {data{ id }} price hm descrip spnot kindOf users {data{ id }} 
+                                        sqadualedf sqadualed linkto createdAt hm name easy
+                												project {data{id attributes {projectName  user_1s {data{id}} profilePic {data{attributes{url formats}}}}}} 
+                     }}}}}}}}} 
+      mesimabetahaliches (filters: { forappruval: { eq: false },finnished:{ eq: false } }) {data{ id attributes{ 
+        						status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai 
+        						mission {data{id}}
+        						project{data{id}}
+                                acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
+            			   }}}
+      welcom_tops (filters: { clicked: { eq: false } }){ data{ id attributes{
+                	 project{data{id}}
+   								   }}}
+      skills{data{id attributes{ 
+            			 open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
+                								 skills {data{ id }} 
+                   							 tafkidims {data {id}}  
+                    						 work_ways {data{ id}}
+        													}}}
+      								}}}
+	  username hervachti
+      profilePic {data{attributes {url formats }}}  
+      askeds  {data{ id}} 
+      declined {data{ id} }
+      work_ways {data{ id }} 
+      tafkidims {data{ id attributes{
+                        open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
+                								 skills {data{ id }} 
+                   							 tafkidims {data {id}}  
+                    						 work_ways {data{ id}}
+        													}}}
+     									 }}} 
+  	projects_1s {data{id attributes{ projectName 
+    			user_1s {data{id attributes{username haskamaz haskamac haskama profilePic {data{attributes{ url formats }}}}}} 
+    			profilePic {data{attributes{ url formats }}} 
+    			decisions (filters: { archived: { eq: false } }){ data{ id attributes{ 
+        					kind createdAt 
+        					newpic {data{id attributes{ url formats }}}
+        					vots  {what why id order users_permissions_user {data{id}}}
+      							}}}
+    			tosplits (filters: { finished: { eq: false } }){ data{ id attributes{ 
+        					name 
+                            halukas {data {id}}
+        					vots  {what why id users_permissions_user {data {id}}}
+                            hervachti {amount noten mekabel users_permissions_user {data {id attributes{hervachti}}}}
+      							}}}
+                halukas (filters: {and:[{ ushar: { eq: true } } { confirmed: { eq: false }}]}){ data{ id attributes{ 
+                    amount senderconf chatre {freetext send {data{id}} when seen} usersend {data {id}} userrecive {data{id}}
+                }}} 
+    			maaps(filters: { archived: { eq: false } }){ data{ id attributes{ 
+        					createdAt name  
+        					sp{data {id attributes{ name myp unit 
+                		            users_permissions_user {data {id attributes{ username profilePic {data{attributes {url formats } }}}}}}}}
+                		    open_mashaabim{data{id attributes{ name sqadualed sqadualedf kindOf spnot easy}}}
+                            vots {what why id users_permissions_user {data { id}}}
+                                }}}
+    			pmashes (filters: { archived: { eq: false } }){ data{ id attributes{ 
+        					hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
+        					mashaabim {data{id}} 
+        					diun {what why order id users_permissions_user {data {id }}}
+        					users { what order why id users_permissions_user {data{id }}}
+      							}}}
+    			open_mashaabims {data{ id attributes{ name 
+                	        project {data{ id }} 
+                	        mashaabim {data{attributes{ sps{data{id attributes {name price kindOf spnot  myp 
+                												users_permissions_user {data{id attributes{ username profilePic {data{attributes{url formats }}}}}}
+                    }}}}}}}}}  
+    			askms(filters: { archived: { eq: false } }){ data{ id attributes{
+                            vots {what why id users_permissions_user {data{id}}}
+                            users_permissions_user {data{id attributes{ username  profilePic{data{attributes {url formats }}}}}}
+                        	open_mashaabim {data{ id attributes{  price descrip spnot kindOf  sqadualedf sqadualed linkto createdAt hm name easy }}}
+                          	sp {data{ id attributes{ price myp }}}
+      											}}}
+   				asks(filters: { archived: { eq: false } }){ data{ id attributes{
+                            vots  {what why id users_permissions_user {data{id}}}
+                            open_mission {data{id attributes{  mission {data{id}}
+                                            declined {data{ id}} sqadualed publicklinks tafkidims {data{ id }}
+                                            noofhours perhour privatlinks descrip hearotMeyuchadot name}}}
+                            project {data{ id }}
+                            users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}
+      									}}}
+    			finiapruvals(filters: { archived: { eq: false } }){ data{ id attributes{
+              			    missname noofhours why what{data{attributes {url formats}}} 
+        					mesimabetahalich {data{id attributes{ perhour hearotMeyuchadot descrip mission {data {id}}}}}
+                            vots  {what why id users_permissions_user {data{id}}}
+          					project {data{ id}} 
+            				users_permissions_user {data{ id} }
+      											}}}
+    			pendms(filters: { archived: { eq: false } }){ data{ id attributes{ 
+        					name hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks
+                            rishon {data{id}}
+                            skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
+                            tafkidims {data{id attributes{ roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
+                            work_ways {data{id attributes{ workWayName ${$lang == 'he' ? 'localizations{data{attributes{workWayName }}}' : ""}}}}
+                            mission {data{ id}}
+                            vallues {data{ id}}
+                            nego { noofhours perhour users_permissions_user {data {id}}}
+                            diun {what why id order users_permissions_user {data{ id}}}  
+                            users { what order why id users_permissions_user {data{id }}}                                   
+      													}}}
+    			open_missions(filters: { archived: { eq: false } }){ data{ id attributes{ 
+        					declined {data{ id}} 
+        					users  {data{id} } 
+      								}}}
+    }}}
+      }}}
 }`
                 })
             })
             .then(r => r.json())
             .then(data => miData = data);
-            if(miData.data.user == null) {
+            if(miData.data.usersPermissionsUser == null) {
                 addToast(`${tolog[$lang]}`, 'info');
                 goto("./login")
             }
         counter += 1;
         localStorage.setItem("miDataL", JSON.stringify(miData));
-        if (isEqual(miData, miDataold)) {
+        if (isEqual(miData, miDataold)  == true) {
             console.log("nada")
             low = false
         } else {
@@ -1491,26 +1524,31 @@ async function start() {
             wegets = [];
             haluask = [];
             hachlatot = [];
-             usernames = miData.data.user.username;
+             usernames = miData.data.usersPermissionsUser.data.attributes.username;
             showOpenPro(miData);
             midd(miData);
             makeWalcom(miData);
             createasked(miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
             createpends(miData);
             mesimabetahalicha(miData);
-                                    console.log("mtaha")
+            console.log("mtaha")
             ishursium(miData);
                         console.log("ishursium")
             sds(miData);
+                        console.log("sds")
             pmash(miData)
+            console.log("pmash")
             sps(miData)
             createmask(miData)
+            console.log("createmask")
             crMaap(miData)
-            console.log("every rashbi")
+            console.log("crMaap")
             rashbi(miData);
-            console.log("every hachla")
+            console.log("rashbi")
             hachla(miData);
-            console.log("every")
+            console.log("hachla")
+            tveria(miData)
+            console.log("tveria")
             bubleUiAngin()
             low = false
         }
@@ -1521,39 +1559,93 @@ async function start() {
 let pmashes = [];
 let huca = [];
 let haluask = [];
-
+let tverias = [];
+function tveria (data){
+    const myid = data.data.usersPermissionsUser.data.id;
+     const projects = data.data.usersPermissionsUser.data.attributes.projects_1s.data;
+    for (let i = 0; i < projects.length; i++) {
+        const proj = projects[i];
+        for (let j = 0; j < projects[i].attributes.halukas.data.length; j++) {
+            const el = projects[i].attributes.halukas.data[j]
+            if (el.attributes.usersend.data.id == myid ||  el.attributes.userrecive.data.id == myid){
+                            console.log(projects[i].attributes.halukas.data[j], "oooo")
+                tverias.push({
+                sendpropic:getProjectData(proj.id,"upic",el.attributes.usersend.data.id),
+                sendname:getProjectData(proj.id,"un",el.attributes.usersend.data.id),    
+                respropic:getProjectData(proj.id,"upic",el.attributes.userrecive.data.id),
+                resname:getProjectData(proj.id,"un",el.attributes.userrecive.data.id),    
+                projectId: proj.id,
+                kind: el.attributes.usersend.data.id == myid ? "send" : "recive",
+          //      created_at: pend.createdAt,
+                projectName: getProjectData(proj.id,"pn"),
+            //    user_1s: getProjectData(proj.id,"us"),
+                src: getProjectData(proj.id,"pp"),
+             //   noofpu: getProjectData(proj.id,"noof"),
+                myid: myid,
+                pendId: projects[i].attributes.halukas.data[j].id,
+                chat: el.attributes.chatre,
+                amount: el.attributes.amount,
+                send: el.attributes.usersend.data.id,
+                recive: el.attributes.userrecive.data.id,
+                senderconf:el.attributes.senderconf,
+                ani: "vidu",
+                azmi: "vidu",
+                pl: 1,
+                messege: []
+            });
+        }
+    }
+};
+        for(let s = 0; s < tverias.length ; s++){
+            for(let t = 0; t < tverias[s].chat.length ; t++ ){
+              tverias[s].messege.push({
+                    message: tverias[s].chat[t].freetext,
+                    when: tverias[s].chat[t].when,
+                    pic: getProjectData(tverias[s].projectId,"upic",tverias[s].chat[t].send.data.id),
+                    sentByMe: tverias[s].chat[t].send.data.id === myid ? true : false,
+                    seen: tverias[s].chat[t].seen,
+                })
+            }
+        }
+    
+    tverias = tverias
+    console.log(tverias)
+}
 function hachla(data) {
-    const myid = data.data.user.id;
+    const myid = data.data.usersPermissionsUser.data.id;
     let src24 = ""
-    if (data.data.user.profilePic !== null) {
-        src24 = data.data.user.profilePic.url
+    if (data.data.usersPermissionsUser.data.attributes.profilePic.data !== null) {
+        src24 = data.data.usersPermissionsUser.data.attributes.profilePic.data.attributes.url
     } else {
         src24 = ""
     }
-    const projects = data.data.user.projects_1s;
+    const projects = data.data.usersPermissionsUser.data.attributes.projects_1s.data;
     for (let i = 0; i < projects.length; i++) {
         const proj = projects[i];
-        for (let j = 0; j < projects[i].decisions.length; j++) {
-            const pend = projects[i].decisions[j]
+        for (let j = 0; j < projects[i].attributes.decisions.data.length; j++) {
+            const pend = projects[i].attributes.decisions.data[j].attributes
+                    console.log("proh")
+
               let newpicid;
               let newpic;
             if(pend.kind == "pic" ){
-                newpicid = pend.newpic.id;
-                newpic =pend.newpic.url
+                newpicid = pend.newpic.data.id;
+                newpic =pend.newpic.data.attributes.url
             }
             hachlatot.push({
               newpicid:newpicid ,
                 mysrc: src24,
                 projectId: proj.id,
                 kind: pend.kind,
-                created_at: pend.created_at,
-                projectName: proj.projectName,
-                user_1s: proj.user_1s,
-                src: proj.profilePic.formats.thumbnail.url,
+                created_at: pend.createdAt,
+                projectName: getProjectData(proj.id,"pn"),
+                user_1s: getProjectData(proj.id,"us"),
+                src: getProjectData(proj.id,"pp"),
+                noofpu: getProjectData(proj.id,"noof"),
                 users: pend.vots,
                 myid: myid,
                 newpic: newpic,
-                pendId: pend.id,
+                pendId: projects[i].attributes.decisions.data[j].id,
                 //   diun: pend.diun,
                 ani: "hachla",
                 azmi: "hachla",
@@ -1561,8 +1653,6 @@ function hachla(data) {
                 messege: []
             });
         }
-        console.log("mihggd", hachlatot)
-
     }
     console.log("mid", hachlatot)
     for (let k = 0; k < hachlatot.length; k++) {
@@ -1611,7 +1701,7 @@ function hachla(data) {
                     src22 = ""
                   }*/
                 hachlatot[t].messege.push({
-                    message: `${hachlatot[t].users[x].users_permissions_user.username}  
+                    message: `${getProjectData(hachlatot[t].projectId,"un",hachlatot[t].users[x].users_permissions_user.id)}  
                      ${hachlatot[t].users[x].what == true ? 'בעד' : ` נגד
                       ${hachlatot[t].users[x].why !== null ? `בנימוק: ${hachlatot[t].users[x].why}` : ``}`}`,
                     what: hachlatot[t].users[x].what,
@@ -1638,7 +1728,7 @@ function hachla(data) {
                           })
                          }
                        }*/
-    }
+    } 
 
     halu = hachlatot.length ;
     localStorage.setItem("halu", halu);
@@ -1646,21 +1736,23 @@ function hachla(data) {
 }
 
 function rashbi(data) {
-    const myid = data.data.user.id;
-    const projects = data.data.user.projects_1s;
+    const myid = data.data.usersPermissionsUser.data.id;
+    const projects = data.data.usersPermissionsUser.data.attributes.projects_1s.data;
     for (let i = 0; i < projects.length; i++) {
-        for (let j = 0; j < projects[i].tosplits.length; j++) {
-            const halug = projects[i].tosplits[j]
+        for (let j = 0; j < projects[i].attributes.tosplits.data.length; j++) {
+            const halug = projects[i].attributes.tosplits.data[j].attributes
             haluask.push({
                 name: halug.name,
                 projectId: projects[i].id,
-                projectName: projects[i].projectName,
-                user_1s: projects[i].user_1s,
-                src: projects[i].profilePic.formats.thumbnail.url,
+                projectName: getProjectData(projects[i].id,"pn"),
+                user_1s: getProjectData(projects[i].id,"us"),
+                src: getProjectData(projects[i].id,"pp"),
                 users: halug.vots,
                 myid: myid,
-                pendId: halug.id,
-                noofusers: projects[i].user_1s.length,
+                pendId: projects[i].attributes.tosplits.data[j].id,
+                noofusers: getProjectData(projects[i].id,"noof"),
+                halukot: halug.halukas.data,
+                hervach: halug.hervachti,
                 ani: "haluk",
                 azmi: "hachla",
                 pl: 1 + halug.vots.length
@@ -1672,7 +1764,7 @@ function rashbi(data) {
         const x = haluask[k].users
         for (let z = 0; z < x.length; z++) {
             haluask[k].uids = [];
-            haluask[k].uids.push(x[z].users_permissions_user.id);
+            haluask[k].uids.push(x[z].users_permissions_user.data.id);
             haluask[k].what = [];
 
             haluask[k].what.push(x[z].what);
@@ -1707,25 +1799,28 @@ function rashbi(data) {
     }
     halu = haluask.length;
     localStorage.setItem("halu", halu);
+
 }
 
 function sps(pp) {
-    const usernames = pp.data.user.username
-    for (let i = 0; i < pp.data.user.sps.length; i++) {
-        const y = pp.data.user.sps[i];
-        if (y.mashaabim.open_mashaabims.length > 0) {
-            for (let t = 0; t < pp.data.user.sps[i].mashaabim.open_mashaabims.length; t++) {
-                const x = pp.data.user.sps[i].mashaabim.open_mashaabims[t]
-                const z = pp.data.user.sps[i].mashaabim.open_mashaabims[t].project;
-                const declineddarra = pp.data.user.sps[i].mashaabim.open_mashaabims[t].declinedsps.map(c => c.id)
-                if (!declineddarra.includes(y.id)) {
-                    if(x.hm <= y.unit){
+    const usernames = pp.data.usersPermissionsUser.data.attributes.username
+    for (let i = 0; i < pp.data.usersPermissionsUser.data.attributes.sps.data.length; i++) {
+        const y = pp.data.usersPermissionsUser.data.attributes.sps.data[i].attributes;
+        if (y.mashaabim.data.attributes.open_mashaabims.data.length > 0) {
+            console.log("here and now",y)
+            for (let t = 0; t < y.mashaabim.data.attributes.open_mashaabims.data.length; t++) {
+                const x = y.mashaabim.data.attributes.open_mashaabims.data[t].attributes
+                const z = x.project.data.attributes;
+                const declineddarra = x.declinedsps.data.map(c => c.id)
+                console.log("klkl")
+                if (!declineddarra.includes(y.mashaabim.data.attributes.open_mashaabims.data[t].id)) {
+                   // if(x.hm <= y.unit){
                     huca.push({
                         declineddarra: declineddarra,
-                        projectid: z.id,
+                        projectid: x.project.data.id,
                         projectName: z.projectName,
-                        srcb: z.profilePic.formats.thumbnail.url,
-                        id: x.id,
+                        srcb: z.profilePic.data.attributes.formats.thumbnail.url,
+                        id: y.mashaabim.data.attributes.open_mashaabims.data[t].id,
                         price: x.price,
                         mashname: x.name,
                         myp: y.myp,
@@ -1733,20 +1828,22 @@ function sps(pp) {
                         kindOf: x.kindOf,
                         spnot: x.spnot,
                         descrip: x.descrip,
-                        oid: y.id,
+                        oid: pp.data.usersPermissionsUser.data.attributes.sps.data[i].id,
                         already: false,
                         ani: "huca",
                         azmi: "hazaa",
                         pl: 6
                     })
-                }
+            //    }
             }
             }
         }
     }
+                    console.log("koooooo")
     huca = huca
     mashs = huca.length
     localStorage.setItem("mashs", mashs);
+    //todo hm vs hm 
     if (!isEqual(huca, hucaold) && counter > 1) {
         if (hucaold.length < huca.length) {
             // Create and show the notification
@@ -1754,20 +1851,9 @@ function sps(pp) {
             if (hucaold.length - huca.length === -1) {
                 rikn = huca[huca.length - 1].projectName
             }
-            let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+            let linkop = "lev"
             let text = `שלום ${usernames} ! יש לך הצעה חדשה: שיתוף משאב  ${rikn !== "0" ? `ברקמת ${rikn}` : "בריקמה"}`;
-            navigator.serviceWorker.register('sw.js');
-            Notification.requestPermission(function(result) {
-                if (result === 'granted') {
-                    navigator.serviceWorker.ready.then(function(registration) {
-                        registration.showNotification('1❤️1', {
-                            body: text,
-                            icon: img
-                        });
-                    });
-                }
-            });
-
+            nutifi("1❤️1 ריקמה חדשה",text,linkop )
         }
     }
 }
@@ -1775,18 +1861,18 @@ let penm = 0;
 
 function pmash(data) {
     //rishonnnn so to create openM first avilable only to rishon then to rest of users..
-    const myid = data.data.user.id;
+    const myid = data.data.usersPermissionsUser.data.id;
     let src24 = ""
-    if (data.data.user.profilePic !== null) {
-        src24 = data.data.user.profilePic.url
+    if (data.data.usersPermissionsUser.data.attributes.profilePic.data !== null) {
+        src24 = data.data.usersPermissionsUser.data.attributes.profilePic.data.attributes.formats.thumbnail.url
     } else {
         src24 = ""
     }
-    const projects = data.data.user.projects_1s;
+    const projects = data.data.usersPermissionsUser.data.attributes.projects_1s.data;
     for (let i = 0; i < projects.length; i++) {
         const proj = projects[i];
-        for (let j = 0; j < projects[i].pmashes.length; j++) {
-             const pend = projects[i].pmashes[j]
+        for (let j = 0; j < projects[i].attributes.pmashes.data.length; j++) {
+             const pend = projects[i].attributes.pmashes.data[j].attributes
             pmashes.push({
                 mysrc: src24,
                 name: pend.name,
@@ -1794,20 +1880,21 @@ function pmash(data) {
                 hearotMeyuchadot: pend.spnot,
                 descrip: pend.descrip,
                 kindOf: pend.kindOf,
-                created_at: pend.created_at,
-                projectName: proj.projectName,
-                user_1s: proj.user_1s,
-                src: proj.profilePic.formats.thumbnail.url,
+                created_at: pend.createdAt,
+                projectName: getProjectData(proj.id,"pn"),
+                user_1s:getProjectData(proj.id,"us"),
+                src: getProjectData(proj.id,"pp"),
+                noofusers: getProjectData(proj.id,"noof"),
                 users: pend.users,
                 myid: myid,
-                mshaabId: pend.mashaabim.id,
+                mshaabId: pend.mashaabim.data.id,
                 hm: pend.hm,
                 price: pend.price,
                 easy: pend.easy,
                 linkto: pend.linkto,
                 sqadualed: pend.sqadualed,
                 sqadualedf: pend.sqadualedf,
-                pendId: pend.id,
+                pendId: projects[i].attributes.pmashes.data[j].id,
                 diun: pend.diun,
                 ani: "pmashes",
                 azmi: "harchava",
@@ -1820,7 +1907,7 @@ function pmash(data) {
         const x = pmashes[k].users
         pmashes[k].uids = [];
         for (let z = 0; z < x.length; z++) {
-            pmashes[k].uids.push(x[z].users_permissions_user.id);
+            pmashes[k].uids.push(x[z].users_permissions_user.data.id);
         }
     }
     for (let t = 0; t < pmashes.length; t++) {
@@ -1835,7 +1922,7 @@ function pmash(data) {
             pmashes[t].already = true;
             pmashes[t].pl += 48
             for (let l = 0; l < pmashes[t].users.length; l++) {
-                if (pmashes[t].users[l].users_permissions_user.id === myid)
+                if (pmashes[t].users[l].users_permissions_user.data.id === myid)
                     if (pmashes[t].users[l].order !== 1) {
                         pmashes[t].mypos = pmashes[t].users[l].what;
                     }
@@ -1855,36 +1942,28 @@ function pmash(data) {
         pmashes[t].noofusersWaiting = noofusersWaiting;
         if (pmashes[t].users.length > 0) {
             for (let x = 0; x < pmashes[t].users.length; x++) {
-                let src22 = ""
-                if (pmashes[t].users[x].users_permissions_user.profilePic !== null) {
-                    src22 = pmashes[t].users[x].users_permissions_user.profilePic.url
-                } else {
-                    src22 = ""
-                }
+                let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].users[x].users_permissions_user.data.id)
                 pmashes[t].messege.push({
-                    message: `${pmashes[t].users[x].users_permissions_user.username}  
+                    message: `${getProjectData(pmashes[t].projectId,"un",pmashes[t].users[x].users_permissions_user.data.id)}  
                      ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד
                       ${pmashes[t].users[x].why !== null ? `בנימוק: ${pmashes[t].users[x].why}` : ``}`}`,
                     what: pmashes[t].users[x].what,
                     pic: src22,
-                    sentByMe: pmashes[t].users[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pmashes[t].users[x].users_permissions_user.data.id === myid ? true : false,
                     changed: pmashes[t].users[x].order == 1 ? true : false,
                 })
             }
         }
+        //todo diun should be orgenized by order so diun order 1 be before users order 2
         if (pmashes[t].diun.length > 0) {
             for (let x = 0; x < pmashes[t].diun.length; x++) {
-                let src22 = ""
-                if (pmashes[t].diun[x].users_permissions_user.profilePic !== null) {
-                    src22 = pmashes[t].diun[x].users_permissions_user.profilePic.url
-                } else {
-                    src22 = ""
-                }
+                let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].diun[x].users_permissions_user.data.id)
+
                 pmashes[t].messege.push({
                     message: pmashes[t].diun[x].why,
                     what: pmashes[t].diun[x].what,
                     pic: src22,
-                    sentByMe: pmashes[t].diun[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pmashes[t].diun[x].users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }
@@ -1896,24 +1975,24 @@ function pmash(data) {
 
 function sds(mta) {
     console.log("sdsa")
-    for (let i = 0; i < mta.data.user.projects_1s.length; i++) {
-        if (mta.data.user.projects_1s[i].open_mashaabims.length > 0) {
-            for (let j = 0; j < mta.data.user.projects_1s[i].open_mashaabims.length; j++) {
-                for (let m = 0; m < mta.data.user.projects_1s[i].open_mashaabims[j].mashaabim.sps.length; m++) {
-                    const y = mta.data.user.projects_1s[i].open_mashaabims[j]
-                    const z = mta.data.user.projects_1s[i]
-                    const x = mta.data.user.projects_1s[i].open_mashaabims[j].mashaabim.sps[m];
+    for (let i = 0; i < mta.data.usersPermissionsUser.data.attributes.projects_1s.data.length; i++) {
+        const z = mta.data.usersPermissionsUser.data.attributes.projects_1s.data[i]
+        if (z.attributes.open_mashaabims.data.length > 0) {
+            for (let j = 0; j <z.attributes.open_mashaabims.data.length; j++) {
+                    const y = z.attributes.open_mashaabims.data[j]
+                for (let m = 0; m < y.attributes.mashaabim.data.attributes.sps.data.length; m++) {
+                    const x = y.attributes.mashaabim.data.attributes.sps.data[m];
                     sdsa.push({
                         projectid: z.id,
-                        projectName: z.projectName,
-                        srcb: z.profilePic.formats.thumbnail.url,
+                        projectName: getProjectData(z.id,"pn"),
+                        srcb: getProjectData(z.id,"pp"),
                         id: x.id,
-                        price: x.price,
-                        mashname: x.name,
-                        myp: x.myp,
-                        kindOf: x.kindOf,
-                        spnot: x.spnot,
-                        descrip: x.descrip,
+                        price: x.attributes.price,
+                        mashname: x.attributes.name,
+                        myp: x.attributes.myp,
+                        kindOf: x.attributes.kindOf,
+                        spnot: x.attributes.spnot,
+                        descrip: x.attributes.descrip,
                         oid: y.id
                     })
                 }
@@ -1924,15 +2003,67 @@ function sds(mta) {
                 localStorage.setItem("sdsa", sdsa);
 }
 let walcomen = [];
-
+function getProjectData(id,thing,uid){
+    const projects = miData.data.usersPermissionsUser.data.attributes.projects_1s.data;
+    if (projects.length > 0){
+        for (let i = 0; i < projects.length ; i++){
+            if (projects[i].id == id){
+                if(thing == "pn"){
+                    return projects[i].attributes.projectName
+                } else if (thing == "pp"){
+                    let srcP = ""
+                       if (projects[i].attributes.profilePic.data != null) {
+                            if (projects[i].attributes.profilePic.data.attributes.formats.thumbnail){
+                            srcP = projects[i].attributes.profilePic.data.attributes.formats.thumbnail.url
+                            } else{
+                            srcP = projects[i].attributes.url
+                            }
+                        } else {
+                            srcP = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
+                        }
+                    return srcP      
+                } else if (thing == "noof"){
+                    return projects[i].attributes.user_1s.data.length
+                } else if (thing == "uids"){
+                   return projects[i].attributes.user_1s.data.map(c => c.id)
+                } else if (thing == "us"){
+                    return projects[i].attributes.user_1s.data
+                } else if (thing == "upic"){
+                    for (let t = 0;t < projects[i].attributes.user_1s.data.length;t++  ){
+                            if (projects[i].attributes.user_1s.data[t].id == uid){
+                                let pic = null
+                                if (projects[i].attributes.user_1s.data[t].attributes.profilePic.data !== null) {
+                                    pic = projects[i].attributes.user_1s.data[t].attributes.profilePic.data.attributes.formats.thumbnail.url
+                                } else {
+                                    pic = null
+                                }
+                                return pic
+                            }
+                    }
+                } else if (thing == "un"){
+                    for (let t = 0;t < projects[i].attributes.user_1s.data.length;t++  ){
+                        if (projects[i].attributes.user_1s.data[t].id == uid){
+                         return projects[i].attributes.user_1s.data[t].attributes.username
+                         }
+                        }
+                }
+            }
+        }
+    } else {
+        sendEror(miData.data.usersPermissionsUser.data.id,thing ,2000)
+        return null
+        //why am i here send error report to telegram
+    }
+}
 function makeWalcom(ata) {
-    const usernames = ata.data.user.username;
-    for (let i = 0; i < ata.data.user.welcom_tops.length; i++) {
-        const wal = ata.data.user.welcom_tops[i];
+    const usernames = ata.data.usersPermissionsUser.data.attributes.username;
+    for (let i = 0; i < ata.data.usersPermissionsUser.data.attributes.welcom_tops.data.length; i++) {
+        const wal = ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i];
+        console.log(wal)
         walcomen.push({
-            id: wal.project.id,
+            id: wal.attributes.project.data.id,
             username: usernames,
-            projectName: wal.project.projectName,
+            projectName: getProjectData(wal.attributes.project.data.id,"pn"),
             ani: "walcomen",
             azmi: "mesima",
             pl: 1
@@ -1940,16 +2071,20 @@ function makeWalcom(ata) {
     }
     walcomen = walcomen;
     wel = walcomen.length;
+    walcomenold = []
             localStorage.setItem("wel", wel);
-
     if (!isEqual(walcomen, walcomenold) && counter > 1) {
         if (walcomenold.length < walcomen.length) {
+
             // Create and show the notification
             const rikn = walcomen[walcomen.length - 1].projectName
 
-            let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
+        //    let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
             let text = `שלום ${usernames} ! הצטרפת בהצלחה לרקמת ${rikn}`;
-            navigator.serviceWorker.register('sw.js');
+            let linkop = "lev"      
+            nutifi("1❤️1 ריקמה חדשה",text,linkop )
+
+         /*   navigator.serviceWorker.register('sw.js');
             Notification.requestPermission(function(result) {
                 if (result === 'granted') {
                     navigator.serviceWorker.ready.then(function(registration) {
@@ -1959,10 +2094,10 @@ function makeWalcom(ata) {
                         });
                     });
                 }
-            });
+            });*/
 
             // let notification = new Notification('1❤️1', { body: text, icon: img });
-        }
+       }
     }
 
 }
@@ -1971,54 +2106,57 @@ let pends = [];
 
 function createpends(data) {
     let src24 = ""
-    if (data.data.user.profilePic !== null) {
-        src24 = data.data.user.profilePic.url
+    if (data.data.usersPermissionsUser.data.attributes.profilePic.data !== null) {
+        src24 = data.data.usersPermissionsUser.data.attributes.profilePic.data.attributes.url
     } else {
-        src24 = ""
+        src24 = null
     }
     //rishonnnn so to create openM first avilable only to rishon then to rest of users..
-    const myid = data.data.user.id;
-    const projects = data.data.user.projects_1s;
+    const myid = data.data.usersPermissionsUser.data.id;
+    const projects = data.data.usersPermissionsUser.data.attributes.projects_1s.data;
     for (let i = 0; i < projects.length; i++) {
-        for (let j = 0; j < projects[i].pendms.length; j++) {
-            const pend = projects[i].pendms[j]
+        for (let j = 0; j < projects[i].attributes.pendms.data.length; j++) {
+            const pend = projects[i].attributes.pendms.data[j]
             pends.push({
                 mysrc: src24,
-                name: pend.name,
-                nego: pend.nego,
+                name: pend.attributes.name,
+                nego: pend.attributes.nego,
                 projectId: projects[i].id,
-                hearotMeyuchadot: pend.hearotMeyuchadot,
-                descrip: pend.descrip,
-                noofhours: pend.noofhours,
-                perhour: pend.perhour,
-                projectName: projects[i].projectName,
-                user_1s: projects[i].user_1s,
-                src: projects[i].profilePic.formats.thumbnail.url,
-                users: pend.users,
+                hearotMeyuchadot: pend.attributes.hearotMeyuchadot,
+                descrip: pend.attributes.descrip,
+                noofhours: pend.attributes.noofhours,
+                perhour: pend.attributes.perhour,
+                projectName: getProjectData(projects[i].id,"pn"),
+                user_1s: getProjectData(projects[i].id,"us"),
+                src: getProjectData(projects[i].id,"pp"),
+                noofusers:getProjectData(projects[i].id,"noof"),
+                users: pend.attributes.users,
                 myid: myid,
-                diun: pend.diun,
-                missionId: pend.mission.id,
-                skills: pend.skills,
-                tafkidims: pend.tafkidims,
-                workways: pend.work_ways,
-                vallues: pend.vallues,
-                privatlinks: pend.privatlinks,
-                publicklinks: pend.publicklinks,
-                mdate: pend.sqadualed,
+                diun: pend.attributes.diun,
+                missionId: pend.attributes.mission.data.id,
+                skills: pend.attributes.skills,
+                tafkidims: pend.attributes.tafkidims,
+                workways: pend.attributes.work_ways,
+                vallues: pend.attributes.vallues,
+                privatlinks: pend.attributes.privatlinks,
+                publicklinks: pend.attributes.publicklinks,
+                mdate: pend.attributes.sqadualed,
                 pendId: pend.id,
                 ani: "pends",
                 azmi: "harchava",
-                pl: 1 + pend.users.length,
+                pl: 1 + pend.attributes.users.length,
                 messege: []
             });
+                        console.log("הגעתי בשלום")
 
         }
     }
+    console.log(pends)
     for (let k = 0; k < pends.length; k++) {
         const x = pends[k].users
         pends[k].uids = [];
         for (let z = 0; z < x.length; z++) {
-            pends[k].uids.push(x[z].users_permissions_user.id);
+            pends[k].uids.push(x[z].users_permissions_user.data.id);
         }
     }
     for (let t = 0; t < pends.length; t++) {
@@ -2033,7 +2171,7 @@ function createpends(data) {
             pends[t].already = true;
             pends[t].pl += 48
             for (let l = 0; l < pends[t].users.length; l++) {
-                if (pends[t].users[l].users_permissions_user.id === myid)
+                if (pends[t].users[l].users_permissions_user.data.id === myid)
                     if (pends[t].users[l].order !== 1) {
                         pends[t].mypos = pends[t].users[l].what;
                     }
@@ -2053,14 +2191,9 @@ function createpends(data) {
         pends[t].noofusersWaiting = noofusersWaiting;
         if (pends[t].users.length > 0) {
             for (let x = 0; x < pends[t].users.length; x++) {
-                let src22 = ""
-                if (pends[t].users[x].users_permissions_user.profilePic !== null) {
-                    src22 = pends[t].users[x].users_permissions_user.profilePic.url
-                } else {
-                    src22 = ""
-                }
+                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].users[x].users_permissions_user.data.id)
                 pends[t].messege.push({
-                    message: `${pends[t].users[x].users_permissions_user.username}  
+                    message: `${getProjectData(pends[t].projectId,"un",pends[t].users[x].users_permissions_user.data.id)}  
                      ${pends[t].users[x].what == true ? `בעד
                          ${pends[t].users[x].order == 4 ? ` הצעה חילופית `: ``}
                       ` : ` נגד
@@ -2068,37 +2201,27 @@ function createpends(data) {
                       ${pends[t].users[x].why !== null ? `בנימוק: ${pends[t].users[x].why}` : ``}`}`,
                     what: pends[t].users[x].what,
                     pic: src22,
-                    sentByMe: pends[t].users[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pends[t].users[x].users_permissions_user.data.id === myid ? true : false,
                     changed: pends[t].users[x].order == 1 ? true : false,
                 })
             }
         }
         if (pends[t].diun.length > 0) {
             for (let x = 0; x < pends[t].diun.length; x++) {
-                let src22 = ""
-                if (pends[t].diun[x].users_permissions_user.profilePic !== null) {
-                    src22 = pends[t].diun[x].users_permissions_user.profilePic.url
-                } else {
-                    src22 = ""
-                }
+                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].diun[x].users_permissions_user.data.id)
                 pends[t].messege.push({
                     message: pends[t].diun[x].why,
                     what: pends[t].diun[x].what,
                     pic: src22,
-                    sentByMe: pends[t].diun[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pends[t].diun[x].users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }
         if (pends[t].nego.length > 0) {
             for (let x = 0; x < pends[t].nego.length; x++) {
-                let src22 = ""
-                if (pends[t].nego[x].users_permissions_user.profilePic !== null) {
-                    src22 = pends[t].nego[x].users_permissions_user.profilePic.url
-                } else {
-                    src22 = ""
-                }
+                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].nego[x].users_permissions_user.data.id)
                 pends[t].messege.push({
-                    message: `${pends[t].nego[x].users_permissions_user.username}
+                    message: `${getProjectData(pends[t].projectId,"un",pends[t].nego[x].users_permissions_user.data.id)}
                      בעד ההצעה עם השינויים הבאים:
                   ${pends[t].nego[x].noofhours !== pends[t].noofhours ? `שלמשימה יוגדרו ${pends[t].nego[x].noofhours} שעות במקום ${pends[t].noofhours} שעות`: ``}
                   ${pends[t].nego[x].perhour !== pends[t].perhour ? `ושהשווי לשעה יהיה ${pends[t].nego[x].perhour} ולא ${pends[t].perhour}`: ``}
@@ -2106,7 +2229,7 @@ function createpends(data) {
                   `,
                     what: true,
                     pic: src22,
-                    sentByMe: pends[t].nego[x].users_permissions_user.id === myid ? true : false,
+                    sentByMe: pends[t].nego[x].users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }
@@ -2141,7 +2264,7 @@ function coinLapach(event) {
 let xy = []
 
 function bubleUiAngin() {
-    arr1 = [...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask, ...hachlatot].sort(({
+    arr1 = [...tverias, ...walcomen, ...askedcoin, ...meData, ...mtaha, ...pmashes, ...pends, ...wegets, ...fiapp, ...askedm, ...huca, ...haluask, ...hachlatot].sort(({
         pl: a
     }, {
         pl: b
