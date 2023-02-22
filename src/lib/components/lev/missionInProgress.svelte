@@ -27,6 +27,7 @@ betha.subscribe(value => {
     let show = true;
         export let low = false;
         export let status = 0;//tween store
+        export let tasks = []
     export let tx = 680;
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
@@ -400,6 +401,10 @@ function done() {
   //file upload in a chlon kofetz and then archived,, future build smart contracts on blockchain
   isOpen = true;
 }
+function opentask(){
+  a = 4
+  isOpen = true;
+}
 let isOpen = false;
 function close() {
   isOpen = false;
@@ -668,6 +673,26 @@ function claf (event){
 </div> 
 {:else if a == 3}
 <h2>{rega[$lang]}</h2> 
+{:else if a == 4}
+<div>
+  {#each tasks as task}
+<h2>{task.attributes.shem}</h2>
+<h5>{task.attributes.des}</h5>
+ <div
+  on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
+  class=" border rounded-2xl border-barbi hover:border-gold " on:click={function(){
+    a = 2;
+    isOpen = true}}
+    on:keypress={function(){
+    a = 2;
+    isOpen = true}}
+    >
+<div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {task.attributes.status == null ? 0 : task.attributes.status}%">{task.attributes.status != null ? task.attributes.status : "0"}%</div>
+    </div> 
+
+<RangeSlider bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
+{/each}
+</div>
 {/if}
   </DialogContent>
   </div>
@@ -700,6 +725,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
     ><div
 	 id="normSml" 
 >  
+{#if tasks.length > 0}
+  <div on:click={opentask} class="absolute inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-red-500 border-2 border-white rounded-full top-0 right-0 dark:border-gray-900">{tasks.length}</div>
+  {/if}
 <svg class="svgg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
    <style bx:fonts="Lobster Two">@import url("https://fonts.googleapis.com/css?family=Lobster+Two:700");</style>
   <style type="text/css">#hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }</style>

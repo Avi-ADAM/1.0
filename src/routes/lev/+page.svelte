@@ -127,7 +127,6 @@ function mesimabetahalicha(data) {
    
     for (let i = 0; i < mtahan.length; i++) {
         mtaha[i] = {...mtahan[i].attributes};
-        
             mtaha[i].id = mtahan[i].id
             mtaha[i].tx = txx(mtahan[i].attributes.name)
             mtaha[i].ani = "mtaha"
@@ -1389,6 +1388,7 @@ async function start() {
         						status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai 
         						mission {data{id}}
         						project{data{id}}
+                                acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
             			   }}}
       welcom_tops (filters: { clicked: { eq: false } }){ data{ id attributes{
                 	 project{data{id}}

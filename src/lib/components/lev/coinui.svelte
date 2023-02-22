@@ -193,6 +193,7 @@ export let sml = false
             on:user={user}
             on:hover={hover}
             on:modal={() =>modal = true}
+            tasks={buble.acts.data}
             status={buble.status}
             tx={buble.tx}
             coinlapach={buble.coinlapach}
