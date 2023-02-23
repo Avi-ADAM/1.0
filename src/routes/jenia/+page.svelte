@@ -1,5 +1,5 @@
 <script>
-  import {  MeshBasicMaterial, CircleBufferGeometry, MeshStandardMaterial, BoxBufferGeometry, DoubleSide , SphereGeometry} from 'three'
+  /*import {  MeshBasicMaterial, CircleBufferGeometry, MeshStandardMaterial, BoxBufferGeometry, DoubleSide , SphereGeometry} from 'three'
   import { DEG2RAD } from 'three/src/math/MathUtils'
 
   import {
@@ -20,12 +20,13 @@
 
   import { Text } from '@threlte/extras'
   let value = '1lev1'
-  let tfc
+  let tfc*/
 </script>
 
-<input type="text" bind:value={tfc} class="border border-yellow-500"/>
 <div>
-  <Canvas>
+ <!-- <Canvas>
+  <input type="text" bind:value={tfc} class="border border-yellow-500"/>
+
     <Text text={value} color={"0x9966FF"} fontSize="8" rotation={{z:0}} position={{ x: 10, y: -20, z: 10 }}/>
 
     <PerspectiveCamera position={{ x: 10, y: 10, z: 10 }} fov={24}>
@@ -41,7 +42,6 @@
     <DirectionalLight position={{ x: -3, y: 10, z: -10 }} intensity={0.2} />
     <AmbientLight intensity={0.2} />
     
-    <!-- Cube -->
     <Group scale={$scaled}>
       <Mesh
         interactive
@@ -53,7 +53,6 @@
         material={new MeshStandardMaterial({ color: '#FF0092' })}
       />
     </Group>
-     <!-- S -->
     <Group scale={$scale}>
       <Mesh
        interactive
@@ -65,14 +64,14 @@
       />
     </Group>
 
-    <!-- Floor -->
+
     <Mesh
       receiveShadow
       rotation={{ x: -90 * (Math.PI / 180) }}
       geometry={new CircleBufferGeometry(3, 72)}
       material={new MeshStandardMaterial({ side: DoubleSide, color: '#EEE8AA' })}
     />
-  </Canvas>
+  </Canvas>-->
 </div>
 
 <style>
