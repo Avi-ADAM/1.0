@@ -1418,8 +1418,8 @@ position: absolute;
 
   .amana{
     width: 100vw;
-    padding: 0px 100px;
-    font-size:22px;
+    padding: 0px 130px;
+    font-size:17px;
     font-family: 'StamSefarad', serif;
     text-align:center;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
@@ -1486,6 +1486,7 @@ position: absolute;
 @media(min-width:1200px) {
    .amana{
     padding: 0 80px;
+    font-size:22px;
     background-size: 1424px  ;
   }
    .centeron{
