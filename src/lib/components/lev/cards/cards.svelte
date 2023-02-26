@@ -177,15 +177,15 @@ on:mouseleave={()=> hoverc("0")}
 
 <span  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
+{#key arr1}
 <Swiper 
   on:swiper={setSwiperRef}
-
   keyboard={{
     enabled: true,
   }}  
 mousewheel={true}
   effect={"cards"}
-    cardsEffect={{ rotate: h > 450 ? true : false }}
+    cardsEffect={{ rotate: h > 450 ? true : false ,perSlideOffset: h > 450 ? 8 : 8}}
   grabCursor={true}
   modules={[Manipulation, Mousewheel, Keyboard, EffectCards, Navigation]}
   class="mySwiperc swiperc"
@@ -570,5 +570,6 @@ mousewheel={true}
   ><SwiperSlide class="swiper-slidec">Slide 7</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 8</SwiperSlide
   ><SwiperSlide class="swiper-slidec">Slide 9</SwiperSlide>-->
 </Swiper>
+{/key}
 </span>
 </div>

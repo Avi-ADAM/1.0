@@ -38,16 +38,16 @@ dispatch("tochat");
          <img src={src}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
          </div>
          <div class="flex flex-col leading-tight">
-            <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-xl text-sm"> הצבעה על אישור משאב חדש </span>
+            <div class=" text-xl mt-1 flex items-center">
+               <span class="text-barbi text-center mr-3 sm:text-xl "> הצבעה על אישור משאב חדש </span>
             </div>
-            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
+            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-xl text-barbi ">{projectName}</span>
          </div>
          </div>
          </div>
   <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
-         <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
+         <p style="line-height: 1;" class=" text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
      {#if kindOf === "perUnit"}
        <span on:mouseenter={()=>hover(" שווי ליחידה")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{easy > 0 ? easy : price} ליחידה</span> * <span on:mouseenter={()=>hover("כמות")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{hm == 1 ? "יחידה אחת" : `${hm} יחידות`} </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * hm : price * hm}</span>
@@ -60,9 +60,9 @@ dispatch("tochat");
 {/if}
         </p>
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{name}</div>
-     {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16 text-sm text-gray-700 text-base">{descrip}</p>{/if}
+     {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16  text-gray-700 text-base">{descrip}</p>{/if}
     {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
+     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd  d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if} 
     </div>
     <div class="flex items-center">

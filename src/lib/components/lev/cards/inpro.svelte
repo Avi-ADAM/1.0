@@ -38,7 +38,7 @@ dispatch("hover",{x:x});
          <img src={src}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
          </div>
          <div class="flex flex-col leading-tight">
-            <div class="sm:text-sm text-md mt-1 flex items-center">
+            <div class=" text-md mt-1 flex items-center">
                <span class="text-barbi text-center mr-3 sm:text-sm text-sm">משימה בתהליך ביצוע </span>
             </div>
             <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>

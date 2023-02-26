@@ -680,12 +680,7 @@ function claf (event){
 <h5>{task.attributes.des}</h5>
  <div
   on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
-  class=" border rounded-2xl border-barbi hover:border-gold " on:click={function(){
-    a = 2;
-    isOpen = true}}
-    on:keypress={function(){
-    a = 2;
-    isOpen = true}}
+  class=" border rounded-2xl border-barbi hover:border-gold " 
     >
 <div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {task.attributes.status == null ? 0 : task.attributes.status}%">{task.attributes.status != null ? task.attributes.status : "0"}%</div>
     </div> 
