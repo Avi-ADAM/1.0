@@ -139,6 +139,9 @@ export let sml = false
         on:hover={hover}
         on:proj={proj}
         on:user={user}
+        on:coinLapach={delo}
+        shear={buble.shear}
+        hervachti={buble.hervachti}
          sendpropic={buble.sendpropic}
                 sendname={buble.sendname}    
                 respropic={buble.respropic}
@@ -162,6 +165,7 @@ export let sml = false
     {:else if buble.ani === "haluk" && milon.desi == true}
     <div class:normSml={modal == false} class=" halu normSml"><Hal
         on:modal={() =>modal = true}
+        on:coinLapach={delo}
         user_1s={buble.user_1s}
         on:hover={hover}
         on:proj={proj}
@@ -192,6 +196,7 @@ export let sml = false
             on:proj={proj}
             on:user={user}
             on:hover={hover}
+            on:coinLapach={delo}
             on:modal={() =>modal = true}
             tasks={buble.acts.data}
             status={buble.status}

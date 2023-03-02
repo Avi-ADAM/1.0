@@ -1427,7 +1427,7 @@ async function start() {
                             hervachti {amount noten mekabel users_permissions_user {data {id attributes{hervachti}}}}
       							}}}
                 halukas (filters: {and:[{ ushar: { eq: true } } { confirmed: { eq: false }}]}){ data{ id attributes{ 
-                    amount senderconf chatre {freetext send {data{id}} when seen} usersend {data {id}} userrecive {data{id}}
+                    amount senderconf chatre {freetext send {data{id}} when seen} usersend {data {id}} userrecive {data{id}}  tosplit{data{id attributes{halukas{data{id attributes{confirmed}}} hervachti{nirsham amount noten mekabel users_permissions_user{data{id attributes{hervachti}}}}}}}
                 }}} 
     			maaps(filters: { archived: { eq: false } }){ data{ id attributes{ 
         					createdAt name  
@@ -1524,6 +1524,7 @@ async function start() {
             wegets = [];
             haluask = [];
             hachlatot = [];
+            tverias = []
              usernames = miData.data.usersPermissionsUser.data.attributes.username;
             showOpenPro(miData);
             midd(miData);
@@ -1570,6 +1571,8 @@ function tveria (data){
             if (el.attributes.usersend.data.id == myid ||  el.attributes.userrecive.data.id == myid){
                             console.log(projects[i].attributes.halukas.data[j], "oooo")
                 tverias.push({
+                    shear:  el.attributes.tosplit.data.attributes.halukas.data,
+                    hervachti: el.attributes.tosplit.data.attributes.hervachti,
                 sendpropic:getProjectData(proj.id,"upic",el.attributes.usersend.data.id),
                 sendname:getProjectData(proj.id,"un",el.attributes.usersend.data.id),    
                 respropic:getProjectData(proj.id,"upic",el.attributes.userrecive.data.id),

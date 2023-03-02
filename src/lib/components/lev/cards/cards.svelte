@@ -152,7 +152,6 @@ function hoverc (id){
     }
     }
  
-  
 </style>
 <span on:mouseenter={()=> hoverc(" ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל")} 
 on:mouseleave={()=> hoverc("0")}>
@@ -169,9 +168,8 @@ on:mouseleave={()=> hoverc("0")} class=" next" src="https://res.cloudinary.com/l
       dir="ltr" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
-
-        
-        <Switch bind:value={cards}  design="multi" options={[true, false]} />                
+ 
+ <Switch bind:value={cards}  design="multi" options={[true, false]} />                
 
 </div>
 

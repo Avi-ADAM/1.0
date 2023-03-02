@@ -2,7 +2,7 @@
     import Chaticon from '../../celim/chaticon.svelte'
  import Diun from './diun.svelte';
   import { addToast } from 'as-toast';
-
+  export let shear = []
     export let low = false;
       export let sendpropic= ""
       export let sendname= ""
@@ -34,11 +34,11 @@ import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
   import ProgressBar from "@okrad/svelte-progressbar";
   import Lowbtn from '$lib/celim/lowbtn.svelte'
-
+import {SendTo} from '$lib/send/sendTo.svelte';
  const dispatch = createEventDispatcher();
    
     export let whyno = [];
-   
+   export let hervachti = [];
     export let created_at;
     export let messege = []
     export let order = messege.length;
@@ -96,9 +96,10 @@ let ser = xyz();
 
 function coinLapach() {
              isOpen = false;
+             console.log("here")
         dispatch('coinLapach', {
      ani: "vidu",
-                coinlapach: coinlapach
+    coinlapach: coinlapach
     } );
 };
 
@@ -118,7 +119,9 @@ function objToString (obj) {
     return str;
 }
 let linkg = 'https://strapi-87gh.onrender.com/graphql';
-  
+  const suc = {"he": "בוצע בהצלחה","en":"appruved sucssefully!"}
+  const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
+
 async function agree(alr) {  
   if  (alr == "alr"){
         alert("soon")
@@ -149,7 +152,6 @@ if (kind  == "send"){
                   },
         body: 
         JSON.stringify({query:
-            //create splits coin for each giver and reciver, archive haluask.
           `mutation { 
   updateHaluka(
       id: ${pendId}
@@ -168,12 +170,81 @@ if (kind  == "send"){
             error1 = e
             console.log(error1)
 }
-  } else{
-            alert("soon")
+  } else if(kind  == "recive"){
+    let add =``
+  
+ let allsp = spCheck()
+    console.log(hervachti, allsp, shear)
+
+if(allsp == true){
+  for (let u = 0; u < hervachti.length; u++) {
+    const element = hervachti[u];
+      if (element.noten == true || element.mekabel == true){
+        const iduse = element.users_permissions_user.data.id
+    const amount = element.users_permissions_user.data.attributes.hervachti + element.amount
+        add = `
+        mutation {
+        updateUsersPermissionsUser(
+    id:${iduse} 
+      data: { hervachti: ${amount} }
+    
+  ){
+      data {
+        id
+  }
+}
+}
+        `
+       let t = await SendTo(add)
+       if (t?.data == null){
+       addToast(er[$lang],"warn")
+       } else{
+        console.log(t)
+       }
+      }
+    };
+  }
+  let que = `mutation { 
+  updateHaluka(
+      id: ${pendId}
+      data: { 
+        confirmed: true
+ }
+  ){data {id}}
+ } ` 
+    console.log(que)
+ try{
+ let res = await SendTo(que)
+ .then (res => res = res);
+  console.log(res)
+  if(res.data !=null){
+    addToast(suc[$lang])
+    coinLapach()
+  }else{
+    addToast(er[$lang],"warn")
+  }
+}  catch (e) {
+  console.error(e)
+            alert("שגיאה",e.status,e.message)
   }
 }
 
-	};
+	}
+};
+function spCheck(){
+  if(shear.length > 1){
+    for (let i = 0; i < shear.length; i++) {
+      const element = shear[i];
+      if(element.id != pendId){
+        if(element.attributes.confirmed != true) 
+          return false 
+    }
+  }
+      return true
+    } else{
+      return true
+    }
+}
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
 async function nego(alr) {
   /*
