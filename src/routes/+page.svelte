@@ -14,6 +14,7 @@ nl_accordion = "1";
 
 <script>
         import { liUN } from '$lib/stores/liUN.js';
+        import { fbl } from '$lib/stores/fbl.js';
 
     import { lang } from '$lib/stores/lang.js'
    import { page } from '$app/stores'
@@ -175,7 +176,7 @@ regHelper.subscribe(value => {
 
     // Chrome requires returnValue to be set.
    // let fgf = false
-   // if (fgf == true){
+   if ($fbl == true){
     event.returnValue = null;
      let data = {name: `${$userName}  who speak ${$lang}` ,  action: `${regHelperL == 1 ? "sing": "not sign"} and mail = ${$email}`, data: $linkos }//username email projectname projectsrc lang openmissionName
             fetch('/api/ste', {
@@ -192,7 +193,7 @@ regHelper.subscribe(value => {
             .catch((error) => {
               console.error('Error:', error);
             });
-  //  }
+    }
     // more compatibility
     return null
   }

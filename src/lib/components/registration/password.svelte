@@ -4,6 +4,8 @@ import { show } from './store-show.js';
 import { email } from './email.js';  
 import { contriesi } from './contries.js';
           import { lang } from '$lib/stores/lang.js'
+		  import { fbl } from '$lib/stores/fbl.js';
+
  import { RingLoader
 } from 'svelte-loading-spinners';
  import { createEventDispatcher } from 'svelte';
@@ -82,6 +84,7 @@ already = true;
             }})
   .then(response => {
 			show.update(n => n + 1);
+			fbl.set(false)
 	const data = response.data;
           /*  await fetch(linkg, {
                     method: 'POST',
