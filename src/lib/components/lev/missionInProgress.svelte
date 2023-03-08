@@ -13,6 +13,8 @@
      import { createEventDispatcher } from 'svelte';
      import {betha} from './storess/betha.js'
      import Lowbtn from '$lib/celim/lowbtn.svelte'
+     import {SendTo} from '$lib/send/sendTo.svelte';
+
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -638,9 +640,39 @@ function claf (event){
 }
 
  }
-    
+ $: op = {}
+    function clicked (t){
+      op[t] = true
+      console.log(t,"rfweiofjw",op)
+    }
+    async function taskishor(id){
+      console.log(id)
+      let que = `mutation { 
+  updateAct(
+      id: ${id}
+      data: { 
+        myIshur: true
+ }
+  ){data {id}}
+ } ` 
+    console.log(que)
+ try{
+ let res = await SendTo(que)
+ .then (res => res = res);
+  console.log(res)
+  if(res.data !=null){
+    addToast(suc[$lang])
+  }else{
+    addToast(er[$lang],"warn")
+  }
+}  catch (e) {
+  console.error(e)
+  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  }
+    }
   let a = 1;
-
+  const suc = {"he": "בוצע בהצלחה","en":"appruved sucssefully!"}
+  const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
  const ishur = {"he": "אישור", "en": "save"}
  const success = {"he": "נשמר בהצלחה", "en": "saved successfully"}
@@ -675,18 +707,32 @@ function claf (event){
 <h2>{rega[$lang]}</h2> 
 {:else if a == 4}
 <div>
-  {#each tasks as task}
-<h2>{task.attributes.shem}</h2>
-<h5>{task.attributes.des}</h5>
+  {#each tasks as task, i}
+  <div class="bg-wow flex flex-col justify-center align-middle border border-yellow-300">
+<h2 class="text-center underline  decoration-wavy">{task.attributes.shem}</h2>
+<p class="text-center">{task.attributes.des}</p>
+{#key op} 
+{#if op?.i != true}
+
  <div
-  on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
+  on:mouseenter={()=>hover(sta[$lang])} 
+  on:mouseleave={()=>hover("0")}
+  on:click={()=>clicked(i)}
+  on:keypress={()=>clicked(i)}
   class=" border rounded-2xl border-barbi hover:border-gold " 
     >
 <div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {task.attributes.status == null ? 0 : task.attributes.status}%">{task.attributes.status != null ? task.attributes.status : "0"}%</div>
-    </div> 
-
-<RangeSlider bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
-{/each}
+    </div>
+{:else if op?.i == true}
+<RangeSlider 
+  bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
+{/if}
+{/key}
+  {#if task.attributes.myIshur == false}
+    <button on:click={taskishor(task.id)} class="button-silver" >{ishur[$lang]}</button>
+  {/if}
+</div>
+  {/each}
 </div>
 {/if}
   </DialogContent>
@@ -700,7 +746,8 @@ style:z-index={hovered === false ? 11 : 16}
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-290 duration-1000 ease-in"     in:scale={{duration: 3200, opacity: 1, start: 0.1}}
+class="hover:scale-290 duration-1000 ease-in"     
+in:scale={{duration: 3200, opacity: 1, start: 0.1}}
 out:scale={{duration: 2200, opacity: 0.5}}
 >
 <Swiper  dir="rtl"
@@ -721,7 +768,10 @@ out:scale={{duration: 2200, opacity: 0.5}}
 	 id="normSml" 
 >  
 {#if tasks.length > 0}
-  <div on:click={opentask} class="absolute inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-red-500 border-2 border-white rounded-full top-0 right-0 dark:border-gray-900">{tasks.length}</div>
+  <div 
+  on:click={opentask} 
+  on:keypress={opentask}
+  class="absolute inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-red-500 border-2 border-white rounded-full top-0 right-0 dark:border-gray-900">{tasks.length}</div>
   {/if}
 <svg class="svgg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
    <style bx:fonts="Lobster Two">@import url("https://fonts.googleapis.com/css?family=Lobster+Two:700");</style>

@@ -21,6 +21,8 @@
   import { onMount } from 'svelte'
   import { linkos } from '$lib/stores/linkos.js';
 
+  $: userName.set($form.name)
+  $: email.set($form.email)
 
 // onMount(async () => {
 //  

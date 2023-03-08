@@ -19,7 +19,7 @@ nl_accordion = "1";
    import { page } from '$app/stores'
     //const emaili = $page.url.searchParams.get('code')
       import { goto } from '$app/navigation';
-
+  import Mobile from '$lib/components/front/mobile.svelte'
       import { userName } from '$lib/stores/store.js';
   import Amana1 from "$lib/components/main/amana.svelte"
   import One from "$lib/components/main/bein.svelte"
@@ -157,7 +157,7 @@ const cookieValueti = document.cookie
     });
 
 
-  let regHelperL = 0;
+  let regHelperL = -1;
 
   
 regHelper.subscribe(value => {
@@ -174,11 +174,11 @@ regHelper.subscribe(value => {
     // Cancel the event as stated by the standard.
 
     // Chrome requires returnValue to be set.
-    let fgf = false
-    if (fgf == true){
+   // let fgf = false
+   // if (fgf == true){
     event.returnValue = null;
-     let data = {user: "avi" , email:  "aviadam.segel@gmail.com", lang: $lang , kind: "nonreg", link: $linkos }//username email projectname projectsrc lang openmissionName
-            fetch('/api/sma', {
+     let data = {name: `${$userName}  who speak ${$lang}` ,  action: `${regHelperL == 1 ? "sing": "not sign"} and mail = ${$email}`, data: $linkos }//username email projectname projectsrc lang openmissionName
+            fetch('/api/ste', {
             method: 'POST',  
             headers: {
               'Content-Type': 'application/json',
@@ -192,7 +192,7 @@ regHelper.subscribe(value => {
             .catch((error) => {
               console.error('Error:', error);
             });
-    }
+  //  }
     // more compatibility
     return null
   }
@@ -216,7 +216,8 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
 
 {:else if regHelperL == 0}
 <Amana1  {idx}/>
-	 
+{:else if regHelperL == -1}
+	 <Mobile />
 {/if}
   
 {/if}

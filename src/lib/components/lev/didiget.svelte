@@ -225,7 +225,7 @@ if(allsp == true){
   }
 }  catch (e) {
   console.error(e)
-            alert("שגיאה",e.status,e.message)
+  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
   }
 }
 
