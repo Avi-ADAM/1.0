@@ -760,7 +760,7 @@ async function busabe(id){
 {:else if a == 4}
 <div>
   {#each tasks as task, i}
-  <div class="bg-wow m-2 p-2 flex flex-col justify-center align-middle border border-yellow-300">
+  <div class="bg-pink-100 m-2 p-2 flex flex-col justify-center align-middle border border-yellow-300">
 <h2 class="text-center underline  decoration-wavy">{task.attributes.shem}</h2>
 <p class="text-center">{task.attributes.des}</p>
 {#key op} 
@@ -778,7 +778,7 @@ async function busabe(id){
 {:else if op[i] == true}
 <RangeSlider 
   bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
-  <button on:click={()=>updStat(task.id,task.attributes.status,i)} class="button-gold">{ishur[$lang]}</button>
+  <button on:click={()=>updStat(task.id,task.attributes.status,i)} class="button-gold hover:text-barbi">{ishur[$lang]}</button>
 {/if}
 {/key}
   {#if task.attributes.myIshur == false}
