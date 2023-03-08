@@ -670,11 +670,63 @@ function claf (event){
   addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
   }
     }
+async function busabe(id){
+      console.log(id)
+      let que = `mutation { 
+  updateAct(
+      id: ${id}
+      data: { 
+        naasa: true
+ }
+  ){data {id}}
+ } ` 
+    console.log(que)
+ try{
+ let res = await SendTo(que)
+ .then (res => res = res);
+  console.log(res)
+  if(res.data !=null){
+    addToast(suc[$lang])
+  }else{
+    addToast(er[$lang],"warn")
+  }
+}  catch (e) {
+  console.error(e)
+  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  }
+    }
+    async function updStat(id,st,i){
+      console.log(id)
+      let que = `mutation { 
+  updateAct(
+      id: ${id}
+      data: { 
+        status: ${st}
+ }
+  ){data {id}}
+ } ` 
+    console.log(que)
+ try{
+ let res = await SendTo(que)
+ .then (res => res = res);
+  console.log(res)
+  if(res.data !=null){
+    addToast(suc[$lang])
+    op[i] = false
+  }else{
+    addToast(er[$lang],"warn")
+  }
+}  catch (e) {
+  console.error(e)
+  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  }
+    }
   let a = 1;
   const suc = {"he": "בוצע בהצלחה","en":"appruved sucssefully!"}
   const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
  const ishur = {"he": "אישור", "en": "save"}
+ const busa = {"he": "בוצע בהצלחה", "en":"done"}
  const success = {"he": "נשמר בהצלחה", "en": "saved successfully"}
  const rega = {"he": "שניה בבקשה", "en": "one moment please"}
  </script>
@@ -708,11 +760,11 @@ function claf (event){
 {:else if a == 4}
 <div>
   {#each tasks as task, i}
-  <div class="bg-wow flex flex-col justify-center align-middle border border-yellow-300">
+  <div class="bg-wow m-2 p-2 flex flex-col justify-center align-middle border border-yellow-300">
 <h2 class="text-center underline  decoration-wavy">{task.attributes.shem}</h2>
 <p class="text-center">{task.attributes.des}</p>
 {#key op} 
-{#if op?.i != true}
+{#if op[i] != true}
 
  <div
   on:mouseenter={()=>hover(sta[$lang])} 
@@ -723,13 +775,16 @@ function claf (event){
     >
 <div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {task.attributes.status == null ? 0 : task.attributes.status}%">{task.attributes.status != null ? task.attributes.status : "0"}%</div>
     </div>
-{:else if op?.i == true}
+{:else if op[i] == true}
 <RangeSlider 
   bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
+  <button on:click={()=>updStat(task.id,task.attributes.status,i)} class="button-gold">{ishur[$lang]}</button>
 {/if}
 {/key}
   {#if task.attributes.myIshur == false}
-    <button on:click={taskishor(task.id)} class="button-silver" >{ishur[$lang]}</button>
+    <button on:click={taskishor(task.id)} class="mx-auto button-silver mx-auto my-1 px-5 py-1 hover:text-barbi" >{ishur[$lang]}</button>
+    {:else}
+    <button on:click={busabe(task.id)} class="button-pinkgold mx-auto my-1 px-5 py-1 hover:text-barbi" >{busa[$lang]}</button>
   {/if}
 </div>
   {/each}
