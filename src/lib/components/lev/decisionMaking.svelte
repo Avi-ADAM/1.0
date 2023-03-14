@@ -308,7 +308,7 @@ function hover (id){
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
-    u = {"he":"לב המערכת","en":"heart of 1❤️1"}
+    u = {"he":"לב המערכת","en":"heart of 1💗1"}
   } else {
  u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
 

@@ -39,7 +39,7 @@ function add (event){
 }
 </script>
 <svelte:head>
-  <title>1❤️1 registration</title>
+  <title>1💗1 registration</title>
 </svelte:head>
 <div in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}" class="body" bind:clientWidth={w}>
 <div class="background">

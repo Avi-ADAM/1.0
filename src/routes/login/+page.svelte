@@ -72,7 +72,7 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
   import { createFieldValidator } from '../../lib/celim/validation.js'
 
   const [ validity, validate ] = createFieldValidator(requiredValidator(), emailValidator())
-    const title = {"he": "התחברות ל-1❤️1", "en":"login to 1❤️1"}
+    const title = {"he": "התחברות ל-1💗1", "en":"login to 1💗1"}
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>

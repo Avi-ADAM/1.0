@@ -27,7 +27,7 @@ import { idPr } from '$lib/stores/idPr.js';
       import {  fly, scale } from 'svelte/transition';
 
 let isOpen = false;
-
+  let isG = false
     let current = "";
 
     let url1 = `${baseUrl}/api/upload`;
@@ -247,6 +247,7 @@ async function start () {
             email 
             username 
             hervachti
+            profilManualAlready
             profilePic { data{ attributes{url formats} }}
             projects_1s {data{ id attributes {projectName}} }
             skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}}}         
@@ -261,9 +262,13 @@ async function start () {
  } )})
   .then(r => r.json())
   .then(data => meDataa = data);
-         if (meDataa.data.me.id === idL && meDataa.data.me != null){
-
-   meData =  meDataa.data.usersPermissionsUser.data.attributes
+  if(meDataa.data != null){
+      if (meDataa.data.me.id === idL && meDataa.data.me != null){
+          if (meDataa.data.usersPermissionsUser.data.attributes.profilManualAlready != true){
+            run()
+          }
+        meData =  meDataa.data.usersPermissionsUser.data.attributes
+        isG = meDataa.data.usersPermissionsUser.data.attributes.profilManualAlready
        mail = meData.email;
        username = meData.username;
        liUN.set(username)
@@ -314,6 +319,7 @@ async function start () {
               }
             }    
               work = work
+
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
             total = meData.hervachti ? meData.hervachti : 0;
@@ -336,6 +342,9 @@ async function start () {
             total = meData.hervachti;
 
           } else {
+            goto("/login")
+          } 
+        } else {
             goto("/login")
           }
         } catch (e) {
@@ -366,25 +375,6 @@ function getCookie(name) {
     return decodeURI(dc.substring(begin + prefix.length, end));
 } 
   onMount(async () => {
-    var myCookie = getCookie("guidMe");
-    console.log(myCookie)
-    if (myCookie == null) {
-	    document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();			
-        run()
-    }
-    else {
-       const cookieValuet = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('guidMe='))
-  .split('=')[1];
-  if (cookieValuet == null || cookieValuet == "again"){
-    console.log("tog")
-    run()
-  }
-} 
-
-    
-   
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
      await start()
      .then()
@@ -665,12 +655,16 @@ async function han (){
         }
 }
 //
-const title = {"he": "פרופיל והגדרות 1❤️1", "en": "1❤️1 profile and settings"}
+function guid(){
+  isG = true
+  run()
+}
+const title = {"he": "פרופיל והגדרות 1💗1", "en": "1💗1 profile and settings"}
 const deletew = {"he": "מחיקה" , "en": "delete"};
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
-const message1 = {"he":"לחיצה על הכתר מובילה ללב 1❤️1, שם נמצאות ההצעות, ההצבעות והפעולות השונות",
-                  "en":"click on the crown to move to the heart of 1❤️1, there are offers, voting and various actions"}
-const levtitle = {"he": "ללב 1❤️1", "en": "to the heart of 1❤️1"}
+const message1 = {"he":"לחיצה על הכתר מובילה ללב 1💗1, שם נמצאות ההצעות, ההצבעות והפעולות השונות",
+                  "en":"click on the crown to move to the heart of 1💗1, there are offers, voting and various actions"}
+const levtitle = {"he": "ללב 1💗1", "en": "to the heart of 1💗1"}
 const message2 = {"he": "רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים",
                    "en": "list of your skills, press the edit button below to add more skills or to remove some from your list"}
 const message3 = {"he": "רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר", 
@@ -726,7 +720,7 @@ let width,height
 
 
           {:else if a == 1}
-          <EditB {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio}/>
+          <EditB isGuidMe={isG} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid(guid)/>
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3> 
           <button 

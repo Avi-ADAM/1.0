@@ -445,7 +445,7 @@ function tochat () {
 }
  $: w = 0;
  const u = {"he":"הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה","en":"vote on request to join the FreeMates and share a resorce "}
-const levi = {"he":"לב 1❤️1", "en":"the heart of 1❤️1"}
+const levi = {"he":"לב 1💗1", "en":"the heart of 1💗1"}
 function hover (id){
   let ut;
   if (id == "0"){

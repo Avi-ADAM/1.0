@@ -121,26 +121,26 @@ onMount(async () => {
 
 $: if (percentage(zman,mstotal) == 90){
  let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-          nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+          nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
 
         } else if (percentage(zman,mstotal) == 95){
  let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-          nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+          nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
 
         } 
 $: if (mstotal-zman == 300000){
  let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-         nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+         nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
   }else if (mstotal-zman == 60000){
           console.log("timer stop min")
  let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-        nutifi("1❤️1 טיימר קרוב לסיום",text,"lev" )
+        nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
 
         }
 $: if (percentage(zman,mstotal) >= 100 && running == true){
            azor ()
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
-    nutifi("1❤️1 טיימר נעצר",text,"lev" )
+    nutifi("1💗1 טיימר נעצר",text,"lev" )
         }
 
   let timer;

@@ -109,7 +109,7 @@ async function xyd () {
     const tower = {"he": "לינק לאתר", "en": "link to website"}
    const vap = {"he": "ערכים ומטרות", "en": "vallues and objectives"}
     const frm = {"he": " משימות פנויות בריקמה", "en":"Open missions"}
-    $: heass = {"he": ` 1❤️1 | ${project.attributes ? project.attributes.projectName : "ריקמה"}` ,"en": ` 1❤️1 | ${project.attributes ? project.attributes.projectName : "FreeMate"}`}
+    $: heass = {"he": ` 1💗1 | ${project.attributes ? project.attributes.projectName : "ריקמה"}` ,"en": ` 1💗1 | ${project.attributes ? project.attributes.projectName : "FreeMate"}`}
 </script>
 <svelte:head>
   <title>{heass[$lang]}</title>

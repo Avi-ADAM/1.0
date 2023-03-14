@@ -209,7 +209,7 @@ function hover (id){
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
-    u = {"he":"לב המערכת","en": "heart of 1❤️1"}
+    u = {"he":"לב המערכת","en": "heart of 1💗1"}
   } else {
      u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
   }

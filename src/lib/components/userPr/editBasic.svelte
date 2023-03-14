@@ -1,28 +1,11 @@
 <script>
 import { goto } from '$app/navigation';
-import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js'
   import { addToast } from 'as-toast';
-
+  import {SendTo} from '$lib/send/sendTo.svelte'
  import { createEventDispatcher } from 'svelte';
-let isGuidMe = false;
- onMount(function(){
-	   const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('guidMe='))
-  if (cookieValue !== null){
-const trtrrt = document.cookie
- .split('; ')
-  .find(row => row.startsWith('guidMe='))
-  .split('=')[1];
-  if (trtrrt == null || trtrrt == "again"){
-	  console.log("guid")
-	isGuidMe = true;
-  }
-} else {
-		isGuidMe = true;
-}
-})
+export let isGuidMe = false;
+
     const dispatch = createEventDispatcher();
 
   function askNotificationPermission() {
@@ -116,14 +99,28 @@ let passi;
 
 function shaneh () {
           passwordx = passwordx.trim();
+          const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+
+    let token  = cookieValue; 
+    let bearer1 = 'bearer' + ' ' + token;
    axios
   .post('https://strapi-87gh.onrender.com/api/auth/change-password', {
     currentPassword: passi,
     password: passwordx,
     passwordConfirmation: passwordx
+  },
+  {
+    headers: {
+      Authorization: bearer1,
+    },
   })
   .then(response => {
         console.log('Your password has been changed.', response);
+        addToast(`${passchanged[$lang]}`, 'info');
+
     before = false;
   })
   .catch(error => {
@@ -155,21 +152,56 @@ function shaneh () {
     passwordx = e.target.value
 	}
     let change = false;
-	 function endGuid(){
+    let pressed = false
+	async function endGuid(){
+    pressed = true
   console.log("guid סיום")
   isGuidMe = false;
   document.cookie = `guidMe=done; expires=` + new Date(2026, 0, 1).toUTCString();
-             addToast(`${guidend[$lang]}`, 'info');
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  let uid = cookieValueId;
+  let q = `
+  mutation { updateUsersPermissionsUser(
+    id:${uid} 
+      data: { profilManualAlready: true }
+  ){
+      data {id}
+    }
+  }
+  `
+  await SendTo(q)
+  addToast(`${guidend[$lang]}`, 'info');
+  pressed = false
 }
- 	 function startGuid(){
+ async function startGuid(){
+  pressed = true
   console.log("guid")
     isGuidMe = true;
  document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
-                 addToast(`${guidback[$lang]}`, 'info');
-
+ const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  let uid = cookieValueId;
+  let q = `
+  mutation { updateUsersPermissionsUser(
+    id:${uid} 
+      data: { profilManualAlready: false }
+  ){
+      data {id}
+    }
+  }
+  `
+  await SendTo(q)
+   addToast(`${guidback[$lang]}`, 'info');
+   dispatch("guid")
+   pressed = false
 }
 const svbt = {"he": "שמירת שינויים","en": "save changes"}
-const guidend = {"he": "המדריך לא יוצג יותר במכשיר זה, ניתן להחזירו בכל עת בתפריט זה","en": "the guid will not show up again in this device, you can return it back from here"}
+const guidend = {"he": "המדריך לא יוצג שוב, ניתן להחזירו בכל עת בתפריט זה","en": "the guid will not show up again, you can return it back from here"}
 const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כדי לראותו","en": "the guid ia back! refreach the page to see it"}
  const pr = {"he":"שפה מועדפת", "en": "prefferd Language"}
  const myfd = {"he":"היום החופשי שלי", "en": "My free day"}
@@ -194,6 +226,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
   const val2 = {"he":"ולפחות אות אחת גדולה באנגלית","en": "must contain a capital letter"}
   const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
   const oldps = {"he": "הסיסמה הקודמת", "en":"old password" }
+  const passchanged = {"he": "הסיסמה השתנתה בהצלחה!", "en": "the password has changed sucssefully!"}
 </script>
 <h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
  <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
@@ -369,7 +402,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 
     </div>
     {:else }
-<h1>הסיסמה שונתה בהצלחה</h1>
+<h1>{passchanged[$lang]}</h1>
 
     {/if}
     {:else}
@@ -377,9 +410,9 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 
     {/if}
 	<button type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">הרשמה לקבלת התראות</button>
-{#if isGuidMe == true}
+{#if isGuidMe != false && pressed == false}
 	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">ביטול הצגת המדריך</button>
-{:else}
+{:else if isGuidMe == false && pressed == false}
 	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"> החזרת הצגת המדריך</button>
 {/if}
 	<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>

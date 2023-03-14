@@ -176,7 +176,7 @@ const todis = {"he":"לינק לדיסקורד","en":"link to discord"}
 const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
 const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
 const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
-$: title = {"he": `${user ? user.username : "פרופיל" } | 1❤️1`, "en": `${user ? user.username : "" } profile | 1❤️1`}
+$: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `${user ? user.username : "" } profile | 1💗1`}
   </script>
   <svelte:head>
   <title>{title[$lang]}</title>

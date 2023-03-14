@@ -1282,7 +1282,7 @@ function tofinish(){
   hagdel = true;
 	finiss.scrollIntoView(true);
 }
-const title = {"he": "מוח הריקמה 1❤️1","en": "1❤️1 FreeMates Brain"}
+const title = {"he": "מוח הריקמה 1💗1","en": "1💗1 FreeMates Brain"}
 const mwa = {"he": "פעולות ממתינות לאישור", "en": "panding missions"}
 const errmsg = {"he": " אירעה שגיאה","en": "error"}
 const editpic = {"he":"עריכת תמונת הפרופיל של הריקמה", "en":"edit FreeMates logo"}

@@ -22,7 +22,7 @@ axios
     console.log('An error occurred:', error.response);
   });
     }
-    const title = {"he": "שכחתי סיסמה 1❤️1", "en":"1❤️1 forgot password"}
+    const title = {"he": "שכחתי סיסמה 1💗1", "en":"1💗1 forgot password"}
     const tempmessege = {"he": " עקב תקלה במערכת שליחת המיילים אין באפשרותינו לחדש סיסמה מכאן, נא לפנות למייל ehad1one@gmail.com ", "en":"do to problem in the mail system we unable to change password from here , please contact us in ehad1one@gmail.com to chang it manually"}
     const em = {"he": " כתובת המייל איתה נרשמת", "en":"your registred email address"}
     const se = {"he": "שליחה", "en":"Send"}

@@ -27,7 +27,7 @@
  הארות הערות וכל דבר למייל ehad1one@gmail.com
  <br/>
  אודות 
-<span><a target=”_blank” class="text-gold hover:text-mturk" href="https://shalom.1lev1.world">1❤️1</a></span></div>		
+<span><a target=”_blank” class="text-gold hover:text-mturk" href="https://shalom.1lev1.world">1💗1</a></span></div>		
 <div class="rabi">
 <strong>תפילה לשלום / רבי נחמן מברסלב</strong><br/>
 אדון השלום, מלך שהשלום שלו, עושה שלום ובורא הכל. 
@@ -42,7 +42,7 @@
 		</div>
 	<div class="fli" dir="rtl">
 		<span class="sec">
-		<div style="white-space: nowrap; padding: 5px;">	<a target=”_blank”  href="https://www.facebook.com/onehHart1"  class="text-barbi" > 1❤️1 
+		<div style="white-space: nowrap; padding: 5px;">	<a target=”_blank”  href="https://www.facebook.com/onehHart1"  class="text-barbi" > 1💗1 
 	ב
 -<img align="left" height="32" width="32" alt="facebook" src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"></a>	
 	</div> 

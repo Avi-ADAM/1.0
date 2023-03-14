@@ -36,7 +36,7 @@ function add (event){
   txx.set(event.detail.tx+(w*event.detail.txx));
   console.log(txx)
 }
-let title = {"he": "הרשמה ל-1❤️1", "en": "1❤️1 registration"};
+let title = {"he": "הרשמה ל-1💗1", "en": "1💗1 registration"};
 let tu = { "he": "תודה", "en": "thank you"};
 let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
 const buttn = { "he": "מייל אישור נשלח. לכל בעיה לחצו כדי לשלוח לנו מייל","en": "please check your email, if you did not receive please click here to contact us"}

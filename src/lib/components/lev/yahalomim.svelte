@@ -13,8 +13,8 @@ import Sv from "./sv.svelte";
  import pic from "$lib/celim/pic.json" 
 
 import { lang} from '$lib/stores/lang.js'
-let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1❤️1-heart, click on the diamonds to sort the actions"}
-let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1❤️1-heart, click on the diamonds to sort the actions"}
+let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
+let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 
 export let name = "";
 export let sug = 13;
@@ -142,7 +142,7 @@ ee = "matrix(2.177643, 0, 0, 2.177643, -192, -585)"
  xx = "matrix(2.108646, 0, 0, 2.108646, -350, -1060)";
 }
 } else {
-   fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1❤️1 heart, click on the diamonds to sort the actions"}
+   fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1 heart, click on the diamonds to sort the actions"}
 if (num === "a"){
 aa2 = "translate(-140.71 -177.44)"
 } else if (num === "b"){
@@ -180,7 +180,7 @@ function getAzmi (){
 export let low = true;
 let hovered = false;
 function hoverede(x){
-        let t = {"he":"לב המערכת", "en": "heart of 1❤️1"}
+        let t = {"he":"לב המערכת", "en": "heart of 1💗1"}
     if (x == "x"){
         t = {"he":"שינוי התצוגה ממטבעות לקלפים", "en": "change the view from coins to cards"}
     }
@@ -188,7 +188,7 @@ function hoverede(x){
     if (hovered == false){
     u = t
   } else {
-u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1❤️1-heart, click on the diamonds to sort the actions"}
+u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
   }
   dispatch("hover", {id: u[$lang]});
  }

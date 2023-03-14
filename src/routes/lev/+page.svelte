@@ -148,7 +148,7 @@ function mesimabetahalicha(data) {
             const rikn = getProjectData(mtaha[mtaha.length - 1].project.data.id,"pn")
             let text = `שלום ${usernames} !יש לך משימה חדשה לביצוע ברקמת ${rikn}`;
             let linkop = "lev"      
-            nutifi("1❤️1 משימה חדשה",text,linkop )
+            nutifi("1💗1 משימה חדשה",text,linkop )
         }
     }
 
@@ -1034,14 +1034,14 @@ async function showOpenPro(mi) {
                 rikn = meData[meData.length - 1].projectName
             }
             let text = `שלום ${usernames} ! יש לך הצעה חדשה: ביצוע משימה  ${rikn !== "0" ? `ברקמת ${rikn}` : "בריקמה"}`;
-            const head = {"he":"1❤️1 הצעה חדשה","en":"1❤️1 new suggestion"}
+            const head = {"he":"1💗1 הצעה חדשה","en":"1💗1 new suggestion"}
             nutifi(head[$lang],text,"lev" )
 
             /*    navigator.serviceWorker.register('sw.js');
             Notification.requestPermission(function(result) {
                 if (result === 'granted') {
                     navigator.serviceWorker.ready.then(function(registration) {
-                        registration.showNotification('1❤️1', {
+                        registration.showNotification('1💗1', {
                             body: text,
                             icon: img
                         });
@@ -1856,7 +1856,7 @@ function sps(pp) {
             }
             let linkop = "lev"
             let text = `שלום ${usernames} ! יש לך הצעה חדשה: שיתוף משאב  ${rikn !== "0" ? `ברקמת ${rikn}` : "בריקמה"}`;
-            nutifi("1❤️1 ריקמה חדשה",text,linkop )
+            nutifi("1💗1 ריקמה חדשה",text,linkop )
         }
     }
 }
@@ -2085,13 +2085,13 @@ function makeWalcom(ata) {
         //    let img = 'https://res.cloudinary.com/love1/image/upload/v1648817031/maskable_icon_x128_tt2kgj.png';
             let text = `שלום ${usernames} ! הצטרפת בהצלחה לרקמת ${rikn}`;
             let linkop = "lev"      
-            nutifi("1❤️1 ריקמה חדשה",text,linkop )
+            nutifi("1💗1 ריקמה חדשה",text,linkop )
 
          /*   navigator.serviceWorker.register('sw.js');
             Notification.requestPermission(function(result) {
                 if (result === 'granted') {
                     navigator.serviceWorker.ready.then(function(registration) {
-                        registration.showNotification('1❤️1', {
+                        registration.showNotification('1💗1', {
                             body: text,
                             icon: img
                         });
@@ -2099,7 +2099,7 @@ function makeWalcom(ata) {
                 }
             });*/
 
-            // let notification = new Notification('1❤️1', { body: text, icon: img });
+            // let notification = new Notification('1💗1', { body: text, icon: img });
        }
     }
 
@@ -2288,7 +2288,7 @@ function bubleUiAngin() {
     console.log(arr1)
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart 
 }
-const defaulti = {"he": "מסך הלב", "en": "heart of 1❤️1"}
+const defaulti = {"he": "מסך הלב", "en": "heart of 1💗1"}
 let u = defaulti[$lang]
 
 function hover(event) {
@@ -2299,7 +2299,7 @@ async function cardsi(event) {
     cards = event.detail.cards
     console.log(cards, "from papa")
 }
-const title = {"he": "לב 1❤️1", "en":"heart of 1❤️1"}
+const title = {"he": "לב 1💗1", "en":"heart of 1💗1"}
  let milon = {
     hachla: true,
     fiap: true,
