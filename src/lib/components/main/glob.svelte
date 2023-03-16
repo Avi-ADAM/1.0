@@ -2,15 +2,13 @@
     //https://res.cloudinary.com/barb1/image/upload/v1676238523/%D7%A4%D7%AA%D7%A6%D7%95%D7%92%D7%94%D7%9C%D7%95%D7%A4%D7%A4%D7%99%D7%95%D7%9F_kkymez.glb
 	import { BoxBufferGeometry, Color, MeshStandardMaterial } from 'three'
 	import { SpotLight, useFrame } from '@threlte/core'
+  import { DEG2RAD } from 'three/src/math/MathUtils'
 
     import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
 	import { AmbientLight, OrbitControls, PerspectiveCamera, DirectionalLight } from '@threlte/core'
 	import { Environment, GLTF } from '@threlte/extras'
-	//const { gltf } = useGltfAnimations<'Take 001'>(({ actions }) => {
-	//	actions['Take 001']?.play()
-	//})
-	import { spring} from 'svelte/motion'
+
   let rotationt = 0
 		let rotX = 0
   let poz = {z:0, y:0, x:0};
@@ -107,7 +105,7 @@ color={0x2DFF34} intensity={180} $poz
 <SpotLight position={poz} />
 
 <DirectionalLight color={new Color(0xCCFBF1)} intensity={0.81} position={{ y: -20, z: -5, x: 5 }} />
-<DirectionalLight color={new Color(0xFF0092)} intensity={0.91} position={{ y: 0, z: -5, x: 1 }} />
+<DirectionalLight color={new Color(0xFF0092)} intensity={0.91} position={{ y: 10, z: 10 }} />
 
 <GLTF
 castShadow receiveShadow
@@ -116,6 +114,7 @@ on:pointerenter={() => (isHovering = true)}
 on:pointerleave={() => {
   isPointerDown = false
   isHovering = false
+
 }}
 on:pointerdown={() => (isPointerDown = true)}
 on:pointerup={() => (isPointerDown = false)}
@@ -127,7 +126,7 @@ on:click={sub}
 rotation={{y: rotationt
 }}
 	position={obPoz}
-	scale={18}
+	scale={16}
 	url="3d/כדור.glb"
 />
 
