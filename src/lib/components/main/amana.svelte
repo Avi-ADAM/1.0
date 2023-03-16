@@ -1,6 +1,7 @@
 ﻿<script>
       import { liUN } from '$lib/stores/liUN.js';
-
+      import { Canvas } from '@threlte/core'
+  import Scene from './glob.svelte'
       import {  doesLang, langUs } from '$lib/stores/lang.js'
   import { goto } from '$app/navigation';
   import Maze from './maze.svelte'
@@ -25,13 +26,13 @@
   $: email.set($form.email)
 
 // onMount(async () => {
-//  
 //
-//   
+//
+//
 //      var chatbox = document.getElementById('fb-customer-chat');
 //      chatbox.setAttribute("page_id", "684861488632219");
 //      chatbox.setAttribute("attribution", "biz_inbox");
-//   
+//
 //      window.fbAsyncInit = function() {
 //        FB.init({
 //          xfbml            : true,
@@ -63,7 +64,7 @@
       const headers = {
         'Content-Type': 'application/json',
       };
-    
+
         try {
             const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
@@ -71,7 +72,7 @@
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  chezins { 
+  chezins {
      data {
       attributes {
         name
@@ -92,7 +93,7 @@
         } catch (e) {
             error1 = e
         }
-        
+
     });
 
 let g = false;
@@ -108,7 +109,7 @@ function find_contry_id(contry_name_arr){
       }
       return arr;
      };
-    
+
     const country =  [
                     { value: 104 , label: 'Israel', heb: 'ישראל'},
                     { value: 167 , label: 'Palestine jehuda & sumeria', heb: 'הרשות הפלסטינית יו"ש'},
@@ -149,13 +150,13 @@ function find_contry_id(contry_name_arr){
                     { value: 31, label: 'British Indian Ocean Territory', heb: 'הטריטוריה הבריטית באוקיינוס ההודי'},
                     { value: 32, label: 'Brunei Darussalam', heb: 'ברוניי דארוסלאם'},
                     { value: 34, label: 'Bulgaria', heb: 'בולגריה'},
-                    { value: 33, label: 'Burkina Faso',  heb: 'בורקינה פאסו'}, 
-                    { value: 36, label: 'Burundi',  heb: 'בורונדי'}, 
-                    { value: 35, label: 'Cambodia',  heb: 'קמבודיה'}, 
-                    { value: 37, label: 'Cameroon',  heb: 'קמרון'}, 
-                    { value: 39, label: 'Canada',  heb: 'קנדה'}, 
-                    { value: 38, label: 'Cape Verde',  heb: 'כף ורדה'}, 
-                    { value: 40, label: 'Cayman Islands', heb: 'איי קיימן'}, 
+                    { value: 33, label: 'Burkina Faso',  heb: 'בורקינה פאסו'},
+                    { value: 36, label: 'Burundi',  heb: 'בורונדי'},
+                    { value: 35, label: 'Cambodia',  heb: 'קמבודיה'},
+                    { value: 37, label: 'Cameroon',  heb: 'קמרון'},
+                    { value: 39, label: 'Canada',  heb: 'קנדה'},
+                    { value: 38, label: 'Cape Verde',  heb: 'כף ורדה'},
+                    { value: 40, label: 'Cayman Islands', heb: 'איי קיימן'},
                     { value: 41, label: 'Central African Republic', heb: ' הרפובליקה המרכז אפריקאית '},
                     { value: 42, label: 'Chad', heb: 'צ\'אד'},
                     { value: 43, label: 'Chile', heb: 'צ\'ילה'},
@@ -436,7 +437,7 @@ if (fpp.includes(jjj)){
                 fpval.set(meData.data.id)
             datar = data;
             let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`
-      console.log(`https://1lev1.world?${encodeURIComponent(linko)}`) 
+      console.log(`https://1lev1.world?${encodeURIComponent(linko)}`)
       linkos.set(linko)           //id con un em ref
               })
   .catch(error => {
@@ -457,7 +458,7 @@ let dow;
 /*function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
-  
+
 }*/
 let trans = false;
 function tran (){
@@ -504,8 +505,9 @@ function change(la){
     goto("/en")
   }
 }
+let w;
 </script>
-   
+
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">
@@ -514,10 +516,10 @@ function change(la){
           on:click={closer}>ביטול</button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
-          
+
                     {:else if a == 4}
  <TRan on:done={done} on:erore={erorer}/>
-         
+
                     {:else if a == 1}
           <div class="sp bg-gold">
             <h3 class="text-barbi"> נשלח בהצלחה, תודה רבה לך נעמוד בקשר</h3>
@@ -528,7 +530,7 @@ function change(la){
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
-         </div> 
+         </div>
          {:else if a == 3}
          <h1> אירעה שגיאה</h1>
          <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
@@ -543,10 +545,10 @@ function change(la){
 </DialogOverlay>
 
 
-         <!-- Messenger פלאגין של צ'אט Code 
+         <!-- Messenger פלאגין של צ'אט Code
     <div id="fb-root"></div>
 
-  
+
     <div id="fb-customer-chat" class="fb-customerchat">
     </div>
      position: absolute;
@@ -555,8 +557,8 @@ function change(la){
          height: 130px;
         width: 130px;
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
-     --> 
-     <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px;" on:click={()=>info()} class="ww" >?</button>
+     -->
+     <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px; z-index:500;" on:click={()=>info()} class="ww" >?</button>
      <div class="all">
        <a   data-sveltekit-prefetch href="/login" ><img title="התחברות ל-1💗1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1💗1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
@@ -566,7 +568,7 @@ function change(la){
           <button on:click={tran} class=" text-barbi hover:text-gold p-0.5 "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-</svg></button> 
+</svg></button>
                   <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >English</button>
           <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
@@ -577,18 +579,18 @@ function change(la){
           {/if}
           </div>
       <div class="mobile">
-        
 
-<section class="container" dir="rtl" id="lines"> 
-    
+
+<section class="container" dir="rtl" id="lines">
+
 <div class="flexi">
   <h3
-       class="amanat" 
-       style="font-weight: 900; white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.2em; line-height: normal;" 
+       class="amanat"
+       style="font-weight: 900; white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.2em; line-height: normal;"
        dir="rtl">
-    שמי: 
+    שמי:
       </h3>
-  <input 
+  <input
           id="name"
           name="name"
           placeholder="השם שלי"
@@ -596,7 +598,7 @@ function change(la){
                 on:blur={handleChange}
           on:change={handleChange}
           bind:value={$form.name}
-        /> 
+        />
      {#if $errors.name}
       <small style="color: red;">יש למלא שם</small>
     {/if}
@@ -606,26 +608,26 @@ function change(la){
 </div>
 <div class="flexi1" style="white-space:nowrap;">
   <div>
-  <h3   class="amanat " id="m" 
- style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1em;" dir="rtl">מ: </h3> 
+  <h3   class="amanat " id="m"
+ style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1em;" dir="rtl">מ: </h3>
  </div>
  <div>
      <MultiSelect
       bind:selected
       {placeholder}
       options={country.map(c => c.heb)}
-       /> 
+       />
        </div>
    {#if erorims == true}
       <small style="color: red;">יש לבחור לפחות מקום 1</small>
     {/if}
-   </div>    
+   </div>
 <div class="flexi2">
-  <h3 class="amanat" 
- style=" font-weight: 900;   white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.2em; line-height:normal;" 
+  <h3 class="amanat"
+ style=" font-weight: 900;   white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.2em; line-height:normal;"
  dir="rtl">דואר L.</h3>
   <input
- 
+
     placeholder="המייל שלי"
     id="email"
     name="email"
@@ -638,46 +640,50 @@ function change(la){
       <small style="color: red;">{$errors.email}</small>
     {/if}
 </div>
-    </section> 
-    <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>    
-    </div> 
+    </section>
+    <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>
+    </div>
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
  <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
-     הצהרת העצמאות של 
-        <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>  
+     הצהרת העצמאות של
+        <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>
         :
     </h1>
           <span style="font-family:David;" class="font-bold">
               <span  style="font-family:David;">
-                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לעולם לא אנהג באלימות ולא אפגע באף אדם.         
+                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לעולם לא אנהג באלימות ולא אפגע באף אדם.
                    <br>
            כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח.
-              <br>	
+              <br>
    אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב ובכך שכאשר כל האנושות תסכים: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית.
               <br>
               כאשר כל אוכלוסיית  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join( " וכל אוכלוסיית " )}`  : "__"}</span> תסכים לחיות לפי אמנה זו אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ומדינת ")}` : "__"}</span>  {selected.length > 1 ? "ממנות" : "ממנה" } בשמי.
               <br>
                כאשר כל האנושות תסכים עם האמנה הזו אני <span style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ושל צבא ") }`+ "." : "__."}</span>
         <br>
-         אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אפתור חילוקי דעות באתר 1💗1 בהסכמה הדדית.  
+         אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אפתור חילוקי דעות באתר 1💗1 בהסכמה הדדית.
             </span>
           </span>
     </div>
-     
+
 
 
 <form on:submit={handleSubmit}>
 
-<div class="flexid">
+<div class="flexid" bind:clientWidth={w}>
    {#if already == false}
 {#if g == false}
     <button
-     class="button hover:scale-150"
+     class="button"
      title="לחצת ויצאת לחופשי"
-      on:submit="{handleSubmit}"
+
       type="submit"
-      ></button> 
+      >
+      <Canvas size={{width:w, height:170}}>
+        <Scene on:submit="{handleSubmit}"/>
+      </Canvas>
+    </button>
        {:else if g == true}
           <div class="sp text-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
@@ -688,15 +694,15 @@ function change(la){
 
       <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>
       {/if}
-     
+
   {/if}
   </div>
   </form>
-  
+
 </div> </div>
   <style>
     .ww{
-      top: calc(100% - 40px); 
+      top: calc(100% - 40px);
       right: calc(100% - 40px);
       width: 20px;
       height: 20px;
@@ -783,7 +789,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
       width: 80vw;
   }
   @media (min-width: 568px){
-  
+
         :global([data-svelte-dialog-content].content) {
  background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
@@ -848,11 +854,11 @@ width:78vw;
 }
      .midscreen-link{
 position: absolute;
-   
+
   background-image: url(https://res.cloudinary.com/love1/image/upload/v1639687279/Prismatic-Hearts-Vortex-Heart-13_pyb3yh.svg);
 
-background-position: center; 
-  background-repeat: no-repeat; 
+background-position: center;
+  background-repeat: no-repeat;
   background-size: contain;
   color: var(--barbi-pink);
   text-shadow: 1px 1px black;
@@ -909,7 +915,7 @@ justify-self: center;
   :global(.multiselect .remove-all) {
 
     /* buttons to remove a single or all selected options at once */
- /* } 
+ /* }
   :global(.multiselect ul) {
     /* dropdown options */
  /* }
@@ -931,7 +937,7 @@ justify-self: center;
   }
   :global(ul.tokens > li):hover{
     color: var(--barbi-pink);
-background-color:var(--lturk);  
+background-color:var(--lturk);
   }
   /*
   :global(li.selected:hover) {
@@ -945,7 +951,7 @@ background-color:var(--lturk);
   }
  /* :global(li.selected.active) {
   } */
- 
+
 #lines{
   display: "";
 
@@ -961,7 +967,7 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
  background-size: 400% 400%;
       -webkit-animation: AnimationName 3s ease infinite;
     -moz-animation: AnimationName 3s ease infinite;
-    animation: AnimationName 3s ease infinite;       
+    animation: AnimationName 3s ease infinite;
 opacity: 0.8;
 
 }
@@ -969,7 +975,7 @@ small{
     background-color: white ;
 }
   input {
-   
+
     font-family: inherit;
     font-size: inherit;
     max-width: 200px;
@@ -979,15 +985,15 @@ small{
     transition: all 150ms ease;
     background: var(--gold);
   }
-  
+
   input:focus {
     outline: none;
     box-shadow: 0 0 0 4px var(--barbi-pink);
     border-color: var(--barbi-pink);
   }
-  
+
   input:disabled,
-  
+
   textarea:disabled {
     color: #ccc;
   }
@@ -1033,8 +1039,8 @@ background-color :var(--gold) ;
     background-position: center;
     background-size:  130vw 100vh;
 }
- .amana{   
-   
+ .amana{
+
     padding: 1.5em 1em 1em 1em;
     font-size: 120%;
     font-family: 'StamSefarad', 'Rubik';
@@ -1060,7 +1066,7 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
  background-size: 400% 400%;
       -webkit-animation: AnimationName 30s ease infinite;
     -moz-animation: AnimationName 30s ease infinite;
-    animation: AnimationName 30s ease infinite;  
+    animation: AnimationName 30s ease infinite;
 }
   .flexid{
     display: flex;
@@ -1069,7 +1075,7 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
    align-items: center;
    order: 1;
   }
- 
+
   .flexi1{
     display: flex;
     flex-direction: column;
@@ -1077,7 +1083,7 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
    align-items: center;
    order: 2;
    line-height: normal;
-   
+
   }
   .flexi2{
     display: flex;
@@ -1097,7 +1103,7 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
         background-image: url(newcoin.svg);
       background-position: center center;
       padding:9vh 0;*/
-      
+
   }
   /*
   .centeron{
@@ -1113,24 +1119,24 @@ position: absolute;
 top: 4%;
 left: 45.2%;
  }*/
-    
-  
+
+
   .button {
- 
+
     justify-self: center;
-          align-self: center;   
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);  
+          align-self: center;
+  /*  background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
  background-repeat: no-repeat;
  background-size: 170px;
  margin: auto;
  min-height: 170px;
- min-width: 170px;
+ min-width: 170px;*/
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-   -webkit-animation:spin 17s linear infinite;
+ /*  -webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;*/
     }
-  
+
  .flexi {
    padding-top: 2vh;
     display: flex;
@@ -1192,16 +1198,16 @@ background-color: var(--gold);
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
+   /* background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
     background-repeat: no-repeat;
-    background-size: 170px;
+    background-size: 170px;*/
     margin: auto;
     min-height: 170px;
     min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-    -webkit-animation:spin 17s linear infinite;
+   /* -webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;*/
     }
   .amana{
     padding: 0px 13vw;
@@ -1220,7 +1226,7 @@ background-color: var(--gold);
       flex-direction: column;
       justify-content: center;
       align-items: center;
-   
+
   }
   .flexi {
     display: flex;
@@ -1252,7 +1258,7 @@ background-color: var(--gold);
 }
 
 @media(min-width:942px) and (max-width:1099px) {
-  
+
   .midscreen-link{
 position: absolute;
       top: 82%;
@@ -1273,8 +1279,8 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
     height:100vh;
     margin:0px auto;
  background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
-background-position: center; 
-  background-repeat: no-repeat; 
+background-position: center;
+  background-repeat: no-repeat;
   background-size: cover; }
   /*
     .centeron{
@@ -1284,21 +1290,21 @@ background-position: center;
    align-self: center;
    min-height: 50px;
    min-width: 50px;
-  
+
    }*/
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
+   /* background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
     background-repeat: no-repeat;
-    background-size: 170px;
+    background-size: 170px;*/
     margin: auto;
     min-height: 170px;
     min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-  -webkit-animation:spin 17s linear infinite;
+  /*-webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;*/
   }
   .amana{
     width: 908px;
@@ -1329,14 +1335,14 @@ background-position: center;
     background-color: transparent;
     max-width: 769px;
   }
-  
+
   .flexi {
     display: flex;
     flex-direction: row;
     justify-content: center;
     align-items: center;
     order: 1;
-  
+
   }
   .flexi1 {
     display: flex;
@@ -1404,16 +1410,16 @@ position: absolute;
   .button {
     justify-self: center;
     align-self: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
+   /* background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
     background-repeat: no-repeat;
-    background-size: 130px;
+    background-size: 130px;*/
     margin: auto;
-    min-height: 130px;
-    min-width: 130px;
+   /* min-height: 130px;
+    min-width: 130px;*/
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-     -webkit-animation:spin 17s linear infinite;
+   /*  -webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;
+    animation:spin 17s linear infinite;*/
 }
 
 
@@ -1447,7 +1453,7 @@ position: absolute;
     margin: 0 auto;
     max-width: 1024px;
   }
-  
+
   .flexi {
     display: flex;
     flex-direction: row;
@@ -1481,7 +1487,7 @@ position: absolute;
   .all{
     height: 100vh;
   }
-} 
+}
 @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
@@ -1525,13 +1531,13 @@ position: absolute;
    left: 48%;
   }
   .button{
-    background-size: 170px;
+   /* background-size: 170px;*/
     min-height: 170px;
     min-width: 170px;
   }
 }
  :global(.multiselect) {
     max-width: 250px;
-   
+
   }
-  </style> 
+  </style>
