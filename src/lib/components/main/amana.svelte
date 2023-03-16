@@ -21,6 +21,8 @@
             import TRan from './translatehe.svelte';
   import { onMount } from 'svelte'
   import { linkos } from '$lib/stores/linkos.js';
+	import { useProgress } from '@threlte/extras'
+	const { progress } = useProgress()
 
   $: userName.set($form.name)
   $: email.set($form.email)
@@ -674,16 +676,20 @@ let w;
 <div class="flexid" bind:clientWidth={w}>
    {#if already == false}
 {#if g == false}
-    <button
-     class="button"
-     title="לחצת ויצאת לחופשי"
+{#if progress < 1}
 
+    <button
+    class="button hover:scale-150"
+    title="לחצת ויצאת לחופשי"
+     on:submit="{handleSubmit}"
       type="submit"
       >
+    </button>
+    {:else}
       <Canvas size={{width:w, height:170}}>
         <Scene on:submit="{handleSubmit}"/>
       </Canvas>
-    </button>
+   {/if}
        {:else if g == true}
           <div class="sp text-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
@@ -1125,16 +1131,16 @@ left: 45.2%;
 
     justify-self: center;
           align-self: center;
-  /*  background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
+   background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
  background-repeat: no-repeat;
  background-size: 170px;
  margin: auto;
  min-height: 170px;
- min-width: 170px;*/
+ min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
- /*  -webkit-animation:spin 17s linear infinite;
+  -webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;*/
+    animation:spin 17s linear infinite;
     }
 
  .flexi {
@@ -1198,16 +1204,16 @@ background-color: var(--gold);
   .button {
     justify-self: center;
     align-self: center;
-   /* background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
+   background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
     background-repeat: no-repeat;
-    background-size: 170px;*/
+    background-size: 170px;
     margin: auto;
     min-height: 170px;
     min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-   /* -webkit-animation:spin 17s linear infinite;
+   -webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;*/
+    animation:spin 17s linear infinite;
     }
   .amana{
     padding: 0px 13vw;
@@ -1295,16 +1301,16 @@ background-position: center;
   .button {
     justify-self: center;
     align-self: center;
-   /* background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
     background-repeat: no-repeat;
-    background-size: 170px;*/
+    background-size: 170px;
     margin: auto;
     min-height: 170px;
     min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-  /*-webkit-animation:spin 17s linear infinite;
+  -webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;*/
+    animation:spin 17s linear infinite;
   }
   .amana{
     width: 908px;
@@ -1410,16 +1416,16 @@ position: absolute;
   .button {
     justify-self: center;
     align-self: center;
-   /* background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
+   background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
     background-repeat: no-repeat;
-    background-size: 130px;*/
+    background-size: 130px;
     margin: auto;
-   /* min-height: 130px;
-    min-width: 130px;*/
+   min-height: 130px;
+    min-width: 130px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-   /*  -webkit-animation:spin 17s linear infinite;
+    -webkit-animation:spin 17s linear infinite;
     -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;*/
+    animation:spin 17s linear infinite;
 }
 
 
@@ -1531,7 +1537,7 @@ position: absolute;
    left: 48%;
   }
   .button{
-   /* background-size: 170px;*/
+    background-size: 170px;
     min-height: 170px;
     min-width: 170px;
   }
