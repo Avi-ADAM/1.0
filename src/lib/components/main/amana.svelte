@@ -685,9 +685,11 @@ let w;
       >
     </button>
     {/if}
+    <div class="cor">
       <Canvas size={{width:w, height:170}}>
         <Scene on:submit="{handleSubmit}"/>
       </Canvas>
+    </div>
        {:else if g == true}
           <div class="sp text-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
@@ -705,6 +707,10 @@ let w;
 
 </div> </div>
   <style>
+    .cor{
+      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
+
+    }
     .ww{
       top: calc(100% - 40px);
       right: calc(100% - 40px);
