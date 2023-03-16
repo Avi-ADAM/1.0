@@ -8,7 +8,6 @@ import preprocess from "svelte-preprocess";
  const config = {
     kit: {
       adapter: vercel({
-      runtime: 'edge'
       }
       )
     },
