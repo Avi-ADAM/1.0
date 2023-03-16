@@ -23,7 +23,6 @@
   import { linkos } from '$lib/stores/linkos.js';
 	import { useProgress } from '@threlte/extras'
 	const { progress } = useProgress()
-
   $: userName.set($form.name)
   $: email.set($form.email)
 
@@ -676,7 +675,7 @@ let w;
 <div class="flexid" bind:clientWidth={w}>
    {#if already == false}
 {#if g == false}
-{#if progress < 1}
+{#if $progress < 1}
 
     <button
     class="button hover:scale-150"
@@ -685,11 +684,10 @@ let w;
       type="submit"
       >
     </button>
-    {:else}
+    {/if}
       <Canvas size={{width:w, height:170}}>
         <Scene on:submit="{handleSubmit}"/>
       </Canvas>
-   {/if}
        {:else if g == true}
           <div class="sp text-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
