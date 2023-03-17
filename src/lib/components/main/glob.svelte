@@ -126,7 +126,7 @@ on:click={sub}
 rotation={{y: rotationt
 }}
 	position={obPoz}
-	scale={16}
-	url="3d/כדור.glb"
+	scale={13}
+	url="3d/withlev.glb"
 />
 
