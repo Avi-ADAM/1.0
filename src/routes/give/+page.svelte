@@ -261,8 +261,8 @@
                   ];
     function submitFormb() {
 
-      let linko = `ref=true&id=${fpval}&con=${find_contry_id(selected)}&un=${liUN}&em=${email}`
-      console.log(`https://1lev1.world?${encodeURIComponent(linko)}`)
+      let linko = `${liUN}&em=${email}`
+      console.log(`https://1lev1.world?ref=true&id=${fpval}&con=${find_contry_id(selected)}&un=${encodeURIComponent(liUN)}&em=${email}`)
     }
 
   function submitForm() {
@@ -324,7 +324,7 @@ function find_contry_id(contry_name_arr){
     function tverya (){
       let i = 36
       while (i < 313) {
-                 let datau = {data:{name:`userName_value${i}`,email: `ggg${i}@kkk.hh` }}
+                 let datau = {data:{name:`userName_value${i}`,email: `ggg${i}@kkk.hh`, countries: [104] }}
 
         fetch("https://strapi-87gh.onrender.com/api/chezins", {
   method: 'POST', // or 'PUT'
@@ -346,8 +346,9 @@ function find_contry_id(contry_name_arr){
       }
     }
 </script>
+<!--
 <button on:click={tverya}>tverya</button>
-
+-->
 <button on:click={onSubmiti}>tttt</button>
 <form on:submit|preventDefault={submitForm}>
   <button type="submit">Submit</button>
