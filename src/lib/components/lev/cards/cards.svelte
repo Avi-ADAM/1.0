@@ -1,4 +1,6 @@
 <script>
+    import Lowding from '$lib/celim/lowding.svelte'
+
      import MissionInProgress from "../../../components/lev/missionInProgress.svelte"
     import ProjectSuggestor from "../../../components/lev/projectSuggestor.svelte"
     import Reqtojoin from '../../../components/lev/reqtojoin.svelte';
@@ -158,6 +160,9 @@ function hoverc (id){
 on:mouseleave={()=> hoverc("0")}>
        <Header second="./moach" secondTitle=""/>
        </span>
+       {#key arr1}
+      {#key low}
+       {#if low == false && arr1.length > 0}
 <div     dir="rtl" bind:clientWidth={h}
  class="body box-border h-screen">
      <img on:mouseenter={()=> hoverc(" יאללה נקסט!")} 
@@ -572,3 +577,10 @@ mousewheel={true}
 </Swiper>
 </span>
 </div>
+{:else}
+<div class="body grid items-center justify-center">
+         <Lowding height="100vh" />
+         </div> 
+         {/if}
+         {/key}
+{/key}

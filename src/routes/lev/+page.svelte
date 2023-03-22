@@ -1264,12 +1264,14 @@ onMount(async () => {
         const elem = document.getElementById('scree');
 
         function flash() {
+            if (cards == false){
             elem.style.backgroundImage = 'radial-gradient(ellipse farthest-corner at ' + initX + 'px top, #ffaaff 0%, #ee88ff 16%, #000 100%)';
             let r = 30 + Math.random() * 70 | 0;
             c++;
             setTimeout(function() {
                 flkr();
             }, r);
+        }
         }
 
         function flkr() {
@@ -1293,7 +1295,7 @@ onMount(async () => {
             }
         }
 
-        if (low == true) {
+        if (low == true && cards == false) {
           //  document.getElementById("my_audio").play();
             let speed = 2400;
             let changeSpeed = speed;
@@ -1320,7 +1322,7 @@ onMount(async () => {
         }
 
         function finito() {
-            if (low == false) {
+            if (low == false && cards == false) {
                 elem.style.backgroundImage = ''
                 clearInterval(repeater)
                 elem.style.backgroundImage = ''
@@ -1491,10 +1493,14 @@ async function start() {
             })
             .then(r => r.json())
             .then(data => miData = data);
-            if(miData.data.usersPermissionsUser == null) {
+            if(miData?.data?.usersPermissionsUser == null || miData?.data == null || miData == null) {
+                console.log("login")
                 addToast(`${tolog[$lang]}`, 'info');
-                goto("./login")
+
+                goto("/login?ref=lev")
             }
+                            console.log("nologin")
+
         counter += 1;
         localStorage.setItem("miDataL", JSON.stringify(miData));
         if (isEqual(miData, miDataold)  == true) {
@@ -2291,7 +2297,7 @@ let u = defaulti[$lang]
 function hover(event) {
     u = event.detail.id
 }
-let cards = false;
+let cards = true;
 async function cardsi(event) {
     cards = event.detail.cards
     console.log(cards, "from papa")
