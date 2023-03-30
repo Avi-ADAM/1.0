@@ -69,7 +69,7 @@ function logout() {
 }
 
 function save (){
-	
+  localStorage.setItem("cards", checked);
     dispatch('message', {
      fblink: fblink,
       twiterlink: twiterlink,
@@ -80,9 +80,11 @@ function save (){
 	  un: un,
 	  em: mail,
 	  lango: lango,
+    cards: checked
     })
   };
 
+ export let checked = false
 
 import axios from 'axios';
 let passwordx;
@@ -94,8 +96,7 @@ export let un;
 export let bi;
 export let frd;
 export let lango;
-export let cards = false;
-let passi;  
+let passi;
 
 function shaneh () {
           passwordx = passwordx.trim();
@@ -104,7 +105,7 @@ function shaneh () {
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
 
-    let token  = cookieValue; 
+    let token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
    axios
   .post('https://strapi-87gh.onrender.com/api/auth/change-password', {
@@ -128,7 +129,7 @@ function shaneh () {
     console.log('An error occurred:', error.response);
   errorl = error.response.data ;
   })};
- 
+
 	let strength = 0;
 	let validations = [];
 	let showPassword = false;
@@ -142,11 +143,12 @@ function shaneh () {
 		//	password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
-		
+
 	}
 	let chan = false;
 	function ch (){
 		chan = true
+    console.log(checked)
 	}
 	function getV (e){
     passwordx = e.target.value
@@ -165,7 +167,7 @@ function shaneh () {
   let uid = cookieValueId;
   let q = `
   mutation { updateUsersPermissionsUser(
-    id:${uid} 
+    id:${uid}
       data: { profilManualAlready: true }
   ){
       data {id}
@@ -188,7 +190,7 @@ function shaneh () {
   let uid = cookieValueId;
   let q = `
   mutation { updateUsersPermissionsUser(
-    id:${uid} 
+    id:${uid}
       data: { profilManualAlready: false }
   ){
       data {id}
@@ -227,10 +229,13 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
   const val3 = {"he":"ולפחות מספר אחד","en": "must contain a number"}
   const oldps = {"he": "הסיסמה הקודמת", "en":"old password" }
   const passchanged = {"he": "הסיסמה השתנתה בהצלחה!", "en": "the password has changed sucssefully!"}
+  const co = {"he": "מטבעות", "en":"coins"}
+  const car = {"he": "קלפים", "en": "cards"}
+  const level = {"he":"תצוגה מועדפת במסך הלב:","en":"preferred Lev page display:"}
 </script>
 <h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
  <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
-  <input name="des" on:change={ch} bind:value={un}  
+  <input name="des" on:change={ch} bind:value={un}
  type='text' class='inputi' required >
   <label for="des" class='labeli'>{nm[$lang]}</label>
   <span class='line'></span>
@@ -238,43 +243,43 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 {#if shgi == true}<small class="text-red-600">{nameal[$lang]}</small>{/if}
 <!--
     <div dir="rtl" class='textinputi'>
-  <input name="es" on:change={ch}  bind:value={mail}    
+  <input name="es" on:change={ch}  bind:value={mail}
  type='text' class='inputi' required >
   <label for="es" class='labeli'>מייל</label>
   <span class='line'></span>
 </div>-->
 
    <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
-  <textarea name="s" on:change={ch}  bind:value={bi}     
+  <textarea name="s" on:change={ch}  bind:value={bi}
  type='textarea' class='inputi d' required></textarea>
   <label for="s" class='labeli'>{biot[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de" on:change={ch}    bind:value={githublink}     
+  <input name="de" on:change={ch}    bind:value={githublink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{githublinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de"  on:change={ch}   bind:value={twiterlink}     
+  <input name="de"  on:change={ch}   bind:value={twiterlink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{twiterlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de"  on:change={ch}   bind:value={discordlink}     
+  <input name="de"  on:change={ch}   bind:value={discordlink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{discordlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de"  on:change={ch}   bind:value={fblink}     
+  <input name="de"  on:change={ch}   bind:value={fblink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{fblinkde[$lang]}</label>
   <span class='line'></span>
 </div>
-<div class="grid items-center justify-center"> 
+<div class="grid items-center justify-center">
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-barbi">{myfd[$lang]}</h2>
@@ -326,7 +331,16 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 <option value="en">English</option>
 </select>
 </div>
-<div class="grid items-center justify-center"> 
+<h3  class="text-barbi">{level[$lang]}</h3>
+
+<div class="flex items-center justify-center" dir="ltr">
+  <label for="Toggle3" class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">
+    <input id="Toggle3" type="checkbox" class="hidden peer" bind:checked on:change="{ch}">
+    <span class="px-4 py-2 rounded-l-md text-barbi peer-checked:text-gray-900 bg-mturk peer-checked:bg-gold">{co[$lang]}</span>
+    <span class="px-4 py-2 rounded-r-md  peer-checked:text-barbi  bg-gold peer-checked:bg-mturk">{car[$lang]}</span>
+  </label>
+  </div>
+<div class="grid items-center justify-center">
 
 {#if chan == true}
 <div>
@@ -338,10 +352,10 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 <div>
         <div>
             {#if errorl}
-                        <h1 
+                        <h1
                         style="color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7; max-width: 40vw;"
                         >{errorl} </h1>
-       {/if} 
+       {/if}
     </div>
 <main>
 	<form on:submit|preventDefault={shaneh}>
@@ -373,7 +387,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 				{showPassword ? "🔒" : "👁"}
 			</span>
 		</div>
-				
+
 
 		<div class="strength">
 			<span class="bar bar-1" class:bar-show={strength > 0} />
@@ -667,7 +681,7 @@ select{
 		color: var(--gold);
 		opacity: 0.8;
 	}
-	/* Buttons 
+	/* Buttons
 	button {
 		margin-top: 2rem;
 		padding: 5px 20px 10px 20px;

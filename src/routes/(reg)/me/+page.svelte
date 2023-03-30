@@ -32,7 +32,7 @@ let isOpen = false;
 
     let url1 = `${baseUrl}/api/upload`;
     let updX = 0;
-  let token; 
+  let token;
   let files;
   let idLi;
   let myP =[];
@@ -45,7 +45,7 @@ let isOpen = false;
   let odata = [];
     let allvn;
   let picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
-  let idL; 
+  let idL;
   let addSl = false;
 let addSl1 = false;
 let addSl2 = false;
@@ -53,7 +53,7 @@ let addSl3 = false;
 let addSl4 = false;
 let addSl5 = false;
  let a = 0;
-let addNs1 = true;  
+let addNs1 = true;
   let error1 = null;
   let addpic = 0;
   let addP = false;
@@ -62,13 +62,13 @@ let addNs1 = true;
     let meData = start();
 let username;
 function letters(data){
-  
+
    if (data.length >= 2 && data.length < 4) {
         st = 185;
-     } 
+     }
   else if (data.length >= 4 && data.length < 5) {
         st = 180;
-     } 
+     }
   else if (data.length >= 5 && data.length < 6) {
         st = 170;
      } else if (data.length >= 6 && data.length < 7) {
@@ -127,7 +127,7 @@ function letters(data){
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idLi = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let link =`${baseUrl}/api/users/${idLi}` ;
   //  let fd = new FormData();
@@ -139,17 +139,17 @@ function letters(data){
                     },
                 })
                 .then(({ data }) => {
-                    const imageId = data[0].id; 
+                    const imageId = data[0].id;
                     sendpg(imageId)
      })
       .catch(error => {
         console.log('צריך לתקן:', error.response);
                 });
-      
+
   };
-  
- 
-      
+
+
+
     async function sendpg(imageId){
        const cookieValue = document.cookie
   .split('; ')
@@ -160,24 +160,24 @@ function letters(data){
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idLi = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
        let res
     let linkg =`${baseUrl}/graphql` ;
         try {
            await fetch(linkg, {
               method: 'POST',
-       
+
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
-        JSON.stringify({query: 
+        body:
+        JSON.stringify({query:
            `mutation { updateUsersPermissionsUser(
-    id:${idLi} 
+    id:${idLi}
       data: {profilePic: ${imageId} }
-    
+
   ){
       data {
         attributes{
@@ -188,7 +188,7 @@ function letters(data){
   }
 }
 }
-`   
+`
         })
 })
   .then(r => r.json())
@@ -213,7 +213,7 @@ function project (id) {
     goto("/moach");
   };
 let mail,lango;
-
+let cards = true
 async function start () {
     const cookieValue = document.cookie
   .split('; ')
@@ -224,7 +224,7 @@ async function start () {
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       let linkgra = `${baseUrl}/graphql`;
@@ -235,30 +235,31 @@ async function start () {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
+        body:
         JSON.stringify({query:
           `query { usersPermissionsUser (id: ${idL}){
     data {
-      id attributes{ 
+      id attributes{
            frd
             fblink twiterlink discordlink githublink
             bio
+            preferCards
             lang
-            email 
-            username 
+            email
+            username
             hervachti
             profilManualAlready
             profilePic { data{ attributes{url formats} }}
             projects_1s {data{ id attributes {projectName}} }
-            skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}}}         
+            skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}}}
             sps (filters: { archived: { ne: true } }) { data{id attributes{ name panui}}}
             tafkidims { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ""}}}}
             vallues {data{ id attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ""}}}}
             work_ways {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ""}}}}
-          } 
+          }
         }
       }me { id }
- } `   
+ } `
  } )})
   .then(r => r.json())
   .then(data => meDataa = data);
@@ -296,10 +297,10 @@ async function start () {
                 skil[i].attributes.skillName = skil[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
-            }       
-            skil = skil 
+            }
+            skil = skil
                         console.log(skil)
- 
+
             taf = meData.tafkidims.data;
                         if ($lang == "he"){
              for (var i = 0; i < taf.length; i++){
@@ -310,16 +311,16 @@ async function start () {
             }
             taf = taf
             mash = meData.sps.data;
-            work = meData.work_ways.data;  
+            work = meData.work_ways.data;
             if ($lang == "he"){
              for (var i = 0; i < work.length; i++){
                 if (work[i].attributes.localizations.data.length > 0){
                 work[i].attributes.workWayName = work[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
-            }    
+            }
               work = work
-
+            cards = meData.preferCards ?? true
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
             total = meData.hervachti ? meData.hervachti : 0;
@@ -343,7 +344,7 @@ async function start () {
 
           } else {
             goto("/login")
-          } 
+          }
         } else {
             goto("/login")
           }
@@ -371,18 +372,18 @@ function getCookie(name) {
         end = dc.length;
         }
     }
-  
+
     return decodeURI(dc.substring(begin + prefix.length, end));
-} 
+}
   onMount(async () => {
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
      await start()
      .then()
   if ((/[\u0590-\u05FF]/).test(username) || (/[\u0600-\u06FF]/).test(username)) {
     username = reverseString(username)
-    username = username        
+    username = username
 }
-  } 
+  }
    })
 let userName_value;
 let biog;
@@ -406,19 +407,20 @@ function sendD () {
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idLi = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
-    let link =`${baseUrl}/api/users/${idLi}` 
+    let link =`${baseUrl}/api/users/${idLi}`
       axios
       .put(link, {
-        username: userName_value, 
+        username: userName_value,
     bio: biog,
     frd: frd,
     lang: lango,
     fblink: fblink,
      twiterlink: twiterlink,
      discordlink: discordlink,
-     githublink: githublink
+     githublink: githublink,
+     preferCards: cards
                   },
       {
       headers: {
@@ -426,7 +428,7 @@ function sendD () {
                 }})
       .then(response => {
         meData = response.data;
-       
+
     isOpen = false;
     a = 0;
     start()
@@ -435,11 +437,11 @@ function sendD () {
       .catch(error => {
         console.log('צריך לתקן:', error.response);
                 });
-      
+
 };
-    
- 
- 
+
+
+
 function callbackFunction(event) {
     a = 2;
     files = event.detail.files;
@@ -456,7 +458,8 @@ function callbackFunction(event) {
    // emailL = event.detail.em;
     biog = event.detail.bi;
     frd = event.detail.frd;
-    lango = event.detail.lango; 
+    lango = event.detail.lango;
+    cards = event.detail.cards
     sendD ();
 }
 
@@ -477,7 +480,7 @@ function remove (event) {
 
 async function add (event) {
  const linkp = event.detail.linkp;
- const miDatanew = event.detail.data; 
+ const miDatanew = event.detail.data;
  const valc = event.detail.valc;
  const a = event.detail.a;
  miDatanew.selected2 = [];
@@ -496,7 +499,7 @@ async function add (event) {
   console.log(a)
 };
 
-async function addnew (event) { 
+async function addnew (event) {
   const linkp = event.detail.linkp;
  const skob = event.detail.skob;
  const miDatanew = event.detail.data;
@@ -535,7 +538,7 @@ function open (event){
  addSl2 = false;
  addSl3 = false;
  addSl4 = false;
- addSl5 = false;  
+ addSl5 = false;
  const a = event.detail.linkp;
   console.log(addSl);
   if (a == "tafkidims"){
@@ -586,7 +589,7 @@ function close (event){
  addSl2 = false;
  addSl3 = false;
  addSl4 = false;
- addSl5 = false;  
+ addSl5 = false;
 }
 
 
@@ -619,7 +622,7 @@ async function han (){
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
  let linkgra = `${baseUrl}/graphql`;
     try {
@@ -629,15 +632,15 @@ async function han (){
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
+        body:
         JSON.stringify({query:
           `mutation { updateSp(
    id: ${spid}
-      data: { 
+      data: {
         archived: true
       }
   ) {data {id }}
- } `   
+ } `
  } )})
   .then(r => r.json())
   .then(data => miDa = data);
@@ -667,11 +670,11 @@ const message1 = {"he":"לחיצה על הכתר מובילה ללב 1💗1, ש�
 const levtitle = {"he": "ללב 1💗1", "en": "to the heart of 1💗1"}
 const message2 = {"he": "רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים",
                    "en": "list of your skills, press the edit button below to add more skills or to remove some from your list"}
-const message3 = {"he": "רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר", 
+const message3 = {"he": "רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר",
                 "en": "youre roles list, after adding or removing remember to press the button below to save your edit"}
 const message4 = {"he":"רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת",
               "en": "Bottom right is youre resource list, on the heart you'll get offers from FreeMates who need them"}
-const message5 = {"he":"רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת", 
+const message5 = {"he":"רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת",
                   "en":"list of your Vallues, we will offer you FreeMates who promoting those vallues"};
 const message6 = {"he":"רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת",
                   "en": "Bottom left are your ways of creation list, we will offer you missions that accsept those terms"}
@@ -705,9 +708,9 @@ let width,height
   <title>{title[$lang]}</title>
 </svelte:head>
 {#await meData}
-<div class="body grid items-center justify-center">
+<div class="body button-gold grid items-center justify-center">
          <Lowding height="100vh" />
-         </div> 
+         </div>
 {:then meData}
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -720,10 +723,10 @@ let width,height
 
 
           {:else if a == 1}
-          <EditB isGuidMe={isG} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid(guid)/>
+          <EditB isGuidMe={isG} checked={cards} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid(guid)/>
           {:else if a == 3}
-          <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3> 
-          <button 
+          <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
+          <button
   class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
   on:click={han}
   >{deletew[$lang]}</button>
@@ -740,7 +743,7 @@ let width,height
 
 {#if addP == false}
 
-<div bind:clientWidth={width} bind:clientHeight={height}  class="body"  style="--the:{stylef};">
+<div bind:clientWidth={width} bind:clientHeight={height}  class="body button-whitegold"  style="--the:{stylef};">
 
   <div >
   <a data-sveltekit-prefetch target="_self" href="/lev">
@@ -760,35 +763,35 @@ let width,height
     </text>
   </svg>
     </div>
-  
+
   <div class="flexi">
-     
-  {#if addNs1 == true} 
+
+  {#if addNs1 == true}
   {#key addSl}
   <div   class="d" class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
           <TourItem message={message2[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/> 
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
         </TourItem>
  </div>
   <div class="d" class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
           <TourItem message={message3[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/> 
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
   <div class="d" class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
-    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/> 
+    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
 </div>
           </TourItem>
 
         <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}" class="d">
                 <TourItem message={message5[$lang]}>
-      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/> 
+      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
         <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}" class="d">
-          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/> 
+          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
         </div>
                             </TourItem>
 
@@ -801,13 +804,13 @@ let width,height
     <div class="centr"></div>
 
   <div class="middle"></div>
-  <!-- <Profile src={picLink}/>--> 
+  <!-- <Profile src={picLink}/>-->
   <div
   class="imgpr"
   >
     <img
     class="imgpr"
-  
+
     src={picLink != null ? picLink : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}
     alt="profilePic">
     </div>
@@ -822,7 +825,7 @@ let width,height
 </svg>          </TourItem>
 
           </button>
-        
+
   {/if}
   {:else}
       <div class="centr"></div>
@@ -831,17 +834,17 @@ let width,height
   >
     <img
     class="imgpr"
-  
+
     src={picLink != null ? picLink : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}
     alt="profilePic">
     </div>
-    <div class="middleu"> 
-  {#if addpic == 0}    
-                 
+    <div class="middleu">
+  {#if addpic == 0}
+
     <button
       on:click={openen}
  class=" hover:bg-gold text-mturk hover:text-barbi rounded-full haalaa"
-     title={message8[$lang]} > 
+     title={message8[$lang]} >
      <TourItem message={message8[$lang]}>
      <svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path  fill="currentColor" d="M7 19L12 14L13.88 15.88C13.33 16.79 13 17.86 13 19H7M10 10.5C10 9.67 9.33 9 8.5 9S7 9.67 7 10.5 7.67 12 8.5 12 10 11.33 10 10.5M13.09 20H6V4H13V9H18V13.09C18.33 13.04 18.66 13 19 13C19.34 13 19.67 13.04 20 13.09V8L14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H13.81C13.46 21.39 13.21 20.72 13.09 20M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z" />
@@ -852,21 +855,21 @@ let width,height
 {/if}
     </div>
 {/if}
-        
+
          <div class="a6"  >
           <TourItem message={message9[$lang]}>
 
 <div in:fly|local={{x: -(width/2),opacity: 0.5}} out:scale|local={{opacity: 0.5, start: 0.1}} class="another button-perl" dir="rtl">
-  
+
     <h2 class="cot">{myfr[$lang]}</h2>
   {#if load == false}
   <span class="d pro">
            {#each myP as data, i}
-           <div class="cont"  >  
-            <button          
+           <div class="cont"  >
+            <button
              on:click={project(data.id)}
              class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center mt-1 mr-2 px-2.5 py-0.5 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow/></span></div></button>
-             
+
            </div>
   {/each}
   </span>
@@ -875,10 +878,10 @@ let width,height
          <Lowding height="50px" width="50px" />
 {/if}
 
-<button   
+<button
 style="z-index: 7;"
-class=" hover:scale-150 "     
-    on:click={() => addP = true} 
+class=" hover:scale-150 "
+    on:click={() => addP = true}
     title={crnfr[$lang]} >
 <svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
@@ -936,18 +939,18 @@ class=" hover:scale-150 "
 </g>
 </svg>
 
- </button> 
-</div> 
-     
+ </button>
+</div>
+
       <!-- <lord-icon
         src="https://cdn.lordicon.com/mecwbjnp.json"
       trigger="loop-on-hover"
                    colors="primary:#ee66aa,secondary:#66eece"
                style="width:42px;height:42px;">
                   </lord-icon> -->
-             
+
                          </TourItem>
-</div> 
+</div>
                            <TourItem message={message10[$lang]}>
 
 <div class="anotheri">
@@ -1372,13 +1375,13 @@ class=" hover:scale-150 "
   </g>
   <path d="M 310.778 152.849 L 406.216 171.904 L 406.216 210.013 L 310.778 229.067 L 215.34 210.013 L 215.34 171.904 Z" style="fill: url(#gradient-1); fill-opacity: 0.73;" transform="matrix(0.999813, 0.019346, -0.019346, 0.999813, -163.843097, -95.620727)" bx:shape="n-gon 310.778 190.958 110.202 38.109 6 0 1@0cc060df"/>
   <text style="fill: url(#gradient-2); font-family: Arial, sans-serif; font-size: 54.1178px; font-weight: 700; line-height: 288.628px; stroke: url(#gradient-3); text-anchor: middle; white-space: pre; filter: url(#drop-shadow-filter-0);" transform="matrix(0.627037, 0.018356, -0.018632, 0.636449, 145.136673, 107.674744)"><tspan>{total != null ? total : 0}<tspan x="0" dy="1em">​</tspan> </tspan><tspan x="0" dy="1em">​</tspan><tspan>💗</tspan></text>
-</svg> 
+</svg>
 </div>
                            </TourItem>
 {#if a == 0}
 <div class="anothere">
-  <button 
-  on:click={basic} 
+  <button
+  on:click={basic}
   title={editbas[$lang]}
   class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
   >
@@ -1399,9 +1402,9 @@ class=" hover:scale-150 "
   style="margin: 0 auto;"
   class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
    ><Close/></button>
-  <Addnew userName_value={meData.username}/> 
+  <Addnew userName_value={meData.username}/>
   {/if}
- <!-- המשימות שסיימתי-->         
+ <!-- המשימות שסיימתי-->
 {/await}
 
   <style>
@@ -1418,12 +1421,12 @@ class=" hover:scale-150 "
      .d::-webkit-scrollbar {
     width: 10px;
 }
- 
+
 .d::-webkit-scrollbar-track {
     background-color: #e4e4e4;
     border-radius: 100px;
 }
- 
+
 .d::-webkit-scrollbar-thumb {
     background-color: #d4aa70;
     border-radius: 100px;
@@ -1516,13 +1519,13 @@ class=" hover:scale-150 "
       0 0 102px #0fa,
       0 0 151px #0fa );*/
 
-     
+
   }
     .n{
        cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
-  
+
     }
-    
+
 .n:hover:before {
   transform: scale(1.2);
   box-shadow: 0 0 15px #d35400;
@@ -1536,8 +1539,8 @@ class=" hover:scale-150 "
 }
     .cot{
     color:var(--barbi-pink);
-     margin: 0 auto; 
-     padding:0;  
+     margin: 0 auto;
+     padding:0;
    text-shadow: 1px 1px  #feeb02;
     }
     .pt{
@@ -1546,7 +1549,7 @@ class=" hover:scale-150 "
        font-size: 13px;
        text-align: start;
     }
-    .pt:hover{ 
+    .pt:hover{
               color:#574010;
              text-shadow: 1px 1px var(--gold) ;
     }
@@ -1555,19 +1558,19 @@ class=" hover:scale-150 "
       flex-direction: row;
       flex-wrap: wrap;
     }
-    .cont > span{ 
+    .cont > span{
       display: none ;
       transition: all 0.5 ;
     }
-    .cont:hover > span{ 
+    .cont:hover > span{
       display: inline ;
     }
     .sp{
    display: grid;
     justify-content: center;
-  align-items: center; 
+  align-items: center;
   }
-  
+
   @media (max-width: 528px) {
      :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
@@ -1635,11 +1638,11 @@ class=" hover:scale-150 "
     }
     .edit{
     z-index: 3;
-     margin-right:auto; 
-     margin-left:auto ; 
-     position: absolute ; 
+     margin-right:auto;
+     margin-left:auto ;
+     position: absolute ;
      top: 59.2%;
-      left: 46%; 
+      left: 46%;
        transform: translate(-50%, -50%);
     }
 
@@ -1651,8 +1654,8 @@ class=" hover:scale-150 "
     position: absolute;
     transform: translate(-50%, -50%);
      top: 59.2%;
-      left: 46%; 
-    z-index: 3; 
+      left: 46%;
+    z-index: 3;
     }
     .centr{
        max-height: 20.52vh;
@@ -1661,11 +1664,11 @@ class=" hover:scale-150 "
     min-width: 19.68vh;
 }
 .middle{
-    
+
       max-height: 19.68vh;
     max-width: 19.68vh;
     min-width: 19.68vh;
-    
+
       }
       .imgpr{
         height: 16vh;
@@ -1678,7 +1681,7 @@ class=" hover:scale-150 "
        }
          .name{
              top: 24%;
-              
+
            }
                  .ceterr{
       height: 7vh;
@@ -1697,7 +1700,7 @@ class=" hover:scale-150 "
      .d::-webkit-scrollbar {
     width: 12px;
 }
-  
+
     .sv{
       width:13px
       ;height:13px;
@@ -1723,7 +1726,7 @@ class=" hover:scale-150 "
           }
   .edit{
         top: 62.2%;
-      left: 48%; 
+      left: 48%;
   }
     .centr{
        max-height: 56.36vh;
@@ -1732,11 +1735,11 @@ class=" hover:scale-150 "
     min-width: 35.2vw;
 }
 .middle{
-    
+
       max-height: 35.2vh;
     max-width: 35.2vh;
     min-width:  35.2vh;
-    
+
       }
       .imgpr{
           height: 32.2vw;
@@ -1768,7 +1771,7 @@ class=" hover:scale-150 "
           }
   .edit{
         top: 72.2%;
-      left: 48%; 
+      left: 48%;
   }
     .centr{
        max-height: 53.12vh;
@@ -1777,11 +1780,11 @@ class=" hover:scale-150 "
     min-width: 51.2vh;
 }
 .middle{
-    
+
       max-height: 51.2vh;
     max-width: 51.2vh;
     min-width:  51.2vh;
-    
+
       }
       .imgpr{
         height: 41.6vh;
@@ -1814,7 +1817,7 @@ class=" hover:scale-150 "
 @media (min-height: 500px) and (min-width: 520px) {
     .name{
              top: 22%;
-               
+
            }
            .ceterr{
  height: 10vh;
@@ -1852,11 +1855,11 @@ class=" hover:scale-150 "
   .userName{
       position: absolute;
     transform: translate(-50%, -50%);
-    left: 50%; 
-   
+    left: 50%;
+
     z-index: 3;
     }
-  
+
 
 .a1{
   position: absolute;
@@ -1895,7 +1898,7 @@ class=" hover:scale-150 "
     transform: translate(-50%, -50%);
     top:80%;
     left: 20%;
-} 
+}
   @media (min-width: 348px) {
  .a2  {
   left: 80%
@@ -1923,15 +1926,15 @@ class=" hover:scale-150 "
       justify-content: center;
       text-align: center;
       background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
-     background-position:right center; 
-    background-repeat: no-repeat; 
+     background-position:right center;
+    background-repeat: no-repeat;
     background-size: cover;
 }
 .selectedl {
   z-index: 77;
 background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
-     background-position: left center; 
-    background-repeat: no-repeat; 
+     background-position: left center;
+    background-repeat: no-repeat;
     background-size: cover;
   position: fixed;
   top: 0;
@@ -1948,69 +1951,69 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
       justify-content: center;
       text-align: center;
 }
-  
+
     .imgpr {
       position: absolute;
     transform: translate(-50%, -50%);
     left: 50%;
      z-index: 1;
     border-radius: 50%;
-      margin-right:auto; 
-      margin-left:auto; 
-   
+      margin-right:auto;
+      margin-left:auto;
+
 
 /*   max-width: 100%;
    max-height: 250px !important; */
  }
-  .body{ 
+  .body{
     width: 100vw;
     height: 100vh;
    /*  background: url(https://res.cloudinary.com/love1/image/upload/v1640438668/amana_kocsdt.svg) !important;
-      background-position: center; 
+      background-position: center;
       background-size: cover !important;
-      background-repeat: no-repeat !important; 
+      background-repeat: no-repeat !important;
 background-color: #fff000;
 background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);*/
-background: #000000;  /* fallback for old browsers */
-background: -webkit-linear-gradient(to right, #434343, #000000);  /* Chrome 10-25, Safari 5.1-6 */
-background: linear-gradient(to right, #434343, #000000); /* W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
+/*background: #000000;   fallback for old browsers */
+/*background: -webkit-linear-gradient(to right, #434343, #000000);   Chrome 10-25, Safari 5.1-6 */
+/*background: linear-gradient(to right, #434343, #000000);  W3C, IE 10+/ Edge, Firefox 16+, Chrome 26+, Opera 12+, Safari 7+ */
 
     }
     .centr{
       position: absolute;
     transform: translate(-50%, -50%);
     top:50%;
-    left: 50%; 
-   
+    left: 50%;
+
 /*    min-height: 332px;
     min-width: 320px;*/
     background: url(https://res.cloudinary.com/love1/image/upload/v1640438986/goldenP_bz4wu5.svg);/*13ndp*/
-    background-position: center; 
-    background-repeat: no-repeat; 
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
     z-index: 2;
     }
     .name{
-    
+
   position: absolute;
     transform: translate(-50%, -50%);
-    left: 50%; 
+    left: 50%;
     z-index: 2;
   /*  background: url(ceter.png);
-    background-position: center; 
-    background-repeat: no-repeat; 
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: contain;*/
-    
+
     }
-    
+
    .another{ /*background: -webkit-linear-gradient( #8f6B29, #FDE08D, #DF9F28);
 	background-image: linear-gradient( #8f6B29, #FDE08D, #DF9F28);
          filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
 
-      
+
      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
-     background-position: center; 
-    background-repeat: no-repeat; 
+     background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;*/
     padding: 1em;
       display:flex;
@@ -2027,7 +2030,7 @@ background: linear-gradient(to right, #434343, #000000); /* W3C, IE 10+/ Edge, F
       align-self: center;
       max-height: 320px;
     max-width: 320px;
-        border-radius: 50%; 
+        border-radius: 50%;
       /*    position: absolute;
           top: 50%;
           left: 50%;
@@ -2035,24 +2038,24 @@ background: linear-gradient(to right, #434343, #000000); /* W3C, IE 10+/ Edge, F
           text-align: center;
    display: flex;
    align-items: center;
-  
+
     border-radius: 50%;
-    
+
       }
-  
-      
+
+
  .by{
   display: flex;
   justify-content: center;
   align-items: center;
   font-family: "Anonymous Pro", "Monospace";
   font-size: 30px;
- }    
+ }
 #circular-text {
  /* position: relative;
   border-radius: 100%;
   padding: 20px;
- */ 
+ */
 }
 
 
@@ -2076,13 +2079,13 @@ background: linear-gradient(to right, #434343, #000000); /* W3C, IE 10+/ Edge, F
     .anothere{
       position : absolute;
           transform: translate(-50%, -50%);
-                  z-index: 3;   
-     background-position: center; 
-    background-repeat: no-repeat; 
+                  z-index: 3;
+     background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
       display:flex;
       flex-direction: column;
       align-items: center;
       justify-content: center;
     }
-  </style>         
+  </style>
