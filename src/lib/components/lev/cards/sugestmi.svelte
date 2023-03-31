@@ -53,7 +53,7 @@ console.log(workways)
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{headi[$lang]}</span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-xl">{headi[$lang]}</span>
             </div>
             <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
 
