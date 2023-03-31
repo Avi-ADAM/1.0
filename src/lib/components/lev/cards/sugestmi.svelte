@@ -8,7 +8,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
-    export let projectName, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[]
+    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[]
     export let already, allr = false;
 function hover(x){
 dispatch("hover",{x:x});
@@ -31,6 +31,15 @@ dispatch("project")
 function tochat (){
 dispatch("tochat");
 }
+const ttal = {"he":"נכנס כבר כסף","en":"already has income"}
+const ttwe = {"he":"צפי רווח: שבוע","en":"exp income: one week "}
+const ttmo = {"he":"צפי רווח: חודש","en":"exp income: one month "}
+const tt3mo = {"he":"צפי רווח: 3 חודשים","en":"exp income: three months"}
+const tt6mo = {"he":"צפי רווח: חצי שנה","en":"exp income: 6 months "}
+const tt1y = {"he":"צפי רווח: שנה","en":"exp income: 1 year"}
+const tt2y = {"he":"צפי רווח: שנתיים","en":"exp income: 2 years "}
+const ttmor = {"he":"צפי רווח: ארוך טווח","en":"exp income: long term"}
+const ttne = {"he":"ללא רווח","en":"not profitable"}
     const headi = {"he":"הצעה למשימה", "en":"suggested mission"}
     const t = {
       "wwneed" : {"he":"דרכי עבודה מבוקשות:","en":"ways of work for the mission:"},
@@ -62,12 +71,35 @@ console.log(workways)
          </div>
          <button on:click={project} class="px-2 mx-2 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded text-sm" >{t.watchpr[$lang]}</button >
          </div>
+
   <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {noOfHours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(noOfHours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
+      <span style="font-size: 17px;" class="text-barbi font-bold bg-gold mb-2">
+
+        {#if timeToP == "alreadi"}
+              {ttal[$lang]}
+             {:else if timeToP == "week"}
+              {ttwe[$lang]}
+              {:else if timeToP == "month"}
+              {ttmo[$lang]}
+               {:else if timeToP == "threeM"}
+              {tt3mo[$lang]}
+               {:else if timeToP == "sixM"}
+              {tt6mo[$lang]}
+               {:else if timeToP == "oneY"}
+              {tt1y[$lang]}
+             {:else if timeToP == "twoY"}
+              {tt2y[$lang]}
+             {:else if timeToP == "more"}
+              {ttmor[$lang]}
+              {:else if timeToP == "never"}
+              {ttne[$lang]}
+            {/if}
+        </span>
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionName}</div>
   {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
    <!-- {#if hearotMeyuchadot}
@@ -105,6 +137,7 @@ console.log(workways)
                 <Tile bg="yellow" word={wo.attributes.workWayName} />
                 </p>{/each}
     </div>{/if}
+
     </div>
 
   </div>

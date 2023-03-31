@@ -1,4 +1,6 @@
 <script>
+    import Tile from '$lib/celim/tile.svelte'
+
      import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
@@ -58,7 +60,7 @@ const cookieValue = document.cookie
   .find(row => row.startsWith('id='))
   .split('=')[1];
   uId = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let d = new Date
     let link = 'https://strapi-87gh.onrender.com/graphql';
@@ -69,12 +71,12 @@ const cookieValue = document.cookie
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
+        body:
         JSON.stringify({query:
           `mutation { updateUsersPermissionsUser(
-    id: "${uId}" 
+    id: "${uId}"
       data: { askeds: [${as}] }
-    
+
   ){
       data {
         attributes{
@@ -95,7 +97,7 @@ const cookieValue = document.cookie
   ){
     data {id}
   }
-}`   
+}`
 } )})
   .then(r => r.json())
   .then(data => miData = data);
@@ -104,10 +106,10 @@ const cookieValue = document.cookie
         } catch (e) {
             error1 = e
         }
-    }; 
-    
-    
-  
+    };
+
+
+
 function nego(oid) {
         console.log("nego", oid);
 	}
@@ -127,7 +129,7 @@ const cookieValue = document.cookie
   .find(row => row.startsWith('id='))
   .split('=')[1];
   uId = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let link = 'https://strapi-87gh.onrender.com/graphql';
     try {
@@ -137,10 +139,10 @@ const cookieValue = document.cookie
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
+        body:
         JSON.stringify({query:
           `mutation { updateUsersPermissionsUser(
-    id: "${uId}" 
+    id: "${uId}"
       data: {declined: [${ds}] }
   ){
       data {
@@ -153,7 +155,7 @@ const cookieValue = document.cookie
       }
   }
 }
-}`   
+}`
 } )})
   .then(r => r.json())
   .then(data => miData = data);
@@ -162,7 +164,7 @@ const cookieValue = document.cookie
         } catch (e) {
             error1 = e
         }
-        
+
 	}
 //out:fly={{duration: 2200, opacity: 0.5, y: 450}}
 
@@ -176,7 +178,7 @@ const cookieValue = document.cookie
     });
   };
 
-  
+
  const slideTo = (index) => {
     if (swiperRef !== null){
     swiperRef.slideTo(index , 400);
@@ -235,7 +237,7 @@ function linke (){
 function project () {
 
         dispatch("proj", {id: projectId});
-} 
+}
  onMount(function(){
  if ($lang != "en" ){
               for (var i = 0; i < skills.data.length; i++){
@@ -292,11 +294,11 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
 </script>
 {#if cards == false}
 <div
-style="position: relative;" 
-style:z-index={hovered === false ? 11 : 16}  
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()} 
-use:clickOutside on:click_outside={toggleShow} 
+style="position: relative;"
+style:z-index={hovered === false ? 11 : 16}
+on:mouseenter={()=> hoverede()}
+on:mouseleave={()=> hoverede()}
+use:clickOutside on:click_outside={toggleShow}
 class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 >
 <Swiper  dir="rtl"
@@ -315,7 +317,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 >
   <SwiperSlide class="swiper-slideg"
     ><div
-	 id="normSml" 
+	 id="normSml"
 ><div class="{`normSml${oid}-${projectId}`}"></div>
 
 <svg in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}" version="1.1" viewBox="6.323 104.09 165.22 165.22" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -938,24 +940,25 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 <g>
 <path d="m503.92 247.08 83.779 36.861s-27.955 50.743-83.36 51.943c-49.464 1.072-82.103-53.618-82.103-53.618l81.684-35.186z" fill="rgba(216, 216, 216, 0)" stroke="rgba(0, 0, 0, 0)">
 </path>
-<text transform="matrix(1 0 0 1 100.04 -13.744)" style="fill:url(#sugzzv); stroke-width: 0; font-family: gan, Powerr;" x="402.493" text-anchor="middle" y="299.752" fill="url(#sugzzv)"  font-size="18px" stroke="url(#sugzzu)" stroke-miterlimit="0" stroke-width=".62511px" > {#if timeToP == "alreadi"}
+<text transform="matrix(1 0 0 1 100.04 -13.744)" style="fill:url(#sugzzv); stroke-width: 0; font-family: gan, Powerr;" x="402.493" text-anchor="middle" y="299.752" fill="url(#sugzzv)"  font-size="18px" stroke="url(#sugzzu)" stroke-miterlimit="0" stroke-width=".62511px" >
+   {#if timeToP == "alreadi"}
           {ttal[$lang]}
-         {:else if timeToP == "week"} 
+         {:else if timeToP == "week"}
           {ttwe[$lang]}
-          {:else if timeToP == "month"} 
+          {:else if timeToP == "month"}
           {ttmo[$lang]}
-           {:else if timeToP == "threeM"} 
+           {:else if timeToP == "threeM"}
           {tt3mo[$lang]}
-           {:else if timeToP == "sixM"} 
-          {tt6mo[$lang]}   
-           {:else if timeToP == "oneY"} 
-          {tt1y[$lang]} 
-         {:else if timeToP == "twoY"} 
-          {tt2y[$lang]}   
-         {:else if timeToP == "more"} 
-          {ttmor[$lang]}   
-          {:else if timeToP == "never"} 
-          {ttne[$lang]}                      
+           {:else if timeToP == "sixM"}
+          {tt6mo[$lang]}
+           {:else if timeToP == "oneY"}
+          {tt1y[$lang]}
+         {:else if timeToP == "twoY"}
+          {tt2y[$lang]}
+         {:else if timeToP == "more"}
+          {ttmor[$lang]}
+          {:else if timeToP == "never"}
+          {ttne[$lang]}
         {/if}
    <tspan dx="0" dy="1.2em" font-size="17px"></tspan></text>
 </g></g>
@@ -974,37 +977,51 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
         {#if total} <p class="lt">{total}</p>{/if}
         {#if timeToP == "alreadi"}
           <p>{ttal[$lang]}</p>
-         {:else if timeToP == "week"} 
+         {:else if timeToP == "week"}
           <p>{ttwe[$lang]}</p>
-          {:else if timeToP == "month"} 
+          {:else if timeToP == "month"}
           <p>{ttmo[$lang]}</p>
-           {:else if timeToP == "threeM"} 
+           {:else if timeToP == "threeM"}
           <p>{tt3mo[$lang]}</p>
-           {:else if timeToP == "sixM"} 
-          <p>{tt6mo[$lang]}</p>   
-           {:else if timeToP == "oneY"} 
-          <p>{tt1y[$lang]}</p> 
-         {:else if timeToP == "twoY"} 
-          <p>{tt2y[$lang]}</p>   
-         {:else if timeToP == "more"} 
-          <p>{ttmor[$lang]}</p>   
-          {:else if timeToP == "never"} 
-          <p>{ttne[$lang]}</p>                      
-        {/if}-->
-   
+           {:else if timeToP == "sixM"}
+          <p>{tt6mo[$lang]}</p>
+           {:else if timeToP == "oneY"}
+          <p>{tt1y[$lang]}</p>
+         {:else if timeToP == "twoY"}
+          <p>{tt2y[$lang]}</p>
+         {:else if timeToP == "more"}
+          <p>{ttmor[$lang]}</p>
+          {:else if timeToP == "never"}
+          <p>{ttne[$lang]}</p>
+        {/if}
+        <span class="bg-gold font-semibold opacity-80 inline-flex items-center mr-2 px-2.5 py-0.5 rounded">
+        </span>
+      -->
+
 </div>
 </SwiperSlide
   ><SwiperSlide class="swiper-slideg"
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-    <div class="ltn ab d " style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")} >  
-      {#each skills.data as skill}<span class="bg-gold font-semibold opacity-80 inline-flex items-center mr-2 px-2.5 py-0.5 rounded">{skill.attributes.skillName}</span>{/each}
-</div> 
+    <div class="ltn ab d flex flex-wrap items-center justify-middle" style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")} >
+      {#each skills.data as skill}
+      <Tile sm={true} bg="green" word={skill.attributes.skillName}/>
+        {/each}
+</div>
    {#if deadLine != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
       {#if deadLinefi != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
 
     <h4 on:mouseenter={()=>hover({"he":"פרטי המשימה","en":"mission details"})} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
-    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="ltn de d">{role.data.map(d=> d.attributes.roleDescription).join(' ')}</p>
+    <div on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})}
+       on:mouseleave={()=>hover("0")}
+       style="text-shadow:none;"
+       class="ltn de d flex flex-wrap items-center justify-middle">
+
+      {#each role.data as d}
+       <Tile sm={true} bg="pink" word={d.attributes.roleDescription}/>
+      {/each}
+
+    </div>
 {#if low == false}
     {#if already === false}
     <button on:mouseenter={()=>hover({"he":"אני רוצה","en":"Yes I want"})} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
@@ -1020,8 +1037,8 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
 </Swiper>
 </div>
 {:else}
-<Cards 
-on:project={project} 
+<Cards
+on:project={project}
  on:agree={claf}
   on:decline={claf}
   on:hover={hoverc}
@@ -1029,13 +1046,14 @@ on:project={project}
   {missionName}
   {noOfHours}
   {perhour}
-  {already} 
+  {already}
   {missionDetails}
   {skills}
   {role}
   {projectName}
-   {src} 
+   {src}
  {workways}
+ {timeToP}
    />
 {/if}
 <style>
@@ -1046,7 +1064,7 @@ on:project={project}
   .pn{
      margin: 5px;
     font-size: 7px;
-     line-height: 1; 
+     line-height: 1;
      font-weight: bold;
   }
   .ab{
@@ -1081,13 +1099,13 @@ on:project={project}
     }
   .ltb{
     margin: 0px;
-     font-size: 9px; 
+     font-size: 9px;
      font-weight: bold;
       line-height: 1;
   }
   .ltn{
     font-size: 8px;
-     line-height: 1; 
+     line-height: 1;
      font-weight: bold;
      height: 100%;
      overflow-y: auto;
@@ -1095,7 +1113,7 @@ on:project={project}
   .lt{
    margin: 1px;
     font-size: 8px;
-     line-height: 1; 
+     line-height: 1;
      font-weight: bold;
   }
   .img{
@@ -1109,7 +1127,7 @@ on:project={project}
   }
 	#normSml{
         white-space: normal;
-        text-align: center; 
+        text-align: center;
         line-height: 0.5;
         align-items: center;
         justify-content: safe center;
@@ -1124,14 +1142,14 @@ on:project={project}
          text-shadow: 1px 1px  rgb(63, 56, 18);
 
          background: url(https://res.cloudinary.com/love1/image/upload/v1643838569/cleenCoin1_xpsitt.png);
-    background-position: center; 
-    background-repeat: no-repeat; 
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
 
     }
 	 #normSmll{
         white-space: normal;
-        text-align: center; 
+        text-align: center;
         align-items: center;
         justify-content: safe center;
         color: var(--barbi-pink);
@@ -1143,8 +1161,8 @@ on:project={project}
          border-radius: 50%;
          text-shadow: 1px 1px  rgb(63, 56, 18);
                      background: url(https://res.cloudinary.com/love1/image/upload/v1643838569/cleenCoin1_xpsitt.png);
-    background-position: center; 
-    background-repeat: no-repeat; 
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
     display: grid;
     grid-template-columns: auto auto;
@@ -1162,12 +1180,12 @@ on:project={project}
         line-height: 0.5;
         text-align: center;
         background: url(https://res.cloudinary.com/love1/image/upload/v1643838569/cleenCoin1_xpsitt.png);
-    background-position: center; 
-    background-repeat: no-repeat; 
+    background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
     }*/
-    .btn{ 
-        
+    .btn{
+
         background-color: rgb(87, 208, 248);
         border-radius: 50%;
         color: var(--barbi-pink);
@@ -1179,17 +1197,17 @@ on:project={project}
   margin-left: 4px;
         grid-row: 5/ 6;
     }
-    
+
 
 .btn:hover {
     opacity: 1;
     padding: 6px;
     }
     @media  (min-width: 550px) {
-    
+
       .ltb{
     margin: 0px;
-     font-size: 17px; 
+     font-size: 17px;
       }
       .ltn{
     font-size: 10px;
@@ -1204,8 +1222,8 @@ on:project={project}
    padding-right: 8px;
     font-size: 10px;
       }
-      
-      
+
+
     .img{
      width: 32px;
      height: 32px;
