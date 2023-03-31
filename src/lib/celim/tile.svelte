@@ -1,4 +1,6 @@
 <script>
+     import Grow from '$lib/celim/icons/grow.svelte'
+  export let gr = false
     export let openi = false;
     export let closei = false;
    export let blue = false;
@@ -37,18 +39,18 @@
    //gray red green yellow indigo purple pink
 </script>
 <span class:line-through={closei == true}
-class:hover:bg-blue-400={blue == true} 
+class:hover:bg-blue-400={blue == true}
 class:hover:from-gold={gold == true}
 class:hover:to-gold={gold == true}
 
-        class:hover:bg-wow2={wow == true} 
-        class:hover:bg-gray-400={gray == true} 
-        class:hover:bg-red-400={red == true} 
-        class:hover:bg-green-400={green == true} 
-        class:hover:bg-yellow-400={yellow == true} 
-        class:hover:bg-indigo-400={indigo == true} 
-        class:hover:bg-purple-400={purple == true} 
-        class:hover:bg-pink-300={pink == true} 
+        class:hover:bg-wow2={wow == true}
+        class:hover:bg-gray-400={gray == true}
+        class:hover:bg-red-400={red == true}
+        class:hover:bg-green-400={green == true}
+        class:hover:bg-yellow-400={yellow == true}
+        class:hover:bg-indigo-400={indigo == true}
+        class:hover:bg-purple-400={purple == true}
+        class:hover:bg-pink-300={pink == true}
         class:bg-blue-200={blue == true} class:text-blue-800={blue == true}
         class:bg-wow={wow == true} class:text-wowt={wow == true}
         class:bg-gray-200={gray == true} class:text-gray-800={gray == true}
@@ -58,13 +60,13 @@ class:hover:to-gold={gold == true}
         class:bg-indigo-200={indigo == true} class:text-indigo-800={indigo == true}
         class:bg-purple-200={purple == true} class:text-purple-800={purple == true}
         class:bg-pink-200={pink == true} class:text-pink-800={pink == true}
-        class:from-gra={gold == true} 
-class:via-grb={gold == true} 
-class:via-gr-c={gold == true} 
-class:via-grd={gold == true} 
-class:to-gre={gold == true} 
-class:bg-gradient-to-br={gold == true} 
-class:text-stgold={gold == true} 
+        class:from-gra={gold == true}
+class:via-grb={gold == true}
+class:via-gr-c={gold == true}
+class:via-grd={gold == true}
+class:to-gre={gold == true}
+class:bg-gradient-to-br={gold == true}
+class:text-stgold={gold == true}
  class="drop-shadow-lg shadow-fuchsia-400 decoration-slate-100 text-xs font-semibold inline-flex items-center mr-2 px-2.5 py-0.5 rounded">
  {word}
  {#if closei}
@@ -72,5 +74,10 @@ class:text-stgold={gold == true}
  {/if}
   {#if openi}
   <svg aria-hidden="true" class="w-3 h-3  bg-slate-100 rounded-full mx-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+ {/if}
+ {#if gr}
+  <span class=" mx-0.5">
+ <Grow width="13" height="13"/>
+</span>
  {/if}
  </span>

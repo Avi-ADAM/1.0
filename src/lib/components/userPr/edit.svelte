@@ -1,14 +1,14 @@
 
-<script> 
+<script>
   import Tile from '$lib/celim/tile.svelte'
 	import { crossfade } from 'svelte/transition';
 	import { quintOut } from 'svelte/easing';
-  
+
 	const [send, receive] = crossfade({
 		duration:1500,
 		easing: quintOut
 	});
-   import Grow from '$lib/celim/icons/grow.svelte' 
+   import Grow from '$lib/celim/icons/grow.svelte'
               import { lang } from '$lib/stores/lang.js'
    // import AddSkil from './addSkil.svelte';
     import { skillsNew } from '../../stores/skillsNew.js';
@@ -33,7 +33,7 @@ export let bgi = "wow"
     export let data = [];
     export let meData = [];
     export let datan ="";
-    let token; 
+    let token;
     //for the options of multiselect
     let allvn = []
      export let addS = false;
@@ -52,7 +52,7 @@ export let bgi = "wow"
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idLi = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
           const parseJSON = (resp) => (resp.json ? resp.json() : resp);
           const checkStatus = (resp) => {
@@ -63,7 +63,7 @@ export let bgi = "wow"
             throw resp;
           });
         };
-       
+
           try {
             let more = ``
             if ($lang == "he"){
@@ -133,23 +133,23 @@ async function increment() {
   .find(row => row.startsWith('id='))
   .split('=')[1];
   uid = cookieValueId;
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let link ="https://strapi-87gh.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
-       
+
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
-        JSON.stringify({query: 
+        body:
+        JSON.stringify({query:
            `mutation { updateUsersPermissionsUser(
-    id:${uid} 
+    id:${uid}
       data: { ${kish}: [${list}] }
-    
+
   ){
       data {
         attributes{
@@ -160,7 +160,7 @@ async function increment() {
   }
 }
 }
-`   
+`
         })
 })
   .then(r => r.json())
@@ -188,11 +188,11 @@ async function increment() {
         g = false;
       }
     };
- 
-   
+
+
   import { RingLoader
 } from 'svelte-loading-spinners'
-export let Valname = "כישורים";  
+export let Valname = "כישורים";
 let yy = 0;
 export let masss = false;
 function find_id(arra){
@@ -248,14 +248,14 @@ const datana = resp;
     valc: valc,
     a: datan
     } );
-  }   
+  }
 }
 
 function adm (id){
  if (datan === "mash" && id.length > 0) {
     const neww = find_id(id);
          needr = neww;
-        updi () 
+        updi ()
       }
     }
 
@@ -317,7 +317,7 @@ meData = slectednew
   const oldsel = data.selected2
   oldsel.push(event.detail.name);
   data.selected2 = oldsel;
-        updi () 
+        updi ()
 }
 
 function addnew (event) {
@@ -340,7 +340,7 @@ dispatch('addnew', {
     skob: skob,
     linkp: kish
     } );
-  
+
 };
 let meDatamm = [];
 function bitulm (){
@@ -358,7 +358,7 @@ async function updi (){
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -373,15 +373,15 @@ async function updi (){
         try {
              await fetch(linkg, {
               method: 'POST',
-       
+
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
-        JSON.stringify({query: 
+        body:
+        JSON.stringify({query:
           `{  mashaabims (filters:{id: {in:[${needr}]}}){data{ id attributes{
-          name descrip kindOf  price linkto 
+          name descrip kindOf  price linkto
         } }}}`
         })
  })
@@ -394,7 +394,7 @@ async function updi (){
             mass: true
           })
     } catch (e) {
-            console.log(e)  
+            console.log(e)
         }
 }
 function clodd (event) {
@@ -489,7 +489,7 @@ async function edit (id){
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
-    token  = cookieValue; 
+    token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
           const parseJSON = (resp) => (resp.json ? resp.json() : resp);
           const checkStatus = (resp) => {
@@ -500,7 +500,7 @@ async function edit (id){
             throw resp;
           });
         };
-       
+
           try {
               const res = await  fetch("https://strapi-87gh.onrender.com/graphql", {
               method: "POST",
@@ -515,9 +515,9 @@ async function edit (id){
        descrip
              kindOf
              unit
-             spnot  
+             spnot
              price
-             myp   
+             myp
              linkto
              users_permissions_user {data{id}}
              sdate
@@ -552,13 +552,13 @@ const bef = {"he":"ה" , "en": "My "}
 const aft = {"he": " שלי", "en": ""}
 const edito = {"he":"עריכה", "en":"edit"}
 const edbef = {"he": "עריכת ה", "en": "edit My "}
-const edaft = {"he": " שלי ", "en": ""} 
-const rem = {"he": "הסרת " , "en": "remove "} 
+const edaft = {"he": " שלי ", "en": ""}
+const rem = {"he": "הסרת " , "en": "remove "}
 const adbf = {"he":" בחירת ", "en": "choose more "}
 const adaf = {"he":" נוספים", "en": ""}
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const onin = {"he":"מושקע בריקמה", "en": "invested on FreeMates"}
-//add new msg 
+//add new msg
 $: searchText = ``
   $: addn = {"he": ` \"${searchText}\" לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור  \"הוספת חדש\" שלמטה`,"en":`\"${searchText}\" Not on the list yet , add it with the \"Add new\" button bellow`}
 
@@ -568,13 +568,13 @@ $: anim = datan == "work" || datan == "val" ? -(width/2) : width/2
 {#if masss === true}
 
 <div class="grid items-center align-center justify-center" >
-<button class=" hover:bg-barbi text-gold font-bold rounded-full" 
+<button class=" hover:bg-barbi text-gold font-bold rounded-full"
 style="width:24px; height:24px; margin: 0 auto;"
 title="{cencel[$lang]}"
 on:click={bitulm}
 ><svg  style="width:24px; height:24px;" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-</svg></button> 
+</svg></button>
 {#if ed === false}
   <Newsp {needr} meData={meDatamm}  on:close={clohh} on:remove={wdwd}/>
 {:else if ed === true}
@@ -584,19 +584,20 @@ on:click={bitulm}
 {:else}
 
       {#if addSl == false}
-      <div class="another button-perl " style="margin: auto" 
-				in:fly={{x: anim , duration: 1500}} out:fly={{x: anim-(width/5) ,y: -100, duration: 1500, opacity: 0.5}}> 
- 
+      <div class="another button-perl " style="margin: auto"
+				in:fly={{x: anim , duration: 1500}} out:fly={{x: anim-(width/5) ,y: -100, duration: 1500, opacity: 0.5}}>
+
         <h2 style="font-weight: 400;  color: var(--barbi-pink); text-shadow: 1px 1px #feeb02 ; " class="th">{bef[$lang]}{Valname}{aft[$lang]}</h2>
      {#if data.length > 0}
-        <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1">   
-          {#each data as dat, i}<p 
-          class="m-0 " style="text-shadow:none;" >
-              <Tile bg="{bgi}"   word={dat.attributes[valc]}/></p>{/each}
+        <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1">
+          {#each data as dat, i}
+          <p
+          class="m-0 " style="text-shadow:none; white-space:none;" >
+              <Tile bg="{bgi}" gr={ datan === "mash" && dat.attributes.panui === false ? true : false}  word={dat.attributes[valc]}/></p>{/each}
     </div>
     {/if}
-    
-        <!-- 
+
+        <!--
         מובייל , רקמות? להוסיף חץ כאייקון? צבע שונה לכל דבר??
           {#if data} <span class="d"> {#each data as dat, i}
            <p style="margin: 0; line-height: 1;  padding: auto;" class="t">{dat[valc]}</p>
@@ -604,11 +605,11 @@ on:click={bitulm}
 <button
 class=" hover:bg-barbi text-mturk rounded-full "
 title="{edito[$lang]}"
-on:click={open} 
+on:click={open}
 ><svg  class="e" viewBox="0 0 24 24">
  <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
 </svg>
-</button> 
+</button>
 </div>
 {:else if  addSl == true}
 {#if g == false}
@@ -618,13 +619,13 @@ title="{cencel[$lang]}"
 on:click={bitul}
 ><svg  style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-</svg></button> 
- 
+</svg></button>
+
    <p class="text-center text-md text-white">{edbef[$lang]}{Valname}{edaft[$lang]}</p>
      {#if data}
       {#each data as da, i}
   <div transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" class="text-center text-sm text-lturk">
-    
+
     {#if datan === "mash" }
     {#if da.attributes.panui != false}
        <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
@@ -633,11 +634,11 @@ on:click={bitul}
     <button
 class=" hover:bg-barbi text-mturk rounded-full "
 title="{edito[$lang]}"
-on:click={edit(da.id)} 
+on:click={edit(da.id)}
 ><svg  style="width:17px;height:17px" viewBox="0 0 24 24">
  <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
 </svg>
-</button> 
+</button>
 {:else}
 <button
 class=" hover:bg-barbi text-mturk rounded-full "
@@ -650,13 +651,13 @@ title="{onin[$lang]}">
     </svg></button>
 {/if}{da.attributes[valc]}
   </div>
- 
-   {/each} 
+
+   {/each}
    {#if datan === "mash" && yy == 2}
    <button
-        on:click={increment} 
+        on:click={increment}
          title="{rem[$lang]}{Valname} "
-    class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150" 
+    class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
     </svg>
@@ -664,7 +665,7 @@ title="{onin[$lang]}">
    {/if}
    {/if}
 <br>
- 
+
   <div > <h3 class="text-center text-sm text-barbi">{adbf[$lang]}{Valname }{adaf[$lang]}</h3>  <MultiSelect
       bind:selected={data.selected2}
            bind:searchText
@@ -677,8 +678,8 @@ title="{onin[$lang]}">
       loading={newcontent}
       /></div>
        <!--      allowUserOptions={"append"}-->
-     
-      {#if datan == "skil"} 
+
+      {#if datan == "skil"}
 <Addnewsk rn={allvn} on:addnewskill={addnew} addS={addS}/>
 {:else if datan == "taf"}
 <Addnewr rn={allvn} on:addnewrole={addnew} addR={addR}/>
@@ -697,13 +698,13 @@ title="{onin[$lang]}">
 {/if} </div>
   {#if datan !== "mash" && yy > 0}
       <button
-        on:click={increment} 
+        on:click={increment}
          title="{adbf[$lang]}{Valname}{adaf[$lang]}"
-    class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150" 
+    class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
     </svg>
-    </button> 
+    </button>
     {/if}
      {:else if g == true}
           <div class="sp ">
@@ -712,9 +713,9 @@ title="{onin[$lang]}">
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div>
           {/if}
-        
 
- 
+
+
 
 {/if} {/if}
 
@@ -762,12 +763,12 @@ title="{onin[$lang]}">
 }
 
    }
-   
+
 .d::-webkit-scrollbar-track {
     background-color: #e4e4e4;
     border-radius: 100px;
 }
- 
+
 .d::-webkit-scrollbar-thumb {
     background-color: #d4aa70;
     border-radius: 100px;
@@ -786,7 +787,7 @@ title="{onin[$lang]}">
 }
    .e{
  width:24px;
- height:24px; 
+ height:24px;
    }
   }
    .another{
@@ -794,10 +795,10 @@ title="{onin[$lang]}">
 padding: 1em;
      /* background: -webkit-linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
 	background-image: linear-gradient(top, #8f6B29, #FDE08D, #DF9F28);
-      
+
      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438850/to_ha8xmq.svg);
-     background-position: center; 
-    background-repeat: no-repeat; 
+     background-position: center;
+    background-repeat: no-repeat;
     background-size: cover;
            filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
 
@@ -825,5 +826,5 @@ padding: 1em;
         }
        }
 
-  
+
  </style>

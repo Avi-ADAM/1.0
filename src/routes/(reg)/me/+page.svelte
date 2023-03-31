@@ -350,6 +350,13 @@ async function start () {
           }
         } catch (e) {
             error1 = e
+            console.log(e)
+            if(e == "TypeError: Failed to fetch"){
+              setTimeout(start(),10000)
+              //getcetch & show msg this from cetch bcz you have no net
+              // else no net page
+              //await net then again??
+            }
         }
         return meData
     };

@@ -1,6 +1,6 @@
 <script>
-let height = 24
-let width = 24
+export let height = 24
+export let width = 24
 </script>
 <svg
 height="{height}"
