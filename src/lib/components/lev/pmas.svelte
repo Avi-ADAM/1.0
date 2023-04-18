@@ -26,7 +26,7 @@ import { idPr } from '../../stores/idPr.js';
     export let kindOf = "";
     export let src = "coin.png";
     export let projectId;
-    export let link = "https://strapi-87gh.onrender.com/api/project/";
+    export let link = "https://meaim.onrender.com/api/project/";
     export let noofusersOk;
     export let noofusersNo;
     export let noofusersWaiting;
@@ -186,7 +186,7 @@ function objToStringC (obj) {
 }
 let whyy = ``
 let ordern = ``;
-let linkg = 'https://strapi-87gh.onrender.com/graphql';
+let linkg = 'https://meaim.onrender.com/graphql';
 let userss = objToString(users);
 async function agree(alr) {
   let d = new Date

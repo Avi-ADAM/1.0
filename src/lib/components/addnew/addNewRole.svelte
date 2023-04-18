@@ -28,7 +28,7 @@ let desR;
 export let skills2 = [];
 let error1 = null;
 let shgi = false;
-let link ="https://strapi-87gh.onrender.com/api/tafkidims";
+let link ="https://meaim.onrender.com/api/tafkidims";
 
 onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -45,7 +45,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
+            const res = await fetch("https://meaim.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -87,7 +87,7 @@ if (rn.includes(roleName_value)){
 } else {
   let d = new Date
 skillslist = find_skill_id(selected);
-   let link ="https://strapi-87gh.onrender.com/graphql" ;
+   let link ="https://meaim.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

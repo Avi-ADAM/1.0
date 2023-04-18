@@ -83,7 +83,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://strapi-87gh.onrender.com/graphql';
+    let link = 'https://meaim.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -153,7 +153,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://strapi-87gh.onrender.com/graphql';
+    let link = 'https://meaim.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',

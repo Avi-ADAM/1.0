@@ -8,7 +8,7 @@
     function onSubmit () {   
 // Request API.
 axios
-  .post('https://strapi-87gh.onrender.com/api/auth/forgot-password', {
+  .post('https://meaim.onrender.com/api/auth/forgot-password', {
     email: email,
   })
   .then(response => {

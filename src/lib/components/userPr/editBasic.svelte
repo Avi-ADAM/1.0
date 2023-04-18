@@ -108,7 +108,7 @@ function shaneh () {
     let token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
    axios
-  .post('https://strapi-87gh.onrender.com/api/auth/change-password', {
+  .post('https://meaim.onrender.com/api/auth/change-password', {
     currentPassword: passi,
     password: passwordx,
     passwordConfirmation: passwordx

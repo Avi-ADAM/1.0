@@ -78,7 +78,7 @@ async function findM() {
           throw resp;
         });
       };
-      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+      let linkg ="https://meaim.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -170,7 +170,7 @@ async function start () {
         });
       };
         try {
-            const res = await fetch("https://strapi-87gh.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch("https://meaim.onrender.com/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -200,7 +200,7 @@ async function start () {
         });
       };
         try {
-            const res = await fetch("https://strapi-87gh.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch("https://meaim.onrender.com/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -371,7 +371,7 @@ async function prog (){
           throw resp;
         });
       };
-      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+      let linkg ="https://meaim.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -446,7 +446,7 @@ async function findiM() {
           throw resp;
         });
       };
-      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+      let linkg ="https://meaim.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -491,7 +491,7 @@ async function findT ()  {
         });
       };
         try {
-            const res = await fetch("https://strapi-87gh.onrender.com/graphql", {
+            const res = await fetch("https://meaim.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -813,7 +813,7 @@ async function updi (){
           throw resp;
         });
       };
-      let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+      let linkg ="https://meaim.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -908,7 +908,7 @@ function allbackFunction(event) {
     files = event.detail.files;
     sendP ();
 }
-let url1 = "https://strapi-87gh.onrender.com/api/upload";
+let url1 = "https://meaim.onrender.com/api/upload";
 let meDatap = [];
 let mecata = [];
 async function sendP () {
@@ -924,7 +924,7 @@ async function sendP () {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let linkdi ="https://strapi-87gh.onrender.com/api/projects/" + $idPr ;
+    let linkdi ="https://meaim.onrender.com/api/projects/" + $idPr ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -961,7 +961,7 @@ async function sendP () {
         }
                 });
                 } else {
-         let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+         let linkg ="https://meaim.onrender.com/graphql" ;
         try {
               fetch(linkg, {
               method: 'POST',
@@ -1084,7 +1084,7 @@ async function updete (event) {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
- let linkg ="https://strapi-87gh.onrender.com/graphql" ;
+ let linkg ="https://meaim.onrender.com/graphql" ;
         try { await
               fetch(linkg, {
               method: 'POST',

@@ -4,7 +4,7 @@ import { show } from './store-show.js';
 import { email } from './email.js';  
 import { contriesi } from './contries.js';
           import { lang } from '$lib/stores/lang.js'
-		  import { fbl } from '$lib/stores/fbl.js';
+		  		  import { fbl } from '$lib/stores/fbl.js';
 
  import { RingLoader
 } from 'svelte-loading-spinners';
@@ -60,7 +60,7 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'https://strapi-87gh.onrender.com/graphql'
+let linkg = 'https://meaim.onrender.com/graphql'
 let miDatan;
 let already = false;
 let errr = {k: false, m: "", p: false}
@@ -68,7 +68,7 @@ async function increment() {
 errr.p = true;
 already = true;
 	axios
-  .post('https://strapi-87gh.onrender.com/api/auth/local/register', {
+  .post('https://meaim.onrender.com/api/auth/local/register', {
     username: userName_value, 
     email: emailL,
     password: passwordx,
@@ -84,7 +84,8 @@ already = true;
             }})
   .then(response => {
 			show.update(n => n + 1);
-			fbl.set(false)
+						fbl.set(false)
+
 	const data = response.data;
           /*  await fetch(linkg, {
                     method: 'POST',
@@ -161,7 +162,7 @@ already = true;
         })
 })
   .then(r => r.json())
-  .then(data => miDatan = data);
+  .then(data => miD atan = data);
             console.log(miDatan);
     */       	
 })	

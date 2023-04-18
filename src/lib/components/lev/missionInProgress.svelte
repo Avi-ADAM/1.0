@@ -314,7 +314,7 @@ timer: 0
   let miDatan;
  let token;
  let bearer1;
- let linkg = "https://strapi-87gh.onrender.com/graphql"
+ let linkg = "https://meaim.onrender.com/graphql"
 async function save() {
     const saved = lapse * 2.7777777777778E-7 + x * 2.7777777777778E-7;
     const noofnew = hoursdon + saved;

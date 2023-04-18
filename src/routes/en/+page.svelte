@@ -55,7 +55,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://strapi-87gh.onrender.com/api/chezins/count", {
+            const res = await fetch("https://meaim.onrender.com/api/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

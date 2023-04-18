@@ -1,5 +1,5 @@
-let url = "https://strapi-87gh.onrender.com/api/cuntries/5"
-let hook = "https://api.render.com/deploy/srv-cdpv9po2i3mjalodkvog?key=nOoOsyohDfc"
+let url = "https://meaim.onrender.com/api/cuntries/5"
+let hook = "https://api.render.com/deploy/srv-cgvck6odh87i4q2a938g?key=ZOpdbN-Msoo"
 let t = false
 
 export async function GET(req) {
