@@ -161,7 +161,7 @@ on:mouseleave={()=> hoverc("0")}>
        </span>
        {#key arr1}
       {#key low}
-       {#if low == false && arr1.length > 0}
+       {#if arr1.length > 0}
 <div     dir="rtl" bind:clientWidth={h}
  class="body box-border h-screen">
      <img on:mouseenter={()=> hoverc(" יאללה נקסט!")} 

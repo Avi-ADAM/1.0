@@ -755,7 +755,7 @@
     
     .y{
          position : absolute;
-    bottom : -5px;
+    top : 95%;
     left: 0% ;
     
     width: 100%;

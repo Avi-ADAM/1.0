@@ -1349,6 +1349,10 @@ onMount(async () => {
         goto("/", )
     }
 })
+ export const snapshot = {
+        capture: () => JSON.parse(JSON.stringify(arr1)),
+        restore: (value) => arr1 = JSON.parse(value)
+    };
 let usernames
 const tolog = {"he": "תוקף ההתחברות שלך פג, אנו מעבירים אותך להתחברות מחדש", "en":"your connection is outdated you being redirected to login"}
 let walcomenold = [],
