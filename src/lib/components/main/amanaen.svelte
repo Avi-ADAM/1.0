@@ -50,7 +50,7 @@ function find_contry_id(contry_name_arr){
       };
     
         try {
-            const res = await fetch("https://meaim.onrender.com/graphql", {
+            const res = await fetch("https://beoni.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -382,7 +382,7 @@ if (fpp.includes(jjj)){
  const mail = $form.email.toLowerCase().trim();
 console.log("t")
   axios
-  .post('https://meaim.onrender.com/api/chezins', {
+  .post('https://beoni.onrender.com/api/chezins', {
       "data": {
         name: $form.name,
         email: mail,

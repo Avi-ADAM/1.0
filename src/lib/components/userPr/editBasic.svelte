@@ -5,12 +5,51 @@ import { goto } from '$app/navigation';
   import {SendTo} from '$lib/send/sendTo.svelte'
  import { createEventDispatcher } from 'svelte';
 export let isGuidMe = false;
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+//import { getAnalytics } from "firebase/analytics";
 
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAq9ZNUsrrUw-mHmi8jCjkmcDdR6PpLpLc",
+  authDomain: "lev1-9ad4a.firebaseapp.com",
+  projectId: "lev1-9ad4a",
+  storageBucket: "lev1-9ad4a.appspot.com",
+  messagingSenderId: "30082803372",
+  appId: "1:30082803372:web:685ddb1486f76123b2a109",
+  measurementId: "G-G3F3SSVCKL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+//const analytics = getAnalytics(app);
+import { getMessaging, getToken } from "firebase/messaging";
+
+// Get registration token. Initially this makes a network call, once retrieved
+// subsequent calls to getToken will return from cache.
+const messaging = getMessaging(app);
+
+// Add the public key generated from the console here.
     const dispatch = createEventDispatcher();
 
   function askNotificationPermission() {
+    getToken(messaging, { vapidKey: 'BJoimg2miGigQrjDQeEUmtYBfea_vQX7fOCcFS33NuhrMeQXqFmKJMlrdhERnOyXnJzkhgTzF70v2J03jHi1py8' }).then((currentToken) => {
+  if (currentToken) {
+    // Send the token to your server and update the UI if necessary
+    // ...
+  } else {
+    // Show permission request UI
+    console.log('No registration token available. Request permission to generate one.');
+    // ...
+  }
+}).catch((err) => {
+  console.log('An error occurred while retrieving token. ', err);
+  // ...
+});
     // function to actually ask the permissions
-    function handlePermission(permission) {
+  /*  function handlePermission(permission) {
       // Whatever the user answers, we make sure Chrome stores the information
       if(!('permission' in Notification)) {
         Notification.permission = permission;
@@ -38,7 +77,7 @@ export let isGuidMe = false;
           handlePermission(permission);
         });
       }
-    }
+    }*/
   }
 
   // Function to check whether browser supports the promise version of requestPermission()
@@ -108,7 +147,7 @@ function shaneh () {
     let token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
    axios
-  .post('https://meaim.onrender.com/api/auth/change-password', {
+  .post('https://beoni.onrender.com/api/auth/change-password', {
     currentPassword: passi,
     password: passwordx,
     passwordConfirmation: passwordx

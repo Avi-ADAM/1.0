@@ -8,7 +8,7 @@
     function onSubmit () {   
 // Request API.
 axios
-  .post('https://meaim.onrender.com/api/auth/forgot-password', {
+  .post('https://beoni.onrender.com/api/auth/forgot-password', {
     email: email,
   })
   .then(response => {

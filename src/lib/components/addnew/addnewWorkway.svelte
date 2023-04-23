@@ -34,7 +34,7 @@
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-let link ="https://meaim.onrender.com/graphql" ;
+let link ="https://beoni.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

@@ -1,4 +1,4 @@
-let url = "https://meaim.onrender.com/api/cuntries/5"
+let url = "https://beoni.onrender.com/api/cuntries/5"
 let hook = "https://api.render.com/deploy/srv-cgvck6odh87i4q2a938g?key=ZOpdbN-Msoo"
 let t = false
 

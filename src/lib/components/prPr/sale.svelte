@@ -46,7 +46,7 @@ let token;
 let error1;
 let idL;
 let miDatan = [];
-let linkg = 'https://meaim.onrender.com/graphql';
+let linkg = 'https://beoni.onrender.com/graphql';
     function find_user_id(user_name_arr){
      var  id = 0;
       for (let i = 0; i< projectUsers.length; i++){

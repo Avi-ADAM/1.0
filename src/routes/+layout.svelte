@@ -17,11 +17,38 @@
 </script>-->
 
 <script>
-  
+  import { initializeApp } from "firebase/app";
+//import { getAnalytics } from "firebase/analytics";
+
+// Your web app's Firebase configuration
+// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+const firebaseConfig = {
+  apiKey: "AIzaSyAq9ZNUsrrUw-mHmi8jCjkmcDdR6PpLpLc",
+  authDomain: "lev1-9ad4a.firebaseapp.com",
+  projectId: "lev1-9ad4a",
+  storageBucket: "lev1-9ad4a.appspot.com",
+  messagingSenderId: "30082803372",
+  appId: "1:30082803372:web:685ddb1486f76123b2a109",
+  measurementId: "G-G3F3SSVCKL"
+};
+
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
+  import { getMessaging, onMessage } from "firebase/messaging";
+
+$: if(browser){
+  const messaging = getMessaging(app);
+
+onMessage(messaging, (payload) => {
+  console.log('Message received. ', payload);
+  // ...
+});
+}
 import "../app.postcss";
 	import { Toasts } from 'as-toast';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
+  import { browser } from "$app/environment";
 export let data
 function getLang() {
   console.log(data)

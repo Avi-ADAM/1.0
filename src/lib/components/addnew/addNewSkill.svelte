@@ -20,7 +20,7 @@ export let mid = -1;
     let desS;
     let meData;
     let error1 = null;
-    let link ="https://meaim.onrender.com/api/skills";
+    let link ="https://beoni.onrender.com/api/skills";
     export let rn = [];
     let shgi = false;
     onMount(async () => {
@@ -37,7 +37,7 @@ export let mid = -1;
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("https://meaim.onrender.com/graphql", {
+          const res = await fetch("https://beoni.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -90,7 +90,7 @@ if (rn.includes(skillName_value)){
 } else {
     let d = new Date
   tafkidimslist = find_role_id(selected);
-    let link ="https://meaim.onrender.com/graphql" ;
+    let link ="https://beoni.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

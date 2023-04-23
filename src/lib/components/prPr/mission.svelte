@@ -185,7 +185,7 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
 //publicklinks save to mission also othet new data
     // הפרדה של קישורים בפסיק
    let d = new Date
- let link = 'https://meaim.onrender.com/graphql';
+ let link = 'https://beoni.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -231,7 +231,7 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
                    console.log("miDatan")
 
           let lechaletz = miDatan.data.createOpenMission.data.id
-          let link = 'https://meaim.onrender.com/graphql';
+          let link = 'https://beoni.onrender.com/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -498,7 +498,7 @@ async function newnew (selected){
     if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
       //create new and update workways2
         let d = new Date
-       let link ="https://meaim.onrender.com/graphql" ;
+       let link ="https://beoni.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

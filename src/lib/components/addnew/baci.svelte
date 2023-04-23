@@ -17,7 +17,7 @@ let isOpen = false;
 let a = 0;
 let success = false
     let before = false;
-    let url1 = "https://meaim.onrender.com/api/upload";
+    let url1 = "https://beoni.onrender.com/api/upload";
     let linkP;
     let desP;
     let desPl;
@@ -91,7 +91,7 @@ async function sendPP(){
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     try {
-           const res = await fetch("https://meaim.onrender.com/graphql", {
+           const res = await fetch("https://beoni.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,
@@ -168,7 +168,7 @@ let vallues = [];
         });
       };
         try {
-           const res = await fetch("https://meaim.onrender.com/graphql", {
+           const res = await fetch("https://beoni.onrender.com/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,
