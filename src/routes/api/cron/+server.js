@@ -1,5 +1,5 @@
 let url = "https://beoni.onrender.com/api/cuntries/5"
-let hook = "https://api.render.com/deploy/srv-cgvck6odh87i4q2a938g?key=ZOpdbN-Msoo"
+let hook = "https://api.render.com/deploy/srv-ch2i7jrh4hsum46ol8t0?key=63ezRdymLCg"
 let t = false
 
 export async function GET(req) {
