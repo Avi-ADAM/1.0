@@ -34,13 +34,55 @@ const messaging = getMessaging(app);
 // Add the public key generated from the console here.
     const dispatch = createEventDispatcher();
 
-  function askNotificationPermission() {
+ async function askNotificationPermission() {
     getToken(messaging, { vapidKey: 'BJoimg2miGigQrjDQeEUmtYBfea_vQX7fOCcFS33NuhrMeQXqFmKJMlrdhERnOyXnJzkhgTzF70v2J03jHi1py8' }).then((currentToken) => {
   if (currentToken) {
     // Send the token to your server and update the UI if necessary
     // ...
+    console.log("token",currentToken)
+    /* const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  uid = cookieValueId;
+    let que = `mutation { 
+  create(
+      id: ${uid}
+      data: { 
+        confirmed: true
+ }
+  ){data {id}}
+ } ` 
+    console.log(que)
+ try{
+ let res = await SendTo(que)
+ .then (res => res = res);
+  console.log(res)
+  if(res.data !=null){
+    addToast(suc[$lang])
+  }else{
+    addToast(er[$lang],"warn")
+  }
+}  catch (e) {
+  console.error(e)
+  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  }*/
   } else {
     // Show permission request UI
+    if (!"Notification" in window) {
+      console.log("This browser does not support notifications.");
+    } else {
+      if(checkNotificationPromise()) {
+        Notification.requestPermission()
+        .then((permission) => {
+          handlePermission(permission);
+        })
+      } else {
+        Notification.requestPermission(function(permission) {
+          handlePermission(permission);
+        });
+      }
+    }
     console.log('No registration token available. Request permission to generate one.');
     // ...
   }
@@ -49,7 +91,7 @@ const messaging = getMessaging(app);
   // ...
 });
     // function to actually ask the permissions
-  /*  function handlePermission(permission) {
+    function handlePermission(permission) {
       // Whatever the user answers, we make sure Chrome stores the information
       if(!('permission' in Notification)) {
         Notification.permission = permission;
@@ -64,20 +106,7 @@ const messaging = getMessaging(app);
     }
 
     // Let's check if the browser supports notifications
-    if (!"Notification" in window) {
-      console.log("This browser does not support notifications.");
-    } else {
-      if(checkNotificationPromise()) {
-        Notification.requestPermission()
-        .then((permission) => {
-          handlePermission(permission);
-        })
-      } else {
-        Notification.requestPermission(function(permission) {
-          handlePermission(permission);
-        });
-      }
-    }*/
+    
   }
 
   // Function to check whether browser supports the promise version of requestPermission()
@@ -135,6 +164,7 @@ export let un;
 export let bi;
 export let frd;
 export let lango;
+export let uid
 let passi;
 
 function shaneh () {

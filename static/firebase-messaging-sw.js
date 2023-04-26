@@ -1,9 +1,19 @@
 import { initializeApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging/sw";
-
+//importScripts('https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js');
+//importScripts('https://www.gstatic.com/firebasejs/9.1.0/firebase-messaging-compat.js');
 // Initialize the Firebase app in the service worker by passing in
 // your app's Firebase config object.
 // https://firebase.google.com/docs/web/setup#config-object
+//import {
+//    initializeApp
+//} from "https://www.gstatic.com/firebasejs/9.1.2/firebase-app.js";
+//
+//import {
+//    getMessaging,
+//    onBackgroundMessage
+//} from "https://www.gstatic.com/firebasejs/9.1.2/firebase-messaging-sw.js";
+ 
 const firebaseApp = initializeApp({
  apiKey: "AIzaSyAq9ZNUsrrUw-mHmi8jCjkmcDdR6PpLpLc",
   authDomain: "lev1-9ad4a.firebaseapp.com",
