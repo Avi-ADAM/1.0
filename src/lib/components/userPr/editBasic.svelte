@@ -33,20 +33,21 @@ const messaging = getMessaging(app);
 
 // Add the public key generated from the console here.
     const dispatch = createEventDispatcher();
-
+    const er = {"he":"כרטה שגיעה","en": "an error just occored"}
+const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en":"you sucssesfully registered to nutification on this device"}
  async function askNotificationPermission() {
     getToken(messaging, { vapidKey: 'BJoimg2miGigQrjDQeEUmtYBfea_vQX7fOCcFS33NuhrMeQXqFmKJMlrdhERnOyXnJzkhgTzF70v2J03jHi1py8' }).then((currentToken) => {
   if (currentToken) {
     // Send the token to your server and update the UI if necessary
     // ...
-    console.log("token",currentToken)
-    /* const cookieValueId = document.cookie
+   /* console.log("token",currentToken)
+     const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   uid = cookieValueId;
     let que = `mutation { 
-  create(
+  createStrapi_plugin_fcm_fcm_topics(
       id: ${uid}
       data: { 
         confirmed: true
@@ -55,11 +56,12 @@ const messaging = getMessaging(app);
  } ` 
     console.log(que)
  try{
- let res = await SendTo(que)
+ let res =  SendTo(que)
  .then (res => res = res);
   console.log(res)
   if(res.data !=null){
     addToast(suc[$lang])
+      localStorage.setItem("nuti", true);
   }else{
     addToast(er[$lang],"warn")
   }

@@ -1,4 +1,4 @@
-import { initializeApp } from "firebase/app";
+/*import { initializeApp } from "firebase/app";
 import { getMessaging } from "firebase/messaging/sw";
 //importScripts('https://www.gstatic.com/firebasejs/9.1.0/firebase-app-compat.js');
 //importScripts('https://www.gstatic.com/firebasejs/9.1.0/firebase-messaging-compat.js');
@@ -41,4 +41,30 @@ onBackgroundMessage(messaging, (payload) => {
 
   self.registration.showNotification(notificationTitle,
     notificationOptions);
+});*/
+
+importScripts('https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js');
+importScripts('https://www.gstatic.com/firebasejs/8.1.1/firebase-messaging.js');
+var firebaseConfig = {
+    apiKey: "AIzaSyAq9ZNUsrrUw-mHmi8jCjkmcDdR6PpLpLc",
+  authDomain: "lev1-9ad4a.firebaseapp.com",
+  projectId: "lev1-9ad4a",
+  storageBucket: "lev1-9ad4a.appspot.com",
+  messagingSenderId: "30082803372",
+  appId: "1:30082803372:web:685ddb1486f76123b2a109",
+  measurementId: "G-G3F3SSVCKL"
+};// Initialize Firebase
+firebase.initializeApp(firebaseConfig);
+const messaging = firebase.messaging();
+messaging.onBackgroundMessage((payload) => {
+console.log('[firebase-messaging-sw.js] Received background message ', payload);
+const notificationTitle = payload.notification.title;
+const notificationOptions = {
+body: payload.notification.body,
+};
+return self.registration.showNotification(notificationTitle,
+notificationOptions);
+});
+self.addEventListener('notificationclick', event => {
+   console.log(event)
 });
