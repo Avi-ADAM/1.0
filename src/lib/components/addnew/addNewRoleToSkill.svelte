@@ -8,7 +8,7 @@
     export let rn = [];
     let roleName_value;
         let desS;
-        let link ="https://beoni.onrender.com/api/tafkidims";
+        let link ="https://beosher.onrender.com/api/tafkidims";
         let meData;
         let shgi = false;
   async function add () {
@@ -16,7 +16,7 @@
   shgi = true;
 } else {
   let d = new Date
-      let link ="https://beoni.onrender.com/graphql" ;
+      let link ="https://beosher.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

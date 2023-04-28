@@ -46,7 +46,7 @@
       };
     
         try {
-            const res = await fetch("https://beoni.onrender.com/graphql", {
+            const res = await fetch("https://beosher.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

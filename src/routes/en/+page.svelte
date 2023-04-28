@@ -55,7 +55,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://beoni.onrender.com/api/chezins/count", {
+            const res = await fetch("https://beosher.onrender.com/api/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

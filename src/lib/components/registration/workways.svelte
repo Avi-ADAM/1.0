@@ -33,7 +33,7 @@
       };
     
         try {
-            const res = await fetch("https://beoni.onrender.com/graphql", {
+            const res = await fetch("https://beosher.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -118,7 +118,7 @@ async function newnew (){
     if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
       //create new and update workways2
         let d = new Date
-       let link ="https://beoni.onrender.com/graphql" ;
+       let link ="https://beosher.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

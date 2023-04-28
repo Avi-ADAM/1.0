@@ -118,7 +118,7 @@ function objToString (obj) {
     }}
     return str;
 }
-let linkg = 'https://beoni.onrender.com/graphql';
+let linkg = 'https://beosher.onrender.com/graphql';
   const suc = {"he": "בוצע בהצלחה","en":"appruved sucssefully!"}
   const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
 

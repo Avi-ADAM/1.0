@@ -46,7 +46,7 @@ async function han (){
   const easy = (meData.myp > 0) ? meData.myp : 0;
   const sdate = (meData.dates !== undefined) ? `sdate: "${new Date(meData.dates).toISOString()}",` : ``;
    const fdate = (meData.datef !== undefined) ? `fdate: "${new Date(meData.datef).toISOString()}" ,` : ``;
- let linkgra = 'https://beoni.onrender.com/graphql';
+ let linkgra = 'https://beosher.onrender.com/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',
