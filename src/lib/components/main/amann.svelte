@@ -353,12 +353,12 @@ g = true;
  erorims = true
  } else {
 const passwordx = generatePassword()
-let linkg = 'https://beosher.onrender.com/graphql'
+let linkg = 'https://tov.onrender.com/graphql'
 let miDatan;
  erorims = false
  const mail = $form.email.toLowerCase()
  axios
- .post('https://beosher.onrender.com/api/chezins', {
+ .post('https://tov.onrender.com/api/chezins', {
      name: $form.name,
        email: mail,
         countries: find_contry_id(selected)

@@ -179,7 +179,7 @@ function shaneh () {
     let token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
    axios
-  .post('https://beosher.onrender.com/api/auth/change-password', {
+  .post('https://tov.onrender.com/api/auth/change-password', {
     currentPassword: passi,
     password: passwordx,
     passwordConfirmation: passwordx

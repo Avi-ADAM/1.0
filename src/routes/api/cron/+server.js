@@ -1,5 +1,5 @@
-let url = "https://beosher.onrender.com/api/cuntries/5"
-let hook = "https://api.render.com/deploy/srv-ch61r85gk4qfhv7ntrfg?key=BULdt4sULMQ"
+let url = "https://tov.onrender.com/api/cuntries/5"
+let hook = import.meta.env.VITE_HOOK
 let t = false
 async function awaitapi(){
 const res = await fetch(url);

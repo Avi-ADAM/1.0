@@ -33,7 +33,7 @@
       };
     
         try {
-            let res = await fetch("https://beosher.onrender.com/graphql", {//api/cuntries?pagination[page]=1&pagination[pageSize]=280
+            let res = await fetch("https://tov.onrender.com/graphql", {//api/cuntries?pagination[page]=1&pagination[pageSize]=280
              method: "POST",
               headers: {
                  'Content-Type': 'application/json'

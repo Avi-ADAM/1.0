@@ -29,7 +29,7 @@ onMount(async () => {
           throw resp;
         });
       };
-      let linkg ="https://beosher.onrender.com/graphql" ;
+      let linkg ="https://tov.onrender.com/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',

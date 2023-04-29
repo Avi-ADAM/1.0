@@ -39,7 +39,7 @@ const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("https://beosher.onrender.com/graphql", {
+          const res = await fetch("https://tov.onrender.com/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

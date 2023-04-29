@@ -11,7 +11,7 @@
    export let color = "--gold";
 
     let error1 = null;
-    let link ="https://beosher.onrender.com/api/vallues";
+    let link ="https://tov.onrender.com/api/vallues";
 let meData;
 export let vallId;   
 export let rn = [];
@@ -22,7 +22,7 @@ async function addNewVall() {
 if (rn.includes(name_value)){
   shgi = true;
 } else {
-  let link ="https://beosher.onrender.com/graphql" ;
+  let link ="https://tov.onrender.com/graphql" ;
   let d = new Date
         try {
              await fetch(link, {

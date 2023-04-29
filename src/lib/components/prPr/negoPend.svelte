@@ -464,7 +464,7 @@ async function increment() {
         }
       }
 }
-let linkg = "https://beosher.onrender.com/graphql"
+let linkg = "https://tov.onrender.com/graphql"
 onMount(async () => {
     const cookieValue = document.cookie
         .split('; ')

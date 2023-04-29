@@ -326,7 +326,7 @@ function find_contry_id(contry_name_arr){
       while (i < 313) {
                  let datau = {data:{name:`userName_value${i}`,email: `ggg${i}@kkk.hh`, countries: [104] }}
 
-        fetch("https://beosher.onrender.com/api/chezins", {
+        fetch("https://tov.onrender.com/api/chezins", {
   method: 'POST', // or 'PUT'
   headers: {
     'Content-Type': 'application/json',

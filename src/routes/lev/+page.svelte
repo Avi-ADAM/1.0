@@ -980,7 +980,7 @@ async function showOpenPro(mi) {
         idL = cookieValueId;
         token = cookieValue;
         let bearer1 = 'bearer' + ' ' + token;
-        let link = "https://beosher.onrender.com/graphql";
+        let link = "https://tov.onrender.com/graphql";
         try {
             await fetch(link, {
                     method: 'POST',
@@ -1363,7 +1363,7 @@ async function start() {
     console.log($lang, "start");
     miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
-    let link = "https://beosher.onrender.com/graphql";
+    let link = "https://tov.onrender.com/graphql";
     try {
         await fetch(link, {
                 method: 'POST',

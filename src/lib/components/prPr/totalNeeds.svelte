@@ -77,7 +77,7 @@ async function han() {
         const easy = (element.attributes.easy > 0) ? element.attributes.easy : 0;
         const sdate = (element.dates !== undefined) ? `sqadualed: "${new Date(element.dates).toISOString()}",` : ``;
         const fdate = (element.datef !== undefined) ? ` sqadualedf: "${new Date(element.datef).toISOString()}" ,` : ``;
-        let link = 'https://beosher.onrender.com/graphql';
+        let link = 'https://tov.onrender.com/graphql';
         try {
             await fetch(link, {
                     method: 'POST',

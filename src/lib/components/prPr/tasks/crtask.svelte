@@ -22,7 +22,7 @@
       return [id ,uid];
      };
      let miDatan = [];
-let linkg = 'https://beosher.onrender.com/graphql';
+let linkg = 'https://tov.onrender.com/graphql';
 async function sub(){
     if (selected.length < 1){
         seEr = true

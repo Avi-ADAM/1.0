@@ -60,7 +60,7 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'https://beosher.onrender.com/graphql'
+let linkg = 'https://tov.onrender.com/graphql'
 let miDatan;
 let already = false;
 let errr = {k: false, m: "", p: false}
@@ -68,7 +68,7 @@ async function increment() {
 errr.p = true;
 already = true;
 	axios
-  .post('https://beosher.onrender.com/api/auth/local/register', {
+  .post('https://tov.onrender.com/api/auth/local/register', {
     username: userName_value, 
     email: emailL,
     password: passwordx,

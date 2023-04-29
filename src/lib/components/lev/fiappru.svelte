@@ -140,7 +140,7 @@ let ser = xyz();
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://beosher.onrender.com/graphql';
+let linkg = 'https://tov.onrender.com/graphql';
 
 function objToString (obj) {
     let str = '';

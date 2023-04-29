@@ -37,7 +37,7 @@
         loginError = null;
 
         axios
-            .post('https://beosher.onrender.com/api/auth/local', {//
+            .post('https://tov.onrender.com/api/auth/local', {//
                 identifier: email,
                 password,
             })

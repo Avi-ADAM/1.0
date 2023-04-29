@@ -47,7 +47,7 @@ let error1 = null;
       };
       const headers = {
         'Content-Type': 'application/json'   
-      }; let link ="https://beosher.onrender.com/graphql" ;
+      }; let link ="https://tov.onrender.com/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
