@@ -23,10 +23,11 @@ export async function GET(req) {
               }else{
                  t = true
             const resi = await fetch(hook);
+                        console.log(resi)
+
               }
       },2000)
            
-            console.log(resi)
         }
       }
     return new Response('Hello Cron!');
