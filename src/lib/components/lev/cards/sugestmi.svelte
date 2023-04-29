@@ -5,11 +5,13 @@
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
      export let low = false;
+
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
-    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[]
+    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true
     export let already, allr = false;
+
 function hover(x){
 dispatch("hover",{x:x});
 }
@@ -47,6 +49,10 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
       "rneed" : {"he":"תפקיד מבוקש:", "en":"requested role:"},
       "watchpr" : {"he": "לצפיה בריקמה","en": "see the FreeMate"}
     }
+    const perho = {"he":"לשעה","en":"per hour"}
+        const hourss = {"he":"שעות","en":"hours"}
+        const monhly = {"he":"בחודש", "en": "per month"}
+
 console.log(workways)
 
 </script>
@@ -76,8 +82,16 @@ console.log(workways)
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {noOfHours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(noOfHours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span 
+            on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} 
+            on:mouseleave={()=>hover("0")} 
+            > {perhour.toLocaleString('en-US', {maximumFractionDigits:2})} {perho[$lang]} </span> * <span 
+            on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} 
+            on:mouseleave={()=>hover("0")}  > {noOfHours.toLocaleString('en-US', {maximumFractionDigits:2})} {hourss[$lang]} </span> = <span 
+            on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}
+            >{(noOfHours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {isMonthly ? monhly[$lang] : ""} </span>
       </p>
+
       <span style="font-size: 17px;" class="text-barbi font-bold bg-gold mb-2">
 
         {#if timeToP == "alreadi"}

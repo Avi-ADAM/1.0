@@ -15,16 +15,16 @@ export async function GET(req) {
         if (t == false){
             console.log("problema")
             let sec = false
-            setTimeout(async function(){
-                  const res = await awaitapi();
-              if (res.status >= 200 && res.status < 300) {
+          ab()
+           const ab = setTimeout(async function(){
+                  const ress = await fetch(url);
+              if (ress.status >= 200 && ress.status < 300) {
         t = false
         sec = false
               }else{
                  t = true
             const resi = await fetch(hook);
-                        console.log(resi)
-
+                        console.log("done dep",resi)
               }
       },2000)
            
