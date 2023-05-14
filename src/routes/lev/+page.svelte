@@ -447,6 +447,7 @@ async function createasked(da) {
                 uid: t.users_permissions_user.data.id,
                 username: t.users_permissions_user.data.attributes.username,
                 src: src22,
+                iskvua: t.open_mission.data.attributes.iskvua,
                 email: t.users_permissions_user.data.attributes.email,
                 publicklinks: t.open_mission.data.attributes.publicklinks,
                 privatlinks: t.open_mission.data.attributes.privatlinks,
@@ -1391,7 +1392,7 @@ async function start() {
                 												project {data{id attributes {projectName  user_1s {data{id}} profilePic {data{attributes{url formats}}}}}} 
                      }}}}}}}}} 
       mesimabetahaliches (filters: { forappruval: { eq: false },finnished:{ eq: false } }) {data{ id attributes{ 
-        						status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks howmanyhoursalready  admaticedai 
+        						status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks iskvua howmanyhoursalready  admaticedai 
         						mission {data{id}}
         						project{data{id}}
                                 acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
@@ -1462,7 +1463,7 @@ async function start() {
    				asks(filters: { archived: { eq: false } }){ data{ id attributes{
                             vots  {what why id users_permissions_user {data{id}}}
                             open_mission {data{id attributes{  mission {data{id}}
-                                            declined {data{ id}} sqadualed publicklinks tafkidims {data{ id }}
+                                            declined {data{ id}} iskvua sqadualed publicklinks tafkidims {data{ id }}
                                             noofhours perhour privatlinks descrip hearotMeyuchadot name}}}
                             project {data{ id }}
                             users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}

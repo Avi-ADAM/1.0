@@ -8,7 +8,6 @@
     export let rn = [];
     let roleName_value;
         let desS;
-        let link ="https://tov.onrender.com/api/tafkidims";
         let meData;
         let shgi = false;
   async function add () {

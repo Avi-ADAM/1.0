@@ -17,6 +17,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 
 const dispatch = createEventDispatcher();
     export let low = false;
+    export let iskvua;
 export let email;
 export let coinlapach
 export let deadline
@@ -246,7 +247,8 @@ adduser = `updateProject(
              name: "${openmissionName}",
              descrip: "${missionDetails}",
              hoursassinged: ${nhours},
-             perhour: ${valph},   
+             perhour: ${valph}, 
+             iskvua:${iskvua},  
              privatlinks: "${privatlinks}",
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
@@ -339,7 +341,8 @@ ${adduser}
              name: "${openmissionName}",
              descrip: "${missionDetails}",
              hoursassinged: ${nhours},
-             perhour: ${valph},   
+             perhour: ${valph},  
+              iskvua:${iskvua},   
              privatlinks: "${privatlinks}",
              publicklinks: "${publicklinks}", 
              users_permissions_user: "${userId}",
@@ -679,7 +682,10 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
    {useraplyname} 
    {noofusersOk} 
    {src2} 
+   noofhours={nhours}
+   perhour={valph}
    {openmissionName} 
+   {iskvua}
    {missionDetails} {noofusersNo}/>
 {/if}
 {/await}

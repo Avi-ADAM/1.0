@@ -11,7 +11,6 @@
    export let color = "--gold";
 
     let error1 = null;
-    let link ="https://tov.onrender.com/api/vallues";
 let meData;
 export let vallId;   
 export let rn = [];
@@ -54,7 +53,7 @@ if (rn.includes(name_value)){
     let userName_value = $liUN
      let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${name_value} והתיאור: ${desV} `}
    fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
+  method: 'POST', 
   headers: {
     'Content-Type': 'application/json',
   },

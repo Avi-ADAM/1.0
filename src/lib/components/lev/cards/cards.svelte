@@ -232,8 +232,12 @@ mousewheel={true}
   cards="true"
  on:user={user}  
   on:hover={hover}
-  {low}
-      coinlapach={buble.coinlapach} 
+    {low}
+    tasks={buble.acts.data}
+    status={buble.status}
+    tx={buble.tx}
+    iskvua={buble.iskvua}
+    coinlapach={buble.coinlapach} 
     usernames={buble.usernames}
     noofpu={buble.noofpu}
     oldzman={buble.timer}
@@ -433,7 +437,10 @@ mousewheel={true}
      on:user={user}
             on:decline={delo}
             cards="true"
-                coinlapach={buble.coinlapach} 
+            iskvua={buble.iskvua}
+            email={buble.email}
+            role={buble.role}
+            coinlapach={buble.coinlapach} 
             {low}
             pid={buble.pid}
             noofusersWaiting={buble.noofusersWaiting}

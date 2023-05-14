@@ -20,7 +20,6 @@ export let mid = -1;
     let desS;
     let meData;
     let error1 = null;
-    let link ="https://tov.onrender.com/api/skills";
     export let rn = [];
     let shgi = false;
     onMount(async () => {

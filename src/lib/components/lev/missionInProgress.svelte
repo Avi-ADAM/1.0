@@ -27,6 +27,7 @@ betha.subscribe(value => {
  export let coinlapach
     export let stname;
     let show = true;
+    export let iskvua = false
         export let low = false;
         export let status = 0;//tween store
         export let tasks = []
@@ -1260,6 +1261,7 @@ on:start={start}
   {low}
   {dueDateOrCountToDedline}
 {x}
+{iskvua}
   {zman}
   {already} 
   {projectName}

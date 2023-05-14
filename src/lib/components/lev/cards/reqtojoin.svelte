@@ -2,9 +2,11 @@
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
      export let low = false;
+     export let iskvua;
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
+  import {lang} from '$lib/stores/lang.js'
     export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting
     export let already = false;
     export let src2;
@@ -20,6 +22,9 @@ function decline(alr) {
   already = true; 
 dispatch("decline",{alr:alr});
 }
+const leho = {"he":" בכל חודש " , "en": " per month"}
+
+const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en":"appruval of joining and mission assigned"}
 </script>
 
 
@@ -33,7 +38,7 @@ dispatch("decline",{alr:alr});
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">צירוף 1 לריקמה לביצוע משימה</span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{hed[$lang]}</span>
             </div>
             <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
          </div>
@@ -43,9 +48,17 @@ dispatch("decline",{alr:alr});
     <div  class="mb-8">
        <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}> {(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span 
+              on:mouseenter={()=>hover("שווי לשעה")} 
+              on:mouseleave={()=>hover("0")} 
+              > {perhour} לשעה </span> * <span 
+              on:mouseenter={()=>hover("כמות השעות")} 
+              on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות {#if iskvua == true}{leho[$lang]}{/if}</span> = <span 
+              on:mouseenter={()=>hover("סך הכל")} 
+              on:mouseleave={()=>hover("0")}> {(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+              {#if iskvua == true} {leho[$lang]}{/if}
       </p>
-      <div class="text-gray-900 font-bold text-xl mb-2">{openmissionName}</div>
+      <div class="text-gray-900 font-bold md:text-3xl mb-2">{openmissionName}</div>
      {#if missionDetails} <p class="text-gray-700 text-base">{missionDetails}</p>{/if}
     </div>
     <div class="flex items-center">
