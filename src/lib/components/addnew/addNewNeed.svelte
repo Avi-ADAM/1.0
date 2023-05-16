@@ -63,52 +63,73 @@ addnee = false
     export let rr = 24;
 export let color = "--gold";
 export let addnee = false;
+const hekind = {"he":"סוג שווי","en":"kind of vallue"}
+const val = {"he":"שווי כספי ","en":"vallue"}
+  const sho = {"he":"תיאור קצר","en":"short description"}
+const blib = {"he":"לינק לפרטי מוצר, למחיר או לרכישה","en":"link to product details, description or price" }
+const cen = {"he":"ביטול","en":"cencel"}
+const nena = {"he":"שם המשאב","en":"need name"}
+const adn = {"he":"הוספת משאב שאינו ברשימה","en":"create need that is not on the list"}
+const adni = {"he":"הוספת משאב חדש","en":"add new need"}  
+const ot = {"he":"עלות חד פעמית","en":"one time"}
+const py = {"he":"ליחידה", "en": "per unit"}
+const pm = {"he": "חודשי","en": "monthly"}
+const pye = {"he": "שנתי", "en": "yearly"}
+const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
+const crn = {"he":"יצירת משאב חדש","en":"create new need"}
   </script>
  {#if addnee === false}
 
       <button on:click={() => addnee = true} 
-        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full">הוספת משאב שאינו ברשימה</button>
+        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
+        >{adn[$lang]}</button>
       {:else if addnee === true}
-      <div  class="p-2 m-2 border-2 border-gold rounded " class:bg-slate-900={onmo == true}>
+      <div  
+      class="p-2 m-2 border-2 border-gold rounded " 
+      class:bg-slate-900={onmo == true}>
   <button
-  title="ביטול"
+  title="{cen[$lang]}"
        on:click={() => addnee = false}
         class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
         ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
          <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
      </svg></button>
-        <div dir="rtl"   class="flex flex-col items-center text-center">
-    <h1 class="text-barbi text-2xl text-center">הוספת משאב חדש</h1>    
+        <div 
+        dir="rtl"   
+        class="flex flex-col items-center text-center">
+    <h1 
+    class="text-barbi text-2xl text-center"
+    >{adni[$lang]}</h1>    
    <div style="--the:{`var(${color})`}; width:100%;" class="flex flex-col items-center text-center">
       
 <div dir="rtl" class='textinput'>
   <input         bind:value={needName}
  type='text' class='input' required>
-  <label for="name" class='label'>שם המשאב</label>
+  <label for="name" class='label'>{nena[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir="rtl" class='textinput'>
   <input         bind:value={desN}
  type='text' class='input' required>
-  <label for="name" class='label'>תיאור קצר</label>
+  <label for="name" class='label'>{sho[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir="rtl" class='textinput'>
   <input         bind:value={linkto}
  type='text' class='input' required>
-  <label for="name" class='label'>לינק לפרטי מוצר\ מחיר \ רכישה</label>
+  <label for="name" class='label'>{blib[$lang]}</label>
   <span class='line'></span>
 </div>
  <div dir="rtl" class='textinput'>
   <input         bind:value={price}
  type="number" class='input' required>
-  <label for="name" class='label'>שווי כספי </label>
+  <label for="name" class='label'>{val[$lang]}</label>
   <span class='line'></span>
 </div>
 
   
    <div dir="rtl"  style="width:80%">
-   <h2 class="text-center text-barbi">סוג שווי</h2>
+   <h2 class="text-center text-barbi">{hekind[$lang]}</h2>
     <select bind:value={valued} class="round form-select appearance-none
       block
       w-full
@@ -123,17 +144,17 @@ export let addnee = false;
       ease-in-out
       m-0
       focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none">
-<option value="total">עלות חד פעמית</option>
-<option value="monthly">חודשי</option>
-<option value="yearly">שנתי</option>
-<option value="perUnit">ליחידה</option>
-<option value="rent">השכרה לזמן קצוב</option>
+<option value="total">{ot[$lang]}</option>
+<option value="monthly">{pm[$lang]}</option>
+<option value="yearly">{pye[$lang]}</option>
+<option value="perUnit">{py[$lang]}</option>
+<option value="rent">{re[$lang]}</option>
 </select>
 </div>
   <button
  on:click={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
- > יצירת משאב חדש</button>
+ >{crn[$lang]}</button>
    </div>
   </div>
       </div>

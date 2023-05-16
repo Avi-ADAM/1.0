@@ -106,7 +106,7 @@ let missionName_value;
    };
 
      let desM;
-    const placeholder = `בחירת כישורים נדרשים`;
+    const placeholder = {"he":"בחירת כישורים נדרשים","en":"choose needed skills"};
      let loading = true
 
 async function subm() {
@@ -158,7 +158,6 @@ tafkidimslist= find_role_id(selectedrole)
         }
     };
     
-let cencel = "ביטול"
 function addnew (event){ 
     const newOb = event.detail.skob;
     const newN = event.detail.skob.attributes.skillName;
@@ -184,37 +183,41 @@ selectedrole.push(newN);
 
 selectedrole = newSele;
 
-  }
-      const placeholderr = { "he" : "בחירת תפקידים נדרשים" ,"en" :"needed roles"};
-
-const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}
+}
+  const yeve = {"he":"יצירת והוספת משימה חדשה","en":"create and add new mission"}
+  const chsk = {"he":"בחירת כישורים נדרשים","en":"choose needed skills"}
+  const sho = {"he":"תיאור קצר","en":"short description"}
+  const placeholderr = { "he" : "בחירת תפקידים נדרשים" ,"en" :"needed roles"};
+  const miname = {"he":"שם המשימה","en":"mission name"}
+  const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}
   const nomv = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
+  const addnewhed = { "he":"הוספת משימה חדשה","en":"add new mission"}
 </script>
  
     
   <div class="grid items-center text-center justify-items-center ">
-    <h1 class="text-center">הוספת משימה חדשה</h1>
+    <h1 class="text-center">{addnewhed[$lang]}</h1>
 </div>
 <div style="width: 50%; margin: 0 auto;">
   
      <div dir="rtl" class='textinput'>
   <input type="text"  id="nam" name="nam"   bind:value={missionName_value}  class='input' required>
-  <label for="nam" class='label'  >שם המשימה</label>
+  <label for="nam" class='label'>{miname[$lang]}</label>
   <span class='line'></span>
 </div>
   
    <div dir="rtl" class='textinput'>
   <input type="text"  id="des" name="des" bind:value={desM}  class='input' required>
-  <label for="des" class='label' >תיאור קצר</label>
+  <label for="des" class='label'>{sho[$lang]}</label>
   <span class='line'></span>
 </div>
 
-    <lebel for="selectskill">בחירת כישורים נדרשים</lebel>
+    <lebel for="selectskill">{chsk[$lang]}</lebel>
         <MultiSelect
       bind:selected
       options={skills2.map(c => c.attributes.skillName)}
       id="selectskill"
-      {placeholder}
+      placeholder={placeholder[$lang]}
       loading={loading}
         noMatchingOptionsMsg={nom[$lang]}
       />
@@ -240,7 +243,7 @@ options={roles.map(c => c.attributes.roleDescription)}
 <button
  on:click={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-6 px-4 m-4 rounded-full"
- >יצירת והוספת משימה חדשה</button>
+ >{yeve[$lang]}</button>
  
 </div>
 </div>
