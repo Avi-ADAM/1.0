@@ -15,7 +15,7 @@ export const POST = async ({ request }) => {
     } else if (isShow == true){
         name = ""
         det = ""
-        action = "www.1lev1.world"
+        action = '1lev1.vercel.app';
     } else if (isStart == true){
         const id = messegeText.split(' ')[1]
         console.log(id)

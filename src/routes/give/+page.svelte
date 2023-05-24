@@ -264,7 +264,6 @@
       let linko = `${liUN}&em=${email}`
       console.log(`https://1lev1.world?ref=true&id=${fpval}&con=${find_contry_id(selected)}&un=${encodeURIComponent(liUN)}&em=${email}`)
     }
-
   function submitForm() {
     let data = {user:"זוכמיר בן סירה",projectName:"וילה לשותפים",projectSrc:"https://res.cloudinary.com/onelove1/image/upload/v1645805401/thumbnail_pngegg_2_8aeb98b032.png",missionName:"פרסום ברשתות החברתיות",email:"aviadam.segel@gmail.com",lang:"en",kind:"exeptedMission"}
     fetch("/api/sma", {
@@ -283,7 +282,20 @@
             });
           }
   async function onSubmiti (){
-   
+    fetch("http://localhost:5173/api/monthi", {
+            method: 'GET',  
+            headers: {
+              'Content-Type': 'application/json',
+            },
+          })
+            .then((response) => response)
+            .then((data) => {
+              console.log('Success:', data);            
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+          
 }
 
 function find_contry_id(contry_name_arr){
