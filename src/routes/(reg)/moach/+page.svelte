@@ -217,7 +217,7 @@ JSON.stringify({query:
             matanotof {data{ id attributes{ name price quant kindOf }}}
             finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
-             user_1s {data{ id attributes{ username profilePic {data{attributes{ url formats}}}}}}
+             user_1s {data{ id attributes{email lang username profilePic {data{attributes{ url formats}}}}}}
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
              id attributes{ status     
             acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
@@ -1741,6 +1741,7 @@ pointer-events: none;">
         </div>
                  {/if}
 {#if showvd == true}<Mission 
+pn={projectname} pl={srcP} {restime}
 {newcontent} {newcontentR} {newcontentW} pu={projectUsers}
                                 userslength={projectUsers.length}
                                  workways2 ={workways2}

@@ -22,7 +22,7 @@ export let newcontentR = true;
 export let newcontentW = true;
 
 let token; 
-
+export let pn,pl,restime;
 export let miData = [];
 let error1 = null;
 
@@ -264,9 +264,44 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
   .then(r => r.json())
   .then(data => miDatana = data);
          console.log(miDatana)
+           let data = {pu:pu,pn:pn,pl:pl,restime:restime, pid:projectId, uid:idL, kind:"pendAsk", name:addslashes(element.attributes.missionName),rishon:element.rishon}
+   fetch("/api/nuti", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
                 } catch (e) {
             error1 = e
         }
+         } else if (element.myM != true && userslength > 1){
+         let data = {pn:pn,pl:pl,pu:pu, pid:projectId, uid:idL, kind:"pend", name:addslashes(element.attributes.missionName)}
+   fetch("/api/nuti", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
          }
              dispatch('close',{md:miDatan});
         } catch (e) {
