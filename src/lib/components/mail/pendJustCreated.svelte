@@ -35,7 +35,10 @@
 	const previewText = {
         "he": `${pn} בריקמה ${un} הצבעה על ההצעה של`,
         "en":`Vote for ${un}'s suggestion on freeMates ${pn}`};
-
+        const slogen = {
+            "he":"1💗1 - יש מה לעשות! ליצור יחד בהסכמה.",
+            "en":"1💗1 Create together harmoniously"
+        }
 	const fontFamily =
 		'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Oxygen-Sans,Ubuntu,Cantarell,"Helvetica Neue",sans-serif';
 
@@ -144,7 +147,7 @@
 				<Button pY={19} style={button} href="https://1lev1.vercel.app/lev">{tovo[lang]}</Button>
 			</Section>		
 			<Hr style={hr} />
-			<Text style={footer}>1💗1</Text>
+			<Text style={footer}>{slogen[lang]}</Text>
 		</Container>
 	</Section>
 </Html>
