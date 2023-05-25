@@ -20,8 +20,8 @@ async function nutifiPusers(
   //by mail
 
   const previewText = {
-    he: `${pn} בריקמה ${un} הצבעה על ההצעה של`,
-    en: `Vote for ${un}'s suggestion on freeMates ${pn}`
+    "he": `הצבעה על ההצעה של ${un} בריקמה ${pn}`,
+    "en": `Vote for ${un}'s suggestion on freeMates ${pn}`
   };
   let emailHtml = await render({
     template: PendJustCreated,

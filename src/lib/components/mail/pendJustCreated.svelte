@@ -22,7 +22,7 @@
     export let restime = "feh"
     const houhe = {"feh":"עומדים יומיים","sth":"עומדים שלושה ימים","nsh":"עומדים ארבעה ימים","sevend":"עומד שבוע אחד"}
     const houen = {"feh":"48 hours","sth":"72 hours","nsh":"96 hours","sevend":"one week"}
-    const hoza = {"pendAsk":"הוצעה משימה חדשה בשם","pend":"הוצעה משימה חדשה בשם"}
+    const hoza = {"pendAsk":"הוצעה משימה חדשה בשם","pend":"הוצעה משימה חדשה בשם","pendmash":"הוצע משאב חדש בשם"}
     const headr = {"he":` שלום ${username}!`,"en":`hallo ${username}!`}
 	const mainText = {"he":`בריקמה ${pn} ${hoza[kind]} "${name}" על ידי ${un} ${kind == "pend" || kind == "pendAsk" ? "והיא עומדת להצבעה!" : "והוא עומד להצבעה!"}`,
                     "en":`in the freeMates ${pn} ${kind == "pend" || kind == "pendAsk" ? "a new mission named" : "a new resorce named"} "${name}" hes suggested by ${un} and the appruval vote just started!`}
