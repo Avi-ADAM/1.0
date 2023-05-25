@@ -23,12 +23,12 @@
     const houhe = {"feh":"עומדים יומיים","sth":"עומדים שלושה ימים","nsh":"עומדים ארבעה ימים","sevend":"עומד שבוע אחד"}
     const houen = {"feh":"48 hours","sth":"72 hours","nsh":"96 hours","sevend":"one week"}
     const hoza = {"pendAsk":"הוצעה משימה חדשה בשם","pend":"הוצעה משימה חדשה בשם"}
-    const headr = {"he":`!${username} שלום`,"en":`hallo ${username}!`}
-	const mainText = {"he":`${kind == "pend" || kind == "pendAsk" ? "והיא עומדת להצבעה!" : "והוא עומד להצבעה!"} ${un} על ידי "${name}" ${hoza[kind]} ${pn} בריקמה`,
+    const headr = {"he":` שלום ${username}!`,"en":`hallo ${username}!`}
+	const mainText = {"he":`בריקמה ${pn} ${hoza[kind]} "${name}" על ידי ${un} ${kind == "pend" || kind == "pendAsk" ? "והיא עומדת להצבעה!" : "והוא עומד להצבעה!"}`,
                     "en":`in the freeMates ${pn} ${kind == "pend" || kind == "pendAsk" ? "a new mission named" : "a new resorce named"} "${name}" hes suggested by ${un} and the appruval vote just started!`}
-    const note = {"he":`${rishon == username ? "ידך" : `${rishon} ידי`} על ${kind == "pend" || kind == "pendAsk" ? "המשימה תאושר היא תתבצע":" המשאב יאושר הוא יושקע"} לפי ההצעה כאשר `,
+    const note = {"he":`לפי ההצעה כאשר ${kind == "pend" || kind == "pendAsk" ? "המשימה תאושר היא תתבצע":" המשאב יאושר הוא יושקע"} על ${rishon == username ? "ידך" : `${rishon} ידי`}  `,
                     "en":`he offered that if the suggestion appruved the ${kind == "pend" || kind == "pendAsk" ? `mission will be assigned to`:`resorce will be invested by`} ${rishon == username ? "you" : rishon}`} 
-    const instruction = {"he":`בכדי להגיב על ההצעה ולנהל משא ומתן על פרטיה, לאחר מכן אם לא יהיו התנגדויות ההצעה תאושר אוטומטית ${houhe[restime]} לרשותך`,
+    const instruction = {"he":`לרשותך ${houhe[restime]} בכדי להגיב על ההצעה ולנהל משא ומתן על פרטיה, לאחר מכן אם לא יהיו התנגדויות ההצעה תאושר אוטומטית `,
                          "en":`you have ${houen[restime]} to response and to negotiat the deatail's, after that if no obligation it will be aotomaticlly appruved`}
     const tovo = {"he":"להצבעה!","en":"vote now!"}
     const src1 = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"
