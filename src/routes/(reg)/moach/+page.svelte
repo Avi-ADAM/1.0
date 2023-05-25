@@ -1788,7 +1788,7 @@ pn={projectname} pl={srcP} {restime}
                  {/if}
     {#if totalneed === true} 
     
-    <TotalNeeds projectId={$idPr} userslength={projectUsers.length} {needr} meData={meDatamm}
+    <TotalNeeds pn={projectname} pl={srcP} {restime} pu={projectUsers} projectId={$idPr} userslength={projectUsers.length} {needr} meData={meDatamm}
                                      on:close={clo}
                                      on:remove={wdwd}
     />{/if}</div>

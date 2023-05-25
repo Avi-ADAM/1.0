@@ -36,6 +36,7 @@ beforeUpdate(async () => {
     upd()
 
 })
+export let pu,pn,pl,restime
 let linkop = ``;
 let already = false;
 let idL;
@@ -111,6 +112,25 @@ async function han() {
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan)
+            if(userslength > 1){
+    let data = {pu:pu,pn:pn,pl:pl,restime:restime, pid:projectId, uid:idL, kind:"pendmash", name:addslashes(element.attributes.name)}
+   fetch("/api/nuti", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+            }
             meData = [];
             //     if (miDatan[qwerys].)
             if(miDatan.data)
