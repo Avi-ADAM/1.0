@@ -3,9 +3,12 @@
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
      export let low = false;
+       import tr from '$lib/translations/tr.json'
+
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
+  import {lang} from '$lib/stores/lang.js';
     export let projectName, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours ,useraplyname
     export let already, allr = false;
 function hover(x){
@@ -26,6 +29,7 @@ dispatch("nego",{alr:alr,y:"n"});
 function tochat (){
 dispatch("tochat");
 }
+const tri = import('$lib/translations/tr.json')
 </script>
 
 
@@ -39,7 +43,7 @@ dispatch("tochat");
          </div>
          <div class="flex flex-col leading-tight">
             <div class=" text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-xl text-sm"> הצעת חלוקה  </span>
+               <span class="text-barbi text-center mr-3 sm:text-xl text-sm">{tr.headers.haluka[$lang]}</span>
             </div>
             <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
          </div>

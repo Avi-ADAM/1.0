@@ -1,6 +1,6 @@
 <script>
     import Lowding from '$lib/celim/lowding.svelte'
-
+    import {lang} from '$lib/stores/lang.js'
      import MissionInProgress from "../../../components/lev/missionInProgress.svelte"
     import ProjectSuggestor from "../../../components/lev/projectSuggestor.svelte"
     import Reqtojoin from '../../../components/lev/reqtojoin.svelte';
@@ -87,17 +87,18 @@ function proj (event){
      dispatch("proj", {id: event.detail.id})
 }
 let hovered = false
-let u = "לב המערכת";
+let d = {"he":"לב 1💗1","en":"heart of 1💗1"};
+let u = {"he":"לב 1💗1","en":"heart of 1💗1"};
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
-    u = "לב המערכת"
+    u = d[$lang]
   } 
   dispatch("hover", {id: u});
  }
 function hoverc (id){
   if (id == "0"){
-        u = "לב המערכת"
+        u = d[$lang]
   } else {
     u = id
   }

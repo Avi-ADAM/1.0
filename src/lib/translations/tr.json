@@ -1,0 +1,46 @@
+{
+    "headers":{
+        "misfini":{
+            "he":"אישור סיום משימה בהצלחה",
+            "en":"approval of sucsessfully finishing a mission"
+        },
+        "hachlalogo":{
+            "he": "הצבעה על שינוי לוגו הריקמה",
+            "en":"vote on changing FreeMates logo"
+        },
+        "haluka":{
+            "he":"הצעת חלוקה",
+            "en":"money splitting offer"
+        }
+    },
+    "common":{
+        "total":{
+            "he":"בסך הכל",
+            "en":"in total"
+        },
+        "hours":{
+            "he":"שעות",
+            "en":"hours"
+        },
+        "noofhours":{
+            "he":"כמות השעות",
+            "en":"number of hours"
+        },
+        "perhour":{
+            "he":"לשעה",
+            "en":"per hour"
+        },
+        "valph":{
+            "he":"שווי לשעה",
+            "en":"vallue per hour"
+        },
+        "notes":{
+            "he":"הערות",
+            "en":"notes"
+        },
+        "finalwords":{
+            "he":"מילות סיכום",
+            "en":"finall words"
+        }
+    }
+}

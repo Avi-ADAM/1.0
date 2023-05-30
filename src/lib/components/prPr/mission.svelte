@@ -5,6 +5,8 @@
   import SveltyPicker from 'svelty-picker'
     import moment from 'moment';
   import { userName } from '$lib/stores/store.js';
+import {SendTo} from '$lib/send/sendTo.svelte';
+  import { addToast } from 'as-toast';
 
   let myDate = '11:00';
     import MultiSelect from 'svelte-multiselect';
@@ -97,6 +99,7 @@ let rishon4 = ``;
 let rishonves4 = ``;
 let already = false;
 let toadd = ``;
+let daleg = false
 async function increment() {
   already = true;
   // ולידציה שהיוזר חבר ברקמה מהקוקיות ומאקספורט של רשימת חברים
@@ -155,7 +158,10 @@ pendq = ` users: [
     ask {id}
   }`
         }*/
-    } else {
+    } else if (element.myM === true && userslength == 1) {
+      daleg = true
+     
+    }else{
         rishon4 = ``;
     }
       if (element.done === true){
@@ -176,9 +182,9 @@ const nhours = (element.nhours > 0) ? element.nhours : 0;
 const valph = (element.valph > 0) ? element.valph : 0;
 let momentx = moment(element.date, "HH:mm DD/MM/YYYY ")
 let momebtt =moment(element.dates, "HH:mm DD/MM/YYYY ")
-const date = (element.date !== undefined && element.date !== "undefined" && element.date !== null) ? ` sqadualed: "${momentx.toISOString()}",` : ``;
+const date = (element.date !== undefined && element.date !== "undefined" && element.date !== null) ? ` ${daleg == false ?"sqadualed":"start"}: "${momentx.toISOString()}",` : ``;
 const dates = (element.dates !== undefined && element.dates !== "undefined" && element.dates !== null) ? ` dates: "${momebtt.toISOString()}",` : ``;
-const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `privatlinks: "${addslashes(element.publicklinks)}",` : ``;
+const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `publicklinks: "${addslashes(element.publicklinks)}",` : ``;
 const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${addslashes(element.privatlinks)}",` : "";
 const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${addslashes(element.spnot)}",` : "";
 const deee = (element.attributes.descrip !== undefined && element.attributes.descrip !== "undefined") ? `descrip: "${addslashes(element.attributes.descrip)}",` : "";
@@ -186,6 +192,7 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
     // הפרדה של קישורים בפסיק
    let d = new Date
  let link = 'https://tov.onrender.com/graphql';
+ if (daleg == false){
     try {
              await fetch(link, {
               method: 'POST',
@@ -225,8 +232,10 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-                  console.log(element.myM,userslength )
+        console.log(element.myM,userslength )
+        if(miDatan.data != null){
 
+        
          if(element.myM === true && userslength > 1){
                    console.log("miDatan")
 
@@ -303,10 +312,44 @@ const deee = (element.attributes.descrip !== undefined && element.attributes.des
   
   })
          }
-             dispatch('close',{md:miDatan});
+                      dispatch('close',{md:miDatan});
+
+        }else{
+                    addToast(er[$lang],"warn")
+
+        }
         } catch (e) {
             error1 = e
         }
+      } else{
+         let qu = `mutation 
+                        { createMesimabetahalich(
+      data: {project: "${projectId}",
+             mission:  "${element.id}",
+             ${heee}
+             name: "${addslashes(element.attributes.missionName)}",
+             ${deee}
+             hoursassinged: ${nhours},
+             perhour: ${valph}, 
+             iskvua:${element.iskvua != true ? false : true}, 
+             ${pb}
+              ${pv} 
+             users_permissions_user: "${idL}",
+              tafkidims: [${tafkidims}],
+                      publishedAt: "${d.toISOString()}",
+              ${date} 
+             ${dates}                  }
+  ) {data{attributes{project{data{id }}}}}
+  }
+` 
+let t = await SendTo(qu)
+       if (t?.data == null){
+       addToast(er[$lang],"warn")
+       } else{
+        console.log(t)
+        dispatch('close',{md:miDatan});
+       }
+      }
         
 	}
 
@@ -648,6 +691,8 @@ const hms = {"he":"כמה שעות בחודש?", "en": "how many hours per month
 const htt = {"he":"מספר השעות","en": "number of hours"}
 const leho = {"he":"לחודש:", "en": "per month:"}
 const acti = {"he":"פרסום", "en": "publish"}
+  const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
+
 let shift = [{"ii": 1}];
 let shifts = 1
 function shifterr (o){
@@ -996,20 +1041,10 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
           {/if}
           {/each}
         </tr>
-       <!-- <tr>
-          <th>להשים את המשימה או לחפש</th>
-          {#each miData as data, i}
-          <td>
-            <input
-            bind:checked={data.myM} 
-            type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> data.rishon == idL}>
-            <label for="tome">השמת המשימה</label>
-          </td>
-          {/each}
-    </tr>-->
+       <!-- -->
     {#if userslength > 1}
     <tr>
-          <th>השמת המשימה ל- <br> אם ריק: תיווצר לריקמה משרה פנויה</th>
+          <th>השמת המשימה ל- <br> אם ריק: תפורסם משרה פנויה</th>
           {#each miData as data, i}
           <td>
              <MultiSelect
@@ -1026,6 +1061,18 @@ const cm = {"he":"משימות שנבחרו", "en":"choosen missions"}
             bind:checked={data.myM} 
             type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
             <label for="tome">השמת המשימה ל-1 </label>-->
+          </td>
+          {/each}
+    </tr>
+    {:else}
+    <tr>
+          <th>להשים את המשימה לעצמי?  <br> אם ריק: תפורסם משרה פנויה</th>
+          {#each miData as data, i}
+          <td>
+            <input
+            bind:checked={data.myM} 
+            type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> data.rishon == idL}>
+            <label for="tome">השמת המשימה לעצמי</label>
           </td>
           {/each}
     </tr>

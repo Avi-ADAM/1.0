@@ -1,6 +1,7 @@
 <script>
      import Grow from '$lib/celim/icons/grow.svelte'
   export let gr = false
+  export let big = false
   export let sm = false
     export let openi = false;
     export let closei = false;
@@ -43,7 +44,6 @@
 class:hover:bg-blue-400={blue == true}
 class:hover:from-gold={gold == true}
 class:hover:to-gold={gold == true}
-
         class:hover:bg-wow2={wow == true}
         class:hover:bg-gray-400={gray == true}
         class:hover:bg-red-400={red == true}
@@ -72,7 +72,9 @@ class:py-0.5={sm == false}
 class:px-2.5={sm == false}
 class:text-xs={sm == false}
 class:px-0.5={sm == true}
- class="drop-shadow-lg shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center mr-2 rounded">
+class:px-2={big == true}
+class:py-1={big == true}
+ class="drop-shadow-lg  shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center mr-2 rounded">
  {word}
  {#if closei}
       <svg aria-hidden="true" class="w-3 h-3 bg-slate-100 rounded-full mx-1"  fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>

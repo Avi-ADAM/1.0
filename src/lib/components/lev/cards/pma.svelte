@@ -54,9 +54,9 @@ dispatch("tochat");
    {:else if kindOf === "total" || kindOf === "rent"}
        <span on:mouseenter={()=>hover("שווי מוצע")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{easy > 0 ? easy : price}</span>
           {:else if kindOf === "monthly"}
-       <span on:mouseenter={()=>hover("שווי לחודש")} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{easy > 0 ? easy : price} לחודש</span> * <span on:mouseenter={()=>hover("כמות חודשים")} on:mouseleave={()=>hover("0")}  style="color: var(--barbi-pink)" >{monts == 1 ? "חודש אחד" : `${hm} חודשים`}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * monts : price * monts}</span> 
+       <span on:mouseenter={()=>hover("שווי לחודש")} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{easy > 0 ? easy : price} לחודש</span> * <span on:mouseenter={()=>hover("כמות חודשים")} on:mouseleave={()=>hover("0")}  style="color: var(--barbi-pink)" >{monts == 1 ? "חודש אחד" : `${monts} חודשים`}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * monts : price * monts}</span> 
           {:else if kindOf === "yearly"}
-       <span on:mouseenter={()=>hover("שווי לשנה")} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{easy > 0 ? easy : price} לשנה</span> * <span on:mouseenter={()=>hover("מספר שנים")} on:mouseleave={()=>hover("0")}  style="color: var(--barbi-pink)" >{yers == 1 ? "שנה אחת" : `${hm} שנים`}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * yers : price * yers}</span> 
+       <span on:mouseenter={()=>hover("שווי לשנה")} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{easy > 0 ? easy : price} לשנה</span> * <span on:mouseenter={()=>hover("מספר שנים")} on:mouseleave={()=>hover("0")}  style="color: var(--barbi-pink)" >{yers === 1 ? "שנה אחת" : `${yers} שנים`}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? easy * yers : price * yers}</span> 
 {/if}
         </p>
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{name}</div>

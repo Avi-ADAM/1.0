@@ -2,12 +2,12 @@
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
+  import {lang} from '$lib/stores/lang.js'
       export let low = false;
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
-    export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting,deadline,easy,myp,price
+    export let projectName, src,src2 ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting,deadline,easy,myp,price
     export let already = false;
-    export let src2;
     export let perhour = 0, noofhours = 0
 function hover(x){
 dispatch("hover",{x:x});
@@ -20,6 +20,8 @@ function decline(alr) {
   already = true; 
 dispatch("decline",{alr:alr});
 }
+const tri = import('$lib/translations/tr.json')
+
 </script>
 
 
@@ -33,7 +35,7 @@ dispatch("decline",{alr:alr});
          </div>
          <div class="flex flex-col leading-tight">
             <div class=" text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-xl text-sm">הצבעה על שיתוף משאב והצטרפות לריקמה </span>
+               <span class="text-barbi text-center mr-3 sm:text-xl text-sm">{tri.headers.hachlalogo[$lang]}</span>
             </div>
             <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
          </div>
@@ -42,15 +44,13 @@ dispatch("decline",{alr:alr});
   <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
        <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
-            <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--barbi-pink)" >{myp} השווי המוצע</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy} השווי שהצענו</span>
         </p>
-              <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="ltn" >{price} <span>שווי מקובל</span></h3>
       <div class="text-gray-900 font-bold text-xl mb-2">{openmissionName}</div>
      {#if missionDetails} <p class="text-gray-700 text-base">{missionDetails}</p>{/if}
     </div>
     <div class="flex items-center">
-      <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
+      
+      <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src2.length > 0 ? src2 : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
       <div class="text-sm">
         <p class="text-gray-900 leading-none">{useraplyname}</p>
         <p class="vo ef"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>

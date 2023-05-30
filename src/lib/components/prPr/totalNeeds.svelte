@@ -76,10 +76,10 @@ async function han() {
         const hm = (element.hm > 0) ? element.hm : 1;
         const price = (element.attributes.price > 0) ? element.attributes.price : 0;
         const easy = (element.attributes.easy > 0) ? element.attributes.easy : 0;
-        const sdate = (element.dates !== undefined) ? `sqadualed: "${new Date(element.dates).toISOString()}",` : ``;
-        const fdate = (element.datef !== undefined) ? ` sqadualedf: "${new Date(element.datef).toISOString()}" ,` : ``;
+        const sdate = (element.attributes.dates !== undefined) ? `sqadualed: "${new Date(element.attributes.dates).toISOString()}",` : ``;
+        const fdate = (element.attributes.datef !== undefined) ? ` sqadualedf: "${new Date(element.attributes.datef).toISOString()}" ,` : ``;
         let link = 'https://tov.onrender.com/graphql';
-        try {
+   try {
             await fetch(link, {
                     method: 'POST',
                     headers: {
@@ -138,7 +138,6 @@ async function han() {
         } catch (e) {
             error1 = e
         }
-
     }
 
 }

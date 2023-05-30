@@ -1,13 +1,18 @@
 <script context="module">
 const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
-export async function SendTo(dat) {
+export async function SendTo(dat,toc) {
 	const ep = HTTP_ST_ENDPOINT + "/graphql"
+	 let token;
+	if (toc == null){
     const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
   .split('=')[1];
   
-  let token  = cookieValue; 
+   token  = cookieValue; 
+	}else {
+		token = toc
+	}
   let bearer1 = 'bearer' + ' ' + token;
 	const response = await fetch(ep, {
 		method: 'POST',
