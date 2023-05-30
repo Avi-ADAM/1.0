@@ -157,7 +157,7 @@ console.log(workways)
                 </p>{/each}
     </div>{/if}
 
-    </div>
+    </div><!---
 <div class="grow sm:pt-1 sm:p-14">
   <h3 class="text-center underline decoration-barbi">הערכת רווח חודשי:</h3>
   <svg width="100%" height="100%" viewBox="0 0 600.00001 600.00001" id="svg2" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -177,7 +177,7 @@ console.log(workways)
   <text style="fill:  rgb(255, 0, 146); font-family: Gan,Powerr; font-size: 25.1px; white-space: pre;" text-anchor="center" x="534.717" y="273"> שנה ראשונה</text>
   <text style="fill:  rgb(255, 0, 146); font-family: Gan,Powerr; font-size: 25.1px; white-space: pre;" text-anchor="center" x="497.547" y="440">שנה שניה</text>
 </svg>
-</div>
+</div>-->
   </div>
 
 
