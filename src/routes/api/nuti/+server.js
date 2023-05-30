@@ -37,7 +37,7 @@ async function nutifiPusers(
     }
   });
 
-  	const text =  render({
+  /*	const text =  render({
       template: PendJustCreated,
       props: {
         un: un,
@@ -53,14 +53,14 @@ async function nutifiPusers(
       options: {
         plainText: true
       }
-    });
+    });*/
 
   const options = {
     from: 'ehad1one@gmail.com',
     to: email,
     subject: previewText[lang],
     html: emailHtml,
-    text: text
+    text: previewText[lang]
   };
 
   sendgrid.send(options);
