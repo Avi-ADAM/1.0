@@ -18,12 +18,11 @@ async function nutifiPusers(
   rishon
 ) {
   //by mail
-
   const previewText = {
     "he": `הצבעה על ההצעה של ${un} בריקמה ${pn}`,
     "en": `Vote for ${un}'s suggestion on freeMates ${pn}`
   };
-  let emailHtml = await render({
+  const emailHtml =  render({
     template: PendJustCreated,
     props: {
       un: un,
@@ -38,7 +37,7 @@ async function nutifiPusers(
     }
   });
 
-  	let text = await render({
+  	const text =  render({
       template: PendJustCreated,
       props: {
         un: un,
