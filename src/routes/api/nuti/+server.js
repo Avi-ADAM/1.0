@@ -38,7 +38,7 @@ async function nutifiPusers(
     }
   });
 
-  	const text = await render({
+  	let text = await render({
       template: PendJustCreated,
       props: {
         un: un,
