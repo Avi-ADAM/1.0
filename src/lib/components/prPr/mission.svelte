@@ -183,7 +183,7 @@ const valph = (element.valph > 0) ? element.valph : 0;
 let momentx = moment(element.date, "HH:mm DD/MM/YYYY ")
 let momebtt =moment(element.dates, "HH:mm DD/MM/YYYY ")
 const date = (element.date !== undefined && element.date !== "undefined" && element.date !== null) ? ` ${daleg == false ?"sqadualed":"start"}: "${momentx.toISOString()}",` : ``;
-const dates = (element.dates !== undefined && element.dates !== "undefined" && element.dates !== null) ? ` dates: "${momebtt.toISOString()}",` : ``;
+const dates = (element.dates !== undefined && element.dates !== "undefined" && element.dates !== null) ? `${daleg == false ? 'dates':'admaticedai'} : "${momebtt.toISOString()}",` : ``;
 const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `publicklinks: "${addslashes(element.publicklinks)}",` : ``;
 const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${addslashes(element.privatlinks)}",` : "";
 const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${addslashes(element.spnot)}",` : "";

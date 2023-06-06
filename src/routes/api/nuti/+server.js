@@ -2,6 +2,53 @@ import { render } from 'svelte-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
 import sendgrid from '@sendgrid/mail';
 
+async function renderEmail(un,username,pl,pn,kind,rishon,name,lang,restime) {
+  html = await render({
+    template: PendJustCreated,
+    props: {
+      un: un,
+      username: username,
+      pl: pl,
+      pn: pn,
+      kind: kind,
+      rishon: rishon,
+      name: name,
+      lang: lang,
+      restime: restime ?? 'feh'
+    }
+  });
+  return html;
+}
+async function renderText(
+  un,
+  username,
+  pl,
+  pn,
+  kind,
+  rishon,
+  name,
+  lang,
+  restime
+) {
+  text = await render({
+    template: PendJustCreated,
+    props: {
+      un: un,
+      username: username,
+      pl: pl,
+      pn: pn,
+      kind: kind,
+      rishon: rishon,
+      name: name,
+      lang: lang,
+      restime: restime ?? 'feh'
+    },
+    options: {
+      plainText: true
+    }
+  });
+  return text;
+}
 sendgrid.setApiKey(import.meta.env.VITE_SENDGRID);
 
 async function nutifiPusers(
@@ -22,45 +69,37 @@ async function nutifiPusers(
     "he": `הצבעה על ההצעה של ${un} בריקמה ${pn}`,
     "en": `Vote for ${un}'s suggestion on freeMates ${pn}`
   };
-  const emailHtml =  render({
-    template: PendJustCreated,
-    props: {
-      un: un,
-      username: username,
-      pl: pl,
-      pn: pn,
-      kind: kind,
-      rishon: rishon,
-      name: name,
-      lang: lang,
-      restime: restime ?? 'feh'
-    }
-  });
+  const emailHtml = await renderEmail(
+    un,
+    username,
+    pl,
+    pn,
+    kind,
+    rishon,
+    name,
+    lang,
+    restime
+  );
 
-  /*	const text =  render({
-      template: PendJustCreated,
-      props: {
-        un: un,
-        username: username,
-        pl: pl,
-        pn: pn,
-        kind: kind,
-        rishon: rishon,
-        name: name,
-        lang: lang,
-        restime: restime ?? 'feh'
-      },
-      options: {
-        plainText: true
-      }
-    });*/
+  const text = await renderText(
+    un,
+    username,
+    pl,
+    pn,
+    kind,
+    rishon,
+    name,
+    lang,
+    restime
+  );
+  
 
   const options = {
     from: 'ehad1one@gmail.com',
     to: email,
     subject: previewText[lang],
     html: emailHtml,
-    text: previewText[lang]
+    text: text
   };
 
   sendgrid.send(options);

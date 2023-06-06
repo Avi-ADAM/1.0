@@ -222,7 +222,7 @@ JSON.stringify({query:
              id attributes{ status     
             acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
               tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""} }}}
-               createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
+              admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
             open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     rishon {data{ id}}
