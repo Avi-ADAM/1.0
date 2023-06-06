@@ -5642,10 +5642,10 @@
   "resolved" "https://registry.npmjs.org/svelte-viewport-info/-/svelte-viewport-info-0.1.12.tgz"
   "version" "0.1.12"
 
-"svelte@^3.2.0", "svelte@^3.23.0", "svelte@^3.32.3", "svelte@^3.53.1", "svelte@^3.54.0", "svelte@^3.55.0", "svelte@^3.55.1", "svelte@^3.x", "svelte@>=3.19.0", "svelte@3.x":
-  "integrity" "sha512-WMXEvF+RtAaclw0t3bPDTUe19pplMlfyKDsixbHQYgCWi9+O9VN0kXU1OppzrB9gPAvz4NALuoca2LfW2bOjTQ=="
-  "resolved" "https://registry.npmjs.org/svelte/-/svelte-3.57.0.tgz"
-  "version" "3.57.0"
+"svelte@^3.2.0", "svelte@^3.23.0", "svelte@^3.32.3", "svelte@^3.54.0", "svelte@^3.55.0", "svelte@^3.55.1", "svelte@^3.59.1", "svelte@^3.x", "svelte@>=3.19.0", "svelte@3.x":
+  "integrity" "sha512-pKj8fEBmqf6mq3/NfrB9SLtcJcUvjYSWyePlfCqN9gujLB25RitWK8PvFzlwim6hD/We35KbPlRteuA6rnPGcQ=="
+  "resolved" "https://registry.npmjs.org/svelte/-/svelte-3.59.1.tgz"
+  "version" "3.59.1"
 
 "sveltekit-i18n@^2.1.4":
   "integrity" "sha512-6eygICleGCSL7elY7A3trF8XUhV+mlW56ZSoD0UUKXlw+Y6u0MTTHDq48u1LyY73SfnlbPHXgTarhTjZ0BvUKA=="
