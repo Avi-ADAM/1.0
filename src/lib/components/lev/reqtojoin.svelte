@@ -219,7 +219,7 @@ async function agree() {
 adduser = `updateProject(
   id: "${projectId}"
  data: {user_1s: ["${idL}","${userId}"]}
-  ){data{attributes {user_1s{data {id{attributes email lang}}}}}}`;
+  ){data{attributes {user_1s{data {id attributes{ email lang}}}}}}`;
         adduser2 = `updateProject(
   id: "${projectId}"
  data: {user_1s: [${pid}]}

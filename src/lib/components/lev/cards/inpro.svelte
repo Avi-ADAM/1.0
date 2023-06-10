@@ -30,6 +30,9 @@ dispatch("hover",{x:x});
 }
  // import { textfit } from 'svelte-textfit';
  // let parent;
+ $: event = dueDateOrCountToDedline != "undefined" &&  dueDateOrCountToDedline != undefined &&  dueDateOrCountToDedline != null ? new Date(dueDateOrCountToDedline) : null;
+
+const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
 $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`}
@@ -57,7 +60,7 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
        <!--use:textfit={{parent,mode:"multi"}}  bind:this={parent}-->
               <div class="text-mturk font-bold text-lg md:text-4xl  mb-2">{missionName}</div>
                 <h5  class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} שעות בוצעו`}</span> מתוך <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal} {totali[$lang]}</span></h5>
-                   {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{dueDateOrCountToDedline}</h5>{/if}
+                   {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{event.toLocaleDateString(undefined, options)}</h5>{/if}
        <div class="flex items-center justify-center m-1"><span class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-wow p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
             {formatTime(zman)}
         </span></div> 

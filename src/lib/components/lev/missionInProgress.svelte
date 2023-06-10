@@ -1131,7 +1131,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
   </g>
    <foreignObject  x='300' y='105' width='100' height='100' transform='translate(-50 -50)'>   
     <span class="{`normSml${perhour}-${projectId}-${mId}`}"></span>
-        <img on:click={()=>project()} on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
+        <img on:click={()=>project()} on:keypress={()=>project()} on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
     </foreignObject> 
   
         <g style="overflow:hidden; text-anchor: middle;" on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  >
