@@ -22,19 +22,19 @@
     export let restime = "feh"
     const houhe = {"feh":"עומדים יומיים","sth":"עומדים שלושה ימים","nsh":"עומדים ארבעה ימים","sevend":"עומד שבוע אחד"}
     const houen = {"feh":"48 hours","sth":"72 hours","nsh":"96 hours","sevend":"one week"}
-    const hoza = {"pendAsk":"הוצעה משימה חדשה בשם","pend":"הוצעה משימה חדשה בשם","pendmash":"הוצע משאב חדש בשם"}
+    const hoza = {"pendAsk":"הוצעה משימה חדשה בשם","pend":"הוצעה משימה חדשה בשם","pendmash":"הוצע משאב חדש בשם","finiappmi":"הסתיימה בהצלחה המשימה"}
     const headr = {"he":` שלום ${username}!`,"en":`hallo ${username}!`}
-	const mainText = {"he":`בריקמה ${pn} ${hoza[kind]} "${name}" על ידי ${un} ${kind == "pend" || kind == "pendAsk" ? "והיא עומדת להצבעה!" : "והוא עומד להצבעה!"}`,
-                    "en":`in the freeMates ${pn} ${kind == "pend" || kind == "pendAsk" ? "a new mission named" : "a new resorce named"} "${name}" hes suggested by ${un} and the appruval vote just started!`}
+	const mainText = {"he":`בריקמה ${pn} ${hoza[kind]} "${name}" על ידי ${un} ${kind == "pend" || kind == "pendAsk" ? "והיא עומדת להצבעה!" : kind == "pendmash" ? "והוא עומד להצבעה!" : "והיא עכשיו בתהליך אישור"} `,
+                    "en":`in the freeMates ${pn} ${kind == "pend" || kind == "pendAsk" ? "a new mission named" : kind == "pendmash" ? "a new resorce named" : "the mission"} "${name}" hes ${kind == "finiappmi" ? "complited sucssesfully" : "suggested"} by ${un} and the appruval vote just started!`}
     const note = {"he":`לפי ההצעה כאשר ${kind == "pend" || kind == "pendAsk" ? "המשימה תאושר היא תתבצע":" המשאב יאושר הוא יושקע"} על ${rishon == username ? "ידך" : `${rishon} ידי`}  `,
                     "en":`he offered that if the suggestion appruved the ${kind == "pend" || kind == "pendAsk" ? `mission will be assigned to`:`resorce will be invested by`} ${rishon == username ? "you" : rishon}`} 
-    const instruction = {"he":`לרשותך ${houhe[restime]} בכדי להגיב על ההצעה ולנהל משא ומתן על פרטיה, לאחר מכן אם לא יהיו התנגדויות ההצעה תאושר אוטומטית `,
-                         "en":`you have ${houen[restime]} to response and to negotiat the deatail's, after that if no obligation it will be aotomaticlly appruved`}
+    const instruction = {"he":`לרשותך ${houhe[restime]}  ${kind == "finiappmi" ? " לבחון את פרטי המשימה ולאשר את סיומה המוצלח או לערער אם לדעתך הביצוע לא הושלם" :  "בכדי להגיב על ההצעה ולנהל משא ומתן על פרטיה" }, לאחר מכן אם לא יהיו התנגדויות  ${kind == "finiappmi" ?  "המשימה": "ההצעה"} תאושר אוטומטית `,
+                         "en":`you have ${houen[restime]} to ${kind == "finiappmi"? "validate that the work has complited,":"response and to negotiat the deatail's,"} after that if no obligation it will be aotomaticlly appruved`}
     const tovo = {"he":"להצבעה!","en":"vote now!"}
     const src1 = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"
 	const previewText = {
-        "he": `${pn} בריקמה ${un} הצבעה על ההצעה של`,
-        "en":`Vote for ${un}'s suggestion on freeMates ${pn}`};
+        "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
+        "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`};
         const slogen = {
             "he":"1💗1 - יש מה לעשות! ליצור יחד בהסכמה.",
             "en":"1💗1 Create together harmoniously"

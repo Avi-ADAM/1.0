@@ -1,7 +1,7 @@
 //get this hour timegramas
 //set timeOut for the exsact time of each
 //do verious task base on timegrama kind
-import {pend} from './pend.svelte'
+import {Pend} from './pend.svelte'
 import {finiapp} from './finiapp.svelte'
 import { Ask } from './ask.svelte';
 
@@ -14,6 +14,8 @@ async function x(id,kind){
       await Ask(id)
       console.log("here")
     } else if (kind == 'pendm') {
+              await Pend(id);
+
     }
     
 }

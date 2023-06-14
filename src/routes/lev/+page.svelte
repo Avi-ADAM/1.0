@@ -136,6 +136,7 @@ function mesimabetahalicha(data) {
             mtaha[i].noofpu = getProjectData(mtahan[i].attributes.project.data.id,"noof")
             mtaha[i].projectName = getProjectData(mtahan[i].attributes.project.data.id,"pn")
             mtaha[i].src = getProjectData(mtahan[i].attributes.project.data.id,"pp")
+             mtaha[i].pu = getProjectData(mtahan[i].attributes.project.data.id,"us")
        
         }
             mtaha = mtaha
@@ -221,7 +222,8 @@ function ishursium(dati) {
                 omid: start[i].attributes.finiapruvals.data[j].id,
                 askId: start[i].attributes.finiapruvals.data[j].id,
                 why: start[i].attributes.finiapruvals.data[j].attributes.why,
-                whatt: start[i].attributes.finiapruvals.data[j].attributes.what,
+                whatt: start[i].attributes.finiapruvals.data[j].attributes.what?.data?.attributes?.url,
+                whattid: start[i].attributes.finiapruvals.data[j].attributes.what?.data?.id,
                 users: start[i].attributes.finiapruvals.data[j].attributes.vots,
                 name: rt[0],
                 stylef: rt[1],
@@ -1352,7 +1354,7 @@ onMount(async () => {
 })
  export const snapshot = {
         capture: () => JSON.parse(JSON.stringify(arr1)),
-        restore: (value) => arr1 = JSON.parse(value)
+        restore: (value) => arr1 = value
     };
 let usernames
 const tolog = {"he": "תוקף ההתחברות שלך פג, אנו מעבירים אותך להתחברות מחדש", "en":"your connection is outdated you being redirected to login"}
@@ -1469,7 +1471,7 @@ async function start() {
                             users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}
       									}}}
     			finiapruvals(filters: { archived: { eq: false } }){ data{ id attributes{
-              			    missname noofhours why what{data{attributes {url formats}}} 
+              			    missname noofhours why what{data{id attributes {url formats}}} 
         					mesimabetahalich {data{id attributes{ perhour hearotMeyuchadot descrip mission {data {id}}}}}
                             vots  {what why id users_permissions_user {data{id}}}
           					project {data{ id}} 
@@ -2358,7 +2360,7 @@ function showall(event) {
 <svelte:head>
     <title>{title[$lang]}</title>
 </svelte:head>
-{#if low == true}
+{#if low == true && cards == false}
   <!--  <audio id="my_audio" src="https://res.cloudinary.com/love1/video/upload/v1655748801/thunder-25689_taqapa.mp3" loop="loop"></audio>-->
     <div bind:clientHeight={h} bind:clientWidth={w} style="display:block;
         position:absolute;

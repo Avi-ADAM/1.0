@@ -234,6 +234,8 @@ mousewheel={true}
  on:user={user}  
   on:hover={hover}
     {low}
+                pu={buble.pu}
+
     tasks={buble.acts.data}
     status={buble.status}
     tx={buble.tx}
@@ -404,6 +406,7 @@ mousewheel={true}
             src2 = {buble.src2}
             why={buble.why}
             whatt={buble.whatt}
+            whattid={buble.whattid}
             missionBName={buble.openName}
             name={buble.name}
             projectId={buble.projectId}

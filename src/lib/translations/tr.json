@@ -1,46 +1,70 @@
 {
-    "headers":{
-        "misfini":{
-            "he":"אישור סיום משימה בהצלחה",
-            "en":"approval of sucsessfully finishing a mission"
+    "headers": {
+        "misfini": {
+            "he": "אישור סיום משימה בהצלחה",
+            "en": "approval of sucsessfully finishing a mission"
         },
-        "hachlalogo":{
+        "hachlalogo": {
             "he": "הצבעה על שינוי לוגו הריקמה",
-            "en":"vote on changing FreeMates logo"
+            "en": "vote on changing FreeMates logo"
         },
-        "haluka":{
-            "he":"הצעת חלוקה",
-            "en":"money splitting offer"
+        "haluka": {
+            "he": "הצעת חלוקה",
+            "en": "money splitting offer"
         }
     },
-    "common":{
-        "total":{
-            "he":"בסך הכל",
-            "en":"in total"
+    "common": {
+        "total": {
+            "he": "בסך הכל",
+            "en": "in total"
         },
-        "hours":{
-            "he":"שעות",
-            "en":"hours"
+        "hours": {
+            "he": "שעות",
+            "en": "hours"
         },
-        "noofhours":{
-            "he":"כמות השעות",
-            "en":"number of hours"
+        "noofhours": {
+            "he": "כמות השעות",
+            "en": "number of hours"
         },
-        "perhour":{
-            "he":"לשעה",
-            "en":"per hour"
+        "perhour": {
+            "he": "לשעה",
+            "en": "per hour"
         },
-        "valph":{
-            "he":"שווי לשעה",
-            "en":"vallue per hour"
+        "valph": {
+            "he": "שווי לשעה",
+            "en": "vallue per hour"
         },
-        "notes":{
-            "he":"הערות",
-            "en":"notes"
+        "notes": {
+            "he": "הערות",
+            "en": "notes"
         },
-        "finalwords":{
-            "he":"מילות סיכום",
-            "en":"finall words"
+        "finalwords": {
+            "he": "מילות סיכום",
+            "en": "finall words"
+        },
+        "nego": {
+            "he": "משא ומתן",
+            "en": "negotiate"
+        }
+    },
+    "finiapp": {
+        "file": {
+            "he": "לצפיה בקובץ מצורף",
+            "en": "click to watch the linked file"
+        }
+    },
+    "vots": {
+        "totalin": {
+            "he": "סך ההצבעות בעד",
+            "en": "total votes in favor"
+        },
+        "notyet": {
+            "he": "לא הצביעו",
+            "en": "not voted yet"
+        },
+        "totalno": {
+            "he": "סך ההצבעות נגד",
+            "en": "total votes against"
         }
     }
 }

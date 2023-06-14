@@ -198,6 +198,7 @@ export let sml = false
             on:hover={hover}
             on:coinLapach={delo}
             on:modal={() =>modal = true}
+            pu={buble.pu}
             tasks={buble.acts.data}
             status={buble.status}
             tx={buble.tx}
@@ -373,6 +374,7 @@ export let sml = false
                                     src2 = {buble.src2}
                                     why={buble.why}
                                     whatt={buble.whatt}
+                                    whattid={buble.whattid}
                                     missionBName={buble.openName}
                                     name={buble.name}
                                     projectId={buble.projectId}

@@ -8,7 +8,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
  const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
-    export let projectName, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours,useraplyname
+    export let projectName,whatt, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours,useraplyname
     export let already, allr = false;
 function hover(x){
 dispatch("hover",{x:x});
@@ -33,6 +33,7 @@ const tri = import('$lib/translations/tr.json')
 const neged ={"he":"נגד","en":"against"}
 const bead = {"he":"בעד","en":"in favor"}
 const notyet = {"he":"טרם","en":"not yet"}
+console.log(whatt)
 </script>
 
 
@@ -61,17 +62,26 @@ const notyet = {"he":"טרם","en":"not yet"}
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionBName}</div>
      {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined" && missionDetails !== undefined} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
     {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover(`${tri.common.notes[$lang]}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
+     <p on:mouseenter={()=>hover(`${tr.common.notes[$lang]}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if} 
-     <div class="flex items-center border border-gold" >
-          <p on:mouseenter={()=>hover(`${tri.common.finalwords}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{why !== undefined && why !== null && why !== "undefined" ? why : ""}</p>
-   </div>
+     <div class="flex items-center border border-gold flex-col" >
+      {#if why !== undefined && why !== null && why !== "undefined"}
+      {#if why.startsWith("http")}
+          <a on:mouseenter={()=>hover(`${tr.common.finalwords[$lang]}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d hover:text-barbi" target=”_blank” href={why}>{why}</a>
+      {:else}
+          <p on:mouseenter={()=>hover(`${tr.common.finalwords[$lang]}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{why}</p>
+      {/if}
+      {/if}
+          {#if whatt}
+           <a on:mouseenter={()=>hover(`${tr.finiapp.file[$lang]}`)} target=”_blank” on:mouseleave={()=>hover("0")} href="{whatt}" class="text-barbi hover:text-gold">{tr.finiapp.file[$lang]}</a>
+          {/if}
+        </div>
         </div>
      <div class="flex items-center">
       <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src ??  "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
       <div class="text-sm">
         <p class="text-gray-900 leading-none">{useraplyname}</p>
-        <p class="vo ef"><span on:mouseenter={()=>hover({"he":"סך ההצבעות בעד","en":"total votes in favor"})} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-{bead[$lang]}</span> <span on:mouseenter={()=>hover({"he":"לא הצביעו","en":"not voted yet"})} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{notyet[$lang]} </span><span on:mouseenter={()=>hover({"he":"סך ההצבעות נגד","en":"total votes against"})} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-{neged[$lang]}</span></p>
+        <p class="vo ef"><span on:mouseenter={()=>hover(`${tr.vots.totalin[$lang]}`)} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-{bead[$lang]}</span> <span on:mouseenter={()=>hover(`${tr.vots.notyet[$lang]}`)} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{notyet[$lang]} </span><span on:mouseenter={()=>hover(`${tr.vots.totalno[$lang]}`)} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-{neged[$lang]}</span></p>
       </div>
     </div>
        </div>
@@ -85,7 +95,7 @@ const notyet = {"he":"טרם","en":"not yet"}
                 <Lev/>
                 </button>   
             <button
-             on:mouseenter={()=>hover({"he":"משא ומתן","en":"negotiate"})} 
+             on:mouseenter={()=>hover(`${tr.common.nego[$lang]}`)} 
              on:mouseleave={()=>hover("0")} 
              on:click= {()=>nego("f")}
               class = "btnc bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110" 

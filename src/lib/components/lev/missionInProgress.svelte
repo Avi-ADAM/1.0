@@ -14,6 +14,8 @@
      import {betha} from './storess/betha.js'
      import Lowbtn from '$lib/celim/lowbtn.svelte'
      import {SendTo} from '$lib/send/sendTo.svelte';
+    import axios from 'axios'
+const baseUrl = import.meta.env.VITE_URL
 
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
@@ -46,6 +48,7 @@ betha.subscribe(value => {
     export let mId;
     export let missId; //add in gr
     export let noofpu; //addtopr
+    export let pu;
     export let perhour;
     export let usernames;
     let mstotal = hourstotal*3600000
@@ -426,6 +429,7 @@ let toapprove = ``;
 let appi = ``;
 let butt = false
 async function afterwhy () {
+ 
    butt = true
   already = true;
   let d = new Date
@@ -440,8 +444,26 @@ const cookieValue = document.cookie
     idL = cookieValueId;
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
-    console.log("done+ file")
-  if (!why && !what) {
+    let newwhat = false;
+ if (what && what[0]){
+    //upload
+     let url1 = `${baseUrl}/api/upload`;
+  let files = what[0] 
+      axios
+     .post( url1, files  ,{
+                    headers: {
+                        Authorization: bearer1,
+                    },
+                })
+                .then(({ data }) => {
+                    const imageId = data[0].id;
+                  newwhat = imageId
+                  })
+      .catch(error => {
+        console.log('צריך לתקן:', error.response);
+                });
+  }
+    if (!why && !what) {
     activE = errorM.ein
   } else if (running) {
     activE = errorM.timer
@@ -456,6 +478,7 @@ if (noofpu === 1) {
              data: {
               missionName: "${missionName}",
               why: "${why}",
+              ${newwhat != false ? `what: "${newwhat}",`: ``}
               noofhours: ${hoursdon},
               mesimabetahalich: ${mId},
               perhour: ${perhour},
@@ -473,6 +496,7 @@ if (noofpu === 1) {
 createFiniapruval(
      data: {
       missname: "${missionName}",
+      ${newwhat != false ? `what: "${newwhat}",`: ``}
       why: "${why}",
       noofhours: ${hoursdon},
       mesimabetahalich: ${mId},
@@ -487,8 +511,8 @@ createFiniapruval(
   ]
 }){data {id }}`
 }
-//files shit from updatepic
-    //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש 
+//files shit from updatepic - done
+    //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש - done beside roles
  
         try {
             await fetch(linkg, {
@@ -516,6 +540,26 @@ ${tofinished}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            if (noofpu > 1) {
+              //nutify project users
+ let data = {pn:projectName,pl:src,pu:pu, pid:projectId, uid:idL, kind:"finiappmi", name:missionName}
+   fetch("/api/nuti", {
+  method: 'POST', 
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+            }
               isOpen = false;
               dispatch("done",
                {ani: "minp",
@@ -743,7 +787,7 @@ async function busabe(id){
               <button on:click={close}>ביטול</button>
              {#if a == 1}
               <h5>יש להעלות קובץ סיום משימה או לתאר במילים</h5>
-      <input  type="file" bind:files={what}>
+      <input  type="file" bind:files={what} >
       <input class="border border-gold" type="text" bind:value={why} placeholder="יש לתאר במילים את סיום המשימה">
           {#if butt == false}  <button class="bg-gold p-2 m-1 rounded-xl" on:click={afterwhy}>אישור</button>
            {:else} <small>כמה שניות בבקשה</small>{/if}

@@ -1,9 +1,9 @@
-/*import { render } from 'svelte-email';
+import { render } from 'svelte-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
 import sendgrid from '@sendgrid/mail';
 
 async function renderEmail(un,username,pl,pn,kind,rishon,name,lang,restime) {
-  html = await render({
+ let html = await render({
     template: PendJustCreated,
     props: {
       un: un,
@@ -30,7 +30,7 @@ async function renderText(
   lang,
   restime
 ) {
-  text = await render({
+let text = await render({
     template: PendJustCreated,
     props: {
       un: un,
@@ -66,9 +66,10 @@ async function nutifiPusers(
 ) {
   //by mail
   const previewText = {
-    "he": `הצבעה על ההצעה של ${un} בריקמה ${pn}`,
-    "en": `Vote for ${un}'s suggestion on freeMates ${pn}`
-  };
+        "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
+        "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`
+      };
+        
   const emailHtml = await renderEmail(
     un,
     username,
@@ -108,9 +109,9 @@ async function nutifiPusers(
 function getUnById(array, id) {
   const foundObject = array.find((obj) => obj.id === id);
   return foundObject ? foundObject.attributes.username : null;
-}*/
+}
 export async function POST({ request }) {
- /* const data = await request.json();
+  const data = await request.json();
   //  console.log("Form submitted a"); kind
   const pn = data.pn;
   const pl = data.pl;
@@ -138,7 +139,7 @@ export async function POST({ request }) {
          rishon
        );
      }
-  }))*/
+  }))
  
   return new Response();
 }

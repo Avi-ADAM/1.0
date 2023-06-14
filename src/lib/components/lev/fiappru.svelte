@@ -71,7 +71,7 @@ let nut;
 let tryo = "116%";
 let tryot = "-10.5%";
 let tryoti = "-5.25%";
-
+let whattid;
 async function xyz (){
 
 ok =  percentage(noofusersOk, noofpu)
@@ -197,6 +197,7 @@ async function agree() {
              data: {
               missionName: "${missionBName}",
               why: "${why}",
+              ${whattid ? `what: "${whattid}",`: ``}
               noofhours: ${nhours},
               mesimabetahalich: ${mId},
               perhour: ${valph},
@@ -565,6 +566,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
    {noofusersOk} 
    {noofusersNo}
    {valph}
+   {whatt}
    />
 {/if}
 {/await}

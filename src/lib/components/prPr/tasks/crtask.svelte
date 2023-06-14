@@ -1,9 +1,9 @@
 <script>
-    export let bmiData = []
+    export let bmiData = [], proles = []
     import { idPr } from '$lib/stores/idPr.js';
     import moment from 'moment';
   import { createEventDispatcher } from 'svelte';
-
+  let isPersonal = true
  const dispatch = createEventDispatcher();
     export let userMevatzeaId, userMevakeshId, mimatai  ,adMatai , name = "", teur = "",selected = [],link = "";
     let seEr = false, neEr = false
@@ -97,6 +97,7 @@ async function sub(){
       }
 }
 }
+    const level = {"he": "השמה למשימה בתהליך ספציפית או להציע לפי תפקיד","en": "do you want to assing it to spesific mission and person or to to offer it to all projecr mambers of a choosen role"}
     const sedes = {"he": " שליחה","en": "send"}
     const placeholderdf = {"he": "תאריך סיום", "en": "end date"}
     const placeholderds = {"he": "תאריך התחלה (אם רלוונטי)" , "en":"starting date (if relevant)"}
@@ -104,9 +105,13 @@ async function sub(){
     const namede = {"he":"שם למטלה", "en": "task name"}
     const desde = {"he": "תיאור קצר", "en":"task description"}
     const placeholder = {"he": "בחירת משימה בתהליך", "en": "choose mission in progress"}
+    const placeholderoles = {"he": "בחירת תפקיד", "en": "choose role"}
     const linkdes = {"he": "לינק רלוונטי", "en": "relevante link"}
     const seerdes = {"he": "נא לבחור משימה בתהליך לשיוך המטלה","en":"please choose one mission in progress"}
     const neerdes = {"he": "חובה להזין שם", "en":"must enter name"}
+    const pers = {"he": "משימה בתהליך", "en":"mission in progress"}
+    const role = {"he": "תפקידים", "en":"roles"}
+
    </script>
     <div class="flex flex-col items-center justify-center">
         <h1 class="text-barbi">{heading[$lang]}</h1>
@@ -135,12 +140,30 @@ async function sub(){
               <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{desde[$lang]}</label>
               <span class='line'></span>
         </div>
+
+        <h3  class="text-barbi">{level[$lang]}</h3>
+
+<div class="flex items-center justify-center" dir="ltr">
+  <label for="Toggle3" class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">
+    <input id="Toggle3" type="checkbox" class="hidden peer" bind:checked={isPersonal}>
+    <span class="px-4 py-2 rounded-l-md text-barbi peer-checked:text-gray-900 bg-mturk peer-checked:bg-gold">{pers[$lang]}</span>
+    <span class="px-4 py-2 rounded-r-md  peer-checked:text-barbi  bg-gold peer-checked:bg-mturk">{role[$lang]}</span>
+  </label>
+  </div>
+        {#if isPersonal == true}
       <MultiSelect
       bind:selected={selected}
       maxSelect={1}
       placeholder={placeholder[$lang]}
       options={bmiData.map(it=>it.attributes.users_permissions_user.data.attributes.username + " - " + it.attributes.name)}
       />
+      {:else}
+        <MultiSelect
+      bind:selected={selected}
+      placeholder={placeholderoles[$lang]}
+      options={proles.map(pr=>pr.name)}
+      />
+      {/if}
     {#if seEr == true}
         <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>
     {/if}
