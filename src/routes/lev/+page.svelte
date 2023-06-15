@@ -1422,7 +1422,7 @@ async function start() {
         													}}}
      									 }}} 
   	projects_1s {data{id attributes{ projectName 
-    			user_1s {data{id attributes{username haskamaz haskamac haskama profilePic {data{attributes{ url formats }}}}}} 
+    			user_1s {data{id attributes{username haskamaz haskamac email haskama profilePic {data{attributes{ url formats }}}}}} 
     			profilePic {data{attributes{ url formats }}} 
     			decisions (filters: { archived: { eq: false } }){ data{ id attributes{ 
         					kind createdAt 

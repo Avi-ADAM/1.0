@@ -449,9 +449,25 @@ const cookieValue = document.cookie
  if (what && what[0]){
     //upload
      let url1 = `${baseUrl}/api/upload`;
-  let files = what[0] 
-      axios
-     .post( url1, files  ,{
+  let files = what[0] ?? what 
+  let file = new FormData();
+file.append("files", files);
+ try {
+        const resp = await axios.post( url1, file ,{
+                    headers: {
+                        Authorization: bearer1,
+                    },
+                });
+        console.log(resp.data);
+         const imageId = resp.data[0].id;
+          newwhat = imageId
+    } catch (err) {
+        // Handle Error Here
+        console.error(err);
+    }
+   
+      /*axios
+     .post( url1, file ,{
                     headers: {
                         Authorization: bearer1,
                     },
@@ -463,7 +479,7 @@ const cookieValue = document.cookie
                   })
       .catch(error => {
         console.log('צריך לתקן:', error.response);
-                });
+                });*/
   }
   console.log("here", newwhat)
     if (!why && !what) {
