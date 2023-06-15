@@ -235,7 +235,7 @@ mousewheel={true}
   on:hover={hover}
     {low}
                 pu={buble.pu}
-
+  hearotMeyuchadot={buble.hearotMeyuchadot}
     tasks={buble.acts.data}
     status={buble.status}
     tx={buble.tx}

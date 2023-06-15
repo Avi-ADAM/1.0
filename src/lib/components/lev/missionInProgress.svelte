@@ -38,6 +38,7 @@ betha.subscribe(value => {
     export let projectName = "ONE"
     export let missionName = "do x" 
     export let missionDetails = "do x in y"
+    export let hearotMeyuchadot;
     export let src = "coin.png"
     export let link = "https://www.1lev1.world"
     export let linkDescription = "לביצוע"
@@ -458,11 +459,13 @@ const cookieValue = document.cookie
                 .then(({ data }) => {
                     const imageId = data[0].id;
                   newwhat = imageId
+                  console.log(newwhat,data)
                   })
       .catch(error => {
         console.log('צריך לתקן:', error.response);
                 });
   }
+  console.log("here", newwhat)
     if (!why && !what) {
     activE = errorM.ein
   } else if (running) {
@@ -1302,8 +1305,13 @@ on:start={start}
   on:hover={hoverc}
   on:azor={azor}
   on:clear={handleClearClick}
+  on:statusi={function(){
+     a = 2;
+    isOpen = true
+  }}
   {low}
   {dueDateOrCountToDedline}
+  {hearotMeyuchadot}
 {x}
 {iskvua}
   {zman}
@@ -1318,6 +1326,7 @@ on:start={start}
    {show}
    {hourstotal}
    {hoursdon}
+   {status}
    />
 {/if}
 <style>

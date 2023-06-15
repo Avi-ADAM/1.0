@@ -1,5 +1,5 @@
 <script>
-export let x = 0,src,projectName,already,zman,dueDateOrCountToDedline, missionName,link,missionDetails, hoursdon, hourstotal,show,running,linkDescription,lapse = 0
+export let x = 0,src,projectName,already,zman,hearotMeyuchadot,status = 0,dueDateOrCountToDedline, missionName,link,missionDetails, hoursdon, hourstotal,show,running,linkDescription,lapse = 0
     import { formatTime } from './../utils.js';
     import {lang} from '$lib/stores/lang.js' 
     export let low = false;
@@ -28,9 +28,13 @@ dispatch("clear");
 function hover(x){
 dispatch("hover",{x:x});
 }
+function statusi(){
+   dispatch("statusi")
+}
  // import { textfit } from 'svelte-textfit';
  // let parent;
  $: event = dueDateOrCountToDedline != "undefined" &&  dueDateOrCountToDedline != undefined &&  dueDateOrCountToDedline != null ? new Date(dueDateOrCountToDedline) : null;
+  const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
 
 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 
@@ -69,10 +73,14 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
             <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>-->
      {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined"} <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="cd d max-h-16 text-sm text-gray-700 text-base">{missionDetails}</p>{/if}
-  <!---  {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
-     {/if} --->
-       
+    {#if hearotMeyuchadot}
+     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm md:text-lg d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" ? hearotMeyuchadot : ""}</p>
+     {/if} 
+        <div
+  on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
+  class="de border rounded-2xl border-barbi hover:border-gold mt-3" on:click={()=>statusi()}
+    on:keypress={()=>statusi()}
+    ><div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {status == null ? 0 : status[0]}%">{status != null ? status[0] : "0"}%</div></div>
     </div>
     <div class="flex items-center">
       </div>
