@@ -1,4 +1,4 @@
-/*import { render } from 'svelte-email';
+import { render } from 'svelte-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
 import sendgrid from '@sendgrid/mail';
 
@@ -109,7 +109,7 @@ async function nutifiPusers(
 function getUnById(array, id) {
   const foundObject = array.find((obj) => obj.id === id);
   return foundObject ? foundObject.attributes.username : null;
-}*/
+}
 export async function POST({ request }) {
   const data = await request.json();
   //  console.log("Form submitted a"); kind
@@ -121,7 +121,7 @@ export async function POST({ request }) {
   const name = data.name;
   const pu = data.pu;
   const restime = data.restime;
-  /*
+  
   const rishon = data.rishon ?? getUnById(pu, data.rishon);
   const un = getUnById(pu, uid);
   await Promise.all(pu.map(async (element) =>{
@@ -141,6 +141,6 @@ export async function POST({ request }) {
        );
      }
   }))
- */
+ 
   return new Response();
 }

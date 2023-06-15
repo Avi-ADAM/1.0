@@ -3,14 +3,14 @@ import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { Tour, TourTip } from 'svelte-tour';
   	import { Toasts } from 'as-toast';
-//import {browser} from '$app/environment '
+import {browser} from '$app/environment '
 import { lang } from '$lib/stores/lang.js'
- // import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
+  import { initializeApp } from "firebase/app";
+  import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-/*
+
 const firebaseConfig = {
   apiKey: "AIzaSyAq9ZNUsrrUw-mHmi8jCjkmcDdR6PpLpLc",
   authDomain: "lev1-9ad4a.firebaseapp.com",
@@ -33,7 +33,7 @@ onMessage(messaging, (payload) => {
   // ...
 });
 }
-*/
+
 let isAuthed = false;
 let token;
 onMount(async () => {
