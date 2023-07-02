@@ -214,7 +214,7 @@ JSON.stringify({query:
             descripFor
             publicDescription
             sales {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
-            matanotof {data{ id attributes{ name price quant kindOf }}}
+            matanotofs {data{ id attributes{ name price quant kindOf }}}
             finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
              user_1s {data{ id attributes{email lang username profilePic {data{attributes{ url formats}}}}}}
@@ -266,18 +266,23 @@ JSON.stringify({query:
             } else if (project.mesimabetahaliches.data.length == null) {
             bmiData.push(project.mesimabetahaliches.data);
             }
-                          if (project.sales.data.length > 0){
+            if (project.sales.data.length > 0){
             salee = project.sales.data;
             } else if (project.sales.data.length == null) {
             salee.push(project.sales.data);
             }
             salee = salee
-              if (project.matanotof.data.length > 0){
-            bmimData = project.matanotof.data;
-            } else if (project.matanotof.data.length == null) {
-            bmimData.push(project.matanotof.data);
+            if (project.matanotofs?.data?.length > 0){
+            bmimData = project.matanotofs.data;
+            } else if (project.matanotofs?.data?.length == null) {
+               if (project.matanotofs?.data == null) {
+            //bmimData.push([]);
+            }else{
+            bmimData.push(project.matanotofs.data);
             }
-             if (project.open_mashaabims.data.length > 0){
+            }
+        console.log(project )
+            if (project.open_mashaabims.data.length > 0){
             opmash = project.open_mashaabims.data;
             } else if (project.open_mashaabims.data.length == null) {
             opmash.push(project.open_mashaabims.data);
@@ -295,6 +300,7 @@ JSON.stringify({query:
             rikmashes = rikmashes
           //  if (project.open_missions.length > 1){
             bmimData = bmimData
+
             omiData = project.open_missions.data;
           //  } else if (project.open_missions.length == null){
           //  omiData.push(project.open_missions);

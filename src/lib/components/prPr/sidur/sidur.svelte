@@ -1,6 +1,7 @@
 <script>
     import Calendar from '@event-calendar/core';
     import TimeGrid from '@event-calendar/time-grid';
+    import Interaction from '@event-calendar/interaction'
     import { lang } from '$lib/stores/lang.js';
       import { addToast } from 'as-toast';
     import '@event-calendar/core/index.css';
@@ -22,7 +23,7 @@
          {id:2,start: "2022-08-26T11:00:00",end: "2022-08-26T14:00:00", title: "alon"}
        // your list of events
         ]
-    let plugins = [TimeGrid];
+    let plugins = [TimeGrid,Interaction];
     let options = {
         nowIndicator: true,
         locale: $lang,
