@@ -12,6 +12,7 @@
     import Uplad from '../userPr/uploadPic.svelte';
      import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly, scale } from 'svelte/transition';
+      import Chooser from '$lib/celim/ui/chooser.svelte'
 let loading = false;
 let isOpen = false;
 let a = 0;
@@ -32,6 +33,7 @@ let files;
   let shgi = false;
     let restime;
     let nam;
+    let ont = false
 async function sendP () {
   if(projectName_value.length < 1){
     naex = {"he": "שם הריקמה חייב להיות ארוך יותר", "en": "please choose name for the FreeMate"}
@@ -108,7 +110,8 @@ async function sendPP(){
         vallues:[${find_value_id(selected)}],
         restime: ${restime},
         timeToP:${timeToP},
-         profilePic: ${imageId},        
+         profilePic: ${imageId}, 
+         isOt:${ont}       
         }  
   ){
   data { id attributes{ projectName}}
@@ -275,12 +278,13 @@ const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה",
 const wel = {"he":"לינק לאתר (אם יש)" ,"en":"link to a website (if any)"}
 let naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
 const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMates will promote"}
-const ladd = {"he":"הוסף לוגו", "en": "add Logo"} 
+const ladd = {"he":"הוספת לוגו", "en": "add Logo"} 
 const su = {"he": "לוגו נוסף בהצלחה", "en": "logo has successfully added"}
 const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
 const cree = {"he": "ליצור ולפרסם ריקמה", "en": "Create new FreeMate"}
 const sur = {"he":"הריקמה נוצרה בהצלחה", "en":"new FreeMates has created"}
 const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "en":"to the FreeMates brain"}
+const inc = {"he":"ניתן להזין את הערך המוערך של ההכנסה אם ידוע, אחרת ניתן יהיה לחשב בהמשך מדף הניהול","en":"if you know the aproximate vallue of income, else you can later caculate it"}
  </script>  
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -411,6 +415,15 @@ const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "e
 </select>
 <small style="color: turquoise;">{timetoex[$lang]}</small>
 </div>
+<Chooser tr={{"he":"ריקמה מתמשכת","en":"continuous"}}   
+  fl={{"he":"ריקמה חד פעמית","en":"one timed"}} 
+  level={{"he":"הריקמה מיועדת להיות אירוע חד פעמי או מתמשך? לדוגמה: הפקת אירוע או הקמת עסק להפקת אירועים","en":"those the FreeMates intend to be a one time think or a continouse one? for exmple: event production vs openting a production company"}} 
+  bind:checked={ont} />
+  <!-- הדוגמה א טובה צריך לתת פתיחה של מסעדה מול אירוע חד פעמי, גם כדאי לשים בשורה נפרדת של הערות 
+{#if ont == true}
+<h3 class="text-barbi">{inc[$lang]}</h3>
+<input type="number"/>
+{/if}-->
   {#if loading == false}
 
 <button 
