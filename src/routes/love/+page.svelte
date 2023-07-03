@@ -1,12 +1,10 @@
-
+ 
 <script>
-  import { t } from '$lib/translations'; 
   import { RingLoader
 } from 'svelte-loading-spinners';
-    let country = [];
-    let error = null
-    let lang = 'en';
-     import datai from '../../lib/components/main/data.json';
+  
+    import {lang} from '$lib/stores/lang.js'
+   //  import datai from '$lib/components/main/data.json';
 
 
   import { LayerCake, Svg, Html } from 'layercake';
@@ -17,70 +15,11 @@
     
   import MapSvg from '../../lib/components/main/map.svg.svelte';
   import Tooltip from '../../lib/components/main/tooltip.html.svelte';
- let data = loadi ();
- async function loadi (){
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            let res = await fetch("https://tov.onrender.com/graphql", {//api/cuntries?pagination[page]=1&pagination[pageSize]=280
-             method: "POST",
-              headers: {
-                 'Content-Type': 'application/json'
-              },  body: JSON.stringify({
-                        query: `query {
-  cuntries {
-    data{
-      id
-      attributes {name free_people{data{id
-    }
-    }
-    } 
-    }
-}
-}   `})
-            }).then(checkStatus)
-          .then(parseJSON);
-            country = res.data.cuntries.data
-             data = datai;
-            for (let j = 0; j< country.length; j++){
-      for (let i = 0; i< data.length; i++){
-        if(data[i].name === country[j].attributes.name){
-          data[i].agrees = country[j].attributes.free_people.data.length 
-        }else if (data[i].name === "Palestine" && country[j].id === 167 || data[i].name === "Palestine" && country[j].id ===  246){
-            if (data[i].agrees > 0){
-                data[i].agrees += country[j].attributes.free_people.data.length
-        }else{
-                data[i].agrees = country[j].attributes.free_people.data.length
-        }}
-         else if (data[i].name === "Russia"  && country[j].attributes.name ==="Russian Federation"){
-             data[i].agrees = country[j].attributes.free_people.data.length
-        }else if (data[i].name === "United States of America"  && country[j].attributes.name ==="United States"){
-             data[i].agrees = country[j].attributes.free_people.data.length
-        }
-            }
-        }
-        data.forEach(d => {
-    dataLookup.set(d[dataJoinKey], d);
-  });
-        } catch (e) {
-            error = e
-            console.log(error)
-        }
-        return data
-    }
+ export let data = null
+ 
   // This example loads json data as json using @rollup/plugin-json
   import world from '../../lib/components/main/countries110m.json';
+  import { onMount } from 'svelte';
 
   const colorKey = 'agrees';
   const colorKeyy = 'value';
@@ -93,7 +32,15 @@
   const dataJoinKey = 'name';
   const mapJoinKey = 'name';
   const dataLookup = new Map();
+ 
+    $:  data.streamed.data.then(function(data) {
+      data.forEach(d => {
+    dataLookup.set(d[dataJoinKey], d);
+        }
+        )
+      })
 
+   
   const geojson = feature(world, world.objects.units);
   const projection = geoMercator;
 
@@ -110,6 +57,7 @@
 					"#EEE8AA"];
 
   const addCommas = format(',');
+  const title = {"he":"כמה הסכימו מכל מקום","en":"How many agreements we accepted from each place"}
 </script>
 
 <style>
@@ -136,7 +84,7 @@
       background-color: rgb(103, 232, 249);
   }
 </style>
-{#await data}
+{#await data.streamed.data}
 <div class="flex flex-col text-center items-center justify-center trr">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
@@ -144,7 +92,7 @@
          </div> 
 {:then}
 <div class="ww">
-    <h1 style="font-size:20px;" class="text-barbi text-center">{$t('love.title')}
+    <h1 style="font-size:20px;" class="text-barbi text-center">{title[$lang]}
     </h1>
     <div class="wwa">
 <div class="chart-container">

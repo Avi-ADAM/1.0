@@ -15,7 +15,7 @@ export let projectSrc;
 let error1
 import {
     goto } from '$app/navigation';
-  import { height } from '@event-calendar/common';
+ // import { height } from '@event-calendar/common';
 let confe = false
 async function project(id) {
     confe = false
