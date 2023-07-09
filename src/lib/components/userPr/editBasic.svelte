@@ -9,6 +9,35 @@ export let isGuidMe = false;
 import { initializeApp } from "firebase/app";
 //import { getAnalytics } from "firebase/analytics";
 
+  import { onMount } from 'svelte';
+  $: t = 0
+  $: teleredy = false
+
+onMount(async () => {
+t = Math.random()
+try{
+let res =await SendTo(`mutation { updateUsersPermissionsUser(
+    id:${uid}
+      data: { city: "${t}" }
+
+  ){
+      data {
+        attributes{
+          telegramId
+      }
+  }
+}
+}`)
+.then (res => res = res);
+  console.log(res.data)
+   if(res.data !=null){
+    console.log("bee")
+  teleredy = true
+   }
+} catch(e) {
+  console.error(e)
+}
+})
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -303,6 +332,9 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
   const co = {"he": "מטבעות", "en":"coins"}
   const car = {"he": "קלפים", "en": "cards"}
   const level = {"he":"תצוגה מועדפת במסך הלב:","en":"preferred Lev page display:"}
+  const nutidev = {"he":"הרשמה לקבלת התראות פוש במכשיר זה","en":"register for device nutification"}
+    const nutitele = {"he":" הרשמה לקבלת התראות בטלגרם ","en":"register for telegram nutification "}
+
 </script>
 <h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
  <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
@@ -404,6 +436,8 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 </div>
 <h3  class="text-barbi">{level[$lang]}</h3>
 
+
+
 <div class="flex items-center justify-center" dir="ltr">
   <label for="Toggle3" class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">
     <input id="Toggle3" type="checkbox" class="hidden peer" bind:checked on:change="{ch}">
@@ -494,8 +528,30 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
     <button type="button" on:click={()=> change = true}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שינוי סיסמה</button>
 
     {/if}
-	<button type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">הרשמה לקבלת התראות</button>
-{#if isGuidMe != false && pressed == false}
+	<button type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{nutidev[$lang]}</button>
+  {#key teleredy}  
+  {#if teleredy == true}
+  <a href="{`https://telegram.me/onelevone_bot?start=${uid}%20${t}`}" alt="telegramjoin"  
+    class="flex items-center grow justify-center  m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">
+    {nutitele[$lang]}
+  <svg
+  class="h-5 w-5"
+  fill="#1da1f2"
+  viewbox="0 0 24 24"
+  version="1.1"
+  xmlns="http://www.w3.org/2000/svg"
+  xmlns:xlink="http://www.w3.org/1999/xlink"
+  xml:space="preserve"
+  xmlns:serif="http://www.serif.com/"
+  style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:1.41421;">
+  <path
+    id="telegram-1"
+    d="M18.384,22.779c0.322,0.228 0.737,0.285 1.107,0.145c0.37,-0.141 0.642,-0.457 0.724,-0.84c0.869,-4.084 2.977,-14.421 3.768,-18.136c0.06,-0.28 -0.04,-0.571 -0.26,-0.758c-0.22,-0.187 -0.525,-0.241 -0.797,-0.14c-4.193,1.552 -17.106,6.397 -22.384,8.35c-0.335,0.124 -0.553,0.446 -0.542,0.799c0.012,0.354 0.25,0.661 0.593,0.764c2.367,0.708 5.474,1.693 5.474,1.693c0,0 1.452,4.385 2.209,6.615c0.095,0.28 0.314,0.5 0.603,0.576c0.288,0.075 0.596,-0.004 0.811,-0.207c1.216,-1.148 3.096,-2.923 3.096,-2.923c0,0 3.572,2.619 5.598,4.062Zm-11.01,-8.677l1.679,5.538l0.373,-3.507c0,0 6.487,-5.851 10.185,-9.186c0.108,-0.098 0.123,-0.262 0.033,-0.377c-0.089,-0.115 -0.253,-0.142 -0.376,-0.064c-4.286,2.737 -11.894,7.596 -11.894,7.596Z" />
+</svg>
+  </a>
+{/if}
+{/key}
+  {#if isGuidMe != false && pressed == false}
 	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">ביטול הצגת המדריך</button>
 {:else if isGuidMe == false && pressed == false}
 	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"> החזרת הצגת המדריך</button>
