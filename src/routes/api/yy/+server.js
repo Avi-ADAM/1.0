@@ -15,10 +15,16 @@ export const POST = async ({ request }) => {
     } else if (isShow == true){
         name = ""
         det = ""
-        action = '1lev1.vercel.app';
+        action = 'https://1lev1.vercel.app';
     } else if (isStart == true){
         const id = messegeText.split(' ')[1]
         console.log(id)
+        const t = messegeText.split(' ')[2];
+        console.log(t);
+        if (t && id){
+            
+        }
+        //lang un
         name = ""
         det = ""
         action = "הרשמתך לעדכונים התקבלה בהצלחה!"
