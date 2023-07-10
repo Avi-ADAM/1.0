@@ -1,7 +1,7 @@
 export const POST = async ({ request }) => {
     console.log("tryng", request.body)
     const data = await request.json()
-    console.log("gg", data)
+    console.log("gg", data, data.message?.text)
     const messegeText = data.message.text
     const isReg = messegeText.startsWith('/getnotification')
     const isShow = messegeText.startsWith('/showaddress')
@@ -17,18 +17,21 @@ export const POST = async ({ request }) => {
         det = ""
         action = 'https://1lev1.vercel.app';
     } else if (isStart == true){
-        const id = messegeText.split(' ')[1]
-        console.log(id)
-        const t = messegeText.split(' ')[2];
-        console.log(t);
-        if (t && id){
-            
+        const startCommand = '/start ';
+
+        const startParameter = data.message.text.substr(startCommand.length);
+      
+      if (startParameter) {
+        const [userId, verificationCode] = startParameter.split('_');
+        console.log(userId, verificationCode, "you here");
+        if (userId && verificationCode) {
         }
         //lang un
         name = ""
         det = ""
         action = "הרשמתך לעדכונים התקבלה בהצלחה!"
     }
+}
     const botMessage = `${name} %0A 
      ${action} %0A 
      ${det}`;
