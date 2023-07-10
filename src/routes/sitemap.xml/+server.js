@@ -1,6 +1,7 @@
 export async function GET() {
     // Suggestion (check for correctness before using):
-     return new Response(`
+     return new Response(
+       `
        <?xml version="1.0" encoding="UTF-8" ?>
        <urlset
          xmlns="https://www.sitemaps.org/schemas/sitemap/0.9"
@@ -11,90 +12,67 @@ export async function GET() {
          xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"  
        >
              <url>
-             <loc>https://www.1lev1.world/</loc>
+             <loc>https://1lev1.vercel.app/</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>weekly</changefreq>
              </url>
              <url>
-             <loc>https://www.1lev1.world/login</loc>
+             <loc>https://1lev1.vercel.app/login</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <changefreq>weekly</changefreq>
              <priority>0.99</priority>
              </url>
              <url>
-             <loc>https://www.1lev1.world/love</loc>
+             <loc>https://1lev1.vercel.app/love</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>0.85</priority>
              <changefreq>daily</changefreq>
              </url>
              <url>
-             <loc>https://www.1lev1.world/about</loc>
+             <loc>https://1lev1.vercel.app/about</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>0.95</priority>
              <changefreq>weekly</changefreq>
              </url>
              <url>
-             <loc>https://www.1lev1.world/lev</loc>
+             <loc>https://1lev1.vercel.app/lev</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>0.96</priority>
              <changefreq>always</changefreq>
              </url>     
              <url>
-             <loc>https://www.1lev1.world/moach</loc>
+             <loc>https://1lev1.vercel.app/moach</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>0.96</priority>
              <changefreq>always</changefreq>
              </url>  
              <url>
-             <loc>https://www.1lev1.world/me</loc>
+             <loc>https://1lev1.vercel.app/me</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>always</changefreq>
              </url>         
              <url>
-             <loc>https://www.1lev1.world/en</loc>
+             <loc>https://1lev1.vercel.app/en</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>0.96</priority>
              <changefreq>always</changefreq>
              </url>    
              <url>
-             <loc>https://www.1lev1.world/ar</loc>
+             <loc>https://1lev1.vercel.app/ar</loc>
              <lastmod>2022-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>always</changefreq>
              </url>                                                            
-             <url>
-             <loc>https://shalom.1lev1.world/</loc>
-             <lastmod>2022-06-12T23:42:27+00:00</lastmod>
-             <priority>0.98</priority>
-             </url>
-             <url>
-             <loc>https://shalom.1lev1.world/1-0/</loc>
-             <lastmod>2022-06-12T23:42:27+00:00</lastmod>
-             <priority>0.90</priority>
-             </url>
-             <url>
-             <loc>https://shalom.1lev1.world/l/</loc>
-             <lastmod>2022-06-12T23:42:27+00:00</lastmod>
-             <priority>0.80</priority>
-             </url>
-             <url>
-             <loc>https://shalom.1lev1.world/1/</loc>
-             <lastmod>2022-06-12T23:42:27+00:00</lastmod>
-             <priority>0.80</priority>
-             </url>
-             <url>
-             <loc>https://shalom.1lev1.world/harmoni/</loc>
-             <lastmod>2022-06-12T23:42:27+00:00</lastmod>
-             <priority>0.80</priority>
-             </url>
        </urlset>
-     `.trim(), {
+     `.trim(),
+       {
          headers: {
-             'Content-Type': 'application/xml'
+           'Content-Type': 'application/xml'
          }
-     });
+       }
+     );
     }
   /* return {
         headers: {
@@ -111,55 +89,55 @@ export async function GET() {
         xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"  
       >
             <url>
-            <loc>https://www.1lev1.world/</loc>
+            <loc>https://1lev1.vercel.app/</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>1.00</priority>
             <changefreq>weekly</changefreq>
             </url>
             <url>
-            <loc>https://www.1lev1.world/login</loc>
+            <loc>https://1lev1.vercel.app/login</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.99</priority>
             </url>
             <url>
-            <loc>https://www.1lev1.world/love</loc>
+            <loc>https://1lev1.vercel.app/love</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>0.85</priority>
             <changefreq>daily</changefreq>
             </url>
             <url>
-            <loc>https://www.1lev1.world/about</loc>
+            <loc>https://1lev1.vercel.app/about</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>0.95</priority>
             <changefreq>weekly</changefreq>
             </url>
             <url>
-            <loc>https://www.1lev1.world/lev</loc>
+            <loc>https://1lev1.vercel.app/lev</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>0.96</priority>
             <changefreq>always</changefreq>
             </url>     
             <url>
-            <loc>https://www.1lev1.world/moach</loc>
+            <loc>https://1lev1.vercel.app/moach</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>0.96</priority>
             <changefreq>always</changefreq>
             </url>  
             <url>
-            <loc>https://www.1lev1.world/me</loc>
+            <loc>https://1lev1.vercel.app/me</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>1.00</priority>
             <changefreq>always</changefreq>
             </url>         
             <url>
-            <loc>https://www.1lev1.world/en</loc>
+            <loc>https://1lev1.vercel.app/en</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>0.96</priority>
             <changefreq>always</changefreq>
             </url>    
             <url>
-            <loc>https://www.1lev1.world/ar</loc>
+            <loc>https://1lev1.vercel.app/ar</loc>
             <lastmod>2022-06-29T20:57:22+00:00</lastmod>
             <priority>1.00</priority>
             <changefreq>always</changefreq>
