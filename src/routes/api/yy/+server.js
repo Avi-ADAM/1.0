@@ -6,6 +6,7 @@ export const POST = async ({ request }) => {
     const isReg = messegeText.startsWith('/getnotification')
     const isShow = messegeText.startsWith('/showaddress')
     const isStart = messegeText.startsWith('/start')
+    console.log(isStart, data.message.entities);
     let name,det,action;
     if (isReg == true){
         //check if chatid is already in use else:
@@ -17,20 +18,21 @@ export const POST = async ({ request }) => {
         det = ""
         action = 'https://1lev1.vercel.app';
     } else if (isStart == true){
-        const startCommand = '/start ';
-
+        const startCommand = '/start';
+        console.log(data.message.entities);
         const startParameter = data.message.text.substr(startCommand.length);
       
       if (startParameter) {
         const [userId, verificationCode] = startParameter.split('_');
-        console.log(userId, verificationCode, "you here");
+        console.log(userId, verificationCode, 'you here');
         if (userId && verificationCode) {
         }
+      }
+
         //lang un
         name = ""
         det = ""
         action = "הרשמתך לעדכונים התקבלה בהצלחה!"
-    }
 }
     const botMessage = `${name} %0A 
      ${action} %0A 
