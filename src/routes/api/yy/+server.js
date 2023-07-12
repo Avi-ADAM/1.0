@@ -18,19 +18,19 @@ export const POST = async ({ request }) => {
         det = ""
         action = 'https://1lev1.vercel.app';
     } else if (isStart == true){
+        name = '';
         const startCommand = '/start';
         console.log(data.message.entities);
         const startParameter = data.message.text.substr(startCommand.length);
-      
       if (startParameter) {
-        const [userId, verificationCode] = startParameter.split('_');
+        const [userId, verificationCode, un, lang] = startParameter.split('_');
         console.log(userId, verificationCode, 'you here');
         if (userId && verificationCode) {
+          name = un;
         }
       }
 
         //lang un
-        name = ""
         det = ""
         action = "הרשמתך לעדכונים התקבלה בהצלחה!"
 }

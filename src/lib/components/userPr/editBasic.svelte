@@ -531,7 +531,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 	<button type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{nutidev[$lang]}</button>
   {#key teleredy}  
   {#if teleredy == true}
-  <a target="_blank" href="{`https://telegram.me/onelevone_bot?start=${uid}_${t}`}" alt="telegramjoin"  
+  <a target="_blank" href="{`https://telegram.me/onelevone_bot?start=${uid}_${t}_${un}_${$lang}`}" alt="telegramjoin"  
     class="flex items-center grow justify-center  m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">
     {nutitele[$lang]}
   <svg
