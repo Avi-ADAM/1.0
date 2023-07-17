@@ -25,6 +25,7 @@
     "svelte-multiselect": "8.3.0",
     "svelte-range-slider-pips": "^2.0.3",
     "svelte-scrollto": "^0.2.0",
+    "svelte-share-buttons-component": "^1.5.5",
     "svelte-sitemap": "^2.5.1",
     "svelte-textfit": "^1.1.4",
     "tailwindcss": "^3.0.24",

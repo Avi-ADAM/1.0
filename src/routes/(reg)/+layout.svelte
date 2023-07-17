@@ -34,7 +34,7 @@ onMessage(messaging, (payload) => {
   // ...
 });
 }
-
+export let data
 let isAuthed = false;
 let token;
 onMount(async () => {
@@ -47,22 +47,11 @@ onMount(async () => {
   .find(row => row.startsWith('when='))
   .split('=')[1];
   const today = Date.now()
-  if(cookieR +2592000000 < today ){
+  if(new Date(cookieR +2592000000) < today ){
     goto("login")
   }
   }
-    const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  if(cookieValue !== null){
-      const tok = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-    token  = tok;     
-}
-    
-if (token){
+    if (data.tok){
     isAuthed = true
 }
 });
@@ -78,7 +67,7 @@ function reg (){
   }
 }
 function login () { 
-    goto ("/login",)
+    goto (`/login${data.from ? "?from=" + data.from : ""}`,)
 }
 const info ={"he": "הגעת לעמוד הדורש הרשמה","en":"This page is for registred users only" }
 const registratio = { "he": "להרשמה", "en": "To Registration"} 

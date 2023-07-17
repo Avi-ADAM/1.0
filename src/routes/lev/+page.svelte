@@ -1255,7 +1255,7 @@ onMount(async () => {
                 .split('=')[1];
             const today = Date.now()
             if (cookieR + 2592000000 < today) {
-                goto("login")
+                goto("/login?from=/lev")
             }
         }
         const cookieValueId = document.cookie
@@ -1504,7 +1504,7 @@ async function start() {
                 console.log("login")
                 addToast(`${tolog[$lang]}`, 'info');
 
-                goto("/login?ref=lev")
+                goto("/login?from=/lev")
             }
                             console.log("nologin")
 
