@@ -121,8 +121,8 @@ async function xyd () {
  <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
  </div>
  {:then project}
-
-<div dir="rtl"  class="h-screen bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
+<div class="w-screen bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
+<div dir="rtl"  class="h-screen lg:w-1/2 mx-auto ">
 
   <div class="4">
     {#if srcP}
@@ -237,6 +237,7 @@ async function xyd () {
 
 <p class="text-gold bg-barbi font-bold hover:text-barbi hover:bg-gold px-2 rounded-xl mb-2 cursor-pointer	"  on:click={mesima(om.id)}>{om.name}</p>
 {/each}-->
+</div>
 </div>
 </div>
 {/await}

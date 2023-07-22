@@ -40,7 +40,6 @@ export const load = async ({fetch}) => {
          .then((data) => {
             country = data.data.cuntries.data;
             data = datai;
-            console.log(data);
             for (let j = 0; j < country.length; j++) {
               for (let i = 0; i < data.length; i++) {
                 if (data[i].name === country[j].attributes.name) {

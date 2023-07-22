@@ -9,8 +9,8 @@
     import { liUN } from '$lib/stores/liUN.js';
  
 
-  
-
+    export let data
+    $: mydata = data
     let active = false;
     let loginError = null;
     let email = "";
@@ -49,16 +49,19 @@
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);
+                if(mydata.from){
+                    goto(mydata.from)
+                }else{
                 goto("/me", )
+                }
                // goto("/oneHomeGr", )
               
             })
             .catch((err) => {
                 if (err.response) {
                     loginError = "";
-                    for (let message of err.response.data.message[0].messages) {
-                        loginError += `${message.message}\n`;
-                    }
+                    console.log(err.response,"tt",err)
+                        loginError += `${err.response.data.error.message}\n`;
                 } else loginError = err;
             });
     };
@@ -70,7 +73,7 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
 
 	import { emailValidator, requiredValidator } from '../../lib/celim/validators.js'
   import { createFieldValidator } from '../../lib/celim/validation.js'
-
+    const iwanttoreg = {"he":"עדיין לא נרשמתי", "en":"I wand to register"}
   const [ validity, validate ] = createFieldValidator(requiredValidator(), emailValidator())
     const title = {"he": "התחברות ל-1💗1", "en":"login to 1💗1"}
 </script>
@@ -88,7 +91,7 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
                          title={buttonForgot[$lang]}  
                          in:fade  
                                 style=" position: fixed;
-                                top: 80%;
+                                top: 70%;
                                 left: 50%;
                                 transform: translate(-50%, -50%);
                                 ">
@@ -109,7 +112,8 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
                         use:validate={email}
                             placeholder={emailenter[$lang]}
                             id="email"
-                            autocomplete="username"
+                             aria-required="true" 
+                            autocomplete="email"
                              />
 </div>                 
 <div dir="rtl">                      
@@ -118,15 +122,18 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
                             bind:value={password}
                             placeholder={passenter[$lang]}
                             id="password"
+                            aria-required="true"
                             autocomplete="current-password"
                            />
 </div>                  
                  <div>
+                    <div class="flex flex-col align-middle justify-center">
                         <button class:active={active} disabled={!$validity.valid}
                         class="center hover:scale-150 bt "    
                      ></button>
+                     <button class="text-gold bg-barbi px-3 py-1 rounded-md hover:text-barbi hover:bg-gold" on:click={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
                      </div>
-                  
+                  </div>
                 </form>
             
         </div>
