@@ -2,7 +2,7 @@
 
    
 <svelte:head>
-	<title>הסכמה עולמית על חירות </title>
+	<title>הסכמה עולמית על חירות 1💗1</title>
 <script>
 nl_pos = "br";
 nl_color = "pink";
