@@ -23,13 +23,13 @@ export async function handle({ event, resolve }) {
         if(lang == "he"){
           title = "ליצור ביחד בהסכמה - 1💗1";
         }
-    if (event.url.pathname == '/' && isJ != undefined){
+    if (event.url.pathname == '/' && isJ != false){
         return new Response('Redirect', {
           status: 303,
           headers: { Location: '/lev' }
         });
 
-    }else if(event.url.pathname.startsWith('/lev') && isJ == undefined){
+    }else if(event.url.pathname.startsWith('/lev') && isJ == false){
          return new Response('Redirect', {
            status: 303,
            headers: { Location: '/' }
