@@ -2,7 +2,8 @@
 /** @type {import('@sveltejs/kit').Handle} */
 export async function handle({ event, resolve }) {
     event.locals.userAgent = event.request.headers.get('accept-language')
-    //coocies? 
+    //coocies?
+    let userAgent = event.request.headers.get('accept-language');
     const coociLang = event.cookies.get('lang');
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
