@@ -8,7 +8,7 @@ export async function handle({ event, resolve }) {
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
         let lang = "he"
-        let title = '1💗1, create together harmoniously';
+        let title = '1💗1 | create together harmoniously | worldwide consensus for freedom and security';
         if (coociLang == undefined) {
           if (userAgent?.includes('he')) {
             lang = 'he';
@@ -21,7 +21,7 @@ export async function handle({ event, resolve }) {
 
         event.locals.lang = lang;
         if(lang == "he"){
-          title = "ליצור ביחד בהסכמה - 1💗1";
+          title = "הסכמה עולמית על חירות וביטחון | ליצור ביחד בהסכמה | 1💗1";
         }
     if (event.url.pathname == '/' && isJ != false){
         return new Response('Redirect', {
