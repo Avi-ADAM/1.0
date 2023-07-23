@@ -4,8 +4,24 @@ export async function handle({ event, resolve }) {
     event.locals.userAgent = event.request.headers.get('accept-language')
     //coocies? 
     const coociLang = event.cookies.get('lang');
-        const isJ = event.cookies.get('jwt');
+        const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
+        let lang = "he"
+        let title = '1💗1, create together harmoniously';
+        if (coociLang == undefined) {
+          if (userAgent?.includes('he')) {
+            lang = 'he';
+          } else {
+            lang = 'en';
+          }
+        } else {
+          lang = coociLang;
+        }
+
+        event.locals.lang = lang;
+        if(lang == "he"){
+          title = "ליצור ביחד בהסכמה - 1💗1";
+        }
     if (event.url.pathname == '/' && isJ != undefined){
         return new Response('Redirect', {
           status: 303,
@@ -20,7 +36,10 @@ export async function handle({ event, resolve }) {
 
     }
 
-    const response = await resolve(event);
+    const response = await resolve(event, {
+      transformPageChunk: ({ html }) => html.replace('%lang%', lang),
+      transformPageChunk: ({ html }) => html.replace('%title%', title)
+    });
 
     return response;
 }
