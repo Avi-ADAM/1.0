@@ -4,7 +4,7 @@
   const PUBLIC_FACEBOOK_PAGE = ""
   const PUBLIC_GITHUB_PAGE = ""
   const PUBLIC_LINKEDIN_PROFILE = ""
-  const PUBLIC_SITE_URL = "https://1lev1.vercel.world"
+  const PUBLIC_SITE_URL = "https://1lev1.vercel.app"
   const PUBLIC_TELEGRAM_USERNAME = ""
   const PUBLIC_TIKTOK_USERNAME = ""
   const PUBLIC_TWITTER_USERNAME = ""
