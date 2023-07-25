@@ -194,7 +194,7 @@
               console.log("jjf")
 
         generation += 1;
-        console.log(tasks,rows)
+        console.log("tasks",tasks,rows)
         
 
 

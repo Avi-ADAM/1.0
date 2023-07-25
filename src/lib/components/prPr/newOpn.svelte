@@ -55,14 +55,13 @@ const requiredWW = {
   <div class=" items-center d" class:full={who == 0}>
           <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{isonly == true ? " פעולה פתוחה" : "פעולות פתוחות"}</h1>
-    {#if isonly == false}
     {#each omiData as datai, i}
     {@const data = datai.attributes}
     {@const title = {
                 he: `הצעה למשימה בשם "${data.name}" בריקמה: ${projectName}, באתר 1💗1 `,
                 en: 'come see this mission on 1💗1'
               }} 
-    <div dir="rtl"  style="overflow-y:auto" class=" d mb-4 pt-4 w-full   lg:w-1/2 mx-auto">
+    <div dir="rtl"  style="overflow-y:auto" class={isonly == false ? "lg:w-1/2 d mb-4 pt-4 w-full  mx-auto" : "d mb-4 pt-4 w-full"}>
     <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
          <div  class="mb-8">
               <div class="  mb-2 text-start">
@@ -139,6 +138,5 @@ const requiredWW = {
           </div>
           
                     {/each}
-                      {/if}
 </div>
 </div>
