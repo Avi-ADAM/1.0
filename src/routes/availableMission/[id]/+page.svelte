@@ -152,7 +152,7 @@ const foreg = {"he":"חלק מהמידע גלוי רק למשתמשים רשומ
     <button on:click={()=>project(data.project.data.id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4" >{seePr[$lang]}</button>
         </div>
     </div>
-    <div  class=" lg:dark:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
+    <div  class=" lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
          <div  class="mb-8">
               <div class="  mb-2">
         <div class="flex flex-row justify-between">
