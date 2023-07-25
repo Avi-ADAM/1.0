@@ -35,7 +35,7 @@
    //import { total } from '$lib/stores/total.js';
  //   import { beforeUpdate, tick } from 'svelte';
     import { goto,invalidateAll } from '$app/navigation';
-   import OpenM from '$lib/components/prPr/openM.svelte';
+   import OpenM from '$lib/components/prPr/newOpn.svelte';
     import PendsM from '$lib/components/prPr/pendsM.svelte';
         import Betaha from '$lib/components/prPr/betaha.svelte';
        import Fini from '$lib/components/prPr/fini.svelte';
@@ -1359,7 +1359,7 @@ let bett = false;
          {:else if a == 5}
             <Betaha {who} {bmiData} />
              {:else if a == 6}
-              <OpenM {who} omiData={omiData}/>
+              <OpenM {who} projectName={projectname} omiData={omiData}/>
              {:else if a == 7}
               <Finisin {who} {fmiData} />
          {/if}
@@ -1390,6 +1390,7 @@ pointer-events: none;">
 </div>
 {/if}
   <div >
+    
 {#if srcP !== null}
       <img
       width="100" height="100" 
@@ -1674,7 +1675,7 @@ pointer-events: none;">
    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
     <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
   </svg></button> 
-  <OpenM omiData={omiData}/>
+  <OpenM omiData={omiData} projectName={projectname}/>
   </span>
  {:else if openMS === true && omiData.length == 0}
   <button title={cencel1[$lang]}
@@ -1747,8 +1748,13 @@ pointer-events: none;">
         </div>
                  {/if}
 {#if showvd == true}<Mission 
-pn={projectname} pl={srcP} {restime}
-{newcontent} {newcontentR} {newcontentW} pu={projectUsers}
+                                  pn={projectname} 
+                                  pl={srcP} 
+                                  {restime}
+                                  {newcontent} 
+                                  {newcontentR} 
+                                  {newcontentW} 
+                                  pu={projectUsers}
                                 userslength={projectUsers.length}
                                  workways2 ={workways2}
                                  skills2={skills2}
