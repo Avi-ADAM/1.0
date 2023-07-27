@@ -79,6 +79,8 @@ onMount(async () => {
     } else if (restime == "sevend") {
         x = 168 * 60 * 60 * 1000
     }
+    x =x
+    console.log(new Date(Date.now() + x).toLocaleString())
 })
 
 function find_role_id(role_name_arr) {
@@ -174,7 +176,7 @@ async function increment() {
     token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let d = new Date
-    let fd = new Date(d + x)
+    let fd = new Date(Date.now() + x)
     for (const element of miData) {
         if (userslength > 1) {
             linkop = "createPendm";
