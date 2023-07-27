@@ -3,6 +3,7 @@
     import Addnewm from '../addnew/addNewMission.svelte';
     import { createEventDispatcher } from 'svelte';
     import {lang } from '$lib/stores/lang.js' 
+    import {mi} from './mi.js'
  const dispatch = createEventDispatcher();
  
 export let selected = [];
@@ -26,11 +27,23 @@ export let mission1 = [];
 let moving = [];
 let ids;
 const placeholder = `בחירה מרשימה`;
-function handl() {
-  console.log("its handl")
+function handl(e) {
+  let type = "add"
+  if (e.detail){
+   if (e.detail.type === 'remove'){
+    type = "remove"
+    console.log(find_mission_id([e.detail.option]),"from choose")
+    let miDatanew = $mi;
+  const y = miDatanew.map(c => c.id);
+ const id = find_mission_id([e.detail.option])
+ const index = y.indexOf(id);
+  miDatanew.splice(index, 1);
+  mi.set(miDatanew)
+   }
+  }
     if (selected.length > 0) {
-    
     dispatch('message', {
+    type:type,
     li: find_mission_id(selected),
     show: true,
     bla: selected
@@ -58,7 +71,8 @@ function newM (event) {
   dispatch('message', {
     li: allm,
     show: true,
-    bla: alln
+    bla: alln,
+    type: "add"
     } );
   addmission = false;
 }
@@ -77,7 +91,7 @@ const head = {"he":"הוספת פעולות הנדרשות להקמה או לת�
           bind:selected
           {placeholder}
           options={mission1.map(c => c.attributes.missionName)}
-         on:change={handl}
+         on:change={(e)=>handl(e)}
           /></div>
         
         

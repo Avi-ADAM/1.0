@@ -2,7 +2,7 @@
  // import Scab from '$lib/celim/moach/scad.svelte'
  //   import Siduri from '$lib/celim/moach/siduri.svelte'
  //   import Taskk from '$lib/celim/moach/taskkk.svelte'
-
+  import {mi, role, ww, skil} from '$lib/components/prPr/mi.js'
     import Tile from '$lib/celim/tile.svelte'
     import { Confetti } from "svelte-confetti"
 
@@ -416,12 +416,13 @@ async function prog (){
  let blabla = [];
  let load = false;
 async function callbackFunction(event) {
-  console.log("shit its me",event.detail.li)
+if(event.detail.type == "add"){
     		cow.scrollIntoView(true);
  load = true;
   const  lim = event.detail.li;
         if (lim.length > 0 || lim > 0){
-  showvd = false;
+  //showvd = false;
+  if($mi.length == 0 ){
  await refreshM ()
  .then() 
   addM = false;
@@ -429,11 +430,40 @@ async function callbackFunction(event) {
   await  findiM ()
  .then()
  load = false;
-  showvd = event.detail.show; 
+  showvd = true; 
     blabla = event.detail.bla;
     addM = true;
     		cow.scrollIntoView(true);
-	};    
+  }else{
+     addM = false;
+     let alrIds = $mi.map(c => c.id)
+     let chooseIds = event.detail.li
+      li =  chooseIds.filter( ( el ) => !alrIds.includes( el ) );
+  await findiM ()
+ .then()
+ load = false;
+  showvd = true; 
+    blabla = event.detail.bla;
+    addM = true;
+    		cow.scrollIntoView(true);
+  }
+	};
+}else{
+  
+  if ($mi.length > 0) {
+
+   miData = $mi;
+  
+   blabla = miData.map(c => c.attributes.missionName);
+  console.log(blabla, miData);
+
+ } else { 
+  miData = [];
+ blabla = [];
+ showvd = false;
+
+ }
+}
 }
 async function findiM() {
   let res = []
@@ -473,8 +503,38 @@ async function findiM() {
  })
   .then(r => r.json())
   .then(data => res = data);
-   miData = res.data.missions.data
-               console.log(miData)
+  let miDatal = res.data.missions.data   
+   for (let z = 0; z < miDatal.length; z++){
+    let skills2 = miDatal[z].attributes.skills.data
+              if ($lang == "he" ){
+              for (var i = 0; i < skills2.length; i++){
+                if (skills2[i].attributes.localizations.data.length > 0){
+                skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
+                }
+              }
+            }
+      miDatal[z].attributes.skills.data = skills2
+          let  roles = miDatal[z].attributes.tafkidims.data
+            if ($lang == "he" ){
+              for (var i = 0; i < roles.length; i++){
+                if (roles[i].attributes.localizations.data.length > 0){
+                roles[i].attributes.roleDescription = roles[i].attributes.localizations.data[0].attributes.roleDescription
+                }
+              }
+            }
+            miDatal[z].attributes.tafkidims.data = roles;
+            let workways2 = miDatal[z].attributes.work_ways.data
+                       if ($lang == "he" ){
+              for (var i = 0; i < workways2.length; i++){
+                if (workways2[i].attributes.localizations.data.length > 0){
+                workways2[i].attributes.workWayName = workways2[i].attributes.localizations.data[0].attributes.workWayName
+                }
+              }
+            }
+            miDatal[z].attributes.work_ways.data = workways2;
+          }
+      const merged = [...miDatal, ...$mi];
+          miData = merged
 
     } catch (e) {
             console.log(e)  
@@ -487,6 +547,7 @@ let skills2 = [];
 
 let workways2 =[];
 async function findT ()  {
+  console.log("findT")
          const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -537,6 +598,9 @@ async function findT ()  {
               }
             }
             workways2 = workways2;
+            skil.set(skills2)
+            ww.set(workways2)
+            role.set(roles)
             newcontent = false
             newcontentR = false
             newcontentW = false
@@ -560,7 +624,7 @@ async function hosa () {
 };
 
 async function removeF (event) {
-  const miDatanew = event.detail.data;
+  let miDatanew = event.detail.data;
   const y = miDatanew.map(c => c.id);
  const id = event.detail.id;
  const index = y.indexOf(id);
@@ -568,14 +632,12 @@ async function removeF (event) {
   miDatanew.splice(index, 1);
  };
   if (miDatanew.length > 0) {
- showvd = false;
-   addM = false;
+
    miData = miDatanew;
-  showvd = true; 
+   mi.set(miData)
    blabla = miData.map(c => c.attributes.missionName);
   console.log(blabla, miData);
 
-  addM = true;
  } else { 
   miData = miDatanew;
  blabla = miData.map(c => c.attributes.missionName);
@@ -798,7 +860,11 @@ function close () {
   addM = false;
   blabla = []
   success = true
-  setTimeout(function(){  success = false},15000)
+  mi.set([])
+  setTimeout(function(){  
+    success = false
+    start()
+  },15000)
    addToast(`${fnnn[$lang]}`, 'info');
 }
 let meDatamm = [];
@@ -1743,11 +1809,12 @@ pointer-events: none;">
     <div  bind:this={cow}>
       {#if load === true}
         <div class="grid justify-center items-center border-2 border-barbi rounded p-4" >
-
          <Lowding/>
         </div>
                  {/if}
-{#if showvd == true}<Mission 
+{#if showvd == true}
+{#key miData}
+<Mission
                                   pn={projectname} 
                                   pl={srcP} 
                                   {restime}
@@ -1774,7 +1841,10 @@ pointer-events: none;">
                                  on:adwww={adwww}
                                  on:removeW={removeW}
                                  on:close={close}
-                                 /> {/if}</div>
+                                 /> 
+                                 {/key}
+                                 {/if}
+                                </div>
                               
 <div class=" m-4" bind:this={dow}>
  

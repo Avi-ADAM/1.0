@@ -8,6 +8,7 @@
   let isonly = false;
   export let projectName
    import { onMount } from 'svelte';
+  import { langAdjast } from '$lib/func/langAdjast.svelte';
    onMount(async () => {
  if (who !== 0){
       isonly = true
@@ -16,8 +17,12 @@
 });
     omiData = filtered;
     }
+    for(let i = 0; i < omiData.length; i++){
+      const langd = langAdjast(omiData[i].attributes, $lang);
+      omiData[i].attributes = langd
+    }
+    omiData = omiData
 })
-$: hovered = false
 
 function remove (id) {
   console.log(id)

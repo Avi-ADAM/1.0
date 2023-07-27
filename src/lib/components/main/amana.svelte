@@ -663,7 +663,7 @@ let w;
               <br>
                כאשר כל האנושות תסכים עם האמנה הזו אני <span style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ושל צבא ") }`+ "." : "__."}</span>
         <br>
-         אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אפתור חילוקי דעות באתר 1💗1 בהסכמה הדדית.
+         אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אצור, אתנהל ואפתור חילוקי דעות באתר 1💗1 בהסכמה הדדית.
             </span>
           </span>
     </div>

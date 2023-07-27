@@ -602,8 +602,11 @@ function change(la){
 Because I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force.              <br>	
 I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication              <br>
 When the entire <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> is a signatory to this Convention, I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will relinquish my weapons and the armed policemen from whom the <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> State is Appointments in my name.              <br>
-I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will give up the weapons of the <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> Army when all of humanity will be a signatory to this Convention          </span>
-          </span>
+I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will give up the weapons of the <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> Army when all of humanity will be a signatory to this Convention         
+I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will create, manage and resolve disagreements on the 1💗1 site by mutual agreement.
+</span>
+        
+</span>
     </div>
      
 

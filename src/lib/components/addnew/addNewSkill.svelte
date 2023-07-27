@@ -123,7 +123,7 @@ if (rn.includes(skillName_value)){
         id = meData.data.createSkill.data.id;
         dispatchskillid (meData, id);
         addS = false;
-               let userName_value = liUN.get()
+               let userName_value = $liUN
          let data = {"name": userName_value, "action": "יצר כישור חדש בשם:", "det": `${skillName_value} והתיאור: ${desS} והתפקידים: ${tafkidimslist.join(", ")}`}
    fetch("/api/ste", {
   method: 'POST', // or 'PUT'
