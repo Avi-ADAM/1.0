@@ -8,7 +8,8 @@
 	import Telegram from '$lib/components/share/shareButtons/Telegram.svelte';
 	import Twitter from '$lib/components/share/shareButtons/Twitter.svelte';
 	import website from '$lib/config/website';
-    import ShareOp from '$lib/celim/icons/shareOp.svelte'
+    import ShareOp from '$lib/celim/icons/shareOp.svelte';
+	import Copy from '$lib/components/share/shareButtons/copy.svelte'
     import Whatsapp from '$lib/components/share/shareButtons/WhatsApp.svelte'
   import { fly } from 'svelte/transition';
   import Close from '$lib/celim/close.svelte'
@@ -68,6 +69,7 @@
                 <Whatsapp {url} {title} />
 				<Telegram {url} {title} /> 
                 <Mail  {title} {body} />
+				<Copy {url} />
             </span>
             {/if}
                

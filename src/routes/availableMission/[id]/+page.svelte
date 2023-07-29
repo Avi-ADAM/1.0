@@ -118,6 +118,8 @@ const requiredWW = {
 function login () { 
     goto (`/login?from=availableMission/${data.mId}`,)
 }
+    let wid
+
 const info ={"he": "בכדי לבקש להצטרף לצוות ולבצע את המשימה וגם בכדי לקבל הצעות למשימות, לפתוח רקמות (פרויקטים) חדשות ולהתנהל בהן בהסכמה יש להתחבר או להירשם","en":"You are not connected" }
 const registratio = { "he": "להרשמה", "en": "To Registration"} 
 const logi = { "he": "להתחברות", "en":"To Login"} 
@@ -133,7 +135,7 @@ const foreg = {"he":"חלק מהמידע גלוי רק למשתמשים רשומ
 {:then data}
 {#if data != null}
 {#if data.archived != true}
-<div dir="rtl"  style="overflow-y:auto" class=" d mb-4 pt-4 w-full   lg:w-1/2 mx-auto">
+<div bind:clientWidth={wid} dir="rtl"  style="overflow-y:auto" class=" d mb-4 pt-4 w-full   lg:w-1/2 mx-auto">
     <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->
     <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -222,7 +224,7 @@ const foreg = {"he":"חלק מהמידע גלוי רק למשתמשים רשומ
         <p 
         on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
         on:mouseleave={()=>hover("0")}  >
-            <Tile sm={true} pink={true} word={skill.attributes.skillName}/></p>
+            <Tile sm={wid > 555 ? true : false} pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
                 </div>
                 {/if}
@@ -231,14 +233,14 @@ const foreg = {"he":"חלק מהמידע גלוי רק למשתמשים רשומ
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each data.tafkidims.data as rol}
                     <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-    <Tile sm={true} word={rol.attributes.roleDescription} wow={true}/></p>{/each}
+    <Tile sm={wid > 555 ? true : false} word={rol.attributes.roleDescription} wow={true}/></p>{/each}
       </div>
       {/if}
       {#if data.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each data.work_ways.data as rol}
           <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold" sm={true}  word={rol.attributes.workWayName}/>
+              <Tile bg="gold" sm={wid > 555 ? true : false}  word={rol.attributes.workWayName}/>
           </p>
           {/each}
           </div>
