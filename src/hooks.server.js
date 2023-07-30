@@ -1,5 +1,15 @@
 
 /** @type {import('@sveltejs/kit').Handle} */
+const desc = {
+  he: '1💗1 הסכמה על חירות, לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח.',
+  en: '1💗1 WorldWide consensus for Security and Peace, colaboration platform'
+};
+        let lang = 'he';
+        const title ={
+         "en": '1💗1 | create together harmoniously | worldwide consensus for freedom and security',
+        "he": "הסכמה עולמית על חירות וביטחון | ליצור ביחד בהסכמה | 1💗1"
+        }
+
 export async function handle({ event, resolve }) {
     event.locals.userAgent = event.request.headers.get('accept-language')
     //coocies?
@@ -7,22 +17,21 @@ export async function handle({ event, resolve }) {
     const coociLang = event.cookies.get('lang');
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
-        let lang = "he"
-        let title = '1💗1 | create together harmoniously | worldwide consensus for freedom and security';
+
         if (coociLang == undefined) {
           if (userAgent?.includes('he')) {
             lang = 'he';
+            console.log(lang)
           } else {
             lang = 'en';
           }
         } else {
           lang = coociLang;
+          console.log(lang,"cookie");
         }
 
         event.locals.lang = lang;
-        if(lang == "he"){
-          title = "הסכמה עולמית על חירות וביטחון | ליצור ביחד בהסכמה | 1💗1";
-        }
+        
     if (event.url.pathname == '/' && isJ != false){
         return new Response('Redirect', {
           status: 303,
@@ -37,10 +46,9 @@ export async function handle({ event, resolve }) {
 
     }
 
-    const response = await resolve(event, {
-      transformPageChunk: ({ html }) => html.replace('%lang%', lang),
-      transformPageChunk: ({ html }) => html.replace('%title%', title)
+    return await resolve(event, {
+      transformPageChunk: ({ html }) => html.replace('%lang%', lang).replace('%title%', title[lang]).replace('%desc%', desc[lang])
     });
 
-    return response;
+    
 }
