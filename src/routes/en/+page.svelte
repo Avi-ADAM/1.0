@@ -1,8 +1,3 @@
-<svelte:head>
-	<title>WorldWide consensus for Freedom</title>
- 
-</svelte:head>
-
 <script>
   import Amana1 from "$lib/components/main/amanaen.svelte"
  
