@@ -1,14 +1,19 @@
 
 /** @type {import('@sveltejs/kit').Handle} */
+
 const desc = {
   he: '1💗1 הסכמה על חירות, לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח.',
   en: '1💗1 WorldWide consensus for Security and Peace, colaboration platform'
 };
         let lang = 'he';
         const title ={
-         "en": '1💗1 | create together harmoniously | worldwide consensus for freedom and security',
+         "en": '1💗1 | create together harmoniously | worldwide consensus for freedom',
         "he": "הסכמה עולמית על חירות וביטחון | ליצור ביחד בהסכמה | 1💗1"
         }
+        let cl = {
+          he: 'he-IL',
+          en: "en-gb"
+        };
 
 export async function handle({ event, resolve }) {
     event.locals.userAgent = event.request.headers.get('accept-language')
@@ -33,6 +38,7 @@ export async function handle({ event, resolve }) {
         event.locals.lang = lang;
         
     if (event.url.pathname == '/' && isJ != false){
+      console.log("jr")
         return new Response('Redirect', {
           status: 303,
           headers: { Location: '/lev' }
@@ -44,11 +50,30 @@ export async function handle({ event, resolve }) {
            headers: { Location: '/' }
          });
 
-    }
+    }else if (event.url.pathname == '/' && lang != "he"){
+      console.log("re",lang)
+        if (lang == "ar"){
+            return new Response('Redirect', {
+              status: 303,
+              headers: { Location: '/ar' }
+            });
+        }else{
+          return new Response('Redirect', {
+            status: 303,
+            headers: { Location: '/en' }
+          });
+        }
 
-    return await resolve(event, {
-      transformPageChunk: ({ html }) => html.replace('%lang%', lang).replace('%title%', title[lang]).replace('%desc%', desc[lang])
-    });
+    }
+      return await resolve(event, {
+        transformPageChunk: ({ html }) =>
+          html
+            .replace('%lang%', lang)
+            .replace('%title%', title[lang])
+            .replace('%desc%', desc[lang])
+            .replace('%desci%', desc[lang])
+            .replace('%cl%', cl[lang])
+      });
 
     
 }
