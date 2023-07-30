@@ -50,19 +50,7 @@ export async function handle({ event, resolve }) {
            headers: { Location: '/' }
          });
 
-    }else if (event.url.pathname == '/' && lang != "he"){
-      console.log("re",lang)
-        if (lang == "ar"){
-            return new Response('Redirect', {
-              status: 303,
-              headers: { Location: '/ar' }
-            });
-        }else{
-          return new Response('Redirect', {
-            status: 303,
-            headers: { Location: '/en' }
-          });
-        }
+    }
 
     }
       return await resolve(event, {
