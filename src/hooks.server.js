@@ -2,14 +2,14 @@
 /** @type {import('@sveltejs/kit').Handle} */
 
 const desc = {
-  he: '1💗1 הסכמה על חירות, לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח.',
-  en: '1💗1 WorldWide consensus for Security and Peace, colaboration platform'
+  he: '1️⃣💗1️⃣ הסכמה על חירות, לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח.',
+  en: '1️⃣💗1️⃣ WorldWide consensus for Security and Peace, colaboration platform, create together harmoniously | consrnsus based partnerships manegment sistem, we can together'
 };
         let lang = 'he';
-        const title ={
-         "en": '1💗1 | create together harmoniously | worldwide consensus for freedom',
-        "he": "הסכמה עולמית על חירות וביטחון | ליצור ביחד בהסכמה | 1💗1"
-        }
+        const title = {
+          en: '1️⃣💗1️⃣ | create together harmoniously | worldwide consensus for freedom',
+          he: 'הסכמה עולמית על חירות וביטחון | ליצור ביחד בהסכמה | 1️⃣💗1️⃣'
+        };
         let cl = {
           he: 'he-IL',
           en: "en-gb"
