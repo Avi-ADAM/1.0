@@ -294,6 +294,7 @@ export let sml = false
                             tafkidims={buble.tafkidims}
                             workways={buble.workways}
                             mdate={buble.mdate}
+                            dates={buble.dates}
                             vallues={buble.vallues}
                             pendId={buble.pendId}
                             users={buble.users}

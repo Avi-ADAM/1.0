@@ -1478,7 +1478,7 @@ async function start() {
             				users_permissions_user {data{ id} }
       											}}}
     			pendms(filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					name hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks
+        					name hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
                             rishon {data{id}}
                             skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
                             tafkidims {data{id attributes{ roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
@@ -2157,6 +2157,7 @@ function createpends(data) {
                 privatlinks: pend.attributes.privatlinks,
                 publicklinks: pend.attributes.publicklinks,
                 mdate: pend.attributes.sqadualed,
+                dates: pend.attributes.dates,
                 pendId: pend.id,
                 ani: "pends",
                 azmi: "harchava",

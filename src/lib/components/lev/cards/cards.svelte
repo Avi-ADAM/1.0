@@ -118,6 +118,7 @@ function hoverc (id){
       background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%);
       overflow: hidden;
     }
+
 .bg{
         position: absolute;
         top: 95% ;
@@ -164,7 +165,7 @@ on:mouseleave={()=> hoverc("0")}>
       {#key low}
        {#if arr1.length > 0}
 <div     dir="rtl" bind:clientWidth={h}
- class="body box-border h-screen">
+ class="body dark:bg-gradient-to-br dark:from-black dark:via-slate-900 dark:via-slate-800 dark:via-slate-600 dark:to-slate-400 box-border h-screen">
      <img on:mouseenter={()=> hoverc(" יאללה נקסט!")} 
 on:mouseleave={()=> hoverc("0")} class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
 
@@ -302,6 +303,7 @@ mousewheel={true}
  on:user={user}
         on:coinLapach={delo}
         {low}
+            dates={buble.dates}
             coinlapach={buble.coinlapach} 
           messege={buble.messege}
         mysrc={buble.mysrc}
