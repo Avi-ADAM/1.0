@@ -1,4 +1,6 @@
 <script>
+    import { addToast } from 'as-toast';
+import SucssesConf from '$lib/celim/sucssesConf.svelte'
 import Tile from '$lib/celim/tile.svelte'
 import Share from '$lib/components/share/shareButtons/index.svelte'
 import { page } from '$app/stores'
@@ -14,7 +16,7 @@ import {
   import {SendTo} from '$lib/send/sendTo.svelte';
 //TODO: get asked from server then show you alr .., find a way to get title
 let error1 = null;
-
+let success = false
 function project(x) {
     goto('/project/'+x)
 }
@@ -22,7 +24,7 @@ export let askedarr = []
 export let alr = false
 async function ask() {
     alr = true
-    const inD  = await data.streamed.alld.then(data);
+    const inD  = data.alld
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
@@ -70,15 +72,26 @@ async function ask() {
   }
 }`
  const d2 = await SendTo(que) 
-    .then(console.log(d2))
-    
+    .then()
+    const r2 = d2.data
+    console.log(r2)
+    if (r2 != null){
+      success = true
+     setTimeout(function(){  
+    success = false
+  },15000)
+   addToast(`${fnnn[$lang]}`, 'info');
 }
+}
+
 export let data
 
 $: hovered = false
 function hover(a){
 }
 console.log(data)
+const fnnn = {"he": "הבקשה נשלחה בהצלחה","en":"request has sent sucsesfully"}
+
 const headi = {
     "he": "הצעה למשימה",
     "en": "suggested mission"
@@ -118,6 +131,8 @@ function login () {
     goto (`/login?from=availableMission/${data.mId}`,)
 }
     let wid
+    const mand = {"he": "המשימה אוישה בהצלחה", "en": "the mission has already assigned"}
+    const alri = {"he": "כבר הגשת בקשה לבצע את המשימה הזו", "en": "you have already requested to do this mission"}
 const iwantto = {"he":"אני אשמח לבצע!","en":"I want to do it!"}
 const info ={"he": "בכדי לבקש להצטרף לצוות ולבצע את המשימה וגם בכדי לקבל הצעות למשימות, לפתוח רקמות (פרויקטים) חדשות ולהתנהל בהן בהסכמה יש להתחבר או להירשם","en":"You are not connected" }
 const registratio = { "he": "להרשמה", "en": "To Registration"} 
@@ -132,7 +147,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
 </script>
 
 <Head title="{$page.data.alld?.title[$lang] ?? headi[$lang]}" {description} {image} {url} />
-
+<SucssesConf {success} />
 {#if data.alld?.fullfild == false}
 <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex align-middle content-center justify-center ">
 <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
@@ -140,7 +155,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
 {:else}
 {#if data != null}
 {#if data.archived != true}
-<div bind:clientWidth={wid} dir="rtl"  style="overflow-y:auto" class=" d mb-4 pt-4 w-full   lg:w-1/2 mx-auto">
+<div bind:clientWidth={wid} dir="rtl"  style="overflow-y:auto" class=" d mb-4 sm:pt-4 w-full   lg:w-1/2 mx-auto">
     <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->
     <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -252,10 +267,12 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           {/if}
           {#if $page.data.tok != false}
           <div class="flex justify-center">
-            {#if alr == false}
+            {#if alr == false && !data.alld.users.data.map(c => c.id).includes(data.uid)}
           <button on:click={ask} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
             class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">{iwantto[$lang]}</button>
-        {/if}  
+        {:else if data.alld.users.data.map(c => c.id).includes(data.uid)}
+        <h3 class="button-perl text-barbi px-4 py-1">{alri[$lang]}</h3>
+            {/if}  
         </div>
           {:else}
           <div class="flex justify-center">
@@ -274,7 +291,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           </div>
           {:else}
           <div class="text-center pt-14">
-          <h1 class="text-barbi sm:text-xl my-5">המשימה אוישה בהצלחה</h1>
+          <h1 class="text-barbi sm:text-xl my-5">{mand[$lang]}</h1>
                {#if $page.data.tok != false}
             <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2  sm:text-xl">לצפיה במשימות אחרות ובכל העדכונים שלך</a>
           {:else}

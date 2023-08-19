@@ -4,6 +4,7 @@ export async function load({ locals, params }) {
   const mId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;
+  const uid = locals.uid
   let que, alld
   let error;
   let bdata = []
@@ -13,6 +14,7 @@ export async function load({ locals, params }) {
   if (tok != false) {
     que = `{  openMission (id:${mId}) {data{attributes{ sqadualed
              archived
+             users{data{id}}
       project {data{ id attributes{ projectName timeToP profilePic {data{ attributes{url  }}}}}}
             tafkidims {data{attributes{roleDescription ${
               lang == 'he'
@@ -65,7 +67,7 @@ export async function load({ locals, params }) {
             data = data;
             data.title = {
               he: `1💗1 | הצעה למשימה "${data.name}" בריקמה: ${data.project.data.attributes.projectName}`,
-              en: 'come see this mission on 1💗1'
+              en: 'come see this mission on    '
             };
             data.fullfild = true
                                   console.log(fullfild);
@@ -88,6 +90,7 @@ export async function load({ locals, params }) {
       });
   });
   return {
+    uid,
     lang,
     mId,
     tok: tok == false ? false : true,

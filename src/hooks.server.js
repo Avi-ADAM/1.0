@@ -20,8 +20,11 @@ export async function handle({ event, resolve }) {
     //coocies?
     let userAgent = event.request.headers.get('accept-language');
     const coociLang = event.cookies.get('lang');
+        const uid = event.cookies.get('id') || false;
+
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
+        event.locals.uid = uid;
 
         if (coociLang == undefined) {
           if (userAgent?.includes('he')) {
