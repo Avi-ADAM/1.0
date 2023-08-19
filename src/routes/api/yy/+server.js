@@ -43,9 +43,31 @@ export const POST = async ({ request }) => {
     const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
     const chatId = data.message.from.id
     console.log(chatId)
+    const dat = {
+      reply_markup: {
+        resize_keyboard: true,
+        inline_keyboard: [
+          [
+            {
+              text: 'Button 1',
+              callback_data: 'Button 1'
+            },
+            {
+              text: 'Button 2',
+              callback_data: 'Button 2'
+            }
+          ]
+        ]
+      }
+    };
 
     const url = `https://api.telegram.org/bot${Token}/sendMessage?chat_id=${chatId}&text=${botMessage}`;
-    const res = await fetch(url);
+    const res = await fetch(url,{
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(dat)});
   //  const name = data.name;
   //  const job = data.job;
   //  console.log("ryng", name, job)
