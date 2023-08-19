@@ -13,7 +13,77 @@
             "en": "money splitting offer"
         }
     },
+    "mission":{
+        "addNewSkills":{
+            "he":"בחירת כישורים נוספים ",
+            "en":"add more skills"
+        },
+        "requireSkills" : {
+            "he": "כישורים נדרשים:",
+            "en": "required skills:"
+        },
+        "requiredRoles" : {
+            "he": "הגדרת תפקיד:",
+            "en": "role:"
+        },
+         "requiredWW" : {
+            "he": "דרכי עבודה מבוקשות:",
+            "en": "ways of work for the mission:"
+        },
+        "total":{
+            "he":"שווי סך הכל למשימה ",
+            "en":"total mission vallue"
+        },
+        "assingToMe":{
+            "he":"להשים את המשימה לעצמי? ",
+            "en":"are you going to do the mission?"
+        },
+        "assingHelp":{
+            "he":"אם ריק: תפורסם משרה פנויה",
+            "en":"if empty: will publish available position"
+        },
+        "assingTo":{
+            "he":"השמת המשימה ל- ",
+            "en":"asign this mission to -"
+        },
+        "hourlyVallue":{
+            "he":"כמה שווה שעה ?",
+            "en":"hour rate"
+        },
+        "specialNotes":{
+            "he":"הערות יחודיות לריקמה שלי",
+            "en":"FreeMates specific notes"
+        },
+        "publicLinks":{
+            "he":"קישורים ציבוריים",
+            "en":"public links "
+        },
+        "privatLinks":{
+            "he":"קישורים יחודיים לריקמה שלי",
+            "en":"FreeMates specific links"
+        },
+        "linkToMission":{
+            "he":"קישור לאתר בו מבוצעת המשימה ",
+            "en":"link to where the mission is done"
+        }
+    },
     "common": {
+        "noLesFromZero":{
+            "he":"לא יכול להיות קטן מ-0",
+            "en":"can not be negative"
+        },
+        "startDate":{
+            "he":"תאריך התחלה",
+            "en":"start date"
+        },
+        "finishDate": {
+            "he": "תאריך סיום",
+            "en": "finnish date"
+        },        
+        "description":{
+            "he":"תיאור",
+            "en": "description"
+        },
         "total": {
             "he": "בסך הכל",
             "en": "in total"
@@ -45,6 +115,10 @@
         "nego": {
             "he": "משא ומתן",
             "en": "negotiate"
+        },
+        "name": {
+            "he": "שם",
+            "en": "name"
         }
     },
     "finiapp": {
@@ -66,5 +140,10 @@
             "he": "סך ההצבעות נגד",
             "en": "total votes against"
         }
+    },
+    "nego":{
+        "original":{"he":"מקורי","en":"original"},
+        "new": {"he":"חדש", "en": "new"},
+        "head": {"he":"הצעת שינוי למשימה", "en": "suggest changes"}
     }
 }

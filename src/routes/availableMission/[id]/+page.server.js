@@ -4,9 +4,10 @@ export async function load({ locals, params }) {
   const mId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;
-  let que;
+  let que, alld
   let error;
   let bdata = []
+  let fullfild = false
   let toc;
   let archived = false
   if (tok != false) {
@@ -50,42 +51,48 @@ export async function load({ locals, params }) {
             `;
     toc = import.meta.env.VITE_ADMINMONTHER;
   }
+  alld = new Promise((resolve) => {
+    SendTo(que, toc)
+      .then((data) => {
+        console.log(data);
+        if (data.data.openMission.data != null) {
+          const datar = data.data.openMission.data.attributes;
+          console.log(datar);
+          if (datar.archived != true) {
+            const langd = langAdjast(datar, lang);
+            data = langd;
+            data.archived = false;
+            data = data;
+            data.title = {
+              he: `1💗1 | הצעה למשימה "${data.name}" בריקמה: ${data.project.data.attributes.projectName}`,
+              en: 'come see this mission on 1💗1'
+            };
+            data.fullfild = true
+                                  console.log(fullfild);
+
+          } else {
+            data = { archived: true };
+            data = data;
+            archived = true;
+            data.fullfild = true;
+          }
+        } else {
+          data = null;
+                      data.fullfild = true;
+                      console.log(fullfild);
+        }
+        return resolve(data);
+      })
+      .catch((error) => {
+        console.log(error);
+      });
+  });
   return {
     lang,
     mId,
     tok: tok == false ? false : true,
     archived,
-    streamed: {
-      alld: new Promise((resolve) => {
-        SendTo(que, toc)
-          .then((data) => {
-            console.log(data)
-            if (data.data.openMission.data != null) {
-              const datar = data.data.openMission.data.attributes;
-              console.log(datar);
-              if (datar.archived != true) {
-                const langd = langAdjast(datar, lang);
-                data = langd;
-                data.archived = false;
-                data = data;
-              data.title = {
-                he: `הצעה למשימה בשם "${data.name}" בריקמה: ${data.project.data.attributes.projectName}, באתר 1💗1 `,
-                en: 'come see this mission on 1💗1'
-              };
-              } else {
-                data = { archived: true };
-                data = data;
-                archived = true;
-              }
-            } else {
-              data = null;
-            }
-            return resolve(data);
-          })
-          .catch((error) => {
-            console.log(error);
-          });
-      })
-    }
+      alld,
+      fullfild
   };
 }

@@ -48,7 +48,7 @@ const dispatch = createEventDispatcher();
 export let newcontent = true;
 export let newcontentR = true;
 export let newcontentW = true;
-$: $mi = miData
+$: $mi = miData //TODO: change it
 let token;
 export let pn, pl, restime;
 export let miData = [];
@@ -364,7 +364,9 @@ SendTo(quee)
                                 .then((response) => response)
                                 .then((data) => {
                                     console.log('Success:', data);
-
+                                     dispatch('close', {
+                        md: miDatan
+                    });
                                 })
                                 .catch((error) => {
                                     console.error('Error:', error);
@@ -416,6 +418,10 @@ SendTo(quee)
                                 console.error('Error:', error);
 
                             })
+                    }else{
+                         dispatch('close', {
+                        md: miDatan
+                    });
                     }
                     
 
@@ -806,7 +812,7 @@ const headingf = {
     "en": "finishing hour for shift"
 };
 const headingr = {
-    "he": "מספר הפרטים במשמרת",
+    "he": "כמה במשמרת הזו",
     "en": "shift partisipant number"
 };
 const iskvua = {
@@ -841,7 +847,10 @@ const er = {
     "he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ",
     "en": "error: please try again, if the problem continue contact at ehad1one@gmail.com"
 }
-
+const removeMission = {
+    "he": "הסרת המשימה שנבחרה",
+    "en": "remove this mission"
+}
 let shift = [{
     "ii": 1
 }];
@@ -897,6 +906,8 @@ const mn = {
   "he": "שם",
   "en": "name"
 }
+const tri = import('$lib/translations/tr.json')
+
 $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
 </script>
 
@@ -1005,12 +1016,12 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
                                     </caption>
 
                                     <tr class="gg">
-                                        <th class="gg">הסרת המשימה שנבחרה</th>
+                                        <th class="gg">{removeMission[$lang]}</th>
                                         {#each miData as data, i}
                                         <td class="gg" style="font-size: 3rem">
                                             {i + 1}
                                             <button
-                                                title='הסרה'
+                                                title='{removeMission[$lang]}'
                                                 on:click={remove(data.id)}><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                                                     <path fill="currentColor" d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z" />
                                                 </svg></button></td>
@@ -1021,18 +1032,18 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
                                         <td class="ggr">
                                             <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                                                 <input type="text"  id="inputii" name="nam" bind:value={data.attributes.missionName} class='input' required>
-                                                <label for="nam" id="labelii" class='label' >שם</label>
+                                                <label for="nam" id="labelii" class='label' >{mn[$lang]}</label>
                                                 <span class='line'></span>
                                             </div>
                                         </td>
                                         {/each}
                                     </tr> <tr>
-                                        <th>תיאור</th>
+                                        <th>{tri.common.description[$lang]}</th>
                                         {#each miData as data, i}
                                         <td>
                                             <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                                                 <textarea type="text"  id="des" name="des"  bind:value={data.attributes.descrip} class='input d' required></textarea>
-                                                <label for="des" class='label' >תיאור</label>
+                                                <label for="des" class='label' >{tri.common.description[$lang]}</label>
                                                 <span class='line'></span>
                                             </div>
                                         </td>
@@ -1085,49 +1096,60 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
       </td>
       {/each}
       </tr> <tr>
-          <th>תאריך התחלה</th>
+          <th>{tri.common.startDate[$lang]}</th>
           {#each miData as data, i}
           <td> <SveltyPicker inputClasses="form-control" format=" hh:ii dd/mm/yyyy" bind:value={data.date}></SveltyPicker></td>
           {/each}
       </tr><tr>
-          <th>תאריך סיום</th>
+          <th>{tri.common.finishDate[$lang]}</th>
           {#each miData as data, i}
           <td> <SveltyPicker inputClasses="form-control" format="hh:ii dd/mm/yyyy " bind:value={data.dates}></SveltyPicker></td>
           {/each}
       </tr> <tr>
-          <th>קישורים ציבוריים</th>
+          <th>{tri.mission.publicLinks[$lang]}</th>
           {#each miData as data, i}
           <td>
               <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                   <input type="text"  id="kisu" name="kisu"   bind:value={data.publicklinks} class='input' required>
-                  <label for="kisu" class='label' >קישורים ציבוריים</label>
+                  <label for="kisu" class='label' >{tri.mission.publiclinks[$lang]}</label>
                   <span class='line'></span>
               </div>
           </td>
           {/each}
       </tr><tr>
-          <th>הערות יחודיות לריקמה שלי</th>
-          {#each miData as data, i}
-          <td>
-              <div dir="{$lang == "he" ? "rtl" : "ltr"}"class='textinput'>
-                  <textarea type="text"  id="hearotMeyuchadot2" name="hearotMeyuchadot2"  bind:value={data.spnot} class='input d' required></textarea>
-                  <label for="hearotMeyuchadot2" class='label' >הערות מיוחדות</label>
-                  <span class='line'></span>
-              </div>
-          </td>
-          {/each}
-      </tr><tr>
-          <th>קישורים יחודיים לריקמה שלי</th>
+          <th>{tri.mission.linkToMission[$lang]}</th>
           {#each miData as data, i}
           <td>
               <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                   <input type="text"  id="link" name="link"    bind:value={data.privatlinks} class='input' required>
-                  <label for="link" class='label'>קישור לאתר בו מבוצעת המשימה </label>
+                  <label for="link" class='label'>{tri.mission.linkToMission[$lang]}</label>
                   <span class='line'></span>
               </div>
           </td>
           {/each}
-      </tr>
+      </tr><tr>
+          <th>{tri.mission.specialNotes[$lang]}</th>
+          {#each miData as data, i}
+          <td>
+              <div dir="{$lang == "he" ? "rtl" : "ltr"}"class='textinput'>
+                  <textarea type="text"  id="hearotMeyuchadot2" name="hearotMeyuchadot2"  bind:value={data.spnot} class='input d' required></textarea>
+                  <label for="hearotMeyuchadot2" class='label' >{tri.mission.specialNotes[$lang]}</label>
+                  <span class='line'></span>
+              </div>
+          </td>
+          {/each}
+      </tr><!-- add to server real private link in addition to linkto mission-<tr>
+          <th>{tri.mission.privatLinks[$lang]}</th>
+          {#each miData as data, i}
+          <td>
+              <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
+                  <input type="text"  id="link" name="link"    bind:value={data.privatlinks} class='input' required>
+                  <label for="link" class='label'>{tri.mission.privatLinks[$lang]}</label>
+                  <span class='line'></span>
+              </div>
+          </td>
+          {/each}
+      </tr>-->
       <tr>
           <th>{iskvua[$lang]}</th>
           {#each miData as data, i}
@@ -1149,22 +1171,22 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
                   <label for="hoursn" class='label'>{data.iskvua == true ? hms[$lang] : hmh[$lang]}</label>
                   <span class='line'></span>
               </div>
-              {#if data.nhours < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכול להיות קטן מ-0</small>{/if}
+              {#if data.nhours < 0}<small class="bg-red-800 text-slate-50 px-2">{tri.common.noLesFromZero[$lang]}</small>{/if}
       </td>
       {/each}
   </tr><tr style="display:''" id="vallueperhourN" >
-      <th>כמה שווה שעה ?</th>
+      <th>{tri.mission.hourlyVallue[$lang]}</th>
       {#each miData as data, i}
       <td>
           <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
               <input type="number"  id="vallueperhourn" name="vallueperhourn"
                   on:change={data.valph  < 0 ? data.valph = 0: data.valph }
                   bind:value={data.valph} class='input' required>
-              <label for="vallueperhourn" class='label'>כמה שווה שעה? </label>
+              <label for="vallueperhourn" class='label'>{tri.mission.hourlyVallue[$lang]}</label>
               <span class='line'></span>
           </div>
           {#if data.valph < 0}
-          <small class="bg-red-800 text-slate-50 px-2">לא יכול להיות קטן מ-0</small>
+          <small class="bg-red-800 text-slate-50 px-2">{tri.common.noLesFromZero[$lang]}</small>
           {/if}
       </td>
       {/each}
@@ -1194,7 +1216,7 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
   {/if}
   {#if userslength > 1}
   <tr>
-      <th>השמת המשימה ל- <br> אם ריק: תפורסם משרה פנויה</th>
+      <th>{tri.mission.assingTo[$lang]}<br>{tri.mission.assingHelp[$lang]}</th>
       {#each miData as data, i}
       <td>
           <MultiSelect
@@ -1216,13 +1238,13 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
   </tr>
   {:else}
   <tr>
-      <th>להשים את המשימה לעצמי?  <br> אם ריק: תפורסם משרה פנויה</th>
+      <th>{tri.mission.assingToMe[$lang]}<br>{tri.mission.assingHelp[$lang]}</th>
       {#each miData as data, i}
       <td>
           <input
               bind:checked={data.myM}
               type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> data.rishon == idL}>
-          <label for="tome">השמת המשימה לעצמי</label>
+          <label for="tome">{tri.mission.assingToMe[$lang]}</label>
       </td>
       {/each}
   </tr>
@@ -1260,7 +1282,7 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
       </td>
       {/each}
   </tr>--><tr >
-      <th>שווי סך הכל למשימה </th>
+      <th>{tri.mission.total[$lang]}</th>
       {#each miData as data, i}
       <td>
           {#if data.valph > 0 & data.nhours > 0}
@@ -1389,7 +1411,7 @@ textarea::-webkit-resizer {
 .body {
     overflow-x: auto;
     overflow-y: auto;
-    height: 100vh;
+    height: 110vh;
     width: 96vw;
     padding-left: 0.5em;
     padding-right: 0.5em;
