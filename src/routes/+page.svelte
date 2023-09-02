@@ -5,6 +5,10 @@
   import Tile from "$lib/celim/tile.svelte";
 	import { Canvas } from '@threlte/core'
   import Scene from '$lib/components/main/1lev1.svelte'
+  import { useProgress } from '@threlte/extras'
+  import CircleProgresBar from "$lib/celim/ui/circleProgresBar.svelte";
+
+	const { progress } = useProgress()
 	const url = 'https://1lev1.vercel.app/';
 	const title = '1️💗1️';
 	const setitle = "טעם לחיים!"
@@ -24,6 +28,7 @@
 	const regesh2 = "רוצה לפתוח דלת אל מציאות חדשה?"
 	const login = "להתחברות"
 	const reg = "להסכמה והרשמה"
+	const loadingTitle = "טעינת אלמנט עיצובי תלת מימדי "
 	$: btna = false
 	$: btnb = false
 	$: scrolli = false
@@ -37,8 +42,8 @@
 	<div class="overflow-auto d  h-2/5"  on:scroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
-		<h2 class="font-bold mt-2 sm:text-5xl text-barbi decoration-mturk underline text-2xl">{setitle}</h2>
-		<p class="text-2xl p-2 px-24 text-barbi">{desc}<span class="underline decoration-lturk">{desc2}</span></p>
+		<h2 class="font-bold mt-2 sm:text-5xl text-barbi decoration-mturk underline text-xl">{setitle}</h2>
+		<p class="text-xl sm:text-2xl p-2 px-24 text-barbi">{desc}<span class="underline decoration-lturk">{desc2}</span></p>
 		<div>
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1} />
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word2}/>
@@ -80,7 +85,12 @@
 			</button>
 		</div>
 	</div>
-	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class="sm:w-1/2 h-1/2 sm:h-screen flex items-center justify-center">
+	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class="sm:w-1/2 h-1/2 sm:h-screen ">
+		{#if $progress < 1}
+		<div class="w-full h-1/2 sm:h-screen  flex items-center justify-center" title="{loadingTitle}">
+		<CircleProgresBar progress={$progress}/>
+		</div>
+		{/if}
 	<Canvas  size={{width:w, height: w*1.8 < h ? w : h > 639 ? w*0.8 : h}}>
         <Scene {fi} hover={btna == true || btnb == true ? true:false} {scrolli}/>
       </Canvas>
