@@ -1,6 +1,7 @@
 <script>
      import Grow from '$lib/celim/icons/grow.svelte'
   export let gr = false
+  export let reverse = false
   export let big = false
   export let sm = false
     export let openi = false;
@@ -67,7 +68,7 @@ class:via-gr-c={gold == true}
 class:via-grd={gold == true}
 class:to-gre={gold == true}
 class:bg-gradient-to-br={gold == true}
-class:text-stgold={gold == true}
+class:text-blue-900={gold == true}
 class:py-0.5={sm == false}
 class:px-2.5={sm == false}
 class:text-xs={sm == false}
@@ -75,6 +76,7 @@ class:text-xl={sm == true}
 class:px-3={sm == true}
 class:px-2={big == true}
 class:py-1={big == true}
+class:flex-row-reverse={reverse == true}
  class="drop-shadow-lg  shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center mr-2 mb-2 rounded">
  {word}
  {#if closei}

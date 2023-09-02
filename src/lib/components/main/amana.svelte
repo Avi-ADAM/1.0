@@ -1,7 +1,7 @@
 ﻿<script>
       import { liUN } from '$lib/stores/liUN.js';
       import { Canvas } from '@threlte/core'
-  import Scene from './glob.svelte'
+  import Scene from './globu.svelte'
       import {  doesLang, langUs } from '$lib/stores/lang.js'
   import { goto } from '$app/navigation';
   import Maze from './maze.svelte'
@@ -470,7 +470,7 @@ function scrollTo() {
 	}
 
  let isOpen = false;
-let a = 0;
+let a = 0, h
 
 function sell(){
 isOpen = true;
@@ -506,7 +506,7 @@ function change(la){
     goto("/en")
   }
 }
-let w;
+$: w = 0
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -672,13 +672,13 @@ let w;
 
 <form on:submit={handleSubmit}>
 
-<div class="flexid" bind:clientWidth={w}>
+<div class="flexid" bind:clientWidth={w} bind:clientHeight={h}>
    {#if already == false}
 {#if g == false}
 {#if $progress < 1}
 
     <button
-    class="button hover:scale-150"
+    class="button hover:scale-150 "
     title="לחצת ויצאת לחופשי"
      on:submit="{handleSubmit}"
       type="submit"
@@ -686,8 +686,8 @@ let w;
     </button>
     {/if}
     <div class="cor">
-      <Canvas size={{width:w, height:170}}>
-        <Scene on:submit="{handleSubmit}"/>
+      <Canvas size={{width:w, height:h}}>
+        <Scene on:click={()=> console.log("hhuibi")} on:submit="{handleSubmit}"/>
       </Canvas>
     </div>
        {:else if g == true}
@@ -1081,9 +1081,9 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
   .flexid{
     display: flex;
     flex-direction: column;
-    justify-content: center;
    align-items: center;
    order: 1;
+   max-height: 20vh;
   }
 
   .flexi1{
@@ -1139,6 +1139,7 @@ left: 45.2%;
  background-repeat: no-repeat;
  background-size: 170px;
  margin: auto;
+ margin-top: 30px;
  min-height: 170px;
  min-width: 170px;
      cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
@@ -1168,9 +1169,10 @@ left: 45.2%;
 .flexid{
     display: flex;
     flex-direction: column;
-    justify-content: center;
    align-items: center;
    order: 1;
+      max-height: 20vh;
+
   }
   /*.centeron{
     background-image: url('ceter.png');
@@ -1191,7 +1193,6 @@ background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
   }
    .mobile{
 background-color: var(--gold);
-    width: 100vw;
     height:100vh;
     margin:0px auto;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1648335809/Gold-German-Imperial-Crown-No-Background_qs7cri.svg);
@@ -1225,7 +1226,7 @@ background-color: var(--gold);
     font-family: 'StamSefarad', serif;
     text-align: center;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 900px;
+    background-size: 1070px;
     background-repeat: no-repeat;
     background-position: center;
     align-self: center;
@@ -1371,9 +1372,10 @@ background-position: center;
    .flexid{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     order: 1;
+       max-height: 20vh;
+
   }
 }
 
@@ -1391,9 +1393,10 @@ position: absolute;
   .flexid{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     order: 1;
+       max-height: 33vh;
+      height:100%;
   }
   .mobile{
     max-width: 1024px;

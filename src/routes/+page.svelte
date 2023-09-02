@@ -1,332 +1,88 @@
-<svelte:head>
 <script>
-nl_pos="br";
-nl_color="pink";
-nl_compact="1";
-nl_accordion="1"; 
-</script> 
-<script src="https://1lev1.vercel.app/nagishli.js?v=2.3"
-charset="utf-8"
-defer> 
-</script> 
-</svelte:head>
+  import { goto } from "$app/navigation";
+  import Arrow from "$lib/celim/icons/arrow.svelte";
+  import Lowding from "$lib/celim/lowding.svelte";
+  import Tile from "$lib/celim/tile.svelte";
+	import { Canvas } from '@threlte/core'
+  import Scene from '$lib/components/main/1lev1.svelte'
+	const url = 'https://1lev1.vercel.app/';
+	const title = '1️💗1️';
+	const setitle = "טעם לחיים!"
+	const desc = 'ליצור צוות מנצח להגשמת כל חלום, להתנהל ו';
+	const desc2 = "ליצור יחד בהסכמה"
+	const word1 = "מערכת ייחודית לקבלת החלטות פה-אחד"
+	const word2 = "לייסד ריקמה (פרויקט) בקליק ולאתר את מרכיביה האנושיים והחומריים בקלות"
+	const word3 = "למצוא ולהתחבר לריקמה שמתאימה בדיוק לערכים, הכישורים ודרך העבודה שלך"
+	const word4 = "פנקס דיגיטלי מבוזר לניהול החשבונות בריקמה לפי ההסכמות"
+	const word5 = "מערכת הצבעות, אישרורים ומשא ומתן לניהול משותף על בסיס הסכמה פה-אחד"
+	const word6 = "חישוב וחלוקת כספים לפי סך ההשקעה ולפי ההסכמות"
+	const word7 = "גרפים, גאנט, לוח משימות ועוד כלים שמתווספים כל הזמן במסך ניהול הריקמה המשותף"
+	const word8 = "לשתף את החפצים המיותרים שלך עם רקמות שמתאימות לערכים שלך ולהרוויח"
+	const word9 = "הכנסה פאסיבית  - הופכת למציאות! בריקמה לא מקבלים תשלום מוגדר אלא אחוז דינמי מהרווחים לכל אורך חיי הריקמה"
+	const word10 = "רקמות הן קבוצות המורכבות מכישורים ומשאבים שונים אשר יוצרות יחד מוצר או נותנות שירות ומתחלקות בהכנסות לפי ההשקעה היחסית ובהסכמה"
+	const regesh1 = "רוצה להביא משמעות ושמחה לחיים שלך?"
+	const regesh2 = "רוצה לפתוח דלת אל מציאות חדשה?"
+	const login = "להתחברות"
+	const reg = "להסכמה והרשמה"
+	$: btna = false
+	$: btnb = false
+	$: scrolli = false
+	let loading = false, loadinga = false,w,h,fi = false
 
-    <script>
-    import {
-        liUN
-    } from '$lib/stores/liUN.js';
-import {
-    fbl
-} from '$lib/stores/fbl.js';
-
-import {
-    lang
-} from '$lib/stores/lang.js'
-import {
-    page
-} from '$app/stores'
-//const emaili = $page.url.searchParams.get('code')
-import {
-    goto
-} from '$app/navigation';
-import Mobile from '$lib/components/front/mobile.svelte'
-import {
-    userName
-} from '$lib/stores/store.js';
-import Amana1 from "$lib/components/main/amana.svelte"
-import One from "$lib/components/main/bein.svelte"
-import {
-    show
-} from '$lib/components/registration/store-show.js';
-import {
-    contriesi
-} from '$lib/components/registration/contries.js';
-import {
-    fpval
-} from '$lib/components/registration/fpval.js';
-import {
-    regHelper
-} from '$lib/stores/regHelper.js';
-import {
-    onMount
-} from 'svelte';
-import {
-    email
-} from '$lib/components/registration/email.js'
-import {
-    linkos
-} from '$lib/stores/linkos.js'
-
-let idx = 1;
-let error;
-
-let user = 0;
-
-let kvar;
-onMount(async () => {
-    const x = $page.url.searchParams.get('ref')
-    if (x != null) {
-        userName.set($page.url.searchParams.get('un'))
-        kvar = $page.url.searchParams.get('em');
-        email.set($page.url.searchParams.get('em'));
-        //cuontry freeppid
-        document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2024, 0, 1).toUTCString();
-        document.cookie = `un=${decodeURIComponent($page.url.searchParams.get('un'))}; expires=` + new Date(2024, 0, 1).toUTCString();
-        liUN.set(decodeURIComponent($page.url.searchParams.get('un')));
-        const array = $page.url.searchParams.get('con').split(',');
-
-        contriesi.set(array)
-        regHelper.set(1);
-        fpval.set($page.url.searchParams.get('id'))
-        console.log(x, kvar, user, $contriesi)
-
-    }
-    if (document.cookie) {
-
-        const unt = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('un='))
-        if (unt != null) {
-            const un = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('un='))
-                .split('=')[1];
-            userName.set(un);
-        }
-        const regt = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('id='))
-        if (regt != null) {
-            const reg = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('id='))
-                .split('=')[1];
-
-            user = reg;
-        }
-        const cookieValuet = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('email='))
-        if (cookieValuet != null) {
-            const cookieValue = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('email='))
-                .split('=')[1];
-            kvar = cookieValue;
-            email.set(cookieValue);
-        }
-        const cookieValueti = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('await='))
-        if (cookieValueti != null) {
-            const cookieValue = document.cookie
-                .split('; ')
-                .find(row => row.startsWith('await='))
-                .split('=')[1];
-            kvar = true
-            show.set(6)
-        }
-    }
-    if (user > 0) {
-        goto("/lev", )
-    }
-    //console.log(emaili)
-    if ('serviceWorker' in navigator) {
-        navigator.serviceWorker.register('service-worker.js', {
-            scope: '/'
-        }).then(function(reg) {
-            // registration worked
-            console.log('Registration succeeded. Scope is ' + reg.scope);
-        }).catch(function(error) {
-            // registration failed
-            console.log('Registration failed with ' + error);
-        });
-
-    };
-    let error1, fppp
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-            return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-            throw resp;
-        });
-    };
-    const headers = {
-        'Content-Type': 'application/json',
-    };
-
-    try {
-        const res = await fetch("https://tov.onrender.com/graphql", {
-                method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    query: `query {
-  chezins { 
-   meta {
-      pagination {
-        total
-      }
-    }
-  }
-}
-              `
-                })
-            }).then(checkStatus)
-            .then(parseJSON);
-        fppp = res.data.chezins
-
-        idx = fppp.meta.pagination.total
-    } catch (e) {
-        error1 = e
-    }
-
-});
-
-let regHelperL = -1;
-
-regHelper.subscribe(value => {
-    regHelperL = value;
-});
-
-/*function toggle() {
-
-regHelperL = 0;
-    show.set(0);
-    regHelper.set(0)
-
-}*/
-function beforeUnload(event) {
-    // Cancel the event as stated by the standard.
-
-    // Chrome requires returnValue to be set.
-    // let fgf = false
-    if ($fbl == true) {
-        event.returnValue = null;
-        let data = {
-            name: `${$userName}  who speak ${$lang}`,
-            action: `${regHelperL == 1 ? "sing": "not sign"} and mail = ${$email}`,
-            data: $linkos
-        } //username email projectname projectsrc lang openmissionName
-        fetch('/api/ste', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                },
-                body: JSON.stringify(data),
-            })
-            .then((response) => response)
-            .then((data) => {
-                console.log('Success:', data);
-            })
-            .catch((error) => {
-                console.error('Error:', error);
-            });
-    }
-    // more compatibility
-    return null
-}
 </script>
-
-<svelte:window on:beforeunload|preventDefault={beforeUnload}/>
-
-<div class="main">
-<!--{#if user > 0}
-{ goto("/lev", )}
-{:else}-->
-  {#if kvar}
-<One {idx} />
-
-<!--
-todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית לקחת פרטים מהקוקיות או מלוקלסטורג'--> 
-{:else}
-{#if regHelperL == 1}
-<One {idx}/>
-
-{:else if regHelperL == 0}
-<Amana1  {idx}/>
-{:else if regHelperL == -1}
-
- <Mobile />
-{/if}
-
-{/if}
- </div>
-
-<style>
-:global(.multiselect) {
-    color: #02a2ff;
-    /* top-level wrapper div */
-}
-
-:global(li.selected) {
-    border: var(--sms-focus-border, 1pt solid var(--sms-active-color, cornflowerblue))
-        /* selected options in the dropdown list */
-}
-
-:global(li:not(.selected):hover) {
-    color: #FF0092;
-    /* unselected but hovered options in the dropdown list */
-}
-
-:global(li.active) {
-    color: #EEE8AA;
-    /* active means element was navigated to with up/down arrow keys */
-    /* ready to be selected by pressing enter */
-}
-
-:root {
-    --primary-light: #a6f9d6;
-    --primary: #5be2a9;
-    --primary-dark: #53ce9a;
-    --secondary: #1e2145;
-    --white: #fff;
-    --grey: #e6e6ff;
-    --grey-dark: #6d7098;
-    --red: #ff6b6b;
-}
-
-*,
-*:after,
-*:before {
-    box-sizing: border-box;
-}
-
-@media (min-width: 1100px) {
-
-    .main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-        width: 100%;
-        height: 100vh;
-        box-sizing: border-box;
-        margin: 0px;
-        background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
-        background-position: center;
-        background-repeat: no-repeat;
-        background-size: cover;
-    }
-}
-
-@media (max-width: 1099px) {
-    .main {
-        flex: 1;
-        display: flex;
-        flex-direction: column;
-
-    }
-}
-
-@media (max-width: 720px) {
-    .main {
-        flex: 1;
-        display: flex;
-        width: 100vw;
-        padding: 0;
-    }
-}
-</style>
+<div dir="rtl" class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden">
+	<div id="text" class="flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
+		<h1 class="font-bold sm:text-9xl text-4xl text-barbi shadow-lg shadow-fuchsia-300 rounded " 
+		style="text-shadow(1px 1px --mturk)">{title}</h1>
+	<div class="overflow-auto d  h-2/5"  on:scroll={()=>{ scrolli = true
+	setTimeout(()=>scrolli = false,1500)
+	}} >
+		<h2 class="font-bold mt-2 sm:text-5xl text-barbi decoration-mturk underline text-2xl">{setitle}</h2>
+		<p class="text-2xl p-2 px-24 text-barbi">{desc}<span class="underline decoration-lturk">{desc2}</span></p>
+		<div>
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1} />
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word2}/>
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word3}/>				
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word4}/>
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word5}/>
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word6}/>
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word7}/>
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word8}/>
+				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word9}/>
+				<Tile bg={"wow"} big={true} sm={true} word={word10}/>
+			</div>
+		<span>
+		<h2 class="text-bold text-2xl text-barbi mt-5 border-4 border-spacing-2 mx-6 border-mturk bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre  rounded-lg px-3 py-4 ">{regesh1}<br>{regesh2}</h2>
+		</span>
+	</div>
+		<div style="font-family:Gan, Power;" class="flex flex-row">
+			<button class="flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl" on:click={()=>{goto("/login") 
+				loadinga = true
+				fi = true}} class:button-perl={btna ==  false} class:button-gold={btna == true} on:focus={()=> btna = true} on:mouseover={()=>btna = true} 
+					on:mouseleave={()=> btna = false }>{login}
+			{#if btna == true && loadinga == false}
+			<span class="mx-2 mb-0.5"><Arrow height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
+			{/if}
+			{#if loadinga == true}
+			<Lowding width="24px" height="24px"/>
+			{/if}
+			</button>
+			<button class="text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto("/hascama") 
+			loading = true
+			fi = true
+		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} on:focus={()=> btnb = true} on:mouseover={()=>btnb = true} on:mouseleave={()=> btnb = false }>{reg}
+			{#if btnb == true && loading == false}
+			<span class="mx-2 mb-0.5"><Arrow height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
+			{/if}
+			{#if loading == true}
+			<Lowding width="24px" height="24px"/>
+			{/if}
+			</button>
+		</div>
+	</div>
+	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class="sm:w-1/2 h-1/2 sm:h-screen flex items-center justify-center">
+	<Canvas  size={{width:w, height: w*1.8 < h ? w : h > 639 ? w*0.8 : h}}>
+        <Scene {fi} hover={btna == true || btnb == true ? true:false} {scrolli}/>
+      </Canvas>
+	</div>
+</div>
