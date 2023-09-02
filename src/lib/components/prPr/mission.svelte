@@ -906,9 +906,11 @@ const mn = {
   "he": "שם",
   "en": "name"
 }
-const tri = import('$lib/translations/tr.json')
-
+   import tr from '$lib/translations/tr.json';
+const tri = tr
+console.log(tri)
 $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
+//TODO: כמות לכל משימה עד אינסוף
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -1038,12 +1040,12 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
                                         </td>
                                         {/each}
                                     </tr> <tr>
-                                        <th>{tri.common.description[$lang]}</th>
+                                        <th>{tri?.common?.description[$lang]}</th>
                                         {#each miData as data, i}
                                         <td>
                                             <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                                                 <textarea type="text"  id="des" name="des"  bind:value={data.attributes.descrip} class='input d' required></textarea>
-                                                <label for="des" class='label' >{tri.common.description[$lang]}</label>
+                                                <label for="des" class='label' >{tri?.common?.description[$lang]}</label>
                                                 <span class='line'></span>
                                             </div>
                                         </td>
@@ -1096,55 +1098,55 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
       </td>
       {/each}
       </tr> <tr>
-          <th>{tri.common.startDate[$lang]}</th>
+          <th>{tri?.common?.startDate[$lang]}</th>
           {#each miData as data, i}
           <td> <SveltyPicker inputClasses="form-control" format=" hh:ii dd/mm/yyyy" bind:value={data.date}></SveltyPicker></td>
           {/each}
       </tr><tr>
-          <th>{tri.common.finishDate[$lang]}</th>
+          <th>{tri?.common?.finishDate[$lang]}</th>
           {#each miData as data, i}
           <td> <SveltyPicker inputClasses="form-control" format="hh:ii dd/mm/yyyy " bind:value={data.dates}></SveltyPicker></td>
           {/each}
       </tr> <tr>
-          <th>{tri.mission.publicLinks[$lang]}</th>
+          <th>{tri?.mission?.publicLinks[$lang]}</th>
           {#each miData as data, i}
           <td>
               <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                   <input type="text"  id="kisu" name="kisu"   bind:value={data.publicklinks} class='input' required>
-                  <label for="kisu" class='label' >{tri.mission.publiclinks[$lang]}</label>
+                  <label for="kisu" class='label' >{tri?.mission?.publicLinks[$lang]}</label>
                   <span class='line'></span>
               </div>
           </td>
           {/each}
       </tr><tr>
-          <th>{tri.mission.linkToMission[$lang]}</th>
+          <th>{tri?.mission?.linkToMission[$lang]}</th>
           {#each miData as data, i}
           <td>
               <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                   <input type="text"  id="link" name="link"    bind:value={data.privatlinks} class='input' required>
-                  <label for="link" class='label'>{tri.mission.linkToMission[$lang]}</label>
+                  <label for="link" class='label'>{tri?.mission?.linkToMission[$lang]}</label>
                   <span class='line'></span>
               </div>
           </td>
           {/each}
       </tr><tr>
-          <th>{tri.mission.specialNotes[$lang]}</th>
+          <th>{tri?.mission?.specialNotes[$lang]}</th>
           {#each miData as data, i}
           <td>
               <div dir="{$lang == "he" ? "rtl" : "ltr"}"class='textinput'>
                   <textarea type="text"  id="hearotMeyuchadot2" name="hearotMeyuchadot2"  bind:value={data.spnot} class='input d' required></textarea>
-                  <label for="hearotMeyuchadot2" class='label' >{tri.mission.specialNotes[$lang]}</label>
+                  <label for="hearotMeyuchadot2" class='label' >{tri?.mission?.specialNotes[$lang]}</label>
                   <span class='line'></span>
               </div>
           </td>
           {/each}
       </tr><!-- add to server real private link in addition to linkto mission-<tr>
-          <th>{tri.mission.privatLinks[$lang]}</th>
+          <th>{tri?.mission?.privatLinks[$lang]}</th>
           {#each miData as data, i}
           <td>
               <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
                   <input type="text"  id="link" name="link"    bind:value={data.privatlinks} class='input' required>
-                  <label for="link" class='label'>{tri.mission.privatLinks[$lang]}</label>
+                  <label for="link" class='label'>{tri?.mission?.privatLinks[$lang]}</label>
                   <span class='line'></span>
               </div>
           </td>
@@ -1171,22 +1173,22 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
                   <label for="hoursn" class='label'>{data.iskvua == true ? hms[$lang] : hmh[$lang]}</label>
                   <span class='line'></span>
               </div>
-              {#if data.nhours < 0}<small class="bg-red-800 text-slate-50 px-2">{tri.common.noLesFromZero[$lang]}</small>{/if}
+              {#if data.nhours < 0}<small class="bg-red-800 text-slate-50 px-2">{tri?.common?.noLesFromZero[$lang]}</small>{/if}
       </td>
       {/each}
   </tr><tr style="display:''" id="vallueperhourN" >
-      <th>{tri.mission.hourlyVallue[$lang]}</th>
+      <th>{tri?.mission?.hourlyVallue[$lang]}</th>
       {#each miData as data, i}
       <td>
           <div dir="{$lang == "he" ? "rtl" : "ltr"}" class='textinput'>
               <input type="number"  id="vallueperhourn" name="vallueperhourn"
                   on:change={data.valph  < 0 ? data.valph = 0: data.valph }
                   bind:value={data.valph} class='input' required>
-              <label for="vallueperhourn" class='label'>{tri.mission.hourlyVallue[$lang]}</label>
+              <label for="vallueperhourn" class='label'>{tri?.mission?.hourlyVallue[$lang]}</label>
               <span class='line'></span>
           </div>
           {#if data.valph < 0}
-          <small class="bg-red-800 text-slate-50 px-2">{tri.common.noLesFromZero[$lang]}</small>
+          <small class="bg-red-800 text-slate-50 px-2">{tri?.common?.noLesFromZero[$lang]}</small>
           {/if}
       </td>
       {/each}
@@ -1216,7 +1218,7 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
   {/if}
   {#if userslength > 1}
   <tr>
-      <th>{tri.mission.assingTo[$lang]}<br>{tri.mission.assingHelp[$lang]}</th>
+      <th>{tri?.mission?.assingTo[$lang]}<br>{tri?.mission?.assingHelp[$lang]}</th>
       {#each miData as data, i}
       <td>
           <MultiSelect
@@ -1238,13 +1240,13 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
   </tr>
   {:else}
   <tr>
-      <th>{tri.mission.assingToMe[$lang]}<br>{tri.mission.assingHelp[$lang]}</th>
+      <th>{tri?.mission?.assingToMe[$lang]}<br>{tri?.mission?.assingHelp[$lang]}</th>
       {#each miData as data, i}
       <td>
           <input
               bind:checked={data.myM}
               type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> data.rishon == idL}>
-          <label for="tome">{tri.mission.assingToMe[$lang]}</label>
+          <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
       </td>
       {/each}
   </tr>
@@ -1282,7 +1284,7 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
       </td>
       {/each}
   </tr>--><tr >
-      <th>{tri.mission.total[$lang]}</th>
+      <th>{tri?.mission?.total[$lang]}</th>
       {#each miData as data, i}
       <td>
           {#if data.valph > 0 & data.nhours > 0}
