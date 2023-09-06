@@ -18,6 +18,14 @@
             "he":"בחירת כישורים נוספים ",
             "en":"add more skills"
         },
+        "addNewRoles": {
+            "he": "בחירת תפקידים נוספים ",
+            "en": "add more roles"
+        },
+        "addNewww": {
+            "he": "בחירת דרכי יצירה נוספים ",
+            "en": "add more creation ways"
+        },
         "requireSkills" : {
             "he": "כישורים נדרשים:",
             "en": "required skills:"
@@ -27,8 +35,8 @@
             "en": "role:"
         },
          "requiredWW" : {
-            "he": "דרכי עבודה מבוקשות:",
-            "en": "ways of work for the mission:"
+            "he": "דרכי יצירה מבוקשות:",
+            "en": "ways of creation for the mission:"
         },
         "total":{
             "he":"שווי סך הכל למשימה ",
@@ -65,6 +73,10 @@
         "linkToMission":{
             "he":"קישור לאתר בו מבוצעת המשימה ",
             "en":"link to where the mission is done"
+        },
+        "noOfHours":{
+            "he":"כמה שעות זה אמור לקחת?",
+            "en":"how many hours it should take?"
         }
     },
     "common": {
