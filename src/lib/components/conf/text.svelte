@@ -26,8 +26,8 @@ function check (lettera, letterb){
     }
 }
 function checkAll (a, b){
-    let al = a.split(" ")
-    let bl = b.split(" ")
+    let al = a.split(" ") ?? []
+    let bl = b.split(" ") ?? []
     let t = 0
     htmlon = ``
     console.log(a.split(" "),a.split(""),al[1])

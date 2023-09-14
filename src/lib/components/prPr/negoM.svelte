@@ -243,7 +243,7 @@ async function increment() {
           namefornego = ``
      } else {
          name4 = `name: "${name2}"`
-         namefornego = `name: ${name1}`
+         namefornego = `name: "${name1}"`
          what4 = false;
      }
       if (descrip === descrip2){
