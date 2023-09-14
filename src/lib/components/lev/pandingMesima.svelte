@@ -3,7 +3,7 @@
   import ProgressBar from "@okrad/svelte-progressbar";
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
-   import { createEventDispatcher } from 'svelte';
+   import { createEventDispatcher, onMount } from 'svelte';
   import Nego from '../prPr/negoM.svelte';
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
@@ -15,7 +15,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
  export let coinlapach;
  export let mypos = null;
      export let low = false;
-
+        export let restime;
     export let messege = [];
     export let descrip = "";
     export let projectName = "";
@@ -42,6 +42,9 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     export let privatlinks;
     export let mdate;
         export let mdates;
+        export let timegramaDate
+         export let timegramaId                     
+        export let createdAt;
     export let pendId;
     export let users;
      export let mysrc;
@@ -57,6 +60,12 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
  let why = "";
 let isOpen = false;
 let loading = false;
+
+onMount(()=>{
+  skills = oneLangAdj(skills,$lang,"skillName")
+  tafkidims = oneLangAdj(tafkidims,$lang,"roleDescription")
+  workways = oneLangAdj(workways,$lang,"workWayName")
+})
     function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -560,6 +569,8 @@ function hoverc (event){
     dispatch("hover", {id: u});
 }
  import Cards from './cards/pending.svelte'
+  import {oneLangAdj} from '$lib/func/oneLangAdj.svelte';
+  import { lang } from '$lib/stores/lang';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr
@@ -596,6 +607,7 @@ function claf (event){
       {masaalr} {mypos}
       on:load={()=>loading = true}
               on:close={afternego}
+              {timegramaId}
         descrip ={descrip}
         projectName ={projectName}
         name1 ={name}
@@ -609,9 +621,11 @@ function claf (event){
         skills = {skills}
         tafkidims = {tafkidims}
         workways ={workways}
-        publicklinks={publicklinks}
-        privatlinks={privatlinks}
         mdate={mdate}
+        {mdates}
+        {publicklinks}
+        {privatlinks}
+           {restime}
         pendId={pendId}
         users={users}
       />
@@ -717,6 +731,10 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   on:decline={claf}
   on:hover={hoverc}
   on:tochat={tochat}
+{skills}
+  {timegramaDate}
+    {tafkidims}
+    {workways}
   {low}
   {noofhours}
   {perhour}
@@ -727,6 +745,8 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
    {noofusersWaiting} 
    {noofusersOk} 
    {name} 
+   {restime}
+   {createdAt}
    {descrip} {mypos} {allr} {noofusersNo}
    on:nego={claf}
    />

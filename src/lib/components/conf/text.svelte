@@ -2,11 +2,12 @@
 export let state = 2 // original and edit, 3 is original second and edit
 export let text;
 export let lebel = {"he":"עריכה", "en": "edit"}
+import tr from '$lib/translations/tr.json'
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
   let htmlon = ``
-
+    export let long = false
 onMount(()=>{
     if (text == textb){
     htmlon = text
@@ -27,19 +28,34 @@ function check (lettera, letterb){
 function checkAll (a, b){
     let al = a.split(" ")
     let bl = b.split(" ")
+    let t = 0
     htmlon = ``
     console.log(a.split(" "),a.split(""),al[1])
+    if(al.length > 0 && bl.length >0){
   for(let i =0; i < bl.length; i++){
 
-    if (check(al[i], bl[i]) == true){
-        htmlon += `${al[i]} `
+    if (check(al[i+t], bl[i]) == true){
+        htmlon += `${al[i+t]} `
     } else{
-        if(al[i] != undefined){
+        if(check(al[i+1], bl[i]) == true){
+            t = 1
+            htmlon += `${al[i+t]} `
+        }else if(check(al[i+2], bl[i]) == true){
+            t = 2
+            htmlon += `${al[i+t]} `
+        }else{
+             if(al[i] != undefined){
         htmlon+= `<span class="line-through text-barbi">${al[i]}</span> `
         }
         htmlon += `<span class="text-wow">${bl[i]} </span>`
     }
+    }
   }
+}else if(al.length > 0 && bl.length == 0){
+        htmlon+= `<span class="line-through text-barbi">${a}</span> `
+}else if(al.length == 0 && bl.length >0){
+        htmlon += `<span class="text-wow">${b}</span>`    
+}
   console.log(htmlon)
 }
     </script>
@@ -53,17 +69,24 @@ function checkAll (a, b){
         {#if text != textb && show2 != true}
         <button on:click={()=>show2 = true}>📑</button>
         {:else if show2 == true}
+        <div class="flex flex-col align-middle justify-center ">
         <button on:click={()=>show2 = false}><Close/></button>
-        <small class:text-right={$lang == "he"}>מקורי:</small>
+        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{text}</p>
-        <small class:text-right={$lang == "he"} class="text-gold">הצעה:</small>
+        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
         <p class="text-gold">{textb}</p>
+        </div>
         {/if}
         </div>
 {:else}
 
 <div dir="rtl" class='textinput max-w-sm mx-auto'>
+    {#if long == false}
   <input type="text" on:input={(e)=>console.log(e)} id="des" name="des" bind:value={textb} class='input' required>
+  {:else}
+      <textarea name="des"  bind:value={textb}     
+ type='text' class='input d' required></textarea>
+  {/if}
   <label for="des" class='label' >{lebel[$lang]}</label>
   <span class='line '></span>
 </div><button on:click={()=>{edit = false

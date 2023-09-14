@@ -6,7 +6,6 @@
   import AxisX from './AxisX.svelte';
   import AxisY from './AxisY.svelte';
   import Tooltip from './Tooltip.html.svelte';
-  // This example loads csv data as json using @rollup/plugin-dsv
   export let datai 
   const xKey = 'value';
   const yKey = 'leb';
@@ -25,7 +24,7 @@
   */
   .chart-container {
     width: 100%;
-    height: 250px;
+    height: 150px;
   }
 </style>
 

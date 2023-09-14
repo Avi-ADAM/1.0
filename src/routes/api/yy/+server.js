@@ -49,7 +49,7 @@ export const POST = async ({ request }) => {
         inline_keyboard: [
           [
             {
-              text: 'Button 1',
+              text: 'הצגת כתובת',
               callback_data: 'Button 1'
             },
             {

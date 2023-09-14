@@ -15,7 +15,9 @@ export const load = async ({ url }) => {
 */
 export function load({ locals }) {
   const userAgent = locals.userAgent;
+  const lang = locals.lang
   return {
-    userAgent
+    userAgent,
+    lang
   };
 }

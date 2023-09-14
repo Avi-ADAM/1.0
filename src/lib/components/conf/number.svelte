@@ -1,16 +1,18 @@
 <script>
     import RangeSlider from "svelte-range-slider-pips";
     import Barb from './barb.svelte'
+    import tr from '$lib/translations/tr.json'
     export let status = [10,20]
     export let state = 2 // original and edit, 3 is original second and edit
 export let number;
+export let numberb = number
+
 export let lebel = {"he":"עריכה", "en": "edit"}
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
-let datai = [{"leb":"הצעה","value":100},{"leb":"מקור","value":1000}]
+let datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
     let edit = false
 let show2 = false
-export let numberb = number
 function checkAll(a,b){
   datai[0].value = b
   datai[1].value = a
@@ -19,22 +21,26 @@ function checkAll(a,b){
     <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
  {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline underline-lturk">{lebel[$lang]}: </h2>
+        <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
        {#if number == numberb} 
        <p class="text-gold">{number}</p>
        {:else}
+       <div dir="rtl" class='w-1/2 mx-auto'>
        <Barb {datai} />
+       </div>
         {/if}
        <button on:click={()=>edit = true}>
             {#if number == numberb}🖍️{:else}✏️{/if}</button>
         {#if number != numberb && show2 != true}
         <button on:click={()=>show2 = true}>📑</button>
         {:else if show2 == true}
+        <div class="flex flex-col align-middle justify-center ">
         <button on:click={()=>show2 = false}><Close/></button>
-        <small class:text-right={$lang == "he"}>מקורי:</small>
+        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{number}</p>
-        <small class:text-right={$lang == "he"} class="text-gold">הצעה:</small>
+        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
         <p class="text-gold">{numberb}</p>
+        </div>
         {/if}
         </div>
   {:else} 
@@ -45,9 +51,12 @@ function checkAll(a,b){
   <input type="number" on:input={(e)=>console.log(e)} id="numberb" name="numberb" bind:value={numberb} class='input' required>
   <label for="numberb" class='label' >{lebel[$lang]}</label>
   <span class='line '></span>
-</div><button on:click={()=>{edit = false
+</div><button on:click={()=>{if(Number(numberb) >= 0){ edit = false
 checkAll(number,numberb)
-}}>✅</button>
+} else{
+  console.log(numberb,Number(numberb))
+  alert(tr.common.noLesFromZero[$lang])
+}}}>✅</button>
 {/if}
 </div>
 <style>

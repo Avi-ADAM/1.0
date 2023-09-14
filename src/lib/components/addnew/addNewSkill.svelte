@@ -2,6 +2,7 @@
     import Addnewro from './addNewRoleToSkill.svelte';
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
+    import {sanitizeUserInput} from '$lib/func/uti/sanitizeUserInput.svelte'
                import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
  //   import { skillIdStore } from './store/skillIdStore.js'
@@ -100,8 +101,8 @@ if (rn.includes(skillName_value)){
         body: 
         JSON.stringify({query: 
            `mutation   {
-  createSkill(data: {  skillName: "${skillName_value}",
-          descrip: "${desS}",
+  createSkill(data: {  skillName: "${sanitizeUserInput(skillName_value)}",
+          descrip: "${sanitizeUserInput(desS)}",
           tafkidims: [${tafkidimslist}],
                 publishedAt: "${d.toISOString()}"
 }
@@ -143,7 +144,7 @@ if (rn.includes(skillName_value)){
   })
        }
       catch(error) {
-        console.log('צריך לתקן:', error.response);
+        console.log('צריך לתקן:', error);
         error = error1 
         console.log(error1)
                 };}

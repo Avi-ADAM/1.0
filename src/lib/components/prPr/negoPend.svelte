@@ -1,5 +1,7 @@
 <script>
 import Addnewro from '../addnew/addNewRole.svelte';
+  import { role, ww, skil} from '$lib/components/prPr/mi.js'
+
 import {
     createEventDispatcher
 } from 'svelte';
@@ -10,6 +12,7 @@ import MultiSelect from 'svelte-multiselect';
 import {
     onMount
 } from 'svelte';
+import Tile from '$lib/celim/tile.svelte'
 import { lang } from '$lib/stores/lang.js'
 const dispatch = createEventDispatcher();
 export let descrip = "";
@@ -79,6 +82,14 @@ newArr.splice(indexy, 1);
 skills3 = newArr;
 skills3 = skills3;
 }
+
+
+
+
+
+
+
+
 
 function minR(a, b) {
 const newArr = a;
@@ -315,6 +326,7 @@ let userss;
 async function increment() {
   dispatch("load")
  
+
       const date = (mdate2 !== undefined) ? ` sqadualed: ${mdate2}` : ``;
       const negoss = ``;
     const cookieValue = document.cookie
@@ -371,6 +383,14 @@ async function increment() {
          perhour4 = `perhour: ${perhour2}`;
          what4 = false;
      }
+
+
+
+
+
+
+
+     
      const skillsId = skills.map(c => c.id);
      const skills2Id = skills3.map(c => c.id);
      const roId = tafkidims.map(c => c.id);

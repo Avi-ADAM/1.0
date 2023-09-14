@@ -80,6 +80,14 @@
         }
     },
     "common": {
+        "watchthe":{
+            "he":"לצפיה בדיון",
+            "en":"watch the discussion"
+        },
+        "addcomment":{
+            "he":"הוספת תגובה",
+            "en":"add comment"
+        },
         "noLesFromZero":{
             "he":"לא יכול להיות קטן מ-0",
             "en":"can not be negative"
@@ -131,6 +139,10 @@
         "name": {
             "he": "שם",
             "en": "name"
+        },
+        "approve":{
+            "he":"אישור",
+            "en":"approve"
         }
     },
     "finiapp": {
@@ -145,17 +157,32 @@
             "en": "total votes in favor"
         },
         "notyet": {
-            "he": "לא הצביעו",
+            "he": "טרם הצביעו",
             "en": "not voted yet"
         },
         "totalno": {
             "he": "סך ההצבעות נגד",
             "en": "total votes against"
+        }, 
+        "inFavor" : {
+            "he": "בעד",
+            "en": "in favor"
+        }, 
+        "votedOn" : {
+            "he": "הצביעו רק על גרסאות קודמות",
+            "en": "voted only on other versions"
         }
     },
     "nego":{
         "original":{"he":"מקורי","en":"original"},
         "new": {"he":"חדש", "en": "new"},
-        "head": {"he":"הצעת שינוי למשימה", "en": "suggest changes"}
+        "head": {"he":"הצעת שינוי למשימה", "en": "suggest changes"},
+        "sugestion": {"he":"ההצעה שלך","en":"your sugestion"}
+    },
+    "pending":{
+        "head":{
+            "he":"הצבעה על אישור משימה חדשה",
+            "en":"vote on suggestion for a new mission"
+        }
     }
 }

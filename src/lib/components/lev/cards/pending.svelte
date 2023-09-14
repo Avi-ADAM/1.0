@@ -1,13 +1,31 @@
 <script>
       import Chaticon from '../../../celim/chaticon.svelte'
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
+      import tr from '$lib/translations/tr.json'
  const dispatch = createEventDispatcher();
+ import {lang} from '$lib/stores/lang.js'
      export let low = false;
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
-  import No from '../../../celim/no.svelte'
-    export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, perhour, noofhours
+  import Tile from '$lib/celim/tile.svelte';
+  import {restim} from '$lib/func/restime.svelte';
+  import { formatTime } from '../utils';
+    export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, perhour, noofhours,skills = [];
+    export let tafkidims = [];
+    export let workways = [];
+    export let restime, createdAt;
     export let already, allr = false;
+    export let timegramaDate
+    let zman
+  onMount(()=>{
+        let x = restim(restime)
+    let cr = new Date(timegramaDate)
+    let crr = cr.getTime() //if nego then use last nego creationtime
+  console.log(zman , Date.now() , crr , x)
+       setInterval(() => {
+   zman = -((Date.now() - cr) - x)
+      }, 1)
+  })
 function hover(x){
 dispatch("hover",{x:x});
 }
@@ -26,10 +44,16 @@ dispatch("nego",{alr:alr,y:"n"});
 function tochat (){
 dispatch("tochat");
 }
+    const t = {
+      "wwneed" : {"he":"דרכי עבודה מבוקשות:","en":"ways of work for the mission:"},
+      "skneed" : {"he":"הכישורים הנדרשים:","en": "needed skills:"},
+      "rneed" : {"he":"תפקיד מבוקש:", "en":"requested role:"}
+    }
+    const timero = {"he":"מונה זמן לסיום הדיון", "en":"time counter for end of discution"}
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  bg-white leading-normal w-full h-full bg-white lg:w-full">
+<div dir="rtl"  style="overflow-y:auto" class=" d  leading-normal w-full h-full bg-white lg:w-full">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -39,7 +63,7 @@ dispatch("tochat");
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-2xl text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm"> הצבעה על אישור משימה חדשה </span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{tr?.pending.head[$lang]}</span>
             </div>
             <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi  sm:text-xl">{projectName}</span>
          </div>
@@ -49,21 +73,57 @@ dispatch("tochat");
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.valph[$lang])} on:mouseleave={()=>hover("0")} > {perhour} {tr?.common.perhour[$lang]} </span> * <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.noofhours[$lang])} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr?.common.hours[$lang]} </span> = <span role="contentinfo" on:mouseenter={()=>hover(tr.mission.total[$lang])} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div class="text-mturk font-bold text-lg sm:text-2xl mb-2">{name}</div>
      {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16 text-sm text-gray-700 sm:text-xl">{descrip}</p>{/if}
     {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm sm:text-lg d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
+     <p on:mouseenter={()=>hover(tr?.mission.specialNotes[$lang])} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm sm:text-lg d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if} 
+      {#if skills.data.length > 0}
+            <small class="text-barbi text-md ">{t.skneed[$lang]}</small>
+            <div class=" flex   d  flex-wrap ">
+                {#each skills.data as skill}
+                <p
+                class="m-1 p-0"
+                style="line-height:1;"
+                on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"}[$lang])}
+                on:mouseleave={()=>hover("0")}  >
+                <Tile sm={true} big={true} bg="green" word={skill.attributes.skillName} />
+                </p>{/each}
+    </div>{/if}
+     {#if tafkidims.data.length > 0}
+      <small class="text-md text-barbi">{t.rneed[$lang]}</small>
+            <div
+            class=" flex   d  flex-wrap ">
+             {#each tafkidims.data as rol}
+             <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})}
+               on:mouseleave={()=>hover("0")} class="m-1"
+               style="line-height:1;text-shadow:none;" >
+               <Tile sm={true} big={true} bg="pink" word={rol.attributes.roleDescription} />
+               </p>{/each}
+    </div>{/if}
+    {#if workways.data.length > 0}
+    <small class="text-md text-barbi">{t.wwneed[$lang]}</small>
+            <div class=" flex   d  flex-wrap ">
+               {#each workways.data as wo}<p
+               on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")}
+                class="m-1" style="line-height:1;text-shadow:none;" >
+                <Tile sm={true} big={true} bg="yellow" word={wo.attributes.workWayName} />
+                </p>{/each}
+    </div>{/if}
+
     </div>
     <div class="flex items-center">
-        <p><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>
+        <p><span on:mouseenter={()=>hover(tr?.vots.totalin[$lang])} on:mouseleave={()=>hover("0")} role="contentinfo"  style="color:#7EE081;" >{noofusersOk}-{tr?.vots.inFavor[$lang]}</span> <span on:mouseenter={()=>hover(tr?.vots.notyet[$lang])} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{tr?.vots.notyet[$lang]} </span><!---<span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span>--></p>
       </div>
+       <div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover(timero[$lang])} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
+            {formatTime(zman)}
+        </span></div> 
        </div>
        {#if low == false}
  {#if already === false && allr === false}
-                <button on:mouseenter={()=>hover("אישור")}
+                <button on:mouseenter={()=>hover(tr?.common.approve[$lang])}
                on:mouseleave={()=>hover("0")} 
                on:click={()=>agree("f")} 
                 class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
@@ -71,7 +131,7 @@ dispatch("tochat");
                 <Lev/>
                 </button>   
             <button
-             on:mouseenter={()=>hover("משא ומתן")} 
+             on:mouseenter={()=>hover(tr?.common.nego[$lang])} 
              on:mouseleave={()=>hover("0")} 
              on:click= {()=>nego("f")}
               class = "btnb bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110" 
@@ -86,7 +146,7 @@ dispatch("tochat");
               <No/>
             </button>-->
     {:else if already === true && mypos === true && noofusersNo > 0 && allr === false}
-            <button on:mouseenter={()=>hover("משא ומתן")} on:mouseleave={()=>hover("0")}  
+            <button on:mouseenter={()=>hover(tr?.common.nego[$lang])} on:mouseleave={()=>hover("0")}  
                 on:click={() => nego("alr")} 
                 class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110" 
                 name="negotiate" 
@@ -100,13 +160,13 @@ dispatch("tochat");
               <No/>
             </button> -->    
             <button 
-            on:mouseenter={()=>hover("תגובה")} 
+            on:mouseenter={()=>hover(tr?.common.addcomment[$lang])} 
             on:mouseleave={()=>hover("0")}  
             on:click={() => tochat()}
             class = "btnc bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110" 
             ><Chaticon class="btin"/></button>
        {:else if already === true && mypos === false && noofusersOk > 0  && allr === false}
-                <button on:mouseenter={()=>hover("אישור")}
+                <button on:mouseenter={()=>hover(tr?.common.approve[$lang])}
                on:mouseleave={()=>hover("0")} 
                on:click={()=>agree("alr")} 
                 class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
@@ -114,13 +174,13 @@ dispatch("tochat");
                 <Lev/>
                 </button>   
               <button 
-                on:mouseenter={()=>hover("משא ומתן")} 
+                on:mouseenter={()=>hover(tr?.common.nego[$lang])} 
                 on:mouseleave={()=>hover("0")}  
                 on:click={() => nego("alr")} 
               class = "btnb bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-red-400 hover:scale-110" 
                    name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
                  <button
-                  on:mouseenter={()=>hover("תגובה")} 
+                  on:mouseenter={()=>hover(tr?.common.addcomment[$lang])} 
                   on:mouseleave={()=>hover("0")}  
                    class = "btnc bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-gold hover:text-barbi hover:scale-110" 
                        on:click={() => tochat()}
@@ -128,7 +188,7 @@ dispatch("tochat");
                           </button>
         {:else}
      <button
-      on:mouseenter={()=>hover("לצפיה בדיון")} 
+      on:mouseenter={()=>hover(tr?.common.watchthe[$lang])} 
       on:mouseleave={()=>hover("0")}  
      class = "btnc bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-gold hover:text-barbi hover:scale-110" 
       on:click={() => tochat()}

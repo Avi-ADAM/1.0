@@ -157,7 +157,7 @@ function hoverc (id){
     }
  
 </style>
-<span on:mouseenter={()=> hoverc(" ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל")} 
+<span role="contentinfo" on:mouseenter={()=> hoverc(" ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל")} 
 on:mouseleave={()=> hoverc("0")}>
        <Header second="./moach" secondTitle=""/>
        </span>
@@ -172,7 +172,7 @@ on:mouseleave={()=> hoverc("0")} class="perv" src="https://res.cloudinary.com/lo
         <img on:mouseenter={()=> hoverc("רגע, מה זה היה?")} 
 on:mouseleave={()=> hoverc("0")} class=" next" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg" alt="next "/>
     <div   
-      dir="ltr" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
+      dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
  
@@ -180,7 +180,7 @@ on:mouseleave={()=> hoverc("0")}
 
 </div>
 
-<span  on:mouseenter={()=> hoverede()}  
+<span role="contentinfo"  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
 {#key arr1}
 <Swiper 
@@ -302,7 +302,13 @@ mousewheel={true}
   on:proj={proj}
  on:user={user}
         on:coinLapach={delo}
+        timegramaId={buble.timegramaId}
         {low}
+        createdAt={buble.createdAt}
+        restime={buble.restime}
+          timegramaDate={buble.timegramaDate}
+                            publicklinks={buble.publicklinks}
+                            privatlinks={buble.privatlinks}
             dates={buble.dates}
             coinlapach={buble.coinlapach} 
           messege={buble.messege}

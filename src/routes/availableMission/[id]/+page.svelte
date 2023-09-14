@@ -23,6 +23,7 @@ function project(x) {
 export let askedarr = []
 export let alr = false
 async function ask() {
+  //TODO: if only me in the freemates and its me create mesimabetahalich
     alr = true
     const inD  = data.alld
   const cookieValueId = document.cookie
@@ -144,6 +145,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
   let image = `https://og.tailgraph.com/og?fontFamily=Roboto&title=This+is+Svead&titleTailwind=text-gray-800+font-bold+text-6xl&text=Set+Head+meta+tag+information&textTailwind=text-gray-700+text-2xl+mt-4&logoTailwind=h-8&bgTailwind=bg-white&footer=svead.vercel.app&footerTailwind=text-teal-600`
   let description = $page.data.alld?.descrip || om[$lang]
   let url = $page.url.toString()
+  //TODO: header nav menu 
 </script>
 
 <Head title="{$page.data.alld?.title[$lang] ?? headi[$lang]}" {description} {image} {url} />

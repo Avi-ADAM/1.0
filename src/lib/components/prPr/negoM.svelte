@@ -1,19 +1,13 @@
 <script>
-import Addnewro from '../addnew/addNewRole.svelte';
   import { role, ww, skil} from '$lib/components/prPr/mi.js'
 
 import {
     createEventDispatcher
 } from 'svelte';
-import AddNewSkill from '../addnew/addNewSkill.svelte';
-  import AddNewWorkway from '../addnew/addnewWorkway.svelte';
-
-import MultiSelect from 'svelte-multiselect';
 import {
     onMount
 } from 'svelte';
-import Tile from '$lib/celim/tile.svelte'
-import {lang} from '$lib/stores/lang'
+ import {lang} from '$lib/stores/lang'
 const dispatch = createEventDispatcher();
 export let descrip ;
 export let projectName ;
@@ -38,7 +32,8 @@ export let workways;
 export let vallues;
 export let publicklinks;
 export let privatlinks = "aaxa"
-export let mdate = new Date;
+export let mdate
+export let mdates
 export let pendId;
 export let users =[];
 export let oldide = 0; //last tg id, if non 0
@@ -72,15 +67,17 @@ let workways2 = $ww;
 let placeholder =`סוג משימה`;
 const plww = {"he":`סוג משימה`,"en":`mission kind`};
 let mdate2 = mdate;
+let mdates2 = mdates;
+
 let hearotMeyuchadot2 = hearotMeyuchadot;
 let privatlinks2 = privatlinks;
 let noofhours2 = noofhours;
 let perhour2 = perhour;
 let myM;
 let done;
-let skills3 = skills;
-let tafkidims2 = tafkidims; 
-let workways3 = workways;
+$: skills3 = [];
+$: tafkidims2 = []; 
+$: workways3 = [];
 
 
 let rishon = 0;
@@ -109,7 +106,7 @@ function myMissionH() {
   .split('=')[1];
   idL = cookieValueId;
 rishonves = idL;
-var checkBox = document.getElementById("done");
+/*var checkBox = document.getElementById("done");
   // Get the output text
   var text = document.getElementById("hoursC");
   var text2 = document.getElementById("vallueperhourC");
@@ -129,7 +126,7 @@ var checkBox = document.getElementById("done");
     text3.style.display = "";
     text4.style.display = "";
     text5.style.display = "";
-  }
+  }*/
 }
 
 function arraysEqual(a1,a2) {
@@ -138,7 +135,9 @@ function arraysEqual(a1,a2) {
 function close (){
     dispatch('close')
 }
+export let timegramaId
  let name4 = ``;
+ 
      let descrip4 = ``;
      let hearotMeyuchadot4 = ``; 
      let noofhours4 = ``;
@@ -215,6 +214,8 @@ async function increment() {
   //TODO: update timegrama, add now pend that is changed to nego
   let namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
       const date = (mdate2 !== undefined) ? ` sqadualed: ${mdate2}` : ``;
+            const dates = (mdates2 !== undefined) ? ` sqadualed: ${mdates2}` : ``;
+
       const negoss = ``;
     const cookieValue = document.cookie
   .split('; ')
@@ -278,12 +279,12 @@ async function increment() {
          perhour4nego = `perhour: ${perhour}`
          what4 = false;
      }
-     const skillsId = skills.map(c => c.id);
-     const skills2Id = skills3.map(c => c.id);
-     const roId = tafkidims.map(c => c.id);
-     const ro2Id = tafkidims2.map(c => c.id);
-     const wwId = workways.map(c => c.id);
-     const ww2Id = workways3.map(c => c.id);
+     const skillsId = skills.data.map(c => c.id);
+     const skills2Id = skills3.data.map(c => c.id);
+     const roId = tafkidims.data.map(c => c.id);
+     const ro2Id = tafkidims2.data.map(c => c.id);
+     const wwId = workways.data.map(c => c.id);
+     const ww2Id = workways3.data.map(c => c.id);
      if (arraysEqual(skillsId, skills2Id) === false){
             skills4 = ` skills: [${skills2Id}], `;
             skills4nego = ` skills: [${skillsId}], `;
@@ -324,6 +325,7 @@ async function increment() {
   } else{
         userss = objToString(users)
   }
+  let fd = new Date(Date.now() + x)
  try {
              await fetch(linkg, {
               method: 'POST',
@@ -333,9 +335,9 @@ async function increment() {
                   },
         body: //${negoss} {rishons} {rishonveses}?
         JSON.stringify({query:
-          `mutation { 
+          console.log(`mutation { 
              updateTimegrama(
-     id: ${timegramaid}
+     id: ${timegramaId}
              data:{
       date: "${fd.toISOString()}",
              }){data {id}
@@ -396,7 +398,7 @@ async function increment() {
       }
     
   ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
-} `   
+} `)   
 // make coin desapire
 } )})
   .then(r => r.json())
@@ -410,9 +412,43 @@ async function increment() {
       }
 }
 let x
-let linkg = "https://tov.onrender.com/graphql"
+let linkg = "https://tov.onrender.com/graphql";
+let dataibno = {"skillName":[],"roleDescription":[],"workWayName":[]}
+function addnew (event){
+   const newOb = event.detail.skob;
+   const valc = event.detail.valc;
+     const dataibn = event.detail.dataibn;
+    const newN = event.detail.skob.attributes[valc];
+  dataibno[valc] = dataibn
+  const newValues = valc == "skillName" ? $skil : valc == "roleDescription" ? $role : valc == "workWayName" ? $ww : [];
+    newValues.push(newOb);
+    if(valc == "skillName"){
+      skills2 = newValues
+      skil.set(skills2)
+    }else if (valc == "roleDescription"){
+      roles = newValues
+      role.set(roles)
+    }else if ( valc == "workWayName" ){
+      workways2 = newValues
+      ww.set(workways2)
+    }
+    const newSele = dataib;
+    newSele.push(newOb);
+    if(valc == "skillName"){
+      skills3.data = newSele
+    }else if (valc == "roleDescription"){
+      tafkidims2.data = newSele
+    }else if ( valc == "workWayName" ){
+      workways3 = newSele
+    }
+    dataibno[valc].push(newN)
+    dataibno = dataibno
+}
 onMount(async () => {
-  console.log("mounted")
+ //  skills3 = skills;
+ //tafkidims2 = tafkidims; 
+ //workways3 = workways;
+  console.log("mounted",$lang)
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -433,14 +469,10 @@ onMount(async () => {
         throw resp;
       });
     };
-    const headers = {
-      'Content-Type': 'application/json',
-    };
       try {
           const res = await fetch("https://tov.onrender.com/graphql", {
               method: "POST",
                 headers: {
-                    'Authorization': bearer1,
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
@@ -499,33 +531,59 @@ onMount(async () => {
         x = 168 * 60 * 60 * 1000
     }
     x =x
-    console.log(new Date(Date.now() + x).toLocaleString())
+    console.log(new Date(Date.now() + x).toLocaleString(),restime)
 })
 export let restime;
  import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import Elements from '../conf/elements.svelte';
     import Number from '../conf/number.svelte';
+  import DateNego from '../conf/dateNego.svelte';
+  import Barb from '../conf/barb.svelte';
 
 const tri = tr
+$: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}]
+
 </script>
 <div class="text-barbi " dir={$lang == "he"?"rtl":"ltr"}>
  <h1 class="md:text-center text-2xl md:text-2xl font-bold underline"
             >{tri?.nego?.head[$lang]} {name1}</h1>
             <div class="flex  flex-col align-middle justify-center ">
 <Text text={name1} bind:textb={name2} lebel={tri?.common?.name}/>
-<Text text={descrip} bind:textb={descrip2} lebel={tri?.common?.description}/>
-<Elements {newcontent} placeholder={tri?.mission?.addNewSkills} datai={skills.data} alld={skills2} bind:dataib={skills3.data} lebel={tri?.mission?.requireSkills} valc="skillName" bgi="gold"/>
-<Elements {newcontent} placeholder={tri?.mission?.addNewRoles} datai={tafkidims.data} alld={roles} bind:dataib={tafkidims2.data} lebel={tri?.mission?.requiredRoles} valc="roleDescription" bgi="gold"/>
-<Elements {newcontent} placeholder={tri?.mission?.addNewWw} datai={workways.data} alld={workways2} bind:dataib={workways3.data} lebel={tri?.mission?.requiredWW} valc="workWayName" bgi="gold"/>
-<Text text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
+<Text long={true} text={descrip} bind:textb={descrip2} lebel={tri?.common?.description}/>
+<Elements dataibn={dataibno.skillName} {newcontent} placeholder={tri?.mission?.addNewSkills} datai={skills.data} alld={skills2} bind:dataib={skills3.data} lebel={tri?.mission?.requireSkills} valc="skillName" bgi="gold"/>
+<Elements {newcontent} placeholder={tri?.mission?.addNewRoles} datai={tafkidims.data} alld={roles} bind:dataib={tafkidims2.data} lebel={tri?.mission?.requiredRoles} dataibn={dataibno.roleDescription} valc="roleDescription" bgi="gold"/>
+<Elements {newcontent} placeholder={tri?.mission?.addNewWw} datai={workways.data} alld={workways2} bind:dataib={workways3.data} lebel={tri?.mission?.requiredWW} dataibn={dataibno.workWayName} valc="workWayName" bgi="gold"/>
+<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
 <Text text={privatlinks} bind:textb={privatlinks2} lebel={tri?.mission?.linkToMission}/>
 <Number number={noofhours} bind:numberb={noofhours2} lebel={tri?.mission?.noOfHours}/>
 <Number number={perhour} bind:numberb={perhour2} lebel={tri?.mission?.hourlyVallue} />
+<DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate}/>
+<DateNego date={mdates} bind:dateb={mdates2} lebel={tri?.common.finishDate}/>
 
-
-
+<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
+    <div class="flex flex-row align-middle justify-center gap-x-2">
+        <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
+  <input
+    bind:checked={myM}
+    type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
 </div>
+</div>
+</div>
+<div class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
+ <h2 class="underline decoration-mturk">{tri?.mission.total[$lang]}</h2>
+      {#if noofhours == noofhours2 && perhour == perhour2}
+       {#if noofhours > 0 & perhour> 0}
+      {noofhours * perhour}
+      {:else} 
+      <p>0</p>
+      {/if}
+      {:else}
+      <div class="w-4/5 mx-auto">
+      <Barb {datai}/></div>
+      {/if}
+      </div>
+      <!---
 <table dir="rtl" >
       <tr class="ggr">
         <th class="ggr" > </th>
@@ -533,10 +591,26 @@ const tri = tr
         <td class="ggr">{tri?.nego?.new[$lang]}</td>
     </tr> 
    <tr>
-                                    <th>תאריך ביצוע</th>
-                                    <td>{mdate}</td>
-                                    <td><input type="datetime-local" bind:value={mdate2}  ></td>
-                                </tr> 
+                   <th>שווי סך הכל למשימה </th>
+                                    <td>
+                                         {#if noofhours > 0 & perhour> 0}
+
+                                        {noofhours * perhour}
+
+                                        {:else} <p>0</p>
+                                        {/if}
+                                    </td>
+                                    <td>
+                                        {#if noofhours2 > 0 & perhour2 > 0}
+
+                                        {noofhours2 * perhour2}
+
+                                        {:else if noofhours > 0 & perhour> 0} 
+                                        {noofhours * perhour}
+
+                                        {:else} <p>0</p>
+                                        {/if}
+                                    </td>
                               <tr>
                                     <th>השמת המשימה לעצמי</th>
                                     <td></td>
@@ -577,7 +651,9 @@ const tri = tr
 </div>
                                         <input >
                                     </td>
-                                </tr><tr >
+                                </tr>
+                              
+                                <tr >
                                     <th>שווי סך הכל למשימה </th>
                                     <td>
                                          {#if noofhours > 0 & perhour> 0}
@@ -599,7 +675,7 @@ const tri = tr
                                         {/if}
                                     </td>
                                 </tr>
-                                </table>
+                                </table>-->
                                 <div>
                                     <button
                                         on:click={increment}

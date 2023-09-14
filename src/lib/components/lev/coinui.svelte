@@ -265,12 +265,17 @@ export let sml = false
                         ><PendingM
                             on:hover={hover}
                             on:modal={modali}
-
                             on:proj={proj}
                             on:user={user}
                             on:coinLapach={delo}
+                            timegramaId={buble.timegramaId}
+                            timegramaDate={buble.timegramaDate}
+                            publicklinks={buble.publicklinks}
+                            privatlinks={buble.privatlinks}
                             coinlapach={buble.coinlapach}
+                            createdAt={buble.createdAt}
                             messege={buble.messege}
+                            restime={buble.restime}
                             mysrc={buble.mysrc}
                             mypos={buble.mypos}
                             descrip={buble.descrip}
@@ -294,7 +299,7 @@ export let sml = false
                             tafkidims={buble.tafkidims}
                             workways={buble.workways}
                             mdate={buble.mdate}
-                            dates={buble.dates}
+                            mdates={buble.dates}
                             vallues={buble.vallues}
                             pendId={buble.pendId}
                             users={buble.users}

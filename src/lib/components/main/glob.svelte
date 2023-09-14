@@ -1,13 +1,11 @@
 <script>
     //https://res.cloudinary.com/barb1/image/upload/v1676238523/%D7%A4%D7%AA%D7%A6%D7%95%D7%92%D7%94%D7%9C%D7%95%D7%A4%D7%A4%D7%99%D7%95%D7%9F_kkymez.glb
-	import { BoxBufferGeometry, Color, MeshStandardMaterial } from 'three'
-	import { SpotLight, useFrame } from '@threlte/core'
-  import { DEG2RAD } from 'three/src/math/MathUtils'
+	import {  Color } from 'three'
+	import { T, useFrame } from '@threlte/core'
 
     import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
-	import { AmbientLight, OrbitControls, PerspectiveCamera, DirectionalLight } from '@threlte/core'
-	import { Environment, GLTF } from '@threlte/extras'
+	import {  GLTF } from '@threlte/extras'
 
   let rotationt = 0
 		let rotX = 0
@@ -80,7 +78,7 @@ function sub (){
     dispatch("submit")
 }
 let isHovering = false, isPointerDown = false
-
+import Globu from './globu.svelte'
 </script>
 <!----
 <PerspectiveCamera position={{ x: 600, y: 200, z: 600 }} near={10} far={10000}>
@@ -93,19 +91,18 @@ let isHovering = false, isPointerDown = false
 
 -->
 
-<PerspectiveCamera position={{ x:0, y:0 , z:25}} fov={24}>
-</PerspectiveCamera>
-<AmbientLight  color={new Color( 0xCCFBF1)}  intensity={0.61} />
+<T.PerspectiveCamera makeDefaulte position={{ x:0, y:0 , z:25}} fov={24}/>
+<T.AmbientLight   intensity={0.61} />
 <!--
 <AmbientLight  color={new Color(0x00029E)}  intensity={1} rotation={345}/>
 color={0x2DFF34} intensity={180} $poz
 <AmbientLight color={new Color( 0x2DFF34 )} intensity={1} />
 
 -->
-<SpotLight position={poz} />
+<T.SpotLight position={poz} />
 
-<DirectionalLight color={new Color(0xCCFBF1)} intensity={0.81} position={{ y: -20, z: -5, x: 5 }} />
-<DirectionalLight color={new Color(0xFF0092)} intensity={0.91} position={{ y: 10, z: 10 }} />
+<T.DirectionalLight  intensity={0.81} position={{ y: -20, z: -5, x: 5 }} />
+<T.DirectionalLight  intensity={0.91} position={{ y: 10, z: 10 }} />
 
 <GLTF
 castShadow receiveShadow
@@ -129,4 +126,4 @@ rotation={{y: rotationt
 	scale={13}
 	url="3d/withlev.glb"
 />
-
+<Globu />

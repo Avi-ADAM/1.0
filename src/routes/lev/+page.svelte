@@ -37,7 +37,7 @@ import {
     doesLang,
     langUs
 } from '$lib/stores/lang.js'
-
+export let data;
 let low = true;
 
 let isOpen = false;
@@ -1363,6 +1363,7 @@ let walcomenold = [],
     meDataold = [],
     hachlatot = [];
 async function start() {
+    lang.set(data.lang)
     console.log($lang, "start");
     miDataold = miData
     let bearer1 = 'bearer' + ' ' + token;
@@ -1421,7 +1422,7 @@ async function start() {
                     						 work_ways {data{ id}}
         													}}}
      									 }}} 
-  	projects_1s {data{id attributes{ projectName 
+  	projects_1s {data{id attributes{ projectName restime
     			user_1s {data{id attributes{username haskamaz haskamac email haskama profilePic {data{attributes{ url formats }}}}}} 
     			profilePic {data{attributes{ url formats }}} 
     			decisions (filters: { archived: { eq: false } }){ data{ id attributes{ 
@@ -1478,13 +1479,14 @@ async function start() {
             				users_permissions_user {data{ id} }
       											}}}
     			pendms(filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					name hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
+        					name createdAt  hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
                             rishon {data{id}}
                             skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
                             tafkidims {data{id attributes{ roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
                             work_ways {data{id attributes{ workWayName ${$lang == 'he' ? 'localizations{data{attributes{workWayName }}}' : ""}}}}
                             mission {data{ id}}
                             vallues {data{ id}}
+                            timegrama{data{id attributes{date}}}
                             nego { noofhours perhour users_permissions_user {data {id}}}
                             diun {what why id order users_permissions_user {data{ id}}}  
                             users { what order why id users_permissions_user {data{id }}}                                   
@@ -1510,7 +1512,7 @@ async function start() {
 
         counter += 1;
         localStorage.setItem("miDataL", JSON.stringify(miData));
-        if (isEqual(miData, miDataold)  == true) {
+        if (!isEqual(miData, miDataold)  == true) {
             console.log("nada")
             low = false
         } else {
@@ -2062,6 +2064,8 @@ function getProjectData(id,thing,uid){
                          return projects[i].attributes.user_1s.data[t].attributes.username
                          }
                         }
+                } else if (thing == "restime"){
+                        return projects[i].attributes.restime
                 }
             }
         }
@@ -2148,6 +2152,8 @@ function createpends(data) {
                 noofusers:getProjectData(projects[i].id,"noof"),
                 users: pend.attributes.users,
                 myid: myid,
+                timegramaId: pend.attributes.timegrama.data.id,
+                timegramaDate: pend.attributes.timegrama.data.attributes.date,
                 diun: pend.attributes.diun,
                 missionId: pend.attributes.mission.data.id,
                 skills: pend.attributes.skills,
@@ -2158,7 +2164,9 @@ function createpends(data) {
                 publicklinks: pend.attributes.publicklinks,
                 mdate: pend.attributes.sqadualed,
                 dates: pend.attributes.dates,
+                restime: getProjectData(projects[i].id,"restime"),
                 pendId: pend.id,
+                createdAt:pend.attributes.createdAt,
                 ani: "pends",
                 azmi: "harchava",
                 pl: 1 + pend.attributes.users.length,

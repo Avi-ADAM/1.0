@@ -2,6 +2,7 @@
   import Close from "$lib/celim/close.svelte";
   import Tile from "$lib/celim/tile.svelte";
   import { lang } from "$lib/stores/lang";
+  import tr from '$lib/translations/tr.json'
   import { MultiSelect } from "svelte-multiselect";
   import AddNewSkill from "../addnew/addNewSkill.svelte";
   import { find_skill_id } from "$lib/func/findSkillId.svelte";
@@ -10,9 +11,15 @@
   import { onMount } from "svelte";
   onMount(()=>{
     console.log("datai",datai,dataib)
-    if(dataib.length > 0){
-        dataibn = dataib.map(c=>c.attributes[valc])
+    if(datai != dataib && datai.length > 0 && dataib.length == 0){
+        if(datai[0].remuved != true){
+            dataib = datai
+        }
     }
+        if(dataib.length > 0){
+            dataibn = dataib.map(c=>c.attributes[valc])
+        }
+    
   })
     export let datai = []
     export let dataib = []
@@ -28,16 +35,22 @@
     export let nom = {}
     export let addS = false
     export let roles = []
-    let dataibn = []
-    function addnew(event) {
+    export let dataibn = []
+function addnew(event) {
     const newOb = event.detail.skob;
     const newN = event.detail.skob.attributes[valc];
+    /*    const newOb = event.detail.skob;
+    const newN = event.detail.skob.attributes[valc];
+    dispatch("addnew",{newOb,newN,valc,dataibn})*/
     const newValues = alld;
     newValues.push(newOb);
     alld = newValues;
     const newSele = dataib;
-    dataib.push(newOb);
+        console.log(dataib,datai)
+    newSele.push(newOb);
     dataib = newSele;
+    dataib = dataib
+    console.log(dataib,datai)
     dataibn.push(newN)
     dataibn = dataibn
 }
@@ -91,7 +104,6 @@ function checkAll (){
     dati = dati
     console.log(dati)
 }
-console.log(valc)
 </script>
 <div class="border border-gold border-opacity-20 rounded m-2">
 {#if edit == false}
@@ -110,26 +122,29 @@ console.log(valc)
         {#if datai != dataib && show2 != true}
         <button on:click={()=>show2 = true}>📑</button>
         {:else if show2 == true}
+        <div class="flex flex-col align-middle justify-center ">
         <button on:click={()=>show2 = false}><Close/></button>
-        <small class:text-right={$lang == "he"}>מקורי:</small>
+        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         {#if datai.length > 0}
         <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1">
           {#each datai as dat, i}
           <p
           class="m-0 " style="text-shadow:none; white-space:none;" >
-              <Tile bg="blue" sm={true} big={true}  word={dat.attributes[valc]}/></p>{/each}
+              <Tile bg="blue" sm={true} big={true}  word={dat.attributes[valc]}/></p>
+              {/each}
     </div>
     {/if}
-        <small class:text-right={$lang == "he"} class="text-gold">הצעה:</small>
+        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
         {#if dataib.length > 0}
         <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1">
           {#each dataib as dat, i}
           <p
           class="m-0 " style="text-shadow:none; white-space:none;" >
-              <Tile bg="pink" sm={true} big={true}  word={dat.attributes[valc]}/></p>{/each}
+              <Tile bg="pink" sm={true} big={true}  word={dat.attributes[valc]}/></p>
+              {/each}
     </div>
     {/if} 
-        
+        </div>
         {/if}
         </div>
 {:else}
