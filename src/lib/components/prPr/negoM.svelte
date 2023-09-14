@@ -334,8 +334,7 @@ async function increment() {
             'Content-Type': 'application/json'
                   },
         body: //${negoss} {rishons} {rishonveses}?
-        JSON.stringify({query:
-          console.log(`mutation { 
+        JSON.stringify({query:`mutation { 
              updateTimegrama(
      id: ${timegramaId}
              data:{
@@ -398,7 +397,7 @@ async function increment() {
       }
     
   ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
-} `)   
+} `   
 // make coin desapire
 } )})
   .then(r => r.json())
