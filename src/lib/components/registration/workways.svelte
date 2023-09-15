@@ -39,7 +39,7 @@
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  workWays {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ""}}
+  workWays(sort: "workWayName") {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ""}}
 }}}
               `})
             }).then(checkStatus)

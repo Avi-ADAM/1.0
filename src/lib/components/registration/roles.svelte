@@ -52,7 +52,7 @@
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  tafkidims { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ""}}
+  tafkidims(sort: "roleDescription") { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ""}}
 }
 }
 }

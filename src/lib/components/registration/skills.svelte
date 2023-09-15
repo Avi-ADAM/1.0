@@ -40,7 +40,7 @@
                  'Content-Type': 'application/json'
               },body: JSON.stringify({
                         query: `query {
-  skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}
+  skills (sort: "skillName") { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}
 }
 } }
               `})
