@@ -3,20 +3,20 @@ import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
 import sendgrid from '@sendgrid/mail';
 
 async function renderEmail(un,username,pl,pn,kind,rishon,name,lang,restime) {
- let html = render({
-    template: PendJustCreated,
-    props: {
-      un: un,
-      username: username,
-      pl: pl,
-      pn: pn,
-      kind: kind,
-      rishon: rishon,
-      name: name,
-      lang: lang,
-      restime: restime ?? 'feh'
-    }
-  });
+ const html = render({
+   template: PendJustCreated,
+   props: {
+     un: un,
+     username: username,
+     pl: pl,
+     pn: pn,
+     kind: kind,
+     rishon: rishon,
+     name: name,
+     lang: lang,
+     restime: restime ?? 'feh'
+   }
+ });
   return html;
 }
 async function renderText(
@@ -30,23 +30,23 @@ async function renderText(
   lang,
   restime
 ) {
-let text =  render({
-    template: PendJustCreated,
-    props: {
-      un: un,
-      username: username,
-      pl: pl,
-      pn: pn,
-      kind: kind,
-      rishon: rishon,
-      name: name,
-      lang: lang,
-      restime: restime ?? 'feh'
-    },
-    options: {
-      plainText: true
-    }
-  });
+const text = render({
+  template: PendJustCreated,
+  props: {
+    un: un,
+    username: username,
+    pl: pl,
+    pn: pn,
+    kind: kind,
+    rishon: rishon,
+    name: name,
+    lang: lang,
+    restime: restime ?? 'feh'
+  },
+  options: {
+    plainText: true
+  }
+});
   return text;
 }
 sendgrid.setApiKey(import.meta.env.VITE_SENDGRID);
