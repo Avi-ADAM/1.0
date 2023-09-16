@@ -4,11 +4,21 @@
   import { lang } from "$lib/stores/lang.js";
   import { onMount } from "svelte";
   export let data
-  let tex
+    let tex
+
+  let c = []
+  let y = []
   onMount(()=>{
+    y = c
     lang.set(data.lang)
   })
+  function oncli (){
+    y.push(0)
+    y = y
+    console.log(y,c)
+  }
 </script>
+<button on:click={oncli}>ooooo</button>
 <div>
 <Nego descrip="  Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, labore nulla voluptates corporis est non quia natus magnam id dolor perferendis distinctio doloremque laboriosam at quisquam cum necessitatibus, rem tempora.
 " 

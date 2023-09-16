@@ -1,9 +1,10 @@
-import { render } from 'svelte-email';
+//import { render } from 'svelte-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
 import sendgrid from '@sendgrid/mail';
+sendgrid.setApiKey(import.meta.env.VITE_SENDGRID);
 
 async function renderEmail(un,username,pl,pn,kind,rishon,name,lang,restime) {
- const html = render({
+/* const html = render({
    template: PendJustCreated,
    props: {
      un: un,
@@ -17,7 +18,7 @@ async function renderEmail(un,username,pl,pn,kind,rishon,name,lang,restime) {
      restime: restime ?? 'feh'
    }
  });
-  return html;
+  return html;*/
 }
 async function renderText(
   un,
@@ -30,7 +31,7 @@ async function renderText(
   lang,
   restime
 ) {
-const text = render({
+/*const text = render({
   template: PendJustCreated,
   props: {
     un: un,
@@ -47,9 +48,8 @@ const text = render({
     plainText: true
   }
 });
-  return text;
+  return text;*/
 }
-sendgrid.setApiKey(import.meta.env.VITE_SENDGRID);
 
 async function nutifiPusers(
   restime,
@@ -65,7 +65,7 @@ async function nutifiPusers(
   rishon
 ) {
   //by mail
-  const previewText = {
+ /* const previewText = {
         "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
         "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`
       };
@@ -105,6 +105,7 @@ async function nutifiPusers(
 
   sendgrid.send(options);
   //by push
+  */
 }
 function getUnById(array, id) {
   const foundObject = array.find((obj) => obj.id === id);

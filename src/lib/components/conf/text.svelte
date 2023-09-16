@@ -26,29 +26,32 @@ function check (lettera, letterb){
     }
 }
 function checkAll (a, b){
-    let al = a.split(" ") ?? []
-    let bl = b.split(" ") ?? []
+    let al = a && a.length > 0 ? a.split(" ") : []
+    let bl = b && b.length > 0 ? b.split(" ") : []
     let t = 0
     htmlon = ``
-    console.log(a.split(" "),a.split(""),al[1])
     if(al.length > 0 && bl.length >0){
   for(let i =0; i < bl.length; i++){
 
     if (check(al[i+t], bl[i]) == true){
         htmlon += `${al[i+t]} `
-    } else{
-        if(check(al[i+1], bl[i]) == true){
+    } else if(check(al[i+1], bl[i]) == true){
             t = 1
             htmlon += `${al[i+t]} `
         }else if(check(al[i+2], bl[i]) == true){
             t = 2
+            htmlon += `${al[i+t]} `
+        }else if(check(al[i-1], bl[i]) == true){
+            t = -1
+            htmlon += `${al[i+t]} `
+        }else if(check(al[i-2], bl[i]) == true){
+            t = -2
             htmlon += `${al[i+t]} `
         }else{
              if(al[i] != undefined){
         htmlon+= `<span class="line-through text-barbi">${al[i]}</span> `
         }
         htmlon += `<span class="text-wow">${bl[i]} </span>`
-    }
     }
   }
 }else if(al.length > 0 && bl.length == 0){

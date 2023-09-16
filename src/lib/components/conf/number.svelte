@@ -10,7 +10,7 @@ export let numberb = number
 export let lebel = {"he":"עריכה", "en": "edit"}
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
-let datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
+$: datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
     let edit = false
 let show2 = false
 function checkAll(a,b){

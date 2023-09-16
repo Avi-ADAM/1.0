@@ -9,11 +9,12 @@
   import AddNewRole from "../addnew/addNewRole.svelte";
   import AddnewWorkway from "../addnew/addnewWorkway.svelte";
   import { onMount } from "svelte";
+  //const dispatch = createEventDispatcher();
   onMount(()=>{
     console.log("datai",datai,dataib)
     if(datai != dataib && datai.length > 0 && dataib.length == 0){
         if(datai[0].remuved != true){
-            dataib = datai
+            dataib = JSON.parse(JSON.stringify(datai));  
         }
     }
         if(dataib.length > 0){
@@ -46,10 +47,11 @@ function addnew(event) {
     newValues.push(newOb);
     alld = newValues;
     const newSele = dataib;
+    const datairosh = datai;
         console.log(dataib,datai)
     newSele.push(newOb);
     dataib = newSele;
-    dataib = dataib
+    datai = datairosh
     console.log(dataib,datai)
     dataibn.push(newN)
     dataibn = dataibn

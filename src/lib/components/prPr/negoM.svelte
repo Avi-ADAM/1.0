@@ -33,7 +33,8 @@ export let vallues;
 export let publicklinks;
 export let privatlinks = "aaxa"
 export let mdate
-export let mdates
+export let mdates;
+export let state = 2
 export let pendId;
 export let users =[];
 export let oldide = 0; //last tg id, if non 0
@@ -75,9 +76,9 @@ let noofhours2 = noofhours;
 let perhour2 = perhour;
 let myM;
 let done;
-$: skills3 = [];
-$: tafkidims2 = []; 
-$: workways3 = [];
+let skills3 = [];
+let tafkidims2 = []; 
+let workways3 = [];
 
 
 let rishon = 0;
@@ -212,9 +213,9 @@ let userss;
 async function increment() {
     dispatch("load")
   //TODO: update timegrama, add now pend that is changed to nego
-  let namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
+  let date4 = ``, dates4 = ``, date4nego, dates4nego, namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
       const date = (mdate2 !== undefined) ? ` sqadualed: ${mdate2}` : ``;
-            const dates = (mdates2 !== undefined) ? ` sqadualed: ${mdates2}` : ``;
+            const dates = (mdates2 !== undefined) ? `dates: ${mdates2}` : ``;
 
       const negoss = ``;
     const cookieValue = document.cookie
@@ -233,12 +234,35 @@ async function increment() {
     } else {
         rishon4 = ``;
     }
-      if (rishonves !== 0){
+     /* if (rishonves !== 0){
         rishonves4= `rishonves: "${rishonves}"`
     } else {
         rishonves4 = ``;
     }
-     if (name1 === name2){
+    ${rishon4nego}
+    ${rishonves4nego}
+     ${rishon4}
+    ${rishonves4}
+    ${rishon4}
+    ${rishonves4},
+    */
+     if (mdates === mdates2){
+          dates4 = ``
+          dates4nego = ``
+     } else {
+         dates4nego =  (mdates !== undefined) ? ` dates: ${mdates}` : ``;
+         dates4 =  (mdates2 !== undefined) ? ` dates: ${mdates2}` : ``;
+         what4 = false;
+     }
+     if (mdate === mdate2){
+          date4 = ``
+          date4nego = ``
+     } else {
+         date4nego =  (mdate !== undefined) ? ` sqadualed: ${mdate}` : ``;
+         date4 =  (mdate2 !== undefined) ? ` date: ${mdate2}` : ``;
+         what4 = false;
+     }
+      if (name1 === name2){
           name4 = ``
           namefornego = ``
      } else {
@@ -339,12 +363,12 @@ async function increment() {
      id: ${timegramaId}
              data:{
       date: "${fd.toISOString()}",
-             }){data {id}
+             }){data {id}}
              createNegopendmission(
               data:{
                 pendm:${pendId},
-                ide: ${oldide++}
-                 users_permissions_user: "${idL}"  
+                 users_permissions_user: "${idL}",
+                 isOriginal:${state == 2 ? true : false},
     ${noofhours4nego}
     ${hearotMeyuchadot4nego}
     ${descrip4nego}
@@ -353,8 +377,8 @@ async function increment() {
     ${skills4nego}
     ${roles4nego}
     ${ww4nego}
-    ${rishon4nego}
-    ${rishonves4nego}
+    ${date4nego}
+    ${dates4nego}
               }
              ){data{id}}
             updatePendm(
@@ -368,8 +392,8 @@ async function increment() {
     ${skills4}
     ${roles4}
     ${ww4}
-    ${rishon4}
-    ${rishonves4},
+    ${date4}
+    ${dates4}
         users:[  ${userss}, 
      {
       what: ${what4}
@@ -380,17 +404,6 @@ async function increment() {
   ], nego:[  
 {
     users_permissions_user: "${idL}"
-    ${noofhours4}
-    ${hearotMeyuchadot4}
-    ${descrip4}
-    ${name4}
-    ${perhour4}
-    ${skills4}
-    ${roles4}
-    ${ww4}
-    ${rishon4}
-    ${rishonves4}
-
 }
 
   ]
@@ -550,16 +563,16 @@ $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":n
             <div class="flex  flex-col align-middle justify-center ">
 <Text text={name1} bind:textb={name2} lebel={tri?.common?.name}/>
 <Text long={true} text={descrip} bind:textb={descrip2} lebel={tri?.common?.description}/>
-<Elements dataibn={dataibno.skillName} {newcontent} placeholder={tri?.mission?.addNewSkills} datai={skills.data} alld={skills2} bind:dataib={skills3.data} lebel={tri?.mission?.requireSkills} valc="skillName" bgi="gold"/>
-<Elements {newcontent} placeholder={tri?.mission?.addNewRoles} datai={tafkidims.data} alld={roles} bind:dataib={tafkidims2.data} lebel={tri?.mission?.requiredRoles} dataibn={dataibno.roleDescription} valc="roleDescription" bgi="gold"/>
-<Elements {newcontent} placeholder={tri?.mission?.addNewWw} datai={workways.data} alld={workways2} bind:dataib={workways3.data} lebel={tri?.mission?.requiredWW} dataibn={dataibno.workWayName} valc="workWayName" bgi="gold"/>
+<Elements dataibn={dataibno.skillName} {newcontent} placeholder={tri?.mission?.addNewSkills} datai={skills.data} alld={skills2} bind:dataib={skills3.data} lebel={tri?.mission?.requireSkills} on:addnew={addnew} valc="skillName" bgi="gold"/>
+<Elements {newcontent} placeholder={tri?.mission?.addNewRoles} datai={tafkidims.data} alld={roles} bind:dataib={tafkidims2.data} lebel={tri?.mission?.requiredRoles} dataibn={dataibno.roleDescription} on:addnew={addnew} valc="roleDescription" bgi="gold"/>
+<Elements {newcontent} placeholder={tri?.mission?.addNewWw} datai={workways.data} alld={workways2} bind:dataib={workways3.data} lebel={tri?.mission?.requiredWW} dataibn={dataibno.workWayName} on:addnew={addnew} valc="workWayName" bgi="gold"/>
 <Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
 <Text text={privatlinks} bind:textb={privatlinks2} lebel={tri?.mission?.linkToMission}/>
 <Number number={noofhours} bind:numberb={noofhours2} lebel={tri?.mission?.noOfHours}/>
 <Number number={perhour} bind:numberb={perhour2} lebel={tri?.mission?.hourlyVallue} />
 <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate}/>
 <DateNego date={mdates} bind:dateb={mdates2} lebel={tri?.common.finishDate}/>
-
+<!---
 <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
         <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
@@ -567,7 +580,7 @@ $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":n
     bind:checked={myM}
     type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
 </div>
-</div>
+</div>-->
 </div>
 <div class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
  <h2 class="underline decoration-mturk">{tri?.mission.total[$lang]}</h2>
