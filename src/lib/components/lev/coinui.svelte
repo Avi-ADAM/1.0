@@ -273,6 +273,7 @@ export let sml = false
                             publicklinks={buble.publicklinks}
                             privatlinks={buble.privatlinks}
                             coinlapach={buble.coinlapach}
+                            isKavua={buble.isKavua}
                             createdAt={buble.createdAt}
                             messege={buble.messege}
                             restime={buble.restime}

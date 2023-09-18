@@ -1479,8 +1479,15 @@ async function start() {
             				users_permissions_user {data{ id} }
       											}}}
     			pendms(filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					name createdAt  hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
+        					name createdAt iskvua hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
                             rishon {data{id}}
+                            negopendmissions{data{id attributes{
+                                name hearotMeyuchadot descrip noofhours perhour isOriginal date dates isMonth 
+                                users_permissions_user{data{id}}
+                                skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
+                                tafkidims {data{id attributes{ roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
+                                work_ways {data{id attributes{ workWayName ${$lang == 'he' ? 'localizations{data{attributes{workWayName }}}' : ""}}}}
+                            }}}
                             skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
                             tafkidims {data{id attributes{ roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
                             work_ways {data{id attributes{ workWayName ${$lang == 'he' ? 'localizations{data{attributes{workWayName }}}' : ""}}}}
@@ -2139,6 +2146,8 @@ function createpends(data) {
             const pend = projects[i].attributes.pendms.data[j]
             pends.push({
                 mysrc: src24,
+                negopendmissions: pend.attributes.negopendmissions,
+                isKavua :pend.attributes.iskvua,
                 name: pend.attributes.name,
                 nego: pend.attributes.nego,
                 projectId: projects[i].id,
@@ -2172,8 +2181,6 @@ function createpends(data) {
                 pl: 1 + pend.attributes.users.length,
                 messege: []
             });
-                        console.log("הגעתי בשלום")
-
         }
     }
     console.log(pends)

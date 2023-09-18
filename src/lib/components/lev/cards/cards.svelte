@@ -12,7 +12,7 @@
         import Reqtom from '../../../components/lev/reqtom.svelte'
         import Weget from '../../../components/lev/weget.svelte'
         import Hal from '../../../components/lev/halukaask.svelte'
-      import { fly } from 'svelte/transition';
+      //import { fly } from 'svelte/transition';
       import { createEventDispatcher } from 'svelte';
     import Header from './../../header/header.svelte'
 const dispatch = createEventDispatcher();
@@ -337,6 +337,7 @@ mousewheel={true}
                 mdate={buble.mdate}
                 vallues={buble.vallues}
                 pendId={buble.pendId}
+                isKavua={buble.isKavua}
                 users={buble.users}
                 cards="true"
                 /></SwiperSlide>

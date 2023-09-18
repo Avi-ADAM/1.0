@@ -3,11 +3,12 @@
     import Barb from './barb.svelte'
     import tr from '$lib/translations/tr.json'
     export let status = [10,20]
+    export let splebel = null
     export let state = 2 // original and edit, 3 is original second and edit
 export let number;
 export let numberb = number
 
-export let lebel = {"he":"עריכה", "en": "edit"}
+export let lebel;
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
 $: datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
@@ -20,8 +21,11 @@ function checkAll(a,b){
 </script>
     <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
  {#if edit == false}
-    <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
+    <div class="flex hi flex-row align-middle justify-center gap-x-2">
+        <h2 class="underline decoration-mturk">{lebel}: <span class:line-through={splebel == false}
+           class:text-barbi={splebel == false}
+           class:text-wow={splebel == true}
+           class:hidden={splebel == null}>{tr?.mission.perMonth[$lang]}</span></h2>
        {#if number == numberb} 
        <p class="text-gold">{number}</p>
        {:else}

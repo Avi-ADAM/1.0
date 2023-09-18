@@ -8,7 +8,7 @@ const desc = {
         let lang = 'he';
         const title = {
           en: '1️⃣💗1️⃣ | create together harmoniously | worldwide consensus for freedom',
-          he: 'הסכמה עולמית על חירות וביטחון | ליצור ביחד בהסכמה | 1️⃣💗1️⃣'
+          he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1️⃣💗1️⃣'
         };
         let cl = {
           he: 'he-IL',
@@ -21,7 +21,7 @@ export async function handle({ event, resolve }) {
     let userAgent = event.request.headers.get('accept-language');
     const coociLang = event.cookies.get('lang');
         const uid = event.cookies.get('id') || false;
-
+        console.log(uid)
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
         event.locals.uid = uid;
@@ -29,13 +29,11 @@ export async function handle({ event, resolve }) {
         if (coociLang == undefined) {
           if (userAgent?.includes('he')) {
             lang = 'he';
-            console.log(lang)
           } else {
             lang = 'en';
           }
         } else {
           lang = coociLang;
-          console.log(lang,"cookie");
         }
 
         event.locals.lang = lang;

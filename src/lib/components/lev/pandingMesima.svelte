@@ -41,6 +41,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     export let publicklinks;
     export let privatlinks;
     export let mdate;
+    export let isKavua = false
         export let mdates;
         export let timegramaDate
          export let timegramaId                     
@@ -623,6 +624,7 @@ function claf (event){
         workways ={workways}
         mdate={mdate}
         {mdates}
+        {isKavua}
         {publicklinks}
         {privatlinks}
            {restime}
@@ -736,6 +738,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
     {tafkidims}
     {workways}
   {low}
+   {isKavua}
   {noofhours}
   {perhour}
   {hearotMeyuchadot}

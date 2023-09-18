@@ -37,7 +37,9 @@ export let mdates;
 export let state = 2
 export let pendId;
 export let users =[];
+export let isKavua;
 export let oldide = 0; //last tg id, if non 0
+$: isKavua2 = isKavua;
 let newcontent = true;
 
 let miDatan = [];
@@ -213,9 +215,7 @@ let userss;
 async function increment() {
     dispatch("load")
   //TODO: update timegrama, add now pend that is changed to nego
-  let date4 = ``, dates4 = ``, date4nego, dates4nego, namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
-      const date = (mdate2 !== undefined) ? ` sqadualed: ${mdate2}` : ``;
-            const dates = (mdates2 !== undefined) ? `dates: ${mdates2}` : ``;
+  let date4 = ``, dates4 = ``,iskvua4 = ``, iskvua4nego = ``, date4nego, dates4nego, namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
 
       const negoss = ``;
     const cookieValue = document.cookie
@@ -245,7 +245,16 @@ async function increment() {
     ${rishonves4}
     ${rishon4}
     ${rishonves4},
+    iskvua
     */
+    if (isKavua === isKavua2){
+          iskvua4 = ``
+          iskvua4nego = ``
+     } else {
+         iskvua4nego =  (mdates !== undefined) ? ` isMonth: ${isKavua}` : ``;
+         iskvua4 =  (mdates2 !== undefined) ? ` iskvua: ${isKavua2}` : ``;
+         what4 = false;
+     }
      if (mdates === mdates2){
           dates4 = ``
           dates4nego = ``
@@ -369,6 +378,7 @@ async function increment() {
                 pendm:${pendId},
                  users_permissions_user: "${idL}",
                  isOriginal:${state == 2 ? true : false},
+    ${iskvua4nego}             
     ${noofhours4nego}
     ${hearotMeyuchadot4nego}
     ${descrip4nego}
@@ -384,6 +394,7 @@ async function increment() {
             updatePendm(
      id: ${pendId}
       data:  { 
+            ${iskvua4}             
            ${noofhours4}
     ${hearotMeyuchadot4}
     ${descrip4}
@@ -401,14 +412,12 @@ async function increment() {
       order: ${what4 == true ? 2 : 3}
     }
     ${another}    
-  ], nego:[  
+  ], nego:[ 
 {
     users_permissions_user: "${idL}"
 }
-
   ]
       }
-    
   ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
 } `   
 // make coin desapire
@@ -568,10 +577,18 @@ $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":n
 <Elements {newcontent} placeholder={tri?.mission?.addNewWw} datai={workways.data} alld={workways2} bind:dataib={workways3.data} lebel={tri?.mission?.requiredWW} dataibn={dataibno.workWayName} on:addnew={addnew} valc="workWayName" bgi="gold"/>
 <Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
 <Text text={privatlinks} bind:textb={privatlinks2} lebel={tri?.mission?.linkToMission}/>
-<Number number={noofhours} bind:numberb={noofhours2} lebel={tri?.mission?.noOfHours}/>
-<Number number={perhour} bind:numberb={perhour2} lebel={tri?.mission?.hourlyVallue} />
+<Number number={noofhours} bind:numberb={noofhours2} lebel={`${tri?.mission?.noOfHours[$lang]} ${isKavua== true && isKavua2 == true ? tri?.mission.perMonth[$lang] : ""}`} splebel={isKavua== true && isKavua2 == true ? null : isKavua== true && isKavua2 == false ? false : isKavua== false && isKavua2 == true ? true : null}/>
+<Number number={perhour} bind:numberb={perhour2} lebel={tri?.mission?.hourlyVallue[$lang]} />
 <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate}/>
 <DateNego date={mdates} bind:dateb={mdates2} lebel={tri?.common.finishDate}/>
+<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
+    <div class="flex flex-row align-middle justify-center gap-x-2">
+        <h2 class="underline decoration-mturk">{tr?.mission.iskvua[$lang]}: </h2>
+  <input
+    bind:checked={isKavua2}
+    type="checkbox" id="tomeC" name="isKavua2" >
+</div>
+</div>
 <!---
 <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
