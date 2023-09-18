@@ -53,6 +53,19 @@ onMount(async () => {
   }
     if (data.tok){
     isAuthed = true
+}else{
+   const cookieValue = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('jwt='))
+         if (cookieValue != null) {
+  const cookieT = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('when='))
+  .split('=')[1];
+          if(cookieT != null){
+                isAuthed = true
+          }
+         }
 }
 });
 function reg (){
