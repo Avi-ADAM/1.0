@@ -428,7 +428,7 @@ if (fpp.includes(jjj)){
     g = false;
    already = true;
    document.cookie = `email=${mail}; expires=` + new Date(2024, 0, 1).toUTCString();
-   document.cookie = `un=${$form.name}; expires=` + new Date(2024, 0, 1).toUTCString();
+   document.cookie = `un=${encodeURIComponent($form.name)}; expires=` + new Date(2024, 0, 1).toUTCString();
    userName.set($form.name);
            liUN.set($form.name);
             email.set(mail);

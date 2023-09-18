@@ -14,6 +14,14 @@
         }
     },
     "mission":{
+        "perMonth":{
+            "he": "בכל חודש:",
+            "en": "per month:"
+        },
+        "iskvua" : {
+            "he": "האם זו משרה קבועה",
+            "en": "is that a constant job"
+        },
         "addNewSkills":{
             "he":"בחירת כישורים נוספים ",
             "en":"add more skills"
