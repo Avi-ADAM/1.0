@@ -140,7 +140,7 @@ function close (){
 }
 export let timegramaId
  let name4 = ``;
- 
+ export let ordern = 0
      let descrip4 = ``;
      let hearotMeyuchadot4 = ``; 
      let noofhours4 = ``;
@@ -177,18 +177,8 @@ function objToString (obj) {
     return str;
 }
 function objToStringC (obj) {
-   const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-      if(obj[i].users_permissions_user.id == idL && what4 == false) {
-        obj[i].order = 1
-      } else if (obj[i].users_permissions_user.id == idL && what4 == true) {
-        obj[i].order = 1
-      }
         const length = Object.keys(obj[i]).length;
         let t = 0;
     for (const [p, val] of Object.entries(obj[i])) {
@@ -409,9 +399,8 @@ async function increment() {
      {
       what: ${what4}
       users_permissions_user: "${idL}"
-      order: ${what4 == true ? 2 : 3}
+      order: ${ordern+1}
     }
-    ${another}    
   ], nego:[ 
 {
     users_permissions_user: "${idL}"

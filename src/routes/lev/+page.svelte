@@ -2146,7 +2146,8 @@ function createpends(data) {
             const pend = projects[i].attributes.pendms.data[j]
             pends.push({
                 mysrc: src24,
-                negopendmissions: pend.attributes.negopendmissions,
+                orderon: pend.attributes.negopendmissions.data.length || 0,
+                negopendmissions: pend.attributes.negopendmissions.data,
                 isKavua :pend.attributes.iskvua,
                 name: pend.attributes.name,
                 nego: pend.attributes.nego,
@@ -2184,13 +2185,16 @@ function createpends(data) {
         }
     }
     console.log(pends)
+    //get all voted users
     for (let k = 0; k < pends.length; k++) {
         const x = pends[k].users
         pends[k].uids = [];
         for (let z = 0; z < x.length; z++) {
             pends[k].uids.push(x[z].users_permissions_user.data.id);
         }
+
     }
+
     for (let t = 0; t < pends.length; t++) {
         const allid = pends[t].uids;
         const myid = pends[t].myid;
@@ -2200,25 +2204,25 @@ function createpends(data) {
         pends[t].cv = 0
         pends[t].mypos = null;
         if (allid.includes(myid)) {
-            pends[t].already = true;
-            pends[t].pl += 48
             for (let l = 0; l < pends[t].users.length; l++) {
                 if (pends[t].users[l].users_permissions_user.data.id === myid)
-                    if (pends[t].users[l].order !== 1) {
+                console.log(t,pends[t].orderon,"ll")
+                if (pends[t].users[l].order == pends[t].orderon) {
+                        pends[t].already = true;
+                        pends[t].pl += 48
                         pends[t].mypos = pends[t].users[l].what;
                     }
             }
         }
         for (let r = 0; r < pends[t].users.length; r++) {
-            if (pends[t].users[r].order !== 1) {
+            if (pends[t].users[r].order == pends[t].orderon) {
                 pends[t].cv += 1
                 if (pends[t].users[r].what === true) {
                     pends[t].noofusersOk += 1;
-                } else if (pends[t].users[r].what === false) {
-                    pends[t].noofusersNo += 1;
-                }
+                } 
             }
         }
+        //TODO: check only voted for old
         const noofusersWaiting = pends[t].user_1s.length - pends[t].cv;
         pends[t].noofusersWaiting = noofusersWaiting;
         if (pends[t].users.length > 0) {

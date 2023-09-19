@@ -21,7 +21,7 @@ export async function handle({ event, resolve }) {
     let userAgent = event.request.headers.get('accept-language');
     const coociLang = event.cookies.get('lang');
         const uid = event.cookies.get('id') || false;
-        console.log(uid)
+        console.log("id = ",uid)
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
         event.locals.uid = uid;
