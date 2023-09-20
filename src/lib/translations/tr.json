@@ -182,10 +182,16 @@
         }
     },
     "nego":{
+        "didNego":{"he":"בעד ההצעה עם השינויים הבאים:","en":"is in favor of the sugestion with the following changes"},
+        "olderVersion":{"he":"גרסא קודמת", "en":"an older version"},
         "original":{"he":"מקורי","en":"original"},
         "new": {"he":"חדש", "en": "new"},
         "head": {"he":"הצעת שינוי למשימה", "en": "suggest changes"},
-        "sugestion": {"he":"ההצעה שלך","en":"your sugestion"}
+        "sugestion": {"he":"ההצעה שלך","en":"your sugestion"},
+        "thatMission":{"he":"שלמשימה יוגדרו","en":"that the mission will be assigned with"},
+        "hoursInsted":{"he":"שעות במקום","en":"hours insted of"},
+        "perhourNego":{"he":"ושהשווי השעתי יהיה","en":"and that the vallue per hour will be"},
+        "insted":{"he":"במקום", "en":"insted"}
     },
     "pending":{
         "head":{

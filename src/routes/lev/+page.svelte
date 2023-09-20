@@ -1,4 +1,5 @@
 <script>
+    import tr from '$lib/translations/tr.json'
     import {nutifi } from '$lib/func/nutifi.svelte'
     import Yahalomim from '$lib/components/lev/yahalomim.svelte'
 import { addToast } from 'as-toast';
@@ -37,6 +38,7 @@ import {
     doesLang,
     langUs
 } from '$lib/stores/lang.js'
+  import { getOccurrence } from '$lib/func/getOccurrence.svelte';
 export let data;
 let low = true;
 
@@ -2206,7 +2208,6 @@ function createpends(data) {
         if (allid.includes(myid)) {
             for (let l = 0; l < pends[t].users.length; l++) {
                 if (pends[t].users[l].users_permissions_user.data.id === myid)
-                console.log(t,pends[t].orderon,"ll")
                 if (pends[t].users[l].order == pends[t].orderon) {
                         pends[t].already = true;
                         pends[t].pl += 48
@@ -2217,9 +2218,24 @@ function createpends(data) {
         for (let r = 0; r < pends[t].users.length; r++) {
             if (pends[t].users[r].order == pends[t].orderon) {
                 pends[t].cv += 1
-                if (pends[t].users[r].what === true) {
-                    pends[t].noofusersOk += 1;
-                } 
+                pends[t].noofusersOk += 1
+            }else{
+                if (getOccurrence(pends[t].uids,pends[t].users[r].users_permissions_user.data.id) > 1){
+                    const results = pends[t].users.filter(obj => {
+                          return obj.users_permissions_user.data.id === pends[t].users[r].users_permissions_user.data.id;
+                        });
+                        pends[t].cv += 1
+                        pends[t].noofusersNo += 1
+                        for (let n = 0; n < results.length; n++) {
+                        if(results[n].order === pends[t].orderon){
+                        pends[t].cv -= 1
+                        pends[t].noofusersNo -= 1
+                           }
+                        }
+                }else{     
+                    pends[t].cv += 1
+                     pends[t].noofusersNo += 1
+                }         
             }
         }
         //TODO: check only voted for old
@@ -2230,15 +2246,12 @@ function createpends(data) {
                 let src22 = getProjectData(pends[t].projectId,"upic",pends[t].users[x].users_permissions_user.data.id)
                 pends[t].messege.push({
                     message: `${getProjectData(pends[t].projectId,"un",pends[t].users[x].users_permissions_user.data.id)}  
-                     ${pends[t].users[x].what == true ? `בעד
-                         ${pends[t].users[x].order == 4 ? ` הצעה חילופית `: ``}
-                      ` : ` נגד
-                  ${pends[t].users[x].order == 3 ? `ההצעה המקורית `: ``}
-                      ${pends[t].users[x].why !== null ? `בנימוק: ${pends[t].users[x].why}` : ``}`}`,
-                    what: pends[t].users[x].what,
+                     ${tr?.vots.inFavor[$lang]}
+                  ${pends[t].users[x].order != pends[t].orderon ? " " + tr?.nego.olderVersion[$lang]: ``}`,
+                    what: pends[t].users[x].order != pends[t].orderon ? false :true ,
                     pic: src22,
                     sentByMe: pends[t].users[x].users_permissions_user.data.id === myid ? true : false,
-                    changed: pends[t].users[x].order == 1 ? true : false,
+                    changed: pends[t].users[x].order != pends[t].orderon ? false :true ,
                 })
             }
         }
@@ -2253,19 +2266,20 @@ function createpends(data) {
                 })
             }
         }
-        if (pends[t].nego.length > 0) {
-            for (let x = 0; x < pends[t].nego.length; x++) {
-                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].nego[x].users_permissions_user.data.id)
-                pends[t].messege.push({
-                    message: `${getProjectData(pends[t].projectId,"un",pends[t].nego[x].users_permissions_user.data.id)}
-                     בעד ההצעה עם השינויים הבאים:
-                  ${pends[t].nego[x].noofhours !== pends[t].noofhours ? `שלמשימה יוגדרו ${pends[t].nego[x].noofhours} שעות במקום ${pends[t].noofhours} שעות`: ``}
-                  ${pends[t].nego[x].perhour !== pends[t].perhour ? `ושהשווי לשעה יהיה ${pends[t].nego[x].perhour} ולא ${pends[t].perhour}`: ``}
+        if (pends[t].negopendmissions.length > 0) {
+            for (let x = 0; x < pends[t].negopendmissions.length; x++) {
+                let src22 = getProjectData(pends[t].projectId,"upic",pends[t].negopendmissions[x].attributes.users_permissions_user.data.id)
+                                console.log("started!")
 
+                pends[t].messege.push({
+                    message: `${getProjectData(pends[t].projectId,"un",pends[t].negopendmissions[x].attributes.users_permissions_user.data.id)}
+                  ${tr?.nego.didNego[$lang]}
+                  ${pends[t].negopendmissions[x].attributes.noofhours !== pends[t].noofhours ? ` ${tr?.nego.thatMission[$lang]} ${pends[t].negopendmissions[x].attributes.noofhours ?? 0} ${tr?.nego.hoursInsted[$lang]} ${pends[t].noofhours ?? 0} ${tr?.common.hours[$lang]}`: ``}
+                  ${pends[t].negopendmissions[x].attributes.perhour !== pends[t].perhour ? ` ${tr?.nego.perhourNego[$lang]} ${pends[t].negopendmissions[x].attributes.perhour ?? 0} ${tr?.nego.insted[$lang]} ${pends[t].perhour ?? 0}`: ``}
                   `,
                     what: true,
                     pic: src22,
-                    sentByMe: pends[t].nego[x].users_permissions_user.data.id === myid ? true : false,
+                    sentByMe: pends[t].negopendmissions[x].attributes.users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }
