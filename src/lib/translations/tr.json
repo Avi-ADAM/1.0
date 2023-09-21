@@ -190,8 +190,20 @@
         "sugestion": {"he":"ההצעה שלך","en":"your sugestion"},
         "thatMission":{"he":"שלמשימה יוגדרו","en":"that the mission will be assigned with"},
         "hoursInsted":{"he":"שעות במקום","en":"hours insted of"},
-        "perhourNego":{"he":"ושהשווי השעתי יהיה","en":"and that the vallue per hour will be"},
-        "insted":{"he":"במקום", "en":"insted"}
+        "perhourNego":{"he":"שהשווי השעתי יהיה","en":"that the vallue per hour will be"},
+                "nameNego": {
+                    "he": "ששם המשימה יהיה",
+                    "en": "that the mission name will be"
+                },
+                "desNego": {
+                    "he": "שתיאור המשימה יהיה",
+                    "en": "that the description will be"
+                },
+                "heaNego": {
+                    "he": "שההערות תהיינה",
+                    "en": "that the mission notes will be"
+                },
+        "insted":{"he":"במקום", "en":"insted of"}
     },
     "pending":{
         "head":{

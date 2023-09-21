@@ -241,48 +241,48 @@ async function increment() {
           iskvua4 = ``
           iskvua4nego = ``
      } else {
-         iskvua4nego =  (mdates !== undefined) ? ` isMonth: ${isKavua}` : ``;
-         iskvua4 =  (mdates2 !== undefined) ? ` iskvua: ${isKavua2}` : ``;
+         iskvua4nego =  (mdates !== undefined) ? ` isMonth: ${isKavua},` : ``;
+         iskvua4 =  (mdates2 !== undefined) ? ` iskvua: ${isKavua2},` : ``;
          what4 = false;
      }
      if (mdates === mdates2){
           dates4 = ``
           dates4nego = ``
      } else {
-         dates4nego =  (mdates !== undefined) ? ` dates: ${mdates}` : ``;
-         dates4 =  (mdates2 !== undefined) ? ` dates: ${mdates2}` : ``;
+         dates4nego =  (mdates !== undefined) ? ` dates: ${mdates},` : ``;
+         dates4 =  (mdates2 !== undefined) ? ` dates: ${mdates2},` : ``;
          what4 = false;
      }
      if (mdate === mdate2){
           date4 = ``
           date4nego = ``
      } else {
-         date4nego =  (mdate !== undefined) ? ` sqadualed: ${mdate}` : ``;
-         date4 =  (mdate2 !== undefined) ? ` date: ${mdate2}` : ``;
+         date4nego =  (mdate !== undefined) ? ` sqadualed: ${mdate},` : ``;
+         date4 =  (mdate2 !== undefined) ? ` date: ${mdate2},` : ``;
          what4 = false;
      }
       if (name1 === name2){
           name4 = ``
           namefornego = ``
      } else {
-         name4 = `name: "${name2}"`
-         namefornego = `name: "${name1}"`
+         name4 = `name: "${name2}",`
+         namefornego = `name: "${name1}",`
          what4 = false;
      }
       if (descrip === descrip2){
           descrip4 = ``
           descrip4nego = ``
      } else {
-         descrip4 = `descrip: "${descrip2}"`
-         descrip4nego = `descrip: "${descrip}"`
+         descrip4 = `descrip: "${descrip2}",`
+         descrip4nego = `descrip: "${descrip}",`
                   what4 = false;
      }
     if (hearotMeyuchadot === hearotMeyuchadot2){
           hearotMeyuchadot4 = ``
           hearotMeyuchadot4nego = ``
      } else {
-         hearotMeyuchadot4 = `hearotMeyuchadot: "${hearotMeyuchadot2}"`
-         hearotMeyuchadot4nego = `hearotMeyuchadot: "${hearotMeyuchadot}"`
+         hearotMeyuchadot4 = `hearotMeyuchadot: "${hearotMeyuchadot2}",`
+         hearotMeyuchadot4nego = `hearotMeyuchadot: "${hearotMeyuchadot}",`
          what4 = false;
 
      }
@@ -290,16 +290,16 @@ async function increment() {
           noofhours4 = ``
           noofhours4nego = ``
      } else {
-         noofhours4 = `noofhours: ${noofhours2}`
-         noofhours4nego = `noofhours: ${noofhours}`
+         noofhours4 = `noofhours: ${noofhours2},`
+         noofhours4nego = `noofhours: ${noofhours},`
          what4 = false;
      }
      if (perhour === perhour2){
          perhour4 = ``;
          perhour4nego = ``
      } else {
-         perhour4 = `perhour: ${perhour2}`;
-         perhour4nego = `perhour: ${perhour}`
+         perhour4 = `perhour: ${perhour2},`;
+         perhour4nego = `perhour: ${perhour},`
          what4 = false;
      }
      const skillsId = skills.data.map(c => c.id);
@@ -349,7 +349,7 @@ async function increment() {
         userss = objToString(users)
   }
   let fd = new Date(Date.now() + x)
- try {
+/* try {
              await fetch(linkg, {
               method: 'POST',
         headers: {
@@ -357,7 +357,7 @@ async function increment() {
             'Content-Type': 'application/json'
                   },
         body: //${negoss} {rishons} {rishonveses}?
-        JSON.stringify({query:`mutation { 
+        JSON.stringify({query:*/console.log(`mutation { 
              updateTimegrama(
      id: ${timegramaId}
              data:{
@@ -408,9 +408,9 @@ async function increment() {
   ]
       }
   ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
-} `   
+} `)
 // make coin desapire
-} )})
+/*} )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
@@ -418,7 +418,7 @@ async function increment() {
         } catch (e) {
             error1 = e
             console.log(error1)
-        }
+        }*/
       }
 }
 let x

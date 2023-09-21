@@ -2269,13 +2269,16 @@ function createpends(data) {
         if (pends[t].negopendmissions.length > 0) {
             for (let x = 0; x < pends[t].negopendmissions.length; x++) {
                 let src22 = getProjectData(pends[t].projectId,"upic",pends[t].negopendmissions[x].attributes.users_permissions_user.data.id)
-                                console.log("started!")
+                                console.log("started!",pends[t].negopendmissions[x])
 
                 pends[t].messege.push({
                     message: `${getProjectData(pends[t].projectId,"un",pends[t].negopendmissions[x].attributes.users_permissions_user.data.id)}
                   ${tr?.nego.didNego[$lang]}
-                  ${pends[t].negopendmissions[x].attributes.noofhours !== pends[t].noofhours ? ` ${tr?.nego.thatMission[$lang]} ${pends[t].negopendmissions[x].attributes.noofhours ?? 0} ${tr?.nego.hoursInsted[$lang]} ${pends[t].noofhours ?? 0} ${tr?.common.hours[$lang]}`: ``}
-                  ${pends[t].negopendmissions[x].attributes.perhour !== pends[t].perhour ? ` ${tr?.nego.perhourNego[$lang]} ${pends[t].negopendmissions[x].attributes.perhour ?? 0} ${tr?.nego.insted[$lang]} ${pends[t].perhour ?? 0}`: ``}
+                  ${pends[t].negopendmissions[x].attributes.noofhours && pends[t].negopendmissions[x].attributes.noofhours !== pends[t].noofhours ? ` ${tr?.nego.thatMission[$lang]} ${pends[t].noofhours ?? 0} ${tr?.nego.hoursInsted[$lang]} ${pends[t].negopendmissions[x].attributes.noofhours ?? 0} ${tr?.common.hours[$lang]}`: ``}
+                  ${pends[t].negopendmissions[x].attributes.perhour && pends[t].negopendmissions[x].attributes.perhour  !== pends[t].perhour ? ` ${tr?.nego.perhourNego[$lang]} ${pends[t].perhour ?? 0} ${tr?.nego.insted[$lang]} ${pends[t].negopendmissions[x].attributes.perhour ?? 0}`: ``}
+                  ${pends[t].negopendmissions[x].attributes.name && pends[t].negopendmissions[x].attributes.name !== pends[t].name ? ` ${tr?.nego.nameNego[$lang]} "${pends[t].name}" ${tr?.nego.insted[$lang]}: "${pends[t].negopendmissions[x].attributes.name}"`: ``}
+                  ${pends[t].negopendmissions[x].attributes.descrip && pends[t].negopendmissions[x].attributes.descrip !== pends[t].descrip ? ` ${tr?.nego.descNego[$lang]} "${pends[t].descrip}" ${tr?.nego.insted[$lang]}: "${pends[t].negopendmissions[x].attributes.descrip}"`: ``}
+                  ${pends[t].negopendmissions[x].attributes.hearotMeyuchadot && pends[t].negopendmissions[x].attributes.hearotMeyuchadot !== pends[t].hearotMeyuchadot ? ` ${tr?.nego.heaNego[$lang]} "${pends[t].hearotMeyuchadot}" ${tr?.nego.insted[$lang]}: "${pends[t].negopendmissions[x].attributes.hearotMeyuchadot}"`: ``}
                   `,
                     what: true,
                     pic: src22,
