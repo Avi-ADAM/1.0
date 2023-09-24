@@ -36,7 +36,12 @@ const dispatch = createEventDispatcher();
 
 export let askedarr = [], declineddarr = [], arr1 = [];
 let swiperRef = null;
+export let indexi = -1
 
+$:if (indexi != -1){
+  swiperRef.slideTo(indexi)
+  indexi = -1
+}
   const setSwiperRef = ({ detail }) => {
     const [swiper] = detail;
     // set swiper instance

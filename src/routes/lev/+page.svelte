@@ -1,4 +1,6 @@
 <script>
+            import { io }  from"socket.io-client";
+
     import tr from '$lib/translations/tr.json'
     import {nutifi } from '$lib/func/nutifi.svelte'
     import Yahalomim from '$lib/components/lev/yahalomim.svelte'
@@ -41,6 +43,7 @@ import {
   import { getOccurrence } from '$lib/func/getOccurrence.svelte';
 export let data;
 let low = true;
+let indexi = -1
 
 let isOpen = false;
 //  import Viewport from 'svelte-viewport-info'
@@ -1179,6 +1182,7 @@ function gen() {
     return xyz, initX;
 }
 let repeater = null;
+let update = false
 onMount(async () => {
     if (localStorage.getItem("miDataLM") !== null) {
         arr1 = JSON.parse(localStorage.getItem("miDataLM"))
@@ -1336,6 +1340,33 @@ onMount(async () => {
             }
         }
         await start();
+        const SERVER_URL = "http://localhost:1337";
+            
+        // token will be verified, connection will be rejected if not a valid JWT
+        const socket = io(SERVER_URL, {
+          auth: { 
+            token: cookieValu
+          },
+        });
+        
+        //  wait until socket connects before adding event listeners
+        socket.on("connect", () => {
+                        console.log("connected")
+          socket.on("pendm:update", (datan) => {
+           // console.log("io= ",datan)
+            let iddd = datan.id
+           // console.log(iddd)
+            update = true
+            let index = arr1.findIndex(
+                    element => element.ani === 'pends' && element.pendId == iddd
+                );
+          //  console.log(index, arr1[index])    
+                if(index != -1 || null){
+                //   indexi = index
+            start()
+                }
+          });
+        });
         setInterval(start, tickSpeed);
         if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
             if ((/[\u0590-\u05FF]/).test(nam) || (/[\u0600-\u06FF]/).test(nam)) {
@@ -1521,7 +1552,7 @@ async function start() {
 
         counter += 1;
         localStorage.setItem("miDataL", JSON.stringify(miData));
-        if (!isEqual(miData, miDataold)  == true) {
+        if (!isEqual(miData, miDataold)  == true && update != true) {
             console.log("nada")
             low = false
         } else {
@@ -1576,6 +1607,7 @@ async function start() {
             console.log("tveria")
             bubleUiAngin()
             low = false
+            update = false
         }
     } catch (e) {
         error1 = e
@@ -2436,7 +2468,7 @@ function showall(event) {
     </div>
 {/if}
 <DialogOverlay class="overlay" {isOpen} onDismiss={close} >
-  <div transition:fly|local={{y: 450, opacity: 0.5, duration: 1000}}>
+  <div transition:fly={{y: 450, opacity: 0.5, duration: 1000}}>
       <DialogContent aria-label="form" class="user ">
           <div dir="rtl" class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
               <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
@@ -2461,7 +2493,7 @@ function showall(event) {
         </DialogContent>
     </div>
 </DialogOverlay>
- <!-- לשים בלוק של פוראיצ' על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו' משם    {#if arr1.length > 0}
+ <!-- לשים בלוק של פוראיצ על כל משימה בתהליך  הצעת משימה והחלטה ולמשוך שם משימה וכו משם    {#if arr1.length > 0}
  -->
  {#if toCoin == true}
   {#if cards == true}
@@ -2475,6 +2507,7 @@ function showall(event) {
             on:proj={proj}
             on:chat={chat}
             on:start={coinLapach}
+            bind:indexi
             {arr1}
             {askedarr}
             {declineddarr}
