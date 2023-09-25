@@ -1340,7 +1340,7 @@ onMount(async () => {
             }
         }
         await start();
-        const SERVER_URL = "http://localhost:1337";
+        const SERVER_URL = "https://tov.onrender.com";
             
         // token will be verified, connection will be rejected if not a valid JWT
         const socket = io(SERVER_URL, {
@@ -1353,14 +1353,15 @@ onMount(async () => {
         socket.on("connect", () => {
                         console.log("connected")
           socket.on("pendm:update", (datan) => {
-           // console.log("io= ",datan)
+            console.log("io= ",datan)
             let iddd = datan.id
-           // console.log(iddd)
+            console.log(iddd)
             update = true
             let index = arr1.findIndex(
                     element => element.ani === 'pends' && element.pendId == iddd
                 );
-          //  console.log(index, arr1[index])    
+                //check if updater is me, check if diun is longer && if users longer
+            console.log(index, arr1[index])    
                 if(index != -1 || null){
                 //   indexi = index
             start()
