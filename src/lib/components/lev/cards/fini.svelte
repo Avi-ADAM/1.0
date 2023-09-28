@@ -67,7 +67,7 @@ console.log(whatt)
      <div class="flex items-center border border-gold flex-col" >
       {#if why !== undefined && why !== null && why !== "undefined"}
       {#if why.startsWith("http")}
-          <a on:mouseenter={()=>hover(`${tr.common.finalwords[$lang]}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d hover:text-barbi" target=”_blank” href={why}>{why}</a>
+          <a on:mouseenter={()=>hover(`${tr.common.finalwords[$lang]}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 max-w-full cd text-sm d hover:text-barbi" target=”_blank” href={why}>link</a>
       {:else}
           <p on:mouseenter={()=>hover(`${tr.common.finalwords[$lang]}`)} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{why}</p>
       {/if}
