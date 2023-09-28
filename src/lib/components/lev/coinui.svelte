@@ -268,6 +268,7 @@ export let sml = false
                             on:proj={proj}
                             on:user={user}
                             on:coinLapach={delo}
+                            diun={buble.diun}
                             timegramaId={buble.timegramaId}
                             timegramaDate={buble.timegramaDate}
                             publicklinks={buble.publicklinks}

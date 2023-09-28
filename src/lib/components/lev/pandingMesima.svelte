@@ -128,21 +128,34 @@ function objToString (obj) {
         let t = 0;
     for (const [p, val] of Object.entries(obj[i])) {
       const last = t === length - 1; 
+      if (t == 0){
+      str += "{"
+    }
         t++;
         if (typeof(val) == "string") {
         str += `${p}:"${val}"\n`;
-    } else if (typeof(val) == "number"|"boolean") {
+        console.log(val, p, "string")
+    } else if (typeof(val) == "number" || typeof(val) =="boolean") {
         str += `${p}:${val}\n`;
-    } else if (typeof(val) == 'null'){
-      str += `${p}:${val.map(c => c.id)}\n`;
+                console.log(val, p, "num")
+    } else if (typeof(val) == 'null'|| typeof(val) ==="object"){
+            console.log(val,p ,"null")
+
+      str += `${p}:${val?.data ? '"'+ val?.data?.id + '"': val}\n`;
+
+    }else{
+      str += `${p}:${val}\n`
+      console.log(val,p ,"else")
     }
         if (last) {
           str += "},"
     }
-    if (t == 1){
+    if (t == 0){
       str += "{"
     }
-    }}
+    }
+  }
+    console.log(str)
     return str;
 }
 function objToStringC (obj) {
@@ -434,12 +447,14 @@ async function afreact (event){
   
   let diunim = ``;
   if (diun !== null){
+    console.log(diun)
  const diu =  objToString(diun)
- diunim = ` ${diu},`
+ diunim = `${diu}`
   }
    why = event.detail.why
   console.log(why)
-           loading = true;
+  let d = new Date()
+         //  loading = true;
        const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -469,6 +484,8 @@ async function afreact (event){
       users_permissions_user: "${idL}"
       why: "${why}"
       order: ${order+=1}
+      zman:"${d.toISOString()}"
+      ide:${idL}
     }
   ]}
   ){data {attributes{ users { users_permissions_user{data { id}}}}}}
@@ -482,10 +499,11 @@ async function afreact (event){
                     message: why,
                     what: mypos,
                     pic:mysrc,
-                    sentByMe: true,       
+                    sentByMe: true,
+                    timestamp:d  
                   })
             messege = messege     
-         loading = false;
+      //   loading = false;
         } catch (e) {
             error1 = e
             console.log(error1)

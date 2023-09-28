@@ -1353,17 +1353,17 @@ onMount(async () => {
         socket.on("connect", () => {
                         console.log("connected")
           socket.on("pendm:update", (datan) => {
-            //console.log("io= ",datan)
+            console.log("io= ",datan)
             let iddd = datan.id
-           // console.log(iddd)
+           console.log(iddd)
             update = true
             let index = arr1.findIndex(
                     element => element.ani === 'pends' && element.pendId == iddd
                 );
                 //check if updater is me, check if diun is longer && if users longer
-           // console.log(index, arr1[index])    
+            console.log(index, arr1[index])    
                 if(index != -1 || null){
-                //   indexi = index
+                  // indexi = index
                 if(arr1[index].diun.length == datan.diun.length){
                  start()
                 }else{  
@@ -1378,15 +1378,20 @@ onMount(async () => {
                     timestamp:new Date(datan.diun[datan.diun.length - 1].zman)
                 })
                 arr1 = arr1
-                 let head = `${tr.nuti.sendNewA[$lang]} ${datan.name} ${tr.nuti.sendNewB[$lang]} ${pname} ${tr.nuti.sendNewC[$lang]} ${uname}`
+                 let head = `${tr.nuti.sendNewA[$lang]} 
+                 ${datan.name} 
+                 ${tr.nuti.sendNewB[$lang]} 
+                 ${pname} 
+                 ${tr.nuti.sendNewC[$lang]}
+                 ${uname}`
                 let body = datan.diun[datan.diun.length - 1].why
                 if(document.visibilityState == "visible"){ 
                 addToast(head+`: "`+body+`"`)
                 }else{
                 nutifi(head,body)
                 }
+                start()
                 }
-               
                 }
           });
         });

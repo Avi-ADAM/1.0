@@ -14,15 +14,16 @@
 
   // 👇️ Today's date
   console.log(today);
-
+	if(date != null){ 
+		let dater = new Date(date)
   if (
-    today.getFullYear() === date.getFullYear() &&
-    today.getMonth() === date.getMonth() &&
-    today.getDate() === date.getDate()
+    today.getFullYear() === dater.getFullYear() &&
+    today.getMonth() === dater.getMonth() &&
+    today.getDate() === dater.getDate()
   ) {
     return true;
   }
-
+	}
   return false;
 }
 	export let what = null;

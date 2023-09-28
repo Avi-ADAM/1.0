@@ -344,6 +344,7 @@ mousewheel={true}
                 vallues={buble.vallues}
                 pendId={buble.pendId}
                 isKavua={buble.isKavua}
+                diun={buble.diun}
                 users={buble.users}
                 cards="true"
                 /></SwiperSlide>
