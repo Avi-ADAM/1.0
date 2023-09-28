@@ -349,7 +349,7 @@ async function increment() {
         userss = objToString(users)
   }
   let fd = new Date(Date.now() + x)
-/* try {
+ try {
              await fetch(linkg, {
               method: 'POST',
         headers: {
@@ -357,7 +357,7 @@ async function increment() {
             'Content-Type': 'application/json'
                   },
         body: //${negoss} {rishons} {rishonveses}?
-        JSON.stringify({query:*/console.log(`mutation { 
+        JSON.stringify({query:`mutation { 
              updateTimegrama(
      id: ${timegramaId}
              data:{
@@ -365,6 +365,7 @@ async function increment() {
              }){data {id}}
              createNegopendmission(
               data:{
+                publishedAt: "${d.toISOString()}",
                 pendm:${pendId},
                  users_permissions_user: "${idL}",
                  isOriginal:${state == 2 ? true : false},
@@ -408,9 +409,9 @@ async function increment() {
   ]
       }
   ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
-} `)
+} `
 // make coin desapire
-/*} )})
+} )})
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
@@ -418,7 +419,7 @@ async function increment() {
         } catch (e) {
             error1 = e
             console.log(error1)
-        }*/
+        }
       }
 }
 let x

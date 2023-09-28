@@ -210,5 +210,19 @@
             "he":"הצבעה על אישור משימה חדשה",
             "en":"vote on suggestion for a new mission"
         }
+    },
+    "nuti":{
+        "sendNewA":{
+            "he":":בדיון על",
+            "en":""
+        },
+        "sendNewB":{
+            "he":"בריקמה",
+            "en":""
+        },
+        "sendNewC":{
+            "he":"נשלחה הודעה חדשה על ידי",
+            "en":""
+        }
     }
 }

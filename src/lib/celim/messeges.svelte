@@ -9,12 +9,34 @@
 	  export let timeRead;
 		export let changed = false
 		// This should use timestamp, but its simplified for the demo.
-		export let isToday;
+		function isToday(date) {
+  const today = new Date();
+
+  // 👇️ Today's date
+  console.log(today);
+
+  if (
+    today.getFullYear() === date.getFullYear() &&
+    today.getMonth() === date.getMonth() &&
+    today.getDate() === date.getDate()
+  ) {
+    return true;
+  }
+
+  return false;
+}
 	export let what = null;
 	
 </script>
 
 <style>
+	.direct-chat-timestamp {
+	margin-left: 50px;
+	margin-right: 50px;
+	color: #999;
+
+	margin-bottom: 0;
+}
 /*
 .direct-chat-msg,
 .direct-chat-text {
@@ -89,13 +111,7 @@ img {
 .direct-chat-name {
 	font-weight: 600;
 }
-.direct-chat-timestamp {
-	margin-left: 50px;
-	margin-right: 50px;
-	color: #999;
 
-	margin-bottom: 0;
-}
 	
 	.read-icon {
 		color: #007bff;
@@ -107,7 +123,7 @@ img {
 </style>
  <div class="chat-message">
          <div class="flex items-end" class:justify-end={sentByMe === true}>
-            <div class="flex flex-col space-y-2 text-xs max-w-xs mx-2 " class:order-2={sentByMe === false} class:order-1={sentByMe === true} class:items-end={sentByMe === true} class:items-start={sentByMe === false}>
+            <div class="flex flex-col space-y-2 text-xs md:text-lg md:max-w-lg max-w-xs mx-2 " class:order-2={sentByMe === false} class:order-1={sentByMe === true} class:items-end={sentByMe === true} class:items-start={sentByMe === false}>
                <div><span class="px-4 py-2 rounded-lg inline-block" 
 				 class:text-gray-600={sentByMe === false && what === null} class:text-white={sentByMe === true && what === null} class:text-black={what == true} class:text-gold={what=== false}
 				 class:bg-gray-300={sentByMe === false && what === null} class:bg-blue-600={sentByMe === true && what === null} class:bg-barbi={what=== false} class:bg-green-300={what=== true}
@@ -117,19 +133,18 @@ img {
             </div>
             <img src="{profilePicChatPartner}" alt="pic" class="w-6 h-6 rounded-full order-1">
          </div>
-      </div>
      
 
 			<!--
 					       <span class="direct-chat-name" class:float-right="{sentByMe}" class:float-left="{!sentByMe}">{sentByMe==true?nameMe:nameChatPartner}</span> 
-
-        <span class="direct-chat-timestamp" class:float-left="{sentByMe}" class:float-right="{!sentByMe}">
-					{#if isToday}
+-->
+        <span class="direct-chat-timestamp left-0" class:float-left="{sentByMe}" class:float-right="{!sentByMe}">
+				{#if isToday(timestamp)}
 							{ new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
 					{:else}
 										{new Date(timestamp).toLocaleString([], {year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute:'2-digit', hour12: false})}
 					{/if}
-
+<!---
 					
 			{#if sentByMe === true}
 					<span class={((timeRead === 0) ? 'un-' : '') + 'read-icon'}><svg width="24px" height="24px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -138,9 +153,11 @@ img {
 <path d="M7 12L11.5757 16.5757C11.8101 16.8101 12.1899 16.8101 12.4243 16.5757L22 7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
 </svg></span>
 			{/if}
-					
+-->
 			</span>
-    </div>
+			      </div>
+
+   <!--- </div>
     <img class="direct-chat-img" src="{sentByMe==true?profilePicMe:profilePicChatPartner}" alt="pic">
     <div class="direct-chat-text">
 		<div class="d-flex">

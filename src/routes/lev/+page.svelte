@@ -1353,18 +1353,40 @@ onMount(async () => {
         socket.on("connect", () => {
                         console.log("connected")
           socket.on("pendm:update", (datan) => {
-            console.log("io= ",datan)
+            //console.log("io= ",datan)
             let iddd = datan.id
-            console.log(iddd)
+           // console.log(iddd)
             update = true
             let index = arr1.findIndex(
                     element => element.ani === 'pends' && element.pendId == iddd
                 );
                 //check if updater is me, check if diun is longer && if users longer
-            console.log(index, arr1[index])    
+           // console.log(index, arr1[index])    
                 if(index != -1 || null){
                 //   indexi = index
-            start()
+                if(arr1[index].diun.length == datan.diun.length){
+                 start()
+                }else{  
+                let src22 = getProjectData(arr1[index].projectId,"upic",datan.diun[datan.diun.length -1].ide)
+                let uname = getProjectData(arr1[index].projectId,"un",datan.diun[datan.diun.length -1].ide)
+                let pname = getProjectData(arr1[index].projectId,"pn")
+                arr1[index].messege.push({
+                    message: datan.diun[datan.diun.length - 1].why,
+                    what: datan.diun[datan.diun.length - 1].what,
+                    pic: src22,
+                    sentByMe: datan.diun[datan.diun.length - 1].ide === idL ? true : false,
+                    timestamp:new Date(datan.diun[datan.diun.length - 1].zman)
+                })
+                arr1 = arr1
+                 let head = `${tr.nuti.sendNewA[$lang]} ${datan.name} ${tr.nuti.sendNewB[$lang]} ${pname} ${tr.nuti.sendNewC[$lang]} ${uname}`
+                let body = datan.diun[datan.diun.length - 1].why
+                if(document.visibilityState == "visible"){ 
+                addToast(head+`: "`+body+`"`)
+                }else{
+                nutifi(head,body)
+                }
+                }
+               
                 }
           });
         });
@@ -1483,7 +1505,7 @@ async function start() {
     			pmashes (filters: { archived: { eq: false } }){ data{ id attributes{ 
         					hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
         					mashaabim {data{id}} 
-        					diun {what why order id users_permissions_user {data {id }}}
+        					diun {what why order id zman users_permissions_user {data {id }}}
         					users { what order why id users_permissions_user {data{id }}}
       							}}}
     			open_mashaabims {data{ id attributes{ name 
@@ -1516,7 +1538,7 @@ async function start() {
         					name createdAt iskvua hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
                             rishon {data{id}}
                             negopendmissions{data{id attributes{
-                                name hearotMeyuchadot descrip noofhours perhour isOriginal date dates isMonth 
+                                name hearotMeyuchadot descrip createdAt noofhours perhour isOriginal date dates isMonth 
                                 users_permissions_user{data{id}}
                                 skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
                                 tafkidims {data{id attributes{ roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
@@ -1529,8 +1551,8 @@ async function start() {
                             vallues {data{ id}}
                             timegrama{data{id attributes{date}}}
                             nego { noofhours perhour users_permissions_user {data {id}}}
-                            diun {what why id order users_permissions_user {data{ id}}}  
-                            users { what order why id users_permissions_user {data{id }}}                                   
+                            diun {what why id zman order users_permissions_user {data{ id}}}  
+                            users { what order why zman id users_permissions_user {data{id }}}                                   
       													}}}
     			open_missions(filters: { archived: { eq: false } }){ data{ id attributes{ 
         					declined {data{ id}} 
@@ -2231,6 +2253,7 @@ function createpends(data) {
     }
 
     for (let t = 0; t < pends.length; t++) {
+            console.log("here",pends[t].pendId)
         const allid = pends[t].uids;
         const myid = pends[t].myid;
         pends[t].already = false;
@@ -2283,6 +2306,7 @@ function createpends(data) {
                   ${pends[t].users[x].order != pends[t].orderon ? " " + tr?.nego.olderVersion[$lang]: ``}`,
                     what: pends[t].users[x].order != pends[t].orderon ? false :true ,
                     pic: src22,
+                    timestamp: new Date(pends[t].users[x].zman),
                     sentByMe: pends[t].users[x].users_permissions_user.data.id === myid ? true : false,
                     changed: pends[t].users[x].order != pends[t].orderon ? false :true ,
                 })
@@ -2295,6 +2319,7 @@ function createpends(data) {
                     message: pends[t].diun[x].why,
                     what: pends[t].diun[x].what,
                     pic: src22,
+                    timestamp: new Date(pends[t].diun[x].zman),
                     sentByMe: pends[t].diun[x].users_permissions_user.data.id === myid ? true : false,
                 })
             }
@@ -2315,12 +2340,18 @@ function createpends(data) {
                   `,
                     what: true,
                     pic: src22,
+                    timestamp: new Date(pends[t].negopendmissions[x].attributes.createdAt),
                     sentByMe: pends[t].negopendmissions[x].attributes.users_permissions_user.data.id === myid ? true : false,
                 })
             }
         }
-
+         console.log("here",pends[t].messege)
+   pends[t].messege = pends[t].messege.sort(function(a,b){
+  return b.timestamp - a.timestamp;
+}).reverse();
     }
+   
+
     pen = pends.length;
         localStorage.setItem("pen", pen);
     //  bubleUiAngin(pends)
