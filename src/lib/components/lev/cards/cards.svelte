@@ -194,7 +194,7 @@ on:mouseleave={()=> hoverede()} >
     enabled: true,
   }}  
 mousewheel={true}
-  effect={"cards"}
+  effect={h > 370 ? "cards" : ""}
     cardsEffect={{ rotate: h > 450 ? true : false ,perSlideOffset: h > 450 ? 8 : 8}}
   grabCursor={true}
   modules={[Manipulation, Mousewheel, Keyboard, EffectCards, Navigation]}
