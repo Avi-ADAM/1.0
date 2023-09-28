@@ -1354,7 +1354,7 @@ onMount(async () => {
                         console.log("connected")
           socket.on("pendm:update", (datan) => {
             console.log("io= ",datan)
-            let iddd = datan.id
+            let iddd = datan.data.id
            console.log(iddd)
             update = true
             let index = arr1.findIndex(
@@ -1364,27 +1364,27 @@ onMount(async () => {
             console.log(index, arr1[index])    
                 if(index != -1 || null){
                   // indexi = index
-                if(arr1[index].diun.length == datan.diun.length){
+                if(arr1[index].diun.length == datan.data.attributes.diun.length){
                  start()
                 }else{  
-                let src22 = getProjectData(arr1[index].projectId,"upic",datan.diun[datan.diun.length -1].ide)
-                let uname = getProjectData(arr1[index].projectId,"un",datan.diun[datan.diun.length -1].ide)
+                let src22 = getProjectData(arr1[index].projectId,"upic",datan.data.attributes.diun[datan.data.attributes.diun.length -1].ide)
+                let uname = getProjectData(arr1[index].projectId,"un",datan.data.attributes.diun[datan.data.attributes.diun.length -1].ide)
                 let pname = getProjectData(arr1[index].projectId,"pn")
                 arr1[index].messege.push({
-                    message: datan.diun[datan.diun.length - 1].why,
-                    what: datan.diun[datan.diun.length - 1].what,
+                    message: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].why,
+                    what: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].what,
                     pic: src22,
-                    sentByMe: datan.diun[datan.diun.length - 1].ide === idL ? true : false,
-                    timestamp:new Date(datan.diun[datan.diun.length - 1].zman)
+                    sentByMe: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].ide === idL ? true : false,
+                    timestamp:new Date(datan.data.attributes.diun[datan.data.attributes.diun.length - 1].zman)
                 })
                 arr1 = arr1
                  let head = `${tr.nuti.sendNewA[$lang]} 
-                 ${datan.name} 
+                 ${datan.data.attributes.name} 
                  ${tr.nuti.sendNewB[$lang]} 
                  ${pname} 
                  ${tr.nuti.sendNewC[$lang]}
                  ${uname}`
-                let body = datan.diun[datan.diun.length - 1].why
+                let body = datan.data.attributes.diun[datan.data.attributes.diun.length - 1].why
                 if(document.visibilityState == "visible"){ 
                 addToast(head+`: "`+body+`"`)
                 }else{

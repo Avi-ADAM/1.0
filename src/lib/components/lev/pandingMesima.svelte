@@ -466,32 +466,28 @@ async function afreact (event){
   idL = cookieValueId;
     token  = cookieValue; 
      bearer1 = 'bearer' + ' ' + token;
+     let dataa = {
+          data: { 
+        diun:[...diun,{
+      what: mypos,
+      users_permissions_user:idL,
+      why:why,
+      order:order+=1,
+      zman:d.toISOString(),
+      ide:idL
+    }
+  ]
+}  
+ }
     try {
-             await fetch(linkg, {
-              method: 'POST',
+             await fetch(`https://tov.onrender.com/api/pendms/${pendId}?populate=*`, {
+              method: 'PUT',
         headers: {
             'Authorization': bearer1,
             'Content-Type': 'application/json'
                   },
-        body: 
-        JSON.stringify({query:
-          `mutation { updatePendm(
-  id: ${pendId}
-      data: { diun:[  
-         ${diunim}
-     {
-      what: ${mypos}
-      users_permissions_user: "${idL}"
-      why: "${why}"
-      order: ${order+=1}
-      zman:"${d.toISOString()}"
-      ide:${idL}
-    }
-  ]}
-  ){data {attributes{ users { users_permissions_user{data { id}}}}}}
- } `   
- // make coin desapire
- } )})
+        body: JSON.stringify(dataa),
+      })
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
