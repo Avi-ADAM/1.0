@@ -139,7 +139,7 @@ img {
 			<!--
 					       <span class="direct-chat-name" class:float-right="{sentByMe}" class:float-left="{!sentByMe}">{sentByMe==true?nameMe:nameChatPartner}</span> 
 -->
-        <span class="direct-chat-timestamp left-0" class:float-left="{sentByMe}" class:float-right="{!sentByMe}">
+        <span class="direct-chat-timestamp left-0 text-xs md:text-sm" class:float-left="{sentByMe}" class:float-right="{!sentByMe}">
 				{#if isToday(timestamp)}
 							{ new Date(timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'}) }
 					{:else}

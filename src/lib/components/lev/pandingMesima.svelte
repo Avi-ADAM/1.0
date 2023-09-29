@@ -1008,7 +1008,11 @@ input[type=text]:invalid {
     :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
-
+ @media (max-width: 450px){
+        :global([data-svelte-dialog-content].chat) {
+              width: 80vw;
+        }
+      }
   @media (min-width: 600px){
         :global([data-svelte-dialog-content].chat) {
                 overflow-y: auto;
