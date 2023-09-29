@@ -1003,9 +1003,9 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   ><SwiperSlide class="swiper-slideg"
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-    <div class="ltn ab d flex flex-wrap items-center justify-middle" style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")} >
+    <div class="ltn ab p-0 d flex flex-wrap items-center justify-center " style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")} >
       {#each skills.data as skill}
-      <Tile sm={true} bg="green" word={skill.attributes.skillName}/>
+      <Tile  bg="green" word={skill.attributes.skillName}/>
         {/each}
 </div>
    {#if deadLine != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
@@ -1018,7 +1018,7 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
        class="ltn de d flex flex-wrap items-center justify-middle">
 
       {#each role.data as d}
-       <Tile sm={true} bg="pink" word={d.attributes.roleDescription}/>
+       <Tile  bg="pink" word={d.attributes.roleDescription}/>
       {/each}
 
     </div>
