@@ -13,18 +13,18 @@
             "en": "money splitting offer"
         }
     },
-    "mission":{
-        "perMonth":{
+    "mission": {
+        "perMonth": {
             "he": "בכל חודש:",
             "en": "per month:"
         },
-        "iskvua" : {
+        "iskvua": {
             "he": "האם זו משרה קבועה",
             "en": "is that a constant job"
         },
-        "addNewSkills":{
-            "he":"בחירת כישורים נוספים ",
-            "en":"add more skills"
+        "addNewSkills": {
+            "he": "בחירת כישורים נוספים ",
+            "en": "add more skills"
         },
         "addNewRoles": {
             "he": "בחירת תפקידים נוספים ",
@@ -34,82 +34,124 @@
             "he": "בחירת דרכי יצירה נוספים ",
             "en": "add more creation ways"
         },
-        "requireSkills" : {
+        "requireSkills": {
             "he": "כישורים נדרשים:",
             "en": "required skills:"
         },
-        "requiredRoles" : {
+        "requiredRoles": {
             "he": "הגדרת תפקיד:",
             "en": "role:"
         },
-         "requiredWW" : {
+        "requiredWW": {
             "he": "דרכי יצירה מבוקשות:",
             "en": "ways of creation for the mission:"
         },
-        "total":{
-            "he":"שווי סך הכל למשימה ",
-            "en":"total mission vallue"
+        "total": {
+            "he": "שווי סך הכל למשימה ",
+            "en": "total mission vallue"
         },
-        "assingToMe":{
-            "he":"להשים את המשימה לעצמי? ",
-            "en":"are you going to do the mission?"
+        "assingToMe": {
+            "he": "להשים את המשימה לעצמי? ",
+            "en": "are you going to do the mission?"
         },
-        "assingHelp":{
-            "he":"אם ריק: תפורסם משרה פנויה",
-            "en":"if empty: will publish available position"
+        "assingHelp": {
+            "he": "אם ריק: תפורסם משרה פנויה",
+            "en": "if empty: will publish available position"
         },
-        "assingTo":{
-            "he":"השמת המשימה ל- ",
-            "en":"asign this mission to -"
+        "assingTo": {
+            "he": "השמת המשימה ל- ",
+            "en": "asign this mission to -"
         },
-        "hourlyVallue":{
-            "he":"כמה שווה שעה ?",
-            "en":"hour rate"
+        "hourlyVallue": {
+            "he": "כמה שווה שעה ?",
+            "en": "hour rate"
         },
-        "specialNotes":{
-            "he":"הערות יחודיות לריקמה שלי",
-            "en":"FreeMates specific notes"
+        "specialNotes": {
+            "he": "הערות יחודיות לריקמה שלי",
+            "en": "FreeMates specific notes"
         },
-        "publicLinks":{
-            "he":"קישורים ציבוריים",
-            "en":"public links "
+        "publicLinks": {
+            "he": "קישורים ציבוריים",
+            "en": "public links "
         },
-        "privatLinks":{
-            "he":"קישורים יחודיים לריקמה שלי",
-            "en":"FreeMates specific links"
+        "privatLinks": {
+            "he": "קישורים יחודיים לריקמה שלי",
+            "en": "FreeMates specific links"
         },
-        "linkToMission":{
-            "he":"קישור לאתר בו מבוצעת המשימה ",
-            "en":"link to where the mission is done"
+        "linkToMission": {
+            "he": "קישור לאתר בו מבוצעת המשימה ",
+            "en": "link to where the mission is done"
         },
-        "noOfHours":{
-            "he":"כמה שעות זה אמור לקחת?",
-            "en":"how many hours it should take?"
+        "noOfHours": {
+            "he": "כמה שעות זה אמור לקחת?",
+            "en": "how many hours it should take?"
+        }
+    },
+    "mash": {
+        "kindof":{
+            "he":"סוג המשאב",
+            "en":"resorce kind"
+        },
+        "total": {
+            "he": "עלות חד פעמית",
+            "en": "one time"
+        },
+        "perUnit": {
+            "he": "ליחידה",
+            "en": "per unit"
+        },
+        "monthly": {
+            "he": "חודשי",
+            "en": "monthly"
+        },
+        "yearly": {
+            "he": "שנתי",
+            "en": "yearly"
+        },
+        "rent": {
+            "he": "השכרה לזמן קצוב",
+            "en": "rent"
+        },
+        "linkto": {
+            "he": "לינק להצעת מחיר",
+            "en": "link to price qwoth"
+        },
+        "noof": {
+            "he": "מספר",
+            "en": "number of"
+        },
+        "shovi": {
+            "he": "שווי",
+            "en": "vallue"
+        },
+        "shovile": {
+            "he": "שווי מקסימלי",
+            "en": "up to vallue"
         }
     },
     "common": {
-        "watchthe":{
-            "he":"לצפיה בדיון",
-            "en":"watch the discussion"
+        "watchthe": {
+            "he": "לצפיה בדיון",
+            "en": "watch the discussion"
         },
-        "addcomment":{
-            "he":"הוספת תגובה",
-            "en":"add comment"
+        "addcomment": {
+            "he": "הוספת תגובה",
+            "en": "add comment"
         },
-        "noLesFromZero":{
-            "he":"לא יכול להיות קטן מ-0",
-            "en":"can not be negative"
+        "noLesFromZero": {
+            "he": "לא יכול להיות קטן מ-0",
+            "en": "can not be negative"
         },
-        "startDate":{
-            "he":"תאריך התחלה",
-            "en":"start date"
+        "startDate": {
+            "he": "תאריך התחלה",
+            "en": "start date"
         },
         "finishDate": {
             "he": "תאריך סיום",
             "en": "finnish date"
-        },        
-        "description":{
-            "he":"תיאור",
+        },
+        "description": {
+            "he": "תיאור",
             "en": "description"
         },
         "total": {
@@ -148,9 +190,9 @@
             "he": "שם",
             "en": "name"
         },
-        "approve":{
-            "he":"אישור",
-            "en":"approve"
+        "approve": {
+            "he": "אישור",
+            "en": "approve"
         }
     },
     "finiapp": {
@@ -171,58 +213,92 @@
         "totalno": {
             "he": "סך ההצבעות נגד",
             "en": "total votes against"
-        }, 
-        "inFavor" : {
+        },
+        "inFavor": {
             "he": "בעד",
             "en": "in favor"
-        }, 
-        "votedOn" : {
+        },
+        "votedOn": {
             "he": "הצביעו רק על גרסאות קודמות",
             "en": "voted only on other versions"
         }
     },
-    "nego":{
-        "didNego":{"he":"בעד ההצעה עם השינויים הבאים:","en":"is in favor of the sugestion with the following changes"},
-        "olderVersion":{"he":"גרסא קודמת", "en":"an older version"},
-        "original":{"he":"מקורי","en":"original"},
-        "new": {"he":"חדש", "en": "new"},
-        "head": {"he":"הצעת שינוי למשימה", "en": "suggest changes"},
-        "sugestion": {"he":"ההצעה שלך","en":"your sugestion"},
-        "thatMission":{"he":"שלמשימה יוגדרו","en":"that the mission will be assigned with"},
-        "hoursInsted":{"he":"שעות במקום","en":"hours insted of"},
-        "perhourNego":{"he":"שהשווי השעתי יהיה","en":"that the vallue per hour will be"},
-                "nameNego": {
-                    "he": "ששם המשימה יהיה",
-                    "en": "that the mission name will be"
-                },
-                "desNego": {
-                    "he": "שתיאור המשימה יהיה",
-                    "en": "that the description will be"
-                },
-                "heaNego": {
-                    "he": "שההערות תהיינה",
-                    "en": "that the mission notes will be"
-                },
-        "insted":{"he":"במקום", "en":"insted of"}
-    },
-    "pending":{
-        "head":{
-            "he":"הצבעה על אישור משימה חדשה",
-            "en":"vote on suggestion for a new mission"
+    "nego": {
+        "didNego": {
+            "he": "בעד ההצעה עם השינויים הבאים:",
+            "en": "is in favor of the sugestion with the following changes"
+        },
+        "olderVersion": {
+            "he": "גרסא קודמת",
+            "en": "an older version"
+        },
+        "original": {
+            "he": "מקורי",
+            "en": "original"
+        },
+        "new": {
+            "he": "חדש",
+            "en": "new"
+        },
+        "headmash": {
+            "he": "הצעת שינוי למשאב",
+            "en": "suggest changes for the resorce"
+        },
+        "head": {
+            "he": "הצעת שינוי למשימה",
+            "en": "suggest changes for the mission"
+        },
+        "sugestion": {
+            "he": "ההצעה שלך",
+            "en": "your sugestion"
+        },
+        "thatMission": {
+            "he": "שלמשימה יוגדרו",
+            "en": "that the mission will be assigned with"
+        },
+        "hoursInsted": {
+            "he": "שעות במקום",
+            "en": "hours insted of"
+        },
+        "perhourNego": {
+            "he": "שהשווי השעתי יהיה",
+            "en": "that the vallue per hour will be"
+        },
+        "nameNego": {
+            "he": "ששם המשימה יהיה",
+            "en": "that the mission name will be"
+        },
+        "desNego": {
+            "he": "שתיאור המשימה יהיה",
+            "en": "that the description will be"
+        },
+        "heaNego": {
+            "he": "שההערות תהיינה",
+            "en": "that the mission notes will be"
+        },
+        "insted": {
+            "he": "במקום",
+            "en": "insted of"
         }
     },
-    "nuti":{
-        "sendNewA":{
-            "he":":בדיון על",
-            "en":""
+    "pending": {
+        "head": {
+            "he": "הצבעה על אישור משימה חדשה",
+            "en": "vote on suggestion for a new mission"
+        }
+    },
+    "nuti": {
+        "sendNewA": {
+            "he": ":בדיון על",
+            "en": ""
         },
-        "sendNewB":{
-            "he":"בריקמה",
-            "en":""
+        "sendNewB": {
+            "he": "בריקמה",
+            "en": ""
         },
-        "sendNewC":{
-            "he":"נשלחה הודעה חדשה על ידי",
-            "en":""
+        "sendNewC": {
+            "he": "נשלחה הודעה חדשה על ידי",
+            "en": ""
         }
     }
 }

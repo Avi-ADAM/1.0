@@ -33,10 +33,10 @@
 	$: btnb = false
 	$: scrolli = false
 	let loading = false, loadinga = false,w,h,fi = false
-
+//w*1.8 < h ? w : h > 639 ? w*0.8 : h
 </script>
 <div dir="rtl" class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden">
-	<div id="text" class="flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
+	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
 		<h1 class="font-bold sm:text-9xl text-4xl text-barbi shadow-lg shadow-fuchsia-300 rounded " 
 		style="text-shadow(1px 1px --mturk)">{title}</h1>
 	<div class="overflow-auto d  h-2/5"  on:scroll={()=>{ scrolli = true
@@ -85,14 +85,17 @@
 			</button>
 		</div>
 	</div>
-	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class="sm:w-1/2 h-1/2 sm:h-screen ">
+	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class:flex={$progress == 1} class="sm:w-1/2 h-1/2 sm:h-screen z-0 items-center justify-center">
 		{#if $progress < 1}
-		<div class="w-full h-1/2 sm:h-screen  flex items-center justify-center" title="{loadingTitle}">
-		<CircleProgresBar progress={$progress}/>
+		<div class="w-full h-1/2 sm:h-screen  flex flex-col items-center justify-stretch" title="{loadingTitle}">
+			<img  src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" alt="logo">
+			<CircleProgresBar progress={$progress}/>
 		</div>
 		{/if}
-	<Canvas  size={{width:w, height: w*1.8 < h ? w : h > 639 ? w*0.8 : h}}>
+		<div class=" z-0 ">
+	<Canvas  size={{width:w<640 ? w : h*1.8, height: w*1.8 < h ? w : h > 639 ? w*0.8 : h }}>
         <Scene {fi} hover={btna == true || btnb == true ? true:false} {scrolli}/>
       </Canvas>
+	  </div>
 	</div>
 </div>

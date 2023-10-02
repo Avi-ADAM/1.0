@@ -4,12 +4,18 @@ Command: npx @threlte/gltf@1.0.1 static/3d/11.glb
 -->
 
 <script>
+  	import {  GLTF } from '@threlte/extras'
+  import Coiner from './coiner.svelte'
   import {spring } from 'svelte/motion'
-  import { Group, SpotLight } from 'three'
+  import { CylinderGeometry, Group, SpotLight } from 'three'
   import { T, forwardEventHandlers } from '@threlte/core'
   import { useGltf } from '@threlte/extras'
+  import { TextureLoader, MirroredRepeatWrapping } from 'three'
+  import { useLoader } from '@threlte/core'
+  const texture = useLoader(TextureLoader).load('https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png')
+  
+const geometry = new CylinderGeometry( 5, 5, 0.5, 32 ); 
  // import { onMount } from 'svelte';
-  export let s = 0
  /* onMount(()=>{
     top.set(4)
     setTimeout(top.set(0),3000)
@@ -35,23 +41,25 @@ Command: npx @threlte/gltf@1.0.1 static/3d/11.glb
   export let poz = {z:0, y:0, x:0};
 
     let arr = new Array(100)
+    let arr2 = new Array(50)
 </script>
 
 <T is={ref} dispose={false} {...$$restProps} bind:this={$component}>
   {#await gltf}
     <slot name="fallback" />
   {:then gltf}
-  <T.AmbientLight  />
-  <T.AmbientLight    intensity={1} rotation={345}/>
-
-<T.AmbientLight  intensity={1} />
+  
+ 
 
 
 <T.SpotLight position={{ y: -20, z: -5, x: 5 }} />
 
 <T.DirectionalLight   intensity={0.81} position={{ y: -20, z: -5, x: 5 }} />
-<T.DirectionalLight  intensity={0.91} position={{ y: 10, z: 10 }} />
+<T.DirectionalLight  intensity={0.91} position={[(poz.y/10)+2.4, $top+(-1.5), 0.45]} />
 <T.DirectionalLight  intensity={0.91} position={[ 0,-2,0 ]} />
+<T.DirectionalLight  intensity={1} position={[(-poz.y/10)-2.4, $top+(-1.5), 0.45]} />
+<T.DirectionalLight  intensity={0.91} position={[-5.17, $top+0, 471.72]} />
+<T.DirectionalLight  intensity={0.91} position={[-1, -1-($top), (poz.y/20)]} />
 
     <T.Group position={[(-poz.y/10)-2.4, $top+(-1.5), 0.45]} scale={0.008}>
       <T.Mesh 
@@ -100,22 +108,29 @@ Command: npx @threlte/gltf@1.0.1 static/3d/11.glb
       position={[-1.2+s, -1, 0]}
       rotation={[-2, (Math.PI / 4),(poz.y/20) ]}
       scale={0.004*poz.y > 0 ? (0.004*poz.y)/2 : -((0.004*poz.y)/20)}
-    />-->
-    <!--קערה תחתונה-->
-    <T.Mesh 
-      rotation={[(poz.y/20)-2.1,(poz.y/20),0]}
-      geometry={gltf.nodes.node_id75.geometry}
-      material={gltf.materials['308']}
-      position={[-0.01, $top+(-3), 0.01]}
-      scale={1.29}
-    />
+         geometry={gltf.nodes.node_id75.geometry}
+ />-->
+    
+    {#if $texture}
+          {#each arr2 as ar , i}
+
+  <T.Mesh 
+    {geometry}
+      rotation={[(poz.y),(poz.y),poz.y+$top]}
+      position={[Math.ceil(Math.random() * 1) * (Math.round(Math.random()) ? 1 : -1), $top-1,Math.ceil(Math.random() * 5) * (Math.round(Math.random()) ? 1 : -1),-2]}
+      scale={0.07}> 
+   <T.MeshStandardMaterial color="#EEE8AA" map={$texture}  />
+  </T.Mesh>
+{/each}
+  {/if}
+
     <!--כתר-->
     <T.Mesh
     c
       rotation={[0+$top/3 ,(poz.y/2),0]}  
       geometry={gltf.nodes.node_id102.geometry}
       material={gltf.materials['310']}
-      position={[-0.01, 2.4-$top/8, 0.31]}
+      position={[-0.01, fi == true?2.4+$top/2 :2.4-$top/8, 0.31]}
       scale={0.01+$top/433}
     />
       <T.SpotLight position={[-0.01, $top+2.4, 0.31]} />
@@ -129,6 +144,19 @@ Command: npx @threlte/gltf@1.0.1 static/3d/11.glb
       scale={0.0002*poz.y}
     />
     {/each}
+   
+    <!--- <Coiner/>
+    <GLTF
+      url="3d/coiner.glb"  
+      rotation={[(poz.y/2)-2,(poz.y/20),0]}
+      position={[-0.01,fi == true? $top*2+(-6) : $top+(-6), 0.01]}
+      scale={10.29}
+      />
+      <T.AmbientLight/>
+      <T.DirectionalLight   intensity={0.81} position={[-0.01,fi == true? $top*2+(-6) : $top+(-6), 0.01]} />
+
+            <T.SpotLight position={[-0.01,fi == true? $top*2+(-6) : $top+(-6), 0.01]}/>
+-->
   {:catch error}
     <slot name="error" {error} />
   {/await}
