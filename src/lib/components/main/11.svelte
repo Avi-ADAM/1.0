@@ -4,8 +4,7 @@ Command: npx @threlte/gltf@1.0.1 static/3d/11.glb
 -->
 
 <script>
-  	import {  GLTF } from '@threlte/extras'
-  import Coiner from './coiner.svelte'
+ 
   import {spring } from 'svelte/motion'
   import { CylinderGeometry, Group, SpotLight } from 'three'
   import { T, forwardEventHandlers } from '@threlte/core'
