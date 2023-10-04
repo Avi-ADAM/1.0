@@ -136,7 +136,12 @@ meData.m = false;
 
  
 };
-
+import {lang} from '$lib/stores/lang'
+const ot = {"he":"עלות חד פעמית","en":"one time"}
+const py = {"he":"ליחידה", "en": "per unit"}
+const pm = {"he": "חודשי","en": "monthly"}
+const pye = {"he": "שנתי", "en": "yearly"}
+const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
 </script>
 {#if error1 !== null}
 {error1}
@@ -208,11 +213,11 @@ meData.m = false;
       ease-in-out
       m-0
       focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none">
-<option value="total">עלות חד פעמית</option>
-<option value="monthly">חודשי</option>
-<option value="yearly">שנתי</option>
-<option value="perUnit">ליחידה</option>
-<option value="rent">השכרה לזמן קצוב</option>
+<option value="total">{ot[$lang]}</option>
+<option value="monthly">{pm[$lang]}</option>
+<option value="yearly">{pye[$lang]}</option>
+<option value="perUnit">{py[$lang]}</option>
+<option value="rent">{re[$lang]}</option>
 </select>
         </td>
     </tr> <tr style="display:{kc ? "" : "none"};">

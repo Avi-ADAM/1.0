@@ -1510,6 +1510,7 @@ async function start() {
     			pmashes (filters: { archived: { eq: false } }){ data{ id attributes{ 
         					hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
         					mashaabim {data{id}} 
+                            timegrama {data{id}}
         					diun {what why order id zman users_permissions_user {data {id }}}
         					users { what order why id users_permissions_user {data{id }}}
       							}}}
@@ -1968,6 +1969,8 @@ function pmash(data) {
                 descrip: pend.descrip,
                 kindOf: pend.kindOf,
                 created_at: pend.createdAt,
+                timegramaId:pend.timegrama.data.id,
+                restime: getProjectData(proj.id,"restime"),
                 projectName: getProjectData(proj.id,"pn"),
                 user_1s:getProjectData(proj.id,"us"),
                 src: getProjectData(proj.id,"pp"),

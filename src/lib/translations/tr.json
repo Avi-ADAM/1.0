@@ -88,6 +88,10 @@
         }
     },
     "mash": {
+        "tota":{
+            "he":"שווי סך הכל למשאב",
+            "en":"total vallue for the resorce"
+        },
         "kindof":{
             "he":"סוג המשאב",
             "en":"resorce kind"
@@ -117,8 +121,8 @@
             "en": "link to price qwoth"
         },
         "noof": {
-            "he": "מספר",
-            "en": "number of"
+            "he": "כמות",
+            "en": "quantity"
         },
         "shovi": {
             "he": "שווי",
@@ -127,9 +131,17 @@
         "shovile": {
             "he": "שווי מקסימלי",
             "en": "up to vallue"
+        },
+        "shovilem": {
+            "he": " שווי מקסימלי למשאב",
+            "en": "total maximum vallue"
         }
     },
     "common": {
+        "puttovote":{
+            "he":"העלאת השינויים להצבעה",
+            "en":"publish changes"
+        },
         "watchthe": {
             "he": "לצפיה בדיון",
             "en": "watch the discussion"

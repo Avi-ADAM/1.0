@@ -398,7 +398,7 @@ async function increment() {
     ${dates4}
         users:[  ${userss}, 
      {
-      what: ${what4}
+      what: true
       users_permissions_user: "${idL}"
       order: ${ordern+1}
     }
@@ -695,12 +695,12 @@ $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":n
                                     </td>
                                 </tr>
                                 </table>-->
-                                <div>
+                                  <div class="w-fit mx-auto">
                                     <button
                                         on:click={increment}
                                         class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
                                         type="submit"
-                                        name="addm">העלאת השינויים להצבעה</button> </div>
+                                        name="addm">{tri?.common.puttovote[$lang]}</button> </div>
                                         </div>
 <style>
      .gg{ 

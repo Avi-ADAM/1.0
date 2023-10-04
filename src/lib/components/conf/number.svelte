@@ -52,8 +52,8 @@ function checkAll(a,b){
 <RangeSlider bind:values={status} pipstep="20" float pips all="label" hoverable />
 --> 
 <div dir="rtl" class='textinput max-w-sm mx-auto'>
-  <input type="number" on:input={(e)=>console.log(e)} id="numberb" name="numberb" bind:value={numberb} class='input' required>
-  <label for="numberb" class='label' >{lebel[$lang]}</label>
+  <input type="number"  id="numberb" name="numberb" bind:value={numberb} class='input' required>
+  <label for="numberb" class='label' >{lebel}</label>
   <span class='line '></span>
 </div><button on:click={()=>{if(Number(numberb) >= 0){ edit = false
 checkAll(number,numberb)

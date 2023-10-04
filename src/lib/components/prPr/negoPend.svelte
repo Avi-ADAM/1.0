@@ -1,26 +1,29 @@
 <script>
-import Addnewro from '../addnew/addNewRole.svelte';
-  import { role, ww, skil} from '$lib/components/prPr/mi.js'
-
+ import tr from '$lib/translations/tr.json';
+  import Text from '../conf/text.svelte';
+    import Number from '../conf/number.svelte';
+  import DateNego from '../conf/dateNego.svelte';
+  import Barb from '../conf/stackBar.svelte';
+  import KindOfnego from '$lib/components/conf/kindOfnego.svelte'
+const tri = tr
 import {
     createEventDispatcher
 } from 'svelte';
-import AddNewSkill from '../addnew/addNewSkill.svelte';
-  import AddNewWorkway from '../addnew/addnewWorkway.svelte';
-
-import MultiSelect from 'svelte-multiselect';
 import {
     onMount
 } from 'svelte';
-import Tile from '$lib/celim/tile.svelte'
-import { lang } from '$lib/stores/lang.js'
+ import {lang} from '$lib/stores/lang'
 const dispatch = createEventDispatcher();
-export let descrip = "";
-export let projectName = "";
-export let name1 = "";
-export let hearotMeyuchadot = "";
-export let noofhours = 0;
-export let perhour = 0;
+  export let restime;
+import moment from 'moment'
+
+export let descrip ;
+export let projectName ;
+export let name1 ;
+export let spnot;
+export let easy = 0;
+export let hm = 0;
+export let price = 0;
 export let projectId;
 export let uids = [];
 export let what = [];
@@ -31,234 +34,48 @@ export let total = 0;
 export let noofusers;
 export let already;
 export let mypos;
-export let skills = [];
-export let tafkidims = [];
-export let workways = [];
-export let vallues;
-export let publicklinks;
-export let privatlinks;
-export let mdate;
+export let missionId;
+export let linkto;
+export let tafkidims;
+export let sqadualed
+export let sqadualedf;
+export let state = 2
 export let pendId;
-export let users;
-let miDatan = [];
-let error1;
+export let users =[];
+export let kindOf = "perUnit";
+export let oldide = 0; //last tg id, if non 0
 let bearer1;
 let token;
 let idL;
-let no = false;
-let masa = false;
-let data;
-let isOpen;
-let less = "";
-let placeholder4 = `בחירת תפקידים`;
-let roles = [];
-let why = '';
-let skills2 = [];
-let placeholder1 = `בחירת כישורים`;
-let addS = false;
+
+const less = {
+  "he":"הסרה",
+  "en":"remove"
+};
 let descrip2 = descrip;
 let name2 = name1;
-let selected2 = [];
-let selected3 = [];
-let selected1 = [];
-let workways2 = [];
-const plww = {"he":`סוג משימה`,"en":`mission kind`};
-let mdate2 = mdate;
-let hearotMeyuchadot2 = hearotMeyuchadot;
-let privatlinks2 = privatlinks;
-let noofhours2 = noofhours;
-let perhour2 = perhour;
-let myM;
-let done;
-let skills3 = skills;
-let tafkidims2 = tafkidims; 
-let workways3 = workways;
+let sqadualed2 = sqadualed;
+let sqadualedf2 = sqadualedf;
 
-function min(a, b) {
-const newArr = a;
-const x = newArr.map(c => c.id);
-const indexy = x.indexOf(b);
-newArr.splice(indexy, 1);
-skills3 = newArr;
-skills3 = skills3;
-}
-
-
-
-
-
-
-
-
-
-function minR(a, b) {
-const newArr = a;
-const x = newArr.map(c => c.id);
-const indexy = x.indexOf(b);
-newArr.splice(indexy, 1);
-tafkidims2 = newArr;
-tafkidims2 = tafkidims2;
-}
-
-function minW(a, b) {
-const newArr = a;
-const x = newArr.map(c => c.id);
-const indexy = x.indexOf(b);
-newArr.splice(indexy, 1);
-workways2 = newArr;
-workways2 = workways2;
-}
-
-const filterByReference = (allob, id)=> {
-   let res = [];
-   res = allob.filter(el => {
-      return id.find(element => {
-         return element === el.id;
-      });
-   });
-   return res;
-}
-
-    function find_skill_id(skill_name_arr){
-     var  arr = [];
-      for (let j = 0; j< skill_name_arr.length; j++ ){
-      for (let i = 0; i< skills2.length; i++){
-        if(skills2[i].attributes.skillName === skill_name_arr[j]){
-          arr.push(skills2[i].id);
-        }
-      }
-      }
-      return arr;
-     };
-
-function addR(id, data, allob) {
-
-const oldob = data;
-const old = oldob.map(c => c.id);
-const neww = find_skill_id(id);
-let array3 = old.concat(neww);
-array3 = [...new Set([...old,...neww])];
-const resp = filterByReference(allob, array3);
-skills3 = resp;
-}
-
-function add(id, data, allob) {
-const oldob = data;
-const old = oldob.map(c => c.id);
-const neww = find_skill_id(id);
-let array3 = old.concat(neww);
-array3 = [...new Set([...old,...neww])];
-const resp = filterByReference(allob, array3);
-tafkidims2 = resp;
-}
-function addW(id, data, allob) {
-const oldob = data;
-const old = oldob.map(c => c.id);
-const neww = find_skill_id(id);
-let array3 = old.concat(neww);
-array3 = [...new Set([...old,...neww])];
-const resp = filterByReference(allob, array3);
-workways3 = resp;
-}
- function addnewW (event){
-    
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.workWayName;
-    const newValues = workways2 ;
-    newValues.push(newOb);
-    workways2 = newValues;
-    const newSele = selected1;
-    newSele.push(newN);
-    selected1 = newSele;
-
-  }
- function addnew (event){
-    
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.skillName;
-    const newValues = skills2 ;
-    newValues.push(newOb);
-    skills2 = newValues;
-    const newSele = selected2;
-    newSele.push(newN);
-    selected2 = newSele;
-
-  }
-   function addnewR (event){
-    
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.roleDescription;
-    const newValues = roles ;
-    newValues.push(newOb);
-    roles = newValues;
-    const newSele = selected3;
-    newSele.push(newN);
-    selected3 = newSele;
-
-  }
+let spnot2 = spnot;
+let linkto2 = linkto;
+let hm2 = hm;
+let price2 = price;
+let easy2 = easy;
 let rishon = 0;
-function myMission() {
-     var checkBox = document.getElementById("tomeC");
+let kindOfb = kindOf
 
-  var text = document.getElementById("doneC");
-  console.log(text);
-  if (text.style.display == "none"){
-    text.style.display = "";
-  } else {
-    text.style.display = "none";
-  }
- const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
- rishon = idL;
-}
-let rishonves = 0;
-function myMissionH() {
- const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
- rishonves = idL;
- var checkBox = document.getElementById("done");
-  // Get the output text
-  var text = document.getElementById("hoursC");
-  var text2 = document.getElementById("vallueperhourC");
-  var text3 = document.getElementById("vallueperhourN");
-  var text4 = document.getElementById("hoursD");
-  var text5 = document.getElementById("vallueperM");
-  // If the checkbox is checked, display the output text
-  if (text.style.display == "none"){
-    text.style.display = "";
-    text2.style.display = "";
-    text3.style.display = "none";
-    text4.style.display = "none";
-    text5.style.display = "none";
-  } else {
-    text.style.display = "none";
-    text2.style.display = "none";
-    text3.style.display = "";
-    text4.style.display = "";
-    text5.style.display = "";
-  }
-}
-
-function arraysEqual(a1,a2) {
-    return JSON.stringify(a1)==JSON.stringify(a2);
-}
 function close (){
     dispatch('close')
 }
+export let timegramaId
  let name4 = ``;
+ export let ordern = 0
      let descrip4 = ``;
-     let hearotMeyuchadot4 = ``; 
-     let noofhours4 = ``;
-     let perhour4 = ``;
-     let skills4 = ``;
-     let roles4 = ``;
-     let ww4 = ``;
+     let spnot4 = ``; 
+     let hm4 = ``;
+     let price4 = ``;
+     
      let rishon4 = ``;
           let rishonves4 = ``;
           let what4 = true;
@@ -288,18 +105,8 @@ function objToString (obj) {
     return str;
 }
 function objToStringC (obj) {
-   const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-      if(obj[i].users_permissions_user.id == idL && what4 == false) {
-        obj[i].order = 1
-      } else if (obj[i].users_permissions_user.id == idL && what4 == true) {
-        obj[i].order = 1
-      }
         const length = Object.keys(obj[i]).length;
         let t = 0;
     for (const [p, val] of Object.entries(obj[i])) {
@@ -321,13 +128,16 @@ function objToStringC (obj) {
     }}
     return str;
 }
+let miDatan = []
+let error1
+let clicked = false
 export let masaalr = false;
 let userss;
 async function increment() {
-  dispatch("load")
- 
+    dispatch("load")
+  //TODO: update timegrama, add now pend that is changed to nego
+  let sqadualedf4 = ``,kindOf4nego  = ``, kindOf4 = ``, sqadualed4 = ``,easy4 = ``, easy4nego = ``, sqadualedf4nego, sqadualed4nego, namefornego, descrip4nego, spnot4nego, hm4nego, price4nego  , rishon4nego, rishonves4nego
 
-      const date = (mdate2 !== undefined) ? ` sqadualed: ${mdate2}` : ``;
       const negoss = ``;
     const cookieValue = document.cookie
   .split('; ')
@@ -345,87 +155,91 @@ async function increment() {
     } else {
         rishon4 = ``;
     }
-      if (rishonves !== 0){
-        rishonves4= `rishonves: "${rishonves}"`
-    } else {
-        rishonves4 = ``;
-    }
-     if (name1 === name2){
-          name4 = ``
+   
+     if (sqadualed === sqadualed2){
+          sqadualed4 = ``
+          sqadualed4nego = ``
      } else {
-         name4 = `name: "${name2}"`
+         sqadualed4nego =  (sqadualed !== undefined) ? ` sqadualed: "${sqadualed}",` : ``;
+         sqadualed4 =  (sqadualed2 !== undefined) ? ` sqadualed: "${sqadualed2}",` : ``;
+         what4 = false;
+     }
+     if (sqadualedf === sqadualedf2){
+          sqadualedf4 = ``
+          sqadualedf4nego = ``
+     } else {
+         sqadualedf4nego =  (sqadualedf !== undefined) ? ` sqadualedf: "${sqadualedf}",` : ``;
+         sqadualedf4 =  (sqadualedf2 !== undefined) ? ` sqadualedf: "${sqadualedf2}"` : ``;
+         what4 = false;
+     }
+      if (name1 === name2){
+          name4 = ``
+          namefornego = ``
+     } else {
+         name4 = `name: "${name2}",`
+         namefornego = `name: "${name1}",`
          what4 = false;
      }
       if (descrip === descrip2){
           descrip4 = ``
+          descrip4nego = ``
      } else {
-         descrip4 = `descrip: "${descrip2}"`
+         descrip4 = `descrip: "${descrip2}",`
+         descrip4nego = `descrip: "${descrip}",`
                   what4 = false;
-
      }
-    if (hearotMeyuchadot === hearotMeyuchadot2){
-          hearotMeyuchadot4 = ``
+    if (spnot === spnot2){
+          spnot4 = ``
+          spnot4nego = ``
      } else {
-         hearotMeyuchadot4 = `hearotMeyuchadot: "${hearotMeyuchadot2}"`
+         spnot4 = `spnot: "${spnot2}",`
+         spnot4nego = `spnot: "${spnot}",`
          what4 = false;
 
      }
-     if (noofhours === noofhours2){
-          noofhours4 = ``
+       if (easy === easy2){
+          easy4 = ``
+          easy4nego = ``
      } else {
-         noofhours4 = `noofhours: ${noofhours2}`
-         what4 = false;
-
-     }
-     if (perhour === perhour2){
-         perhour4 = ``;
-     } else {
-         perhour4 = `perhour: ${perhour2}`;
+         easy4 = `easy: ${easy2},`
+         easy4nego = `easy: ${easy},`
          what4 = false;
      }
-
-
-
-
-
-
-
-     
-     const skillsId = skills.map(c => c.id);
-     const skills2Id = skills3.map(c => c.id);
-     const roId = tafkidims.map(c => c.id);
-     const ro2Id = tafkidims2.map(c => c.id);
-     const wwId = workways.map(c => c.id);
-     const ww2Id = workways3.map(c => c.id);
-     if (arraysEqual(skillsId, skills2Id) === false){
-            skills4 = ` skills: [${skills2Id}], `;
-                     what4 = false;
-
-    } else {
-        skills4 =``;
-    }
-     if (arraysEqual(roId, ro2Id) === false){
-            roles4 = ` tafkidims: [${ro2Id}], `;
-                     what4 = false;
-
-    }  else {
-            roles4 = ``;
-    }
-     if (arraysEqual(wwId, ww2Id) === false){
-            ww4 = ` work_ways: [${ww2Id}], `;
-                     what4 = false;
-
-    } else {
-        ww4 = ``;
-    }
+     if (hm === hm2){
+          hm4 = ``
+          hm4nego = ``
+     } else {
+         hm4 = `hm: ${hm2},`
+         hm4nego = `hm: ${hm},`
+         what4 = false;
+     }
+     if (price === price2){
+         price4 = ``;
+         price4nego = ``
+     } else {
+         price4 = `price: ${price2},`;
+         price4nego = `price: ${price},`
+         what4 = false;
+     }
+       if (kindOf === kindOfb){
+         kindOf4 = ``;
+         kindOf4nego = ``
+     } else {
+         kindOf4 = `kindOf:${kindOfb},`;
+         kindOf4nego = `kindOf:${kindOf},`
+         what4 = false;
+     }
+       let fd = new Date(Date.now() + x)
+     let d = new Date()
     let another = ``
- if (what4 == true && masaalr == true && mypos == false || what4 == true && masaalr == false || what4 == false){
+     if (what4 == true && masaalr == true && mypos == false || what4 == true && masaalr == false || what4 == false){
 
     if (what4 == false){
     another = `,{
       what: true
       users_permissions_user: "${idL}"
       order: 4
+      zman: "${d.toISOString()}"
     }`
     } 
      if (masaalr == true){
@@ -433,7 +247,7 @@ async function increment() {
   } else{
         userss = objToString(users)
   }
- try {
+try {
              await fetch(linkg, {
               method: 'POST',
         headers: {
@@ -441,37 +255,51 @@ async function increment() {
             'Content-Type': 'application/json'
                   },
         body: //${negoss} {rishons} {rishonveses}?
-        JSON.stringify({query:
-          `mutation { updatePendm(
-      input: {
-      where: {id: ${pendId}}
-      data:  { users:[ ${userss}, 
-     {
-      what: ${what4}
-      users_permissions_user: "${idL}"
-      order: ${what4 == true ? 2 : 3}
-    }
-    ${another}
-  ], nego:[  
-{
-    users_permissions_user: "${idL}"  
-    ${noofhours4}
-    ${hearotMeyuchadot4}
+        JSON.stringify({query:`mutation { 
+             updateTimegrama(
+     id: ${timegramaId}
+             data:{
+      date: "${fd.toISOString()}",
+             }){data {id}}
+             createNegoMash(
+              data:{
+                publishedAt: "${d.toISOString()}",
+                pmash:${pendId},
+                 isOriginal:${state == 2 ? true : false},
+                 ${kindOf4nego}
+    ${easy4nego}             
+    ${hm4nego}
+    ${spnot4nego}
+    ${descrip4nego}
+    ${namefornego}
+    ${price4nego}
+    ${sqadualedf4nego}
+    ${sqadualed4nego}
+              }
+             ){data{id}}
+            updatePmash(
+     id: ${pendId}
+      data:  { 
+            ${easy4}             
+           ${hm4}
+    ${spnot4}
+    ${kindOf4}
     ${descrip4}
     ${name4}
-    ${perhour4}
-    ${skills4}
-    ${roles4}
-    ${ww4}
-    ${rishon4}
-    ${rishonves4}
- }
-
+    ${price4}
+    ${sqadualedf4}
+    ${sqadualed4}
+        users:[  ${userss}, 
+     {
+      what: true
+      users_permissions_user: "${idL}"
+      order: ${ordern+1}
+      zman: "${d.toISOString()}"
+    }
   ]
       }
-    }
-  ){pendm { users { users_permissions_user { id}}}}
- } `   
+  ){data {  id}}
+} `
 // make coin desapire
 } )})
   .then(r => r.json())
@@ -484,398 +312,107 @@ async function increment() {
         }
       }
 }
-let linkg = "https://tov.onrender.com/graphql"
+let x
+let linkg = "https://tov.onrender.com/graphql";
+
 onMount(async () => {
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
-    const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-    idL = cookieValueId;
-    token = cookieValue;
-    bearer1 = 'bearer' + ' ' + token;
-
-    try {
-        await fetch(linkg, {
-                method: 'POST',
-                headers: {
-                    'Authorization': bearer1,
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    query: `{skills { id skillName} tafkidims {id roleDescription}workWays {id workWayName} } `
-                })
-            })
-            .then(r => r.json())
-            .then(data => miDatan = data.data);
-
-    } catch (e) {
-        error1 = e
-        console.log(error1)
+ 
+  console.log("mounted",$lang)
+     if (restime == "feh") {
+        x = 48 * 60 * 60 * 1000
+    } else if (restime == "sth") {
+        x = 72 * 60 * 60 * 1000 
+    } else if (restime == "nsh") {
+        x = 96 * 60 * 60 * 1000
+    } else if (restime == "sevend") {
+        x = 168 * 60 * 60 * 1000
     }
-    skills2 = miDatan.skills;
-    roles = miDatan.tafkidims;
-    workways2 = miDatan.workWays;
-    console.log(skills2)
+    x =x
+    console.log(new Date(Date.now() + x).toLocaleString(),restime)
 })
+function montsi (moy,beg,end){
+  if(moy == "monthly" || moy ==  "yearly"){
+    let mo = moy == "monthly" ? "months" : "years"
+            var a = moment(end, "HH:mm DD/MM/YYYY ");
+            var b = moment(beg, "HH:mm DD/MM/YYYY ");
+            if(moy == "monthly"){
+            return a.diff(b, 'months', true).toFixed(2)
+            }else{
+            return a.diff(b, 'years', true).toFixed(2)
+            }
+  }else{
+    return 1
+  }
+          }
+$: datai = [{
+  "leb":`${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2)}| ${tri?.mash?.shovile[$lang]},${easy2* hm2 * montsi(kindOfb,sqadualed2,sqadualedf2)}`,
+  "value":price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2),
+  "vallue2":(easy2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2))- (price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2))},
+  {"leb":`${tri?.nego?.original[$lang]},${price * hm * montsi(kindOf,sqadualed,sqadualedf)} | ${tri?.mash?.shovile[$lang]},${easy * hm * montsi(kindOf,sqadualed,sqadualedf)}`,"value":price * hm * montsi(kindOf,sqadualed,sqadualedf), "vallue2":(easy * hm * montsi(kindOf,sqadualed,sqadualedf))-(price * hm * montsi(kindOf,sqadualed,sqadualedf))}]
+$: console.log(datai)
 </script>
+<div class="text-barbi " dir={$lang == "he"?"rtl":"ltr"}>
+ <h1 class="md:text-center text-2xl md:text-2xl font-bold underline"
+            >{tri?.nego?.headmash[$lang]} {name1}</h1>
+            <div class="flex  flex-col align-middle justify-center ">
+<Text text={name1} bind:textb={name2} lebel={tri?.common?.name}/>
+<Text long={true} text={descrip} bind:textb={descrip2} lebel={tri?.common?.description}/>
+<Text long={true} text={spnot} bind:textb={spnot2} lebel={tri?.mission?.specialNotes}/>
+<Text text={linkto} bind:textb={linkto2} lebel={tri?.mash?.linkto}/>
+<KindOfnego {kindOf} bind:kindOfb lebel={tri?.mash.kindof}/>
 
-<table dir="rtl" >
-    <caption class="sm:text-right md:text-center text-right ">
-        <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-            >הצעת שינוי ל{name1}</h1>
-    </caption>
-      <tr class="ggr">
-        <th class="ggr" ></th>
-        <td class="ggr">מקור</td>
-        <td class="ggr">שינוי</td>
-    </tr> 
-    <tr >
-        <th  >שם</th>
-        <td >{name1}</td>
-        <td >
-                  <div dir="rtl" class='textinput'>
-  <input type="text"  id="nam" name="nam" bind:value={name2} class='input' required>
-  <label for="nam" class='label' >שם</label>
-  <span class='line'></span>
+{#if !(kindOf == "total" && kindOfb == "total")}
+<Number number={hm} bind:numberb={hm2} lebel={tri?.mash?.noof[$lang]} />
+{/if}
+<Number number={price} bind:numberb={price2} lebel={tri?.mash?.shovi[$lang]} />
+<Number number={easy} bind:numberb={easy2} lebel={tri?.mash?.shovile[$lang]} />
+            {#if kindOf == "yearly"|| kindOfb == "yearly" || kindOfb == "monthly" ||  kindOf ==  "monthly" || kindOf == "rent" || kindOfb == "rent"}
+<DateNego date={sqadualed} bind:dateb={sqadualed2} lebel={tri?.common.startDate}/>
+<DateNego date={sqadualedf} bind:dateb={sqadualedf2} lebel={tri?.common.finishDate}/>
+{/if}
+
+<!---<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
+    <div class="flex flex-row align-middle justify-center gap-x-2">
+        <h2 class="underline decoration-mturk">{tr?.mission.iskvua[$lang]}: </h2>
+  <input
+    bind:checked={isKavua2}
+    type="checkbox" id="tomeC" name="isKavua2" >
 </div>
-        </td>
-    </tr> <tr>
-        <th>תיאור</th>
-        <td>{descrip}</td>
-        <td>
-                                  <div dir="rtl" class='textinput'>
-  <input type="text"  id="des" name="des" bind:value={descrip2} class='input' required>
-  <label for="des" class='label' >תיאור</label>
-  <span class='line'></span>
 </div>
-        </td>
-    </tr> <tr>
-        <th>כישורים נדרשים</th>
-         <td> {#each skills as da, i}
-        {da.skillName}   
-            {/each}</td>
-        <td>
-            {#each skills3 as da, i}
-            <button class="p-2 m-1" title={less} on:click={min(skills3 ,da.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
-                <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-            </svg>{da.skillName}   </button>
-            {/each}
-        </td>
-    </tr> <tr>
-        <th>בחירת כישורים נוספים </th>
-        <td></td>
-        <td> <MultiSelect
-            bind:selected={selected2}
-            {placeholder1}
-            options={skills2.map(c => c.skillName)}
-            on:change={add(selected2, skills3, skills2)}
-            />
-            <AddNewSkill on:addnewskill={addnew} addS={addS} roles1={roles} />
-            </td>
-            </tr> <tr>
-                <th>הגדרת תפקיד</th>
-                  <td> {#each tafkidims as ga, i}
-        {ga.roleDescription}   
-            {/each}</td>
-                <td>
-                    {#each tafkidims2 as ta, i}
-                    <button class="p-2 m-1" title={less} on:click={minR(tafkidims2, ta.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
-                        <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-                    </svg>{ta.roleDescription}</button>
-                    {/each}
-                </td>
-            </tr>
-            <tr>
-                <th>בחירת תפקידים אחרים </th>
-                <td></td>
-                <td> <MultiSelect
-                    bind:selected={selected3}
-                    on:add={(event) => console.log(event)}
-                    {placeholder4}
-                    options={roles.map(c => c.roleDescription)}
-                    on:change={addR(selected3, tafkidims2, roles)}
-                    />
-                    <Addnewro  on:addnewrole={addnewR}   />
-                    </td>
-                    </tr> <tr>
-                        <th>סוג משימה</th>
-                         <td> {#each workways as oa, i}
-        {oa.workWayName}   
-            {/each}</td>
-                        <td>
-                            {#each workways3 as dm, i}
-                            <button class="p-2 m-1" title={less} on:click={minW(workways3, dm.id)}><svg style="width:20px;height:20px" viewBox="0 0 24 24">
-                                <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
-                            </svg>{dm.workWayName}   </button>
-                            {/each}
-                        </td>
-                    </tr>
-                    <tr>
-                        <th> הוספת סוג משימה</th>
-                        <td></td>
-                        <td><MultiSelect
-                            bind:selected={selected1}
-                            placeholder={plww[$lang]}
-                            options={workways2.map(c => c.workWayName)}
-                            on:change={addW(selected1, workways3, workways2 )}
-                            />
-                            <AddNewWorkway  on:addww={addnewW}/>
-                                </td>
-                                </tr> <tr>
-                                    <th>תאריך ביצוע</th>
-                                    <td>{mdate}</td>
-                                    <td><input type="datetime-local" bind:value={mdate2}  ></td>
-                                </tr> <tr>
-                                    <th>הערות יחודיות לריקמה שלי</th>
-                                    <td>{hearotMeyuchadot}</td>
-                                    <td>
-                                                              <div dir="rtl" class='textinput'>
-  <input type="text"  id="hearotMeyuchadot2" name="hearotMeyuchadot2"  bind:value={hearotMeyuchadot2} class='input' required>
-  <label for="hearotMeyuchadot2" class='label' >הערות מיוחדות</label>
-  <span class='line'></span>
+
+<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
+    <div class="flex flex-row align-middle justify-center gap-x-2">
+        <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
+  <input
+    bind:checked={myM}
+    type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
 </div>
-                                    </td>
-                                </tr><tr>
-                                    <th>קישור לביצוע המשימה</th>
-                                    <td>{privatlinks}</td>
-                                    <td>
-                                                             <div dir="rtl" class='textinput'>
-  <input type="text"  id="link" name="link"  bind:value={privatlinks2} class='input' required>
-  <label for="link" class='label'>קישור לאתר בו מבוצעת המשימה </label>
-  <span class='line'></span>
+</div>-->
 </div>
-                                    </td>
-                                </tr><tr style="display:''" id="hoursD">
-                                    <th >כמה שעות זה אמור לקחת? </th>
-                                    <td>{noofhours}</td>
-                                    <td>
-                                                             <div dir="rtl" class='textinput'>
-  <input type="number" placeholder="0" id="hoursn" name="hoursn"  bind:value={noofhours2} class='input' required>
-  <label for="hoursn" class='label'>כמה שעות זה אמור לקחת? </label>
-  <span class='line'></span>
-</div>
-                                    </td>
-                                </tr><tr style="display:''" id="vallueperhourN" >
-                                    <th>כמה שווה שעה ?</th>
-                                    <td>{perhour}</td>
-                                    <td>
-                                              <div dir="rtl" class='textinput'>
-  <input type="number"  id="vallueperhourn" name="vallueperhourn" placeholder="0"
-                                            bind:value={perhour2} class='input' required>
-  <label for="vallueperhourn" class='label'>כמה שווה שעה? </label>
-  <span class='line'></span>
-</div>
-                                    </td>
-                                </tr>
-                                
-                                <!--<tr>
-                                    <th>השמת המשימה לעצמי</th>
-                                    <td></td>
-                                    <td>
-                                        <input
-                                            bind:checked={myM}
-                                            type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
-                                        <label for="tome">השמת המשימה לעצמי</label>
-                                    </td>
-                                </tr><tr style="display:none" id="doneC" >
-                                    <th>ביצעתי כבר את המשימה</th>
-                                    <td></td>
-                                    <td>
-                                        <input
-                                            bind:checked={done}
-                                            type="checkbox" id="done" name="done" value="done" on:click={()=> myMissionH()}>
-                                        <label for="done">ביצעתי כבר את המשימה</label>
-                                    </td>
-                                </tr><tr style="display:none" id="hoursC">
-                                    <th>כמה שעות זה לקח לי? </th>
-                                    <td>{noofhours}</td>
-                                    <td>
-                                                                           <div dir="rtl" class='textinput'>
-  <input type="number" placeholder="0" id="hours" name="hours"  bind:value={noofhours2} class='input' required>
-  <label for="hours" class='label'>כמה שעות זה לקח לי? </label>
-  <span class='line'></span>
-</div>
-                                    </td>
-                                </tr>--><tr style="display:none" id="vallueperhourC">
-                                    <th>כמה שווה שעה? </th>
-                                    <td>{perhour}</td>
-                                    <td>
-                                         <div dir="rtl" class='textinput'>
-  <input type="number"  id="vallueperhour" name="vallueperhour" placeholder="0"
-                                            bind:value={perhour2} class='input' required>
-  <label for="vallueperhour" class='label'>כמה שווה שעה? </label>
-  <span class='line'></span>
-</div>
-                                        <input >
-                                    </td>
-                                </tr><tr >
-                                    <th>שווי סך הכל למשימה </th>
-                                    <td>
-                                         {#if noofhours > 0 & perhour> 0}
-
-                                        {noofhours * perhour}
-
-                                        {:else} <p>0</p>
-                                        {/if}
-                                    </td>
-                                    <td>
-                                        {#if noofhours2 > 0 & perhour2 > 0}
-
-                                        {noofhours2 * perhour2}
-
-                                        {:else if noofhours > 0 & perhour> 0} 
-                                        {noofhours * perhour}
-
-                                        {:else} <p>0</p>
-                                        {/if}
-                                    </td>
-                                </tr>
-                                </table>
-                                <div>
-                                    <button
-                                        on:click={increment}
-                                        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-                                        type="submit"
-                                        name="addm">העלאת השינויים להצבעה</button> </div>
-<style>
-     .gg{ 
-     position: sticky;
-     top: 1px; 
-background-color: #6b0f1a;
-background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-     border-width: 4px;
-  border-color: rgb(103, 232, 249);
-     border-radius: 4%;
-      opacity: 1;
-      color: rgb(132, 241, 223);
-  }
-   .ggd{ 
- 
-background-color: #6b0f1a;
-background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-     border-width: 4px;
-  border-color: rgb(103, 232, 249);
-     border-radius: 4%;
-      opacity: 1;
-                  color: rgb(132, 241, 223);
-
-
-  }
-  .ggr{ 
-    position: sticky;
-     top: 1px; 
-background-color: #6b0f1a;
-background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-     opacity: 1;
-            color: rgb(132, 241, 223);
-
-  }
-  .ggr:hover, .gg:hover, .ggd:hover {
-    background:var(--barbi-pink);
-  } 
-    .dd{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    .body {
-      overflow-x: auto;
-      overflow-y: auto;
-     height: 100vh;
-     width: 100vw;
-     padding-left: 0.5em;
-     padding-right: 0.5em;
-    }
+<div class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
+ <h2 class="underline decoration-mturk">{tri?.mash.tota[$lang]}</h2>
+      {#if price == price2 && hm == hm2 && kindOf == kindOfb && easy == easy2}
+       {#if price > 0 & hm> 0}
+      {price * hm * montsi(kindOf,sqadualed,sqadualedf)}
+      {#if price != easy}
+       {tri?.mash?.shovile[$lang]}:
+       {easy * hm * montsi(kindOf,sqadualed,sqadualedf)}
+       {/if}
+      {:else} 
+      <p>0</p>
+      {/if}
+      {:else}
+      {#key datai}
+      <div class="w-1/2 mx-auto">
+      <Barb {datai}/></div>
+      {/key}
+      {/if}
+      </div>
   
-  table, th, td {
-  border-collapse: collapse;
-  border-width: 4px;
-  border-color: rgb(103, 232, 249);
-border-radius: 4%;
-  }
-  table {
-  text-align: center;
-  color: var(--barbi-pink);
-  margin: 0 auto;
- 
-  }
- 
-  th{
-     background-color: #6b0f1a;
-     background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-     color: rgb(132, 241, 223);
-   }
-  td{
-     background-color: #5efaf2;
-     background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
-  }
- th:hover{
-       background:var(--barbi-pink);
-
- }
-  td:hover {
-    background:rgb(132, 241, 223);
-  } 
-       .textinput {
-  position: relative;
-  width: 100%;
-  display: block;
-}
-
-.input {
-
-  border: none;
-  margin: 0;
-  padding: 10px 0;
-  outline: none;
-  border-bottom: solid 1px var(--mturk);
-  font-size: 15px;
-  margin-top: 12px;
-  width: 100%;
- color:  var(--barbi-pink);
-  -webkit-tap-highlight-color: transparent;
-  background: transparent;
-}
-
-
-.label {
-
-  font-size: 15px;
-  position: absolute;
-  right: 0;
-  top: 22px;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-  pointer-events: none;
-  color:var(--mturk);
-  user-select: none;
-}
-
-.line {
-  height: 2px;
-  background-color: #2196F3;
-  position: absolute;
-  transform: translateX(-50%);
-  left: 50%;
-  bottom: 0;
-  width: 0;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-}
-
-.input:focus ~ .line, .input:valid ~ .line {
-  width: 100%;
-}
-
-.input:focus ~ .label, .input:valid ~ .label {
-  font-size: 11px;
-  color: var(--barbi-pink);
-  top: 0;
-} 
-</style>
+ <div class="w-fit mx-auto">
+     <button
+         on:click={increment}
+         class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+         type="submit"
+         name="addm">{tri?.common.puttovote[$lang]}</button> </div>
+         </div>

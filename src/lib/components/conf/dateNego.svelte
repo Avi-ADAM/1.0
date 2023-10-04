@@ -13,7 +13,7 @@ import { lang } from '$lib/stores/lang.js'
     const und = {"he":"לא הוגדר","en":"undefined"}
 onMount(()=>{
     if (date == dateb){
-        if(date == undefined || "undefined"){
+        if(date == undefined ||date == "undefined"){
             htmlon = und[$lang]
         }else{
                 htmlon = date
@@ -71,9 +71,10 @@ function checkAll (a, b){
         </div>
 {:else}
 
-<div dir="rtl" class='textinput max-w-sm mx-auto'>
-    <SveltyPicker inputClasses="form-control" format="hh:ii dd/mm/yyyy " bind:value={dateb}></SveltyPicker>
-  <label for="des" class='label' >{lebel[$lang]}</label>
+<div dir="rtl" class=' max-w-sm mx-auto'>
+  <small>{lebel[$lang]}</small>
+
+    <SveltyPicker inputClasses="form-control" format="hh:ii dd/mm/yyyy" bind:value={dateb}></SveltyPicker>
 </div><button on:click={()=>{edit = false
 checkAll(date,dateb)
 }}>✅</button>

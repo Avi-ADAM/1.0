@@ -436,6 +436,7 @@ function afternego (event) {
     no = false; 
     masa = false;
     //dispach or update  coin to negotiable state 
+    coinLapach()
 }
   let rect = false;
 async function react (){
