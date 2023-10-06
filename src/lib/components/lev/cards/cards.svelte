@@ -275,6 +275,7 @@ mousewheel={true}
      coinlapach={buble.coinlapach} 
         on:coinLapach={delo}
         restime={buble.restime}
+        ordern={buble.orderon}
         timegramaId={buble.timegramaId}
                  messege={buble.messege}
         mysrc={buble.mysrc}

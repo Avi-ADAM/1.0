@@ -1,6 +1,6 @@
 <script>
             import { io }  from"socket.io-client";
-
+    import {pendMisMes} from '$lib/stores/pendMisMes.js'
     import tr from '$lib/translations/tr.json'
     import {nutifi } from '$lib/func/nutifi.svelte'
     import Yahalomim from '$lib/components/lev/yahalomim.svelte'
@@ -1370,14 +1370,18 @@ onMount(async () => {
                 let src22 = getProjectData(arr1[index].projectId,"upic",datan.data.attributes.diun[datan.data.attributes.diun.length -1].ide)
                 let uname = getProjectData(arr1[index].projectId,"un",datan.data.attributes.diun[datan.data.attributes.diun.length -1].ide)
                 let pname = getProjectData(arr1[index].projectId,"pn")
-                arr1[index].messege.push({
+                let arr = arr1[index].messege
+                arr.push({
                     message: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].why,
                     what: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].what,
                     pic: src22,
                     sentByMe: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].ide === idL ? true : false,
                     timestamp:new Date(datan.data.attributes.diun[datan.data.attributes.diun.length - 1].zman)
                 })
-                arr1 = arr1
+                arr = arr
+                   let old = $pendMisMes
+                     old[arr1[index].pendId] = arr
+                     pendMisMes.set(old)
                  let head = `${tr.nuti.sendNewA[$lang]} 
                  ${datan.data.attributes.name} 
                  ${tr.nuti.sendNewB[$lang]} 
@@ -1509,8 +1513,11 @@ async function start() {
                                 }}}
     			pmashes (filters: { archived: { eq: false } }){ data{ id attributes{ 
         					hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
-        					mashaabim {data{id}} 
-                            timegrama {data{id}}
+        					nego_mashes{data{id attributes{
+                                hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
+                            }}}
+                            mashaabim {data{id}} 
+                            timegrama {data{id attributes{date}}}
         					diun {what why order id zman users_permissions_user {data {id }}}
         					users { what order why id users_permissions_user {data{id }}}
       							}}}
@@ -1962,6 +1969,7 @@ function pmash(data) {
         for (let j = 0; j < projects[i].attributes.pmashes.data.length; j++) {
              const pend = projects[i].attributes.pmashes.data[j].attributes
             pmashes.push({
+                orderon: pend.nego_mashes.data.length,
                 mysrc: src24,
                 name: pend.name,
                 projectId: proj.id,
@@ -1969,6 +1977,7 @@ function pmash(data) {
                 descrip: pend.descrip,
                 kindOf: pend.kindOf,
                 created_at: pend.createdAt,
+                nego_mashes:pend.nego_mashes,
                 timegramaId:pend.timegrama.data.id,
                 restime: getProjectData(proj.id,"restime"),
                 projectName: getProjectData(proj.id,"pn"),
@@ -2009,6 +2018,39 @@ function pmash(data) {
         pmashes[t].cv = 0
         pmashes[t].mypos = null;
         if (allid.includes(myid)) {
+            for (let l = 0; l < pmashes[t].users.length; l++) {
+                if (pmashes[t].users[l].users_permissions_user.data.id === myid)
+                if (pmashes[t].users[l].order == pends[t].orderon) {
+                        pmashes[t].already = true;
+                        pmashes[t].pl += 48
+                        pmashes[t].mypos = pmashes[t].users[l].what;
+                    }
+            }
+        }
+        for (let r = 0; r < pmashes[t].users.length; r++) {
+            if (pmashes[t].users[r].order == pmashes[t].orderon) {
+                pmashes[t].cv += 1
+                pmashes[t].noofusersOk += 1
+            }else{
+                if (getOccurrence(pmashes[t].uids,pmashes[t].users[r].users_permissions_user.data.id) > 1){
+                    const results = pmashes[t].users.filter(obj => {
+                          return obj.users_permissions_user.data.id === pmashes[t].users[r].users_permissions_user.data.id;
+                        });
+                        pmashes[t].cv += 1
+                        pmashes[t].noofusersNo += 1
+                        for (let n = 0; n < results.length; n++) {
+                        if(results[n].order === pmashes[t].orderon){
+                        pmashes[t].cv -= 1
+                        pmashes[t].noofusersNo -= 1
+                           }
+                        }
+                }else{     
+                    pmashes[t].cv += 1
+                     pmashes[t].noofusersNo += 1
+                }         
+            }
+        }/*
+        if (allid.includes(myid)) {
             pmashes[t].already = true;
             pmashes[t].pl += 48
             for (let l = 0; l < pmashes[t].users.length; l++) {
@@ -2027,7 +2069,7 @@ function pmash(data) {
                     pmashes[t].noofusersNo += 1;
                 }
             }
-        }
+        }*/
         const noofusersWaiting = pmashes[t].user_1s.length - pmashes[t].cv;
         pmashes[t].noofusersWaiting = noofusersWaiting;
         if (pmashes[t].users.length > 0) {
@@ -2357,6 +2399,9 @@ function createpends(data) {
    pends[t].messege = pends[t].messege.sort(function(a,b){
   return b.timestamp - a.timestamp;
 }).reverse();
+   let old = $pendMisMes
+    old[pends[t].pendId] = pends[t].messege
+    pendMisMes.set(old)
     }
    
 

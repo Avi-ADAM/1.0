@@ -231,6 +231,7 @@ export let sml = false
                     on:user={user}
                     on:coinLapach={delo}
                     on:modal={modali}
+                            ordern={buble.orderon}
                     timegramaId={buble.timegramaId}
                     restime={buble.restime}
                     coinlapach={buble.coinlapach}

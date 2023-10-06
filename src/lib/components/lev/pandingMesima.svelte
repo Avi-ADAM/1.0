@@ -660,7 +660,19 @@ function claf (event){
   {#if loading === true}
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
   {:else}
-    <Diun on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos} profilePicChatPartner={src} messages={messege}/>
+    <Diun 
+    on:rect={afreact} 
+    on:no={afterwhy} 
+    {no} 
+    rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} 
+    smalldes={projectName} 
+    nameChatPartner={`הצבעה על ${name}`} 
+    {mypos} 
+    profilePicChatPartner={src}
+     messages={messege}
+     {pendId}
+     ani="pendM"
+     />
   {/if}
       </div>
   </DialogContent>

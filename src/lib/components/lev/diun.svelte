@@ -3,8 +3,10 @@
 
 	import ChatMessage from '../../celim/messeges.svelte';
 	import TodayDivider from '../../celim/todaydevider.svelte';
+  import { pendMisMes } from '$lib/stores/pendMisMes';
 	  const dispatch = createEventDispatcher();
-
+   export let ani
+   export let pendId
    export let rect, no = false
    export let mypos = null;
 	export let nameMe='Me';
@@ -13,7 +15,8 @@
 	export let nameChatPartner='הצבעה';
 	export let profilePicChatPartner='https://storage.needpix.com/rsynced_images/male-teacher-cartoon.jpg';
 	export let money = false
-	export let messages = [{"what": true, "messageId":416,"message":"abc","timestamp":1587139022488.826,"sentByMe":false,"timeRead":1587139025367.015},{"what": false,"messageId":417,"message":"test","timestamp":1587139034294.678,"sentByMe":true,"timeRead":1587139048713.461},{"what": null,"messageId":418,"message":"a","timestamp":1587139047495.052,"sentByMe":true,"timeRead":1587139048713.461},{"what": true,"messageId":419,"message":"testset","timestamp":1587139312376.663,"sentByMe":true,"timeRead":1587139336397.5078},{"what": true,"messageId":420,"message":"tatta","timestamp":1587139349155.217,"sentByMe":false,"timeRead":1587139359024.353},{"what": false,"messageId":426,"message":"t","timestamp":1587577393781.811,"sentByMe":false,"timeRead":1587686514958.049},{"what": null,"messageId":427,"message":"aaa","timestamp":1587577411018.97,"sentByMe":false,"timeRead":1587686514958.049},{"what": true,"messageId":431,"message":"a","timestamp":1587652540004.281,"sentByMe":false,"timeRead":1587686514958.049},{"what": true,"messageId":432,"message":"u","timestamp":1587686520069.1272,"sentByMe":true,"timeRead":1587687940655.5369},{"what": true,"messageId":433,"message":"a","timestamp":1587782491376.533,"sentByMe":false,"timeRead":1589814592979.757}];
+   export let messages = []
+	 $: messagesi = ani == "pendM" ? $pendMisMes[pendId] : messages
    let why = "";
    let clicked = false
 function click() {
@@ -167,7 +170,7 @@ function click() {
         //על הצאט  <button type="button" class="btn btn-tool" title="Contacts"><Fa icon={faUsers} /></button>
           //למזער  <button type="button" class="btn btn-tool"><Fa icon={faCompressArrowsAlt} /></button>
        -->
-            {#each messages as message}
+            {#each messagesi as message}
                 <ChatMessage
                     nameMe = {nameMe}
                     profilePicMe = {profilePicMe}

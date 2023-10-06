@@ -185,7 +185,7 @@ function objToStringC (obj) {
     return str;
 }
 let whyy = ``
-let ordern = ``;
+export let ordern = 0;
 let linkg = 'https://tov.onrender.com/graphql';
 let userss = objToString(users);
 async function agree(alr) {
@@ -197,7 +197,6 @@ async function agree(alr) {
   noofusersNo -= 1;
   ser = xyz();
     userss = objToStringC(users)
-    ordern = `order: 2`
       } else{
   already = true;
    noofusersOk += 1;
@@ -250,7 +249,7 @@ async function agree(alr) {
      {
       what: true
       users_permissions_user: "${idL}"
-      ${ordern}
+      order: ${ordern}
     }
   ],
  archived: true
@@ -284,7 +283,7 @@ async function agree(alr) {
      {
       what: true
       users_permissions_user: "${idL}"
-            ${ordern}
+      order: ${ordern}
     }
   ]}
   ){data{attributes { users { users_permissions_user {data{ id}}}}}}
@@ -323,7 +322,6 @@ function decline(alr) {
   noofusersOk -= 1;
   ser = xyz();
    userss = objToStringC(users)
-    ordern = `order: 2`
     if (noofusersNo === noofusers){
    archivedtru  = `archived: true,`;
   }
@@ -376,7 +374,7 @@ async function afterwhy (event){
       what: false
       ${whyy}
       users_permissions_user: "${idL}"
-                  ${ordern}
+      order: ${ordern}
     }
   ]}
   ){data{attributes { users { users_permissions_user {data{ id}}}}}}
