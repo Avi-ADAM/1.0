@@ -237,7 +237,7 @@ async function agree(alr) {
              easy: ${easy},
              linkto: "${linkto}",
              pmash: "${pendId}",
-                     publishedAt: "${d.toISOString()}",
+             publishedAt: "${d.toISOString()}",
              mashaabim: "${mshaabId}"
              ${date} 
              ${sdate}
@@ -250,6 +250,8 @@ async function agree(alr) {
       what: true
       users_permissions_user: "${idL}"
       order: ${ordern}
+         ide: ${idL}
+      zman: "${d.toISOString()}"
     }
   ],
  archived: true
@@ -284,6 +286,8 @@ async function agree(alr) {
       what: true
       users_permissions_user: "${idL}"
       order: ${ordern}
+      ide: ${idL}
+      zman: "${d.toISOString()}"
     }
   ]}
   ){data{attributes { users { users_permissions_user {data{ id}}}}}}
@@ -375,6 +379,8 @@ async function afterwhy (event){
       ${whyy}
       users_permissions_user: "${idL}"
       order: ${ordern}
+      ide: ${idL}
+      zman:"${d.toISOString()}"
     }
   ]}
   ){data{attributes { users { users_permissions_user {data{ id}}}}}}
@@ -476,6 +482,7 @@ diunim = ` ${diu},`
       users_permissions_user: "${idL}"
       why: "${why}"
       order: ${order+=1}
+      ide: ${idL}
       zman: "${d.toISOString()}"
     }
   ]}

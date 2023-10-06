@@ -265,6 +265,8 @@ async function agree(alr) {
       what: true
       users_permissions_user: "${idL}"
       order: ${ordern}
+      ide: ${idL}
+      zman: "${d.toISOString()}"
     }
   ],
  archived: true
@@ -303,6 +305,8 @@ async function agree(alr) {
       what: true
       users_permissions_user: "${idL}"
       order:${ordern}
+      ide: ${idL}
+      zman:"${d.toISOString()}"
     }
   ]}
   ){data {attributes{ users { users_permissions_user{data { id}}}}}}
