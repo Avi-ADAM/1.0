@@ -489,14 +489,14 @@ async function afreact (event){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-         messege.push({
-                    message: why,
-                    what: mypos,
-                    pic:mysrc,
-                    sentByMe: true,
-                    timestamp:d  
-                  })
-            messege = messege     
+        // messege.push({
+        //            message: why,
+        //            what: mypos,
+        //            pic:mysrc,
+        //            sentByMe: true,
+        //            timestamp:d  
+        //          })
+        //    messege = messege     
       //   loading = false;
         } catch (e) {
             error1 = e

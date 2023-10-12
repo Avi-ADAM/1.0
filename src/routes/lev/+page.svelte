@@ -1350,6 +1350,52 @@ onMount(async () => {
         //  wait until socket connects before adding event listeners
         socket.on("connect", () => {
                         console.log("connected")
+        socket.on("pmash:update", (datan) => {
+            console.log("io= ",datan)
+            let iddd = datan.data.id
+           console.log(iddd)
+            update = true
+            let index = arr1.findIndex(
+                    element => element.ani === 'pmashes' && element.pendId == iddd
+                );
+                //check if updater is me, check if diun is longer && if users longer
+            console.log(index, arr1[index])    
+                if(index != -1 || null){
+                  // indexi = index
+                if(arr1[index].diun.length == datan.data.attributes.diun.length){
+                 start()
+                }else{  
+                let src22 = getProjectData(arr1[index].projectId,"upic",datan.data.attributes.diun[datan.data.attributes.diun.length -1].ide)
+                let uname = getProjectData(arr1[index].projectId,"un",datan.data.attributes.diun[datan.data.attributes.diun.length -1].ide)
+                let pname = getProjectData(arr1[index].projectId,"pn")
+                let arr = arr1[index].messege
+                arr.push({
+                    message: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].why,
+                    what: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].what,
+                    pic: src22,
+                    sentByMe: datan.data.attributes.diun[datan.data.attributes.diun.length - 1].ide === idL ? true : false,
+                    timestamp:new Date(datan.data.attributes.diun[datan.data.attributes.diun.length - 1].zman)
+                })
+                arr = arr
+                   let old = $pendMasMes
+                     old[arr1[index].pendId] = arr
+                     pendMasMes.set(old)
+                 let head = `${tr.nuti.sendNewA[$lang]} 
+                 ${datan.data.attributes.name} 
+                 ${tr.nuti.sendNewB[$lang]} 
+                 ${pname} 
+                 ${tr.nuti.sendNewC[$lang]}
+                 ${uname}`
+                let body = datan.data.attributes.diun[datan.data.attributes.diun.length - 1].why
+                if(document.visibilityState == "visible"){ 
+                addToast(head+`: "`+body+`"`)
+                }else{
+                nutifi(head,body)
+                }
+                //start()
+                }
+                }
+          });                
           socket.on("pendm:update", (datan) => {
             console.log("io= ",datan)
             let iddd = datan.data.id
@@ -2143,7 +2189,6 @@ function pmash(data) {
                 })
             }
         }
-         console.log("here 1300",pmashes[t].messege)
    pmashes[t].messege = pmashes[t].messege.sort(function(a,b){
   return b.timestamp - a.timestamp;
 }).reverse();
@@ -2151,6 +2196,8 @@ function pmash(data) {
     old[pmashes[t].pendId] = pmashes[t].messege
     pendMasMes.set(old)
     }
+   console.log("here 1300",$pendMasMes)
+
    pmashes = pmashes
     
     pmashd = pmashes.length;

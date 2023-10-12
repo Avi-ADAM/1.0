@@ -111,7 +111,7 @@ dispatch("tochat");
             on:mouseenter={()=>hover("תגובה")} 
             on:mouseleave={()=>hover("0")}  
             on:click={() => tochat()}
-            class = "btnc bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110" 
+            class = "btnb bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110" 
             ><Chaticon class="btin"/></button>
        {:else if already === true && mypos === false && noofusersOk > 0  && allr === false}
                 <button on:mouseenter={()=>hover("אישור")}

@@ -135,21 +135,28 @@ function objToString (obj) {
         let t = 0;
     for (const [p, val] of Object.entries(obj[i])) {
       const last = t === length - 1; 
+      if (t == 0){
+      str += "{"
+    }
         t++;
         if (typeof(val) == "string") {
         str += `${p}:"${val}"\n`;
-    } else if (typeof(val) == "number"|"boolean") {
+    } else if (typeof(val) == "number" || typeof(val) =="boolean") {
         str += `${p}:${val}\n`;
-    } else if (typeof(val) == 'null'){
-      str += `${p}:${val.map(c => c.id)}\n`;
+    } else if (typeof(val) == 'null'|| typeof(val) ==="object"){
+      str += `${p}:${val?.data ? '"'+ val?.data?.id + '"': val}\n`;
+
+    }else{
+      str += `${p}:${val}\n`
     }
         if (last) {
           str += "},"
     }
-    if (t == 1){
+    if (t == 0){
       str += "{"
     }
-    }}
+    }
+  }
     return str;
 }
 function objToStringC (obj) {
@@ -444,7 +451,67 @@ async function react (){
       rect = true;
       isOpen = true;
 }
-async function afreact (event){
+ async function afreact (event){
+ let diunim = ``;
+  if (diun !== null){
+ const diu =  objToString(diun)
+ diunim = `${diu}`
+  }
+   why = event.detail.why
+  console.log(why)
+  let d = new Date()
+         //  loading = true;
+       const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    token  = cookieValue; 
+     bearer1 = 'bearer' + ' ' + token;
+     let dataa = {
+          data: { 
+        diun:[...diun,{
+      what: mypos,
+      users_permissions_user:idL,
+      why:why,
+      order:order+=1,
+      zman:d.toISOString(),
+      ide:idL
+    }
+  ]
+}  
+ }
+    try {
+             await fetch(`https://tov.onrender.com/api/pmashes/${pendId}?populate=*`, {
+              method: 'PUT',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: JSON.stringify(dataa),
+      })
+  .then(r => r.json())
+  .then(data => miDatan = data);
+         console.log(miDatan)
+      /*   messege.push({
+                    message: why,
+                    what: mypos,
+                    pic:mysrc,
+                    sentByMe: true,
+                    timestamp:d  
+                  })
+            messege = messege  */   
+      //   loading = false;
+        } catch (e) {
+            error1 = e
+            console.log(error1)
+        }
+}
+/*saved for when graphql enable on io async function afreactold (event){
  let diunim = ``;
   if (diun !== null){
  const diu =  objToString(diun)
@@ -506,7 +573,7 @@ diunim = ` ${diu},`
             console.log(error1)
         }
 }
-
+*/
  import { Swiper, SwiperSlide } from "swiper/svelte";
 
   // Import Swiper styles
@@ -637,7 +704,11 @@ title="ביטול"
 {restime}
 />
   {:else if diunm === true}
- <Diun on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos} profilePicChatPartner={src} messages={messege}/>
+ <Diun
+  on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos}
+  {pendId}
+  profilePicChatPartner={src} 
+  ani="pmashes"/>
 {/if}
       </div>
   </DialogContent>
