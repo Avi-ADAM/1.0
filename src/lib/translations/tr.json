@@ -236,6 +236,30 @@
         }
     },
     "nego": {
+        "sothatMashto":{
+            "he": "כך שסך כל השווי יהיה",
+            "en": "so that the total vallue"            
+        },
+        "sothatMash":{
+            "he":"כך שסך כל השווי המקסימלי יהיה",
+            "en":"so that the total max vallue"
+        },
+        "easy":{
+            "he":"השווי המקסימלי",
+            "en":"the maximum vallue"
+        },
+        "price":{
+            "he":"המחיר",
+            "en":"the price"
+        },
+        "total":{
+            "he":"ובסך הכל",
+            "en": "and in total"
+        },
+        "quant":{
+            "he":"הכמות",
+            "en":"the quantity"
+        },
         "didNego": {
             "he": "בעד ההצעה עם השינויים הבאים:",
             "en": "is in favor of the sugestion with the following changes"
@@ -268,6 +292,14 @@
             "he": "שלמשימה יוגדרו",
             "en": "that the mission will be assigned with"
         },
+        "thatMash": {
+            "he": "שלמשאב יוגדר",
+            "en": "that the resource will be assigned with"
+        },
+        "thatMashF": {
+            "he": "שלמשאב תוגדר",
+            "en": "that the resource will be assigned with"
+        },
         "hoursInsted": {
             "he": "שעות במקום",
             "en": "hours insted of"
@@ -280,6 +312,14 @@
             "he": "ששם המשימה יהיה",
             "en": "that the mission name will be"
         },
+        "nameMashNego": {
+            "he": "ששם המשאב יהיה",
+            "en": "that the resource name will be"
+        },
+        "desMashNego": {
+            "he": "שתיאור המשאב יהיה",
+            "en": "that the description will be"
+        },        
         "desNego": {
             "he": "שתיאור המשימה יהיה",
             "en": "that the description will be"
@@ -287,6 +327,14 @@
         "heaNego": {
             "he": "שההערות תהיינה",
             "en": "that the mission notes will be"
+        },
+        "heaMashNego": {
+            "he": "שההערות תהיינה",
+            "en": "that the resource notes will be"
+        },
+        "kindOf": {
+            "he": "שסוג המשאב יהיה",
+            "en": "that the resource kind will be"
         },
         "insted": {
             "he": "במקום",

@@ -1,6 +1,6 @@
 <script>
             import { io }  from"socket.io-client";
-    import {pendMisMes} from '$lib/stores/pendMisMes.js'
+    import {pendMisMes, pendMasMes} from '$lib/stores/pendMisMes.js'
     import tr from '$lib/translations/tr.json'
     import {nutifi } from '$lib/func/nutifi.svelte'
     import Yahalomim from '$lib/components/lev/yahalomim.svelte'
@@ -41,6 +41,8 @@ import {
     langUs
 } from '$lib/stores/lang.js'
   import { getOccurrence } from '$lib/func/getOccurrence.svelte';
+  import { montsi } from "$lib/func/montsi.svelte";
+  import { kindOfTranslation } from "$lib/func/kindOfTranslate.svelte";
 export let data;
 let low = true;
 let indexi = -1
@@ -211,7 +213,6 @@ function ishursium(dati) {
         for (let j = 0; j < start[i].attributes.finiapruvals.data.length; j++) {
             const rt = letters(start[i].attributes.finiapruvals.data[j].attributes.missname);
             let src22 = getProjectData(start[i].id,"upic",start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id);
-           console.log(start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id)
             fiapp.push({
                 uid: start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id,
                 username: getProjectData(start[i].id,"un",start[i].attributes.finiapruvals.data[j].attributes.users_permissions_user.data.id),
@@ -243,7 +244,6 @@ function ishursium(dati) {
                 pl: -2
             });
         }
-  console.log("ishursium",fiapp)
     }
     for (let k = 0; k < fiapp.length; k++) {
         const x = fiapp[k].users
@@ -340,7 +340,6 @@ function crMaap(hh) {
             }
         }
     }
-    console.log("a")
     for (let k = 0; k < wegets.length; k++) {
         const x = wegets[k].users
         wegets[k].uids = [];
@@ -441,7 +440,6 @@ function createD() {
 async function createasked(da) {
     const start = da.data.usersPermissionsUser.data.attributes.projects_1s.data
     for (let i = 0; i < start.length; i++) {
-        console.log(start[i])
         for (let j = 0; j < start[i].attributes.asks.data.length; j++) {
             const rt = letters(start[i].attributes.asks.data[j].attributes.open_mission.data.attributes.name);
             let src21 = getProjectData(start[i].attributes.asks.data[j].attributes.project.data.id,"pp");
@@ -1514,7 +1512,7 @@ async function start() {
     			pmashes (filters: { archived: { eq: false } }){ data{ id attributes{ 
         					hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
         					nego_mashes{data{id attributes{
-                                hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
+                                hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot users_permissions_user {data { id}}
                             }}}
                             mashaabim {data{id}} 
                             timegrama {data{id attributes{date}}}
@@ -1661,7 +1659,6 @@ function tveria (data){
         for (let j = 0; j < projects[i].attributes.halukas.data.length; j++) {
             const el = projects[i].attributes.halukas.data[j]
             if (el.attributes.usersend.data.id == myid ||  el.attributes.userrecive.data.id == myid){
-                            console.log(projects[i].attributes.halukas.data[j], "oooo")
                 tverias.push({
                     shear:  el.attributes.tosplit.data.attributes.halukas.data,
                     hervachti: el.attributes.tosplit.data.attributes.hervachti,
@@ -1704,7 +1701,6 @@ function tveria (data){
         }
     
     tverias = tverias
-    console.log(tverias)
 }
 function hachla(data) {
     const myid = data.data.usersPermissionsUser.data.id;
@@ -1719,8 +1715,6 @@ function hachla(data) {
         const proj = projects[i];
         for (let j = 0; j < projects[i].attributes.decisions.data.length; j++) {
             const pend = projects[i].attributes.decisions.data[j].attributes
-                    console.log("proh")
-
               let newpicid;
               let newpic;
             if(pend.kind == "pic" ){
@@ -1749,7 +1743,6 @@ function hachla(data) {
             });
         }
     }
-    console.log("mid", hachlatot)
     for (let k = 0; k < hachlatot.length; k++) {
         const x = hachlatot[k].users
         hachlatot[k].uids = [];
@@ -1827,7 +1820,6 @@ function hachla(data) {
 
     halu = hachlatot.length ;
     localStorage.setItem("halu", halu);
-    console.log(hachlatot)
 }
 
 function rashbi(data) {
@@ -1902,12 +1894,10 @@ function sps(pp) {
     for (let i = 0; i < pp.data.usersPermissionsUser.data.attributes.sps.data.length; i++) {
         const y = pp.data.usersPermissionsUser.data.attributes.sps.data[i].attributes;
         if (y.mashaabim.data.attributes.open_mashaabims.data.length > 0) {
-            console.log("here and now",y)
             for (let t = 0; t < y.mashaabim.data.attributes.open_mashaabims.data.length; t++) {
                 const x = y.mashaabim.data.attributes.open_mashaabims.data[t].attributes
                 const z = x.project.data.attributes;
                 const declineddarra = x.declinedsps.data.map(c => c.id)
-                console.log("klkl")
                 if (!declineddarra.includes(y.mashaabim.data.attributes.open_mashaabims.data[t].id)) {
                    // if(x.hm <= y.unit){
                     huca.push({
@@ -1934,7 +1924,6 @@ function sps(pp) {
             }
         }
     }
-                    console.log("koooooo")
     huca = huca
     mashs = huca.length
     localStorage.setItem("mashs", mashs);
@@ -1977,7 +1966,7 @@ function pmash(data) {
                 descrip: pend.descrip,
                 kindOf: pend.kindOf,
                 created_at: pend.createdAt,
-                nego_mashes:pend.nego_mashes,
+                nego_mashes:pend.nego_mashes.data,
                 timegramaId:pend.timegrama.data.id,
                 restime: getProjectData(proj.id,"restime"),
                 projectName: getProjectData(proj.id,"pn"),
@@ -2019,12 +2008,14 @@ function pmash(data) {
         pmashes[t].mypos = null;
         if (allid.includes(myid)) {
             for (let l = 0; l < pmashes[t].users.length; l++) {
-                if (pmashes[t].users[l].users_permissions_user.data.id === myid)
-                if (pmashes[t].users[l].order == pends[t].orderon) {
+                if (pmashes[t].users[l].users_permissions_user.data.id === myid){
+                    console.log(pmashes[t].users[l].order,"  pemashes check ",pmashes[t].orderon)
+                if (pmashes[t].users[l].order == pmashes[t].orderon) {
                         pmashes[t].already = true;
                         pmashes[t].pl += 48
                         pmashes[t].mypos = pmashes[t].users[l].what;
                     }
+                }
             }
         }
         for (let r = 0; r < pmashes[t].users.length; r++) {
@@ -2077,12 +2068,12 @@ function pmash(data) {
                 let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].users[x].users_permissions_user.data.id)
                 pmashes[t].messege.push({
                     message: `${getProjectData(pmashes[t].projectId,"un",pmashes[t].users[x].users_permissions_user.data.id)}  
-                     ${pmashes[t].users[x].what == true ? 'בעד' : ` נגד
-                      ${pmashes[t].users[x].why !== null ? `בנימוק: ${pmashes[t].users[x].why}` : ``}`}`,
+                      ${tr?.vots.inFavor[$lang]}
+                  ${pmashes[t].users[x].order != pmashes[t].orderon ? " " + tr?.nego.olderVersion[$lang]: ``}`,
                     what: pmashes[t].users[x].what,
                     pic: src22,
                     sentByMe: pmashes[t].users[x].users_permissions_user.data.id === myid ? true : false,
-                    changed: pmashes[t].users[x].order == 1 ? true : false,
+                    changed: pmashes[t].users[x].order < pmashes[t].orderon ? true : false,
                 })
             }
         }
@@ -2099,14 +2090,75 @@ function pmash(data) {
                 })
             }
         }
+        //nego to store
+         if (pmashes[t].nego_mashes.length > 0) {
+            for (let x = 0; x < pmashes[t].nego_mashes.length; x++) {
+                let src22 = getProjectData(pmashes[t].projectId,"upic",pmashes[t].nego_mashes[x].attributes.users_permissions_user.data.id)
+              console.log("started!  sqadualedf sqadualed linkto createdAt name descrip easy  kindOf spnot",pmashes[t].nego_mashes[x])
+                    //total                
+                pmashes[t].messege.push({
+                    message: `<span class="underline">${getProjectData(pmashes[t].projectId,"un",pmashes[t].nego_mashes[x].attributes.users_permissions_user.data.id)}
+                  ${tr?.nego.didNego[$lang]}</span>
+                  ${pmashes[t].nego_mashes[x].attributes.hm && pmashes[t].nego_mashes[x].attributes.hm !== pmashes[t].hm ? `<br>⚙️ ${tr?.nego.thatMashF[$lang]} 
+                    ${tr?.nego.quant[$lang]}
+                    ${pmashes[t].hm ?? 0} 
+                    ${tr?.nego.insted[$lang]} 
+                    ${pmashes[t].nego_mashes[x].attributes.hm ?? 0} `: ``}
+                  ${pmashes[t].nego_mashes[x].attributes.price && pmashes[t].nego_mashes[x].attributes.price  !== pmashes[t].price ? `<br>⚙️ ${tr?.nego.thatMash[$lang]} 
+                    ${tr?.nego.price[$lang]}
+                    ${pmashes[t].price ?? 0} 
+                    ${tr?.nego.insted[$lang]} 
+                    ${pmashes[t].nego_mashes[x].attributes?.price ?? 0}`: ``}
+                  ${pmashes[t].nego_mashes[x].attributes.easy && pmashes[t].nego_mashes[x].attributes.easy  !== pmashes[t].easy ? `<br>⚙️ ${tr?.nego.thatMash[$lang]} 
+                    ${tr?.nego.easy[$lang]}
+                    ${pmashes[t].easy ?? 0} 
+                    ${tr?.nego.insted[$lang]} 
+                    ${pmashes[t].nego_mashes[x].attributes.easy ?? 0}`: ``}    
+                  ${pmashes[t].nego_mashes[x].attributes.price  !== pmashes[t].price || pmashes[t].nego_mashes[x].attributes.hm !== pmashes[t].hm ? `<br>⚙️ ${tr?.nego.sothatMashto[$lang]} 
+                    ${pmashes[t].price * montsi(pmashes[t].kindOf,pmashes[t].sqadualed,pmashes[t].sqadualedf) * pmashes[t].hm ?? 0} 
+                    ${tr?.nego.insted[$lang]} 
+                    ${pmashes[t].nego_mashes[x].attributes?.price ? pmashes[t].nego_mashes[x].attributes?.price : pmashes[t].price  * montsi(pmashes[t].nego_mashes[x].attributes.kindOf ? pmashes[t].nego_mashes[x].attributes.kindOf : pmashes[t].kindOf ,pmashes[t].nego_mashes[x].attributes.sqadualed ? pmashes[t].nego_mashes[x].attributes.sqadualed : pmashes[t].sqadualed , pmashes[t].nego_mashes[x].attributes.sqadualedf ? pmashes[t].nego_mashes[x].attributes.sqadualedf : pmashes[t].sqadualedf) * pmashes[t].nego_mashes[x].attributes.hm ? pmashes[t].nego_mashes[x].attributes.hm  : pmashes[t].hm ?? 0}`: ``}           
+                  ${pmashes[t].nego_mashes[x].attributes.easy  !== pmashes[t].easy || pmashes[t].nego_mashes[x].attributes.hm !== pmashes[t].hm ? `<br>⚙️ ${tr?.nego.sothatMash[$lang]} 
+                    ${pmashes[t].easy * montsi(pmashes[t].nego_mashes[x].attributes.kindOf ? pmashes[t].nego_mashes[x].attributes.kindOf : pmashes[t].kindOf ,pmashes[t].nego_mashes[x].attributes.sqadualed ? pmashes[t].nego_mashes[x].attributes.sqadualed : pmashes[t].sqadualed , pmashes[t].nego_mashes[x].attributes.sqadualedf ? pmashes[t].nego_mashes[x].attributes.sqadualedf : pmashes[t].sqadualedf) * pmashes[t].nego_mashes[x].attributes.hm ? pmashes[t].nego_mashes[x].attributes.hm : pmashes[t].hm ?? 0} 
+                    ${tr?.nego.insted[$lang]} 
+                    ${pmashes[t].nego_mashes[x].attributes.easy ? pmashes[t].nego_mashes[x].attributes.easy : pmashes[t].easy   * montsi(pmashes[t].nego_mashes[x].attributes.kindOf,pmashes[t].nego_mashes[x].attributes.sqadualed,pmashes[t].nego_mashes[x].attributes.sqadualedf) * pmashes[t].nego_mashes[x].attributes.hm  ?? 0}`: ``}                                      
+                  ${pmashes[t].nego_mashes[x].attributes.name && pmashes[t].nego_mashes[x].attributes.name !== pmashes[t].name ? `<br>⚙️ ${tr?.nego.nameMashNego[$lang]} "${pmashes[t].name}" ${tr?.nego.insted[$lang]}: "${pmashes[t].nego_mashes[x].attributes.name}"`: ``}
+                  ${pmashes[t].nego_mashes[x].attributes.descrip && pmashes[t].nego_mashes[x].attributes.descrip !== pmashes[t].descrip ? `<br>⚙️ ${tr?.nego.desMashNego[$lang]} 
+                    "${pmashes[t].descrip}" 
+                    ${tr?.nego.insted[$lang]}: 
+                    "${pmashes[t].nego_mashes[x].attributes.descrip}"`: ``}
+                  ${pmashes[t].nego_mashes[x].attributes.hearotMeyuchadot && pmashes[t].nego_mashes[x].attributes.hearotMeyuchadot !== pmashes[t].hearotMeyuchadot ? `<br>⚙️ ${tr?.nego.heaMashNego[$lang]} 
+                    "${pmashes[t].hearotMeyuchadot}" 
+                    ${tr?.nego.insted[$lang]}: 
+                    "${pmashes[t].nego_mashes[x].attributes.spnot}"`: ``}
+                  ${pmashes[t].nego_mashes[x].attributes.kindOf && pmashes[t].nego_mashes[x].attributes.kindOf !== pmashes[t].kindOf ? `<br>⚙️ ${tr?.nego.kindOf[$lang]} 
+                    ${kindOfTranslation(pmashes[t].kindOf,$lang)}
+                    ${tr?.nego.insted[$lang]}: 
+                    "${kindOfTranslation(pmashes[t].nego_mashes[x].attributes.kindOf,$lang)}"`: ``}                    
+                  `,
+                    what: true,
+                    pic: src22,
+                    timestamp: new Date(pmashes[t].nego_mashes[x].attributes.createdAt),
+                    sentByMe: pmashes[t].nego_mashes[x].attributes.users_permissions_user.data.id === myid ? true : false,
+                })
+            }
+        }
+         console.log("here 1300",pmashes[t].messege)
+   pmashes[t].messege = pmashes[t].messege.sort(function(a,b){
+  return b.timestamp - a.timestamp;
+}).reverse();
+   let old = $pendMasMes
+    old[pmashes[t].pendId] = pmashes[t].messege
+    pendMasMes.set(old)
     }
+   pmashes = pmashes
+    
     pmashd = pmashes.length;
   localStorage.setItem("pmashd", pmashd);
     console.log(pmashes)
 }
 
 function sds(mta) {
-    console.log("sdsa")
     for (let i = 0; i < mta.data.usersPermissionsUser.data.attributes.projects_1s.data.length; i++) {
         const z = mta.data.usersPermissionsUser.data.attributes.projects_1s.data[i]
         if (z.attributes.open_mashaabims.data.length > 0) {
@@ -2193,7 +2245,6 @@ function makeWalcom(ata) {
     const usernames = ata.data.usersPermissionsUser.data.attributes.username;
     for (let i = 0; i < ata.data.usersPermissionsUser.data.attributes.welcom_tops.data.length; i++) {
         const wal = ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i];
-        console.log(wal)
         walcomen.push({
             id: wal.attributes.project.data.id,
             username: usernames,
@@ -2291,7 +2342,6 @@ function createpends(data) {
             });
         }
     }
-    console.log(pends)
     //get all voted users
     for (let k = 0; k < pends.length; k++) {
         const x = pends[k].users
@@ -2303,7 +2353,6 @@ function createpends(data) {
     }
 
     for (let t = 0; t < pends.length; t++) {
-            console.log("here",pends[t].pendId)
         const allid = pends[t].uids;
         const myid = pends[t].myid;
         pends[t].already = false;
@@ -2344,7 +2393,6 @@ function createpends(data) {
                 }         
             }
         }
-        //TODO: check only voted for old
         const noofusersWaiting = pends[t].user_1s.length - pends[t].cv;
         pends[t].noofusersWaiting = noofusersWaiting;
         if (pends[t].users.length > 0) {
@@ -2358,7 +2406,7 @@ function createpends(data) {
                     pic: src22,
                     timestamp: new Date(pends[t].users[x].zman),
                     sentByMe: pends[t].users[x].users_permissions_user.data.id === myid ? true : false,
-                    changed: pends[t].users[x].order != pends[t].orderon ? false :true ,
+                    changed: pends[t].users[x].order < pends[t].orderon ? true :false ,
                 })
             }
         }
@@ -2377,16 +2425,35 @@ function createpends(data) {
         if (pends[t].negopendmissions.length > 0) {
             for (let x = 0; x < pends[t].negopendmissions.length; x++) {
                 let src22 = getProjectData(pends[t].projectId,"upic",pends[t].negopendmissions[x].attributes.users_permissions_user.data.id)
-                                console.log("started!",pends[t].negopendmissions[x])
-
+                //TODO: total
                 pends[t].messege.push({
-                    message: `${getProjectData(pends[t].projectId,"un",pends[t].negopendmissions[x].attributes.users_permissions_user.data.id)}
-                  ${tr?.nego.didNego[$lang]}
-                  ${pends[t].negopendmissions[x].attributes.noofhours && pends[t].negopendmissions[x].attributes.noofhours !== pends[t].noofhours ? ` ${tr?.nego.thatMission[$lang]} ${pends[t].noofhours ?? 0} ${tr?.nego.hoursInsted[$lang]} ${pends[t].negopendmissions[x].attributes.noofhours ?? 0} ${tr?.common.hours[$lang]}`: ``}
-                  ${pends[t].negopendmissions[x].attributes.perhour && pends[t].negopendmissions[x].attributes.perhour  !== pends[t].perhour ? ` ${tr?.nego.perhourNego[$lang]} ${pends[t].perhour ?? 0} ${tr?.nego.insted[$lang]} ${pends[t].negopendmissions[x].attributes.perhour ?? 0}`: ``}
-                  ${pends[t].negopendmissions[x].attributes.name && pends[t].negopendmissions[x].attributes.name !== pends[t].name ? ` ${tr?.nego.nameNego[$lang]} "${pends[t].name}" ${tr?.nego.insted[$lang]}: "${pends[t].negopendmissions[x].attributes.name}"`: ``}
-                  ${pends[t].negopendmissions[x].attributes.descrip && pends[t].negopendmissions[x].attributes.descrip !== pends[t].descrip ? ` ${tr?.nego.descNego[$lang]} "${pends[t].descrip}" ${tr?.nego.insted[$lang]}: "${pends[t].negopendmissions[x].attributes.descrip}"`: ``}
-                  ${pends[t].negopendmissions[x].attributes.hearotMeyuchadot && pends[t].negopendmissions[x].attributes.hearotMeyuchadot !== pends[t].hearotMeyuchadot ? ` ${tr?.nego.heaNego[$lang]} "${pends[t].hearotMeyuchadot}" ${tr?.nego.insted[$lang]}: "${pends[t].negopendmissions[x].attributes.hearotMeyuchadot}"`: ``}
+                    message: `<span class="underline">${getProjectData(pends[t].projectId,"un",pends[t].negopendmissions[x].attributes.users_permissions_user.data.id)}
+                  ${tr?.nego.didNego[$lang]}</span>
+                  ${pends[t].negopendmissions[x].attributes.noofhours && pends[t].negopendmissions[x].attributes.noofhours !== pends[t].noofhours ? `<br>⚙️ ${tr?.nego.thatMission[$lang]}
+                   ${pends[t].noofhours ?? 0} 
+                   ${tr?.nego.hoursInsted[$lang]} 
+                   ${pends[t].negopendmissions[x].attributes.noofhours ?? 0} 
+                   ${tr?.common.hours[$lang]}`: ``}
+                  ${pends[t].negopendmissions[x].attributes.perhour && pends[t].negopendmissions[x].attributes.perhour  !== pends[t].perhour ? `<br> ⚙️ ${tr?.nego.perhourNego[$lang]} 
+                    ${pends[t].perhour ?? 0} 
+                    ${tr?.nego.insted[$lang]} 
+                    ${pends[t].negopendmissions[x].attributes.perhour ?? 0}`: ``}
+                  ${pends[t].negopendmissions[x].attributes?.perhour  !== pends[t].perhour ||  pends[t].negopendmissions[x].attributes?.noofhours !== pends[t].noofhours ? `<br>⚙️ ${tr?.nego.total[$lang]} 
+                    ${pends[t].perhour * pends[t].noofhours ?? 0} 
+                    ${tr?.nego.insted[$lang]} 
+                    ${pends[t].negopendmissions[x].attributes.perhour ?? 0}`: ``}  
+                  ${pends[t].negopendmissions[x].attributes.name && pends[t].negopendmissions[x].attributes.name !== pends[t].name ? `<br>⚙️ ${tr?.nego.nameNego[$lang]} 
+                    "${pends[t].name}" 
+                    ${tr?.nego.insted[$lang]}: 
+                    "${pends[t].negopendmissions[x].attributes.name}"`: ``}
+                  ${pends[t].negopendmissions[x].attributes.descrip && pends[t].negopendmissions[x].attributes.descrip !== pends[t].descrip ? `<br>⚙️ ${tr?.nego.desNego[$lang]} 
+                    "${pends[t].descrip}" 
+                    ${tr?.nego.insted[$lang]}: 
+                    "${pends[t].negopendmissions[x].attributes.descrip}"`: ``}
+                  ${pends[t].negopendmissions[x].attributes.hearotMeyuchadot && pends[t].negopendmissions[x].attributes.hearotMeyuchadot !== pends[t].hearotMeyuchadot ? `<br>⚙️ ${tr?.nego.heaNego[$lang]} 
+                    "${pends[t].hearotMeyuchadot}" 
+                    ${tr?.nego.insted[$lang]}: 
+                    "${pends[t].negopendmissions[x].attributes.hearotMeyuchadot}"`: ``}
                   `,
                     what: true,
                     pic: src22,
@@ -2395,7 +2462,6 @@ function createpends(data) {
                 })
             }
         }
-         console.log("here",pends[t].messege)
    pends[t].messege = pends[t].messege.sort(function(a,b){
   return b.timestamp - a.timestamp;
 }).reverse();

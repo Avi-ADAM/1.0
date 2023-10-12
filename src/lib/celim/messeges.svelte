@@ -130,7 +130,7 @@ img {
 				 class:bg-gray-300={sentByMe === false && what === null} class:bg-blue-600={sentByMe === true && what === null} class:bg-barbi={what=== false} class:bg-green-300={what=== true}
 								 class:rounded-bl-none={sentByMe === true} class:rounded-br-none={sentByMe === false}
 								 class:line-through={changed == true}
-				dir="rtl" >{message}</span></div>
+				dir="rtl" >{@html message}</span></div>
             </div>
             <img src="{profilePicChatPartner}" alt="pic" class="w-6 h-6 rounded-full order-1">
          </div>

@@ -15,7 +15,7 @@ import {
  import {lang} from '$lib/stores/lang'
 const dispatch = createEventDispatcher();
   export let restime;
-import moment from 'moment'
+  import { montsi } from '$lib/func/montsi.svelte';
 
 export let descrip ;
 export let projectName ;
@@ -330,20 +330,7 @@ onMount(async () => {
     x =x
     console.log(new Date(Date.now() + x).toLocaleString(),restime)
 })
-function montsi (moy,beg,end){
-  if(moy == "monthly" || moy ==  "yearly"){
-    let mo = moy == "monthly" ? "months" : "years"
-            var a = moment(end, "HH:mm DD/MM/YYYY ");
-            var b = moment(beg, "HH:mm DD/MM/YYYY ");
-            if(moy == "monthly"){
-            return a.diff(b, 'months', true).toFixed(2)
-            }else{
-            return a.diff(b, 'years', true).toFixed(2)
-            }
-  }else{
-    return 1
-  }
-          }
+
 $: datai = [{
   "leb":`${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2)}| ${tri?.mash?.shovile[$lang]},${easy2* hm2 * montsi(kindOfb,sqadualed2,sqadualedf2)}`,
   "value":price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2),

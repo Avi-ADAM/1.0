@@ -134,18 +134,13 @@ function objToString (obj) {
         t++;
         if (typeof(val) == "string") {
         str += `${p}:"${val}"\n`;
-        console.log(val, p, "string")
     } else if (typeof(val) == "number" || typeof(val) =="boolean") {
         str += `${p}:${val}\n`;
-                console.log(val, p, "num")
     } else if (typeof(val) == 'null'|| typeof(val) ==="object"){
-            console.log(val,p ,"null")
-
       str += `${p}:${val?.data ? '"'+ val?.data?.id + '"': val}\n`;
 
     }else{
       str += `${p}:${val}\n`
-      console.log(val,p ,"else")
     }
         if (last) {
           str += "},"
@@ -155,7 +150,6 @@ function objToString (obj) {
     }
     }
   }
-    console.log(str)
     return str;
 }
 function objToStringC (obj) {
@@ -452,7 +446,6 @@ async function afreact (event){
   
   let diunim = ``;
   if (diun !== null){
-    console.log(diun)
  const diu =  objToString(diun)
  diunim = `${diu}`
   }
