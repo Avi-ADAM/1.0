@@ -19,4 +19,3 @@ Welcome to **1💗1**, a platform designed for collaborative decision-making and
 To get involved, simply send an email to [ehad1one@gmail.com](mailto:ehad1one@gmail.com) expressing your interest and the area you'd like to contribute to. We will assign you a mission on the site, allowing you to become a partner and contribute your hours to the collective effort.
 
 Join us in revolutionizing collaboration and partnership management!
-
