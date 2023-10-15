@@ -206,7 +206,7 @@ async function increment() {
     dispatch("load")
   //TODO: update timegrama, add now pend that is changed to nego
   let date4 = ``, dates4 = ``,iskvua4 = ``, iskvua4nego = ``, date4nego, dates4nego, namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
-
+  let d = new Date()
       const negoss = ``;
     const cookieValue = document.cookie
   .split('; ')
@@ -249,16 +249,18 @@ async function increment() {
           dates4 = ``
           dates4nego = ``
      } else {
-         dates4nego =  (mdates !== undefined) ? ` dates: ${mdates},` : ``;
-         dates4 =  (mdates2 !== undefined) ? ` dates: ${mdates2},` : ``;
+        let momebtt = moment(mdates2, "HH:mm DD/MM/YYYY ") || null
+         dates4nego =  (mdates != null && mdates != undefined) ? ` dates: "${mdates}",` : ``;
+         dates4 =  (mdates2 != null && mdates2 != undefined) ? ` dates: "${momebtt.toISOString()}",` : ``;
          what4 = false;
      }
      if (mdate === mdate2){
           date4 = ``
           date4nego = ``
      } else {
-         date4nego =  (mdate !== undefined) ? ` sqadualed: ${mdate},` : ``;
-         date4 =  (mdate2 !== undefined) ? ` date: ${mdate2},` : ``;
+        let momebtt = moment(mdate2, "HH:mm DD/MM/YYYY ") || null
+         date4nego =  (mdate != null && mdate != undefined) ? ` date: "${mdate}",` : ``;
+         date4 =  (mdate2 != null && mdate2 != undefined) ? ` sqadualed: "${momebtt.toISOString()}",` : ``;
          what4 = false;
      }
       if (name1 === name2){
@@ -551,6 +553,7 @@ export let restime;
     import Number from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
   import Barb from '../conf/barb.svelte';
+  import moment from 'moment';
 
 const tri = tr
 $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}]

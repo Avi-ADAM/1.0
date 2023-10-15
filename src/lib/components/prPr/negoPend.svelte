@@ -16,6 +16,7 @@ import {
 const dispatch = createEventDispatcher();
   export let restime;
   import { montsi } from '$lib/func/montsi.svelte';
+  import moment from 'moment';
 
 export let descrip ;
 export let projectName ;
@@ -160,16 +161,18 @@ async function increment() {
           sqadualed4 = ``
           sqadualed4nego = ``
      } else {
+        let momebtt = moment(sqadualed2, "HH:mm DD/MM/YYYY ") || null
          sqadualed4nego =  (sqadualed !== undefined) ? ` sqadualed: "${sqadualed}",` : ``;
-         sqadualed4 =  (sqadualed2 !== undefined) ? ` sqadualed: "${sqadualed2}",` : ``;
+         sqadualed4 =  (sqadualed2 !== undefined && sqadualed2 != null) ? ` sqadualed: "${momebtt.toISOString()}",` : ``;
          what4 = false;
      }
      if (sqadualedf === sqadualedf2){
           sqadualedf4 = ``
           sqadualedf4nego = ``
      } else {
+              let momebtt = moment(sqadualedf2, "HH:mm DD/MM/YYYY ") || null
          sqadualedf4nego =  (sqadualedf !== undefined) ? ` sqadualedf: "${sqadualedf}",` : ``;
-         sqadualedf4 =  (sqadualedf2 !== undefined) ? ` sqadualedf: "${sqadualedf2}"` : ``;
+         sqadualedf4 =  (sqadualedf2 !== undefined && sqadualedf2 != null) ? ` sqadualedf: "${momebtt.toISOString()}"` : ``;
          what4 = false;
      }
       if (name1 === name2){
