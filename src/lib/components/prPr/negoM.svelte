@@ -417,10 +417,14 @@ async function increment() {
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+         addToast(tr?.toasts.suc[$lang])
+
          close();
         } catch (e) {
             error1 = e
             console.log(error1)
+           addToast(tr?.toasts.er[$lang],"warn")
+
         }
       }
 }
@@ -554,6 +558,7 @@ export let restime;
   import DateNego from '../conf/dateNego.svelte';
   import Barb from '../conf/barb.svelte';
   import moment from 'moment';
+  import { addToast } from 'as-toast';
 
 const tri = tr
 $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}]

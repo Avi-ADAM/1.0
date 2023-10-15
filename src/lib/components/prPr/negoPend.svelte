@@ -17,6 +17,7 @@ const dispatch = createEventDispatcher();
   export let restime;
   import { montsi } from '$lib/func/montsi.svelte';
   import moment from 'moment';
+  import { addToast } from 'as-toast';
 
 export let descrip ;
 export let projectName ;
@@ -308,10 +309,12 @@ try {
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
+         addToast(tr?.toasts.suc[$lang])
          close();
         } catch (e) {
             error1 = e
             console.log(error1)
+           addToast(tr?.toasts.er[$lang],"warn")
         }
       }
 }

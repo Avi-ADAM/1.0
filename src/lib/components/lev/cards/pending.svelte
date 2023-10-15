@@ -10,7 +10,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Tile from '$lib/celim/tile.svelte';
   import {restim} from '$lib/func/restime.svelte';
   import { formatTime } from '../utils';
-    export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, perhour, noofhours,skills = [];
+    export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, perhour, noofhours,skills = [], isKavua = false
     export let tafkidims = [];
     export let workways = [];
     export let restime, createdAt;
@@ -47,7 +47,9 @@ dispatch("tochat");
     const t = {
       "wwneed" : {"he":"דרכי עבודה מבוקשות:","en":"ways of work for the mission:"},
       "skneed" : {"he":"הכישורים הנדרשים:","en": "needed skills:"},
-      "rneed" : {"he":"תפקיד מבוקש:", "en":"requested role:"}
+      "rneed" : {"he":"תפקיד מבוקש:", "en":"requested role:"},
+      "perMonth":{"he":"לחודש","en":"per month"},
+      "formonth":{"he":"בכל חודש","en":"every month"}
     }
     const timero = {"he":"מונה זמן לסיום הדיון", "en":"time counter for end of discution"}
 </script>
@@ -73,7 +75,7 @@ dispatch("tochat");
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.valph[$lang])} on:mouseleave={()=>hover("0")} > {perhour} {tr?.common.perhour[$lang]} </span> * <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.noofhours[$lang])} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr?.common.hours[$lang]} </span> = <span role="contentinfo" on:mouseenter={()=>hover(tr.mission.total[$lang])} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.valph[$lang])} on:mouseleave={()=>hover("0")} > {perhour} {tr?.common.perhour[$lang]} </span> * <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.noofhours[$lang])} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr?.common.hours[$lang]} {isKavua == true ? t.formonth[$lang]:"" } </span> = <span role="contentinfo" on:mouseenter={()=>hover(tr.mission.total[$lang])} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {isKavua == true ? t.perMonth[$lang]:"" } </span>
       </p>
       <div class="text-mturk font-bold text-lg sm:text-2xl mb-2">{name}</div>
      {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16 text-sm text-gray-700 sm:text-xl">{descrip}</p>{/if}

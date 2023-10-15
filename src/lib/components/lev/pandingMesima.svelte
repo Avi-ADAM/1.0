@@ -231,10 +231,12 @@ async function agree(alr) {
             'Content-Type': 'application/json'
                   },
         body: 
+        //TODO: isMust isYesod isshift howMeny
         JSON.stringify({query:
           `mutation { createOpenMission(
       data: {project: "${projectId}",
              mission:  "${missionId}",
+             iskvua: ${isKavua},
              work_ways: [${workwaysa}],
              hearotMeyuchadot: "${hearotMeyuchadot}",
              name: "${name}",
