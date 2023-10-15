@@ -327,7 +327,10 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
   const level = {"he":"תצוגה מועדפת במסך הלב:","en":"preferred Lev page display:"}
   const nutidev = {"he":"הרשמה לקבלת התראות פוש במכשיר זה","en":"register for device nutification"}
     const nutitele = {"he":" הרשמה לקבלת התראות בטלגרם ","en":"register for telegram nutification "}
-
+    const logoutM = {"he":"יציאה מהחשבון במכשיר זה","en":"logOut"}
+    const addGuid = {"he":"החזרת הצגת המדריך","en":"resume the guid"}
+    const remuGuid = {"he":"ביטול הצגת המדריך","en":"don't show the guid again"}
+const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 </script>
 <h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
  <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
@@ -518,7 +521,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 
     {/if}
     {:else}
-    <button type="button" on:click={()=> change = true}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">שינוי סיסמה</button>
+    <button type="button" on:click={()=> change = true}  class="transition-all  m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{changpsw[$lang]}</button>
 
     {/if}
 	<button id="nb" type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{nutidev[$lang]}</button>
@@ -545,11 +548,11 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
 {/if}
 {/key}
   {#if isGuidMe != false && pressed == false}
-	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">ביטול הצגת המדריך</button>
+	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{remuGuid[$lang]}</button>
 {:else if isGuidMe == false && pressed == false}
-	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"> החזרת הצגת המדריך</button>
+	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{addGuid[$lang]}</button>
 {/if}
-	<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">יציאה מהחשבון במכשיר זה</button>
+	<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">{logoutM[$lang]}</button>
 </div>
 </div>
 <style>
