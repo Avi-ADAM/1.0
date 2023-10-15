@@ -42,20 +42,13 @@ onBackgroundMessage(messaging, (payload) => {
   self.registration.showNotification(notificationTitle,
     notificationOptions);
 });*/
-
+/*
 importScripts('https://www.gstatic.com/firebasejs/8.1.1/firebase-app.js');
 importScripts('https://www.gstatic.com/firebasejs/8.1.1/firebase-messaging.js');
-var firebaseConfig = {
-  apiKey: import.meta.env.VITE_GOOGLE_API,
-  authDomain: import.meta.env.VITE_AUTH,
-  projectId: import.meta.env.VITE_projectId,
-  storageBucket: import.meta.env.VITE_storageBucket,
-  messagingSenderId: import.meta.env.VITE_messagingSenderId,
-  appId: import.meta.env.VITE_appId,
-  measurementId:import.meta.env.VITE_measurementId
-};;// Initialize Firebase
-firebase.initializeApp(firebaseConfig);
-const messaging = firebase.messaging();
+ import firebase from '$lib/func/firebase';
+
+ const app = firebase();
+const messaging = app.messaging();
 messaging.onBackgroundMessage((payload) => {
 console.log('[firebase-messaging-sw.js] Received background message ', payload);
 const notificationTitle = payload.notification.title;
@@ -67,4 +60,4 @@ notificationOptions);
 });
 self.addEventListener('notificationclick', event => {
    console.log(event)
-});
+});*/

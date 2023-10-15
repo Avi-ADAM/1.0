@@ -41,32 +41,25 @@ let res =await SendTo(`mutation { updateUsersPermissionsUser(
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_GOOGLE_API,
-  authDomain: import.meta.env.VITE_AUTH,
-  projectId: import.meta.env.VITE_projectId,
-  storageBucket: import.meta.env.VITE_storageBucket,
-  messagingSenderId: import.meta.env.VITE_messagingSenderId,
-  appId: import.meta.env.VITE_appId,
-  measurementId:import.meta.env.VITE_measurementId
-};
+
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
-//const analytics = getAnalytics(app);
-import { getMessaging, getToken } from "firebase/messaging";
+ //import firebase from '$lib/func/firebase';
+
+// const app = firebase();//const analytics = getAnalytics(app);
+//import { getMessaging, getToken } from "firebase/messaging";
 
 // Get registration token. Initially this makes a network call, once retrieved
 // subsequent calls to getToken will return from cache.
-const messaging = getMessaging(app);
+//const messaging = getMessaging(app);
 
 // Add the public key generated from the console here.
     const dispatch = createEventDispatcher();
     const er = {"he":"כרטה שגיעה","en": "an error just occored"}
 const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en":"you sucssesfully registered to nutification on this device"}
  async function askNotificationPermission() {
-    getToken(messaging, { vapidKey: 'BJoimg2miGigQrjDQeEUmtYBfea_vQX7fOCcFS33NuhrMeQXqFmKJMlrdhERnOyXnJzkhgTzF70v2J03jHi1py8' }).then((currentToken) => {
-  if (currentToken) {
+   // getToken(messaging, { vapidKey: 'BJoimg2miGigQrjDQeEUmtYBfea_vQX7fOCcFS33NuhrMeQXqFmKJMlrdhERnOyXnJzkhgTzF70v2J03jHi1py8' }).then((currentToken) => {
+  //if (currentToken) {
     // Send the token to your server and update the UI if necessary
     // ...
    /* console.log("token",currentToken)
@@ -98,7 +91,7 @@ const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en
   console.error(e)
   addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
   }*/
-  } else {
+ // } else {
     // Show permission request UI
     if (!"Notification" in window) {
       console.log("This browser does not support notifications.");
@@ -116,11 +109,11 @@ const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en
     }
     console.log('No registration token available. Request permission to generate one.');
     // ...
-  }
-}).catch((err) => {
-  console.log('An error occurred while retrieving token. ', err);
+ // }
+//}).catch((err) => {
+ // console.log('An error occurred while retrieving token. ', err);
   // ...
-});
+//});
     // function to actually ask the permissions
     function handlePermission(permission) {
       // Whatever the user answers, we make sure Chrome stores the information

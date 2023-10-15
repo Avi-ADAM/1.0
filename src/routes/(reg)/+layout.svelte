@@ -6,25 +6,17 @@ import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
 
 import { lang } from '$lib/stores/lang.js'
-  import { initializeApp } from "firebase/app";
   import { getAnalytics } from "firebase/analytics";
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_GOOGLE_API,
-  authDomain: import.meta.env.VITE_AUTH,
-  projectId: import.meta.env.VITE_projectId,
-  storageBucket: import.meta.env.VITE_storageBucket,
-  messagingSenderId: import.meta.env.VITE_messagingSenderId,
-  appId: import.meta.env.VITE_appId,
-  measurementId:import.meta.env.VITE_measurementId
-};
+
 
 // Initialize Firebase
-const app = initializeApp(firebaseConfig);
+/*const app = firebase()
   import { getMessaging, onMessage } from "firebase/messaging";
+  import firebase from '$lib/func/firebase.js';
 
 $: if(browser){
   const messaging = getMessaging(app);
@@ -33,7 +25,7 @@ onMessage(messaging, (payload) => {
   console.log('Message received. ', payload);
   // ...
 });
-}
+}*/
 export let data
 let isAuthed = false;
 let token;

@@ -17,23 +17,7 @@
 </script>-->
 
 <script>
-  import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
-
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-const firebaseConfig = {
-  apiKey: import.meta.env.VITE_GOOGLE_API,
-  authDomain: import.meta.env.VITE_AUTH,
-  projectId: import.meta.env.VITE_projectId,
-  storageBucket: import.meta.env.VITE_storageBucket,
-  messagingSenderId: import.meta.env.VITE_messagingSenderId,
-  appId: import.meta.env.VITE_appId,
-  measurementId:import.meta.env.VITE_measurementId
-};
-
-// Initialize Firebase
-const app = initializeApp(firebaseConfig);
+/* const app = firebase()
   import { getMessaging, onMessage } from "firebase/messaging";
 
 $: if(browser){
@@ -43,12 +27,13 @@ onMessage(messaging, (payload) => {
   console.log('Message received. ', payload);
   // ...
 });
-}
+}*/
 import "../app.postcss";
 	import { Toasts } from 'as-toast';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
   import { browser } from "$app/environment";
+ // import firebase from "$lib/func/firebase";
 export let data
 function getLang() {
   console.log(data)
