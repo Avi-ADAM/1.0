@@ -1182,6 +1182,12 @@ function gen() {
 let repeater = null;
 let update = false
 onMount(async () => {
+    if (localStorage.getItem("pendMasMes") !== null) {
+        pendMasMes.set(JSON.parse(localStorage.getItem("pendMasMes")))
+    }
+    if (localStorage.getItem("pendMisMes") !== null) {
+        pendMisMes.set(JSON.parse(localStorage.getItem("pendMisMes")))
+    }    
     if (localStorage.getItem("miDataLM") !== null) {
         arr1 = JSON.parse(localStorage.getItem("miDataLM"))
     }
@@ -1380,6 +1386,7 @@ onMount(async () => {
                    let old = $pendMasMes
                      old[arr1[index].pendId] = arr
                      pendMasMes.set(old)
+                localStorage.setItem("pendMasMes", JSON.stringify($pendMasMes));
                  let head = `${tr.nuti.sendNewA[$lang]} 
                  ${datan.data.attributes.name} 
                  ${tr.nuti.sendNewB[$lang]} 
@@ -1426,6 +1433,7 @@ onMount(async () => {
                    let old = $pendMisMes
                      old[arr1[index].pendId] = arr
                      pendMisMes.set(old)
+        localStorage.setItem("pendMisMes", JSON.stringify($pendMisMes));
                  let head = `${tr.nuti.sendNewA[$lang]} 
                  ${datan.data.attributes.name} 
                  ${tr.nuti.sendNewB[$lang]} 
@@ -2196,8 +2204,7 @@ function pmash(data) {
     old[pmashes[t].pendId] = pmashes[t].messege
     pendMasMes.set(old)
     }
-   console.log("here 1300",$pendMasMes)
-
+    localStorage.setItem("pendMasMes", JSON.stringify($pendMasMes));
    pmashes = pmashes
     
     pmashd = pmashes.length;
@@ -2520,7 +2527,7 @@ function createpends(data) {
     old[pends[t].pendId] = pends[t].messege
     pendMisMes.set(old)
     }
-   
+           localStorage.setItem("pendMisMes", JSON.stringify($pendMisMes));
 
     pen = pends.length;
         localStorage.setItem("pen", pen);
