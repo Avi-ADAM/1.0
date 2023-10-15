@@ -73,7 +73,7 @@
 		</span>
 	</div>
 		<div style="font-family:Gan, Power;" class="flex flex-row">
-			<button class="flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl" on:click={()=>{goto("/login") 
+			<button class="transition-all duration-300 flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl" on:click={()=>{goto("/login") 
 				loadinga = true
 				fi = true}} class:button-perl={btna ==  false} class:button-gold={btna == true} on:focus={()=> btna = true} on:mouseover={()=>btna = true} 
 					on:mouseleave={()=> btna = false }>{login[$lang]}
@@ -84,7 +84,7 @@
 			<Lowding width="24px" height="24px"/>
 			{/if}
 			</button>
-			<button class="text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/ar" : "/en"}`) 
+			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/ar" : "/en"}`) 
 			loading = true
 			fi = true
 		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} on:focus={()=> btnb = true} on:mouseover={()=>btnb = true} on:mouseleave={()=> btnb = false }>{reg[$lang]}
@@ -99,8 +99,8 @@
 	</div>
 	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class:flex={$progress == 1} class="sm:w-1/2 h-1/2 sm:h-screen z-0 items-center justify-center">
 		{#if $progress < 1}
-		<div class="w-full h-1/2 sm:h-screen  flex flex-col items-center justify-stretch" title="{loadingTitle[$lang]}">
-			<img  src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" alt="logo">
+		<div class="w-full h-1/2 sm:h-screen flex flex-col items-center  justify-center" title="{loadingTitle[$lang]}">
+			<img class="ani"  src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" alt="logo">
 			<CircleProgresBar progress={$progress}/>
 		</div>
 		{/if}
@@ -111,3 +111,41 @@
 	  </div>
 	</div>
 </div>
+<style>
+	
+img {
+  animation: wiggle 2s linear infinite;
+  max-height: 25vh;
+}
+@media (min-width: 640px){
+	img {
+  animation: wiggle 2s linear infinite;
+  max-height: 50vh;
+}
+}
+
+/* Keyframes */
+@keyframes wiggle {
+  0%, 7% {
+    transform: rotateZ(0);
+  }
+  15% {
+    transform: rotateZ(-15deg);
+  }
+  20% {
+    transform: rotateZ(10deg);
+  }
+  25% {
+    transform: rotateZ(-10deg);
+  }
+  30% {
+    transform: rotateZ(6deg);
+  }
+  35% {
+    transform: rotateZ(-4deg);
+  }
+  40%, 100% {
+    transform: rotateZ(0);
+  }
+}
+</style>
