@@ -39,7 +39,8 @@ export let pendId;
 export let users =[];
 export let isKavua;
 export let oldide = 0; //last tg id, if non 0
-$: isKavua2 = isKavua;
+
+let isKavua2
 let newcontent = true;
 
 let miDatan = [];
@@ -241,8 +242,8 @@ async function increment() {
           iskvua4 = ``
           iskvua4nego = ``
      } else {
-         iskvua4nego =  (mdates !== undefined) ? ` isMonth: ${isKavua},` : ``;
-         iskvua4 =  (mdates2 !== undefined) ? ` iskvua: ${isKavua2},` : ``;
+         iskvua4nego =  ` isMonth: ${isKavua ?? false},`
+         iskvua4 = ` iskvua: ${isKavua2 ?? false},`
          what4 = false;
      }
      if (mdates === mdates2){
@@ -403,6 +404,8 @@ async function increment() {
       what: true
       users_permissions_user: "${idL}"
       order: ${ordern+1}
+      zman:"${d.toISOString()}"
+      ide:${idL}
     }
   ], nego:[ 
 {
@@ -462,6 +465,7 @@ function addnew (event){
     dataibno = dataibno
 }
 onMount(async () => {
+  isKavua2 = isKavua
  //  skills3 = skills;
  //tafkidims2 = tafkidims; 
  //workways3 = workways;

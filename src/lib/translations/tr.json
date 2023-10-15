@@ -88,13 +88,13 @@
         }
     },
     "mash": {
-        "tota":{
-            "he":"שווי סך הכל למשאב",
-            "en":"total vallue for the resorce"
+        "tota": {
+            "he": "שווי סך הכל למשאב",
+            "en": "total vallue for the resorce"
         },
-        "kindof":{
-            "he":"סוג המשאב",
-            "en":"resorce kind"
+        "kindof": {
+            "he": "סוג המשאב",
+            "en": "resorce kind"
         },
         "total": {
             "he": "עלות חד פעמית",
@@ -138,9 +138,9 @@
         }
     },
     "common": {
-        "puttovote":{
-            "he":"העלאת השינויים להצבעה",
-            "en":"publish changes"
+        "puttovote": {
+            "he": "העלאת השינויים להצבעה",
+            "en": "publish changes"
         },
         "watchthe": {
             "he": "לצפיה בדיון",
@@ -236,29 +236,41 @@
         }
     },
     "nego": {
-        "sothatMashto":{
+        "moaNego":{
+            "he":"שהמשימה תהיה",
+            "en":"that the mission will be"
+        },
+        "montly":{
+            "he":"קבועה כך שסך השעות יתחדש בכל חודש",
+            "en":"monthly, so every month the mission will get another hours"
+        },
+        "ont":{
+            "he":"חד פעמית",
+            "en":"one time"
+        },
+        "sothatMashto": {
             "he": "כך שסך כל השווי יהיה",
-            "en": "so that the total vallue"            
+            "en": "so that the total vallue"
         },
-        "sothatMash":{
-            "he":"כך שסך כל השווי המקסימלי יהיה",
-            "en":"so that the total max vallue"
+        "sothatMash": {
+            "he": "כך שסך כל השווי המקסימלי יהיה",
+            "en": "so that the total max vallue"
         },
-        "easy":{
-            "he":"השווי המקסימלי",
-            "en":"the maximum vallue"
+        "easy": {
+            "he": "השווי המקסימלי",
+            "en": "the maximum vallue"
         },
-        "price":{
-            "he":"המחיר",
-            "en":"the price"
+        "price": {
+            "he": "המחיר",
+            "en": "the price"
         },
-        "total":{
-            "he":"ובסך הכל",
+        "total": {
+            "he": "ובסך הכל",
             "en": "and in total"
         },
-        "quant":{
-            "he":"הכמות",
-            "en":"the quantity"
+        "quant": {
+            "he": "הכמות",
+            "en": "the quantity"
         },
         "didNego": {
             "he": "בעד ההצעה עם השינויים הבאים:",
@@ -319,7 +331,7 @@
         "desMashNego": {
             "he": "שתיאור המשאב יהיה",
             "en": "that the description will be"
-        },        
+        },
         "desNego": {
             "he": "שתיאור המשימה יהיה",
             "en": "that the description will be"
@@ -359,6 +371,16 @@
         "sendNewC": {
             "he": "נשלחה הודעה חדשה על ידי",
             "en": ""
+        }
+    },
+    "toasts": {
+        "suc": {
+            "he": "בוצע בהצלחה",
+            "en": "done sucssefully!"
+        },
+        "er": {
+            "he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ",
+            "en": "error: please try again, if the problem not solved please contact us at ehad1one@gmail.com"
         }
     }
 }

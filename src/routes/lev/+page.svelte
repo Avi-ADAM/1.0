@@ -2501,6 +2501,10 @@ function createpends(data) {
                     "${pends[t].hearotMeyuchadot}" 
                     ${tr?.nego.insted[$lang]}: 
                     "${pends[t].negopendmissions[x].attributes.hearotMeyuchadot}"`: ``}
+                  ${pends[t].negopendmissions[x].attributes.isMonth !== pends[t].isKavua ? `<br>⚙️ ${tr?.nego.moaNego[$lang]} 
+                    "${pends[t].isKavua  == true ? `${tr?.nego.montly[$lang]}` : `${tr?.nego.ont[$lang]}`}" 
+                    ${tr?.nego.insted[$lang]}:
+                    "${pends[t].negopendmissions[x].attributes.isMonth  == true ? `${tr?.nego.montly[$lang]}` : `${tr?.nego.ont[$lang]}`}" `: ``}
                   `,
                     what: true,
                     pic: src22,
