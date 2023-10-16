@@ -653,17 +653,17 @@ $: w = 0
     </h1>
           <span style="font-family:David;" class="font-bold">
               <span  style="font-family:David;">
-                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לעולם לא אנהג באלימות ולא אפגע באף אדם.
+                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לא רוצה לפגוע באף אדם.
                    <br>
-           כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח.
+           כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק פגיעה באדם, אלימות וכפיה בכוח.
               <br>
-   אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב ובכך שכאשר כל האנושות תסכים: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית.
+   אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בבבוא הטוב, מקווה ומצפה שכל האנושות תסכים ואלימות, קרבות וכפיה בכוח יפסיקו להיות צורה של תקשורת אנושית.
               <br>
-              כאשר כל אוכלוסיית  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join( " וכל אוכלוסיית " )}`  : "__"}</span> תסכים לחיות לפי אמנה זו אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ומדינת ")}` : "__"}</span>  {selected.length > 1 ? "ממנות" : "ממנה" } בשמי.
+              כאשר כל אוכלוסיית  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join( " וכל אוכלוסיית " )}`  : "__"}</span>  תסכים ותחיה לפי אמנה זו אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר עם כל השאר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ומדינת ")}` : "__"}</span>  {selected.length > 1 ? "ממנות" : "ממנה" } בשמי ונחיה בחופשיות ובהסכמה הדדית. 
               <br>
-               כאשר כל האנושות תסכים עם האמנה הזו אני <span style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ושל צבא ") }`+ "." : "__."}</span>
+               כאשר כל האנושות תסכים ותחיה לפי אמנה זו אני <span style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ושל צבא ") }`+ "." : "__."}</span> כאשר בו זמנית יוותרו כל צבאות העולם על נשקם ונהפוך לאנושות מפורזת וחופשית
         <br>
-         אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אצור, אתנהל ואפתור חילוקי דעות באתר 1💗1 בהסכמה הדדית.
+         אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" on:keypress={()=>info()} on:click={()=>info()}>"רקמות"</span> המתנהלות באתר 1💗1 רק בהסכמה הדדית.
             </span>
           </span>
     </div>
