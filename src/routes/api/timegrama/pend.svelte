@@ -1,7 +1,7 @@
 <script context="module">
   import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
      import { SendTo } from '$lib/send/sendTo.svelte';
-const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
+  const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 //get by id
 //calculate votes
 //if no no create open mission 
@@ -12,8 +12,8 @@ export async function Pend(id,taid){
       let qu = `{
   pendm (id:${id}) {data{ id attributes{
    rishon{data{id}}  archived 
-}}} 
- }`;
+  }}} 
+    }`;
     try {
       let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
       console.log(res,"pend first res");
@@ -43,7 +43,7 @@ export async function Pend(id,taid){
         const dates = (res2.data.pendm.data.attributes.dates !== undefined && res2.data.pendm.data.attributes.dates !== "undefined" && res2.data.pendm.data.attributes.dates !== null) ? `dates: "${res2.data.pendm.data.attributes.sqadualed.dates}",` : ``;
                 let qub = `mutation { createOpenMission(
       data: {
-        howMeny:${res2.data.pendm.data.attributes.howMeny ?? 0}, 
+        howMeny:${res2.data.pendm.data.attributes.howMeny ?? 1}, 
         iskvua:${res2.data.pendm.data.attributes.iskvua ?? false},
          isMust :${res2.data.pendm.data.attributes.isMust ?? false},
          isYesod :${res2.data.pendm.data.attributes.isYesod ?? false},
@@ -74,9 +74,10 @@ export async function Pend(id,taid){
  }
   ){data{id}}
  } `   
+ console.log(qub,"queri2")
      try {
       let res3 = await SendTo(qub, VITE_ADMINMONTHER).then((res3) => (res3 = res3));
-      console.log(res3,"pend res3 ")     
+      console.log(res3,"pend res3 ",res?.errors?.locations)     
       if (res3.data != null) {
               console.log(res3.data,"pend res3 data ")
               //update timegrama to done

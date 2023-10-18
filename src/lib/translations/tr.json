@@ -1,4 +1,10 @@
-{
+{   
+    "ask":{
+        "askedTo":{
+            "he":" רוצה להצטרף לריקמה ולבצע את המשימה",
+            "en":"want to join the FreeMates and do the mission"
+        }
+    },
     "headers": {
         "misfini": {
             "he": "אישור סיום משימה בהצלחה",
@@ -229,6 +235,10 @@
         "inFavor": {
             "he": "בעד",
             "en": "in favor"
+        },
+        "against":{
+            "he":"לא בעד",
+            "en":"not in favor"
         },
         "votedOn": {
             "he": "הצביעו רק על גרסאות קודמות",
