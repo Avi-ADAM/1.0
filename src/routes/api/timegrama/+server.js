@@ -2,6 +2,8 @@
 //set timeOut for the exsact time of each
 //do verious task base on timegrama kind
 import {Pend} from './pend.svelte'
+import { PendM } from './pendM.svelte';
+
 import {finiapp} from './finiapp.svelte'
 import { Ask } from './ask.svelte';
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
@@ -16,6 +18,8 @@ async function x(id,kind,taid){
     } else if (kind == 'pendm') {
               await Pend(id,taid);
 
+    }else if(kind == "pmash"){
+      await PendM(id,taid)
     }
     
 }
@@ -45,15 +49,15 @@ export async function GET() {
    console.log(res,"start")
    if (res.data != null) {
      console.log(res.data, 'pip');
-     //TODO: check if already worked for this hour
+     //TODO: check if already worked for this hour --why? if is archived/done it  will not do again
      const all = res.data.timegramas.data;
      if (all.length > 0)
        await Promise.all(all.map(async (element) =>{
-        console.log(element, 'element 52');
+        console.log(element, 'element line52');
         const dateof = new Date(element.attributes.date)
         const myid = element.attributes[element.attributes.whatami].data.id;
         const tgid = element.id;
-        console.log(dateof,myid, "line 56");
+        console.log(dateof,myid, " line56");
         if (d >= dateof) {
           // targetDate has passed, execute function x immediately
           x(myid, element.attributes.whatami, tgid);

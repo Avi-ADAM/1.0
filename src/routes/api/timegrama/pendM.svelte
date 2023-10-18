@@ -7,10 +7,10 @@ const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 //archive pend
 //else 
 export async function PendM(id,taid){
-    console.log(id)
+    console.log(id,taid)
       let qu = `{
   pmash (id:${id}) {data{ id attributes{
-   rishon  archived 
+     archived 
 }}} 
  }`;
     try {
@@ -18,50 +18,53 @@ export async function PendM(id,taid){
       console.log(res);
       if (res.data != null) {
         console.log(res.data, 'pip');
-        if(res.data.pendm.data.attributes.archived != true && res.data.pendm.data.attributes.rishon != true){
+        if(res.data.pmash.data.attributes.archived != true){// && res.data.pendm.data.attributes.rishon != true){
                 //cr openm
                 let qua = `{
   pmash (id:${id}) {data{ id attributes{
-    name spnot kindOf linkTo price descrip easy hm sqadualed sqadualedf
+   isYesod isMust name spnot kindOf linkto price descrip easy hm sqadualed sqadualedf
         project{data{id}}
-                            mission {data{ id}}
-                            vallues {data{ id}}
+                            mashaabim {data{ id}}
   }}}
                 }`
  try {
       let res2 = await SendTo(qua, VITE_ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2);
       if (res2.data != null) {
+        console.log(res2.data,"res2 data")
         let d = new Date()
-         const date = (res2.data.pendm.data.attributes.sqadualed !== undefined && res2.data.pendm.data.attributes.sqadualed !== "undefined" && res2.data.pendm.data.attributes.sqadualed !== null) ? `start: "${res2.data.pendm.data.attributes.sqadualed}",` : ``;
-        const dates = (res2.data.pendm.data.attributes.dates !== undefined && res2.data.pendm.data.attributes.dates !== "undefined" && res2.data.pendm.data.attributes.dates !== null) ? `admaticedai: "${res2.data.pendm.data.attributes.sqadualed.dates}",` : ``;
-                let qub = `mutation { createOpenM(
-      data: {project: "${res2.data.pendm.data.attributes.project.data.id}",
-             mission:  "${res2.data.pendm.data.attributes.mission.data.id}",
-             hearotMeyuchadot: "${res2.data.pendm.data.attributes.hearotMeyuchadot}",
-             name: "${res2.data.pendm.data.attributes.name}",
-                     publishedAt: "${d.toISOString()}",
-             descrip: "${res2.data.pendm.data.attributes.descrip}",
-             vallues:  [${res2.data.pendm.data.attributes.work_ways.map(c => c.data.id)}],
-             noofhours: ${res2.data.pendm.data.attributes.noofhours},
-             perhour: ${res2.data.pendm.data.attributes.perhour},   
-             privatlinks: "${res2.data.pendm.data.attributes.privatlinks}",
-             publicklinks: "${res2.data.pendm.data.attributes.publicklinks}",
-            ${date}
-            ${dates}
+         const date = (res2.data.pmash.data.attributes.sqadualed !== undefined && res2.data.pmash.data.attributes.sqadualed !== "undefined" && res2.data.pmash.data.attributes.sqadualed !== null) ? `sqadualed: "${res2.data.pmash.data.attributes.sqadualed}",` : ``;
+        const dates = (res2.data.pmash.data.attributes.sqadualedf !== undefined && res2.data.pmash.data.attributes.sqadualedf !== "undefined" && res2.data.pmash.data.attributes.sqadualedf !== null) ? `sqadualedf: "${res2.data.pmash.data.attributes.sqadualedf}",` : ``;
+                let qub = `mutation { createOpenMashaabim(
+      data: {project: "${res2.data.pmash.data.attributes.project.data.id}",
+             spnot: "${res2.data.pmash.data.attributes.spnot}",
+             name: "${res2.data.pmash.data.attributes.name}",
+             descrip: "${res2.data.pmash.data.attributes.descrip}",
+             kindOf: ${res2.data.pmash.data.attributes.kindOf},
+             hm: ${res2.data.pmash.data.attributes.hm},
+             price: ${res2.data.pmash.data.attributes.price},
+             easy: ${res2.data.pmash.data.attributes.easy},
+             linkto: "${res2.data.pmash.data.attributes.linkto}",
+             pmash: "${res2.data.pmash.data.id}",
+             publishedAt: "${d.toISOString()}",
+             isYesod:${res2.data.pmash.data.attributes.isYesod || false},
+             isMust:${res2.data.pmash.data.attributes.isMust || false},
+             mashaabim: "${res2.data.pmash.data.attributes.mashaabim.data.id}"
+             ${date} 
+             ${dates}
             }
   ) {data{attributes {project{data{ id} }}}}
   updatePmash(
-   id: ${res2.data.pendm.data.id}
+   id: ${res2.data.pmash.data.id}
       data: { 
  archived: true
  }
   ){data{id}}
  } `   
      try {
-      let res3 = await SendTo(qu, VITE_ADMINMONTHER).then((res3) => (res3 = res3));
+      let res3 = await SendTo(qub, VITE_ADMINMONTHER).then((res3) => (res3 = res3));
             if (res3.data != null) {
-              console.log(res3)
+              console.log(res3.data,"res3 data")
               //update timegrama to done
               let que4 = `mutation { 
              updateTimegrama(
@@ -71,10 +74,12 @@ export async function PendM(id,taid){
              }){
               data{id}
              }
+            }
               `
                try {
-      let res4 = await SendTo(qu, VITE_ADMINMONTHER).then((res4) => (res4 = res4));
+      let res4 = await SendTo(que4, VITE_ADMINMONTHER).then((res4) => (res4 = res4));
             if (res4.data != null) {
+              console.log("succses",id," ",res4.data )
               return "sucsses" + id
                }
  } catch (e) {
