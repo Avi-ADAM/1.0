@@ -491,21 +491,24 @@ async function afreact (event){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-        // messege.push({
-        //            message: why,
-        //            what: mypos,
-        //            pic:mysrc,
-        //            sentByMe: true,
-        //            timestamp:d  
-        //          })
-        //    messege = messege     
+      nowId.set(miDatan.data.attributes.diun[miDatan.data.attributes.diun.length -1].id)       
+         diun.push({
+                   what: mypos,
+                      users_permissions_user:idL,
+                      why:why,
+                      order:order+=1,
+                      zman:d.toISOString(),
+                      ide:idL
+                 })
+           diun = diun  
+           clicked = false   
       //   loading = false;
         } catch (e) {
             error1 = e
             console.log(error1)
         }
 }
-  
+  let clicked = false
 $: pcli = 0
 $: pmcli = 0
 function linke (s){
@@ -585,6 +588,7 @@ function hoverc (event){
  import Cards from './cards/pending.svelte'
   import {oneLangAdj} from '$lib/func/oneLangAdj.svelte';
   import { lang } from '$lib/stores/lang';
+  import { nowId } from '$lib/stores/pendMisMes';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr
@@ -663,6 +667,7 @@ function claf (event){
     on:rect={afreact} 
     on:no={afterwhy} 
     {no} 
+    bind:clicked
     rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} 
     smalldes={projectName} 
     nameChatPartner={`הצבעה על ${name}`} 

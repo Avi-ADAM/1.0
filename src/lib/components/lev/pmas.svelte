@@ -266,6 +266,7 @@ async function agree(alr) {
   ){data{attributes { users { users_permissions_user {data{ id}}}}}}
  } `   
 //update pendm add consent from second and  archived,,, make coin desapire
+//TODO: archive timegrama
 } )})
   .then(r => r.json())
   .then(data => miDatan = data); 
@@ -497,20 +498,24 @@ async function react (){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-      /*   messege.push({
-                    message: why,
-                    what: mypos,
-                    pic:mysrc,
-                    sentByMe: true,
-                    timestamp:d  
+         nowId.set(miDatan.data.attributes.diun[miDatan.data.attributes.diun.length -1].id)
+         diun.push({
+                   what: mypos,
+                   users_permissions_user:idL,
+                   why:why,
+                   order:order+=1,
+                   zman:d.toISOString(),
+                   ide:idL
                   })
-            messege = messege  */   
+            diun = diun   
+            clicked = false
       //   loading = false;
         } catch (e) {
             error1 = e
             console.log(error1)
         }
 }
+let clicked = false
 /*saved for when graphql enable on io async function afreactold (event){
  let diunim = ``;
   if (diun !== null){
@@ -633,6 +638,7 @@ function hoverc (event){
     dispatch("hover", {id: u});
 }
  import Cards from './cards/pma.svelte'
+  import { nowId } from '$lib/stores/pendMisMes';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr
@@ -705,7 +711,11 @@ title="ביטול"
 />
   {:else if diunm === true}
  <Diun
-  on:rect={afreact} on:no={afterwhy} {no} rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos}
+  on:rect={afreact} 
+  on:no={afterwhy} 
+  {no} 
+  bind:clicked
+  rect={true} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos}
   {pendId}
   profilePicChatPartner={src} 
   ani="pmashes"/>

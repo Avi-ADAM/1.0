@@ -3,7 +3,7 @@
 
 	import ChatMessage from '../../celim/messeges.svelte';
 	import TodayDivider from '../../celim/todaydevider.svelte';
-    import {pendMisMes, pendMasMes} from '$lib/stores/pendMisMes.js'
+    import {pendMisMes, pendMasMes, askMisMes, meAskMisMes} from '$lib/stores/pendMisMes.js'
 	  const dispatch = createEventDispatcher();
    export let ani
    export let pendId
@@ -16,9 +16,9 @@
 	export let profilePicChatPartner='https://storage.needpix.com/rsynced_images/male-teacher-cartoon.jpg';
 	export let money = false
    export let messages = []
-	 $: messagesi = ani == "pendM" ? $pendMisMes[pendId] : ani == "pmashes" ? $pendMasMes[pendId] : messages
+	 $: messagesi = ani == "pendM" ? $pendMisMes[pendId] : ani == "pmashes" ? $pendMasMes[pendId] : ani == "askedMi" ? $askMisMes[pendId] : ani == "iaskedMi"? $meAskMisMes[pendId] : messages
    let why = "";
-   let clicked = false
+ export let clicked = false
 function click() {
    clicked = true
  if (no == true) {
@@ -223,7 +223,7 @@ function click() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                </svg>
             </button>-->
-            {#if clicked == false}
+            {#if clicked == false }
             <button on:click={click} type="button" class="inline-flex items-center justify-center rounded-lg  transition duration-500 ease-in-out text-mturk hover:text-barbi focus:outline-none">
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 sm:ml-2 transform -rotate-90">
                   <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
