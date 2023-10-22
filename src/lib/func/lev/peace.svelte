@@ -1,29 +1,23 @@
  <script context="module">
     import tr from '$lib/translations/tr.json'
-   export function peace(miData, id,lang) {
+   export function peace(miData, id,lang,myid) {
     console.log("peace askeds")  /*{data{ id attributes{
             archived
             project{data{id}} 
             vots  {what  zman}
             timegrama {data{id attributes{date}}}
             createdAt
-            chat{data{id attributes{why ide what zman users_permissions_user {data{id}}}}}
+            chat{id why ide what zman users_permissions_user {data{id}}}}}
         }}} ")*/
     let mtaha = []
     let mtahan = miData.data.usersPermissionsUser.data.attributes.asks.data
     for (let i = 0; i < mtahan.length; i++) {
-            console.log("peace",mtahan[i])
         if(mtahan[i].attributes.archived != true && mtahan[i].attributes.open_mission.data.id == id){
-            console.log("peace",mtahan[i],"secc")
-           /* mtaha[i] = {...mtahan[i].attributes};
-            mtaha[i].id = mtahan[i].id
-            mtaha[i].ani = "peaceMi" 
-            mtaha[i].azmi = "requests"      
-            mtaha[i].pl = 0 + i
-            mtaha[i].messeges = []*/
-            
+            console.log("peace",mtahan[i])
             mtaha.push({
-                 message: `${miData.data.usersPermissionsUser.data.attributes.username} ${tr?.ask.askedTo[lang]} ${mtahan[i].attributes.project.data.attributes.projectName}`,
+                 message: `${miData.data.usersPermissionsUser.data.attributes.username} 
+                            ${tr?.ask.askedTo[lang]} 
+                            ${mtahan[i].attributes.open_mission.data.attributes.name}`,
                     what: true,
                     pic: mtahan[i].attributes.project.data.attributes.profilePic.data.attributes.url,
                     timestamp:new Date(mtahan[i].attributes.createdAt),
@@ -31,40 +25,44 @@
                     changed:  false,
             })
             mtaha = mtaha
-            /*
-        if (dictasked[t].users.length > 0) {
-            for (let x = 0; x < dictasked[t].users.length; x++) {
-                let src22 = getProjectData(dictasked[t].projectId,"upic",dictasked[t].users[x].users_permissions_user.data.id)
-                dictasked[t].messege.push({
-                    message: `${getProjectData(dictasked[t].projectId,"un",dictasked[t].users[x].users_permissions_user.data.id)}  
-                  ${pmashes[t].users[x].what == true ? tr?.vots.inFavor[$lang] : tr?.vots.against[$lang]} `,
-                    what: dictasked[t].users[x].what,
-                    pic: src22,
-                    timestamp:new Date(dictasked[t].users[x].zman),
-                    sentByMe: dictasked[t].users[x].users_permissions_user.data.id === myid ? true : false,
+
+        if (mtahan[i].attributes.vots.length > 0) {
+            for (let x = 0; x < mtahan[i].attributes.vots.length; x++) {
+              //  let src22 = getProjectData(dictasked[t].projectId,"upic",dictasked[t].users[x].users_permissions_user.data.id)
+                mtaha.push({
+                    message: `${tr?.ask.onpm[lang]}  
+                  ${mtahan[i].attributes.vots[x].what == true ? " " + tr?.vots.inFavor[lang] : " "+ tr?.vots.against[lang]} `,
+                    what: mtahan[i].attributes.vots[x].what ?? true,
+                    pic: "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png",
+                    timestamp:new Date(mtahan[i].attributes.vots[x].zman ?? Date.now()) ,
+                    sentByMe: mtahan[i].attributes.vots[x].users_permissions_user.data.id === myid ? true : false,
                     changed:  false,
                 })
             }
         }
-        if (dictasked[t].chat.length > 0) {
-            for (let x = 0; x < dictasked[t].chat.length; x++) {
-                let src22 = dictasked[t].pid.includes(dictasked[t].chat[x].users_permissions_user.data.id) ?
-                             getProjectData(dictasked[t].projectId,"upic",dictasked[t].users[x].users_permissions_user.data.id) :
-                             dictasked[t].src
-                dictasked[t].messege.push({
-                    message: why,
-                    what: true,
+              if (mtahan[i].attributes.chat.length > 0) {
+            for (let x = 0; x < mtahan[i].attributes.chat.length; x++) {
+                let src22 = mtahan[i].attributes.chat[x].users_permissions_user.data.attributes.profilePic?.formats?.thumbnail?.url ? 
+                            mtahan[i].attributes.chat[x].users_permissions_user.data.attributes.profilePic.formats.thumbnail.url :
+                            mtahan[i].attributes.chat[x].users_permissions_user.data.attributes.profilePic?.url ?
+                            mtahan[i].attributes.chat[x].users_permissions_user.data.attributes.profilePic?.url :
+                            "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
+                mtaha.push({
+                    message: mtahan[i].attributes.chat[x].why,
+                    what:  mtahan[i].attributes.chat[x].what ?? true,
                     pic: src22,
-                    timestamp:new Date(dictasked[t].chat[x].zman),
-                    sentByMe: dictasked[t].chat[x].users_permissions_user.data.id === myid ? true : false,
+                    timestamp:new Date( mtahan[i].attributes.chat[x].zman),
+                    sentByMe:  mtahan[i].attributes.chat[x].users_permissions_user.data.id === myid ? true : false,
                     changed:  false,
                 })
             }
         } 
-   dictasked[t].messege = dictasked[t].messege.sort(function(a,b){
+                console.log("peace arrived")
+
+   mtaha = mtaha.sort(function(a,b){
   return b.timestamp - a.timestamp;
 }).reverse();
-  let old = $meAskMisMes
+  /*let old = $meAskMisMes
     old[mtahan[i].attributes.open_mission.data.id] =  mtaha[mtahan[i].attributes.open_mission.data.id]
     meAskMisMes.set(old)
     localStorage.setItem("meAskMisMes", JSON.stringify($meAskMisMes));

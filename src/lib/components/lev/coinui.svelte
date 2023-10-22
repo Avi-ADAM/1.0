@@ -418,7 +418,6 @@ export let sml = false
                                             on:acsept={delo}
                                             on:hover={hover}
                                             on:modal={modali}
-
                                             on:proj={proj}
                                             on:user={user}
                                             on:decline={delo}
@@ -456,6 +455,7 @@ export let sml = false
                                             openMid={buble.omid}
                                             stylef={buble.stylef}
                                             st={buble.st}
+                                            chat={buble.chat}
                                             declined={buble.decid}
                                             {low}
                                             /></div>
@@ -548,6 +548,8 @@ export let sml = false
                                                         coinlapach={buble.coinlapach}
                                                         askedarr={askedarr}
                                                         {declineddarr}
+                                                        chat = {buble.chat ?? null}
+                                                        askId = {buble.askId ?? null}
                                                         deadLine = {buble.attributes.sqadualed}
                                                         oid = {buble.id}
                                                         hst = {buble.hst}

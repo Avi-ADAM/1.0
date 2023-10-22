@@ -1,6 +1,7 @@
 <script>
     import Tile from '$lib/celim/tile.svelte'
-
+  import {calcX} from '$lib/func/calcX.svelte'
+  import {SendTo} from '$lib/send/sendTo.svelte'
      import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
     import { createEventDispatcher } from 'svelte';
@@ -8,14 +9,16 @@
                    import { lang } from '$lib/stores/lang.js'
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 	import dayjs from 'dayjs';
+  import { nowId } from "$lib/stores/pendMisMes.js";
 
  const dispatch = createEventDispatcher();
-     export let low = false
+     export let low = false, alreadyi = false
      export let timeToP = "more"
 export let hst = 187;
 export let stb = 180;
 export let coinlapach;
     export let deadLine;
+    export let restime
         export let deadLinefi;
     export let projectName;
     export let missionName;
@@ -47,6 +50,8 @@ let miData = [];
 
 async function agree(oid) {
   already = true;
+  let x = calcX(restime)
+  let fd = new Date(Date.now() + x)
 const as = askedarr;
  as.push(`${oid}`);
  console.log(as)
@@ -97,11 +102,26 @@ const cookieValue = document.cookie
   ){
     data {id}
   }
+
 }`
 } )})
   .then(r => r.json())
   .then(data => miData = data);
          console.log(miData)
+         //TODO: not remove coin just move to chat mode
+           let hiluzId = miData.data.createAsk.data.id
+                        let quee = `mutation 
+                        {createTimegrama(
+    data:{
+      date: "${fd.toISOString()}",
+      whatami: "ask",
+      ask: ${hiluzId},
+    }
+  ){
+    data {id}
+  }
+}`
+SendTo(quee)
          less (oid);
         } catch (e) {
             error1 = e
@@ -270,6 +290,9 @@ function project () {
     dispatch("hover", {id: u[$lang]});
 }
  import Cards from './cards/sugestmi.svelte'
+  import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
+  import Diun from './diun.svelte';
+  import { RingLoader } from 'svelte-loading-spinners';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr
@@ -290,8 +313,137 @@ const tt1y = {"he":"צפי רווח: שנה","en":"exp income: 1 year"}
 const tt2y = {"he":"צפי רווח: שנתיים","en":"exp income: 2 years "}
 const ttmor = {"he":"צפי רווח: ארוך טווח","en":"exp income: long term"}
 const ttne = {"he":"ללא רווח","en":"not profitable"}
+let isOpen = false, diunm = false, loading = false 
+const close = () => {
+    isOpen = false;
+    diunm = false;
+};
 
+let clicked = false
+export let chat = []
+export let askId
+export let order
+let miDatan = []
+ async function afreact (event){
+ 
+  let why = event.detail.why
+  console.log(why)
+  let d = new Date()
+         //  loading = true;
+       const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  let idL = cookieValueId;
+   let token  = cookieValue; 
+   let bearer1 = 'bearer' + ' ' + token;
+     let dataa = {
+          data: { 
+        chat:[...chat,{
+      what: true,
+      users_permissions_user:idL,
+      why:why,
+      order:order+=1,
+      zman:d.toISOString(),
+      ide:idL
+    }
+  ]
+}  
+ }
+    try {
+             await fetch(`https://tov.onrender.com/api/asks/${askId}?populate=*`, {
+              method: 'PUT',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: JSON.stringify(dataa),
+      })
+  .then(r => r.json())
+  .then(data => miDatan = data);
+         console.log(miDatan)
+       chat.push({
+                  what: true,
+                  users_permissions_user:idL,
+                  why:why,
+                  order:order+=1,
+                  zman:d.toISOString(),
+                  ide:idL
+                  })
+            chat = chat   
+            clicked = false 
+         nowId.set(miDatan.data.attributes.chat[miDatan.data.attributes.chat.length -1].id)
+      //   loading = false;
+        } catch (e) {
+          let error1 = e
+            console.log(error1)
+        }
+}
+function tochat (){
+    console.log("chat")
+    isOpen = true
+    diunm = true
+}
+const chatdes ={"he":"צ'אט עם","en":"chat with"}
+const chatdes2 ={"he":"על הצטרפות לריקמה","en":"on joining"}
 </script>
+<DialogOverlay {isOpen} onDismiss={close} class="overlay">
+        <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent class="chat" aria-label="form" >
+      <div dir="rtl" class="grid items-center justify-center aling-center">
+              <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+title="ביטול"
+><svg style="width:24px;height:24px" viewBox="0 0 24 24"> 
+  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+</svg></button>
+{#if loading === true}
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+  <!--   
+{:else if masa === true}
+
+<Nego
+      on:load={()=>loading = true}
+        on:close={afternego}
+  descrip ={descrip}
+  projectName ={projectName}
+  name1 ={name}
+  spnot = {hearotMeyuchadot}
+  kindOf ={kindOf}
+  hm = {hm}
+  {timegramaId}
+  projectId = {projectId}
+  total ={total}
+  noofusers={noofusers}
+  price={price}
+  easy = {easy}
+  linkto = {linkto}
+  pendId ={pendId}
+  mshaabId={mshaabId}
+  sqadualedf={sqadualedf}
+  sqadualed={sqadualed}
+  users={users}
+{restime}
+/>-->
+  {:else if diunm === true}
+ <Diun
+  on:rect={afreact} 
+  smalldes={projectName+"-"+missionName} 
+  nameChatPartner={`${chatdes[$lang]} ${projectName} ${chatdes2[$lang]}`} 
+  mypos={true}
+  rect={true}
+  {clicked}
+  pendId={oid}
+  profilePicChatPartner={src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"} 
+  ani="iaskedMi"/>
+{/if}
+      </div>
+  </DialogContent>
+  </div>
+</DialogOverlay>
 {#if cards == false}
 <div
 style="position: relative;"
@@ -1042,7 +1194,9 @@ on:project={project}
  on:agree={claf}
   on:decline={claf}
   on:hover={hoverc}
+  on:tochat={tochat}
   {low}
+  {alreadyi}
   {missionName}
   {noOfHours}
   {perhour}

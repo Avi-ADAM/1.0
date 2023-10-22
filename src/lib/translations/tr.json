@@ -1,5 +1,9 @@
 {   
     "ask":{
+        "onpm":{
+            "he":"הצבעה אחת",
+            "en":"one project member vote"
+        },
         "askedTo":{
             "he":" רוצה להצטרף לריקמה ולבצע את המשימה",
             "en":"want to join the FreeMates and do the mission"

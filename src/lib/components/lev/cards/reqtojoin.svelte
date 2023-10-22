@@ -7,6 +7,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
   import {lang} from '$lib/stores/lang.js'
+  import Chaticon from '$lib/celim/chaticon.svelte';
     export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting
     export let already = false;
     export let src2;
@@ -22,6 +23,10 @@ function decline(alr) {
   already = true; 
 dispatch("decline",{alr:alr});
 }
+function tochat() {
+dispatch("chat");
+}
+
 const leho = {"he":" בכל חודש " , "en": " per month"}
 
 const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en":"appruval of joining and mission assigned"}
@@ -88,6 +93,13 @@ const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en
               <No/>
             </button>
         {/if}
+            <button
+      on:mouseenter={()=>hover("לצפיה בדיון")} 
+      on:mouseleave={()=>hover("0")}  
+     class = "btnc bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-gold hover:text-barbi hover:scale-110" 
+      on:click={() => tochat()}
+      ><Chaticon/>
+        </button>
          {:else if low == true}
           <Lowbtn isCart="true"/>
         {/if}

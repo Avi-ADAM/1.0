@@ -56,6 +56,9 @@ let resP = [];
 export let stylef = '24px';
 export let askId;
 export let users;
+export let chat
+export let mypose = true
+export let order = 1
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -538,6 +541,72 @@ function hoverc (event){
   }
     dispatch("hover", {id: u});
 }
+let clicked = false
+async function react (){
+     allr = true;
+      isOpen = true;
+}
+ async function afreact (event){
+  if (chat !== null){
+ const diu =  objToString(chat)
+  }
+  let why = event.detail.why
+  console.log(why)
+  let d = new Date()
+         //  loading = true;
+       const cookieValue = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('jwt='))
+  .split('=')[1];
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  idL = cookieValueId;
+    token  = cookieValue; 
+     bearer1 = 'bearer' + ' ' + token;
+     let dataa = {
+          data: { 
+        chat:[...chat,{
+      what: mypose,
+      users_permissions_user:idL,
+      why:why,
+      order:order+=1,
+      zman:d.toISOString(),
+      ide:idL
+    }
+  ]
+}  
+ }
+    try {
+             await fetch(`https://tov.onrender.com/api/asks/${askId}?populate=*`, {
+              method: 'PUT',
+        headers: {
+            'Authorization': bearer1,
+            'Content-Type': 'application/json'
+                  },
+        body: JSON.stringify(dataa),
+      })
+  .then(r => r.json())
+  .then(data => miDatan = data);
+         console.log(miDatan)
+       chat.push({
+                  what: mypose,
+                  users_permissions_user:idL,
+                  why:why,
+                  order:order+=1,
+                  zman:d.toISOString(),
+                  ide:idL
+                  })
+            chat = chat   
+            clicked = false 
+         nowId.set(miDatan.data.attributes.chat[miDatan.data.attributes.chat.length -1].id)
+      //   loading = false;
+        } catch (e) {
+            error1 = e
+            console.log(error1)
+        }
+}
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
@@ -548,12 +617,80 @@ function hoverede(){
   dispatch("hover", {id: u});
  }
  import Card from './cards/reqtojoin.svelte'
+  import { DialogContent, DialogOverlay } from "svelte-accessible-dialog";
+  import { RingLoader } from "svelte-loading-spinners";
+  import Diun from "./diun.svelte";
+  import { nowId } from "$lib/stores/pendMisMes.js";
 export let cards = false;
+function tochat (){
+  isOpen = true
+  diunm = true
+}
+let isOpen = false, loading = false ,diunm = false
+const chatdes ={"he":"צ'אט עם","en":"chat with"}
+const chatdes2 ={"he":"על צירופו לריקמה","en":"on joining"}
+const close = () => {
+    isOpen = false;
+    diunm = false;
+};
 </script>
 
 {#await ser}
 <h1>loop</h1>
 {:then ser}
+ <DialogOverlay {isOpen} onDismiss={close} class="overlay">
+        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent class="chat" aria-label="form" >
+      <div dir="rtl" class="grid items-center justify-center aling-center">
+              <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+title="ביטול"
+><svg style="width:24px;height:24px" viewBox="0 0 24 24"> 
+  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+</svg></button>
+{#if loading === true}
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+  <!--   
+{:else if masa === true}
+
+<Nego
+      on:load={()=>loading = true}
+        on:close={afternego}
+  descrip ={descrip}
+  projectName ={projectName}
+  name1 ={name}
+  spnot = {hearotMeyuchadot}
+  kindOf ={kindOf}
+  hm = {hm}
+  {timegramaId}
+  projectId = {projectId}
+  total ={total}
+  noofusers={noofusers}
+  price={price}
+  easy = {easy}
+  linkto = {linkto}
+  pendId ={pendId}
+  mshaabId={mshaabId}
+  sqadualedf={sqadualedf}
+  sqadualed={sqadualed}
+  users={users}
+{restime}
+/>-->
+  {:else if diunm === true}
+ <Diun
+  on:rect={afreact} 
+  smalldes={projectName+"-"+openmissionName}
+  nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`} 
+  mypos={true}
+  {clicked}
+  pendId={askId}
+  rect={true}
+  profilePicChatPartner={src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"} 
+  ani="askedMi"/>
+{/if}
+      </div>
+  </DialogContent>
+  </div>
+</DialogOverlay>
 {#if cards == false}
 <div 
 style="position: relative;" 
@@ -561,7 +698,9 @@ style:z-index={hovered === false ? 11 : 16}
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
-class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
+class="hover:scale-290 duration-1000 ease-in" 
+role="content-info"
+ transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
@@ -674,6 +813,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   on:agree={()=>agree()}
   on:decline={()=>decline()}
   on:hover={hoverc} 
+  on:chat={tochat}
   {low}
   {already} 
   {projectName}

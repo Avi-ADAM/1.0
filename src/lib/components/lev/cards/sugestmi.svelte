@@ -9,7 +9,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
-    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true
+    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false
     export let already, allr = false;
 
 function hover(x){
@@ -61,7 +61,7 @@ console.log(workways)
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  leading-normal w-full h-full bg-white ">
+<div dir="rtl"  style="overflow-y:auto" class=" d  leading-normal w-full h-full bg-white dark:bg-slate-800  ">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -81,12 +81,12 @@ console.log(workways)
          <button on:click={project} class="px-2 mx-2 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded text-sm" >{t.watchpr[$lang]}</button >
          </div>
 
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row  leading-normal">
+  <div  class=" bg-white dark:bg-slate-800 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row  leading-normal">
     
     <div  class="mb-8">
             <div class="sm:text-3xl text-xl text-mturk font-bold  mb-2">{missionName}</div>
 
-         <p style="line-height: 1;" class="sm:text-xl text-lg text-gray-600 flex items-center">
+         <p style="line-height: 1;" class="sm:text-xl text-lg text-gray-600 dark:text-slate-100 flex items-center">
             <img style="width:2.5rem;"   src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span 
             on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} 
@@ -120,7 +120,7 @@ console.log(workways)
               {ttne[$lang]}
             {/if}
         </span>
-  {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
+  {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 dark:text-slate-100 text-base">{missionDetails}</p>{/if}
    <!-- {#if hearotMeyuchadot}
      <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if}-->
@@ -157,7 +157,8 @@ console.log(workways)
                 </p>{/each}
     </div>{/if}
 
-    </div><!---
+    </div>
+    <!---
 <div class="grow sm:pt-1 sm:p-14">
   <h3 class="text-center underline decoration-barbi">הערכת רווח חודשי:</h3>
   <svg width="100%" height="100%" viewBox="0 0 600.00001 600.00001" id="svg2" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -185,7 +186,7 @@ console.log(workways)
        <div dir="rtl"  style="overflow-y:visible" class=" bg-transparent ">
 
        {#if low == false}
- {#if already === false && allr === false}
+ {#if already === false && allr === false && alreadyi == false}
                 <button on:mouseenter={()=>hover({"he":"אני רוצה","en":"yes I want"})}
                on:mouseleave={()=>hover("0")}
                on:click={()=>agree("f")}
@@ -208,7 +209,8 @@ console.log(workways)
               name="decline">
               <No/>
             </button>
-
+            {:else if alreadyi == true}
+            <button on:mouseenter={()=>hover({"he":"צ'אט","en":"chat"})} on:mouseleave={()=>hover("0")}  class="text-barbi btnc flex items-center" on:click={() => tochat()}><Chaticon/></button>
 
         {/if}
  {:else if low == true}

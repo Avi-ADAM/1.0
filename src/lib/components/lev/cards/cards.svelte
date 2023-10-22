@@ -466,6 +466,7 @@ mousewheel={true}
             coinlapach={buble.coinlapach} 
             {low}
             pid={buble.pid}
+            chat={buble.chat}
             noofusersWaiting={buble.noofusersWaiting}
             uids={buble.uids}
             what={buble.what}
@@ -548,6 +549,9 @@ mousewheel={true}
  on:user={user}
      coinlapach={buble.coinlapach} 
     {low}
+      chat = {buble.chat ?? null}
+     askId = {buble.askId ?? null}
+    alreadyi={buble.alreadyi}
       askedarr={askedarr}
       {declineddarr}
       deadLine = {buble.attributes.sqadualed}

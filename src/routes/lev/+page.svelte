@@ -557,15 +557,15 @@ async function createasked(da) {
         }
         if (dictasked[t].chat?.length > 0) {
             for (let x = 0; x < dictasked[t].chat.length; x++) {
-                let src22 = dictasked[t].pid.includes(dictasked[t].chat[x].users_permissions_user.data.id) ?
-                             getProjectData(dictasked[t].projectId,"upic",dictasked[t].users[x].users_permissions_user.data.id) :
+                let src22 = dictasked[t].pid.includes(dictasked[t].chat[x].ide) ?
+                             getProjectData(dictasked[t].projectId,"upic",dictasked[t].chat[x].ide) :
                              dictasked[t].src
                 dictasked[t].messeges.push({
                     message: dictasked[t].chat[x].why,
                     what: true,
                     pic: src22,
                     timestamp:new Date(dictasked[t].chat[x].zman),
-                    sentByMe: dictasked[t].chat[x].users_permissions_user.data.id === myid ? true : false,
+                    sentByMe: dictasked[t].chat[x].ide === myid ? true : false,
                     changed:  false,
                 })
             }
@@ -1060,7 +1060,7 @@ async function showOpenPro(mi) {
                     },
                     body: JSON.stringify({
                         query: `{openMissions (filters: {id:{in: [${keysSorted}]}}){data{ id attributes{
-            project {data{ id attributes{ projectName timeToP profilePic{data{attributes {url formats }}}}}}
+            project {data{ id attributes{ projectName timeToP user_1s {data{id }} profilePic{data{attributes {url formats }}}}}}
             sqadualed
             tafkidims{data {attributes {roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
             skills {data{attributes{skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
@@ -1084,9 +1084,18 @@ async function showOpenPro(mi) {
                     meData[i].hst = checkHst(meData[i].attributes.project.data.attributes.projectName)
                     meData[i].stb = checkStb(meData[i].attributes.name)
                     if(askedarr.includes(meData[i].id)){
+                        const asksar =  mi.data.usersPermissionsUser.data.attributes.asks.data;
+                        const askId = asksar.find(ask => ask.attributes.open_mission.data.id === meData[i].id);
+                        console.log(askId,"askId",meData[i].id)
+                        meData[i].askId = askId.id
+                        meData[i].chat = askId.attributes.chat 
+                        meData[i].pid = meData[i].attributes.project.data.attributes.user_1s.data.map(t=> t.id)
+                        meData[i].projectId = meData[i].attributes.project.data.id
+                        meData[i].openName = meData[i].attributes.name
                         let old = $meAskMisMes
-                        old[meData[i].id] = peace(miData,meData[i].id,$lang)
+                        old[meData[i].id] = peace(miData,meData[i].id,$lang,idL)
                         meAskMisMes.set(old)
+                        console.log("peace",$meAskMisMes)
                         localStorage.setItem("meAskMisMes", JSON.stringify($meAskMisMes));
                     }
             }
@@ -1255,6 +1264,12 @@ onMount(async () => {
     if (localStorage.getItem("pendMasMes") !== null) {
         pendMasMes.set(JSON.parse(localStorage.getItem("pendMasMes")))
     }
+    if (localStorage.getItem("askMisMes") !== null) {
+        askMisMes.set(JSON.parse(localStorage.getItem("askMisMes")))
+    }
+    if (localStorage.getItem("meAskMisMes") !== null) {
+        meAskMisMes.set(JSON.parse(localStorage.getItem("meAskMisMes")))
+    }    
     if (localStorage.getItem("pendMisMes") !== null) {
         pendMisMes.set(JSON.parse(localStorage.getItem("pendMisMes")))
     }    
@@ -1457,7 +1472,8 @@ onMount(async () => {
                      old[arr1[index].pendId] = arr
                      pendMasMes.set(old)
                 localStorage.setItem("pendMasMes", JSON.stringify($pendMasMes));
-                 let head = `${tr.nuti.sendNewA[$lang]} 
+                if(datan.data.attributes.chat[datan.data.attributes.chat.length -1].id != $nowId){ 
+                let head = `${tr.nuti.sendNewA[$lang]} 
                  ${datan.data.attributes.name} 
                  ${tr.nuti.sendNewB[$lang]} 
                  ${pname} 
@@ -1469,8 +1485,8 @@ onMount(async () => {
                 }else{
                 nutifi(head,body)
                 }
-                //start()
                 }
+            }
                 }
           });                
           socket.on("pendm:update", (datan) => {
@@ -1503,8 +1519,9 @@ onMount(async () => {
                    let old = $pendMisMes
                      old[arr1[index].pendId] = arr
                      pendMisMes.set(old)
-        localStorage.setItem("pendMisMes", JSON.stringify($pendMisMes));
-                 let head = `${tr.nuti.sendNewA[$lang]} 
+                localStorage.setItem("pendMisMes", JSON.stringify($pendMisMes));
+               if(datan.data.attributes.chat[datan.data.attributes.chat.length -1].id != $nowId){
+                let head = `${tr.nuti.sendNewA[$lang]} 
                  ${datan.data.attributes.name} 
                  ${tr.nuti.sendNewB[$lang]} 
                  ${pname} 
@@ -1516,10 +1533,79 @@ onMount(async () => {
                 }else{
                 nutifi(head,body)
                 }
-                start()
-                }
+            }
+            }
                 }
           });
+          socket.on("ask:update", (datan) => {
+            console.log("io= ",datan)
+            let iddd = datan.data.id
+           console.log(iddd)
+            update = true
+            let index 
+            let isMeData = false
+            if(datan.data.attributes.users_permissions_user.data.id == idL){
+               index = arr1.findIndex(
+                element => element.ani === 'meData' && element.askId == iddd
+            );
+                isMeData = true
+            }else{
+             index = arr1.findIndex(
+                    element => element.ani === 'askedcoin' && element.askId == iddd
+                );
+                isMeData = false
+            }
+                //check if updater is me, check if diun is longer && if users longer
+            console.log(index, arr1[index])    
+                if(index != -1 || null){
+                  // indexi = index
+                if(arr1[index].chat.length == datan.data.attributes.chat.length && datan.data.attributes.chat[datan.data.attributes.chat.length -1].id != $nowId){
+                 start()
+                }else{
+                let src22 = arr1[index].pid.includes(datan.data.attributes.chat[datan.data.attributes.chat.length -1].ide) ?
+                             getProjectData(arr1[index].projectId,"upic",datan.data.attributes.chat[datan.data.attributes.chat.length -1].ide) :
+                             isMeData ? picLink : arr1[index].src 
+                let uname = arr1[index].pid.includes(datan.data.attributes.chat[datan.data.attributes.chat.length -1].ide) ?
+                             getProjectData(arr1[index].projectId,"un",datan.data.attributes.chat[datan.data.attributes.chat.length -1].ide) :
+                             isMeData ? nam : arr1[index].username                             
+                let pname = isMeData ? arr1[index].attributes.project.data.attributes.projectName : getProjectData(arr1[index].projectId,"pn")
+                let arr = isMeData ? $meAskMisMes[datan.data.attributes.open_mission.data.id] : arr1[index].messeges
+                arr.push({
+                    message: datan.data.attributes.chat[datan.data.attributes.chat.length - 1].why,
+                    what: datan.data.attributes.chat[datan.data.attributes.chat.length - 1].what,
+                    pic: src22,
+                    sentByMe: datan.data.attributes.chat[datan.data.attributes.chat.length - 1].ide === idL ? true : false,
+                    timestamp:new Date(datan.data.attributes.chat[datan.data.attributes.chat.length - 1].zman)
+                })
+                arr = arr
+                if(isMeData = false){
+                   let old = $askMisMes
+                     old[arr1[index].askId] = arr
+                     askMisMes.set(old)
+                    localStorage.setItem("askMisMes", JSON.stringify($askMisMes));
+                }else{
+                    let old = $meAskMisMes
+                     old[arr1[index].id] = arr
+                     meAskMisMes.set(old)
+                    localStorage.setItem("meAskMisMes", JSON.stringify($meAskMisMes));
+                }
+                if(datan.data.attributes.chat[datan.data.attributes.chat.length -1].id != $nowId){
+                 let head = `${tr.nuti.sendNewA[$lang]} 
+                 ${arr1[index].openName} 
+                 ${tr.nuti.sendNewB[$lang]} 
+                 ${pname} 
+                 ${tr.nuti.sendNewC[$lang]}
+                 ${uname}`
+                let body = datan.data.attributes.chat[datan.data.attributes.chat.length - 1].why
+                if(document.visibilityState == "visible"){ 
+                addToast(head+`: "`+body+`"`)
+                }else{
+                nutifi(head,body)
+                }
+                }
+                }
+                }
+          });          
         });
         setInterval(start, tickSpeed);
         if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
@@ -1572,14 +1658,13 @@ async function start() {
       asks (filters: { archived: { eq: false } }){ data{ id attributes{
             archived
             project{data{id attributes{projectName profilePic {data{attributes{ url formats }}} }}} 
-            vots{what  zman}
+            vots{what  zman users_permissions_user{data{id}}}
             timegrama {data{id attributes{date}}}
             createdAt
             open_mission {data{id attributes{  
-                 iskvua sqadualed publicklinks tafkidims {data{ id }}
-                 noofhours perhour privatlinks descrip hearotMeyuchadot name
+                  name
                 }}}            
-            chat{why ide what zman users_permissions_user {data{id}} }
+            chat{why ide what zman id users_permissions_user {data{id attributes{username profilePic {data{attributes {url formats }}}}}} }
         }}}
       askms (filters: { archived: { eq: false } }){ data{ id attributes{
                     vots  {what why id users_permissions_user {data{id}}}
@@ -1671,7 +1756,7 @@ async function start() {
                             vots  {what why zman id users_permissions_user {data{id}}}
                             timegrama {data{id attributes{date}}}
                             createdAt
-                            chat{why ide what zman users_permissions_user {data{id}}}
+                            chat{why id ide what zman users_permissions_user {data{id}}}
                             open_mission {data{id attributes{  mission {data{id}}
                                             declined {data{ id}} iskvua sqadualed publicklinks tafkidims {data{ id }}
                                             noofhours perhour privatlinks descrip hearotMeyuchadot name}}}
