@@ -1811,7 +1811,7 @@ async function start() {
 
         counter += 1;
         localStorage.setItem("miDataL", JSON.stringify(miData));
-        if (!isEqual(miData, miDataold) == true && update != true) {
+        if (isEqual(miData, miDataold) == true && update != true) {
             console.log("nada")
             low = false
         } else {
