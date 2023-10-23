@@ -44,9 +44,20 @@ async function ask() {
         const p = r.map(c => c.id);
         askedarr = p;
     }
+        let d = new Date
+    let myvote = ``
+    let pid = inD.project.data.attributes.user_1s.data.map(t=>t.id)
+         if(pid.includes(uId)){
+      myvote = `vots: [{
+                        what: true
+                        users_permissions_user: "${uId}"
+                        ide:${uId}
+                        zman:"${d.toISOString()}"
+                          }
+                        ]`
+     }
   const as = askedarr;
     as.push(`${data.mId}`);  
-    let d = new Date
  let que = `mutation { updateUsersPermissionsUser(
     id: "${uId}"
       data: { askeds: [${as}] }
@@ -67,6 +78,7 @@ async function ask() {
             project: ${inD.project.data.id},
             users_permissions_user: ${uId},
             publishedAt: "${d.toISOString()}",
+            ${myvote}
     }
   ){
     data {id}
@@ -77,12 +89,33 @@ async function ask() {
     const r2 = d2.data
     console.log(r2)
     if (r2 != null){
+      let restime = inD.project.data.attributes.restime
+       let x = calcX(restime)
+     let fd = new Date(Date.now() + x)
+         let hiluzId = r2.createAsk.data.id
+                        let quee = `mutation 
+                        {createTimegrama(
+         data:{
+           date: "${fd.toISOString()}",
+           whatami: "ask",
+      ask: ${hiluzId},
+          }
+        ){
+          data {id}
+        }
+      }`
+    const d3 = await SendTo(quee)
+    .then()
+    const r3 = d3.data
+    console.log(r3)
+    if (r3 != null){
       success = true
      setTimeout(function(){  
     success = false
   },15000)
    addToast(`${fnnn[$lang]}`, 'info');
 }
+    }
 }
 
 export let data
@@ -140,6 +173,7 @@ const registratio = { "he": "להרשמה", "en": "To Registration"}
 const logi = { "he": "להתחברות", "en":"To Login"} 
 const foreg = {"he":"כדי לראות את כל המידע נדרשת התחברות או הרשמה","en":"some information is available only for registersd users"}
  import { Head } from 'svead'
+  import { calcX } from '$lib/func/calcX.svelte';
 
   let title = 'This is Svead a Svelte Head Component'
   let image = `https://og.tailgraph.com/og?fontFamily=Roboto&title=This+is+Svead&titleTailwind=text-gray-800+font-bold+text-6xl&text=Set+Head+meta+tag+information&textTailwind=text-gray-700+text-2xl+mt-4&logoTailwind=h-8&bgTailwind=bg-white&footer=svead.vercel.app&footerTailwind=text-teal-600`

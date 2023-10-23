@@ -274,6 +274,7 @@ ${adduser}
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
+
                                       }
                                     ]}
                         ){data{id}}
@@ -433,6 +434,8 @@ ${adduser2}
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
+                                        ide:${idL}
+                                        zman:"${d.toISOString()}"
                                       }
                                     ]}
                         ){data{id}}

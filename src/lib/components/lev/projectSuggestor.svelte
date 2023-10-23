@@ -35,6 +35,7 @@ export let coinlapach;
     export let total = 0;
     export let askedarr =[];
     export let declineddarr = [];
+    export let pid;
 let already = false;
     let token;
     let uId;
@@ -55,6 +56,7 @@ async function agree(oid) {
 const as = askedarr;
  as.push(`${oid}`);
  console.log(as)
+ let myvote = ``
   //todo if project member voted yes
 const cookieValue = document.cookie
   .split('; ')
@@ -65,9 +67,22 @@ const cookieValue = document.cookie
   .find(row => row.startsWith('id='))
   .split('=')[1];
   uId = cookieValueId;
+
     token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
-    let d = new Date
+        let d = new Date
+
+    console.log(pid)
+     if(pid.includes(uId)){
+      myvote = `vots: [{
+                        what: true
+                        users_permissions_user: "${uId}"
+                        ide:${uId}
+                        zman:"${d.toISOString()}"
+                          }
+                        ]`
+     }
+
     let link = 'https://tov.onrender.com/graphql';
     try {
              await fetch(link, {
@@ -98,6 +113,7 @@ const cookieValue = document.cookie
             project: ${projectId},
             users_permissions_user: ${uId},
             publishedAt: "${d.toISOString()}",
+            ${myvote}
     }
   ){
     data {id}

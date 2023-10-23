@@ -549,6 +549,8 @@ mousewheel={true}
  on:user={user}
      coinlapach={buble.coinlapach} 
     {low}
+    pid={buble.pid}
+     restime={buble.attributes.project.data.attributes.restime}
       chat = {buble.chat ?? null}
      askId = {buble.askId ?? null}
     alreadyi={buble.alreadyi}

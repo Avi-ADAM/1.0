@@ -546,8 +546,10 @@ export let sml = false
                                                         on:mesima={mesima}
                                                         timeToP={buble.attributes.project.data.attributes.timeToP}
                                                         coinlapach={buble.coinlapach}
+                                                        restime={buble.attributes.project.data.attributes.restime}
                                                         askedarr={askedarr}
                                                         {declineddarr}
+                                                        pid={buble.pid}
                                                         chat = {buble.chat ?? null}
                                                         askId = {buble.askId ?? null}
                                                         deadLine = {buble.attributes.sqadualed}

@@ -15,7 +15,7 @@ export async function load({ locals, params }) {
     que = `{  openMission (id:${mId}) {data{attributes{ sqadualed
              archived
              users{data{id}}
-      project {data{ id attributes{ projectName timeToP profilePic {data{ attributes{url  }}}}}}
+      project {data{ id attributes{ projectName user_1s{data{id}} restime timeToP profilePic {data{ attributes{url  }}}}}}
             tafkidims {data{attributes{roleDescription ${
               lang == 'he'
                 ? 'localizations{data{attributes{ roleDescription }}}'

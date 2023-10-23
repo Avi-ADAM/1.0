@@ -580,10 +580,13 @@ async function createasked(da) {
     askMisMes.set(old)
     }
 }
-   /*let filters = [idL];
+console.log(dictasked)
+   let filters = [idL];
 
-    let result = dictasked.filter(val => filters.includes(val.uid));
-    dictasked = result*/
+    let result = dictasked.filter(val => !filters.includes(val.uid));
+    dictasked = result
+console.log(dictasked)
+
     localStorage.setItem("askMisMes", JSON.stringify($askMisMes));
     dictasked = dictasked;
     askedcoin = dictasked;
@@ -1060,7 +1063,7 @@ async function showOpenPro(mi) {
                     },
                     body: JSON.stringify({
                         query: `{openMissions (filters: {id:{in: [${keysSorted}]}}){data{ id attributes{
-            project {data{ id attributes{ projectName timeToP user_1s {data{id }} profilePic{data{attributes {url formats }}}}}}
+            project {data{ id attributes{ projectName restime timeToP user_1s {data{id }} profilePic{data{attributes {url formats }}}}}}
             sqadualed
             tafkidims{data {attributes {roleDescription ${$lang == 'he' ? 'localizations {data{attributes {roleDescription }}}' : ""}}}}
             skills {data{attributes{skillName ${$lang == 'he' ? 'localizations {data{attributes{skillName }}}' : ""}}}}
@@ -1081,6 +1084,7 @@ async function showOpenPro(mi) {
                 meData[i].ani = "meData",
                 meData[i].azmi = "hazaa",               
                 meData[i].pl = 10 + i,
+                meData[i].pid = meData[i].attributes.project.data.attributes.user_1s.data.map(t=> t.id),
                     meData[i].hst = checkHst(meData[i].attributes.project.data.attributes.projectName)
                     meData[i].stb = checkStb(meData[i].attributes.name)
                     if(askedarr.includes(meData[i].id)){
@@ -1089,7 +1093,6 @@ async function showOpenPro(mi) {
                         console.log(askId,"askId",meData[i].id)
                         meData[i].askId = askId.id
                         meData[i].chat = askId.attributes.chat 
-                        meData[i].pid = meData[i].attributes.project.data.attributes.user_1s.data.map(t=> t.id)
                         meData[i].projectId = meData[i].attributes.project.data.id
                         meData[i].openName = meData[i].attributes.name
                         let old = $meAskMisMes
