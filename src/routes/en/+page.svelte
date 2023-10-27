@@ -36,31 +36,48 @@ onMount(async () => {
   }
  
  }; 
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
+ let error1, fppp
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
-          return resp;
+            return resp;
         }
         return parseJSON(resp).then((resp) => {
-          throw resp;
+            throw resp;
         });
-      };
-      const headers = {
+    };
+    const headers = {
         'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch("https://tov.onrender.com/api/chezins/count", {
-              method: "GET",
-              headers: {
-                 'Content-Type': 'application/json'
-              },
+    };
+
+    try {
+        const res = await fetch("https://tov.onrender.com/graphql", {
+                method: "POST",
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    query: `query {
+  chezins { 
+   meta {
+      pagination {
+        total
+      }
+    }
+  }
+}
+              `
+                })
             }).then(checkStatus)
-          .then(parseJSON);
- idx = res + 2
-        } catch (e) {
-            error = e
-        }
+            .then(parseJSON);
+        fppp = res.data.chezins
+
+        idx = fppp.meta.pagination.total
+    } catch (e) {
+        error1 = e
+    }
+
+             
     });
 	let user;
 
