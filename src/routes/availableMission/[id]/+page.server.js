@@ -67,7 +67,7 @@ export async function load({ locals, params }) {
             data = data;
             data.title = {
               he: `1💗1 | הצעה למשימה "${data.name}" בריקמה: ${data.project.data.attributes.projectName}`,
-              en: 'come see this mission on    '
+              en: `1💗1 | come see this mission "${data.name}" on freeMates:"${data.project.data.attributes.projectName}"`
             };
             data.fullfild = true
                                   console.log(fullfild);
