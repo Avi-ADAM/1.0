@@ -1,5 +1,4 @@
 import { SendTo } from '$lib/send/sendTo.svelte';
-import { langAdjast } from '$lib/func/langAdjast.svelte';
 export async function load({ locals, params }) {
   const mId = params.id;
   const lang = locals.lang;
@@ -23,8 +22,11 @@ export async function load({ locals, params }) {
   let archived = false;
   if (tok != false) {
     toc = tok;
+    console.log("loged in")
   } else {
     toc = import.meta.env.VITE_ADMINMONTHER;
+        console.log('not loged in');
+
   }
   alld = new Promise((resolve) => {
     SendTo(que, toc)
