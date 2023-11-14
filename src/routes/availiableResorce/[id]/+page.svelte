@@ -502,7 +502,7 @@
                     >{creatnew[$lang]}</button
                   >
                   {:else}
-                    <h3>{rangehead[$lang]}</h3>
+                    <h3 class="text-barbi">{rangehead[$lang]}</h3>
                     <div class="w-full">
 
                     <RangeSlider 
