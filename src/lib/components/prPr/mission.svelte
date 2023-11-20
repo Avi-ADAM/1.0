@@ -45,6 +45,8 @@ import {
     addslashes
 } from '$lib/func/uti/string.svelte'
 const dispatch = createEventDispatcher();
+const baseUrl = import.meta.env.VITE_URL
+
 export let newcontent = true;
 export let newcontentR = true;
 export let newcontentW = true;
@@ -185,6 +187,9 @@ async function increment() {
      {
       what: true
       users_permissions_user: "${idL}"
+      ide: ${idL}
+      order: 0
+      zman: "${d.toISOString()}"
     }
   ]`;
         } else if (userslength === 1) {
@@ -249,7 +254,7 @@ async function increment() {
         const deee = (element.attributes.descrip !== undefined && element.attributes.descrip !== "undefined") ? `descrip: "${addslashes(element.attributes.descrip)}",` : "";
         //publicklinks save to mission also othet new data
         // הפרדה של קישורים בפסיק
-        let link = 'https://tov.onrender.com/graphql';
+        let link = baseUrl+'/graphql';
         if (daleg == false) {
             try {
                 await fetch(link, {
@@ -296,7 +301,7 @@ async function increment() {
                     if (element.myM === true && userslength > 1) {
 
                         let lechaletz = miDatan.data.createOpenMission.data.id
-                        let link = 'https://tov.onrender.com/graphql';
+                        let link = baseUrl+'/graphql';
                         try {
                             await fetch(link, {
                                     method: 'POST',
@@ -316,6 +321,9 @@ async function increment() {
      {
       what: true
       users_permissions_user: "${idL}"
+      ide: ${idL}
+      order: 0
+      zman: "${d.toISOString()}"
     }
   ]
     }
@@ -587,7 +595,7 @@ async function newnew(selectedWorkways) {
         if (!$ww.map(c => c.attributes.workWayName).includes(selectedWorkways[i])) {
             //create new and update workways2
             let d = new Date
-            let link = "https://tov.onrender.com/graphql";
+            let link = baseUrl+"/graphql";
             try {
                 await fetch(link, {
                         method: 'POST',
