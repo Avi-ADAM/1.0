@@ -14,6 +14,7 @@
   import Diun from './diun.svelte';
   const dispatch = createEventDispatcher();
   export let low = false;
+  const baseUrl = import.meta.env.VITE_URL
 
   export let coinlapach;
   export let deadline;
@@ -88,7 +89,7 @@
   }
   let error1;
   let miDatan = [];
-  let linkg = 'https://tov.onrender.com/graphql';
+  let linkg = baseUrl+'/graphql';
 
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
@@ -528,7 +529,7 @@ updateAskm(
       }
     };
     try {
-      await fetch(`https://tov.onrender.com/api/askms/${askId}?populate=*`, {
+      await fetch(`${baseUrl}/api/askms/${askId}?populate=*`, {
         method: 'PUT',
         headers: {
           Authorization: bearer1,

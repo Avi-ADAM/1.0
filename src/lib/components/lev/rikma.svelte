@@ -16,6 +16,8 @@ let idL;
 let srcP;
 let error1 = null;
 let vallues  = []
+const baseUrl = import.meta.env.VITE_URL
+
       let linkP  =[]
        let githublink;
          let fblink, discordlink, twiterlink;
@@ -44,7 +46,7 @@ async function xyd () {
       const headers = {
         'Content-Type': 'application/json'   
       };
-        let link ="https://tov.onrender.com/graphql" ;
+        let link = baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

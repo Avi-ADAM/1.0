@@ -8,6 +8,8 @@ import Tile from '$lib/celim/tile.svelte'
 import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
+const baseUrl = import.meta.env.VITE_URL
+
 export let missionId;
 let projectUsers =[];
 let token;
@@ -40,7 +42,7 @@ async function xyd () {
       const headers = {
         'Content-Type': 'application/json'   
       };
-        let link ="https://tov.onrender.com/graphql" ;
+        let link = baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

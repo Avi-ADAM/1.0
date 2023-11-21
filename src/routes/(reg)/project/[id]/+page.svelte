@@ -12,6 +12,8 @@ import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
 let projectUsers =[];
+const baseUrl = import.meta.env.VITE_URL
+
 let token;
 let idL;
 let srcP;
@@ -45,7 +47,7 @@ async function xyd () {
       const headers = {
         'Content-Type': 'application/json'   
       };
-        let link ="https://tov.onrender.com/graphql" ;
+        let link =baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

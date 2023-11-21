@@ -54,9 +54,9 @@ const head = {"he":"אישור קבלת משאב בהצלחה","en":"approval of
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-xl text-sm">{head[$lang]}</span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-xl">{head[$lang]}</span>
             </div>
-            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
+            <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-lg sm:text-xl  text-barbi ">{projectName}</span>
          </div>
          </div>
          </div>

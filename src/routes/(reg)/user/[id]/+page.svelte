@@ -24,6 +24,8 @@ let ur = [];
 let val = [];
 let mash = []
 let error1 = null;
+const baseUrl = import.meta.env.VITE_URL
+
      onMount(async () => {
     const cookieValue = document.cookie
   .split('; ')
@@ -47,7 +49,8 @@ let error1 = null;
       };
       const headers = {
         'Content-Type': 'application/json'   
-      }; let link ="https://tov.onrender.com/graphql" ;
+      }; 
+      let link =baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

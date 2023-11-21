@@ -187,7 +187,9 @@ function objToStringC (obj) {
 let whyy = ``;
 let allr = false;
 export let ordern = 0;
-let linkg = 'https://tov.onrender.com/graphql';
+const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+'/graphql';
 let userss = objToString(users);
 async function agree(alr) {
   let d = new Date
@@ -480,7 +482,7 @@ async function afreact (event){
 }  
  }
     try {
-             await fetch(`https://tov.onrender.com/api/pendms/${pendId}?populate=*`, {
+             await fetch(`${baseUrl}/api/pendms/${pendId}?populate=*`, {
               method: 'PUT',
         headers: {
             'Authorization': bearer1,
