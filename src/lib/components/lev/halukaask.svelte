@@ -29,6 +29,8 @@ import { idPr } from '../../stores/idPr.js';
     export let users;
     export let diun = [];
     export let order = diun.length;
+    const baseUrl = import.meta.env.VITE_URL
+
     let miDatan = [];
     let error1;
     let bearer1;
@@ -100,7 +102,7 @@ function objToString (obj) {
     }}
     return str;
 }
-let linkg = 'https://tov.onrender.com/graphql';
+let linkg = baseUrl+'/graphql';
   
 async function agree(alr) {
   if  (alr == "alr"){

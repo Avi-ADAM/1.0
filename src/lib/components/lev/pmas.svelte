@@ -26,7 +26,8 @@ import { idPr } from '../../stores/idPr.js';
     export let kindOf = "";
     export let src = "coin.png";
     export let projectId;
-    export let link = "https://tov.onrender.com/api/project/";
+    const baseUrl = import.meta.env.VITE_URL
+    export let link = baseUrl+"/api/project/";
     export let noofusersOk;
     export let noofusersNo;
     export let noofusersWaiting;
@@ -193,7 +194,7 @@ function objToStringC (obj) {
 }
 let whyy = ``
 export let ordern = 0;
-let linkg = 'https://tov.onrender.com/graphql';
+let linkg = baseUrl+'/graphql';
 let userss = objToString(users);
 async function agree(alr) {
   let d = new Date
@@ -487,7 +488,7 @@ async function react (){
 }  
  }
     try {
-             await fetch(`https://tov.onrender.com/api/pmashes/${pendId}?populate=*`, {
+             await fetch(`${baseUrl}/api/pmashes/${pendId}?populate=*`, {
               method: 'PUT',
         headers: {
             'Authorization': bearer1,

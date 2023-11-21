@@ -58,7 +58,8 @@ let lang;
 export let stylef = '24px';
 export let askId;
 export let users;
-    
+    const baseUrl = import.meta.env.VITE_URL
+
 let idL;
 let bearer1; 
 let token;
@@ -140,7 +141,7 @@ let ser = xyz();
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+let linkg = baseUrl+'/graphql';
 
 function objToString (obj) {
     let str = '';

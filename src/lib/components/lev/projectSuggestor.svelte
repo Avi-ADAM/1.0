@@ -10,6 +10,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 	import dayjs from 'dayjs';
   import { nowId } from "$lib/stores/pendMisMes.js";
+const baseUrl = import.meta.env.VITE_URL
 
  const dispatch = createEventDispatcher();
      export let low = false, alreadyi = false
@@ -83,7 +84,7 @@ const cookieValue = document.cookie
                         ]`
      }
 
-    let link = 'https://tov.onrender.com/graphql';
+    let link = baseUrl+'/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -167,7 +168,7 @@ const cookieValue = document.cookie
   uId = cookieValueId;
     token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
-    let link = 'https://tov.onrender.com/graphql';
+    let link =baseUrl+ '/graphql';
     try {
              await fetch(link, {
               method: 'POST',
@@ -371,7 +372,7 @@ let miDatan = []
 }  
  }
     try {
-             await fetch(`https://tov.onrender.com/api/asks/${askId}?populate=*`, {
+             await fetch(`${baseUrl}/api/asks/${askId}?populate=*`, {
               method: 'PUT',
         headers: {
             'Authorization': bearer1,
@@ -404,8 +405,7 @@ function tochat (){
     isOpen = true
     diunm = true
 }
-const chatdes ={"he":"צ'אט עם","en":"chat with"}
-const chatdes2 ={"he":"על הצטרפות לריקמה","en":"on joining"}
+const chatdes2 ={"he":"צ'אט על הצטרפות לריקמה" ,"en":"chat on joining"}
 </script>
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -448,7 +448,8 @@ title="ביטול"
  <Diun
   on:rect={afreact} 
   smalldes={projectName+"-"+missionName} 
-  nameChatPartner={`${chatdes[$lang]} ${projectName} ${chatdes2[$lang]}`} 
+  nameChatPartner={`${chatdes2[$lang]} 
+  ${projectName}`} 
   mypos={true}
   rect={true}
   {clicked}

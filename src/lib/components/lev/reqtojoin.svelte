@@ -162,7 +162,9 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+'/graphql';
 
 function objToString (obj) {
     let str = '';
@@ -582,7 +584,7 @@ async function react (){
 }  
  }
     try {
-             await fetch(`https://tov.onrender.com/api/asks/${askId}?populate=*`, {
+             await fetch(`${baseUrl}/api/asks/${askId}?populate=*`, {
               method: 'PUT',
         headers: {
             'Authorization': bearer1,

@@ -264,7 +264,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
                   class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
                 >
                   <img
-                    class="w-6 lg:w-12"
+                    class="w-12 lg:w-24"
                     src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
                     alt="howmuch"
                   />

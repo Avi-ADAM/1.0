@@ -272,7 +272,7 @@
   import { find_skill_id } from '$lib/func/findSkillId.svelte';
   console.log($page)
   let title = 'This is Svead a Svelte Head Component';
-  let image = `https://og.tailgraph.com/og?fontFamily=Roboto&title=This+is+Svead&titleTailwind=text-gray-800+font-bold+text-6xl&text=Set+Head+meta+tag+information&textTailwind=text-gray-700+text-2xl+mt-4&logoTailwind=h-8&bgTailwind=bg-white&footer=svead.vercel.app&footerTailwind=text-teal-600`;
+  let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
   let description = $page?.data.alld?.descrip || om[$lang];
   let url = $page.url.toString();
   //TODO: header nav menu
