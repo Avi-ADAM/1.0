@@ -190,6 +190,7 @@ export let frd;
 export let lango;
 export let uid
 let passi;
+const baseUrl = import.meta.env.VITE_URL
 
 function shaneh () {
           passwordx = passwordx.trim();
@@ -201,7 +202,7 @@ function shaneh () {
     let token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
    axios
-  .post('https://tov.onrender.com/api/auth/change-password', {
+  .post(baseUrl+'/api/auth/change-password', {
     currentPassword: passi,
     password: passwordx,
     passwordConfirmation: passwordx

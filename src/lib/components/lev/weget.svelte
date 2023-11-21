@@ -92,7 +92,9 @@ let token;
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+'/graphql';
 
 
 let monts = 0

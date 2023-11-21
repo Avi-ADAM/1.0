@@ -26,6 +26,7 @@ export let meData = [];
 }
  let already = false;
  let idL;
+const baseUrl = import.meta.env.VITE_URL
 
 async function han (){
     console.log(meData)
@@ -46,7 +47,7 @@ async function han (){
   const easy = (meData.myp > 0) ? meData.myp : 0;
   const sdate = (meData.dates !== undefined) ? `sdate: "${new Date(meData.dates).toISOString()}",` : ``;
    const fdate = (meData.datef !== undefined) ? `fdate: "${new Date(meData.datef).toISOString()}" ,` : ``;
- let linkgra = 'https://tov.onrender.com/graphql';
+ let linkgra = baseUrl+'/graphql';
     try {
              await fetch(linkgra, {
               method: 'POST',

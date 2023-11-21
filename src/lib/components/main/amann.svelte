@@ -320,6 +320,7 @@ function find_contry_id(contry_name_arr){
                   ];
     const name = `countries`;
         let lang ="he";
+const baseUrl = import.meta.env.VITE_URL
 
     const placeholdr = {he: "", ar: "", en: ""};
     const pl = `${placeholdr}.${lang}`;
@@ -353,12 +354,12 @@ g = true;
  erorims = true
  } else {
 const passwordx = generatePassword()
-let linkg = 'https://tov.onrender.com/graphql'
+let linkg = baseUrl+'/graphql'
 let miDatan;
  erorims = false
  const mail = $form.email.toLowerCase()
  axios
- .post('https://tov.onrender.com/api/chezins', {
+ .post(baseUrl+'/api/chezins', {
      name: $form.name,
        email: mail,
         countries: find_contry_id(selected)

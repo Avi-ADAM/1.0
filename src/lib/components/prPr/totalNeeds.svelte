@@ -36,6 +36,8 @@ beforeUpdate(async () => {
     upd()
 
 })
+const baseUrl = import.meta.env.VITE_URL
+
 export let pu,pn,pl,restime
 let linkop = ``;
 let already = false;
@@ -78,7 +80,7 @@ async function han() {
         const easy = (element.attributes.easy > 0) ? element.attributes.easy : 0;
         const sdate = (element.attributes.dates !== undefined) ? `sqadualed: "${new Date(element.attributes.dates).toISOString()}",` : ``;
         const fdate = (element.attributes.datef !== undefined) ? ` sqadualedf: "${new Date(element.attributes.datef).toISOString()}" ,` : ``;
-        let link = 'https://tov.onrender.com/graphql';
+        let link = baseUrl+'/graphql';
    try {
             await fetch(link, {
                     method: 'POST',

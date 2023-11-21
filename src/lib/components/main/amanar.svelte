@@ -16,6 +16,7 @@
       import Tikun from './tikunar.svelte';
             import TRan from './tranarb.svelte';
       import {  doesLang, langUs, lang } from '$lib/stores/lang.js'
+const baseUrl = import.meta.env.VITE_URL
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -46,7 +47,7 @@ function find_contry_id(contry_name_arr){
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -357,7 +358,7 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
-            fetch('https://tov.onrender.com/api/chezins', {
+            fetch(baseUrl+'/api/chezins', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -409,7 +410,7 @@ onMount(async () => {
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/api/chezins/count", {
+            const res = await fetch(baseUrl+"/api/chezins/count", {
               method: "GET",
               headers: {
                  'Content-Type': 'application/json'

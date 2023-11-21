@@ -17,6 +17,8 @@ import {
     goto } from '$app/navigation';
  // import { height } from '@event-calendar/common';
 let confe = false
+const baseUrl = import.meta.env.VITE_URL
+
 async function project(id) {
     confe = false
     confe = true
@@ -36,7 +38,7 @@ async function project(id) {
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

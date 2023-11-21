@@ -44,7 +44,8 @@ export let pid
 export let stylef = '24px';
 export let askId;
 export let users;
-    
+    const baseUrl = import.meta.env.VITE_URL
+
 onMount(async () => {
   if (kind == "pic"){
     openmissionName = {"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"}
@@ -85,7 +86,7 @@ import { Swiper, SwiperSlide } from "swiper/svelte";
  }
 let error1;
 let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+let linkg = baseUrl+'/graphql';
 
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;

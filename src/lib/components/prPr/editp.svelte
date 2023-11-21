@@ -42,7 +42,8 @@ function sendP () {
 let vallues = [];
     let error1 = null;
     let addval = false;
-    
+    const baseUrl = import.meta.env.VITE_URL
+
     onMount(async () => {
       basis = projectName_value
        const cookieValue = document.cookie
@@ -65,7 +66,7 @@ let vallues = [];
                  'Content-Type': 'application/json'      };
     
         try {
-           const res = await fetch("https://tov.onrender.com/graphql", {
+           const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

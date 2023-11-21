@@ -55,7 +55,9 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'https://tov.onrender.com/graphql'
+const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+'/graphql'
 let miDatan;
 let errr = {k: false, m: "", p: false}
 async function increment() {    
@@ -71,9 +73,9 @@ errr.p = true;
  let uid = cookieValueId;
    let token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://tov.onrender.com/graphql" ;
+    let link =baseUrl+"/graphql" ;
      axios
-  .post('https://tov.onrender.com/password', {
+  .post(baseUrl+'/password', {
      identifier: emailL,
     password: newpp,
     newPassword: passwordx,

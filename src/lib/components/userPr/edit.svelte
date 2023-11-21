@@ -24,6 +24,7 @@
 
 
 import { slide, fly } from 'svelte/transition';
+const baseUrl = import.meta.env.VITE_URL
 
 let newskillslist, idLi, name
  const dispatch = createEventDispatcher();
@@ -69,7 +70,7 @@ export let bgi = "wow"
             if ($lang == "he"){
               more =  `localizations{ data {attributes{ ${valc} }}}`
             }
-              const res = await  fetch("https://tov.onrender.com/graphql", {
+              const res = await  fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -135,7 +136,7 @@ async function increment() {
   uid = cookieValueId;
     token  = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
-    let link ="https://tov.onrender.com/graphql" ;
+    let link =baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',
@@ -369,7 +370,7 @@ async function updi (){
           throw resp;
         });
       };
-      let linkg ="https://tov.onrender.com/graphql" ;
+      let linkg =baseUrl+"/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -502,7 +503,7 @@ async function edit (id){
         };
 
           try {
-              const res = await  fetch("https://tov.onrender.com/graphql", {
+              const res = await  fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                 'Authorization': bearer1,
