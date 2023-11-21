@@ -26,7 +26,7 @@ export async function load({ locals, params }) {
             }}}}
             descrip
             hearotMeyuchadot
-            name dates
+            name dates iskvua
             work_ways {data{attributes{workWayName ${
               lang == 'he'
                 ? 'localizations{data{attributes{workWayName }}}'
@@ -37,7 +37,7 @@ export async function load({ locals, params }) {
     toc = tok;
   } else {
     que = `{  openMission (id:${mId}) {data{attributes{ descrip
-      archived noofhours perhour   
+      archived noofhours perhour iskvua sqadualed dates
       tafkidims {data{attributes{roleDescription ${
         lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ''
       }}}}

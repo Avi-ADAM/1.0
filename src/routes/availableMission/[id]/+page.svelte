@@ -171,6 +171,9 @@ const iwantto = {"he":"אני אשמח לבצע!","en":"I want to do it!"}
 const info ={"he": "בכדי לבקש להצטרף לצוות ולבצע את המשימה וגם בכדי לקבל הצעות למשימות, לפתוח רקמות (פרויקטים) חדשות ולהתנהל בהן בהסכמה יש להתחבר או להירשם","en":"You are not connected" }
 const registratio = { "he": "להרשמה", "en": "To Registration"} 
 const logi = { "he": "להתחברות", "en":"To Login"} 
+    const perho = {"he":"לשעה","en":"per hour"}
+        const hourss = {"he":"שעות","en":"hours"}
+        const monhly = {"he":"בחודש", "en": "per month"}
 const foreg = {"he":"כדי לראות את כל המידע נדרשת התחברות או הרשמה","en":"some information is available only for registersd users"}
  import { Head } from 'svead'
   import { calcX } from '$lib/func/calcX.svelte';
@@ -219,7 +222,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
             {#if data.alld.descrip !== null && data.alld.descrip !== "null"  && data.alld.descrip !== "undefined"  && data.alld.descrip !== undefined} 
            <p class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl">{data.alld.descrip}</p>{/if}
     {#if data.tok == true}
-    <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d">{data.alld.hearotMeyuchadot !== undefined && data.alld.hearotMeyuchadot !== null && data.alld.hearotMeyuchadot !== "undefined" ? data.alld.hearotMeyuchadot : ""}</p>
+    <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d">{data.alld.hearotMeyuchadot !== undefined && data.alld.hearotMeyuchadot !== null && data.alld.hearotMeyuchadot !== "null" && data.alld.hearotMeyuchadot !== "undefined" ? data.alld.hearotMeyuchadot : ""}</p>
     {:else}
     
 <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -255,16 +258,39 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
     <span class="sr-only">for registered users only...</span>
     </div>
     {/if}
+    {#if data.alld.sqadualed || data.alld.dates}
+                                <p
+                  style="line-height: 1;"
+                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
+                >
+                  <img
+                    class="w-6 lg:w-12"
+                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+                    alt="howmuch"
+                  />
+                {#if data.alld.sqadualed}
+                <span> {new Date(data.alld?.sqadualed).toLocaleDateString($lang)}</span>
+                {/if}
+                 {#if data.alld.dates}
+                <span> - {new Date(data.alld?.dates).toLocaleDateString()}</span>
+                {/if}
+                  </p>
+                {/if}  
      <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {data.alld.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {data.alld.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.alld.noofhours * data.alld.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+        <span 
+        on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} 
+        on:mouseleave={()=>hover("0")} > 
+        {data.alld.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} {perho[$lang]} </span> * <span 
+        on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} 
+        on:mouseleave={()=>hover("0")}  > {data.alld.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {hourss[$lang]} {data.alld.iskvua ? monhly[$lang] : "" }</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.alld.noofhours * data.alld.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {data.alld.iskvua ? monhly[$lang] : "" } </span>
     </p>
         </div>
             <div class="">
                 <Share 
-                slug="{"/availableMission/"+$page.data.mId}"
+                slug="{"availableMission/"+$page.data.mId}"
 	 title="{data.alld.title[$lang]}"
-     desc="its new thing"
+     desc="a new mission"
      hashtags={['1💗1','consensus']}
 	 quote="{data.alld.title[$lang]}"
 	 related={[]}
