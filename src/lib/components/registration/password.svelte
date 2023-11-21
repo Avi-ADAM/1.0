@@ -60,7 +60,9 @@ userName.subscribe(value => {
 email.subscribe(new1Value => {
   emailL = new1Value;
 });
-let linkg = 'https://tov.onrender.com/graphql'
+const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+'/graphql'
 let miDatan;
 let already = false;
 let errr = {k: false, m: "", p: false}
@@ -68,7 +70,7 @@ async function increment() {
 errr.p = true;
 already = true;
 	axios
-  .post('https://tov.onrender.com/api/auth/local/register', {
+  .post(baseUrl+'/api/auth/local/register', {
     username: userName_value, 
     email: emailL,
     password: passwordx,

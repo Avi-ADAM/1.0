@@ -5,6 +5,8 @@
   import {mi, role, ww, skil} from '$lib/components/prPr/mi.js'
     import Tile from '$lib/celim/tile.svelte'
     import { Confetti } from "svelte-confetti"
+  //import Mindmap from '$lib/components/prPr/mindmap.svelte'
+  const baseUrl = import.meta.env.VITE_URL
 
   import {
     isEqual
@@ -45,6 +47,7 @@
 //import { validate_component } from 'svelte/internal';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
+  import Sheirut from '$lib/components/prPr/sheirut.svelte';
 let idL;
 let success = false;
 let isOpen = false;
@@ -78,7 +81,7 @@ async function findM() {
           throw resp;
         });
       };
-      let linkg ="https://tov.onrender.com/graphql" ;
+      let linkg =baseUrl+"/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -170,7 +173,7 @@ async function start () {
         });
       };
         try {
-            const res = await fetch("https://tov.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch(baseUrl+"/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -200,7 +203,7 @@ async function start () {
         });
       };
         try {
-            const res = await fetch("https://tov.onrender.com/graphql" , {//+ $idPr
+            const res = await fetch(baseUrl+"/graphql" , {//+ $idPr
               method: "POST",
               headers: {
                 'Authorization': bearer1,
@@ -377,7 +380,7 @@ async function prog (){
           throw resp;
         });
       };
-      let linkg ="https://tov.onrender.com/graphql" ;
+      let linkg =baseUrl+"/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -482,7 +485,7 @@ async function findiM() {
           throw resp;
         });
       };
-      let linkg ="https://tov.onrender.com/graphql" ;
+      let linkg =baseUrl+"/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -558,7 +561,7 @@ async function findT ()  {
         });
       };
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -885,7 +888,7 @@ async function updi (){
           throw resp;
         });
       };
-      let linkg ="https://tov.onrender.com/graphql" ;
+      let linkg =baseUrl+"/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
@@ -980,7 +983,7 @@ function allbackFunction(event) {
     files = event.detail.files;
     sendP ();
 }
-let url1 = "https://tov.onrender.com/api/upload";
+let url1 = baseUrl+"/api/upload";
 let meDatap = [];
 let mecata = [];
 async function sendP () {
@@ -996,7 +999,7 @@ async function sendP () {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
-    let linkdi ="https://tov.onrender.com/api/projects/" + $idPr ;
+    let linkdi =baseUrl+"/api/projects/" + $idPr ;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
@@ -1033,7 +1036,7 @@ async function sendP () {
         }
                 });
                 } else {
-         let linkg ="https://tov.onrender.com/graphql" ;
+         let linkg =baseUrl+"/graphql" ;
         try {
               fetch(linkg, {
               method: 'POST',
@@ -1156,7 +1159,7 @@ async function updete (event) {
   idL = cookieValueId;
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
- let linkg ="https://tov.onrender.com/graphql" ;
+ let linkg =baseUrl+"/graphql" ;
         try { await
               fetch(linkg, {
               method: 'POST',
@@ -1875,6 +1878,9 @@ pointer-events: none;">
                                      on:remove={wdwd}
     />{/if}</div>
 </div>
+    <div class="p-8 ">
+      <Sheirut {restime} usersNum={projectUsers.length}/>
+    </div>
     <div class=" p-2">
       <Hamatanot {trili} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
       <br>
@@ -1901,7 +1907,7 @@ pointer-events: none;">
       </div>
     {/if}
     </div>
-    
+  <!--<Mindmap/>--> 
    </div> 
 </div>
 

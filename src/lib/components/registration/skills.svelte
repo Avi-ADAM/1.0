@@ -13,6 +13,8 @@
     let skills2 = [];
     let error1 = null; 
     let addskil = 0;
+    const baseUrl = import.meta.env.VITE_URL
+
     let newcontent = true
     onMount(async () => {
            if ($lang == "he" ){
@@ -34,7 +36,7 @@
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

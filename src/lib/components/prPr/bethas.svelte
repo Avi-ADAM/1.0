@@ -13,6 +13,7 @@
     export let actdata = []
     let isOpen = false;
     let xx = {}
+    let proles = []
     let sodata = [];
     let soter = []
 onMount(async () => {
@@ -27,6 +28,10 @@ onMount(async () => {
                   bmiData[i].attributes.tafkidims.data[j].color =  xx[bmiData[i].attributes.tafkidims.data[j].id] 
                    } else {
                     xx[bmiData[i].attributes.tafkidims.data[j].id] = colors[counter]
+                    proles.push({
+                      id: bmiData[i].attributes.tafkidims.data[j].id,
+                      name: bmiData[i].attributes.tafkidims.data[j].attributes.roleDescription
+                    })
                     bmiData[i].attributes.tafkidims.data[j].color =  colors[counter]
            const word = $lang == "en" ? bmiData[i].attributes.tafkidims.data[j].attributes.roleDescription : bmiData[i].attributes.tafkidims.data[j].attributes.localizations.data.length > 0 ?  bmiData[i].attributes.tafkidims.data[j].attributes.localizations.data[0].attributes.roleDescription : bmiData[i].attributes.tafkidims.data[j].attributes.roleDescription
               soter.push({
@@ -40,6 +45,7 @@ onMount(async () => {
                 
                    }
         }
+        proles = proles
         bmiData = bmiData
         if (bmiData[i].attributes.acts){
         for (let t = 0; t < bmiData[i].attributes.acts.data.length; t++) {
@@ -122,7 +128,7 @@ onMount(async () => {
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}><Close/></button>
-          <Crtask {bmiData} on:done={done}/>
+          <Crtask {proles} {bmiData} on:done={done}/>
       </div>
   </DialogContent>
   </div>
@@ -175,7 +181,7 @@ onMount(async () => {
           <td>{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</td>
           <td>
             {#each data.attributes.tafkidims.data as taf, i} 
-            <Tile bg={taf.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
+            <Tile  bg={taf.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
             {/each}
 </td>
         </tr>

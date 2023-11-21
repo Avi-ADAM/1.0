@@ -32,7 +32,7 @@
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -110,14 +110,15 @@ function increment() {
 	} )
 	}
 
- 
+ const baseUrl = import.meta.env.VITE_URL
+
   let meData = []
 async function newnew (){
   for (let i = 0; i<selected.length ;i++){
     if (!vallues.map(c => c.attributes.valueName).includes(selected[i])){
       //create new and update vallues
         console.log(selected,vallues)
-  let link ="https://tov.onrender.com/graphql" ;
+  let link =baseUrl+"/graphql" ;
   let d = new Date
         try {
              await fetch(link, {

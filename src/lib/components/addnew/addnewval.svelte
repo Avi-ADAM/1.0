@@ -3,6 +3,7 @@
  const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
+const baseUrl = import.meta.env.VITE_URL
 
  let vallues = [];
 // דף של השראה כפתור להוסיף את ההשראה שלך, כפתור לתיקונים  
@@ -21,7 +22,7 @@ async function addNewVall() {
 if (rn.includes(name_value)){
   shgi = true;
 } else {
-  let link ="https://tov.onrender.com/graphql" ;
+  let link =baseUrl+"/graphql" ;
   let d = new Date
         try {
              await fetch(link, {

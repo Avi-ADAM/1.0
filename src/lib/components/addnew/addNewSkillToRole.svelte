@@ -3,6 +3,7 @@
  const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
+const baseUrl = import.meta.env.VITE_URL
 
 let skillName_value;
     let desS;
@@ -15,7 +16,7 @@ if (rn.includes(skillName_value)){
   shgi = true;
 } else {
   let d = new Date;
-   let link ="https://tov.onrender.com/graphql" ;
+   let link =baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

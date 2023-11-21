@@ -14,9 +14,10 @@ let amortha = "I, ||name||, will give up the weapons of the ||country|| Army whe
 let error1;
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
+const baseUrl = import.meta.env.VITE_URL
 
 let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+let linkg = baseUrl+'/graphql';
 async function add (){
 already = true;
  let d = new Date

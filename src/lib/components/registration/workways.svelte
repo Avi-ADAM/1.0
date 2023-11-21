@@ -12,7 +12,8 @@
     let newcontent = true
     let workways2 = [];
     let error1 = null
-    
+    const baseUrl = import.meta.env.VITE_URL
+
     onMount(async () => {
       if ($lang == "he" ){
        workways2 = jwork
@@ -33,7 +34,7 @@
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -118,7 +119,7 @@ async function newnew (){
     if (!workways2.map(c => c.attributes.workWayName).includes(selected[i])){
       //create new and update workways2
         let d = new Date
-       let link ="https://tov.onrender.com/graphql" ;
+       let link =baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

@@ -13,6 +13,7 @@ export let mid = -1;
  let selected;
  let id;
      const placeholder = `${$lang == "he" ? "תפקידים קשורים" : "related Roles"}`;
+    const baseUrl = import.meta.env.VITE_URL
 
     let addro = false;    
 
@@ -37,7 +38,7 @@ export let mid = -1;
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("https://tov.onrender.com/graphql", {
+          const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -90,7 +91,7 @@ if (rn.includes(skillName_value)){
 } else {
     let d = new Date
   tafkidimslist = find_role_id(selected);
-    let link ="https://tov.onrender.com/graphql" ;
+    let link =baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

@@ -27,14 +27,15 @@
         name: meData.data.createWorkWay.data.attributes.workwayName,
         } );
     };
-    
+    const baseUrl = import.meta.env.VITE_URL
+
    async function addww () {
     let d = new Date
        shgi = false;
 if (rn.includes(Name_value)){
   shgi = true;
 } else {
-let link ="https://tov.onrender.com/graphql" ;
+let link =baseUrl+"/graphql" ;
         try {
              await fetch(link, {
               method: 'POST',

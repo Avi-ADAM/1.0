@@ -12,6 +12,8 @@
  const dispatch = createEventDispatcher();
     let roles1 = [];
     let error1 = null;
+    const baseUrl = import.meta.env.VITE_URL
+
     let addrole = 0;
      function find_role_id(role_name_arr){
      var  arr = [];
@@ -46,7 +48,7 @@
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'

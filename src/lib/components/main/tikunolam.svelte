@@ -14,9 +14,10 @@ let already = false;
 let error1;
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
+const baseUrl = import.meta.env.VITE_URL
 
 let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+let linkg = baseUrl+'/graphql';
 async function add (){
 already = true;
  let d = new Date

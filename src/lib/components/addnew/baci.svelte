@@ -13,12 +13,14 @@
      import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly, scale } from 'svelte/transition';
       import Chooser from '$lib/celim/ui/chooser.svelte'
+      const baseUrl = import.meta.env.VITE_URL
+
 let loading = false;
 let isOpen = false;
 let a = 0;
 let success = false
     let before = false;
-    let url1 = "https://tov.onrender.com/api/upload";
+    let url1 = baseUrl+"/api/upload";
     let linkP;
     let desP;
     let desPl;
@@ -93,7 +95,7 @@ async function sendPP(){
     token  = cookieValue; 
     let bearer1 = 'bearer' + ' ' + token;
     try {
-           const res = await fetch("https://tov.onrender.com/graphql", {
+           const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,
@@ -171,7 +173,7 @@ let vallues = [];
         });
       };
         try {
-           const res = await fetch("https://tov.onrender.com/graphql", {
+           const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                    'Authorization': bearer1,

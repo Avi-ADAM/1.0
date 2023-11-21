@@ -2,6 +2,8 @@
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
     import Addnewnee from '../addnew/addNewNeed.svelte';
+    const baseUrl = import.meta.env.VITE_URL
+
    //// import { sneed } from '../../stores/sneed.js';
   //  import { total } from '../../stores/total.js';
     import { createEventDispatcher } from 'svelte';
@@ -29,7 +31,7 @@ onMount(async () => {
           throw resp;
         });
       };
-      let linkg ="https://tov.onrender.com/graphql" ;
+      let linkg =baseUrl+"/graphql" ;
         try {
              await fetch(linkg, {
               method: 'POST',
