@@ -13,7 +13,7 @@ async function x(id,kind,taid){
     console.log(id,kind)
     if (kind == "ask"){
               console.log('here');
-     // await Ask(id,taid)
+      await Ask(id,taid)
      // console.log("here")
     } else if (kind == 'pendm') {
               await Pend(id,taid);
@@ -46,7 +46,7 @@ export async function GET() {
     `; 
  try {
    let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
-   console.log(res,"start")
+   console.log(res,"start 49")
    if (res.data != null) {
      console.log(res.data, 'pip');
      //TODO: check if already worked for this hour --why? if is archived/done it  will not do again

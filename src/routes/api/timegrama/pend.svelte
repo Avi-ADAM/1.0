@@ -16,7 +16,7 @@ export async function Pend(id,taid){
     }`;
     try {
       let res = await SendTo(qu, VITE_ADMINMONTHER).then((res) => (res = res));
-      console.log(res,"pend first res");
+      console.log(res,"pend first res", id);
       if (res.data != null) {
         console.log(res.data,"pend first res data");
         if(res.data.pendm.data.attributes.archived != true && res.data.pendm.data.attributes.rishon != true){
@@ -33,6 +33,7 @@ export async function Pend(id,taid){
                             vallues {data{ id}}
   }}}
                 }`
+                console.log("we go second pend", id)
  try {
       let res2 = await SendTo(qua, VITE_ADMINMONTHER).then((res2) => (res2 = res2));
       console.log(res2,"pend  res2");
@@ -52,17 +53,17 @@ export async function Pend(id,taid){
             project: "${res2.data.pendm.data.attributes.project.data.id}",
              mission:  "${res2.data.pendm.data.attributes.mission.data.id}",
              work_ways: [${res2.data.pendm.data.attributes.work_ways.data.map(c => c.id)}],
-             hearotMeyuchadot: "${sanitizeUserInput(res2.data.pendm.data.attributes.hearotMeyuchadot)}",
-             name: "${sanitizeUserInput(res2.data.pendm.data.attributes.name)}",
+             hearotMeyuchadot: """${sanitizeUserInput(res2.data.pendm.data.attributes.hearotMeyuchadot)}""",
+             name: """${sanitizeUserInput(res2.data.pendm.data.attributes.name)}""",
              publishedAt: "${d.toISOString()}",
-             descrip: "${sanitizeUserInput(res2.data.pendm.data.attributes.descrip)}",
+             descrip: """${sanitizeUserInput(res2.data.pendm.data.attributes.descrip)}""",
              skills: [${res2.data.pendm.data.attributes.skills.data.map(c => c.id)}], 
              tafkidims: [${res2.data.pendm.data.attributes.tafkidims.data.map(c => c.id)}],
              vallues:  [${res2.data.pendm.data.attributes.vallues.data.map(c => c.id)}],
              noofhours: ${res2.data.pendm.data.attributes.noofhours},
              perhour: ${res2.data.pendm.data.attributes.perhour},   
-             privatlinks: "${sanitizeUserInput(res2.data.pendm.data.attributes.privatlinks)}",
-             publicklinks: "${sanitizeUserInput(res2.data.pendm.data.attributes.publicklinks)}",
+             privatlinks: """${sanitizeUserInput(res2.data.pendm.data.attributes.privatlinks)}""",
+             publicklinks: """${sanitizeUserInput(res2.data.pendm.data.attributes.publicklinks)}""",
             ${date}
             ${dates}
             }
