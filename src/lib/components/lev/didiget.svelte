@@ -2,6 +2,7 @@
   import Chaticon from '../../celim/chaticon.svelte';
   import Diun from './diun.svelte';
   import { addToast } from 'as-toast';
+  const baseUrl = import.meta.env.VITE_URL
   export let shear = [];
   export let low = false;
   export let sendpropic = '';
@@ -119,7 +120,7 @@
     }
     return str;
   }
-  let linkg = 'https://tov.onrender.com/graphql';
+  let linkg = baseUrl+'/graphql';
   const suc = { he: 'בוצע בהצלחה', en: 'appruved sucssefully!' };
   const er = {
     he: 'אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ',

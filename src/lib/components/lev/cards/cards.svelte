@@ -32,6 +32,7 @@ const dispatch = createEventDispatcher();
   export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
+  import DecisionMaking from '../decisionMaking.svelte';
   let h ;
 
 export let askedarr = [], declineddarr = [], arr1 = [];
@@ -53,7 +54,7 @@ $:if (indexi != -1){
         dispatch("cards",{cards:false})
 }
   let slideIndex;
-                let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true}
+                let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}
 afterUpdate(async () => {
 if (swiperRef !== null) {
   swiperRef.update()
@@ -491,6 +492,7 @@ mousewheel={true}
             valph ={buble.perhour}
             nhours={buble.nhours}
             deadline={buble.deadline}
+            sqedualed={buble.sqedualed}
                 missId={buble.missId}
                 id={buble.id}
                 openMid={buble.omid}
@@ -586,6 +588,7 @@ mousewheel={true}
       askedarr={askedarr}
      declineddarra= {buble.declineddarra}
       deadLine = {buble.sqadualed}
+      sqadualedf = {buble.sqadualedf}
       oid = {buble.oid}
       id = {buble.id}
       price= {buble.price}
@@ -601,6 +604,43 @@ mousewheel={true}
                 spnot={buble.spnot}
                 easy={buble.easy}
                 /></SwiperSlide>
+                           {:else if buble.ani === "hachla" && milon.hachla == true}
+                                                <SwiperSlide class="swiper-slidec"><DecisionMaking
+                                                    on:acsept={delo}
+                                                    on:decline={delo}
+                                                    on:hover={hover}
+                                                    on:proj={proj}
+                                                          cards="true" 
+                                                    on:chat={chat}
+                                                    timegramaDate={buble.timegramaDate}
+                                                    restime={buble.restime}                                                    
+                                                    noofpu={buble.noofpu}
+                                                    newpicid={buble?.newpicid}
+                                                    coinlapach={buble.coinlapach}
+                                                    created_at={buble.created_at}
+                                                    spdata={buble.spdata}
+                                                    kind={buble.kind}
+                                                    messege={buble.messege}
+                                                    myid={buble.myid}
+                                                    noofusersWaiting={buble.noofusersWaiting}
+                                                    uids={buble.uids}
+                                                    what={buble.mypos}
+                                                    noofusersOk={buble.noofusersOk}
+                                                    noofusersNo={buble.noofusersNo}
+                                                    already={buble.already}
+                                                    users={buble.users}
+                                                    askId={buble.pendId}
+                                                    projectName = {buble.projectName}
+                                                    projectId ={buble.projectId}
+                                                    userId ={ buble.uid}
+                                                    src = {buble.src}
+                                                    src2 = {buble?.newpic}
+                                                    stylef={buble.stylef}
+                                                    st={buble.st}
+                                                    spid={buble.spid}
+                                                    {low}
+                                                    /></SwiperSlide>
+                          
 {/if}
 {/each}
  <!--- <SwiperSlide class="swiper-slidec">Slide 1</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 2</SwiperSlide

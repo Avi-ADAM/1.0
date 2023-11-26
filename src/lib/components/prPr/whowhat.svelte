@@ -32,7 +32,9 @@ let ulist = [
 ]; 
 export let trili;
 export let users;
-let linkg = "https://tov.onrender.com/graphql";
+const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+"/graphql";
 let dictid = {};
 let dictidi = {};
 let hal = false;

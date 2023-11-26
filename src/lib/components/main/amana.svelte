@@ -51,6 +51,8 @@
 // })
   let fpp = [];
   let fppp = [];
+  const baseUrl = import.meta.env.VITE_URL
+
     let error1 = null;
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -67,7 +69,7 @@
       };
 
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -413,7 +415,7 @@ if (fpp.includes(jjj)){
  erorims = false
  const mail = $form.email.toLowerCase().trim()
   axios
-  .post('https://tov.onrender.com/api/chezins', {
+  .post(baseUrl+'/api/chezins', {
       "data": {
      name: $form.name,
         email: mail,

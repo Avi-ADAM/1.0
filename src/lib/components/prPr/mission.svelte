@@ -343,7 +343,7 @@ async function increment() {
                         {createTimegrama(
     data:{
       date: "${fd.toISOString()}",
-      ask: ${hiluzask},
+      ask: "${hiluzask}",
       whatami: "ask",
     }
   ){
@@ -392,13 +392,14 @@ SendTo(quee)
     data:{
       date: "${fd.toISOString()}",
       whatami: "pendm",
-      pendm:  ${hiluzpend},
+      pendm:  "${hiluzpend}",
     }
   ){
     data {id}
   }
 }`
-SendTo(quee)
+ let v = await SendTo(quee)
+    console.log(v)
                         let data = {
                             pn: pn,
                             pl: pl,

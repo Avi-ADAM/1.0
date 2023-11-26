@@ -59,6 +59,7 @@ export let users;
 export let chat
 export let mypose = true
 export let order = 1
+export let sqedualed
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -179,6 +180,7 @@ function objToString (obj) {
     }}
     return str;
 }
+
     const userss = objToString(users)
 let welcome = ``;
 let adduser = ``;
@@ -189,8 +191,9 @@ async function agree() {
   noofusersWaiting -= 1;
   ser = xyz();
   const d = new Date
-               const tafkidimsa = role.data.map(c => c.id);
+  const tafkidimsa = role.data.map(c => c.id);
 
+    const sdate = (sqedualed !== undefined && sqedualed != null) ? `start: "${sqedualed}"` : ``;
     const date = (deadline !== undefined && deadline != null) ? ` admaticedai: "${deadline}"` : ``;
         const cookieValue = document.cookie
         .split('; ')
@@ -260,6 +263,7 @@ adduser = `updateProject(
               tafkidims: [${tafkidimsa}],
                       publishedAt: "${d.toISOString()}",
             ${date}
+            ${sdate}
                   }
   ) {data{attributes{project{data{id }}}}}
 
@@ -355,6 +359,7 @@ ${adduser}
              tafkidims: [${tafkidimsa}],
                      publishedAt: "${d.toISOString()}",
             ${date}
+            ${sdate}
                   }
   ) {data{attributes{project{data{id }}}}}
 
@@ -380,12 +385,29 @@ ${adduser2}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            //TODO: monter if iskvua, timegrama if dates
+              let chiluzh = miDatan.data.createMesimabetahalich.data.id
+    let monti = ``
+        if(iskvua == true){
+          monti = `
+            createMonter(
+              data:{
+                mesimabetahalich: "${chiluzh}",
+                ani: "mesimabetahalich"
+                ${sqedualed != undefined && sqedualed != null ? `start: "${sqedualed > d ? sqedualed : d.toISOString()}"` : `start: "${d.toISOString()}"`}
+                ${deadline != undefined && deadline != null ? `finish: "${deadline}"` : ``}
+              }
+            )
+          `
+        }
+   
             const otherasks = miDatan.data.updateOpenMission.data.attributes.asks.data
             console.log(otherasks);
             if (otherasks.length> 1){
             let nextquery = ``
             for (let i = 0; i < otherasks.length; i++){
                 nextquery =  `
+               ${i == 0 ? monti : ``}
                 updateAsk(
                        id: "${otherasks[i].id}" 
                                 data: { archived: true
@@ -408,6 +430,37 @@ ${adduser2}
 
           }
         }
+           if (newnew == true){
+              let emailt;
+              let ema = miDatan.data.updateProject.data.attributes.user_1s.data
+              let la; 
+              for (let i = 0; i <ema.length; i++){
+                if (ema[i].id == userId){
+                  emailt = ema[i].attributes.email
+                  la = ema[i].attributes.lang
+                }
+              }
+              let langi = $lang
+              if (la == "he" || la == "en"){
+                langi = la
+              }
+                            console.log(langi)
+            let data = {user: useraplyname, projectName :projectName, projectSrc:  src2, missionName: openmissionName, email: emailt, lang: langi , kind: "exeptedMission"}//username email projectname projectsrc lang openmissionName
+            fetch('/api/sma', {
+            method: 'POST',  
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response)
+            .then((data) => {
+              console.log('Success:', data);            
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+          }
             dispatch('acsept', {
                 ani: "asked",
                 coinlapach: coinlapach

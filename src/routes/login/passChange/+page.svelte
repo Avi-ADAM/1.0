@@ -4,6 +4,7 @@
  	import { page } from '$app/stores'
     const email = $page.url.searchParams.get('code')
 	import { lang } from '$lib/stores/lang.js'
+	const baseUrl = import.meta.env.VITE_URL
 
 let passwordx;
 let errorl = null;
@@ -17,7 +18,7 @@ function shaneh () {
 
   // Request API.
 axios
-  .post('https://tov.onrender.com/api/auth/reset-password', {
+  .post(baseUrl+'/api/auth/reset-password', {
     code: email,
     password: passwordx,
     passwordConfirmation: passwordx,

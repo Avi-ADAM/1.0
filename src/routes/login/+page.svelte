@@ -7,7 +7,8 @@
     import { JWT } from '$lib/stores/jwt.js';
     import { idM } from '$lib/stores/idM.js';    
     import { liUN } from '$lib/stores/liUN.js';
- 
+    const baseUrl = import.meta.env.VITE_URL
+
 
     export let data
     $: mydata = data
@@ -37,7 +38,7 @@
         loginError = null;
 
         axios
-            .post('https://tov.onrender.com/api/auth/local', {//
+            .post(baseUrl+'/api/auth/local', {//
                 identifier: email,
                 password, 
             })

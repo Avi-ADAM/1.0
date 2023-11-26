@@ -10,13 +10,18 @@
         }
     },
     "headers": {
+        
         "misfini": {
             "he": "אישור סיום משימה בהצלחה",
             "en": "approval of sucsessfully finishing a mission"
         },
-        "hachlalogo": {
+        "pic": {
             "he": "הצבעה על שינוי לוגו הריקמה",
             "en": "vote on changing FreeMates logo"
+        },
+        "sheirutpends":{
+            "he":"הצבעה על יצירת שירות חדש לריקמה",
+            "en":"vote on creating new service to the FreeMates"
         },
         "haluka": {
             "he": "הצעת חלוקה",

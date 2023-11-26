@@ -3,7 +3,7 @@
 
 	import ChatMessage from '../../celim/messeges.svelte';
 	import TodayDivider from '../../celim/todaydevider.svelte';
-    import {pendMisMes, pendMasMes, askMisMes, meAskMisMes} from '$lib/stores/pendMisMes.js'
+    import {pendMisMes, pendMasMes, askMisMes, meAskMisMes,meAskMasMes,askMasMes} from '$lib/stores/pendMisMes.js'
 	  const dispatch = createEventDispatcher();
    export let ani
    export let pendId
@@ -16,7 +16,13 @@
 	export let profilePicChatPartner='https://storage.needpix.com/rsynced_images/male-teacher-cartoon.jpg';
 	export let money = false
    export let messages = []
-	 $: messagesi = ani == "pendM" ? $pendMisMes[pendId] : ani == "pmashes" ? $pendMasMes[pendId] : ani == "askedMi" ? $askMisMes[pendId] : ani == "iaskedMi"? $meAskMisMes[pendId] : messages
+	 $: messagesi = ani == "pendM" ? $pendMisMes[pendId] : 
+                   ani == "pmashes" ? $pendMasMes[pendId] : 
+                   ani == "askedMi" ? $askMisMes[pendId] : 
+                   ani == "iaskedMi"? $meAskMisMes[pendId] : 
+                   ani == "askedMa" ? $askMasMes[pendId] : 
+                   ani == "iaskedMa"? $meAskMasMes[pendId] :                  
+                   messages
    let why = "";
  export let clicked = false
 function click() {

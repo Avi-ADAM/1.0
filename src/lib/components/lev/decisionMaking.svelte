@@ -19,7 +19,7 @@ import {
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
 const dispatch = createEventDispatcher();
-    export let low = false, kind, messege, myid, userId;
+    export let low = false, kind, messege, myid, userId,spdata;
     export let newpicid;  
 export let coinlapach;
 export let deadline;
@@ -44,12 +44,20 @@ export let pid
 export let stylef = '24px';
 export let askId;
 export let users;
+export let timegramaDate, restime
     const baseUrl = import.meta.env.VITE_URL
 
 onMount(async () => {
+  console.log("HACHLATA!!!")
   if (kind == "pic"){
     openmissionName = {"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"}
     st = 115
+  }else{
+        openmissionName = { "he":"הצבעה על יצירת שירות חדש",
+            "en":"vote on creating new service"
+        }
+            st = 115
+
   }
 })
 let idL;
@@ -372,7 +380,7 @@ $: ww = 0
 {#if cards == false}
 
 <div 
-
+role="contentinfo"
 on:dblclick={tomodal}
  bind:clientWidth={ww}
  bind:clientHeight={h}
@@ -399,7 +407,6 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
   effect={"flip"}
-
   grabCursor={true}
   modules={[EffectFlip, Navigation]}
   flipEffect={{ slideShadows: false}}
@@ -558,7 +565,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
                 </g>
         </g>
         <path d="M 1275.254748 881.616379 Q 1277.371544 881.308248 1279.48834 881.616379 L 1280.975819 881.832903 Q 1283.092615 882.141034 1285.002205 883.035265 L 1286.344079 883.663644 Q 1288.253668 884.557875 1289.769127 885.950672 L 1290.834044 886.929395 Q 1292.349503 888.322192 1293.322488 890.077219 L 1294.006207 891.310481 Q 1294.979191 893.065508 1295.314459 895.010971 L 1295.550052 896.378053 Q 1295.88532 898.323515 1295.550052 900.268977 L 1295.314459 901.636059 Q 1294.979191 903.581522 1294.006207 905.336549 L 1293.322488 906.569811 Q 1292.349503 908.324838 1290.834044 909.717635 L 1289.769127 910.696358 Q 1288.253668 912.089155 1286.344079 912.983386 L 1285.002205 913.611765 Q 1283.092615 914.505996 1280.975819 914.814127 L 1279.48834 915.030651 Q 1277.371544 915.338782 1275.254748 915.030651 L 1273.767269 914.814127 Q 1271.650473 914.505996 1269.740883 913.611765 L 1268.399009 912.983386 Q 1266.48942 912.089155 1264.973961 910.696358 L 1263.909044 909.717635 Q 1262.393585 908.324838 1261.4206 906.569811 L 1260.736881 905.336549 Q 1259.763897 903.581522 1259.428629 901.636059 L 1259.193036 900.268977 Q 1258.857768 898.323515 1259.193036 896.378053 L 1259.428629 895.010971 Q 1259.763897 893.065508 1260.736881 891.310481 L 1261.4206 890.077219 Q 1262.393585 888.322192 1263.909044 886.929395 L 1264.973961 885.950672 Q 1266.48942 884.557875 1268.399009 883.663644 L 1269.740883 883.035265 Q 1271.650473 882.141034 1273.767269 881.832903 Z" style="stroke: url(#desgradient-2); stroke-miterlimit: 17; fill: url(#desgradient-1); stroke-width: 2px;" transform="matrix(-1, 1e-12, 2e-12, -1, 2553.297363280778, 1717.467407226184)" bx:shape="n-gon 1277.371544 898.323515 18.513776 17.015267 20 0.37 1@f7764595"/>
-           <foreignObject on:click={()=>linke("u")} on:keypress={()=>linke("u")} on:mouseenter={()=>hover({"he":"הלוגו העכשווי", "en":"old Logo"})} on:mouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
+           <foreignObject role="button" tabindex="0" on:click={()=>linke("u")} on:keypress={()=>linke("u")} on:mouseenter={()=>hover({"he":"הלוגו העכשווי", "en":"old Logo"})} on:mouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
                                                   <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
                                                         width='38px'
@@ -567,13 +574,15 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
                                                         src={src}
                                                         style="border-radius: 50%;"
                                                         /> 
-                          </foreignObject>  
+                          </foreignObject> 
+                        {#if kind == "pic"} 
              <foreignObject x='1276' y='892' width='50px' height='50px' transform="translate(-25,-25)" >
-              <img on:mouseenter={()=>hover(newlogo[$lang])} on:mouseleave={()=>hover("0")} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="50" height="50" alt="projectlogo" >
+              <img on:mouseenter={()=>hover(newlogo[$lang])} on:mouseleave={()=>hover("0")} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="50" height="50" alt="new project logo" >
             </foreignObject>
+            {/if}
         <path transform="matrix(0.90,0,0,0.90,1275,872)" id="curveeuu" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
         <text  style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;" >
-            <textPath on:mouseenter={()=>hover({"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"})} on:mouseleave={()=>hover("0")} style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;"  class="curved-text" startOffset={st} xlink:href="#curveeuu">
+            <textPath role="contentinfo" on:mouseenter={()=>hover({"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"})} on:mouseleave={()=>hover("0")} style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;"  class="curved-text" startOffset={st} xlink:href="#curveeuu">
                 {openmissionName[$lang]}
             </textPath>
         </text>
@@ -649,7 +658,19 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 >
 
 <div class="{`normSmll${askId}-noo`}"></div>
-             <p style="margin-top: 10px;"><span on:mouseenter={()=>hover({"he":"בעד", "en":"in favor"})} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{noofusersOk} </span><span on:mouseenter={()=>hover({"he":"לא הצביעו","en":"not voted yet"})} on:mouseleave={()=>hover("0")} style="color:aqua">{noofusersWaiting} </span><span on:mouseenter={()=>hover({"he":"נגד","en": "against"})} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{noofusersNo} </span></p>
+             <p style="margin-top: 10px;">
+              <span role="contentinfo"
+               on:mouseenter={()=>hover({"he":"בעד", "en":"in favor"})} 
+               on:mouseleave={()=>hover("0")} style="color:var(--gold)" 
+               >{noofusersOk} </span><span 
+               on:mouseenter={()=>hover({"he":"לא הצביעו","en":"not voted yet"})} 
+               on:mouseleave={()=>hover("0")} 
+               role="contentinfo"
+               style="color:aqua">{noofusersWaiting} </span><span 
+               on:mouseenter={()=>hover({"he":"נגד","en": "against"})} 
+               on:mouseleave={()=>hover("0")} 
+               role="contentinfo"
+               style="color:var(--barbi-pink)" >{noofusersNo} </span></p>
 
                     <!--  <button on:click={tochat}><Chaticon/></button>-->
                  {#if deadline}    <p on:mouseenter={()=>hover({"he":"תאריך הביצוע", "en": "date"})} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
@@ -679,6 +700,10 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
    {src} 
    {src2}
    {low}
+   {kind}
+   {spdata}
+   {timegramaDate} 
+   {restime}
    {deadline}
    {noofusersWaiting} 
    {noofusersOk} 

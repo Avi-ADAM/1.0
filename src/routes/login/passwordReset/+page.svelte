@@ -4,11 +4,12 @@
     let email;
     let before = true;
     let erori;
+    const baseUrl = import.meta.env.VITE_URL
 
     function onSubmit () {   
 // Request API.
 axios
-  .post('https://tov.onrender.com/api/auth/forgot-password', {
+  .post(baseUrl+'/api/auth/forgot-password', {
     email: email,
   })
   .then(response => {

@@ -15,6 +15,7 @@
 
   let idx = 1;
 let error;
+const baseUrl = import.meta.env.VITE_URL
 
 onMount(async () => {
   //console.log(emaili)
@@ -51,7 +52,7 @@ onMount(async () => {
     };
 
     try {
-        const res = await fetch("https://tov.onrender.com/graphql", {
+        const res = await fetch(baseUrl+"/graphql", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'

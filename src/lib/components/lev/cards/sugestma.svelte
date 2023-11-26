@@ -6,7 +6,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
-    export let mashName,easy,myp,price,total,  descrip,projectName, src, spnot
+    export let mashName,easy,myp,price,total,  descrip,projectName, src, spnot ,deadLine, sqadualedf
     export let already = false;
 function hover(x){
 dispatch("hover",{x:x});
@@ -53,11 +53,29 @@ dispatch("tochat");
       </p>
               <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="ltn" >{price} <span>שווי מקובל</span></h3>
              {#if total} <p on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{total}</p>{/if}
+             {#if deadLine || sqadualedf}
+                                <p
+                  style="line-height: 1;"
+                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
+                >
+                  <img
+                    class="w-6 lg:w-12"
+                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+                    alt="howmuch"
+                  />
+                {#if deadLine}
+                <span> {new Date(deadLine).toLocaleDateString()}</span>
+                {/if}
+                 {#if sqadualedf}
+                <span> - {new Date(sqadualedf).toLocaleDateString()}</span>
+                {/if}
+                  </p>
+                {/if}  
               <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{mashName}</div>
      {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16 text-gray-700 text-base">{descrip}</p>{/if}
-   <!-- {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
-     {/if}--> 
+    {#if spnot}
+     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{spnot !== undefined && spnot !== null && spnot !== "undefined" ? spnot : ""}</p>
+     {/if} 
 
     </div>
   

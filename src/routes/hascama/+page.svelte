@@ -59,6 +59,7 @@ import {
 
 let idx = 1;
 let error;
+const baseUrl = import.meta.env.VITE_URL
 
 let user = 0;
 
@@ -158,7 +159,7 @@ onMount(async () => {
     };
 
     try {
-        const res = await fetch("https://tov.onrender.com/graphql", {
+        const res = await fetch(baseUrl+"/graphql", {
                 method: "POST",
                 headers: {
                     'Content-Type': 'application/json'

@@ -4,6 +4,7 @@ import { missionNew } from '../../stores/missionNew';
   import { onMount } from 'svelte';
   import { createEventDispatcher } from 'svelte';
              import { lang } from '$lib/stores/lang.js'
+const baseUrl = import.meta.env.VITE_URL
 
  const dispatch = createEventDispatcher();
 function inc() {
@@ -39,7 +40,7 @@ const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       'Content-Type': 'application/json',
     };
       try {
-          const res = await fetch("https://tov.onrender.com/graphql", {
+          const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
