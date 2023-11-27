@@ -3,17 +3,19 @@
   import Header from '$lib/components/header/header.svelte';
   import { goto } from '$app/navigation';
 export let data;
-
 let projectId = data.projectId;
+    const showl = {"he":"הצגת השירותים שלנו","en":"show services"}
 
  import Tile from '$lib/celim/tile.svelte'
 
 import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
+  import SheirutShow from '$lib/components/prPr/sheirut/sheirutShow.svelte';
+  import Close from '$lib/celim/close.svelte';
 let projectUsers =[];
 const baseUrl = import.meta.env.VITE_URL
-
+let show = false
 let token;
 let idL;
 let srcP;
@@ -60,6 +62,7 @@ async function xyd () {
         JSON.stringify({query: 
           `{  project (id:${projectId}) {data{attributes{ projectName  user_1s {data{ id attributes{ username profilePic {data{attributes{ url}}}}}}
           linkToWebsite     
+                      sheiruts(filters:{isApruved:{eq: true} }){data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
            githublink fblink discordlink  twiterlink  vallues {data{attributes{ valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName }}}' : ""}}}}
                         publicDescription    profilePic {data{attributes{ url formats }}}   open_missions (filters:{archived:{eq: false} }) {data{ id attributes{ name}}}}
         }}}`
@@ -97,13 +100,12 @@ async function xyd () {
     goto(`/user/${x}`)   
    }
      function mesima (x){
-      alert("soon")
+    goto(`/availableMission/${x}`)   
     }
     function hover(c){
       console.log("hover")
     }
     let project = xyd();
-
  const githublinkde = {"he":"לינק לגיטהב של הריקמה","en":"link to the FreeMates GitHub"}
    const fblinkde = {"he":"לינק לפייסבוק של הריקמה","en":"link to the FreeMates Facebook"}
    const discordlinkde = {"he":"לינק לדיסקורד של הריקמה","en":"link to the FreeMates Discord"}
@@ -123,8 +125,8 @@ async function xyd () {
  <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
  </div>
  {:then project}
-<div class="w-screen bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
-<div dir="rtl"  class="h-screen lg:w-1/2 mx-auto ">
+<div class="w-screen d overflow-y-auto h-screen bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
+<div dir="rtl"  class="h-screen d lg:w-1/2 mx-auto ">
 
   <div class="4">
     {#if srcP}
@@ -232,13 +234,31 @@ async function xyd () {
 <h3 style="color: var(--barbi-pink) ;text-shadow: 1px 1px var(--gold);" class="5">{frm[$lang]}</h3>
 <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                 {#each projecto as om }<p on:mouseenter={()=>hover({"he":"משימות פנויות בריקמה","en":"open missions in the FreeMate"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="wow"   word={om.attributes.name}/></p>{/each}
+            <button on:click={mesima(om.id)}>  <Tile bg="wow"   word={om.attributes.name}/></button>
+            
+            </p>{/each}
     </div>
     <!--
 {#each projecto as om }
 
 <p class="text-gold bg-barbi font-bold hover:text-barbi hover:bg-gold px-2 rounded-xl mb-2 cursor-pointer	"  on:click={mesima(om.id)}>{om.name}</p>
 {/each}-->
+{#if project.attributes.sheiruts?.data?.length >0}
+{#if show === false}
+   <button   
+            class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
+        on:click={()=>show = true}>{showl[$lang]}
+    </button>
+  {:else} 
+      <div class="flex flex-col items-center justify-center  p-8 mx-auto bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"> 
+        <button   
+                class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
+            on:click={()=>show = false}><Close/>
+        </button>
+    <SheirutShow wb={true} projectName={project.attributes.projectName} pid={projectId} sheirutim={project.attributes.sheiruts}/>
+      </div>
+    {/if}
+    {/if}
 </div>
 </div>
 </div>

@@ -216,6 +216,7 @@ JSON.stringify({query:
             projectName
             descripFor
             publicDescription
+            sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
             sales {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
             matanotofs {data{ id attributes{ name price quant kindOf }}}
             finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
@@ -1879,7 +1880,7 @@ pointer-events: none;">
     />{/if}</div>
 </div>
     <div class="p-8 ">
-      <Sheirut {restime} usersNum={projectUsers.length}/>
+      <Sheirut sheirutim={project?.sheiruts} pn={projectname} {restime} usersNum={projectUsers.length}/>
     </div>
     <div class=" p-2">
       <Hamatanot {trili} {fmiData} {rikmashes} {salee} {projectUsers} bmiData={bmimData}/>
