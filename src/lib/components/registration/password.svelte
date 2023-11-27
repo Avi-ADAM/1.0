@@ -87,7 +87,7 @@ already = true;
   .then(response => {
 			show.update(n => n + 1);
 						fbl.set(false)
-
+if(response.data){
 	const data = response.data;
           /*  await fetch(linkg, {
                     method: 'POST',
@@ -125,12 +125,12 @@ already = true;
 		tx: 0,
 		txx: 0
 	} );
-	const id = miDatan.data.user.id;
+	const id = response.data.user.id;
 //	let token  = miDatan.data.register.jwt;
 	document.cookie = `await=${Date.now}; expires=` + new Date(2024, 0, 1).toUTCString();
     document.cookie = `when=${Date.now}; expires=` + new Date(2024, 0, 1).toUTCString();
   //  document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2024, 0, 1).toUTCString();
-    document.cookie = `id=${miDatan.data.register.user.id}; expires=` + new Date(2024, 0, 1).toUTCString();
+    document.cookie = `id=${response.data.user.id}; expires=` + new Date(2024, 0, 1).toUTCString();
 	document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();			
 /*	let bearer1 = 'bearer' + ' ' + token;          
 	await fetch(linkg, {
@@ -166,7 +166,20 @@ already = true;
   .then(r => r.json())
   .then(data => miD atan = data);
             console.log(miDatan);
-    */       	
+    */       
+}else{
+	 dispatch ('progres',{
+		tx: 0,
+		txx: 0
+	} );
+	const id = 0;
+//	let token  = miDatan.data.register.jwt;
+	document.cookie = `await=${Date.now}; expires=` + new Date(2024, 0, 1).toUTCString();
+    document.cookie = `when=${Date.now}; expires=` + new Date(2024, 0, 1).toUTCString();
+  //  document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2024, 0, 1).toUTCString();
+    document.cookie = `id=0; expires=` + new Date(2024, 0, 1).toUTCString();
+	document.cookie = `guidMe=again; expires=` + new Date(2024, 0, 1).toUTCString();	
+}	
 })	
 .catch(error => {
             error1 = error

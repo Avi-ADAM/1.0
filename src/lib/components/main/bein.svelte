@@ -40,7 +40,7 @@ let title = {"he": "הרשמה ל-1💗1", "en": "1💗1 registration"};
 let tu = { "he": "תודה", "en": "thank you"};
 let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
 const buttn = { "he": "מייל אישור נשלח. לכל בעיה לחצו כדי לשלוח לנו מייל","en": "please check your email, if you did not receive please click here to contact us"}
-const gtl = {"he":"לאחר האישור במייל להתחברות","en": "go to login (after confirming your email)"}
+const gtl = {"he":" להתחברות לאתר","en": "go to login "}
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -97,8 +97,8 @@ const gtl = {"he":"לאחר האישור במייל להתחברות","en": "go 
 <br>
 {see[$lang]}
 </h1>
-    <a href="mailto:ehad1one@gmail.com" ><p class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi px-2 rounded-full">{buttn[$lang]}</p></a>
-   <!---- <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={() =>goto("./login") }>{gtl[$lang]}</button>-->
+   <!---- <a href="mailto:ehad1one@gmail.com" ><p class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi px-2 rounded-full">{buttn[$lang]}</p></a>-->
+    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={() =>goto("./login") }>{gtl[$lang]}</button>
   </div>
   </div>
 {/if}
