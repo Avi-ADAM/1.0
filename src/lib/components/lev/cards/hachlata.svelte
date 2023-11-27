@@ -70,7 +70,7 @@ const tri = import('$lib/translations/tr.json')
          </div>
          </div>
          </div>
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="d bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
         {#if kind == "sheirutpends"}
               <h1 class="text-gray-900 font-bold text:2xl sm:text-3xl mb-2">{spdata.sheirut.data.attributes.name}</h1>
@@ -79,7 +79,7 @@ const tri = import('$lib/translations/tr.json')
           <h5 class="text-barbi font-bold text-xl mb-2">🧮{spdata.sheirut.data.attributes.equaliSplited ? equaliSplitedTr[$lang]:equaliSplitedFl[$lang]}</h5>
           {:else if kind == "pic"}
           <div class="w-full sm:w-3/4 lg:w-1/3">
-          <svg class="scale-110" version="1.1" id="desLayer_1" x="0px" y="0px" viewBox="1194.702695 779.45875 162.446096 162.190653" enable-background="new 0 0 2103.3203 1667.9167" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
+          <svg class="scale-110" height="100%" width="100%" version="1.1" id="desLayer_1" x="0px" y="0px" viewBox="1194.702695 779.45875 162.446096 162.190653" enable-background="new 0 0 2103.3203 1667.9167" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
         <defs>
                 <bx:grid x="-23.43558" y="159.787667" width="100" height="100"/>
                 <linearGradient id="deslinearGradient4172">

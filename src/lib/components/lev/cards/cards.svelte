@@ -613,6 +613,7 @@ mousewheel={true}
                                                           cards="true" 
                                                     on:chat={chat}
                                                     timegramaDate={buble.timegramaDate}
+                                                    timegramaId={buble.timegramaId}
                                                     restime={buble.restime}                                                    
                                                     noofpu={buble.noofpu}
                                                     newpicid={buble?.newpicid}

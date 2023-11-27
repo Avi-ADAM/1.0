@@ -44,7 +44,7 @@ export let pid
 export let stylef = '24px';
 export let askId;
 export let users;
-export let timegramaDate, restime
+export let timegramaDate, restime,timegramaId
     const baseUrl = import.meta.env.VITE_URL
 
 onMount(async () => {
@@ -200,11 +200,53 @@ async function agree() {
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
     let update = ``
+    let d = new Date()
   if (kind == 'pic'){
     update = `ProfilePic: "${newpicid}"`
   }
     console.log(uids);
- if (noofpu === noofusersOk) {    
+ if (noofpu === noofusersOk) {   
+  let que = `` 
+      if(kind != "sheirutpends"){
+        `updateSheirutpends(id:"${projectId}"
+        data:{
+          archived: true,
+           vots: [${userss}, 
+              {
+               what: true
+               ide:${idL}
+               zman: "${d.toISOString()}"
+               order:0
+               users_permissions_user: "${idL}"
+             }
+           ]}          
+        }){data{id}}
+        updateSheirut(id:"${spdata.sheirut.data.id}"
+        data:{
+          isApruved:true
+        }){data{id}}
+        `
+      }else{
+        que `    updateProject(
+     id: "${projectId}"
+      data: {
+        ${update}
+                  }
+  ) {data{id }}
+ updateDecision(
+              id: "${askId}"
+       data: { archived: true,
+           vots: [${userss}, 
+              {
+                ide:${idL}
+               zman: "${d.toISOString()}"
+               order:0
+              what: true
+              users_permissions_user: "${idL}"
+            }
+          ]}
+         ){data{id}}`
+      }
         try {
             await fetch(linkg, {
                     method: 'POST',
@@ -213,33 +255,39 @@ async function agree() {
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        query: `mutation 
-                        { updateproject(
-     id: "${projectId}"
-      data: {
-        ${update}
-                  }
-  ) {data{id }}
- updateDecision(
-              id: "${askId}"
-                                data: { archived: true,
-                                    vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
+                        query: `mutation {
+                     ${que}
 }
 `})
                 })
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            if(miDatan.data != null){
+             let que4 = `mutation { 
+             updateTimegrama(
+     id: ${timegramaId}
+             data:{
+              done: true
+             }){
+              data{id}
+             }
+            }
+              `
+               try {
+      let res4 = await SendTo(que4, VITE_ADMINMONTHER).then((res4) => (res4 = res4));
+      console.log(res4,"ask res4 ")      
+      if (res4.data != null) {
+              console.log(res4.data,"ask res4 ")      
+ dispatch('acsept', {
                 ani: "askedma",
                 coinlapach: coinlapach 
             })
+               }
+ } catch (e) {
+      console.error(e);
+    }
+  }
 
         } catch (e) {
             error1 = e
@@ -334,6 +382,7 @@ function hoverc (event){
     dispatch("hover", {id: u[$lang]});
 }
  import Card from './cards/hachlata.svelte'
+  import {SendTo} from '$lib/send/sendTo.svelte';
 export let cards = false;
 export let tx = 200;
 const newlogo = {"he":"הלוגו החדש שמוצע","en":"new Logo offered"}

@@ -518,6 +518,7 @@ export let sml = false
                                                     created_at={buble.created_at}
                                                     spdata={buble.spdata}
                                                     kind={buble.kind}
+                                                    timegramaId={buble.timegramaId}
                                                     timegramaDate={buble.timegramaDate}
                                                     restime={buble.restime}
                                                     messege={buble.messege}
