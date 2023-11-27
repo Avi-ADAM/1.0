@@ -296,6 +296,37 @@ async function agree() {
 } else {
 
         console.log("just add vote to asked and update to not show for me again")
+         let que = `` 
+      if(kind != "sheirutpends"){
+        `updateSheirutpends(id:"${projectId}"
+        data:{
+           vots: [${userss}, 
+              {
+               what: true
+               ide:${idL}
+               zman: "${d.toISOString()}"
+               order:0
+               users_permissions_user: "${idL}"
+             }
+           ]}          
+        }){data{id}}
+        `
+      }else{
+        que `    
+ updateDecision(
+              id: "${askId}"
+       data: {
+           vots: [${userss}, 
+              {
+                ide:${idL}
+               zman: "${d.toISOString()}"
+               order:0
+              what: true
+              users_permissions_user: "${idL}"
+            }
+          ]}
+         ){data{id}}`
+      }
          try {
             await fetch(linkg, {
                     method: 'POST',
@@ -306,16 +337,7 @@ async function agree() {
                     body: JSON.stringify({
                         query: `mutation 
                         {
-                            updateDecision(
-id: "${askId}" 
-                                data: { vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
-                     
+                           ${que}
                     }
 `})
                 })
