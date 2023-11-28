@@ -21,7 +21,7 @@
                 class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
             on:click={()=>show = false}><Close/>
         </button>
-    <SheirutShow projectName={pn} pid={$idPr} {sheirutim}/>
+    <SheirutShow projectName={pn} pid={$idPr} {sheirutim} {restime}/>
       </div>
     {/if}
     <AddSheirut {restime} {usersNum}/>

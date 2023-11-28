@@ -46,7 +46,9 @@ let token;
 let error1;
 let idL;
 let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+'/graphql';
     function find_user_id(user_name_arr){
      var  id = 0;
       for (let i = 0; i< projectUsers.length; i++){

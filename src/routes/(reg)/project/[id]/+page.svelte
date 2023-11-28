@@ -61,7 +61,7 @@ async function xyd () {
         body: 
         JSON.stringify({query: 
           `{  project (id:${projectId}) {data{attributes{ projectName  user_1s {data{ id attributes{ username profilePic {data{attributes{ url}}}}}}
-          linkToWebsite     
+          linkToWebsite  restime
                       sheiruts(filters:{isApruved:{eq: true} }){data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
            githublink fblink discordlink  twiterlink  vallues {data{attributes{ valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName }}}' : ""}}}}
                         publicDescription    profilePic {data{attributes{ url formats }}}   open_missions (filters:{archived:{eq: false} }) {data{ id attributes{ name}}}}
@@ -216,7 +216,7 @@ async function xyd () {
      <h2 class="mt-2 text-sm text-barbi text-center " style="text-shadow: 1px 1px var(--gold);">{vap[$lang]}</h2>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 m-1"> 
                 {#each vallues as vallue}<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold"   word={vallue.attributes.valueName}/></p>{/each}
+              <Tile bg="gold" sm={true} big={true}  word={vallue.attributes.valueName}/></p>{/each}
     </div>
     </div>
     {/if}
@@ -234,7 +234,7 @@ async function xyd () {
 <h3 style="color: var(--barbi-pink) ;text-shadow: 1px 1px var(--gold);" class="5">{frm[$lang]}</h3>
 <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                 {#each projecto as om }<p on:mouseenter={()=>hover({"he":"משימות פנויות בריקמה","en":"open missions in the FreeMate"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-            <button on:click={mesima(om.id)}>  <Tile bg="wow"   word={om.attributes.name}/></button>
+            <button on:click={mesima(om.id)}>  <Tile bg="wow"  sm={true} big={true} word={om.attributes.name}/></button>
             
             </p>{/each}
     </div>
@@ -255,7 +255,12 @@ async function xyd () {
                 class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
             on:click={()=>show = false}><Close/>
         </button>
-    <SheirutShow wb={true} projectName={project.attributes.projectName} pid={projectId} sheirutim={project.attributes.sheiruts}/>
+    <SheirutShow
+     wb={true} 
+     projectName={project.attributes.projectName} 
+     pid={projectId} 
+     restime={project.attributes.restime}
+     sheirutim={project.attributes.sheiruts}/>
       </div>
     {/if}
     {/if}

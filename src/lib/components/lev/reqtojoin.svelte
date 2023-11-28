@@ -371,7 +371,8 @@ ${welcome}
 ${adduser2}
  updateAsk(
             id: "${askId}"
-                                data: { archived: true,
+                                data: { 
+                                  archived: true,
                                     vots: [${userss}, 
                                        {
                                         what: true
