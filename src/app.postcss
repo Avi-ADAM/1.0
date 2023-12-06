@@ -1,8 +1,10 @@
 /* Write your global styles here, in PostCSS syntax */
-
 @import '@fontsource/fira-mono';
 
 @tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 @font-face {
   font-family: "David";
   src: url("https://res.cloudinary.com/love1/raw/upload/v1676153669/DavidLibre-Regular_cde5oh.ttf") format("truetype");
@@ -204,8 +206,11 @@
 	--lpink: rgb(251, 207, 232);
 	--mpink: rgb(244, 114, 182);
 }
-h1, h2 , h3{
+h1, h2 {
 	font-family: 'Gan','Powerr' ;
+}
+h3{
+	font-family: 'Dorian','Glad'  ;
 }
 h4, h5, h6{
 	font-family: 'Glad','Bellefair' ;
@@ -217,7 +222,85 @@ label, input , p, div ,span{
 		font-family: 'Bellefair', 'Gan' ;
 
 }
+.tiptap ol li {
+  counter-increment: muffins;
+}
+.tiptap ol li:before {
+  content: counter(muffins) ". ";
+  color:var(--gold);
+}
+.tiptap ol {
+  list-style: none;
+  counter-reset: muffins;
+}
+.tiptap ul
+{
+      margin:0px 40px ;
+    padding: 0 0 0 40px;
+}
+/*   //     list-style-image: linear-gradient(to left bottom, red, blue);
 
+*/
+.tiptap ul
+{
+    list-style-image: url('list.svg');
+    display: list-item;
+}
+.tiptap a{
+  color: var(--lturk);
+}
+
+    .tiptap h1{
+  font-size: 2rem;
+}
+.tiptap h3{
+  font-size: 1.5rem;
+}
+.tiptap p{
+  font-size: 1.2rem;
+}
+@media(min-width: 670px){
+  .tiptap h1{
+  font-size: 2.5rem;
+}
+.tiptap h3{
+  font-size: 2rem;
+}
+.tiptap p{
+  font-size: 1.5rem;
+}
+}
+.tiptap blockquote {
+    font-family: Sarabun;
+  box-shadow: 7px 7px 13px lightgrey;
+  background: var(--gold);
+  margin-bottom:18px;
+  padding: 15px;
+  font-size: 22px;
+  border-left: solid var(--mturk);
+  border-right: solid var(--mturk);
+
+}
+
+
+.tiptap blockquote:before {  
+    content: open-quote;  
+    font-size: 24pt;  
+    text-align: center;  
+    line-height: 42px;  
+    color: #fff;  
+    background: #ddd;  
+    float: left;  
+    position: relative;  
+    border-radius: 25px;  
+   margin-right: 0.5em;
+  vertical-align: -0.4em;
+  
+    /** define it as a block element **/  
+    display: block;  
+    height: 25px;  
+    width: 25px;  
+}  
 .button-gold {
   color: rgba(0, 0, 0, 0.72);
   text-decoration: none;
@@ -1115,6 +1198,3 @@ overflow: hidden;
     --range-pip-in-range:      hsl(180, 25.4%, 24.7%);
     --range-pip-in-range-text: hsl(180, 25.4%, 24.7%);
   }
-@tailwind components;
-
-@tailwind utilities

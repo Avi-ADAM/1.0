@@ -9,6 +9,7 @@
 import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
+  import RichText from '$lib/celim/ui/richText.svelte';
 export let projectId;
 let projectUsers =[];
 let token;
@@ -185,7 +186,8 @@ async function xyd () {
 <h1 class="q">{project.attributes.projectName}</h1>
  {#if project.attributes.publicDescription !== null}
     <div class="border border-gold rounded m-2 p-2"> 
-   <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2 text-gold">{project.attributes.publicDescription}</pre>
+            <RichText editable={false} outpot={project.attributes.publicDescription}/>
+   <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2 text-gold">{project.attributes.publicDescription}</pre>-->
     </div>
    {/if}
  <div dir="ltr" class="flex items-center justify-center">

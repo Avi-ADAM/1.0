@@ -5,7 +5,6 @@
   import {mi, role, ww, skil} from '$lib/components/prPr/mi.js'
     import Tile from '$lib/celim/tile.svelte'
     import { Confetti } from "svelte-confetti"
-  //import Mindmap from '$lib/components/prPr/mindmap.svelte'
   const baseUrl = import.meta.env.VITE_URL
 
   import {
@@ -48,6 +47,7 @@
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
+  import RichText from '$lib/celim/ui/richText.svelte';
 let idL;
 let success = false;
 let isOpen = false;
@@ -1590,12 +1590,14 @@ pointer-events: none;">
     </div>
   {#if project.publicDescription != "undefined" && project.publicDescription !=  null}
     <div class="border-2 border-gold rounded m-2 p-2"> 
-   <pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>
+   <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
+   <RichText editable={false} outpot={desP}/>
     </div>
    {/if}
   {#if project.descripFor != "undefined" && project.descripFor != null}
     <div class="border-2 border-gold rounded m-2 p-2"> 
-   <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>
+         <RichText editable={false} outpot={desP}/>
+  <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
     </div>
 
    {/if}

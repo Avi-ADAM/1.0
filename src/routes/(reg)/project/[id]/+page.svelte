@@ -13,6 +13,7 @@ import { lang } from '$lib/stores/lang.js'
 } from 'svelte-loading-spinners';
   import SheirutShow from '$lib/components/prPr/sheirut/sheirutShow.svelte';
   import Close from '$lib/celim/close.svelte';
+  import RichText from '$lib/celim/ui/richText.svelte';
 let projectUsers =[];
 const baseUrl = import.meta.env.VITE_URL
 let show = false
@@ -196,7 +197,8 @@ async function xyd () {
 <h1 class="q">{project.attributes.projectName}</h1>
  {#if project.attributes.publicDescription !== null}
     <div class="border border-gold rounded m-2 p-2"> 
-   <pre style="overflow-y:auto;  white-space: pre-wrap; " class="text-center 2 d max-h-24 p-2 text-gold">{project.attributes.publicDescription}</pre>
+      <RichText editable={false} outpot={project.attributes.publicDescription}/>
+   <!----<pre style="overflow-y:auto;  white-space: pre-wrap; " class="text-center 2 d max-h-24 p-2 text-gold"></pre>-->
     </div>
    {/if}
  <div dir="ltr" class="flex items-center justify-center">

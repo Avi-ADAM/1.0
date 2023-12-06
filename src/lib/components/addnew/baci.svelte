@@ -226,6 +226,7 @@ let suc = false;
 export let userName_value;
   import { RingLoader
 } from 'svelte-loading-spinners'
+  import RichText from '$lib/celim/ui/richText.svelte';
  const closer = () => {
     isOpen = false;
   a = 0;
@@ -275,7 +276,7 @@ const frn = {"he":"שם הריקמה", "en":"FreeMates name"}
 const hours = {"he": "שעות", "en": "hours"}
 const hrex = {"he": "לאחר זמן זה חוסר מענה יחשב כהסכמה", "en": "after that: non-voting will consider as agreement"}
 const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en":"time to respond to FreeMates voting"}
-const teure = {"he": "תיאור קצר שיהיה גלוי לכל", "en": "short description with public visibility"} 
+const teure = {"he": "תיאור שיהיה גלוי לכל", "en": "short description with public visibility"} 
 const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMates members"}
 const wel = {"he":"לינק לאתר (אם יש)" ,"en":"link to a website (if any)"}
 let naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
@@ -322,18 +323,29 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600 bg-slate-50">{naex[$lang]}</small>{/if}
-
+<!----
     <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <textarea name="es"  bind:value={desP}    
  type='text' class='input d' required ></textarea>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{teure[$lang]}</label>
   <span class='line'></span>
+</div>-->
+<br>
+<div class="w-full">
+<h2 class="text-barbi">{teure[$lang]}</h2>
+<RichText bind:outpot={desP}/>
 </div>
+<!----
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <textarea name="s"  bind:value={desPl}     
  type='text' class='input d' required></textarea>
   <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="s" class='label'>{prte[$lang]}</label>
   <span class='line'></span>
+</div>-->
+<div class="w-full">
+    <h2 class="text-barbi">{prte[$lang]}</h2>
+
+<RichText bind:outpot={desPl}/>
 </div>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input name="de"    bind:value={linkP}     
