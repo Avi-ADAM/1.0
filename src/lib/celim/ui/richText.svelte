@@ -1,6 +1,7 @@
 <script>
   import { lang } from '$lib/stores/lang';
   import { onMount, onDestroy } from 'svelte';
+  import List from '$lib/celim/icons/list.svelte'
   import { Editor } from '@tiptap/core';
   import TextAlign from '@tiptap/extension-text-align';
   import Link from '@tiptap/extension-link';
@@ -60,8 +61,8 @@
   const quoteLeb = { he: 'ציטוט', en: 'qoute' };
   const listNLeb = { he: '1. רשימה', en: 'List 1.' };
   const listLeb = {
-    he: `<div class="flex flex-row flex-wrap"><img src="list.svg" alt="list"/> רשימה</div>`,
-    en: `<div class="flex flex-row flex-wrap"><img src="list.svg" alt="list"/>List</div>`
+    he: ` רשימה`,
+    en: `List`
   };
   const linkPro = { he: 'כתובת קישור', en: 'Enter URL' };
   const parLeb = { he: `<p>פסקה</p>`, en: `<p>paragaph</p>` };
@@ -467,7 +468,7 @@
                 hide = true;
               }}
               class={editor.isActive('bulletList') ? 'active' : ''}
-              >{@html listLeb[$lang]}</button
+              ><div class="flex flex-row flex-wrap align-middle"><List/>{@html listLeb[$lang]}</div></button
             >
 
             <button
@@ -517,7 +518,7 @@
     background: var(--gold);
     color: var(--barbi-pink);
     padding: 0 0.75rem;
-    font-size: 1.1rem;
+    font-size: 0.8rem;
     border-radius: 0.25rem;
     border: 1px dotted var(--barbi-pink);
   }
@@ -532,7 +533,7 @@
   }
   @media (min-width: 450px) {
     button {
-      font-size: 1.5rem;
+      font-size: 1.2rem;
     }
   }
   @media (min-width: 850px) {

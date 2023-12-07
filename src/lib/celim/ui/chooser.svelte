@@ -14,7 +14,7 @@ dispatch("change",{checked:checked})
 
 </script>
 
-<h3  class="text-barbi">{level[$lang]}</h3>
+<h2 class="text-barbi ">{level[$lang]}</h2>
 
 <div class="flex items-center justify-center" dir="ltr">
   <label for={`Toggle${uniqueID}+${uniqueIDD}`}  class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">
