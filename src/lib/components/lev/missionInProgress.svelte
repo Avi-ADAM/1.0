@@ -199,12 +199,19 @@ async function azor () {
                 })
                 .then(r => r.json())
                 .then(data => miCatan = data);
+                addToast(azori[$lang])
             console.log(miCatan);
         } catch (e) {
             error1 = e
+            addToast(er[$lang], 'warn');
             console.log(error1);
         }
 } 
+const azori = {
+  "he":"הטיימר נעצר בהצלחה, יש ללחוץ שמירה כדי לשמור",
+  "en":"timer stopped sucsesfully, click save to save it"
+}
+
 async function start () {
       const startTime = Date.now() - lapse
       timer = setInterval(() => {
@@ -702,6 +709,7 @@ function claf (event){
             error1 = e
                         isOpen = false;
             console.log(error1);
+                addToast(er[$lang],"warn")
 }
 
  }
@@ -788,7 +796,7 @@ async function busabe(id){
     }
   let a = 1;
   const suc = {"he": "בוצע בהצלחה","en":"appruved sucssefully!"}
-  const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
+  const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
  const ishur = {"he": "אישור", "en": "save"}
  const busa = {"he": "בוצע בהצלחה", "en":"done"}

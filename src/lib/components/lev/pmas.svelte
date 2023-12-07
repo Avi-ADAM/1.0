@@ -13,8 +13,10 @@ import { idPr } from '../../stores/idPr.js';
   import ProgressBar from "@okrad/svelte-progressbar";
  import { onMount } from 'svelte';
  import Lowbtn from '$lib/celim/lowbtn.svelte'
+ import {lang} from '$lib/stores/lang.js'
   const dispatch = createEventDispatcher();
       export let low = false;
+  const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
 
   export let coinlapach;
     export let mypos = null;
@@ -276,6 +278,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
+            addToast(er[$lang],"warn")
         }
           } else {
  try {
@@ -311,6 +314,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
+            addToast(er[$lang],"warn")
         }
        
       }
@@ -405,6 +409,8 @@ async function afterwhy (event){
         } catch (e) {
             error1 = e
             console.log(error1)
+            addToast(er[$lang],"warn")
+
         }
 }
 const close = () => {
@@ -640,6 +646,7 @@ function hoverc (event){
 }
  import Cards from './cards/pma.svelte'
   import { nowId } from '$lib/stores/pendMisMes';
+  import { addToast } from 'as-toast';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr

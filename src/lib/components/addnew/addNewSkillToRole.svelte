@@ -49,7 +49,6 @@ if (rn.includes(skillName_value)){
     finnish (id,meData.data.createSkill.data);
       console.log("some")
           let userName_value = liUN.get()
-                console.log("some דםצק")
 
          let data = {"name": userName_value, "action": "יצר כישור חדש בשם:", "det": `${skillName_value} והתיאור: ${desS} `}
    fetch("/api/ste", {

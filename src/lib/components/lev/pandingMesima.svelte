@@ -280,6 +280,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
+                        addToast(er[$lang],"warn")
         }
           
         console.log("will create mission")
@@ -317,6 +318,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
+       addToast(er[$lang],"warn")
         }
        
 
@@ -419,6 +421,7 @@ async function afterwhy (event){
                  coinLapach()
         } catch (e) {
             error1 = e
+            addToast(er[$lang],"warn")
             console.log(error1)
  }
         }
@@ -508,8 +511,11 @@ async function afreact (event){
         } catch (e) {
             error1 = e
             console.log(error1)
+            addToast(er[$lang],"warn")
         }
 }
+  const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
+
   let clicked = false
 $: pcli = 0
 $: pmcli = 0
@@ -591,6 +597,7 @@ function hoverc (event){
   import {oneLangAdj} from '$lib/func/oneLangAdj.svelte';
   import { lang } from '$lib/stores/lang';
   import { nowId } from '$lib/stores/pendMisMes';
+  import { addToast } from 'as-toast';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr
