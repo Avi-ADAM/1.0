@@ -427,7 +427,7 @@
           <div
             id="dropdownNavbar2"
             class:hidden={hide == true}
-            class="z-10bg-gold divide-y divide-gray-100 rounded-lg shadow flex-row flex"
+            class="z-10 bg-gold divide-y divide-gray-100 rounded-lg shadow flex-row flex"
           >
             <button
               on:click={() => {
@@ -468,7 +468,7 @@
                 hide = true;
               }}
               class={editor.isActive('bulletList') ? 'active' : ''}
-              ><div class="flex flex-row flex-wrap align-middle"><List/>{@html listLeb[$lang]}</div></button
+              ><div class="flex flex-row flex-wrap align-middle items-center justify-center"><List/>{@html listLeb[$lang]}</div></button
             >
 
             <button
