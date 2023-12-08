@@ -36,6 +36,7 @@
   import { kindOfTranslation } from '$lib/func/kindOfTranslate.svelte';
   import { peace } from '$lib/func/lev/peace.svelte';
   import Love from '$lib/func/lev/love.svelte';
+  import SucssesConf from '$lib/celim/sucssesConf.svelte';
   export let data;
   let low = true;
   let indexi = -1;
@@ -2084,7 +2085,7 @@
 
       counter += 1;
       localStorage.setItem('miDataL', JSON.stringify(miData));
-      if (!isEqual(miData, miDataold) == true && update != true) {
+      if (isEqual(miData, miDataold) == true && update != true) {
         console.log('nada');
         low = false;
       } else {
@@ -3484,7 +3485,9 @@
       milon[key] = true;
     }
   }
+  let success = false
 </script>
+<SucssesConf {success} />
 
 <svelte:head>
   <title>{title[$lang]}</title>
