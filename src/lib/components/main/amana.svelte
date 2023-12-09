@@ -429,8 +429,8 @@ if (fpp.includes(jjj)){
   .then(response => {
     g = false;
    already = true;
-   document.cookie = `email=${mail}; expires=` + new Date(2024, 0, 1).toUTCString();
-   document.cookie = `un=${encodeURIComponent($form.name)}; expires=` + new Date(2024, 0, 1).toUTCString();
+   document.cookie = `email=${mail}; expires=` + new Date(2025, 0, 1).toUTCString();
+   document.cookie = `un=${encodeURIComponent($form.name)}; expires=` + new Date(2025, 0, 1).toUTCString();
    userName.set($form.name);
            liUN.set($form.name);
             email.set(mail);
@@ -572,7 +572,7 @@ $: w = 0
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
-                  <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >English</button>
+            <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">English</button>
           <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
                   <button on:click={info} title="הסבר ומידע" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >הסבר ומידע</button>

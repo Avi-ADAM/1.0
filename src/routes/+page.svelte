@@ -7,12 +7,26 @@
   import Scene from '$lib/components/main/1lev1.svelte'
   import { useProgress } from '@threlte/extras'
   import CircleProgresBar from "$lib/celim/ui/circleProgresBar.svelte";
-	import {lang} from '$lib/stores/lang'
+	import {lang,langUs,doesLang} from '$lib/stores/lang'
 	const { progress } = useProgress()
 	const url = 'https://1lev1.vercel.app/';
 	const title = '1️💗1️';
 	const setitle = {"he":"ליצור יחד בהסכמה","en":"create together harmoniously"}//"טעם לחיים!"
 
+	function change(){
+  if ($lang == "he"){
+    doesLang.set(true)
+    langUs.set("en")
+    lang.set("en")
+    document.cookie = `lang=${$lang}; expires=` + new Date(2025, 0, 1).toUTCString();    
+  }else {
+     doesLang.set(true)
+    langUs.set("en")
+    lang.set("he")
+    document.cookie = `lang=${$lang}; expires=` + new Date(2025, 0, 1).toUTCString();
+  }
+}
+const changel = {"he":"English","en":"עברית"}
 	const desc = {"he":'ליצור צוות מנצח להגשמת כל חלום, להתנהל ו',
 					"en":'Creating a winning team to fulfill every dream, to manage and'};
 	const desc2 = {"he":"ליצור יחד בהסכמה",
@@ -44,9 +58,23 @@
 	$: btna = false
 	$: btnb = false
 	$: scrolli = false
-	let loading = false, loadinga = false,w,h,fi = false
+	let loading = false, loadinga = false,w,h,fi = false, trans = false
 //w*1.8 < h ? w : h > 639 ? w*0.8 : h
 </script>
+ <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
+              {#if trans === false}
+          <button on:click={()=>trans = !trans}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          {:else}
+          <button on:click={()=>trans = !trans} class=" text-barbi hover:text-gold p-0.5 "
+ ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+</svg></button>
+      <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel[$lang]}</button>
+      <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
+      <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
+      <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">מפת ההסכמה</a>
+          {/if}
+          </div>
 <div dir={$lang === "he" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden">
 	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
 		<h1 class="font-bold sm:text-9xl text-4xl text-barbi shadow-lg shadow-fuchsia-300 rounded " 
