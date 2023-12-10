@@ -31,6 +31,17 @@ self.addEventListener('activate', (event) => {
 
   event.waitUntil(deleteOldCaches());
 });
+self.addEventListener('push', ev => {
+  const data = ev.data.json();
+  console.log('Got push', data);
+
+  ev.waitUntil(self.registration.showNotification(data.title, {
+    body: 'Hello, World!',
+  //  registration_ids: [$('.header-user-name').find('span').text()],
+    icon: 'http://mongoosejs.com/docs/images/mongoose5_62x30_transparent.png'
+  }));
+
+});
 
 self.addEventListener('fetch', (event) => {
   // ignore POST requests etc

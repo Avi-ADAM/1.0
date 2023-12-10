@@ -5,15 +5,22 @@ import { goto } from '$app/navigation';
   import {SendTo} from '$lib/send/sendTo.svelte'
  import { createEventDispatcher } from 'svelte';
 export let isGuidMe = false;
-// Import the functions you need from the SDKs you need
-import { initializeApp } from "firebase/app";
-//import { getAnalytics } from "firebase/analytics";
-
+export let projectIds = []
   import { onMount } from 'svelte';
   $: t = 0
   $: teleredy = false
+ let sub;
 
 onMount(async () => {
+   const notificationBtn = document.getElementById("nb")
+      // set the button to shown or hidden, depending on what the user answers
+      if(Notification.permission === 'denied' || Notification.permission === 'default') {
+        notificationBtn.style.display = 'block';
+      } else {
+        notificationBtn.style.display = 'none';
+      }
+      /*
+
 t = Math.random()
 try{
 let res =await SendTo(`mutation { updateUsersPermissionsUser(
@@ -36,66 +43,19 @@ let res =await SendTo(`mutation { updateUsersPermissionsUser(
    }
 } catch(e) {
   console.error(e)
-}
+}*/
 })
 
-// Your web app's Firebase configuration
-// For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
-
-// Initialize Firebase
- //import firebase from '$lib/func/firebase';
-
-// const app = firebase();//const analytics = getAnalytics(app);
-//import { getMessaging, getToken } from "firebase/messaging";
-
-// Get registration token. Initially this makes a network call, once retrieved
-// subsequent calls to getToken will return from cache.
-//const messaging = getMessaging(app);
-
-// Add the public key generated from the console here.
     const dispatch = createEventDispatcher();
     const er = {"he":"כרטה שגיעה","en": "an error just occored"}
 const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en":"you sucssesfully registered to nutification on this device"}
  async function askNotificationPermission() {
-   // getToken(messaging, { vapidKey: 'BJoimg2miGigQrjDQeEUmtYBfea_vQX7fOCcFS33NuhrMeQXqFmKJMlrdhERnOyXnJzkhgTzF70v2J03jHi1py8' }).then((currentToken) => {
-  //if (currentToken) {
-    // Send the token to your server and update the UI if necessary
-    // ...
-   /* console.log("token",currentToken)
-     const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  uid = cookieValueId;
-    let que = `mutation { 
-  createStrapi_plugin_fcm_fcm_topics(
-      id: ${uid}
-      data: { 
-        confirmed: true
- }
-  ){data {id}}
- } ` 
-    console.log(que)
- try{
- let res =  SendTo(que)
- .then (res => res = res);
-  console.log(res)
-  if(res.data !=null){
-    addToast(suc[$lang])
-      localStorage.setItem("nuti", true);
-  }else{
-    addToast(er[$lang],"warn")
-  }
-}  catch (e) {
-  console.error(e)
-  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
-  }*/
- // } else {
-    // Show permission request UI
+      // Show permission request UI
     if (!"Notification" in window) {
       console.log("This browser does not support notifications.");
     } else {
+      console.log("here")
       if(checkNotificationPromise()) {
         Notification.requestPermission()
         .then((permission) => {
@@ -107,18 +67,14 @@ const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en
         });
       }
     }
-    console.log('No registration token available. Request permission to generate one.');
-    // ...
- // }
-//}).catch((err) => {
- // console.log('An error occurred while retrieving token. ', err);
-  // ...
-//});
     // function to actually ask the permissions
     function handlePermission(permission) {
       // Whatever the user answers, we make sure Chrome stores the information
       if(!('permission' in Notification)) {
         Notification.permission = permission;
+      }
+      if(Notification.permission === "granted") {
+        addMachshir()
       }
       const notificationBtn = document.getElementById("nb")
       // set the button to shown or hidden, depending on what the user answers
@@ -138,12 +94,61 @@ const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en
   function checkNotificationPromise() {
     try {
       Notification.requestPermission().then();
+
     } catch(e) {
       return false;
     }
 
     return true;
   }
+  async function addMachshir (){
+    console.log("here")
+  
+    const reg = await navigator.serviceWorker.ready;
+    sub = await reg.pushManager.getSubscription();
+    console.log(sub)
+    if (!sub) {
+      // Fetch VAPID public key
+      sub = await reg.pushManager.subscribe({
+        userVisibleOnly: true,
+        applicationServerKey: import.meta.env.VITE_publicKey,
+      });
+      let d = new Date()
+      const subscriptionJSON = JSON.stringify(sub); 
+  const cookieValueId = document.cookie
+  .split('; ')
+  .find(row => row.startsWith('id='))
+  .split('=')[1];
+  uid = cookieValueId;
+    let que = `mutation { 
+  createMachshir(
+      data: { 
+        users_permissions_user:${uid},
+        jsoni:${JSON.stringify(subscriptionJSON)},
+       ${projectIds.length > 0 ? `projects:[${projectIds}],`:``}
+        publishedAt: "${d.toISOString()}"
+   }
+   ){data {id}}
+  } ` 
+     console.log(que)
+  try{
+  let res = await SendTo(que)
+  .then (res => res = res);
+  console.log(res)
+  if(res.data !=null){
+    addToast(suc[$lang])
+      localStorage.setItem("nuti", true);
+  }else{
+    addToast(er[$lang],"warn")
+  }
+}  catch (e) {
+  console.error(e)
+  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  }
+    }
+    console.log(sub);
+  }
+  
 let password;
 let shgi;
 function logout() {
