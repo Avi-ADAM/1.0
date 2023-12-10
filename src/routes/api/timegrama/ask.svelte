@@ -38,13 +38,13 @@ export async function Ask(id,taid){
           //TODO: test it! 
           welcome = `createWelcomTop(
                     data: {users_permissions_user: "${res.data.ask.data.attributes.users_permissions_user.data.id}",
-                          project: "${projectId}"
-                                publishedAt: "${d.toISOString()}",
+                          project: "${res.data.ask.data.attributes.project.data.id}"
+                          publishedAt: "${d.toISOString()}",
                         }
                 ) {data{id}}`;
                 adduser = `updateProject(
-                  id: "${projectId}"
-                 data: {user_1s: ${[...res.data.ask.data.attributes.project.data.attributes.user_1s.data.map(c => c.id), res.data.ask.data.attributes.users_permissions_user.data.id]}
+                  id: "${res.data.ask.data.attributes.project.data.id}"
+                 data: {user_1s: [${[...res.data.ask.data.attributes.project.data.attributes.user_1s.data.map(c => c.id), res.data.ask.data.attributes.users_permissions_user.data.id]}]}
                   ){data{attributes {user_1s{data {id attributes{ email lang}}}}}}`;
                         
               }
@@ -115,7 +115,7 @@ updateOpenMission(
         console.log(monti)
            if (!res.data.ask.data.attributes.project.data.attributes.user_1s.data.map(c => c.id).includes(res.data.ask.data.attributes.users_permissions_user.data.id)){
               let emailt;
-              let ema = miDatan.data.updateProject.data.attributes.user_1s.data
+              let ema = res3.data.updateProject.data.attributes.user_1s.data
               let la; 
               for (let i = 0; i <ema.length; i++){
                 if (ema[i].id == res.data.ask.data.attributes.users_permissions_user.data.id){
@@ -156,6 +156,7 @@ updateOpenMission(
             if (otherasks.length> 1){
             let nextquery = ``
             for (let i = 0; i < otherasks.length; i++){
+              //TODO: otherasks timegrama
                 nextquery =  `mutation {
                 updateAsk(
                        id: "${otherasks[i].id}" 
