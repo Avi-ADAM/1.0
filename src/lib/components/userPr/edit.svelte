@@ -667,7 +667,8 @@ title="{onin[$lang]}">
    {/if}
 <br>
 
-  <div > <h3 class="text-center text-sm text-barbi">{adbf[$lang]}{Valname }{adaf[$lang]}</h3>  <MultiSelect
+  <div > <h3 class="text-center text-sm text-barbi">{adbf[$lang]}{Valname }{adaf[$lang]}</h3> 
+    <div class="flex flex-row-reverse"> <MultiSelect
       bind:selected={data.selected2}
            bind:searchText
                 noMatchingOptionsMsg={addn[$lang]}
@@ -675,9 +676,13 @@ title="{onin[$lang]}">
       options={allvn}
       --sms-width={"200px"}
       on:change={addSK(data.selected2)}
-      on:blur={adm(data.selected2)}
       loading={newcontent}
-      /></div>
+      />
+      {#if datan === "mash" && data?.selected2?.length > 0}
+      <button on:click={adm(data.selected2)}>✅</button>
+      {/if}
+    </div>
+  </div>
        <!--      allowUserOptions={"append"}-->
 
       {#if datan == "skil"}

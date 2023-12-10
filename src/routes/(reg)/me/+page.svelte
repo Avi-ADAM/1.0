@@ -730,7 +730,7 @@ let width,height
 
 
           {:else if a == 1}
-          <EditB isGuidMe={isG} checked={cards} uid={meDataa.data.me.id} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid(guid)/>
+          <EditB projectIds={myP.map(c=>c.id)} isGuidMe={isG} checked={cards} uid={meDataa.data.me.id} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid(guid)/>
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
           <button

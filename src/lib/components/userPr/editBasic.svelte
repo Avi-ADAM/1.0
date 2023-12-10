@@ -14,7 +14,8 @@ export let projectIds = []
 onMount(async () => {
    const notificationBtn = document.getElementById("nb")
       // set the button to shown or hidden, depending on what the user answers
-      if(Notification.permission === 'denied' || Notification.permission === 'default') {
+
+      if(Notification?.permission === 'denied' || Notification?.permission === 'default') {
         notificationBtn.style.display = 'block';
       } else {
         notificationBtn.style.display = 'none';
@@ -83,10 +84,7 @@ const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en
       } else {
         notificationBtn.style.display = 'none';
       }
-    }
-
-    // Let's check if the browser supports notifications
-    
+    }    
   }
 
   // Function to check whether browser supports the promise version of requestPermission()
