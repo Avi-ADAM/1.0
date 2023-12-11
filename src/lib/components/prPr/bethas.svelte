@@ -120,6 +120,7 @@ onMount(async () => {
     const hd = {"he":"שעות שהושמו/ בוצעו", "en":"hours asigned/ done"}
     const sho = {"he": "שווי המשימה", "en": "mission vallue"}
     const ro = {"he": "תפקיד", "en": "role"}
+    $: w = 0 
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -133,13 +134,13 @@ onMount(async () => {
   </DialogContent>
   </div>
 </DialogOverlay>
-<section dir={$lang == "he" ? "rtl": "ltr"}>
+<section dir={$lang == "he" ? "rtl": "ltr"} bind:clientWidth={w}>
   <h1>{hed[$lang]}</h1> 
   <button on:click={() =>isOpen = true} ><Plus/></button>
   <div>
     {#each soter as x, i}
     <button on:click={() =>sot(x.id, x.openi)}>
-    <Tile bg="{x.color}" word={x.word} closei={x.closei} openi={x.openi}/>
+    <Tile big={w > 500 ? true:false} sm={w > 500 ? true:false} bg="{x.color}" word={x.word} closei={x.closei} openi={x.openi}/>
     </button>
     {/each}
   </div>
@@ -163,13 +164,13 @@ onMount(async () => {
         {#key sodata}
         {#each sodata as data, i}
         <tr transition:slide="{{ duration: 1000, easing: quintOut }}">
-          <td>{data.attributes.name}</td>
+          <td><h2 class="md:text-xl">{data.attributes.name}</h2></td>
           <td> 
         <div class="flex flex-col items-center justify-center ">
 
-          <div><img  class="sm:w-10 sm:h-10 w-7 h-7 rounded-full" src="{data.attributes.users_permissions_user.data.attributes.profilePic.data != null ? data.attributes.users_permissions_user.data.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="Medium avatar">
+          <div><img  class="sm:w-16 sm:h-16 w-7 h-7 rounded-full" src="{data.attributes.users_permissions_user.data.attributes.profilePic.data != null ? data.attributes.users_permissions_user.data.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="Medium avatar">
 </div> 
-        <div><Tile single={true}  bg="gold"  word="{data.attributes.users_permissions_user.data.attributes.username}"/></div>
+        <div><Tile big={w > 500 ? true:false} sm={w > 500 ? true:false} single={true}  bg="gold"  word="{data.attributes.users_permissions_user.data.attributes.username}"/></div>
         </div>
         </td>
           <td>
@@ -177,11 +178,11 @@ onMount(async () => {
     <div class="bg-barbi text-xs font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {data.attributes.status == null ? 0 : data.attributes.status}%">{data.attributes.status == null ? 0 : data.attributes.status}%</div>
   </div>
           </td>
-          <td>{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})}/{data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</td>
-          <td>{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</td>
+          <td><h2 class="md:text-xl">{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})}/{data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</h2></td>
+          <td><h2 class="md:text-xl">{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</h2></td>
           <td>
             {#each data.attributes.tafkidims.data as taf, i} 
-            <Tile  bg={taf.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
+            <Tile big={w > 500 ? true:false} sm={w > 500 ? true:false} bg={taf.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
             {/each}
 </td>
         </tr>
