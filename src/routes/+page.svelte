@@ -11,49 +11,150 @@
 	const { progress } = useProgress()
 	const url = 'https://1lev1.vercel.app/';
 	const title = '1️💗1️';
-	const setitle = {"he":"ליצור יחד בהסכמה","en":"create together harmoniously"}//"טעם לחיים!"
-	function change(){
-  if ($lang == "he"){
+	const setitle = {
+  "he": "ליצור יחד בהסכמה",
+  "en": "create together harmoniously",
+  "ar": "الإبداع معًا بتناغم"
+};//"טעם לחיים!"
+function change(lan){
+  if (lan == "en"){
     doesLang.set(true)
     langUs.set("en")
     lang.set("en")
-    document.cookie = `lang=${$lang}; expires=` + new Date(2025, 0, 1).toUTCString();    
-  }else {
+    document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();    
+  }else if (lan == "he"){
      doesLang.set(true)
-    langUs.set("en")
+    langUs.set("he")
     lang.set("he")
-    document.cookie = `lang=${$lang}; expires=` + new Date(2025, 0, 1).toUTCString();
+    document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+  }else if (lan == "ar"){
+     doesLang.set(true)
+    langUs.set("ar")
+    lang.set("ar")
+    document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
   }
 }
-const changel = {"he":"English","en":"עברית"}
-	const desc = {"he":'ליצור צוות מנצח להגשמת כל חלום, להתנהל ו',
-					"en":'Creating a winning team to fulfill every dream, to manage and'};
-	const desc2 = {"he":"ליצור יחד בהסכמה",
-					"en":"to create together in harmony"}
-	const word1 = {"he":"מערכת ייחודית לקבלת החלטות פה-אחד","en":"Unanimous Decision Making: Our unique system facilitates unanimous decision-making among project collaborators."}
-	const word2 = {"he":"לייסד ריקמה (פרויקט) בקליק ולאתר את מרכיביה האנושיים והחומריים בקלות",
-					"en":"Founding a FreeMates project with a click and easily identifying its human and material components"}
-	const word3 = {"he":"למצוא ולהתחבר לריקמה שמתאימה בדיוק לערכים, הכישורים ודרך העבודה שלך",
-					"en":"Finding and connecting to a FreeMate that aligns precisely with your values, skills, and work style"}
-	const word4 = {"he":"פנקס דיגיטלי מבוזר לניהול החשבונות בריקמה לפי ההסכמות",
-					"en":"Distributed digital ledger for accounting management in the FreeMates based on agreements"}
-	const word5 = {"he":"מערכת הצבעות, אישרורים ומשא ומתן לניהול משותף על בסיס הסכמה פה-אחד",
-					"en":"Voting system, approvals, and negotiation for collaborative management based on unanimous agreement"}
-	const word6 = {"he":"חישוב וחלוקת כספים לפי סך ההשקעה ולפי ההסכמות",
-					"en": "Calculation and distribution of funds based on investment and agreements"}
-	const word7 = {"he":"גרפים, גאנט, לוח משימות ועוד כלים שמתווספים כל הזמן במסך ניהול הריקמה המשותף",
-					"en":"Graphs, Gantt charts, task boards, and other tools that are constantly added to the shared FreeMates management screen"}
-	const word8 = {"he":"לשתף את החפצים המיותרים שלך עם רקמות שמתאימות לערכים שלך ולהרוויח",
-					"en":"Sharing your unnecessary items with FreeMates that align with your values and earning"}
-	const word9 = {"he":"הכנסה פאסיבית  - הופכת למציאות! בריקמה לא מקבלים תשלום מוגדר אלא אחוז דינמי מהרווחים לכל אורך חיי הריקמה",
-					"en":"Passive income - becomes a reality! In FreeMates, you don't receive a fixed payment but a dynamic percentage of profits throughout the lifespan of the FreeMate"}
-	const word10 = {"he":"רקמות הן קבוצות המורכבות מכישורים ומשאבים שונים אשר יוצרות יחד מוצר או נותנות שירות ומתחלקות בהכנסות לפי ההשקעה היחסית ובהסכמה",
-					"en": "FreeMates are groups composed of different skills and resources that come together to create a product or provide a service and share income based on relative investment and agreement"}
-	const regesh1 = {"he":"רוצה להביא משמעות ושמחה לחיים שלך?","en":"Want to bring meaning and joy to your life?"}
-	const regesh2 = {"he":"רוצה לפתוח דלת אל מציאות חדשה?","en":"Want to open the door to a new reality?"}
-	const login = {"he":"להתחברות","en":"Login"}
-	const reg = {"he":"להסכמה והרשמה","en":"Agreement and Registration"}
-	const loadingTitle = {"he":"טעינת אלמנט עיצובי תלת מימדי ", "en": "Loading a three-dimensional design element"}
+const changel = {
+  "en": "English",
+  "he": "עברית",
+  "ar": "العربية"
+};
+
+const desc = {
+  "he": 'ליצור צוות מנצח להגשמת כל חלום, להתנהל ו',
+  "en": 'Creating a winning team to fulfill every dream, to manage and',
+  "ar": 'إنشاء فريق رابح لتحقيق كل حلم ، لإدارة و'
+};
+
+const desc2 = {
+  "he": "ליצור יחד בהסכמה",
+  "en": "to create together in harmony",
+  "ar": "للإبداع معًا بانسجام"
+};
+const word1 = {
+  "he": "מערכת ייחודית לקבלת החלטות פה-אחד",
+  "en": "Unanimous Decision Making: Our unique system facilitates unanimous decision-making among project collaborators.",
+  "ar": "اتخاذ قرارات بالإجماع: نظامنا الفريد يسهل اتخاذ القرارات بالإجماع بين المشاركين في المشروع."
+};
+
+const word2 = {
+  "he": "לייסד ריקמה (פרויקט) בקליק ולאתר את מרכיביה האנושיים והחומריים בקלות",
+  "en": "Founding a FreeMates project with a click and easily identifying its human and material components",
+  "ar": "تأسيس مشروع FreeMates بنقرة واحدة وتحديد مكوناته البشرية والمادية بسهولة."
+};
+const word3 = {
+  "he": "למצוא ולהתחבר לריקמה שמתאימה בדיוק לערכים, הכישורים ודרך העבודה שלך",
+  "en": "Finding and connecting to a FreeMate that aligns precisely with your values, skills, and work style",
+  "ar": "العثور والاتصال بـ FreeMate الذي يتوافق تمامًا مع قيمك ومهاراتك ونمط عملك"
+};
+
+const word4 = {
+  "he": "פנקס דיגיטלי מבוזר לניהול החשבונות בריקמה לפי ההסכמות",
+  "en": "Distributed digital ledger for accounting management in the FreeMates based on agreements",
+  "ar": "دفتر الأستاذ الرقمي الموزع لإدارة المحاسبة في FreeMates بناءً على الاتفاقات"
+};
+
+const word5 = {
+  "he": "מערכת הצבעות, אישרורים ומשא ומתן לניהול משותף על בסיס הסכמה פה-אחד",
+  "en": "Voting system, approvals, and negotiation for collaborative management based on unanimous agreement",
+  "ar": "نظام التصويت والموافقات والمفاوضات لإدارة تعاونية بناءً على اتفاق بالإجماع"
+};
+const word6 = {
+  "he": "חישוב וחלוקת כספים לפי סך ההשקעה ולפי ההסכמות",
+  "en": "Calculation and distribution of funds based on investment and agreements",
+  "ar": "حساب وتوزيع الأموال استنادًا إلى الاستثمار والاتفاقات"
+};
+
+const word7 = {
+  "he": "גרפים, גאנט, לוח משימות ועוד כלים שמתווספים כל הזמן במסך ניהול הריקמה המשותף",
+  "en": "Graphs, Gantt charts, task boards, and other tools that are constantly added to the shared FreeMates management screen",
+  "ar": "رسوم بيانية، جداول Gantt، لوحات المهام، وأدوات أخرى يتم إضافتها باستمرار إلى شاشة إدارة FreeMates المشتركة"
+};
+
+const word8 = {
+  "he": "לשתף את החפצים המיותרים שלך עם רקמות שמתאימות לערכים שלך ולהרוויח",
+  "en": "Sharing your unnecessary items with FreeMates that align with your values and earning",
+  "ar": "مشاركة العناصر الزائدة الخاصة بك مع FreeMates التي تتوافق مع قيمك وكسب المال"
+};
+
+const word9 = {
+  "he": "הכנסה פאסיבית  - הופכת למציאות! בריקמה לא מקבלים תשלום מוגדר אלא אחוז דינמי מהרווחים לכל אורך חיי הריקמה",
+  "en": "Passive income - becomes a reality! In FreeMates, you don't receive a fixed payment but a dynamic percentage of profits throughout the lifespan of the FreeMate",
+  "ar": "الدخل السلبي - يصبح واقعًا! في FreeMates ، لا تتلقى دفعة محددة ولكن نسبة ديناميكية من الأرباح طوال فترة حياة FreeMate"
+};
+
+const word10 = {
+  "he": "רקמות הן קבוצות המורכבות מכישורים ומשאבים שונים אשר יוצרות יחד מוצר או נותנות שירות ומתחלקות בהכנסות לפי ההשקעה היחסית ובהסכמה",
+  "en": "FreeMates are groups composed of different skills and resources that come together to create a product or provide a service and share income based on relative investment and agreement",
+  "ar": "FreeMates هي مجموعات مكونة من مهارات وموارد مختلفة تجتمع معًا لإنشاء منتج أو تقديم خدمة وتقاسم الدخل استنادًا إلى الاستثمار النسبي والاتفاق"
+};
+
+const regesh1 = {
+  "he": "רוצה להביא משמעות ושמחה לחיים שלך?",
+  "en": "Want to bring meaning and joy to your life?",
+  "ar": "هل تريد إضفاء الدلالة والفرح على حياتك؟"
+};
+
+const regesh2 = {
+  "he": "רוצה לפתוח דלת אל מציאות חדשה?",
+  "en": "Want to open the door to a new reality?",
+  "ar": "هل تريد فتح الباب أمام واقع جديد؟"
+};
+
+const login = {
+  "he": "להתחברות",
+  "en": "Login",
+  "ar": "تسجيل الدخول"
+};
+
+const reg = {
+  "he": "להסכמה והרשמה",
+  "en": "Agreement and Registration",
+  "ar": "الموافقة والتسجيل"
+};
+const loadingTitle = {
+  "he": "טעינת אלמנט עיצובי תלת מימדי",
+  "en": "Loading a three-dimensional design element",
+  "ar": "تحميل عنصر تصميم ثلاثي الأبعاد"
+};
+const agree = {
+  "he": ' כדי להירשם ולהינות מ-1️💗1️ יש להוסיף את ההסכמה שלך ל"אמנת החירות העולמית" שבעמוד הבא, כך נוודא את המחויבות שלך להתנהלות בהסכמה עם השאר. בנוסף הסכמתך תתווסף ל',
+  "ar": 'للتسجيل والاستمتاع ب-1️💗1️ ، يجب إضافة موافقتك على "الميثاق العالمي للحريات" في الصفحة التالية ، وبهذا سنضمن التزامك بالتعامل بموافقة مع الآخرين. بالإضافة إلى ذلك ، سيتم إضافة موافقتك إلى ',
+  "en": "To register and benefit from 1️💗1️, you need to add your agreement to the 'Global Freedom Charter' on the next page, ensuring your commitment to engaging in agreement with others. Additionally, your agreement will be added to"
+};
+
+const agree2 = {
+  "he": '"מפת ההסכמה"',
+  "ar": '"خريطة الاتفاق"',
+  "en": '"Agreement Map"'
+};
+
+const agree3 = {
+  "he": " ויחד ניצור עולם טוב יותר",
+  "ar": " ومعًا سنخلق عالمًا أفضل",
+  "en": "Together we will create a better world"
+};
+
 	$: btna = false
 	$: btnb = false
 	$: scrolli = false
@@ -68,13 +169,22 @@ const changel = {"he":"English","en":"עברית"}
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
-      <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel[$lang]}</button>
-      <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
+{#if $lang != "en"}
+      <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel["en"]}</button>
+{/if} 
+
+{#if $lang != "ar"}
+      <button on:click={() =>change("ar")} title="change language to Arabic" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel["ar"]}</button>
+{/if}
+{#if $lang != "he"}
+      <button on:click={() =>change("he")} title="change language to Hebrew" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel["he"]}</button>
+{/if}
+
       <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
       <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">מפת ההסכמה</a>
           {/if}
           </div>
-<div dir={$lang === "he" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden">
+<div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden">
 	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
 		<h1 class="font-bold sm:text-9xl text-4xl text-barbi shadow-lg shadow-fuchsia-300 rounded " 
 		style="text-shadow(1px 1px --mturk)">{title}</h1>
@@ -94,6 +204,7 @@ const changel = {"he":"English","en":"עברית"}
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word8[$lang]}/>
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]}/>
 				<Tile bg={"wow"} big={true} sm={true} word={word10[$lang]}/>
+				<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>
 			</div>
 		<span>
 		<h2 class="text-bold text-2xl text-barbi mt-5 border-4 border-spacing-2 mx-6 border-mturk bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre  rounded-lg px-3 py-4 ">{regesh1[$lang]}<br>{regesh2[$lang]}</h2>
@@ -105,7 +216,7 @@ const changel = {"he":"English","en":"עברית"}
 				fi = true}} class:button-perl={btna ==  false} class:button-gold={btna == true} on:focus={()=> btna = true} on:mouseover={()=>btna = true} 
 					on:mouseleave={()=> btna = false }>{login[$lang]}
 			{#if btna == true && loadinga == false}
-			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
+			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he" || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}
 			{#if loadinga == true}
 			<Lowding width="24px" height="24px"/>
@@ -116,7 +227,7 @@ const changel = {"he":"English","en":"עברית"}
 			fi = true
 		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} on:focus={()=> btnb = true} on:mouseover={()=>btnb = true} on:mouseleave={()=> btnb = false }>{reg[$lang]}
 			{#if btnb == true && loading == false}
-			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
+			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he"  || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}
 			{#if loading == true}
 			<Lowding width="24px" height="24px"/>

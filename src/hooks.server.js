@@ -3,17 +3,24 @@
 
 const desc = {
   he: '1💗1 הסכמה עולמית על חירות, לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
-  en: '1💗1 WorldWide consensus for Security and Peace, colaboration platform, create together harmoniously | consrnsus based partnerships manegment sistem, we can together'
+  en: '1💗1 WorldWide consensus for Security and Peace, colaboration platform, create together harmoniously | consrnsus based partnerships manegment sistem, we can together',
+  ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا'
 };
-        let lang = 'he';
-        const title = {
-          en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
-          he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1'
-        };
-        let cl = {
-          he: 'he-IL',
-          en: "en-gb"
-        };
+
+const title = {
+  en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
+  he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
+  ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية'
+};
+
+let cl = {
+  he: 'he-IL',
+  en: 'en-gb',
+  ar: 'ar-EG'
+};
+
+let lang = 'he'; // Default language set to Hebrew
+
 
 export async function handle({ event, resolve }) {
     let qlang = event.url.searchParams.get('lang') || null
@@ -25,7 +32,7 @@ export async function handle({ event, resolve }) {
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
         event.locals.uid = uid;
-          if (qlang != 'he' && qlang != 'en' ) {
+          if (qlang != 'he' && qlang != 'en' && qlang != 'ar') {
             //&& qlang != 'ar'
             if (coociLang == undefined) {
               if (userAgent?.includes('he')) {
@@ -36,7 +43,7 @@ export async function handle({ event, resolve }) {
             } else {
               lang = coociLang;
             }
-          } else if (qlang != null){
+          } else if (qlang != null) {
             lang = qlang;
           }
 
