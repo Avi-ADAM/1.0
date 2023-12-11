@@ -12,7 +12,6 @@
 	const url = 'https://1lev1.vercel.app/';
 	const title = '1️💗1️';
 	const setitle = {"he":"ליצור יחד בהסכמה","en":"create together harmoniously"}//"טעם לחיים!"
-
 	function change(){
   if ($lang == "he"){
     doesLang.set(true)

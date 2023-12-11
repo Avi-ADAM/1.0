@@ -834,7 +834,7 @@ async function busabe(id){
 <div>
   {#each tasks as task, i}
   <div class="bg-pink-100 m-2 p-2 flex flex-col justify-center align-middle border border-yellow-300">
-<h2 class="text-center underline  decoration-wavy">{task.attributes.shem}</h2>
+<h2 class="text-center underline">{task.attributes.shem}</h2>
 <p class="text-center">{task.attributes.des}</p>
 {#key op} 
 {#if op[i] != true}
@@ -844,6 +844,8 @@ async function busabe(id){
   on:mouseleave={()=>hover("0")}
   on:click={()=>clicked(i)}
   on:keypress={()=>clicked(i)}
+  role="button"
+  tabindex="0"
   class=" border rounded-2xl border-barbi hover:border-gold " 
     >
 <div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {task.attributes.status == null ? 0 : task.attributes.status}%">{task.attributes.status != null ? task.attributes.status : "0"}%</div>
@@ -851,11 +853,11 @@ async function busabe(id){
 {:else if op[i] == true}
 <RangeSlider 
   bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
-  <button on:click={()=>updStat(task.id,task.attributes.status,i)} class="button-gold hover:text-barbi">{ishur[$lang]}</button>
+  <button on:click={()=>updStat(task.id,task.attributes.status,i)} class="button-gold px-5 py-1 mx-auto hover:text-barbi">{ishur[$lang]}</button>
 {/if}
 {/key}
   {#if task.attributes.myIshur == false}
-    <button on:click={taskishor(task.id)} class="mx-auto button-silver mx-auto my-1 px-5 py-1 hover:text-barbi" >{ishur[$lang]}</button>
+    <button on:click={taskishor(task.id)} class="mx-auto button-silver my-1 px-5 py-1 hover:text-barbi" >{ishur[$lang]}</button>
     {:else}
     <button on:click={busabe(task.id)} class="button-pinkgold mx-auto my-1 px-5 py-1 hover:text-barbi" >{busa[$lang]}</button>
   {/if}
@@ -1328,6 +1330,7 @@ on:start={start}
  on:done={done}
   on:save={save}
   on:hover={hoverc}
+  on:task={opentask}
   on:azor={azor}
   on:clear={handleClearClick}
   on:statusi={function(){
@@ -1335,6 +1338,7 @@ on:start={start}
     isOpen = true
   }}
   {low}
+  {tasks}
   {dueDateOrCountToDedline}
   {hearotMeyuchadot}
 {x}

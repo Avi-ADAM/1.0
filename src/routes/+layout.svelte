@@ -38,6 +38,7 @@ export let data
 function getLang() {
   console.log(data)
     let la;
+    if(!data.lang){
     const fromSe = data.userAgent
     if ($doesLang == false) {
        
@@ -53,6 +54,9 @@ function getLang() {
     else {
         la = $langUs
     }
+  }else{
+    la = data.lang
+  }
    // if (navigator.languages != undefined)
    //     return navigator.languages[0];
    // return navigator.language;

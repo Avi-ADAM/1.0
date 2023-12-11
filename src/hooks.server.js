@@ -2,13 +2,13 @@
 /** @type {import('@sveltejs/kit').Handle} */
 
 const desc = {
-  he: '1️⃣💗1️⃣ הסכמה על חירות, לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח.',
-  en: '1️⃣💗1️⃣ WorldWide consensus for Security and Peace, colaboration platform, create together harmoniously | consrnsus based partnerships manegment sistem, we can together'
+  he: '1💗1 הסכמה עולמית על חירות, לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
+  en: '1💗1 WorldWide consensus for Security and Peace, colaboration platform, create together harmoniously | consrnsus based partnerships manegment sistem, we can together'
 };
         let lang = 'he';
         const title = {
-          en: '1️⃣💗1️⃣ | create together harmoniously | worldwide consensus for freedom',
-          he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1️⃣💗1️⃣'
+          en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
+          he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1'
         };
         let cl = {
           he: 'he-IL',
@@ -16,28 +16,32 @@ const desc = {
         };
 
 export async function handle({ event, resolve }) {
+    let qlang = event.url.searchParams.get('lang') || null
     event.locals.userAgent = event.request.headers.get('accept-language')
     //coocies?
     let userAgent = event.request.headers.get('accept-language');
     const coociLang = event.cookies.get('lang');
         const uid = event.cookies.get('id') || false;
-        console.log("id = ",uid)
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;
         event.locals.uid = uid;
-
-        if (coociLang == undefined) {
-          if (userAgent?.includes('he')) {
-            lang = 'he';
-          } else {
-            lang = 'en';
+          if (qlang != 'he' && qlang != 'en' ) {
+            //&& qlang != 'ar'
+            if (coociLang == undefined) {
+              if (userAgent?.includes('he')) {
+                lang = 'he';
+              } else {
+                lang = 'en';
+              }
+            } else {
+              lang = coociLang;
+            }
+          } else if (qlang != null){
+            lang = qlang;
           }
-        } else {
-          lang = coociLang;
-        }
 
         event.locals.lang = lang;
-        
+       console.log('id = ', uid, " lang=", lang);
     if (event.url.pathname == '/' && isJ != false){
       console.log("jr")
         return new Response('Redirect', {
