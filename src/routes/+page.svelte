@@ -148,7 +148,11 @@ const agree2 = {
   "ar": '"خريطة الاتفاق"',
   "en": '"Agreement Map"'
 };
-
+const mapa = {
+  "he": 'מפת ההסכמה',
+  "ar": 'خريطة الاتفاق',
+  "en": 'Agreement Map'
+};
 const agree3 = {
   "he": " ויחד ניצור עולם טוב יותר",
   "ar": " ومعًا سنخلق عالمًا أفضل",
@@ -170,18 +174,19 @@ const agree3 = {
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
 {#if $lang != "en"}
-      <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel["en"]}</button>
+      <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["en"]}</button>
 {/if} 
 
 {#if $lang != "ar"}
-      <button on:click={() =>change("ar")} title="change language to Arabic" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel["ar"]}</button>
+      <button on:click={() =>change("ar")} title="change language to Arabic" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["ar"]}</button>
 {/if}
 {#if $lang != "he"}
-      <button on:click={() =>change("he")} title="change language to Hebrew" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5">{changel["he"]}</button>
+      <button on:click={() =>change("he")} title="change language to Hebrew" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["he"]}</button>
 {/if}
-
-      <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
-      <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">מפת ההסכמה</a>
+{#if $lang == "he"}
+      <a class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
+    {/if}
+	  <a class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">{mapa[$lang]}</a>
           {/if}
           </div>
 <div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden">
