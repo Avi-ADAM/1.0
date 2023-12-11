@@ -1697,10 +1697,11 @@ pointer-events: none;">
 </div>
 {/if}
 {#if bett == true}
-  <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={()=>bett = false} title={cencel1[$lang]}><Close/></button>
+
 <div dir="ltr" style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); " >
-<Bethas {bmiData}  />
+  <button class="mt-2 hover:bg-gold bg-barbi text-gold hover:text-barbi rounded-full"
+          on:click={()=>bett = false} title={cencel1[$lang]}><Close/></button>
+  <Bethas {bmiData}  />
 </div>
 {/if}
 </div>

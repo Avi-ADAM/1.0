@@ -1,9 +1,10 @@
 import datai from '$lib/components/main/data.json';
+const baseUrl = import.meta.env.VITE_URL;
 
 export const load = async ({fetch}) => {
     let data, error, country
 
-    const res =  fetch('https://tov.onrender.com/graphql', {
+    const res =  fetch(baseUrl+'/graphql', {
       //api/cuntries?pagination[page]=1&pagination[pageSize]=280
       method: 'POST',
       headers: {

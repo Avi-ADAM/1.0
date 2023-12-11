@@ -71,8 +71,8 @@ onMount(async () => {
         kvar = $page.url.searchParams.get('em');
         email.set($page.url.searchParams.get('em'));
         //cuontry freeppid
-        document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2024, 0, 1).toUTCString();
-        document.cookie = `un=${encodeURIComponent($page.url.searchParams.get('un'))}; expires=` + new Date(2024, 0, 1).toUTCString();
+        document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2025, 0, 1).toUTCString();
+        document.cookie = `un=${encodeURIComponent($page.url.searchParams.get('un'))}; expires=` + new Date(2025, 0, 1).toUTCString();
         liUN.set(decodeURIComponent($page.url.searchParams.get('un')));
         const array = $page.url.searchParams.get('con').split(',');
 
