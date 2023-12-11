@@ -22,7 +22,9 @@
       return [id ,uid];
      };
      let miDatan = [];
-let linkg = 'https://tov.onrender.com/graphql';
+     const baseUrl = import.meta.env.VITE_URL
+
+let linkg = baseUrl+'/graphql';
 async function sub(){
     if (selected.length < 1){
         seEr = true
@@ -146,8 +148,8 @@ async function sub(){
 <div class="flex items-center justify-center" dir="ltr">
   <label for="Toggle3" class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">
     <input id="Toggle3" type="checkbox" class="hidden peer" bind:checked={isPersonal}>
-    <span class="px-4 py-2 rounded-l-md text-barbi peer-checked:text-gray-900 bg-mturk peer-checked:bg-gold">{pers[$lang]}</span>
-    <span class="px-4 py-2 rounded-r-md  peer-checked:text-barbi  bg-gold peer-checked:bg-mturk">{role[$lang]}</span>
+    <span class="px-4 py-2 rounded-l-md text-barbi peer-checked:text-gray-900 bg-mturk peer-checked:bg-gold">{role[$lang]}</span>
+    <span class="px-4 py-2 rounded-r-md  peer-checked:text-barbi  bg-gold peer-checked:bg-mturk">{pers[$lang]}</span>
   </label>
   </div>
         {#if isPersonal == true}
