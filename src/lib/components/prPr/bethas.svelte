@@ -165,11 +165,11 @@ onMount(async () => {
         <tr transition:slide="{{ duration: 1000, easing: quintOut }}">
           <td>{data.attributes.name}</td>
           <td> 
-        <div class="flex items-center space-x-4">
-           <img data-tooltip-target="tooltip-jese" class="sm:w-10 sm:h-10 w-7 h-7 rounded-full" src="{data.attributes.users_permissions_user.data.attributes.profilePic.data != null ? data.attributes.users_permissions_user.data.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="Medium avatar">
-        <div class="font-large dark:text-white">
-        <div>{data.attributes.users_permissions_user.data.attributes.username}</div>
-    </div>    
+        <div class="flex flex-col items-center justify-center ">
+
+          <div><img  class="sm:w-10 sm:h-10 w-7 h-7 rounded-full" src="{data.attributes.users_permissions_user.data.attributes.profilePic.data != null ? data.attributes.users_permissions_user.data.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="Medium avatar">
+</div> 
+        <div><Tile single={true}  bg="gold"  word="{data.attributes.users_permissions_user.data.attributes.username}"/></div>
         </div>
         </td>
           <td>

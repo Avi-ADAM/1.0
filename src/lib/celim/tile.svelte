@@ -1,6 +1,7 @@
 <script>
      import Grow from '$lib/celim/icons/grow.svelte'
   export let gr = false
+  export let single = false
   export let reverse = false
   export let big = false
   export let sm = false
@@ -77,7 +78,9 @@ class:px-3={sm == true}
 class:px-2={big == true}
 class:py-1={big == true}
 class:flex-row-reverse={reverse == true}
- class="drop-shadow-lg transition-all duration-300 shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center mr-2 mb-2 rounded">
+class:mr-2={single != true}
+class:mb-2={single != true}
+ class="drop-shadow-lg transition-all duration-300 shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center  rounded">
  {@html word}
  {#if closei}
       <svg aria-hidden="true" class="w-3 h-3 bg-slate-100 rounded-full mx-1"  fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
