@@ -170,13 +170,13 @@ onMount(async () => {
           <th class="sm:text-xl text-sm">{who[$lang]}</th>
           <th class="sm:text-xl text-sm">{pro[$lang]}</th>
           <th class="sm:text-xl text-sm">{hd[$lang]}</th>
-          <th class="sm:text-xl text-sm">{sho[$lang]}</th>
+         <!--- <th class="sm:text-xl text-sm">{sho[$lang]}</th>-->
           <th class="sm:text-xl text-sm">{ro[$lang]}</th>
         </tr>
       </thead>
     </table>
   </div>
-  <div class="tbl-content d">
+  <div class="tbl-content d pl-4">
     <table cellpadding="0" cellspacing="0" border="0">
       <tbody>
         {#key sodata}
@@ -186,7 +186,7 @@ onMount(async () => {
           <td>{#if data.hasAct == true}<button on:click={()=> {data.open = !data.open
           console.log(data.open)}}><svg
                 class:rotate-90={data.open == false}
-                class="w-5 h-5 ms-5"
+                class="sm:w-5 sm:h-5 sm:ms-5 h-3 w-3 ms-3"
                 aria-hidden="true"
                 xmlns="http://www.w3.org/2000/svg"
                 fill="none"
@@ -219,8 +219,8 @@ onMount(async () => {
   </div>
           </td>
           <td><p class="md:text-xl text-sm">{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})}/{data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</p></td>
-          <td><p class="md:text-xl text-sm">{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</p></td>
-          <td>
+          <!----<td><p class="md:text-xl text-sm">{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</p></td>-->
+          <td >
             {#each data.attributes.tafkidims.data as taf, i} 
             <Tile big={w > 500 ? true:false} sm={w > 500 ? true:false} bg={taf.color} word="{$lang == "en" ? taf.attributes.roleDescription : taf.attributes.localizations.data.length > 0 ?  taf.attributes.localizations.data[0].attributes.roleDescription : taf.attributes.roleDescription }"/>
             {/each}
