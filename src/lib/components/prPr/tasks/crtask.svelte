@@ -4,6 +4,12 @@
     import moment from 'moment';
   import { createEventDispatcher } from 'svelte';
   let isPersonal = true
+  export let id 
+  $: if (id > 0){
+    const bmi = bmiData.filter(t=>t.id == id)
+    console.log(bmi)
+    selected = [bmi[0].attributes.users_permissions_user.data.attributes.username + " - " + bmi[0].attributes.name]
+  }
  const dispatch = createEventDispatcher();
     export let userMevatzeaId, userMevakeshId, mimatai  ,adMatai , name = "", teur = "",selected = [],link = "";
     let seEr = false, neEr = false
@@ -67,7 +73,7 @@ async function sub(){
                         query: `mutation 
                         { createAct(
       data: {project: "${$idPr}",
-             des:  "${teur}",
+             des:  """${teur}""",
              my: "${userMevatzeaId}",
              shem: "${name}",
              vali: "${userMevakeshId}",
@@ -143,7 +149,7 @@ async function sub(){
               <span class='line'></span>
         </div>
 
-        <h3  class="text-barbi">{level[$lang]}</h3>
+        <h2  class="text-barbi text-center text-sm sm:text-xl">{level[$lang]}:</h2>
 
 <div class="flex items-center justify-center" dir="ltr">
   <label for="Toggle3" class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">

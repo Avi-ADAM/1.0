@@ -223,7 +223,7 @@ JSON.stringify({query:
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
              user_1s {data{ id attributes{email lang username profilePic {data{attributes{ url formats}}}}}}
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
-             id attributes{ status     
+             id attributes{ status  iskvua 
             acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
               tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""} }}}
               admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
@@ -1440,7 +1440,7 @@ let bett = false;
 בנוסף במקרה של רענון יעלם האידי של הרקמה
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
 
-<div dir="rtl" class="all  text-barbi text-center">
+<div dir="rtl" class="all  text-barbi text-center overflow-y-auto h-screen scroll-smooth d" style="-webkit-scrollbar:0px;" >
   <Header/>
   {#if success}
   <div style="
@@ -1459,7 +1459,7 @@ pointer-events: none;">
 <Confetti x={[-5, 5]} y={[0, 0.1]} delay={[500, 2000]}  duration=5000 amount=200  />
 </div>
 {/if}
-  <div >
+  <div>
     
 {#if srcP !== null}
       <img
@@ -1964,6 +1964,9 @@ pointer-events: none;">
     .all{
      min-height: 100vh;
    }
+   	.all::-webkit-scrollbar {
+    width: 0px;
+}
 .textlink:hover{
   -webkit-text-stroke: 1px var(--barbi-pink);
 }
