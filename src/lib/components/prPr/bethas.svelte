@@ -131,7 +131,7 @@ onMount(async () => {
 
     const who = {"he":" על ידי", "en":"by"}
     const pro = {"he":"אחוז ביצוע", "en":"progress"}
-    const hd = {"he":"שעות שהושמו/ בוצעו", "en":"hours asigned/ done"}
+    const hd = {"he":"שעות שהושמו / בוצעו", "en":"hours asigned/ done"}
     const sho = {"he": "שווי המשימה", "en": "mission vallue"}
     const ro = {"he": "תפקיד", "en": "role"}
     const acts = {"he":"מטלות","en":"actions"}
@@ -176,13 +176,13 @@ onMount(async () => {
       </thead>
     </table>
   </div>
-  <div class="tbl-content d pl-4">
+  <div class="tbl-content d xs:pl-0  pl-1">
     <table cellpadding="0" cellspacing="0" border="0">
       <tbody>
         {#key sodata}
         {#each sodata as data, i}
         {#if data.isAct == false}
-        <tr transition:slide="{{ duration: 1000, easing: quintOut }}" class:border-x-2={data.open == true} class:border-t-2={data.open} class="border-gold">
+        <tr transition:slide="{{ duration: 1000, easing: quintOut }}" class:border-r-2={data.open == true && $lang == "he"} class:border-t-2={data.open} class="border-gold">
           <td>{#if data.hasAct == true}<button on:click={()=> {data.open = !data.open
           console.log(data.open)}}><svg
                 class:rotate-90={data.open == false}
@@ -218,7 +218,7 @@ onMount(async () => {
     <div class="bg-barbi text-xs md:text-xl font-medium text-blue-100 text-center p-0.5 leading-none rounded-full" style="width: {data.attributes.status == null ? 0 : data.attributes.status}%">{data.attributes.status == null ? 0 : data.attributes.status}%</div>
   </div>
           </td>
-          <td><p class="md:text-xl text-sm">{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})}/{data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</p></td>
+          <td><p class="md:text-xl text-sm">{data.attributes.howmanyhoursalready == null ? 0 : data.attributes.howmanyhoursalready.toLocaleString('en-US', {maximumFractionDigits:2})} / {data.attributes.hoursassinged.toLocaleString('en-US', {maximumFractionDigits:2})}</p></td>
           <!----<td><p class="md:text-xl text-sm">{(data.attributes.hoursassinged * data.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2}) }</p></td>-->
           <td >
             {#each data.attributes.tafkidims.data as taf, i} 

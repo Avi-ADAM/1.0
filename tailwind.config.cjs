@@ -1,9 +1,15 @@
 //const colors = require('tailwindcss/colors');
 //  mode: 'jit',
+/** @type {import('tailwindcss').Config} */
+const defaultTheme = require('tailwindcss/defaultTheme');
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}'],
   theme: {
+    screens: {
+      xs: '475px',
+      ...defaultTheme.screens
+    },
     scale: {
       0: '0',
       25: '.25',

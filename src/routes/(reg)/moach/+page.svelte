@@ -48,6 +48,7 @@
       import {  fly } from 'svelte/transition';
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import Diun from '$lib/components/lev/diun.svelte';
 let idL;
 let success = false;
 let isOpen = false;
@@ -1382,6 +1383,9 @@ const towel = {"he":"לינק לגוגל דרייב המשותף","en": "link to
   let sid = false
 let gan = false
 let bett = false;
+function afreact (){
+
+}
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
@@ -1432,8 +1436,19 @@ let bett = false;
               <OpenM {who} projectName={projectname} omiData={omiData}/>
              {:else if a == 7}
               <Finisin {who} {fmiData} />
-         {/if}
-  </DialogContent>
+               {:else if a === 8}
+ <Diun
+  on:rect={afreact} 
+  smalldes={projectName+"-"+openmissionName}
+  nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`} 
+  mypos={true}
+  {clicked}
+  pendId={askId}
+  rect={true}
+  profilePicChatPartner={src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"} 
+  {ani}/>
+{/if}
+           </DialogContent>
   </div>
 </DialogOverlay>
 <!--{#if idUst.map(c => c.id) == idUsl} 
