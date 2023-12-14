@@ -594,7 +594,7 @@ on:click={bitulm}
           {#each data as dat, i}
           <p
           class="m-0 " style="text-shadow:none; white-space:none;" >
-              <Tile bg="{bgi}" gr={ datan === "mash" && dat.attributes.panui === false ? true : false}  word={dat.attributes[valc]}/></p>{/each}
+              <Tile big={width > 640} sm={width > 640} bg="{bgi}" gr={ datan === "mash" && dat.attributes.panui === false ? true : false}  word={dat.attributes[valc]}/></p>{/each}
     </div>
     {/if}
 

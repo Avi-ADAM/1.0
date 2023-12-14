@@ -245,6 +245,7 @@ async function start () {
             bio
             preferCards
             lang
+            machshirs{data{id attributes{jsoni}}}
             email
             username
             hervachti
@@ -730,7 +731,7 @@ let width,height
 
 
           {:else if a == 1}
-          <EditB projectIds={myP.map(c=>c.id)} bind:isGuidMe={isG} checked={cards} uid={meDataa.data.me.id} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid={guid}/>
+          <EditB machshirs={meData?.machshirs.data} projectIds={myP.map(c=>c.id)} bind:isGuidMe={isG} checked={cards} uid={meDataa.data.me.id} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid={guid}/>
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
           <button
@@ -875,7 +876,7 @@ let width,height
            <div class="cont"  >
             <button
              on:click={project(data.id)}
-             class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center mt-1 mr-2 px-2.5 py-0.5 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow/></span></div></button>
+             class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center sm:text-xl mt-1 mr-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow width={width > 640 ? 47.4:23.7} height={width > 640 ? 35.7:17.85}/></span></div></button>
 
            </div>
   {/each}
