@@ -35,11 +35,15 @@ self.addEventListener('push', ev => {
   const data = ev.data.json();
   console.log('Got push', data);
 
-  ev.waitUntil(self.registration.showNotification(data.title, {
-    body: 'Hello, World!',
-  //  registration_ids: [$('.header-user-name').find('span').text()],
-    icon: 'http://mongoosejs.com/docs/images/mongoose5_62x30_transparent.png'
-  }));
+  ev.waitUntil(
+    self.registration.showNotification(data.message.title, {
+      body: data.message.body,
+      //  registration_ids: [$('.header-user-name').find('span').text()],
+      icon:
+        data.message.pic ??
+        'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png'
+    })
+  );
 
 });
 

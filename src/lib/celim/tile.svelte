@@ -90,7 +90,7 @@ class:mb-2={single != true}
  {/if}
  {#if gr}
   <span class=" mx-0.5">
- <Grow width="13" height="13"/>
+ <Grow width="{big ? 26 :13}" height="{big ? 26 :13}"/>
 </span>
  {/if}
  </span>

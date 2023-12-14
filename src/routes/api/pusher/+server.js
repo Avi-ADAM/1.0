@@ -3,7 +3,8 @@ export async function POST({ request }) {
   const datam = await request.json();
   console.log('submitted');
   const messege = datam.messege;
-  const jsoni = datam.jsoni;
+  const jsoni = JSON.parse(datam.jsoni);
+  console.log(jsoni)
   webPush.setVapidDetails(
     import.meta.env.VITE_URL,
     import.meta.env.VITE_publicKey,

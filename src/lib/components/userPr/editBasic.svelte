@@ -10,6 +10,7 @@ export let projectIds = []
   $: t = 0
   $: teleredy = false
  let sub;
+ export let machshirs
 
 onMount(async () => {
    const notificationBtn = document.getElementById("nb")
@@ -18,7 +19,13 @@ onMount(async () => {
       if(Notification?.permission === 'denied' || Notification?.permission === 'default') {
         notificationBtn.style.display = 'block';
       } else {
-        notificationBtn.style.display = 'none';
+    const reg = await navigator.serviceWorker.ready;
+    sub = await reg.pushManager.getSubscription();
+    console.log(sub, "hh",machshirs)    
+    if(sub == null){
+      addMachshir()
+    }   
+     notificationBtn.style.display = 'none';
       }
       /*
 
