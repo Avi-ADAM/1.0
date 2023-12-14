@@ -255,7 +255,7 @@ function shaneh () {
 	async function endGuid(){
     pressed = true
   console.log("guid סיום")
-  isGuidMe = false;
+  isGuidMe = true;
   document.cookie = `guidMe=done; expires=` + new Date(2026, 0, 1).toUTCString();
   const cookieValueId = document.cookie
   .split('; ')
@@ -278,7 +278,7 @@ function shaneh () {
  async function startGuid(){
   pressed = true
   console.log("guid")
-    isGuidMe = true;
+    isGuidMe = false;
  document.cookie = `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
  const cookieValueId = document.cookie
   .split('; ')
@@ -551,10 +551,10 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
   </a>
 {/if}
 {/key}
-  {#if isGuidMe != false && pressed == false}
-	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{addGuid[$lang]}</button>
-{:else if isGuidMe == false && pressed == false}
-	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{remuGuid[$lang]}</button>
+  {#if isGuidMe == false && pressed == false}
+	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{remuGuid[$lang]}</button>
+{:else if isGuidMe == true && pressed == false}
+	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{addGuid[$lang]}</button>
 {/if}
 	<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">{logoutM[$lang]}</button>
 </div>
