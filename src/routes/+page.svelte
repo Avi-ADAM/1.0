@@ -200,9 +200,9 @@ const agree3 = {
 	<div class="overflow-auto d  h-2/5"  on:scroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
-		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  decoration-mturk underline text-xl"
+		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  overline decoration-mturk text-xl"
     style="text-shadow:none;">{setitle[$lang]}</h2>
-		<p class="text-xl sm:text-2xl p-2 px-24 text-barbi">{desc[$lang]}<span class="underline decoration-lturk">{desc2[$lang]}</span></p>
+		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{desc[$lang]}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{desc2[$lang]}</span></h3>
 		<div>
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]} />
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word2[$lang]}/>
@@ -216,9 +216,9 @@ const agree3 = {
 				<Tile bg={"wow"} big={true} sm={true} word={word10[$lang]}/>
 				<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>
 			</div>
-		<span>
-		<h2 class="text-bold text-2xl text-barbi mt-5 border-4 border-spacing-2 mx-6 border-mturk bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre  rounded-lg px-3 py-4 ">{regesh1[$lang]}<br>{regesh2[$lang]}</h2>
-		</span>
+		<div class="bg-gradient-to-br from-fuchsia-400 via-barbi  to-mpink px-3 py-4 mt-1 border-4 border-spacing-2 ">
+		<h2 style="text-shadow:none;" class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  ">{regesh1[$lang]}<br>{regesh2[$lang]}</h2>
+    </div>
 	</div>
 		<div style="font-family:Gan, Power;" class="flex flex-row">
 			<button class="transition-all duration-300 flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl" on:click={()=>{goto("/login") 
