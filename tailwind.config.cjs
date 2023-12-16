@@ -26,6 +26,18 @@ const config = {
       290: '2.9'
     },
     extend: {
+      animation: {
+        gradientx: 'gradientx 8s linear infinite',
+        gradienty: 'gradienty 8s linear infinite'
+      },
+      keyframes: {
+        gradientx: {
+          to: { 'background-position': '200% center' }
+        },
+        gradienty: {
+          to: { 'background-position': 'center 200%' }
+        }
+      },
       colors: {
         blu: '#04619f',
         silver: '#BBC2CC',

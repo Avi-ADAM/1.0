@@ -12,10 +12,42 @@ export async function GET() {
          xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"  
        >
              <url>
-             <loc>https://1lev1.vercel.app/</loc>
+             <loc>https://1lev1.vercel.app</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>weekly</changefreq>
+             <xhtml:link
+              rel="alternate"
+              hreflang="en"
+              href="https://1lev1.vercel.app?lang=en" />
+            <xhtml:link
+              rel="alternate"
+              hreflang="ar"
+              href="https://1lev1.vercel.app?lang=ar" />
+             </url>
+            <xhtml:link
+              rel="alternate"
+              hreflang="he"
+              href="https://1lev1.vercel.app?lang=he" />
+             </url>
+                          <url>
+             <loc>https://1lev1.vercel.app/hascama</loc>
+             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
+             <priority>1.00</priority>
+             <changefreq>weekly</changefreq>
+             <xhtml:link
+              rel="alternate"
+              hreflang="en"
+              href="https://1lev1.vercel.app/en" />
+            <xhtml:link
+              rel="alternate"
+              hreflang="ar"
+              href="https://1lev1.vercel.app/ar" />
+             </url>
+            <xhtml:link
+              rel="alternate"
+              hreflang="he"
+              href="https://1lev1.vercel.app/hascama" />
              </url>
              <url>
              <loc>https://1lev1.vercel.app/login</loc>
@@ -54,17 +86,23 @@ export async function GET() {
              <changefreq>always</changefreq>
              </url>         
              <url>
-             <loc>https://1lev1.vercel.app/en</loc>
+             <loc>https://1lev1.vercel.app/project/1</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>0.96</priority>
              <changefreq>always</changefreq>
              </url>    
              <url>
-             <loc>https://1lev1.vercel.app/ar</loc>
+             <loc>https://1lev1.vercel.app/availableMission/1</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>always</changefreq>
-             </url>                                                            
+                     </url>    
+             <url>
+             <loc>https://1lev1.vercel.app/availiableResorce/1</loc>
+             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
+             <priority>1.00</priority>
+             <changefreq>always</changefreq>
+             </url> 
        </urlset>
      `.trim(),
        {

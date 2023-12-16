@@ -189,14 +189,19 @@ const agree3 = {
 	  <a class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">{mapa[$lang]}</a>
           {/if}
           </div>
-<div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden">
+<div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden bg-[length:200%_auto] animate-gradientx">
 	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
-		<h1 class="font-bold sm:text-9xl text-4xl text-barbi shadow-lg shadow-fuchsia-300 rounded " 
-		style="text-shadow(1px 1px --mturk)">{title}</h1>
+		<div dir="ltr" style="text-shadow:none;" class="pt-2 font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] flex-wrap flex flex-row">
+        <div class="flip">
+          <h1  class="text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
+		>1</h1></div>
+    <div><h1 
+		>💗1️</h1></div></div>
 	<div class="overflow-auto d  h-2/5"  on:scroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
-		<h2 class="font-bold mt-2 sm:text-5xl text-barbi decoration-mturk underline text-xl">{setitle[$lang]}</h2>
+		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  decoration-mturk underline text-xl"
+    style="text-shadow:none;">{setitle[$lang]}</h2>
 		<p class="text-xl sm:text-2xl p-2 px-24 text-barbi">{desc[$lang]}<span class="underline decoration-lturk">{desc2[$lang]}</span></p>
 		<div>
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]} />
@@ -255,7 +260,13 @@ const agree3 = {
 	</div>
 </div>
 <style>
-	
+	.flip{
+    -moz-transform: scale(-1, 1);
+-webkit-transform: scale(-1, 1);
+-o-transform: scale(-1, 1);
+-ms-transform: scale(-1, 1);
+transform: scale(-1, 1);
+  }
 img {
   animation: wiggle 2s linear infinite;
   max-height: 25vh;
