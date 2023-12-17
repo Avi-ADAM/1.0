@@ -93,11 +93,12 @@ onMount(async () => {
     //toast email add to table
   }
     export let bmiData = [];
-    let ohh = false;
-    function sot(x , y){
+    $: ohh = soter.map(c=>c.openi).includes(false);
+    function sot(idd , y){
+      console.log(ohh, soter.map(c=>c.openi).includes(false),y)
         if (y == true && ohh == false|| ohh == true && y == false){
         let soret = soter.map(c => c.id)
-        let index = soret.indexOf(x)
+        let index = soret.indexOf(idd)
         soter[index].closei = false;
         soter[index].openi = true;
         if (y == true && ohh == false){
@@ -108,21 +109,27 @@ onMount(async () => {
             }
         }
         }
-        ohh = true;
         const asort = soret.slice(index, index+1)
         const newar = bmiData.filter(val => val.tid.includes(asort[0]))
+                      console.log(sodata.length,bmiData.length)
+
             if (sodata.length == bmiData.length){
             sodata = newar
             } else {
-            const arr3 = sodata.concat(newar) 
-            sodata = arr3
+              let array3 = sodata.concat(newar);
+              array3 = [...new Set([...sodata,...newar])];
+            sodata = array3
             }
-        } else if (ohh == true && y == true){
+        } 
+        sodata = sodata
+        console.log(sodata)
+        /*else if (ohh == true && y == true){
+          console.log("else if")
             if(bmiData.length == sodata.length){
                 ohh = false;
-                sot(x,y)
+                sot(idd,y)
             }
-        }
+        }*/
        
     }
     const hed = {"he":"משימות בתהליך ביצוע","en":"mission in progress"}
@@ -207,10 +214,11 @@ onMount(async () => {
           <td><h2 class="md:text-xl">{data.attributes.name}</h2></td>
           <td> 
         <div class="flex flex-col items-center justify-center ">
-
-          <div><img  class="sm:w-16 sm:h-16 w-7 h-7 rounded-full" src="{data.attributes.users_permissions_user.data.attributes.profilePic.data != null ? data.attributes.users_permissions_user.data.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="Medium avatar">
-</div> 
-        <div><Tile big={w > 500 ? true:false} sm={w > 500 ? true:false} single={true}  bg="gold"  word="{data.attributes.users_permissions_user.data.attributes.username}"/></div>
+        <div><Tile
+          animate={true}
+          src="{data.attributes.users_permissions_user.data.attributes.profilePic.data != null ? data.attributes.users_permissions_user.data.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="Medium avatar"
+          pic={true}
+          big={w > 500 ? true:false} sm={w > 500 ? true:false} single={true}  bg="gold"  word="{data.attributes.users_permissions_user.data.attributes.username}"/></div>
         </div>
         </td>
           <td>

@@ -1,6 +1,10 @@
 <script>
      import Grow from '$lib/celim/icons/grow.svelte'
+     export let animate = false
   export let gr = false
+  export let pic = false
+  export let src = ""
+  export let alt = ""
   export let single = false
   export let reverse = false
   export let big = false
@@ -44,9 +48,8 @@
 </script>
 <span class:line-through={closei == true}
 class:hover:bg-blue-400={blue == true}
-class:hover:from-gold={gold == true}
-class:hover:to-gold={gold == true}
-        class:hover:bg-wow2={wow == true}
+class:hover:bg-gold={gold == true}
+        class:hover:bg-neww={wow == true}
         class:hover:bg-gray-400={gray == true}
         class:hover:bg-red-400={red == true}
         class:hover:bg-green-400={green == true}
@@ -63,34 +66,38 @@ class:hover:to-gold={gold == true}
         class:bg-indigo-200={indigo == true} class:text-indigo-800={indigo == true}
         class:bg-purple-200={purple == true} class:text-purple-800={purple == true}
         class:bg-pink-200={pink == true} class:text-pink-800={pink == true}
-        class:from-gra={gold == true}
-class:via-grb={gold == true}
-class:via-gr-c={gold == true}
-class:via-grd={gold == true}
-class:to-gre={gold == true}
-class:bg-gradient-to-br={gold == true}
+        class:hover:bg-[linear-gradient(to_right,theme(colors.gold),theme(colors.grb),theme(colors.grb),theme(colors.gold))]={gold == true}
+  class:bg-[length:200%_auto]={gold==true } 
+  class:animate-gradientx={gold == true && animate == true}
+class:bg-[linear-gradient(to_left,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]={gold == true}
 class:text-blue-900={gold == true}
 class:py-0.5={sm == false}
 class:px-2.5={sm == false}
 class:text-xs={sm == false}
-class:text-xl={sm == true}
-class:px-3={sm == true}
-class:px-2={big == true}
+class:text-xl={big == true}
+class:px-5={big == true}
 class:py-1={big == true}
 class:flex-row-reverse={reverse == true}
 class:mr-2={single != true}
 class:mb-2={single != true}
- class="drop-shadow-lg transition-all duration-300 shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center  rounded">
+class:flex-wrap={pic == true}
+ class="drop-shadow-lg  transition-all duration-300 shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center  rounded">
+   {#if pic}
+  <span class=" mx-1">
+ <img src={src} alt={alt} class:w-12={big == true} class:h-12={big == true} class:w-7={big == false} class:h-7={big == false} class=" border-2 border-white  rounded-full"/>
+</span>
+ {/if}
  {@html word}
  {#if closei}
-      <svg aria-hidden="true" class="w-3 h-3 bg-slate-100 rounded-full mx-1"  fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
+      <svg aria-hidden="true" class="w-3 h-3 sm:w-5 sm:h-5 bg-slate-100 rounded-full mx-1"  fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
  {/if}
   {#if openi}
-  <svg aria-hidden="true" class="w-3 h-3  bg-slate-100 rounded-full mx-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
+  <svg aria-hidden="true" class="w-3 h-3 sm:w-6 sm:h-6 bg-slate-100 rounded-full mx-1" fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd"></path></svg>
  {/if}
  {#if gr}
   <span class=" mx-0.5">
  <Grow width="{big ? 26 :13}" height="{big ? 26 :13}"/>
 </span>
  {/if}
+
  </span>
