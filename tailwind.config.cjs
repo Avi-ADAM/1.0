@@ -28,6 +28,7 @@ const config = {
     extend: {
       animation: {
         gradientx: 'gradientx 8s linear infinite',
+        gradientxslow: 'gradientx 16s linear infinite',
         gradienty: 'gradienty 8s linear infinite'
       },
       keyframes: {
@@ -51,6 +52,7 @@ const config = {
         grbb: '#3e2f5b',
         barbi: '#FF0092',
         gold: '#EEE8AA',
+        neww: '#49f3df',
         lturk: 'rgb(103, 232, 249)',
         mturk: 'rgb(34, 211, 238)',
         sturk: '#CCFBF1',

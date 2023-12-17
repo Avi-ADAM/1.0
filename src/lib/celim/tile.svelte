@@ -68,7 +68,7 @@ class:hover:bg-gold={gold == true}
         class:bg-pink-200={pink == true} class:text-pink-800={pink == true}
         class:hover:bg-[linear-gradient(to_right,theme(colors.gold),theme(colors.grb),theme(colors.grb),theme(colors.gold))]={gold == true}
   class:bg-[length:200%_auto]={gold==true } 
-  class:animate-gradientx={gold == true && animate == true}
+  class:animate-gradientxslow={gold == true && animate == true}
 class:bg-[linear-gradient(to_left,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]={gold == true}
 class:text-blue-900={gold == true}
 class:py-0.5={sm == false}
@@ -84,7 +84,7 @@ class:flex-wrap={pic == true}
  class="drop-shadow-lg  transition-all duration-300 shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center  rounded">
    {#if pic}
   <span class=" mx-1">
- <img src={src} alt={alt} class:w-12={big == true} class:h-12={big == true} class:w-7={big == false} class:h-7={big == false} class=" border-2 border-white  rounded-full"/>
+ <img src={src} alt={alt} class:min-w-12={big == true} class:h-12={big == true} class:min-w-7={big == false} class:h-7={big == false} class=" border-2 border-white  rounded-full"/>
 </span>
  {/if}
  {@html word}
