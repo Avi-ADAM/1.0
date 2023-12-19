@@ -40,8 +40,7 @@
         currentStart = moment().clone().startOf('year');
          currentEnd = moment().clone().endOf('year');
          console.log(currentStart,currentEnd) 
-         
-        data = generate();
+         data =  generate()
 		 options = {
             resizeHandleWidth: 5,
         dateAdapter: new MomentSvelteGanttDateAdapter(moment),
@@ -51,7 +50,7 @@
       //      zoomLevels,
 		columnUnit: 'month',
         columnOffset: 1,
-        rowHeight: 26,
+        rowHeight: 40,
         rowPadding: 2,
        headers:[{ unit: 'year', format: 'YYYY' }, { unit: 'month', format: 'M',offset: 1 }],
         minWidth: 300,
@@ -62,7 +61,7 @@
     console.log(options)
         window.gantt = gantt = new SvelteGantt({ target: document.getElementById('example-gantt'), props: options });
     	gantt.api.tasks.on.select((task) => dispatch('selected', { id:task}));
-        
+
     });
 	
     function shuffle(array) {
@@ -251,10 +250,15 @@
                 color: var(--barbi-pink);
 
     }
+    @media(min-width:640px){
+        .btnl,.btnr{
+            height: 48px;
+        }
+    }
 </style>
  <div width="100%">
-    <button class="btnl" on:click={()=>onSetNextDay()} value=">"><svg width="16" height="16" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
-        <button class="btnr" on:click={()=>onSetPreviousDay()} value="<"><svg width="16" height="16" style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+    <button class="btnl" on:click={()=>onSetNextDay()} value=">"><svg class="w-4 sm:w-8 h-4 sm:h-8" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+        <button class="btnr" on:click={()=>onSetPreviousDay()} value="<"><svg class="w-4 sm:w-8 h-4 sm:h-8" style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
    </div>
 <div class="container">
    

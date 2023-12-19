@@ -1919,7 +1919,7 @@ pointer-events: none;"
           </div>
         </div>
 <!--tab header-->
-   <div class="flex justify-center  max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
+   <nav class="flex justify-center bg-gold max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
                   <button
                 on:click={() => (tab = 1)}
                 class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold  {tab == 1 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
@@ -2026,7 +2026,7 @@ pointer-events: none;"
                   <!--<Siduri/>-->
                 </div></button
               >
-          </div>
+              </nav>
 <!--tabs-->
 <div class="border-t-2 border-mturk">
 {#if tab === 1}
@@ -2250,24 +2250,24 @@ pointer-events: none;"
             </div>
           </div>
 {:else if tab == 3}          
-          <div dir="rtl">
+          <div dir="rtl" class="pt-2">
           
               {#if pmiData.length > 0}
                 <button
-                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
+                  class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
                   on:click={topends}>{mwa[$lang]}</button
                 >
               {/if}
 
               {#if omiData.length > 0}
                 <button
-                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges text-pinki hover:text-barbi font-bold px-4 rounded"
+                  class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges text-pinki hover:text-barbi font-bold px-4 rounded"
                   on:click={toopens}>{opmi[$lang]}</button
                 >
               {/if}
               {#if bmiData.length > 0}
                 <button
-                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg text-barbi hover:text-barbi font-bold px-4 rounded"
+                  class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg text-barbi hover:text-barbi font-bold px-4 rounded"
                   on:click={tobetha}
                 >
                   פעולות בתהליך ביצוע</button
@@ -2275,7 +2275,7 @@ pointer-events: none;"
               {/if}
               {#if fmiData.length > 0}
                 <button
-                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-mpink text-pinki hover:text-barbi font-bold px-4 rounded"
+                  class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-mpink text-pinki hover:text-barbi font-bold px-4 rounded"
                   on:click={tofinish}
                 >
                   פעולות שהסתיימו</button
@@ -2283,8 +2283,8 @@ pointer-events: none;"
               {/if}
               <div
                 dir="ltr"
-                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 242, 222, 0.8); "
-                class="d"
+                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; "
+                class="d bg-wow"
               >
                 <Gantt
                   {bmiData}
@@ -2299,7 +2299,7 @@ pointer-events: none;"
               
               <div
                 dir="ltr"
-                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 242, 222, 0.8); "
+                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color:rgb(2, 255, 187); "
                 class="d"
               >
                 <Sidur />
