@@ -89,7 +89,7 @@
   }
 
   .tick text {
-    fill: #666;
+    fill: var(--barbi-pink);
   }
 
   .tick.tick-0 line {

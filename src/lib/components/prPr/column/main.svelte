@@ -16,7 +16,7 @@
   const zKey = 'key';
 
   const seriesNames = Object.keys(data[0]).filter(d => d !== xKey);
-  const seriesColors = ['#00e047', '#7ceb68', '#b7f486', '#ecfda5'];
+  const seriesColors = ["rgb(244, 114, 182)","rgb(34, 211, 238)","rgb(251, 207, 232)","rgb(103, 232, 249)", '#00e047', '#7ceb68', '#b7f486', '#ecfda5'];
 
   data.forEach(d => {
     seriesNames.forEach(name => {
