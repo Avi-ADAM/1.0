@@ -1603,7 +1603,7 @@
         style="z-index: 700;"
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
-        <DialogContent aria-label="form" class="content">
+        <DialogContent aria-label="form" class="{a != 8 ? "content" :"chat"}">
           <div style="z-index: 400;" dir="rtl">
             <button
               class=" hover:bg-barbi text-mturk rounded-full"
@@ -1919,10 +1919,10 @@ pointer-events: none;"
           </div>
         </div>
 <!--tab header-->
-   <nav class="flex justify-center bg-gold max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
+   <nav class="flex justify-center bg- max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
                   <button
                 on:click={() => (tab = 1)}
-                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold  {tab == 1 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 1 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={maini[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
@@ -1935,7 +1935,7 @@ pointer-events: none;"
               >
               <button
                 on:click={() => (tab = 2)}
-                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 2 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 2 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={neww[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
@@ -1948,7 +1948,7 @@ pointer-events: none;"
               >
               <button
                 on:click={() => (tab = 3)}
-                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 3 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 3 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={gann[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
@@ -1961,7 +1961,7 @@ pointer-events: none;"
               >
               <button
                 on:click={() => (tab = 4)}
-                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 4 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 4 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={sidd[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
@@ -1975,7 +1975,7 @@ pointer-events: none;"
             {#if bmiData.length > 0}
                 <button
                   on:click={() => (tab = 5)}
-                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 5 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 5 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                   title={bet[$lang]}
                   ><div
                     class="flex flex-col items-center justify-center align-middle"
@@ -1989,7 +1989,7 @@ pointer-events: none;"
             {/if}
              <button
                 on:click={() => (tab = 6)}
-                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={shirutims[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
@@ -2002,7 +2002,7 @@ pointer-events: none;"
               >
                <button
                 on:click={() => (tab = 7)}
-                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={mechirot[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
@@ -2015,7 +2015,7 @@ pointer-events: none;"
               >
                <button
                 on:click={() => (tab = 8)}
-                class="border hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold  {tab == 8 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 8 ? "bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-r from-gra via-grb  to-grc text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={haluka[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
@@ -2031,16 +2031,12 @@ pointer-events: none;"
 <div class="border-t-2 border-mturk">
 {#if tab === 1}
         {#if project.publicDescription != 'undefined' && project.publicDescription != null}
-          <div class="border-2 border-gold rounded m-2 p-2">
             <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
             <RichText editable={false} outpot={desP} />
-          </div>
         {/if}
         {#if project.descripFor != 'undefined' && project.descripFor != null}
-          <div class="border-2 border-gold rounded m-2 p-2">
             <RichText editable={false} outpot={desP} />
             <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
-          </div>
         {/if}
 
         <div>
