@@ -31,6 +31,10 @@
  export let clicked = false
  $: off = 0
  $: console.log(clicked,"y7k7k",off)
+
+  const scrollToBottom = async (node) => {
+    node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
+  }; 
  let dow
 async function click() {
    if(why.length > 0){
@@ -52,7 +56,7 @@ async function click() {
       addMes(why,pendId,true,true,picLink,d,0)
       why = ""
       clicked = false
-      dow.scrollTo(0,off)
+ 	scrollToBottom(dow);
       console.log(clicked,"u")
    }
       }
