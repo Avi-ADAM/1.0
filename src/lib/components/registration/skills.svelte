@@ -1,7 +1,9 @@
 <script>
     import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
-          import { lang } from '$lib/stores/lang.js'
+          import { lang } from '$lib/stores/lang.js';
+            import { page } from '$app/stores';
+
     import { show } from './store-show.js';
     import { skills1 } from './skills1.js';
     import { onMount } from 'svelte';
@@ -135,7 +137,8 @@ selected = newSele;
     const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
   const ws = {"he": "מה הן היכולות שלך?","en": "What you can do?"}
-  </script>
+ let focused=false
+ </script>
   
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -147,7 +150,7 @@ selected = newSele;
   </div>
 </DialogOverlay>
   
-    <h1 class="midscreenText-2">
+    <h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
       
      {userName_value} 
      <br/>
@@ -155,6 +158,8 @@ selected = newSele;
   </h1>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
   <MultiSelect
+        on:focus={()=>focused=true}
+      on:blur={()=>focused=false}
         loading={newcontent}
   bind:selected
   noMatchingOptionsMsg={nom[$lang]}
@@ -177,6 +182,7 @@ selected = newSele;
 <style>
 
     .midscreenText-2 {
+            transition: all 1s ease-in;
       grid-column: 1 /5;
   grid-row: 1/ 2;
   align-self: center;

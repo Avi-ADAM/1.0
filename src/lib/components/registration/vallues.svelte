@@ -8,6 +8,7 @@
     import jvals from '$lib/data/vallues.json'
     import enjvals from '$lib/data/valluesEn.json'
  import { createEventDispatcher } from 'svelte';
+  import { page } from '$app/stores';
  const dispatch = createEventDispatcher(); 
     let vallues = [];
     let error1 = null;
@@ -187,11 +188,12 @@ const newOb = meData.data.createVallue.data;
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
   $: addn = {"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`}
   const what = {"he": "אלו ערכים ומטרות ברצונך לקדם?","en": "which vallues you wish to promote?"}
+  let focused = false
   </script>
 
 
   
-<h1 class="midscreenText-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
+<h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
   {userName_value}
   <br/>
 {what[$lang]}
@@ -199,6 +201,8 @@ const newOb = meData.data.createVallue.data;
   {#key vallues}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
+      on:focus={()=>focused=true}
+      on:blur={()=>focused=false}
       createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
       loading={newcontent}
@@ -219,6 +223,7 @@ const newOb = meData.data.createVallue.data;
 
 <style>
     .midscreenText-2 {
+      transition: all 1s ease-in;
       grid-column: 1 /5;
   grid-row: 1/ 2;
   align-self: center;

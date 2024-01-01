@@ -1,19 +1,22 @@
 <script>
       import { createEventDispatcher } from 'svelte';
-
+   import {BarLoader} from 'svelte-loading-spinners'
 	import ChatMessage from '../../celim/messeges.svelte';
 	import TodayDivider from '../../celim/todaydevider.svelte';
-    import {pendMisMes, pendMasMes, askMisMes, meAskMisMes,meAskMasMes,askMasMes} from '$lib/stores/pendMisMes.js'
+    import {pendMisMes, pendMasMes, askMisMes, meAskMisMes,meAskMasMes,askMasMes,forum, addMes} from '$lib/stores/pendMisMes.js'
+  import { slide } from 'svelte/transition';
+  import { quintOut } from 'svelte/easing';
 	  const dispatch = createEventDispatcher();
    export let ani
    export let pendId
+   export let rikmaName = "1💗1"
    export let rect, no = false
-   export let mypos = null;
+   export let mypos = null;   
 	export let nameMe='Me';
-	export let profilePicMe='https://p0.pikist.com/photos/474/706/boy-portrait-outdoors-facial-men-s-young-t-shirt-hair-person-thumbnail.jpg';
+	export let profilePicMe= "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
    export let smalldes = "small description"
 	export let nameChatPartner='הצבעה';
-	export let profilePicChatPartner='https://storage.needpix.com/rsynced_images/male-teacher-cartoon.jpg';
+	export let profilePicChatPartner='/favicon.ico';
 	export let money = false
    export let messages = []
 	 $: messagesi = ani == "pendM" ? $pendMisMes[pendId] : 
@@ -21,11 +24,16 @@
                    ani == "askedMi" ? $askMisMes[pendId] : 
                    ani == "iaskedMi"? $meAskMisMes[pendId] : 
                    ani == "askedMa" ? $askMasMes[pendId] : 
-                   ani == "iaskedMa"? $meAskMasMes[pendId] :                  
+                   ani == "iaskedMa"? $meAskMasMes[pendId] : 
+                   ani == "forum"? $forum[pendId]?.messages ?? [] :                  
                    messages
    let why = "";
  export let clicked = false
-function click() {
+ $: off = 0
+ $: console.log(clicked,"y7k7k",off)
+ let dow
+async function click() {
+   if(why.length > 0){
    clicked = true
  if (no == true) {
     if (why.length > 27) {
@@ -34,13 +42,24 @@ function click() {
             alert("מינימום 27 תווים")//todo lang
         }
       } else if (rect == true) {
-    
             dispatch("rect",{why:why})
-      
+   if(ani === "forum"){
+      let picLink =  "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
+      if (localStorage.getItem('picLink') !== null) {
+          picLink = JSON.parse(localStorage.getItem('picLink'));
+        }
+        let d = new Date
+      addMes(why,pendId,true,true,picLink,d,0)
+      why = ""
+      clicked = false
+      dow.scrollTo(0,off)
+      console.log(clicked,"u")
+   }
       }
       why = ""
-      clicked = true
+   }
       }
+      $: loading = ani == "forum" ? $forum[pendId]?.loading ?? false : false
 </script>
 
 
@@ -144,6 +163,7 @@ function click() {
             <div class="sm:text-2xl text-lg mt-1 flex items-center">
                <span class="text-gray-200 mr-3">{nameChatPartner}</span>
             </div>
+            <span class="sm:text-lg text-md mx-5  text-barbi">{rikmaName}</span>
             <span class="sm:text-lg text-md ml-3 text-gold">{smalldes}</span>
          </div>
       </div>
@@ -163,9 +183,11 @@ function click() {
                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
             </svg>
          </button>-->
+
       </div>
    </div>
-   <div id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto d">
+  
+   <div bind:this={dow} bind:offsetHeight={off} transition:slide="{{ duration: 1000, easing: quintOut }}" id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto d">
 <!--
 <div class="card card-danger direct-chat direct-chat-danger">
     <div class="card-header">
@@ -188,14 +210,20 @@ function click() {
 										timeRead={message.timeRead}
                               what={message.what}
                               changed={message.changed}
+                              pending={message.pending ?? false}
 										/>
             {/each}
 					
-				
+
 					
 		</div>
-    <div dir="rtl" class:pb-8={rect == false && no == false} class="border-t-2 border-gray-200 pr-4 pl-8 sm:px-4 pt-4 mb-2 sm:mb-0" >
-           {#if rect == true || no == true}
+
+    <div dir="rtl" class:pb-8={rect == false && no == false}  class="{loading == true ? "" : "border-t-2"} border-gray-200 pr-4 pl-8 sm:px-4 pt-4 mb-2 sm:mb-0" >
+      {#if loading == true} 	
+      <div class="w-full flex items-center justify-center" ><div class="mx-auto"><BarLoader size="120" color="#ff00ae" unit="px" duration="2s"></BarLoader></div>
+         </div>
+         {/if}
+      {#if rect == true || no == true}
 
       <div class="relative flex ">
          <!---<span class="absolute inset-y-0 flex items-center">
@@ -229,6 +257,7 @@ function click() {
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
                </svg>
             </button>-->
+            {#key  clicked}
             {#if clicked == false }
             <button on:click={click} type="button" class="inline-flex items-center justify-center rounded-lg  transition duration-500 ease-in-out text-mturk hover:text-barbi focus:outline-none">
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 sm:ml-2 transform -rotate-90">
@@ -236,6 +265,7 @@ function click() {
                </svg>
             </button>
             {/if}
+            {/key}
          </div>
       </div>
          {/if}

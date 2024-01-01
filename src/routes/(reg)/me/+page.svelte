@@ -340,6 +340,7 @@ async function start () {
             } else {
               picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
             }
+            localStorage.setItem('picLink', JSON.stringify(picLink));
             console.log(meData)
             total = meData.hervachti;
 

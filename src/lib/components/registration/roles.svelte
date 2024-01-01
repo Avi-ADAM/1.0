@@ -1,4 +1,6 @@
 <script>
+    import { page } from '$app/stores';
+
     import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
     import { show } from './store-show.js';
@@ -143,6 +145,7 @@ selected = newSele;
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
   const what = {"he": "יש לך תפקיד מועדף?","en": "Do you have a preferred role?"}
+  let focused = false
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -154,14 +157,19 @@ selected = newSele;
   </DialogContent>
   </div>
 </DialogOverlay>
+
+
+
   
-<h1 class="midscreenText-2">
+<h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
     {userName_value}
     <br/>
      {what[$lang]}
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
+           on:focus={()=>focused=true}
+      on:blur={()=>focused=false}
        --sms-max-width={"60vw"}
           noMatchingOptionsMsg={nom[$lang]}
            loading={newcontent}
@@ -209,6 +217,7 @@ width:78vw;
 }
  
     .midscreenText-2 {
+            transition: all 1s ease-in;
       grid-column: 1 /5;
   grid-row: 1/ 2;
   align-self: center;

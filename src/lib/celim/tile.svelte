@@ -69,7 +69,8 @@ class:hover:bg-gold={gold == true}
         class:hover:bg-[linear-gradient(to_right,theme(colors.gold),theme(colors.grb),theme(colors.grb),theme(colors.gold))]={gold == true}
   class:bg-[length:200%_auto]={gold==true } 
   class:animate-gradientxslow={gold == true && animate == true}
-class:bg-[linear-gradient(to_left,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]={gold == true}
+  class:bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.gold),theme(colors.grc),theme(colors.gra))]={gold == true && animate == false}
+class:bg-[linear-gradient(to_left,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]={gold == true && animate == true}
 class:text-blue-900={gold == true}
 class:py-0.5={sm == false}
 class:px-2.5={sm == false}

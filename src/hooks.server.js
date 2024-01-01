@@ -28,6 +28,9 @@ export async function handle({ event, resolve }) {
     //coocies?
     let userAgent = event.request.headers.get('accept-language');
     const coociLang = event.cookies.get('lang');
+    		const isDesktop =
+          event.request.headers.get('sec-ch-ua-mobile') === '?0';
+        event.locals.isDesktop = isDesktop;
         const uid = event.cookies.get('id') || false;
         const isJ = event.cookies.get('jwt') || false;
         event.locals.tok = isJ;

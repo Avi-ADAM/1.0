@@ -47,7 +47,8 @@
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Diun from '$lib/components/lev/diun.svelte';
-  import { forum } from '$lib/stores/pendMisMes';
+  import { forum, initialForum, updSend } from '$lib/stores/pendMisMes';
+  import {SendTo} from '$lib/send/sendTo.svelte';
   let idL;
   let success = false;
   let isOpen = false;
@@ -238,6 +239,8 @@
              user_1s {data{ id attributes{email lang username profilePic {data{attributes{ url formats}}}}}}
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
              id attributes{ status  iskvua 
+                          forums{data{id}}
+
             acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
               tafkidims {data{ id attributes{ roleDescription ${
                 $lang == 'he'
@@ -1505,23 +1508,106 @@
   let sid = false;
   let gan = false;
   let bett = false;
-  function afreact() {}
-  $: width = 0;
+    $: width = 0;
   let chatId;
   let newID;
   let smalldes;
   let nameChatPartner;
-  let clicked = false;
+  $: clicked = false;
   let ani;
+  let isNew = false
+      const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
+
+  const messs = {"he":"הודעתך נשלחה בהצלחה","en":"your message was send succsefully"}
+  async function afreact(e) {
+    const m = e.detail.why
+    console.log(m)
+    let da = new Date
+    if(isNew == true){
+      let queFor = `mutation { createForum(
+       data: {
+        project:"${$idPr}",
+        mesimabetahaliches:"${newID}",
+        publishedAt:"${da.toISOString()}"
+       }
+        ){data{id}}
+      }`
+     let d = await SendTo(queFor).then(d=> d = d.data)
+     if(d != null){
+      const forumId = d.createForum.data.id
+      createMes(forumId,m)
+     }else{
+      console.error(d)
+      addToast(`${er[$lang]}`, 'warn');
+     }
+    }else{
+     createMes(chatId,m)
+    }
+
+  }
+
+async function createMes(id,mes){
+       const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+      idL = cookieValueId;
+      let da = new Date()
+      let queFor = `mutation { createMessage(
+       data: {
+        forum:"${id}",
+        users_permissions_user:"${idL}",
+        when:"${da.toISOString()}",
+        publishedAt:"${da.toISOString()}",
+        content:"""${mes}"""
+       }
+        ){data{id}}
+      }`
+     let d = await SendTo(queFor).then(d=> d = d.data)
+     if(d != null){
+      if(isNew == true){
+        //update bmidata, 
+        updSend(0,0)
+        let oldbmiData = bmiData
+        let bmiDataSp = oldbmiData.findIndex(obj=> obj.id == newID)
+        if(bmiDataSp !== -1){
+            oldbmiData[bmiDataSp].attributes.forums = {data:[{id:id}]}
+            bmiData = oldbmiData
+            bmiData = bmiData
+            console.log(bmiData)
+        }else{
+          console.error(1570)
+        }
+        chatId = id
+        //inititate with new id
+              initialForum(false,[chatId],idL)
+      }else{
+      //message sended
+      updSend(chatId,0)
+      }
+      clicked = false
+      console.log(clicked,"sdfaw")
+      addToast(`${messs[$lang]}`, 'info');
+     }else{
+      console.error(d)
+      addToast(`${messs[$lang]}`, 'warn');
+     }
+  }
   function openChat(e) {
-    const isNew = e.detail.isNew;
+     isNew = e.detail.isNew;
+     console.log(e)
     if (isNew == false) {
+      initialForum(false,[e.detail.id],idL)
       chatId = e.detail.id;
+      smalldes = e.detail.smalldes;
+      nameChatPartner = e.detail.nameChatPartner[$lang];
+      //TODO: meanwhile show loading on chat
     } else {
       chatId = 0;
       $forum[0] = [];
+      newID = e.detail.id
       smalldes = e.detail.smalldes;
-      nameChatPartner = e.detail.nameChatPartner[$lang] + ' ' + projectname;
+      nameChatPartner = e.detail.nameChatPartner[$lang];
     }
 
     clicked = false;
@@ -1647,7 +1733,9 @@
             {:else if a == 7}
               <Finisin {who} {fmiData} />
             {:else if a === 8}
+            {#key clicked}
               <Diun
+                rikmaName={projectname}
                 on:rect={afreact}
                 {smalldes}
                 {nameChatPartner}
@@ -1658,6 +1746,7 @@
                 profilePicChatPartner={srcP}
                 {ani}
               />
+              {/key}
             {/if}
           </div></DialogContent
         >
@@ -1962,12 +2051,12 @@ pointer-events: none;"
               <button
                 on:click={() => (tab = 4)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 4 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={sidd[$lang]}
+                title={haluka[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
                 >
                   <h2 style="{tab == 4 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {sidd[$lang]}
+                    {haluka[$lang]}
                   </h2>
                   <!--<Siduri/>-->
                 </div></button
@@ -2016,12 +2105,12 @@ pointer-events: none;"
                <button
                 on:click={() => (tab = 8)}
                 class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 8 ? "bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-r from-gra via-grb  to-grc text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={haluka[$lang]}
+                title={sidd[$lang]}
                 ><div
                   class="flex flex-col items-center justify-center align-middle"
                 >
                   <h2 style="{tab == 8 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {haluka[$lang]}
+                    {sidd[$lang]}
                   </h2>
                   <!--<Siduri/>-->
                 </div></button
@@ -2292,42 +2381,7 @@ pointer-events: none;"
               </div>
               </div>
 {:else if tab === 4}
-              
-              <div
-                dir="ltr"
-                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color:rgb(2, 255, 187); "
-                class="d"
-              >
-                <Sidur />
-              </div>
-{:else if tab === 5}
-              <div
-                dir="ltr"
-                style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
-              >
-            
-                <Bethas {bmiData} on:chat={openChat} />
-              </div>
-{:else if tab === 6}
-                     <div class="p-8">
-            <Sheirut
-              sheirutim={project?.sheiruts}
-              pn={projectname}
-              {restime}
-              usersNum={projectUsers.length}
-            />
-          </div>
-{:else if tab === 7}
-          <Hamatanot
-              {trili}
-              {fmiData}
-              {rikmashes}
-              {salee}
-              {projectUsers}
-              bmiData={bmimData}
-            />
-{:else if tab === 8}
-          <div class=" p-2">
+         <div class=" p-2">
             
             {#if fmiData.length > 0 || rikmashes.length > 0}
               <div
@@ -2372,6 +2426,42 @@ pointer-events: none;"
               </div>
             {/if}
           </div>
+{:else if tab === 5}
+              <div
+                dir="ltr"
+                style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
+              >
+            
+                <Bethas {bmiData} on:chat={openChat} />
+              </div>
+{:else if tab === 6}
+                     <div class="p-8">
+            <Sheirut
+              sheirutim={project?.sheiruts}
+              pn={projectname}
+              {restime}
+              usersNum={projectUsers.length}
+            />
+          </div>
+{:else if tab === 7}
+          <Hamatanot
+              {trili}
+              {fmiData}
+              {rikmashes}
+              {salee}
+              {projectUsers}
+              bmiData={bmimData}
+            />
+{:else if tab === 8}
+      
+              <div
+                dir="ltr"
+                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color:rgb(2, 255, 187); "
+                class="d"
+              >
+                <Sidur />
+              </div>
+         
 {/if}              
           </div>
                    <div class=" m-4" bind:this={openss}>
@@ -2517,6 +2607,36 @@ pointer-events: none;"
 {/if}
 
 <style>
+     :global([data-svelte-dialog-content].chat) {
+       z-index: 1000;
+      padding: 0px;
+      background-color: #242526;
+          margin: 0px;
+                height: 70vh; 
+      aspect-ratio: 1/1.7;
+          margin-top: 30vh;
+                          border-radius: 10%;
+      overflow-y: auto;
+        }
+
+ @media (max-width: 450px){
+        :global([data-svelte-dialog-content].chat) {
+              width: 80vw;
+        }
+      }
+  @media (min-width: 600px){
+        :global([data-svelte-dialog-content].chat) {
+                overflow-y: auto;
+       z-index: 1000;
+      padding: 0px;
+      background-color: #242526;
+      margin: 0px;
+                      height: 80vh; 
+                margin-top: 20vh;
+                border-radius: 5%;
+              width: auto !important;
+        }
+      }
   .alli {
     /*   background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%); */
     background: radial-gradient(

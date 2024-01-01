@@ -4,6 +4,8 @@
     import { show } from './store-show.js';
     import { workways1 } from './workways1.js';
     import { onMount } from 'svelte';
+      import { page } from '$app/stores';
+
  import { createEventDispatcher } from 'svelte';
    import jwork from '$lib/data/workways.json'
     import enjwork from '$lib/data/workwaysEn.json'
@@ -188,16 +190,18 @@ $: searchText = ``
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
   $: addn = {"he":`הוספת "${searchText}"`,"en": `Create "${searchText}"`}
     const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
-  
+  let focused = false
   </script>
 
-<h1 class="midscreenText-2">
+<h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
     {userName_value}
 <br/>
  {ws[$lang]}
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
+           on:focus={()=>focused=true}
+      on:blur={()=>focused=false}
      createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
      loading={newcontent}
@@ -217,6 +221,7 @@ $: searchText = ``
 
 <style>
     .midscreenText-2 {
+            transition: all 1s ease-in;
       grid-column: 1 /5;
   grid-row: 1/ 2;
   align-self: center;

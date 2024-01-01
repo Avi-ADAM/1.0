@@ -6,10 +6,10 @@
      import Close from '$lib/celim/close.svelte'
       import {  fly } from 'svelte/transition';
     import Tile from '$lib/celim/tile.svelte'
-    import { onMount } from 'svelte';
+    import { createEventDispatcher, onMount } from 'svelte';
     import { slide } from 'svelte/transition';
   	import { quintOut } from 'svelte/easing';
-  import { rotate } from 'svelte-gestures';
+  import Chaticon from '$lib/celim/chaticon.svelte';
 
     export let actdata = []
     let isOpen = false;
@@ -141,10 +141,14 @@ onMount(async () => {
     const hd = {"he":"שעות שהושמו / בוצעו", "en":"hours asigned/ done"}
     const sho = {"he": "שווי המשימה", "en": "mission vallue"}
     const ro = {"he": "תפקיד", "en": "role"}
-    const acts = {"he":"מטלות","en":"actions"}
+    const acts = {"he":"דיון ומטלות","en":"chat & actions"}
     const des = {"he":"תיאור","en":"decription"}
     $: w = 0 
     let id = 0
+     const dispatch = createEventDispatcher();
+    function chat (id,isNew,smalldes){
+      dispatch("chat",{id,isNew,smalldes,"nameChatPartner":{"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}})
+    }
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -187,10 +191,19 @@ onMount(async () => {
     <table cellpadding="0" cellspacing="0" border="0">
       <tbody>
         {#key sodata}
+      {#key bmiData}
         {#each sodata as data, i}
         {#if data.isAct == false}
         <tr transition:slide="{{ duration: 1000, easing: quintOut }}" class:border-r-2={data.open == true && $lang == "he"} class:border-t-2={data.open} class="border-gold">
-          <td>{#if data.hasAct == true}<button on:click={()=> {data.open = !data.open
+          <td>
+            {#if data.attributes.forums?.data?.length === 0}
+              <button class="mx-1" on:click={()=>chat(data.id,true,data.attributes.name)}>
+                <Chaticon/></button>
+                {:else}
+              <button class="mx-1" on:click={()=>chat(data.attributes.forums.data[0].id,false,data.attributes.name)}>
+                <Chaticon/></button>                
+            {/if}
+            {#if data.hasAct == true}<button on:click={()=> {data.open = !data.open
           console.log(data.open)}}><svg
                 class:rotate-90={data.open == false}
                 class="sm:w-5 sm:h-5 sm:ms-5 h-3 w-3 ms-3"
@@ -210,7 +223,8 @@ onMount(async () => {
               {:else}
               <button on:click={() =>{isOpen = true
               id = data.id}} ><Plus/></button>
-              {/if}</td>
+              {/if}
+            </td>
           <td><h2 class="md:text-xl">{data.attributes.name}</h2></td>
           <td> 
         <div class="flex flex-col items-center justify-center ">
@@ -274,6 +288,7 @@ onMount(async () => {
         {/if}
         {/if}
        {/each}
+       {/key}
        {/key}
       </tbody>
     </table>

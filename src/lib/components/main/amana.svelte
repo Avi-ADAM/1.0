@@ -384,6 +384,8 @@ let nameuse = false;
   export let idx = 1;
    let data;
     import { createForm } from "svelte-forms-lib";
+  import Close from '$lib/celim/close.svelte';
+  import { scrollToTop } from 'svelte-scrollto';
     let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
@@ -404,10 +406,12 @@ onSubmit: values => {
 if (fpp.includes(jjj)){
   console.log("sssss")
   nameuse = true;
+    scrollToTop()
 } else {
  if (selected.length < 1) {
  console.log("uuuu")
   erorims = true
+  scrollToTop()
  } else {
    console.log("kkkk")
 
@@ -509,6 +513,8 @@ function change(la){
   }
 }
 $: w = 0
+$: wid = 0
+$: if($errors.name || $errors.email) {scrollToTop()}
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -516,7 +522,7 @@ $: w = 0
   <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>ביטול</button>
+          on:click={closer}><Close/></button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
 
@@ -562,7 +568,7 @@ $: w = 0
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      -->
      <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px; z-index:500;" on:click={()=>info()} class="ww" >?</button>
-     <div class="all">
+     <div bind:clientWidth={wid} class="all">
        <a   data-sveltekit-prefetch href="/login" ><img title="התחברות ל-1💗1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1💗1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
@@ -617,6 +623,7 @@ $: w = 0
  <div>
      <MultiSelect
       bind:selected
+
       {placeholder}
       options={country.map(c => c.heb)}
        />
@@ -834,7 +841,7 @@ width:78vw;
   line-height: 60px;
   position: absolute;
   left: 50%;
-  bottom: 0px;
+  bottom: 50%;
   color: #FFF;
   text-align: center;
   font-size: 70px;
