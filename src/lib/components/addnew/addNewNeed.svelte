@@ -6,6 +6,7 @@ const baseUrl = import.meta.env.VITE_URL
            import { lang } from '$lib/stores/lang.js'
 
  const dispatch = createEventDispatcher();
+ let clicked = false
 let token;
 let needName;
 let  desN = "";
@@ -16,6 +17,7 @@ let meData = [];
 // cando choose
 export let onmo = false
 async function subm() {
+  clicked = true
    const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -151,10 +153,12 @@ const crn = {"he":"יצירת משאב חדש","en":"create new need"}
 <option value="rent">{re[$lang]}</option>
 </select>
 </div>
+{#if clicked == false}
   <button
  on:click={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
  >{crn[$lang]}</button>
+ {/if}
    </div>
   </div>
       </div>

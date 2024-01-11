@@ -92,11 +92,11 @@ async function han() {
                         query: `mutation { ${linkop}(
       data: { 
         name: "${addslashes(element.attributes.name)}",
-      descrip: "${addslashes(element.attributes.descrip)}",
+      descrip: """${addslashes(element.attributes.descrip)}""",
         project: "${projectId}",
               kindOf: ${element.attributes.kindOf},
              hm: ${hm},
-             spnot: "${spnot}",  
+             spnot: """${spnot}""",  
              price: ${price},
              easy: ${easy},   
              linkto: "${element.attributes.linkto}",
