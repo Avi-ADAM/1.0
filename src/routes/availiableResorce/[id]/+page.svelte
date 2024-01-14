@@ -344,15 +344,70 @@
                   {data.alld.name}
                 </h2>
                 {#if data.alld.descrip !== null && data.alld.descrip !== 'null' && data.alld.descrip !== 'undefined' && data.alld.descrip !== undefined}
-                  <p class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl">
+                  <p class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl overflow-y-auto">
                     {data.alld.descrip}
                   </p>
                 {/if}
-                {#if data.tok == true}
+                
+                {#if data.alld.sqadualed || data.alld.sqadualedf}
+                                <p
+                  style="line-height: 1;"
+                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
+                >
+                  <img
+                    class="w-6 lg:w-12"
+                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+                    alt="howmuch"
+                  />
+                {#if data.alld.sqadualed}
+                <span> {new Date(data.alld?.sqadualed).toLocaleDateString()}</span>
+                {/if}
+                 {#if data.alld.sqadualedf}
+                <span> - {new Date(data.alld?.sqadualedf).toLocaleDateString()}</span>
+                {/if}
+                  </p>
+                {/if}  
+                <p
+                  style="line-height: 1;"
+                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
+                >
+                  <img
+                    class="w-6 lg:w-12"
+                    src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
+                    alt="howmuch"
+                  />
+                  <span>
+                  <span>{data.alld.price}</span>
+                  {#if data.alld.price != data.alld.easy}
+                    <span> ↔️ {data.alld.easy}</span>
+                  {/if}
+                  </span>
+                  {#if data.alld.kindOf != "total" && data.alld.hm > 1}
+                    <span> ✖️ {data.alld.hm} {units[$lang]}</span>
+                  {/if}
+                  {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "years" || data.alld.kindOf == "rent"}
+                    <span> ✖️ {montsi(data.alld.kindOf,data.alld.sqadualed,data.alld.sqadualedf,true)} 
+                    {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "rent"}
+                      <span>{monts[$lang]}</span>
+                      {:else if data.alld.kindOf == "years"}
+                      <span>{years[$lang]}</span>
+                      {/if}
+                    </span>
+                  {/if}
+                  {#if data.alld.kindOf != "total"}
+                    <span> 🟰 {data.alld.price * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
+                      {#if data.alld.price != data.alld.easy}
+                      <span> ↔️ {data.alld.easy * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
+                      </span>
+                      {/if}
+                      {total[$lang]}
+                    </span>
+                  {/if}
+                </p>
                   <p
                     on:mouseenter={() => hover('הערות')}
                     on:mouseleave={() => hover('0')}
-                    class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d"
+                    class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d overflow-y-auto mt-2"
                   >
                     {data.alld.spnot !== undefined &&
                     data.alld.spnot !== null &&
@@ -360,7 +415,7 @@
                       ? data.alld.spnot
                       : ''}
                   </p>
-                {:else}
+                {#if data.tok !== true}
                   <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
                     <div class="flex items-center w-full space-x-2">
                       <div
@@ -438,61 +493,6 @@
                     <span class="sr-only">for registered users only...</span>
                   </div>
                 {/if}
-                {#if data.alld.sqadualed || data.alld.sqadualedf}
-                                <p
-                  style="line-height: 1;"
-                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
-                >
-                  <img
-                    class="w-6 lg:w-12"
-                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
-                    alt="howmuch"
-                  />
-                {#if data.alld.sqadualed}
-                <span> {new Date(data.alld?.sqadualed).toLocaleDateString()}</span>
-                {/if}
-                 {#if data.alld.sqadualedf}
-                <span> - {new Date(data.alld?.sqadualedf).toLocaleDateString()}</span>
-                {/if}
-                  </p>
-                {/if}  
-                <p
-                  style="line-height: 1;"
-                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
-                >
-                  <img
-                    class="w-6 lg:w-12"
-                    src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
-                    alt="howmuch"
-                  />
-                  <span>
-                  <span>{data.alld.price}</span>
-                  {#if data.alld.price != data.alld.easy}
-                    <span> ↔️ {data.alld.easy}</span>
-                  {/if}
-                  </span>
-                  {#if data.alld.kindOf != "total" && data.alld.hm > 1}
-                    <span> ✖️ {data.alld.hm} {units[$lang]}</span>
-                  {/if}
-                  {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "years" || data.alld.kindOf == "rent"}
-                    <span> ✖️ {montsi(data.alld.kindOf,data.alld.sqadualed,data.alld.sqadualedf,true)} 
-                    {#if data.alld.kindOf == "monthly" || data.alld.kindOf == "rent"}
-                      <span>{monts[$lang]}</span>
-                      {:else if data.alld.kindOf == "years"}
-                      <span>{years[$lang]}</span>
-                      {/if}
-                    </span>
-                  {/if}
-                  {#if data.alld.kindOf != "total"}
-                    <span> 🟰 {data.alld.price * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
-                      {#if data.alld.price != data.alld.easy}
-                      <span> ↔️ {data.alld.easy * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
-                      </span>
-                      {/if}
-                      {total[$lang]}
-                    </span>
-                  {/if}
-                </p>
                 {#if alr == true && alrr == false && !data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
                   <div class="flex justify-center">
                   {#if easychoose != true}
