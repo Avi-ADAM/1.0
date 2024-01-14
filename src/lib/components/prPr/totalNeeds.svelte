@@ -14,10 +14,10 @@ import {
 } from 'svelte';
 import moment from 'moment'
 import { lang } from '$lib/stores/lang.js'
+  import { calcX } from '$lib/func/calcX.svelte';
 const dispatch = createEventDispatcher();
 let token;
 export let needr = [];
-
 export let projectId;
 
 export let meData = [];
@@ -39,6 +39,7 @@ beforeUpdate(async () => {
 const baseUrl = import.meta.env.VITE_URL
 
 export let pu,pn,pl,restime
+let x = calcX(restime)
 let linkop = ``;
 let already = false;
 let idL;
@@ -48,6 +49,7 @@ export let userslength = 0;
 async function han() {
     console.log(meData)
     already = true;
+    let d = new Date
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -66,6 +68,9 @@ async function han() {
      {
       what: true
       users_permissions_user: "${idL}"
+      ide: ${idL}
+      order: 0
+      zman: "${d.toISOString()}"
     }
   ]`;
     } else if (userslength === 1) {
@@ -114,7 +119,24 @@ async function han() {
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan)
+            
             if(userslength > 1){
+                    let fd = new Date(Date.now() + x)
+
+                    let hiluzpend = miDatan.data.createPmash.data.id
+                        let quee = `mutation 
+                        {createTimegrama(
+    data:{
+      date: "${fd.toISOString()}",
+      whatami: "pmash",
+      pendm:  "${hiluzpend}",
+    }
+  ){
+    data {id}
+  }
+}`
+ let v = await SendTo(quee)
+    console.log(v)
     let data = {pu:pu,pn:pn,pl:pl,restime:restime, pid:projectId, uid:idL, kind:"pendmash", name:addslashes(element.attributes.name)}
    fetch("/api/nuti", {
   method: 'POST', // or 'PUT'
