@@ -49,7 +49,7 @@ const desc = {
 
 const desc2 = {
   "he": "ליצור יחד בהסכמה",
-  "en": "to create together in harmony",
+  "en": " to create together in harmony",
   "ar": "للإبداع معًا بانسجام"
 };
 const word1 = {
