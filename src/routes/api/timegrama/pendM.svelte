@@ -37,9 +37,9 @@ export async function PendM(id,taid){
         const dates = (res2.data.pmash.data.attributes.sqadualedf !== undefined && res2.data.pmash.data.attributes.sqadualedf !== "undefined" && res2.data.pmash.data.attributes.sqadualedf !== null) ? `sqadualedf: "${res2.data.pmash.data.attributes.sqadualedf}",` : ``;
                 let qub = `mutation { createOpenMashaabim(
       data: {project: "${res2.data.pmash.data.attributes.project.data.id}",
-             spnot: "${res2.data.pmash.data.attributes.spnot}",
-             name: "${res2.data.pmash.data.attributes.name}",
-             descrip: "${res2.data.pmash.data.attributes.descrip}",
+             spnot: """${res2.data.pmash.data.attributes.spnot}""",
+             name: """${res2.data.pmash.data.attributes.name}""",
+             descrip: """${res2.data.pmash.data.attributes.descrip}""",
              kindOf: ${res2.data.pmash.data.attributes.kindOf},
              hm: ${res2.data.pmash.data.attributes.hm},
              price: ${res2.data.pmash.data.attributes.price},
@@ -61,9 +61,11 @@ export async function PendM(id,taid){
  }
   ){data{id}}
  } `   
+ console.log(qub)
      try {
       let res3 = await SendTo(qub, VITE_ADMINMONTHER).then((res3) => (res3 = res3));
-            if (res3.data != null) {
+      console.log(res3,"res3",id,taid)      
+      if (res3.data != null) {
               console.log(res3.data,"res3 data")
               //update timegrama to done
               let que4 = `mutation { 
