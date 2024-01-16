@@ -1,5 +1,8 @@
 export async function GET() {
     // Suggestion (check for correctness before using):
+    let que = `{  openMissions (filters: { archived: { ne: false }}) {data{id}}
+    open_mashaabims (filters: { archived: { eq: false } }){ data{ id }}
+              }`;
      return new Response(
        `
        <?xml version="1.0" encoding="UTF-8" ?>
@@ -28,7 +31,7 @@ export async function GET() {
             <xhtml:link
               rel="alternate"
               hreflang="he"
-              href="https://1lev1.vercel.app?lang=he" />
+              href="https://1lev1.vercel.app/he" />
              </url>
                           <url>
              <loc>https://1lev1.vercel.app/hascama</loc>

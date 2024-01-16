@@ -26,6 +26,9 @@ export async function handle({ event, resolve }) {
     let qlang = event.url.searchParams.get('lang') || null
     event.locals.userAgent = event.request.headers.get('accept-language')
     //coocies?
+    if (event.url.pathname == '/he'){
+      qlang = "he"
+    }
     let userAgent = event.request.headers.get('accept-language');
     const coociLang = event.cookies.get('lang');
     		const isDesktop =
