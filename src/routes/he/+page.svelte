@@ -204,13 +204,13 @@ const agree3 = {
 		>1</h1></div>
     <div><h1 
 		>💗1️</h1></div></div>
-	<div class="overflow-auto d  h-2/5"  on:scroll={()=>{ scrolli = true
+	<div class="overflow-auto d  h-2/5"  dir={$lang !== "en" ? "ltr" : "rtl"}  on:scroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
 		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  overline decoration-mturk text-xl"
     style="text-shadow:none;">{setitle[$lang]}</h2>
 		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{desc[$lang]}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{desc2[$lang]}</span></h3>
-		<div>
+		<div dir={$lang == "en" ? "ltr" : "rtl"}>
       	<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={wordNew[$lang]} animate={true} />
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]} animate={true} />
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word2[$lang]} animate={true}/>
