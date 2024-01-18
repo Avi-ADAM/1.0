@@ -27,7 +27,6 @@ export async function GET() {
               rel="alternate"
               hreflang="ar"
               href="https://1lev1.vercel.app?lang=ar" />
-             </url>
             <xhtml:link
               rel="alternate"
               hreflang="he"
@@ -46,7 +45,6 @@ export async function GET() {
               rel="alternate"
               hreflang="ar"
               href="https://1lev1.vercel.app/ar" />
-             </url>
             <xhtml:link
               rel="alternate"
               hreflang="he"
