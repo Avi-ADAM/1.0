@@ -57,9 +57,14 @@ const word1 = {
   "en": "Unanimous Decision Making: Our unique system facilitates unanimous decision-making among project collaborators.",
   "ar": "اتخاذ قرارات بالإجماع: نظامنا الفريد يسهل اتخاذ القرارات بالإجماع بين المشاركين في المشروع."
 };
+const wordNew = {
+  "he": "כל אחת היא מלכה וכל אחד הוא מלך! כאן יוצרים, בונים ומרוויחים יחד תוך שמירה על עצמאות אישית וחירות מלאה",
+  "en": "Every woman is a queen, and every man is a king! Here we create, build, and earn together while preserving personal autonomy and complete freedom",
+  "ar": "كل امرأة هي ملكة، وكل رجل هو ملك! هنا نقوم بالإبداع، والبناء، والكسب المشترك مع الحفاظ على الاستقلال الشخصي والحرية الكاملة"
+};
 
 const word2 = {
-  "he": "לייסד ריקמה (פרויקט) בקליק ולאתר את מרכיביה האנושיים והחומריים בקלות",
+  "he": "לייסד ריקמה (שותפות) בקליק ולאתר את מרכיביה האנושיים והחומריים בקלות",
   "en": "Founding a FreeMates project with a click and easily identifying its human and material components",
   "ar": "تأسيس مشروع FreeMates بنقرة واحدة وتحديد مكوناته البشرية والمادية بسهولة."
 };
@@ -206,6 +211,7 @@ const agree3 = {
     style="text-shadow:none;">{setitle[$lang]}</h2>
 		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{desc[$lang]}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{desc2[$lang]}</span></h3>
 		<div>
+      	<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={wordNew[$lang]} animate={true} />
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]} animate={true} />
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word2[$lang]} animate={true}/>
 				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word3[$lang]} animate={true}/>				
