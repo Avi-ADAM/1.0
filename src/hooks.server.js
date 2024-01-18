@@ -3,10 +3,10 @@
 
 const desc = {
   he: '1💗1 הסכמה עולמית על חי | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
-  en: '1💗1 WorldWide consensus for Security and Peace, colaboration platform, create together harmoniously | consrnsus based partnerships manegment sistem, we can together',
+  en: '1💗1 WorldWide consensus for Security and Peace | colaboration platform, create together harmoniously | consensus based partnerships manegment sistem | we can together',
   ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا'
 };
-
+//To establish consensus for non-violence, To allow a network of harmoneus creation
 const title = {
   en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
   he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
@@ -78,6 +78,7 @@ export async function handle({ event, resolve }) {
             .replace('%xtitle%', title[lang])
             .replace('%title%', title[lang])
             .replace('%desc%', desc[lang])
+            .replace('%xdes%', desc[lang])
             .replace('%desci%', desc[lang])
             .replace('%cl%', cl[lang])
       });
