@@ -198,12 +198,21 @@ const agree3 = {
           </div>
 <div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden bg-[length:200%_auto] animate-gradientx">
 	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
-		<div dir="ltr" style="text-shadow:none;" class="pt-2 font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] flex-wrap flex flex-row">
+		<div dir="ltr" style="text-shadow:none;" class="pt-2 font-bold sm:text-9xl text-4xl text-transparent 
+        bg-clip-text bg-[length:auto_200%] animate-gradienty 
+        bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] 
+        flex-wrap flex flex-row">
         <div class="flip">
-          <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
+          <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
 		>1</h1></div>
-    <div><h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] "
-		>💗1️</h1></div></div>
+    <div><h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+        bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] "
+		>💗</h1>
+    </div><div>
+          <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
+		>1</h1></div></div>
 	<div class="overflow-auto d  h-2/5"  dir={$lang !== "en" ? "ltr" : "rtl"}  on:scroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
@@ -261,6 +270,7 @@ const agree3 = {
 		</div>
 		{/if}
 		<div class=" z-0 ">
+           <!--- "gold coin" (https://skfb.ly/oyPLs) by alex.yefremov is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).-->
 	<Canvas  size={{width:w<640 ? w : h*1.8, height: w*1.8 < h ? w : h > 639 ? w*0.8 : h }}>
         <Scene {fi} hover={btna == true || btnb == true ? true:false} {scrolli}/>
       </Canvas>
