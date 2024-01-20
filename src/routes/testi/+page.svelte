@@ -202,14 +202,17 @@ const agree3 = {
         bg-clip-text bg-[length:auto_200%] animate-gradienty 
         bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] 
         flex-wrap flex flex-row">
-        <div>
+        <div class="flip">
           <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
 		>1</h1></div>
     <div><h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
         bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] "
-		>💗1️</h1>
-    </div></div>
+		>💗</h1>
+    </div><div>
+          <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
+		>1</h1></div></div>
 	<div class="overflow-auto d  h-2/5"  dir={$lang !== "en" ? "ltr" : "rtl"}  on:scroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
