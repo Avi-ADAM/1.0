@@ -81,6 +81,8 @@ if (files) {
   }
 }
 async function sendPP(){
+  await newnew()
+    .then()
    let d = new Date;
      const cookieValue = document.cookie
   .split('; ')
@@ -180,7 +182,7 @@ let vallues = [];
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues {data{ id attributes{  valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName}} }' : ""}}}}
+  vallues  (sort: "valueName:asc") {data{ id attributes{  valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName}} }' : ""}}}}
   projects{data{attributes{  projectName}}}
 }
               `})
@@ -195,6 +197,7 @@ let vallues = [];
               }
             }          
             vallues = vallues
+                        newcontent = false
             const runi = res.data.projects.data;
            run = runi.map(c => c.attributes.projectName)
         } catch (e) {
@@ -243,21 +246,75 @@ export let userName_value;
 }
 
 
-  function addnew (event){
-    
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.valueName;
-    const newValues = vallues;
+  async function newnew (){
+    let meData = []
+  for (let i = 0; i<selected.length ;i++){
+    if (!vallues.map(c => c.attributes.valueName).includes(selected[i])){
+      //create new and update vallues
+        console.log(selected,vallues)
+  let link =baseUrl+"/graphql" ;
+  let d = new Date
+        try {
+             await fetch(link, {
+              method: 'POST',
+       
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body: 
+        JSON.stringify({query: 
+           `mutation  createVallue {
+  createVallue(data: {  valueName: "${selected[i]}",
+        publishedAt: "${d.toISOString()}"}) {
+    data {
+      id
+      attributes {
+        valueName
+      } 
+
+       }
+    }
+}`   
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+const newOb = meData.data.createVallue.data;
+    const newValues = vallues ;
     newValues.push(newOb);
        
     vallues = newValues;
-   const newSele = selected;
+    let data = {"name": userName_value, "action": "create ערך חדש בשם:", "det": `${selected[i]}`}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
 
-selected.push(newN);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  }
+      catch(error) {
+        console.log('צריך לתקן:', error.response);
+        error = error1 
+        console.log(error1)
+                };}
+              }
+            }
 
-selected = newSele;
-addval == false;
-  }
+  
+
+  $: ugug = ``;
+    let newcontent = true
+  $: addne = {"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`}
 const timeto = {"he":"כמה זמן עד שהריקמה תכניס כסף", "en":"how much time until the FreeMates will be profitable"}
 const timetoex = {"he":"חישוב הזמן עד שניתן יהיה לחלק כסף מרגע שאוישו כל המשימות ונתקבלו כל המשאבים הנדרשים", "en" : "the time until money can be splited from when all of the missions has asigned and all the resources has accepted" }
 const cvar = {"he":"הריקמה כבר רווחית", "en": "the FreeMates is already profitable"}
@@ -363,19 +420,19 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 ?
 </h1> 
 
- <div  class="input-2">
-   <MultiSelect
-   bind:selected
-   {placeholder}
-   options={vallues.map(c => c.attributes.valueName)}
-   /></div>
-   <div  class="input-2-2">
-   {#if addval == false}
-    <button
-    on:click={() => addval = true} 
-    class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-    >{addn[$lang]}</button>
-  {:else if addval == true} <AddnewVal addS={true} on:addnew={addnew} fn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
+<div  class="input-2">
+     <MultiSelect
+  
+      createOptionMsg={addne[$lang]}
+     allowUserOptions={"append"}
+      loading={newcontent}
+      bind:searchText={ugug}
+     bind:selected
+     {placeholder}
+     options={vallues.map(c => c.attributes.valueName)}
+     />
+  </div>
+
   <br>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>

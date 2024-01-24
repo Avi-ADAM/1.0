@@ -39,7 +39,7 @@
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues (sort: "valueName:desc"){
+  vallues (sort: "valueName:asc"){
     data{
       id
       attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ""}}
