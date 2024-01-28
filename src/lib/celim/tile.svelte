@@ -85,7 +85,7 @@ class:flex-wrap={pic == true}
  class="drop-shadow-lg  transition-all duration-300 shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center  rounded">
    {#if pic}
   <span class=" mx-1">
- <img src={src} alt={alt} class:min-w-12={big == true} class:h-12={big == true} class:min-w-7={big == false} class:h-7={big == false} class=" border-2 border-white  rounded-full"/>
+ <img src={src} alt={alt} class:min-w-12={big == true} class:h-12={big == true} class:min-w-7={big == false} class:h-7={big == false} class=" border-2 border-white max-w-max  rounded-full"/>
 </span>
  {/if}
  {@html word}

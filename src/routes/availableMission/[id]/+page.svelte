@@ -306,7 +306,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         <p 
         on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
         on:mouseleave={()=>hover("0")}  >
-            <Tile sm={wid > 555 ? true : false} pink={true} word={skill.attributes.skillName}/></p>
+            <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
                 </div>
                 {/if}
@@ -315,14 +315,14 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each data.alld.tafkidims.data as rol}
                     <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-    <Tile sm={wid > 555 ? true : false} word={rol.attributes.roleDescription} wow={true}/></p>{/each}
+    <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.roleDescription} wow={true}/></p>{/each}
       </div>
       {/if}
       {#if data.alld.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each data.alld.work_ways.data as rol}
           <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold" sm={wid > 555 ? true : false}  word={rol.attributes.workWayName}/>
+              <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.workWayName}/>
           </p>
           {/each}
           </div>
