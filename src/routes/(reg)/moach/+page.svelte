@@ -134,7 +134,8 @@
     drivelink,
     twiterlink,
     watsapplink;
-
+    $: errorM = false
+    $:noneti = ""
   let newcontent = true;
   let newcontentR = true;
   let newcontentW = true;
@@ -200,6 +201,8 @@
         })
           .then(checkStatus)
           .then(parseJSON);
+               errorM = false
+
         ata = res.data.project.data.attributes;
         console.log(res);
         const users = ata.user_1s.data;
@@ -307,6 +310,8 @@
               .then(checkStatus)
               .then(parseJSON);
             console.log(res);
+                errorM = false
+
             meData = res.data.project.data.attributes;
             project = res.data.project.data.attributes;
             projectname = res.data.project.data.attributes.projectName;
@@ -405,6 +410,12 @@
       } catch (e) {
         error1 = e;
         console.log(error1);
+         if(e == "TypeError: Failed to fetch"){
+          const nonet = {"he":"נראה שאין חיבור לאינטרנט, כדאי לנסות שוב","en":"no internet connection, try again"}
+                   errorM = true
+                  noneti = `${nonet[$lang]}`
+
+              }
       }
       return meData;
     }
@@ -448,6 +459,7 @@
         })
           .then((r) => r.json())
           .then((data) => (user = data));
+               errorM = false
         console.log(user);
         if (user.errors) {
           if (user.errors[0].message === 'Invalid token.') {
@@ -458,6 +470,13 @@
           user.data.usersPermissionsUser.data.attributes.projects_1s.data;
       } catch (e) {
         console.log(e);
+        if(e == "TypeError: Failed to fetch"){
+          const nonet = {"he":"נראה שאין חיבור לאינטרנט, כדאי לנסות שוב","en":"no internet connection, try again"}
+          errorM = true
+          noneti =`${nonet[$lang]}`
+          console.log(noneti)
+          return []
+              }
       }
       return projects;
     }
@@ -1658,7 +1677,7 @@ async function createMes(id,mes){
     localStorage.setItem('pendMisMes', JSON.stringify($forum));
   }
   $: tab = 1
-
+const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"}
 </script>
 
 <svelte:head>
@@ -1675,7 +1694,11 @@ async function createMes(id,mes){
   />
 </svelte:head>
 <div class="alli"></div>
-
+  {#key errorM}
+        {#if errorM != false}
+      <h2   class="absolute bg-barbi text-gold py-3 px-6 rounded-sm bottom-6 -translate-x-1/2 left-1/2 ">{noneti}</h2>
+    {/if}
+    {/key}
 {#if $idPr}
   {#await meData}
     <div class="alli grid items-center justify-center">
@@ -1752,6 +1775,7 @@ async function createMes(id,mes){
         >
       </div>
     </DialogOverlay>
+  
     <!--{#if idUst.map(c => c.id) == idUsl} 
 בנוסף במקרה של רענון יעלם האידי של הרקמה
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
@@ -1763,6 +1787,7 @@ async function createMes(id,mes){
       style="-webkit-scrollbar:0px;"
     >
       <Header />
+    
       {#if success}
         <div
           style="
@@ -2354,8 +2379,7 @@ pointer-events: none;"
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg text-barbi hover:text-barbi font-bold px-4 rounded"
                   on:click={tobetha}
-                >
-                  פעולות בתהליך ביצוע</button
+                >{mesimaBetaHe[$lang]}</button
                 >
               {/if}
               {#if fmiData.length > 0}

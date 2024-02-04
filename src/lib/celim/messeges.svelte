@@ -1,5 +1,7 @@
 <script>
   import { Wave } from "svelte-loading-spinners";
+  import { quintOut } from "svelte/easing";
+  import { slide } from "svelte/transition";
 
 	
     export let sentByMe;
@@ -125,7 +127,7 @@ img {
 				color: #8f8f8f8f;
 	}
 </style>
- <div class="chat-message">
+ <div transition:slide="{{ duration: 1000, easing: quintOut }}"  class="chat-message">
          <div class="flex items-end" class:justify-end={sentByMe === true}>
             <div class="flex flex-col space-y-2 text-xs md:text-lg md:max-w-lg max-w-xs mx-2 " class:order-2={sentByMe === false} class:order-1={sentByMe === true} class:items-end={sentByMe === true} class:items-start={sentByMe === false}>
                <div><span class="px-4 py-2 rounded-lg inline-block" 

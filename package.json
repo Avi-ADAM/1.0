@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev ",
+    "dev": "vite dev",
     "build": "vite build ",
     "preview": "vite preview"
   },
@@ -76,9 +76,11 @@
     "socket.io": "^4.5.1",
     "socket.io-client": "^4.5.1",
     "svelte-accessible-dialog": "^2.1.3",
+    "svelte-agnostic-draggable": "^0.2.0",
     "svelte-cloudinary": "^0.2.5",
     "svelte-confetti": "^1.2.0",
     "svelte-copy-to-clipboard": "^0.2.5",
+    "svelte-datatables-net": "^0.0.11",
     "svelte-easy-crop": "^2.0.1",
     "svelte-email": "^0.0.4",
     "svelte-forms-lib": "^2.0.1",
@@ -88,6 +90,7 @@
     "svelte-mindmap": "^1.0.4",
     "svelte-preprocess": "^5.0.4",
     "svelte-sequential-preprocessor": "^1.0.0",
+    "svelte-touch-to-mouse": "^1.0.0",
     "svelte-tour": "^1.0.7",
     "svelte-viewport-info": "^0.1.12",
     "sveltekit-i18n": "^2.1.4",

@@ -191,7 +191,7 @@ async function click() {
       </div>
    </div>
   
-   <div bind:this={dow} bind:offsetHeight={off} transition:slide="{{ duration: 1000, easing: quintOut }}" id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto d">
+   <div bind:this={dow} bind:offsetHeight={off} id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto d">
 <!--
 <div class="card card-danger direct-chat direct-chat-danger">
     <div class="card-header">

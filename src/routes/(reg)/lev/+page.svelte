@@ -17,19 +17,19 @@
   import { addToast } from 'as-toast';
   import Mesima from '$lib/components/lev/mesima.svelte';
   import { sendEror } from '$lib/func/sendEror.svelte';
-  import { betha } from '../../lib/components/lev/storess/betha.js';
+  import { betha } from '$lib/components/lev/storess/betha.js';
   import { RingLoader } from 'svelte-loading-spinners';
-  import Cardsui from '../../lib/components/lev/cards/cards.svelte';
-  import Tooltip from './../../lib/celim/tooltip.svelte';
-  import Coinsui from '../../lib/components/lev/coinui.svelte';
+  import Cardsui from '$lib/components/lev/cards/cards.svelte';
+  import Tooltip from '$lib/celim/tooltip.svelte';
+  import Coinsui from '$lib/components/lev/coinui.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { isEqual } from 'lodash';
-  import Rikma from '../../lib/components/lev/rikma.svelte';
-  import Hevel from '../../lib/components/lev/hevel.svelte';
+  import Rikma from '$lib/components/lev/rikma.svelte';
+  import Hevel from '$lib/components/lev/hevel.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
-  import Levchat from '../../lib/components/lev/levchat.svelte';
+  import Levchat from '$lib/components/lev/levchat.svelte';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
   import { getOccurrence } from '$lib/func/getOccurrence.svelte';
   import { montsi } from '$lib/func/montsi.svelte';
@@ -37,6 +37,7 @@
   import { peace } from '$lib/func/lev/peace.svelte';
   import Love from '$lib/func/lev/love.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
+  import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
   export let data;
   let low = true;
   let indexi = -1;
@@ -74,7 +75,7 @@
   let ma = 13;
   let wegets = [];
   let arr1 = [];
-
+  let askWants = [] 
   function close() {
     if (mode !== 4) {
       isOpen = false;
@@ -1988,6 +1989,30 @@
                 	        mashaabim {data{attributes{ sps{data{id attributes {name price kindOf spnot  myp 
                 												users_permissions_user {data{id attributes{ username profilePic {data{attributes{url formats }}}}}}
                     }}}}}}}}}  
+          askwants(filters:{archived:{eq:false}}){
+            data{
+              id attributes{
+                timegrama{
+                  data{id}
+                }
+                vots{what why order ide zman users_permissions_user{
+                  data{
+                    id
+                  }
+                }}
+                users_permissions_user{
+                  data{
+                    id
+                  }
+                }
+                sheirut{
+                  data{
+                    id
+                  }
+                }
+              }
+            }
+          }          
     			askms(filters: { archived: { eq: false } }){ data{ id attributes{
                             vots {what zman why id users_permissions_user {data{id}}}
                             timegrama {data{id attributes{date}}}
@@ -2139,6 +2164,8 @@
         console.log('hachla');
         tveria(miData);
         console.log('tveria');
+        askWants = sharLimud(miData)
+        console.log('scharLimud',askWants)
         bubleUiAngin();
         low = false;
         update = false;

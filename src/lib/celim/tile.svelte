@@ -49,7 +49,7 @@
 <span class:line-through={closei == true}
 class:hover:bg-blue-400={blue == true}
 class:hover:bg-gold={gold == true}
-        class:hover:bg-neww={wow == true}
+        class:hover:bg-wow={wow == true}
         class:hover:bg-gray-400={gray == true}
         class:hover:bg-red-400={red == true}
         class:hover:bg-green-400={green == true}
@@ -58,7 +58,7 @@ class:hover:bg-gold={gold == true}
         class:hover:bg-purple-400={purple == true}
         class:hover:bg-pink-300={pink == true}
         class:bg-blue-200={blue == true} class:text-blue-800={blue == true}
-        class:bg-wow={wow == true} class:text-wowt={wow == true}
+        class:bg-neww={wow == true} class:text-wowt={wow == true}
         class:bg-gray-200={gray == true} class:text-gray-800={gray == true}
         class:bg-red-200={red == true} class:text-red-800={red == true}
         class:bg-green-200={green == true} class:text-green-800={green == true}

@@ -1,0 +1,59 @@
+<script>
+  import {isToday }from '$lib/func/uti/isToday.svelte';
+   export let chats = []
+   export let chatId = 0
+   import {lang} from '$lib/stores/lang'
+  import { quintOut } from 'svelte/easing';
+  import { slide } from 'svelte/transition';
+   console.log(chats)
+   function toChat(id){
+    chatId = id
+   }
+</script>
+<section transition:slide="{{ duration: 1000, easing: quintOut }}"  class="flex flex-col justify-center antialiased bg-gold text-gray-600  px-2 pb-2 h-max w-full shadow-xl shadow-fuchsia-500 rounded">
+    <div class="h-full">
+        <!-- Card -->
+        <div class="relative max-w-[340px] mx-auto bg-white shadow-lg rounded-lg">
+          
+            <!-- Card body -->
+            <div class="py-3 px-5 d overflow-y-auto h-[420px] ">
+                
+                <!-- Chat list -->
+                <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="divide-y divide-gray-200">
+                   {#each chats as chat}
+                    <button on:click={()=>toChat(chat.id)} class="w-full {$lang == "en" ? "text-left" : "text-right"} py-2 focus:outline-none focus-visible:bg-indigo-50 mt-2 p-2 hover:shadow-lg rounded cursor-pointer transition">
+                        <div class="flex flex-row ">
+                        <div class="flex ml-2  basis-3/4">
+                             <img 
+                             src="{chat.md.projectPic}" 
+                             alt="project profile pic" 
+                             width="40" height="40" 
+                             class="rounded-full {$lang =="en"? "mr-2": "ml-2"} h-10 w-10">
+
+                            <div class="flex flex-col ml-2">
+                                 <span class="font-medium text-xl text-black">{chat.md.projectName}</span> 
+                                <span class="font-medium text-lg text-gray-800">{chat.md.mesimaName}</span> 
+                             </div>
+                                </div>
+                        <div class="flex flex-col items-center  basis-1/4">
+                             <span class="text-gray-300">   {#if isToday(chat?.messages[chat.messages.length - 1].timestamp)}
+				{ new Date(chat?.messages[chat.messages.length - 1].timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}) }
+					{:else}
+				{new Date(chat?.messages[chat.messages.length - 1].timestamp).toLocaleString([$lang], {year: 'numeric', month: '2-digit', day: '2-digit'})}
+					{/if}</span>
+                             <span><svg class="w-5 h-5 fill-barbi" viewBox="0 0 100 100"><circle r="50" cx=50 cy=50 ></circle></svg></span> </div>
+                    </div>
+                  <div class="text-sm text-gray-500 truncate w-full"><span class="font-bold">{chat.messages[chat.messages.length - 1].username}:</span> {chat?.messages[chat.messages.length - 1].message ?? " יש אמונה לא אכנע"}
+                 
+                </div>
+                            
+                     
+                    </button>
+
+                  {/each}
+                </div>
+            </div>
+          
+        </div>
+    </div>
+</section>

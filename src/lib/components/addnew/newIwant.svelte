@@ -6,7 +6,6 @@
     import { idPr } from '../../stores/idPr.js';
     import axios from 'axios';
     import { goto } from '$app/navigation';
-    import AddnewVal from './addnewval.svelte';
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
     import Uplad from '../userPr/uploadPic.svelte';
@@ -81,7 +80,7 @@ if (files) {
   }
 }
 async function sendPP(){
-  await newnew()
+    await newnew()
     .then()
    let d = new Date;
      const cookieValue = document.cookie
@@ -182,7 +181,7 @@ let vallues = [];
                  'Content-Type': 'application/json'
               },  body: JSON.stringify({
                         query: `query {
-  vallues  (sort: "valueName:asc") {data{ id attributes{  valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName}} }' : ""}}}}
+  vallues (sort: "valueName:asc") {data{ id attributes{  valueName ${$lang == 'he' ? 'localizations{data{attributes{ valueName}} }' : ""}}}}
   projects{data{attributes{  projectName}}}
 }
               `})
@@ -197,7 +196,7 @@ let vallues = [];
               }
             }          
             vallues = vallues
-                        newcontent = false
+            newcontent = false
             const runi = res.data.projects.data;
            run = runi.map(c => c.attributes.projectName)
         } catch (e) {
@@ -244,7 +243,6 @@ export let userName_value;
   isOpen = true;
  
 }
-
 
   async function newnew (){
     let meData = []
@@ -328,16 +326,15 @@ const more = {"he": "יותר משנתיים", "en": "more then 2 years" }
 const never = {"he": "לעולם לא", "en": "never"}
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const cencel = {"he":"ביטול","en": "cencel"}
-const crn = {"he":"יצירת ריקמה חדשה", "en": "Create new FreeMates"}
-const frn = {"he":"שם הריקמה", "en":"FreeMates name"}
+const crn = {"he":"הצבת צורך חדש", "en": "post new Iwant"}
+const frn = {"he":"כותרת", "en":"name"}
 const hours = {"he": "שעות", "en": "hours"}
 const hrex = {"he": "לאחר זמן זה חוסר מענה יחשב כהסכמה", "en": "after that: non-voting will consider as agreement"}
 const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en":"time to respond to FreeMates voting"}
 const teure = {"he": "תיאור שיהיה גלוי לכל", "en": "short description with public visibility"} 
-const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMates members"}
 const wel = {"he":"לינק לאתר (אם יש)" ,"en":"link to a website (if any)"}
 let naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
-const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMates will promote"}
+const whva = {"he":"אלו ערכים ומטרות ברצונך להגשים" , "en":"which vallues and goals you wish to fullfile "}
 const ladd = {"he":"הוספת לוגו", "en": "add Logo"} 
 const su = {"he": "לוגו נוסף בהצלחה", "en": "logo has successfully added"}
 const addn = {"he":"הוספת ערך חדש","en": "Add new Vallue"}
@@ -345,7 +342,9 @@ const cree = {"he": "ליצור ולפרסם ריקמה", "en": "Create new Free
 const sur = {"he":"הריקמה נוצרה בהצלחה", "en":"new FreeMates has created"}
 const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "en":"to the FreeMates brain"}
 const inc = {"he":"ניתן להזין את הערך המוערך של ההכנסה אם ידוע, אחרת ניתן יהיה לחשב בהמשך מדף הניהול","en":"if you know the aproximate vallue of income, else you can later caculate it"}
- </script>  
+ </script> 
+ <h2> בקרוב כאן ניתן יהיה להביע משאלות כדי שיגשימו לך אותם בהתאמה אישית מלאה</h2>
+ <!----
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form">
@@ -380,30 +379,13 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   <span class='line'></span>
 </div>
 {#if shgi == true}<small class="text-red-600 bg-slate-50">{naex[$lang]}</small>{/if}
-<!----
-    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
-  <textarea name="es"  bind:value={desP}    
- type='text' class='input d' required ></textarea>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{teure[$lang]}</label>
-  <span class='line'></span>
-</div>-->
+
 <br>
-<div class="w-full">
+<div class="w-full ">
 <h2 class="text-barbi">{teure[$lang]}</h2>
 <RichText bind:outpot={desP}/>
 </div>
-<!----
-   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
-  <textarea name="s"  bind:value={desPl}     
- type='text' class='input d' required></textarea>
-  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="s" class='label'>{prte[$lang]}</label>
-  <span class='line'></span>
-</div>-->
-<div class="w-full">
-    <h2 class="text-barbi">{prte[$lang]}</h2>
 
-<RichText bind:outpot={desPl}/>
-</div>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input name="de"    bind:value={linkP}     
  type='text' class='input' required>
@@ -420,7 +402,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 ?
 </h1> 
 
-<div  class="input-2">
+ <div  class="input-2">
      <MultiSelect
   
       createOptionMsg={addne[$lang]}
@@ -486,15 +468,15 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 </select>
 <small style="color: turquoise;">{timetoex[$lang]}</small>
 </div>
-<Chooser tr={{"he":"ריקמה מתמשכת","en":"continuous"}}   
-  fl={{"he":"ריקמה חד פעמית","en":"one timed"}} 
+<Chooser tr={{"he":"מכרז","en":"continuous"}}   
+  fl={{"he":"אישרור של כל הוצאה בנפרד","en":"one timed"}} 
   level={{"he":"הריקמה מיועדת להיות אירוע חד פעמי או מתמשך? לדוגמה: הפקת אירוע או הקמת עסק להפקת אירועים","en":"those the FreeMates intend to be a one time think or a continouse one? for exmple: event production vs openting a production company"}} 
-  bind:checked={ont} />
+  bind:checked={ont} />-->
   <!-- הדוגמה א טובה צריך לתת פתיחה של מסעדה מול אירוע חד פעמי, גם כדאי לשים בשורה נפרדת של הערות 
 {#if ont == true}
 <h3 class="text-barbi">{inc[$lang]}</h3>
 <input type="number"/>
-{/if}-->
+{/if}--><!--
   {#if loading == false}
 
 <button 
@@ -521,12 +503,12 @@ display: flex;
 justify-content: center;
 overflow: hidden;
 pointer-events: none;">
-      <Confetti rounded size=30 x={[-5, 5]} y={[-5, 5]} delay={[0, 50]} amount=200 duration=10000 colorArray={["url(https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png)"]} fallDistance="100vh"/><!--colorRange={[0, 120]}-->
+      <Confetti rounded size=30 x={[-5, 5]} y={[-5, 5]} delay={[0, 50]} amount=200 duration=10000 colorArray={["url(https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png)"]} fallDistance="100vh"/>--><!--colorRange={[0, 120]}-->
 <Confetti noGravity x={[-5, 5]} y={[-5, 5]} delay={[550, 550]} duration=10000  amount=2000 colorRange={[120, 240]} fallDistance="100vh"/>
 <Confetti noGravity x={[-5, 5]} y={[-5, 5]} delay={[1000, 1050]} duration=10000 amount=200 colorRange={[240, 360]} fallDistance="100vh"/>
 <Confetti x={[-5, 5]} y={[0, 0.1]} delay={[500, 2000]}  duration=5000 amount=200  />
-</div>
-{/if}
+<!--</div>
+{/if}-->
 <style>
  
 
@@ -535,6 +517,7 @@ pointer-events: none;">
   border-style: solid;
   border-color: transparent  transparent var(--gold)  var(--gold);
 }
+
   .a{
      background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
