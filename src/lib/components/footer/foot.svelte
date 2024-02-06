@@ -1,178 +1,240 @@
-
 <script context="module">
-  import mapTouchToMouseFor from 'svelte-touch-to-mouse'
+  import mapTouchToMouseFor from 'svelte-touch-to-mouse';
 </script>
+
 <script>
-         import NewIwant from '$lib/components/addnew/newIwant.svelte';
-import { quintOut } from 'svelte/easing';
-import {fly, slide} from 'svelte/transition';
-import { lang } from '$lib/stores/lang.js'
+  import NewIwant from '$lib/components/addnew/newIwant.svelte';
+  import { quintOut } from 'svelte/easing';
+  import { fly, slide } from 'svelte/transition';
+  import { lang } from '$lib/stores/lang.js';
   import Plus from '$lib/celim/icons/plus.svelte';
   import Chaticon from '$lib/celim/chaticon.svelte';
-  import Close from '$lib/celim/close.svelte';
-  import {  forum } from '$lib/stores/pendMisMes.js';
-  import ListSmall from '../forum/listSmall.svelte';
+  import { isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
-    import { browser } from '$app/environment';
-    import {onMount} from 'svelte'
+  import { onMount } from 'svelte';
   import Drag from '$lib/celim/icons/drag.svelte';
   import ChatSmall from './chatSmall.svelte';
   import Arrow from '$lib/celim/icons/arrow.svelte';
-    let draggable
-    onMount(async() => {
-        draggable = (await import ('svelte-agnostic-draggable')).draggable
+  let draggable;
+  onMount(async () => {
+    draggable = (await import('svelte-agnostic-draggable')).draggable;
+  });
+  mapTouchToMouseFor('.draggable');
 
-/**** map all touch events to mouse events ****/   
-
-    })
-       mapTouchToMouseFor('.draggable')
-
-  let username = ""
-let iwant = false, addP = false,min = true
-function addi (kind){
-  if(kind == "chat"){
-  iwant = true
-  }else{
-  isOpen = true
+  let username = '';
+  let iwant = false,
+    addP = false,
+    min = true;
+  function addi(kind) {
+    if (kind == 'chat') {
+      iwant = true;
+      mapTouchToMouseFor('.draggable');
+      isChatOpen.set(true);
+    } else {
+      isOpen = true;
     }
-}
-let  isOpen = false;
-const close = () => {
+  }
+  let isOpen = false;
+  const close = () => {
     isOpen = false;
     iwant = false;
-};
-let loading = false
-const cencel = {"he":"ביטול","en": "cencel"}  
-export let chatId = 0
-const back = {"he":"חזרה לרשימת הצ'אטים","en":"back to chat list"} 
+    isChatOpen.set(false);
+  };
+  let loading = false;
+  const cencel = { he: 'ביטול', en: 'cencel' };
+  export let chatId = 0;
+  const back = { he: "חזרה לרשימת הצ'אטים", en: 'back to chat list' };
 
-/**** Svelte Event Handling ****/
+  /**** Svelte Event Handling ****/
 
-  function onDraggableInit ()    { console.log('Draggable was created') }
-  function onDragStart ()        { console.log('dragging started') }
-  function onDragMove ()         { console.log('dragging continues') }
-  function onDragStop ()         { console.log('dragging was stopped') }
-  function onDraggableDestroy () { console.log('Draggable was destroyed') }
+  function onDraggableInit() {
+    console.log('Draggable was created');
+  }
+  function onDragStart() {
+    console.log('dragging started');
+  }
+  function onDragMove() {
+    console.log('dragging continues');
+  }
+  function onDragStop() {
+    console.log('dragging was stopped');
+  }
+  function onDraggableDestroy() {
+    console.log('Draggable was destroyed');
+  }
 </script>
 
-
-
 <DialogOverlay {isOpen} onDismiss={close} class="overlay z-[9999]">
-        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="chat z-[9999]" aria-label="form" >
+  <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
+    <DialogContent class="chat z-[9999]" aria-label="form">
       <div dir="rtl" class="grid items-center justify-center aling-center">
-              <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-title="{cencel[$lang]}"
-><svg style="width:24px;height:24px" viewBox="0 0 24 24"> 
-  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-</svg></button>
-{#if loading === true}
-         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
- 
-  {:else if iwant !== true}
-   <NewIwant userName_value={username}/>
- 
-{/if}
+        <button
+          on:click={close}
+          style="margin: 0 auto;"
+          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+          title={cencel[$lang]}
+          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+            />
+          </svg></button
+        >
+        {#if loading === true}
+          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
+          ></RingLoader>
+        {:else if iwant !== true}
+          <NewIwant userName_value={username} />
+        {/if}
       </div>
-  </DialogContent>
+    </DialogContent>
   </div>
 </DialogOverlay>
-     {#if iwant == true}
-  <div  use:draggable={{
-    containment:'parent', cursor:'grabbing'
-  }} style="
+{#if $isChatOpen == true}
+  <div
+    use:draggable={{
+      containment: 'parent',
+      cursor: 'grabbing'
+    }}
+    style="
     display:block; cursor:grab
-  " on:draggable:init={onDraggableInit} on:draggable:destroy={onDraggableDestroy}
-    on:drag:start={onDragStart} on:drag:move={onDragMove} on:drag:stop={onDragStop}
-  transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}} dir="rtl" 
-     class=" draggable z-[9999]  absolute top-0 left-0  w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded">
-             <div class="flex flex-row bg-gold rounded">
-               <div>
-                 <button on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-title="{cencel[$lang]}"
-><svg style="width:24px;height:24px" viewBox="0 0 24 24"> 
-  <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-</svg></button></div>
-<div class="hover:bg-wow  text-barbi hover:text-barbi font-bold rounded">
-<Drag/>
-</div>
-{#if chatId != 0}
-<div class="hover:bg-wow justify-end flex  text-barbi hover:text-barbi font-bold rounded">
- <button on:click={()=> chatId = 0} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-title="{back[$lang]}"
-><Arrow back={true}/></button>
-</div>
-{/if}
-             </div>
-    <ChatSmall bind:chatId/>
-    </div>
-    {/if}
-   <button style="position: absolute; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"  on:click={()=>min = !min} class="ww3  items-center flex justify-center text-xl" >
-    {#if min !== false}
-      ↙️
-    {:else}
-      ↗️
-    {/if}
-    </button>
-        {#if min !== false}
-         {#if iwant !== true}
-
-     <button transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" style="position: absolute; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"  on:click={()=>addi("chat")} class="ww2 ww items-center flex justify-center text-xl" ><Chaticon/></button>
-     {/if}
-     <button transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" style="position: absolute; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"  on:click={()=>addi()} class="ww ww1  text-bold sm:text-2xl text-xl items-center flex justify-center " ><Plus/></button>
+  "
+    on:draggable:init={onDraggableInit}
+    on:draggable:destroy={onDraggableDestroy}
+    on:drag:start={onDragStart}
+    on:drag:move={onDragMove}
+    on:drag:stop={onDragStop}
+    transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
+    dir="rtl"
+    class=" draggable z-[9999] absolute top-0 left-0 w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded"
+  >
+    <div class="flex flex-row bg-gold rounded">
+      <div>
+        <button
+          on:click={close}
+          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+          title={cencel[$lang]}
+          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+            />
+          </svg></button
+        >
+      </div>
+      <div class="hover:bg-wow text-barbi hover:text-barbi font-bold rounded">
+        <Drag />
+      </div>
+      {#if $nowChatId != 0}
+        <div
+          class="hover:bg-wow justify-end flex text-barbi hover:text-barbi font-bold rounded"
+        >
+          <button
+            on:click={() => (chatId = 0)}
+            class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+            title={back[$lang]}><Arrow back={true} /></button
+          >
+        </div>
       {/if}
+    </div>
+    <ChatSmall bind:chatId />
+  </div>
+{/if}
+<button
+  style="position: absolute; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"
+  on:click={() => (min = !min)}
+  class="ww3 items-center flex justify-center text-xl"
+>
+  {#if min !== false}
+    ↙️
+  {:else}
+    ↗️
+  {/if}
+</button>
+{#if min !== false}
+  {#if $isChatOpen !== true}
+    <button
+      transition:slide|all={{ delay: 150, duration: 1000, easing: quintOut }}
+      style="position: absolute; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
+      on:click={() => addi('chat')}
+      class="ww2 ww items-center flex justify-center text-xl"
+      ><Chaticon /></button
+    >
+  {/if}
+  <button
+    transition:slide={{ delay: 150, duration: 1000, easing: quintOut }}
+    style="position: absolute; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
+    on:click={() => addi()}
+    class="ww ww1 text-bold sm:text-2xl text-xl items-center flex justify-center"
+    ><Plus /></button
+  >
+{/if}
 
-      <style>
-   .ww2{
-      top: calc(100% - 105px);
-      right: calc(100% - 55px);
-            width: 50px;
-      height: 50px;
-   }
-    .ww3{
-      top: calc(100% - 35px);
-      right: calc(100% - 35px);
-            width: 25px;
-      height: 25px;
-        box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
+<style>
+  .ww2 {
+    top: calc(100% - 105px);
+    right: calc(100% - 55px);
+    width: 50px;
+    height: 50px;
+  }
+  .ww3 {
+    top: calc(100% - 35px);
+    right: calc(100% - 35px);
+    width: 25px;
+    height: 25px;
+    box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
+  }
+  .ww1 {
+    top: calc(100% - 55px);
+    right: calc(100% - 105px);
+    width: 50px;
+    height: 50px;
+  }
+  .ww {
+    border-radius: 50%;
+    background: rgb(26, 188, 156);
+    background: -moz-linear-gradient(
+      -45deg,
+      rgba(26, 188, 156, 1) 0%,
+      rgba(142, 68, 173, 1) 100%
+    );
+    background: -webkit-linear-gradient(
+      -45deg,
+      rgba(26, 188, 156, 1) 0%,
+      rgba(142, 68, 173, 1) 100%
+    );
+    background: linear-gradient(
+      135deg,
+      rgba(26, 188, 156, 1) 0%,
+      rgba(142, 68, 173, 1) 100%
+    );
 
-   }
-    .ww1{
-      top: calc(100% - 55px);
-      right: calc(100% - 105px);
-            width: 50px;
-      height: 50px;
+    box-shadow: 0 10px 30px 0px rgba(0, 0, 0, 0.6);
+    transform: translatey(0px);
+    animation: float 6s ease-in-out infinite;
+  }
+  @keyframes float {
+    0% {
+      box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
+      transform: translatey(0px);
     }
- .ww{
-
-      border-radius: 50%;
-      	background: rgb(26, 188, 156);
-	background: -moz-linear-gradient(-45deg, rgba(26, 188, 156, 1) 0%, rgba(142, 68, 173, 1) 100%);
-	background: -webkit-linear-gradient(-45deg, rgba(26, 188, 156, 1) 0%, rgba(142, 68, 173, 1) 100%);
-	background: linear-gradient(135deg, rgba(26, 188, 156, 1) 0%, rgba(142, 68, 173, 1) 100%);
-
-      box-shadow: 0 10px 30px 0px rgba(0,0,0,0.6);
-	transform: translatey(0px);
-	animation: float 6s ease-in-out infinite;
+    50% {
+      box-shadow: 0 25px 15px 0px rgba(0, 0, 0, 0.2);
+      transform: translatey(-20px);
     }
-    @keyframes float {
-	0% {
-		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
-		transform: translatey(0px);
-	}
-	50% {
-		box-shadow: 0 25px 15px 0px rgba(0,0,0,0.2);
-		transform: translatey(-20px);
-	}
-	100% {
-		box-shadow: 0 5px 15px 0px rgba(0,0,0,0.6);
-		transform: translatey(0px);
-	}
-}
+    100% {
+      box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
+      transform: translatey(0px);
+    }
+  }
   .draggable {
-    -webkit-touch-callout:none;
-    -ms-touch-action:none; touch-action:none;
-    -moz-user-select:none; -webkit-user-select:none; -ms-user-select:none; user-select:none;
+    -webkit-touch-callout: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
   }
 </style>

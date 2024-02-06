@@ -55,19 +55,20 @@ export async function handle({ event, resolve }) {
 
         event.locals.lang = lang;
        console.log('id = ', uid, " lang=", lang);
-    if (event.url.pathname == '/' && isJ != false){
-      console.log("jr")
-        return new Response('Redirect', {
-          status: 303,
-          headers: { Location: '/lev' }
-        });
-
-    }else if(event.url.pathname.startsWith('/lev') && isJ == false){
-         return new Response('Redirect', {
-           status: 303,
-           headers: { Location: '/' }
-         });
-
+    if (event.url.pathname == '/' && isJ != false) {
+      console.log('jr');
+      return new Response('Redirect', {
+        status: 303,
+        headers: { Location: '/lev' }
+      });
+    } else if (event.url.pathname.startsWith('/lev') && isJ == false) {
+      return new Response('Redirect', {
+        status: 303,
+        headers: { Location: '/' }
+      });
+    } else if (event.url.pathname.startsWith('/api')) {
+      const response = await resolve(event);
+      return response;
     }
 
     

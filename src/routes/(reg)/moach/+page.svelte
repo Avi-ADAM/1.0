@@ -47,7 +47,7 @@
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Diun from '$lib/components/lev/diun.svelte';
-  import { forum, initialForum, updSend } from '$lib/stores/pendMisMes';
+  import { forum, initialForum, isChatOpen, updSend, nowChatId, newChat } from '$lib/stores/pendMisMes';
   import {SendTo} from '$lib/send/sendTo.svelte';
   let idL;
   let success = false;
@@ -1538,6 +1538,43 @@
       const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
 
   const messs = {"he":"הודעתך נשלחה בהצלחה","en":"your message was send succsefully"}
+     
+    let unsubscribe;
+
+    function subs() {
+        unsubscribe = newChat.subscribe(value => {
+            if (value.created == true) {
+                addTo();
+            }
+        });
+    }
+    import { onDestroy } from 'svelte';
+
+  
+
+    onDestroy(() => {
+        if (unsubscribe) {
+            unsubscribe();
+        }
+    });
+
+    function addTo() {
+      
+        let oldbmiData = bmiData
+        let bmiDataSp = oldbmiData.findIndex(obj=> obj.id == $newChat.id)
+        if(bmiDataSp !== -1){
+            oldbmiData[bmiDataSp].attributes.forums = {data:[{id:id}]}
+            bmiData = oldbmiData
+            bmiData = bmiData
+            console.log(bmiData)
+             if (unsubscribe) {
+            unsubscribe();
+        }
+            }
+              }
+  
+
+
   async function afreact(e) {
     const m = e.detail.why
     console.log(m)
@@ -1609,30 +1646,53 @@ async function createMes(id,mes){
       addToast(`${messs[$lang]}`, 'info');
      }else{
       console.error(d)
-      addToast(`${messs[$lang]}`, 'warn');
+      addToast(`${er[$lang]}`, 'warn');
      }
   }
   function openChat(e) {
      isNew = e.detail.isNew;
      console.log(e)
     if (isNew == false) {
-      initialForum(false,[e.detail.id],idL)
+      $nowChatId = e.detail.id
+      $isChatOpen = true
+      /*
+       initialForum(false,[e.detail.id],idL)
       chatId = e.detail.id;
       smalldes = e.detail.smalldes;
-      nameChatPartner = e.detail.nameChatPartner[$lang];
+      nameChatPartner = e.detail.nameChatPartner[$lang];*/
       //TODO: meanwhile show loading on chat
     } else {
-      chatId = 0;
-      $forum[0] = [];
-      newID = e.detail.id
+      $newChat = {
+          started:true,
+          created: false,
+          id: 0,
+          md: { mbId:e.detail.id, pid:$idPr}
+            }
+      let tempF = $forum
+      tempF[-1] = {
+        loading: false,
+        messages:[],
+        md:{
+          projectName:projectname,
+          projectPic:srcP,
+          mesimaName:e.detail.smalldes
+        }
+      };
+      forum.set(tempF)
+      nowChatId.set(-1)
+      $isChatOpen = true
+      subs()
+      console.log($nowChatId)
+      /*newID = e.detail.id
       smalldes = e.detail.smalldes;
       nameChatPartner = e.detail.nameChatPartner[$lang];
-    }
-
-    clicked = false;
+      clicked = false;
     ani = 'forum';
     a = 8;
-    isOpen = true;
+    isOpen = true;*/
+    }
+
+    
   }
   function forums(dat) {
     let oldForums = $forum;

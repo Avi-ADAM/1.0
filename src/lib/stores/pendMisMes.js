@@ -9,8 +9,16 @@ export const meAskMisMes = writable({})
 export const askMisMes = writable({});
 export const meAskMasMes = writable({});
 export const askMasMes = writable({});
-export const forum = writable({})
+export const forum = writable({}) 
 export const nowId = writable(0)
+export const nowChatId = writable(0)
+export const isChatOpen = writable(false)
+export const newChat = writable({
+  started:false,
+  created: false,
+  id: 0,
+  md: { mbId:0, pid:0}
+});
 /*export async function initialWebS (token,id){
     const socket = io(baseUrl, {
         auth: {
@@ -128,7 +136,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
               forums(arry, myId, all);
 
             }else{
-                          forums(res4.data, myId, all);
+                forums(res4.data, myId, all);
             }
            } else {
              console.error(res4);
@@ -136,7 +144,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
          } catch (e) {
            console.error(e);
          }
-    
+    return "ok"
 }
 
 export function forums(dat,myId,all=false) {
@@ -177,6 +185,7 @@ export function forums(dat,myId,all=false) {
   old[arr1[index].pendId] = arr;
   pendMisMes.set(forums);
   localStorage.setItem('pendMisMes', JSON.stringify(forum));*/
+  return "ok"
 }
 export function addMes(
   why = '',

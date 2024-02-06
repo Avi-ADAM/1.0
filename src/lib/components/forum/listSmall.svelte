@@ -3,12 +3,15 @@
    export let chats = []
    export let chatId = 0
    import {lang} from '$lib/stores/lang'
+  import { nowChatId } from '$lib/stores/pendMisMes';
   import { quintOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
    console.log(chats)
    function toChat(id){
+    nowChatId.set(id)
     chatId = id
    }
+   //TODO: projectName and image as link to moach or publick page from open dialog - do you want to go to ...
 </script>
 <section transition:slide="{{ duration: 1000, easing: quintOut }}"  class="flex flex-col justify-center antialiased bg-gold text-gray-600  px-2 pb-2 h-max w-full shadow-xl shadow-fuchsia-500 rounded">
     <div class="h-full">

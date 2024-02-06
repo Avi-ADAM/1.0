@@ -8,6 +8,7 @@
   import { quintOut } from 'svelte/easing';
 	  const dispatch = createEventDispatcher();
    export let ani
+   export let dont = false
    export let pendId
    export let rikmaName = "1💗1"
    export let rect, no = false
@@ -30,7 +31,7 @@
    let why = "";
  export let clicked = false
  $: off = 0
- $: console.log(clicked,"y7k7k",off)
+ $: console.log(clicked,"diun",off)
 
   const scrollToBottom = async (node) => {
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
@@ -88,10 +89,9 @@ async function click() {
   padding: 10px 0;
   outline: none;
   border-bottom: solid 1px var(--barbi-pink);
-  font-size: 15px;
   margin-top: 12px;
   width: 100%;
- color:  var(--barbi-pink);
+ color:  var(--gold);
   -webkit-tap-highlight-color: transparent;
   background: transparent;
 }
@@ -135,9 +135,12 @@ async function click() {
 .t{
     height: 75vh;
      width: 100%;
-    border-radius: 10%;
+     border-bottom-left-radius:10%;
+          border-bottom-right-radius:10%;
  }
-
+.dont{
+       border-radius: 10%;
+}
 @media (max-width:600px){
  .t{
     height: 65vh;
@@ -152,7 +155,7 @@ async function click() {
 }
 </style>
 
-<div style="background-color: #242526;" dir="rtl" class="flex-1 p:2 sm:p-6 justify-between flex flex-col  t">
+<div style="background-color: #242526;" dir="rtl" class="flex-1 p:2 sm:p-6 justify-between flex flex-col {dont == false ? "dont" : "shadow-md shadow-fuchsia-400"} t">
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
       <div class="relative flex items-center space-x-4">
          <div class="relative">
@@ -240,7 +243,7 @@ async function click() {
       <!--   <input type="textarea" placeholder={no === true ? "נימוק" : "נימוק, נא להתייחס לנימוקים שכבר הועלו"} class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3">-->
        <div dir="rtl" class='textinput'>
   <textarea name="s"  bind:value={why}     
- type='text' minlength="26" class='input d' required></textarea>
+ type='text' minlength="26" class='input sm:text-lg text-gold d' required></textarea>
   <label for="s" class='label'>{money == true ? "פרטים שיעזרו לההעברה להתבצע" : no === true ? "נימוק" : "נימוק, נא להתייחס לנימוקים שכבר הועלו"}</label>
   <span class='line'></span>
 </div>  
