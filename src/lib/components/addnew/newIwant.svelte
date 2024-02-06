@@ -343,7 +343,7 @@ const sur = {"he":"הריקמה נוצרה בהצלחה", "en":"new FreeMates ha
 const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "en":"to the FreeMates brain"}
 const inc = {"he":"ניתן להזין את הערך המוערך של ההכנסה אם ידוע, אחרת ניתן יהיה לחשב בהמשך מדף הניהול","en":"if you know the aproximate vallue of income, else you can later caculate it"}
  </script> 
- <h2> בקרוב כאן ניתן יהיה להביע משאלות כדי שיגשימו לך אותם בהתאמה אישית מלאה</h2>
+ <h2 class="text-center text-wow"> בקרוב כאן ניתן יהיה להביע משאלות כדי שיגשימו לך אותם בהתאמה אישית מלאה</h2>
  <!----
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
