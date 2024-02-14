@@ -655,6 +655,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     </div>
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
+  <div class=" overflow-y-auto md:px-20 lg:px-44 overflow-x-hidden mt-1/5 d h-[95%] ">
  <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
      הצהרת העצמאות של
         <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>
@@ -675,6 +676,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
          אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" on:keypress={()=>info()} on:click={()=>info()}>"רקמות"</span> המתנהלות באתר 1💗1 רק בהסכמה הדדית.
             </span>
           </span>
+    </div>
     </div>
 
 
@@ -1547,6 +1549,21 @@ position: absolute;
    .amana{
     padding: 0 210px;
     background-size: 1888px  ;
+    font-size: 29px;
+  }
+   .centeron{
+   left: 48%;
+  }
+  .button{
+    background-size: 170px;
+    min-height: 170px;
+    min-width: 170px;
+  }
+}
+@media(min-width:2200px) {
+   .amana{
+    padding: 0 290px;
+    background-size: 2288px  ;
     font-size: 29px;
   }
    .centeron{
