@@ -8,7 +8,7 @@
       const dai = da.toISOString()
      let d = await sendToSer({fid:id,fidn:Number(id),da:dai,mes,idL:0},'1chatsend').then(d=> d = d)
      if(d != null){
-          //message sended
+      //message sended
       nowId.set(d.data.createMessage.data.id)
       updSend(id,0)
       //nutify all subscribers and nutify
