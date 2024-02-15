@@ -1,7 +1,7 @@
 import webPush from "web-push";
 export async function POST({ request }) {
   const datam = await request.json();
-  console.log('submitted');
+  console.log('pusher strats');
   const messege = datam.messege;
   const jsoni = JSON.parse(datam.jsoni);
   console.log(jsoni)

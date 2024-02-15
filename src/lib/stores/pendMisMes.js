@@ -13,13 +13,15 @@ export const forum = writable({})
 export const nowId = writable(0)
 export const nowChatId = writable(0)
 export const isChatOpen = writable(false)
+export const isChatLoading = writable(false);
+
 export const newChat = writable({
   started:false,
   created: false,
   id: 0,
   md: { mbId:0, pid:0}
 });
-/*export async function initialWebS (token,id){
+export async function initialWebS (token,id){
     const socket = io(baseUrl, {
         auth: {
           token: token
@@ -34,16 +36,20 @@ export const newChat = writable({
           //get array of relevant forum ids\
                       console.log(
                         'yallla cvar, geula',
-                        datan.data.attributes.forums.data.id
+                        datan,
+                        datan.data
                       );
 
-          let array = []
-          if(array.includes(datan.data.attributes.forums.data.id)){
-            console.log("yallla cvar, geula")
+          if (datan.data.id != nowId) {
+            if (datan.data.attributes.fid in forum) {
+              console.log('yallla cvar, geula');
+              initialForum(true, [], id);
+            }
           }
         })
+      
     })
-}*/
+}
 export async function initialForum (all = false,ids = [],myId = 0){
   for (let i = 0; i < ids.length; i++) {
     if(ids[i] in forum){
@@ -54,6 +60,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
   }
   let que = ``
   if(all == true){
+    isChatLoading.set(true)
       que = `{
        usersPermissionsUser (id:${myId}) {data{ attributes{
                             projects_1s {data {id attributes{ projectName profilePic{data{attributes{url formats}}} forums{
@@ -96,6 +103,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
                           if (forumo.id in forum) {
                             forum[forumo.id].loading = true;
                             forum[forumo.id].md = {
+                              pid:project.id,
                               projectName: project.attributes.projectName,
                               projectPic: project.attributes.profilePic.data?.attributes?.formats?.thumbnail
                                 ? project.attributes.profilePic.data.attributes.formats.thumbnail.url
@@ -108,6 +116,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
                             forum[forumo.id] = {
                               loading: true,
                               md: {
+                                pid: project.id,
                                 projectName: project.attributes.projectName,
                                 projectPic: project.attributes.profilePic.data
                                   ?.attributes?.formats?.thumbnail
@@ -185,6 +194,7 @@ export function forums(dat,myId,all=false) {
   old[arr1[index].pendId] = arr;
   pendMisMes.set(forums);
   localStorage.setItem('pendMisMes', JSON.stringify(forum));*/
+  isChatLoading.set(false);
   return "ok"
 }
 export function addMes(

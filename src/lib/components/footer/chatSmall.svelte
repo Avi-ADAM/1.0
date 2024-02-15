@@ -7,7 +7,26 @@
     import {page} from '$app/stores'
   import { createMessage } from "$lib/func/chat/createMessage.svelte";
   import { createForum } from "$lib/func/chat/createForum.svelte";
+  import { addToast } from "as-toast";
+  export let un;
+     let unsubscribe;
 let messagesArray = forumToArr()
+
+    function subs() {
+        unsubscribe = forum.subscribe(value => {
+            messagesArray = forumToArr()
+        });
+    }
+    import { onDestroy } from 'svelte';
+
+  
+
+    onDestroy(() => {
+        if (unsubscribe) {
+            unsubscribe();
+        }
+    });
+    subs()
 function  forumToArr(){
  let messagesArray = Object.entries($forum)
   .filter(([key, value]) => value.hasOwnProperty('messages')) // Ensure the property exists
@@ -35,7 +54,7 @@ const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש
 async function afreact (e){
     const m = e.detail.why
     if($nowChatId != -1){
-  let c = await createMessage($nowChatId,m).then(c=>c = c)
+  let c = await createMessage($nowChatId,m,$forum[$nowChatId].md,un).then(c=>c = c)
     if(c == "sucsses"){
         clicked = false
       console.log(clicked)
@@ -59,7 +78,7 @@ async function afreact (e){
   md: { mbId:0, pid:0}
 }
       $nowChatId = forumId
-  let c = await createMessage(forumId,m).then(c=>c = c)
+  let c = await createMessage(forumId,m,$forum[forumId].md,un).then(c=>c = c)
     if(c == "sucsses"){
         clicked = false
       console.log(clicked)
@@ -78,7 +97,9 @@ async function afreact (e){
 let nameChatPartner = {"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}
 </script>
 {#if $nowChatId == 0}
-<ListSmall bind:chatId chats={messagesArray}/>
+{#key messagesArray}
+<ListSmall bind:chatId chats={messagesArray}/>  
+{/key}
 {:else}
  <Diun
     dont={true}

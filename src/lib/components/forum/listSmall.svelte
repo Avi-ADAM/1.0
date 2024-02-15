@@ -3,7 +3,8 @@
    export let chats = []
    export let chatId = 0
    import {lang} from '$lib/stores/lang'
-  import { nowChatId } from '$lib/stores/pendMisMes';
+  import { isChatLoading, nowChatId } from '$lib/stores/pendMisMes';
+  import { Rainbow } from 'svelte-loading-spinners';
   import { quintOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
    console.log(chats)
@@ -23,6 +24,12 @@
                 
                 <!-- Chat list -->
                 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="divide-y divide-gray-200">
+                  {#if $isChatLoading}
+                  <div class="w-full h-full flex justify-center align-middle items-center">
+                  <Rainbow />
+                  </div>
+                  {/if}
+                  {#key chats}
                    {#each chats as chat}
                     <button on:click={()=>toChat(chat.id)} class="w-full {$lang == "en" ? "text-left" : "text-right"} py-2 focus:outline-none focus-visible:bg-indigo-50 mt-2 p-2 hover:shadow-lg rounded cursor-pointer transition">
                         <div class="flex flex-row ">
@@ -54,6 +61,7 @@
                     </button>
 
                   {/each}
+                  {/key}
                 </div>
             </div>
           

@@ -16,6 +16,7 @@
   import Drag from '$lib/celim/icons/drag.svelte';
   import ChatSmall from './chatSmall.svelte';
   import Arrow from '$lib/celim/icons/arrow.svelte';
+  export let un;
   let draggable;
   onMount(async () => {
     draggable = (await import('svelte-agnostic-draggable')).draggable;
@@ -67,7 +68,7 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay z-[9999]">
   <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class="chat z-[9999]" aria-label="form">
+    <DialogContent class=" z-[9999]" aria-label="form">
       <div dir="rtl" class="grid items-center justify-center aling-center">
         <button
           on:click={close}
@@ -131,14 +132,14 @@
           class="hover:bg-wow justify-end flex text-barbi hover:text-barbi font-bold rounded"
         >
           <button
-            on:click={() => (chatId = 0)}
+            on:click={() => ($nowChatId = 0)}
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
             title={back[$lang]}><Arrow back={true} /></button
           >
         </div>
       {/if}
     </div>
-    <ChatSmall bind:chatId />
+    <ChatSmall bind:chatId {un}/>
   </div>
 {/if}
 <button
@@ -172,6 +173,15 @@
 {/if}
 
 <style>
+   .draggable {
+    -webkit-touch-callout: none;
+    -ms-touch-action: none;
+    touch-action: none;
+    -moz-user-select: none;
+    -webkit-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+  }
   .ww2 {
     top: calc(100% - 105px);
     right: calc(100% - 55px);
@@ -228,13 +238,5 @@
       transform: translatey(0px);
     }
   }
-  .draggable {
-    -webkit-touch-callout: none;
-    -ms-touch-action: none;
-    touch-action: none;
-    -moz-user-select: none;
-    -webkit-user-select: none;
-    -ms-user-select: none;
-    user-select: none;
-  }
+ 
 </style>

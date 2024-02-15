@@ -36,8 +36,10 @@ export async function handle({ event, resolve }) {
         event.locals.isDesktop = isDesktop;
         const uid = event.cookies.get('id') || false;
         const isJ = event.cookies.get('jwt') || false;
+        const un = event.cookies.get('un') || false;
         event.locals.tok = isJ;
         event.locals.uid = uid;
+        event.locals.un = un;
           if (qlang != 'he' && qlang != 'en' && qlang != 'ar') {
             //&& qlang != 'ar'
             if (coociLang == undefined) {
