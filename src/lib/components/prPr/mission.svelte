@@ -248,10 +248,10 @@ async function increment() {
         let momebtt = moment(element.dates, "HH:mm DD/MM/YYYY ")
         const date = (element.date !== undefined && element.date !== "undefined" && element.date !== null) ? ` ${daleg == false ?"sqadualed":"start"}: "${momentx.toISOString()}",` : ``;
         const dates = (element.dates !== undefined && element.dates !== "undefined" && element.dates !== null) ? `${daleg == false ? 'dates':'admaticedai'} : "${momebtt.toISOString()}",` : ``;
-        const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `publicklinks: "${addslashes(element.publicklinks)}",` : ``;
-        const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: "${addslashes(element.privatlinks)}",` : "";
-        const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: "${addslashes(element.spnot)}",` : "";
-        const deee = (element.attributes.descrip !== undefined && element.attributes.descrip !== "undefined") ? `descrip: "${addslashes(element.attributes.descrip)}",` : "";
+        const pb = (element.publicklinks !== undefined && element.publicklinks !== "undefined") ? `publicklinks: """${element.publicklinks}""",` : ``;
+        const pv = (element.privatlinks !== undefined && element.privatlinks !== "undefined") ? `privatlinks: """${element.privatlinks}""",` : "";
+        const heee = (element.spnot !== undefined && element.spnot !== "undefined") ? `hearotMeyuchadot: """${element.spnot}""",` : "";
+        const deee = (element.attributes.descrip !== undefined && element.attributes.descrip !== "undefined") ? `descrip: """${element.attributes.descrip}""",` : "";
         //publicklinks save to mission also othet new data
         // הפרדה של קישורים בפסיק
         let link = baseUrl+'/graphql';
@@ -268,7 +268,7 @@ async function increment() {
       data: {project: "${projectId}",
              mission:  "${element.id}",
              work_ways: [${work_ways}],
-             name: "${element.attributes.missionName}",
+             name: """${element.attributes.missionName}""",
              skills: [${skills}], 
              tafkidims: [${tafkidims}],
              vallues:  [${vallues}],
@@ -916,6 +916,7 @@ const mn = {
   "en": "name"
 }
    import tr from '$lib/translations/tr.json';
+  import RichText from '$lib/celim/ui/richText.svelte';
 const tri = tr
 console.log(tri)
 $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
@@ -1142,11 +1143,14 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
           <th>{tri?.mission?.specialNotes[$lang]}</th>
           {#each miData as data, i}
           <td>
-              <div dir="{$lang == "he" ? "rtl" : "ltr"}"class='textinput'>
+            <!----  
                   <textarea type="text"  id="hearotMeyuchadot2" name="hearotMeyuchadot2"  bind:value={data.spnot} class='input d' required></textarea>
                   <label for="hearotMeyuchadot2" class='label' >{tri?.mission?.specialNotes[$lang]}</label>
-                  <span class='line'></span>
-              </div>
+                  <span class='line'></span>-->
+            <div dir="{$lang == "he" ? "rtl" : "ltr"}" >
+             <small   >{tri?.mission?.specialNotes[$lang]}</small>
+              <RichText bind:outpot={data.spnot}/>
+                            </div>
           </td>
           {/each}
       </tr><!-- add to server real private link in addition to linkto mission-<tr>
