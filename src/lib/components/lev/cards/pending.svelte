@@ -10,6 +10,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Tile from '$lib/celim/tile.svelte';
   import {restim} from '$lib/func/restime.svelte';
   import { formatTime } from '../utils';
+  import RichText from '$lib/celim/ui/richText.svelte';
     export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, perhour, noofhours,skills = [], isKavua = false
     export let tafkidims = [];
     export let workways = [];
@@ -77,10 +78,13 @@ dispatch("tochat");
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.valph[$lang])} on:mouseleave={()=>hover("0")} > {perhour} {tr?.common.perhour[$lang]} </span> * <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.noofhours[$lang])} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr?.common.hours[$lang]} {isKavua == true ? t.formonth[$lang]:"" } </span> = <span role="contentinfo" on:mouseenter={()=>hover(tr.mission.total[$lang])} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {isKavua == true ? t.perMonth[$lang]:"" } </span>
       </p>
-      <div class="text-mturk font-bold text-lg sm:text-2xl mb-2">{name}</div>
+      <div  class="text-mturk font-bold text-lg sm:text-2xl mb-2">{name}</div>
      {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16 text-sm text-gray-700 sm:text-xl">{descrip}</p>{/if}
     {#if hearotMeyuchadot}
+    <RichText outpot={hearotMeyuchadot} editable={false}/>
+    <!----
      <p on:mouseenter={()=>hover(tr?.mission.specialNotes[$lang])} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm sm:text-lg d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
+    -->
      {/if} 
       {#if skills.data.length > 0}
             <small class="text-barbi text-md ">{t.skneed[$lang]}</small>
