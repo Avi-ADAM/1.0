@@ -89,7 +89,7 @@
 
 <div
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  class="border-gold border m-1 bg-transperent"
+  class=" bg-transperent"
 >
   {#if editor && editable}
     <div

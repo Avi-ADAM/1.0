@@ -177,6 +177,7 @@ const logi = { "he": "להתחברות", "en":"To Login"}
 const foreg = {"he":"כדי לראות את כל המידע נדרשת התחברות או הרשמה","en":"some information is available only for registersd users"}
  import { Head } from 'svead'
   import { calcX } from '$lib/func/calcX.svelte';
+  import RichText from '$lib/celim/ui/richText.svelte';
 
   let title = 'This is Svead a Svelte Head Component'
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
@@ -220,10 +221,9 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
             <div class="px-2">
             <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.alld.name}</h2>
             {#if data.alld.descrip !== null && data.alld.descrip !== "null"  && data.alld.descrip !== "undefined"  && data.alld.descrip !== undefined} 
-           <p class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl">{data.alld.descrip}</p>{/if}
+           <RichText outpot={data.alld.descrip} editable={false}/>{/if}
+     <RichText outpot={data.alld.hearotMeyuchadot} editable={false}/>
     {#if data.tok == true}
-    <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d">{data.alld.hearotMeyuchadot !== undefined && data.alld.hearotMeyuchadot !== null && data.alld.hearotMeyuchadot !== "null" && data.alld.hearotMeyuchadot !== "undefined" ? data.alld.hearotMeyuchadot : ""}</p>
-    {:else}
     
 <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
     <div class="flex items-center w-full space-x-2">

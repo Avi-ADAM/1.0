@@ -53,7 +53,7 @@ export async function Pend(id,taid){
             project: "${res2.data.pendm.data.attributes.project.data.id}",
              mission:  "${res2.data.pendm.data.attributes.mission.data.id}",
              work_ways: [${res2.data.pendm.data.attributes.work_ways.data.map(c => c.id)}],
-             hearotMeyuchadot: """${sanitizeUserInput(res2.data.pendm.data.attributes.hearotMeyuchadot)}""",
+             hearotMeyuchadot: """${res2.data.pendm.data.attributes.hearotMeyuchadot}""",
              name: """${sanitizeUserInput(res2.data.pendm.data.attributes.name)}""",
              publishedAt: "${d.toISOString()}",
              descrip: """${sanitizeUserInput(res2.data.pendm.data.attributes.descrip)}""",
