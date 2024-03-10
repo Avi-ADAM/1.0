@@ -116,7 +116,7 @@ console.log(workways)
             >{(noOfHours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {isMonthly ? monhly[$lang] : ""} </span>
       </p>
 
-      <span  class="text-barbi text-xl font-bold bg-gold mb-2">
+      <span  class="text-barbi text-xl lg:text-2xl bg-gold px-4 underline py-2  decoration-mturk m-4">
 
         {#if timeToP == "alreadi"}
               {ttal[$lang]}
