@@ -58,7 +58,6 @@ async function click() {
       why = ""
       clicked = false
  	scrollToBottom(dow);
-      console.log(clicked,"u")
    }
       }
       why = ""

@@ -186,7 +186,7 @@ on:mouseleave={()=> hoverc("0")}
 
 </div>
 
-<span role="contentinfo"  on:mouseenter={()=> hoverede()}  
+<span role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
 {#key arr1}
 <Swiper 
@@ -194,7 +194,9 @@ on:mouseleave={()=> hoverede()} >
   keyboard={{
     enabled: true,
   }}  
-mousewheel={true}
+mousewheel={{
+  eventsTarget: "wrapper",
+}}
   effect={h > 370 ? "cards" : ""}
     cardsEffect={{ rotate: h > 450 ? true : false ,perSlideOffset: h > 450 ? 8 : 8}}
   grabCursor={true}
@@ -564,7 +566,7 @@ mousewheel={true}
                 role ={buble.attributes.tafkidims}
               skills ={ buble.attributes.skills} 
               missionDetails = {buble.attributes.descrip} 
-              notes = {buble.attributes.hearotMeyuchadot}
+              hearotMeyuchadot = {buble.attributes.hearotMeyuchadot}
            src = {buble.attributes.project.data.attributes.profilePic.data?.attributes.formats.thumbnail.url}
                missionName={buble.attributes.name}
                 projectId={buble.attributes.project.data.id}

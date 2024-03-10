@@ -36,6 +36,7 @@ export let coinlapach;
     export let total = 0;
     export let askedarr =[];
     export let declineddarr = [];
+    export let hearotMeyuchadot
     export let pid;
 let already = false;
     let token;
@@ -1213,6 +1214,7 @@ on:project={project}
   on:hover={hoverc}
   on:tochat={tochat}
   {low}
+  {hearotMeyuchadot}
   {alreadyi}
   {missionName}
   {noOfHours}

@@ -6,6 +6,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
+  import RichText from '$lib/celim/ui/richText.svelte';
     export let mashName,easy,myp,price,total,  descrip,projectName, src, spnot ,deadLine, sqadualedf
     export let already = false;
 function hover(x){
@@ -72,9 +73,10 @@ dispatch("tochat");
                   </p>
                 {/if}  
               <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{mashName}</div>
-     {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-16 text-gray-700 text-base">{descrip}</p>{/if}
-    {#if spnot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{spnot !== undefined && spnot !== null && spnot !== "undefined" ? spnot : ""}</p>
+     {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-32 text-gray-700 text-base">{descrip}</p>{/if}
+    {#if spnot && spnot !== undefined && spnot !== null && spnot !== "undefined"}
+     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-1/2 cd d">
+       <RichText  outpot={spnot} editable={false}/> </p>
      {/if} 
 
     </div>

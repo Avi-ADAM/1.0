@@ -9,7 +9,8 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
-    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false
+  import RichText from '$lib/celim/ui/richText.svelte';
+    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false,hearotMeyuchadot
     export let already, allr = false;
 
 function hover(x){
@@ -85,7 +86,24 @@ console.log(workways)
     
     <div  class="mb-8">
             <div class="sm:text-3xl text-xl text-mturk font-bold  mb-2">{missionName}</div>
-
+      <!----  {#if data.alld.sqadualed || data.alld.sqadualedf}
+                                <p
+                  style="line-height: 1;"
+                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
+                >
+                  <img
+                    class="w-6 lg:w-12"
+                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+                    alt="howmuch"
+                  />
+                {#if data.alld.sqadualed}
+                <span> {new Date(data.alld?.sqadualed).toLocaleDateString()}</span>
+                {/if}
+                 {#if data.alld.sqadualedf}
+                <span> - {new Date(data.alld?.sqadualedf).toLocaleDateString()}</span>
+                {/if}
+                  </p>
+                {/if}  -->
          <p style="line-height: 1;" class="sm:text-xl text-lg text-gray-600 dark:text-slate-100 flex items-center">
             <img style="width:2.5rem;"   src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span 
@@ -121,9 +139,11 @@ console.log(workways)
             {/if}
         </span>
   {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 dark:text-slate-100 text-base">{missionDetails}</p>{/if}
-   <!-- {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
-     {/if}-->
+    {#if hearotMeyuchadot && hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null"}
+     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class=" max-h-1/2  d">
+      <RichText  outpot={hearotMeyuchadot} editable={false}/> 
+      </p>
+     {/if}
        {#if skills.data.length > 0}
             <small class="text-barbi text-md ">{t.skneed[$lang]}</small>
             <div class=" flex   d  flex-wrap ">
