@@ -29,6 +29,18 @@
         }
     },
     "mission": {
+        "checklistadd":{
+            "he":"הוספת פריט לרשימת מטלות",
+            "en":"add item to checklist"
+        },
+        "seechecklist":{
+            "he":"צפיה ברשימת מטלות",
+            "en":"see checklist"
+        },
+        "checklist":{
+            "he":"רשימת מטלות",
+            "en":"checklist"
+        },
         "perMonth": {
             "he": "בכל חודש:",
             "en": "per month:"

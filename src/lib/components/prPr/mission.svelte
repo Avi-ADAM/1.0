@@ -1,4 +1,7 @@
 <script>
+    import Crtask from '$lib/components/prPr/tasks/crtask.svelte'
+    import Plus from '$lib/celim/plus.svelte';
+    import ExpandTask from '$lib/components/prPr/tasks/expandTask.svelte'
 import {
     mi,
     skil,
@@ -10,7 +13,8 @@ import {
     DialogContent
 } from 'svelte-accessible-dialog';
 import {
-    fly
+    fly, slide
+
 } from 'svelte/transition';
 import Close from '$lib/celim/close.svelte'
 import SveltyPicker from 'svelty-picker'
@@ -297,7 +301,13 @@ async function increment() {
                 console.log(miDatan)
                 console.log(element.myM, userslength)
                 if (miDatan.data != null) {
-
+                    if(element.checklist){
+                    for(let i =0;i < element.checklist.length;i++){
+                    const momentx = moment(element.checklist[i].dateS, "HH:mm DD/MM/YYYY ")
+                    const momebtt =moment(element.checklist[i].dateF, "HH:mm DD/MM/YYYY ")
+                    crTask(projectId,null,null,linkop == "createPendm"? miDatan.data.createPendm.data.id:null,linkop == "createOpenMission"? miDatan.data.createOpenMission.data.id:null,momentx.toISOString(),momebtt.toISOString(),null,element.checklist[i].shem,element.checklist[i].des,element.checklist[i].link,idL)
+            }
+                    }
                     if (element.myM === true && userslength > 1) {
 
                         let lechaletz = miDatan.data.createOpenMission.data.id
@@ -458,7 +468,7 @@ SendTo(quee)
                       publishedAt: "${d.toISOString()}",
               ${date} 
              ${dates}                  }
-  ) {data{attributes{project{data{id }}}}}
+  ) {data{id attributes{project{data{id }}}}}
   }
 `
             let t = await SendTo(qu)
@@ -466,6 +476,14 @@ SendTo(quee)
                 addToast(er[$lang], "warn")
             } else {
                 console.log(t)
+                //get id add checklist
+                if(element.checklist){
+                    for(let i =0;i < element.checklist.length;i++){
+                    const momentx = moment(element.checklist[i].dateS, "HH:mm DD/MM/YYYY ")
+                    const momebtt =moment(element.checklist[i].dateF, "HH:mm DD/MM/YYYY ")
+                    crTask(projectId,t.data.createMesimabetahalich.data.id,null,null,null,momentx.toISOString(),momebtt.toISOString(),null,element.checklist[i].shem,element.checklist[i].des,element.checklist[i].link,idL)
+                }
+            }
                 dispatch('close', {
                     md: miDatan
                 });
@@ -860,6 +878,8 @@ const removeMission = {
     "he": "הסרת המשימה שנבחרה",
     "en": "remove this mission"
 }
+     const nama = {"he":"שם", "en":"name"}
+    const des = {"he":"תיאור","en":"decription"}
 let shift = [{
     "ii": 1
 }];
@@ -917,15 +937,23 @@ const mn = {
 }
    import tr from '$lib/translations/tr.json';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { quintOut } from 'svelte/easing';
+  import Expand from '$lib/celim/icons/expand.svelte';
+  import { crTask } from '$lib/func/moach/crtask.svelte';
 const tri = tr
 console.log(tri)
 $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
 //TODO: כמות לכל משימה עד אינסוף
+let dialog = 1
+let misid = 0
+let itemid = 0
+let editdata = -1
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
     <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 1000}}>
-        <DialogContent aria-label="form" class="contenti">
+        <DialogContent aria-label="form" class="{dialog === 2 ? "formi" :"contenti" }">
+            {#if dialog == 1}
             <div style="z-index: 400; overflow-x: auto;" dir="{$lang == "he" ? "rtl" : "ltr"}" class="d" >
                 <button class=" hover:bg-barbi text-mturk rounded-full"
                     on:click={closer}><Close/>
@@ -1011,6 +1039,35 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
                             {/each}
 
                         </table>
+            </div>
+                        {:else if dialog === 2}
+                        <Crtask misid={misid} fromMis={true} editdata={editdata} on:add={(e)=>{
+                           const data = e.detail.data
+                           const id = e.detail.id
+                           const isEdit = e.detail.isEdit
+                           console.log(isEdit)
+                           if(!miData[id].checklist){
+                            miData[id].checklist = []
+                           }
+                           if(isEdit == true){
+                            console.log(":here",itemid)
+                        miData[id].checklist.splice(itemid,1)
+                           }
+                           miData[id].checklist.push(
+                            data
+                           ) 
+                           miData = miData 
+                           isOpen = false
+                           dialog = 1
+                        }}/>
+                        {:else if dialog === 3}
+                              <div
+                              dir="{$lang != "he" ? "ltr": "rtl"}"
+                style="  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
+              >
+        <ExpandTask tasks={itemid != -1 ? [miData[misid].checklist[itemid]] : miData[misid].checklist} on:add={()=>dialog = 2}/>
+                    </div>
+                        {/if}
                         </DialogContent>
                         </div>
                         </DialogOverlay>
@@ -1153,7 +1210,71 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
                             </div>
           </td>
           {/each}
-      </tr><!-- add to server real private link in addition to linkto mission-<tr>
+      </tr>
+      <tr>
+          <th>{tri?.mission?.checklist[$lang]}</th>
+          {#key miData}
+          {#each miData as da, i}
+          <td>
+              
+                
+                {#if da.checklist}
+         <ul transition:slide="{{ duration: 1000, easing: quintOut }}">
+        {#each da.checklist as datai, t}
+                <li  >
+                    <div class="flex flex-row  space-x-2 items-start border-y-2 border-y-mturk">
+                       <span class="p-1">✅</span>
+           <h2 class="md:text-xl p-1">{datai.shem}</h2>
+            <button
+                 class="bg-gold p-0.5 m-0.5 rounded text-barb"
+                on:click={()=>{
+                    dialog = 3
+                    misid = i
+                    itemid = t
+                    isOpen = true
+                  }}
+                  title="{tri?.mission?.seechecklist[$lang]}">
+                <Expand/></button>
+                
+                <button on:click={()=>{
+                    dialog = 2
+                    misid = i
+                    itemid = t
+                    editdata = datai
+                    isOpen = true                    
+                }} class="bg-gold p-0.5 m-0.5 rounded">🖍️</button>
+                <button on:click={()=>{
+                    da.checklist.splice(t,1)
+                    miData = miData
+                }} class="bg-gold p-0.5 m-0.5 rounded">✖️</button>
+       </div>
+                </li>
+        {/each}
+            </ul>
+           
+                <button
+                on:click={()=>{
+                    dialog = 3
+                    misid = i
+                    itemid = -1
+                    isOpen = true
+                  }}
+                  title="{tri?.mission?.seechecklist[$lang]}">
+                <Expand/></button>
+                <!--expand list of items with checkmark as list counter and x for deliting-->
+         {/if}
+            <button
+              title=" {tri?.mission?.checklistadd[$lang]}" 
+               on:click={()=>{
+                    dialog = 2
+                    misid = i
+                    isOpen = true
+                  }}><Plus/></button> 
+          </td>
+          {/each}
+          {/key}
+      </tr>
+      <!-- add to server real private link in addition to linkto mission-<tr>
           <th>{tri?.mission?.privatLinks[$lang]}</th>
           {#each miData as data, i}
           <td>
@@ -1341,7 +1462,28 @@ $: yeshshift = miData.map(c => c.isshif).includes(true) ? true : false
         width: 90vw;
     }
 }
-
+   
+   :global([data-svelte-dialog-content].formi) {
+  background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 13s ease infinite;
+    -moz-animation: AnimationName 13s ease infinite;
+    animation: AnimationName 3s ease infinite;
+      width: 80vw;
+  }
+  @media (min-width: 568px){
+  
+        :global([data-svelte-dialog-content].formi) {
+ background-color: #000000;
+background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+ background-size: 400% 400%;
+      -webkit-animation: AnimationName 13s ease infinite;
+    -moz-animation: AnimationName 13s ease infinite;
+    animation: AnimationName 13s ease infinite;
+width:50vw;
+        }
+  }
 textarea::-webkit-resizer {
     border-width: 8px;
     border-style: solid;
@@ -1504,6 +1646,37 @@ td:hover {
     background: transparent;
 }
 
+#check table{
+  table-layout: fixed;
+}
+.tbl-header{
+  position: sticky;
+  background-color: rgba(255,255,255,0.3);
+ }
+.tbl-content{
+  max-height:calc(94vh - 173px);
+  margin-top: 0px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  border: 1px solid rgba(255,255,255,0.3);
+}
+#check th{
+  padding: 2px 1px;
+  text-align: center;
+  font-weight: 500;
+  font-family: gan,powerr;
+  color: #fff;
+  text-transform: uppercase;
+}
+#check td{
+  padding: 1px;
+  text-align: center;
+  vertical-align:middle;
+  font-weight: 300;
+  font-size: 12px;
+  color:var(--barbi-pink);
+  border-bottom: solid 1px rgba(255,255,255,0.1);
+}
 .label {
 
     font-size: 15px;

@@ -43,5 +43,25 @@ export const qids = {
     }
   }
 }
+`,
+  '4crtask': `mutation CreateAct($pendm:ID ,$open_mission:ID,$dateS:DateTime, $dateF:DateTime,$myIshur:bolean ,$shem: String,$des:String,$link:String, $pid : ID, $askId: ID, $assignedId:ID, $mbId: ID , $da: DateTime, $publishedAt: DateTime)
+                        { createAct(
+      data: {project:$pid,
+             des: $des,
+             my: $assignedId,
+             shem: $shem,
+             vali: $askId,
+             mesimabetahalich: $mbId,
+             link: $link,
+             publishedAt:$publishedAt,
+             myIshur:$myIshur,
+             dateF:$dateF,
+             dateS:$dateS,
+             pendm:$pendm,
+             open_mission:$open_mission
+                  }
+    
+  ) {data{id attributes{ shem my {data{id}}}}}
+}
 `
 };

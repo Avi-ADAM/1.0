@@ -2,9 +2,24 @@
     export let bmiData = [], proles = []
     import { idPr } from '$lib/stores/idPr.js';
     import moment from 'moment';
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
   let isPersonal = true
   export let id 
+  export let misid
+  export let fromMis = false
+  export let editdata = -1
+  let isEdit = false
+  onMount(()=>{
+    console.log(editdata)
+    if(editdata != -1){
+      isEdit = true
+      teur = editdata.des
+      name  = editdata.shem
+        link = editdata.link
+         mimatai = editdata.dateS
+         adMatai = editdata.dateF
+    }
+  })
   $: if (id > 0){
     const bmi = bmiData.filter(t=>t.id == id)
     console.log(bmi)
@@ -32,6 +47,7 @@
 
 let linkg = baseUrl+'/graphql';
 async function sub(){
+    if (fromMis == false){
     if (selected.length < 1){
         seEr = true
     } else {
@@ -75,7 +91,7 @@ async function sub(){
       data: {project: "${$idPr}",
              des:  """${teur}""",
              my: "${userMevatzeaId}",
-             shem: "${name}",
+             shem: """${name}""",
              vali: "${userMevakeshId}",
              mesimabetahalich: "${mtaha}",
              link: "${link}",
@@ -104,12 +120,27 @@ async function sub(){
         }  
       }
 }
+    }else{
+      dispatch("add",{
+        isEdit,
+        id:misid,
+        data:{
+          des:teur,
+          shem:name,
+          link,
+          dateS:mimatai,
+          dateF:adMatai
+        }
+      })
+    }
 }
     const level = {"he": "השמה למשימה בתהליך ספציפית או להציע לפי תפקיד","en": "do you want to assing it to spesific mission and person or to to offer it to all projecr mambers of a choosen role"}
     const sedes = {"he": " שליחה","en": "send"}
     const placeholderdf = {"he": "תאריך סיום", "en": "end date"}
     const placeholderds = {"he": "תאריך התחלה (אם רלוונטי)" , "en":"starting date (if relevant)"}
     const heading = {"he":"יצירת מטלה חדשה", "en":"create new task"}
+    const editheading = {"he":"עריכת מטלה", "en":"edit task"}
+
     const namede = {"he":"שם למטלה", "en": "task name"}
     const desde = {"he": "תיאור קצר", "en":"task description"}
     const placeholder = {"he": "בחירת משימה בתהליך", "en": "choose mission in progress"}
@@ -119,10 +150,10 @@ async function sub(){
     const neerdes = {"he": "חובה להזין שם", "en":"must enter name"}
     const pers = {"he": "משימה בתהליך", "en":"mission in progress"}
     const role = {"he": "תפקידים", "en":"roles"}
-
+  //TODO: validation of dateF after dateS
    </script>
     <div class="flex flex-col items-center justify-center">
-        <h1 class="text-barbi">{heading[$lang]}</h1>
+        <h1 class="text-barbi">{isEdit == false ? heading[$lang] : editheading[$lang]}</h1>
         <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
               <input name="des" bind:value={name}  
              type='text' class='input'required >
@@ -148,8 +179,9 @@ async function sub(){
               <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{desde[$lang]}</label>
               <span class='line'></span>
         </div>
+        {#if fromMis != true}
 
-        <h2  class="text-barbi text-center text-sm sm:text-xl">{level[$lang]}:</h2>
+        <h2  class="text-barbi text-center text-sm sm:text-xl">:{level[$lang]}</h2>
 
 <div class="flex items-center justify-center" dir="ltr">
   <label for="Toggle3" class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">
@@ -171,6 +203,7 @@ async function sub(){
       placeholder={placeholderoles[$lang]}
       options={proles.map(pr=>pr.name)}
       />
+      {/if}
       {/if}
     {#if seEr == true}
         <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>

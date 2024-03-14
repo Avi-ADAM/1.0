@@ -15,10 +15,10 @@ export async function POST({ request, cookies }) {
       } else {
         variablesObject[key] = keyValueObject[key];
       }
-    } 
+    }     
     let newd = [],e
     const dat = qids[data.data.queId]
-    console.log(dat)
+    console.log(dat, variablesObject);
   let jw = cookies.get('jwt');
   let bearer1 = 'bearer' + ' ' + jw;
   const res = await fetch(ep, {

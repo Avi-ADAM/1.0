@@ -10,6 +10,7 @@
     import { slide } from 'svelte/transition';
   	import { quintOut } from 'svelte/easing';
   import Chaticon from '$lib/celim/chaticon.svelte';
+  import { addToast } from 'as-toast';
 
     export let actdata = []
     let isOpen = false;
@@ -88,9 +89,11 @@ onMount(async () => {
   const closer = () => {
     isOpen = false;
   }
+  const doneMes = {"he":"המטלה נוצרה בהצלחה","en":"task has created sucsefully"}
   function done() {
     isOpen = false;
-    //toast email add to table
+    addToast(doneMes[$lang])
+    //TODO: email add to table
   }
     export let bmiData = [];
     $: ohh = soter.map(c=>c.openi).includes(false);
