@@ -10,7 +10,7 @@
 		Preview,
 		Section,
 		Text
-	} from 'svelte-email';
+	} from 'svelty-email';
 
 	export let un = 'Alex';
     export let username = "x"
