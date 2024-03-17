@@ -11,6 +11,7 @@
     import enjwork from '$lib/data/workwaysEn.json'
  const dispatch = createEventDispatcher();
               import { lang } from '$lib/stores/lang.js'
+  import Skip from '$lib/celim/icons/skip.svelte';
     let newcontent = true
     let workways2 = [];
     let error1 = null
@@ -103,6 +104,14 @@ function increment() {
 	} );
    newnew()
 	}
+  function toend() {
+  newnew()
+		show.set(5);
+    dispatch ('progres',{
+		tx: 0,
+		txx: 8
+	} )
+	}
 function back() {
 		show.update(n => n - 1);
      dispatch ('progres',{
@@ -190,7 +199,9 @@ $: searchText = ``
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
   $: addn = {"he":`הוספת "${searchText}"`,"en": `Create "${searchText}"`}
     const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
-  let focused = false
+   const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
+
+    let focused = false
   </script>
 
 <h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
@@ -213,6 +224,9 @@ $: searchText = ``
    
   <button class="button-in-1-2" on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
+    </button>
+      <button class="button-end bg-sturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+    <Skip/>
     </button>
   <button class="button-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
@@ -265,6 +279,12 @@ text-shadow: 1px 1px purple;
   }
     .button-2{
       grid-column: 4/5;
+    grid-row: 7 / 8;
+       align-self: center;
+    justify-self: center;
+  }
+   .button-end{
+      grid-column: 2/4;
     grid-row: 7 / 8;
        align-self: center;
     justify-self: center;

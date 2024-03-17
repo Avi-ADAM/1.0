@@ -106,6 +106,15 @@ function increment() {
     roles2.set(find_role_id(selected));
    
 	}
+  function toend() {
+        roles2.set(find_role_id(selected));
+
+		show.set(5);
+    dispatch ('progres',{
+		tx: 0,
+		txx: 4
+	} )
+	}
   function back() {
 		show.update(n => n - 1);
       dispatch ('progres',{
@@ -117,6 +126,7 @@ function increment() {
 	}
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
+  import Skip from '$lib/celim/icons/skip.svelte';
 
 let isOpen = false;
  const close = () => {
@@ -145,6 +155,7 @@ selected = newSele;
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
   const what = {"he": "יש לך תפקיד מועדף?","en": "Do you have a preferred role?"}
+ const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
   let focused = false
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
@@ -188,6 +199,9 @@ selected = newSele;
     </div>
     <button class="button-in-1-2" on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
+    </button>
+      <button class="button-end bg-sturk hover:bg-mturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+    <Skip/>
     </button>
   <button class="button-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
@@ -263,7 +277,12 @@ text-shadow: 1px 1px purple;
        align-self: center;
     justify-self: center;
   }
-    
+       .button-end{
+      grid-column: 2/4;
+    grid-row: 7 / 8;
+       align-self: center;
+    justify-self: center;
+  }
     .input-2{
     grid-column: 2/4;
     grid-row: 2/3;

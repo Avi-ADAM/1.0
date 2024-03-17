@@ -104,7 +104,15 @@ function increment() {
 	} );
     skills1.set(find_skill_id(selected));
 	}
-  
+  function toend() {
+        skills1.set(find_skill_id(selected));
+
+		show.set(5);
+    dispatch ('progres',{
+		tx: 0,
+		txx: 4
+	} )
+	}
 function back() {
 		show.update(n => n - 1);
        dispatch ('progres',{
@@ -115,6 +123,7 @@ function back() {
 	}
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly } from 'svelte/transition';
+  import Skip from '$lib/celim/icons/skip.svelte';
 
 let isOpen = false;
  const close = () => {
@@ -137,7 +146,9 @@ selected = newSele;
     const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
   const ws = {"he": "מה הן היכולות שלך?","en": "What you can do?"}
- let focused=false
+ const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
+
+  let focused=false
  </script>
   
  <DialogOverlay {isOpen} onDismiss={close} >
@@ -174,6 +185,9 @@ selected = newSele;
   </div>
     <button class="button-in-1-2" on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
+    </button>
+       <button class="button-end bg-sturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+    <Skip/>
     </button>
   <button class="button-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
@@ -241,6 +255,12 @@ text-shadow: 1px 1px purple;
   }
     .button-2{
       grid-column: 4/5;
+      grid-row:8/9;
+       align-self: center;
+    justify-self: center;
+  }
+    .button-end{
+      grid-column: 2/4;
       grid-row:8/9;
        align-self: center;
     justify-self: center;

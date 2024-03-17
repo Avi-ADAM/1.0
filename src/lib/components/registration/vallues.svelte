@@ -9,6 +9,8 @@
     import enjvals from '$lib/data/valluesEn.json'
  import { createEventDispatcher } from 'svelte';
   import { page } from '$app/stores';
+  import Skip from '$lib/celim/icons/skip.svelte';
+  import Tile from '$lib/celim/tile.svelte';
  const dispatch = createEventDispatcher(); 
     let vallues = [];
     let error1 = null;
@@ -79,7 +81,7 @@
 
 
     let selected = [];
-    const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
+    const placeholder = `${$lang == "he" ? " בחירת ערכים ומטרות" : "vallues and goals"}`;
 
  
 export let userName_value;
@@ -99,6 +101,14 @@ function increment() {
     dispatch ('progres',{
 		tx: 0,
 		txx: 20
+	} )
+	}
+function toend() {
+  newnew()
+		show.set(5);
+    dispatch ('progres',{
+		tx: 0,
+		txx: 4
 	} )
 	}
 
@@ -188,6 +198,8 @@ const newOb = meData.data.createVallue.data;
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
   $: addn = {"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`}
   const what = {"he": "אלו ערכים ומטרות ברצונך לקדם?","en": "which vallues you wish to promote?"}
+  const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
+   const info = {"he":"כאשר העבודה שלך מגשימה את הערכים ומקדמת את המטרות שלך היא הופכת ליצירה מהנה, אנו נסייע לך לקדם את הערכים והמטרות שלך","en":"When your work aligns with your values and advances your goals, it becomes enjoyable creation. We will assist you in promoting your values and goals."}
   let focused = false
   </script>
 
@@ -198,11 +210,15 @@ const newOb = meData.data.createVallue.data;
   <br/>
 {what[$lang]}
 </h1> 
-  {#key vallues}
+<div class="info">
+<Tile word={info[$lang]} big={true} bg="gold" animate={true} sm={true}/>
+</div> 
+{#key vallues}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
       on:focus={()=>focused=true}
       on:blur={()=>focused=false}
+      --sms-width={"50vw"}
       createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
       loading={newcontent}
@@ -216,6 +232,9 @@ const newOb = meData.data.createVallue.data;
  
      <button class="button-in-2 " on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
+    </button>
+    <button class="button-end bg-sturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+    <Skip/>
     </button>
   <button class="button-2" on:click="{increment}">
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
@@ -251,9 +270,17 @@ text-shadow: 1px 1px purple;
 	 }
  .input-2{
     grid-column: 2/4;
+    grid-row: 4/5;
+        margin-top:0;
+   align-self: center;
+  justify-self: center;
+    }
+    .info{
+    grid-column: 2/4;
     grid-row: 2/3;
         margin-top:0;
-
+       align-self: center;
+  justify-self: center;
     }
 }
     .button-in-2{
@@ -268,11 +295,24 @@ text-shadow: 1px 1px purple;
        align-self: center;
     justify-self: center;
   }
-   
-    .input-2{
+   .button-end{
+      grid-column: 2/4;
+    grid-row: 7 / 8;
+       align-self: center;
+    justify-self: center;
+  }
+      .input-2{
+    grid-column: 2/4;
+    grid-row: 3/4;
+     align-self: center;
+  justify-self: center;
+    
+    }
+    .info{
     grid-column: 2/4;
     grid-row: 2/3;
-    margin-top: -8vh;
+     align-self: center;
+  justify-self: center;
     }
     .input-2-2{
     grid-column: 1/5;
