@@ -39,6 +39,7 @@ self.addEventListener('push', ev => {
     self.registration.showNotification(data.message.title, {
       body: data.message.body,
       //  registration_ids: [$('.header-user-name').find('span').text()],
+      //ליצור בלינק פרמטר של אידי של הפוש ואז לעדכן כנקרא כשנלחץ
       icon:
         data.message.pic ??
         'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png'
