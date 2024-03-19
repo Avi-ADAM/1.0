@@ -21,7 +21,7 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import Cardsui from '$lib/components/lev/cards/cards.svelte';
   import Tooltip from '$lib/celim/tooltip.svelte';
-  import Coinsui from '$lib/components/lev/coinui.svelte';
+  import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
   import { isEqual } from 'lodash';

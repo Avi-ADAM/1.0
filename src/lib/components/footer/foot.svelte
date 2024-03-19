@@ -143,7 +143,7 @@
   </div>
 {/if}
 <button
-  style="position: absolute; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"
+  style="position: fixed; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"
   on:click={() => (min = !min)}
   class="ww3 items-center flex justify-center text-xl"
 >
@@ -157,7 +157,7 @@
   {#if $isChatOpen !== true}
     <button
       transition:slide|all={{ delay: 150, duration: 1000, easing: quintOut }}
-      style="position: absolute; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
+      style="position: fixed; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
       on:click={() => addi('chat')}
       class="ww2 ww items-center flex justify-center text-xl"
       ><Chaticon /></button
@@ -165,7 +165,7 @@
   {/if}
   <button
     transition:slide={{ delay: 150, duration: 1000, easing: quintOut }}
-    style="position: absolute; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
+    style="position: fixed; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
     on:click={() => addi()}
     class="ww ww1 text-bold sm:text-2xl text-xl items-center flex justify-center"
     ><Plus /></button

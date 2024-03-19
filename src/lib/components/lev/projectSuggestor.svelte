@@ -1,5 +1,7 @@
 <script>
     import Tile from '$lib/celim/tile.svelte'
+    	import { Drawer } from 'vaul-svelte';
+
   import {calcX} from '$lib/func/calcX.svelte'
   import {SendTo} from '$lib/send/sendTo.svelte'
      import { clickOutside } from './outsidclick.js';
@@ -406,7 +408,13 @@ function tochat (){
     isOpen = true
     diunm = true
 }
+let dialogOpen = false
+function modal(){
+  dispatch("modal")
+  dialogOpen=true
+}
 const chatdes2 ={"he":"צ'אט על הצטרפות לריקמה" ,"en":"chat on joining"}
+
 </script>
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -469,7 +477,9 @@ style:z-index={hovered === false ? 11 : 16}
 on:mouseenter={()=> hoverede()}
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow}
-class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
+on:click={modal}
+class="hover:scale-290 duration-1000 ease-in"     
+in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 >
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
@@ -1206,6 +1216,41 @@ class="hover:scale-290 duration-1000 ease-in"     in:scale="{{ duration: 3200, o
   >
 </Swiper>
 </div>
+
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        <Cards
+on:project={project}
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  on:tochat={tochat}
+  {low}
+  {hearotMeyuchadot}
+  {alreadyi}
+  {missionName}
+  {noOfHours}
+  {perhour}
+  {already}
+  {missionDetails}
+  {skills}
+  {role}
+  {projectName}
+   {src}
+ {workways}
+ {timeToP}
+   />
+      </div>
+            <Drawer.Close />
+    </Drawer.Content>
+  </Drawer.Portal>
+</Drawer.Root>
+</div>
 {:else}
 <Cards
 on:project={project}
@@ -1229,7 +1274,21 @@ on:project={project}
  {timeToP}
    />
 {/if}
+
 <style>
+  .swiper-slidec {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px !important;
+  border: 1px solid var(--barbi-pink);
+  font-size: 22px;
+  font-weight: bold;
+  min-height:100vh;
+  min-width: 25vw !important;
+  max-width: 80vw !important;
+  
+}
   .xyz{
             grid-column: 1/4;
 
