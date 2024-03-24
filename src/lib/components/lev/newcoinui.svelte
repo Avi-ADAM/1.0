@@ -1,6 +1,8 @@
 <script>
   $: w = 500;
   $: h = 500 ;
+    $: ow = 500;
+  $: oh = 500 ;
   let screen
   $: top = 0
   $: left = 0
@@ -12,9 +14,12 @@
   //placeCircles();
 
   // Add your infinite scroll mechanism here
-  $: size = w>550? 125:75;
-  $: bigsize = w>550? 225: 165;
+  $: size = ow>550? 125:115;
+  $: bigsize = ow>550? 225: 100;
+  $: add = ow>550? 70: 70;
+
   function checkLine(i) {
+
     let myLine = 1;
     let lineCircels = 8;
     let check = false;
@@ -27,17 +32,22 @@
         (((bigsize) + (size * myLine * 1.1 * Math.PI))/(size/2) ).toFixed(0)
       );
       calculated += thisLineCircles;
-      if (i - calculated < 0) {
-        let isThisLineOverflowsY = (bigsize) + (size * myLine * 2.4) > h 
-        let isThisLineOverflowsX = (bigsize) + (size * myLine * 2.4) > w
+      if (i - calculated < 0 ) {
+        let isThisLineOverflowsY = (bigsize) + (size * myLine * 2.8) > oh 
+        let isThisLineOverflowsX = (bigsize) + (size * myLine * 2.8) > ow
         if(isThisLineOverflowsY){
-          maxH = (((bigsize) + (size * myLine * 2.8))/h)*100
-          scrollY =(((bigsize + (size * myLine * 2.8)) - h)/2)
+          maxH = (((bigsize) + (size * myLine * 2.8))/oh)*100
+          scrollY =(((bigsize + (size * myLine * 2.4)) - oh)/2)
+          console.log(h,"sco;",scrollY)
+        }else{
+          maxH = 100
         }
         if(isThisLineOverflowsX){
-          console.info("thislineoverflowx")
-          maxW = (((bigsize) + (size * myLine * 2.8))/w)*100
-          scrollX = (((bigsize + (size * myLine * 2.8)) - w)/2)
+          console.info("thislineoverflowx",w,center)
+          maxW = (((bigsize) + (size * myLine * 2.8))/ow)*100
+          scrollX = (((bigsize + (size * myLine * 2.4)) - ow)/2)
+        }else{
+          maxW = 100
         }        
         lineCircels = thisLineCircles;
         realcircels = (arr1.length - calculated) > 0 ? lineCircels : lineCircels + (arr1.length - calculated)
@@ -49,9 +59,11 @@
     }
      const angle = (i / realcircels) * 2 * Math.PI
       const distanceFromCenter = myLine * (size) * 1.1+ bigsize/2
-      const x = center.x + distanceFromCenter * Math.cos(angle)-(70)
-      const y = center.y + distanceFromCenter * Math.sin(angle)-(70)
-      if(i == arr1.length){
+      console.log(center,i,"kk")
+      const x = center.x + distanceFromCenter * Math.cos(angle) -add
+      const y = center.y + distanceFromCenter * Math.sin(angle)-add
+      if(scrollX >0|| scrollY >0 ){
+        console.log("scroling")
         window.scrollBy(scrollX,scrollY)
       }
     return { myline: myLine, lineCircels: realcircels,x,y};
@@ -74,7 +86,7 @@
   import Hal from './halukaask.svelte';
   import { fly } from 'svelte/transition';
 
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
 
   const dispatch = createEventDispatcher();
   export let adder = [],
@@ -176,19 +188,42 @@
     }
   }
   export let sml = false;
+  function checkLines(arr,w,h){
+    let c = {}
+    for (let i = 0; i < arr.length; i++) {
+      c[i] = checkLine(i) 
+      console.log(i,checkLine(i))    
+      c = c 
+    }
+    return c
+  }
+  onMount(()=>{
+    size = w>550? 125:75;
+    bigsize = w>550? 225: 165;
+    orders = checkLines(arr1,w,h)
+    console.log(orders,w)
+  })
+  $: orders = checkLines(arr1,w,h)
+  
 </script>
-
-<div bind:this={screen} dir="ltr" style="top:{top}%;
+<div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} dir="ltr" style=" position:fixed; width:100vw;height:100vh ;overflow: auto; top:0%;
+    left: 0%;
+    max-width: 100vw;
+    max-height: 100vh;" class="d">
+     {#key arr1}
+  {#key w}
+  {#key h}
+  {#key orders}
+<div  dir="ltr"  bind:clientWidth={w} bind:clientHeight={h} style=" position: absolute; overflow: auto;top:{top}%;
     left: {left}%;
     width: {maxW}vw;
-    height: {maxH}vh;" class="screen" bind:clientWidth={w} bind:clientHeight={h}>
-  {#key arr1,w,h}
+    height: {maxH}vh;" class="screen d" >
+ 
+
     {#each arr1 as buble, i}
-      {@const myline = checkLine(i)}
-      {@const angle = (i / myline.lineCircels) * 2 * Math.PI}
-      {@const distanceFromCenter = myline.myline * (size) * 1.1+ bigsize/2}
+      {@const myline = orders[i] ?? {x:0,y:0}}
       {#if buble.ani === 'vidu' && milon.desi == true}
-        <div class:normSml={modal == false} class="vidu normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class:normSml={modal == false} class="vidu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Vid
             on:modal={() => (modal = true)}
             on:hover={hover}
@@ -219,7 +254,7 @@
           />
         </div>
       {:else if buble.ani === 'haluk' && milon.desi == true}
-        <div class:normSml={modal == false} class=" halu normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class:normSml={modal == false} class=" halu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Hal
             on:modal={() => (modal = true)}
             on:coinLapach={delo}
@@ -250,7 +285,7 @@
           />
         </div>
       {:else if buble.ani === 'mtaha' && milon.betaha == true}
-        <div class:normSml={modal == false} class="betaha normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class:normSml={modal == false} class="betaha normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <MissionInProgress
             on:proj={proj}
             on:user={user}
@@ -284,7 +319,7 @@
           />
         </div>
       {:else if buble.ani === 'pmashes' && milon.ppmash == true}
-        <div class="normSml ppmash" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="normSml ppmash" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <PendingMa
             on:hover={hover}
             on:proj={proj}
@@ -325,7 +360,7 @@
           />
         </div>
       {:else if buble.ani === 'pends' && milon.pend == true}
-        <div class="normSml pend" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="normSml pend" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <PendingM
             on:hover={hover}
             on:modal={modali}
@@ -374,7 +409,7 @@
           />
         </div>
       {:else if buble.ani === 'wegets' && milon.pmaap == true}
-        <div class="pmaap normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="pmaap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Weget
             on:acsept={delo}
             on:decline={delo}
@@ -423,7 +458,7 @@
           />
         </div>
       {:else if buble.ani === 'fiapp' && milon.fiap == true}
-        <div class="fiap normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="fiap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Fiappru
             on:acsept={delo}
             on:decline={delo}
@@ -470,7 +505,7 @@
           />
         </div>
       {:else if buble.ani === 'walcomen' && milon.welc == true}
-        <div class="welc normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="welc normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Welcomt
             id={buble.id}
             on:hover={hover}
@@ -480,7 +515,7 @@
           />
         </div>
       {:else if buble.ani === 'askedcoin' && milon.asks == true}
-        <div class="asks normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="asks normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Reqtojoin
             on:acsept={delo}
             on:hover={hover}
@@ -529,7 +564,7 @@
           />
         </div>
       {:else if buble.ani === 'askedm' && milon.askmap == true}
-        <div class="askmap normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="askmap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Reqtom
             on:acsept={delo}
             on:decline={delo}
@@ -574,7 +609,7 @@
           />
         </div>
       {:else if buble.ani === 'hachla' && milon.hachla == true}
-        <div class:normSml={modal == false} class="hachla normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class:normSml={modal == false} class="hachla normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Desi
             on:acsept={delo}
             on:decline={delo}
@@ -613,8 +648,9 @@
           />
         </div>
       {:else if buble.ani === 'meData' && milon.sugg == true}
-        <div class="sugg normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="sugg normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <ProjectSuggestor
+            on:modal={modali}
             on:less={delo}
             on:hover={hover}
             on:proj={proj}
@@ -649,7 +685,7 @@
           />
         </div>
       {:else if buble.ani === 'huca' && milon.pmashs == true}
-        <div class="pmashs normSml" style="width:{size}px; left:{myline.x}px; top:{myline.y}px">
+        <div class="pmashs normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Mashsug
             on:less={delo}
             on:hover={hover}
@@ -681,7 +717,7 @@
         </div>
       {/if}
     {/each}
-  {/key}
+
     <div class="midCom">
     <Mid
       {sml}
@@ -707,12 +743,13 @@
     />
   </div>
 </div>
-
+  {/key}
+  {/key}
+  {/key}
+  {/key}
+</div>
 <style>
   .screen {
-    position: absolute;
-    
-    overflow: auto;
      background-color: #000000;
     background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
   }

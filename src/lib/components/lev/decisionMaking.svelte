@@ -187,7 +187,7 @@ async function agree() {
   noofusersWaiting -= 1;
   ser = xyz();
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
-      const cookieValue = document.cookie
+    const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
         .split('=')[1];
