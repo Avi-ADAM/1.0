@@ -16,6 +16,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
  export let mypos = null;
      export let low = false;
         export let restime;
+        let dialogOpen = false
+        export let modal = false
     export let messege = [];
     export let descrip = "";
     export let projectName = "";
@@ -598,6 +600,7 @@ function hoverc (event){
   import { lang } from '$lib/stores/lang';
   import { nowId } from '$lib/stores/pendMisMes';
   import { addToast } from 'as-toast';
+  import { Drawer } from 'vaul-svelte';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr
@@ -696,6 +699,10 @@ function claf (event){
 <div
 role="contentinfo"
 style="position: relative;" 
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true
+}}
 style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
@@ -768,6 +775,47 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   >
 </Swiper>
 </div>
+
+{#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  on:tochat={tochat}
+{skills}
+  {timegramaDate}
+    {tafkidims}
+    {workways}
+  {low}
+   {isKavua}
+  {noofhours}
+  {perhour}
+  {hearotMeyuchadot}
+  {already} 
+  {projectName}
+   {src} 
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {name} 
+   {restime}
+   {createdAt}
+   {descrip} {mypos} {allr} {noofusersNo}
+   on:nego={claf}
+   />
+   </div>
+   </Drawer.Content>
+   </Drawer.Portal>
+   </Drawer.Root>
+   </div>
+{/if}
 {:else}
 <Cards 
  on:agree={claf}

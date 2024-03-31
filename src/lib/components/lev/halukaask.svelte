@@ -2,12 +2,15 @@
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
    import { createEventDispatcher } from 'svelte';
+       	import { Drawer } from 'vaul-svelte';
+
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
   import ProgressBar from "@okrad/svelte-progressbar";
   import Lowbtn from '$lib/celim/lowbtn.svelte'
-
+    export let modal = false
+    let dialogOpen = false
  const dispatch = createEventDispatcher();
      export let low = false;
     export let halukot = []
@@ -563,6 +566,10 @@ title="ביטול"
 <div 
 use:clickOutside
 on:click_outside={toggleShow} 
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
@@ -661,6 +668,32 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
   >
 </Swiper>
 </div>
+{#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  {why}
+  {already} 
+  {projectName}
+   {src} 
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {noofusersNo}
+   />
+      </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+      </Drawer.Root>
+      </div>
+      {/if}
 {:else}
 
 <Cards 

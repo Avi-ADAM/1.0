@@ -1,5 +1,7 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
+      	import { Drawer } from 'vaul-svelte';
+
 import {
     clickOutside
 } from './outsidclick.js';
@@ -15,7 +17,8 @@ import {
 import { idPr } from './../../stores/idPr.js';
     export let low = false;
 import Lowbtn from '$lib/celim/lowbtn.svelte'
-
+    export let modal = false
+    let dialogOpen = false
 const dispatch = createEventDispatcher();
 export let coinlapach;
 export let mId;
@@ -455,6 +458,10 @@ style="position: relative;"
 style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()} 
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
 use:clickOutside on:click_outside={toggleShow}
 class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper  dir="rtl"
@@ -549,6 +556,40 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   >
 </Swiper>
 </div>
+{#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        
+<Cards 
+ on:agree={agree}
+  on:decline={decline}
+  on:hover={hoverc}
+  {why}
+  {useraplyname}
+  {src2}
+  {missionBName}
+  {already} 
+  {missionDetails}
+  {projectName}
+   {src} 
+   {nhours}
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {noofusersNo}
+   {valph}
+   {whatt}
+   />
+      </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+      </Drawer.Root>
+      </div>
+      {/if}
 {:else}
 <Cards 
  on:agree={agree}

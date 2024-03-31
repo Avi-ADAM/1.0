@@ -2,6 +2,8 @@
   import Chaticon from '../../celim/chaticon.svelte';
   import Diun from './diun.svelte';
   import { addToast } from 'as-toast';
+      export let modal = false
+    let dialogOpen = false
   const baseUrl = import.meta.env.VITE_URL
   export let shear = [];
   export let low = false;
@@ -598,6 +600,10 @@ id: ${pendId}
     <div
       use:clickOutside
       on:click_outside={toggleShow}
+      on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
       style="position: relative;"
       style:z-index={hovered === false ? 11 : 16}
       on:mouseenter={() => hoverede()}
@@ -817,6 +823,32 @@ id: ${pendId}
         </SwiperSlide>
       </Swiper>
     </div>
+    {#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        <Cards
+      on:agree={claf}
+      on:decline={claf}
+      on:hover={hoverc}
+      {why}
+      {already}
+      {projectName}
+      {src}
+      {noofusersWaiting}
+      {noofusersOk}
+      {noofusersNo}
+    />
+      </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+      </Drawer.Root>
+      </div>
+      {/if}
   {:else}
     <Cards
       on:agree={claf}

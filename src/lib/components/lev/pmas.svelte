@@ -1,5 +1,7 @@
 <script>
   import Diun from './diun.svelte';
+      	import { Drawer } from 'vaul-svelte';
+
 import { RingLoader
 } from 'svelte-loading-spinners'
    import Chaticon from '../../celim/chaticon.svelte'
@@ -17,7 +19,8 @@ import { idPr } from '../../stores/idPr.js';
   const dispatch = createEventDispatcher();
       export let low = false;
   const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
-
+    export let modal = false
+    let dialogOpen = false
   export let coinlapach;
     export let mypos = null;
     export let messege = [];
@@ -736,7 +739,10 @@ title="ביטול"
 
 <div 
 use:clickOutside
-role="contentinfo"
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
 on:click_outside={toggleShow} 
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
@@ -823,7 +829,43 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
   >
 </Swiper>
 </div>
-
+{#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        
+<Cards 
+ on:agree={claf}
+  on:decline={claf}
+  on:hover={hoverc}
+  on:tochat={tochat}
+  {low}
+  {kindOf}
+  {hm}
+  {monts}
+  {yers}
+  {easy}
+  {price}
+  {hearotMeyuchadot}
+  {already} 
+  {projectName}
+   {src} 
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {name} 
+   {descrip} {mypos} {allr} {noofusersNo}
+   on:nego={claf}
+   />
+      </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+      </Drawer.Root>
+      </div>
+      {/if}
 {:else}
 <Cards 
  on:agree={claf}

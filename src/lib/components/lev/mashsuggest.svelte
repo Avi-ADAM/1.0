@@ -1,10 +1,14 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
   import { fly } from 'svelte/transition';
+      	import { Drawer } from 'vaul-svelte';
+
   import { createEventDispatcher } from 'svelte';
   import { clickOutside } from './outsidclick.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   const dispatch = createEventDispatcher();
+      export let modal = false
+    let dialogOpen = false
   export let coinlapach;
   export let low = false;
   export let messege = [];
@@ -393,7 +397,10 @@
 {#if cards == false}
   <div
     style="position: relative;"
-    role="contentinfo"
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
     style:z-index={hovered === false ? 11 : 16}
     on:mouseenter={() => (hovered = true)}
     on:mouseleave={() => (hovered = false)}
@@ -539,6 +546,40 @@
       </SwiperSlide>
     </Swiper>
   </div>
+  {#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        
+  <Cards
+    on:agree={() => agree(oid)}
+    on:decline={() => decline(oid)}
+    on:hover={hoverc}
+    on:tochat={tochat}
+    {low}
+    {mashName}
+    {easy}
+    {myp}
+    {already}
+    {deadLine} 
+    {sqedualedf}
+    {price}
+    {total}
+    {descrip}
+    {projectName}
+    {src}
+    {spnot}
+  />
+      </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+      </Drawer.Root>
+      </div>
+      {/if}
 {:else}
   <Cards
     on:agree={() => agree(oid)}

@@ -3,6 +3,8 @@
   import ProgressBar from '@okrad/svelte-progressbar';
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
+      	import { Drawer } from 'vaul-svelte';
+
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
   import { createEventDispatcher } from 'svelte';
@@ -15,7 +17,8 @@
   const dispatch = createEventDispatcher();
   export let low = false;
   const baseUrl = import.meta.env.VITE_URL
-
+    export let modal = false
+    let dialogOpen = false
   export let coinlapach;
   export let deadline;
   export let projectName;
@@ -633,7 +636,10 @@ updateAskm(
 
   {#if cards == false}
     <div
-      role="contentinfo"
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
       style="position: relative;"
       style:z-index={hovered === false ? 11 : 16}
       on:mouseenter={() => hoverede()}
@@ -925,6 +931,41 @@ updateAskm(
         </SwiperSlide>
       </Swiper>
     </div>
+    {#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        <Card
+      on:tochat={tochat}
+      on:agree={() => agree()}
+      on:decline={() => decline()}
+      on:hover={hoverc}
+      {already}
+      {projectName}
+      {src}
+      {low}
+      {deadline}
+      {easy}
+      {myp}
+      {price}
+      {noofusersWaiting}
+      {useraplyname}
+      {noofusersOk}
+      {src2}
+      {openmissionName}
+      {missionDetails}
+      {noofusersNo}
+    />
+      </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+      </Drawer.Root>
+      </div>
+      {/if}
   {:else}
     <Card
       on:tochat={tochat}

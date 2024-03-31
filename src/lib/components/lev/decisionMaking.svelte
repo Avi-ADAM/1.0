@@ -1,6 +1,7 @@
 <script>
     import { pinch } from 'svelte-gestures';
   import * as animateScroll from "svelte-scrollto";
+    	import { Drawer } from 'vaul-svelte';
 
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
@@ -409,8 +410,9 @@ export let cards = false;
 export let tx = 200;
 const newlogo = {"he":"הלוגו החדש שמוצע","en":"new Logo offered"}
 const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
-let modal = true;
-let top;
+    export let modal = false
+    let dialogOpen = false
+    let top;
 function tomodal(){
   modal = false;
   animateScroll.scrollToTop()
@@ -451,13 +453,13 @@ $: ww = 0
 {#if cards == false}
 
 <div 
-role="contentinfo"
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
 on:dblclick={tomodal}
  bind:clientWidth={ww}
  bind:clientHeight={h}
-use:pinch 
-  on:pinch="{handler}"
-class:coinmodal={modal == false}
 style="position: relative;" 
 style:z-index={hovered === false && modal == true ? 11 : 58}  
 on:mouseenter={()=> hoverede()} 
@@ -761,6 +763,40 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 </Swiper>
 </span>
 </div>
+
+{#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        <Card
+  on:agree={()=>agree()}
+  on:decline={()=>decline()}
+  on:hover={hoverc} 
+  {already} 
+  {projectName}
+   {src} 
+   {src2}
+   {low}
+   {kind}
+   {spdata}
+   {timegramaDate} 
+   {restime}
+   {deadline}
+   {noofusersWaiting} 
+   {noofusersOk} 
+   {openmissionName} 
+   {missionDetails} 
+   {noofusersNo}/>
+      </div>
+      </Drawer.Content>
+      </Drawer.Portal>
+      </Drawer.Root>
+      </div>
+      {/if}
 {:else}
 <Card
   on:agree={()=>agree()}
@@ -785,6 +821,18 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 {/await}
 
 <style>
+     .swiper-slidec {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px !important;
+  border: 1px solid var(--barbi-pink);
+  font-size: 22px;
+  font-weight: bold;
+  min-height:100vh;
+  min-width: 25vw !important;
+  max-width: 80vw !important;
+  }
     .btin{
     width:13px;
      height:13px;
