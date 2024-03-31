@@ -1,4 +1,5 @@
 <script>
+      	import { Drawer } from 'vaul-svelte';
     import {nutifi } from '$lib/func/nutifi.svelte'
     import { addToast } from 'as-toast';
   import RangeSlider from "svelte-range-slider-pips";
@@ -29,6 +30,8 @@ betha.subscribe(value => {
  export let coinlapach
     export let stname;
     let show = true;
+    export let modal = false
+    let dialogOpen = false
     export let iskvua = false
         export let low = false;
         export let status = 0;//tween store
@@ -872,6 +875,10 @@ async function busabe(id){
 
 <div 
 style="position: relative;" 
+on:click={()=>{modal = true
+  dispatch("modal")
+dialogOpen = true}}
+role="button"
 style:z-index={hovered === false ? 11 : 16}  
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
@@ -1320,7 +1327,53 @@ out:scale={{duration: 2200, opacity: 0.5}}
 </SwiperSlide
   >
 </Swiper>
-
+{#if modal}
+<div data-vaul-drawer-wrapper>
+<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
+	<Drawer.Trigger/>
+	<Drawer.Portal>
+		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+			<div class="swiper-slidec mx-auto ">
+        
+<Cards 
+on:start={start}
+ on:done={done}
+  on:save={save}
+  on:hover={hoverc}
+  on:task={opentask}
+  on:azor={azor}
+  on:clear={handleClearClick}
+  on:statusi={function(){
+     a = 2;
+    isOpen = true
+  }}
+  {low}
+  {tasks}
+  {dueDateOrCountToDedline}
+  {hearotMeyuchadot}
+{x}
+{iskvua}
+  {zman}
+  {already} 
+  {projectName}
+   {src} 
+   {missionDetails}
+   {link}
+   {missionName}
+   {linkDescription} 
+   {running} 
+   {show}
+   {hourstotal}
+   {hoursdon}
+   {status}
+   />
+   </div>
+</Drawer.Content>
+  </Drawer.Portal>
+</Drawer.Root>
+</div>
+{/if}
 </div>
 
 {:else}
@@ -1359,6 +1412,19 @@ on:start={start}
    />
 {/if}
 <style>
+    .swiper-slidec {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px !important;
+  border: 1px solid var(--barbi-pink);
+  font-size: 22px;
+  font-weight: bold;
+  min-height:100vh;
+  min-width: 25vw !important;
+  max-width: 80vw !important;
+  
+}
   .di{
             grid-column: 1/4;
 

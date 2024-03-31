@@ -223,7 +223,7 @@
     {#each arr1 as buble, i}
       {@const myline = orders[i] ?? {x:0,y:0}}
       {#if buble.ani === 'vidu' && milon.desi == true}
-        <div class:normSml={modal == false} class="vidu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+        <div  class="vidu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Vid
             on:modal={() => (modal = true)}
             on:hover={hover}
@@ -254,7 +254,7 @@
           />
         </div>
       {:else if buble.ani === 'haluk' && milon.desi == true}
-        <div class:normSml={modal == false} class=" halu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+        <div  class=" halu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Hal
             on:modal={() => (modal = true)}
             on:coinLapach={delo}
@@ -285,7 +285,7 @@
           />
         </div>
       {:else if buble.ani === 'mtaha' && milon.betaha == true}
-        <div class:normSml={modal == false} class="betaha normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+        <div  class="betaha normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <MissionInProgress
             on:proj={proj}
             on:user={user}
@@ -310,6 +310,7 @@
             missionDetails={buble.descrip}
             src={buble.src}
             link={buble.privatlinks}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
             dueDateOrCountToDedline={buble.admaticedai}
             hoursdon={buble.howmanyhoursalready}
             hourstotal={buble.hoursassinged}
@@ -609,7 +610,7 @@
           />
         </div>
       {:else if buble.ani === 'hachla' && milon.hachla == true}
-        <div class:normSml={modal == false} class="hachla normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+        <div class="hachla normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
           <Desi
             on:acsept={delo}
             on:decline={delo}

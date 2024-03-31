@@ -7,6 +7,7 @@ export let x = 0,tasks = [], src,projectName,already,zman,hearotMeyuchadot,statu
 import Lowbtn from '$lib/celim/lowbtn.svelte'
      // import Chaticon from '../../../celim/chaticon.svelte'
   import { createEventDispatcher } from 'svelte';
+  import RichText from '$lib/celim/ui/richText.svelte';
  const dispatch = createEventDispatcher();
 function start(){
 dispatch("start");
@@ -40,7 +41,7 @@ function opentask(){
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
 
 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-
+console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
 $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`}
 </script>
@@ -83,8 +84,10 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
             <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>-->
      {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined"} <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="cd d max-h-16 text-sm text-gray-700 text-base">{missionDetails}</p>{/if}
-    {#if hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm md:text-lg d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" ? hearotMeyuchadot : ""}</p>
+    {#if hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" }
+     <span role="contentinfo" on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} >
+   <RichText editable={false}  outpot={hearotMeyuchadot}/>
+   </span>
      {/if} 
         <div
   on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
