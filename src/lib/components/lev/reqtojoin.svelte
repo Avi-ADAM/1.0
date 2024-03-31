@@ -1,6 +1,8 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
+   import { Drawer } from 'vaul-svelte';
+
 	import dayjs from 'dayjs';
   import {lang} from '$lib/stores/lang.js'
   import {
