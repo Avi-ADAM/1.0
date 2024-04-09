@@ -89,11 +89,11 @@
 
 <div
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  class=" bg-transperent"
+  class="bg-mturk bg-opacity-25"
 >
   {#if editor && editable}
     <div
-      class="max-w-screen flex flex-wrap items-top justify-right mx-auto pb-0 pr-2 p-4"
+      class="max-w-screen flex flex-wrap items-top justify-right mx-auto pb-0 pr-2 p-4 "
     >
       <button
         on:click={() => editor.chain().focus().toggleBold().run()}

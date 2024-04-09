@@ -16,6 +16,9 @@
   import Drag from '$lib/celim/icons/drag.svelte';
   import ChatSmall from './chatSmall.svelte';
   import Arrow from '$lib/celim/icons/arrow.svelte';
+  import Switch from '$lib/celim/switch.svelte';
+  import Chooser from '$lib/celim/ui/chooser.svelte';
+  import { Drawer } from 'vaul-svelte';
   export let un;
   let draggable;
   onMount(async () => {
@@ -33,18 +36,20 @@
       mapTouchToMouseFor('.draggable');
       isChatOpen.set(true);
     } else {
-      isOpen = true;
+      dialogOpen = true;
     }
   }
-  let isOpen = false;
+  let dialogOpen = false;
   const close = () => {
-    isOpen = false;
+    dialogOpen = false;
     iwant = false;
     isChatOpen.set(false);
   };
   let loading = false;
   const cencel = { he: 'ביטול', en: 'cencel' };
+  export let idL
   export let chatId = 0;
+  export let online = false
   const back = { he: "חזרה לרשימת הצ'אטים", en: 'back to chat list' };
 
   /**** Svelte Event Handling ****/
@@ -65,33 +70,28 @@
     console.log('Draggable was destroyed');
   }
 </script>
+<div data-vaul-drawer-wrapper >
+	<Drawer.Root  bind:open={dialogOpen}  shouldScaleBackground>
+    	<Drawer.Trigger/>
+		<Drawer.Portal>
+			<Drawer.Overlay class="fixed inset-0 bg-black/40 z-[1000]" />
+			<Drawer.Content
+				class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
+			>
+				<div class="flex-1 rounded-t-[10px] p-4">
+					<div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi" />
+					<div class="mx-auto d overflow-auto flex flex-col ">
+					
+      <div>
+        					<div class="mx-auto d overflow-auto flex flex-col z-[1001]">
 
-<DialogOverlay {isOpen} onDismiss={close} class="overlay z-[9999]">
-  <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class=" z-[9999]" aria-label="form">
-      <div dir="rtl" class="grid items-center justify-center aling-center">
-        <button
-          on:click={close}
-          style="margin: 0 auto;"
-          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title={cencel[$lang]}
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-            />
-          </svg></button
-        >
-        {#if loading === true}
-          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-          ></RingLoader>
-        {:else if iwant !== true}
-          <NewIwant userName_value={username} />
-        {/if}
-      </div>
-    </DialogContent>
-  </div>
-</DialogOverlay>
+                         <NewIwant {idL} userName_value={username} />
+</div>
+            </div>
+    </Drawer.Content>
+  </Drawer.Portal>
+</Drawer.Root>
+</div>
 {#if $isChatOpen == true}
   <div
     use:draggable={{
@@ -138,6 +138,9 @@
           >
         </div>
       {/if}
+      <div>
+        <Chooser bind:level={online} />
+      </div>
     </div>
     <ChatSmall bind:chatId {un}/>
   </div>
@@ -159,7 +162,7 @@
       transition:slide|all={{ delay: 150, duration: 1000, easing: quintOut }}
       style="position: fixed; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
       on:click={() => addi('chat')}
-      class="ww2 ww items-center flex justify-center text-xl"
+      class="{online == true ? "online":"ww"} ww2  items-center flex justify-center text-xl"
       ><Chaticon /></button
     >
   {/if}
@@ -200,6 +203,30 @@
     right: calc(100% - 105px);
     width: 50px;
     height: 50px;
+  }
+  .online{
+     border-radius: 50%;
+    background: rgb(31, 246, 35);
+    background: -moz-linear-gradient(
+      -45deg,
+      rgb(31, 246, 35) 0%,
+      rgba(26, 188, 156, 1) 100%
+    );
+    background: -webkit-linear-gradient(
+      -45deg,
+      rgba(31, 246, 35) 0%,
+      rgba(26, 188, 156, 1) 100%
+    );
+    background: linear-gradient(
+      135deg,
+      rgba(31, 246, 35) 0%,
+      rgba(26, 188, 156, 1) 100%
+    );
+
+    box-shadow: 0 10px 30px 0px rgba(0, 0, 0, 0.6);
+    transform: translatey(0px);
+    animation: float 6s ease-in-out infinite;
+
   }
   .ww {
     border-radius: 50%;

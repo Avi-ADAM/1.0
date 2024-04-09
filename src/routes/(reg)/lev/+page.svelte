@@ -1455,10 +1455,10 @@
         .split('=')[1];
       idL = cookieValueId;
       token = cookieValu;
-      const elem = document.getElementById('scree');
+      const elem = document.getElementById('screen');
 
       function flash() {
-        if (cards == false) {
+        if (low == true &&cards == false) {
           elem.style.backgroundImage =
             'radial-gradient(ellipse farthest-corner at ' +
             initX +

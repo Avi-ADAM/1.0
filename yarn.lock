@@ -1470,6 +1470,11 @@
   "resolved" "https://registry.npmjs.org/@socket.io/component-emitter/-/component-emitter-3.1.0.tgz"
   "version" "3.1.0"
 
+"@svelte-plugins/datepicker@^1.0.9":
+  "integrity" "sha512-HagVB8jLUwNFbwfAcJBNURN1QMQ+qAQQjLJPH97GMqI6auo7jIxOMiSIEWpx7SxTDewHJAlH1izQy3cwBVV8oQ=="
+  "resolved" "https://registry.npmjs.org/@svelte-plugins/datepicker/-/datepicker-1.0.9.tgz"
+  "version" "1.0.9"
+
 "@sveltejs/adapter-vercel@3.0.1":
   "integrity" "sha512-PBY3YRm7Q7Prax07mxD/rvcho2CntGkYncAIkz2DtG5NTcVG5JZ1RM627it5zYYtc2/RB3YjMkZuCMBqDCiPkA=="
   "resolved" "https://registry.npmjs.org/@sveltejs/adapter-vercel/-/adapter-vercel-3.0.1.tgz"
@@ -2152,10 +2157,10 @@
     "follow-redirects" "^1.14.9"
     "form-data" "^4.0.0"
 
-"axobject-query@^3.2.1":
-  "integrity" "sha512-jsyHu61e6N4Vbz/v18DHwWYKK0bSWLqn47eeDSKPB7m8tqMHF9YJ+mhIk2lVteyZrY8tnSj/jHOv4YiTCuCJgg=="
-  "resolved" "https://registry.npmjs.org/axobject-query/-/axobject-query-3.2.1.tgz"
-  "version" "3.2.1"
+"axobject-query@^4.0.0":
+  "integrity" "sha512-+60uv1hiVFhHZeO+Lz0RYzsVHy5Wr1ayX0mwda9KPDVLNJgZ1T9Ny7VmFbLDzxsH0D87I86vgj3gFrjTJUYznw=="
+  "resolved" "https://registry.npmjs.org/axobject-query/-/axobject-query-4.0.0.tgz"
+  "version" "4.0.0"
   dependencies:
     "dequal" "^2.0.3"
 
@@ -3201,6 +3206,11 @@
   dependencies:
     "image-size" "^0.7.3"
     "mimer" "^1.0.0"
+
+"date-fns@^3.6.0":
+  "integrity" "sha512-fRHTG8g/Gif+kSh50gaGEdToemgfj74aRX3swtiouboip5JDLAyDE9F11nHMIcvOaXeOC6D7SpNhi7uFyB7Uww=="
+  "resolved" "https://registry.npmjs.org/date-fns/-/date-fns-3.6.0.tgz"
+  "version" "3.6.0"
 
 "dayjs@^1.10.6":
   "integrity" "sha512-QvzAURSbQ0pKdIye2txOzNaHmxtUBXerpY0FJsFXUMKbIZeFm5ht1LS/jFsrncjnmtv8HsG0W2g6c0zUjZWmpA=="
@@ -5223,10 +5233,10 @@
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.13"
 
-"magic-string@^0.30.0", "magic-string@^0.30.2":
-  "integrity" "sha512-B7xGbll2fG/VjP+SWg4sX3JynwIU0mjoTc6MPpKNuIvftk6u6vqhDnk1R80b8C2GBR6ywqy+1DcKBrevBg+bmw=="
-  "resolved" "https://registry.npmjs.org/magic-string/-/magic-string-0.30.3.tgz"
-  "version" "0.30.3"
+"magic-string@^0.30.0", "magic-string@^0.30.2", "magic-string@^0.30.4":
+  "integrity" "sha512-ISQTe55T2ao7XtlAStud6qwYPZjE4GK1S/BeVPus4jrq6JuOnQ00YKQC581RWhR122W7msZV263KzVeLoqidyQ=="
+  "resolved" "https://registry.npmjs.org/magic-string/-/magic-string-0.30.8.tgz"
+  "version" "0.30.8"
   dependencies:
     "@jridgewell/sourcemap-codec" "^1.4.15"
 
@@ -7444,23 +7454,24 @@
   "resolved" "https://registry.npmjs.org/svelte-viewport-info/-/svelte-viewport-info-0.1.12.tgz"
   "version" "0.1.12"
 
-"svelte@^3.19.0 || ^4.0.0", "svelte@^3.2.0 || ^4.0.0-next.0", "svelte@^3.23.0 || ^4.0.0-next.0 || ^4.0.0", "svelte@^3.54.0 || ^4.0.0", "svelte@^3.54.0 || ^4.0.0-next.0", "svelte@^4.0.0", "svelte@^4.0.4", "svelte@^4.1.1", "svelte@>=3 <5", "svelte@>=3.49.0", "svelte@>=4", "svelte@3 - 4", "svelte@3.x || 4.x":
-  "integrity" "sha512-kVsdPjDbLrv74SmLSUzAsBGquMs4MPgWGkGLpH+PjOYnFOziAvENVzgJmyOCV2gntxE32aNm8/sqNKD6LbIpeQ=="
-  "resolved" "https://registry.npmjs.org/svelte/-/svelte-4.2.0.tgz"
-  "version" "4.2.0"
+"svelte@^3.19.0 || ^4.0.0", "svelte@^3.2.0 || ^4.0.0-next.0", "svelte@^3.23.0 || ^4.0.0-next.0 || ^4.0.0", "svelte@^3.54.0 || ^4.0.0", "svelte@^3.54.0 || ^4.0.0-next.0", "svelte@^4.0.0", "svelte@^4.1.1", "svelte@^4.2.12", "svelte@>=3 <5", "svelte@>=3.49.0", "svelte@>=4", "svelte@3 - 4", "svelte@3.x || 4.x":
+  "integrity" "sha512-d8+wsh5TfPwqVzbm4/HCXC783/KPHV60NvwitJnyTA5lWn1elhXMNWhXGCJ7PwPa8qFUnyJNIyuIRt2mT0WMug=="
+  "resolved" "https://registry.npmjs.org/svelte/-/svelte-4.2.12.tgz"
+  "version" "4.2.12"
   dependencies:
     "@ampproject/remapping" "^2.2.1"
     "@jridgewell/sourcemap-codec" "^1.4.15"
     "@jridgewell/trace-mapping" "^0.3.18"
+    "@types/estree" "^1.0.1"
     "acorn" "^8.9.0"
     "aria-query" "^5.3.0"
-    "axobject-query" "^3.2.1"
+    "axobject-query" "^4.0.0"
     "code-red" "^1.0.3"
     "css-tree" "^2.3.1"
     "estree-walker" "^3.0.3"
     "is-reference" "^3.0.1"
     "locate-character" "^3.0.0"
-    "magic-string" "^0.30.0"
+    "magic-string" "^0.30.4"
     "periscopic" "^3.1.0"
 
 "svelte@^3.55.1":

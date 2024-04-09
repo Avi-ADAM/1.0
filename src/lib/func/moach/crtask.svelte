@@ -1,7 +1,6 @@
 <script context="module">
     import {sendToSer} from "$lib/send/sendToSer.svelte";
-
-    export async function crTask(pid=0,mbId,assignedId,pendm,open_mission,dateS,dateF,myIshur,shem,des,link,askId,){
+    export async function crTask(pid=0,mbId,assignedId,pendm,open_mission,dateS,dateF,myIshur,shem,des,link,askId){
       const da = new Date()
       const dai = da.toISOString()
      let d = await sendToSer({pid,mbId,pendm ,open_mission,dateS,dateF,myIshur ,shem,des,link,askId, assignedId,  publishedAt: dai  },'4crtask').then(d=> d = d)

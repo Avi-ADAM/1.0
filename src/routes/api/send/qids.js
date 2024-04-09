@@ -63,5 +63,42 @@ export const qids = {
     
   ) {data{id attributes{ shem my {data{id}}}}}
 }
-`
+`,
+  '5crratson': `mutation CreateRatson($logo:ID ,
+                                      $startDate:DateTime,
+                                       $finnishDate:DateTime,
+                                       $fulfilled:Boolean,
+                                       $name: String,
+                                       $des:String,
+                                       $allowJoin : Boolean, 
+                                       $vallues: [ID], 
+                                       $longDes:String, 
+                                       $bounti: Boolean,
+                                       $totalbounti: Float,
+                                       $users_permissions_users: [ID],
+                                       $missions:[ID],
+                                       $mashaabims:[ID],
+                                       $link: String,
+                                       $publishedAt: DateTime)
+                        { createRatson(
+      data: {startDate:$startDate,
+             desc: $des,
+             longDes: $longDes,
+             name: $name,
+             link:$link,
+             fulfilled: $fulfilled,
+             logo: $logo,
+             publishedAt:$publishedAt,
+             allowJoin:$allowJoin,
+             finnishDate:$finnishDate,
+             vallues:$vallues,
+             bounti:$bounti,
+             totalbounti:$totalbounti,
+             users_permissions_users:$users_permissions_users,
+             missions: $missions,
+             mashaabims:$mashaabims
+                  }
+    
+  ) {data{id}}
+}`
 };

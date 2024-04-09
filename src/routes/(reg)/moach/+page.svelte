@@ -310,6 +310,7 @@
               .then(checkStatus)
               .then(parseJSON);
             console.log(res);
+            if(res.data){
                 errorM = false
 
             meData = res.data.project.data.attributes;
@@ -400,6 +401,10 @@
             }
             trili = meData.tosplits.data;
             // pre(projectUsers, fmiData)
+          }else{
+            if(res.error && res.error.status == 401)
+            goto("/login?from=moach")
+          }
           } catch (e) {
             error1 = e;
             console.log(error1);
@@ -459,15 +464,20 @@
         })
           .then((r) => r.json())
           .then((data) => (user = data));
+          if(user.data){
                errorM = false
         console.log(user);
         if (user.errors) {
           if (user.errors[0].message === 'Invalid token.') {
-            goto('./login');
+                goto("/login?from=moach");
           }
         }
         projects =
           user.data.usersPermissionsUser.data.attributes.projects_1s.data;
+      }else{
+         if(user.error && user.error.status == 401)
+            goto("/login?from=moach")
+      }
       } catch (e) {
         console.log(e);
         if(e == "TypeError: Failed to fetch"){
@@ -1753,7 +1763,7 @@ const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions
     href=" https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
   />
 </svelte:head>
-<div class="alli"></div>
+<div class="alli bg-[radial-gradient(circle_at_45%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),theme(colors.black))]"></div>
   {#key errorM}
         {#if errorM != false}
       <h2   class="absolute bg-barbi text-gold py-3 px-6 rounded-sm bottom-6 -translate-x-1/2 left-1/2 ">{noneti}</h2>
@@ -2723,12 +2733,12 @@ pointer-events: none;"
       }
   .alli {
     /*   background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%); */
-    background: radial-gradient(
+  /*  background: radial-gradient(
       circle at 0.9%,
       rgb(2, 255, 187) 0%,
       rgb(238 232 170) 50%,
       rgb(2, 255, 187) 100.2%
-    );
+    );*/
     z-index: -1;
     min-width: 100vw;
     min-height: 100vh;

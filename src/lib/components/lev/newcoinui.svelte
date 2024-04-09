@@ -216,7 +216,7 @@
   {#key orders}
 <div  dir="ltr"  bind:clientWidth={w} bind:clientHeight={h} style=" position: absolute; overflow: auto;top:{top}%;
     left: {left}%;
-    width: {maxW}vw;
+    width: calc({maxW}vw - 10px);
     height: {maxH}vh;" class="screen d" >
  
 

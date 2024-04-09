@@ -25,7 +25,7 @@ import { idPr } from '$lib/stores/idPr.js';
     import { goto} from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
       import {  fly, scale } from 'svelte/transition';
-
+let iwant = false
 let isOpen = false;
   let isG = false
     let current = "";
@@ -355,6 +355,8 @@ async function start () {
             console.log(e)
             if(e == "TypeError: Failed to fetch"){
               setTimeout(start(),10000)
+              const msg = {"he":"נראה שיש בעיה בחיבור לאינטרנט, אנו מנסים שוב","en":"seems llike we have a internet connection problem, we are trying again"}
+              addToast(msg[$lang],"warn")
               //getcetch & show msg this from cetch bcz you have no net
               // else no net page
               //await net then again??
@@ -604,6 +606,7 @@ function close (event){
 
   import { RingLoader
 } from 'svelte-loading-spinners';
+  import { addToast } from 'as-toast';
 let mass = false;
 
 function massss (event){
@@ -711,6 +714,7 @@ const plm = {"he": "בחירת משאבים", "en": "choose resources"}
 const plw = {"he": "בחירת דרכי יצירה", "en": "choose ways of creation"}
 const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
 let width,height
+
 </script>
 
   <svelte:head>
@@ -890,7 +894,10 @@ let width,height
 <button
 style="z-index: 7;"
 class=" hover:scale-150 "
-    on:click={() => addP = true}
+    on:click={() => {
+      iwant = false
+      addP = true
+    }}
     title={crnfr[$lang]} >
 <svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
 	 viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
@@ -1427,27 +1434,7 @@ class=" hover:scale-150 "
        max-height: 15vh;
        overflow-y: scroll;
      }
-     .d::-webkit-scrollbar {
-    width: 10px;
-}
-
-.d::-webkit-scrollbar-track {
-    background-color: #e4e4e4;
-    border-radius: 100px;
-}
-
-.d::-webkit-scrollbar-thumb {
-    background-color: #d4aa70;
-    border-radius: 100px;
-}
-.d {
-    scrollbar-color: #D4AA70 #e4e4e4;
-}
-.d::-webkit-scrollbar-thumb {
-    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
-    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
-    border-radius: 100px;
-}
+   
       :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
                 width: 80vw;

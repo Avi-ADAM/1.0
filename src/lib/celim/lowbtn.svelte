@@ -692,7 +692,7 @@
         <path id="path4957" style="filter: url(#filter4101); fill-rule: evenodd; stroke: url(#gradient-118); stroke-opacity: 0.77; paint-order: fill; stroke-width: 6.46699px; stroke-miterlimit: 9; fill: url(#gradient-44);" d="m-278.8 1022.6c0 4.1842-3.6181 7.5761-8.0812 7.5761s-8.0812-3.3919-8.0812-7.5761 3.6181-7.5762 8.0812-7.5762 8.0812 3.392 8.0812 7.5762z" transform="matrix(.31496 -.15420 .15108 .35950 -25.518 606.01)"/>
         <path id="path4959" d="m51.013 1019.9 0.55481 34.011" style="filter: url(#filter4093); fill-rule: evenodd; stroke: url(#gradient-119); stroke-opacity: 0.77; paint-order: fill; stroke-width: 1.65388px; stroke-miterlimit: 9; fill: url(#gradient-45);" transform="matrix(1.4399 -.65463 .54086 1.1951 -586.31 -168.02)"/>
       </g>
-      <g id="g4961" transform="matrix(-.68139 -.074091 .074091 -.68139 65.814 1383.1)">
+      <g  id="g4961" transform="matrix(-.68139 -.074091 .074091 -.68139 65.814 1383.1)">
         <path id="path4963" style="filter: url(#filter4101); fill-rule: evenodd; stroke: url(#gradient-120); stroke-opacity: 0.77; paint-order: fill; stroke-width: 6.46699px; stroke-miterlimit: 9; fill: url(#gradient-46);" d="m-278.8 1022.6c0 4.1842-3.6181 7.5761-8.0812 7.5761s-8.0812-3.3919-8.0812-7.5761 3.6181-7.5762 8.0812-7.5762 8.0812 3.392 8.0812 7.5762z" transform="matrix(.31496 -.15420 .15108 .35950 -25.518 606.01)"/>
         <path id="path4965" style="filter: url(#filter4093); fill-rule: evenodd; stroke: url(#gradient-121); stroke-opacity: 0.77; paint-order: fill; stroke-width: 1.65388px; stroke-miterlimit: 9; fill: url(#gradient-47);" d="m51.013 1019.9 0.55481 34.011" transform="matrix(1.4399 -.65463 .54086 1.1951 -586.31 -168.02)"/>
       </g>
