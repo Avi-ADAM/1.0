@@ -1,8 +1,6 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
-   import { Drawer } from 'vaul-svelte';
-
 	import dayjs from 'dayjs';
   import {lang} from '$lib/stores/lang.js'
   import {
@@ -20,8 +18,6 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 const dispatch = createEventDispatcher();
     export let low = false;
     export let iskvua;
-        export let modal = false
-    let dialogOpen = false
 export let email;
 export let coinlapach
 export let deadline
@@ -762,10 +758,8 @@ on:mouseenter={()=> hoverede()}
 on:mouseleave={()=> hoverede()}
 use:clickOutside on:click_outside={toggleShow} 
 class="hover:scale-290 duration-1000 ease-in" 
-on:click={()=>{modal = true
-  dispatch("modal")
-dialogOpen = true}}
-role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
+role="content-info"
+ transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
@@ -873,39 +867,6 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
   >
 </Swiper>
 </div>
-{#if modal}
-<div data-vaul-drawer-wrapper>
-<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
-	<Drawer.Trigger/>
-	<Drawer.Portal>
-		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
-			<div class="swiper-slidec mx-auto ">
-        
-<Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
-  on:chat={tochat}
-  {low}
-  {already} 
-  {projectName}
-   {src} 
-   {noofusersWaiting} 
-   {useraplyname} 
-   {noofusersOk} 
-   {src2} 
-   noofhours={nhours}
-   perhour={valph}
-   {openmissionName} 
-   {iskvua}
-   {missionDetails} {noofusersNo}/>
-      </div>
-      </Drawer.Content>
-      </Drawer.Portal>
-      </Drawer.Root>
-      </div>
-      {/if}
 {:else}
 <Card
   on:agree={()=>agree()}

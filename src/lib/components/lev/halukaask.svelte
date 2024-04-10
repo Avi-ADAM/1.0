@@ -711,6 +711,18 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 {/if}
 {/await}
 <style>
+  .swiper-slidec {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 18px !important;
+  border: 1px solid var(--barbi-pink);
+  font-size: 22px;
+  font-weight: bold;
+  min-height:100vh;
+  min-width: 25vw !important;
+  max-width: 80vw !important;
+  }
   .j{
   font-size:12px;
   }
