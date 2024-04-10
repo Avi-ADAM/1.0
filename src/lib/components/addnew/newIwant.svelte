@@ -367,7 +367,7 @@
 
 {#if before == false}
 <div
-  class="a d overflow-auto max-h-[80vh]"
+  class="a d overflow-auto max-h-[80vh] min-h-[79vh]"
 >
   <div
     dir={$lang == 'en' ? 'ltr' : 'rtl'}
