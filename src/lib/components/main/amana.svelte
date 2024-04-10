@@ -510,6 +510,10 @@ function change(la){
     doesLang.set(true)
     langUs.set("en")
     goto("/en")
+  }else if(la == "ar"){
+        doesLang.set(true)
+    langUs.set("ar")
+    goto("/ar")
   }
 }
 $: w = 0
@@ -579,7 +583,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
             <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">English</button>
-          <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
+          <button on:click={() =>change("ar")} class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " >العربية</button>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
                   <button on:click={info} title="הסבר ומידע" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >הסבר ומידע</button>
                   <button on:click={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
@@ -663,11 +667,11 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     </h1>
           <span style="font-family:David;" class="font-bold">
               <span  style="font-family:David;">
-                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לא רוצה לפגוע באף אדם.
+                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לא רוצה לפגוע באף אדם ולעולם לא אפגע באף אדם.
                    <br>
            כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק פגיעה באדם, אלימות וכפיה בכוח.
               <br>
-   אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בבבוא הטוב, מקווה ומצפה שכל האנושות תסכים ואלימות, קרבות וכפיה בכוח יפסיקו להיות צורה של תקשורת אנושית.
+   אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב הבסיסי שבאדם, ולכך מקווה ומצפה שכאשר כל האנושות כולה תסכים אלימות, קרבות וכפיה בכוח יפסיקו להיות צורה של תקשורת אנושית.
               <br>
               כאשר כל אוכלוסיית  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join( " וכל אוכלוסיית " )}`  : "__"}</span>  תסכים ותחיה לפי אמנה זו אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר עם כל השאר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ומדינת ")}` : "__"}</span>  {selected.length > 1 ? "ממנות" : "ממנה" } בשמי ונחיה בחופשיות ובהסכמה הדדית. 
               <br>
@@ -1066,10 +1070,9 @@ background-color :var(--gold) ;
     font-size: 120%;
     font-family: 'StamSefarad', 'Rubik';
     text-align: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 180vw 180vh;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: rgb(223, 225, 235);
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
     line-height: normal;
     font-size-adjust: auto;
     height: 80vh;
@@ -1236,11 +1239,9 @@ background-color: var(--gold);
     font-size:20px;
     font-family: 'StamSefarad', serif;
     text-align: center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 1070px;
-    background-repeat: no-repeat;
-    background-position: center;
-    align-self: center;
+   background: rgb(223, 225, 235);
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;    align-self: center;
   }
   .container {
     padding-top: 26vh;
@@ -1329,15 +1330,14 @@ background-position: center;
     animation:spin 17s linear infinite;
   }
   .amana{
-    width: 908px;
+    width: 95%;
     padding: 0px 25px;
     font-size:25px;
     font-family: 'StamSefarad', serif;
     text-align:center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 1100px;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: rgb(223, 225, 235);
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
     margin: 0 auto;
     align-self: center;
     opacity: 0.8;
@@ -1454,10 +1454,9 @@ position: absolute;
     font-size:17px;
     font-family: 'StamSefarad', serif;
     text-align:center;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 1150px  ;
-    background-repeat: no-repeat;
-    background-position: center;
+    background: rgb(223, 225, 235);
+  border-radius: 50px;
+  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
     opacity: 0.9;
   }
   .container {
@@ -1519,7 +1518,6 @@ position: absolute;
    .amana{
     padding: 0 80px;
     font-size:22px;
-    background-size: 1424px  ;
   }
    .centeron{
    left: 48%;
@@ -1527,30 +1525,20 @@ position: absolute;
 }
 
 @media(min-width:1300px) {
-   .amana{
-    padding: 0 150px;
-    background-size: 1500px  ;
-  }
+
    .centeron{
    left: 48%;
   }
 }
 
 @media(min-width:1450px) {
-   .amana{
-    padding: 0 210px;
-    background-size: 1600px  ;
-  }
+  
    .centeron{
    left: 48%;
   }
 }
 @media(min-width:1700px) {
-   .amana{
-    padding: 0 210px;
-    background-size: 1888px  ;
-    font-size: 29px;
-  }
+ 
    .centeron{
    left: 48%;
   }
@@ -1561,11 +1549,7 @@ position: absolute;
   }
 }
 @media(min-width:2200px) {
-   .amana{
-    padding: 0 290px;
-    background-size: 2288px  ;
-    font-size: 29px;
-  }
+
    .centeron{
    left: 48%;
   }

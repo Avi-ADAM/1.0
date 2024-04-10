@@ -34,6 +34,8 @@ function find_contry_id(contry_name_arr){
      };
    let fpp = [];
   let fppp = [];
+  const baseUrl = import.meta.env.VITE_URL
+
     let error1 = null;
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -50,7 +52,7 @@ function find_contry_id(contry_name_arr){
       };
     
         try {
-            const res = await fetch("https://tov.onrender.com/graphql", {
+            const res = await fetch(baseUrl+"/graphql", {
               method: "POST",
               headers: {
                  'Content-Type': 'application/json'
@@ -348,8 +350,11 @@ function find_contry_id(contry_name_arr){
    let idx = 1;
    let data;
    let g = false;
-
+	import { useProgress } from '@threlte/extras'
+	const { progress } = useProgress()
     import { createForm } from "svelte-forms-lib";
+  import { Canvas } from '@threlte/core';
+  import Scene from './globu.svelte'
         let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
@@ -382,7 +387,7 @@ if (fpp.includes(jjj)){
  const mail = $form.email.toLowerCase().trim();
 console.log("t")
   axios
-  .post('https://tov.onrender.com/api/chezins', {
+  .post(baseUrl+'/api/chezins', {
       "data": {
         name: $form.name,
         email: mail,
@@ -471,10 +476,18 @@ function change(la){
     langUs.set("he")
     lang.set("he")
     console.log("change", $lang)
-    goto("/")
+    goto("/hascama")
     
+  }else if(la == "ar"){
+    doesLang.set(true)
+    langUs.set("ar")
+    lang.set("ar")
+    console.log("change", $lang)
+    goto("/ar")
   }
 }
+$: w = 0
+$: h = 0
 </script>
    
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -524,7 +537,7 @@ function change(la){
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
           <button on:click={()=>change("he")} title="למעבר לשפה העברית" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >עברית</button>
-          <a class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
+          <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " on:click={()=>change("ar")}>العربية</button>
                            <button on:click={sell} title="ask for change in the text" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">suggest text change</button>
                           <button on:click={tr} title="translate to another language" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >translate</button>
 
@@ -592,50 +605,56 @@ function change(la){
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="ltr" class="amana" id="amana-show">
- <h1 dir="ltr" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
-       <span style=" text-shadow: 1px 1px var(--mturk); 	font-family: 'Gan','Rubik' ;">{$form.name ? $form.name : "__"}</span>'s Declaration of Independent:
-    </h1>
-          <span>
-              <span>
-              I ,<span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will never use violence or hurt anyone.   
-                   <br>
-Because I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force.              <br>	
-I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication              <br>
-When the entire <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> is a signatory to this Convention, I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will relinquish my weapons and the armed policemen from whom the <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> State is Appointments in my name.              <br>
-I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will give up the weapons of the <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> Army when all of humanity will be a signatory to this Convention         
-I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will create, manage and resolve disagreements on the 1💗1 site by mutual agreement.
+  <div class="card">
+  <div class="card-overlay"></div>
+  <div class="card-inner d overflow-y-auto">
+<h1 dir="ltr" style="color:var(--barbi-pink); text-decoration: underline; font-weight: 900;">
+    <span style="text-shadow: 1px 1px var(--mturk); font-family: 'Gan','Rubik';">{$form.name ? $form.name : "__"}</span>'s Declaration of Independence:
+</h1>
+<span>
+    <span>
+        I, <span style="text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will never use violence or harm anyone.
+        <br>
+        Because I, <span style="text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money, or interest that justifies harming a person's life through violence or coercion.
+        <br>
+        I trust in the inherent goodness of humanity, and I hope that when all of humanity signs this Convention, violence, conflict, and coercion will cease to be forms of human communication.
+        <br>
+        When the entire <span style="color: black; text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> becomes a signatory to this Convention, I, <span style="text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will relinquish my weapons and the armed policemen acting on behalf of the <span style="color: black; text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> State.
+        <br>
+        I will also give up the weapons of the <span style="color: black; text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> Army when all of humanity becomes a signatory to this Convention.
+        <br>
+        Furthermore, I commit to creating, managing, and resolving disagreements on the 1💗1 platform through mutual agreement.
+    </span>
 </span>
-        
-</span>
+
+    </div>
+    </div>
     </div>
      
 
 
 <form on:submit={handleSubmit}>
-
-<div class="flexid">
-  <!-- {#if already == false}
-    <button
-     class="button hover:scale-150"
-      on:submit="{handleSubmit}"
-      type="submit"
-      ></button> 
-      {:else if already == true}
-  <h1 class="alredy" dir="rtl">{$form.name}
- Your signature has been received, you have reached the number {idx} place, an email will be sent when we expand, soon</h1>
-  <button class="p-4 rounded-full bg-lturk hover:bg-barbi text-barbi hover:text-lturk" on:click={()=> goto("/about", )}>אודותינו</button>
-  {/if}-->
+<div class="flexid" bind:clientWidth={w} bind:clientHeight={h}>
    {#if already == false}
 {#if g == false}
+{#if $progress < 1}
+
     <button
      class="button hover:scale-150"
      title="click for freedom"
-      on:submit="{handleSubmit}"
+     on:submit="{handleSubmit}"
       type="submit"
-      ></button> 
+      >
+    </button>
+    {/if}
+    <div class="cor">
+      <Canvas size={{width:w, height:h}}>
+        <Scene en={true} on:click={()=> console.log("hhuibi")} on:submit="{handleSubmit}"/>
+      </Canvas>
+    </div>
        {:else if g == true}
           <div class="sp text-center">
-            <h3 class="text-barbi">on moment please</h3>
+            <h3 class="text-barbi">one moment please</h3>
           <br>
          <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> {/if}
@@ -643,13 +662,50 @@ I, <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : 
 
       <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>
       {/if}
-     
+
   {/if}
   </div>
+
   </form>
   
 </div> </div>
   <style>
+    .card {
+  --bg: #e8e8e8;
+  --contrast: #e2e0e0;
+  --grey: #93a1a1;
+  position: relative;
+  padding: 9px;
+  background-color: var(--bg);
+  border-radius: 35px;
+  box-shadow: rgba(50, 50, 93, 0) 0px 50px 100px -20px, rgba(0, 0, 0, 0) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+    border-radius: 35px;
+
+  pointer-events: none;
+  background: repeating-conic-gradient(var(--bg) 0.0000001%, var(--grey) 0.000104%) 60% 60%/600% 600%;
+  filter: opacity(10%) contrast(105%);
+}
+
+.card-inner {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  
+  width: 84vw;
+  height: 72vh;
+  background-color: var(--contrast);
+  border-radius: 30px;
+  /* Content style */
+  font-size: 1.5em;
+  font-size-adjust: auto;
+  font-weight: 900;
+  color: #c7c4c4;
+  text-align: center;
+}
 .overlay{
   background-color: #ff1a1a;
   background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
@@ -906,20 +962,7 @@ background-color:var(--lturk);
     background-size:  130vw 100vh;
 }
  .amana{   
-   
-    padding: 1.5em 1em 1em 1em;
-    font-size: 120%;
-    font-family: 'StamSefarad', serif;
-    text-align: center;
-    font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 180vw 180vh;
-    background-repeat: no-repeat;
-    background-position: center;
-    line-height: normal;
-    font-size-adjust: auto;
-    height: 80vh;
-        overflow-y: auto;
+    overflow-y: auto;
 
   }
   .aab{
@@ -933,12 +976,11 @@ background-color:var(--lturk);
   }
   .flexid{
     display: flex;
-    flex-direction: colomn;
-    justify-content: center;
+    flex-direction: column;
    align-items: center;
    order: 1;
+   max-height: 20vh;
   }
- 
   .flexi1{
     display: flex;
     flex-direction: column;
@@ -1066,15 +1108,7 @@ left: 45.2%;
     animation:spin 17s linear infinite;
     }
   .amana{
-    padding: 0px 13vw;
-    font-size:100%;
-    font-family: 'StamSefarad', serif;
-    text-align: center;
-    font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 888px;
-    background-repeat: no-repeat;
-    background-position: center;
+   
     align-self: center;
   }
   .container {
@@ -1111,10 +1145,21 @@ left: 45.2%;
     justify-content: center;
     align-items: center;
   }
+.flexid{
+    display: flex;
+    flex-direction: column;
+   align-items: center;
+   order: 1;
+      max-height: 20vh;
 
+  }
 }
 
 @media(min-width:942px) and (max-width:1099px) {
+  .card-inner {
+  width: 84vw;
+    height: 60vh;
+  }
   .amanat{
 padding: 0 1rem;
     text-shadow: 1px 1px var(--barbi-pink) ;
@@ -1157,17 +1202,9 @@ background-position: center;
     animation:spin 17s linear infinite;
   }
   .amana{
-    width: 908px;
-    padding: 0px 25px;
-    font-size: 120%;
     font-family: 'StamSefarad', serif;
     text-align:center;
     font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 1100px;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin: 0 auto;
     align-self: center;
   }
   .container {
@@ -1208,25 +1245,32 @@ background-position: center;
     align-items: center;
     order: 3;
   }
-   .flexid{
+    .flexid{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     order: 1;
+       max-height: 20vh;
+
   }
 }
 
 @media(min-width:1100px) {
+   .card-inner {
+  width: 84vw;
+    height: calc(66vh - 180px);
+    font-size: 1.8em;
+  }
      .onlym{
   display: none;
 }
   .flexid{
     display: flex;
     flex-direction: column;
-    justify-content: center;
     align-items: center;
     order: 1;
+       max-height: 33vh;
+      height:100%;
   }
   .mobile{
     max-width: 1024px;
@@ -1266,16 +1310,8 @@ background-position: center;
   }
 
   .amana{
-    width: 100vw;
-    padding: 0px 120px;
-    font-size:110%;
-    font-family: 'StamSefarad', serif;
-    text-align:center;
-    font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 1150px  ;
-    background-repeat: no-repeat;
-    background-position: center;
+    display: flex;
+    justify-content: center;
   }
   .container {
     display: flex;
@@ -1330,20 +1366,14 @@ background-position: center;
   }
 } 
 @media(min-width:1200px) {
-   .amana{
-    padding: 0 110px;
-    background-size: 1400px  ;
-  }
+
    .centeron{
    left: 48%;
   }
 }
 
 @media(min-width:1300px) {
-   .amana{
-    padding: 0 150px;
-    background-size: 1500px  ;
-  }
+
    .centeron{
    left: 48%;
   }
@@ -1352,20 +1382,12 @@ background-position: center;
 @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 @media(min-width:1450px) {
-   .amana{
-    padding: 0 210px;
-    background-size: 1600px  ;
-  }
-   .centeron{
+    .centeron{
    left: 48%;
   }
 }
 @media(min-width:1700px) {
-   .amana{
-    padding: 0 210px;
-    background-size: 1888px  ;
-   font-size: 29px;
-  }
+ 
    .centeron{
    left: 48%;
   }

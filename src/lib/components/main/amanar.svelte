@@ -395,6 +395,22 @@ function tran (){
 trans = !trans;
 }
 let error;
+function change(la){
+  if (la == "he"){
+    doesLang.set(true)
+    langUs.set("he")
+    lang.set("he")
+    console.log("change", $lang)
+    goto("/hascama")
+    
+  }else if(la == "en"){
+    doesLang.set(true)
+    langUs.set("en")
+    lang.set("en")
+    console.log("change", $lang)
+    goto("/en")
+  }
+}
 onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -499,8 +515,8 @@ function erorer(){
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
-          <a style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/en" >English</a>
-          <a class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/">עברית</a>
+          <button style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 "   on:click={()=>change("en")} >English</button>
+          <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  on:click={()=>change("he")}>עברית</button>
                         <button on:click={sell} title=" اطلب تغيير النص" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >اطلب تغيير النص</button>
                   <button on:click={tr} title="الترجمة إلى لغات أخرى" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >ترجم</button>
           {/if}
@@ -563,19 +579,25 @@ function erorer(){
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
- <h1 dir="rtl" style="color:var(--barbi-pink);   text-decoration: underline; font-weight: 900;">
-    إعلان استقلال  
-        <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  
-        الشخصي
+<h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
+     إعلان استقلال
+        <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>
         :
     </h1>
-          <span>
-              <span>
-أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> لن أستخدم العنف أبدًا أو أؤذي أي شخص                   <br>
-لأنني <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> لا أريد أن أكون ضحية للعنف ولأنه لا توجد سلطة أو قيمة أو غرض أو معتقد أو مال أو فائدة تبرر الإضرار بحياة الشخص والعنف والإكراه بالقوة.              <br>	
-أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> سأمنح ثقتي في الخير وأنه عندما توقع البشرية جمعاء هذه الاتفاقية: سيتوقف العنف والقتال والحكم عن أن يكون شكلاً من أشكال التواصل البشري              <br>
-عندما تكون كل <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> من الموقعين على هذه المعاهدة أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> سأتخلى عن أسلحتي ورجال الشرطة المسلحين الذين عينتهم دولة <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> بالنيابة عني.              <br>
-أنا <span style=" text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> ، سأتخلى عن أسلحة الجيش <span style="color: black;   text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? selected : "__"}</span> عندما توقع البشرية جمعاء على هذه الاتفاقية.          </span>
+          <span style="font-family:David;" class="font-bold">
+              <span  style="font-family:David;">
+                أنا <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  لا أريد أن أؤذي أي شخص ولن أؤذي أي شخص أبدًا.
+                   <br>
+           لأنني أعتقد أنه ليس هناك سلطة أو قيمة أو هدف أو إيمان أو مال أو مصلحة يمكن أن يبرر الإيذاء البشري أو العنف أو القوة.
+              <br>
+   أنا أؤمن بالخير الأساسي في الإنسان، وأتمنى وأتوقع أنه عندما يوافق جميع البشر على عدم العنف والحروب واستخدام القوة، سيتوقفون عن أن يكونوا وسيلة للتواصل البشري.
+              <br>
+              عندما يوافق جميع سكان  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join( " وجميع سكان " )}`  : "__"}</span>  ويعيشون وفقًا لهذا الإيمان، سأتخلى عن سلاحي وعن الشرطيين المسلحين من دولة <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ومن دولة ")}` : "__"}</span>  {selected.length > 1 ? "بأسمي" : "باسمها" } وسنعيش بحرية وبموافقة متبادلة. 
+              <br>
+               عندما يوافق جميع البشرية وتعيش وفقًا لهذا الإيمان، سأتخلى عن أسلحتي الخاصة بجيش <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" وجيش ") }`+ "." : "__."}</span> عندما تتخلى جميع جيوش العالم عن أسلحتها وتصبح البشرية ضعيفة وحرة
+        <br>
+         سأظل دائمًا أحل النزاعات وأديرها وأحلها في "رقميات" التي تجري على موقع 1💗1 فقط بموافقة متبادلة.
+            </span>
     </div>
      
 
