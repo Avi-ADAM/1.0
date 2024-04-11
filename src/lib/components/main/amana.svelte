@@ -659,14 +659,16 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     </div>
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
-  <div class=" overflow-y-auto md:px-20 lg:px-44 overflow-x-hidden mt-1/5 d h-[95%] ">
- <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
+  <div class="card  bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]">
+  <div class="card-overlay "></div>
+  <div class="card-inner d overflow-y-auto ">
+     <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
      הצהרת העצמאות של
         <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>
         :
     </h1>
-          <span style="font-family:David;" class="font-bold">
-              <span  style="font-family:David;">
+          <span style="font-family:David;" class="text-bold text-transparent bg-clip-text  bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]">
+              <span  style="font-family:StamSefarad,David;">
                 אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לא רוצה לפגוע באף אדם ולעולם לא אפגע באף אדם.
                    <br>
            כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק פגיעה באדם, אלימות וכפיה בכוח.
@@ -682,7 +684,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
           </span>
     </div>
     </div>
-
+</div>
 
 
 <form on:submit={handleSubmit}>
@@ -722,6 +724,42 @@ $: if($errors.name || $errors.email) {scrollToTop()}
 
 </div> </div>
   <style>
+      .card {
+  --bg: #e8e8e8;
+  --contrast: #e2e0e0;
+  --grey: #93a1a1;
+  position: relative;
+  padding: 9px;
+  background-color: var(--bg);
+  border-radius: 35px;
+  box-shadow: rgba(50, 50, 93, 0) 0px 50px 100px -20px, rgba(0, 0, 0, 0) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+    border-radius: 35px;
+
+  pointer-events: none;
+  background: repeating-conic-gradient(var(--bg) 0.0000001%, var(--grey) 0.000104%) 60% 60%/600% 600%;
+  filter: opacity(10%) contrast(105%);
+}
+
+.card-inner {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  padding:0.5em;
+  width: 84vw;
+  height: 72vh;
+  background-color: var(--contrast);
+  border-radius: 30px;
+  /* Content style */
+  font-size: 1.5em;
+  font-size-adjust: auto;
+  font-weight: 900;
+  color: #c7c4c4;
+  text-align: center;
+}
     .cor{
       cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
 
@@ -1066,16 +1104,7 @@ background-color :var(--gold) ;
 }
  .amana{
 
-    padding: 1.5em 1em 1em 1em;
-    font-size: 120%;
-    font-family: 'StamSefarad', 'Rubik';
     text-align: center;
-    background: rgb(223, 225, 235);
-  border-radius: 50px;
-  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
-    line-height: normal;
-    font-size-adjust: auto;
-    height: 80vh;
         overflow-y: auto;
 
   }
@@ -1174,6 +1203,10 @@ left: 45.2%;
 }
 
 @media(min-width:577px) and (max-width:1099px) {
+    .card-inner {
+  width: 84vw;
+    height: 60vh;
+  }
    .amanat{
   margin: 0 auto;
   padding: 0;
@@ -1234,15 +1267,7 @@ background-color: var(--gold);
     -moz-animation:spin 17s linear infinite;
     animation:spin 17s linear infinite;
     }
-  .amana{
-    padding: 0px 13vw;
-    font-size:20px;
-    font-family: 'StamSefarad', serif;
-    text-align: center;
-   background: rgb(223, 225, 235);
-  border-radius: 50px;
-  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;    align-self: center;
-  }
+
   .container {
     padding-top: 26vh;
       display: flex;
@@ -1330,17 +1355,8 @@ background-position: center;
     animation:spin 17s linear infinite;
   }
   .amana{
-    width: 95%;
-    padding: 0px 25px;
-    font-size:25px;
-    font-family: 'StamSefarad', serif;
-    text-align:center;
-    background: rgb(223, 225, 235);
-  border-radius: 50px;
-  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
-    margin: 0 auto;
-    align-self: center;
-    opacity: 0.8;
+ 
+    opacity: 0.9;
   }
   .container {
     display: flex;
@@ -1391,6 +1407,11 @@ background-position: center;
 }
 
 @media(min-width:1100px) {
+     .card-inner {
+  width: 84vw;
+    height: calc(66vh - 180px);
+    font-size: 1.2em;
+  }
     .onlym{
   display: none;
 }
@@ -1448,16 +1469,9 @@ position: absolute;
 
 
 
-  .amana{
-    width: 100vw;
-    padding: 0px 130px;
-    font-size:17px;
-    font-family: 'StamSefarad', serif;
-    text-align:center;
-    background: rgb(223, 225, 235);
-  border-radius: 50px;
-  box-shadow: rgba(0, 0, 0, 0.17) 0px -23px 25px 0px inset, rgba(0, 0, 0, 0.15) 0px -36px 30px 0px inset, rgba(0, 0, 0, 0.1) 0px -79px 40px 0px inset, rgba(0, 0, 0, 0.06) 0px 2px 1px, rgba(0, 0, 0, 0.09) 0px 4px 2px, rgba(0, 0, 0, 0.09) 0px 8px 4px, rgba(0, 0, 0, 0.09) 0px 16px 8px, rgba(0, 0, 0, 0.09) 0px 32px 16px;
-    opacity: 0.9;
+   .amana{
+    display: flex;
+    justify-content: center;
   }
   .container {
     display: flex;
@@ -1516,8 +1530,7 @@ position: absolute;
 @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
 @media(min-width:1200px) {
    .amana{
-    padding: 0 80px;
-    font-size:22px;
+    font-size:1.8em;
   }
    .centeron{
    left: 48%;

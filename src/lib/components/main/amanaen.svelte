@@ -605,14 +605,14 @@ $: h = 0
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="ltr" class="amana" id="amana-show">
-  <div class="card">
-  <div class="card-overlay"></div>
-  <div class="card-inner d overflow-y-auto">
+  <div class="card  bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]">
+  <div class="card-overlay "></div>
+  <div class="card-inner d overflow-y-auto ">
 <h1 dir="ltr" style="color:var(--barbi-pink); text-decoration: underline; font-weight: 900;">
     <span style="text-shadow: 1px 1px var(--mturk); font-family: 'Gan','Rubik';">{$form.name ? $form.name : "__"}</span>'s Declaration of Independence:
 </h1>
-<span>
-    <span>
+<span class="  text-bold text-transparent bg-clip-text  bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]">
+    <span style="font-family:poppins,Gan;" >
         I, <span style="text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, will never use violence or harm anyone.
         <br>
         Because I, <span style="text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money, or interest that justifies harming a person's life through violence or coercion.

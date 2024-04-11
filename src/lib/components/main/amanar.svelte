@@ -579,12 +579,15 @@ function erorer(){
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
+   <div class="card  bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]">
+  <div class="card-overlay "></div>
+  <div class="card-inner d overflow-y-auto ">
 <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
      إعلان استقلال
         <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>
         :
     </h1>
-          <span style="font-family:David;" class="font-bold">
+          <span style="font-family:David;" class="text-bold text-transparent bg-clip-text  bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]">
               <span  style="font-family:David;">
                 أنا <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  لا أريد أن أؤذي أي شخص ولن أؤذي أي شخص أبدًا.
                    <br>
@@ -599,7 +602,8 @@ function erorer(){
          سأظل دائمًا أحل النزاعات وأديرها وأحلها في "رقميات" التي تجري على موقع 1💗1 فقط بموافقة متبادلة.
             </span>
     </div>
-     
+     </div>
+     </div>
 
 
 <form on:submit={handleSubmit}>
@@ -624,6 +628,42 @@ function erorer(){
   
 </div> </div>
   <style>
+    .card {
+  --bg: #e8e8e8;
+  --contrast: #e2e0e0;
+  --grey: #93a1a1;
+  position: relative;
+  padding: 9px;
+  background-color: var(--bg);
+  border-radius: 35px;
+  box-shadow: rgba(50, 50, 93, 0) 0px 50px 100px -20px, rgba(0, 0, 0, 0) 0px 30px 60px -30px, rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+}
+
+.card-overlay {
+  position: absolute;
+  inset: 0;
+    border-radius: 35px;
+
+  pointer-events: none;
+  background: repeating-conic-gradient(var(--bg) 0.0000001%, var(--grey) 0.000104%) 60% 60%/600% 600%;
+  filter: opacity(10%) contrast(105%);
+}
+
+.card-inner {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  padding:0.5em;
+  width: 84vw;
+  height: 72vh;
+  background-color: var(--contrast);
+  border-radius: 30px;
+  /* Content style */
+  font-size: 1.5em;
+  font-size-adjust: auto;
+  font-weight: 900;
+  color: #c7c4c4;
+  text-align: center;
+}
      :global([data-svelte-dialog-content].content) {
   background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
@@ -822,22 +862,7 @@ background-color:var(--lturk);
     background-position: center;
     background-size:  130vw 100vh;
 }
- .amana{   
-   
-    padding: 1.5em 1em 1em 1em;
-    font-size: 120%;
-    font-family: 'StamSefarad', serif;
-    text-align: center;
-    font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 180vw 180vh;
-    background-repeat: no-repeat;
-    background-position: center;
-    line-height: normal;
-    font-size-adjust: auto;
-    height: 80vh;
-    overflow-y: auto;
-  }
+
   .aab{
              background-color: var(--gold);
 
@@ -927,6 +952,12 @@ left: 45.2%;
 }
 
 @media(min-width:577px) and (max-width:1099px) {
+  
+    .card-inner {
+  width: 84vw;
+    height: 60vh;
+    font-size:1.8;
+  }
   .amanat{
   margin: 0 auto;
   padding: 0;
@@ -980,18 +1011,7 @@ left: 45.2%;
     -moz-animation:spin 17s linear infinite;
     animation:spin 17s linear infinite;
     }
-  .amana{
-    padding: 0px 13vw;
-    font-size: 100%;
-    font-family: 'StamSefarad', serif;
-    text-align: center;
-    font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: cover;
-    background-repeat: no-repeat;
-    background-position: center;
-    align-self: center;
-  }
+  
   .container {
     padding-top: 26vh;
       display: flex;
@@ -1073,20 +1093,7 @@ background-position: center;
     -moz-animation:spin 17s linear infinite;
     animation:spin 17s linear infinite;
   }
-  .amana{
-    width: 908px;
-    padding: 0px 25px;
-    font-size: 130%;
-    font-family: 'StamSefarad', serif;
-    text-align:center;
-    font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 1100px;
-    background-repeat: no-repeat;
-    background-position: center;
-    margin: 0 auto;
-    align-self: center;
-  }
+ 
   .container {
     display: flex;
     padding-top: 10em;
@@ -1135,6 +1142,11 @@ background-position: center;
 }
 
 @media(min-width:1100px) {
+      .card-inner {
+  width: 84vw;
+    height: calc(66vh - 180px);
+    font-size: 1.9em;
+  }
      .onlym{
   display: none;
 }
@@ -1181,19 +1193,11 @@ background-position: center;
     -moz-animation:spin 17s linear infinite;
     animation:spin 17s linear infinite;
   }
-
-  .amana{
-    width: 100vw;
-    padding: 0px 120px;
-    font-size: 140%;
-    font-family: 'StamSefarad', serif;
-    text-align:center;
-    font-weight: 900;
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639088838/megila1_m6kvgh.png);
-    background-size: 1150px  ;
-    background-repeat: no-repeat;
-    background-position: center;
+ .amana{
+    display: flex;
+    justify-content: center;
   }
+
   .container {
     display: flex;
     padding-top: 67px;
@@ -1247,40 +1251,27 @@ background-position: center;
   }
 } 
 @media(min-width:1200px) {
-   .amana{
-    padding: 0 110px;
-    background-size: 1400px  ;
-  }
+
    .centeron{
    left: 48%;
   }
 }
 
 @media(min-width:1300px) {
-   .amana{
-    padding: 0 150px;
-    background-size: 1500px  ;
-  }
+  
    .centeron{
    left: 48%;
   }
 }
 
 @media(min-width:1450px) {
-   .amana{
-    padding: 0 210px;
-    background-size: 1600px  ;
-  }
+  
    .centeron{
    left: 48%;
   }
 }
 @media(min-width:1700px) {
-   .amana{
-    padding: 0 210px;
-    background-size: 1888px  ;
-   font-size: 29px;
-  }
+  
    .centeron{
    left: 48%;
   }
