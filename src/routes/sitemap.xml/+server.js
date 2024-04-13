@@ -22,11 +22,11 @@ export async function GET() {
              <xhtml:link
               rel="alternate"
               hreflang="en"
-              href="https://1lev1.vercel.app?lang=en" />
+              href="https://1lev1.vercel.app/en" />
             <xhtml:link
               rel="alternate"
               hreflang="ar"
-              href="https://1lev1.vercel.app?lang=ar" />
+              href="https://1lev1.vercel.app/ar" />
             <xhtml:link
               rel="alternate"
               hreflang="he"
@@ -40,11 +40,11 @@ export async function GET() {
              <xhtml:link
               rel="alternate"
               hreflang="en"
-              href="https://1lev1.vercel.app/en" />
+              href="https://1lev1.vercel.app/convention" />
             <xhtml:link
               rel="alternate"
               hreflang="ar"
-              href="https://1lev1.vercel.app/ar" />
+              href="https://1lev1.vercel.app/aitifaqia" />
             <xhtml:link
               rel="alternate"
               hreflang="he"

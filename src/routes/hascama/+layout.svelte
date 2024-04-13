@@ -31,6 +31,7 @@ onMount(async () => {
    getLang()
    let x;
    let user;
+   /*
    if($lang != "he" && $lang != "ar" && x == null && user == 0){
         console.log('after', $lang)
     goto("/en")
@@ -39,7 +40,7 @@ onMount(async () => {
 
     goto("/ar")
   }
-  
+  */
 })
 </script>
 

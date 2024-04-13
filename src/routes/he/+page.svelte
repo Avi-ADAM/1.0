@@ -249,7 +249,7 @@ const agree3 = {
 			<Lowding width="24px" height="24px"/>
 			{/if}
 			</button>
-			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/ar" : "/en"}`) 
+			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/aitifaqia" : "/convention"}`) 
 			loading = true
 			fi = true
 		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} on:focus={()=> btnb = true} on:mouseover={()=>btnb = true} on:mouseleave={()=> btnb = false }>{reg[$lang]}
