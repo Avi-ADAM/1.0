@@ -489,7 +489,9 @@ function change(la){
 $: w = 0
 $: h = 0
 </script>
-   
+   <svelte:head>
+    <title>worldwide consensus on freedom and peace</title>
+   </svelte:head>
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">
