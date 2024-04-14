@@ -483,7 +483,7 @@ function change(la){
     langUs.set("ar")
     lang.set("ar")
     console.log("change", $lang)
-    goto("/ar")
+    goto("/aitifaqia")
   }
 }
 $: w = 0

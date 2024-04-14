@@ -509,11 +509,11 @@ function change(la){
   if (la == "en"){
     doesLang.set(true)
     langUs.set("en")
-    goto("/en")
+    goto("/convention")
   }else if(la == "ar"){
         doesLang.set(true)
     langUs.set("ar")
-    goto("/ar")
+    goto("aitifaqia")
   }
 }
 $: w = 0
