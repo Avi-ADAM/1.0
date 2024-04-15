@@ -1,4 +1,5 @@
 <script>
+  import {lang} from '$lib/stores/lang.js'
      import Grow from '$lib/celim/icons/grow.svelte'
      export let animate = false
   export let gr = false
@@ -78,6 +79,7 @@ class:text-xs={sm == false}
 class:text-xl={big == true}
 class:px-5={big == true}
 class:py-1={big == true}
+class:font-sans={$lang == "en"}
 class:flex-row-reverse={reverse == true}
 class:mr-2={single != true}
 class:mb-2={single != true}

@@ -343,6 +343,7 @@ function find_contry_id(contry_name_arr){
    let idx = 1;
    let data;
     import { createForm } from "svelte-forms-lib";
+  import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
     
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
@@ -515,11 +516,14 @@ function erorer(){
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
+<!--todo: to home-->
           <button style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 "   on:click={()=>change("en")} >English</button>
           <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  on:click={()=>change("he")}>עברית</button>
                         <button on:click={sell} title=" اطلب تغيير النص" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >اطلب تغيير النص</button>
                   <button on:click={tr} title="الترجمة إلى لغات أخرى" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >ترجم</button>
-          {/if}
+                  <button on:click={()=>goto('/ar')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>
+  
+                  {/if}
           </div>
       <div class="mobile">
         

@@ -355,6 +355,7 @@ function find_contry_id(contry_name_arr){
     import { createForm } from "svelte-forms-lib";
   import { Canvas } from '@threlte/core';
   import Scene from './globu.svelte'
+  import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
         let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
@@ -542,6 +543,7 @@ $: h = 0
           <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " on:click={()=>change("ar")}>العربية</button>
                            <button on:click={sell} title="ask for change in the text" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">suggest text change</button>
                           <button on:click={tr} title="translate to another language" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >translate</button>
+                  <button on:click={()=>goto('/en')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>
 
                            {/if}
           </div>
