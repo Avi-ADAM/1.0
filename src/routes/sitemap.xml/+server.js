@@ -15,8 +15,8 @@ export async function GET() {
          xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"  
        >
              <url>
-             <loc>https://1lev1.vercel.app</loc>
-             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
+             <loc>https://1lev1.vercel.app/</loc>
+             <lastmod>2024-03-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>weekly</changefreq>
              <xhtml:link
