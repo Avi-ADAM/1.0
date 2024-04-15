@@ -17,7 +17,11 @@
             import TRan from './tranarb.svelte';
       import {  doesLang, langUs, lang } from '$lib/stores/lang.js'
 const baseUrl = import.meta.env.VITE_URL
-
+import { Head } from 'svead'
+  let title = ' 1💗1 | التوافق العالمي من أجل الحرية'
+  let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
+  let description = "يمثل التوافق العالمي من أجل الحرية اتفاقًا جماعيًا للالتزام بعدم العنف واحترام الآخرين والخير الأصيل الكامن في الإنسانية. من خلال المشاركة في هذا التوافق، يلتزم الأفراد بخلق عالم حيث لا تعرِّف الإكراه والنزاع والعدوانية التواصل الإنساني بعد الآن |.يمكن لأولئك الذين يوافقون على هذه المبادئ الانضمام والتسجيل على منصة 1💗1، حيث يمكنهم إنشاء وإدارة شراكات بطريقة تعتمد على التوافق. دعونا نبني عالمًا حيث تسود الحرية وتجد الخلافات حلاً من خلال الموافقة المشتركة."
+  let url = "https://1lev1.vercel.app/aitifaqia"
 function find_contry_id(contry_name_arr){
      var  arr = [];
       for (let j = 0; j< contry_name_arr.length; j++ ){
@@ -470,7 +474,8 @@ function erorer(){
   a = 5;
 }
 </script>
-   
+   <Head {title} {description} {image} {url} />
+  
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">

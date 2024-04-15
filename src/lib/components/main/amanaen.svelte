@@ -20,8 +20,13 @@
       import {  fly } from 'svelte/transition';
       import Tikun from './tikuneng.svelte';
             import TRan from './translateeng.svelte';
+import { Head } from 'svead'
+  let title = ' 1💗1 | Global Consensus for Freedom'
+  let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
+  let description = "The Global Consensus for Freedom represents a collective agreement to uphold non-violence, mutual respect, and the inherent goodness within humanity. By participating in this consensus, individuals commit to creating a world where coercion, conflict, and aggression no longer define human communication. | Those who agree to these principles can join and register on the 1💗1 platform, where they can create and manage partnerships in a consensus-driven manner. | Let’s build a world where freedom prevails, and disagreements find resolution through shared consent."
+  let url = "https://1lev1.vercel.app/convention"
 
-function find_contry_id(contry_name_arr){
+  function find_contry_id(contry_name_arr){
      var  arr = [];
       for (let j = 0; j< contry_name_arr.length; j++ ){
       for (let i = 0; i< country.length; i++){
@@ -490,9 +495,8 @@ function change(la){
 $: w = 0
 $: h = 0
 </script>
-   <svelte:head>
-    <title>worldwide consensus on freedom and peace</title>
-   </svelte:head>
+  <Head {title} {description} {image} {url} />
+
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">
