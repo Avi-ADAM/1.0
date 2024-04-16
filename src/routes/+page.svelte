@@ -58,18 +58,18 @@ const word1 = {
   "ar": "اتخاذ قرارات بالإجماع: نظامنا الفريد يسهل اتخاذ القرارات بالإجماع بين المشاركين في المشروع."
 };
 const wordNew = {
-  "he": "כל אחת היא מלכה וכל אחד הוא מלך! כאן יוצרים, בונים ומרוויחים יחד תוך שמירה על עצמאות אישית וחירות מלאה",
-  "en": "Every woman is a queen, and every man is a king! Here we create, build, and earn together while preserving personal autonomy and complete freedom",
-  "ar": "كل امرأة هي ملكة، وكل رجل هو ملك! هنا نقوم بالإبداع، والبناء، والكسب المشترك مع الحفاظ على الاستقلال الشخصي والحرية الكاملة"
+  "he": "👑 כל אחת היא מלכה וכל אחד הוא מלך! כאן יוצרים, בונים ומרוויחים יחד תוך שמירה על עצמאות אישית וחירות מלאה",
+  "en": "👑 Every woman is a queen, and every man is a king! Here we create, build, and earn together while preserving personal autonomy and complete freedom",
+  "ar": "👑 كل امرأة هي ملكة، وكل رجل هو ملك! هنا نقوم بالإبداع، والبناء، والكسب المشترك مع الحفاظ على الاستقلال الشخصي والحرية الكاملة "
 };
 
 const word2 = {
-  "he": "לייסד ריקמה (שותפות) בקליק ולאתר את מרכיביה האנושיים והחומריים בקלות",
+  "he": "לייסד ריקמה (סוג שותפות ייחודי) בקליק ולאתר ולצרף אליה שותפים, שותפות ומשאבים נדרשים בקלות",
   "en": "Founding a FreeMates project with a click and easily identifying its human and material components",
   "ar": "تأسيس مشروع FreeMates بنقرة واحدة وتحديد مكوناته البشرية والمادية بسهولة."
 };
 const word3 = {
-  "he": "למצוא ולהתחבר לריקמה שמתאימה בדיוק לערכים, הכישורים ודרך העבודה שלך",
+  "he": "למצוא ולהתחבר לריקמה שמתאימה בדיוק לערכים, הכישורים ולוח הזמנים שלך",
   "en": "Finding and connecting to a FreeMate that aligns precisely with your values, skills, and work style",
   "ar": "العثور والاتصال بـ FreeMate الذي يتوافق تمامًا مع قيمك ومهاراتك ونمط عملك"
 };
@@ -171,7 +171,26 @@ const agree3 = {
 	let loading = false, loadinga = false,w,h,fi = false, trans = false
   //רוצה להתפרנס מהתשוקה.אהבה שלך
 //w*1.8 < h ? w : h > 639 ? w*0.8 : h
+
+import { Head } from 'svead'
+
+  let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
+const description = {
+  he: '1💗1 הסכמה עולמית על חי | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
+  en: '1💗1 WorldWide consensus for Security and Peace | colaboration platform, create together harmoniously | consensus based partnerships manegment platform | we can together',
+  ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا'
+};
+//To establish consensus for non-violence, To allow a network of harmoneus creation
+const pagetitle = {
+  en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
+  he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
+  ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية'
+};
+  let pageurl = {"ar":"https://1lev1.vercel.app/ar",
+  "en":"https://1lev1.vercel.app/en",
+"he":"https://1lev1.vercel.app/he"}
 </script>
+   <Head title={pagetitle[$lang]} description={description[$lang]} {image} url={pageurl[$lang]} />
  <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
           <button on:click={()=>trans = !trans}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
@@ -249,7 +268,7 @@ const agree3 = {
 			<Lowding width="24px" height="24px"/>
 			{/if}
 			</button>
-			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/ar" : "/en"}`) 
+			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/aitifaqia" : "/convention"}`) 
 			loading = true
 			fi = true
 		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} on:focus={()=> btnb = true} on:mouseover={()=>btnb = true} on:mouseleave={()=> btnb = false }>{reg[$lang]}
