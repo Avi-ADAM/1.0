@@ -1,4 +1,5 @@
 <script>
+  import { sendToSer } from '$lib/send/sendToSer.svelte';
 	import { createEventDispatcher, onMount } from 'svelte';
 
 	/** @type {HTMLDivElement}*/
@@ -10,6 +11,12 @@
 	 * Bot username
 	 * */
 	export let username = '';
+
+    /** @type {Number}
+	 * user id
+	 * */
+	export let uid = 0;
+
 
 	/** @type {string}
 	 * Widget size.
@@ -52,6 +59,7 @@
 
 	function telegramCallback( user) {
         console.log(user)
+        sendToSer({uid,telegramId:user.id},"6addTelegram",uid)
 		dispatch('auth', user);
 	}
 	function cleanStart() {

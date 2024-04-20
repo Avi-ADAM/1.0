@@ -8,7 +8,7 @@ export let isGuidMe = false;
 export let projectIds = []
   import { onMount } from 'svelte';
   $: t = 0
-  $: teleredy = false
+  export let teleredy = false
  let sub;
  export let machshirs
 
@@ -189,6 +189,7 @@ function save (){
  export let checked = false
 
 import axios from 'axios';
+  import LoginT from '$lib/func/telegram/loginT.svelte';
 let passwordx;
 let errorl = null;
 let before = true;
@@ -306,6 +307,8 @@ function shaneh () {
    dispatch("guid")
    pressed = false
 }
+const teletrue = {"he": "ניהול הרשמתך לקבלת עדכונים בטלגרם","en": "manage your telegram nutification subscription"}
+
 const svbt = {"he": "שמירת שינויים","en": "save changes"}
 const guidend = {"he": "המדריך לא יוצג שוב, ניתן להחזירו בכל עת בתפריט זה","en": "the guid will not show up again, you can return it back from here"}
 const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כדי לראותו","en": "the guid ia back! refreach the page to see it"}
@@ -493,6 +496,8 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 			/>
 			<span
 				class="toggle-password"
+        role="button"
+        tabindex="0"
 				on:mouseenter={() => (showPassword = true)}
 				on:mouseleave={() => (showPassword = false)}
 			>
@@ -536,11 +541,14 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 
     {/if}
 	<button id="nb" type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{nutidev[$lang]}</button>
-  {#key teleredy}  
-  {#if teleredy == true}
-  <a target="_blank" href="{`https://telegram.me/onelevone_bot?start=${uid}_${t}_${un}_${$lang}`}" alt="telegramjoin"  
-    class="flex items-center grow justify-center  m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">
-    {nutitele[$lang]}
+  <!--target="_blank" href="{`https://telegram.me/onelevone_bot?start=${uid}_${t}_${un}_${$lang}`}" alt="telegramjoin"-->
+  <h3   
+    class="flex items-center grow justify-center text-barbi underline font-bold p-2">
+     {#if teleredy !== true}
+ {nutitele[$lang]}
+ {:else}
+ {teletrue[$lang]}
+ {/if}
   <svg
   class="h-5 w-5"
   fill="#1da1f2"
@@ -555,9 +563,9 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
     id="telegram-1"
     d="M18.384,22.779c0.322,0.228 0.737,0.285 1.107,0.145c0.37,-0.141 0.642,-0.457 0.724,-0.84c0.869,-4.084 2.977,-14.421 3.768,-18.136c0.06,-0.28 -0.04,-0.571 -0.26,-0.758c-0.22,-0.187 -0.525,-0.241 -0.797,-0.14c-4.193,1.552 -17.106,6.397 -22.384,8.35c-0.335,0.124 -0.553,0.446 -0.542,0.799c0.012,0.354 0.25,0.661 0.593,0.764c2.367,0.708 5.474,1.693 5.474,1.693c0,0 1.452,4.385 2.209,6.615c0.095,0.28 0.314,0.5 0.603,0.576c0.288,0.075 0.596,-0.004 0.811,-0.207c1.216,-1.148 3.096,-2.923 3.096,-2.923c0,0 3.572,2.619 5.598,4.062Zm-11.01,-8.677l1.679,5.538l0.373,-3.507c0,0 6.487,-5.851 10.185,-9.186c0.108,-0.098 0.123,-0.262 0.033,-0.377c-0.089,-0.115 -0.253,-0.142 -0.376,-0.064c-4.286,2.737 -11.894,7.596 -11.894,7.596Z" />
 </svg>
-  </a>
-{/if}
-{/key}
+</h3>
+      <LoginT uid={uid} requestAccess={true} username="onelev_bot" on:outh={()=>teleredy = true}/>
+
   {#if isGuidMe == false && pressed == false}
 	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{remuGuid[$lang]}</button>
 {:else if isGuidMe == true && pressed == false}
