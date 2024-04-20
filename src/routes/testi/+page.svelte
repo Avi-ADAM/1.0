@@ -2,7 +2,7 @@
   import { goto } from "$app/navigation";
   import Arrow from "$lib/celim/icons/arrow.svelte";
   import Lowding from "$lib/celim/lowding.svelte";
-  import Tile from "$lib/celim/tile.svelte";
+  import LoginT from "$lib/func/telegram/loginT.svelte";
 	import { Canvas } from '@threlte/core'
   import Scene from '$lib/components/main/1lev1.svelte'
   import { useProgress } from '@threlte/extras'
@@ -220,19 +220,8 @@ const agree3 = {
     style="text-shadow:none;">{setitle[$lang]}</h2>
 		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{desc[$lang]}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{desc2[$lang]}</span></h3>
 		<div dir={$lang == "en" ? "ltr" : "rtl"}>
-      	<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={wordNew[$lang]} animate={true} />
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]} animate={true} />
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word2[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word3[$lang]} animate={true}/>				
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word4[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word5[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word6[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word7[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word8[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]} animate={true}/>
-				<Tile bg={"wow"} big={true} sm={true} word={word10[$lang]}/>
-				<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>
-			</div>
+      <LoginT requestAccess={true} username="onelev_bot"/>
+    </div>
 		<div class="bg-gradient-to-br from-fuchsia-400 via-barbi  to-mpink px-3 py-4 mt-1 border-4 border-spacing-2 ">
 		<h2 style="text-shadow:none;" class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  ">{regesh1[$lang]}<br>{regesh2[$lang]}</h2>
     </div>
