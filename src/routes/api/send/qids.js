@@ -101,7 +101,7 @@ export const qids = {
     
   ) {data{id}}
 }`,
-  '6addTelegram': `mutation UpdateUsersPermissionsUser($telegramId:Int ,
+  '6addTelegram': `mutation UpdateUsersPermissionsUser($telegramId:String ,
                                       $uid:ID!,
                                   )
                         { updateUsersPermissionsUser(
