@@ -34,6 +34,7 @@ export const qids = {
           data{
             id
             attributes{
+              telegramId
               lang 
               machshirs{data{id attributes{jsoni}}}
             }

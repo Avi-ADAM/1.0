@@ -2,6 +2,7 @@
 // a get all other project users/ chat members email & devises 
 
 import { pusherer } from '$lib/func/pusherer.svelte'
+import { sendBolkTelegram } from '$lib/func/telegram/sendBolkTelegram.svelte';
 import { sendToSer } from '$lib/send/sendToSer.svelte';
 
 //b sendMessages
@@ -77,7 +78,10 @@ export async function POST({request, cookies, fetch}){
         };
       });
     });
-
+      //validate that user has telegramId
+     const valid = transformedData.filter((user) => user.users_permission_user.data.attributes.telegramId);
+     const transformedDataTel = valid;
+    
     const pic =
       'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png';
     //  jsonim.data.project.data.attributes.profilePic.data?.attributes?.formats
@@ -85,5 +89,6 @@ export async function POST({request, cookies, fetch}){
      // jsonim.data.project.data.attributes.profilePic.data?.attributes?.url
         //jsonim myid messege mainlang pic
         pusherer(transformedData, idL,pic,title,body,lang,fetch);
+        sendBolkTelegram(transformedDataTel, idL,title,body,lang,fetch);
     return new Response    
 }
