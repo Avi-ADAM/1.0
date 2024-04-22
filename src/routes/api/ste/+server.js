@@ -1,4 +1,4 @@
-const { Telegraf } = require('telegraf');
+import { Telegraf } from 'telegraf';
 import { Markup } from 'telegraf';
 
 export const POST = async ({ request }) => {
