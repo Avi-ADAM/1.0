@@ -5,7 +5,9 @@ import { Markup } from 'telegraf';
 let appIds = [];
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
-const bot = new Telegraf(Token);
+const bot = new Telegraf(Token, {
+    webhookReply: true
+});
 
 bot.start((ctx) => {
   console.log(ctx.chat.id);
@@ -40,13 +42,9 @@ bot.start((ctx) => {
   }
 });
 bot.help((ctx) => ctx.reply('Send me a sticker'));
-import { createServer } from 'https';
 
-createServer(
-  await bot.createWebhook({ domain: '1lev1.vercel.app/api/newTelegram' })
-).listen(8443);
 
-/*export async function POST({ request }) {
+export async function POST({ request }) {
     console.log("ffy")
   try {
     await bot.handleUpdate(request.body);
@@ -55,4 +53,4 @@ createServer(
     console.error('Error handling Telegram update:', error);
     return new Response('', { status: 500 });
   }
-}*/
+}
