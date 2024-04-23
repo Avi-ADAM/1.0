@@ -5,10 +5,10 @@ import { Markup } from 'telegraf';
 let appIds = [];
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
-const app = new Telegraf(Token);
-app.launch();
+const bot = new Telegraf(Token);
+bot.launch();
 
-app.start((ctx) => {
+bot.start((ctx) => {
   //check if the chat_id is in our list
   if (appIds.includes(ctx.chat.id)) {
     ctx.reply('Welcome to 1💗1', {
@@ -39,4 +39,6 @@ app.start((ctx) => {
     });
   }
 });
-app.help((ctx) => ctx.reply('Send me a sticker'));
+bot.help((ctx) => ctx.reply('Send me a sticker'));
+
+export default bot;
