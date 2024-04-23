@@ -6,9 +6,9 @@ let appIds = [];
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
 const bot = new Telegraf(Token);
-bot.launch();
 
 bot.start((ctx) => {
+    console.log(ctx.chat.id)
   //check if the chat_id is in our list
   if (appIds.includes(ctx.chat.id)) {
     ctx.reply('Welcome to 1💗1', {
