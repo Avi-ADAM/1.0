@@ -40,9 +40,14 @@ bot.start((ctx) => {
   }
 });
 bot.help((ctx) => ctx.reply('Send me a sticker'));
+import { createServer } from 'https';
 
+createServer(
+  tlsOptions,
+  await bot.createWebhook({ domain: '1lev1.vercel.app/api/newTelegram' })
+).listen(8443);
 
-export async function POST({ request }) {
+/*export async function POST({ request }) {
     console.log("ffy")
   try {
     await bot.handleUpdate(request.body);
@@ -51,4 +56,4 @@ export async function POST({ request }) {
     console.error('Error handling Telegram update:', error);
     return new Response('', { status: 500 });
   }
-}
+}*/
