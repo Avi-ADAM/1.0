@@ -19,7 +19,7 @@ bot.start((ctx) => {
       ])
     });
   } else {
-    ctx.reply('Welcome to 1💗1', {
+    ctx.reply('Welcome to 1💗1'/*, {
       parse_mode: 'HTML',
       disable_web_page_preview: true,
       reply_markup: Markup.inlineKeyboard([
@@ -36,13 +36,14 @@ bot.start((ctx) => {
           'https://1lev1.vercel.app/me'
         )
       ])
-    });
+    } */);
   }
 });
 bot.help((ctx) => ctx.reply('Send me a sticker'));
 
 
 export async function POST({ request }) {
+    console.log("ffy")
   try {
     await bot.handleUpdate(request.body);
     return new Response('', { status: 200 });
