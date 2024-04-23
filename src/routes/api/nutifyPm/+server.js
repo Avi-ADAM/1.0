@@ -79,7 +79,9 @@ export async function POST({request, cookies, fetch}){
       });
     });
       //validate that user has telegramId
-     const valid = transformedData.filter((user) => user.users_permission_user.data.attributes.telegramId);
+     const valid = jsonim.data.project.data.attributes.user_1s.data.filter(
+       (user) => user.attributes.telegramId
+     );
      const transformedDataTel = valid;
     
     const pic =
@@ -88,7 +90,9 @@ export async function POST({request, cookies, fetch}){
     //    ?.thumbnails.url ??
      // jsonim.data.project.data.attributes.profilePic.data?.attributes?.url
         //jsonim myid messege mainlang pic
+     
         pusherer(transformedData, idL,pic,title,body,lang,fetch);
+        console.log('after', transformedDataTel);
         sendBolkTelegram(transformedDataTel, idL,title,body,lang,fetch);
     return new Response    
 }

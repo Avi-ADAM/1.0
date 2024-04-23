@@ -4,12 +4,12 @@ import { Markup } from 'telegraf';
 export const POST = async ({ request }) => {
   console.log('tryng', request.body);
   const data = await request.json();
-  let isNew = data.isNew || false;
-  const name = data.name || null;
-  const action = data.action.replace('\n', '%0A') || null;
-  const det = data.det;
-  const chat_id = data.chat_id || null;
-  const lang = data.lang || 'he';
+  let isNew = data?.isNew || false;
+  const name = data?.name || null;
+  const action = data.action ? data.action.replace('\n', '%0A') : null;
+  const det = data?.det;
+  const chat_id = data?.chat_id || null;
+  const lang = data?.lang || 'he';
   const buttontext = {
     he: 'לצפייה ב-1💗1',
     en: ' see on 1💗1',
@@ -34,11 +34,15 @@ export const POST = async ({ request }) => {
     app.telegram.sendMessage(
       chatId,
       botMessage,
-      Markup.inlineKeyboard([
-        Markup.button.url(buttontext[lang], 'https://1lev1.vercel.app/moach')
-      ])
+      {
+        parse_mode: 'HTML',
+        disable_web_page_preview: true,
+        reply_markup: Markup.inlineKeyboard([
+          Markup.button.url(buttontext[lang], 'https://1lev1.vercel.app/moach')
+        ]),
+      }
     );
-    M
+   // 6377840674;
 
 }
   return new Response();
