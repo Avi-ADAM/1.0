@@ -5,6 +5,8 @@ let appIds = []
 //token new
   const Token =  import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW
   const app = new Telegraf(Token);
+  app.launch();
+
   app.start((ctx) => {
     //check if the chat_id is in our list
     if(appIds.includes(ctx.chat.id)){
