@@ -43,7 +43,6 @@ bot.help((ctx) => ctx.reply('Send me a sticker'));
 import { createServer } from 'https';
 
 createServer(
-  tlsOptions,
   await bot.createWebhook({ domain: '1lev1.vercel.app/api/newTelegram' })
 ).listen(8443);
 
