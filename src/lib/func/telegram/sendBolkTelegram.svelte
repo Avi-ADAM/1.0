@@ -12,7 +12,7 @@
       for (let i = 0; i < telegrams.length; i++) {
             const element = telegrams[i];
             if(element.id !== myid){
-                let data = {lang:element.attributes.lang ?? mainlang,chat_id: element.attributes.telegramId,  messege :title[element.attributes.lang ?? mainlang] + "%0A" + body[element.attributes.lang ?? mainlang] }
+                let data = {isNew: true, lang:element.attributes.lang ?? mainlang,chat_id: element.attributes.telegramId,  messege :title[element.attributes.lang ?? mainlang] + "%0A" + body[element.attributes.lang ?? mainlang] }
                 fetch('https:1lev1.vercel.app/api/ste', {
                 method: 'POST',  
                 headers: {
