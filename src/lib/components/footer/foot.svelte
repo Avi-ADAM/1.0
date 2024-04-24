@@ -139,7 +139,7 @@
         </div>
       {/if}
       <div>
-        <Chooser bind:level={online} />
+        <!----<Chooser bind:level={online} />-->
       </div>
     </div>
     <ChatSmall bind:chatId {un}/>

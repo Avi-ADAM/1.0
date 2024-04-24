@@ -9,7 +9,7 @@ import { lang } from '$lib/stores/lang.js'
   import { getAnalytics } from "firebase/analytics";
   import { initialForum, forum } from '$lib/stores/pendMisMes.js';
   import Foot from '$lib/components/footer/foot.svelte';
- // import { initialWebS } from '$lib/stores/pendMisMes.js';
+ import { initialWebS } from '$lib/stores/pendMisMes.js';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -51,7 +51,7 @@ onMount(async () => {
     isAuthed = true
     initialForum(true,[],data.uid)
     console.log($forum)
-        //  initialWebS(data.tok,data.uid)
+    initialWebS(data.tok,data.uid)
 
 }else{
    const cookieValue = document.cookie
@@ -93,14 +93,14 @@ const logi = { "he": "להתחברות", "en":"To Login"}
 
 
 {#if isAuthed}
-<main class="min-h-[95dvh] min-w-screen">
-  <slot></slot>
-  <Foot/>
+<main class="h-[100dvh] min-w-screen absolute top-0 left-0">
+  <Foot un={data.un} idL={data.uid}/>
   <Tour TourTip={TourTip}></Tour>
 <span style:z-index="9999">
   <Toasts />
 </span>
       </main>
+  <slot></slot>
 
   {:else}
 <div class="a  bg-gradient-to-br from-gra to-grb">

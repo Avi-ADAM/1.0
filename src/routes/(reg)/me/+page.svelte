@@ -293,14 +293,13 @@ async function start () {
             val = val
             skil = meData.skills.data;
               if ($lang == "he"){
-             for (var i = 0; i < skil.length; i++){
-                if (skil[i].attributes.localizations.data.length > 0){
-                skil[i].attributes.skillName = skil[i].attributes.localizations.data[0].attributes.skillName
+             for (var i = 0; i < meData.skills.data.length; i++){
+                if (meData.skills.data[i].attributes.localizations.data.length > 0){
+                meData.skills.data[i].attributes.skillName = meData.skills.data[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }
-            skil = skil
-                        console.log(skil)
+            meData = meData
 
             taf = meData.tafkidims.data;
                         if ($lang == "he"){
@@ -367,6 +366,10 @@ async function start () {
     function reverseString(str) {
     return str.split("").reverse().join("");
 }
+ export const snapshot = {
+    capture: () => JSON.parse(JSON.stringify(meData)),
+    restore: (value) => (meData = value)
+  };
 function getCookie(name) {
     var dc = document.cookie;
     var prefix = name + "=";
@@ -583,7 +586,7 @@ function close (event){
     taf = event.detail.list
   }
   else if (a == "skills"){
-    skil = event.detail.list;
+    meData.skills.data = event.detail.list;
   }
   else if (a == "vallues"){
   val = event.detail.list;
@@ -783,7 +786,7 @@ let width,height
   {#key addSl}
   <div   class="d" class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
           <TourItem message={message2[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={skil} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={meData.skills.data} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
         </TourItem>
  </div>
   <div class="d" class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">

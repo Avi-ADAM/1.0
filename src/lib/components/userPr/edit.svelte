@@ -604,7 +604,7 @@ on:click={bitulm}
            <p style="margin: 0; line-height: 1;  padding: auto;" class="t">{dat[valc]}</p>
            {/each} </span>{/if}-->
 <button
-class=" hover:bg-barbi text-mturk rounded-full "
+class=" hover:bg-barbi text-mturk rounded-full h-6 w-6"
 title="{edito[$lang]}"
 on:click={open}
 ><svg  class="e" viewBox="0 0 24 24">

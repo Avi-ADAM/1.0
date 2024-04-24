@@ -531,7 +531,7 @@
       <NumberInput bind:value={totalbounti} topLebel={inc[$lang]} />
   {/if}
   </div>
-  <div class="sticky bottom-0 left-4 bg-slate-600 bg-opacity-60 flex flex-row align-bottom">
+  <div class="text-center justify-center items-center m-2 flex flex-row align-bottom">
    
     {#if loading == false}
       <button
