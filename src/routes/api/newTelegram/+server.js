@@ -5,9 +5,6 @@ import { Markup } from 'telegraf';
 let appIds = [];
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
-
-export async function POST({ request }) {
-    console.log("ffy")
     const bot = new Telegraf(Token);
 
     bot.start((ctx) => {
@@ -46,14 +43,17 @@ export async function POST({ request }) {
     });
     bot.help((ctx) => ctx.reply('Send me a sticker'));
 
-
+export async function POST({ request }) {
   try {
-    await 
-    
-    bot.handleUpdate(request.body);
+    if (!request || !request.body) {
+      console.error('NullPointerException: request.body is null or undefined');
+      return new Response('', { status: 500 });
+    }
+    await bot.handleUpdate(request.body);
     return new Response('', { status: 200 });
   } catch (error) {
-    console.error('Error handling Telegram update:', error);
+    console.error('Unhandled Exception while handling Telegram update: ', error);
+    console.error(error.stack);
     return new Response('', { status: 500 });
   }
 }
