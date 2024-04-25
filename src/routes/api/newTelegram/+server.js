@@ -42,8 +42,13 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       }
     });
     bot.help((ctx) => ctx.reply('Send me a sticker'));
+import { createServer } from 'https';
 
-export async function POST({ request }) {
+createServer(
+  tlsOptions,
+  await bot.createWebhook({ domain: 'https://1lev1.vercel.app',path:'/api/newTelegram' })
+).listen(8443);
+export async function GET({ request }) {
   try {
     if (!request || !request.body) {
       console.error('NullPointerException: request.body is null or undefined');

@@ -35,7 +35,7 @@ let isOpen = false;
   let token;
   let files;
   let idLi;
-  let myP =[];
+
   let skil =[];
   let taf =[];
   let mash = [];
@@ -60,7 +60,6 @@ let addNs1 = true;
     let st = 0;
     let stylef = '31px';
     let meData = start();
-let username;
 function letters(data){
 
    if (data.length >= 2 && data.length < 4) {
@@ -272,26 +271,21 @@ async function start () {
         meData =  meDataa.data.usersPermissionsUser.data.attributes
         isG = meDataa.data.usersPermissionsUser.data.attributes.profilManualAlready
        mail = meData.email;
-       username = meData.username;
-       liUN.set(username)
+       liUN.set(meData.username)
           letters(meData.username);
-            myP = meData.projects_1s.data ;
             lango = meData.lang;
             if (lango == "en" || lango == "he") {
               lang.set(lango)
               doesLang.set(true)
               langUs.set(lango)
             }
-            val = meData.vallues.data;
             if ($lang == "he"){
-              for (var i = 0; i < val.length; i++){
-                if (val[i].attributes.localizations.data.length > 0){
-                val[i].attributes.valueName = val[i].attributes.localizations.data[0].attributes.valueName
+              for (var i = 0; i < meData.vallues.data.length; i++){
+                if (meData.vallues.data[i].attributes.localizations.data.length > 0){
+                meData.vallues.data[i].attributes.valueName = meData.vallues.data[i].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
-            val = val
-            skil = meData.skills.data;
               if ($lang == "he"){
              for (var i = 0; i < meData.skills.data.length; i++){
                 if (meData.skills.data[i].attributes.localizations.data.length > 0){
@@ -301,28 +295,25 @@ async function start () {
             }
             meData = meData
 
-            taf = meData.tafkidims.data;
                         if ($lang == "he"){
-             for (var i = 0; i < taf.length; i++){
-                if (taf[i].attributes.localizations.data.length > 0){
-                taf[i].attributes.roleDescription = taf[i].attributes.localizations.data[0].attributes.roleDescription
+             for (var i = 0; i < meData.tafkidims.data.length; i++){
+                if (meData.tafkidims.data[i].attributes.localizations.data.length > 0){
+                meData.tafkidims.data[i].attributes.roleDescription = meData.tafkidims.data[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
-            taf = taf
-            mash = meData.sps.data;
-            work = meData.work_ways.data;
+            meData = meData
             if ($lang == "he"){
-             for (var i = 0; i < work.length; i++){
-                if (work[i].attributes.localizations.data.length > 0){
-                work[i].attributes.workWayName = work[i].attributes.localizations.data[0].attributes.workWayName
+             for (var i = 0; i < meData.work_ways.data.length; i++){
+                if (meData.work_ways.data[i].attributes.localizations.data.length > 0){
+                meData.work_ways.data[i].attributes.workWayName = meData.work_ways.data[i].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }
-              work = work
             cards = meData.preferCards ?? true
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
+
             total = meData.hervachti ? meData.hervachti : 0;
             fblink = meData.fblink
             twiterlink = meData.twiterlink
@@ -340,9 +331,9 @@ async function start () {
               picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
             }
             localStorage.setItem('picLink', JSON.stringify(picLink));
-            console.log(meData)
-            total = meData.hervachti;
 
+            total = meData.hervachti;
+            meData=meData
           } else {
             goto("/login")
           }
@@ -389,16 +380,17 @@ function getCookie(name) {
 
     return decodeURI(dc.substring(begin + prefix.length, end));
 }
+/*
   onMount(async () => {
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
      await start()
      .then()
-  if ((/[\u0590-\u05FF]/).test(username) || (/[\u0600-\u06FF]/).test(username)) {
-    username = reverseString(username)
-    username = username
+  if ((/[\u0590-\u05FF]/).test(meData.username) || (/[\u0600-\u06FF]/).test(meData.username)) {
+    meData.username = reverseString(meData.username)
+    meData = meData
 }
   }
-   })
+   })*/
 let userName_value;
 let biog;
 let frd;
@@ -489,6 +481,7 @@ function remove (event) {
             val = meData.vallues.data;
             mash = meData.sps.data;
             work = meData.work_ways.data;
+            meData = meData
             addNs1 = true;
 };
 
@@ -509,6 +502,7 @@ async function add (event) {
             val = meData.vallues.data;
             mash = meData.sps.data;
             work = meData.work_ways.data;
+            meData = meData
   addNs1 = true;
   console.log(a)
 };
@@ -528,6 +522,7 @@ async function addnew (event) {
             val = meData.vallues.data;
             mash = meData.sps.data;
             work = meData.work_ways.data;
+            meData = meData
   addNs1 = true;
 };
 const closer = () => {
@@ -583,22 +578,22 @@ function close (event){
   const a = event.detail.linkp;
 
   if (a == "tafkidims"){
-    taf = event.detail.list
+    meData.tafkidims.data = event.detail.list
   }
   else if (a == "skills"){
     meData.skills.data = event.detail.list;
   }
   else if (a == "vallues"){
-  val = event.detail.list;
-    console.log(a, val)
+  meData.vallues.data = event.detail.list;
   }
   else if (a == "mashaabims"){
-   mash = event.detail.list;
+   meData.sps.data = event.detail.list;
   }
   else if (a == "workWays"){
-    work = event.detail.list;
+    meData.work_ways.data = event.detail.list;
   }
   current = "l";
+  meData = meData
   addSl1 = false;
  addSl2 = false;
  addSl3 = false;
@@ -661,11 +656,12 @@ async function han (){
   .then(data => miDa = data);
          console.log(miDa)
         const tor = miDa.data.updateSp.data.id
-        const oldob = mash
+        const oldob = meData.sps.data
         const x = oldob.map(c => c.id);
         const indexy = x.indexOf(tor);
         oldob.splice(indexy, 1);
-        mash = oldob;
+        meData.sps.data = oldob;
+        meData = meData
         a = 0;
         isOpen = false;
         } catch (e) {
@@ -739,7 +735,7 @@ let width,height
 
 
           {:else if a == 1}
-          <EditB machshirs={meData?.machshirs.data} projectIds={myP.map(c=>c.id)} bind:isGuidMe={isG} checked={cards} uid={meDataa.data.me.id} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid={guid}/>
+          <EditB machshirs={meData?.machshirs.data} projectIds={meData.projects_1s.data.map(c=>c.id)} bind:isGuidMe={isG} checked={cards} uid={meDataa.data.me.id} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid={guid}/>
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
           <button
@@ -775,7 +771,7 @@ let width,height
     <svg width="45vw" height="9vw" viewBox="0 0 500 100">
     <path id="curve" d="M73.2,148.6c4-6.1,65.5-96.8,178.6-95.6c111.3,1.2,170.8,90.3,175.1,97" />
     <text width="500" id="text" >
-      <textPath  text-anchor="center" class="curved-text" xlink:href="#curve" startOffset="{st}">{username}</textPath>
+      <textPath  text-anchor="center" class="curved-text" xlink:href="#curve" startOffset="{st}">{meData.username}</textPath>
     </text>
   </svg>
     </div>
@@ -791,23 +787,23 @@ let width,height
  </div>
   <div class="d" class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
           <TourItem message={message3[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={taf} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={meData.tafkidims.data} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
   <div class="d" class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
-    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={mash} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
+    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={meData.sps.data} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
 </div>
           </TourItem>
 
         <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}" class="d">
                 <TourItem message={message5[$lang]}>
-      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={val} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
+      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={meData.vallues.data} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
         <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}" class="d">
-          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={work} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
+          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={meData.work_ways.data} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
         </div>
                             </TourItem>
 
@@ -880,7 +876,7 @@ let width,height
     <h2 class="cot">{myfr[$lang]}</h2>
   {#if load == false}
   <span class="d pro">
-           {#each myP as data, i}
+           {#each meData.projects_1s.data as data, i}
            <div class="cont"  >
             <button
              on:click={project(data.id)}
