@@ -33,27 +33,29 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
           '<<register for nutification הרשמה לעדכונים>>',
           'https://1lev1.vercel.app/me'
         )
-      ])
+      ]).resize()
     )
     }
 }
 );
     bot.help((ctx) =>
-      ctx.reply('Here you can register to updates from our 1💗1 platform', Markup.inlineKeyboard([
-        Markup.button.url(
-          '<<to registration להרשמה>>',
-          'https://1lev1.vercel.app'
-        ),
-        Markup.button.url(
-          '<<login להתחברות >>',
-          'https://1lev1.vercel.app/login'
-        ),
-        Markup.button.url(
-          '<<register for nutification הרשמה לעדכונים>>',
-          'https://1lev1.vercel.app/me'
-        )
-      ])
-        )
+      ctx.reply(
+        'Here you can register to updates from our 1💗1 platform',
+        Markup.inlineKeyboard([
+          Markup.button.url(
+            '<<to registration להרשמה>>',
+            'https://1lev1.vercel.app'
+          ),
+          Markup.button.url(
+            '<<login להתחברות >>',
+            'https://1lev1.vercel.app/login'
+          ),
+          Markup.button.url(
+            '<<register for nutification הרשמה לעדכונים>>',
+            'https://1lev1.vercel.app/me'
+          )
+        ]).resize()
+      )
     );
 import { createServer } from 'https';
 
