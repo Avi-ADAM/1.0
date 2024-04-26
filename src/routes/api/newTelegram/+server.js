@@ -24,18 +24,15 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
      Markup.inlineKeyboard([
           Markup.button.url(
             '<<to registration להרשמה>>',
-            'https://1lev1.vercel.app',
-            { buttonColor: 'primary' }
+            'https://1lev1.vercel.app'
           ),
           Markup.button.url(
             '<<login להתחברות >>',
-            'https://1lev1.vercel.app/login',
-            { buttonColor: 'secondary' }
+            'https://1lev1.vercel.app/login'
           ),
           Markup.button.url(
             '<<register for nutification הרשמה לעדכונים>>',
-            'https://1lev1.vercel.app/me',
-            { buttonColor: 'positive' }
+            'https://1lev1.vercel.app/me'
           )
       ]).resize()
     )
@@ -48,18 +45,15 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
         Markup.inlineKeyboard([
           Markup.button.url(
             '<<to registration להרשמה>>',
-            'https://1lev1.vercel.app',
-            { buttonColor: 'primary' }
+            'https://1lev1.vercel.app'
           ),
           Markup.button.url(
             '<<login להתחברות >>',
-            'https://1lev1.vercel.app/login',
-            { buttonColor: 'secondary' }
+            'https://1lev1.vercel.app/login'
           ),
           Markup.button.url(
             '<<register for nutification הרשמה לעדכונים>>',
-            'https://1lev1.vercel.app/me',
-            { buttonColor: 'positive' }
+            'https://1lev1.vercel.app/me'
           )
         ]).resize()
       )
