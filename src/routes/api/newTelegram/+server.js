@@ -45,10 +45,9 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
 import { createServer } from 'https';
 
 createServer(
-  tlsOptions,
   await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
 ).listen(8443);
-export async function GET({ request }) {
+/*export async function GET({ request }) {
   try {
     if (!request || !request.body) {
       console.error('NullPointerException: request.body is null or undefined');
@@ -61,4 +60,4 @@ export async function GET({ request }) {
     console.error(error.stack);
     return new Response('', { status: 500 });
   }
-}
+}*/
