@@ -20,10 +20,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
         });
       } else {
         ctx.reply(
-          'Welcome to 1💗1' , {
-      parse_mode: 'HTML',
-      disable_web_page_preview: true,
-      reply_markup: Markup.inlineKeyboard([
+          'Welcome to 1💗1' , Markup.inlineKeyboard([
         Markup.button.url(
           '<<to registration להרשמה>>',
           'https://1lev1.vercel.app'
@@ -37,11 +34,27 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
           'https://1lev1.vercel.app/me'
         )
       ])
-    } 
-        );
-      }
-    });
-    bot.help((ctx) => ctx.reply('Send me a sticker'));
+    )
+    }
+}
+);
+    bot.help((ctx) =>
+      ctx.reply('Here you can register to updates from our 1💗1 platform', Markup.inlineKeyboard([
+        Markup.button.url(
+          '<<to registration להרשמה>>',
+          'https://1lev1.vercel.app'
+        ),
+        Markup.button.url(
+          '<<login להתחברות >>',
+          'https://1lev1.vercel.app/login'
+        ),
+        Markup.button.url(
+          '<<register for nutification הרשמה לעדכונים>>',
+          'https://1lev1.vercel.app/me'
+        )
+      ])
+        )
+    );
 import { createServer } from 'https';
 
 createServer(
