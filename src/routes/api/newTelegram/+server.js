@@ -22,6 +22,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
         ctx.reply(
           'Welcome to 1💗1' ,
      Markup.inlineKeyboard([
+     [
           Markup.button.url(
             '<<to registration להרשמה>>',
             'https://1lev1.vercel.app'
@@ -33,7 +34,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
           Markup.button.url(
             '<<register for nutification הרשמה לעדכונים>>',
             'https://1lev1.vercel.app/me'
-          )
+          )]
       ]).resize()
     )
     }
@@ -42,7 +43,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
     bot.help((ctx) =>
       ctx.reply(
         'Here you can register to updates from our 1💗1 platform',
-        Markup.inlineKeyboard([
+        Markup.inlineKeyboard([[
           Markup.button.url(
             '<<to registration להרשמה>>',
             'https://1lev1.vercel.app'
@@ -55,7 +56,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
             '<<register for nutification הרשמה לעדכונים>>',
             'https://1lev1.vercel.app/me'
           )
-        ]).resize()
+        ]]).resize()
       )
     );
 import { createServer } from 'https';
