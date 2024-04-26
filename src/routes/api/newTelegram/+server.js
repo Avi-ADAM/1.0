@@ -49,12 +49,15 @@ createServer(
 ).listen(8443);
 export async function POST({ request }) {
   try {
+    const data = await request.json()
+    console.log(data)
+    /*
     if (!request || !request.body) {
       console.error('NullPointerException: request.body is null or undefined');
       return new Response('', { status: 500 });
     }
-    console.log(request.body)
-   // await bot.handleUpdate(request.body);
+    */
+    await bot.handleUpdate(data);
     return new Response('', { status: 200 });
   } catch (error) {
     console.error('Unhandled Exception while handling Telegram update: ', error);
