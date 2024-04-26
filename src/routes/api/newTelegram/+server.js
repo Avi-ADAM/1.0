@@ -46,7 +46,7 @@ import { createServer } from 'https';
 
 createServer(
   tlsOptions,
-  await bot.createWebhook({ domain: 'https://1lev1.vercel.app',path:'/api/newTelegram' })
+  await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
 ).listen(8443);
 export async function GET({ request }) {
   try {
