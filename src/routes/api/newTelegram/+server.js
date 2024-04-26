@@ -25,11 +25,11 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
           Markup.button.url(
             '<<to registration להרשמה>>',
             'https://1lev1.vercel.app'
-          ),
+          )],[
           Markup.button.url(
             '<<login להתחברות >>',
             'https://1lev1.vercel.app/login'
-          ),
+          )],[
           Markup.button.url(
             '<<register for nutification הרשמה לעדכונים>>',
             'https://1lev1.vercel.app/me'
@@ -46,11 +46,11 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
           Markup.button.url(
             '<<to registration להרשמה>>',
             'https://1lev1.vercel.app'
-          ),
+          )],[
           Markup.button.url(
             '<<login להתחברות >>',
             'https://1lev1.vercel.app/login'
-          ),
+          )],[
           Markup.button.url(
             '<<register for nutification הרשמה לעדכונים>>',
             'https://1lev1.vercel.app/me'
