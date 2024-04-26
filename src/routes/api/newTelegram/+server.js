@@ -47,17 +47,18 @@ import { createServer } from 'https';
 createServer(
   await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
 ).listen(8443);
-/*export async function GET({ request }) {
+export async function POST({ request }) {
   try {
     if (!request || !request.body) {
       console.error('NullPointerException: request.body is null or undefined');
       return new Response('', { status: 500 });
     }
-    await bot.handleUpdate(request.body);
+    console.log(request.body)
+   // await bot.handleUpdate(request.body);
     return new Response('', { status: 200 });
   } catch (error) {
     console.error('Unhandled Exception while handling Telegram update: ', error);
     console.error(error.stack);
     return new Response('', { status: 500 });
   }
-}*/
+}
