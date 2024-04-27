@@ -3,9 +3,11 @@ const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
 	const ep = HTTP_ST_ENDPOINT + "/graphql"
 	import {qids} from './qids.js'
     import {json, error} from '@sveltejs/kit'
+const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 
 export async function POST({ request, cookies }) {
   const data = await request.json();
+  let isSer = data.isSer ?? false;
     let idL = cookies.get('id');
     let variablesObject = {};
     let keyValueObject = data.data.arg
@@ -19,7 +21,7 @@ export async function POST({ request, cookies }) {
     let newd = [],e
     const dat = qids[data.data.queId]
     console.log(dat, variablesObject);
-  let jw = cookies.get('jwt');
+  let jw = isSer ? VITE_ADMINMONTHER : cookies.get('jwt');
   let bearer1 = 'bearer' + ' ' + jw;
   const res = await fetch(ep, {
     method: 'POST',

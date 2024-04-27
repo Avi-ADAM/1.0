@@ -112,5 +112,17 @@ export const qids = {
                   }
     
   ) {data{id}}
-}`
+}`,
+  '7getTelegramIds': `query GetTelegramIds {
+        usersPermissionsUser{
+          data{
+            id
+            attributes{
+              telegramId
+              lang 
+            }
+          }
+        }
+       }
+`
 };

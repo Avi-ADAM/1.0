@@ -2,7 +2,12 @@
 import { Telegraf } from 'telegraf';
 import { Markup } from 'telegraf';
 
-let appIds = [];
+let appIds = await sendToSer({}, '7getTelegramIds',0,0,true).then((res) => {
+  return res.data.usersPermissionsUser.map(
+    (item) => item.data.attributes.telegramId
+  );
+});
+console.log(appIds)
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
     const bot = new Telegraf(Token);
@@ -11,13 +16,29 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       console.log(ctx.chat.id);
       //check if the chat_id is in our list
       if (appIds.includes(ctx.chat.id)) {
-        ctx.reply('Welcome to 1💗1', {
-          parse_mode: 'HTML',
-          disable_web_page_preview: true,
-          reply_markup: Markup.inlineKeyboard([
-            Markup.button.url('<<to 1💗1>>', 'https://1lev1.vercel.app/lev')
-          ])
-        });
+        ctx.reply(
+          'Welcome to 1💗1',
+          Markup.inlineKeyboard([
+            [
+              Markup.button.url(
+                '<<login להתחברות>>',
+                'https://1lev1.vercel.app/login'
+              )
+            ],
+            [
+              Markup.button.callback(
+                '<<start timer ⏳ הפעלת טיימר>>',
+                'timerStart'
+              )
+            ],
+            [
+              Markup.button.callback(
+                '<<stop timer ⌛ עצירת טיימר>>',
+                'timerStop'
+              )
+            ]
+          ]).resize()
+        );
       } else {
         ctx.reply(
           'Welcome to 1💗1' ,
@@ -60,6 +81,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       )
     );
 import { createServer } from 'https';
+import { sendToSer } from '$lib/send/sendToSer.svelte';
 
 createServer(
   await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
