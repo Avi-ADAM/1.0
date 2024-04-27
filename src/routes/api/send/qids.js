@@ -114,10 +114,11 @@ export const qids = {
   ) {data{id}}
 }`,
   '7getTelegramIds': `query GetTelegramIds {
-        usersPermissionsUser{
+        usersPermissionsUsers{
           data{
             id
             attributes{
+              username
               telegramId
               lang 
             }
