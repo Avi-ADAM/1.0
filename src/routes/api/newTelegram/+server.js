@@ -14,9 +14,9 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       
       //check if the chat_id is in our list
       if (appIds.includes(ctx.chat.id)) {
-        const username = allD.find((x) => x.data.attributes.telegramId == ctx.chat.id).data.attributes.username
+       // const username = allD.find((x) => x.data.attributes.telegramId == ctx.chat.id).data.attributes.username
         ctx.reply(
-          username +'Welcome to 1💗1',
+         'Welcome to 1💗1',
           Markup.inlineKeyboard([
             [
               Markup.button.url(
