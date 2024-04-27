@@ -1,12 +1,9 @@
 //create a server with telegraf to listen for new messages
 import { Telegraf } from 'telegraf';
 import { Markup } from 'telegraf';
-
-let appIds = await sendToSer({}, '7getTelegramIds',0,0,true).then((res) => {
-  return res.data.usersPermissionsUser.map(
-    (item) => item.data.attributes.telegramId
-  );
-});
+import { sendToSer } from '$lib/send/sendToSer.svelte';
+let allD = []
+let appIds = []
 console.log(appIds)
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
@@ -81,12 +78,11 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       )
     );
 import { createServer } from 'https';
-import { sendToSer } from '$lib/send/sendToSer.svelte';
 
 createServer(
   await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
 ).listen(8443);
-export async function POST({ request }) {
+export async function POST({ request, fetch }) {
   try {
     const data = await request.json()
     console.log(data)
@@ -96,6 +92,13 @@ export async function POST({ request }) {
       return new Response('', { status: 500 });
     }
     */
+   appIds = await sendToSer({}, '7getTelegramIds', 0, 0, true, fetch).then((res) => {
+    allD = res.data
+    console.log(allD)
+     return res.data.usersPermissionsUser.map(
+       (item) => item.data.attributes.telegramId
+     );
+   });
     await bot.handleUpdate(data);
     return new Response('', { status: 200 });
   } catch (error) {
