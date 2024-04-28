@@ -14,9 +14,9 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       
       //check if the chat_id is in our list
       if (appIds.includes(ctx.chat.id)) {
-       // const username = allD.find((x) => x.data.attributes.telegramId == ctx.chat.id).data.attributes.username
+        const username = allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes.username
         ctx.reply(
-         'Welcome to 1💗1',
+         username +'Welcome to 1💗1',
           Markup.inlineKeyboard([
             [
               Markup.button.url(
@@ -98,7 +98,7 @@ export async function POST({ request, fetch }) {
     allD = res.data
     console.log(allD)
      return res.data.usersPermissionsUsers.data.map(
-       (item) => item.data.attributes.telegramId
+       (item) => item.attributes.telegramId
      );
    });
     await bot.handleUpdate(data);
