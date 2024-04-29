@@ -134,7 +134,7 @@ export const qids = {
               username
               telegramId
               lang 
-              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id attributes{name stname timer howmanyhoursalready hoursassinged project{data{attributes{projectName}}}}}}}}}
+              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id attributes{name stname timer howmanyhoursalready hoursassinged project{data{attributes{projectName}}} }}}
             }
           }
         }
