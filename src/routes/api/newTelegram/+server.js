@@ -95,7 +95,7 @@ export async function POST({ request, fetch }) {
     }
     */
    appIds = await sendToSer({}, '7getTelegramIds', 0, 0, true, fetch).then((res) => {
-    allD = res.data
+    allD = res.data.usersPermissionsUsers.data
     console.log(allD)
      return res.data.usersPermissionsUsers.data.map(
        (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
