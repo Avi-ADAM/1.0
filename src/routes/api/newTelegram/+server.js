@@ -15,8 +15,10 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       //check if the chat_id is in our list
       if (appIds.includes(ctx.chat.id)) {
         const username = allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes.username
+        const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id
+        
         ctx.reply(
-         username +'Welcome to 1💗1',
+         username + " " +'Welcome to 1💗1',
           Markup.inlineKeyboard([
             [
               Markup.button.url(
@@ -27,7 +29,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
             [
               Markup.button.callback(
                 '<<start timer ⏳ הפעלת טיימר>>',
-                'timerStart'
+                `timerStart-${uid}`
               )
             ],
             [
@@ -79,6 +81,27 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
         ]]).resize()
       )
     );
+    
+    bot.action (/^timerStart-(\d+)$/, async (ctx) => {
+      await sendToSer({id:ctx.match[1]}, '8getMissionsOnProgress', 0, 0, true, fetch).then((res) => {
+       console.log(res)
+        if(res.data != null ){
+          if(res.data.usersPermissionsUsers.data.length > 0){
+            let arr =
+              res.data.usersPermissionsUsers.data.attributes.mesimabetahaliches.data.forEach(
+                (item) => {
+                  const mid = item.id;
+                  const mname = item.attributes.name;
+                  return Markup.button.callback(mname, `startTimer-${mid}`);
+                }
+              );
+              console.log(arr)
+            ctx.reply("choose mission to start timer", Markup.inlineKeyboard([...arr]).resize())
+        }
+      }
+      })
+      
+    })
 import { createServer } from 'https';
 
 createServer(
