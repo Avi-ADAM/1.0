@@ -4,7 +4,7 @@ import { Markup } from 'telegraf';
 import { sendToSer } from '$lib/send/sendToSer.svelte';
 let allD = []
 let appIds = []
-let fetch
+let fetch2
 console.log(appIds)
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
@@ -109,7 +109,7 @@ createServer(
   await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
 ).listen(8443);
 export async function POST({ request, fetch }) {
-  fetch = fetch
+  fetch2 = fetch
   try {
     const data = await request.json()
     console.log(data)
