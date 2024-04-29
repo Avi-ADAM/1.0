@@ -105,6 +105,22 @@ export async function POST({ request, fetch }) {
        (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
      );
    });
+     bot.action(/^startTimer-(\d+)$/, async (ctx) => {
+      //validate that uid is that telegramId and owned that mission in progress
+       await sendToSer(
+         { mId: ctx.match[1] , stname: Date.now(),x:0},
+         '9startTimer',
+         0,
+         0,
+         true,
+         fetch
+       ).then((res) => {
+         console.log(res);
+         if (res.data != null) {
+          ctx.reply('timer started');
+         }
+       });
+     });
     bot.action(/^timerStart-(\d+)$/, async (ctx) => {
       await sendToSer(
         { id: ctx.match[1] },
