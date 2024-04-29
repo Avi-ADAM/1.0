@@ -116,13 +116,13 @@ export async function POST({ request, fetch }) {
       ).then((res) => {
         console.log(res);
         if (res.data != null) {
-          if (res.data.usersPermissionsUsers.data.length > 0) {
+          if (res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.length > 0) {
             let arr =
-              res.data.usersPermissionsUsers.data.attributes.mesimabetahaliches.data.forEach(
+              res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.forEach(
                 (item) => {
                   const mid = item.id;
                   const mname = item.attributes.name;
-                  return Markup.button.callback(mname, `startTimer-${mid}`);
+                  return Markup.button.callback(mname, `startTimer-${mid}-${ctx.match[1]}`);
                 }
               );
             console.log(arr);
