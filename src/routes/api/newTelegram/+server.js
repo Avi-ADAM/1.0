@@ -117,14 +117,15 @@ export async function POST({ request, fetch }) {
         console.log(res);
         if (res.data != null) {
           if (res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.length > 0) {
-            let arr =
+            let arr =[]
               res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.forEach(
                 (item) => {
                   const mid = item.id;
                   const mname = item.attributes.name;
-                  return Markup.button.callback(mname, `startTimer-${mid}-${ctx.match[1]}`);
+                  arr.push( [Markup.button.callback(mname, `startTimer-${mid}-${ctx.match[1]}`)])
                 }
               );
+              arr = arr
             console.log(arr);
             ctx.reply(
               'choose mission to start timer',
