@@ -119,7 +119,7 @@ export async function POST({ request, fetch }) {
       //validate that uid is that telegramId and owned that mission in progress
       if(uid == ctx.match[2]){
        await sendToSer(
-         { mId: ctx.match[1] , stname: Date.now(),x:0},
+         { mId: ctx.match[1] , stname: String(Date.now()),x:0},
          '9startTimer',
          0,
          0,
