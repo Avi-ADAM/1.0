@@ -98,7 +98,7 @@ export async function POST({ request, fetch }) {
     allD = res.data
     console.log(allD)
      return res.data.usersPermissionsUsers.data.map(
-       (item) => item.attributes.telegramId
+       (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
      );
    });
     await bot.handleUpdate(data);
