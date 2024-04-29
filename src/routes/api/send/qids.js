@@ -140,7 +140,7 @@ export const qids = {
         }
        }
 `,
-  '9startTimer': `mutation StartTimer($x: Int, $stname: String, $mId: ID!)
+  '9startTimer': `mutation StartTimer($x: Float, $stname: String, $mId: ID!)
                         { 
  updateMesimabetahalich(
   id: $mId
