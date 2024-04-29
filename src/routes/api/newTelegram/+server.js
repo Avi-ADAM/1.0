@@ -151,7 +151,7 @@ export async function POST({ request, fetch }) {
               res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.forEach(
                 (item) => {
                   const mid = item.id;
-                  const mname = item.attributes.name;
+                  const mname = item.attributes.name + "⏲️" + item.attributes.project.data.attributes.projectName;
                   arr.push( [Markup.button.callback(mname, `startTimer-${mid}-${ctx.match[1]}`)])
                 }
               );
