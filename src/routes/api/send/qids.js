@@ -125,5 +125,19 @@ export const qids = {
           }
         }
        }
+`,
+  '8getMissionsOnProgress': `query GetMissionsOnProgress($id: ID!) {
+        usersPermissionsUser(id: $id) {
+          data{
+            id
+            attributes{
+              username
+              telegramId
+              lang 
+              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id attributes{name stname timer howmanyhoursalready hoursassinged}}}
+            }
+          }
+        }
+       }
 `
 };
