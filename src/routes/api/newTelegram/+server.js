@@ -81,7 +81,11 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
         ]]).resize()
       )
     );
-    
+const started = { he: 'טיימר הופעל בהצלחה', en: 'timer started' };    
+const choose = {
+  he: 'בחירת משימה להפעלת טיימר',
+  en: 'choose mission to start timer'
+};    
    
 import { createServer } from 'https';
 
@@ -105,8 +109,15 @@ export async function POST({ request, fetch }) {
        (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
      );
    });
-     bot.action(/^startTimer-(\d+)$/, async (ctx) => {
+     bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
+      console.log(ctx.match[1], ctx.match[2],"startTimer");
+        const lang = allD.find(
+          (x) => x.attributes.telegramId == ctx.chat.id
+        ).attributes.lang || 'en';
+        const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
+        
       //validate that uid is that telegramId and owned that mission in progress
+      if(uid == ctx.match[2]){
        await sendToSer(
          { mId: ctx.match[1] , stname: Date.now(),x:0},
          '9startTimer',
@@ -117,11 +128,14 @@ export async function POST({ request, fetch }) {
        ).then((res) => {
          console.log(res);
          if (res.data != null) {
-          ctx.reply('timer started');
+          ctx.reply(started[lang]);
          }
        });
+      }
      });
     bot.action(/^timerStart-(\d+)$/, async (ctx) => {
+             const lang =
+               allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes.lang || 'en';
       await sendToSer(
         { id: ctx.match[1] },
         '8getMissionsOnProgress',
@@ -144,7 +158,7 @@ export async function POST({ request, fetch }) {
               arr = arr
             console.log(arr);
             ctx.reply(
-              'choose mission to start timer',
+              choose[lang],
               Markup.inlineKeyboard([...arr]).resize()
             );
           }
