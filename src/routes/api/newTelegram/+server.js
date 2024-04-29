@@ -4,7 +4,6 @@ import { Markup } from 'telegraf';
 import { sendToSer } from '$lib/send/sendToSer.svelte';
 let allD = []
 let appIds = []
-let fetch2
 console.log(appIds)
 //token new
 const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
@@ -83,33 +82,13 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
       )
     );
     
-    bot.action (/^timerStart-(\d+)$/, async (ctx) => {
-      await sendToSer({id:ctx.match[1]}, '8getMissionsOnProgress', 0, 0, true, fetch).then((res) => {
-       console.log(res)
-        if(res.data != null ){
-          if(res.data.usersPermissionsUsers.data.length > 0){
-            let arr =
-              res.data.usersPermissionsUsers.data.attributes.mesimabetahaliches.data.forEach(
-                (item) => {
-                  const mid = item.id;
-                  const mname = item.attributes.name;
-                  return Markup.button.callback(mname, `startTimer-${mid}`);
-                }
-              );
-              console.log(arr)
-            ctx.reply("choose mission to start timer", Markup.inlineKeyboard([...arr]).resize())
-        }
-      }
-      })
-      
-    })
+   
 import { createServer } from 'https';
 
 createServer(
   await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
 ).listen(8443);
 export async function POST({ request, fetch }) {
-  fetch2 = fetch
   try {
     const data = await request.json()
     console.log(data)
@@ -126,6 +105,35 @@ export async function POST({ request, fetch }) {
        (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
      );
    });
+    bot.action(/^timerStart-(\d+)$/, async (ctx) => {
+      await sendToSer(
+        { id: ctx.match[1] },
+        '8getMissionsOnProgress',
+        0,
+        0,
+        true,
+        fetch
+      ).then((res) => {
+        console.log(res);
+        if (res.data != null) {
+          if (res.data.usersPermissionsUsers.data.length > 0) {
+            let arr =
+              res.data.usersPermissionsUsers.data.attributes.mesimabetahaliches.data.forEach(
+                (item) => {
+                  const mid = item.id;
+                  const mname = item.attributes.name;
+                  return Markup.button.callback(mname, `startTimer-${mid}`);
+                }
+              );
+            console.log(arr);
+            ctx.reply(
+              'choose mission to start timer',
+              Markup.inlineKeyboard([...arr]).resize()
+            );
+          }
+        }
+      });
+    });
     await bot.handleUpdate(data);
     return new Response('', { status: 200 });
   } catch (error) {
