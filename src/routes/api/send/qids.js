@@ -139,5 +139,15 @@ export const qids = {
           }
         }
        }
-`
+`,
+  '9startTimer': `mutation StartTimer($x: Int, $stname: String, $mId: ID!)
+                        { 
+ updateMesimabetahalich(
+  id: $mId
+  data: {
+ stname: $stname,
+ timer: $x
+  }
+ ) {data{id attributes{ stname timer}}}
+ }`
 };
