@@ -10,7 +10,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
     const bot = new Telegraf(Token);
 
     bot.start((ctx) => {
-      console.log(ctx.chat.id);
+      console.log(ctx.chat.id,appIds);
       
       //check if the chat_id is in our list
       if (appIds.includes(ctx.chat.id)) {
