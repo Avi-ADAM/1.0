@@ -226,7 +226,7 @@ export async function POST({ request, fetch }) {
                   arr.push([
                     Markup.button.callback(
                       mname,
-                      `stopTimer-${mid}-${ctx.match[1]}-${item.attributes.stname}-${item.attributes.x}-${item.attributes.howmanyhoursalready}`
+                      `stopTimer-${mid}-${ctx.match[1]}-${item.attributes.stname}-${item.attributes.timer}-${item.attributes.howmanyhoursalready}`
                     )
                   ]);
                 }
