@@ -18,7 +18,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
         const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id
         
         ctx.reply(
-         username + " " +'Welcome to 1💗1',
+          username + ' ' + 'Welcome to 1💗1',
           Markup.inlineKeyboard([
             [
               Markup.button.url(
@@ -35,7 +35,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
             [
               Markup.button.callback(
                 '<<stop timer ⌛ עצירת טיימר>>',
-                'timerStop'
+                `timerStop-${uid}`
               )
             ]
           ]).resize()
@@ -85,8 +85,9 @@ const started = { he: 'טיימר הופעל בהצלחה', en: 'timer started' 
 const choose = {
   he: 'בחירת משימה להפעלת טיימר',
   en: 'choose mission to start timer'
-};    
-   
+};   
+const stop = { he: 'טיימר נעצר בהצלחה', en: 'timer stopped' }; 
+const chooseStop = { he: 'בחירת משימה לעצירת טיימר', en: 'choose mission to stop timer' };   
 import { createServer } from 'https';
 
 createServer(
@@ -108,6 +109,31 @@ export async function POST({ request, fetch }) {
      return res.data.usersPermissionsUsers.data.map(
        (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
      );
+   });
+   bot.action(/^stopTimer-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+     console.log(ctx.match[1], ctx.match[2], 'stopTimer');
+     const lang =
+       allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
+         .lang || 'en';
+     const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
+
+     //validate that uid is that telegramId and owned that mission in progress
+     if (uid == ctx.match[2]) {
+      const x =  (new Date().getTime() - Number(ctx.match[3]))+Number(ctx.match[4]); 
+       await sendToSer(
+         { mId: ctx.match[1], stname: "stopi", x: x },
+         '10stopTimer',
+         0,
+         0,
+         true,
+         fetch
+       ).then((res) => {
+         console.log(res);
+         if (res.data != null) {
+           ctx.reply(stop[lang], Markup.inlineKeyboard([[Markup.button.callback('<<save timer 🕒 שמירת טיימר>>', `saveTimer-${ctx.match[1]}-${uid}-${ctx.match[4]}-${x}`)],[Markup.button.callback('<<clear timer ⏳ ניקוי טיימר>>', `clearTimer-${ctx.match[1]}-${uid}`)]]).resize());
+         }
+       });
+     }
    });
      bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
       console.log(ctx.match[1], ctx.match[2],"startTimer");
@@ -152,7 +178,9 @@ export async function POST({ request, fetch }) {
                 (item) => {
                   const mid = item.id;
                   const mname = item.attributes.name + "⏲️" + item.attributes.project.data.attributes.projectName;
+                  if(item.attributes.stname == "stopi" || Number(item.attributes.stname) == 0 ){
                   arr.push( [Markup.button.callback(mname, `startTimer-${mid}-${ctx.match[1]}`)])
+                  }
                 }
               );
               arr = arr
@@ -161,6 +189,52 @@ export async function POST({ request, fetch }) {
               choose[lang],
               Markup.inlineKeyboard([...arr]).resize()
             );
+          }
+        }
+      });
+    });
+    bot.action(/^timerStop-(\d+)$/, async (ctx) => {
+      const lang =
+        allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
+          .lang || 'en';
+      await sendToSer(
+        { id: ctx.match[1] },
+        '8getMissionsOnProgress',
+        0,
+        0,
+        true,
+        fetch
+      ).then((res) => {
+        console.log(res);
+        if (res.data != null) {
+          if (
+            res.data.usersPermissionsUser.data.attributes.mesimabetahaliches
+              .data.length > 0
+          ) {
+            let arr = [];
+            res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.forEach(
+              (item) => {
+                const mid = item.id;
+                const mname =
+                  item.attributes.name +
+                  '⏲️' +
+                  item.attributes.project.data.attributes.projectName;
+                if (
+                  item.attributes.stname != 'stopi' &&
+                  Number(item.attributes.stname) > 0
+                ) {
+                  arr.push([
+                    Markup.button.callback(
+                      mname,
+                      `stopTimer-${mid}-${ctx.match[1]}-${item.attributes.stname}-${item.attributes.x}-${item.attributes.howmanyhoursalready}`
+                    )
+                  ]);
+                }
+              }
+            );
+            arr = arr;
+            console.log(arr);
+            ctx.reply(chooseStop[lang], Markup.inlineKeyboard([...arr]).resize());
           }
         }
       });
