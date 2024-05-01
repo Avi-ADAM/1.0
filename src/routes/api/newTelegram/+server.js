@@ -111,7 +111,7 @@ export async function POST({ request, fetch }) {
      );
    });
    bot.action(/^stopTimer-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
-     console.log(ctx.match[1], ctx.match[2], 'stopTimer');
+     console.log("stopTimer");
      const lang =
        allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
          .lang || 'en';
