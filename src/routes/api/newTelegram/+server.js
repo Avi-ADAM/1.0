@@ -110,7 +110,7 @@ export async function POST({ request, fetch }) {
        (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
      );
    });
-   bot.action(/^stopTimer-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+   bot.action(/^stopTimer-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
      console.log(ctx.match[1], ctx.match[2], 'stopTimer');
      const lang =
        allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
@@ -177,7 +177,7 @@ export async function POST({ request, fetch }) {
               res.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.forEach(
                 (item) => {
                   const mid = item.id;
-                  const mname = item.attributes.name + "⏲️" + item.attributes.project.data.attributes.projectName;
+                  const mname = item.attributes.name + " ⏲️ " + item.attributes.project.data.attributes.projectName;
                   if(item.attributes.stname == "stopi" || Number(item.attributes.stname) == 0 ){
                   arr.push( [Markup.button.callback(mname, `startTimer-${mid}-${ctx.match[1]}`)])
                   }
@@ -217,7 +217,7 @@ export async function POST({ request, fetch }) {
                 const mid = item.id;
                 const mname =
                   item.attributes.name +
-                  '⏲️' +
+                  ' ⏲️ ' +
                   item.attributes.project.data.attributes.projectName;
                 if (
                   item.attributes.stname != 'stopi' &&
