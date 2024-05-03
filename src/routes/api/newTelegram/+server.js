@@ -109,32 +109,55 @@ export async function POST({ request, fetch }) {
      return res.data.usersPermissionsUsers.data.map(
        (item) => item.attributes.telegramId != null ? Number(item.attributes.telegramId) : 0
      );
-   });
-   bot.action(/^stopTimer-(\d+)-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
-     console.log("stopTimer");
-     const lang =
-       allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
-         .lang || 'en';
-     const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
+   }); 
+   bot.action(
+     /^stopTimer-(\d+)-(\d+)-(\d+)-(\d+)-(\d+(\.\d+)?)$/,
+     async (ctx) => {
+       console.log('Action triggered!');
+       console.log('Matched data:', ctx.match);
+       // Your other logic here
+       console.log('stopTimer');
+       const lang =
+         allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
+           .lang || 'en';
+       const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
 
-     //validate that uid is that telegramId and owned that mission in progress
-     if (uid == ctx.match[2]) {
-      const x =  (new Date().getTime() - Number(ctx.match[3]))+Number(ctx.match[4]); 
-       await sendToSer(
-         { mId: ctx.match[1], stname: "stopi", x: x },
-         '10stopTimer',
-         0,
-         0,
-         true,
-         fetch
-       ).then((res) => {
-         console.log(res);
-         if (res.data != null) {
-           ctx.reply(stop[lang], Markup.inlineKeyboard([[Markup.button.callback('<<save timer 🕒 שמירת טיימר>>', `saveTimer-${ctx.match[1]}-${uid}-${ctx.match[4]}-${x}`)],[Markup.button.callback('<<clear timer ⏳ ניקוי טיימר>>', `clearTimer-${ctx.match[1]}-${uid}`)]]).resize());
-         }
-       });
+       //validate that uid is that telegramId and owned that mission in progress
+       if (uid == ctx.match[2]) {
+         const x =
+           new Date().getTime() - Number(ctx.match[3]) + Number(ctx.match[4]);
+         await sendToSer(
+           { mId: ctx.match[1], stname: 'stopi', x: x },
+           '10stopTimer',
+           0,
+           0,
+           true,
+           fetch
+         ).then((res) => {
+           console.log(res);
+           if (res.data != null) {
+             ctx.reply(
+               stop[lang],
+               Markup.inlineKeyboard([
+                 [
+                   Markup.button.callback(
+                     '<<save timer 🕒 שמירת טיימר>>',
+                     `saveTimer-${ctx.match[1]}-${uid}-${ctx.match[4]}-${x}`
+                   )
+                 ],
+                 [
+                   Markup.button.callback(
+                     '<<clear timer ⏳ ניקוי טיימר>>',
+                     `clearTimer-${ctx.match[1]}-${uid}`
+                   )
+                 ]
+               ]).resize()
+             );
+           }
+         });
+       }
      }
-   });
+   );
      bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
       console.log(ctx.match[1], ctx.match[2],"startTimer");
         const lang = allD.find(
@@ -225,8 +248,7 @@ export async function POST({ request, fetch }) {
                 ) {
                   arr.push([
                     Markup.button.callback(
-                      mname,
-                      `stopTimer-${mid}-${ctx.match[1]}-${item.attributes.stname}-${item.attributes.timer}-${item.attributes.howmanyhoursalready}`
+                      mname,`stopTimer-${mid}-${ctx.match[1]}-${item.attributes.stname}-${item.attributes.timer}-${item.attributes.howmanyhoursalready}`
                     )
                   ]);
                 }
