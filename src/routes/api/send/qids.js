@@ -151,7 +151,6 @@ export const qids = {
  ) {data{id attributes{ stname timer}}}
  }`,
   '10stopTimer': `mutation StopTimer($mId: ID!, $stname: String, $x: Float){
-  { 
  updateMesimabetahalich(
   id: $mId
   data: {
