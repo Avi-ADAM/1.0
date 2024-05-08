@@ -70,7 +70,6 @@
     "lodash.has": "^4.5.2",
     "lodash.isequal": "^4.5.0",
     "moment": "^2.29.2",
-    "node": "^18.20.2",
     "nodemailer": "^6.9.2",
     "postcss": "^8.4.12",
     "prettier": "^3.0.3",
