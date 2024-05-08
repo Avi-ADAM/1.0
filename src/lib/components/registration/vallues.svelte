@@ -210,7 +210,7 @@ const newOb = meData.data.createVallue.data;
   <br/>
 {what[$lang]}
 </h1> 
-{#if !focused && !$page.data.isDesktop}
+{#if focused && !$page.data.isDesktop}
 <div class="info">
 <Tile word={info[$lang]} big={$page.data.isDesktop} bg="gold" animate={true} sm={$page.data.isDesktop}/>
 </div> 
