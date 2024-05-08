@@ -61,15 +61,15 @@ export async function handle({ event , resolve }) {
     //&& qlang != 'ar'
     if (event.url.pathname == '/en'){
         event.locals.lang = "en";
-	    event.cookies.set('lang', 'en');
+	    event.cookies.set('lang', 'en',{path: '/'});
              lang = 'en';
     }else if (event.url.pathname == '/ar'){
        event.locals.lang = 'ar';
-       	    event.cookies.set('lang', 'ar');
+       	     event.cookies.set('lang', 'ar', { path: '/' });
                   lang = 'ar';
     }else if (event.url.pathname == '/he'){
        event.locals.lang = 'he';
-       	    event.cookies.set('lang', 'he');
+       	    event.cookies.set('lang', 'he', { path: '/' });
         lang = 'he';
     }else if (coociLang == undefined) {
       if (userAgent?.includes('he')) {

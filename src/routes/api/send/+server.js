@@ -40,12 +40,12 @@ export async function POST({ request, cookies }) {
         console.log("here")
         
       }else{
-      throw error(500, newd.errors[0].message);
+      error(500, newd.errors[0].message);
       }
     })
     .catch((e) => {
       console.error('Error:', e);
-      throw error(500,e);
+      error(500,e);
     });
     return json(newd);
 }

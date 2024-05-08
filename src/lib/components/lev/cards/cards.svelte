@@ -50,9 +50,11 @@ $:if (indexi != -1){
       swiperRef = swiper;
     });
   };
-  $: if (cards == false){
+  function change(){
+    console.log(cards,"change")
+      console.log("will change")
         dispatch("cards",{cards:false})
-}
+  }
   let slideIndex;
                 let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}
 afterUpdate(async () => {
@@ -182,7 +184,7 @@ on:mouseleave={()=> hoverc("0")} class=" next" src="https://res.cloudinary.com/l
 on:mouseleave={()=> hoverc("0")} 
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
  
- <Switch bind:value={cards}  design="multi" options={[true, false]} />                
+ <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
 
 </div>
 

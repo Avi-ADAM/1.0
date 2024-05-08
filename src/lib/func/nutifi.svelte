@@ -1,6 +1,6 @@
 <script context="module">
 import * as Push from 'push.js'; // if using ES6 
-export function nutifi(head,text,link) {
+export async function nutifi(head,text,link) {
   console.log(head,text,link)//if lev visible not but if other page fire anyay
   if(!document.visibilityState == "visible"){
   Push.create(head, {
@@ -9,7 +9,7 @@ export function nutifi(head,text,link) {
     onClick: function () {
         window.focus();
         this.close();//close all?
-    }
+      }
 });
   }
 }

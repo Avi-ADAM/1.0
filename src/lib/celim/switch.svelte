@@ -1,9 +1,12 @@
 <script>
+  import { createEventDispatcher } from "svelte";
+
     // based on suggestions from:
     // Inclusive Components by Heydon Pickering https://inclusive-components.design/toggle-button/
     // On Designing and Building Toggle Switches by Sara Soueidan https://www.sarasoueidan.com/blog/toggle-switch-design/
     // and this example by Scott O'hara https://codepen.io/scottohara/pen/zLZwNv 
-
+    
+    const dispatch = createEventDispatcher();
 
     export let label = "";
     export let design = 'inner label'
@@ -25,7 +28,7 @@
 				  id={`group-${uniqueID}`}>
 {#if label.length > 0}    <div class='legend' id={`label-${uniqueID}`}>{label}</div>{/if}
         {#each options as option}
-            <input type="radio" id={`${option}-${uniqueID}`} value={option} bind:group={value}/>
+            <input type="radio" id={`${option}-${uniqueID}`} value={option} on:change={()=>dispatch("change",{value})} bind:group={value}/>
             <label for={`${option}-${uniqueID}`}>
                 {#if option == true}
                 <img alt="קלפים" class="imgi" style:height="20px" style:display="inherit"  src="https://res.cloudinary.com/love1/image/upload/v1653313408/credit-cards_vdsjnd.svg"/>

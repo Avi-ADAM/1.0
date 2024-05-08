@@ -441,30 +441,6 @@ textarea::-webkit-resizer {
     border-color: transparent transparent var(--barbi-pink) var(--barbi-pink);
 }
 
-.d::-webkit-scrollbar {
-    width: 10px;
-}
-
-.d::-webkit-scrollbar-track {
-    background-color: #e4e4e4;
-    border-radius: 100px;
-}
-
-.d::-webkit-scrollbar-thumb {
-    background-color: #d4aa70;
-    border-radius: 100px;
-}
-
-.d {
-    scrollbar-color: #D4AA70 #e4e4e4;
-}
-
-.d::-webkit-scrollbar-thumb {
-    background-image: linear-gradient(180deg, #D0368A 0%, #708AD4 99%);
-    box-shadow: inset 2px 2px 5px 0 rgba(#fff, 0.5);
-    border-radius: 100px;
-}
-
 select.round {
     background-image:
         linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),

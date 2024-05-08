@@ -625,7 +625,7 @@ on:click={bitul}
    <p class="text-center text-md text-white">{edbef[$lang]}{Valname}{edaft[$lang]}</p>
      {#if data}
       {#each data as da, i}
-  <div transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" class="text-center text-sm text-lturk">
+  <div transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" class="text-center text-sm text-lturk md:text-xl">
 
     {#if datan === "mash" }
     {#if da.attributes.panui != false}

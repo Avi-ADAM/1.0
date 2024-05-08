@@ -48,5 +48,4 @@ export async function POST({ request }) {
     console.log(output)
   }
 
-    return new Response;
-}
+  }

@@ -106,16 +106,13 @@ onMount(async () => {
     }
   }
     if (stname === "0") {
-      console.log(stname, lapse, x,"מאפס")
   } else if (stname === "stopi") {
-          console.log(stname, lapse ,x,"מסטופי")
     if (tdtd[coinlapach-1].ch == true && tdtd[coinlapach-1].hoursdon == false){
     oldzman = tdtd[coinlapach-1].timer
   }
     x = oldzman
   } else {
-          console.log(stname, lapse,x,"מאחר")
-    if (tdtd[coinlapach-1].ch == true){
+     if (tdtd[coinlapach-1].ch == true){
     oldzman = tdtd[coinlapach-1].timer
     }
       const startTime = stname - lapse
@@ -161,9 +158,9 @@ async function azor () {
       zmani += lapse;
       x += lapse;
       lapse = 0;
+      console.log(x,"מאחר")
         tdtd[coinlapach-1].stname = "stopi"
         tdtd[coinlapach-1].timer = x
-        console.log("from azor",x)
         tdtd[coinlapach-1].hoursdon = false
         tdtd[coinlapach-1].ch = true
         tdtd[coinlapach-1].x = x
@@ -230,6 +227,7 @@ async function start () {
         tdtd[coinlapach-1].lapse = lapse
        tdtd[coinlapach-1].running = true
       betha.set(tdtd)
+      console.log("from start",x,stname)
  const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -349,9 +347,6 @@ async function save() {
         tdtd[coinlapach-1].lapse = 0
         tdtd[coinlapach-1].zman = msdon
         tdtd[coinlapach-1].running = false
-          console.log("trynoww")
-                  console.log("trynow")
-
     const cookieValue = document.cookie
         .split('; ')
         .find(row => row.startsWith('jwt='))
@@ -364,7 +359,6 @@ async function save() {
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
         try {
-          console.log("try")
             await fetch(linkg, {
                     method: 'POST',
                     headers: {
