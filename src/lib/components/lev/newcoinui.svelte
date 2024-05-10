@@ -64,7 +64,7 @@
       const y = center.y + distanceFromCenter * Math.sin(angle)-add
       if(scrollX >0|| scrollY >0 ){
         console.log("scroling")
-        window.scrollBy(scrollX,scrollY)
+        $page.data.isDesktop ? window.scrollBy(scrollX,scrollY) : Event.observe(window, 'load', function() { window.scrollBy(scrollX,scrollY); })
       }
     return { myline: myLine, lineCircels: realcircels,x,y};
   }
@@ -87,6 +87,7 @@
   import { fly } from 'svelte/transition';
 
   import { createEventDispatcher, onMount } from 'svelte';
+  import { page } from '$app/stores';
 
   const dispatch = createEventDispatcher();
   export let adder = [],
@@ -201,7 +202,7 @@
     size = w>550? 125:75;
     bigsize = w>550? 225: 165;
     orders = checkLines(arr1,w,h)
-    console.log(orders,w)
+    console.log(orders,w,"mount")
   })
   $: orders = checkLines(arr1,w,h)
   
