@@ -63,8 +63,9 @@
       const x = center.x + distanceFromCenter * Math.cos(angle) -add
       const y = center.y + distanceFromCenter * Math.sin(angle)-add
       if(scrollX >0|| scrollY >0 ){
-        console.log("scroling")
-        $page.data.isDesktop ? window.scrollBy(scrollX,scrollY) : Event.observe(window, 'load', function() { window.scrollBy(scrollX,scrollY); })
+        console.log("scroling",scrollX,scrollY)
+         window.scrollBy(scrollX,scrollY) 
+         console.log("scroled")
       }
     return { myline: myLine, lineCircels: realcircels,x,y};
   }
