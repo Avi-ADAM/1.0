@@ -2216,10 +2216,10 @@ pointer-events: none;"
 {#if tab === 1}
         {#if project.publicDescription != 'undefined' && project.publicDescription != null}
             <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
-            <RichText editable={false} outpot={desP} />
+            <RichText editable={false} outpot={project?.publicDescription} />
         {/if}
         {#if project.descripFor != 'undefined' && project.descripFor != null}
-            <RichText editable={false} outpot={desP} />
+            <RichText editable={false} outpot={project?.descripFor} />
             <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
         {/if}
 
