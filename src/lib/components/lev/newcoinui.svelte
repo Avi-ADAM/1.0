@@ -206,7 +206,10 @@
     console.log(orders,w,"mount")
   })
   $: orders = checkLines(arr1,w,h)
-  
+  export const snapshot = {
+    capture: () => JSON.parse(JSON.stringify(orders)),
+    restore: (value) => (orders = value)
+  };
 </script>
 <div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} dir="ltr" style=" position:fixed; width:100vw;height:100vh ;overflow: auto; top:0%;
     left: 0%;
