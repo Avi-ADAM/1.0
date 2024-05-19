@@ -158,5 +158,27 @@ export const qids = {
  timer: $x
   }
  ) {data{id attributes{ stname timer}}}
- }`
+ }`,
+  '11saveTimer': `mutation SaveTimer($mId: ID!, $stname: String, $x: Float,$howmanyhoursalready: Float){
+ updateMesimabetahalich(
+  id: $mId
+  data: {
+ howmanyhoursalready:$howmanyhoursalready,
+ stname: $stname,
+ timer: $x
+  }
+ ) {data{id attributes{ stname timer}}}
+ }`,
+  '12mission': `query GetMissions {
+         missions {data{id attributes{
+                        descrip   missionName 
+                            } }}
+       }
+`,
+  '13missionById': `query GetMissionsByid($ids:[ID]) {
+         missions(filters: {id:{in: [$ids]}}) {data{id attributes{
+                        descrip   missionName 
+                            } }}
+       }
+`
 };
