@@ -40,12 +40,14 @@ export const load = async ({fetch}) => {
        res
          .then((data) => {
             country = data.data.cuntries.data;
+            let total =0
             data = datai;
             for (let j = 0; j < country.length; j++) {
               for (let i = 0; i < data.length; i++) {
                 if (data[i].name === country[j].attributes.name) {
                   data[i].agrees =
                     country[j].attributes.free_people.data.length;
+                    total += country[j].attributes.free_people.data.length
                 } else if (
                   (data[i].name === 'Palestine' && country[j].id === 167) ||
                   (data[i].name === 'Palestine' && country[j].id === 246)
@@ -53,9 +55,11 @@ export const load = async ({fetch}) => {
                   if (data[i].agrees > 0) {
                     data[i].agrees +=
                       country[j].attributes.free_people.data.length;
+                      total += country[j].attributes.free_people.data.length
                   } else {
                     data[i].agrees =
                       country[j].attributes.free_people.data.length;
+                      total += country[j].attributes.free_people.data.length
                   }
                 } else if (
                   data[i].name === 'Russia' &&
@@ -63,15 +67,19 @@ export const load = async ({fetch}) => {
                 ) {
                   data[i].agrees =
                     country[j].attributes.free_people.data.length;
+                    total += country[j].attributes.free_people.data.length
                 } else if (
                   data[i].name === 'United States of America' &&
                   country[j].attributes.name === 'United States'
                 ) {
                   data[i].agrees =
                     country[j].attributes.free_people.data.length;
+                    total += country[j].attributes.free_people.data.length
                 }
               }
             }
+            data.total = total
+            console.log(data,data.total);
            return resolve(data);
          })
          .catch((error) => {
