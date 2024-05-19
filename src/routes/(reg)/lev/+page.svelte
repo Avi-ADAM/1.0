@@ -24,7 +24,8 @@
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { isEqual } from 'lodash';
+  import pkg from 'lodash';
+  const {isEqual} = pkg;
   import Rikma from '$lib/components/lev/rikma.svelte';
   import Hevel from '$lib/components/lev/hevel.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';

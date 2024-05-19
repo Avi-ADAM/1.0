@@ -32,8 +32,9 @@
   const dataJoinKey = 'name';
   const mapJoinKey = 'name';
   const dataLookup = new Map();
- 
+  $: noof = 0
     $:  data.streamed.data.then(function(data) {
+      noof = data.total
       data.forEach(d => {
     dataLookup.set(d[dataJoinKey], d);
         }
@@ -47,7 +48,7 @@
   
   let evt;
   let hideTooltip = true;
-
+      const onm = {"he":"רק רגע בבקשה","en":"one moment please","ar":"دقيقة واحدة فقط من فضلك"}
   // Create a flat array of objects that LayerCake can use to measure
   // extents for the color scale
   const flatData = geojson.features.map(d => d.properties);
@@ -55,9 +56,9 @@
   'rgb(244, 114, 182)',
   'rgb(209, 146, 255)',
 					"#EEE8AA"];
-
+     $: console.log(data.streamed.data)
   const addCommas = format(',');
-  const title = {"he":"כמה הסכימו מכל מקום","en":"How many agreements we accepted from each place"}
+  const title = {"he":" סך הכל הסכימו","en":"Total agreements","ar":" مجموع الموافقات المستلمة"}
 </script>
 
 <style>
@@ -86,13 +87,13 @@
 </style>
 {#await data.streamed.data}
 <div class="flex flex-col text-center items-center justify-center trr">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
+            <h3 class="text-barbi">{onm[$lang]}</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> 
 {:then}
 <div class="ww">
-    <h1 style="font-size:20px;" class="text-barbi text-center">{title[$lang]}
+    <h1 style="font-size:20px;" class="text-barbi text-center">{title[$lang]} - {noof}
     </h1>
     <div class="wwa">
 <div class="chart-container">
