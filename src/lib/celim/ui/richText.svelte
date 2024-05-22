@@ -390,7 +390,7 @@
   {/if}
 
   <div
-    class="border-gold border rounded m-2 p-8 text-barbi bg-gradient-to-br from-black to-blu"
+    class="border-gold border rounded m-2 p-8 text-barbi bg-gold"
     bind:this={element}
   />
   {#if editor && editable}

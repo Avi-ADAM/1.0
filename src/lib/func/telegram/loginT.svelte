@@ -59,7 +59,7 @@
 
 	function telegramCallback( user) {
         console.log(user)
-        sendToSer({uid,telegramId:user.id.toString()},"6addTelegram",uid)
+        sendToSer({uid,telegramId:user.id.toString()},"6addTelegram",uid,null,false,fetch)
 		dispatch('auth', user);
 	}
 	function cleanStart() {
