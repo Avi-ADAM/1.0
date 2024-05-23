@@ -78,7 +78,7 @@
   }
 </script>
 <div data-vaul-drawer-wrapper >
-	<Drawer.Root  bind:open={dialogOpen}  shouldScaleBackground>
+	<Drawer.Root  bind:open={dialogOpen}   shouldScaleBackground>
     	<Drawer.Trigger/>
 		<Drawer.Portal>
 			<Drawer.Overlay class="fixed inset-0 bg-black/40 z-[1000]" />
@@ -86,11 +86,12 @@
 				class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
 			>
 				<div class="flex-1 rounded-t-[10px] p-4">
-					<div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi" />
+          <div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi" />
+
 					<div class="mx-auto d overflow-auto flex flex-col ">
 					
       <div>
-        					<div class="mx-auto d overflow-auto flex flex-col z-[1001]">
+        					<div class="mx-auto h-[85vh] d overflow-auto flex flex-col z-[1001]">
         {#if newMeeting == false}
         <NewIwant {idL} userName_value={username} />
         {:else}
@@ -99,6 +100,7 @@
         }}/>
         {/if}
 </div>
+
             </div>
     </Drawer.Content>
   </Drawer.Portal>
