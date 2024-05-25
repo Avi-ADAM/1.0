@@ -180,5 +180,31 @@ export const qids = {
                         descrip   missionName 
                             } }}
        }
-`
+`,'14changeOnline': `mutation ChangeOnline($id: ID!, $online: Boolean) {
+   UpdatePgishauser(id: $id, data: {online: $online}) {data{id attributes{ online}}}
+}`,
+"15createPgishauser": `mutation CreatePgishauser($id: ID!) {
+  createPgishauser(data: {users_permissions_user: $id}) {data{id}}
+}`,'16createPgisha': `mutation CreatePgisha($ids: [ID],$name: String, $desc: String,pendIds:[ID]) {
+  createPgisha(data: {pgishausers: $ids,pgishauserspend:$pendIds, name: $name, desc: $desc}) {data{id}}
+}` , '17getUsers': `query GetUsers {
+  usersPermissionsUsers{
+    data{
+      id
+      attributes{
+        username
+        lang 
+      }
+    }
+  }
+ }
+`, "18createNewMeeting": `mutation CreateNewMeeting( $outpot: String, $name: String) {
+  createPgisha(data: 
+    {name: $name, desc: $outpot})
+     {data{id}}
+  }`,"19CreatePendMeeting": `mutation CreatePgishauserPend($id: ID!,$pgishaId:ID) {
+  createPgishauserpend(data: {users_permissions_user: $id,pgisha: $pgishaId}) {data{id}}
+  }`, "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String) {
+  createPgishauser(data: {users_permissions_user: $id,pgishas: $pgishaId,uid:$uid}) {data{id}}
+  }`
 };

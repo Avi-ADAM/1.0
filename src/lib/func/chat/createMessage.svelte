@@ -6,7 +6,7 @@
     export async function createMessage(id=0,mes="",md={},un=""){
       const da = new Date()
       const dai = da.toISOString()
-     let d = await sendToSer({fid:id,fidn:Number(id),da:dai,mes,idL:0},'1chatsend').then(d=> d = d)
+     let d = await sendToSer({fid:id,fidn:Number(id),da:dai,mes,idL:0},'1chatsend',null,null,false,fetch).then(d=> d = d)
      if(d != null){
       //message sended
       nowId.set(d.data.createMessage.data.id)

@@ -10,15 +10,15 @@
   import Plus from '$lib/celim/icons/plus.svelte';
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
-  import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
-  import { RingLoader } from 'svelte-loading-spinners';
   import { onMount } from 'svelte';
   import Drag from '$lib/celim/icons/drag.svelte';
   import ChatSmall from './chatSmall.svelte';
   import Arrow from '$lib/celim/icons/arrow.svelte';
-  import Switch from '$lib/celim/switch.svelte';
-  import Chooser from '$lib/celim/ui/chooser.svelte';
   import { Drawer } from 'vaul-svelte';
+  import OnlineSwitch from '$lib/celim/onlineSwitch.svelte';
+  import NewMeetingIcon from '$lib/celim/3d/newMeetingIcon.svelte';
+  import { Canvas } from '@threlte/core';
+  import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
   export let un;
   let draggable;
   onMount(async () => {
@@ -36,6 +36,7 @@
       mapTouchToMouseFor('.draggable');
       isChatOpen.set(true);
     } else {
+      newMeeting = false
       dialogOpen = true;
     }
   }
@@ -46,10 +47,16 @@
     isChatOpen.set(false);
   };
   let loading = false;
+  let newMeeting = false;
   const cencel = { he: 'ביטול', en: 'cencel' };
   export let idL
   export let chatId = 0;
-  export let online = false
+  export let online = true
+  function onlineSwitcher(e) {
+    const changedTo = e.detail.checked
+    console.log(changedTo)
+   // sendToSer('setOnline', { id: idL, online: changedTo })
+  }
   const back = { he: "חזרה לרשימת הצ'אטים", en: 'back to chat list' };
 
   /**** Svelte Event Handling ****/
@@ -71,7 +78,7 @@
   }
 </script>
 <div data-vaul-drawer-wrapper >
-	<Drawer.Root  bind:open={dialogOpen}  shouldScaleBackground>
+	<Drawer.Root  bind:open={dialogOpen}   shouldScaleBackground>
     	<Drawer.Trigger/>
 		<Drawer.Portal>
 			<Drawer.Overlay class="fixed inset-0 bg-black/40 z-[1000]" />
@@ -79,14 +86,21 @@
 				class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
 			>
 				<div class="flex-1 rounded-t-[10px] p-4">
-					<div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi" />
+          <div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi" />
+
 					<div class="mx-auto d overflow-auto flex flex-col ">
 					
       <div>
-        					<div class="mx-auto d overflow-auto flex flex-col z-[1001]">
-
-                         <NewIwant {idL} userName_value={username} />
+        					<div class="mx-auto h-[85vh] d overflow-auto flex flex-col z-[1001]">
+        {#if newMeeting == false}
+        <NewIwant {idL} userName_value={username} />
+        {:else}
+        <CreateNewMeeting on:close={()=>{newMeeting = false
+        dialogOpen = false
+        }}/>
+        {/if}
 </div>
+
             </div>
     </Drawer.Content>
   </Drawer.Portal>
@@ -95,7 +109,7 @@
 {#if $isChatOpen == true}
   <div
     use:draggable={{
-      containment: 'parent',
+      containment: 'window',
       cursor: 'grabbing'
     }}
     style="
@@ -110,7 +124,9 @@
     dir="rtl"
     class=" draggable z-[9999] absolute top-0 left-0 w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded"
   >
-    <div class="flex flex-row bg-gold rounded">
+  <div>
+    <div class="flex flex-row bg-gold rounded  justify-between">
+      <div class="flex flex-row  items-start justify-start">
       <div>
         <button
           on:click={close}
@@ -138,12 +154,25 @@
           >
         </div>
       {/if}
-      <div>
-        <!----<Chooser bind:level={online} />-->
       </div>
-    </div>
+      <div class="flex flex-row gap-2 items-start justify-end "	>
+      <div>
+        <OnlineSwitch bind:checked={online} on:change={onlineSwitcher} />
+      </div>
+      <button class="h-6 w-6 mx-2 my-1" on:click={() => {
+        isChatOpen.set(false);
+        newMeeting = true
+        dialogOpen = true
+      }}>
+        <Canvas >
+          <NewMeetingIcon />
+        </Canvas>
+      </button>
+      </div>
+  </div>
     <ChatSmall bind:chatId {un}/>
   </div>
+</div>
 {/if}
 <button
   style="position: fixed; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"

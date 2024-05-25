@@ -95,8 +95,12 @@ function proj (event){
      dispatch("proj", {id: event.detail.id})
 }
 let hovered = false
+const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
+    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
 let d = {"he":"לב 1💗1","en":"heart of 1💗1"};
 let u = {"he":"לב 1💗1","en":"heart of 1💗1"};
+const nexttitle = {"he":" יאללה נקסט!","en":"  next!"}
+const pretitle = {"he":"רגע, מה זה היה?","en":"wait.. what was that?"}	
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
@@ -172,13 +176,13 @@ on:mouseleave={()=> hoverc("0")}>
        {#key arr1}
       {#key low}
        {#if arr1.length > 0}
-<div     dir="rtl" bind:clientWidth={h}
+<div     dir="{$lang == "he" ? "rtl" : "ltr"}" bind:clientWidth={h}
  class="body dark:bg-gradient-to-br dark:from-black dark:via-slate-900 dark:via-slate-800 dark:via-slate-600 dark:to-slate-400 box-border h-screen">
-     <img on:mouseenter={()=> hoverc(" יאללה נקסט!")} 
-on:mouseleave={()=> hoverc("0")} class="perv" src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg" alt="back"/>
+     <img on:mouseenter={()=> hoverc(nexttitle[$lang])} 
+on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "perv" : "	next"	}" src="{srcb[$lang]}" alt="{$lang == "he" ? "חזרה" : "	next"	}"/>
 
-        <img on:mouseenter={()=> hoverc("רגע, מה זה היה?")} 
-on:mouseleave={()=> hoverc("0")} class=" next" src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg" alt="next "/>
+        <img on:mouseenter={()=> hoverc(pretitle[$lang])} 
+on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src="{srca[$lang]}" alt="{$lang == "he" ? "הבא" : "	next"	}"/>
     <div   
       dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
@@ -207,8 +211,8 @@ mousewheel={{
       dir="rtl"
     loop="true"
     navigation={{
-    nextEl: ".perv",
-    prevEl: ".next",
+    nextEl: $lang == "he" ? ".perv" : ".next",
+     prevEl: $lang == "he" ? ".next" : ".perv"
   }}
 >
 {#each arr1 as buble, i}
