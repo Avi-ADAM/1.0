@@ -278,6 +278,8 @@ async function start () {
               lang.set(lango)
               doesLang.set(true)
               langUs.set(lango)
+              //add to coocies
+              document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
             }
             if ($lang == "he"){
               for (var i = 0; i < meData.vallues.data.length; i++){
