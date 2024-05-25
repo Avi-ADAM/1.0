@@ -1946,7 +1946,11 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
       justify-content: center;
       text-align: center;
 }
-
+@media(min-width: 720px){
+  .selected, .selectedl{
+    width: 30vw;
+  }
+}
     .imgpr {
       position: absolute;
     transform: translate(-50%, -50%);
