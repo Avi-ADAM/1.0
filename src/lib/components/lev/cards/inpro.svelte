@@ -39,7 +39,13 @@ function opentask(){
  // let parent;
  $: event = dueDateOrCountToDedline != "undefined" &&  dueDateOrCountToDedline != undefined &&  dueDateOrCountToDedline != null ? new Date(dueDateOrCountToDedline) : null;
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
-
+   const deta = {"he": "פרטי המשימה","en": "mission details"}
+   const notes = {"he": "הערות","en": "notes"}
+   const hoursdonTitle = {"he":"שעות בוצעו ונשמרו","en":"hours done and saved"}
+   const from = {"he":"מתוך","en":"from"}
+   const timero = {"he":"מונה זמן", "en":"timer"}
+   const totalTitle = {"he":"מספר השעות שהוקצו למשימה","en":"total hours assigned to the mission"}
+   const nooftitle = {"he":"מספר השעות שבוצעו ונשמרו","en":"number of hours done and saved"}
 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
@@ -74,26 +80,39 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
     <div   class="mb-8">
        <!--use:textfit={{parent,mode:"multi"}}  bind:this={parent}-->
               <div class="text-mturk font-bold text-lg md:text-4xl  mb-2">{missionName}</div>
-                <h5  class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} שעות בוצעו`}</span> מתוך <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal} {totali[$lang]}</span></h5>
+                <h5  class="mn cd "><span on:mouseenter={()=>hover(nooftitle[$lang])} on:mouseleave={()=>hover("0")} role="contentinfo"
+                   >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} ${hoursdonTitle[$lang]}`}</span> {from[$lang]} <span
+                   role="contentinfo" on:mouseenter={()=>hover(totalTitle[$lang])} on:mouseleave={()=>hover("0")}>{hourstotal} {totali[$lang]}</span></h5>
                    {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{event.toLocaleDateString(undefined, options)}</h5>{/if}
-       <div class="flex items-center justify-center m-1"><span class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-wow p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
+       <div class="flex items-center justify-center m-1"><span 
+         class="  bg-goldGrad bg-[length:200%_auto] animate-gradientx text-center text-wow p-2 sm:text-2xl text-xl" 
+         style:font-family="Digital" 
+         role="contentinfo"
+         on:mouseenter={()=>hover(timero[$lang])} on:mouseleave={()=>hover("0")}  
+         style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
             {formatTime(zman)}
         </span></div> 
          <!--<p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>-->
-     {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined"} <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="cd d max-h-16 text-sm text-gray-700 text-base">{missionDetails}</p>{/if}
-    {#if hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" }
-     <span role="contentinfo" on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} >
+     {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined"} <p 
+     on:mouseenter={()=>hover(deta[$lang])} on:mouseleave={()=>hover("0")}
+       class="cd d max-h-16 text-sm sm:text-xl text-gray-700 ">{missionDetails}</p>{/if}
+    {#if hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" && hearotMeyuchadot.length > 0}
+     <span role="contentinfo" on:mouseenter={()=>hover(notes[$lang])} on:mouseleave={()=>hover("0")} >
    <RichText editable={false}  outpot={hearotMeyuchadot}/>
    </span>
      {/if} 
         <div
+        role="button"
+        tabindex="0"
   on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
   class="de border rounded-2xl border-barbi hover:border-gold mt-3" on:click={()=>statusi()}
     on:keypress={()=>statusi()}
-    ><div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {status == null ? 0 : status[0]}%">{status != null ? status[0] : "0"}%</div></div>
+    ><div class=" rounded-2xl bg-goldGrad bg-[length:200%_auto] animate-gradientx" style="width: {status == null ? 0 : status[0]}%"> <div
+       style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
+      class="text-center text-white text-xl">{status != null ? status[0] : "0"}%</div></div></div>
     </div>
     <div class="flex items-center">
       </div>
