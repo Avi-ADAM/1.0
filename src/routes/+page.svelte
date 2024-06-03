@@ -9,7 +9,7 @@
   import CircleProgresBar from "$lib/celim/ui/circleProgresBar.svelte";
 	import {lang,langUs,doesLang} from '$lib/stores/lang'
 	const { progress } = useProgress()
-	const url = 'https://1lev1.vercel.app/';
+	const url = 'https://1lev1.com/';
 	const title = '1️💗1️';
 	const setitle = {
   "he": "ליצור יחד בהסכמה",
@@ -186,9 +186,9 @@ const pagetitle = {
   he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
   ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية'
 };
-  let pageurl = {"ar":"https://1lev1.vercel.app/ar",
-  "en":"https://1lev1.vercel.app/en",
-"he":"https://1lev1.vercel.app/he"}
+  let pageurl = {"ar":"https://1lev1.com/ar",
+  "en":"https://1lev1.com/en",
+"he":"https://1lev1.com/he"}
 </script>
    <Head title={pagetitle[$lang]} description={description[$lang]} {image} url={pageurl[$lang]} />
  <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">

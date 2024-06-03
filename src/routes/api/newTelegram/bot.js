@@ -15,7 +15,7 @@ bot.start((ctx) => {
       parse_mode: 'HTML',
       disable_web_page_preview: true,
       reply_markup: Markup.inlineKeyboard([
-        Markup.button.url('<<to 1💗1>>', 'https://1lev1.vercel.app/lev')
+        Markup.button.url('<<to 1💗1>>', 'https://1lev1.com/lev')
       ])
     });
   } else {
@@ -25,15 +25,15 @@ bot.start((ctx) => {
       reply_markup: Markup.inlineKeyboard([
         Markup.button.url(
           '<<to registration להרשמה>>',
-          'https://1lev1.vercel.app'
+          'https://1lev1.com'
         ),
         Markup.button.url(
           '<<login להתחברות >>',
-          'https://1lev1.vercel.app/login'
+          'https://1lev1.com/login'
         ),
         Markup.button.url(
           '<<register for nutification הרשמה לעדכונים>>',
-          'https://1lev1.vercel.app/me'
+          'https://1lev1.com/me'
         )
       ])
     });

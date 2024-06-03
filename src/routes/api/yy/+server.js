@@ -16,7 +16,7 @@ export const POST = async ({ request }) => {
     } else if (isShow == true){
         name = ""
         det = ""
-        action = 'https://1lev1.vercel.app';
+        action = 'https://1lev1.com';
     } else if (isStart == true){
         name = '';
         const startCommand = '/start';

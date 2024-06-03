@@ -9,7 +9,7 @@
   import CircleProgresBar from "$lib/celim/ui/circleProgresBar.svelte";
 	import {lang,langUs,doesLang} from '$lib/stores/lang'
 	const { progress } = useProgress()
-	const url = 'https://1lev1.vercel.app/';
+	const url = 'https://1lev1.com/';
 	const title = '1️💗1️';
 	const setitle = {
   "he": "ליצור יחד בהסכמה",

@@ -5,7 +5,7 @@ export let projectSrc ="https://res.cloudinary.com/love1/image/upload/v164564719
                 "en":""}//
  const msg2 = {"he":"להרשמה!","en":"register now!"}//link des 
 export let lang = "he"
-export let link = "https://1lev1.vercel.app"
+export let link = "https://1lev1.com"
 const hallo = {"he":"!","en":"Hello, "}
 const shalom = {"he":"שלום","en":"!"}
 

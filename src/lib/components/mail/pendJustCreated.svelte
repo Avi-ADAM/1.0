@@ -144,7 +144,7 @@
 				{instruction[lang]}
 			</Text>
 			<Section style={{ padding: '16px 0 20px' }}>
-				<Button pY={19} style={button} href="https://1lev1.vercel.app/lev">{tovo[lang]}</Button>
+				<Button pY={19} style={button} href="https://1lev1.com/lev">{tovo[lang]}</Button>
 			</Section>		
 			<Hr style={hr} />
 			<Text style={footer}>{slogen[lang]}</Text>

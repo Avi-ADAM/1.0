@@ -23,7 +23,7 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
             [
               Markup.button.url(
                 '<<login להתחברות>>',
-                'https://1lev1.vercel.app/login'
+                'https://1lev1.com/login'
               )
             ],
             [
@@ -47,15 +47,15 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
      [
           Markup.button.url(
             '<<to registration להרשמה>>',
-            'https://1lev1.vercel.app'
+            'https://1lev1.com'
           )],[
           Markup.button.url(
             '<<login להתחברות >>',
-            'https://1lev1.vercel.app/login'
+            'https://1lev1.com/login'
           )],[
           Markup.button.url(
             '<<register for nutification הרשמה לעדכונים>>',
-            'https://1lev1.vercel.app/me'
+            'https://1lev1.com/me'
           )]
       ]).resize()
     )
@@ -68,15 +68,15 @@ const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
         Markup.inlineKeyboard([[
           Markup.button.url(
             '<<to registration להרשמה>>',
-            'https://1lev1.vercel.app'
+            'https://1lev1.com'
           )],[
           Markup.button.url(
             '<<login להתחברות >>',
-            'https://1lev1.vercel.app/login'
+            'https://1lev1.com/login'
           )],[
           Markup.button.url(
             '<<register for nutification הרשמה לעדכונים>>',
-            'https://1lev1.vercel.app/me'
+            'https://1lev1.com/me'
           )
         ]]).resize()
       )
@@ -91,7 +91,7 @@ const chooseStop = { he: 'בחירת משימה לעצירת טיימר', en: 'c
 import { createServer } from 'https';
 
 createServer(
-  await bot.createWebhook({ domain:'1lev1.vercel.app',path:'/api/newTelegram' })
+  await bot.createWebhook({ domain:'1lev1.com',path:'/api/newTelegram' })
 ).listen(8443);
 export async function POST({ request, fetch }) {
   try {

@@ -27,9 +27,11 @@ dispatch("nego",{alr:alr,y:"n"});
 function tochat (){
 dispatch("tochat");
 }
-const neged ={"he":"נגד","en":"against"}
+const neged ={"he":"נדרש בירור","en":"negotiation needed"}
+const negedT = {"he":"סך ההצבעות להליך בירור","en":"total votes for negotiation"}
 const bead = {"he":"בעד","en":"in favor"}
 const notyet = {"he":"טרם","en":"not yet"}
+const notyetT ={"he":"לא הצביעו","en":"not voted yet"}
 const leshana = {"he":"לשנה","en":"per year"}
 const oneyear = {"he":"שנה אחת","en":"one year"}
 const years = {"he":"שנים","en":"years"} 
@@ -41,13 +43,14 @@ const perunit = {"he":"ליחידה","en":"per unit"}
 const units = {"he":"יחידות","en":"units"}
 const oneunit = {"he":"יחידה אחת","en":"one unit"}
 const head = {"he":"אישור קבלת משאב בהצלחה","en":"approval of getting a resorce sucsessfully"}
+const totalinfavor = {"he":"סך ההצבעות בעד","en":"total votes in favor"}
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  bg-white leading-normal w-full h-full bg-white lg:w-full">
+<div dir={$lang == "he" ? "rtl" : "ltr"} style="overflow-y:auto" class=" d  leading-normal w-full h-full bg-white lg:w-full">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
-   <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
+   <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-liteGoldTobr">
       <div class="relative flex items-center space-x-1">
          <div class="relative">
          <img src={src2}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
@@ -87,7 +90,16 @@ const head = {"he":"אישור קבלת משאב בהצלחה","en":"approval of
       <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
       <div class="text-sm">
         <p class="text-gray-900 leading-none">{useraplyname}</p>
-        <p class="vo ef"><span on:mouseenter={()=>hover({"he":"סך ההצבעות בעד","en":"total votes in favor"})} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-{bead[$lang]}</span> <span on:mouseenter={()=>hover({"he":"לא הצביעו","en":"not voted yet"})} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{notyet[$lang]} </span><span on:mouseenter={()=>hover({"he":"סך ההצבעות נגד","en":"total votes against"})} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-{neged[$lang]}</span></p>
+        <p class="vo ef"><span
+          role="contentinfo"
+           on:mouseenter={()=>hover(totalinfavor[$lang])} 
+           on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-{bead[$lang]}</span> <span
+           role="contentinfo"
+            on:mouseenter={()=>hover(notyetT[$lang])} 
+            on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{notyet[$lang]} </span><span 
+            role="contentinfo"	
+            on:mouseenter={()=>hover()} 
+            on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-{neged[$lang]}</span></p>
       </div>
     </div>
        </div>

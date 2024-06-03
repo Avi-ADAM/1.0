@@ -15,91 +15,91 @@ export async function GET() {
          xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"  
        >
              <url>
-             <loc>https://1lev1.vercel.app/he</loc>
+             <loc>https://1lev1.com/he</loc>
              <lastmod>2024-03-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>weekly</changefreq>
              <xhtml:link
               rel="alternate"
               hreflang="en"
-              href="https://1lev1.vercel.app/en" />
+              href="https://1lev1.com/en" />
             <xhtml:link
               rel="alternate"
               hreflang="ar"
-              href="https://1lev1.vercel.app/ar" />
+              href="https://1lev1.com/ar" />
             <xhtml:link
               rel="alternate"
               hreflang="he"
-              href="https://1lev1.vercel.app/he" />
+              href="https://1lev1.com/he" />
              </url>
                           <url>
-             <loc>https://1lev1.vercel.app/hascama</loc>
+             <loc>https://1lev1.com/hascama</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>weekly</changefreq>
              <xhtml:link
               rel="alternate"
               hreflang="en"
-              href="https://1lev1.vercel.app/convention" />
+              href="https://1lev1.com/convention" />
             <xhtml:link
               rel="alternate"
               hreflang="ar"
-              href="https://1lev1.vercel.app/aitifaqia" />
+              href="https://1lev1.com/aitifaqia" />
             <xhtml:link
               rel="alternate"
               hreflang="he"
-              href="https://1lev1.vercel.app/hascama" />
+              href="https://1lev1.com/hascama" />
              </url>
              <url>
-             <loc>https://1lev1.vercel.app/login</loc>
+             <loc>https://1lev1.com/login</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <changefreq>weekly</changefreq>
              <priority>0.99</priority>
              </url>
              <url>
-             <loc>https://1lev1.vercel.app/love</loc>
+             <loc>https://1lev1.com/love</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>0.85</priority>
              <changefreq>daily</changefreq>
              </url>
              <url>
-             <loc>https://1lev1.vercel.app/about</loc>
+             <loc>https://1lev1.com/about</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>0.95</priority>
              <changefreq>weekly</changefreq>
              </url>
              <url>
-             <loc>https://1lev1.vercel.app/lev</loc>
+             <loc>https://1lev1.com/lev</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>0.96</priority>
              <changefreq>always</changefreq>
              </url>     
              <url>
-             <loc>https://1lev1.vercel.app/moach</loc>
+             <loc>https://1lev1.com/moach</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>0.96</priority>
              <changefreq>always</changefreq>
              </url>  
              <url>
-             <loc>https://1lev1.vercel.app/me</loc>
+             <loc>https://1lev1.com/me</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>always</changefreq>
              </url>         
              <url>
-             <loc>https://1lev1.vercel.app/project/1</loc>
+             <loc>https://1lev1.com/project/1</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>0.96</priority>
              <changefreq>always</changefreq>
              </url>    
              <url>
-             <loc>https://1lev1.vercel.app/availableMission/1</loc>
+             <loc>https://1lev1.com/availableMission/1</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>always</changefreq>
                      </url>    
              <url>
-             <loc>https://1lev1.vercel.app/availiableResorce/1</loc>
+             <loc>https://1lev1.com/availiableResorce/1</loc>
              <lastmod>2023-06-29T20:57:22+00:00</lastmod>
              <priority>1.00</priority>
              <changefreq>always</changefreq>
@@ -128,55 +128,55 @@ export async function GET() {
         xmlns:video="https://www.google.com/schemas/sitemap-video/1.1"  
       >
             <url>
-            <loc>https://1lev1.vercel.app/</loc>
+            <loc>https://1lev1.com/</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>1.00</priority>
             <changefreq>weekly</changefreq>
             </url>
             <url>
-            <loc>https://1lev1.vercel.app/login</loc>
+            <loc>https://1lev1.com/login</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <changefreq>weekly</changefreq>
             <priority>0.99</priority>
             </url>
             <url>
-            <loc>https://1lev1.vercel.app/love</loc>
+            <loc>https://1lev1.com/love</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>0.85</priority>
             <changefreq>daily</changefreq>
             </url>
             <url>
-            <loc>https://1lev1.vercel.app/about</loc>
+            <loc>https://1lev1.com/about</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>0.95</priority>
             <changefreq>weekly</changefreq>
             </url>
             <url>
-            <loc>https://1lev1.vercel.app/lev</loc>
+            <loc>https://1lev1.com/lev</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>0.96</priority>
             <changefreq>always</changefreq>
             </url>     
             <url>
-            <loc>https://1lev1.vercel.app/moach</loc>
+            <loc>https://1lev1.com/moach</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>0.96</priority>
             <changefreq>always</changefreq>
             </url>  
             <url>
-            <loc>https://1lev1.vercel.app/me</loc>
+            <loc>https://1lev1.com/me</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>1.00</priority>
             <changefreq>always</changefreq>
             </url>         
             <url>
-            <loc>https://1lev1.vercel.app/en</loc>
+            <loc>https://1lev1.com/en</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>0.96</priority>
             <changefreq>always</changefreq>
             </url>    
             <url>
-            <loc>https://1lev1.vercel.app/ar</loc>
+            <loc>https://1lev1.com/ar</loc>
             <lastmod>2023-06-29T20:57:22+00:00</lastmod>
             <priority>1.00</priority>
             <changefreq>always</changefreq>
