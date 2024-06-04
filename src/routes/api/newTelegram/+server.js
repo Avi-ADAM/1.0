@@ -91,7 +91,7 @@ const chooseStop = { he: 'בחירת משימה לעצירת טיימר', en: 'c
 import { createServer } from 'https';
 
 createServer(
-  await bot.createWebhook({ domain:'1lev1.com',path:'/api/newTelegram' })
+  await bot.createWebhook({ domain:'www.1lev1.com',path:'/api/newTelegram' })
 ).listen(8443);
 export async function POST({ request, fetch }) {
   try {
