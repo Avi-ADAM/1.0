@@ -1,7 +1,7 @@
 {
     "short_name": "1💗1",
     "name": "1💗1 we can together",
-    "start_url": "https://1lev1.com/",
+    "start_url": "https://www.1lev1.com/",
     "theme_color": "#EEE8AA",
     "icons": [
         {
@@ -19,13 +19,13 @@
     ],
     "background_color": "#FF0092",
     "display": "fullscreen",
-    "scope": "https://1lev1.com/",
+    "scope": "https://www.1lev1.com/",
     "shortcuts": [
         {
             "name": "Heart",
             "short_name": "Heart",
             "description": "Suggestions, updates, decisions - the center of actions, the beating heart",
-            "url": "https://1lev1.com/lev?source=pwa",
+            "url": "https://www.1lev1.com/lev?source=pwa",
             "icons": [
                 {
                     "src": "https://res.cloudinary.com/love1/image/upload/v1640287109/diamond_uapr5j.png",
@@ -37,7 +37,7 @@
             "name": "Me",
             "short_name": "Me",
             "description": "Manage all my features and offerings",
-            "url": "https://1lev1.com/me?source=pwa",
+            "url": "https://www.1lev1.com/me?source=pwa",
             "icons": [
                 {
                     "src": "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png",
@@ -49,7 +49,7 @@
             "name": "Brain",
             "short_name": "My Tissues",
             "description": "Joint management page",
-            "url": "https://1lev1.com/moach?source=pwa",
+            "url": "https://www.1lev1.com/moach?source=pwa",
             "icons": [
                 {
                     "src": "https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg",
@@ -61,7 +61,7 @@
             "name": "Agreement",
             "short_name": "Agreement on Peace and Security",
             "description": "First agreement to register",
-            "url": "https://1lev1.com/?source=pwa",
+            "url": "https://www.1lev1.com/?source=pwa",
             "icons": [
                 {
                     "src": "https://res.cloudinary.com/love1/image/upload/v1641158380/barbheb_qf1jmw.jpg",
@@ -73,7 +73,7 @@
             "name": "Agreement Map",
             "short_name": "Agreement Map",
             "description": "How many agreed from each place",
-            "url": "https://1lev1.com/love?source=pwa",
+            "url": "https://www.1lev1.com/love?source=pwa",
             "icons": [
                 {
                     "src": "https://res.cloudinary.com/love1/image/upload/v1641162218/-1_orig-removebg-preview_fdzhwy.png",
