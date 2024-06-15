@@ -23,7 +23,7 @@ const manifestLink = {
 };
 
 const desc = {
-  he: '1💗1 הסכמה עולמית על חי | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
+  he: '1💗1 הסכמה עולמית על חירות | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
   en: '1💗1 WorldWide consensus for Security and Peace | collaboration platform, create together harmoniously | consensus based partnerships management platform | we can together',
   ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا'
 };
