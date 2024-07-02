@@ -70,11 +70,11 @@
   /* .feature-path {
     stroke: #333;
     stroke-width: 0.5px;
-  } 
+  } */
   .feature-path:hover {
     stroke: rgb(43, 158, 110);
     stroke-width: 0.5px;
-  }*/
+  }
   /**
    * Disable the outline on feature click.
    * Depending on map funtionality and accessiblity issues,
