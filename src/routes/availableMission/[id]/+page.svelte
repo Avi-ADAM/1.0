@@ -222,12 +222,14 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
             <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.alld.attributes.name}</h2>
             {#if data.alld.attributes.descrip !== null && data.alld.attributes.descrip !== "null"  && data.alld.attributes.descrip !== "undefined"  && data.alld.attributes.descrip !== undefined && data.alld.attributes.descrip} 
            <RichText outpot={data.alld.attributes.descrip} editable={false}/>{/if}
-           {#if data.alld.attributes.hearotMeyuchadot !== null && data.alld.attributes.hearotMeyuchadot !== "null"  && data.alld.attributes.hearotMeyuchadot !== "undefined"  && data.alld.attributes.hearotMeyuchadot !== undefined  && data.alld.attributes.hearotMeyuchadot} 
-
-     <RichText outpot={data.alld.attributes.hearotMeyuchadot} editable={false}/>
-     {/if}
+   
     {#if data.tok == true}
-    
+            
+    {#if data.alld.attributes.hearotMeyuchadot !== null && data.alld.attributes.hearotMeyuchadot !== "null"  && data.alld.attributes.hearotMeyuchadot !== "undefined"  && data.alld.attributes.hearotMeyuchadot !== undefined  && data.alld.attributes.hearotMeyuchadot} 
+
+    <RichText outpot={data.alld.attributes.hearotMeyuchadot} editable={false}/>
+    {/if}
+    {:else}
 <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
     <div class="flex items-center w-full space-x-2">
         <div class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32"></div>

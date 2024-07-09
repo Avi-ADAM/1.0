@@ -28,21 +28,28 @@ project {data{ id attributes{ projectName user_1s{data{id}} restime timeToP prof
  }`;
 toc = tok;
 } else {
-que = `{  openMission (id:${mId}) {data{attributes{ descrip
-archived noofhours perhour iskvua sqadualed dates
-tafkidims {data{attributes{roleDescription ${
- lang == 'he' ? 'localizations{data{attributes{ roleDescription }}}' : ''
-}}}}
+que = `{  openMission (id:${mId}) {data{attributes{ sqadualed
+      archived
+      users{data{id}}
+project {data{ id attributes{ projectName user_1s{data{id}} restime timeToP profilePic {data{ attributes{url  }}}}}}
+     tafkidims {data{attributes{roleDescription ${
+       lang == 'he'
+         ? 'localizations{data{attributes{ roleDescription }}}'
+         : ''
+     }}}}
      skills {data{attributes{skillName ${
        lang == 'he' ? 'localizations{data{attributes{skillName }}}' : ''
      }}}}
+     descrip
+     hearotMeyuchadot
+     name dates iskvua
      work_ways {data{attributes{workWayName ${
        lang == 'he'
          ? 'localizations{data{attributes{workWayName }}}'
          : ''
      }}}}
-     name project {data{ id attributes{ projectName profilePic {data{ attributes{url  }}}}}}}}}}
-     `;
+     noofhours perhour   }}}
+ }`;
     toc = import.meta.env.VITE_ADMINMONTHER;
   }
  let alld = []
@@ -55,7 +62,6 @@ tafkidims {data{attributes{roleDescription ${
           datar = langd;
           console.log(datar);
           alld = datar;
-
           alld = alld;
           alld.title = {
             he: `1💗1 | הצעה למשימה "${alld.attributes.name}" בריקמה: ${alld.attributes.project.data.attributes.projectName}`,
