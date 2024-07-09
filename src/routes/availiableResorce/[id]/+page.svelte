@@ -277,22 +277,27 @@
   let url = $page.url.toString();
   //TODO: header nav menu
 </script>
+{#await data.alld}
 
-<Head
-  title={$page.data?.alld?.title[$lang] ?? headi[$lang]}
-  {description}
-  {image}
-  {url}
-/>
-<SucssesConf {success} />
-{#if data?.alld?.fullfild == false}
   <div
     class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex align-middle content-center justify-center"
   >
     <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
   </div>
-{:else if data != null}
+
+{:then a } 
+
+{#if data != null}
+
+<SucssesConf {success} />
+    
   {#if data.alld?.archived != true && data.alld != null}
+  <Head
+  title={$page.data?.alld?.title[$lang] ?? headi[$lang]}
+  {description}
+  {image}
+  {url}
+/>
     <div
       bind:clientWidth={wid}
       dir="rtl"
@@ -395,7 +400,7 @@
                     </span>
                   {/if}
                   {#if data.alld.kindOf != "total"}
-                    <span> 🟰 {data.alld.price * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
+                    <span>  =  {data.alld.price * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
                       {#if data.alld.price != data.alld.easy}
                       <span> ↔️ {data.alld.easy * data.alld.hm * montsi(data.alld.kindOf, data.alld.sqadualed, data.alld.sqadualedf,true)}
                       </span>
@@ -699,3 +704,4 @@
     {/if}
   </div>
 {/if}
+{/await}
