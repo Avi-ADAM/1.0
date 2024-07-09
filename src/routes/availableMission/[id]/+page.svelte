@@ -185,14 +185,14 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
   let url = $page.url.toString()
   //TODO: header nav menu 
 </script>
-
-<Head title="{$page.data.alld?.title[$lang] ?? headi[$lang]}" {description} {image} {url} />
-<SucssesConf {success} />
-{#if data.alld?.fullfild == false}
+{#await data.alld}
 <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex align-middle content-center justify-center ">
 <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 </div>
-{:else}
+{:then a}
+<Head title="{data?.alld?.title[$lang] ?? headi[$lang]}" {description} {image} {url} />
+<SucssesConf {success} />
+
 {#if data != null}
 {#if data.archived != true}
 <div bind:clientWidth={wid} dir="rtl"  style="overflow-y:auto" class=" d mb-4 sm:pt-4 w-full   lg:w-1/2 mx-auto">
@@ -201,17 +201,17 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
     <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
         <div class="relative flex items-center space-x-1">
             <div class="relative">
-                <img src={data.alld.project.data.attributes.profilePic.data?.attributes.url}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+                <img src={data.alld.attributes.project.data.attributes.profilePic.data?.attributes.url}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
             </div>
             <div class="flex flex-col leading-tight">
                 <div class="sm:text-sm text-md mt-1 flex items-center">
                     <span class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl">{headi[$lang]}</span>
                 </div>
-                <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200 ">{data.alld.project.data.attributes.projectName}</span>
+                <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200 ">{data.alld.attributes.project.data.attributes.projectName}</span>
             </div>
         </div>
         <div>
-    <button on:click={()=>project(data.alld.project.data.id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4" >{seePr[$lang]}</button>
+    <button on:click={()=>project(data.alld.attributes.project.data.id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4" >{seePr[$lang]}</button>
         </div>
     </div>
     <div  class=" lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
@@ -219,10 +219,13 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
               <div class="  mb-2">
         <div class="flex flex-row justify-between">
             <div class="px-2">
-            <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.alld.name}</h2>
-            {#if data.alld.descrip !== null && data.alld.descrip !== "null"  && data.alld.descrip !== "undefined"  && data.alld.descrip !== undefined} 
-           <RichText outpot={data.alld.descrip} editable={false}/>{/if}
-     <RichText outpot={data.alld.hearotMeyuchadot} editable={false}/>
+            <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.alld.attributes.name}</h2>
+            {#if data.alld.attributes.descrip !== null && data.alld.attributes.descrip !== "null"  && data.alld.attributes.descrip !== "undefined"  && data.alld.attributes.descrip !== undefined && data.alld.attributes.descrip} 
+           <RichText outpot={data.alld.attributes.descrip} editable={false}/>{/if}
+           {#if data.alld.attributes.hearotMeyuchadot !== null && data.alld.attributes.hearotMeyuchadot !== "null"  && data.alld.attributes.hearotMeyuchadot !== "undefined"  && data.alld.attributes.hearotMeyuchadot !== undefined  && data.alld.attributes.hearotMeyuchadot} 
+
+     <RichText outpot={data.alld.attributes.hearotMeyuchadot} editable={false}/>
+     {/if}
     {#if data.tok == true}
     
 <div role="status" class="space-y-2.5 animate-pulse max-w-lg">
@@ -258,7 +261,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
     <span class="sr-only">for registered users only...</span>
     </div>
     {/if}
-    {#if data.alld.sqadualed || data.alld.dates}
+    {#if data.alld.attributes.sqadualed || data.alld.attributes.dates}
                                 <p
                   style="line-height: 1;"
                   class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
@@ -268,11 +271,11 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
                     src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
                     alt="howmuch"
                   />
-                {#if data.alld.sqadualed}
-                <span> {new Date(data.alld?.sqadualed).toLocaleDateString($lang)}</span>
+                {#if data.alld.attributes.sqadualed}
+                <span> {new Date(data.alld?.attributes.sqadualed).toLocaleDateString($lang)}</span>
                 {/if}
-                 {#if data.alld.dates}
-                <span> - {new Date(data.alld?.dates).toLocaleDateString()}</span>
+                 {#if data.alld.attributes.dates}
+                <span> - {new Date(data.alld?.attributes.dates).toLocaleDateString()}</span>
                 {/if}
                   </p>
                 {/if}  
@@ -281,9 +284,9 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         <span 
         on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} 
         on:mouseleave={()=>hover("0")} > 
-        {data.alld.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} {perho[$lang]} </span> * <span 
+        {data.alld.attributes.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} {perho[$lang]} </span> * <span 
         on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} 
-        on:mouseleave={()=>hover("0")}  > {data.alld.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {hourss[$lang]} {data.alld.iskvua ? monhly[$lang] : "" }</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.alld.noofhours * data.alld.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {data.alld.iskvua ? monhly[$lang] : "" } </span>
+        on:mouseleave={()=>hover("0")}  > {data.alld.attributes.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {hourss[$lang]} {data.alld.attributes.iskvua ? monhly[$lang] : "" }</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.alld.attributes.noofhours * data.alld.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {data.alld.attributes.iskvua ? monhly[$lang] : "" } </span>
     </p>
         </div>
             <div class="">
@@ -299,10 +302,10 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
             </div>     
         </div>
                    
-    {#if data.alld.skills.data.length > 0}
+    {#if data.alld.attributes.skills.data.length > 0}
     <small class="text-barbi text-sm lg:text-2xl">{requireSkills[$lang]}</small>
     <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4 ">
-        {#each data.alld.skills.data as skill}
+        {#each data.alld.attributes.skills.data as skill}
         <p 
         on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
         on:mouseleave={()=>hover("0")}  >
@@ -310,17 +313,17 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
                 {/each}
                 </div>
                 {/if}
-                {#if data.alld.tafkidims.data.length > 0}  
+                {#if data.alld.attributes.tafkidims.data.length > 0}  
                 <small class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</small>
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
-                    {#each data.alld.tafkidims.data as rol}
+                    {#each data.alld.attributes.tafkidims.data as rol}
                     <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
     <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.roleDescription} wow={true}/></p>{/each}
       </div>
       {/if}
-      {#if data.alld.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
+      {#if data.alld.attributes.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
-          {#each data.alld.work_ways.data as rol}
+          {#each data.alld.attributes.work_ways.data as rol}
           <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.workWayName}/>
           </p>
@@ -329,10 +332,10 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           {/if}
           {#if $page.data.tok != false}
           <div class="flex justify-center">
-            {#if alr == false && !data.alld.users.data.map(c => c.id).includes(data.uid)}
+            {#if alr == false && !data.alld.attributes.users.data.map(c => c.id).includes(data.uid)}
           <button on:click={ask} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
             class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">{iwantto[$lang]}</button>
-        {:else if data.alld.users.data.map(c => c.id).includes(data.uid)}
+        {:else if data.alld.attributes.users.data.map(c => c.id).includes(data.uid)}
         <h3 class="button-perl text-barbi px-4 py-1">{alri[$lang]}</h3>
             {/if}  
         </div>
@@ -383,5 +386,4 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           {/if}
                 </div>
           {/if}
-          {/if}
-          
+          {/await}
