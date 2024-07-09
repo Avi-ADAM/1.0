@@ -207,10 +207,10 @@ function back() {
 		        passwordx = e.target.value
 		const password = e.target.value;
 		validations = [
-			password.length > 1,
+		//	password.length > 1,
 			password.length > 8,
 			password.search(/[A-Z]/) > -1,
-			password.search(/[0-9]/) > -1,
+		//	password.search(/[0-9]/) > -1,
 		//	password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
@@ -277,20 +277,20 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 
 		<div class="strength">
 			<span class="bar bar-1" class:bar-show={strength > 0} />
-			<span class="bar bar-2" class:bar-show={strength > 1} />
-			<span class="bar bar-3" class:bar-show={strength > 2} />
-			<span class="bar bar-4" class:bar-show={strength > 3} />
+			<span class="bar bar-2" class:bar-show={strength > 0} />
+			<span class="bar bar-3" class:bar-show={strength > 1} />
+			<span class="bar bar-4" class:bar-show={strength > 1} />
 		</div>
 
 		<ul dir="rtl">
 			<li>
-				{validations[1] ? "🏆" : "❌"} {val1[$lang]}
+				{validations[0] ? "🏆" : "❌"} {val1[$lang]}
 			</li>
 			<li>
-				{validations[2] ? "🏆" : "❌"} {val2[$lang]}
+				{validations[1] ? "🏆" : "❌"} {val2[$lang]}
 			</li>
-			<li>{validations[3] ? "🏆" : "❌"} {val3[$lang]}</li>
-			<!--<li>
+			<!--<li>{validations[3] ? "🏆" : "❌"} {val3[$lang]}</li>
+			<li>
 				{validations[3] ? "🏆" : "❌"}  ולפחות סמל אחד מאלו($&+,:;=?@#) must contain one symbol ($&+,:;=?@#)
 			</li>-->
 		</ul>
@@ -299,7 +299,7 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 		  <button class="button-2"   on:click="{back}"  >
     <img alt="go"  class="img-4"  src="{srca[$lang]}"/>
     </button>
-  <button disabled={strength < 4} class="button-in-1-2" class:non={strength < 4 }  on:click="{increment}">
+  <button disabled={strength < 2} class="button-in-1-2" class:non={strength < 2 }  on:click="{increment}">
     <img alt="go" class="img-4"  src="{srcb[$lang]}"/>
     </button>
 </div>
