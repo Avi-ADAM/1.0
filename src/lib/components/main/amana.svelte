@@ -24,6 +24,9 @@
 	import { useProgress } from '@threlte/extras'
 	const { progress } = useProgress()
   import { Head } from 'svead'
+  import { track } from '@vercel/analytics';
+ 
+
   let title = ' 1💗1 | הסכמה עולמית על חירות'
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description ="הסכמה העולמית על חירות היא חלק מרכזי ב- 1💗1. על ידי הסכמה להצהרה זו, ניתן להירשם לפלטפורמה השיתופית 1💗1 ומשתתפים ביצירת עולם יותר בטוח. על ידי ההתחייבות ההדדית לאי-אלימות, לפתרון סכסוכים בהסכמה ולכבוד הדדי, אנו ניצור עולם בו כוח ואלימות מפסיקים להיות צורות של תקשורת אנושית. הצטרפו אלינו לקידום שלום, הסכמות וחופש. ביחד, אנחנו יכולים ליצור עולם שבו הטוב הבסיסי מנצח ובו חילוקי דעות נפתרים בהסכמה משותפת."
@@ -407,6 +410,7 @@ const { form, errors, state, handleChange, handleSubmit } = createForm({
           .required()
       }),
 onSubmit: values => {
+  track('tryToSign', {}, { flags: ['tryToSign'] });
   nameuse = false;
   const jjj = $form.name
 if (fpp.includes(jjj)){
@@ -681,13 +685,29 @@ $: if($errors.name || $errors.email) {scrollToTop()}
                    <br>
            כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק פגיעה באדם, אלימות וכפיה בכוח.
               <br>
+              <div class="text-center justify-center flex items-center text-bold text-transparent bg-clip-text bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]" style="flex-wrap: wrap; font-family:StamSefarad,David;">
+              אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" on:keypress={()=>info()} on:click={()=>info()}>"רקמות"</span> המתנהלות באתר 		<div dir="ltr" style="text-shadow:none;" class=" font-bold  mx-2 mt-2 text-transparent 
+              bg-clip-text bg-[length:auto_200%] animate-gradienty 
+              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] 
+              flex-wrap flex flex-row">
+              <div class="flip">
+                <h1  class="font-bold  text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+                bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
+          >1</h1></div>
+          <div><h1  class="font-bold text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+              bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] "
+          >💗</h1>
+          </div><div>
+                <h1  class="font-bold  text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+                bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
+          >1</h1></div></div> רק בהסכמה הדדית.
+              </div>
+             <!----
    אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב הבסיסי שבאדם, ולכך מקווה ומצפה שכאשר כל האנושות כולה תסכים אלימות, קרבות וכפיה בכוח יפסיקו להיות צורה של תקשורת אנושית.
-              <br>
+              <br> -->
               כאשר כל אוכלוסיית  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join( " וכל אוכלוסיית " )}`  : "__"}</span>  תסכים ותחיה לפי אמנה זו אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר עם כל השאר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ומדינת ")}` : "__"}</span>  {selected.length > 1 ? "ממנות" : "ממנה" } בשמי ונחיה בחופשיות ובהסכמה הדדית. 
               <br>
                כאשר כל האנושות תסכים ותחיה לפי אמנה זו אני <span style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ושל צבא ") }`+ "." : "__."}</span> כאשר בו זמנית יוותרו כל צבאות העולם על נשקם ונהפוך לאנושות מפורזת וחופשית
-        <br>
-         אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" on:keypress={()=>info()} on:click={()=>info()}>"רקמות"</span> המתנהלות באתר 1💗1 רק בהסכמה הדדית.
             </span>
           </span>
     </div>
