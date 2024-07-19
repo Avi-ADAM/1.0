@@ -26,7 +26,7 @@ export let mission1 = [];
      };
 let moving = [];
 let ids;
-const placeholder = `בחירה מרשימה`;
+const placeholder = {"he":`בחירה מרשימה`,"en":"choose from list"};
 function handl(e) {
   let type = "add"
   if (e.detail){
@@ -80,8 +80,9 @@ const head = {"he":"הוספת פעולות הנדרשות להקמה או לת�
   </script>
 
 <div dir="rtl" >
-<h1 class="text-barbi font-bold">{head[$lang]}</h1>
-  
+  <slot>
+<h2 class="text-barbi font-bold">{head[$lang]}</h2>
+  </slot>
            <div class="inline-block relative w-min	">
         
       
@@ -89,7 +90,7 @@ const head = {"he":"הוספת פעולות הנדרשות להקמה או לת�
           --sms-selected-bg="white"
                         loading={mission1.length > 0 ? false : true}
           bind:selected
-          {placeholder}
+          placeholder={placeholder[$lang]}
           options={mission1.map(c => c.attributes.missionName)}
          on:change={(e)=>handl(e)}
           /></div>

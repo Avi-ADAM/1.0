@@ -1,5 +1,5 @@
 //import {
-  const PUBLIC_CONTACT_EMAIL = "ehad1one@gmail.com"
+  const PUBLIC_CONTACT_EMAIL = "baruch@1lev1.com"
   const PUBLIC_FACEBOOK_AUTHOR_PAGE = ""
   const PUBLIC_FACEBOOK_PAGE = ""
   const PUBLIC_GITHUB_PAGE = ""

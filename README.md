@@ -16,6 +16,6 @@ Welcome to **1💗1**, a platform designed for collaborative decision-making and
 
 **1💗1** is an ambitious project with numerous plans and limited developers time. Any assistance is highly appreciated and will grant you partnership status. While we are working towards an automated approach, currently, contributions are managed manually on our system.
 
-To get involved, simply send an email to [ehad1one@gmail.com](mailto:ehad1one@gmail.com) expressing your interest and the area you'd like to contribute to. We will assign you a mission on the site, allowing you to become a partner and contribute your hours to the collective effort.
+To get involved, simply send an email to [baruch@1lev1.com](mailto:baruch@1lev1.com) expressing your interest and the area you'd like to contribute to. We will assign you a mission on the site, allowing you to become a partner and contribute your hours to the collective effort.
 
 Join us in revolutionizing collaboration and partnership management!

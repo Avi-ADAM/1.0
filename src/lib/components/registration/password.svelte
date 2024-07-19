@@ -313,7 +313,7 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 <h2 class=" bg-white text-red">{errr.m}
 {arr3[$lang]}<br>
  {arr2[$lang]}<br>
- {arr1[$lang]}ehad1one@gmail.com
+ {arr1[$lang]}baruch@1lev1.com
 </h2>
 {/if}
 	</form>

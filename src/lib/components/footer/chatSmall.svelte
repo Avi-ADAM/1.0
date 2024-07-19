@@ -47,7 +47,7 @@ function  forumToArr(){
 }
 let clicked = false, ani = "forum"
 console.log(messagesArray);
-const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
+const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
 
   const messs = {"he":"הודעתך נשלחה בהצלחה","en":"your message was send succsefully"}
 

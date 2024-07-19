@@ -24,7 +24,7 @@
 ניסוח אחיד עליו מסכימים כולם, גורם לבני אדם ממדינות, לאומים ותרבויות שונות
 לבטוח זה בזה, לדעת כי ערך החיים נמצא אצל כולם מעל הכל, ולהגיע להסכמה הדדית​
 <br/>
- הארות הערות וכל דבר למייל ehad1one@gmail.com
+ הארות הערות וכל דבר למייל baruch@1lev1.com
  <br/>
  אודות 
 <span><a target=”_blank” class="text-gold hover:text-mturk" href="https://shalom.1lev1.world">1💗1</a></span></div>		

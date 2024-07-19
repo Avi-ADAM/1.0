@@ -24,7 +24,7 @@ axios
   });
     }
     const title = {"he": "שכחתי סיסמה 1💗1", "en":"1💗1 forgot password"}
-    const tempmessege = {"he": " עקב תקלה במערכת שליחת המיילים אין באפשרותינו לחדש סיסמה מכאן, נא לפנות למייל ehad1one@gmail.com ", "en":"do to problem in the mail system we unable to change password from here , please contact us in ehad1one@gmail.com to chang it manually"}
+    const tempmessege = {"he": " עקב תקלה במערכת שליחת המיילים אין באפשרותינו לחדש סיסמה מכאן, נא לפנות למייל baruch@1lev1.com ", "en":"do to problem in the mail system we unable to change password from here , please contact us in baruch@1lev1.com to chang it manually"}
     const em = {"he": " כתובת המייל איתה נרשמת", "en":"your registred email address"}
     const se = {"he": "שליחה", "en":"Send"}
     const heading = {"he": "יש למלא כתובת מייל אליה ישלח לינק לאיפוס הסיסמה", "en":"please enter your registred email address to get a reset link"}

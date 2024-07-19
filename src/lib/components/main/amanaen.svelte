@@ -347,7 +347,7 @@ import { Head } from 'svead'
     const placeholder = `My place`;
     const required = true;
     let nameuse = false;
- let erorim = {st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "ehad1one@gmail.com"  }
+ let erorim = {st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "baruch@1lev1.com"  }
     let selected = [];
        let already = false;
        let erorims = false;

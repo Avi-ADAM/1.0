@@ -384,7 +384,7 @@ let nameuse = false;
     const pl = `${placeholdr}.${lang}`;
     const placeholder =`המקום שלי`;
     const required = true;
-    let erorim = {st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "ehad1one@gmail.com"  }
+    let erorim = {st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "baruch@1lev1.com"  }
     let selected = [];
        let already = false;
        let erorims = false;
@@ -681,7 +681,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     </h1>
           <span style="font-family:David;" class="text-bold text-transparent bg-clip-text  bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]">
               <span  style="font-family:StamSefarad,David;">
-                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לא רוצה לפגוע באף אדם ולעולם לא אפגע באף אדם.
+                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לא רוצה לפגוע באף אדם ולעולם לא אפגע באף אדם.<!--חיובי-->
                    <br>
            כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק פגיעה באדם, אלימות וכפיה בכוח.
               <br>

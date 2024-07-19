@@ -239,7 +239,7 @@ function back() {
 <h2 class=" bg-white text-red">{errr.m}
 קרתה בעיה,<br>
  יש לבדוק את המייל,<br>
- אם לא התקבל מייל הרשמה נא לפנות ל-ehad1one@gmail.com
+ אם לא התקבל מייל הרשמה נא לפנות ל-baruch@1lev1.com
 </h2>
 {/if}
 	</form>
