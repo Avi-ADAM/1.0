@@ -56,8 +56,9 @@
         eventStartEditable: true
     };
     console.log(options)
+    const inDev = {'he':'בפיתוח נמרץ בקרוב ניתן יהיה לראות ולסדר משמרות כאן','en':'in development, coming soon~!'}
 </script>
-<h1>בפיתוח נמרץ בקרוב ניתן יהיה לראות ולסדר משמרות כאן</h1>
+<h1>{inDev[$lang]}</h1>
 <Calendar bind:this={ec} {plugins} {options} />
 <style>
    

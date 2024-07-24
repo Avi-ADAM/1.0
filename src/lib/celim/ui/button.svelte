@@ -29,11 +29,12 @@ active:border-b-[2px] active:brightness-90 active:translate-y-[2px]
    on:mouseenter={()=>hover = true}
    on:mouseleave={()=>hover = false}
         on:click={onclick}
-        name="{name}"><div class="flex flex-row align-center justify-center items-center gap-4">	
+        title="{text[$lang]}"
+        name="{name}"><div class="flex flex-row align-center justify-center items-center gap-4"><slot>	
         <h2 class="text-transparent font-extrabold text-xl md:text-2xl  bg-clip-text bg-[length:auto_200%] animate-gradienty 
         {hover == false  ? "bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.700),theme(colors.wow),theme(colors.fuchsia.700),theme(colors.barbi))]"
         : "bg-[linear-gradient(to_top,theme(colors.gra),theme(colors.grc),theme(colors.grd),theme(colors.gold),theme(colors.grd),theme(colors.grc),theme(colors.gra))]"}	
-">{text[$lang]}</h2>
+">{text[$lang]}</h2></slot>
 {#if loading}
 <div class="w-8 h-8">
 <Lowding color={hover ? "var(--gold)":"var(--barbi-pink)"}/></div>

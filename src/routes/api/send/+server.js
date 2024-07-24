@@ -12,6 +12,7 @@ export async function POST({ request, cookies }) {
     let variablesObject = {};
     let keyValueObject = data.data.arg
     for (let key in keyValueObject) {
+      if(keyValueObject[key] != null)
       if (key === 'idL') {
         variablesObject[key] = idL; // Use the local uid for 'idL'
       } else {

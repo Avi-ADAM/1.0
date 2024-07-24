@@ -36,6 +36,8 @@ export const qids = {
             attributes{
               telegramId
               lang 
+              email
+              username
               machshirs{data{id attributes{jsoni}}}
             }
           }
@@ -206,5 +208,8 @@ export const qids = {
   createPgishauserpend(data: {users_permissions_user: $id,pgisha: $pgishaId}) {data{id}}
   }`, "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String) {
   createPgishauser(data: {users_permissions_user: $id,pgishas: $pgishaId,uid:$uid}) {data{id}}
+  }`,
+  '19createMission': `mutation CreateMission($descrip: String, $missionName: String, $publishedAt: DateTime, $skills: [ID], $tafkidims: [ID]) {
+  createMission(data: {descrip: $descrip, missionName: $missionName, publishedAt: $publishedAt, skills: $skills, tafkidims: $tafkidims}) {data{id}}
   }`
 };

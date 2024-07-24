@@ -1,4 +1,5 @@
 <script>
+	import  RichText from '$lib/celim/ui/richText.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import {lang} from '$lib/stores/lang'
@@ -74,9 +75,12 @@ const requiredWW = {
             <div class="px-2 sm:basis-3/4 ">
             <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.name}</h2>
             {#if data.descrip !== null && data.descrip !== "null"  && data.descrip !== "undefined"  && data.descrip !== undefined} 
-           <p class="cd d max-h-16 text-gray-100 text-lg lg-text-2xl">{data.descrip}</p>{/if}
+           <RichText outpot={data.descrip} editable={false} sml={true}/>
+            {/if}
     {#if data.hearotMeyuchadot}
-    <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d">{data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== null && data.hearotMeyuchadot !== "undefined" ? data.hearotMeyuchadot : ""}</p>
+    {#if data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== null && data.hearotMeyuchadot !== "undefined" ? data.hearotMeyuchadot : ""}
+    <RichText outpot={data.hearotMeyuchadot} editable={false} sml={true}/>
+    {/if}
    
     {/if}
      <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">

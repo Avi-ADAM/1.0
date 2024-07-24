@@ -1,19 +1,109 @@
 <script>
      import MultiSelect from 'svelte-multiselect';
-    import Addnewm from '../addnew/addNewMission.svelte';
     import { createEventDispatcher } from 'svelte';
     import {lang } from '$lib/stores/lang.js' 
     import {mi} from './mi.js'
+    import { skil, ww, role } from './mi.js';
+  import Button from '$lib/celim/ui/button.svelte';
+  import Arrow from '$lib/celim/icons/arrow.svelte';
+  import Mission from "./mission.svelte";
+  import { idPr } from '../../stores/idPr.js'
  const dispatch = createEventDispatcher();
- 
+ export let pn, pl, restime,projectUsers, alit;
+ const baseUrl = import.meta.env.VITE_URL
+
+ let newcontent = true;
+let newcontentR = true;
+let newcontentW = true;
+let error8
+async function findT() {
+    /*TODO: כאשר מחפשים כישורים וכן לגבי כל שאר האובייקטים להציג את היגרסה העברית והאנגלית כך שהחיפוש יוכל למצוא את כולן*/ 
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp;
+      }
+      return parseJSON(resp).then((resp) => {
+        throw resp;
+      });
+    };
+    try {
+      const res = await fetch(baseUrl + '/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: `query {
+    skills {data{ id attributes{ skillName ${
+      $lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''
+    } }}}
+     tafkidims {data{ id attributes{ roleDescription ${
+       $lang == 'he'
+         ? 'localizations{data {attributes{ roleDescription}} }'
+         : ''
+     }}}}
+     workWays {data{ id attributes{ workWayName ${
+       $lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''
+     } } }}
+ }
+              `
+        })
+      })
+        .then(checkStatus)
+        .then(parseJSON);
+    let  skills2 = res.data.skills.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < skills2.length; i++) {
+          if (skills2[i].attributes.localizations.data.length > 0) {
+            skills2[i].attributes.skillName =
+              skills2[i].attributes.localizations.data[0].attributes.skillName;
+          }
+        }
+      }
+      skills2 = skills2;
+     let roles = res.data.tafkidims.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < roles.length; i++) {
+          if (roles[i].attributes.localizations.data.length > 0) {
+            roles[i].attributes.roleDescription =
+              roles[
+                i
+              ].attributes.localizations.data[0].attributes.roleDescription;
+          }
+        }
+      }
+      roles = roles;
+    let  workways2 = res.data.workWays.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < workways2.length; i++) {
+          if (workways2[i].attributes.localizations.data.length > 0) {
+            workways2[i].attributes.workWayName =
+              workways2[
+                i
+              ].attributes.localizations.data[0].attributes.workWayName;
+          }
+        }
+      }
+      workways2 = workways2;
+      skil.set(skills2);
+      ww.set(workways2);
+      role.set(roles);
+      newcontent = false;
+      newcontentR = false;
+      newcontentW = false;
+    } catch (e) {
+      error8 = e;
+      console.log(error8);
+    }
+}
+
 export let selected = [];
 
-export let roles = [];
-    let addmission = false;  
 export let mission1 = [];
 
 
-    function find_mission_id(mission_name_arr){
+function find_mission_id(mission_name_arr){
      var  arr = [];
       for (let j = 0; j< mission_name_arr.length; j++ ){
       for (let i = 0; i< mission1.length; i++){
@@ -23,110 +113,87 @@ export let mission1 = [];
       }
       }
       return arr;
-     };
+};
 let moving = [];
-let ids;
-const placeholder = {"he":`בחירה מרשימה`,"en":"choose from list"};
-function handl(e) {
-  let type = "add"
-  if (e.detail){
-   if (e.detail.type === 'remove'){
-    type = "remove"
-    console.log(find_mission_id([e.detail.option]),"from choose")
-    let miDatanew = $mi;
-  const y = miDatanew.map(c => c.id);
- const id = find_mission_id([e.detail.option])
- const index = y.indexOf(id);
-  miDatanew.splice(index, 1);
-  mi.set(miDatanew)
-   }
-  }
-    if (selected.length > 0) {
-    dispatch('message', {
-    type:type,
-    li: find_mission_id(selected),
-    show: true,
-    bla: selected
-    } );
-   moving = selected;
-    selected = moving;
-    };
-  //  
-   
-    
-	};
+const placeholder = {"he":`בחירה מרשימה או יצירת חדשה`,"en":"choose from list or create new"};
 
-let cencel = " ביטול הוספת פעולה חדשה";
 
-function newM (event) {
-  console.log("its newm")
-  const myids = find_mission_id(selected);
-  const newId = event.detail.id;
- const allm = myids.concat(newId);
- const mys = selected;
-  const newn = event.detail.name;
- const alln = mys.concat(newn);
-  console.log(allm);
-  console.log(alln);
-  dispatch('message', {
-    li: allm,
-    show: true,
-    bla: alln,
-    type: "add"
-    } );
-  addmission = false;
-}
 const head = {"he":"הוספת פעולות הנדרשות להקמה או לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
+let id = 0
+$: ugug = ``;
+ $: addn = {"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`}
+ let name = ""
+ function add(){
+  let isNew = false
+  if (selected.length > 0) {
+    before = true
+          before = false;
+          findT()
+          
+  if (!mission1.map(c => c.attributes.missionName).includes(selected[0])){
+    isNew = true
+    name = selected[0]
+    id = 0
+  }else{
+    name = selected[0]   
+    id = find_mission_id(selected)
+  }
+
+ }
+}
+ $: before = true
+ const mn = {
+  "he": "שם המשימה",
+  "en": "mission name"
+}
+
+let noRiset = true
   </script>
 
-<div dir="rtl" >
+<div dir="{$lang == 'he' ? 'rtl' : 'ltr'}" >
   <slot>
 <h2 class="text-barbi font-bold">{head[$lang]}</h2>
   </slot>
-           <div class="inline-block relative w-min	">
-        
-      
+            {#if before}
+        <h3>{mn[$lang]}</h3>
+      {/if}
+      {#if before && noRiset}
+      <div class="inline-block relative w-min	">
+
           <MultiSelect
           --sms-selected-bg="white"
-                        loading={mission1.length > 0 ? false : true}
+        loading={mission1.length > 0 ? false : true}
+        createOptionMsg={addn[$lang]}
+        allowUserOptions={"append"}
+         bind:searchText={ugug}
           bind:selected
           placeholder={placeholder[$lang]}
           options={mission1.map(c => c.attributes.missionName)}
-         on:change={(e)=>handl(e)}
+        maxSelect={1}
           /></div>
-        
-        
-{#if addmission == false}
-<!--{#if selected[0]} 
-          <button
-          title="הוספה"
-          class="bg-pink-200 hover:bg-pink-500 text-mturk hover:text-lturk font-bold py-1 px-2 rounded-full" 
-          on:click={handl}><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />
-        </svg></button>
-          {/if}-->
-<button
- on:click={() => addmission = true}
-  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold  px-2 rounded-full"
-  >הוספת פעולה שאינה ברשימה</button>
-  {:else if addmission == true}
-  <div  class="bg-neutral-800 border border-barbi rounded m-4">
-  <button
-  title={cencel}
-       on:click={() => addmission = false}
-        class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
-        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-         <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-     </svg></button>
- <Addnewm roles={roles} on:new={newM}/></div>
- {/if} 
+          {#if selected[0]}
+        <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
+        {/if}
+        {/if}
+{#if before == false}
+        <Mission    
+        {name}
+        {id}
+         {pn}
+        {pl}
+        {restime}
+        {newcontent}
+        {newcontentR}
+        {newcontentW}
+        pu={projectUsers}
+        userslength={projectUsers.length}
+        vallues={alit}
+        projectId={$idPr}
+        on:close={()=>dispatch('close')}/>
+        {/if}
  </div>
 
 <style>
-  h1{
-      font-size: 29px;  
-     
-    }
     :global(div.multiselect > ul.selected > li) {
       background: whitesmoke;
     }

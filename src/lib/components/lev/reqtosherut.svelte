@@ -186,6 +186,7 @@ let welcome = ``;
 let adduser = ``;
 let adduser2 = ``;
 async function agree() {
+  //add sheirut to rikma -> add missions and reasorses to sheiruyt -> add reciver as project client
     already = true;
      noofusersOk += 1;
   noofusersWaiting -= 1;

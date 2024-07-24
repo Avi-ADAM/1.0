@@ -6,8 +6,8 @@
   import Tile from '$lib/celim/tile.svelte';
   import { Confetti } from 'svelte-confetti';
   const baseUrl = import.meta.env.VITE_URL;
-
-  import { isEqual } from 'lodash';
+  import pkg from 'lodash';
+  const {isEqual} = pkg;
   import Bethas from '$lib/components/prPr/bethas.svelte';
   import Sidur from '$lib/components/prPr/sidur/sidur.svelte';
   import { addToast } from 'as-toast';
@@ -504,7 +504,6 @@
       if (lim.length > 0 || lim > 0) {
         //showvd = false;
         if ($mi.length == 0) {
-          await refreshM().then();
           addM = false;
           li = event.detail.li;
           await findiM().then();
@@ -637,91 +636,8 @@
   let skills2 = [];
 
   let workways2 = [];
-  async function findT() {
-    console.log('findT');
-    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-    const checkStatus = (resp) => {
-      if (resp.status >= 200 && resp.status < 300) {
-        return resp;
-      }
-      return parseJSON(resp).then((resp) => {
-        throw resp;
-      });
-    };
-    try {
-      const res = await fetch(baseUrl + '/graphql', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `query {
-    skills {data{ id attributes{ skillName ${
-      $lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''
-    } }}}
-     tafkidims {data{ id attributes{ roleDescription ${
-       $lang == 'he'
-         ? 'localizations{data {attributes{ roleDescription}} }'
-         : ''
-     }}}}
-     workWays {data{ id attributes{ workWayName ${
-       $lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''
-     } } }}
- }
-              `
-        })
-      })
-        .then(checkStatus)
-        .then(parseJSON);
-      skills2 = res.data.skills.data;
-      if ($lang == 'he') {
-        for (var i = 0; i < skills2.length; i++) {
-          if (skills2[i].attributes.localizations.data.length > 0) {
-            skills2[i].attributes.skillName =
-              skills2[i].attributes.localizations.data[0].attributes.skillName;
-          }
-        }
-      }
-      skills2 = skills2;
-      roles = res.data.tafkidims.data;
-      if ($lang == 'he') {
-        for (var i = 0; i < roles.length; i++) {
-          if (roles[i].attributes.localizations.data.length > 0) {
-            roles[i].attributes.roleDescription =
-              roles[
-                i
-              ].attributes.localizations.data[0].attributes.roleDescription;
-          }
-        }
-      }
-      roles = roles;
-      workways2 = res.data.workWays.data;
-      if ($lang == 'he') {
-        for (var i = 0; i < workways2.length; i++) {
-          if (workways2[i].attributes.localizations.data.length > 0) {
-            workways2[i].attributes.workWayName =
-              workways2[
-                i
-              ].attributes.localizations.data[0].attributes.workWayName;
-          }
-        }
-      }
-      workways2 = workways2;
-      skil.set(skills2);
-      ww.set(workways2);
-      role.set(roles);
-      newcontent = false;
-      newcontentR = false;
-      newcontentW = false;
-    } catch (e) {
-      error8 = e;
-      console.log(error8);
-    }
-  }
-
-  async function refreshM() {
-    findT();
-  }
+  
+ 
 
   async function hosa() {
     addM = true;
@@ -749,168 +665,6 @@
     }
   }
 
-  async function removeS(event) {
-    const miDatanew = event.detail.data;
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-  }
-
-  async function removeR(event) {
-    const miDatanew = event.detail.data;
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-  }
-
-  async function removeW(event) {
-    const miDatanew = event.detail.data;
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-  }
-
-  async function addskills(event) {
-    const mid = event.detail.mid;
-    const miDatanew = event.detail.data;
-    const y = miDatanew.map((c) => c.id);
-    const index = y.indexOf(mid);
-
-    const id = event.detail.id;
-    const filterByReference = (skills2, id) => {
-      let res = [];
-      res = skills2.filter((el) => {
-        return id.find((element) => {
-          return element === el.id;
-        });
-      });
-      return res;
-    };
-    const resp = filterByReference(skills2, id);
-    console.log(resp);
-    miDatanew[index].attributes.skills.data = resp;
-    miDatanew[index].selected2 = [];
-    console.log(miDatanew);
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-  }
-
-  async function addroles(event) {
-    const mid = event.detail.mid;
-    const miDatanew = event.detail.data;
-    const y = miDatanew.map((c) => c.id);
-    const index = y.indexOf(mid);
-
-    const id = event.detail.id;
-    const filterByReference = (roles, id) => {
-      let res = [];
-      res = roles.filter((el) => {
-        return id.find((element) => {
-          return element === el.id;
-        });
-      });
-      return res;
-    };
-    const resp = filterByReference(roles, id);
-    miDatanew[index].attributes.tafkidims.data = resp;
-    miDatanew[index].selected3 = [];
-    console.log(miDatanew);
-    showvd = false;
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    addM = true;
-  }
-
-  async function adwww(event) {
-    console.log('fff');
-
-    const mid = event.detail.mid;
-    const miDatanew = event.detail.data;
-    const y = miDatanew.map((c) => c.id);
-    const index = y.indexOf(mid);
-
-    const id = event.detail.id;
-    const filterByReference = (roles, id) => {
-      let res = [];
-      res = roles.filter((el) => {
-        return id.find((element) => {
-          return element === el.id;
-        });
-      });
-      return res;
-    };
-    const resp = filterByReference(workways2, id);
-    miDatanew[index].attributes.work_ways.data = resp;
-    miDatanew[index].selected1 = [];
-    console.log(miDatanew);
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-    console.log(miData);
-  }
-
-  async function addnewsk(event) {
-    const skob = event.detail.skob;
-    const mid = event.detail.mid;
-    const miDatanew = event.detail.data;
-    const y = miDatanew.map((c) => c.id);
-    const index = y.indexOf(mid);
-    miDatanew[index].attributes.skills.data.push(skob);
-    console.log(miDatanew);
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-  }
-  async function addnewr(event) {
-    const skob = event.detail.skob;
-    const mid = event.detail.mid;
-    const miDatanew = event.detail.data;
-    const y = miDatanew.map((c) => c.id);
-    const index = y.indexOf(mid);
-    miDatanew[index].attributes.tafkidims.data.push(skob);
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-  }
-
   function closeM() {
     addM = false;
     showvd = false;
@@ -919,22 +673,7 @@
 
   let descripFor;
 
-  async function addneww(event) {
-    const skob = event.detail.skob;
-    const mid = event.detail.mid;
-    const miDatanew = event.detail.data;
-    const y = miDatanew.map((c) => c.id);
-    const index = y.indexOf(mid);
-    miDatanew[index].attributes.work_ways.data.push(skob);
-    showvd = false;
-    await refreshM().then();
-    miData = miDatanew;
-    showvd = true;
-    addM = false;
-    blabla = miData.map((c) => c.attributes.missionName);
-    await findM().then();
-    addM = true;
-  }
+ 
   let openMA = false;
   let cencel1 = { he: 'סגירה', en: 'close' };
 
@@ -1545,7 +1284,7 @@
   $: clicked = false;
   let ani;
   let isNew = false
-      const er = {"he": "אם הבעיה נמשכת ehad1one@gmail.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at ehad1one@gmail.com"}
+      const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
 
   const messs = {"he":"הודעתך נשלחה בהצלחה","en":"your message was send succsefully"}
      
@@ -1748,6 +1487,9 @@ async function createMes(id,mes){
   }
   $: tab = 1
 const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"}
+function add(event){
+  console.log(event.detail)
+}
 </script>
 
 <svelte:head>
@@ -1783,7 +1525,8 @@ const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
         <DialogContent aria-label="form" class="{a != 8 ? "content" :"chat"}">
-          <div style="z-index: 400;" dir="rtl">
+          <div style="z-index: 400;"      dir="{$lang == "he" ? "rtl" : "ltr"}"
+          >
             <button
               class=" hover:bg-barbi text-mturk rounded-full"
               on:click={closer}
@@ -1851,7 +1594,7 @@ const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
 
     <div
-      dir="rtl"
+      dir="{$lang == "he" ? "rtl" : "ltr"}"
       bind:clientWidth={width}
       class="all text-barbi text-center overflow-y-auto h-screen scroll-smooth d"
       style="-webkit-scrollbar:0px;"
@@ -2082,8 +1825,10 @@ pointer-events: none;"
           </button>
         </div>
         <h1 class="1">{projectname}</h1>
-        <div dir="ltr" class="flex items-center justify-center">
-          <div dir="ltr" class="flex -space-x-2 overflow-hidden">
+        <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
+        class="flex items-center justify-center">
+          <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
+          class="flex -space-x-2 overflow-hidden">
             {#each projectUsers as user}
               <button
                 title={user.attributes.username}
@@ -2332,6 +2077,13 @@ pointer-events: none;"
                     {mission1}
                     bind:selected={blabla}
                     on:message={callbackFunction}
+                    on:add={add}
+                    on:close={close}
+                    pn={projectname}
+                    pl={srcP}
+                    {restime}
+                    {projectUsers}
+                    {alit}
                   />
                 </div>
               {/if}
@@ -2356,23 +2108,10 @@ pointer-events: none;"
                   {newcontentW}
                   pu={projectUsers}
                   userslength={projectUsers.length}
-                  {workways2}
-                  {skills2}
-                  {roles}
-                  roles1={roles}
                   vallues={alit}
                   {miData}
                   projectId={$idPr}
                   on:remove={removeF}
-                  on:removeS={removeS}
-                  on:addskills={addskills}
-                  on:addnewsk={addnewsk}
-                  on:removeR={removeR}
-                  on:addroles={addroles}
-                  on:addnewr={addnewr}
-                  on:addneww={addneww}
-                  on:adwww={adwww}
-                  on:removeW={removeW}
                   on:close={close}
                 />
               {/key}
@@ -2430,7 +2169,8 @@ pointer-events: none;"
             </div>
           </div>
 {:else if tab == 3}          
-          <div dir="rtl" class="pt-2">
+          <div      dir="{$lang == "he" ? "rtl" : "ltr"}"
+          class="pt-2">
           
               {#if pmiData.length > 0}
                 <button
@@ -2461,7 +2201,8 @@ pointer-events: none;"
                 >
               {/if}
               <div
-                dir="ltr"
+              dir="{$lang == "he" ? "rtl" : "ltr"}"
+
                 style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; "
                 class="d bg-wow"
               >
@@ -2522,7 +2263,8 @@ pointer-events: none;"
           </div>
 {:else if tab === 5}
               <div
-                dir="ltr"
+              dir="{$lang == "he" ? "rtl" : "ltr"}"
+              class="rounded-lg"
                 style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
               >
             
@@ -2531,10 +2273,13 @@ pointer-events: none;"
 {:else if tab === 6}
                      <div class="p-8">
             <Sheirut
+            on:new={findM}
               sheirutim={project?.sheiruts}
               pn={projectname}
               {restime}
               usersNum={projectUsers.length}
+              {roles}
+   
             />
           </div>
 {:else if tab === 7}
@@ -2549,8 +2294,8 @@ pointer-events: none;"
 {:else if tab === 8}
       
               <div
-                dir="ltr"
-                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color:rgb(2, 255, 187); "
+              dir="{$lang == "he" ? "rtl" : "ltr"}"
+              style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color:rgb(2, 255, 187); "
                 class="d"
               >
                 <Sidur />
