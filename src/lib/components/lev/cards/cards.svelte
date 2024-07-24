@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/stores'
     import Lowding from '$lib/celim/lowding.svelte'
     import {lang} from '$lib/stores/lang.js'
      import MissionInProgress from "../../../components/lev/missionInProgress.svelte"
@@ -117,6 +118,8 @@ function hoverc (id){
 
   dispatch("hover", {id: u});
 }
+const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל',"en" : 'Navigation: right side, bottom'}
+$: console.log('AAAAAA',$page.data.isDesktop,$page.data)
 </script>
 <style>
  
@@ -167,9 +170,8 @@ function hoverc (id){
         width: 90px;
     }
     }
- 
 </style>
-<span role="contentinfo" on:mouseenter={()=> hoverc(" ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל")} 
+<span role="contentinfo" on:mouseenter={()=> hoverc(nav[$lang])} 
 on:mouseleave={()=> hoverc("0")}>
        <Header second="./moach" secondTitle=""/>
        </span>
@@ -186,7 +188,7 @@ on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src=
     <div   
       dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
- style:visibility={low == true ? "hidden":  "visible"} class="bg">
+ style:visibility={low == true || !$page?.data?.isDesktop ? "hidden":  "visible"} class="bg">
  
  <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
 
