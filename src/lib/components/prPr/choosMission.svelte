@@ -158,8 +158,7 @@ let noRiset = true
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      <div class="inline-block relative w-min	">
-
+      <div class=" w-full flex-row	flex items-center justify-center space-x-2"><div>
           <MultiSelect
           --sms-selected-bg="white"
         loading={mission1.length > 0 ? false : true}
@@ -173,7 +172,7 @@ let noRiset = true
           /></div>
           {#if selected[0]}
         <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
-        {/if}
+        {/if}</div>
         {/if}
 {#if before == false}
         <Mission    
