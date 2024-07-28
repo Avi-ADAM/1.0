@@ -165,6 +165,7 @@ let noRiset = true
           --sms-selected-bg="white"
         loading={mission1.length > 0 ? false : true}
         on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
+        on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
         createOptionMsg={addn[$lang]}
         allowUserOptions={"append"}
          bind:searchText={ugug}

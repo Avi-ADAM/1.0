@@ -1596,7 +1596,7 @@ function add(event){
     <div
       dir="{$lang == "he" ? "rtl" : "ltr"}"
       bind:clientWidth={width}
-      class="all text-barbi text-center overflow-y-auto h-screen scroll-smooth d"
+      class="all text-barbi text-center overflow-y-auto min-h-screen scroll-smooth d"
       style="-webkit-scrollbar:0px;"
     >
       <Header />
