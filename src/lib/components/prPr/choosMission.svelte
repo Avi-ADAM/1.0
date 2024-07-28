@@ -164,6 +164,7 @@ let noRiset = true
           <MultiSelect
           --sms-selected-bg="white"
           closeDropdownOnSelect='desktop'
+          ulOptionsClass="bg-gold z-[1000]"
         loading={mission1.length > 0 ? false : true}
         on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
         on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
