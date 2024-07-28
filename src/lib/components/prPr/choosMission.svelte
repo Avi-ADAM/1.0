@@ -163,6 +163,7 @@ let noRiset = true
       <div class=" w-full flex-row	flex items-center justify-center space-x-2"><div>
           <MultiSelect
           --sms-selected-bg="white"
+          closeDropdownOnSelect='desktop'
         loading={mission1.length > 0 ? false : true}
         on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
         on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
