@@ -10,7 +10,7 @@ import { lang } from '$lib/stores/lang.js'
   import { initialForum, forum } from '$lib/stores/pendMisMes.js';
   import Foot from '$lib/components/footer/foot.svelte';
  import { initialWebS } from '$lib/stores/pendMisMes.js';
-
+import { showFoot } from '$lib/stores/showFoot.js';
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
@@ -93,7 +93,7 @@ const logi = { "he": "להתחברות", "en":"To Login"}
 
 
 {#if isAuthed}
-<main class="h-[100dvh] min-w-screen absolute top-0 left-0">
+<main class="h-screen min-w-screen absolute top-0 left-0">
   <Foot un={data.un} idL={data.uid}/>
   <Tour TourTip={TourTip}></Tour>
 <span style:z-index="9999">
