@@ -1053,6 +1053,11 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
+"@mediakular/gridcraft@^0.2.8":
+  version "0.2.8"
+  resolved "https://registry.npmjs.org/@mediakular/gridcraft/-/gridcraft-0.2.8.tgz"
+  integrity sha512-NK+KJiqptjKNhnpLO7AQmFaqy7Kuscbcek4Th5dTH0nc0qAU34IK9iQqhgAeVKqbeN32wyAbdABQvz9833EJGw==
+
 "@melt-ui/svelte@0.68.0":
   version "0.68.0"
   resolved "https://registry.npmjs.org/@melt-ui/svelte/-/svelte-0.68.0.tgz"
@@ -5551,7 +5556,7 @@ node-releases@^2.0.14:
   resolved "https://registry.npmjs.org/node-releases/-/node-releases-2.0.14.tgz"
   integrity sha512-y10wOWt8yZpqXmOgRo77WaHEmhYQYGNA6y421PKsKYWEK8aW+cqAphborZDhqfyKrbZEN92CN1X2KbafY2s7Yw==
 
-nodemailer@^6.9.2:
+nodemailer@^6.9.13:
   version "6.9.13"
   resolved "https://registry.npmjs.org/nodemailer/-/nodemailer-6.9.13.tgz"
   integrity sha512-7o38Yogx6krdoBf3jCAqnIN4oSQFx+fMa0I7dK1D+me9kBxx12D+/33wSb+fhOCtIxvYJ+4x4IMEhmhCKfAiOA==

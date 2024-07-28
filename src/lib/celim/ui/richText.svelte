@@ -13,6 +13,7 @@
   export let trans = false
   export let editable = true;
   export let sml = false
+  export let minw = false
   let element;
   let editor;
   let menu;
@@ -92,7 +93,7 @@
 
 <div
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  class="bg-{trans == false ? "mturk bg-opacity-25" : 'bg-transparent'}" 
+  class="bg-{trans == false ? "mturk bg-opacity-25" : 'bg-transparent'} {minw ? 'min-w-[50vw]' : ''} " 
 >
   {#if editor && editable}
     <div

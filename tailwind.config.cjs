@@ -4,7 +4,7 @@
 const defaultTheme = require('tailwindcss/defaultTheme');
 
 const config = {
-  content: ['./src/**/*.{html,js,svelte,ts}'],
+  content: ['./src/**/*.{html,js,svelte,ts}', './node_modules/@mediakular/gridcraft/dist/themes/**/*.svelte'],
   theme: {
     screens: {
       xs: '475px',
@@ -76,7 +76,8 @@ const config = {
         wowt: 'rgb(3, 55, 47)'
       }
     }
-  }
+  },
+  Plugins:[]
 };
 
 module.exports = config;

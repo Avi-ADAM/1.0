@@ -10,4 +10,4 @@
     $:dateStr2 = value ? (new Date(value2)).toLocaleDateString(local) : "-";
   </script>
   
-  <div>{dateStr} - {dateStr2}</div>
+  <div class="text-barbi">{dateStr ? dateStr : "-"} - {dateStr2 ? dateStr2 : "-"}</div>

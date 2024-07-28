@@ -2,7 +2,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "dev": "vite dev",
+    "dev": "vite dev --host",
     "build": "vite build ",
     "preview": "vite preview"
   },
@@ -39,6 +39,7 @@
     "@event-calendar/interaction": "^1.5.0",
     "@fontsource/fira-mono": "^4.5.7",
     "@lottiefiles/svelte-lottie-player": "^0.2.0",
+    "@mediakular/gridcraft": "^0.2.8",
     "@okrad/svelte-progressbar": "^1.11.3",
     "@sendgrid/mail": "^7.7.0",
     "@sentry/sveltekit": "^7.101.1",
@@ -70,7 +71,7 @@
     "lodash.has": "^4.5.2",
     "lodash.isequal": "^4.5.0",
     "moment": "^2.29.2",
-    "nodemailer": "^6.9.2",
+    "nodemailer": "^6.9.13",
     "postcss": "^8.4.12",
     "prettier": "^3.0.3",
     "prettier-plugin-svelte": "^3.0.3",
