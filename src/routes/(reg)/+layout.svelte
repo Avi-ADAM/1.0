@@ -93,6 +93,7 @@ const logi = { "he": "להתחברות", "en":"To Login"}
 
 
 {#if isAuthed}
+{#if $showFoot}
 <main class="h-screen min-w-screen absolute top-0 left-0">
   <Foot un={data.un} idL={data.uid}/>
   <Tour TourTip={TourTip}></Tour>
@@ -100,6 +101,7 @@ const logi = { "he": "להתחברות", "en":"To Login"}
   <Toasts />
 </span>
       </main>
+ {/if}
   <slot></slot>
 
   {:else}

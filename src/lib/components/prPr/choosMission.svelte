@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/stores';
      import MultiSelect from 'svelte-multiselect';
     import { createEventDispatcher } from 'svelte';
     import {lang } from '$lib/stores/lang.js' 
@@ -8,6 +9,7 @@
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Mission from "./mission.svelte";
   import { idPr } from '../../stores/idPr.js'
+  import { showFoot } from '$lib/stores/showFoot.js';
  const dispatch = createEventDispatcher();
  export let pn, pl, restime,projectUsers, alit;
  const baseUrl = import.meta.env.VITE_URL
@@ -162,6 +164,7 @@ let noRiset = true
           <MultiSelect
           --sms-selected-bg="white"
         loading={mission1.length > 0 ? false : true}
+        on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
         createOptionMsg={addn[$lang]}
         allowUserOptions={"append"}
          bind:searchText={ugug}
