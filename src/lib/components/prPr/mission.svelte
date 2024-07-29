@@ -81,26 +81,26 @@
         console.log(c.data.mission.data);
         let t = c.data.mission.data;
         if ($lang == 'he') {
-          for (var i = 0; i < t.skills.length; i++) {
-            if (t.skills[i].attributes.localizations.data.length > 0) {
-              t.skills[i].attributes.skillName =
-                t.skills[
+          for (var i = 0; i < t.attributes.skills.length; i++) {
+            if (t.attributes.skills[i].attributes.localizations.data.length > 0) {
+              t.attributes.skills[i].attributes.skillName =
+                t.attributes.skills[
                   i
                 ].attributes.localizations.data[0].attributes.skillName;
             }
           }
-          for (var i = 0; i < t.roles.length; i++) {
-            if (t.roles[i].attributes.localizations.data.length > 0) {
-              t.roles[i].attributes.roleDescription =
-                t.roles[
+          for (var i = 0; i < t.attributes.roles.length; i++) {
+            if (t.attributes.roles[i].attributes.localizations.data.length > 0) {
+              t.attributes.roles[i].attributes.roleDescription =
+                t.attributes.roles[
                   i
                 ].attributes.localizations.data[0].attributes.roleDescription;
             }
           }
-          for (var i = 0; i < t.work_ways.length; i++) {
-            if (t.work_ways[i].attributes.localizations.data.length > 0) {
-              t.work_ways[i].attributes.workWayName =
-                t.work_ways[
+          for (var i = 0; i < t.attributes.work_ways.length; i++) {
+            if (t.attributes.work_ways[i].attributes.localizations.data.length > 0) {
+              t.attributes.work_ways[i].attributes.workWayName =
+                t.attributes.work_ways[
                   i
                 ].attributes.localizations.data[0].attributes.workWayName;
             }
