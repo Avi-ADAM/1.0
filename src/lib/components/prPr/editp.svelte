@@ -264,12 +264,7 @@ addval == false;
 </div></div>
 
 <style>
-  :global(div.multiselect > ul.selected > li) {
-    background: var(--gold);
-  }
-  :global(div.multiselect > ul.selected > li button, button.remove-all) {
-color: var(--barbi-pink)
-}
+
 select.round {
   background-image:
     linear-gradient(315deg, transparent 50%, rgb(0, 174, 255) 50%),

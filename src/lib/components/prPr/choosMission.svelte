@@ -160,11 +160,11 @@ let noRiset = true
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      <div class=" w-full flex-row	flex items-center justify-center space-x-2"><div>
+      <div class=" w-full flex-row	flex items-center justify-center z-[1000] space-x-2">
           <MultiSelect
-          --sms-selected-bg="white"
           closeDropdownOnSelect='desktop'
-          ulOptionsClass="bg-gold z-[1000]"
+          ulOptionsClass="bg-gold z-[10000] position-absolute"
+          liSelectedClass='bg-barbi text-gold'
         loading={mission1.length > 0 ? false : true}
         on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
         on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
@@ -175,7 +175,7 @@ let noRiset = true
           placeholder={placeholder[$lang]}
           options={mission1.map(c => c.attributes.missionName)}
         maxSelect={1}
-          /></div>
+          />
           {#if selected[0]}
         <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
         {/if}</div>
@@ -198,8 +198,3 @@ let noRiset = true
         {/if}
  </div>
 
-<style>
-    :global(div.multiselect > ul.selected > li) {
-      background: whitesmoke;
-    }
-  </style> 
