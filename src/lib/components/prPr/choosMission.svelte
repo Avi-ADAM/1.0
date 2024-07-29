@@ -198,3 +198,8 @@ let noRiset = true
         {/if}
  </div>
 
+<style>
+    :global(ul.options){
+    max-height: 40vh;
+  }
+</style>
