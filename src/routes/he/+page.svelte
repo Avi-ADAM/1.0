@@ -216,8 +216,8 @@ const pagetitle = {
           {/if}
           </div>
 <div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden bg-[length:200%_auto] animate-gradientx">
-	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-1/2  sm:h-screen ">
-		<div dir="ltr" style="text-shadow:none;" class="pt-2 font-bold sm:text-9xl text-4xl text-transparent 
+	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-2/3  sm:h-screen ">
+		<div dir="ltr" style="text-shadow:none;" class="pt-2 sm:pt-6 font-bold sm:text-9xl text-4xl text-transparent 
         bg-clip-text bg-[length:auto_200%] animate-gradienty 
         bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] 
         flex-wrap flex flex-row">
@@ -232,7 +232,7 @@ const pagetitle = {
           <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
 		>1</h1></div></div>
-	<div class="overflow-auto d  h-2/5"  dir={$lang !== "en" ? "ltr" : "rtl"}  on:scroll={()=>{ scrolli = true
+	<div class="overflow-auto d  "  dir={$lang !== "en" ? "ltr" : "rtl"}  on:scroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
 		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  overline decoration-mturk text-xl"
@@ -281,9 +281,9 @@ const pagetitle = {
 			</button>
 		</div>
 	</div>
-	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class:flex={$progress == 1} class="sm:w-1/2 h-1/2 sm:h-screen z-0 items-center justify-center">
+	<div id="levi" bind:clientHeight={h} bind:clientWidth={w} class:flex={$progress == 1} class="sm:w-1/2 h-1/3 sm:h-screen z-0 items-center justify-center">
 		{#if $progress < 1}
-		<div class="w-full h-1/2 sm:h-screen flex flex-col items-center  justify-center" title="{loadingTitle[$lang]}">
+		<div class="w-full h-1/3 sm:h-screen flex flex-col items-center justify-end sm:justify-center" title="{loadingTitle[$lang]}">
 			<img class="ani"  src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" alt="logo">
 			<CircleProgresBar progress={$progress}/>
 		</div>
