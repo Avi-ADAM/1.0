@@ -1870,7 +1870,5 @@
     top: 0;
   }
 
-  :global(div.multiselect > ul.selected) {
-    z-index: unset !important;
-  }
+
 </style>
