@@ -171,7 +171,7 @@ $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
     }
     }
 </style>
-<span role="contentinfo" on:mouseenter={()=> hoverc(nav[$lang])} 
+<span  role="contentinfo" on:mouseenter={()=> hoverc(nav[$lang])} 
 on:mouseleave={()=> hoverc("0")}>
        <Header second="./moach" secondTitle=""/>
        </span>
@@ -194,7 +194,7 @@ on:mouseleave={()=> hoverc("0")}
 
 </div>
 
-<span role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  
+<div role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
 {#key arr1}
 <Swiper 
@@ -661,7 +661,7 @@ mousewheel={{
   ><SwiperSlide class="swiper-slidec">Slide 9</SwiperSlide>-->
 </Swiper>
 {/key}
-</span>
+</div>
 </div>
 {:else}
 <div class="body grid items-center justify-center">
