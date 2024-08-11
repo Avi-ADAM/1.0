@@ -23,13 +23,13 @@ const dispatch = createEventDispatcher();
   import "swiper/css";
   import "swiper/css/navigation";
 
-  import "swiper/css/effect-cards";
+  import "swiper/css/effect-creative";
   import "swiper/css/keyboard"
   import "swiper/css/mousewheel"
   import "./stylec.css";
 
   // import required modules
-  import {Manipulation, Mousewheel, Keyboard, EffectCards , Navigation} from "swiper";
+  import {Manipulation, Mousewheel, Keyboard, EffectCreative , Navigation} from "swiper";
   export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
@@ -131,7 +131,6 @@ $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
       width: 100%;
       background: #ffcba4;
       background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%);
-      overflow: hidden;
     }
 
 .bg{
@@ -205,10 +204,8 @@ on:mouseleave={()=> hoverede()} >
 mousewheel={{
   eventsTarget: "wrapper",
 }}
-  effect={h > 370 ? "cards" : ""}
-    cardsEffect={{ rotate: h > 450 ? true : false ,perSlideOffset: h > 450 ? 8 : 8}}
   grabCursor={true}
-  modules={[Manipulation, Mousewheel, Keyboard, EffectCards, Navigation]}
+  modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
   class="mySwiperc swiperc"
       dir="rtl"
     loop="true"
