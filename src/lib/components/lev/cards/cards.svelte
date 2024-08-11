@@ -23,13 +23,13 @@ const dispatch = createEventDispatcher();
   import "swiper/css";
   import "swiper/css/navigation";
 
-  import "swiper/css/effect-creative";
+  import "swiper/css/effect-fade";
   import "swiper/css/keyboard"
   import "swiper/css/mousewheel"
   import "./stylec.css";
 
   // import required modules
-  import {Manipulation, Mousewheel, Keyboard, EffectCreative , Navigation} from "swiper";
+  import {Manipulation, Mousewheel, Keyboard, EffectFade , Navigation} from "swiper";
   export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
@@ -204,8 +204,9 @@ on:mouseleave={()=> hoverede()} >
 mousewheel={{
   eventsTarget: "wrapper",
 }}
+effect={'fade'}
   grabCursor={true}
-  modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
+  modules={[Manipulation, Mousewheel, Keyboard,EffectFade, Navigation]}
   class="mySwiperc swiperc"
       dir="rtl"
     loop="true"
