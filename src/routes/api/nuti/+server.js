@@ -1,25 +1,66 @@
-//import { render } from 'svelte-email';
+import { render } from 'svelty-email';
 import PendJustCreated from '$lib/components/mail/pendJustCreated.svelte';
-import sendgrid from '@sendgrid/mail';
-sendgrid.setApiKey(import.meta.env.VITE_SENDGRID);
+import nodemailer from 'nodemailer';
 
-async function renderEmail(un,username,pl,pn,kind,rishon,name,lang,restime) {
-/* const html = render({
-   template: PendJustCreated,
-   props: {
-     un: un,
-     username: username,
-     pl: pl,
-     pn: pn,
-     kind: kind,
-     rishon: rishon,
-     name: name,
-     lang: lang,
-     restime: restime ?? 'feh'
-   }
- });
-  return html;*/
+async function sendMail(
+  restime,
+  pid,
+  pl,
+  pn,
+  un,
+  kind,
+  name,
+  email,
+  username,
+  lang,
+  rishon){
+    const previewText = {
+      "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
+      "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`
+    };
+  const transporter = nodemailer.createTransport({
+    host: 'smtp.zoho.com',
+    secure: true,
+    port: 465,
+    auth: {
+      user: "notifications@1lev1.com",	
+      pass: import.meta.env.VITE_ZOHO,
+    },
+  });
+  
+  const emailHtml = render({
+    template: PendJustCreated,
+    props: {
+      un: un,
+      username: username,
+      pl: pl,
+      pn: pn,
+      kind: kind,
+      rishon: rishon,
+      name: name,
+      lang: lang,
+      restime: restime ?? 'feh'
+    }
+  });
+
+  const options = {
+    from:"notifications@1lev1.com",
+    to:email ,
+    subject:previewText[lang],
+    html: emailHtml
+  };
+  
+  transporter.sendMail(options);
+  transporter.verify(function(err, success) {
+  if (err) {
+    console.log(err)
+    return 'error';
+} 
+else {
+  console.log(success)
+    return 'OK';
 }
+});}
 async function renderText(
   un,
   username,
@@ -51,62 +92,7 @@ async function renderText(
   return text;*/
 }
 
-async function nutifiPusers(
-  restime,
-  pid,
-  pl,
-  pn,
-  un,
-  kind,
-  name,
-  email,
-  username,
-  lang,
-  rishon
-) {
-  //by mail
- /* const previewText = {
-        "he": `הצבעה על ${kind == "finiappmi"? "אישור סיום המשימה":"ההצעה"} של ${un} בריקמה ${pn}`,
-        "en":`Vote for ${un}'s ${kind == "finiappmi"?"mission complition appruval":"suggestion"} on the freeMates ${pn}`
-      };
-        
-  const emailHtml = await renderEmail(
-    un,
-    username,
-    pl,
-    pn,
-    kind,
-    rishon,
-    name,
-    lang,
-    restime
-  );
 
-  const text = await renderText(
-    un,
-    username,
-    pl,
-    pn,
-    kind,
-    rishon,
-    name,
-    lang,
-    restime
-  );
-  
-
-  const options = {
-    from: 'ehad1one@gmail.com',
-    to: email,
-    subject: previewText[lang],
-    html: emailHtml,
-    text: text
-  };
-
-  sendgrid.send(options);
-  //by push
-  */
-}
 function getUnById(array, id) {
   const foundObject = array.find((obj) => obj.id === id);
   return foundObject ? foundObject.attributes.username : null;
@@ -127,7 +113,7 @@ export async function POST({ request }) {
   const un = getUnById(pu, uid);
   await Promise.all(pu.map(async (element) =>{
      if (element.id != uid) {
-      await nutifiPusers(
+      await sendMail(
          restime,
          pid,
          pl,
