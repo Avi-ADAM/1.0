@@ -1,9 +1,12 @@
 // pusherer for push devices, api/nuti for emails, TODO: telegram
 // a get all other project users/ chat members email & devises 
 
+import SimpleNuti from '$lib/components/mail/simpleNuti.svelte';
+import {sendBolkMail} from '$lib/func/bolkmail/bolkMail.svelte';
 import { pusherer } from '$lib/func/pusherer.svelte'
 import { sendBolkTelegram } from '$lib/func/telegram/sendBolkTelegram.svelte';
 import { sendToSer } from '$lib/send/sendToSer.svelte';
+import { render } from 'svelty-email';
 
 //b sendMessages
 export async function POST({request, cookies, fetch}){
@@ -94,5 +97,33 @@ export async function POST({request, cookies, fetch}){
         pusherer(transformedData, idL,pic,title,body,lang,fetch);
         console.log('after', transformedDataTel);
         sendBolkTelegram(transformedDataTel, idL,title,body,lang,fetch);
+        
+  const transformedDataMail =
+  jsonim.data.project.data.attributes.user_1s.data.flatMap((user) => {
+    //filter by if email not null or undefined
+    return{
+      email: user.attributes.email,
+      emailHtml:  render({
+        template: SimpleNuti,
+        props: {
+          head: title,
+         body: body,
+         username: user.attributes.userName,
+         previewText: title,
+         lang :user.attributes.lang == "he" || "en" ? user.attributes.lang : lang
+        }
+      }),
+      users_permission_user: {
+        data: {
+          id: user.id,
+          attributes: {
+            userName: user.attributes.username,
+            lang: user.attributes.lang
+          }
+        }
+      }
+    }
+  })
+  sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
     return new Response    
 }
