@@ -97,7 +97,7 @@
     "svelte-tour": "^1.0.7",
     "svelte-viewport-info": "^0.1.12",
     "sveltekit-i18n": "^2.1.4",
-    "svelty-email": "^0.0.7",
+    "svelty-email": "^0.0.11",
     "svelty-picker": "^3.0.0",
     "swiper": "^8.1.0",
     "telegraf": "^4.16.3",
