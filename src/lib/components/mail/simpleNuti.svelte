@@ -15,7 +15,7 @@
 	export let head = '';
     export let body = '';
     export let username = "x"
-    export let previewText = "";
+    export let previewText = {};
     export let lang = "he";
   
     const headr = {"he":` שלום ${username}!`,"en":`hallo ${username}!`}
