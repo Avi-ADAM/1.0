@@ -17,7 +17,8 @@
     email: element.email,
     previewText: title[element.users_permission_user.data.attributes.lang ?? mainlang],
     emailText:title[element.users_permission_user.data.attributes.lang ?? mainlang] + ":" + body[element.users_permission_user.data.attributes.lang ?? mainlang] }
-                fetch('https://www.1lev1.com/api/sendMail', {
+    console.log(data,"before fetch bolk")          
+    fetch('/api/sendMail', {
                 method: 'POST',  
                 headers: {
                   'Content-Type': 'application/json',
