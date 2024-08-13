@@ -43,7 +43,7 @@
           maxH = 100
         }
         if(isThisLineOverflowsX){
-          console.info("thislineoverflowx",w,center)
+          console.log("thislineoverflowx",w,center)
           maxW = (((bigsize) + (size * myLine * 2.8))/ow)*100
           scrollX = (((bigsize + (size * myLine * 2.4)) - ow)/2)
         }else{
@@ -216,9 +216,7 @@
     max-width: 100vw;
     max-height: 100vh;" class="d">
      {#key arr1}
-  {#key w}
-  {#key h}
-  {#key orders}
+
 <div  dir="ltr"  bind:clientWidth={w} bind:clientHeight={h} style=" position: absolute; overflow: auto;top:{top}%;
     left: {left}%;
     width: calc({maxW}vw - 10px);
@@ -749,9 +747,7 @@
     />
   </div>
 </div>
-  {/key}
-  {/key}
-  {/key}
+
   {/key}
 </div>
 <style>

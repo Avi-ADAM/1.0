@@ -58,7 +58,7 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
   on:keypress={opentask}
   role="button"
   tabindex="0"
-  class="absolute inline-flex items-center justify-center w-12 h-12 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-1 left-1  dark:border-gray-700">{tasks.length}</div>
+  class="absolute inline-flex items-center justify-center w-12 h-12 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-1 {$lang == "en" ? "left-1" : "right-1"}  dark:border-gray-700">{tasks.length}</div>
   {/if}
 <div dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d   leading-normal w-full h-full bg-white lg:w-full">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">

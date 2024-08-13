@@ -62,7 +62,7 @@ console.log(workways)
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  leading-normal w-full h-full bg-white dark:bg-slate-800  ">
+<div dir="rtl"  style="overflow-y:auto" class=" d  leading-normal w-full h-full bg-white dark:bg-slate-800  lg:w-full">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
