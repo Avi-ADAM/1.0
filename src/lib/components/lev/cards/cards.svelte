@@ -187,7 +187,7 @@ on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src=
     <div   
       dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
- style:visibility={low == true || !$page?.data?.isDesktop ? "hidden":  "visible"} class="bg">
+ style:visibility={low == true  ? "hidden":  "visible"} class="bg">
  
  <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
 
