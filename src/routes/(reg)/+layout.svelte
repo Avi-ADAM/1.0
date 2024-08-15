@@ -11,6 +11,8 @@ import { lang } from '$lib/stores/lang.js'
   import Foot from '$lib/components/footer/foot.svelte';
  import { initialWebS } from '$lib/stores/pendMisMes.js';
 import { showFoot } from '$lib/stores/showFoot.js';
+  import { initialWebSP } from '$lib/stores/pgishot.js';
+
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
 
@@ -50,8 +52,9 @@ onMount(async () => {
     if (data.tok){
     isAuthed = true
     initialForum(true,[],data.uid)
-    console.log($forum)
+    console.log(data.uid,$forum)
     initialWebS(data.tok,data.uid)
+    initialWebSP(data.tok,data.uid)
 
 }else{
    const cookieValue = document.cookie
