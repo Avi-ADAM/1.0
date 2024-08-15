@@ -14,7 +14,6 @@ export const nowId = writable(0)
 export const nowChatId = writable(0)
 export const isChatOpen = writable(false)
 export const isChatLoading = writable(false);
-
 export const newChat = writable({
   started:false,
   created: false,
@@ -63,6 +62,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
     isChatLoading.set(true)
       que = `{
        usersPermissionsUser (id:${myId}) {data{ attributes{
+
                             projects_1s {data {id attributes{ projectName profilePic{data{attributes{url formats}}} forums{
                                 data{id attributes{
                     subject spec done mesimabetahaliches {data{attributes{name}}} messages(filters:{archived: {ne:true}}){data{id attributes{

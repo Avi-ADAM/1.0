@@ -200,16 +200,25 @@ export const qids = {
     }
   }
  }
-`, "18createNewMeeting": `mutation CreateNewMeeting( $outpot: String, $name: String) {
+`, "18createNewMeeting": `mutation CreateNewMeeting( $outpot: String, $name: String,$publishedAt:DateTime) {
   createPgisha(data: 
-    {name: $name, desc: $outpot})
+    {name: $name, desc: $outpot,publishedAt:$publishedAt})
      {data{id}}
   }`,"19CreatePendMeeting": `mutation CreatePgishauserPend($id: ID!,$pgishaId:ID) {
   createPgishauserpend(data: {users_permissions_user: $id,pgisha: $pgishaId}) {data{id}}
-  }`, "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String) {
-  createPgishauser(data: {users_permissions_user: $id,pgishas: $pgishaId,uid:$uid}) {data{id}}
+  }`, "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String,$publishedAt:DateTime) {
+  createPgishauser(data: {users_permissions_user: $id,pgishas: $pgishaId,uid:$uid,
+               publishedAt:$publishedAt
+}) {data{id}}
   }`,
-  '19createMission': `mutation CreateMission($descrip: String, $missionName: String, $publishedAt: DateTime, $skills: [ID], $tafkidims: [ID]) {
+  '21createMission': `mutation CreateMission($descrip: String, $missionName: String, $publishedAt: DateTime, $skills: [ID], $tafkidims: [ID]) {
   createMission(data: {descrip: $descrip, missionName: $missionName, publishedAt: $publishedAt, skills: $skills, tafkidims: $tafkidims}) {data{id}}
-  }`
+  }`,
+  '22setOnline': `mutation SetOnline($id:ID!,$online:Boolean) {
+    updatePgishauser(id: $id, data: {available: $online}){
+      data{id attributes{available}}}
+  }`,
+  "23myUserMeeting": `query GetMyUserMeeting($id: ID!) {
+  pgishausers(filters: {users_permissions_user: {id: {eq: $id}}}) {data{id attributes{available uid pgishas{data{id}}}}}
+  }`,
 };

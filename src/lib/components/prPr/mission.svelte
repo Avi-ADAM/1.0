@@ -238,7 +238,7 @@
       const work_ways = find_workway_id(element.selectedWorkways);
       const tafkidims = find_role_id(element.selectedRoles);
         if (element.id === 0) {
-            await sendToSer({skills,tafkidims,descrip:element.descrip,missionName:element.missionName,publishedAt:fd},'19createMission',null,null,null,fetch).then((res) => {
+            await sendToSer({skills,tafkidims,descrip:element.descrip,missionName:element.missionName,publishedAt:fd},'21createMission',null,null,null,fetch).then((res) => {
                 console.log(res)
                 element.id = res.data.createMission.data.id;
                 element = element

@@ -3,6 +3,7 @@
 </script>
 
 <script>
+  import { sendToSer } from '$lib/send/sendToSer.svelte';
   import NewIwant from '$lib/components/addnew/newIwant.svelte';
   import { quintOut } from 'svelte/easing';
   import { fly, slide } from 'svelte/transition';
@@ -19,9 +20,11 @@
   import NewMeetingIcon from '$lib/celim/3d/newMeetingIcon.svelte';
   import { Canvas } from '@threlte/core';
   import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
+  import { initiatePgishot, isOnline, myUserMeeting } from '$lib/stores/pgishot';
   export let un;
   let draggable;
   onMount(async () => {
+    initiatePgishot(idL);
     draggable = (await import('svelte-agnostic-draggable')).draggable;
   });
   mapTouchToMouseFor('.draggable');
@@ -54,8 +57,13 @@
   export let online = true
   function onlineSwitcher(e) {
     const changedTo = e.detail.checked
-    console.log(changedTo)
-   // sendToSer('setOnline', { id: idL, online: changedTo })
+    console.log(changedTo, $myUserMeeting)
+    if($myUserMeeting == 0){
+      console.log(0)
+      //create usermeeting and make it online
+    }else{
+      sendToSer( { id: $myUserMeeting, online: changedTo },'22setOnline', null, null, false, fetch)
+    }
   }
   const back = { he: "חזרה לרשימת הצ'אטים", en: 'back to chat list' };
 
@@ -157,7 +165,7 @@
       </div>
       <div class="flex flex-row gap-2 items-start justify-end "	>
       <div>
-        <OnlineSwitch bind:checked={online} on:change={onlineSwitcher} />
+        <OnlineSwitch bind:checked={$isOnline} on:change={onlineSwitcher} />
       </div>
       <button class="h-6 w-6 mx-2 my-1" on:click={() => {
         isChatOpen.set(false);

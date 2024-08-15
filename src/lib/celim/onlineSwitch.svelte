@@ -50,7 +50,7 @@
     .live-animation {
       position: absolute;
       top: 50%;
-      left: 25%;
+      left: 75%;
       width: 0;
       height: 0;
       border-radius: 50%;

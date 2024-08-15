@@ -36,7 +36,9 @@ let me = $page.data.uid
    })
    function create (){
     loadingBtn = true
-    sendToSer({name,outpot},"18createNewMeeting",null,null,false,fetch).then((data)=>{
+    let d = new Date()
+    let publishedAt = d.toISOString()
+    sendToSer({name,outpot,publishedAt},"18createNewMeeting",null,null,false,fetch).then((data)=>{
       let me = $page.data.uid
       if(data.data != null){
         console.log(data, data.data.createPgisha.data.id)
@@ -58,7 +60,7 @@ let me = $page.data.uid
           })
         }else{
               const uid = encodeURIComponent("meeting-"+data.data.createPgisha.data.id+"-"+$page.data.uid);
-          sendToSer({id,pgishaId:data.data.createPgisha.data.id,uid},"20CreateUserMeeting",null,null,false,fetch).then((data)=>{
+          sendToSer({id,pgishaId:data.data.createPgisha.data.id,uid,publishedAt},"20CreateUserMeeting",null,null,false,fetch).then((data)=>{
             console.log(data)
             if(data.data != null){
               //check that it is the last run of the for loop
