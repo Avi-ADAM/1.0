@@ -1,4 +1,5 @@
 <script>
+  import { lang } from "$lib/stores/lang.js";
     import { createEventDispatcher } from "svelte";
     const dispatch = createEventDispatcher();
     export let checked = false;
@@ -50,7 +51,7 @@
     .live-animation {
       position: absolute;
       top: 50%;
-      left: 75%;
+      
       width: 0;
       height: 0;
       border-radius: 50%;
@@ -85,7 +86,7 @@
         class="btn-change flex items-center p-1 rounded-lg w-12 h-6 cursor-pointer"
       >
         {#if checked}
-          <div class="live-animation"></div>
+          <div class="live-animation {$lang == 'en' ? 'left-3/4' : 'left-1/4'}"></div>
         {/if}
       </label>
     </div>
