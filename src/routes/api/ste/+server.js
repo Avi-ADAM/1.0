@@ -10,6 +10,7 @@ export const POST = async ({ request }) => {
   const det = data?.det;
   const message = data?.message || null;
   const chat_id = data?.chat_id || null;
+  const urladd = data?.urladd || "lev";
   const lang = data?.lang || 'he';
   const buttontext = {
     he: 'לצפייה ב-1💗1',
@@ -18,7 +19,7 @@ export const POST = async ({ request }) => {
   // const email = (form.get('email'));
   // const contact = (form.get('contact'));
   const botMessage = isNew
-    ? `${det} %0A 
+    ? `<b>${det}</b>\n
     ${message}`
     : `${name} %0A 
      ${action} %0A 
@@ -39,7 +40,7 @@ export const POST = async ({ request }) => {
       {
         reply_markup: {
           inline_keyboard: [
-            [{ text: buttontext[lang], url: 'https://www.1lev1.com/moach' }]
+            [{ text: buttontext[lang], url: 'https://www.1lev1.com/'+urladd }]
           ]
         }
       }
