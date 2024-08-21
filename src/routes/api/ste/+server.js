@@ -19,7 +19,7 @@ export const POST = async ({ request }) => {
   // const email = (form.get('email'));
   // const contact = (form.get('contact'));
   const botMessage = isNew
-    ? `<b>${det}</b>\n
+    ? `**${det}**\n
     ${message}`
     : `${name} %0A 
      ${action} %0A 
@@ -38,6 +38,7 @@ export const POST = async ({ request }) => {
       chatId,
       botMessage,
       {
+        parse_mode: 'HTML',
         reply_markup: {
           inline_keyboard: [
             [{ text: buttontext[lang], url: 'https://www.1lev1.com/'+urladd }]
