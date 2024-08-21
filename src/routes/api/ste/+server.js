@@ -8,6 +8,7 @@ export const POST = async ({ request }) => {
   const name = data?.name || null;
   const action = data.action ? data.action.replace('\n', '%0A') : null;
   const det = data?.det;
+  const message = data?.message || null;
   const chat_id = data?.chat_id || null;
   const lang = data?.lang || 'he';
   const buttontext = {
@@ -17,7 +18,8 @@ export const POST = async ({ request }) => {
   // const email = (form.get('email'));
   // const contact = (form.get('contact'));
   const botMessage = isNew
-    ? `${det}`
+    ? `${det} %0A 
+    ${message}`
     : `${name} %0A 
      ${action} %0A 
      ${det}`;
@@ -35,13 +37,13 @@ export const POST = async ({ request }) => {
       chatId,
       botMessage,
       {
-        parse_mode: 'HTML',
-        disable_web_page_preview: true,
-        reply_markup: Markup.inlineKeyboard([
-          Markup.button.url(buttontext[lang], 'https://1lev1.com/moach')
-        ]),
+        reply_markup: {
+          inline_keyboard: [
+            [{ text: buttontext[lang], url: 'https://www.1lev1.com/moach' }]
+          ]
+        }
       }
-    );
+    ).catch(err => console.error('Error sending message:', err));
    // 6377840674;
 
 }

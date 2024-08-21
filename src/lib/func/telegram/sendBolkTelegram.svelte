@@ -13,7 +13,7 @@
             const element = telegrams[i];
             if(element.id !== myid){
               
-                let data = {isNew: true, lang:element.attributes.lang ?? mainlang,chat_id: element.attributes.telegramId,  det :title[element.attributes.lang ?? mainlang] + "%0A" + body[element.attributes.lang ?? mainlang] }
+                let data = {isNew: true, lang:element.attributes.lang ?? mainlang,chat_id: element.attributes.telegramId,  det :title[element.attributes.lang ?? mainlang] , messege : body[element.attributes.lang ?? mainlang] }
               console.log(data)
                 fetch('https://www.1lev1.com/api/ste', {
                 method: 'POST',  
