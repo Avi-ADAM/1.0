@@ -18,18 +18,14 @@ export async function POST({ request }) {
         },
 });
 console.log(import.meta.env.VITE_ZOHO, 'import.meta.env.VITE_ZOHO')
-await new Promise((resolve, reject) => {
     transporter.verify(function (err, success) {
         if (err) {
-            console.log(err)
-            reject(err)
+            console.log(err, 'err mail 23')
         }
         else {
-            console.log(success)
-            resolve(success)
+            console.log(success, 'success mail 26')	
         }
     });
-   })
 
 const options = {
     from: "notifications@1lev1.com",
@@ -51,7 +47,7 @@ await new Promise((resolve, reject) => {
     });
 
 })
-        return new Response(result);
+        return new Response('Success to send mail', { status: 200 });
    /* } catch (error) {
         console.error('Error sending mail:', error);
         return new Response('Failed to send mail', { status: 500 });
