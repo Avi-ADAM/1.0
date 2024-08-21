@@ -5,13 +5,8 @@ async function sendMail(
     email,
     previewText,
     emailText) {
-       
+     
     const transporter = nodemailer.createTransport({
-       /* service: 'gmail',
-        auth: {
-            user: "ehad1one@gmail.com",
-            pass: import.meta.env.VITE_APP
-        }*/
             host: 'smtp.zoho.com',
             secure: true,
             port: 465,
@@ -20,7 +15,19 @@ async function sendMail(
               pass: import.meta.env.VITE_ZOHO,
             },
     });
-
+    console.log(import.meta.env.VITE_ZOHO, 'import.meta.env.VITE_ZOHO')
+    await new Promise((resolve, reject) => {
+        transporter.verify(function (err, success) {
+            if (err) {
+                console.log(err)
+                reject(err)
+            }
+            else {
+                console.log(success)
+                resolve(success)
+            }
+        });
+       })
 
     const options = {
         from: "notifications@1lev1.com",
@@ -29,18 +36,21 @@ async function sendMail(
         html: emailHtml,
         text: emailText
     };
+    await new Promise((resolve, reject) => {
+        transporter.sendMail(options, (err, info) => {
+            if (err) {
+                console.log(err)
+                reject(err)
+            }
+            else {
+                console.log(info)
+                resolve(info)
+            }
+        });
 
-    transporter.sendMail(options);
-    transporter.verify(function (err, success) {
-        if (err) {
-            console.log(err)
-            return 'error';
-        }
-        else {
-            console.log(success)
-            return 'OK';
-        }
-    });
+    })
+
+    return 'Email sent successfully';
 }
 
 
