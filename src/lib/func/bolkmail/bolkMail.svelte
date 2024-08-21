@@ -1,7 +1,7 @@
 <script context="module">
 
     /***
-     * push to telegram
+     * send mail to users
      * @param {Array} emails   array contains id, and as attributes username lang and telegram chatid
      * @param {number} myid  user id to not notify
      * @param {object} title  {"he","ר","en":"r"}

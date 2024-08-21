@@ -47,20 +47,23 @@ async function sendMail(
 
 export async function POST({ request }) {
     const data = await request.json();
-    console.log("bolkmail 44", data);
+    console.log("bolkmail 44", data); 
     const emailHtml = data.emailHtml;
     const emailText = data.emailText
     const email = data.email
     const previewText = data.previewText
 
-    const result = await sendMail(
-        emailHtml,
-        email,
-        previewText,
-        emailText
-    )
-        .then(res => result = res)
-
-
-    return new Response(result);
+    try {
+        const result = await sendMail(
+            emailHtml,
+            email,
+            previewText,
+            emailText
+        );
+    
+        return new Response(result);
+    } catch (error) {
+        console.error('Error sending mail:', error);
+        return new Response('Failed to send mail', { status: 500 });
+    }
 }

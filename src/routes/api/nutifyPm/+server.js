@@ -106,10 +106,10 @@ export async function POST({request, cookies, fetch}){
       emailHtml:  render({
         template: SimpleNuti,
         props: {
-          head: title[user.attributes.lang == "he" || "en" ? user.attributes.lang : lang],
-         body: body[user.attributes.lang == "he" || "en" ? user.attributes.lang : lang],
+          head: title,
+         body: body,
          username: user.attributes.username,
-         previewText: title[user.attributes.lang == "he" || "en" ? user.attributes.lang : lang],
+         previewText: title,
          lang :user.attributes.lang == "he" || "en" ? user.attributes.lang : lang
         }
       }),

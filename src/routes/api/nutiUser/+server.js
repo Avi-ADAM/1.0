@@ -63,31 +63,25 @@ export async function POST({request, cookies, fetch}){
     
     const pic =
       'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png';
-    //  jsonim.data.project.data.attributes.profilePic.data?.attributes?.formats
-    //    ?.thumbnails.url ??
-     // jsonim.data.project.data.attributes.profilePic.data?.attributes?.url
-        //jsonim myid messege mainlang pic
+  
      console.log('before', transformedDataMaCH, transformedDataTel);
-        pusherer(transformedDataMaCH, idL,pic,title,body,lang,fetch);
+      pusherer(transformedDataMaCH, idL,pic,title,body,lang,fetch);
         console.log('after', transformedDataTel);
         if(transformedDataTel && transformedDataTel !== null && transformedDataTel !== undefined){
-             sendBolkTelegram([{id:uid,attributes:{telegramId:transformedDataTel,lang:jsonim.data.usersPermissionsUser.data.attributes?.lang}}], idL,title,body,jsonim.data.usersPermissionsUser.data.attributes?.lang == "he"	 || "en" ? jsonim.data.usersPermissionsUser.data.attributes?.lang : lang,fetch);
+        sendBolkTelegram([{id:uid,attributes:{telegramId:transformedDataTel,lang:jsonim.data.usersPermissionsUser.data.attributes?.lang}}], idL,title,body,jsonim.data.usersPermissionsUser.data.attributes?.lang == "he"	 || "en" ? jsonim.data.usersPermissionsUser.data.attributes?.lang : lang,fetch);
             }
-        
-        /*
-  const transformedDataMail =
-  jsonim.data.project.data.attributes.user_1s.data.flatMap((user) => {
-    //filter by if email not null or undefined
-    return{
+        //link to mail, to push, callback button to terlegram
+        const user = jsonim.data.usersPermissionsUser.data
+  const transformedDataMail = [{
       email: user.attributes.email,
       emailHtml:  render({
         template: SimpleNuti,
         props: {
-          head: title[user.attributes.lang == "he" || "en" ? user.attributes.lang : lang],
-         body: body[user.attributes.lang == "he" || "en" ? user.attributes.lang : lang],
+          head: title,
+         body: body,
          username: user.attributes.username,
-         previewText: title[user.attributes.lang == "he" || "en" ? user.attributes.lang : lang],
-         lang :user.attributes.lang == "he" || "en" ? user.attributes.lang : lang
+         previewText: title,
+         lang :user.attributes.lang == "he" || user.attributes.lang == "en" ? user.attributes.lang : lang
         }
       }),
       users_permission_user: {
@@ -99,8 +93,8 @@ export async function POST({request, cookies, fetch}){
           }
         }
       }
-    }
-  })
-  sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)*/
+    }]
+  
+  sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
     return new Response    
 }

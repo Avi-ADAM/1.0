@@ -4,6 +4,7 @@ import Nego from "$lib/components/prPr/negoPend.svelte";
   import { sanitizeUserInput } from "$lib/func/uti/sanitizeUserInput.svelte";
   import { lang } from "$lib/stores/lang.js";
   import { onMount } from "svelte";
+  import { MultiSelect } from "svelte-multiselect";
   export let data
     let tex
 
@@ -18,7 +19,23 @@ import Nego from "$lib/components/prPr/negoPend.svelte";
    // y.push(0)
     //y = y
     //console.log(y,c)
-    fetch("/api/pusher")
+    let data = {uid:1, title: {"en":"בודק בדיקה","he":"בודק בדיקה"}, body: {"en":"uiuituy7 והתיאור:  tesrt test test  ", "he":"uiuituy7 והתיאור: tesrt test test "}}
+   fetch("/api/nutiUser", {
+  method: 'POST', 
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
+
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
   }
 
 
@@ -119,8 +136,24 @@ async function run() {
   });
   console.log('Sent push');
 }*/
+let searchText,  selected, addn = {
+  he: 'הוספת דרך חדשה',	en: 'add new way'}
+let newcontentW
+let placeholder = {
+  he: 'הוספת דרך חדשה',	en: 'add new way'}
+let ww = []
 </script>
-
+<MultiSelect
+--sms-open-z-index={10000}
+  createOptionMsg={addn[$lang]}
+  allowUserOptions={true}
+  bind:searchText
+  loading={newcontentW}
+  bind:selected
+  placeholder={placeholder[$lang]}
+  options={ww.map((c) => c.attributes.workWayName)}
+  
+/>
 <button class="w-3.5 h-3.5 me-2 text-green-500 text-barbi bg-gray-500" on:click={oncli}>ooooo</button>
 
 <RichText bind:outpot/>

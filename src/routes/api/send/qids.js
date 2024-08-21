@@ -204,9 +204,11 @@ export const qids = {
   createPgisha(data: 
     {name: $name, desc: $outpot,publishedAt:$publishedAt})
      {data{id}}
-  }`,"19CreatePendMeeting": `mutation CreatePgishauserPend($id: ID!,$pgishaId:ID) {
+  }`,
+  "19CreatePendMeeting": `mutation CreatePgishauserPend($id: ID!,$pgishaId:ID) {
   createPgishauserpend(data: {users_permissions_user: $id,pgisha: $pgishaId}) {data{id}}
-  }`, "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String,$publishedAt:DateTime) {
+  }`,
+   "20CreateUserMeeting": `mutation CreateUserMeeting($id: ID!,$pgishaId:[ID],$uid:String,$publishedAt:DateTime) {
   createPgishauser(data: {users_permissions_user: $id,pgishas: $pgishaId,uid:$uid,
                publishedAt:$publishedAt
 }) {data{id}}
@@ -219,6 +221,21 @@ export const qids = {
       data{id attributes{available}}}
   }`,
   "23myUserMeeting": `query GetMyUserMeeting($id: ID!) {
-  pgishausers(filters: {users_permissions_user: {id: {eq: $id}}}) {data{id attributes{available uid pgishas{data{id}}}}}
+  pgishausers(filters: {users_permissions_user: {id: {eq: $id}}}) {data{id attributes{available uid pgishas{data{id 
+  attributes{pgishausers {data{id attributes{available} }}}}}}}}
   }`,
+  '24userJSONQue': `query GetUserJSON($uid: ID!) {	
+  usersPermissionsUser(id: $uid) {
+   data{
+            id
+            attributes{
+              telegramId
+              lang 
+              email
+              username
+              machshirs{data{id attributes{jsoni}}}
+            }
+          }
+}
+}`
 };
