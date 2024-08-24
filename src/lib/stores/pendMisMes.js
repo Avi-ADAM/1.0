@@ -2,7 +2,7 @@ import { SendTo } from '$lib/send/sendTo.svelte';
 import { io } from 'socket.io-client';
 import { writable } from 'svelte/store';
   const baseUrl = import.meta.env.VITE_URL
-
+export const username = writable("")
 export const pendMisMes = writable({});
 export const pendMasMes = writable({});
 export const meAskMisMes = writable({})
@@ -62,7 +62,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
     isChatLoading.set(true)
       que = `{
        usersPermissionsUser (id:${myId}) {data{ attributes{
-
+                            username
                             projects_1s {data {id attributes{ projectName profilePic{data{attributes{url formats}}} forums{
                                 data{id attributes{
                     subject spec done mesimabetahaliches {data{attributes{name}}} messages(filters:{archived: {ne:true}}){data{id attributes{
@@ -72,7 +72,6 @@ export async function initialForum (all = false,ids = [],myId = 0){
                             } }}}
                             } }}
       }`;
-          console.log('store');
 
   }else if(all == false && ids.length >0){
        que = `{
@@ -93,6 +92,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
            if (res4.data != null) {
             console.log(res4.data,"res4")
             if(all == true){
+              username.set(data.usersPermissionsUser.data.attributes.username)
               function extractForums(data) {
                 let forums = [];
                 data.usersPermissionsUser.data.attributes.projects_1s.data.forEach(
