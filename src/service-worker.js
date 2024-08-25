@@ -38,14 +38,52 @@ self.addEventListener('push', ev => {
   ev.waitUntil(
     self.registration.showNotification(data.message.title, {
       body: data.message.body,
+     
       //  registration_ids: [$('.header-user-name').find('span').text()],
       //ליצור בלינק פרמטר של אידי של הפוש ואז לעדכן כנקרא כשנלחץ
       icon:
         data.message.pic ??
-        'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png'
+        'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',
+        data: {
+          url: data.message?.url ?? '/lev', 
+          otherData: data.message.otherData // מידע נוסף שנרצה לשמור
+      },
+      actions: [
+          { action: 'open_url', title: 'Open' }
+      ]
     })
   );
 
+});
+self.addEventListener('notificationclick', function(event) {
+  const url = event.notification.data.url;
+
+  event.notification.close();
+
+  event.waitUntil(
+      clients.matchAll({ type: 'window', includeUncontrolled: true }).then(function(clientList) {
+          // בדוק אם יש כבר חלון פתוח של האתר
+          for (var i = 0; i < clientList.length; i++) {
+              var client = clientList[i];
+              if (client.url === url && 'focus' in client) {
+                  return client.focus();
+              }
+          }
+          // אם לא, פתח חלון חדש
+          if (client.openWindow) {
+              return client.openWindow(url);
+          }
+      }).then(() => {
+          // דוגמה להפעלת פונקציה לשינוי בלוקל סטורג' או ביצוע fetch
+          /*
+          localStorage.setItem('notification_clicked', 'true');
+          return fetch('/update', {
+              method: 'POST',
+              body: JSON.stringify({ clicked: true }),
+              headers: { 'Content-Type': 'application/json' }
+          });*/
+      })
+  );
 });
 
 self.addEventListener('fetch', (event) => {
