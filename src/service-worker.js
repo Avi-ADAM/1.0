@@ -34,7 +34,8 @@ self.addEventListener('activate', (event) => {
 self.addEventListener('push', ev => {
   const data = ev.data.json();
   console.log('Got push', data);
-
+  const url = data.message?.url || 'https://www.1lev1.com/lev';
+  console.log(url)
   ev.waitUntil(
     self.registration.showNotification(data.message.title, {
       body: data.message.body,
@@ -45,7 +46,7 @@ self.addEventListener('push', ev => {
         data.message.pic ??
         'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',
         data: {
-          url: data.message?.url ?? '/lev', 
+          url: url, 
           otherData: data.message.otherData // מידע נוסף שנרצה לשמור
       },
       actions: [
