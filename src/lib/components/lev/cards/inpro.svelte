@@ -4,6 +4,7 @@ export let x = 0,tasks = [], src,projectName,already,zman,hearotMeyuchadot,statu
     import {lang} from '$lib/stores/lang.js' 
     export let low = false;
     export let iskvua = false
+    export let isVisible = false
 import Lowbtn from '$lib/celim/lowbtn.svelte'
      // import Chaticon from '../../../celim/chaticon.svelte'
   import { createEventDispatcher } from 'svelte';
@@ -51,16 +52,17 @@ console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
 $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`}
 </script>
-
+{#key isVisible}
 {#if tasks.length > 0}
   <div 
   on:click={opentask} 
   on:keypress={opentask}
   role="button"
   tabindex="0"
-  class="absolute inline-flex items-center justify-center w-12 h-12 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-1 {$lang == "en" ? "left-1" : "right-1"}  dark:border-gray-700">{tasks.length}</div>
+  class="absolute inline-flex items-center justify-center w-8 h-8 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-[3%] {$lang == "en" ? "right-[3%]" : "left-[3%]"}  dark:border-gray-700">{tasks.length}</div>
   {/if}
-<div dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d   leading-normal w-full h-full bg-white lg:w-full">
+  {/key}
+<div dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">

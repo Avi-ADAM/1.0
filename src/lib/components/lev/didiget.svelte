@@ -3,6 +3,7 @@
   import Diun from './diun.svelte';
   import { addToast } from 'as-toast';
       export let modal = false
+      export let isVisible = false;
     let dialogOpen = false
   const baseUrl = import.meta.env.VITE_URL
   export let shear = [];
@@ -855,6 +856,7 @@ role="button"
       on:decline={claf}
       on:hover={hoverc}
       {why}
+      {isVisible}
       {already}
       {projectName}
       {src}

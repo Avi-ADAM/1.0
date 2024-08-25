@@ -1,8 +1,10 @@
 <script>
     //  import Chaticon from '../../../celim/chaticon.svelte'
   import { createEventDispatcher } from 'svelte';
+  import {lang} from '$lib/stores/lang.js'
  const dispatch = createEventDispatcher();
      export let low = false;
+     export let isVisible = false;
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
@@ -27,10 +29,21 @@ dispatch("nego",{alr:alr,y:"n"});
 function tochat (){
 dispatch("tochat");
 }
+const askedVal = {
+  "en": "asked vallue",
+  "he":"הצעת הריקמה"}
+  const myval = {
+    "en": "my vallue",
+    "he":'ההצעה שלי'
+  }
+  const head = {
+    "he":"הצעה לשיתוף משאב בריקמה",
+    "en":"Suggestion for sharing a reasurce with a FreeMates"
+  }
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  bg-white leading-normal w-full h-full lg:w-full">
+<div dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="overflow-y:auto" class=" d  {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''}  leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -40,7 +53,7 @@ dispatch("tochat");
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">הצעה לשיתוף משאב בריקמה</span>
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{head[$lang]}</span>
             </div>
             <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
          </div>
@@ -48,9 +61,16 @@ dispatch("tochat");
          </div>
   <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
-         <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
+         <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span on:mouseenter={()=>hover("ההצעה שלי")} on:mouseleave={()=>hover("0")} style="color: var(--barbi-pink)">{easy} הצעת הריקמה</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {myp} ההצעה שלי</span> 
+        <span
+        role="contentinfo"
+         on:mouseenter={()=>hover(askedVal[$lang])} 
+         on:mouseleave={()=>hover("0")} 
+         style="color: var(--barbi-pink)">{easy} {askedVal[$lang]}</span
+         > /<span 
+         role="contentinfo"
+         on:mouseenter={()=>hover(myval[$lang])} on:mouseleave={()=>hover("0")} > {myp} {myval[$lang]}</span> 
       </p>
               <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="ltn" >{price} <span>שווי מקובל</span></h3>
              {#if total} <p on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{total}</p>{/if}

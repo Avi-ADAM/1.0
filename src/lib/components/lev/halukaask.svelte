@@ -3,7 +3,7 @@
     import {  fly } from 'svelte/transition';
    import { createEventDispatcher } from 'svelte';
        	import { Drawer } from 'vaul-svelte';
-
+         export let isVisible = false;
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
@@ -700,6 +700,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
  on:agree={claf}
   on:decline={claf}
   on:hover={hoverc}
+  {isVisible}
   {why}
   {already} 
   {projectName}

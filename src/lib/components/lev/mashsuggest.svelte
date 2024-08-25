@@ -2,7 +2,7 @@
   import { lang } from '$lib/stores/lang.js';
   import { fly } from 'svelte/transition';
       	import { Drawer } from 'vaul-svelte';
-
+        export let isVisible = false;
   import { createEventDispatcher } from 'svelte';
   import { clickOutside } from './outsidclick.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
@@ -586,6 +586,7 @@ role="button"
     on:decline={() => decline(oid)}
     on:hover={hoverc}
     on:tochat={tochat}
+    {isVisible}
     {low}
     {mashName}
     {easy}

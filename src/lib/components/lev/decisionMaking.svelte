@@ -2,7 +2,7 @@
     import { pinch } from 'svelte-gestures';
   import * as animateScroll from "svelte-scrollto";
     	import { Drawer } from 'vaul-svelte';
-
+      export let isVisible = false;
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
  import { lang } from '$lib/stores/lang.js';
@@ -776,6 +776,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
   on:agree={()=>agree()}
   on:decline={()=>decline()}
   on:hover={hoverc} 
+  isVisible={false}
   {already} 
   {projectName}
    {src} 
@@ -806,6 +807,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
   {projectName}
    {src} 
    {src2}
+   {isVisible}
    {low}
    {kind}
    {spdata}

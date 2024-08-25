@@ -27,6 +27,7 @@ betha.subscribe(value => {
 	});
 
  const dispatch = createEventDispatcher();
+ export let isVisible = false;
  export let coinlapach
     export let stname;
     let show = true;
@@ -1384,6 +1385,7 @@ on:start={start}
      a = 2;
     isOpen = true
   }}
+  {isVisible}
   {low}
   {tasks}
   {dueDateOrCountToDedline}

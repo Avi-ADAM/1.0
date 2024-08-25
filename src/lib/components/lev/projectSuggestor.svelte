@@ -13,7 +13,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 	import dayjs from 'dayjs';
   import { nowId } from "$lib/stores/pendMisMes.js";
 const baseUrl = import.meta.env.VITE_URL
-
+export let isVisible = false;
  const dispatch = createEventDispatcher();
      export let low = false, alreadyi = false
      export let timeToP = "more"
@@ -1263,6 +1263,7 @@ on:project={project}
   on:decline={claf}
   on:hover={hoverc}
   on:tochat={tochat}
+  {isVisible}
   {low}
   {hearotMeyuchadot}
   {alreadyi}

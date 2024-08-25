@@ -14,7 +14,7 @@
         import Weget from '../../../components/lev/weget.svelte'
         import Hal from '../../../components/lev/halukaask.svelte'
       //import { fly } from 'svelte/transition';
-      import { createEventDispatcher } from 'svelte';
+      import { createEventDispatcher, onMount } from 'svelte';
     import Header from './../../header/header.svelte'
 const dispatch = createEventDispatcher();
   import { Swiper, SwiperSlide } from "swiper/svelte";
@@ -27,9 +27,21 @@ const dispatch = createEventDispatcher();
   import "swiper/css/keyboard"
   import "swiper/css/mousewheel"
   import "./stylec.css";
+  let currentIndex = 0;
+  let swiperInstance;
 
+
+  onMount(() => {
+    swiperInstance = new Swiper('.swiper', {
+      on: {
+        slideChange: () => {
+          currentIndex = swiperInstance.realIndex;
+        },
+      },
+    });
+  });
   // import required modules
-  import {Manipulation, Mousewheel, Keyboard, EffectFade , Navigation} from "swiper";
+  import {Manipulation, Mousewheel, Keyboard, EffectFade , Navigation} from "swiper";//, Virtual
   export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
@@ -122,7 +134,7 @@ const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין
 $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
 </script>
 <style>
- 
+
    .body{
       height: 100vh !important;
       width: 100vw !important;
@@ -207,7 +219,7 @@ mousewheel={{
 effect={'fade'}
   grabCursor={true}
   modules={[Manipulation, Mousewheel, Keyboard,EffectFade, Navigation]}
-  class="mySwiperc swiperc"
+  class="mySwiperc swiperc "
       dir="rtl"
     loop="true"
     navigation={{
@@ -217,7 +229,8 @@ effect={'fade'}
 >
 {#each arr1 as buble, i}
 {#if buble.ani === "haluk" && milon.desi == true}
-<SwiperSlide  class="swiper-slidec"><Hal    
+<SwiperSlide  class="swiper-slidec "><Hal  
+  isVisible={currentIndex === i}  
     user_1s={buble.user_1s}
           on:hover={hover}
  on:proj={proj}
@@ -243,12 +256,13 @@ effect={'fade'}
     order={buble.order}
                                /></SwiperSlide>
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
- <SwiperSlide class="swiper-slidec"><MissionInProgress
+ <SwiperSlide class="swiper-slidec "><MissionInProgress
   on:proj={proj}
   cards="true"
  on:user={user}  
   on:hover={hover}
     {low}
+    isVisible={currentIndex === i}
                 pu={buble.pu}
   hearotMeyuchadot={buble.hearotMeyuchadot}
     tasks={buble.acts.data}
@@ -280,6 +294,7 @@ effect={'fade'}
   on:proj={proj}
  on:user={user}
          cards="true"
+         isVisible={currentIndex === i}
 {low}
      coinlapach={buble.coinlapach} 
         on:coinLapach={delo}
@@ -321,6 +336,7 @@ effect={'fade'}
         on:coinLapach={delo}
         timegramaId={buble.timegramaId}
         {low}
+        isVisible={currentIndex === i}
         createdAt={buble.createdAt}
         restime={buble.restime}
           timegramaDate={buble.timegramaDate}
@@ -369,6 +385,7 @@ effect={'fade'}
           on:proj={proj}
  on:user={user}
  {low}
+ isVisible={currentIndex === i}
      coinlapach={buble.coinlapach} 
             mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
@@ -416,6 +433,7 @@ effect={'fade'}
  on:user={user}
  cards="true"
  {low}
+ isVisible={currentIndex === i}
      coinlapach={buble.coinlapach} 
              mId={buble.mId}
             noofusersWaiting={buble.noofusersWaiting}
@@ -469,6 +487,7 @@ effect={'fade'}
      on:user={user}
             on:decline={delo}
             cards="true"
+            isVisible={currentIndex === i}
             iskvua={buble.iskvua}
             email={buble.email}
             role={buble.role}
@@ -517,6 +536,7 @@ effect={'fade'}
             cards="true"
  on:user={user}
  on:chat={chat}
+ isVisible={currentIndex === i}
  {low}
             pid={buble.pid}
                 coinlapach={buble.coinlapach} 
@@ -557,6 +577,7 @@ effect={'fade'}
             on:hover={hover}
       on:proj={proj}
  on:user={user}
+ isVisible={currentIndex === i}
      coinlapach={buble.coinlapach} 
     {low}
     pid={buble.pid}
@@ -591,6 +612,7 @@ effect={'fade'}
  on:user={user}
  messege={buble.messege}
       i={i}
+      isVisible={currentIndex === i}
           coinlapach={buble.coinlapach} 
       {low}
       askedarr={askedarr}
@@ -628,6 +650,7 @@ effect={'fade'}
                                                     coinlapach={buble.coinlapach}
                                                     created_at={buble.created_at}
                                                     spdata={buble.spdata}
+                                                    isVisible={currentIndex === i}
                                                     kind={buble.kind}
                                                     messege={buble.messege}
                                                     myid={buble.myid}

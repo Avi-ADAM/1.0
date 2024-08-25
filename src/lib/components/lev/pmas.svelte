@@ -18,6 +18,7 @@ import { idPr } from '../../stores/idPr.js';
  import {lang} from '$lib/stores/lang.js'
   const dispatch = createEventDispatcher();
       export let low = false;
+      export let isVisible = false;
   const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
     export let modal = false
     let dialogOpen = false
@@ -872,6 +873,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
   on:decline={claf}
   on:hover={hoverc}
   on:tochat={tochat}
+  {isVisible}
   {low}
   {kindOf}
   {hm}

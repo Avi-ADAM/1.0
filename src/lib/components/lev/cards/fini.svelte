@@ -4,6 +4,7 @@
   import tr from '$lib/translations/tr.json'
   import {lang} from '$lib/stores/lang.js'
       export let low = false;
+      export let isVisible = false;
 import Lowbtn from '$lib/celim/lowbtn.svelte'
  const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
@@ -37,7 +38,7 @@ console.log(whatt)
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  bg-white leading-normal w-full h-full bg-white lg:w-full">
+<div dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">

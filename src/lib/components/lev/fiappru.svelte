@@ -1,7 +1,7 @@
 <script>
   import ProgressBar from "@okrad/svelte-progressbar";
       	import { Drawer } from 'vaul-svelte';
-
+        export let isVisible = false;
 import {
     clickOutside
 } from './outsidclick.js';
@@ -595,6 +595,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
  on:agree={agree}
   on:decline={decline}
   on:hover={hoverc}
+  {isVisible}
   {why}
   {useraplyname}
   {src2}

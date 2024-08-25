@@ -19,6 +19,7 @@
   const baseUrl = import.meta.env.VITE_URL
     export let modal = false
     let dialogOpen = false
+    export let isVisible = false;
   export let coinlapach;
   export let deadline;
   export let projectName;
@@ -972,6 +973,7 @@ role="button"
       on:agree={() => agree()}
       on:decline={() => decline()}
       on:hover={hoverc}
+      {isVisible}
       {already}
       {projectName}
       {src}

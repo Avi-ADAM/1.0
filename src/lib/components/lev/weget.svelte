@@ -19,6 +19,7 @@ import { idPr } from './../../stores/idPr.js';
 const dispatch = createEventDispatcher();
     export let low = false;
     export let modal = false
+    export let isVisible = false;
     let dialogOpen = false
 export let coinlapach;
 export let mId;
@@ -609,6 +610,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
  on:agree={agree}
   on:decline={open}
   on:hover={hoverc}
+  {isVisible}
   {low}
   {agprice}
   {useraplyname}

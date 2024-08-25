@@ -1,8 +1,10 @@
 <script>
   import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
+ import {lang} from '$lib/stores/lang.js'
   import Lev from '../../../celim/lev.svelte';
       export let low = false;
+      export let isVisible = false
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
     export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting,deadline,easy,myp,price
@@ -23,7 +25,7 @@ dispatch("decline",{alr:alr});
 </script>
 
 
-<div dir="rtl"  class="  bg-white leading-normal w-full h-full bg-white lg:w-full">
+<div dir="rtl"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%] d">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">

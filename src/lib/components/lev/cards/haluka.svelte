@@ -4,7 +4,7 @@
  const dispatch = createEventDispatcher();
      export let low = false;
        import tr from '$lib/translations/tr.json'
-
+export let isVisible = false
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
@@ -33,7 +33,7 @@ const tri = import('$lib/translations/tr.json')
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  bg-white leading-normal w-full h-full bg-white lg:w-full">
+<div dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">

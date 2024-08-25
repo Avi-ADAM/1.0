@@ -18,6 +18,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 const dispatch = createEventDispatcher();
     export let low = false;
     export let iskvua;
+    export let isVisible = false;
 export let email;
 export let coinlapach
 export let deadline
@@ -186,7 +187,7 @@ let welcome = ``;
 let adduser = ``;
 let adduser2 = ``;
 async function agree() {
-  //add sheirut to rikma -> add missions and reasorses to sheiruyt -> add reciver as project client
+  //add sheirut to rikma -> add missions and reasorses to sheiruyt -> add reciver as project clientcreateMidGen
     already = true;
      noofusersOk += 1;
   noofusersWaiting -= 1;
@@ -874,6 +875,7 @@ role="content-info"
   on:decline={()=>decline()}
   on:hover={hoverc} 
   on:chat={tochat}
+  {isVisible}
   {low}
   {already} 
   {projectName}

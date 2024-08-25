@@ -223,7 +223,12 @@ label, input , p, div ,span{
 
 }
 
-
+.boxright{
+  box-shadow: rgba(240, 46, 170, 0.4) 5px 5px, rgba(240, 46, 170, 0.3) 10px 10px, rgba(240, 46, 170, 0.2) 15px 15px, rgba(240, 46, 170, 0.1) 20px 20px, rgba(240, 46, 170, 0.05) 25px 25px;
+   }
+   .boxleft{
+     box-shadow: rgba(240, 46, 170, 0.4) -5px 5px, rgba(240, 46, 170, 0.3) -10px 10px, rgba(240, 46, 170, 0.2) -15px 15px, rgba(240, 46, 170, 0.1) -20px 20px, rgba(240, 46, 170, 0.05) -25px 25px;
+   }
 .tiptap ol li {
   counter-increment: muffins;
 }
@@ -1057,8 +1062,8 @@ button:focus:not(:focus-visible) {
     height: 44px;
     width: 60px;
     position: absolute;
-    top: calc(100% - 48px);
-    right: calc(100% - 64px);
+    top: calc(90% - 48px);
+    right: calc(90% - 64px);
     border: 1px solid red;
     border-radius: 25%;
     padding: 9px 16px;
@@ -1067,7 +1072,7 @@ button:focus:not(:focus-visible) {
     height: 44px;
     width: 58px;
     position: absolute;
-    top: calc(100% - 48px);
+    top: calc(90% - 48px);
     right: calc(50% - 29px);
     border: 1px solid red;
     border-radius: 25%;
@@ -1077,8 +1082,8 @@ button:focus:not(:focus-visible) {
     height: 44px;
     width: 60px;
     position: absolute;
-    top: calc(100% - 48px);
-    left: calc(100% - 64px);
+    top: calc(90% - 48px);
+    left: calc(90% - 64px);
     border: 1px solid var(--barbi-pink);
     border-radius: 25%;
     padding: 9px 16px ;

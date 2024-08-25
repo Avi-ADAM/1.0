@@ -16,7 +16,7 @@ import {
     createEventDispatcher
 } from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
-
+export let isVisible = false;
 const dispatch = createEventDispatcher();
     export let low = false;
     export let iskvua;
@@ -912,6 +912,7 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
   on:decline={()=>decline()}
   on:hover={hoverc} 
   on:chat={tochat}
+  {isVisible}
   {low}
   {already} 
   {projectName}

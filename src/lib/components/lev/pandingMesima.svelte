@@ -13,6 +13,7 @@ import { RingLoader
 import Lowbtn from '$lib/celim/lowbtn.svelte'
  const dispatch = createEventDispatcher();
  export let coinlapach;
+ export let isVisible = false;
  export let mypos = null;
      export let low = false;
         export let restime;
@@ -790,6 +791,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   on:decline={claf}
   on:hover={hoverc}
   on:tochat={tochat}
+  {isVisible}
 {skills}
   {timegramaDate}
     {tafkidims}
