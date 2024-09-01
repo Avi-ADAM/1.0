@@ -283,7 +283,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
-                        addToast(er[$lang],"warn")
+        toast.warning(er[$lang])
         }
           
         console.log("will create mission")
@@ -321,7 +321,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
-       addToast(er[$lang],"warn")
+       toast.warning(er[$lang])
         }
        
 
@@ -424,7 +424,7 @@ async function afterwhy (event){
                  coinLapach()
         } catch (e) {
             error1 = e
-            addToast(er[$lang],"warn")
+            toast.warning(er[$lang])
             console.log(error1)
  }
         }
@@ -514,7 +514,7 @@ async function afreact (event){
         } catch (e) {
             error1 = e
             console.log(error1)
-            addToast(er[$lang],"warn")
+            toast.warning(er[$lang])
         }
 }
   const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
@@ -600,7 +600,7 @@ function hoverc (event){
   import {oneLangAdj} from '$lib/func/oneLangAdj.svelte';
   import { lang } from '$lib/stores/lang';
   import { nowId } from '$lib/stores/pendMisMes';
-  import { addToast } from 'as-toast';
+  import { toast } from 'svelte-sonner';
   import { Drawer } from 'vaul-svelte';
 export let cards = false;
 function claf (event){

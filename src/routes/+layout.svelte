@@ -29,10 +29,9 @@ onMessage(messaging, (payload) => {
 });
 }*/
 import "../app.postcss";
-	import { Toasts } from 'as-toast';
-  import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+import { Toaster } from 'svelte-sonner';
+import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
-  import { browser } from "$app/environment";
  // import firebase from "$lib/func/firebase";
 export let data
 function getLang() {
@@ -83,7 +82,7 @@ onMount(async () => {
 
 <main>
 	<slot />
- <span style:z-index="99999">
-<Toasts />
- </span>
+<Toaster toastOptions={{
+  style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
+}} richColors  closeButton  position="top-center" />
 </main>

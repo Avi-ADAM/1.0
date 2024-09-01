@@ -222,7 +222,7 @@ export const qids = {
   }`,
   "23myUserMeeting": `query GetMyUserMeeting($id: ID!) {
   pgishausers(filters: {users_permissions_user: {id: {eq: $id}}}) {data{id attributes{available uid pgishas{data{id 
-  attributes{pgishausers {data{id attributes{available} }}}}}}}}
+  attributes{name publishedAt pgishausers {data{id attributes{available users_permissions_user{data{id attributes{username}}}} }}}}}}}}
   }`,
   '24userJSONQue': `query GetUserJSON($uid: ID!) {	
   usersPermissionsUser(id: $uid) {

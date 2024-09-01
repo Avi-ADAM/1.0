@@ -1,7 +1,7 @@
 <script>
 import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js'
-  import { addToast } from 'as-toast';
+  import { toast } from 'svelte-sonner';
   import {SendTo} from '$lib/send/sendTo.svelte'
  import { createEventDispatcher } from 'svelte';
 export let isGuidMe = false;
@@ -141,14 +141,14 @@ const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en
   .then (res => res = res);
   console.log(res)
   if(res.data !=null){
-    addToast(suc[$lang])
+    toast.success(suc[$lang])
       localStorage.setItem("nuti", true);
   }else{
-    addToast(er[$lang],"warn")
+    toast.warning(er[$lang])
   }
 }  catch (e) {
   console.error(e)
-  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
   }
     }
     console.log(sub);
@@ -225,7 +225,7 @@ function shaneh () {
   })
   .then(response => {
         console.log('Your password has been changed.', response);
-        addToast(`${passchanged[$lang]}`, 'info');
+        toast.success(`${passchanged[$lang]}`);
 
     before = false;
   })
@@ -280,7 +280,7 @@ function shaneh () {
   }
   `
   await SendTo(q)
-  addToast(`${guidend[$lang]}`, 'info');
+  toast.success(`${guidend[$lang]}`);
   pressed = false
 }
  async function startGuid(){
@@ -303,7 +303,7 @@ function shaneh () {
   }
   `
   await SendTo(q)
-   addToast(`${guidback[$lang]}`, 'info');
+   toast.success(`${guidback[$lang]}`);
    dispatch("guid")
    pressed = false
 }

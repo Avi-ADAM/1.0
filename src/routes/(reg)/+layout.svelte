@@ -3,10 +3,10 @@
 import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { Tour, TourTip } from 'svelte-tour';
-  	import { Toasts } from 'as-toast';
-import { browser } from '$app/environment';
+    import { Toaster } from 'svelte-sonner';
+
 import { lang } from '$lib/stores/lang.js'
-  import { getAnalytics } from "firebase/analytics";
+ // import { getAnalytics } from "firebase/analytics";
   import { initialForum, forum } from '$lib/stores/pendMisMes.js';
   import Foot from '$lib/components/footer/foot.svelte';
  import { initialWebS } from '$lib/stores/pendMisMes.js';
@@ -100,9 +100,9 @@ const logi = { "he": "להתחברות", "en":"To Login"}
 <main class="h-screen min-w-screen absolute top-0 left-0">
   <Foot un={data.un} idL={data.uid}/>
   <Tour TourTip={TourTip}></Tour>
-<span style:z-index="9999">
-  <Toasts />
-</span>
+  <Toaster toastOptions={{
+		style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
+  }} richColors  closeButton position="top-center" />
       </main>
  {/if}
   <slot></slot>

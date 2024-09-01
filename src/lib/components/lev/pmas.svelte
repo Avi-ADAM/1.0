@@ -282,7 +282,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
-            addToast(er[$lang],"warn")
+            toast.warning(er[$lang])
         }
           } else {
  try {
@@ -318,7 +318,7 @@ async function agree(alr) {
         } catch (e) {
             error1 = e
             console.log(error1)
-            addToast(er[$lang],"warn")
+            toast.warning(er[$lang])
         }
        
       }
@@ -413,7 +413,7 @@ async function afterwhy (event){
         } catch (e) {
             error1 = e
             console.log(error1)
-            addToast(er[$lang],"warn")
+            toast.warning(er[$lang])
 
         }
 }
@@ -650,8 +650,8 @@ function hoverc (event){
 }
  import Cards from './cards/pma.svelte'
   import { nowId } from '$lib/stores/pendMisMes';
-  import { addToast } from 'as-toast';
-export let cards = false;
+  import { toast } from 'svelte-sonner';
+  export let cards = false;
 function claf (event){
   let o = event.detail.alr
   let d = event.detail.y

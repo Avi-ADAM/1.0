@@ -343,12 +343,15 @@ async function start () {
             goto("/login")
           }
         } catch (e) {
-            error1 = e
-            console.log(e)
-            if(e == "TypeError: Failed to fetch"){
-              setTimeout(start(),10000)
-              const msg = {"he":"נראה שיש בעיה בחיבור לאינטרנט, אנו מנסים שוב","en":"seems llike we have a internet connection problem, we are trying again"}
-              addToast(msg[$lang],"warn")
+      error1 = e;
+      console.log(e);
+      if (e == 'TypeError: Failed to fetch') {
+        setTimeout(start(), 10000);
+        const msg = {
+          he: 'נראה שיש בעיה בחיבור לאינטרנט, אנו מנסים שוב',
+          en: 'seems llike we have a internet connection problem, we are trying again'
+        };
+        toast.warning(msg[$lang]);
               //getcetch & show msg this from cetch bcz you have no net
               // else no net page
               //await net then again??
@@ -603,10 +606,8 @@ function close (event){
  addSl5 = false;
 }
 
-
-  import { RingLoader
-} from 'svelte-loading-spinners';
-  import { addToast } from 'as-toast';
+  import { RingLoader } from 'svelte-loading-spinners';
+  import { toast } from 'svelte-sonner';
 let mass = false;
 
 function massss (event){

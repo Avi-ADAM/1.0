@@ -11,7 +11,7 @@
   import moment from 'moment';
   import { userName } from '$lib/stores/store.js';
   import { SendTo } from '$lib/send/sendTo.svelte';
-  import { addToast } from 'as-toast';
+  import { toast } from 'svelte-sonner';
   import { onMount } from 'svelte';
   let myDate = '11:00';
   import MultiSelect from 'svelte-multiselect';
@@ -550,7 +550,7 @@
           } else {
             loading = false
             error = true
-            addToast(er[$lang], 'warn');
+            toast.warning(er[$lang]);
           }
         } catch (e) {
           error1 = e;
@@ -580,7 +580,7 @@
 `;
         let t = await SendTo(qu);
         if (t?.data == null) {
-          addToast(er[$lang], 'warn');
+          toast.warning(er[$lang]);
         } else {
           console.log(t);
           //get id add checklist

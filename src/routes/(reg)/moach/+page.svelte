@@ -10,7 +10,7 @@
   const {isEqual} = pkg;
   import Bethas from '$lib/components/prPr/bethas.svelte';
   import Sidur from '$lib/components/prPr/sidur/sidur.svelte';
-  import { addToast } from 'as-toast';
+  import { toast } from 'svelte-sonner';
   import Pub from '$lib/celim/icons/pub.svelte';
   //	import { draw } from 'svelte/transition';
   import Close from '$lib/celim/close.svelte';
@@ -689,7 +689,7 @@
       success = false;
       start();
     }, 15000);
-    addToast(`${fnnn[$lang]}`, 'info');
+    toast.success(`${fnnn[$lang]}`);
   }
   let meDatamm = [];
   async function updi() {
@@ -738,7 +738,7 @@
     addN = false;
     meDatamm = [];
     needr = [];
-    addToast(cloma[$lang], 'info');
+    toast.success(cloma[$lang]);
   }
   let noofopen = 2;
 
@@ -757,7 +757,7 @@
       a = 0;
       isOpen = true;
     } else {
-      addToast(tovote[$lang], 'info');
+      toast.success(tovote[$lang]);
       a = 0;
       isOpen = true;
     }
@@ -777,7 +777,7 @@
       a = 0;
       isOpen = true;
     } else {
-      addToast(`${tovote[$lang]}`, 'info');
+      toast.success(`${tovote[$lang]}`);
       a = 0;
       isOpen = true;
     }
@@ -854,7 +854,7 @@
               srcP = meDatap.profilePic.url;
               isOpen = false;
               a = 0;
-              addToast(`${picupsu[$lang]}`, 'info');
+              toast.success(`${picupsu[$lang]}`);
             })
             .catch((error) => {
               console.log('צריך לתקן:', error.response);
@@ -897,7 +897,7 @@
               .then((data) => (meDatap = data));
             isOpen = false;
             a = 0;
-            addToast(`${picvots[$lang]}`, 'info');
+            toast.success(`${picvots[$lang]}`);
           } catch (e) {
             console.log(e);
           }
@@ -1079,7 +1079,7 @@
       descripFor = mecata.descripFor;
       isOpen = false;
       a = 0;
-      addToast(`${editfix[$lang]}`, 'info');
+      toast.success(`${editfix[$lang]}`);
     } catch (e) {
       console.log(e);
       if (e.response != undefined) {
@@ -1343,7 +1343,7 @@
       createMes(forumId,m)
      }else{
       console.error(d)
-      addToast(`${er[$lang]}`, 'warn');
+      toast.warning(`${er[$lang]}`);
      }
     }else{
      createMes(chatId,m)
@@ -1392,10 +1392,10 @@ async function createMes(id,mes){
       }
       clicked = false
       console.log(clicked,"sdfaw")
-      addToast(`${messs[$lang]}`, 'info');
+      toast.success(`${messs[$lang]}`);
      }else{
       console.error(d)
-      addToast(`${er[$lang]}`, 'warn');
+      toast.warning(`${er[$lang]}`);
      }
   }
   function openChat(e) {

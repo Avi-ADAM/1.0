@@ -7,7 +7,8 @@
     import {page} from '$app/stores'
   import { createMessage } from "$lib/func/chat/createMessage.svelte";
   import { createForum } from "$lib/func/chat/createForum.svelte";
-  import { addToast } from "as-toast";
+	import {toast } from 'svelte-sonner';
+
   export let un;
      let unsubscribe;
 let messagesArray = forumToArr()
@@ -58,10 +59,10 @@ async function afreact (e){
     if(c == "sucsses"){
         clicked = false
       console.log(clicked)
-      addToast(`${messs[$lang]}`, 'info');
+      toast.success(`${messs[$lang]}`);
     }else{
 
-    addToast(`${er[$lang]}`, 'warn');
+    toast.warning(`${er[$lang]}`);
         clicked = false
     }
   }else{
@@ -82,15 +83,15 @@ async function afreact (e){
     if(c == "sucsses"){
         clicked = false
       console.log(clicked)
-      addToast(`${messs[$lang]}`, 'info');
+      toast.success(`${messs[$lang]}`);
     }else{
 
-    addToast(`${er[$lang]}`, 'warn');
+    toast.warning(`${er[$lang]}`);
         clicked = false
     }
        }else{
       console.error("error")
-      addToast(`${er[$lang]}`, 'warn');
+      toast.warning(`${er[$lang]}`);
      }
   }
 }

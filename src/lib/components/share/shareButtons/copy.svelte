@@ -1,6 +1,6 @@
 <script>
-  import { addToast } from 'as-toast';
-  import CopyToClipboard from "svelte-copy-to-clipboard";
+    import { toast } from 'svelte-sonner';
+    import CopyToClipboard from "svelte-copy-to-clipboard";
   export let exampleText = 'Copy me!';
   import {lang} from '$lib/stores/lang'
   const su = {
@@ -13,12 +13,12 @@
   }
   const handleSuccessfullyCopied = (e) => {
         checked = true
-        addToast(su[$lang],"info")
+        toast.success(su[$lang])
         setTimeout(()=>checked = false,15000)
     }
 
   const handleFailedCopy = () => {
-       addToast(er[$lang],"warn")
+       toast.warning(er[$lang])
        error = true
         setTimeout(()=>checked = true,15000)
   }

@@ -1,7 +1,8 @@
 <script>
   import Chaticon from '../../celim/chaticon.svelte';
   import Diun from './diun.svelte';
-  import { addToast } from 'as-toast';
+  import { toast } from 'svelte-sonner';
+
       export let modal = false
       export let isVisible = false;
     let dialogOpen = false
@@ -206,7 +207,7 @@
         `;
               let t = await SendTo(add);
               if (t?.data == null) {
-                addToast(er[$lang], 'warn');
+                toast.warning(er[$lang]);
               } else {
                 console.log(t);
               }
@@ -226,14 +227,14 @@
           let res = await SendTo(que).then((res) => (res = res));
           console.log(res);
           if (res.data != null) {
-            addToast(suc[$lang]);
+            toast.success(suc[$lang]);
             coinLapach();
           } else {
-            addToast(er[$lang], 'warn');
+            toast.warning(er[$lang]);
           }
         } catch (e) {
           console.error(e);
-          addToast(`${er[$lang]}.${e.status},${e.message}`, 'warn');
+          toast.warning(`${er[$lang]}.${e.status},${e.message}`);
         }
       }
     }
@@ -432,7 +433,7 @@ id: ${pendId}
           });
         }
         messege = messege;
-        addToast(`${fnnn[$lang]}`, 'info');
+        toast.success(`${fnnn[$lang]}`);
 
         setTimeout(function () {
           isOpen = false;

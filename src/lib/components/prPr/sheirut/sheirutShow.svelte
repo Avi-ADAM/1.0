@@ -4,8 +4,8 @@
   import { calcX } from '$lib/func/calcX.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
 import {lang} from '$lib/stores/lang'
-  import { addToast } from 'as-toast';
-  import { onMount } from 'svelte';
+import { toast } from 'svelte-sonner';
+import { onMount } from 'svelte';
 const noap = {"he":"השירות עדיין לא אושר בהצבעה","en":"this service is still on ongoing apruval vote"}
  const oneTimeTr = {"he":"חד פעמי","en":"one time"}
     const oneTimeFl = {"he":"חודשי","en":"monthly"}
@@ -58,7 +58,7 @@ async function ask(id,i){
      setTimeout(function(){  
     success = false
   },15000)
-   addToast(`${fnnn[$lang]}`, 'info');
+   toast.success(`${fnnn[$lang]}`);
            }
  } catch (e) {
       console.error(e);

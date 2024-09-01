@@ -8,8 +8,7 @@
   import { idPr } from '$lib/stores/idPr';
   import { lang } from '$lib/stores/lang'
     const dispatch = createEventDispatcher();
-
-  import { addToast } from 'as-toast';
+    import { toast } from 'svelte-sonner';
   import { createEventDispatcher } from 'svelte';
     export let restime = "feh", usersNum = 1
     let name , descrip,oneTime = false,isPublik = false,already = false, success = false , equaliSplited = true
@@ -108,7 +107,7 @@ let pendque = `mutation {
      setTimeout(function(){  
     success = false
   },15000)
-   addToast(`${fnnn[$lang]}`, 'info');
+   toast.success(`${fnnn[$lang]}`);
    dispatch("close")
 }
     }
@@ -118,7 +117,7 @@ let pendque = `mutation {
      setTimeout(function(){  
     success = false
   },15000)
-   addToast(`${fnnn[$lang]}`, 'info');
+  toast.success(`${fnnn[$lang]}`);
       dispatch("close")
   }
   }

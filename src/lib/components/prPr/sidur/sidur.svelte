@@ -3,7 +3,7 @@
     import TimeGrid from '@event-calendar/time-grid';
     import Interaction from '@event-calendar/interaction'
     import { lang } from '$lib/stores/lang.js';
-      import { addToast } from 'as-toast';
+    import { toast } from 'svelte-sonner';
     import '@event-calendar/core/index.css';
     let ec;
     let count = 0;
@@ -51,7 +51,7 @@
         eventClick: function (eventClickInfo) { 
             //a. choose: in the tvach, not havig my max shift, noon alse has choosed, b.edit my shift , cencel , change hours 
             console.log(eventClickInfo);
-               addToast(` ${eventClickInfo.event.title} המשמרת כבר נבחרה על ידי`, 'info',5000);
+               toast.warning(` ${eventClickInfo.event.title} המשמרת כבר נבחרה על ידי`);
         },
         eventStartEditable: true
     };

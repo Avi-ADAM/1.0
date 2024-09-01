@@ -1,7 +1,7 @@
 <script>
       	import { Drawer } from 'vaul-svelte';
     import {nutifi } from '$lib/func/nutifi.svelte'
-    import { addToast } from 'as-toast';
+    import { toast } from 'svelte-sonner';
   import RangeSlider from "svelte-range-slider-pips";
     import { lang } from '$lib/stores/lang.js'
 	  import { fly, scale } from 'svelte/transition';
@@ -200,11 +200,11 @@ async function azor () {
                 })
                 .then(r => r.json())
                 .then(data => miCatan = data);
-                addToast(azori[$lang])
+                toast.info(azori[$lang])
             console.log(miCatan);
         } catch (e) {
             error1 = e
-            addToast(er[$lang], 'warn');
+            toast.warning(er[$lang]);
             console.log(error1);
         }
 } 
@@ -702,12 +702,12 @@ function claf (event){
                 .then(data => miDatan = data);
             console.log(miDatan);
             isOpen = false;
-               addToast(`${success[$lang]}`, 'info',5000);
+               toast.success(`${success[$lang]}`);
         } catch (e) {
             error1 = e
                         isOpen = false;
             console.log(error1);
-                addToast(er[$lang],"warn")
+                toast.warning(er[$lang])
 }
 
  }
@@ -732,13 +732,13 @@ function claf (event){
  .then (res => res = res);
   console.log(res)
   if(res.data !=null){
-    addToast(suc[$lang])
+    toast.success(suc[$lang])
   }else{
-    addToast(er[$lang],"warn")
+    toast.warning(er[$lang])
   }
 }  catch (e) {
   console.error(e)
-  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
   }
     }
 async function busabe(id){
@@ -757,13 +757,13 @@ async function busabe(id){
  .then (res => res = res);
   console.log(res)
   if(res.data !=null){
-    addToast(suc[$lang])
+    toast.success(suc[$lang])
   }else{
-    addToast(er[$lang],"warn")
+    toast.warning(er[$lang])
   }
 }  catch (e) {
   console.error(e)
-  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
   }
     }
     async function updStat(id,st,i){
@@ -782,14 +782,14 @@ async function busabe(id){
  .then (res => res = res);
   console.log(res)
   if(res.data !=null){
-    addToast(suc[$lang])
+    toast.success(suc[$lang])
     op[i] = false
   }else{
-    addToast(er[$lang],"warn")
+    toast.warning(er[$lang])
   }
 }  catch (e) {
   console.error(e)
-  addToast(`${er[$lang]}.${e.status},${e.message}`,"warn")
+  toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
   }
     }
   let a = 1;

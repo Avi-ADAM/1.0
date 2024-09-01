@@ -14,7 +14,7 @@
   import tr from '$lib/translations/tr.json';
   import { nutifi } from '$lib/func/nutifi.svelte';
   import Yahalomim from '$lib/components/lev/yahalomim.svelte';
-  import { addToast } from 'as-toast';
+  import { toast } from 'svelte-sonner';
   import Mesima from '$lib/components/lev/mesima.svelte';
   import { sendEror } from '$lib/func/sendEror.svelte';
   import { betha } from '$lib/components/lev/storess/betha.js';
@@ -1414,8 +1414,9 @@
           mashs = localStorage.getItem('mashs');
         }
   }
-
+  let nowT 
   onMount(async () => {
+  nowT = Date.now();
     //recover localhost
     localRec()
     /*  if ('serviceWorker' in navigator) {
@@ -1619,7 +1620,7 @@
                     datan.data.attributes.diun.length - 1
                   ].why;
                 if (document.visibilityState == 'visible') {
-                  addToast(head + `: "` + body + `"`);
+                  toast.info(head,{description:body});
                 } else {
                   nutifi(head, body);
                 }
@@ -1704,7 +1705,7 @@
                     datan.data.attributes.diun.length - 1
                   ].why;
                 if (document.visibilityState == 'visible') {
-                  addToast(head + `: "` + body + `"`);
+                  toast(head, {description:body});
                 } else {
                   nutifi(head, body);
                 }
@@ -1829,7 +1830,7 @@
                     datan.data.attributes.chat.length - 1
                   ].why;
                 if (document.visibilityState == 'visible') {
-                  addToast(head + `: "` + body + `"`);
+                  toast(head, {description:body});
                 } else {
                   nutifi(head, body);
                 }
@@ -2096,14 +2097,14 @@
       })
         .then((r) => r.json())
         .then((data) => (miData = data));
-        console.log("1",miData)
+        console.log("1",nowT - Date.now(),miData)
       if (
         miData?.data?.usersPermissionsUser == null ||
         miData?.data == null ||
         miData == null
       ) {
         console.log('login');
-        addToast(`${tolog[$lang]}`, 'info');
+        toast.warning(`${tolog[$lang]}`);
 
         goto('/login?from=/lev');
       }
@@ -2112,11 +2113,11 @@
       counter += 1;
       localStorage.setItem('miDataL', JSON.stringify(miData));
       if (isEqual(miData, miDataold) == true && update != true) {
-        console.log('nada');
+        console.log('nada',nowT - Date.now());
         low = false;
       } else {
         console.log(miDataold);
-        console.log('tada');
+        console.log('tada',nowT - Date.now());
         console.log(miData);
         miData = miData;
         askedm = [];
@@ -2142,32 +2143,39 @@
         tverias = [];
         usernames = miData.data.usersPermissionsUser.data.attributes.username;
         showOpenPro(miData);
+        console.log('openpro',nowT - Date.now());
         midd(miData);
+        console.log('midd',nowT - Date.now());
         makeWalcom(miData);
+        console.log('makeWalcom',nowT - Date.now());
         createasked(miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
+        console.log('createasked',nowT - Date.now());
         createpends(miData);
+        console.log('createpends',nowT - Date.now());
         mesimabetahalicha(miData);
-        console.log('mtaha');
+        console.log('mtaha',nowT - Date.now());
         ishursium(miData);
-        console.log('ishursium');
+        console.log('ishursium',nowT - Date.now());
         sds(miData);
-        console.log('sds');
+        console.log('sds',nowT - Date.now());
         pmash(miData);
-        console.log('pmash');
+        console.log('pmash',nowT - Date.now());
         sps(miData);
+        console.log('sps',nowT - Date.now());
         createmask(miData);
-        console.log('createmask');
+        console.log('createmask',nowT - Date.now());
         crMaap(miData);
-        console.log('crMaap');
+        console.log('crMaap',nowT - Date.now());
         rashbi(miData);
-        console.log('rashbi');
+        console.log('rashbi',nowT - Date.now());
         hachla(miData);
-        console.log('hachla');
+        console.log('hachla',nowT - Date.now());
         tveria(miData);
-        console.log('tveria');
+        console.log('tveria',nowT - Date.now());
         askWants = sharLimud(miData)
-        console.log('scharLimud',askWants)
+        console.log('scharLimud',askWants,nowT - Date.now());
         bubleUiAngin();
+        console.log('bubleUiAngin',nowT - Date.now());
         low = false;
         update = false;
       }

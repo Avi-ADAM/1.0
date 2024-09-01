@@ -1,6 +1,6 @@
 <script>
-    import { addToast } from 'as-toast';
-import SucssesConf from '$lib/celim/sucssesConf.svelte'
+    import { toast } from 'svelte-sonner';
+    import SucssesConf from '$lib/celim/sucssesConf.svelte'
 import Tile from '$lib/celim/tile.svelte'
 import Share from '$lib/components/share/shareButtons/index.svelte'
 import { page } from '$app/stores'
@@ -113,7 +113,7 @@ async function ask() {
      setTimeout(function(){  
     success = false
   },15000)
-   addToast(`${fnnn[$lang]}`, 'info');
+   toast.success(`${fnnn[$lang]}`);
 }
     }
 }
@@ -220,7 +220,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         <div class="flex flex-row justify-between">
             <div class="px-2">
             <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.alld.attributes.name}</h2>
-            {#if data.alld.attributes.descrip !== null && data.alld.attributes.descrip !== "null"  && data.alld.attributes.descrip !== "undefined"  && data.alld.attributes.descrip !== undefined && data.alld.attributes.descrip} 
+            {#if data.alld.attributes.descrip !==  null && data.alld.attributes.descrip !== "null"  && data.alld.attributes.descrip !== "undefined"  && data.alld.attributes.descrip !== undefined && data.alld.attributes.descrip} 
            <RichText outpot={data.alld.attributes.descrip} editable={false}/>{/if}
    
     {#if data.tok == true}

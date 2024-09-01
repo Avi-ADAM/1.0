@@ -1,6 +1,6 @@
 <script>
-  import { addToast } from 'as-toast';
-  import SucssesConf from '$lib/celim/sucssesConf.svelte';
+    import { toast } from 'svelte-sonner';
+    import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import { page } from '$app/stores';
   import { lang } from '$lib/stores/lang.js';
@@ -169,7 +169,7 @@
         setTimeout(function () {
           success = false;
         }, 15000);
-        addToast(`${fnnn[$lang]}`, 'info');
+        toast.success(`${fnnn[$lang]}`);
       }
     }
   }
