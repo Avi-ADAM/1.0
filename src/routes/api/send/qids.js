@@ -178,7 +178,7 @@ export const qids = {
        }
 `,
   '13missionById': `query GetMissionsByid($ids:[ID]) {
-         missions(filters: {id:{in: [$ids]}}) {data{id attributes{
+         missions(filters: {id:{in: $ids}}) {data{id attributes{
                         descrip   missionName 
                             } }}
        }
