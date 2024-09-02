@@ -2,7 +2,7 @@
 import { sendToSer } from '$lib/send/sendToSer.svelte';
 import { json } from '@sveltejs/kit';
 
-const OPENAI_API_KEY = import.meta.env.VITE_OPENAI;
+const OPENAI_API_KEY = import.meta.env.OPENAI;
 
 async function analyzeText(text, predefinedMissions, fetch) {
   const prompt = `
