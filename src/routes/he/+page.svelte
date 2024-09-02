@@ -116,13 +116,13 @@ const word10 = {
 };
 
 const regesh1 = {
-  "he": "רוצה להביא משמעות ושמחה לחיים שלך?",
+  "he": "?רוצה להביא משמעות ושמחה לחיים שלך",
   "en": "Want to bring meaning and joy to your life?",
   "ar": "هل تريد إضفاء الدلالة والفرح على حياتك؟"
 };
 
 const regesh2 = {
-  "he": "רוצה לפתוח דלת אל מציאות חדשה?",
+  "he": "?רוצה לפתוח דלת אל מציאות חדשה",
   "en": "Want to open the door to a new reality?",
   "ar": "هل تريد فتح الباب أمام واقع جديد؟"
 };

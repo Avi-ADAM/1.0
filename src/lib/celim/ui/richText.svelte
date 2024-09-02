@@ -9,6 +9,7 @@
   import StarterKit from '@tiptap/starter-kit';
   import Underline from '@tiptap/extension-underline';
   import LinkIcon from '../icons/linkIcon.svelte';
+  import Separator from './separator.svelte';
   export let outpot = ``;
   export let trans = false
   export let editable = true;
@@ -89,6 +90,7 @@
   let leftsvg = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm-8 4a1 1 0 100-2H2a1 1 0 100 2h8zm9 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-9 5a1 1 0 100-2H2a1 1 0 100 2h8z"></path> </g></svg>`;
   let rightsvg = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm0 4a1 1 0 100-2h-8a1 1 0 100 2h8zm1 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-1 5a1 1 0 100-2h-8a1 1 0 100 2h8z"></path> </g></svg>`;
   let actives = $lang == 'he' ? rightsvg : leftsvg;
+  $: show = false
 </script>
 
 <div
@@ -312,7 +314,28 @@
     class="border-gold border rounded {sml ? "" : "m-2 p-8"} text-barbi bg-{trans == false ? "gold" : "transparent"}"
     bind:this={element}
   />
-  {#if editor && editable}
+  <Separator gradient={true}>
+    <div slot="label" class="border px-2 py-2 rounded-full">
+      <svg
+        on:click={()=> show = !show}
+        on:keypress={()=> show = !show}
+        role="button"
+        tabindex="0"
+        xmlns="http://www.w3.org/2000/svg"
+        width="24"
+        height="24"
+        viewBox="0 0 24 24"
+        fill="none"
+        stroke="currentColor"
+        stroke-width="2"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        class="lucide lucide-plus focus:border-none focus:ring-0"
+        ><path d="M5 12h14" />{#if show != true}<path d="M12 5v14" />{/if}</svg
+      >
+    </div>
+  </Separator>
+  {#if editor && editable && show}
     <div bind:this={menu} class="menu">
       <div
         class="max-w-screen flex flex-wrap items-top justify-center mx-auto pt-0 pr-2 p-4"
@@ -425,7 +448,7 @@
 </div>
 
 <style>
-
+svg:focus { outline: none; }
   #dropdownNavbarLink, #dropdownNavbarLink2 {
     background: var(--barbi-pink);
   }

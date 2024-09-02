@@ -22,6 +22,7 @@
    export let pink = false;
       export let wow = false;
      export let gold = false;
+     export let neww = false;
    export let word = "word";
    export let bg = "blue"
    $: if (bg == "blue"){
@@ -44,6 +45,8 @@
      wow = true;
    }else if (bg == "gold"){
      gold = true;
+   }else if(bg == "neww"){
+     neww = true;
    }
    //gray red green yellow indigo purple pink
 </script>
@@ -84,7 +87,7 @@ class:flex-row-reverse={reverse == true}
 class:mr-2={single != true}
 class:mb-2={single != true}
 class:flex-wrap={pic == true}
- class="drop-shadow-lg  transition-all duration-300 shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center  rounded">
+ class="drop-shadow-lg {neww ? "animate-shine  rounded-full border bg-[linear-gradient(110deg,#000103,45%,#1e2631,55%,#000103)] bg-[length:200%_100%] px-3 py-1 font-medium text-neutral-400 transition-colors" : "rounded-full transition-all duration-300"}  shadow-fuchsia-400 decoration-slate-100  font-semibold inline-flex items-center  ">
    {#if pic}
   <span class=" mx-1">
  <img src={src} alt={alt} class:min-w-12={big == true} class:h-12={big == true} class:min-w-7={big == false} class:h-7={big == false} class=" border-2 border-white max-w-max  rounded-full"/>

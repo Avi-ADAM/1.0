@@ -37,6 +37,7 @@ const config = {
           'linear-gradient(to right, #ff7e5f, #feb47b, #86e3ce, #d4a5a5, #ffdfd3, #d4a5a5, #86e3ce, #feb47b, #ff7e5f)'
       },
       animation: {
+        shine: "shine 2s linear infinite",
         gradientx: 'gradientx 8s linear infinite',
         gradientxslow: 'gradientx 16s linear infinite',
         gradienty: 'gradienty 8s linear infinite'
@@ -47,7 +48,12 @@ const config = {
         },
         gradienty: {
           to: { 'background-position': 'center 200%' }
-        }
+        },
+        shine: {
+          from: { backgroundPosition: "0 0" },
+          to: { backgroundPosition: "-200% 0" },
+        },
+        
       },
       colors: {
         blu: '#04619f',
