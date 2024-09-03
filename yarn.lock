@@ -4978,10 +4978,10 @@ koalas@^1.0.2:
   resolved "https://registry.npmjs.org/koalas/-/koalas-1.0.2.tgz"
   integrity sha512-RYhBbYaTTTHId3l6fnMZc3eGQNW6FVCqMG6AMwA5I1Mafr6AflaXeoi6x3xQuATRotGYRLk6+1ELZH4dstFNOA==
 
-layercake@^8.3.4:
-  version "8.3.4"
-  resolved "https://registry.npmjs.org/layercake/-/layercake-8.3.4.tgz"
-  integrity sha512-r5OrzTxpDp0BQm9m5kJTIzsD5o9nbOkxXTaMzce1LPTigs9PnQfvfjnsAdj/tXpe15BJaP1RVWFgnMDSghJhXw==
+layercake@^7.6.1:
+  version "7.6.1"
+  resolved "https://registry.npmjs.org/layercake/-/layercake-7.6.1.tgz"
+  integrity sha512-YTUpM6Nv0RnMknaoj24MlacLrc05rqvzWWn0orglmaR6iOaljKuBn+xYK4VtOxQ73kGacAskgd4cqBkyTu5aWw==
   dependencies:
     d3-array "^3.2.4"
     d3-color "^3.1.0"
@@ -7416,7 +7416,7 @@ svelte-viewport-info@^1.0.2:
   dependencies:
     tslib "^2.6.2"
 
-svelte@*, "svelte@^3.0.0 || ^4.0.0", "svelte@^3.0.0 || ^4.0.0 || ^5.0.0-next.1", "svelte@^3.19.0 || ^4.0.0", "svelte@^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0", "svelte@^3.53.0 || ^4.0.0 || ^5.0.0", svelte@^4.0.0, "svelte@^4.0.0 || ^5.0.0-next.0", "svelte@^4.0.0 || ^5.0.0-next.1", "svelte@^4.0.0 || ^5.0.0-next.100 || ^5.0.0", "svelte@^4.0.0 || ^5.0.0-next.118", svelte@^4.0.1, svelte@^4.0.4, svelte@^4.2.16, svelte@^4.2.19, svelte@^4.2.8, "svelte@>=3 <5", svelte@>=3.49.0, svelte@>=4, "svelte@3 - 5 || >=5.0.0-next.120", "svelte@3.x || 4.x || 5.x":
+svelte@*, "svelte@^3.0.0 || ^4.0.0", "svelte@^3.0.0 || ^4.0.0 || ^5.0.0-next.1", "svelte@^3.19.0 || ^4.0.0", "svelte@^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0", "svelte@^3.53.0 || ^4.0.0 || ^5.0.0", svelte@^4.0.0, "svelte@^4.0.0 || ^5.0.0-next.0", "svelte@^4.0.0 || ^5.0.0-next.1", "svelte@^4.0.0 || ^5.0.0-next.100 || ^5.0.0", "svelte@^4.0.0 || ^5.0.0-next.118", svelte@^4.0.1, svelte@^4.0.4, svelte@^4.2.16, svelte@^4.2.19, svelte@^4.2.8, "svelte@>=3 <5", svelte@>=3.49.0, svelte@>=4, "svelte@3 - 4", "svelte@3.x || 4.x || 5.x":
   version "4.2.19"
   resolved "https://registry.npmjs.org/svelte/-/svelte-4.2.19.tgz"
   integrity sha512-IY1rnGr6izd10B0A8LqsBfmlT5OILVuZ7XsI0vdGPEvuonFV7NYEUK4dAkm9Zg2q0Um92kYjTpS1CAP3Nh/KWw==

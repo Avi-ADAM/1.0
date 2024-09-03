@@ -16,7 +16,7 @@
     "@threlte/extras": "^8.11.5",
     "@threlte/preprocess": "^0.0.2",
     "autoprefixer": "^10.4.20",
-    "layercake": "^8.3.4",
+    "layercake": "^7.6.1",
     "postcss-load-config": "^6.0.1",
     "svead": "^0.0.4",
     "svelte": "^4.2.19",
