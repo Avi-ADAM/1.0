@@ -62,7 +62,7 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
   class="absolute inline-flex items-center justify-center w-8 h-8 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-[3%] {$lang == "en" ? "right-[3%]" : "left-[3%]"}  dark:border-gray-700">{tasks.length}</div>
   {/if}
   {/key}
-<div dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+<div dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -116,14 +116,16 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
        style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
       class="text-center text-white text-xl">{status != null ? status[0] : "0"}%</div></div></div>
     </div>
-    <div class="flex items-center">
-      </div>
+  
        </div>
        {#if low == false}
        {#if lapse !== 0 || x !== 0}
-       <div class="flex items-center justify-center">
-<button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-4 rounded-full hover:from-lturk hover:to-barbi " on:click={clear}>ניקוי</button>
-<button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-4 rounded-full from-lturk to-barbi " on:click={save}> הוספה</button>
+       <div class="flex items-center justify-center space-x-2">
+<button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")} 
+    class="border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi hover:text-gold  px-4 py-1 rounded hover:from-lturk hover:to-barbi " on:click={clear}>ניקוי</button>
+<button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} 
+   class="  bg-gradient-to-br text-gold hover:text-barbi hover:from-graa hover:to-grab 
+      px-4 py-1 rounded from-lturk to-barbi " on:click={save}> הוספה</button>
     </div>{/if}
     {#if already === false}
     <button on:mouseenter={()=>hover("לחיצה לסיום המשימה")} on:mouseleave={()=>hover("0")} on:click={done}  

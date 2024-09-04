@@ -239,16 +239,16 @@ const pagetitle = {
     style="text-shadow:none;">{setitle[$lang]}</h2>
 		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{desc[$lang]}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{desc2[$lang]}</span></h3>
 		<div dir={$lang == "en" ? "ltr" : "rtl"}>
-      	<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={wordNew[$lang]} animate={true} />
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]} animate={true} />
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word2[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word3[$lang]} animate={true}/>				
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word4[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word5[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word6[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word7[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word8[$lang]} animate={true}/>
-				<Tile bg={"gold"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]} animate={true}/>
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={wordNew[$lang]} />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]}  />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word2[$lang]} />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word3[$lang]} />				
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word4[$lang]} />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word5[$lang]} />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word6[$lang]} />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word7[$lang]} />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word8[$lang]} />
+      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]} />
 				<Tile bg={"wow"} big={true} sm={true} word={word10[$lang]}/>
 				<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>
 			</div>

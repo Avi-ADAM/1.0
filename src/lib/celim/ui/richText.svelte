@@ -314,6 +314,7 @@
     class="border-gold border rounded {sml ? "" : "m-2 p-8"} text-barbi bg-{trans == false ? "gold" : "transparent"}"
     bind:this={element}
   />
+  {#if editor && editable}
   <Separator gradient={true}>
     <div slot="label" class="border px-2 py-2 rounded-full">
       <svg
@@ -335,6 +336,7 @@
       >
     </div>
   </Separator>
+  {/if}
   {#if editor && editable && show}
     <div bind:this={menu} class="menu">
       <div
