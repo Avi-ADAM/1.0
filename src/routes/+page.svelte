@@ -183,7 +183,7 @@ const description = {
 //To establish consensus for non-violence, To allow a network of harmoneus creation
 const pagetitle = {
   en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
-  he: 'הסכמה עולמית על חירות וביטחון | 1💗1️ ליצור ביחד בהסכמה | 1💗1',
+  he: ' ליצור ביחד בהסכמה | הסכמה עולמית על חירות וביטחון | 1💗1',
   ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية'
 };
   let pageurl = {"ar":"https://1lev1.com/ar",
