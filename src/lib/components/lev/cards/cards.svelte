@@ -136,11 +136,10 @@ $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
 <style>
 
    .body{
-      height: 100vh !important;
-      width: 100vw !important;
+      height: 100vh;
+      width: 100vw;
       border: none;
-      height: 100%;
-      width: 100%;
+
       background: #ffcba4;
       background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%);
     }
@@ -181,6 +180,7 @@ $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
         width: 90px;
     }
     }
+
 </style>
 <span  role="contentinfo" on:mouseenter={()=> hoverc(nav[$lang])} 
 on:mouseleave={()=> hoverc("0")}>
@@ -190,7 +190,7 @@ on:mouseleave={()=> hoverc("0")}>
       {#key low}
        {#if arr1.length > 0}
 <div     dir="{$lang == "he" ? "rtl" : "ltr"}" bind:clientWidth={h}
- class="body dark:bg-gradient-to-br dark:from-black dark:via-slate-900 dark:via-slate-800 dark:via-slate-600 dark:to-slate-400 box-border h-screen">
+ class="body box-border h-screen">
      <img on:mouseenter={()=> hoverc(nexttitle[$lang])} 
 on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "perv" : "	next"	}" src="{srcb[$lang]}" alt="{$lang == "he" ? "חזרה" : "	next"	}"/>
 
