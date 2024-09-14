@@ -208,7 +208,7 @@ function back() {
 		const password = e.target.value;
 		validations = [
 		//	password.length > 1,
-			password.length > 8,
+			password.length >= 8,
 			password.search(/[A-Z]/) > -1,
 		//	password.search(/[0-9]/) > -1,
 		//	password.search(/[$&+,:;=?@#]/) > -1,
