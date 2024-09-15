@@ -162,8 +162,9 @@ let noRiset = true
       {#if before && noRiset}
       <div class=" w-full flex-row	flex items-center justify-center z-[1000] space-x-2">
           <MultiSelect
+          --sms-open-z-index={10000}
           closeDropdownOnSelect='desktop'
-          ulOptionsClass="bg-gold z-[10000] position-absolute"
+          ulOptionsClass="bg-gold"
           liSelectedClass='bg-barbi text-gold'
         loading={mission1.length > 0 ? false : true}
         on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
