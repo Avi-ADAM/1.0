@@ -160,7 +160,7 @@ let noRiset = true
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      <div class=" w-full flex-row	flex items-center justify-center z-[1000] space-x-2">
+      <div style="padding-bottom: {!$page.data.isDesktop ? "50vh" :"0"};" class=" w-full flex-row	flex items-center justify-center z-[1000] space-x-2">
           <MultiSelect
           --sms-open-z-index={10000}
           closeDropdownOnSelect='desktop'
