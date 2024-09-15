@@ -196,6 +196,8 @@ function closeMobileModal() {
         <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
         {/if}</div>
         {:else}
+        <Button on:click={openMobileModal}>{placeholder[$lang]}</Button>
+
         <MobileModal isOpen={showMobileModal} title={placeholder[$lang]}>
           <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
             <MultiSelect
