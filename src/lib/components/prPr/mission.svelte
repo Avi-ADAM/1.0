@@ -1026,6 +1026,8 @@
   import LinkIcon from '$lib/celim/icons/linkIcon.svelte';
   import LinkToIcon from '$lib/celim/icons/linkToIcon.svelte';
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
+  import MobileModal from '$lib/celim/ui/mobileModal.svelte';
+  import { page } from '$app/stores';
   let error = false, success = false, loading = false  
   const tri = tr;
   let wid = 0
@@ -1401,6 +1403,7 @@
         </div>
         {/if}
         {:else}
+        {#if $page.data.isDesktop}
         <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
         <MultiSelect
@@ -1420,6 +1423,29 @@
         roles1={roles}
       />
                 </div>
+                {:else}
+                <MobileModal isOpen={ske} title="{placeholder1[$lang]}">
+                  <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
+
+                    <MultiSelect
+                    --sms-open-z-index={10000}
+                    loading={newcontent}
+                    on:change={() => mi.set(miData)}
+                    bind:selected={miData[0].selectedSkills}
+                    placeholder={placeholder1[$lang]}
+                    options={$skil.map((c) => c.attributes.skillName)}
+                    noMatchingOptionsMsg={nom[$lang]}
+                  />
+                  <AddNewSkill
+                    color={'--barbi-pink'}
+                    mid={miData[0].id}
+                    on:addnewskill={addnew}
+                    {addS}
+                    roles1={roles}
+                  />
+                            </div>
+                </MobileModal>
+      {/if}
       {/if}
     </div>   
     <div class='my-2'>
@@ -1436,6 +1462,7 @@
       </div>
       {/if}
       {:else}
+      {#if $page.data.isDesktop}
       <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
       --sms-open-z-index={10000}
@@ -1452,6 +1479,26 @@
       on:addnewrole={addnewrole}
     />
     </div>
+  {:else}
+  <MobileModal isOpen={roleE} title="{placeholder5[$lang]}">
+    <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
+      <MultiSelect
+      --sms-open-z-index={10000}
+      loading={newcontentR}
+      bind:selected={miData[0].selectedRoles}
+      on:change={() => mi.set(miData)}
+      on:add={(event) => console.log(event)}
+      placeholder={placeholder5[$lang]}
+      options={$role.map((c) => c.attributes.roleDescription)}
+    />
+    <Addnewro
+      color={'--barbi-pink'}
+      mid={miData[0].id}
+      on:addnewrole={addnewrole}
+    />
+    </div>
+  </MobileModal>
+  {/if}
     {/if}
     </div>
     <div class='my-2'>
@@ -1469,6 +1516,7 @@
           </div>
           {/if}
           {:else}
+          {#if $page.data.isDesktop}
           <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
             <MultiSelect
               --sms-open-z-index={10000}
@@ -1484,7 +1532,28 @@
                 }}
               />
               </div>
-              {/if}
+             
+              {:else}
+              <MobileModal isOpen={wwe} title="{placeholder[$lang]}">
+                <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
+
+                  <MultiSelect
+                  --sms-open-z-index={10000}
+                    createOptionMsg={addn[$lang]}
+                    allowUserOptions={true}
+                    bind:searchText
+                    loading={newcontentW}
+                    bind:selected={miData[0].selectedWorkways}
+                    placeholder={placeholder[$lang]}
+                    options={$ww.map((c) => c.attributes.workWayName)}
+                    on:change={(e) => {
+                      addW(miData[0].selectedWorkways, miData[0].id, e);
+                    }}
+                  />
+                  </div>
+                  </MobileModal>
+                  {/if}
+                  {/if}
         </div>
         <div>
             {#if assignE}
