@@ -200,7 +200,13 @@ let noRiset = true
  </div>
 
 <style>
-    :global(ul.options){
-    max-height: 40vh;
-  }
+:global(.multiselect-list) {
+  position: fixed !important;
+  top: 50% !important;
+  left: 50% !important;
+  transform: translate(-50%, -50%) !important;
+  max-height: 80vh;
+  overflow-y: auto;
+}
 </style>
+
