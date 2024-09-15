@@ -46,7 +46,7 @@
       border-radius: 8px;
       width: 90%;
       max-width: 500px;
-      max-height: 90vh;
+      height: 90vh;
       overflow-y: auto;
     }
   
