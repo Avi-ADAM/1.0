@@ -1,15 +1,16 @@
 <script>
-  import { page } from '$app/stores';
-     import MultiSelect from 'svelte-multiselect';
+    import { page } from '$app/stores';
+  import MobileModal from '$lib/celim/ui/mobileModal.svelte';
+  import MultiSelect from 'svelte-multiselect';
+  import Arrow from '$lib/celim/icons/arrow.svelte';
+  import { showFoot } from '$lib/stores/showFoot';
     import { createEventDispatcher } from 'svelte';
     import {lang } from '$lib/stores/lang.js' 
     import {mi} from './mi.js'
     import { skil, ww, role } from './mi.js';
   import Button from '$lib/celim/ui/button.svelte';
-  import Arrow from '$lib/celim/icons/arrow.svelte';
   import Mission from "./mission.svelte";
   import { idPr } from '../../stores/idPr.js'
-  import { showFoot } from '$lib/stores/showFoot.js';
  const dispatch = createEventDispatcher();
  export let pn, pl, restime,projectUsers, alit;
  const baseUrl = import.meta.env.VITE_URL
@@ -150,7 +151,23 @@ $: ugug = ``;
 }
 
 let noRiset = true
-  </script>
+let showMobileModal = false;
+
+function openMobileModal() {
+  showMobileModal = true;
+  if ($page.data.isDesktop === false) {
+    showFoot.set(false);
+  }
+}
+
+function closeMobileModal() {
+  showMobileModal = false;
+  if ($page.data.isDesktop === false) {
+    showFoot.set(true);
+  }
+}
+
+</script>
 
 <div dir="{$lang == 'he' ? 'rtl' : 'ltr'}" >
   <slot>
@@ -160,15 +177,13 @@ let noRiset = true
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      <div style="padding-bottom: {!$page.data.isDesktop && !$showFoot ? "80vh" :"0"};" class=" w-full flex-row	flex items-center justify-center  space-x-2">
+      {#if $page.data.isDesktop}
+      <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
           <MultiSelect
-          --sms-open-z-index={10000}
           closeDropdownOnSelect='desktop'
           ulOptionsClass="bg-gold"
           liSelectedClass='bg-barbi text-gold'
         loading={mission1.length > 0 ? false : true}
-        on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
-        on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
         createOptionMsg={addn[$lang]}
         allowUserOptions={"append"}
          bind:searchText={ugug}
@@ -180,6 +195,30 @@ let noRiset = true
           {#if selected[0]}
         <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
         {/if}</div>
+        {:else}
+        <MobileModal isOpen={showMobileModal} title={placeholder[$lang]}>
+          <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
+            <MultiSelect
+            --sms-open-z-index={10000}
+            closeDropdownOnSelect='desktop'
+            ulOptionsClass="bg-gold"
+            liSelectedClass='bg-barbi text-gold'
+          loading={mission1.length > 0 ? false : true}
+          on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
+          on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
+          createOptionMsg={addn[$lang]}
+          allowUserOptions={"append"}
+           bind:searchText={ugug}
+            bind:selected
+            placeholder={placeholder[$lang]}
+            options={mission1.map(c => c.attributes.missionName)}
+          maxSelect={1}
+            />
+            {#if selected[0]}
+          <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
+          {/if}</div>
+        </MobileModal>
+      {/if}
         {/if}
 {#if before == false}
         <Mission    
