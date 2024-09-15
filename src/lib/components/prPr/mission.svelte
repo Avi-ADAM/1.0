@@ -1404,6 +1404,7 @@
         <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
         <MultiSelect
+        --sms-open-z-index={10000}
         loading={newcontent}
         on:change={() => mi.set(miData)}
         bind:selected={miData[0].selectedSkills}
