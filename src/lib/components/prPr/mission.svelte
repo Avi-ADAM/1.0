@@ -1424,7 +1424,7 @@
       />
                 </div>
                 {:else}
-                <MobileModal isOpen={ske} title="{placeholder1[$lang]}">
+                <MobileModal on:close={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
                   <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                     <MultiSelect
@@ -1443,6 +1443,7 @@
                     {addS}
                     roles1={roles}
                   />
+                  <button on:click={()=> ske = false}><Done/></button>
                             </div>
                 </MobileModal>
       {/if}
@@ -1480,7 +1481,7 @@
     />
     </div>
   {:else}
-  <MobileModal isOpen={roleE} title="{placeholder5[$lang]}">
+  <MobileModal on:close={()=> roleE = false} bind:isOpen={roleE} title="{placeholder5[$lang]}">
     <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
       --sms-open-z-index={10000}
@@ -1496,6 +1497,7 @@
       mid={miData[0].id}
       on:addnewrole={addnewrole}
     />
+    <button on:click={()=> roleE = false}><Done/></button>
     </div>
   </MobileModal>
   {/if}
@@ -1534,7 +1536,7 @@
               </div>
              
               {:else}
-              <MobileModal isOpen={wwe} title="{placeholder[$lang]}">
+              <MobileModal on:close={()=> wwe = false} bind:isOpen={wwe} title="{placeholder[$lang]}">
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                   <MultiSelect
@@ -1550,6 +1552,7 @@
                       addW(miData[0].selectedWorkways, miData[0].id, e);
                     }}
                   />
+                  <button on:click={()=> wwe = false}><Done/></button>
                   </div>
                   </MobileModal>
                   {/if}
