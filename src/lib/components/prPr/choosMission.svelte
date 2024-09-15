@@ -160,7 +160,7 @@ let noRiset = true
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      <div style="padding-bottom: {!$page.data.isDesktop ? "50vh" :"0"};" class=" w-full flex-row	flex items-center justify-center z-[1000] space-x-2">
+      <div style="padding-bottom: {!$page.data.isDesktop && !$showFoot ? "80vh" :"0"};" class=" w-full flex-row	flex items-center justify-center z-[1000] space-x-2">
           <MultiSelect
           --sms-open-z-index={10000}
           closeDropdownOnSelect='desktop'
@@ -199,14 +199,5 @@ let noRiset = true
         {/if}
  </div>
 
-<style>
-:global(.multiselect-list) {
-  position: fixed !important;
-  top: 50% !important;
-  left: 50% !important;
-  transform: translate(-50%, -50%) !important;
-  max-height: 80vh;
-  overflow-y: auto;
-}
-</style>
+
 
