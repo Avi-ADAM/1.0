@@ -237,5 +237,20 @@ export const qids = {
             }
           }
 }
-}`
+}`,
+'25UserArr1': `query GetUserArr1($uid: ID!) {	
+  usersPermissionsUser(id: $uid) {
+   data{
+            id
+            attributes{
+              arr1
+              arrdate
+               }
+          }
+}
+}`,
+'26addUserArr1': `mutation AddUserArr1($uid: ID!, $arr: JSON, $arrDate: DateTime) {
+  updateUsersPermissionsUser(id: $uid, data: { arr1: $arr, arrdate: $arrDate}) 
+  {data{id}}
+}	`,
 };

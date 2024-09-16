@@ -60,6 +60,13 @@ export async function initiatePgishot(idL) {
             let meetings = {}
             for(let i=0;i<d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data.length;i++){
                 meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id] = d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]
+                meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id].messages = []
+                meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id].kind = "meeting"
+
+                meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id].messages.push({
+                  timestamp: d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i].attributes.publishedAt,
+                  message: "הפגישה נוצרה"
+                })
                 for(let j=0;j<d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes?.pgishausers?.data.length;j++){
                   console.log(d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes?.pgishausers?.data[j]?.id, get(myUserMeeting))
                     if(d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes?.pgishausers?.data[j]?.id !== get(myUserMeeting)){

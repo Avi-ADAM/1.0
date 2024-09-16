@@ -92,7 +92,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
            if (res4.data != null) {
             console.log(res4.data,"res4")
             if(all == true){
-              username.set(data.usersPermissionsUser.data.attributes.username)
+              username.set(res4.data.usersPermissionsUser.data.attributes.username)
               function extractForums(data) {
                 let forums = [];
                 data.usersPermissionsUser.data.attributes.projects_1s.data.forEach(

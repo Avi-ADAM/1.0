@@ -19,6 +19,7 @@ let messagesArray = forumToArr()
         });
     }
     import { onDestroy } from 'svelte';
+  import { meetingsData } from "$lib/stores/pgishot";
 
   
 
@@ -29,7 +30,10 @@ let messagesArray = forumToArr()
     });
     subs()
 function  forumToArr(){
- let messagesArray = Object.entries($forum)
+  let joined = [$forum, $meetingsData];
+  joined = Object.assign({}, ...joined);
+  joined = joined
+ let messagesArray = Object.entries(joined)
   .filter(([key, value]) => value.hasOwnProperty('messages')) // Ensure the property exists
   .map(([key, value]) => {
     return {
@@ -97,6 +101,7 @@ async function afreact (e){
 }
 let nameChatPartner = {"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}
 </script>
+
 {#if $nowChatId == 0}
 {#key messagesArray}
 <ListSmall bind:chatId chats={messagesArray}/>  
