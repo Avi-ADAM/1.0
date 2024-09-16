@@ -40,7 +40,7 @@ export const POST = async ({ request }) => {
 
      //getNutifiction => check for id and email and username alse ask for email and if exsist send to login with explanation how to reg
     // %0A is url encoded '\n' which is used for new line. 
-    const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
+    const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW;
     const chatId = data.message.from.id
     console.log(chatId)
     const dat = {

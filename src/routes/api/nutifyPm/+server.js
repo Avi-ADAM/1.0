@@ -14,7 +14,7 @@ export async function POST({request, cookies, fetch}){
   const pid = da.pid || 0;
   const title = da.title || { he: '', en: '' };
   const body = da.body || { he: '', en: '' };
-  const lang = cookies.get('lang');
+  const lang = cookies.get('lang') || "he";
   const idL = cookies.get('id');
   console.log(pid,"nutifyPm 15")
   let datau = { data: { arg:{pid}, queId: '3projectJSONQue' } };
@@ -93,8 +93,9 @@ export async function POST({request, cookies, fetch}){
     //    ?.thumbnails.url ??
      // jsonim.data.project.data.attributes.profilePic.data?.attributes?.url
         //jsonim myid messege mainlang pic
-     
-        pusherer(transformedData, idL,pic,title,body,lang,fetch);
+        console.log('before',title,body, transformedData);
+
+        pusherer('https://www.1lev1.com/lev', transformedData, idL,pic,title,body,lang,fetch);
         console.log('after', transformedDataTel);
         sendBolkTelegram(transformedDataTel, idL,title,body,lang,fetch);
         
@@ -110,7 +111,7 @@ export async function POST({request, cookies, fetch}){
          body: body,
          username: user.attributes.username,
          previewText: title,
-         lang :user.attributes.lang == "he" || "en" ? user.attributes.lang : lang
+         lang :user.attributes.lang == "he" || user.attributes.lang ==  "en" ? user.attributes.lang : lang
         }
       }),
       users_permission_user: {

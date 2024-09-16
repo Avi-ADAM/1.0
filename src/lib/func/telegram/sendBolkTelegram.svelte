@@ -12,8 +12,8 @@
       for (let i = 0; i < telegrams.length; i++) {
             const element = telegrams[i];
             if(element.id !== myid){
-              
-                let data = {isNew: true, lang:element.attributes.lang ?? mainlang,chat_id: element.attributes.telegramId,  det :title[element.attributes.lang ?? mainlang] , message : body[element.attributes.lang ?? mainlang],urladd: element.attributes.urladd||"lev" }
+                                const lango = element.users_permission_user.data.attributes.lang == "he" || element.attributes.lang == "en" ? element.attributes.lang : mainlang == "he" || mainlang == "en" ? mainlang : "he" 
+                let data = {isNew: true, lang:lango,chat_id: element.attributes.telegramId,  det :title[lango] , message : body[lango],urladd: element.attributes.urladd||"lev" }
               console.log(data)
                 fetch('https://www.1lev1.com/api/ste', {
                 method: 'POST',  

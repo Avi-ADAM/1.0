@@ -25,10 +25,9 @@ export const POST = async ({ request }) => {
      ${action} %0A 
      ${det}`;
   // %0A is url encoded '\n' which is used for new line.
-  const Token = isNew
-    ? import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW
-    : import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
-  const chatId = isNew ? chat_id : import.meta.env.VITE_TELEGRAM_CHAT_ID;
+  const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN_NEW
+   
+  const chatId = isNew ? chat_id : import.meta.env.VITE_NEW_TELEGRAM;
  if(isNew != true){
     const url = `https://api.telegram.org/bot${Token}/sendMessage?chat_id=${chatId}&text=${botMessage}`;  
   const res = await fetch(url);

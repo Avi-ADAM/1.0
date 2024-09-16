@@ -12,8 +12,11 @@
       console.log(jsonim) 
       for (let i = 0; i < jsonim.length; i++) {
             const element = jsonim[i];
+                  const lango = element.users_permission_user.data.attributes.lang == "he" || element.users_permission_user.data.attributes.lang == "en" ? element.users_permission_user.data.attributes.lang : mainlang == "he" || mainlang == "en" ? mainlang : "he" 
+
+            console.log(element)
             if(element.users_permission_user.data.id !== myid){
-                let data = {jsoni: element.jsoni, messege :{url, body: body[element.users_permission_user.data.attributes.lang ?? mainlang], pic, title: title[element.users_permission_user.data.attributes.lang ?? mainlang]}}
+                let data = {jsoni: element.jsoni, messege :{url, body: body[lango], pic, title: title[lango]}}
                 fetch('/api/pusher', {
                 method: 'POST',  
                 headers: {

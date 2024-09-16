@@ -14,7 +14,7 @@ export async function POST({request, cookies, fetch}){
   const uid = da.uid || 0;
   const title = da.title || { he: '', en: '' };
   const body = da.body || { he: '', en: '' };
-  const lang = cookies.get('lang');
+  const lang = cookies.get('lang') || "he";
   const idL = cookies.get('id');
   console.log(uid,"nutifyUser 15")
   let datau = { data: { arg:{uid}, queId: '24userJSONQue' } };
