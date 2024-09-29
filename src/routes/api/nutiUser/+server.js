@@ -72,6 +72,7 @@ export async function POST({request, cookies, fetch}){
             }
         //link to mail, to push, callback button to terlegram
         const user = jsonim.data.usersPermissionsUser.data
+        if(user.attributes.noMail != true){
   const transformedDataMail = [{
       email: user.attributes.email,
       emailHtml:  render({
@@ -96,5 +97,6 @@ export async function POST({request, cookies, fetch}){
     }]
   
   sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
+        }
     return new Response    
 }

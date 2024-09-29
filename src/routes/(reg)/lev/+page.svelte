@@ -39,6 +39,8 @@
   import Love from '$lib/func/lev/love.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { page } from '$app/stores';
   export let data;
   let low = true;
   let indexi = -1;
@@ -1860,8 +1862,15 @@
     }
   });
   export const snapshot = {
-    capture: () => JSON.parse(JSON.stringify(arr1)),
-    restore: (value) => (arr1 = value)
+    capture:  () => 
+      JSON.parse({arr1:JSON.stringify(arr1),date:new Date})
+     ,
+    restore: async (value) => {arr1 = value.arr1
+      console.log("ARR!JSON__out",value)
+      await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
+        console.log("ARR!JSON__out_ser",v)
+      })
+    }
   };
   let usernames;
   const tolog = {
@@ -1946,7 +1955,7 @@
         													}}}
      									 }}} 
   	projects_1s {data{id attributes{ projectName restime
-    			user_1s {data{id attributes{username haskamaz haskamac email haskama profilePic {data{attributes{ url formats }}}}}} 
+    			user_1s {data{id attributes{username haskamaz haskamac email noMail haskama profilePic {data{attributes{ url formats }}}}}} 
     			profilePic {data{attributes{ url formats }}} 
           sheirutpends(filters:{ archived: { eq: false } }){data{id attributes{
             sheirut{data{id attributes{name descrip equaliSplited oneTime}}}
@@ -3439,7 +3448,7 @@
 
   let xy = [];
 
-  function bubleUiAngin() {
+  async function bubleUiAngin() {
     arr1 = [
       ...tverias,
       ...walcomen,
@@ -3469,6 +3478,11 @@
 
     createD();
     console.log(arr1);
+    const x = new Date();
+      const d = x.toISOString();
+      await sendToSer({uid: $page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
+        console.log("ARR!JSON",v)
+      })
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart
   }
   const defaulti = { he: 'מסך הלב', en: 'heart of 1💗1' };

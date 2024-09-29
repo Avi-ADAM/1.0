@@ -102,6 +102,7 @@ export async function POST({request, cookies, fetch}){
   const transformedDataMail =
   jsonim.data.project.data.attributes.user_1s.data.flatMap((user) => {
     //filter by if email not null or undefined
+    if(user.attributes.noMail != true){
     return{
       email: user.attributes.email,
       emailHtml:  render({
@@ -124,6 +125,7 @@ export async function POST({request, cookies, fetch}){
         }
       }
     }
+  }
   })
   sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
     return new Response    

@@ -38,6 +38,7 @@ export const qids = {
               lang 
               email
               username
+              noMail
               machshirs{data{id attributes{jsoni}}}
             }
           }
@@ -232,6 +233,7 @@ export const qids = {
               telegramId
               lang 
               email
+              noMail
               username
               machshirs{data{id attributes{jsoni}}}
             }

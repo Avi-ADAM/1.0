@@ -2,33 +2,33 @@
 <script>
     import { liUN } from '$lib/stores/liUN.js';
 
-import Arrow from '$lib/celim/icons/arrow.svelte'
-	import Close from '$lib/celim/close.svelte'
-  import Lowding from '$lib/celim/lowding.svelte'
+  import Arrow from '$lib/celim/icons/arrow.svelte';
+  import Close from '$lib/celim/close.svelte';
+  import Lowding from '$lib/celim/lowding.svelte';
   import { TourItem } from 'svelte-tour';
  import { run } from 'svelte-tour';
     import { Tour } from 'svelte-tour';
   import TourTip from '$lib/components/tour/tourMeEnd.svelte';
- import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+  import { lang, doesLang, langUs } from '$lib/stores/lang.js';
   import { onMount } from 'svelte';
-  import axios from 'axios'
+  import axios from 'axios';
 	import { draw } from 'svelte/transition';
  import Addnew from '$lib/components/addnew/baci.svelte';
 import Addnewp from '$lib/components/userPr/uploadPic.svelte';
-import { uPic } from  '$lib/stores/uPic.js';
+  import { uPic } from '$lib/stores/uPic.js';
 import Edit from '$lib/components/userPr/edit.svelte';
 import EditB from '$lib/components/userPr/editBasic.svelte';
-const baseUrl = import.meta.env.VITE_URL
+  const baseUrl = import.meta.env.VITE_URL;
 //import Profile from '../../lib/components/userPr/new.svelte';
 //import { addS } from '../../lib/stores/addS.js';
 import { idPr } from '$lib/stores/idPr.js';
-    import { goto} from '$app/navigation';
+  import { goto } from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-      import {  fly, scale } from 'svelte/transition';
-let iwant = false
+  import { fly, scale } from 'svelte/transition';
+  let iwant = false;
 let isOpen = false;
-  let isG = false
-    let current = "";
+  let isG = false;
+  let current = '';
 
     let url1 = `${baseUrl}/api/upload`;
     let updX = 0;
@@ -36,15 +36,16 @@ let isOpen = false;
   let files;
   let idLi;
 
-  let skil =[];
-  let taf =[];
+  let skil = [];
+  let taf = [];
   let mash = [];
   let val = [];
   let work = [];
   let total = 0;
   let odata = [];
     let allvn;
-  let picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
+  let picLink =
+    'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
   let idL;
   let addSl = false;
 let addSl1 = false;
@@ -60,54 +61,51 @@ let addNs1 = true;
     let st = 0;
     let stylef = '31px';
     let meData = start();
-function letters(data){
-
+  function letters(data) {
    if (data.length >= 2 && data.length < 4) {
         st = 185;
-     }
-  else if (data.length >= 4 && data.length < 5) {
+    } else if (data.length >= 4 && data.length < 5) {
         st = 180;
-     }
-  else if (data.length >= 5 && data.length < 6) {
+    } else if (data.length >= 5 && data.length < 6) {
         st = 170;
      } else if (data.length >= 6 && data.length < 7) {
-        st = 165
+      st = 165;
      } else if (data.length >= 7 && data.length < 8) {
-        st = 160
-     }else if (data.length >= 8 && data.length < 9) {
-        st = 150
-     }else if (data.length >= 9 && data.length < 10) {
-            st = 140
-     }else if (data.length >= 10 && data.length < 11) {
+      st = 160;
+    } else if (data.length >= 8 && data.length < 9) {
+      st = 150;
+    } else if (data.length >= 9 && data.length < 10) {
+      st = 140;
+    } else if (data.length >= 10 && data.length < 11) {
             st = 130;
-     }else if (data.length >= 11 && data.length < 12) {
+    } else if (data.length >= 11 && data.length < 12) {
             st = 135;
             stylef = '29px';
-    } else  if (data.length >= 12 && data.length <13) {
+    } else if (data.length >= 12 && data.length < 13) {
                 st = 130;
                 stylef = '29px';
-     }else  if (data.length >= 13 && data.length <14) {
+    } else if (data.length >= 13 && data.length < 14) {
                 st = 125;
                 stylef = '25px';
-     }else  if (data.length >= 14 && data.length <15) {
+    } else if (data.length >= 14 && data.length < 15) {
                 st = 125;
                 stylef = '25px';
-     }else  if (data.length >= 15 && data.length <17) {
+    } else if (data.length >= 15 && data.length < 17) {
                 st = 125;
                 stylef = '25px';
-     }else  if (data.length >= 17 && data.length <19) {
+    } else if (data.length >= 17 && data.length < 19) {
                 st = 130;
                 stylef = '19px';
-     }else  if (data.length >= 19 && data.length <20) {
+    } else if (data.length >= 19 && data.length < 20) {
                 st = 130;
                 stylef = '17px';
-     }else  if (data.length >= 20 && data.length <21) {
+    } else if (data.length >= 20 && data.length < 21) {
                 st = 125;
                 stylef = '17px';
-     }else  if (data.length >= 21 && data.length <22) {
+    } else if (data.length >= 21 && data.length < 22) {
                 st = 125;
                 stylef = '16px';
-     } else  if (data.length >= 22){
+    } else if (data.length >= 22) {
                        st = 125;
          stylef = '14px';
     }
@@ -116,64 +114,60 @@ function letters(data){
     //  }
 }
 //
-   function sendP () {
+  function sendP() {
     const cookieValue = document.cookie
   .split('; ')
-  .find(row => row.startsWith('jwt='))
+      .find((row) => row.startsWith('jwt='))
   .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
-  .find(row => row.startsWith('id='))
+      .find((row) => row.startsWith('id='))
   .split('=')[1];
   idLi = cookieValueId;
-    token  = cookieValue;
+    token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
-    let link =`${baseUrl}/api/users/${idLi}` ;
+    let link = `${baseUrl}/api/users/${idLi}`;
   //  let fd = new FormData();
      //   fd.append('files', files[0]);
       axios
-     .post( url1, files  ,{
+      .post(url1, files, {
                     headers: {
-                        Authorization: bearer1,
-                    },
+          Authorization: bearer1
+        }
                 })
                 .then(({ data }) => {
                     const imageId = data[0].id;
-                    sendpg(imageId)
+        sendpg(imageId);
      })
-      .catch(error => {
+      .catch((error) => {
         console.log('צריך לתקן:', error.response);
                 });
+  }
 
-  };
-
-
-
-    async function sendpg(imageId){
+  async function sendpg(imageId) {
        const cookieValue = document.cookie
   .split('; ')
-  .find(row => row.startsWith('jwt='))
+      .find((row) => row.startsWith('jwt='))
   .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
-  .find(row => row.startsWith('id='))
+      .find((row) => row.startsWith('id='))
   .split('=')[1];
   idLi = cookieValueId;
-    token  = cookieValue;
+    token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
-       let res
-    let linkg =`${baseUrl}/graphql` ;
+    let res;
+    let linkg = `${baseUrl}/graphql`;
         try {
            await fetch(linkg, {
               method: 'POST',
 
         headers: {
-            'Authorization': bearer1,
+          Authorization: bearer1,
             'Content-Type': 'application/json'
                   },
-        body:
-        JSON.stringify({query:
-           `mutation { updateUsersPermissionsUser(
+        body: JSON.stringify({
+          query: `mutation { updateUsersPermissionsUser(
     id:${idLi}
       data: {profilePic: ${imageId} }
 
@@ -190,40 +184,40 @@ function letters(data){
 `
         })
 })
-  .then(r => r.json())
-  .then(data => res = data.data.updateUsersPermissionsUser.data);
-  console.log(res)
+        .then((r) => r.json())
+        .then((data) => (res = data.data.updateUsersPermissionsUser.data));
+      console.log(res);
             uPic.set(res.attributes.profilePic.data.attributes.formats.thumbnail.url);
-            picLink =  $uPic;
+      picLink = $uPic;
             uPic.set(res.attributes.profilePic.data.attributes.formats.small.url);
-            picLink =  $uPic;
+      picLink = $uPic;
     updX = 0;
     isOpen = false;
     a = 0;
         } catch (e) {
-            error1 = e
+      error1 = e;
         }
     }
     let meDataa = [];
-let load = false
-function project (id) {
-  load = true
+  let load = false;
+  function project(id) {
+    load = true;
     idPr.set(id);
-    goto("/moach");
-  };
-let mail,lango;
-let cards = true
-async function start () {
+    goto('/moach');
+  }
+  let mail, lango;
+  let cards = true;
+  async function start() {
     const cookieValue = document.cookie
   .split('; ')
-  .find(row => row.startsWith('jwt='))
+      .find((row) => row.startsWith('jwt='))
   .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
-  .find(row => row.startsWith('id='))
+      .find((row) => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue;
+    token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       let linkgra = `${baseUrl}/graphql`;
@@ -231,12 +225,11 @@ async function start () {
              await fetch(linkgra, {
               method: 'POST',
         headers: {
-            'Authorization': bearer1,
+          Authorization: bearer1,
             'Content-Type': 'application/json'
                   },
-        body:
-        JSON.stringify({query:
-          `query { usersPermissionsUser (id: ${idL}){
+        body: JSON.stringify({
+          query: `query { usersPermissionsUser (id: ${idL}){
     data {
       id attributes{
            frd
@@ -246,101 +239,133 @@ async function start () {
             lang
             machshirs{data{id attributes{jsoni}}}
             email
+            noMail
             username
             hervachti
             profilManualAlready
             profilePic { data{ attributes{url formats} }}
             projects_1s {data{ id attributes {projectName}} }
-            skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ""}}}}
+            skills { data{ id attributes{ skillName ${$lang == 'he' ? 'localizations { data {attributes{skillName} }}' : ''}}}}
             sps (filters: { archived: { ne: true } }) { data{id attributes{ name panui}}}
-            tafkidims { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ""}}}}
-            vallues {data{ id attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ""}}}}
-            work_ways {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ""}}}}
+            tafkidims { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ''}}}}
+            vallues {data{ id attributes {valueName ${$lang == 'he' ? 'localizations{ data { attributes{ valueName } } }' : ''}}}}
+            work_ways {data{ id attributes{workWayName  ${$lang == 'he' ? 'localizations {data{attributes{workWayName}} }' : ''}}}}
           }
         }
       }me { id }
  } `
- } )})
-  .then(r => r.json())
-  .then(data => meDataa = data);
-  if(meDataa.data != null){
-      if (meDataa.data.me.id === idL && meDataa.data.me != null){
-          if (meDataa.data.usersPermissionsUser.data.attributes.profilManualAlready != true){
-            run()
+        })
+      })
+        .then((r) => r.json())
+        .then((data) => (meDataa = data));
+      if (meDataa.data != null) {
+        if (meDataa.data.me.id === idL && meDataa.data.me != null) {
+          if (
+            meDataa.data.usersPermissionsUser.data.attributes
+              .profilManualAlready != true
+          ) {
+            run();
           }
-        meData =  meDataa.data.usersPermissionsUser.data.attributes
-        isG = meDataa.data.usersPermissionsUser.data.attributes.profilManualAlready
+          meData = meDataa.data.usersPermissionsUser.data.attributes;
+          isG =
+            meDataa.data.usersPermissionsUser.data.attributes
+              .profilManualAlready;
        mail = meData.email;
-       liUN.set(meData.username)
+          liUN.set(meData.username);
           letters(meData.username);
             lango = meData.lang;
-            if (lango == "en" || lango == "he") {
-              lang.set(lango)
-              doesLang.set(true)
-              langUs.set(lango)
+          if (lango == 'en' || lango == 'he') {
+            lang.set(lango);
+            doesLang.set(true);
+            langUs.set(lango);
               //add to coocies
-              document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+            document.cookie =
+              `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
             }
-            if ($lang == "he"){
-              for (var i = 0; i < meData.vallues.data.length; i++){
-                if (meData.vallues.data[i].attributes.localizations.data.length > 0){
-                meData.vallues.data[i].attributes.valueName = meData.vallues.data[i].attributes.localizations.data[0].attributes.valueName
+          if ($lang == 'he') {
+            for (var i = 0; i < meData.vallues.data.length; i++) {
+              if (
+                meData.vallues.data[i].attributes.localizations.data.length > 0
+              ) {
+                meData.vallues.data[i].attributes.valueName =
+                  meData.vallues.data[
+                    i
+                  ].attributes.localizations.data[0].attributes.valueName;
                 }
               }
             }
-              if ($lang == "he"){
-             for (var i = 0; i < meData.skills.data.length; i++){
-                if (meData.skills.data[i].attributes.localizations.data.length > 0){
-                meData.skills.data[i].attributes.skillName = meData.skills.data[i].attributes.localizations.data[0].attributes.skillName
+          if ($lang == 'he') {
+            for (var i = 0; i < meData.skills.data.length; i++) {
+              if (
+                meData.skills.data[i].attributes.localizations.data.length > 0
+              ) {
+                meData.skills.data[i].attributes.skillName =
+                  meData.skills.data[
+                    i
+                  ].attributes.localizations.data[0].attributes.skillName;
                 }
               }
             }
-            meData = meData
+          meData = meData;
 
-                        if ($lang == "he"){
-             for (var i = 0; i < meData.tafkidims.data.length; i++){
-                if (meData.tafkidims.data[i].attributes.localizations.data.length > 0){
-                meData.tafkidims.data[i].attributes.roleDescription = meData.tafkidims.data[i].attributes.localizations.data[0].attributes.roleDescription
+          if ($lang == 'he') {
+            for (var i = 0; i < meData.tafkidims.data.length; i++) {
+              if (
+                meData.tafkidims.data[i].attributes.localizations.data.length >
+                0
+              ) {
+                meData.tafkidims.data[i].attributes.roleDescription =
+                  meData.tafkidims.data[
+                    i
+                  ].attributes.localizations.data[0].attributes.roleDescription;
                 }
               }
             }
-            meData = meData
-            if ($lang == "he"){
-             for (var i = 0; i < meData.work_ways.data.length; i++){
-                if (meData.work_ways.data[i].attributes.localizations.data.length > 0){
-                meData.work_ways.data[i].attributes.workWayName = meData.work_ways.data[i].attributes.localizations.data[0].attributes.workWayName
+          meData = meData;
+          if ($lang == 'he') {
+            for (var i = 0; i < meData.work_ways.data.length; i++) {
+              if (
+                meData.work_ways.data[i].attributes.localizations.data.length >
+                0
+              ) {
+                meData.work_ways.data[i].attributes.workWayName =
+                  meData.work_ways.data[
+                    i
+                  ].attributes.localizations.data[0].attributes.workWayName;
                 }
               }
             }
-            cards = meData.preferCards ?? true
+          cards = meData.preferCards ?? true;
         //    roundText (meData.username);
            /// pics = meData.profilePic.formats.small.url;
 
             total = meData.hervachti ? meData.hervachti : 0;
-            fblink = meData.fblink
-            twiterlink = meData.twiterlink
-            discordlink = meData.discordlink
+          fblink = meData.fblink;
+          twiterlink = meData.twiterlink;
+          discordlink = meData.discordlink;
             githublink = meData.githublink;
-            if (meData.profilePic.data != null){
+          noMail = meData.noMail;
+          if (meData.profilePic.data != null) {
             uPic.set(meData.profilePic.data.attributes.formats.thumbnail.url);
-            picLink =  $uPic;
+            picLink = $uPic;
             uPic.set(meData.profilePic.data.attributes.formats.small.url);
             picLink = $uPic;
-            let b = "/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max"
+            let b = '/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max';
             var output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
-            picLink = output
+            picLink = output;
             } else {
-              picLink = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"
+            picLink =
+              'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
             }
             localStorage.setItem('picLink', JSON.stringify(picLink));
 
             total = meData.hervachti;
-            meData=meData
+          meData = meData;
           } else {
-            goto("/login")
+          goto('/login');
           }
         } else {
-            goto("/login")
+        goto('/login');
           }
         } catch (e) {
       error1 = e;
@@ -357,10 +382,10 @@ async function start () {
               //await net then again??
             }
         }
-        return meData
-    };
+    return meData;
+  }
     function reverseString(str) {
-    return str.split("").reverse().join("");
+    return str.split('').reverse().join('');
 }
  export const snapshot = {
     capture: () => JSON.parse(JSON.stringify(meData)),
@@ -368,16 +393,14 @@ async function start () {
   };
 function getCookie(name) {
     var dc = document.cookie;
-    var prefix = name + "=";
-    var begin = dc.indexOf("; " + prefix);
+    var prefix = name + '=';
+    var begin = dc.indexOf('; ' + prefix);
     if (begin == -1) {
         begin = dc.indexOf(prefix);
         if (begin != 0) return null;
-    }
-    else
-    {
+    } else {
         begin += 2;
-        var end = document.cookie.indexOf(";", begin);
+      var end = document.cookie.indexOf(';', begin);
         if (end == -1) {
         end = dc.length;
         }
@@ -399,30 +422,32 @@ function getCookie(name) {
 let userName_value;
 let biog;
 let frd;
-let fblink, twiterlink,discordlink,githublink;
-function sendD () {
+  let fblink, twiterlink, discordlink, githublink, noMail;
+  function sendD() {
   //todo refresh data if lang changed
-  if (lango == "en" || lango == "he") {
-              lang.set(lango)
-              doesLang.set(true)
-              langUs.set(lango)
+    if (lango == 'en' || lango == 'he') {
+      lang.set(lango);
+      doesLang.set(true);
+      langUs.set(lango);
             } else {
-              lango = "ar"
+      lango = 'ar';
             }
     const cookieValue = document.cookie
   .split('; ')
-  .find(row => row.startsWith('jwt='))
+      .find((row) => row.startsWith('jwt='))
   .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
-  .find(row => row.startsWith('id='))
+      .find((row) => row.startsWith('id='))
   .split('=')[1];
   idLi = cookieValueId;
-    token  = cookieValue;
+    token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
-    let link =`${baseUrl}/api/users/${idLi}`
+    let link = `${baseUrl}/api/users/${idLi}`;
       axios
-      .put(link, {
+      .put(
+        link,
+        {
         username: userName_value,
     bio: biog,
     frd: frd,
@@ -431,33 +456,33 @@ function sendD () {
      twiterlink: twiterlink,
      discordlink: discordlink,
      githublink: githublink,
-     preferCards: cards
+          preferCards: cards,
+          noMail: noMail
                   },
       {
       headers: {
-        'Authorization': bearer1
-                }})
-      .then(response => {
+            Authorization: bearer1
+          }
+        }
+      )
+      .then((response) => {
         meData = response.data;
 
     isOpen = false;
     a = 0;
-    start()
+        start();
   //  updpic.set(0);
                   })
-      .catch(error => {
+      .catch((error) => {
         console.log('צריך לתקן:', error.response);
                 });
-
-};
-
-
+  }
 
 function callbackFunction(event) {
     a = 2;
     files = event.detail.files;
     console.log(files);
-    sendP ();
+    sendP();
 	}
   	function callbackFunctio(event) {
     a = 2;
@@ -467,52 +492,52 @@ function callbackFunction(event) {
      githublink = event.detail.githublink;
     userName_value = event.detail.un;
    // emailL = event.detail.em;
+    noMail = event.detail.noMail;
     biog = event.detail.bi;
     frd = event.detail.frd;
     lango = event.detail.lango;
-    cards = event.detail.cards
-    sendD ();
+    cards = event.detail.cards;
+    sendD();
 }
 
-
-function remove (event) {
+  function remove(event) {
   const miDatanew = event.detail.data;
   const linkp = event.detail.linkp;
   addNs1 = false;
   meData[linkp].data = miDatanew;
-  console.log(miDatanew,meData)
+    console.log(miDatanew, meData);
   skil = meData.skills.data;
             taf = meData.tafkidims.data;
             val = meData.vallues.data;
             mash = meData.sps.data;
             work = meData.work_ways.data;
-            meData = meData
+    meData = meData;
             addNs1 = true;
-};
+  }
 
-async function add (event) {
+  async function add(event) {
  const linkp = event.detail.linkp;
  const miDatanew = event.detail.data;
  const valc = event.detail.valc;
  const a = event.detail.a;
  miDatanew.selected2 = [];
-  console.log(miDatanew,meData)
+    console.log(miDatanew, meData);
  addNs1 = false;
  const meDatanew = meData;
  meDatanew[linkp].data = miDatanew;
- console.log (meDatanew);
+    console.log(meDatanew);
  meData = meDatanew;
  skil = meData.skills.data;
             taf = meData.tafkidims.data;
             val = meData.vallues.data;
             mash = meData.sps.data;
             work = meData.work_ways.data;
-            meData = meData
+    meData = meData;
   addNs1 = true;
-  console.log(a)
-};
+    console.log(a);
+  }
 
-async function addnew (event) {
+  async function addnew(event) {
   const linkp = event.detail.linkp;
  const skob = event.detail.skob;
  const miDatanew = event.detail.data;
@@ -520,34 +545,33 @@ async function addnew (event) {
  addNs1 = false;
  const meDatanew = meData;
  meDatanew[linkp].data = miDatanew;
- console.log (meDatanew);
+    console.log(meDatanew);
  meData = meDatanew;
  skil = meData.skills.data;
             taf = meData.tafkidims.data;
             val = meData.vallues.data;
             mash = meData.sps.data;
             work = meData.work_ways.data;
-            meData = meData
+    meData = meData;
   addNs1 = true;
-};
+  }
 const closer = () => {
     isOpen = false;
     updX = 0;
   addpic = 0;
   a = 0;
 };
-function basic (){
+  function basic() {
       isOpen = true;
       a = 1;
 }
-function openen () {
+  function openen() {
   isOpen = true;
   updX = 1;
   addpic = 1;
 }
 
-function open (event){
-
+  function open(event) {
  addSl1 = false;
  addSl2 = false;
  addSl3 = false;
@@ -555,12 +579,11 @@ function open (event){
  addSl5 = false;
  const a = event.detail.linkp;
   console.log(addSl);
-  if (a == "tafkidims"){
- current = "a2"
+    if (a == 'tafkidims') {
+      current = 'a2';
     addSl2 = true;
-  }
-  else if (a == "skills"){
-    current = "a1";
+    } else if (a == 'skills') {
+      current = 'a1';
     addSl1 = true;
   }
   else if (a == "vallues"){
@@ -610,71 +633,74 @@ function close (event){
   import { toast } from 'svelte-sonner';
 let mass = false;
 
-function massss (event){
-  console.log("here")
-  if (event.detail.mass == true){
+  function massss(event) {
+    console.log('here');
+    if (event.detail.mass == true) {
   mass = true;
-  } else  if (event.detail.mass == false){
+    } else if (event.detail.mass == false) {
     mass = false;
   }
 }
 let messege;
 let spid;
-function delm ( event){
+  function delm(event) {
   isOpen = true;
-  a = 3
+    a = 3;
   const nj = event.detail.nj;
-  spid = event.detail.id
-  messege = $lang == "he" ? `המשאב ${nj} ימחק האם להמשיך?` : `the resource ${nj} will be deleted, do you want to continue?`;
+    spid = event.detail.id;
+    messege =
+      $lang == 'he'
+        ? `המשאב ${nj} ימחק האם להמשיך?`
+        : `the resource ${nj} will be deleted, do you want to continue?`;
 }
 let miDa = [];
-async function han (){
-  a = 2
- console.log(spid)
+  async function han() {
+    a = 2;
+    console.log(spid);
    const cookieValue = document.cookie
   .split('; ')
-  .find(row => row.startsWith('jwt='))
+      .find((row) => row.startsWith('jwt='))
   .split('=')[1];
-    token  = cookieValue;
+    token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
  let linkgra = `${baseUrl}/graphql`;
     try {
              await fetch(linkgra, {
               method: 'POST',
         headers: {
-            'Authorization': bearer1,
+          Authorization: bearer1,
             'Content-Type': 'application/json'
                   },
-        body:
-        JSON.stringify({query:
-          `mutation { updateSp(
+        body: JSON.stringify({
+          query: `mutation { updateSp(
    id: ${spid}
       data: {
         archived: true
       }
   ) {data {id }}
  } `
- } )})
-  .then(r => r.json())
-  .then(data => miDa = data);
-         console.log(miDa)
-        const tor = miDa.data.updateSp.data.id
-        const oldob = meData.sps.data
-        const x = oldob.map(c => c.id);
+        })
+      })
+        .then((r) => r.json())
+        .then((data) => (miDa = data));
+      console.log(miDa);
+      const tor = miDa.data.updateSp.data.id;
+      const oldob = meData.sps.data;
+      const x = oldob.map((c) => c.id);
         const indexy = x.indexOf(tor);
         oldob.splice(indexy, 1);
         meData.sps.data = oldob;
-        meData = meData
+      meData = meData;
         a = 0;
         isOpen = false;
         } catch (e) {
-            error1 = e
+      error1 = e;
         }
 }
 //
-function guid(){
-  isG = true
-  run()
+  function guid() {
+    isG = true;
+    run();
 }
 const title = {"he": "פרופיל והגדרות 1💗1", "en": "1💗1 profile and settings"}
 const deletew = {"he": "מחיקה" , "en": "delete"};
@@ -734,11 +760,26 @@ let width,height
              <button style="margin: 0 auto;" class=" hover:bg-barbi text-mturk rounded-full p-2"
           on:click={closer}><Close/></button>
           {#if a == 0}
-          <Addnewp on:message={callbackFunction}/>
-
-
+            <Addnewp on:message={callbackFunction} />
           {:else if a == 1}
-          <EditB machshirs={meData?.machshirs.data} projectIds={meData.projects_1s.data.map(c=>c.id)} bind:isGuidMe={isG} checked={cards} uid={meDataa.data.me.id} {fblink}{twiterlink}{discordlink}{githublink} frd={meData.frd} {mail} un={meData.username} bi={meData.bio} on:message={callbackFunctio} on:guid={guid}/>
+            <EditB
+              machshirs={meData?.machshirs.data}
+              projectIds={meData.projects_1s.data.map((c) => c.id)}
+              bind:isGuidMe={isG}
+              checked={cards}
+              uid={meDataa.data.me.id}
+              {fblink}
+              {twiterlink}
+              {noMail}
+              {discordlink}
+              {githublink}
+              frd={meData.frd}
+              {mail}
+              un={meData.username}
+              bi={meData.bio}
+              on:message={callbackFunctio}
+              on:guid={guid}
+            />
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
           <button

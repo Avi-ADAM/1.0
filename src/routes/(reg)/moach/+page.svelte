@@ -239,7 +239,7 @@
             matanotofs {data{ id attributes{ name price quant kindOf }}}
             finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
-             user_1s {data{ id attributes{email lang username profilePic {data{attributes{ url formats}}}}}}
+             user_1s {data{ id attributes{email noMail lang username profilePic {data{attributes{ url formats}}}}}}
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
              id attributes{ status  iskvua 
                           forums{data{id}}

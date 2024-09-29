@@ -177,6 +177,7 @@ function save (){
       twiterlink: twiterlink,
       discordlink: discordlink,
       githublink: githublink,
+      noMail: noMail,
     frd: frd,
 	  bi : bi,
 	  un: un,
@@ -190,10 +191,11 @@ function save (){
 
 import axios from 'axios';
   import LoginT from '$lib/func/telegram/loginT.svelte';
+  import Checkbox from '$lib/celim/ui/input/checkbox.svelte';
 let passwordx;
 let errorl = null;
 let before = true;
-export let fblink, twiterlink,discordlink,githublink;
+export let fblink, twiterlink,discordlink,githublink,noMail;
 export let mail;
 export let un;
 export let bi;
@@ -327,6 +329,7 @@ const guidback = {"he": "המדריך חזר! יש לרענן את העמוד כ
    const fblinkde = {"he":"לינק לפייסבוק שלי","en":"link to my Facebook"}
    const discordlinkde = {"he":"לינק לדיסקורד שלי","en":"link to my Discord"}
    const twiterlinkde = {"he":"לינק לטוויטר שלי","en":"link to my twitter"}
+   const nomailde = {"he":"לא לשלוח לי מיילים","en":"do not send me emails"}
   const nameal = {"he":"השם כבר קיים נא לבחור שם אחר","en": "name already exists please choose another name"}
   const biot = {"he": "ביוגרפיה", "en": "biography"}
   const addn = {"he":" יצירת סיסמה חדשה","en": "Create new password"}
@@ -457,11 +460,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
   </div>
 <div class="grid items-center justify-center">
 
-{#if chan == true}
-<div>
-<button type="button" on:click={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{svbt[$lang]}</button>
-</div>
-{/if}
+
 {#if change}
 {#if before}
 <div>
@@ -571,7 +570,13 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 {:else if isGuidMe == true && pressed == false}
 	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{addGuid[$lang]}</button>
 {/if}
-	<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">{logoutM[$lang]}</button>
+<Checkbox name="noMail" lebel={nomailde} lang={$lang} bind:value={noMail} on:change={ch}/>
+{#if chan == true}
+<div>
+<button type="button" on:click={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{svbt[$lang]}</button>
+</div>
+{/if}	
+<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">{logoutM[$lang]}</button>
 </div>
 </div>
 <style>

@@ -112,7 +112,7 @@ export async function POST({ request }) {
   const rishon = data.rishon ?? getUnById(pu, data.rishon);
   const un = getUnById(pu, uid);
   await Promise.all(pu.map(async (element) =>{
-     if (element.id != uid) {
+     if (element.id != uid && element.attributes.noMail != true) {
       await sendMail(
          restime,
          pid,
