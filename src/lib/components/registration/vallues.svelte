@@ -205,7 +205,7 @@ const newOb = meData.data.createVallue.data;
 
 
   
-<h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
+<h1  class="midscreenText-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
   {userName_value}
   <br/>
 {what[$lang]}
@@ -215,11 +215,9 @@ const newOb = meData.data.createVallue.data;
 <Tile word={info[$lang]} big={$page.data.isDesktop} bg="gold" animate={true} sm={$page.data.isDesktop}/>
 </div> 
 {/if}
-{#key vallues}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
-      on:focus={()=>focused=true}
-      on:blur={()=>focused=false}
+    
       --sms-width={"50vw"}
       createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
@@ -230,7 +228,6 @@ const newOb = meData.data.createVallue.data;
      options={vallues.map(c => c.attributes.valueName)}
      />
     </div>
-     {/key}
  
      <button class="button-in-2 " on:click="{back}">
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
