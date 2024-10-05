@@ -87,7 +87,20 @@ const requiredWW = {
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
         <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
     </p>
-      
+       {#if data.acts.data.length > 0}
+                          <ul>
+                            {#each data.acts.data as datai, t}
+                              <li>
+                                <div
+                                  class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
+                                >
+                                  <span class="p-1">✅</span>
+                                  <h2 class="md:text-xl p-1">{datai.attributes.shem}</h2>
+                                </div>
+                              </li>
+                            {/each}
+                          </ul>
+                        {/if}
                    
     {#if data.skills.data.length > 0}
     <small class="text-barbi text-sm lg:text-2xl">{requireSkills[$lang]}</small>
