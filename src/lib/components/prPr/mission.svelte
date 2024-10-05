@@ -81,32 +81,34 @@
         console.log(c.data.mission.data);
         let t = c.data.mission.data;
         if ($lang == 'he') {
-          for (var i = 0; i < t.attributes.skills.length; i++) {
-            if (t.attributes.skills[i].attributes.localizations.data.length > 0) {
-              t.attributes.skills[i].attributes.skillName =
-                t.attributes.skills[
+          for (var i = 0; i < t.attributes.skills.data.length; i++) {
+            if (t.attributes.skills.data[i].attributes.localizations.data.length > 0) {
+              t.attributes.skills.data[i].attributes.skillName =
+                t.attributes.skills.data[
                   i
                 ].attributes.localizations.data[0].attributes.skillName;
             }
           }
-          for (var i = 0; i < t.attributes.roles.length; i++) {
-            if (t.attributes.roles[i].attributes.localizations.data.length > 0) {
-              t.attributes.roles[i].attributes.roleDescription =
-                t.attributes.roles[
+          for (var i = 0; i < t.attributes.tafkidims.data.length; i++) {
+            if (t.attributes.tafkidims.data[i].attributes.localizations.data.length > 0) {
+              t.attributes.tafkidims.data[i].attributes.roleDescription =
+                t.attributes.tafkidims.data[
                   i
                 ].attributes.localizations.data[0].attributes.roleDescription;
             }
           }
-          for (var i = 0; i < t.attributes.work_ways.length; i++) {
-            if (t.attributes.work_ways[i].attributes.localizations.data.length > 0) {
-              t.attributes.work_ways[i].attributes.workWayName =
-                t.attributes.work_ways[
+          console.log(t.attributes.tafkidims.data, 't.attributes.roles.data');
+          for (var i = 0; i < t.attributes.work_ways.data.length; i++) {
+            if (t.attributes.work_ways.data[i].attributes.localizations.data.length > 0) {
+              t.attributes.work_ways.data[i].attributes.workWayName =
+                t.attributes.work_ways.data[
                   i
                 ].attributes.localizations.data[0].attributes.workWayName;
             }
           }
         }
         t = t;
+        console.log(t, 't 111');
         miData[0].selectedSkills = t.attributes.skills.data.map(
           (c) => c.attributes.skillName
         );
