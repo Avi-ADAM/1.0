@@ -6,6 +6,8 @@ async function awaitapi(mId,lang,tok) {
     if (tok != false) {
       que = `{  openMission (id:${mId}) {data{attributes{ sqadualed
       archived
+            acts{data{attributes{shem}}}
+
       users{data{id}}
 project {data{ id attributes{ projectName user_1s{data{id}} restime timeToP profilePic {data{ attributes{url  }}}}}}
      tafkidims {data{attributes{roleDescription ${
@@ -30,6 +32,7 @@ toc = tok;
 } else {
 que = `{  openMission (id:${mId}) {data{attributes{ sqadualed
       archived
+      acts{data{attributes{shem}}}
       users{data{id}}
 project {data{ id attributes{ projectName user_1s{data{id}} restime timeToP profilePic {data{ attributes{url  }}}}}}
      tafkidims {data{attributes{roleDescription ${

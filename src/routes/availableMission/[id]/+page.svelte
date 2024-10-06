@@ -290,6 +290,22 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} 
         on:mouseleave={()=>hover("0")}  > {data.alld.attributes.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {hourss[$lang]} {data.alld.attributes.iskvua ? monhly[$lang] : "" }</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.alld.attributes.noofhours * data.alld.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {data.alld.attributes.iskvua ? monhly[$lang] : "" } </span>
     </p>
+    {#if data.alld.attributes.acts.data.length > 0}
+    <div class="border-2 border-gold">
+    <ul>
+      {#each data.alld.attributes.acts.data as datai, t}
+        <li>
+          <div
+            class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
+          >
+            <span class="p-1">✅</span>
+            <h2 class="md:text-xl p-1 text-barbi">{datai.attributes.shem}</h2>
+          </div>
+        </li>
+      {/each}
+    </ul>
+  </div>
+  {/if}
         </div>
             <div class="">
                 <Share 
@@ -303,7 +319,8 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
 	 />
             </div>     
         </div>
-                   
+       
+    
     {#if data.alld.attributes.skills.data.length > 0}
     <small class="text-barbi text-sm lg:text-2xl">{requireSkills[$lang]}</small>
     <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4 ">
