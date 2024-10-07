@@ -1181,7 +1181,6 @@
             meData[i].chat = askId.attributes.chat;
             meData[i].projectId = meData[i].attributes.project.data.id;
             meData[i].openName = meData[i].attributes.name;
-            meData[i].acts = meData[i].attributes.acts.data;
             let old = $meAskMisMes;
             old[meData[i].id] = peace(miData, meData[i].id, $lang, idL);
             meAskMisMes.set(old);
@@ -1886,9 +1885,9 @@
       if(updateV === false){     
       arr1 = value.arr1
       console.log("ARR!JSON__out",value)
-      await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
+   /*   await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON__out_ser",v)
-      })
+      })*/
     
   }
 }
@@ -3501,9 +3500,9 @@
     console.log(arr1);
     const x = new Date();
       const d = x.toISOString();
-      await sendToSer({uid: $page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
+    /*  await sendToSer({uid: $page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON",v)
-      })
+      })*/
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart
   }
   const defaulti = { he: 'מסך הלב', en: 'heart of 1💗1' };

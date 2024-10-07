@@ -45,6 +45,7 @@ const ttmor = {"he":"צפי רווח: ארוך טווח","en":"exp income: long 
 const ttne = {"he":"ללא רווח","en":"not profitable"}
     const headi = {"he":"הצעה למשימה", "en":"suggested mission"}
     const t = {
+      "acts": {"he":"רשימת מטלות:","en":"todo list:"},	
       "wwneed" : {"he":"דרכי עבודה מבוקשות:","en":"ways of work for the mission:"},
       "skneed" : {"he":"הכישורים הנדרשים:","en": "needed skills:"},
       "rneed" : {"he":"תפקיד מבוקש:", "en":"requested role:"},
@@ -58,7 +59,7 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
         const monhly = {"he":"בחודש", "en": "per month"}
 
 console.log(workways)
-
+$: console.log("ACTS: ",acts)
 </script>
 
 
@@ -148,6 +149,24 @@ console.log(workways)
       <RichText  outpot={hearotMeyuchadot} editable={false}/> 
       </p>
      {/if}
+     {#if acts.data.length > 0}
+     <div class="border-2 border-gold mt-5 p-2">
+      <small class="text-barbi text-md ">{t.acts[$lang]}</small>
+
+     <ul>
+       {#each acts?.data as datai, t}
+         <li>
+           <div
+             class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
+           >
+             <span class="p-1">✅</span>
+             <h2 class="md:text-xl p-1 text-barbi">{datai.attributes.shem}</h2>
+           </div>
+         </li>
+       {/each}
+     </ul>
+   </div>
+   {/if}
        {#if skills.data.length > 0}
             <small class="text-barbi text-md ">{t.skneed[$lang]}</small>
             <div class=" flex   d  flex-wrap ">
@@ -160,22 +179,7 @@ console.log(workways)
                 <Tile sm={true} big={true} bg="green" word={skill.attributes.skillName} />
                 </p>{/each}
     </div>{/if}
-     {#if acts.length > 0}
-    <div class="border-2 border-gold">
-    <ul>
-      {#each acts as datai, t}
-        <li>
-          <div
-            class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
-          >
-            <span class="p-1">✅</span>
-            <h2 class="md:text-xl p-1 text-barbi">{datai.attributes.shem}</h2>
-          </div>
-        </li>
-      {/each}
-    </ul>
-  </div>
-  {/if}
+   
      {#if role.data.length > 0}
       <small class="text-md text-barbi">{t.rneed[$lang]}</small>
             <div
