@@ -548,6 +548,7 @@ export let sml = false
                                                         on:proj={proj}
                                                         on:user={user}
                                                         on:mesima={mesima}
+                                                        acts={buble.acts}
                                                         timeToP={buble.attributes.project.data.attributes.timeToP}
                                                         coinlapach={buble.coinlapach}
                                                         restime={buble.attributes.project.data.attributes.restime}

@@ -10,7 +10,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
-    export let projectName,timeToP, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false,hearotMeyuchadot
+    export let projectName,timeToP, acts, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false,hearotMeyuchadot
     export let already, allr = false;
   export let isVisible = false;
 function hover(x){
@@ -107,12 +107,16 @@ console.log(workways)
          <p style="line-height: 1;" class="sm:text-xl text-lg text-gray-600 dark:text-slate-100 flex items-center">
             <img style="width:2.5rem;"   src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span 
+            role="contentinfo"
             on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} 
             on:mouseleave={()=>hover("0")} 
             > {perhour.toLocaleString('en-US', {maximumFractionDigits:2})} {perho[$lang]} </span> * <span 
+            role="contentinfo"
             on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} 
             on:mouseleave={()=>hover("0")}  > {noOfHours.toLocaleString('en-US', {maximumFractionDigits:2})} {hourss[$lang]} </span> = <span 
-            on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}
+            role="contentinfo"
+            on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} 
+            on:mouseleave={()=>hover("0")}
             >{(noOfHours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {isMonthly ? monhly[$lang] : ""} </span>
       </p>
 
@@ -156,6 +160,22 @@ console.log(workways)
                 <Tile sm={true} big={true} bg="green" word={skill.attributes.skillName} />
                 </p>{/each}
     </div>{/if}
+     {#if acts.length > 0}
+    <div class="border-2 border-gold">
+    <ul>
+      {#each acts as datai, t}
+        <li>
+          <div
+            class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
+          >
+            <span class="p-1">✅</span>
+            <h2 class="md:text-xl p-1 text-barbi">{datai.attributes.shem}</h2>
+          </div>
+        </li>
+      {/each}
+    </ul>
+  </div>
+  {/if}
      {#if role.data.length > 0}
       <small class="text-md text-barbi">{t.rneed[$lang]}</small>
             <div

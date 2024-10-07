@@ -581,6 +581,7 @@ effect={'fade'}
      coinlapach={buble.coinlapach} 
     {low}
     pid={buble.pid}
+    acts={buble.acts}
      restime={buble.attributes.project.data.attributes.restime}
       chat = {buble.chat ?? null}
      askId = {buble.askId ?? null}

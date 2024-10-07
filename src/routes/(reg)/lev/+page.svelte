@@ -1,7 +1,8 @@
 <script>
   import { io } from 'socket.io-client';
   const baseUrl = import.meta.env.VITE_URL
-
+  const levVersion = 1.00
+  let updateV = null
   import {
     pendMisMes,
     pendMasMes,
@@ -1128,6 +1129,9 @@
             query: `{openMissions (filters: {id:{in: [${keysSorted}]}}){data{ id attributes{
             project {data{ id attributes{ projectName restime timeToP user_1s {data{id }} profilePic{data{attributes {url formats }}}}}}
             sqadualed
+            acts{data{id attributes{
+              shem des
+            }}}
             tafkidims{data {attributes {roleDescription ${
               $lang == 'he'
                 ? 'localizations {data{attributes {roleDescription }}}'
@@ -1177,6 +1181,7 @@
             meData[i].chat = askId.attributes.chat;
             meData[i].projectId = meData[i].attributes.project.data.id;
             meData[i].openName = meData[i].attributes.name;
+            meData[i].acts = meData[i].attributes.acts.data;
             let old = $meAskMisMes;
             old[meData[i].id] = peace(miData, meData[i].id, $lang, idL);
             meAskMisMes.set(old);
@@ -1418,9 +1423,18 @@
   }
   let nowT 
   onMount(async () => {
+
   nowT = Date.now();
+  //check if code updated
+  const storedVersion = localStorage.getItem('version');
+  if (storedVersion !== levVersion) {
+    updateV = true;
+    localStorage.setItem('version', levVersion);
+  }else{
+    updateV = false;
     //recover localhost
     localRec()
+  }
     /*  if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', {
             scope: '.'
@@ -1865,12 +1879,19 @@
     capture:  () => 
       JSON.parse({arr1:JSON.stringify(arr1),date:new Date})
      ,
-    restore: async (value) => {arr1 = value.arr1
+    restore: async (value) => {
+      while(updateV === null){
+        await new Promise(resolve => setTimeout(resolve, 1000))
+      }
+      if(updateV === false){     
+      arr1 = value.arr1
       console.log("ARR!JSON__out",value)
       await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON__out_ser",v)
       })
-    }
+    
+  }
+}
   };
   let usernames;
   const tolog = {

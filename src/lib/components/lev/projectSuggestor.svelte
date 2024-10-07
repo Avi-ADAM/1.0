@@ -27,6 +27,7 @@ export let coinlapach;
     export let missionName;
     export let role = [];
     export let skills = [];
+    export let acts = [];
     export let missionDetails;
     export let src = "coin.png";
     export let projectId;
@@ -1238,6 +1239,7 @@ on:project={project}
   on:decline={claf}
   on:hover={hoverc}
   on:tochat={tochat}
+  {acts}
   {low}
   {hearotMeyuchadot}
   {alreadyi}
@@ -1272,6 +1274,7 @@ on:project={project}
   on:hover={hoverc}
   on:tochat={tochat}
   {isVisible}
+  {acts}
   {low}
   {hearotMeyuchadot}
   {alreadyi}
