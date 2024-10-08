@@ -319,7 +319,7 @@ try {
       }
 }
 let x
-let linkg = "https://tov.onrender.com/graphql";
+let linkg = "https://one-0b.onrender.com/graphql";
 
 onMount(async () => {
  

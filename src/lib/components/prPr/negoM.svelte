@@ -432,7 +432,7 @@ async function increment() {
       }
 }
 let x
-let linkg = "https://tov.onrender.com/graphql";
+let linkg = "https://one-0b.onrender.com/graphql";
 let dataibno = {"skillName":[],"roleDescription":[],"workWayName":[]}
 function addnew (event){
    const newOb = event.detail.skob;
@@ -491,7 +491,7 @@ onMount(async () => {
       });
     };
       try {
-          const res = await fetch("https://tov.onrender.com/graphql", {
+          const res = await fetch("https://one-0b.onrender.com/graphql", {
               method: "POST",
                 headers: {
                     'Content-Type': 'application/json'
