@@ -20,7 +20,6 @@ let que3 = ``
 let suc = []
 export async function GET(req) {
       //get mesimabetahalich sort by iskvua
-      let resis;
  let que = `{
   mesimabetahaliches (filters:{iskvua:{eq: true},forappruval: { eq: false },finnished:{ eq: false }}) {data{ id}} 
  }
