@@ -31,6 +31,7 @@
   export let declineddarra = [];
   export let id;
   export let i;
+  export let restime;
   export let already = false;
   const baseUrl = import.meta.env.VITE_URL
 
@@ -129,7 +130,9 @@
         .then((data) => (miData = data));
       console.log(miData);
       let hiluzId = miData.data.createAskm.data.id;
-      let quee = `mutation 
+        let x = calcX(restime)
+      let fd = new Date(Date.now() + x)
+            let quee = `mutation 
                         {createTimegrama(
              data:{
                date: "${fd.toISOString()}",

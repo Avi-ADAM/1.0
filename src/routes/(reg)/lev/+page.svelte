@@ -2561,6 +2561,7 @@
               kindOf: x.kindOf,
               sqedualed: x.sqedualed,
               sqedualedf: x.sqedualedf,
+              restime: getProjectData(x.project.data.id, 'restime'),
               spnot: x.spnot,
               descrip: x.descrip,
               oid: pp.data.usersPermissionsUser.data.attributes.sps.data[i].id,

@@ -1,4 +1,5 @@
 <script>
+	import { restim } from '$lib/func/restime.svelte';
 import * as animateScroll from "svelte-scrollto";
 import Vid from './didiget.svelte'
 import Desi from './decisionMaking.svelte'
@@ -502,7 +503,6 @@ export let sml = false
                                                 declined={buble.decid}
                                                 spid={buble.spid}
                                                 {low}
-
                                                 /></div>
                                                 {:else if buble.ani === "hachla" && milon.hachla == true}
                                                 <div class:normSml={modal == false} class="hachla normSml" ><Desi
@@ -583,6 +583,7 @@ export let sml = false
                                                             on:user={user}
                                                             messege={buble.messege}
                                                             i={i}
+                                                            restime={buble.restime}
                                                             coinlapach={buble.coinlapach}
                                                             askedarr={askedarr}
                                                             declineddarra= {buble.declineddarra}

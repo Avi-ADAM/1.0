@@ -625,6 +625,7 @@ effect={'fade'}
       price= {buble.price}
       myp={buble.myp}
       already= {buble.already}
+      restime={buble.restime}
               projectName = {buble.projectName}
               missionDetails = {buble.descrip} 
               notes = {buble.hearotMeyuchadot}

@@ -12,6 +12,7 @@
 
    return [year, month, day].join('-');
  }
+import { calcX } from '$lib/func/calcX.svelte';
 import { objToString } from '$lib/func/objToString.svelte';
 import {SendTo} from '$lib/send/sendTo.svelte';
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER
@@ -37,7 +38,7 @@ export async function GET(req) {
     const id = element.id;
     //TODO: check if timer not on
     let que2 = `{
-  mesimabetahalich (id:${id}) {data{ attributes{admaticedai mission{data{id}} dates hearotMeyuchadot timer monter{monthStart hours isDone hoursDone } project{data{id attributes{user_1s{data{id}}}}} howmanyhoursalready name 
+  mesimabetahalich (id:${id}) {data{ attributes{admaticedai mission{data{id}} dates hearotMeyuchadot timer monter{monthStart hours isDone hoursDone } project{data{id attributes{restime user_1s{data{id}}}}} howmanyhoursalready name 
   finnished_missions{data{id attributes{noofhours}}} hoursassinged perhour users_permissions_user{data{id}}}}} 
  }
     `; 
@@ -121,6 +122,27 @@ ${fm}
         console.log('Sucsses! ', resis.data);
         suc.push(id);
         suc = suc;
+        if(at.project.data.attributes.user_1s.data.length > 1){
+          let x = calcX(at.project.data.attributes.restime)
+          let fd = new Date(Date.now() + x)
+          let hiluzId = resis.data.createFiniapruval.data.id;
+          let quee = `mutation 
+                            {createTimegrama(
+                 data:{
+                   date: "${fd.toISOString()}",
+                   whatami: "finiapruval",
+                   finiapruval: ${hiluzId},
+                 }
+               ){
+                 data {id}
+               }
+             }`;
+         let resis2 = await SendTo(quee,VITE_ADMINMONTHER)
+         .then (resis2 => resis2 = resis2);
+         if(resis2.data != null){
+          console.log("timegrama created",resis2.data)
+         }
+        }
       } else{
         //telegram id error
         console.log(resis)
