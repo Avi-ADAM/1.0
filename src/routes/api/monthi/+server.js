@@ -91,7 +91,7 @@ createFiniapruval(
    }
 ){data {id }}`;
       }
-    let q = new Date("03/01/2023")
+    let q = new Date()
     let monter = objToString(at.monter)
   
    que3 = `
