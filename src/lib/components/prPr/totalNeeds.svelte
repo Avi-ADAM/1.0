@@ -130,7 +130,7 @@ async function han() {
     data:{
       date: "${fd.toISOString()}",
       whatami: "pmash",
-      pendm:  "${hiluzpend}",
+      pmash:  "${hiluzpend}",
     }
   ){
     data {id}
