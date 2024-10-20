@@ -15,6 +15,7 @@ import {
 import moment from 'moment'
 import { lang } from '$lib/stores/lang.js'
   import { calcX } from '$lib/func/calcX.svelte';
+  import SendTo from '$lib/send/sendTo.svelte';
 const dispatch = createEventDispatcher();
 let token;
 export let needr = [];
