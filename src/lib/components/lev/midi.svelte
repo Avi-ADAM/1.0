@@ -167,6 +167,7 @@ ee ="translate(3.8484 -18.405)";
 }
 
 
+
 export let low = true;
 let hovered = false;
 function hoverede(x){
@@ -215,12 +216,14 @@ console.log(mashs)
 </style>
 
 <div 
+role="contentinfo"
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}   class="midCom hover:scale-150 duration-1000 ease-in-out"
 on:mouseenter={()=> hoverede()} 
 on:mouseleave={()=> hoverede()}
 >
 <div
+role="contentinfo"
 on:mouseenter={()=> hoverede("x")} 
 on:mouseleave={()=> hoverede()}
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
