@@ -267,6 +267,7 @@ try {
              }){data {id}}
              createNegoMash(
               data:{
+              users_permissions_user:"${idL}",
                 publishedAt: "${d.toISOString()}",
                 pmash:${pendId},
                  isOriginal:${state == 2 ? true : false},
@@ -319,8 +320,7 @@ try {
       }
 }
 let x
-let linkg = "https://one-0b.onrender.com/graphql";
-
+let linkg = import.meta.env.VITE_URL + "/graphql"	
 onMount(async () => {
  
   console.log("mounted",$lang)
@@ -338,10 +338,10 @@ onMount(async () => {
 })
 
 $: datai = [{
-  "leb":`${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2)}| ${tri?.mash?.shovile[$lang]},${easy2* hm2 * montsi(kindOfb,sqadualed2,sqadualedf2)}`,
-  "value":price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2),
-  "vallue2":(easy2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2))- (price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2))},
-  {"leb":`${tri?.nego?.original[$lang]},${price * hm * montsi(kindOf,sqadualed,sqadualedf)} | ${tri?.mash?.shovile[$lang]},${easy * hm * montsi(kindOf,sqadualed,sqadualedf)}`,"value":price * hm * montsi(kindOf,sqadualed,sqadualedf), "vallue2":(easy * hm * montsi(kindOf,sqadualed,sqadualedf))-(price * hm * montsi(kindOf,sqadualed,sqadualedf))}]
+  "leb":`${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true)}| ${tri?.mash?.shovile[$lang]},${easy2* hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true)}`,
+  "value":price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true),
+  "vallue2":(easy2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true))- (price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true))},
+  {"leb":`${tri?.nego?.original[$lang]},${price * hm * montsi(kindOf,sqadualed,sqadualedf,true)} | ${tri?.mash?.shovile[$lang]},${easy * hm * montsi(kindOf,sqadualed,sqadualedf,true)}`,"value":price * hm * montsi(kindOf,sqadualed,sqadualedf,true), "vallue2":(easy * hm * montsi(kindOf,sqadualed,sqadualedf,true))-(price * hm * montsi(kindOf,sqadualed,sqadualedf,true))}]
 $: console.log(datai)
 </script>
 <div class="text-barbi " dir={$lang == "he"?"rtl":"ltr"}>
@@ -386,10 +386,10 @@ $: console.log(datai)
  <h2 class="underline decoration-mturk">{tri?.mash.tota[$lang]}</h2>
       {#if price == price2 && hm == hm2 && kindOf == kindOfb && easy == easy2}
        {#if price > 0 & hm> 0}
-      {price * hm * montsi(kindOf,sqadualed,sqadualedf)}
+      {(price * hm * montsi(kindOf,sqadualed,sqadualedf,true)).toLocaleString()}
       {#if price != easy}
        {tri?.mash?.shovile[$lang]}:
-       {easy * hm * montsi(kindOf,sqadualed,sqadualedf)}
+       {(easy * hm * montsi(kindOf,sqadualed,sqadualedf,true)).toLocaleString()}
        {/if}
       {:else} 
       <p>0</p>

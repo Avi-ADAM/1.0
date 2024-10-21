@@ -12,7 +12,7 @@
             var b = moment(beg, "HH:mm DD/MM/YYYY ");
     }
             if(moy == "monthly"){
-              console.log("i am in my palss",beg,end,a,b)
+              console.log("i am in my palss",beg,end,a,b,a.diff(b, 'months', true).toFixed(2))
             return a.diff(b, 'months', true).toFixed(2)
             }else{
             return a.diff(b, 'years', true).toFixed(2)

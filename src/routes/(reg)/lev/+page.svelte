@@ -1876,7 +1876,7 @@
   });
   export const snapshot = {
     capture:  () => 
-      JSON.parse({arr1:JSON.stringify(arr1),date:new Date})
+      JSON.parse(JSON.stringify(arr1))
      ,
     restore: async (value) => {
       while(updateV === null){

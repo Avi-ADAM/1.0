@@ -16,7 +16,8 @@ onMount(()=>{
         if(date == undefined ||date == "undefined"){
             htmlon = und[$lang]
         }else{
-                htmlon = date
+            const fdate = new Date(date)
+                htmlon = fdate.toLocaleDateString($lang)
 
         }
     } else{
@@ -26,6 +27,8 @@ onMount(()=>{
 let edit = false
 let show2 = false
 export let dateb = date
+$:fdate = new Date(date);
+$:fdateb = new Date(dateb)
 function check (lettera, letterb){
     if(lettera == letterb){
         return true
@@ -63,9 +66,9 @@ function checkAll (a, b){
         <div class="flex flex-col align-middle justify-center ">
         <button on:click={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
-        <p>{date}</p>
+        <p>{fdate.toLocaleDateString($lang)}</p>
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
-        <p class="text-gold">{dateb}</p>
+        <p class="text-gold">{fdateb.toLocaleDateString($lang)}</p>
         </div>
         {/if}
         </div>

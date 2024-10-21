@@ -671,7 +671,7 @@ function claf (event){
 
     <DialogOverlay {isOpen} onDismiss={close} class="overlay">
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="chat" aria-label="form" >
+  <DialogContent class="{masa == true? "full" : "chat"}" aria-label="form" >
       <div dir="rtl" class="grid items-center justify-center aling-center">
               <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
@@ -1073,7 +1073,7 @@ input[type=text]:invalid {
     opacity: 1;
     padding: 6px;
     }
-  
+
    :global([data-svelte-dialog-content].chat) {
        z-index: 1000;
       padding: 0px;
@@ -1099,6 +1099,11 @@ input[type=text]:invalid {
                 margin-top: 20vh;
                 border-radius: 15%;
         }
+        :global([data-svelte-dialog-content].full) {
+          z-index: 1000;
+      padding: 10px;
+      background-color: #242526;
+        }
           :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
@@ -1106,7 +1111,7 @@ input[type=text]:invalid {
   width: 24px;
   height: 24px;
   }
-        :global([data-svelte-dialog-content].content) {
+        :global([data-svelte-dialog-content].full) {
 width:50vw;
         }
   }
