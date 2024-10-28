@@ -244,7 +244,7 @@
              id attributes{ status  iskvua 
                           forums{data{id}}
 
-            acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
+            acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahaliches{data{id}}}}}
               tafkidims {data{ id attributes{ roleDescription ${
                 $lang == 'he'
                   ? 'localizations{data {attributes{ roleDescription}} }'
