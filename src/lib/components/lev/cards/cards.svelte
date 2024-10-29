@@ -283,6 +283,7 @@ effect={'fade'}
     src={buble.src}
     link={buble.privatlinks}
     dueDateOrCountToDedline ={buble.admaticedai}
+    startDate ={buble.dates}
     hoursdon ={buble.howmanyhoursalready}
     hourstotal = {buble.hoursassinged}
     perhour = {buble.perhour}

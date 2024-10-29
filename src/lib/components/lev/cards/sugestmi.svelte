@@ -143,7 +143,7 @@ $: console.log("ACTS: ",acts)
               {ttne[$lang]}
             {/if}
         </span>
-  {#if missionDetails !== null && missionDetails !== "null"} <p class="cd d max-h-16 text-gray-700 dark:text-slate-100 text-base">{missionDetails}</p>{/if}
+  {#if missionDetails !== null && missionDetails !== "null"} <div class=" d max-h-1/2"><RichText outpot={missionDetails} editable={false} /></div>{/if}
     {#if hearotMeyuchadot && hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null"}
      <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class=" max-h-1/2  d">
       <RichText  outpot={hearotMeyuchadot} editable={false}/> 

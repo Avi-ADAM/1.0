@@ -13,7 +13,7 @@
   import { Head } from "svead";
   import { page } from "$app/stores";
     const intitle = {he:" משימות פתוחות",en:"Open missions"}
-    const name = {"he": 'שם',"en":"name"}
+    const name = {"he": ' שם ושם הריקמה',"en":"name and project name"}
     const des = {"he":"תיאור","en":'description'}
     const shovi = {'he':'שווי','en':'vallue'}
     const datest = {'he':'תאריך','en':'date'}
@@ -25,43 +25,96 @@
     let alld;
     let isLoading = true;
 
-async function getData(){
+// יצירת אובייקט PagingData חדש
+let paging = new PagingData(
+    1,      // currentPage
+    20,     // itemsPerPage
+    [10, 20, 50, 100] // itemsPerPageOptions
+);
+
+let allMissions = []; // מערך שישמור את כל המשימות
+let isLoadingMore = false;
+let hasMoreData = true;
+const BATCH_SIZE = 20;
+const LOAD_DELAY = 2000; // 2 seconds delay between loads
+
+async function loadBatch(start) {
     try {
-        isLoading = true;
         let userLang = data.lang;
         let isReg = data.tok;
-        const qid = userLang != "en" ? isReg ? "27GetOpenMissionsRegTr" : "29GetOpenMissionsNonregTr" : isReg ? "28GetOpenMissionsReg" : "30GetOpenMissionsNonreg";
+        const qid = userLang != "en" 
+            ? isReg ? "27GetOpenMissionsRegTr" : "29GetOpenMissionsNonregTr" 
+            : isReg ? "28GetOpenMissionsReg" : "30GetOpenMissionsNonreg";
         
-        const response = await sendToSer({}, qid, null, null, !isReg, fetch);
+        const variables = {
+            start: start,
+            limit: BATCH_SIZE
+        };
         
-        if (response.data.openMissions.data != null) {
-            const datar = response.data.openMissions.data;
+        const response = await sendToSer(variables, qid, null, null, !isReg, fetch);
+        
+        if (response.data.openMissions.data) {
+            const newData = response.data.openMissions.data;
+            const pagination = response.data.openMissions.meta.pagination;
+            
             const reformatArray = arr => arr.map(({id, attributes}) => ({id, ...attributes}));
-            return reformatArray(datar);
+            const formattedData = reformatArray(newData);
+            
+            // בדיקה אם יש עוד נתונים לטעון
+            hasMoreData = start + BATCH_SIZE < pagination.total;
+            
+            return {
+                data: formattedData,
+                total: pagination.total
+            };
         }
         return null;
     } catch (error) {
         console.error(error);
         return null;
+    }
+}
+
+async function loadAllData() {
+    if (isLoadingMore || !hasMoreData) return;
+    
+    isLoadingMore = true;
+    const currentStart = allMissions.length;
+    
+    try {
+        const result = await loadBatch(currentStart);
+        if (result) {
+            allMissions = [...allMissions, ...result.data];
+            alld = allMissions
+            alld = alld
+            console.log(alld)
+            activUpd += 1
+            // אם יש עוד נתונים, נטען אותם אחרי השהייה
+            if (hasMoreData) {
+                setTimeout(() => {
+                    loadAllData();
+                }, LOAD_DELAY);
+            }
+        }
     } finally {
-        isLoading = false;
+        isLoadingMore = false;
     }
 }
 
 onMount(async () => {
-    alld = await getData();
+    isLoading = true;
+    await loadAllData();
+    isLoading = false;
 });
 
+// עדכון הקומפוננטה כך שתשתמש ב-allMissions במקום ב-alld
+
 let theme = PrelineTheme;
-let paging = { 
-        itemsPerPage: 20,
-        currentPage: 1,
-        itemsPerPageOptions: [10, 20, 50, 100]
-    }
-   // ThemeStore.set(theme);
-   // theme.grid.container = MyTableContainer;
-   //ThemeStore.set(theme);
-    let columns = [
+
+// האזנה לשינויים בגודל העמוד
+
+
+let columns = [
         { 
             key: 'name', 
             title: name[$lang],
@@ -107,7 +160,7 @@ let paging = {
         accessor: (row) => { 
             return {
                 value: row.sqadualed,
-                vallue2: row.dates
+                value2: row.dates
             }
         },
         renderComponent: Dates 
@@ -152,6 +205,7 @@ let paging = {
         renderComponent: GoButton
     }
     ];
+    $: activUpd = 0
     let title = {he:"משימות פתוחות",en:"Open missions"}
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description = {he:"משימות פתוחות שאפשר להגיש מועמדות כדי להצטרף ולבצע יחד ב-1💗1",en:"Open missions that you can submit candidates to join and do together in 1💗1"}
@@ -159,14 +213,16 @@ let paging = {
     </script>
 <Head title={title[$lang]} description={description[$lang]} {image} {url} />
 <div class="w-full px-2 text-center bg-gold text-barbi" dir={$lang == "he" ? 'rtl':'ltr'}>
-<h2 class="flex justify-center items-center">{intitle[$lang]}{#if isLoading}
+<h2 class="flex justify-center items-center">{intitle[$lang]}{#if isLoading || isLoadingMore}
     <RingLoader size={30}/>
      {/if}</h2>
-
+{#key activUpd}
     <Grid 
     bind:data={alld} 
     bind:columns {theme} {paging}/>
     <GridFooter  
        bind:data={alld} 
+       {theme}
     bind:paging/>
+    {/key}
 </div>

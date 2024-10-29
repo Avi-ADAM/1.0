@@ -4,7 +4,7 @@ export let x = 0,tasks = [], src,projectName,already,zman,hearotMeyuchadot,statu
     import {lang} from '$lib/stores/lang.js' 
     export let low = false;
     export let iskvua = false
-    export let isVisible = false
+    export let isVisible = false, startDate = null
 import Lowbtn from '$lib/celim/lowbtn.svelte'
      // import Chaticon from '../../../celim/chaticon.svelte'
   import { createEventDispatcher } from 'svelte';
@@ -38,7 +38,8 @@ function opentask(){
 }
  // import { textfit } from 'svelte-textfit';
  // let parent;
- $: event = dueDateOrCountToDedline != "undefined" &&  dueDateOrCountToDedline != undefined &&  dueDateOrCountToDedline != null ? new Date(dueDateOrCountToDedline) : null;
+ $: std = startDate != null ? new Date(startDate) : null;
+ $: eve = dueDateOrCountToDedline != "undefined" &&  dueDateOrCountToDedline != undefined &&  dueDateOrCountToDedline != null ? new Date(dueDateOrCountToDedline) : null;
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
    const deta = {"he": "פרטי המשימה","en": "mission details"}
    const notes = {"he": "הערות","en": "notes"}
@@ -82,10 +83,32 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
     <div   class="mb-8">
        <!--use:textfit={{parent,mode:"multi"}}  bind:this={parent}-->
               <div class="text-mturk font-bold text-lg md:text-4xl  mb-2">{missionName}</div>
-                <h5  class="mn cd "><span on:mouseenter={()=>hover(nooftitle[$lang])} on:mouseleave={()=>hover("0")} role="contentinfo"
+              <h5 style="line-height: 1;" class="sm:text-xl text-lg text-gray-600 dark:text-slate-100 flex items-center">
+               <img style="width:2.5rem;"   src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
+                                 <span on:mouseenter={()=>hover(nooftitle[$lang])} on:mouseleave={()=>hover("0")} role="contentinfo"
                    >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} ${hoursdonTitle[$lang]}`}</span> {from[$lang]} <span
                    role="contentinfo" on:mouseenter={()=>hover(totalTitle[$lang])} on:mouseleave={()=>hover("0")}>{hourstotal} {totali[$lang]}</span></h5>
-                   {#if dueDateOrCountToDedline !== null} <h5 style="margin: 7px; font-size: 13px; line-height: 1;">{event.toLocaleDateString(undefined, options)}</h5>{/if}
+                   {#if std || dueDateOrCountToDedline}
+                                <p
+                  style="line-height: 1;"
+                  class="text-sm text-barbi flex items-center lg:text-2xl m-5"
+                >
+                  <img
+                    class="w-4 lg:w-8"
+                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+                    alt="howmuch"
+                  />
+                {#if std}
+                <span> {new Date(std).toLocaleDateString($lang,options)}</span>
+                {/if}
+                {#if std  && dueDateOrCountToDedline}
+                 - 
+                 {/if}
+                 {#if dueDateOrCountToDedline}
+                <span>{eve.toLocaleDateString($lang,options)}</span>
+                {/if}
+                  </p>
+                {/if}  
        <div class="flex items-center justify-center m-1"><span 
          class="  bg-goldGrad bg-[length:200%_auto] animate-gradientx text-center text-wow p-2 sm:text-2xl text-xl" 
          style:font-family="Digital" 
@@ -98,9 +121,9 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>-->
-     {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined"} <p 
+     {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined" && missionDetails.length > 0} <p 
      on:mouseenter={()=>hover(deta[$lang])} on:mouseleave={()=>hover("0")}
-       class="cd d max-h-16 text-sm sm:text-xl text-gray-700 ">{missionDetails}</p>{/if}
+       class="cd d max-h-1/2"><RichText outpot={missionDetails} editable={false} /></p>{/if}
     {#if hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" && hearotMeyuchadot.length > 0}
      <span role="contentinfo" on:mouseenter={()=>hover(notes[$lang])} on:mouseleave={()=>hover("0")} >
    <RichText editable={false}  outpot={hearotMeyuchadot}/>
@@ -120,7 +143,7 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
        </div>
        {#if low == false}
        {#if lapse !== 0 || x !== 0}
-       <div class="flex items-center justify-center space-x-2">
+       <div class="flex items-center justify-center space-x-2 mb-12">
 <button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")} 
     class="border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi hover:text-gold  px-4 py-1 rounded hover:from-lturk hover:to-barbi " on:click={clear}>ניקוי</button>
 <button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} 

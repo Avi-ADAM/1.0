@@ -1947,7 +1947,7 @@
                 												project {data{id attributes {projectName  user_1s {data{id}} profilePic {data{attributes{url formats}}}}}} 
                      }}}}}}}}} 
       mesimabetahaliches (filters: { forappruval: { eq: false },finnished:{ eq: false } }) {data{ id attributes{ 
-        						status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks iskvua howmanyhoursalready  admaticedai 
+        						status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks iskvua howmanyhoursalready  admaticedai dates
         						mission {data{id}}
         						project{data{id}}
                                 acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
