@@ -254,5 +254,64 @@ export const qids = {
 '26addUserArr1': `mutation AddUserArr1($uid: ID!, $arr: JSON, $arrDate: DateTime) {
   updateUsersPermissionsUser(id: $uid, data: { arr1: $arr, arrdate: $arrDate}) 
   {data{id}}
-}	`,
+}`,
+	'27getFiniApp': `query GetFiniApp($id: ID!) {
+   finiapruval(id:'$id){
+   data{
+   id attributes{
+   
+   }}
+   }
+}`,
+"27GetOpenMissionsRegTr":` query GetOpenMissionsRegTr
+{  openMissions {data{id attributes{ sqadualed
+             archived
+             users{data{id}}
+      project {data{ id attributes{ projectName user_1s{data{id}} restime timeToP profilePic {data{ attributes{url  }}}}}}
+            tafkidims {data{attributes{roleDescription localizations{data{attributes{ roleDescription }}}
+            }}}
+            skills {data{attributes{skillName localizations{data{attributes{skillName }}}
+            }}}
+            descrip
+            hearotMeyuchadot
+            name dates iskvua
+            work_ways {data{attributes{workWayName localizations{data{attributes{workWayName }}}
+            }}}
+            noofhours perhour   }}}
+        }
+
+`,
+"28GetOpenMissionsReg":`query GetOpenMissionsReg
+{  openMissions {data{id attributes{ sqadualed
+             archived
+             users{data{id}}
+      project {data{ id attributes{ projectName user_1s{data{id}} restime timeToP profilePic {data{ attributes{url  }}}}}}
+            tafkidims {data{attributes{roleDescription }}}
+            skills {data{attributes{skillName}}}
+            descrip
+            hearotMeyuchadot
+            name dates iskvua
+            work_ways {data{attributes{workWayName}}}
+            noofhours perhour   }}}
+        }`,
+"29GetOpenMissionsNonregTr" :`query GetOpenMissionsNonregTr
+{  openMissions {data{attributes{ descrip
+      archived noofhours perhour iskvua sqadualed dates
+      tafkidims {data{attributes{roleDescription localizations{data{attributes{ roleDescription }}}
+      }}}
+            skills {data{attributes{skillName localizations{data{attributes{skillName }}}
+            }}}
+            work_ways {data{attributes{workWayName localizations{data{attributes{workWayName }}}
+            }}}
+            name project {data{ id attributes{ projectName profilePic {data{ attributes{url  }}}}}}}}}}
+            `,       
+"30GetOpenMissionsNonreg":`query GetOpenMissionsNonreg
+{  openMissions {data{attributes{ descrip
+      archived noofhours perhour iskvua sqadualed dates
+      tafkidims {data{attributes{roleDescription }}}
+            skills {data{attributes{skillName}}}
+            work_ways {data{attributes{workWayName}}}
+            name project {data{ id attributes{ projectName profilePic {data{ attributes{url  }}}}}}}}}}
+            `            
+
 };
