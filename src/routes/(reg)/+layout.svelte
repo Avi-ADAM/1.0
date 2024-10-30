@@ -72,7 +72,7 @@ onMount(async () => {
 }
 });
 function reg (){
-  if ($lang == "he"){
+  if ($lang && $lang == "he"){
     goto("/",)
   } else if ($lang == "en"){
     goto("/en",)
@@ -82,7 +82,6 @@ function reg (){
     goto("/",)
   }
 }
-$: console.log($forum)
 function login () { 
     goto (`/login${data.from ? "?from=" + data.from : ""}`,)
 }

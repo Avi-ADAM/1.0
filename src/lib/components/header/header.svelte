@@ -22,14 +22,14 @@
 }
 </script>
 <span style="overflow:hidden;">
-<img on:keypress={()=>cl("a")} title={title[$lang]}  on:click={()=>cl("a")}
+<img on:keypress={()=>cl("a")} title={title[$lang ?? "he"]}  on:click={()=>cl("a")}
  class:rounda={acli == true}
   class:translate-x-12={acli == false}
   class:-translate-y-12={acli == false}
   class:hover:translate-x-9={acli == false} class:hover:-translate-y-9={acli == false}   class:hover:scale-150={acli == false}
   class="right"  alt="פרופיל אישי" src="https://res.cloudinary.com/love1/image/upload/v1644446152/PicsArt_01-28-06.01.26_1_a7ky2k.png"/>
 <img on:keypress={()=>cl("b")} on:click={()=>cl("b")}
-    class:roundb={bcli == true} title="{secondTitle[$lang]}"
+    class:roundb={bcli == true} title="{secondTitle[$lang ?? "he"]}"
     class:-translate-x-12={bcli == false} class:-translate-y-12={bcli == false}
      class:hover:-translate-x-9={bcli == false}
     class:hover:-translate-y-9={bcli == false} class:hover:scale-150={bcli == false}
