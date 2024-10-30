@@ -32,20 +32,34 @@ const dispatch = createEventDispatcher();
 
 
   onMount(() => {
-    swiperInstance = new Swiper('.swiper', {
-      on: {
-        slideChange: () => {
-          currentIndex = swiperInstance.realIndex;
-        },
-      },
-    });
+    // הסר את האתחול הישיר של Swiper כאן
+    // swiperInstance = new Swiper('.swiper', {
+    //   on: {
+    //     slideChange: () => {
+    //       currentIndex = swiperInstance.realIndex;
+    //     },
+    //   },
+    // });
   });
+
+  // הוסף פונקציה לטיפול באירוע swiper
+  function handleSwiper(e) {
+    const [swiper] = e.detail;
+    swiperInstance = swiper;
+    
+    swiper.on('slideChange', () => {
+      currentIndex = swiper.realIndex;
+    });
+  }
+
   // import required modules
   import {Manipulation, Mousewheel, Keyboard, EffectFade , Navigation} from "swiper";//, Virtual
   export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
   import DecisionMaking from '../decisionMaking.svelte';
+  import Filter from './filter.svelte';
+  import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
   let h ;
 
 export let askedarr = [], declineddarr = [], arr1 = [];
@@ -69,7 +83,7 @@ $:if (indexi != -1){
         dispatch("cards",{cards:false})
   }
   let slideIndex;
-                let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}
+  export let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}
 afterUpdate(async () => {
 if (swiperRef !== null) {
   swiperRef.update()
@@ -132,6 +146,24 @@ function hoverc (id){
 }
 const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל',"en" : 'Navigation: right side, bottom'}
 $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
+
+function showonly(event) {
+    const value = event.detail.data;
+    for (const key in milon) {
+        milon[key] = false
+    }
+
+    milon[value] = true;
+}
+
+function showall(event) {
+  filter = false
+    for (const key in milon) {
+        milon[key] = true
+    }
+
+}
+let filter = false
 </script>
 <style>
 
@@ -204,12 +236,20 @@ on:mouseleave={()=> hoverc("0")}
  <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
 
 </div>
-
+<div   
+dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
+on:mouseleave={()=> hoverc("0")} 
+style:visibility={low == true  ? "hidden":  "visible"} class="top-0 absolute left-1/2 -translate-x-1/2">
+<button class="w-8 h-8  text-center bg-gold hover:bg-gold/80 rounded-full" on:click={()=> filter ? showall() : filter = true}><FilterIcon {filter} /></button>
+{#if filter}
+<Filter on:showonly={showonly} />
+{/if}
+</div>
 <div role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
 {#key arr1}
 <Swiper 
-  on:swiper={setSwiperRef}
+  on:swiper={handleSwiper}
   keyboard={{
     enabled: true,
   }}  
