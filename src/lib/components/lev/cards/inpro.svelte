@@ -83,7 +83,7 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
     <div   class="mb-8">
        <!--use:textfit={{parent,mode:"multi"}}  bind:this={parent}-->
               <div class="text-mturk font-bold text-lg md:text-4xl  mb-2">{missionName}</div>
-              <h5 style="line-height: 1;" class="sm:text-xl text-lg text-gray-600 dark:text-slate-100 flex items-center">
+              <h5 style="line-height: 1;" class="sm:text-xl text-lg text-gray-600  flex items-center">
                <img style="width:2.5rem;"   src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
                                  <span on:mouseenter={()=>hover(nooftitle[$lang])} on:mouseleave={()=>hover("0")} role="contentinfo"
                    >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} ${hoursdonTitle[$lang]}`}</span> {from[$lang]} <span

@@ -93,7 +93,7 @@ async function sub(){
              my: "${userMevatzeaId}",
              shem: """${name}""",
              vali: "${userMevakeshId}",
-             mesimabetahalich: "${mtaha}",
+             mesimabetahaliches: "${mtaha}",
              link: "${link}",
              publishedAt: "${d.toISOString()}",
             ${tt}

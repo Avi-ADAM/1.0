@@ -234,6 +234,8 @@
             projectName
             descripFor
             publicDescription
+             acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}} myIshur valiIshur status mesimabetahaliches{data{id 
+                  attributes{name forums{data{id}}}}}}}}
             sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
             sales {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
             matanotofs {data{ id attributes{ name price quant kindOf }}}
@@ -1271,6 +1273,10 @@
     he:"שירותים",
     en:"services"
   }
+  const actL = {
+    he:"פעולות",
+    en:"todo"
+  }
 
   const maini = {he: "ראשי", en:"main"}
   const choo = { he: 'בחירת ריקמה', en: 'choose FreeMate' };
@@ -1299,6 +1305,7 @@
         });
     }
     import { onDestroy } from 'svelte';
+  import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
 
   
 
@@ -1917,6 +1924,20 @@ pointer-events: none;"
                   </div></button
                 >
             {/if}
+            {#if meData?.acts.data.length > 0}
+            <button
+            on:click={() => (tab = 9)}
+            class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 9 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={actL[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style="{tab == 9 ? "": "text-shadow:1px 1px #fff ;"}">
+                {actL[$lang]}
+              </h2>
+                  </div></button
+                >
+            {/if}
              <button
                 on:click={() => (tab = 6)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
@@ -2283,6 +2304,8 @@ pointer-events: none;"
    
             />
           </div>
+{:else if tab === 9}
+<ActsTable acts={meData.acts.data}/>          
 {:else if tab === 7}
           <Hamatanot
               {trili}
