@@ -3,6 +3,9 @@
     export let pname = '';
     export let mname = '';
     export let type = '';
+    export let isOpen = false
+    export let isPend = false
+  import Tile from "$lib/celim/tile.svelte";
     import Button from "$lib/celim/ui/button.svelte";
 import {lang} from '$lib/stores/lang'
   export let text = {"he":"אני אבצע", "en":"assign to me"}
@@ -29,6 +32,17 @@ import {lang} from '$lib/stores/lang'
         {/if}
     </div>
 </div>
+    {#if !pname && !mname}
+        {#if isOpen}
+        <button on:click={onClick} >
+        <Tile bg="pink" word={isOpen.name}/>
+        </button>
+        {:else if isPend}
+        <button on:click={onClick} >
+        <Tile bg="gold" word={isPend.name}/>
+        </button>
+        {/if}
+        {/if}
 {:else}
 <Button text={text} on:click={onClick}/>
 {/if}

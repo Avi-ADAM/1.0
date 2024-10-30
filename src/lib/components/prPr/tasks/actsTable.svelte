@@ -16,10 +16,24 @@
     20,     // itemsPerPage
     [10, 20, 50, 100] // itemsPerPageOptions
 );
-    function handleTaskClick(a,b,c) {
-        console.log(a,b,c)
+    function handleTaskClick(row,type,mid,isOpen,isPend) {
+
+        let id
+    let kind 
+    if (mid) {
+     kind = 'betha'
+     id = mid
+    } else if (isOpen) {
+       kind = 'openM';
+      id = isOpen.id
+    } else if (isPend) {
+      kind = 'pendm'
+      id = isPend.id
+    }
+        console.log(row,type,mid,isOpen,isPend)
         dispatch('taskClick', {
-           
+           id,
+           kind
         });
     }
 
@@ -66,18 +80,22 @@
                 const myData = row.my?.data?.[0]?.attributes;
                 const mesima = row.mesimabetahaliches?.data?.[0]?.attributes;
                 const profilePic = myData?.profilePic?.data?.attributes?.url;
+                const isPend = row.pendm?.data?.id ? {id:row.pendm?.data?.id,name:row.pendm?.data?.attributes.name}: false
+                const isOpen = row.open_mission?.data?.id ? {id:row.open_mission?.data?.id,name:row.open_mission?.data?.attributes.name} : false                
                 const username = myData?.username;
                 const mesimaName = mesima?.name;
-                const mid =  row.mesimabetahaliches?.data?.[0]?.id
-                const type = !username && !mesimaName ? "button" : null
-              
+                const mid =  row.mesimabetahaliches?.data?.[0]?.id || false
+                const type = !username && !mesimaName && !isPend && !isOpen ? "button" : null
+
                 return {
                     type,
                     src: profilePic || '', 
                     pname: username || '', 
                     mname: mesimaName || '',
                     taskId: row.id,
-                    onClick: () => handleTaskClick(row,type,mid)
+                    isPend,
+                    isOpen,
+                    onClick: () => handleTaskClick(row,type,mid,isOpen,isPend)
                 };
             },
             renderComponent: NameAndPname

@@ -19,12 +19,13 @@
          mimatai = editdata.dateS
          adMatai = editdata.dateF
     }
-  })
-  $: if (id > 0){
+ if (id > 0){
     const bmi = bmiData.filter(t=>t.id == id)
     console.log(bmi)
     selected = [bmi[0].attributes.users_permissions_user.data.attributes.username + " - " + bmi[0].attributes.name]
   }
+})
+
  const dispatch = createEventDispatcher();
     export let userMevatzeaId, userMevakeshId, mimatai  ,adMatai , name = "", teur = "",selected = [],link = "";
     let seEr = false, neEr = false
@@ -193,7 +194,6 @@ async function sub(){
         {#if isPersonal == true}
       <MultiSelect
       bind:selected={selected}
-      maxSelect={1}
       placeholder={placeholder[$lang]}
       options={bmiData.map(it=>it.attributes.users_permissions_user.data.attributes.username + " - " + it.attributes.name)}
       />
