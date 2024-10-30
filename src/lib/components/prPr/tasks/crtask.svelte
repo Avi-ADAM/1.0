@@ -33,6 +33,7 @@
      import SveltyPicker from 'svelty-picker'
 
     import {lang} from '$lib/stores/lang.js'
+  import Button from '$lib/celim/ui/button.svelte';
     function find_se_id(lebel){
      let id , uid;
        for (let i = 0; i< bmiData.length; i++){
@@ -47,14 +48,23 @@
      const baseUrl = import.meta.env.VITE_URL
 
 let linkg = baseUrl+'/graphql';
+let loading = false
+let success = false
+let error = false
 async function sub(){
+  loading = true
     if (fromMis == false){
     if (selected.length < 1){
         seEr = true
+        error = true
+        loading = false
     } else {
         if(name.length < 1){
               neEr = true
+              error = true
+              loading = false
                  } else {
+                  error = false
                   let d = new Date
               neEr = false
              seEr = false
@@ -108,7 +118,8 @@ async function sub(){
                 })
                 .then(r => r.json())
                 .then(data => miDatan = data);
-
+                loading = false
+                success = true
             dispatch('done', {
                 id: miDatan.data.createAct.data.id,
                 name:  miDatan.data.createAct.data.attributes.shem,
@@ -116,12 +127,16 @@ async function sub(){
             })
           
         } catch (e) {
-            error1 = e
+           const error1 = e
+           loading = false
+           error = true
             /*dispatch('eror')*/
         }  
       }
 }
     }else{
+      loading = false
+      success = true
       dispatch("add",{
         isEdit,
         id:misid,
@@ -198,17 +213,19 @@ async function sub(){
       options={bmiData.map(it=>it.attributes.users_permissions_user.data.attributes.username + " - " + it.attributes.name)}
       />
       {:else}
-        <MultiSelect
+      בבניה
+       <!-- <MultiSelect
       bind:selected={selected}
       placeholder={placeholderoles[$lang]}
       options={proles.map(pr=>pr.name)}
-      />
+      />-->
       {/if}
       {/if}
     {#if seEr == true}
         <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>
     {/if}
-<button class="text-barbi bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:text-gold hover:bg-gradient-to-br hover:from-barbi hober:via-mpink hober:to-lpink px-4 py-1 rounded-xl mt-2" type="submit" on:click|preventDefault={sub}>{sedes[$lang]}</button>
+    <hr class="h-2">
+  <Button on:click={sub} {loading} {success} text={sedes} {error}/>
     </div>
 
     <style>
