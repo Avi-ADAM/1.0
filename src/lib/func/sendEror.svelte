@@ -1,22 +1,29 @@
 <script context="module">
-export function sendEror(uid,data,errorId) {
-  console.log(uid,data,errorId)
-    let datar = {"log": `id: ${uid} erId: ${errorId} data: ${data}`}
-    fetch("/api/loger", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(datar),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
-
-  })
-  .catch((error) => {
-    console.error('Error:', error);
+export function sendEror(uid, data, errorId) {
+  const safeData = typeof data === 'object' ? JSON.stringify(data) : String(data);
   
+  const datar = {
+    log: `id: ${uid} erId: ${errorId} data: ${safeData}`
+  };
+
+  fetch("/api/loger", {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify(datar)
   })
+  .then(response => {
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    return response.json();
+  })
+  .then(data => {
+    console.log('Success:', data);
+  })
+  .catch(error => {
+    console.error('Error:', error);
+  });
 }
 </script>
