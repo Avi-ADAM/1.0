@@ -61,22 +61,23 @@
   let askedcoin = [];
   let error1 = null;
   let mtaha = [];
-  let pmashd = 17;
-  let mashs = 17;
-  let maap = 13;
-  let sug = 13;
-  let pen = 13;
-  let ask = 13;
-  let halu = 1;
-  let wel = 17;
-  let askma = 13;
-  let beta = 13;
-  let des = 17;
-  let fia = 17;
+  let pmashd = 0;
+  let mashs = 0;
+  let maap = 0;
+  let sug = 0;
+  let pen = 0;
+  let ask = 0;
+  let halu = 0;
+  let wel = 0;
+  let askma = 0;
+  let beta = 0;
+  let des = 0;
+  let fia = 0;
+  let hachlot = 0
   let fiapp = [];
   let askedm = [];
-  let askm = 17;
-  let ma = 13;
+  let askm = 0;
+  let ma = 0;
   let wegets = [];
   let arr1 = [];
   let askWants = [] 
@@ -2457,7 +2458,7 @@
                        }*/
     }
 
-    halu = hachlatot.length;
+    hachlot = hachlatot.length;
     localStorage.setItem('halu', halu);
   }
 
@@ -3694,6 +3695,18 @@
           {arr1}
           {askedarr}
           {declineddarr}
+          {sug}
+{pen}
+{ask}
+{wel}
+{beta}
+{des}
+{fia}
+{pmash}
+{mashs}
+{maap}
+{askma}
+{hachlot}
         />
       </Tooltip>
     </div>

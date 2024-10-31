@@ -46,7 +46,7 @@ const dispatch = createEventDispatcher();
   function handleSwiper(e) {
     const [swiper] = e.detail;
     swiperInstance = swiper;
-    
+    setSwiperRef(e);
     swiper.on('slideChange', () => {
       currentIndex = swiper.realIndex;
     });
@@ -70,12 +70,8 @@ $:if (indexi != -1){
   swiperRef.slideTo(indexi)
   indexi = -1
 }
-  const setSwiperRef = ({ detail }) => {
-    const [swiper] = detail;
-    // set swiper instance
-    setTimeout(() => {
-      swiperRef = swiper;
-    });
+  const setSwiperRef = (e) => {
+    swiperRef = e.detail[0];
   };
   function change(){
     console.log(cards,"change")
@@ -89,7 +85,7 @@ if (swiperRef !== null) {
   swiperRef.update()
 }
 })
-                async function delo (event){
+  async function delo (event){
     console.log("slideIndex")
   slideIndex = event.detail.coinlapach 
 
@@ -127,7 +123,19 @@ const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/b
 let d = {"he":"לב 1💗1","en":"heart of 1💗1"};
 let u = {"he":"לב 1💗1","en":"heart of 1💗1"};
 const nexttitle = {"he":" יאללה נקסט!","en":"  next!"}
-const pretitle = {"he":"רגע, מה זה היה?","en":"wait.. what was that?"}	
+const pretitle = {"he":"רגע, מה זה היה?","en":"wait.. what was that?"}
+export let sug = 13;
+export let pen = 13;
+export let ask = 17;
+export let wel = 17;
+export let beta = 13;
+export let des = 13;
+export let fia = 99;
+export let pmash = 99;
+export let mashs = 17;
+export let maap = 17;
+export let askma = 13;
+export let hachlot = 9
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
@@ -144,7 +152,7 @@ function hoverc (id){
 
   dispatch("hover", {id: u});
 }
-const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל',"en" : 'Navigation: right side, bottom'}
+const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות ��שמאל',"en" : 'Navigation: right side, bottom'}
 $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
 
 function showonly(event) {
@@ -237,12 +245,24 @@ on:mouseleave={()=> hoverc("0")}
 
 </div>
 <div   
-dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
+dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינו�� התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
-style:visibility={low == true  ? "hidden":  "visible"} class="top-0 absolute left-1/2 -translate-x-1/2">
-<button class="w-8 h-8  text-center bg-gold hover:bg-gold/80 rounded-full" on:click={()=> filter ? showall() : filter = true}><FilterIcon {filter} /></button>
+style:visibility={low == true  ? "hidden":  "visible"} class="top-0 absolute left-1/2 -translate-x-1/2 flex flex-row items-center justify-center">
+<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter ? showall() : filter = true}>
+  <FilterIcon isX={filter} /></button>
 {#if filter}
-<Filter on:showonly={showonly} />
+<Filter on:showonly={showonly} {sug}
+{pen}
+{ask}
+{wel}
+{beta}
+{des}
+{fia}
+{pmash}
+{mashs}
+{maap}
+{askma}
+{hachlot}/>
 {/if}
 </div>
 <div role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  

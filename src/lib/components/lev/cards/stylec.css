@@ -19,7 +19,7 @@
   font-weight: bold;
   height: 100%;
   width: 100%;
-  overflow:visible;
+  overflow: hidden; /* שינוי מ-visible ל-hidden */
 }
 
 

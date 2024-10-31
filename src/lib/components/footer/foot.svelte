@@ -165,7 +165,7 @@
       </div>
       <div class="flex flex-row gap-2 items-start justify-end "	>
       <div>
-        <OnlineSwitch bind:checked={$isOnline} on:change={onlineSwitcher} />
+        <OnlineSwitch bind:checked={$isOnline} on:change={()=>onlineSwitcher} />
       </div>
       <button class="h-6 w-6 mx-2 my-1" on:click={() => {
         isChatOpen.set(false);

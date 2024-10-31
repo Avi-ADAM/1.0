@@ -642,7 +642,7 @@ function hoverede(){
  
 function hoverc (event){
    if (event.detail.x == "0"){
- u = "הצבעה על פרסום הצעת משימה לריקמה"
+ u = "הצבעה על פרסום הצעת משאב לריקמה"
   } else {
     u = event.detail.x
   }
