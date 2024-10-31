@@ -172,6 +172,7 @@ function showall(event) {
 
 }
 let filter = false
+const filterT = {"he":"מיון","en":"filter"}
 </script>
 <style>
 
@@ -224,7 +225,7 @@ let filter = false
 </style>
 <span  role="contentinfo" on:mouseenter={()=> hoverc(nav[$lang])} 
 on:mouseleave={()=> hoverc("0")}>
-       <Header second="./moach" secondTitle=""/>
+       <Header second="/moach" secondTitle={{"he":"למוח","en":"to Brain"}}/>
        </span>
        {#key arr1}
       {#key low}
@@ -245,7 +246,7 @@ on:mouseleave={()=> hoverc("0")}
 
 </div>
 <div   
-dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינו�� התצוגה מקלפים למטבעות")} 
+dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc(filterT[$lang])} 
 on:mouseleave={()=> hoverc("0")} 
 style:visibility={low == true  ? "hidden":  "visible"} class="top-0 absolute left-1/2 -translate-x-1/2 flex flex-row items-center justify-center">
 <button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter ? showall() : filter = true}>
@@ -749,7 +750,7 @@ effect={'fade'}
 </div>
 {:else}
 <div class="body grid items-center justify-center">
-         <Lowding height="100vh" />
+         <Lowding height="50vh" />
          </div> 
          {/if}
          {/key}

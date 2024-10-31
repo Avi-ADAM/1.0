@@ -1,7 +1,7 @@
 <script>
   import { io } from 'socket.io-client';
   const baseUrl = import.meta.env.VITE_URL
-  const levVersion = 1.00
+  const levVersion = 1
   let updateV = null
   import {
     pendMisMes,
@@ -1423,18 +1423,26 @@
   }
   let nowT 
   onMount(async () => {
-
-  nowT = Date.now();
+    nowT = Date.now();
   //check if code updated
   const storedVersion = localStorage.getItem('version');
-  if (storedVersion !== levVersion) {
+  if (storedVersion != levVersion) {
     updateV = true;
     localStorage.setItem('version', levVersion);
-  }else{
+    console.log("here VERSION")
+  } else {
     updateV = false;
-    //recover localhost
-    localRec()
+    console.log("here VERSION OK")
+
+    // קודם כל מנסה לשחזר מהסנאפשוט
+    const storedSnapshot = localStorage.getItem('arr1Snapshot');
+    if (storedSnapshot) {
+      arr1 = JSON.parse(storedSnapshot);
+    }
+    //אם אין סנאפשוט, משחזר מהלוקל סטורג' הרגיל
+    localRec();
   }
+
     /*  if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', {
             scope: '.'
@@ -1876,23 +1884,26 @@
     }
   });
   export const snapshot = {
-    capture:  () => 
-      JSON.parse(JSON.stringify(arr1))
-     ,
-    restore: async (value) => {
-      while(updateV === null){
-        await new Promise(resolve => setTimeout(resolve, 1000))
-      }
-      if(updateV === false){     
-      arr1 = value.arr1
-      console.log("ARR!JSON__out",value)
-   /*   await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
+  capture: () => {
+    const snapshotData = JSON.stringify(arr1);
+    localStorage.setItem('arr1Snapshot', snapshotData);
+    return JSON.parse(snapshotData);
+  },
+  restore: async (value) => {
+    while(updateV === null){
+      await new Promise(resolve => setTimeout(resolve, 1000));
+    }
+    if(updateV === false){     
+      arr1 = value;
+      localStorage.setItem('arr1Snapshot', JSON.stringify(value));
+    }
+  }
+  /*   await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON__out_ser",v)
       })*/
-    
-  }
-}
-  };
+};
+
+  
   let usernames;
   const tolog = {
     he: 'תוקף ההתחברות שלך פג, אנו מעבירים אותך להתחברות מחדש',
