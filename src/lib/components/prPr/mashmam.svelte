@@ -1,3 +1,4 @@
+
 <script>
   export let meData = [];
   import { onMount } from 'svelte';
@@ -23,10 +24,11 @@
     kc = false;
     let is = [];
 
-    for (var i = 0; i < meData.length; i++) {
+    for (let i = 0; i < meData.length; i++) {
+      let a,b
       if (meData[i].attributes.kindOf === 'monthly') {
-        var b = moment(meData[i].attributes.sqadualed);
-        var a = moment(meData[i].attributes.sqadualedf);
+        b = moment(meData[i].attributes.sqadualed);
+        a = moment(meData[i].attributes.sqadualedf);
         meData[i].monts = a.diff(b, 'months', true).toFixed(2);
         ky = true;
         meData[i].m = true;
@@ -37,8 +39,8 @@
         meData[i].total = meData[i].monts * meData[i].attributes.price;
         meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
       } else if (meData[i].attributes.kindOf === 'yearly') {
-        var b = moment(meData[i].attributes.sqadualed);
-        var a = moment(meData[i].attributes.sqadualedf);
+        b = moment(meData[i].attributes.sqadualed);
+        a = moment(meData[i].attributes.sqadualedf);
         meData[i].years = a.diff(b, 'years', true).toFixed(2);
         ky = true;
         meData[i].y = true;

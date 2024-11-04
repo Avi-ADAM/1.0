@@ -1,3 +1,4 @@
+
 <script>
  
 export let fmiData = [];
@@ -26,6 +27,7 @@ export let fmiData = [];
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{isonly == true ? " פעולה שבוצעה ואושרה " : "פעולות שבוצעו ואושרו"} </h1>
     </caption>
+    <thead>
                {#if isonly == false}
 
         <tr class="gg">
@@ -42,7 +44,10 @@ export let fmiData = [];
       {#each fmiData as data, i}
             <td class="ggr">{data.attributes.missionName}</td>
             {/each}
-          </tr> <tr>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
             <th>תיאור</th>
             {#each fmiData as data, i}
             <td>{data.attributes.descrip}</td>
@@ -129,6 +134,7 @@ export let fmiData = [];
              </td>
              {/each}
         </tr>
+        </tbody>
     </table>
 
  

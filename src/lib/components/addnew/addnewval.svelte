@@ -1,21 +1,16 @@
 <script>
-     import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
 const baseUrl = import.meta.env.VITE_URL
 
  let vallues = [];
 // דף של השראה כפתור להוסיף את ההשראה שלך, כפתור לתיקונים  
-    let name_value;
-    let desV;
-   export let color = "--gold";
+    let name_value = $state();
+    let desV = $state();
 
     let error1 = null;
 let meData;
-export let vallId;   
-export let rn = [];
-    let shgi = false;
+    let shgi = $state(false);
 
 async function addNewVall() {
    shgi = false;
@@ -79,7 +74,7 @@ if (rn.includes(name_value)){
 
  
 function dispatchvall (meData) {
-  dispatch('addnew', {
+ addnew({
     id: meData.data.createVallue.data.id,
     skob: meData.data.createVallue.data
     } );
@@ -88,10 +83,17 @@ function dispatchvall (meData) {
 
 function dispatchb () {
    addS = false
-  dispatch('b', {
-    } );
+  b();
 };
-export let addS = false; 
+  /** @type {{color?: string, vallId: any, rn?: any, addS?: boolean}} */
+  let {
+    addnew,
+    b,
+    color = "--gold",
+    vallId,
+    rn = [],
+    addS = $bindable(false)
+  } = $props();
 
 const cencel = {"he":"ביטול","en": "cencel"}
 
@@ -105,10 +107,10 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
 {#if addS == false}
 <button 
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-2 rounded-full"
-on:click={() => addS = true}>{addn[$lang]}</button>
+onclick={() => addS = true}>{addn[$lang]}</button>
 {:else}
 <button title={cencel[$lang]}
-on:click={dispatchb}
+onclick={dispatchb}
 class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded-full text-center" ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
@@ -129,7 +131,7 @@ class=" hover:bg-barbi text-gold hover:text-lturk font-bold  rounded-full text-c
   <span class='line'></span>
 </div>
 
-<button style="margin-top: 20px; " on:click={addNewVall} 
+<button style="margin-top: 20px; " onclick={addNewVall} 
 title={btnTitles[$lang]}
 class=" hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-1 rounded-full"><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z" />

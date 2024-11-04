@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   import { sanitizeUserInput } from '$lib/func/uti/sanitizeUserInput.svelte';
      import { SendTo } from '$lib/send/sendTo.svelte';
   const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;

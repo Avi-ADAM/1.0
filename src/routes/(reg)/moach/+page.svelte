@@ -383,7 +383,7 @@
             bmiData = bmiData;
             vallues = project.vallues.data;
             if ($lang == 'he') {
-              for (var i = 0; i < vallues.length; i++) {
+              for (let i = 0; i < vallues.length; i++) {
                 if (vallues[i].attributes.localizations.data.length > 0) {
                   vallues[i].attributes.valueName =
                     vallues[
@@ -596,7 +596,7 @@
       for (let z = 0; z < miDatal.length; z++) {
         let skills2 = miDatal[z].attributes.skills.data;
         if ($lang == 'he') {
-          for (var i = 0; i < skills2.length; i++) {
+          for (let i = 0; i < skills2.length; i++) {
             if (skills2[i].attributes.localizations.data.length > 0) {
               skills2[i].attributes.skillName =
                 skills2[
@@ -608,7 +608,7 @@
         miDatal[z].attributes.skills.data = skills2;
         let roles = miDatal[z].attributes.tafkidims.data;
         if ($lang == 'he') {
-          for (var i = 0; i < roles.length; i++) {
+          for (let i = 0; i < roles.length; i++) {
             if (roles[i].attributes.localizations.data.length > 0) {
               roles[i].attributes.roleDescription =
                 roles[
@@ -620,7 +620,7 @@
         miDatal[z].attributes.tafkidims.data = roles;
         let workways2 = miDatal[z].attributes.work_ways.data;
         if ($lang == 'he') {
-          for (var i = 0; i < workways2.length; i++) {
+          for (let i = 0; i < workways2.length; i++) {
             if (workways2[i].attributes.localizations.data.length > 0) {
               workways2[i].attributes.workWayName =
                 workways2[
@@ -1067,7 +1067,7 @@
       restime = mecata.restime;
       vallues = mecata.vallues.data;
       if ($lang == 'he') {
-        for (var i = 0; i < vallues.length; i++) {
+        for (let i = 0; i < vallues.length; i++) {
           if (vallues[i].attributes.localizations.data.length > 0) {
             vallues[i].attributes.valueName =
               vallues[i].attributes.localizations.data[0].attributes.valueName;

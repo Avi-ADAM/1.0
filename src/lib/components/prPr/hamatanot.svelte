@@ -243,6 +243,7 @@
                 {our[$lang]}
               </h1>
             </caption>
+            <thead>
             <tr class="gg">
               <th class="gg"></th>
               {#each bmiData as data, i}
@@ -252,6 +253,8 @@
                 </td>
               {/each}
             </tr>
+          </thead>
+          <tbody>
             <tr>
               <th>{nm[$lang]}</th>
               {#each bmiData as data, i}
@@ -399,6 +402,7 @@
                 </td>
               {/each}
             </tr>
+          </tbody>
           </table>
         {/if}
       </div>

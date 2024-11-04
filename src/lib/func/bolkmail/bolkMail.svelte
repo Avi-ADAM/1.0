@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 
     /***
      * send mail to users

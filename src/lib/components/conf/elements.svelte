@@ -22,21 +22,24 @@
         }
     
   })
-    export let datai = []
-    export let dataib = []
-    let dati = datai
-    export let show2 = false
-    export let lebel = {"he":"","en":""}
-    export let valc;
-    export let edit = false
-    export let bgi = "gold"
-    export let newcontent = true
-    export let placeholder = {}
-    export let alld = []
-    export let nom = {}
-    export let addS = false
-    export let roles = []
-    export let dataibn = []
+    let dati = $state(datai)
+  /** @type {{datai?: any, dataib?: any, show2?: boolean, lebel?: any, valc: any, edit?: boolean, bgi?: string, newcontent?: boolean, placeholder?: any, alld?: any, nom?: any, addS?: boolean, roles?: any, dataibn?: any}} */
+  let {
+    datai = $bindable([]),
+    dataib = $bindable([]),
+    show2 = $bindable(false),
+    lebel = {"he":"","en":""},
+    valc,
+    edit = $bindable(false),
+    bgi = "gold",
+    newcontent = true,
+    placeholder = {},
+    alld = $bindable([]),
+    nom = {},
+    addS = false,
+    roles = [],
+    dataibn = $bindable([])
+  } = $props();
 function addnew(event) {
     const newOb = event.detail.skob;
     const newN = event.detail.skob.attributes[valc];
@@ -119,13 +122,13 @@ function checkAll (){
     <Tile sm={true} big={true} bg="{dat.added ? "green" : dat.remuved ? "red" : bgi}" closei={dat.remuved} openi={dat.added} word={dat.attributes[valc]}/></p>{/each}
     </div>
     {/if}
-    <button on:click={()=>edit = true}>
+    <button onclick={()=>edit = true}>
      {#if datai == dataib}🖍️{:else}✏️{/if}</button>
         {#if datai != dataib && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <button onclick={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         {#if datai.length > 0}
         <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1">
@@ -169,7 +172,7 @@ function checkAll (){
             <AddnewWorkway color={"--barbi-pink"}  on:addww={addnew}/>
         {/if}
                 </div>
-        <button on:click={()=>{edit = false
+        <button onclick={()=>{edit = false
 checkAll(datai,dataib)
 }}>✅</button>
     </div>

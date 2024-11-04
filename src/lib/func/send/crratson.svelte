@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   import { sendToSer } from '$lib/send/sendToSer.svelte';
   export async function crRatson(
     logo,

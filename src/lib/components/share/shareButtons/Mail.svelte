@@ -1,8 +1,8 @@
 <script>
 	import EmailIcon from '$lib/celim/icons/Email.svelte';
 
-	export let title;
-    export let body;
+	/** @type {{title: any, body: any}} */
+	let { title, body } = $props();
 
 	const baseUrl = 'mailto:';
 	const parametersObject = {

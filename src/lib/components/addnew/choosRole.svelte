@@ -10,9 +10,9 @@ const baseUrl = import.meta.env.VITE_URL
 function inc() {
      missionNew.set(find_role_id(selected));
   };
-  let roles1 = [];
+  let roles1 = $state([]);
   let error1 = null;
-   let loading = true
+   let loading = $state(true)
   function find_role_id(role_name_arr){
    var  arr = [];
     for (let j = 0; j< role_name_arr.length; j++ ){
@@ -66,7 +66,8 @@ const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       }
   });
 
-export let selected = [];
+  /** @type {{selected?: any}} */
+  let { selected = $bindable([]) } = $props();
       const placeholder = `${$lang == "he" ? "בחירת תפקידים נדרשים" : "needed roles"}`;
 
 const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}

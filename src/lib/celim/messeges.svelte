@@ -4,15 +4,6 @@
   import { slide } from "svelte/transition";
 
 	
-    export let sentByMe;
-    export let nameChatPartner;
-    export let profilePicChatPartner;
-    export let nameMe;
-    export let pending = false;
-		export let message;
-    export let timestamp;		
-	  export let timeRead = 0;
-		export let changed = false
 		// This should use timestamp, but its simplified for the demo.
 		function isToday(date) {
   const today = new Date();
@@ -31,7 +22,19 @@
 	}
   return false;
 }
-	export let what = null;
+	/** @type {{sentByMe: any, nameChatPartner: any, profilePicChatPartner: any, nameMe: any, pending?: boolean, message: any, timestamp: any, timeRead?: number, changed?: boolean, what?: any}} */
+	let {
+		sentByMe,
+		nameChatPartner,
+		profilePicChatPartner,
+		nameMe,
+		pending = false,
+		message,
+		timestamp,
+		timeRead = 0,
+		changed = false,
+		what = null
+	} = $props();
 	
 </script>
 

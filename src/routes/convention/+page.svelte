@@ -13,7 +13,7 @@
   import { onMount } from 'svelte';
       import { email } from '$lib/components/registration/email.js'
 
-  let idx = 1;
+  let idx = $state(1);
 let error;
 const baseUrl = import.meta.env.VITE_URL
 
@@ -80,9 +80,9 @@ onMount(async () => {
 
              
     });
-	let user;
+	let user = $state();
 
-   let kvar;
+   let kvar = $state();
     onMount(async () => {
     if (document.cookie) {
      
@@ -131,7 +131,7 @@ const cookieValueti = document.cookie
     );
 
 
-  let regHelperL = 0;
+  let regHelperL = $state(0);
 
   
 regHelper.subscribe(value => {
@@ -178,7 +178,7 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
   border: var(--sms-focus-border, 1pt solid var(--sms-active-color, cornflowerblue))
   /* selected options in the dropdown list */
 }
-:global(li:not(.selected):hover) {
+:global(li:not(:global(.selected)):hover) {
   color: #FF0092;
   /* unselected but hovered options in the dropdown list */
 }
@@ -203,11 +203,11 @@ button:disabled {
   background-color: var(--grey);
 }
 
-button:focus:not(:disabled) {
+button:focus:not(:global(:disabled)) {
   box-shadow: 0 0 0 4px var(--primary-light);
 }
 
-button:hover:not(:disabled) {
+button:hover:not(:global(:disabled)) {
  
   background: radial-gradient(skyblue 20%, var(--barbi-pink))
 		skyblue ;

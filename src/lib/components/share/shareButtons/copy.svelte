@@ -1,7 +1,6 @@
 <script>
     import { toast } from 'svelte-sonner';
     import CopyToClipboard from "svelte-copy-to-clipboard";
-  export let exampleText = 'Copy me!';
   import {lang} from '$lib/stores/lang'
   const su = {
     "he": "!העתקת בהצלחה",
@@ -24,20 +23,25 @@
   }
 	import Copy from '$lib/celim/icons/copy.svelte';
 	
-	export let url;
-  $: checked = false
-  $: error = false
+  /** @type {{exampleText?: string, url: any}} */
+  let { exampleText = 'Copy me!', url } = $props();
+  let checked = $state(false);
+  
+  let error = $state(false);
+  
 </script>
 
 <button 
 	><span class="sr-only">Copy to clipboard</span>
-    <CopyToClipboard text={url} on:copy={handleSuccessfullyCopied} on:fail={handleFailedCopy} let:copy>
-      <button on:click={copy}><Copy
-		{checked}
-        {error}
-		width={48}
-	/></button>
-</CopyToClipboard></button
+    <CopyToClipboard text={url} on:copy={handleSuccessfullyCopied} on:fail={handleFailedCopy} >
+      {#snippet children({ copy })}
+        <button onclick={copy}><Copy
+  		{checked}
+          {error}
+  		width={48}
+  	/></button>
+      {/snippet}
+    </CopyToClipboard></button
 >
 
 <style>

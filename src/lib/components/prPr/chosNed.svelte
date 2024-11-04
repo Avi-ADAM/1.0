@@ -10,10 +10,9 @@
  const dispatch = createEventDispatcher();
     //let  userName_value;
     let token; 
- export let needss = [];
   //  let error = null
-    let addnee = false;  
-  let isLow = true
+    let addnee = $state(false);  
+  let isLow = $state(true)
 onMount(async () => {
          const cookieValue = document.cookie
   .split('; ')
@@ -71,8 +70,8 @@ onMount(async () => {
       return arr1;
      };
 
-export let selctedi = [];
-export let selected = [];
+  /** @type {{needss?: any, selctedi?: any, selected?: any}} */
+  let { needss = $bindable([]), selctedi = [], selected = $bindable([]) } = $props();
     const placeholder = `הוספת משאבים נדרשים `;
 
 function newn(event) {

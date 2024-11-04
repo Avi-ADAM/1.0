@@ -15,27 +15,27 @@
       import Chooser from '$lib/celim/ui/chooser.svelte'
       const baseUrl = import.meta.env.VITE_URL
 
-let loading = false;
-let isOpen = false;
-let a = 0;
-let success = false
-    let before = false;
+let loading = $state(false);
+let isOpen = $state(false);
+let a = $state(0);
+let success = $state(false)
+    let before = $state(false);
     let url1 = baseUrl+"/api/upload";
-    let linkP;
-    let desP;
-    let desPl;
+    let linkP = $state();
+    let desP = $state();
+    let desPl = $state();
     let resP;
-    let projectName_value = "";
+    let projectName_value = $state("");
     let token; 
-    let timeToP = "already";
+    let timeToP = $state("already");
    let idL;
 let run = [];
 let imageId = 50;
 let files;
-  let shgi = false;
-    let restime;
+  let shgi = $state(false);
+    let restime = $state();
     let nam;
-    let ont = false
+    let ont = $state(false)
 async function sendP () {
   if(projectName_value.length < 1){
     naex = {"he": "שם הריקמה חייב להיות ארוך יותר", "en": "please choose name for the FreeMate"}
@@ -154,7 +154,7 @@ async function sendPP(){
               }
 }
 
-let vallues = [];
+let vallues = $state([]);
     let error1 = null;
     let addval = false;
     
@@ -205,7 +205,7 @@ let vallues = [];
         }
     });
 
-let suc = false;
+let suc = $state(false);
     function find_value_id(value_name_arr){
      var  arr = [];
       for (let j = 0; j< value_name_arr.length; j++ ){
@@ -219,24 +219,25 @@ let suc = false;
      };
 
 
-    let selected;
+    let selected = $state();
         const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
 
  function project (id) {
          idPr.set(resP.data.createProject.data.id);
     goto("/moach");
   };
-export let userName_value;
   import { RingLoader
 } from 'svelte-loading-spinners'
   import RichText from '$lib/celim/ui/richText.svelte';
+  /** @type {{userName_value: any}} */
+  let { userName_value } = $props();
  const closer = () => {
     isOpen = false;
   a = 0;
   };
   	function callbackFunction(event) {
     a = 2;
-    files = event.detail.files;
+    files = event.files;
     isOpen = false;
     suc = true;
 	}
@@ -312,9 +313,10 @@ const newOb = meData.data.createVallue.data;
 
   
 
-  $: ugug = ``;
-    let newcontent = true
-  $: addne = {"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`}
+  let ugug = $state(``);
+  
+    let newcontent = $state(true)
+  let addne = $derived({"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`})
 const timeto = {"he":"כמה זמן עד שהריקמה תכניס כסף", "en":"how much time until the FreeMates will be profitable"}
 const timetoex = {"he":"חישוב הזמן עד שניתן יהיה לחלק כסף מרגע שאוישו כל המשימות ונתקבלו כל המשאבים הנדרשים", "en" : "the time until money can be splited from when all of the missions has asigned and all the resources has accepted" }
 const cvar = {"he":"הריקמה כבר רווחית", "en": "the FreeMates is already profitable"}
@@ -336,7 +338,7 @@ const hre = {"he":"זמן תגובה לקבלת החלטות בריקמה", "en"
 const teure = {"he": "תיאור שיהיה גלוי לכל", "en": "short description with public visibility"} 
 const prte = {"he": "תאור מפורט שגלוי רק בתוך הריקמה", "en":"long description visible only to the FreeMates members"}
 const wel = {"he":"לינק לאתר (אם יש)" ,"en":"link to a website (if any)"}
-let naex = {"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"}
+let naex = $state({"he":"השם כבר קיים נא לבחור שם אחר" , "en":"name already exists please try another name"})
 const whva = {"he":"אלו ערכים ומטרות הריקמה תקדם" , "en":"which vallues and goals the FreeMates will promote"}
 const ladd = {"he":"הוספת לוגו", "en": "add Logo"} 
 const su = {"he": "לוגו נוסף בהצלחה", "en": "logo has successfully added"}
@@ -351,9 +353,9 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   <DialogContent aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>{cencel[$lang]}</button>
+          onclick={closer}>{cencel[$lang]}</button>
           {#if a == 0}
-          <Uplad on:message={callbackFunction}/>
+          <Uplad message={callbackFunction}/>
 
           {:else if a == 2}
           <div class="sp bg-gold">
@@ -411,7 +413,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   <span class='line'></span>
 </div>
 <br>
-<button on:click={openen} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >{ladd[$lang]}</button>
+<button onclick={openen} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >{ladd[$lang]}</button>
 {#if suc == true}<small class="text-barbi">{su[$lang]}</small>{/if}
          
 <h1 class="midscreenText-2 text-center text-gold">
@@ -499,7 +501,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 
 <button 
     class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
-     on:click="{sendP}"
+     onclick={sendP}
      name="addm">{cree[$lang]}</button>
        {:else}  <RingLoader size="100" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 {/if}</div>
@@ -507,7 +509,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 <div class="aft">
   <h1 class="text-barbi">{sur[$lang]}</h1>
   <button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={project} >{tob[$lang]}</button>
+ onclick={project} >{tob[$lang]}</button>
 </div>
 {/if}
   {#if success}

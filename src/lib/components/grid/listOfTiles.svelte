@@ -1,7 +1,7 @@
 <script>
   import Tile from "$lib/celim/tile.svelte";
-    export let color = 'pink'
-    export let items = []
+  /** @type {{color?: string, items?: any}} */
+  let { color = 'pink', items = [] } = $props();
 </script>
 <div class="flex sm:flex-row flex-wrap justify-center align-middle d  ">
     {#each items as item}

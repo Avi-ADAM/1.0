@@ -1,22 +1,22 @@
 <svelte:head>
-  <script bind:this={script} src={url} />
+  <script bind:this={script} src={url}></script>
 </svelte:head>
 
 <script>
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte';
 
-  const dispatch = createEventDispatcher();
-  export let url;
-  let script;
+  /** @type {{url: any}} */
+  let { url, lodaed, error } = $props();
+  let script = $state();
 
   onMount(async () => {
     script.addEventListener('load', () => {
-      dispatch('loaded');
+      lodaed()
     })
 
     script.addEventListener('error', (event) => {
       console.error("something went wrong", event);
-      dispatch('error');
+      error()
     });
   });
 </script>

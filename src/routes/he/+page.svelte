@@ -165,10 +165,13 @@ const agree3 = {
   "en": "Together we will create a better world"
 };
 
-	$: btna = false
-	$: btnb = false
-	$: scrolli = false
-	let loading = false, loadinga = false,w,h,fi = false, trans = false
+	let btna = $state(false);
+  
+	let btnb = $state(false);
+  
+	let scrolli = $state(false);
+  
+	let loading = $state(false), loadinga = $state(false),w = $state(),h = $state(),fi = $state(false), trans = $state(false)
   //רוצה להתפרנס מהתשוקה.אהבה שלך
 //w*1.8 < h ? w : h > 639 ? w*0.8 : h
 
@@ -193,21 +196,21 @@ const pagetitle = {
    <Head title={pagetitle[$lang]} description={description[$lang]} {image} url={pageurl[$lang]} />
  <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
-          <button on:click={()=>trans = !trans}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          <button onclick={()=>trans = !trans}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
-          <button on:click={()=>trans = !trans} class=" text-barbi hover:text-gold p-0.5 "
+          <button onclick={()=>trans = !trans} class=" text-barbi hover:text-gold p-0.5 "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
 {#if $lang != "en"}
-      <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["en"]}</button>
+      <button onclick={() =>change("en")} title="change language to English" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["en"]}</button>
 {/if} 
 
 {#if $lang != "ar"}
-      <button on:click={() =>change("ar")} title="change language to Arabic" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["ar"]}</button>
+      <button onclick={() =>change("ar")} title="change language to Arabic" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["ar"]}</button>
 {/if}
 {#if $lang != "he"}
-      <button on:click={() =>change("he")} title="change language to Hebrew" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["he"]}</button>
+      <button onclick={() =>change("he")} title="change language to Hebrew" class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5">{changel["he"]}</button>
 {/if}
 {#if $lang == "he"}
       <a class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
@@ -232,7 +235,7 @@ const pagetitle = {
           <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
 		>1</h1></div></div>
-	<div class="overflow-auto d  "  dir={$lang !== "en" ? "ltr" : "rtl"}  on:scroll={()=>{ scrolli = true
+	<div class="overflow-auto d  "  dir={$lang !== "en" ? "ltr" : "rtl"}  onscroll={()=>{ scrolli = true
 	setTimeout(()=>scrolli = false,1500)
 	}} >
 		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  overline decoration-mturk text-xl"
@@ -257,10 +260,10 @@ const pagetitle = {
     </div>
 	</div>
 		<div style="font-family:Gan, Power;" class="flex flex-row">
-			<button class="transition-all duration-300 flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl" on:click={()=>{goto("/login") 
+			<button class="transition-all duration-300 flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl" onclick={()=>{goto("/login") 
 				loadinga = true
-				fi = true}} class:button-perl={btna ==  false} class:button-gold={btna == true} on:focus={()=> btna = true} on:mouseover={()=>btna = true} 
-					on:mouseleave={()=> btna = false }>{login[$lang]}
+				fi = true}} class:button-perl={btna ==  false} class:button-gold={btna == true} onfocus={()=> btna = true} onmouseover={()=>btna = true} 
+					onmouseleave={()=> btna = false}>{login[$lang]}
 			{#if btna == true && loadinga == false}
 			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he" || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}
@@ -268,10 +271,10 @@ const pagetitle = {
 			<Lowding width="24px" height="24px"/>
 			{/if}
 			</button>
-			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"on:click={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/aitifaqia" : "/convention"}`) 
+			<button class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"onclick={()=>{goto(`${$lang == "he" ? "/hascama" : $lang == "ar" ? "/aitifaqia" : "/convention"}`) 
 			loading = true
 			fi = true
-		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} on:focus={()=> btnb = true} on:mouseover={()=>btnb = true} on:mouseleave={()=> btnb = false }>{reg[$lang]}
+		}}  class:button-perl={btnb ==  false} class:button-gold={btnb == true} onfocus={()=> btnb = true} onmouseover={()=>btnb = true} onmouseleave={()=> btnb = false}>{reg[$lang]}
 			{#if btnb == true && loading == false}
 			<span class="mx-2 mb-0.5"><Arrow back={$lang == "he"  || $lang == "ar" ? false : true} height="32" color={"var(--gold)"} fill="var(--barbi-pink)"/></span>
 			{/if}

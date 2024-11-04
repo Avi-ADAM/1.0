@@ -1,4 +1,6 @@
 <script>
+  import { preventDefault } from 'svelte/legacy';
+
     import { lang } from '$lib/stores/lang.js'
 
     import { fade } from "svelte/transition";
@@ -9,13 +11,11 @@
     import { liUN } from '$lib/stores/liUN.js';
     const baseUrl = import.meta.env.VITE_URL
 
-
-    export let data
-    $: mydata = data
-    let active = false;
-    let loginError = null;
-    let email = "";
-    let password = "";
+
+    let active = $state(false);
+    let loginError = $state(null);
+    let email = $state("");
+    let password = $state("");
     let username = "";
     let fillFilds ;
     let emailenter = {
@@ -76,21 +76,24 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
 
 	import { emailValidator, requiredValidator } from '../../lib/celim/validators.js'
   import { createFieldValidator } from '../../lib/celim/validation.js'
+  /** @type {{data: any}} */
+  let { data } = $props();
     const iwanttoreg = {"he":"עדיין לא נרשמתי", "en":"I wand to register"}
   const [ validity, validate ] = createFieldValidator(requiredValidator(), emailValidator())
     const title = {"he": "התחברות ל-1💗1", "en":"login to 1💗1"}
+    let mydata = $derived(data)
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
   </svelte:head>
 <div class="body">
  <div class="login">            
-                <form class="fr" on:submit|preventDefault={login} in:fade >
+                <form class="fr" onsubmit={preventDefault(login)} in:fade >
                     <div>
                     {#if loginError}
                         <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
                         <button
-                         on:click={handleclick} 
+                         onclick={handleclick} 
                          title={buttonForgot[$lang]}  
                          in:fade  
                                 style=" position: fixed;
@@ -134,7 +137,7 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
                         <button class:active={active} disabled={!$validity.valid}
                         class="center hover:scale-150 bt "    
                      ></button>
-                     <button class="text-gold bg-barbi px-3 py-1 rounded-md hover:text-barbi hover:bg-gold" on:click={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
+                     <button class="text-gold bg-barbi px-3 py-1 rounded-md hover:text-barbi hover:bg-gold" onclick={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
                      </div>
                   </div>
                 </form>

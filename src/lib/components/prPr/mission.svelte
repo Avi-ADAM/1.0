@@ -81,7 +81,7 @@
         console.log(c.data.mission.data);
         let t = c.data.mission.data;
         if ($lang == 'he') {
-          for (var i = 0; i < t.attributes.skills.data.length; i++) {
+          for (let i = 0; i < t.attributes.skills.data.length; i++) {
             if (t.attributes.skills.data[i].attributes.localizations.data.length > 0) {
               t.attributes.skills.data[i].attributes.skillName =
                 t.attributes.skills.data[
@@ -89,7 +89,7 @@
                 ].attributes.localizations.data[0].attributes.skillName;
             }
           }
-          for (var i = 0; i < t.attributes.tafkidims.data.length; i++) {
+          for (let i = 0; i < t.attributes.tafkidims.data.length; i++) {
             if (t.attributes.tafkidims.data[i].attributes.localizations.data.length > 0) {
               t.attributes.tafkidims.data[i].attributes.roleDescription =
                 t.attributes.tafkidims.data[
@@ -98,7 +98,7 @@
             }
           }
           console.log(t.attributes.tafkidims.data, 't.attributes.roles.data');
-          for (var i = 0; i < t.attributes.work_ways.data.length; i++) {
+          for (let i = 0; i < t.attributes.work_ways.data.length; i++) {
             if (t.attributes.work_ways.data[i].attributes.localizations.data.length > 0) {
               t.attributes.work_ways.data[i].attributes.workWayName =
                 t.attributes.work_ways.data[
@@ -142,7 +142,7 @@
   });
 
   function find_role_id(role_name_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < role_name_arr.length; j++) {
       for (let i = 0; i < roles1.length; i++) {
         if (roles1[i].attributes.roleDescription === role_name_arr[j]) {
@@ -154,7 +154,7 @@
   }
 
   function find_workway_id(workway_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < workway_arr.length; j++) {
       for (let i = 0; i < $ww.length; i++) {
         if ($ww[i].attributes.workWayName === workway_arr[j]) {
@@ -166,7 +166,7 @@
   }
 
   function find_user_id(user_name_arr) {
-    var id = 0;
+    let id = 0;
     for (let i = 0; i < pu.length; i++) {
       if (pu[i].attributes.username === user_name_arr[0]) {
         id = pu[i].id;
@@ -193,7 +193,7 @@
   };
 
   function find_skill_id(skill_name_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < skill_name_arr.length; j++) {
       for (let i = 0; i < skills2.length; i++) {
         if (skills2[i].attributes.skillName === skill_name_arr[j]) {

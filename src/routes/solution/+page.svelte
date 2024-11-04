@@ -1,7 +1,7 @@
 <script>
       import Tile from '$lib/celim/tile.svelte';
 import { animate, signal, all } from '$lib/func/animation.ts'
-  import { afterUpdate, onMount } from 'svelte';
+  import { onMount } from 'svelte';
       let colors = ["pink" ,"blue", "purple","wow","indigo",  "green", "yellow", "red", "gray"];
 
   onMount(()=>{
@@ -11,7 +11,7 @@ import { animate, signal, all } from '$lib/func/animation.ts'
     const line = signal({ x: 2.5, y: 2.5, x2: 1.5, y2: 1.5, fill: 'blue' })
 $: oldH = 0
 $: oldW = 0
-      afterUpdate(async() => {
+      $effect(async() => {
         if(oldH == 0 && oldW== 0){
           oldH = h
           oldW = w

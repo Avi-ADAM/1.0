@@ -1,8 +1,7 @@
 <script>
     import {lang} from '$lib/stores/lang.js'
-export let noofhours = 0
-export let  perhour = 0
-    export let iskvua = false
+    /** @type {{noofhours?: number, perhour?: number, iskvua?: boolean}} */
+    let { noofhours = 0, perhour = 0, iskvua = false } = $props();
     const perho = {"he":"לשעה","en":"per hour"}
         const hourss = {"he":"שעות","en":"hours"}
         const monhly = {"he":"בחודש", "en": "per month"}

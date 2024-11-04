@@ -1,16 +1,16 @@
 <script>
-        let amort = ""
-let amorts =  ""
-let amortt = ""
-let amortf = ""
-let amorth = ""
+        let amort = $state("")
+let amorts =  $state("")
+let amortt = $state("")
+let amortf = $state("")
+let amorth = $state("")
 let amorta = "أنا||اسم|| لن أستخدم العنف أبدًا أو أؤذي أي شخص"
 let amortsa =  "لأنني ||اسم|| لا أريد أن أكون ضحية للعنف ولأنه لا توجد سلطة أو قيمة أو غرض أو معتقد أو مال أو فائدة تبرر الإضرار بحياة الشخص والعنف والإكراه بالقوة."
 let amortta = "أنا ||اسم|| سأمنح ثقتي في الخير وأنه عندما توقع البشرية جمعاء هذه الاتفاقية: سيتوقف العنف والقتال والحكم عن أن يكون شكلاً من أشكال التواصل البشري"
 let amortfa = "عندما تكون كل ||اسم مكان|| من الموقعين على هذه المعاهدة أنا ||اسم|| سأتخلى عن أسلحتي ورجال الشرطة المسلحين الذين عينتهم دولة ||اسم مكان|| بالنيابة عني."
 let amortha = "أنا ||اسم||، سأتخلى عن أسلحة الجيش ||اسم مكان|| عندما توقع البشرية جمعاء على هذه الاتفاقية."
-  let already = false;
-  let lang, come, name, email;
+  let already = $state(false);
+  let lang = $state(), come = $state(), name = $state(), email = $state();
 let error1;
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
@@ -116,7 +116,7 @@ already = true;
 {#if already == false}
 <div class="flex items-center justify-center">
 <button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={add} >اتصال</button>
+ onclick={add} >اتصال</button>
  </div>
  {/if}
 <style>

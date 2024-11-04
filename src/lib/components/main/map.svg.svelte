@@ -6,35 +6,38 @@
 
   const { data, width, height, zGet } = getContext('LayerCake');
 
-  /** projection - A D3 projection function. Pass this in as an uncalled function, e.g. `projection={geoAlbersUsa}`. */
-  export let projection;
+  
 
-  /**[fixedAspectRatio] - By default, the map fills to fit the $width and $height. If instead you want a fixed-aspect ratio, like for a server-side rendered map, set that here. */
-  export let fixedAspectRatio = undefined;
+  
 
-  /**  [fill] - The shape's fill color. By default, the fill will be determined by the z-scale, unless this prop is set. */
-  export let fill = undefined;
+  
 
-  /** [stroke='#333'] - The shape's stroke color. */
-  export let stroke = '#333';
+  
 
-  /** [strokeWidth=0.5] - The shape's stroke width. */
-  export let strokeWidth = 0;
+  
 
-  /** [features] - A list of GeoJSON features. Use this if you want to draw a subset of the features in `$data` while keeping the zoom on the whole GeoJSON feature set. By default, it plots everything in `$data.features` if left unset. */
-  export let features = undefined;
+  
+  /** @type {{projection: any, fixedAspectRatio?: any, fill?: any, stroke?: string, strokeWidth?: number, features?: any}} */
+  let {
+    projection,
+    fixedAspectRatio = undefined,
+    fill = undefined,
+    stroke = '#333',
+    strokeWidth = 0,
+    features = undefined
+  } = $props();
 
   /* --------------------------------------------
    * Here's how you would do cross-component hovers
    */
   const dispatch = createEventDispatcher();
 
-  $: fitSizeRange = fixedAspectRatio ? [100, 100 / fixedAspectRatio] : [$width, $height];
+  let fitSizeRange = $derived(fixedAspectRatio ? [100, 100 / fixedAspectRatio] : [$width, $height]);
 
-  $: projectionFn = projection()
-    .fitSize(fitSizeRange, $data);
+  let projectionFn = $derived(projection()
+    .fitSize(fitSizeRange, $data));
 
-  $: geoPathFn = geoPath(projectionFn);
+  let geoPathFn = $derived(geoPath(projectionFn));
 
   function handleMousemove(feature) {
     return function handleMousemoveFn(e) {
@@ -49,8 +52,8 @@
 
 <g
   class="map-group"
-  on:mouseout={(e) => dispatch('mouseout')}
-  on:blur={(e) => dispatch('mouseout')}
+  onmouseout={(e) => dispatch('mouseout')}
+  onblur={(e) => dispatch('mouseout')}
 >
   {#each (features || $data.features) as feature}
     <path
@@ -59,9 +62,9 @@
       stroke={stroke}
       stroke-width={strokeWidth}
       d="{geoPathFn(feature)}"
-      on:mouseover={(e) => dispatch('mousemove', { e, props: feature.properties })}
-      on:focus={(e) => dispatch('mousemove', { e, props: feature.properties })}
-      on:mousemove={handleMousemove(feature)}
+      onmouseover={(e) => dispatch('mousemove', { e, props: feature.properties })}
+      onfocus={(e) => dispatch('mousemove', { e, props: feature.properties })}
+      onmousemove={handleMousemove(feature)}
     ></path>
   {/each}
 </g>

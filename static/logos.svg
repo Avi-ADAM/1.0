@@ -1,0 +1,14 @@
+<svg version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="0 0 500 500" xml:space="preserve">
+  <!-- Background Circle -->
+  <circle cx="250" cy="250" r="240" stroke="gold" stroke-width="10" fill="#FFD700"/>
+  <!-- Inner Circle for Text Background -->
+  <circle cx="250" cy="250" r="220" fill="#EEE8AA"/>
+  <!-- Crown -->
+  <path d="M205,80 L245,80 L245,100 L230,115 L215,100 L205,80" fill="gold" />
+  <path d="M255,80 L295,80 L295,100 L280,115 L265,100 L255,80" fill="gold" />
+  <!-- 1💗1 Text -->
+  <text x="50%" y="55%" font-family="Arial, sans-serif" font-size="160" fill="gold" stroke="black" stroke-width="2" text-anchor="middle" dominant-baseline="middle">1💗1</text>
+  <!-- Decorative Leaves -->
+  <path d="M10,250 A240,240 0 0,1 490,250" stroke="gold" stroke-width="5" fill="none"/>
+  <path d="M10,250 A240,240 0 0,0 490,250" stroke="gold" stroke-width="5" fill="none"/>
+</svg>

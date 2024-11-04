@@ -1,6 +1,6 @@
 <script>
-   export let width=24
-      export let height=24
+	/** @type {{width?: number, height?: number}} */
+	let { width = 24, height = 24 } = $props();
 
 </script>
 <svg width={width} height={height} version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"

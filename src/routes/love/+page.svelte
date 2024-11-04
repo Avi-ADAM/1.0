@@ -1,5 +1,7 @@
  
 <script>
+  import { run } from 'svelte/legacy';
+
   import { RingLoader
 } from 'svelte-loading-spinners';
   
@@ -15,11 +17,12 @@
     
   import MapSvg from '../../lib/components/main/map.svg.svelte';
   import Tooltip from '../../lib/components/main/tooltip.html.svelte';
- export let data = null
  
   // This example loads json data as json using @rollup/plugin-json
   import world from '../../lib/components/main/countries110m.json';
   import { onMount } from 'svelte';
+  /** @type {{data?: any}} */
+  let { data = null } = $props();
 
   const colorKey = 'agrees';
   const colorKeyy = 'value';
@@ -32,22 +35,25 @@
   const dataJoinKey = 'name';
   const mapJoinKey = 'name';
   const dataLookup = new Map();
-  $: noof = 0
-    $:  data.streamed.data.then(function(data) {
-      noof = data.total
-      data.forEach(d => {
-    dataLookup.set(d[dataJoinKey], d);
-        }
-        )
-      })
+  let noof = $state(0);
+  
+    run(() => {
+    data.streamed.data.then(function(data) {
+        noof = data.total
+        data.forEach(d => {
+      dataLookup.set(d[dataJoinKey], d);
+          }
+          )
+        })
+  });
 
    
   const geojson = feature(world, world.objects.units);
   const projection = geoMercator;
 
   
-  let evt;
-  let hideTooltip = true;
+  let evt = $state();
+  let hideTooltip = $state(true);
       const onm = {"he":"רק רגע בבקשה","en":"one moment please","ar":"دقيقة واحدة فقط من فضلك"}
   // Create a flat array of objects that LayerCake can use to measure
   // extents for the color scale
@@ -56,7 +62,9 @@
   'rgb(244, 114, 182)',
   'rgb(209, 146, 255)',
 					"#EEE8AA"];
-     $: console.log(data.streamed.data)
+     run(() => {
+    console.log(data.streamed.data)
+  });
   const addCommas = format(',');
   const title = {"he":" סך הכל הסכימו","en":"Total agreements","ar":" مجموع الموافقات المستلمة"}
 </script>
@@ -119,14 +127,16 @@
       {#if hideTooltip !== true}
         <Tooltip
           {evt}
-          let:detail
+          
         >
-          {@const tooltipData = { ...detail.props, ...dataLookup.get(detail.props[mapJoinKey]) }}
-          {#each Object.entries(tooltipData) as [key, value]}
-            {@const keyCapitalized = key.replace(/^\w/, d => d.toUpperCase())}
-            <div class="row"><span>{keyCapitalized}:</span> {typeof value === 'number' ? addCommas(value) : value}</div>
-          {/each}
-        </Tooltip>
+          {#snippet children({ detail })}
+                                {@const tooltipData = { ...detail.props, ...dataLookup.get(detail.props[mapJoinKey]) }}
+            {#each Object.entries(tooltipData) as [key, value]}
+              {@const keyCapitalized = key.replace(/^\w/, d => d.toUpperCase())}
+              <div class="row"><span>{keyCapitalized}:</span> {typeof value === 'number' ? addCommas(value) : value}</div>
+            {/each}
+                                        {/snippet}
+                            </Tooltip>
       {/if}
     </Html>
   </LayerCake>

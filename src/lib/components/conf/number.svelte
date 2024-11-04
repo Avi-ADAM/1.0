@@ -2,18 +2,21 @@
     import RangeSlider from "svelte-range-slider-pips";
     import Barb from './barb.svelte'
     import tr from '$lib/translations/tr.json'
-    export let status = [10,20]
-    export let splebel = null
-    export let state = 2 // original and edit, 3 is original second and edit
-export let number;
-export let numberb = number
 
-export let lebel;
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
-$: datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
-    let edit = false
-let show2 = false
+  /** @type {{status?: any, splebel?: any, state?: number, number: any, numberb?: any, lebel: any}} */
+  let {
+    status = [10,20],
+    splebel = null,
+    state = 2,
+    number,
+    numberb = $bindable(number),
+    lebel
+  } = $props();
+let datai = $derived([{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}])
+    let edit = $state(false)
+let show2 = $state(false)
 function checkAll(a,b){
   datai[0].value = b
   datai[1].value = a
@@ -33,13 +36,13 @@ function checkAll(a,b){
        <Barb {datai} />
        </div>
         {/if}
-       <button on:click={()=>edit = true}>
+       <button onclick={()=>edit = true}>
             {#if number == numberb}🖍️{:else}✏️{/if}</button>
         {#if number != numberb && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <button onclick={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{number}</p>
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
@@ -55,7 +58,7 @@ function checkAll(a,b){
   <input type="number"  id="numberb" name="numberb" bind:value={numberb} class='input' required>
   <label for="numberb" class='label' >{lebel}</label>
   <span class='line '></span>
-</div><button on:click={()=>{if(Number(numberb) >= 0){ edit = false
+</div><button onclick={()=>{if(Number(numberb) >= 0){ edit = false
 checkAll(number,numberb)
 } else{
   console.log(numberb,Number(numberb))

@@ -1,12 +1,15 @@
 <script>
 	import TwitterIcon from '$lib/celim/icons/twiter.svelte';
 
-	export let hashtags = []; // array of hashtags exclude '#' e.g. ['svelte', 'askRodney']
-	export let quote = undefined;
-	export let related = []; // array of Twitter users (including '@')
-	export let title; // text in Tweet
-	export let url;
-	export let via = ''; // include '@' e.g. '@askRodney'
+	/** @type {{hashtags?: any, quote?: any, related?: any, title: any, url: any, via?: string}} */
+	let {
+		hashtags = [],
+		quote = undefined,
+		related = [],
+		title,
+		url,
+		via = ''
+	} = $props();
 
 	const TWITTER_BLUE = '#00aced';
 
@@ -51,7 +54,7 @@
 	}
 </script>
 
-<button on:click={handleClick}
+<button onclick={handleClick}
 	><span class="sr-only">Share on Twitter</span><TwitterIcon
 		colour={TWITTER_BLUE}
 		width={48}

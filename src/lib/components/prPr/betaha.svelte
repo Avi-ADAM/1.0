@@ -33,6 +33,7 @@ function confirm (id) {
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{isonly == true ? "פעולה" : "פעולות"} בתהליך ביצוע</h1>
     </caption>
+    <thead>
        {#if isonly == false}
         <tr class="gg">
           <th class="gg "></th>
@@ -48,7 +49,10 @@ function confirm (id) {
       {#each bmiData as data, i}
             <td class="ggr  font-bold">{data.attributes.name}</td>
             {/each}
-          </tr> <tr>
+          </tr>
+    </thead>
+    <tbody>
+          <tr>
             <th>תיאור</th>
             {#each bmiData as data, i}
             <td>{data.attributes.descrip !== null && data.attributes.descrip !== undefined && data.attributes.descrip !== "undefined" ? data.attributes.descrip : ""}</td>
@@ -156,6 +160,7 @@ function confirm (id) {
         </td>
           {/each}
     </tr> 
+    </tbody>
     </table>
   </div>
   </div>

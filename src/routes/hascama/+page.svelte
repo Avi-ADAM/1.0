@@ -12,6 +12,8 @@ defer>
 </svelte:head>
 
     <script>
+  import { preventDefault } from 'svelte/legacy';
+
     import {
         liUN
     } from '$lib/stores/liUN.js';
@@ -57,13 +59,13 @@ import {
     linkos
 } from '$lib/stores/linkos.js'
 
-let idx = 1;
+let idx = $state(1);
 let error;
 const baseUrl = import.meta.env.VITE_URL
 
 let user = 0;
 
-let kvar;
+let kvar = $state();
 onMount(async () => {
     const x = $page.url.searchParams.get('ref')
     if (x != null) {
@@ -187,7 +189,7 @@ onMount(async () => {
 
 });
 
-let regHelperL = -1;
+let regHelperL = $state(-1);
 
 regHelper.subscribe(value => {
     regHelperL = value;
@@ -232,7 +234,7 @@ function beforeUnload(event) {
 }
 </script>
 
-<svelte:window on:beforeunload|preventDefault={beforeUnload}/>
+<svelte:window onbeforeunload={preventDefault(beforeUnload)}/>
 
 <div class="main">
 <!--{#if user > 0}
@@ -268,7 +270,7 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
         /* selected options in the dropdown list */
 }
 
-:global(li:not(.selected):hover) {
+:global(li:not(:global(.selected)):hover) {
     color: #FF0092;
     /* unselected but hovered options in the dropdown list */
 }

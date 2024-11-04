@@ -1,7 +1,8 @@
 <script>
         import { Confetti } from "svelte-confetti"
 
-    export let success
+  /** @type {{success: any}} */
+  let { success } = $props();
 </script>
 
 {#if success}

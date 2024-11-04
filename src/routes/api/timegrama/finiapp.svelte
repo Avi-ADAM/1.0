@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 //get by id
 //calculate votes
 //if no no create finnished mission 

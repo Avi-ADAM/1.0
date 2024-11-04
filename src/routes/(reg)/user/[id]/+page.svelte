@@ -1,6 +1,3 @@
-
-
-
 <script>
 
   import { lang } from '$lib/stores/lang.js'
@@ -110,7 +107,7 @@ const baseUrl = import.meta.env.VITE_URL
             ur =  user.tafkidims.data;
               val = user.vallues.data;
             if ($lang == "he"){
-              for (var i = 0; i < val.length; i++){
+              for (let i = 0; i < val.length; i++){
                 if (val[i].attributes.localizations.data.length > 0){
                 val[i].attributes.valueName = val[i].attributes.localizations.data[0].attributes.valueName
                 }
@@ -119,7 +116,7 @@ const baseUrl = import.meta.env.VITE_URL
             val = val
             uskill = user.skills.data;
               if ($lang == "he"){
-              for (var i = 0; i < uskill.length; i++){
+              for (let i = 0; i < uskill.length; i++){
                 if (uskill[i].attributes.localizations.data.length > 0){
                 uskill[i].attributes.skillName = uskill[i].attributes.localizations.data[0].attributes.skillName
                 }
@@ -128,7 +125,7 @@ const baseUrl = import.meta.env.VITE_URL
             uskill = uskill   
             ur = user.tafkidims.data;
                         if ($lang == "he"){
-              for (var i = 0; i < ur.length; i++){
+              for (let i = 0; i < ur.length; i++){
                 if (ur[i].attributes.localizations.data.length > 0){
                 ur[i].attributes.roleDescription = ur[i].attributes.localizations.data[0].attributes.roleDescription
                 }
@@ -138,7 +135,7 @@ const baseUrl = import.meta.env.VITE_URL
             mash = user.sps.data;
             uww = user.work_ways.data;  
             if ($lang == "he"){
-              for (var i = 0; i < uww.length; i++){
+              for (let i = 0; i < uww.length; i++){
                 if (uww[i].attributes.localizations.data.length > 0){
                 uww[i].attributes.workWayName = uww[i].attributes.localizations.data[0].attributes.workWayName
                 }

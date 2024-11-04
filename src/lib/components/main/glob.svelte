@@ -7,7 +7,7 @@
  const dispatch = createEventDispatcher();
 	import {  GLTF } from '@threlte/extras'
 
-  let rotationt = 0
+  let rotationt = $state(0)
 		let rotX = 0
   let poz = {z:0, y:0, x:0};
   let obPoz = {z:0, y:0, x:0}
@@ -77,7 +77,7 @@ function sub (){
     console.log("click")
     dispatch("submit")
 }
-let isHovering = false, isPointerDown = false
+let isHovering = $state(false), isPointerDown = $state(false)
 import Globu from './globu.svelte'
 </script>
 <!----

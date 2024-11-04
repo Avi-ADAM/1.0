@@ -42,18 +42,19 @@
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
   import { sendToSer } from '$lib/send/sendToSer.svelte';
   import { page } from '$app/stores';
-  export let data;
-  let low = true;
-  let indexi = -1;
+  /** @type {{data: any}} */
+  let { data } = $props();
+  let low = $state(true);
+  let indexi = $state(-1);
 
-  let isOpen = false;
+  let isOpen = $state(false);
   //  import Viewport from 'svelte-viewport-info'
   let idL;
   let meData = [];
   let miData = [];
   let token;
-  let askedarr = [];
-  let declineddarr = [];
+  let askedarr = $state([]);
+  let declineddarr = $state([]);
   let d = [];
   let sk = [];
   let dictids = {};
@@ -61,33 +62,33 @@
   let askedcoin = [];
   let error1 = null;
   let mtaha = [];
-  let pmashd = 0;
-  let mashs = 0;
-  let maap = 0;
-  let sug = 0;
-  let pen = 0;
-  let ask = 0;
-  let halu = 0;
-  let wel = 0;
-  let askma = 0;
-  let beta = 0;
+  let pmashd = $state(0);
+  let mashs = $state(0);
+  let maap = $state(0);
+  let sug = $state(0);
+  let pen = $state(0);
+  let ask = $state(0);
+  let halu = $state(0);
+  let wel = $state(0);
+  let askma = $state(0);
+  let beta = $state(0);
   let des = 0;
-  let fia = 0;
-  let hachlot = 0
+  let fia = $state(0);
+  let hachlot = $state(0)
   let fiapp = [];
   let askedm = [];
   let askm = 0;
   let ma = 0;
   let wegets = [];
-  let arr1 = [];
+  let arr1 = $state([]);
   let askWants = [] 
   function close() {
     if (mode !== 4) {
       isOpen = false;
     }
   }
-  let eizeish, eizep;
-  let mode = 0;
+  let eizeish = $state(), eizep = $state();
+  let mode = $state(0);
 
   function user(event) {
     isOpen = false;
@@ -109,7 +110,7 @@
     mode = 2;
     isOpen = true;
   }
-  let eizeme;
+  let eizeme = $state();
   function mesima(event) {
     isOpen = false;
     eizeme = event.detail.id;
@@ -429,7 +430,7 @@
     localStorage.setItem('maap', maap);
   }
   let orech;
-  let adder = [];
+  let adder = $state([]);
   let check;
   let wi = 125;
 
@@ -1266,9 +1267,9 @@
 
   // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו
   let tyu = false;
-  let nam = '';
-  let total = '';
-  let picLink = '';
+  let nam = $state('');
+  let total = $state('');
+  let picLink = $state('');
 
   function midd(min) {
     const dd = min.data.usersPermissionsUser.data.attributes;
@@ -1304,7 +1305,7 @@
   let outerFlash = 'rgb(255,55,255)';
   let x = [],
     y = [],
-    xyz = ['1,2'],
+    xyz = $state(['1,2']),
     c = 0;
 
   function sortNumber(a, b) {
@@ -1314,8 +1315,8 @@
   function prcnt(a, b) {
     return parseInt((a * b) / 100, 10);
   }
-  let h,
-    w,
+  let h = $state(),
+    w = $state(),
     initX = 0;
 
   function gen() {
@@ -3519,18 +3520,18 @@
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart
   }
   const defaulti = { he: 'מסך הלב', en: 'heart of 1💗1' };
-  let u = defaulti[$lang];
+  let u = $state(defaulti[$lang]);
 
   function hover(event) {
     u = event.detail.id;
   }
-  let cards = true;
+  let cards = $state(true);
   async function cardsi(event) {
     cards = event.detail.cards;
     console.log(cards, 'from papa');
   }
   const title = { he: 'לב 1💗1', en: 'heart of 1💗1' };
-  let milon = {
+  let milon = $state({
     hachla: true,
     fiap: true,
     welc: true,
@@ -3543,7 +3544,7 @@
     pmashs: true,
     pmaap: true,
     askmap: true
-  };
+  });
 
   function cardsYaron() {
     //  dispatch("cards", {
@@ -3551,7 +3552,7 @@
     //  })
   }
 
-  let toCoin = true;
+  let toCoin = $state(true);
 
   function showonly(event) {
     const value = event.detail.data;
@@ -3661,7 +3662,7 @@
       >
         <button
           style="margin: 0 auto;"
-          on:click={close}
+          onclick={close}
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
           title="סגירה"
           ><svg style="width:24px;height:24px;z-index:999;" viewBox="0 0 24 24">

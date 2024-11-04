@@ -40,7 +40,7 @@ import {newp} from '../registration/newp'
 //        fjs.parentNode.insertBefore(js, fjs);
 //      }(document, 'script', 'facebook-jssdk'));
 // })
-let g = false;
+let g = $state(false);
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -326,14 +326,15 @@ const baseUrl = import.meta.env.VITE_URL
     const pl = `${placeholdr}.${lang}`;
     const placeholder =`המקום שלי`;
     const required = true;
-    let erorim = {st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "baruch@1lev1.com"  }
-    let selected = [];
-       let already = false;
-       let erorims = false;
+    let erorim = $state({st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "baruch@1lev1.com"  })
+    let selected = $state([]);
+       let already = $state(false);
+       let erorims = $state(false);
    let datar;
-  export let idx = 1;
    let data;
     import { createForm } from "svelte-forms-lib";
+  /** @type {{idx?: number}} */
+  let { idx = 1 } = $props();
     let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
@@ -425,13 +426,13 @@ newp.set(passwordx)
 
           }}
         });
-let dow;
+let dow = $state();
 function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
   
 }
-let trans = false;
+let trans = $state(false);
 function tran (){
 trans = !trans;
 }
@@ -439,8 +440,8 @@ function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
 
- let isOpen = false;
-let a = 0;
+ let isOpen = $state(false);
+let a = $state(0);
 
 function sell(){
 isOpen = true;
@@ -472,7 +473,7 @@ function erorer(){
   <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>ביטול</button>
+          onclick={closer}>ביטול</button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
           
@@ -492,10 +493,10 @@ function erorer(){
          </div> 
          {:else if a == 3}
          <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 0}>לנסות שוב</button>
           {:else if a == 5}
          <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 4}>לנסות שוב</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 4}>לנסות שוב</button>
          {/if}
   </DialogContent>
   </div>
@@ -514,9 +515,9 @@ function erorer(){
        <a   data-sveltekit-prefetch href="/login" ><img title="התחברות ל-1💗1" class="right translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150" alt="התחברות ל-1💗1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
-          <button on:click={tran}><img alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          <button onclick={tran}><img alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
-          <button on:click={tran} class=" text-barbi hover:text-gold p-0.5 "
+          <button onclick={tran} class=" text-barbi hover:text-gold p-0.5 "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
@@ -524,8 +525,8 @@ function erorer(){
           <a  class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/en" >English</a>
           <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/ar">العربية</a>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
-                  <button on:click={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
-                  <button on:click={tr} title="תרגום לשפות נוספות" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >תרגום לשפות נוספות</button>
+                  <button onclick={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
+                  <button onclick={tr} title="תרגום לשפות נוספות" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >תרגום לשפות נוספות</button>
                             <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">מפת ההסכמה</a>
           {/if}
           </div>
@@ -546,8 +547,8 @@ function erorer(){
           name="name"
           placeholder="השם שלי"
           required
-                on:blur={handleChange}
-          on:change={handleChange}
+                onblur={handleChange}
+          onchange={handleChange}
           bind:value={$form.name}
         /> 
      {#if $errors.name}
@@ -576,8 +577,8 @@ function erorer(){
     id="email"
     name="email"
     required
-          on:blur={handleChange}
-    on:change={handleChange}
+          onblur={handleChange}
+    onchange={handleChange}
     bind:value={$form.email}
     />
  {#if $errors.email}
@@ -585,7 +586,7 @@ function erorer(){
     {/if}
 </div>
     </section> 
-    <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>    
+    <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" onclick={scrollTo}  data-ca3_icon=""></button></div>    
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
@@ -610,7 +611,7 @@ function erorer(){
      
 
 
-<form on:submit={handleSubmit}>
+<form onsubmit={handleSubmit}>
 
 <div class="flexid">
    {#if already == false}
@@ -618,7 +619,7 @@ function erorer(){
     <button
      class="button hover:scale-150"
      title="לחצת ויצאת לחופשי"
-      on:submit="{handleSubmit}"
+      onsubmit={handleSubmit}
       type="submit"
       ></button> 
        {:else if g == true}
@@ -780,7 +781,7 @@ justify-self: center;
     color: var(--gold);
     /* selected options in the dropdown list */
   }
-  :global(li:not(.selected):hover) {
+  :global(li:not(:global(.selected)):hover) {
  color: var(--barbi-pink);
     background-color:var(--lturk);    /* unselected but hovered options in the dropdown list */
   }

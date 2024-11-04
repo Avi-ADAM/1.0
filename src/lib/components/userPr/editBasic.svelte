@@ -1,16 +1,14 @@
 <script>
+  import { preventDefault } from 'svelte/legacy';
+
 import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js'
   import { toast } from 'svelte-sonner';
   import {SendTo} from '$lib/send/sendTo.svelte'
  import { createEventDispatcher } from 'svelte';
-export let isGuidMe = false;
-export let projectIds = []
   import { onMount } from 'svelte';
-  $: t = 0
-  export let teleredy = false
+  let t = $derived(0)
  let sub;
- export let machshirs
 
 onMount(async () => {
    const notificationBtn = document.getElementById("nb")
@@ -187,22 +185,33 @@ function save (){
     })
   };
 
- export let checked = false
 
 import axios from 'axios';
   import LoginT from '$lib/func/telegram/loginT.svelte';
   import Checkbox from '$lib/celim/ui/input/checkbox.svelte';
 let passwordx;
-let errorl = null;
-let before = true;
-export let fblink, twiterlink,discordlink,githublink,noMail;
-export let mail;
-export let un;
-export let bi;
-export let frd;
-export let lango;
-export let uid
-let passi;
+let errorl = $state(null);
+let before = $state(true);
+  /** @type {{isGuidMe?: boolean, projectIds?: any, teleredy?: boolean, machshirs: any, checked?: boolean, fblink: any, twiterlink: any, discordlink: any, githublink: any, noMail: any, mail: any, un: any, bi: any, frd: any, lango: any, uid: any}} */
+  let {
+    isGuidMe = $bindable(false),
+    projectIds = [],
+    teleredy = $bindable(false),
+    machshirs,
+    checked = $bindable(false),
+    fblink = $bindable(),
+    twiterlink = $bindable(),
+    discordlink = $bindable(),
+    githublink = $bindable(),
+    noMail = $bindable(),
+    mail,
+    un = $bindable(),
+    bi = $bindable(),
+    frd = $bindable(),
+    lango = $bindable(),
+    uid = $bindable()
+  } = $props();
+let passi = $state();
 const baseUrl = import.meta.env.VITE_URL
 
 function shaneh () {
@@ -237,9 +246,9 @@ function shaneh () {
   errorl = error.response.data ;
   })};
 
-	let strength = 0;
-	let validations = [];
-	let showPassword = false;
+	let strength = $state(0);
+	let validations = $state([]);
+	let showPassword = $state(false);
 	function validatePassword(e) {
         passwordx = e.target.value
 		const password = e.target.value;
@@ -252,7 +261,7 @@ function shaneh () {
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
 
 	}
-	let chan = false;
+	let chan = $state(false);
 	function ch (){
 		chan = true
     console.log(checked)
@@ -260,8 +269,8 @@ function shaneh () {
 	function getV (e){
     passwordx = e.target.value
 	}
-    let change = false;
-    let pressed = false
+    let change = $state(false);
+    let pressed = $state(false)
 	async function endGuid(){
     pressed = true
   console.log("guid סיום")
@@ -351,7 +360,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 </script>
 <h1 class="text-barbi text-center text-m">{head[$lang]}</h1>
  <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
-  <input name="des" on:change={ch} bind:value={un}
+  <input name="des" onchange={ch} bind:value={un}
  type='text' class='inputi' required >
   <label for="des" class='labeli'>{nm[$lang]}</label>
   <span class='line'></span>
@@ -366,31 +375,31 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 </div>-->
 
    <div dir={$lang == "he" ? "rtl" :"ltr"}  class='textinputi'>
-  <textarea name="s" on:change={ch}  bind:value={bi}
+  <textarea name="s" onchange={ch}  bind:value={bi}
  type='textarea' class='inputi d' required></textarea>
   <label for="s" class='labeli'>{biot[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de" on:change={ch}    bind:value={githublink}
+  <input name="de" onchange={ch}    bind:value={githublink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{githublinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de"  on:change={ch}   bind:value={twiterlink}
+  <input name="de"  onchange={ch}   bind:value={twiterlink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{twiterlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de"  on:change={ch}   bind:value={discordlink}
+  <input name="de"  onchange={ch}   bind:value={discordlink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{discordlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input name="de"  on:change={ch}   bind:value={fblink}
+  <input name="de"  onchange={ch}   bind:value={fblink}
  type='text' class='inputi' required>
   <label for="de" class='labeli'>{fblinkde[$lang]}</label>
   <span class='line'></span>
@@ -399,7 +408,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-barbi">{myfd[$lang]}</h2>
-    <select class:round={$lang == "he"} class:rounden={$lang == "en"} on:change={ch} bind:value={frd}
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} onchange={ch} bind:value={frd}
 	 class=" form-select appearance-none
       block
       w-full
@@ -427,7 +436,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 
    <div dir="rtl" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-barbi">{pr[$lang]}</h2>
-    <select class:round={$lang == "he"} class:rounden={$lang == "en"} on:change={ch} bind:value={lango}
+    <select class:round={$lang == "he"} class:rounden={$lang == "en"} onchange={ch} bind:value={lango}
 	 class=" form-select appearance-none
       block
       w-full
@@ -453,7 +462,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 
 <div class="flex items-center justify-center" dir="ltr">
   <label for="Toggle3" class="inline-flex items-center  p-2 rounded-md cursor-pointer text-gray-800">
-    <input id="Toggle3" type="checkbox" class="hidden peer" bind:checked on:change="{ch}">
+    <input id="Toggle3" type="checkbox" class="hidden peer" bind:checked onchange={ch}>
     <span class="px-4 py-2 rounded-l-md text-barbi peer-checked:text-gray-900 bg-mturk peer-checked:bg-gold">{co[$lang]}</span>
     <span class="px-4 py-2 rounded-r-md  peer-checked:text-barbi  bg-gold peer-checked:bg-mturk">{car[$lang]}</span>
   </label>
@@ -472,7 +481,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
        {/if}
     </div>
 <main>
-	<form on:submit|preventDefault={shaneh}>
+	<form onsubmit={preventDefault(shaneh)}>
 		 <div class="field">
 			<input
 				autocomplete="old-password"
@@ -490,15 +499,15 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 				name="email"
 				class="input"
 				placeholder="{addn[$lang]}"
-				on:input={validatePassword}
-				on:blur={getV}
+				oninput={validatePassword}
+				onblur={getV}
 			/>
 			<span
 				class="toggle-password"
         role="button"
         tabindex="0"
-				on:mouseenter={() => (showPassword = true)}
-				on:mouseleave={() => (showPassword = false)}
+				onmouseenter={() => (showPassword = true)}
+				onmouseleave={() => (showPassword = false)}
 			>
 				{showPassword ? "🔒" : "👁"}
 			</span>
@@ -506,10 +515,10 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 
 
 		<div class="strength">
-			<span class="bar bar-1" class:bar-show={strength > 0} />
-			<span class="bar bar-2" class:bar-show={strength > 1} />
-			<span class="bar bar-3" class:bar-show={strength > 2} />
-			<span class="bar bar-4" class:bar-show={strength > 3} />
+			<span class="bar bar-1" class:bar-show={strength > 0}></span>
+			<span class="bar bar-2" class:bar-show={strength > 1}></span>
+			<span class="bar bar-3" class:bar-show={strength > 2}></span>
+			<span class="bar bar-4" class:bar-show={strength > 3}></span>
 		</div>
 
 	<ul dir="rtl">
@@ -525,7 +534,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 			</li>-->
 		</ul>
 
-		<button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full" on:click={shaneh} disabled={strength < 4}>{changti[$lang]}</button>
+		<button  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full" onclick={shaneh} disabled={strength < 4}>{changti[$lang]}</button>
 	</form>
 </main>
 
@@ -536,10 +545,10 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
 
     {/if}
     {:else}
-    <button type="button" on:click={()=> change = true}  class="transition-all  m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{changpsw[$lang]}</button>
+    <button type="button" onclick={()=> change = true}  class="transition-all  m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{changpsw[$lang]}</button>
 
     {/if}
-	<button id="nb" type="button" on:click={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{nutidev[$lang]}</button>
+	<button id="nb" type="button" onclick={askNotificationPermission} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{nutidev[$lang]}</button>
   <!--target="_blank" href="{`https://telegram.me/onelevone_bot?start=${uid}_${t}_${un}_${$lang}`}" alt="telegramjoin"-->
   <h3   
     class="flex items-center grow justify-center text-barbi underline font-bold p-2">
@@ -566,17 +575,17 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
       <LoginT uid={uid} requestAccess={true} username="onelev_bot" on:outh={()=>teleredy = true}/>
 
   {#if isGuidMe == false && pressed == false}
-	<button type="button" on:click={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{remuGuid[$lang]}</button>
+	<button type="button" onclick={endGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{remuGuid[$lang]}</button>
 {:else if isGuidMe == true && pressed == false}
-	<button type="button" on:click={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{addGuid[$lang]}</button>
+	<button type="button" onclick={startGuid} class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{addGuid[$lang]}</button>
 {/if}
 <Checkbox name="noMail" lebel={nomailde} lang={$lang} bind:value={noMail} on:change={ch}/>
 {#if chan == true}
 <div>
-<button type="button" on:click={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{svbt[$lang]}</button>
+<button type="button" onclick={save}  class="m-4 border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full">{svbt[$lang]}</button>
 </div>
 {/if}	
-<button type="button" on:click={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">{logoutM[$lang]}</button>
+<button type="button" onclick={logout} class="m-2 bg-gold text-red-800 border border-red-800 hover:text-gold hover:bg-red-800 p-2 rounded-full">{logoutM[$lang]}</button>
 </div>
 </div>
 <style>
@@ -782,7 +791,7 @@ select{
 		transition: transform 400ms;
 	}
 	.field:focus-within .label,
-	.input:not(:placeholder-shown) + .label {
+	.input:not(:global(:placeholder-shown)) + .label {
 		transform: scale(0.8) translateY(-5rem);
 		opacity: 1;
 	}

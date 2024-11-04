@@ -3,10 +3,13 @@
       const dispatch = createEventDispatcher();
       import {lang} from '$lib/stores/lang.js'
     const text = {he: "פעולות פתוחות", ar: "", en:  "add missions"}		
-    export let addM = false;
-    export let openMS = false;
-    export let noofopen = 0;
-    export let hosafa = "";
+  /** @type {{addM?: boolean, openMS?: boolean, noofopen?: number, hosafa?: string}} */
+  let {
+    addM = false,
+    openMS = false,
+    noofopen = 0,
+    hosafa = ""
+  } = $props();
 function bighand (){
 dispatch('progres');
 }    
@@ -130,7 +133,7 @@ function trym (){
       <text id="text3" class="s-y1SdroFNffHn" fill="url(#linearGradient42480)" style=" font-size: 32.9909px; line-height: 121.037px; paint-order: stroke markers; stroke-width: 42px; word-spacing: -0.8px; white-space: pre;" transform="matrix(1, 0, 0, 1, -0.998111, 0)" bx:origin="0.691816 1.299581"><textPath startOffset="0" class="s-y1SdroFNffHn">{text[$lang]}</textPath></text>
     </g>
     {#if addM == false}
-    <g id="button"  on:mouseenter={bighand} on:click={hosa} style="">
+    <g id="button"  onmouseenter={bighand} onclick={hosa} style="">
       <title>{hosafa}</title>
       <g transform="matrix(0.029858, 0, 0, 0.024393, -126.193626, 345.094269)" style="">
         <g id="Layer_2" style=""/>
@@ -221,7 +224,7 @@ function trym (){
   
 
   {#if openMS === false}
-    <g class="gg" transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"  on:click={trym} style="">
+    <g class="gg" transform="matrix(1, 0, 0, 1, -1.574639, 41.588951)"  onclick={trym} style="">
       <title>הצגת ועריכת פעולות פתוחות</title>
       <rect style=  "opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-1" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>
       <text dominant-baseline="middle" style= "text-anchor: middle; font-style: normal; font-weight: normal; font-size: 96.8301px; line-height: 125%; font-family: sans-serif; letter-spacing: 0px; word-spacing: 0px; fill: rgb(171, 55, 200); fill-opacity: 1; stroke: none; stroke-width: 1px; stroke-linecap: butt; stroke-linejoin: miter; stroke-opacity: 1; white-space: pre;" x="371" y="682.429" id="text4238"><tspan id="tspan4240" x="371" y="682.429" style="text-anchor: middle; font-size: 96.8px; word-spacing: 0px;">{noofopen}</tspan></text>

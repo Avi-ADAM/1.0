@@ -7,29 +7,32 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
  const dispatch = createEventDispatcher();
-    export let low = false;
 
-	  export let shows = true;
-    export let deadLine = "11.11.2022";
-    export let projectName = "ONE";
-    export let missionName = "do x";
-    export let role = "programer";
-    export let skills = [];
-    export let missionDetails = "do x like y in z";
-    export let src;
-    export let projectId;
-    export let link = "/project/";
-    export let oid = 0;
-    export let notes = "";
-    export let workways= "";
-    export let noOfHours = 0;
-    export let perhour = 0;
-    export let total = 0;
-    export let askedarr =[];
-    export let declineddarr = [];
+  /** @type {{low?: boolean, shows?: boolean, deadLine?: string, projectName?: string, missionName?: string, role?: string, skills?: any, missionDetails?: string, src: any, projectId: any, link?: string, oid?: number, notes?: string, workways?: string, noOfHours?: number, perhour?: number, total?: number, askedarr?: any, declineddarr?: any}} */
+  let {
+    low = false,
+    shows = $bindable(true),
+    deadLine = "11.11.2022",
+    projectName = "ONE",
+    missionName = "do x",
+    role = "programer",
+    skills = [],
+    missionDetails = "do x like y in z",
+    src,
+    projectId,
+    link = "/project/",
+    oid = 0,
+    notes = "",
+    workways = "",
+    noOfHours = 0,
+    perhour = 0,
+    total = 0,
+    askedarr = [],
+    declineddarr = []
+  } = $props();
 
 
-    let missionDetailsa, missionDetailsb, missionDetailsc;
+    let missionDetailsa = $state(), missionDetailsb = $state(), missionDetailsc;
     onMount(async () => {
      missionDetailsa = missionDetails.substring(0,20)
      missionDetailsb = missionDetails.substring(21,40)
@@ -163,8 +166,8 @@ async function decline(oid) {
 	}
 //out:fly={{duration: 2200, opacity: 0.5, y: 450}}
 let ishover = false;
-let wid = 125;
-let hei = 125; 
+let wid = $state(125);
+let hei = $state(125); 
 function hover () {
 ishover = !ishover;
 if (ishover === true) {
@@ -177,7 +180,7 @@ hei = 125
 }
 </script>
 
-<svg in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}" on:mouseenter={hover} on:mouseleave={hover} width={wid} height={hei} version="1.1" viewBox="6.323 104.09 165.22 165.22" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}" onmouseenter={hover} onmouseleave={hover} width={wid} height={hei} version="1.1" viewBox="6.323 104.09 165.22 165.22" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
   <linearGradient id="zzk">
   <stop stop-color="#bd8328" offset="0"/>

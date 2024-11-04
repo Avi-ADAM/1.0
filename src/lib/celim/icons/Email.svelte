@@ -1,5 +1,6 @@
 <script>
-   export let width = 48
+   /** @type {{width?: number}} */
+   let { width = 48 } = $props();
     //export let colour = "black"
 </script>
 <svg viewBox="0 0 1024 1024" {width}  class="text-gray-500 hover:text-barbi">

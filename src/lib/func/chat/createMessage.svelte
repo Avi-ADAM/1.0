@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   import { sendApi } from "$lib/send/sendApi.svelte";
   import {sendToSer} from "$lib/send/sendToSer.svelte";
   import { nowId, updSend } from "$lib/stores/pendMisMes";

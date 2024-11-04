@@ -1,53 +1,58 @@
 <script>
   import {lang} from '$lib/stores/lang.js'
      import Grow from '$lib/celim/icons/grow.svelte'
-     export let animate = false
-  export let gr = false
-  export let pic = false
-  export let src = ""
-  export let alt = ""
-  export let single = false
-  export let reverse = false
-  export let big = false
-  export let sm = false
-    export let openi = false;
-    export let closei = false;
-   export let blue = false;
-   export let gray = false;
-   export let red = false;
-   export let green = false;
-   export let yellow = false;
-   export let indigo = false;
-   export let purple = false;
-   export let pink = false;
-      export let wow = false;
-     export let gold = false;
-     export let neww = false;
-   export let word = "word";
-   export let bg = "blue"
-   $: if (bg == "blue"){
-    blue = true;
-   } else if (bg == "pink"){
-    pink = true;
-   } else if (bg == "yellow"){
-    yellow = true;
-   } else if (bg == "green"){
-    green = true;
-   } else if (bg == "indigo"){
-    indigo = true;
-   } else if (bg == "gray"){
-    gray = true;
-   } else if (bg == "red"){
-    red = true;
-   } else if (bg == "purple"){
-    purple = true;
-   } else if (bg == "wow"){
-     wow = true;
-   }else if (bg == "gold"){
-     gold = true;
-   }else if(bg == "neww"){
-     neww = true;
-   }
+  /** @type {{animate?: boolean, gr?: boolean, pic?: boolean, src?: string, alt?: string, single?: boolean, reverse?: boolean, big?: boolean, sm?: boolean, openi?: boolean, closei?: boolean, blue?: boolean, gray?: boolean, red?: boolean, green?: boolean, yellow?: boolean, indigo?: boolean, purple?: boolean, pink?: boolean, wow?: boolean, gold?: boolean, neww?: boolean, word?: string, bg?: string}} */
+  let {
+    animate = false,
+    gr = false,
+    pic = false,
+    src = "",
+    alt = "",
+    single = false,
+    reverse = false,
+    big = false,
+    sm = false,
+    openi = false,
+    closei = false,
+    blue = $bindable(false),
+    gray = $bindable(false),
+    red = $bindable(false),
+    green = $bindable(false),
+    yellow = $bindable(false),
+    indigo = $bindable(false),
+    purple = $bindable(false),
+    pink = $bindable(false),
+    wow = $bindable(false),
+    gold = $bindable(false),
+    neww = $bindable(false),
+    word = "word",
+    bg = "blue"
+  } = $props();
+   $effect(() => {
+    if (bg == "blue"){
+      blue = true;
+     } else if (bg == "pink"){
+      pink = true;
+     } else if (bg == "yellow"){
+      yellow = true;
+     } else if (bg == "green"){
+      green = true;
+     } else if (bg == "indigo"){
+      indigo = true;
+     } else if (bg == "gray"){
+      gray = true;
+     } else if (bg == "red"){
+      red = true;
+     } else if (bg == "purple"){
+      purple = true;
+     } else if (bg == "wow"){
+       wow = true;
+     }else if (bg == "gold"){
+       gold = true;
+     }else if(bg == "neww"){
+       neww = true;
+     }
+  });
    //gray red green yellow indigo purple pink
 </script>
 <span class:line-through={closei == true}

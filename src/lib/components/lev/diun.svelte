@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
       import { createEventDispatcher } from 'svelte';
    import {BarLoader} from 'svelte-loading-spinners'
 	import ChatMessage from '../../celim/messeges.svelte';
@@ -6,37 +8,31 @@
     import {pendMisMes, pendMasMes, askMisMes, meAskMisMes,meAskMasMes,askMasMes,forum, addMes} from '$lib/stores/pendMisMes.js'
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
-	  const dispatch = createEventDispatcher();
-   export let ani
-   export let dont = false
-   export let pendId
-   export let rikmaName = "1💗1"
-   export let rect, no = false
-   export let mypos = null;   
-	export let nameMe='Me';
-	export let profilePicMe= "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
-   export let smalldes = "small description"
-	export let nameChatPartner='הצבעה';
-	export let profilePicChatPartner='/favicon.ico';
-	export let money = false
-   export let messages = []
-	 $: messagesi = ani == "pendM" ? $pendMisMes[pendId] : 
-                   ani == "pmashes" ? $pendMasMes[pendId] : 
-                   ani == "askedMi" ? $askMisMes[pendId] : 
-                   ani == "iaskedMi"? $meAskMisMes[pendId] : 
-                   ani == "askedMa" ? $askMasMes[pendId] : 
-                   ani == "iaskedMa"? $meAskMasMes[pendId] : 
-                   ani == "forum"? $forum[pendId]?.messages ?? [] :                  
-                   messages
-   let why = "";
- export let clicked = false
- $: off = 0
- $: console.log(clicked,"diun",off)
+	  const dispatch = createEventDispatcher();
+   let why = $state("");
+  /** @type {{ani: any, dont?: boolean, pendId: any, rikmaName?: string, rect: any, no?: boolean, mypos?: any, nameMe?: string, profilePicMe?: string, smalldes?: string, nameChatPartner?: string, profilePicChatPartner?: string, money?: boolean, messages?: any, clicked?: boolean}} */
+  let {
+    ani,
+    dont = false,
+    pendId,
+    rikmaName = "1💗1",
+    rect,
+    no = false,
+    mypos = null,
+    nameMe = 'Me',
+    profilePicMe = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png",
+    smalldes = "small description",
+    nameChatPartner = 'הצבעה',
+    profilePicChatPartner = '/favicon.ico',
+    money = false,
+    messages = [],
+    clicked = $bindable(false)
+  } = $props();
 
   const scrollToBottom = async (node) => {
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
   }; 
- let dow
+ let dow = $state()
 async function click() {
    if(why.length > 0){
    clicked = true
@@ -63,7 +59,20 @@ async function click() {
       why = ""
    }
       }
-      $: loading = ani == "forum" ? $forum[pendId]?.loading ?? false : false
+	 let messagesi = $derived(ani == "pendM" ? $pendMisMes[pendId] : 
+                   ani == "pmashes" ? $pendMasMes[pendId] : 
+                   ani == "askedMi" ? $askMisMes[pendId] : 
+                   ani == "iaskedMi"? $meAskMisMes[pendId] : 
+                   ani == "askedMa" ? $askMasMes[pendId] : 
+                   ani == "iaskedMa"? $meAskMasMes[pendId] : 
+                   ani == "forum"? $forum[pendId]?.messages ?? [] :                  
+                   messages)
+ let off = $state(0);
+  
+ run(() => {
+    console.log(clicked,"diun",off)
+  });
+      let loading = $derived(ani == "forum" ? $forum[pendId]?.loading ?? false : false)
 </script>
 
 
@@ -264,8 +273,8 @@ async function click() {
                </svg>
             </button>-->
             {#key  clicked}
-            {#if clicked == false }
-            <button on:click={click} type="button" class="inline-flex items-center justify-center rounded-lg  transition duration-500 ease-in-out text-mturk hover:text-barbi focus:outline-none">
+            {#if clicked == false}
+            <button onclick={click} type="button" class="inline-flex items-center justify-center rounded-lg  transition duration-500 ease-in-out text-mturk hover:text-barbi focus:outline-none">
                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 sm:ml-2 transform -rotate-90">
                   <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
                </svg>

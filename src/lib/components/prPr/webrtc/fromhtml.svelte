@@ -1,4 +1,4 @@
-        <style>
+    <style>
             html, body { 
                 background-color: #333; 
             }
@@ -14,7 +14,6 @@
             import { io } from "socket.io-client";
             import { browser } from '$app/env';
             /** CONFIG **/
-            var SIGNALING_SERVER = "http://localhost:8080";
             var SIGNALING_SERVER = window.location.protocol + "://" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
             var USE_AUDIO = true;
             var USE_VIDEO = true;

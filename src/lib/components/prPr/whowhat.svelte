@@ -373,98 +373,106 @@ const noy = {"he": "שעוד לא הצביעו", "en": "that didnt vote yet"}
 <div class="dd md:items-center">
   <div class="body items-center">
   
-  <table dir="rtl" >
+  <table dir="rtl">
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{head[$lang]}</h1>
     </caption>
-        <tr class="gg">
-          <th class="gg"></th>
-          {#each ulist as data, i}
-          <td class="gg" style="font-size: 3rem">
-            {i + 1}
+    <tbody>
+      <tr class="gg">
+        <th class="gg"></th>
+        {#each ulist as data, i}
+        <td class="gg" style="font-size: 3rem">
+          {i + 1}
         </td>
-          {/each}
-    </tr> <tr class="ggr">
-      <th class="ggr">{name[$lang]}</th>
-      {#each ulist as data, i}
-            <td class="ggr">{data.username}</td>
-            {/each}
-          </tr> <tr>
-          <th>{pres[$lang]}</th>
-          {#each ulist as data, i}
-          <td>
-            {#if  revach > 0}
+        {/each}
+      </tr>
+      <tr class="ggr">
+        <th class="ggr">{name[$lang]}</th>
+        {#each ulist as data, i}
+        <td class="ggr">{data.username}</td>
+        {/each}
+      </tr>
+      <tr>
+        <th>{pres[$lang]}</th>
+        {#each ulist as data, i}
+        <td>
+          {#if  revach > 0}
  {data.x.toFixed(2)}
  {:else}  
  0      
      {/if}
-           </td>
-           {/each}
-      </tr><tr>
-          <th>{amho[$lang]}</th>
-          {#each ulist as data, i}
-          <td>
-            {#if  data.ihave > 0}
+        </td>
+        {/each}
+      </tr>
+      <tr>
+        <th>{amho[$lang]}</th>
+        {#each ulist as data, i}
+        <td>
+          {#if  data.ihave > 0}
  {data.ihave.toFixed(2)}
  {:else}  
  0      
      {/if}
-           </td>
-           {/each}
-      </tr><tr>
-          <th>{amtog[$lang]}</th>
-          {#each ulist as data, i}
-          <td>
-            {#if  revach > 0 &&  (data.ihave-data.x) > 0 }
+        </td>
+        {/each}
+      </tr>
+      <tr>
+        <th>{amtog[$lang]}</th>
+        {#each ulist as data, i}
+        <td>
+          {#if  revach > 0 &&  (data.ihave-data.x) > 0 }
  {data.noten.toFixed(2)}
  {:else}  
  0      
      {/if}
-           </td>
-           {/each}
-      </tr> <tr >
-      <th >{movto[$lang]}</th>
-      {#each ulist as data, i}
-      <td>
-        {#if data.le}
-        {#each data.le as ee, i}
-            {` ${ee.le} :  ${ee.cama.toFixed(2)} `}
-            <br>
-            {/each}
-            {/if}
-            </td>
-            {/each}
-          </tr> 
+        </td>
+        {/each}
+      </tr>
       <tr>
-          <th>{amtor[$lang]}</th>
-          {#each ulist as data, i}
-          <td>
-            {#if  revach > 0 && (data.ihave-data.x) < 0 }
+        <th>{movto[$lang]}</th>
+        {#each ulist as data, i}
+        <td>
+          {#if data.le}
+          {#each data.le as ee, i}
+          {` ${ee.le} :  ${ee.cama.toFixed(2)} `}
+          <br>
+          {/each}
+          {/if}
+        </td>
+        {/each}
+      </tr>
+      <tr>
+        <th>{amtor[$lang]}</th>
+        {#each ulist as data, i}
+        <td>
+          {#if  revach > 0 && (data.ihave-data.x) < 0 }
  {data.meca.toFixed(2)}
  {:else}  
  0      
      {/if}
-           </td>
-           {/each}
-      </tr><tr >
-      <th >{perof[$lang]}</th>
-      {#each ulist as data, i}
-            <td >{data.p.toFixed(2)}</td>
-            {/each}
-          </tr> 
-         
-    </table>
+        </td>
+        {/each}
+      </tr>
+      <tr>
+        <th>{perof[$lang]}</th>
+        {#each ulist as data, i}
+        <td>{data.p.toFixed(2)}</td>
+        {/each}
+      </tr>
+    </tbody>
+  </table>
 
-     {#if  already === false }<!--//hal === false &&-->
-   <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+  {#if  already === false }<!--//hal === false &&-->
+  <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
  on:click={ask}>{appbu[$lang]}</button>
-{/if}
-{#if hatzaa == true}
-<div class="border border-barbi m-2 p-2">
-<h1 class="font-bold">{ft[$lang]}<br>
-  {` ${sofar[$lang]} ${noofok > 1 ? `${there[$lang]} ${noofok} ${vots[$lang]}`: onvo[$lang] } ${toap[$lang]} ${noofno > 0 ? `, ${noofno} ${ag[$lang]} `: ""} ${noofw > 0 ? `${and[$lang]}-${noofw} ${noy[$lang]}`: ""}`}</h1>
-</div>{/if}
+  {/if}
+  {#if hatzaa == true}
+  <div class="border border-barbi m-2 p-2">
+    <h1 class="font-bold">{ft[$lang]}<br>
+      {` ${sofar[$lang]} ${noofok > 1 ? `${there[$lang]} ${noofok} ${vots[$lang]}`: onvo[$lang] } ${toap[$lang]} ${noofno > 0 ? `, ${noofno} ${ag[$lang]} `: ""} ${noofw > 0 ? `${and[$lang]}-${noofw} ${noy[$lang]}`: ""}`}</h1>
+  </div>
+  {/if}
   </div>
   </div>
 <style>

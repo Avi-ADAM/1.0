@@ -7,13 +7,23 @@
   import SucssesConf from "../sucssesConf.svelte";
   import Succses from "../icons/succses.svelte";
   import Err from "../icons/err.svelte";
-    export let loading = false, success = false, error = false, text = {"he": "יצירה", "en": "Create"},name = "button"
+  /** @type {{loading?: boolean, success?: boolean, error?: boolean, text?: any, name?: string, children?: import('svelte').Snippet}} */
+  let {
+    loading = false,
+    success = false,
+    error = false,
+    text = {"he": "יצירה", "en": "Create"},
+    name = "button",
+    click,
+    children
+  } = $props();
    
     function onclick (){
         if(success == false)
-        dispatch("click")
+        click()
     }
-    $: hover = false
+    let hover = $state(false);
+  
 </script>    
 <button
         class="cursor-pointer transition-all  px-6 py-2 rounded-lg
@@ -24,17 +34,17 @@ active:border-b-[2px] active:brightness-90 active:translate-y-[2px]
  bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  
   hover:bg-[linear-gradient(to_right,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.mpink),theme(colors.fuchsia.400),theme(colors.barbi))]
    font-bold p-2 "
-   on:focus={()=>hover = true}
-   on:blur={()=>hover = false}
-   on:mouseenter={()=>hover = true}
-   on:mouseleave={()=>hover = false}
-        on:click={onclick}
+   onfocus={()=>hover = true}
+   onblur={()=>hover = false}
+   onmouseenter={()=>hover = true}
+   onmouseleave={()=>hover = false}
+        {onclick}
         title="{text[$lang]}"
-        name="{name}"><div class="flex flex-row align-center justify-center items-center gap-4"><slot>	
+        name="{name}"><div class="flex flex-row align-center justify-center items-center gap-4">{#if children}{@render children()}{:else}	
         <h2 class="text-transparent font-extrabold text-xl md:text-2xl  bg-clip-text bg-[length:auto_200%] animate-gradienty 
         {hover == false  ? "bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.700),theme(colors.wow),theme(colors.fuchsia.700),theme(colors.barbi))]"
         : "bg-[linear-gradient(to_top,theme(colors.gra),theme(colors.grc),theme(colors.grd),theme(colors.gold),theme(colors.grd),theme(colors.grc),theme(colors.gra))]"}	
-">{text[$lang]}</h2></slot>
+">{text[$lang]}</h2>{/if}
 {#if loading}
 <div class="w-8 h-8">
 <Lowding color={hover ? "var(--gold)":"var(--barbi-pink)"}/></div>

@@ -12,14 +12,18 @@
 		Text
 	} from 'svelty-email';
 
-	export let un = 'Alex';
-    export let username = "x"
-	export let pl,pn;
-    export let kind = "";
-    export let rishon = "";
-    export let name="";
-    export let lang = "he";
-    export let restime = "feh"
+	/** @type {{un?: string, username?: string, pl: any, pn: any, kind?: string, rishon?: string, name?: string, lang?: string, restime?: string}} */
+	let {
+		un = 'Alex',
+		username = "x",
+		pl,
+		pn,
+		kind = "",
+		rishon = "",
+		name = "",
+		lang = "he",
+		restime = "feh"
+	} = $props();
     const houhe = {"feh":"עומדים יומיים","sth":"עומדים שלושה ימים","nsh":"עומדים ארבעה ימים","sevend":"עומד שבוע אחד"}
     const houen = {"feh":"48 hours","sth":"72 hours","nsh":"96 hours","sevend":"one week"}
     const hoza = {"pendAsk":"הוצעה משימה חדשה בשם","pend":"הוצעה משימה חדשה בשם","pendmash":"הוצע משאב חדש בשם","finiappmi":"הסתיימה בהצלחה המשימה"}

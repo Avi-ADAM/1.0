@@ -1,7 +1,6 @@
 <script>
-   export let width = 48
-    export let checked = false
-    export let error = false
+   /** @type {{width?: number, checked?: boolean, error?: boolean}} */
+   let { width = 48, checked = false, error = false } = $props();
 </script>
 <svg xmlns="http://www.w3.org/2000/svg" {width} fill="currentColor" class="text-gray-500 hover:text-barbi" viewBox="0 0 16 16">
     {#if checked}

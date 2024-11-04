@@ -57,7 +57,7 @@ async function findT() {
         .then(parseJSON);
     let  skills2 = res.data.skills.data;
       if ($lang == 'he') {
-        for (var i = 0; i < skills2.length; i++) {
+        for (let i = 0; i < skills2.length; i++) {
           if (skills2[i].attributes.localizations.data.length > 0) {
             skills2[i].attributes.skillName =
               skills2[i].attributes.localizations.data[0].attributes.skillName;
@@ -67,7 +67,7 @@ async function findT() {
       skills2 = skills2;
      let roles = res.data.tafkidims.data;
       if ($lang == 'he') {
-        for (var i = 0; i < roles.length; i++) {
+        for (let i = 0; i < roles.length; i++) {
           if (roles[i].attributes.localizations.data.length > 0) {
             roles[i].attributes.roleDescription =
               roles[
@@ -79,7 +79,7 @@ async function findT() {
       roles = roles;
     let  workways2 = res.data.workWays.data;
       if ($lang == 'he') {
-        for (var i = 0; i < workways2.length; i++) {
+        for (let i = 0; i < workways2.length; i++) {
           if (workways2[i].attributes.localizations.data.length > 0) {
             workways2[i].attributes.workWayName =
               workways2[
@@ -107,7 +107,7 @@ export let mission1 = [];
 
 
 function find_mission_id(mission_name_arr){
-     var  arr = [];
+     let  arr = [];
       for (let j = 0; j< mission_name_arr.length; j++ ){
       for (let i = 0; i< mission1.length; i++){
         if(mission1[i].attributes.missionName === mission_name_arr[j]){

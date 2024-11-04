@@ -1,8 +1,8 @@
 <script>
 	import TelegramIcon from '$lib/celim/icons/telegram.svelte';
 
-	export let url;
-	export let title;
+	/** @type {{url: any, title: any}} */
+	let { url, title } = $props();
 
 
 	const baseUrl = 'https://telegram.me/share/url';
@@ -42,7 +42,7 @@
 	}
 </script>
 
-<button on:click={handleClick}
+<button onclick={handleClick}
 	><span class="sr-only">Share on Telegram</span><TelegramIcon
 		width={48}
 	/></button

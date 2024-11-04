@@ -1,4 +1,6 @@
 ﻿<script>
+  import { run } from 'svelte/legacy';
+
       import { liUN } from '$lib/stores/liUN.js';
       import { Canvas } from '@threlte/core'
   import Scene from './globu.svelte'
@@ -31,8 +33,12 @@
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description ="הסכמה העולמית על חירות היא חלק מרכזי ב- 1💗1. על ידי הסכמה להצהרה זו, ניתן להירשם לפלטפורמה השיתופית 1💗1 ומשתתפים ביצירת עולם יותר בטוח. על ידי ההתחייבות ההדדית לאי-אלימות, לפתרון סכסוכים בהסכמה ולכבוד הדדי, אנו ניצור עולם בו כוח ואלימות מפסיקים להיות צורות של תקשורת אנושית. הצטרפו אלינו לקידום שלום, הסכמות וחופש. ביחד, אנחנו יכולים ליצור עולם שבו הטוב הבסיסי מנצח ובו חילוקי דעות נפתרים בהסכמה משותפת."
   let url = "https://1lev1.com/hascama"
-  $: userName.set($form.name)
-  $: email.set($form.email)
+  run(() => {
+    userName.set($form.name)
+  });
+  run(() => {
+    email.set($form.email)
+  });
 
 // onMount(async () => {
 //
@@ -107,7 +113,7 @@
 
     });
 
-let g = false;
+let g = $state(false);
 
 function find_contry_id(contry_name_arr){
      var  arr = [];
@@ -379,22 +385,23 @@ function find_contry_id(contry_name_arr){
                   ];
     const name = `countries`;
         let lang ="he";
-let nameuse = false;
+let nameuse = $state(false);
     const placeholdr = {he: "", ar: "", en: ""};
     const pl = `${placeholdr}.${lang}`;
     const placeholder =`המקום שלי`;
     const required = true;
-    let erorim = {st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "baruch@1lev1.com"  }
-    let selected = [];
-       let already = false;
-       let erorims = false;
+    let erorim = $state({st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "baruch@1lev1.com"  })
+    let selected = $state([]);
+       let already = $state(false);
+       let erorims = $state(false);
    let datar;
-  export let idx = 1;
    let data;
     import { createForm } from "svelte-forms-lib";
   import Close from '$lib/celim/close.svelte';
   import { scrollToTop } from 'svelte-scrollto';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
+  /** @type {{idx?: number}} */
+  let { idx = 1 } = $props();
     let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
@@ -471,13 +478,13 @@ if (fpp.includes(jjj)){
           }}
         }
         });
-let dow;
+let dow = $state();
 /*function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
 
 }*/
-let trans = false;
+let trans = $state(false);
 function tran (){
 trans = !trans;
 }
@@ -485,8 +492,8 @@ function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
 
- let isOpen = false;
-let a = 0, h
+ let isOpen = $state(false);
+let a = $state(0), h = $state()
 
 function sell(){
 isOpen = true;
@@ -526,9 +533,13 @@ function change(la){
     goto("aitifaqia")
   }
 }
-$: w = 0
-$: wid = 0
-$: if($errors.name || $errors.email) {scrollToTop()}
+let w = $state(0);
+  
+let wid = $state(0);
+  
+run(() => {
+    if($errors.name || $errors.email) {scrollToTop()}
+  });
 </script>
 <Head {title} {description} {image} {url} />
 
@@ -537,7 +548,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
   <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}><Close/></button>
+          onclick={closer}><Close/></button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
 
@@ -557,10 +568,10 @@ $: if($errors.name || $errors.email) {scrollToTop()}
          </div>
          {:else if a == 3}
          <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 0}>לנסות שוב</button>
           {:else if a == 5}
          <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 4}>לנסות שוב</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 4}>לנסות שוב</button>
          {:else if a == 6}
          <Maze/>
          {/if}
@@ -582,24 +593,24 @@ $: if($errors.name || $errors.email) {scrollToTop()}
         width: 130px;
 <div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
      -->
-     <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px; z-index:500;" on:click={()=>info()} class="ww" >?</button>
+     <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px; z-index:500;" onclick={()=>info()} class="ww" >?</button>
      <div bind:clientWidth={wid} class="all">
        <a   data-sveltekit-prefetch href="/login" ><img title="התחברות ל-1💗1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1💗1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
           <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
-          <button on:click={tran}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          <button onclick={tran}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
-          <button on:click={tran} class=" text-barbi hover:text-gold p-0.5 "
+          <button onclick={tran} class=" text-barbi hover:text-gold p-0.5 "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
-            <button on:click={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">English</button>
-          <button on:click={() =>change("ar")} class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " >العربية</button>
+            <button onclick={() =>change("en")} title="change language to English" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">English</button>
+          <button onclick={() =>change("ar")} class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " >العربية</button>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " title=" 1💗1 אודות "   data-sveltekit-prefetch href="/about" > אודות</a>
-                  <button on:click={info} title="הסבר ומידע" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >הסבר ומידע</button>
-                  <button on:click={()=>goto('/he')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>                 
-                  <button on:click={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
-                  <button on:click={tr} title="תרגום לשפות נוספות" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >תרגום לשפות נוספות</button>
+                  <button onclick={info} title="הסבר ומידע" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >הסבר ומידע</button>
+                  <button onclick={()=>goto('/he')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>                 
+                  <button onclick={sell} title="בקשת שינוי" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >בקשת שינוי לטקסט</button>
+                  <button onclick={tr} title="תרגום לשפות נוספות" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >תרגום לשפות נוספות</button>
                   <a class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  data-sveltekit-prefetch href="/love">מפת ההסכמה</a>
           {/if}
           </div>
@@ -620,8 +631,8 @@ $: if($errors.name || $errors.email) {scrollToTop()}
           name="name"
           placeholder="השם שלי"
           required
-                on:blur={handleChange}
-          on:change={handleChange}
+                onblur={handleChange}
+          onchange={handleChange}
           bind:value={$form.name}
         />
      {#if $errors.name}
@@ -658,8 +669,8 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     id="email"
     name="email"
     required
-          on:blur={handleChange}
-    on:change={handleChange}
+          onblur={handleChange}
+    onchange={handleChange}
     bind:value={$form.email}
     />
  {#if $errors.email}
@@ -667,7 +678,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     {/if}
 </div>
     </section>
-    <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>
+    <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" onclick={scrollTo}  data-ca3_icon=""></button></div>
     </div>
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
@@ -686,7 +697,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
            כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק פגיעה באדם, אלימות וכפיה בכוח.
               <br>
               <div class="text-center justify-center flex items-center text-bold text-transparent bg-clip-text bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]" style="flex-wrap: wrap; font-family:StamSefarad,David;">
-              אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" on:keypress={()=>info()} on:click={()=>info()}>"רקמות"</span> המתנהלות באתר 		<div dir="ltr" style="text-shadow:none;" class=" font-bold  mx-2 mt-2 text-transparent 
+              אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" onkeypress={()=>info()} onclick={()=>info()}>"רקמות"</span> המתנהלות באתר 		<div dir="ltr" style="text-shadow:none;" class=" font-bold  mx-2 mt-2 text-transparent 
               bg-clip-text bg-[length:auto_200%] animate-gradienty 
               bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] 
               flex-wrap flex flex-row">
@@ -715,7 +726,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
 </div>
 
 
-<form on:submit={handleSubmit}>
+<form onsubmit={handleSubmit}>
 
 <div class="flexid" bind:clientWidth={w} bind:clientHeight={h}>
    {#if already == false}
@@ -725,7 +736,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     <button
     class="button hover:scale-150 "
     title="לחצת ויצאת לחופשי"
-     on:submit="{handleSubmit}"
+     onsubmit={handleSubmit}
       type="submit"
       >
     </button>
@@ -1018,7 +1029,7 @@ justify-self: center;
     color: var(--gold);
     /* selected options in the dropdown list */
   }
-  :global(li:not(.selected):hover) {
+  :global(li:not(:global(.selected)):hover) {
  color: var(--barbi-pink);
     background-color:var(--lturk);    /* unselected but hovered options in the dropdown list */
   }

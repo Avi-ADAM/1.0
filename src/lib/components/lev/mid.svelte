@@ -1,3 +1,7 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script> 
  import { onMount } from 'svelte';
     import { createEventDispatcher } from 'svelte';
@@ -106,43 +110,43 @@ fiap = "fiap";
 <stop stop-color="#ffd000" offset=".214"/>
 <stop stop-color="#f06" offset=".888"/>
 </linearGradient>
-<style bx:fonts="Aubrey" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Aubrey%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Ballet" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Ballet%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Bahianita" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Bahianita%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Barriecito" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Barriecito%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Biryani" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Biryani%3Aital%2Cwght%400%2C200%3B0%2C300%3B0%2C400%3B0%2C600%3B0%2C700%3B0%2C800%3B0%2C900&amp;display=swap);</style>
-<style bx:fonts="Caesar Dressing" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Caesar+Dressing%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Cherish" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Cherish%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Chelsea Market" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Chelsea+Market%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Charm" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Charm%3Aital%2Cwght%400%2C400%3B0%2C700&amp;display=swap);</style>
-<style bx:fonts="Almendra Display" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Almendra+Display%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Almendra SC" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Almendra+SC%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Aclonica" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Aclonica%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Abril Fatface" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Abril+Fatface%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Aguafina Script" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Aguafina+Script%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Angkor" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Angkor%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Asset" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Asset%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Atomic Age" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Atomic+Age%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Cherry Swash" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Cherry+Swash%3Aital%2Cwght%400%2C400%3B0%2C700&amp;display=swap);</style>
-<style bx:fonts="Crafty Girls" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Crafty+Girls%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Hachi Maru Pop" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Lemon" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Lemon%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Love Ya Like A Sister" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Macondo Swash Caps" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Macondo+Swash+Caps%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Major Mono Display" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Major+Mono+Display%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Miss Fajardose" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Miss+Fajardose%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Mystery Quest" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Mystery+Quest%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Shizuru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shizuru%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Shojumaru" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Shojumaru%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Stick" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Stick%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Zen Tokyo Zoo" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Zen+Tokyo+Zoo%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Yuji Mai" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Yuji+Mai%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Walter Turncoat" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Walter+Turncoat%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Wallpoet" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Wallpoet%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Sue Ellen Francisco" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Sue+Ellen+Francisco%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Rampart One" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Rampart+One%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Raleway Dots" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Raleway+Dots%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
-<style bx:fonts="Raleway" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Raleway%3Aital%2Cwght%400%2C100%3B0%2C200%3B0%2C300%3B0%2C400%3B0%2C500%3B0%2C600%3B0%2C700%3B0%2C800%3B0%2C900%3B1%2C100%3B1%2C200%3B1%2C300%3B1%2C400%3B1%2C500%3B1%2C600%3B1%2C700%3B1%2C800%3B1%2C900&amp;display=swap);</style>
+<style bx:fonts="Aubrey" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Ballet" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Bahianita" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Barriecito" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Biryani" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Caesar Dressing" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Cherish" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Chelsea Market" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Charm" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Almendra Display" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Almendra SC" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Aclonica" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Abril Fatface" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Aguafina Script" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Angkor" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Asset" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Atomic Age" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Cherry Swash" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Crafty Girls" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Hachi Maru Pop" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Lemon" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Love Ya Like A Sister" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Macondo Swash Caps" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Major Mono Display" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Miss Fajardose" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Mystery Quest" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Shizuru" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Shojumaru" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Stick" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Zen Tokyo Zoo" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Yuji Mai" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Walter Turncoat" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Wallpoet" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Sue Ellen Francisco" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Rampart One" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Raleway Dots" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Raleway" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <linearGradient id="bhl" x1="1662.1" x2="1662.1" y1="528.96" y2="564.08" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
 <linearGradient id="bhm" x1="1644" x2="1644" y1="462.58" y2="564.08" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
 <linearGradient id="bhn" x1="1644.3" x2="1644.3" y1="435.08" y2="487.08" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
@@ -1553,7 +1557,7 @@ fiap = "fiap";
 <stop stop-color="#fff" offset="0"/>
 <stop stop-color="#bd8524" offset="1"/>
 </linearGradient>
-<style bx:fonts="Londrina Sketch" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Londrina+Sketch%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+<style bx:fonts="Londrina Sketch" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <linearGradient id="bxp" x1="-14.698" x2="-14.698" y1="33.774" y2="45.358" gradientUnits="userSpaceOnUse" xlink:href="#aoj"/>
 <radialGradient id="bkr" cx="-14.698" cy="39.566" r="10" gradientUnits="userSpaceOnUse">
 <stop stop-color="#ffad55" offset="0"/>
@@ -2545,16 +2549,12 @@ ee ="matrix(1.4501 0 0 1.2385 -298.08 -520.09)";
 
 }
 }
-	import { afterUpdate } from 'svelte';
-
 export let low = true;
 let wi = "0.2";
 onMount (async () => {
   bit()
 })
-afterUpdate (async () => {
-  bit()
-})
+
 let myInterval = null;
 
 function bit (){

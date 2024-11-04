@@ -1,6 +1,6 @@
 <script>
-export let height = 24
-export let width = 24
+  /** @type {{height?: number, width?: number}} */
+  let { height = 24, width = 24 } = $props();
 </script>
 <svg
 height="{height}"
@@ -53,7 +53,7 @@ class="bg-gold rounded-full"
         units="px"
         type="xygrid"
         empspacing="5"
-    />
+></inkscape:grid>
   </sodipodi:namedview
   >
   <g
@@ -105,10 +105,10 @@ class="bg-gold rounded-full"
         >
         <dc:type
             rdf:resource="http://purl.org/dc/dcmitype/StillImage"
-        />
+></dc:type>
         <cc:license
             rdf:resource="http://creativecommons.org/licenses/publicdomain/"
-        />
+></cc:license>
         <dc:publisher
           >
           <cc:Agent
@@ -128,13 +128,13 @@ class="bg-gold rounded-full"
         >
         <cc:permits
             rdf:resource="http://creativecommons.org/ns#Reproduction"
-        />
+></cc:permits>
         <cc:permits
             rdf:resource="http://creativecommons.org/ns#Distribution"
-        />
+></cc:permits>
         <cc:permits
             rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
-        />
+></cc:permits>
       </cc:License
       >
     </rdf:RDF

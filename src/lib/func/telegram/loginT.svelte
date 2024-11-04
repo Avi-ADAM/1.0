@@ -3,57 +3,34 @@
 	import { createEventDispatcher, onMount } from 'svelte';
 
 	/** @type {HTMLDivElement}*/
-	let div;
+	let div = $state();
 	/** @type {HTMLScriptElement}*/
 	let script;
 
-	/** @type {string}
-	 * Bot username
-	 * */
-	export let username = '';
+	
 
-    /** @type {Number}
-	 * user id
-	 * */
-	export let uid = 0;
+    
 
 
-	/** @type {string}
-	 * Widget size.
-	 * Must be one of: 'small', 'medium', 'large'
-	 * Default is medium
-	 */
-	export let size = 'medium';
+	
 
-	/** @type {string}
-	 * Authorization type.
-	 * Must be one of: ('callback', 'redirect')
-	 * Callback means that you will get an event containing user info when the user is logged in, you'll need to use on:auth to handle it.
-	 * Redirect means that user will be redirected to the URL you specify in `redirectURL` parameter.
-	 * Default is callback
-	 * */
-	export let authType = 'callback';
+	
 
-	/** @type {string}
-	 * (Optional) Redirect URL
-	 * If authType is set to redirect, this is the URL that user will be redirected to after logging in.
-	 * Must be a valid URL in the format of `https://example.com/path/to/page`
-	 * */
-	export let redirectURL = '';
+	
 
-	/** @type {boolean}
-	 * (Optional) Request access
-	 * If set to true, user will be asked to grant access to your bot.
-	 * This is useful if you want your bot to be able to send messages to the user.
-	 * Default is false
-	 */
-	export let requestAccess = false;
+	
 
-	/** @type {number}
-	 * Button radius in pixels.
-	 * Default is 10.
-	 */
-	export let buttonRadius = 10;
+	
+	/** @type {{username?: string, uid?: Number, size?: string, authType?: string, redirectURL?: string, requestAccess?: boolean, buttonRadius?: number}} */
+	let {
+		username = '',
+		uid = 0,
+		size = 'medium',
+		authType = 'callback',
+		redirectURL = '',
+		requestAccess = false,
+		buttonRadius = 10
+	} = $props();
 
 	const dispatch = createEventDispatcher();
 
@@ -95,7 +72,7 @@
 	});
 </script>
 
-<div bind:this={div} />
+<div bind:this={div}></div>
 
 <style>
 	div {

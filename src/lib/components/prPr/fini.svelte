@@ -391,6 +391,7 @@ let fir,ssec;
       {#each meData as data, i}
       <td >
        {data.attributes.hm}
+      </td>
       {/each}
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>

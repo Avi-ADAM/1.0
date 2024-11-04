@@ -1,14 +1,14 @@
 <script>
 	import { lang } from './../../stores/lang.js';
-    export let value;
-    let dateStr;
+    let dateStr = $derived(value ? (new Date(value)).toLocaleDateString(local) : "-");
     let local = $lang == "en" ?"en-GB" : "he";
   
-    $:dateStr = value ? (new Date(value)).toLocaleDateString(local) : "-";
-    export let value2;
-    let dateStr2;
+  /** @type {{value: any, value2: any}} */
+  let { value, value2 } = $props();
+    let dateStr2 = $derived(value2 ? (new Date(value2)).toLocaleDateString(local) : "-");
   
-    $:dateStr2 = value2 ? (new Date(value2)).toLocaleDateString(local) : "-";
-  </script>
+      
+    
+</script>
   
   <div dir="ltr" class="text-barbi">{dateStr ? dateStr : "-"} - {dateStr2 ? dateStr2 : "-"}</div>

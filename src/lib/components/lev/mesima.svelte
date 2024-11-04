@@ -1,4 +1,3 @@
-
 <script>
   import {
     createEventDispatcher
@@ -9,7 +8,7 @@ import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
 const baseUrl = import.meta.env.VITE_URL
-export let missionId;
+  let { missionId } = $props();
 let projectUsers =[];
 let token;
 let idL;
@@ -67,19 +66,19 @@ async function xyd () {
   .then(r => r.json())
   .then(data => datar = data.data.openMission.data.attributes);
   if ($lang != "en" ){
-              for (var i = 0; i < datar.skills.data.length; i++){
-                if (datar.skills.data[i].attributes.localizations.data.length > 0){
-                datar.skills.data[i].attributes.skillName = datar.skills.data[i].attributes.localizations.data[0].attributes.skillName
+              for (var p = 0; p < datar.skills.data.length; p++){
+                if (datar.skills.data[p].attributes.localizations.data.length > 0){
+                datar.skills.data[p].attributes.skillName = datar.skills.data[p].attributes.localizations.data[0].attributes.skillName
                 }
               }
-              for (var i = 0; i < datar.tafkidims.data.length; i++){
-                if (datar.tafkidims.data[i].attributes.localizations.data.length > 0){
-                datar.tafkidims.data[i].attributes.roleDescription = datar.tafkidims.data[i].attributes.localizations.data[0].attributes.roleDescription
+              for (var o = 0; o < datar.tafkidims.data.length; o++){
+                if (datar.tafkidims.data[o].attributes.localizations.data.length > 0){
+                datar.tafkidims.data[o].attributes.roleDescription = datar.tafkidims.data[o].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
-              for (var i = 0; i < datar.work_ways.data.length; i++){
-                if (datar.work_ways.data[i].attributes.localizations.data.length > 0){
-                datar.work_ways.data[i].attributes.workWayName = datar.work_ways.data[i].attributes.localizations.data[0].attributes.workWayName
+              for (var r = 0; r < datar.work_ways.data.length; r++){
+                if (datar.work_ways.data[r].attributes.localizations.data.length > 0){
+                datar.work_ways.data[r].attributes.workWayName = datar.work_ways.data[r].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }
@@ -127,17 +126,17 @@ async function xyd () {
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span onmouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover({"he":"סך הכל","en": "total"})} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div style="font-size: 17px;" class="  mb-2"><h2 class="text-barbi font-bold">{data.name}</h2></div>
   {#if data.descrip !== null && data.descrip !== "null"  && data.descrip !== "undefined"  && data.descrip !== undefined} <p class="cd d max-h-16 text-gray-700 text-base">{data.descrip}</p>{/if}
 {#if data.hearotMeyuchadot}
-     <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== null && data.hearotMeyuchadot !== "undefined" ? data.hearotMeyuchadot : ""}</p>
+     <p onmouseenter={()=>hover("הערות")} onmouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{data.hearotMeyuchadot !== undefined && data.hearotMeyuchadot !== null && data.hearotMeyuchadot !== "undefined" ? data.hearotMeyuchadot : ""}</p>
      {/if}
     {#if data.skills.length > 0}
             <small class="text-barbi text-sm ">כישורים נדרשים:</small>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
-               {#each data.skills as skill}<p on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")}  >
+               {#each data.skills as skill}<p onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} onmouseleave={()=>hover("0")}  >
                 <Tile pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
     </div>
@@ -145,15 +144,15 @@ async function xyd () {
      {#if data.tafkidims.length > 0}  <small class="text-sm text-barbi">תפקידים נדרשים:</small>
             <div class="border border-gold flex flex-row  flex-wrap justify-center align-middle d  cd p-2">  
               {#each data.tafkidims as rol}
-              <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+              <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
         <Tile word={rol.attributes.roleDescription} wow={true}/></p>{/each}
     </div>{/if}
     {#if data.work_ways.length > 0}  <small class="text-sm text-barbi">דרכי העבודה:</small>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
-                {#each data.work_ways as rol}<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                {#each data.work_ways as rol}<p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold"   word={rol.attributes.workWayName}/></p>{/each}
     </div>{/if}
-           <button on:click={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >
+           <button onclick={()=>project(data.project.data.id)} class="px-4 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-sm mt-2 border-2 border-gold" >לצפיה בריקמה </button >
 
     </div>
   

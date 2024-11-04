@@ -1,9 +1,11 @@
 <script>
+  import { preventDefault } from 'svelte/legacy';
+
  import axios from 'axios';
   import { lang } from '$lib/stores/lang.js'
-    let email;
-    let before = true;
-    let erori;
+    let email = $state();
+    let before = $state(true);
+    let erori = $state();
     const baseUrl = import.meta.env.VITE_URL
 
     function onSubmit () {   
@@ -38,7 +40,7 @@ axios
 <div dir="rtl" class="flex items-center text-center flex-col">
 <h3 style="text-align:center; font-size: 1em;">{heading[$lang]}</h3>
 {#if erori} <small style="color: red; ">{erori}</small>{/if}
-<form class="flex items-center text-center" style="margin: 0 auto;"    on:submit|preventDefault={onSubmit}>
+<form class="flex items-center text-center" style="margin: 0 auto;"    onsubmit={preventDefault(onSubmit)}>
   <div>
    <!-- <p class="text-center text-barbi">{tempmessege[$lang]}</p>-->
     <div class="text-center"><label>

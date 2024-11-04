@@ -12,9 +12,9 @@
   import Skip from '$lib/celim/icons/skip.svelte';
   import Tile from '$lib/celim/tile.svelte';
  const dispatch = createEventDispatcher(); 
-    let vallues = [];
+    let vallues = $state([]);
     let error1 = null;
-    let newcontent = true
+    let newcontent = $state(true)
  onMount(async () =>{
      if ($lang == "he" ){
        vallues = jvals
@@ -80,12 +80,12 @@
      };
 
 
-    let selected = [];
+    let selected = $state([]);
     const placeholder = `${$lang == "he" ? " בחירת ערכים ומטרות" : "vallues and goals"}`;
 
  
-export let userName_value;
-export let show_value = 0;
+  /** @type {{userName_value: any, show_value?: number}} */
+  let { userName_value = $bindable(), show_value = $bindable(0) } = $props();
 
 userName.subscribe(value => {
   userName_value = value;
@@ -193,10 +193,11 @@ const newOb = meData.data.createVallue.data;
 
   
 
-  $: ugug = ``;
+  let ugug = $state(``);
+  
       const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
-  $: addn = {"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`}
+  let addn = $derived({"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`})
   const what = {"he": "אלו ערכים ומטרות ברצונך לקדם?","en": "which vallues you wish to promote?"}
   const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
    const info = {"he":"כאשר העבודה שלך מגשימה את הערכים ומקדמת את המטרות שלך היא הופכת ליצירה מהנה, אנו נסייע לך לקדם את הערכים והמטרות שלך","en":"When your work aligns with your values and advances your goals, it becomes enjoyable creation. We will assist you in promoting your values and goals."}
@@ -229,13 +230,13 @@ const newOb = meData.data.createVallue.data;
      />
     </div>
  
-     <button class="button-in-2 " on:click="{back}">
+     <button class="button-in-2 " onclick={back}>
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
-    <button class="button-end bg-sturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+    <button class="button-end bg-sturk p-1 rounded-full" onclick={toend} title="{skipt[$lang]}">
     <Skip/>
     </button>
-  <button class="button-2" on:click="{increment}">
+  <button class="button-2" onclick={increment}>
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
 

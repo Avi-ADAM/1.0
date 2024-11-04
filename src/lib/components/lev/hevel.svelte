@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
 
   import { lang } from '$lib/stores/lang.js'
  import {
@@ -6,24 +8,24 @@
 } from 'svelte';
  const dispatch = createEventDispatcher();
 
-  export let userId; 
   import { onMount } from 'svelte';
+  let { userId } = $props();
 function pr (x){
   dispatch('proj',{id:x})
 }
-let user = [];
-let fblink, twiterlink, discordlink, githublink
-let load = false
-let projects =[];
-let uskill =[];
+let user = $state([]);
+let fblink = $state(), twiterlink = $state(), discordlink = $state(), githublink = $state()
+let load = $state(false)
+let projects =$state([]);
+let uskill =$state([]);
 let token;
 let idL;
-let srcU = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
-let uww = [];
-let fmm = [];
-let ur = [];
-let val = [];
-let mash = []
+let srcU = $state("https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png");
+let uww = $state([]);
+let fmm = $state([]);
+let ur = $state([]);
+let val = $state([]);
+let mash = $state([])
 let error1 = null;
 const baseUrl = import.meta.env.VITE_URL
 
@@ -91,11 +93,11 @@ const baseUrl = import.meta.env.VITE_URL
             let fnn = []
             fnn = user.finnished_missions.data;
             if (fnn.length > 1){
-             for (let i = 0; i < fnn.length; i++){
-              if (fnn[i].attributes.missionName in fermatana) {
-                    fermatana[fnn[i].attributes.missionName] += 1
+             for (let p = 0; p < fnn.length; p++){
+              if (fnn[p].attributes.missionName in fermatana) {
+                    fermatana[fnn[p].attributes.missionName] += 1
                    } else {
-                    fermatana[fnn[i].attributes.missionName] = 1
+                    fermatana[fnn[p].attributes.missionName] = 1
                    }
               }
          for (const [key, value] of Object.entries(fermatana)) {
@@ -110,27 +112,27 @@ const baseUrl = import.meta.env.VITE_URL
             ur =  user.tafkidims.data;
               val = user.vallues.data;
             if ($lang == "he"){
-              for (var i = 0; i < val.length; i++){
-                if (val[i].attributes.localizations.data.length > 0){
-                val[i].attributes.valueName = val[i].attributes.localizations.data[0].attributes.valueName
+              for (var o = 0; o < val.length; o++){
+                if (val[o].attributes.localizations.data.length > 0){
+                val[o].attributes.valueName = val[o].attributes.localizations.data[0].attributes.valueName
                 }
               }
             }
             val = val
             uskill = user.skills.data;
               if ($lang == "he"){
-              for (var i = 0; i < uskill.length; i++){
-                if (uskill[i].attributes.localizations.data.length > 0){
-                uskill[i].attributes.skillName = uskill[i].attributes.localizations.data[0].attributes.skillName
+              for (var u = 0; u < uskill.length; u++){
+                if (uskill[u].attributes.localizations.data.length > 0){
+                uskill[u].attributes.skillName = uskill[u].attributes.localizations.data[0].attributes.skillName
                 }
               }
             }       
             uskill = uskill   
             ur = user.tafkidims.data;
                         if ($lang == "he"){
-              for (var i = 0; i < ur.length; i++){
-                if (ur[i].attributes.localizations.data.length > 0){
-                ur[i].attributes.roleDescription = ur[i].attributes.localizations.data[0].attributes.roleDescription
+              for (var y = 0; y < ur.length; y++){
+                if (ur[y].attributes.localizations.data.length > 0){
+                ur[y].attributes.roleDescription = ur[y].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
             }
@@ -138,9 +140,9 @@ const baseUrl = import.meta.env.VITE_URL
             mash = user.sps.data;
             uww = user.work_ways.data;  
             if ($lang == "he"){
-              for (var i = 0; i < uww.length; i++){
-                if (uww[i].attributes.localizations.data.length > 0){
-                uww[i].attributes.workWayName = uww[i].attributes.localizations.data[0].attributes.workWayName
+              for (var t = 0; t < uww.length; t++){
+                if (uww[t].attributes.localizations.data.length > 0){
+                uww[t].attributes.workWayName = uww[t].attributes.localizations.data[0].attributes.workWayName
                 }
               }
             }    
@@ -159,15 +161,17 @@ const todis = {"he":"לינק לדיסקורד","en":"link to discord"}
 const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
 const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
 const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
-let h,w, height,width;
-$:if(h > w){
-  height = "90vw"
-  width = "90vw"
-} else if (h < w){
-  console.log("f",h,w)
-  height = "calc(100vh - 60px)";
-  width = "calc(100vh - 60px)";
-}
+let h = $state(),w = $state(), height = $state(),width = $state();
+run(() => {
+    if(h > w){
+    height = "90vw"
+    width = "90vw"
+  } else if (h < w){
+    console.log("f",h,w)
+    height = "calc(100vh - 60px)";
+    width = "calc(100vh - 60px)";
+  }
+  });
 let viewBox="460 0 1000 1080"//1450
 
 const sk = {"he": "כישורים", "en":"skills"}
@@ -187,7 +191,7 @@ const mm = {"he": "משימות","en":"missions"}
       <div class="middle" >
         <svg height={height} width={width} id="eARfSi12ITv1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
     viewBox="{viewBox}" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
-     {#if srcU }
+     {#if srcU}
 <foreignObject class="stroke-1 stroke-barbi" x='768' y='348' width='384' height='384' > <img
  height="100%" width="100%" 
  class="border-2 border-barbi"
@@ -222,7 +226,7 @@ const mm = {"he": "משימות","en":"missions"}
    <div class= " overflow-y-auto h-3/5 d mb-6 mx-5  max-w-9/12 px-5 grid align-middle justify-center">
         {#each projects as data, i}
        <span style="font-size:25px;" class="font-bold hover:scale-110 text-gold bg-barbi rounded-lg px-1 my-1 ">
-          <button class="text-gold hover:text-mturk "   on:click={pr(data.id)} >{data.attributes.projectName}</button>
+          <button class="text-gold hover:text-mturk "   onclick={pr(data.id)} >{data.attributes.projectName}</button>
        </span>
        {/each}
     </div>

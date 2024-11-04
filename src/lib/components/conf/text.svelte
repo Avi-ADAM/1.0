@@ -1,13 +1,9 @@
 <script>
-export let state = 2 // original and edit, 3 is original second and edit
-export let text;
-export let lebel = {"he":"עריכה", "en": "edit"}
 import tr from '$lib/translations/tr.json'
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
-  let htmlon = ``
-    export let long = false
+  let htmlon = $state(``)
 onMount(()=>{
     if (text == textb){
     htmlon = text
@@ -15,9 +11,16 @@ onMount(()=>{
     checkAll(text,textb)
     }
 })
-let edit = false
-let show2 = false
-export let textb = text
+let edit = $state(false)
+let show2 = $state(false)
+  /** @type {{state?: number, text: any, lebel?: any, long?: boolean, textb?: any}} */
+  let {
+    state = 2,
+    text,
+    lebel = {"he":"עריכה", "en": "edit"},
+    long = false,
+    textb = $bindable(text)
+  } = $props();
 function check (lettera, letterb){
     if(lettera == letterb){
         return true
@@ -67,13 +70,13 @@ function checkAll (a, b){
     {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
         <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
-        <p class="text-gold">{@html htmlon}</p><button on:click={()=>edit = true}>
+        <p class="text-gold">{@html htmlon}</p><button onclick={()=>edit = true}>
             {#if text == textb}🖍️{:else}✏️{/if}</button>
         {#if text != textb && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <button onclick={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{text}</p>
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
@@ -85,14 +88,14 @@ function checkAll (a, b){
 
 <div dir="rtl" class='textinput max-w-sm mx-auto'>
     {#if long == false}
-  <input type="text" on:input={(e)=>console.log(e)} id="des" name="des" bind:value={textb} class='input' required>
+  <input type="text" oninput={(e)=>console.log(e)} id="des" name="des" bind:value={textb} class='input' required>
   {:else}
       <textarea name="des"  bind:value={textb}     
  type='text' class='input d' required></textarea>
   {/if}
   <label for="des" class='label' >{lebel[$lang]}</label>
   <span class='line '></span>
-</div><button on:click={()=>{edit = false
+</div><button onclick={()=>{edit = false
 checkAll(text,textb)
 }}>✅</button>
 {/if}

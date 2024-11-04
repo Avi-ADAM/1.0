@@ -347,14 +347,14 @@ import { Head } from 'svead'
     const placeholder = `My place`;
     const required = true;
     let nameuse = false;
- let erorim = {st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "baruch@1lev1.com"  }
-    let selected = [];
-       let already = false;
-       let erorims = false;
+ let erorim = $state($state($state($state({st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "baruch@1lev1.com"  }))))
+    let selected = $state($state($state($state([]))));
+       let already = $state($state($state($state(false))));
+       let erorims = $state($state($state($state(false))));
    let datar;
    let idx = 1;
    let data;
-   let g = false;
+   let g = $state($state($state($state(false))));
 	import { useProgress } from '@threlte/extras'
 	const { progress } = useProgress()
     import { createForm } from "svelte-forms-lib";
@@ -441,18 +441,18 @@ console.log("t")
   const lines = document.getElementById("lines")
   
 }*/
-    let trans = false;
+    let trans = $state($state($state($state(false))));
 function tran (){
 trans = !trans;
 }
 let error;
 
-    let dow;
+    let dow = $state($state($state($state())));
     function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
-     let isOpen = false;
-let a = 0;
+     let isOpen = $state($state($state($state(false))));
+let a = $state($state($state($state(0))));
 function tr(){
 isOpen = true;
 a = 4;
@@ -492,8 +492,10 @@ function change(la){
     goto("/aitifaqia")
   }
 }
-$: w = 0
-$: h = 0
+let w = $state($state($state($state(0))));
+  
+let h = $state($state($state($state(0))));
+  
 </script>
   <Head {title} {description} {image} {url} />
 
@@ -502,7 +504,7 @@ $: h = 0
   <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>close</button>
+          onclick={closer}>close</button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
          
@@ -523,10 +525,10 @@ $: h = 0
          </div> 
          {:else if a == 3}
          <h1> error</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}> try again</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 0}> try again</button>
            {:else if a == 5}
          <h1> error</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 4}> try again</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 4}> try again</button>
          {/if}
   </DialogContent>
   </div>
@@ -537,17 +539,17 @@ $: h = 0
 
           <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ;">
               {#if trans === false}
-          <button on:click={tran}><img alt="translation-by-bar-sultan" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          <button onclick={tran}><img alt="translation-by-bar-sultan" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
-          <button on:click={tran} class=" text-barbi hover:text-lturk "
+          <button onclick={tran} class=" text-barbi hover:text-lturk "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
-          <button on:click={()=>change("he")} title="למעבר לשפה העברית" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >עברית</button>
-          <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " on:click={()=>change("ar")}>العربية</button>
-                           <button on:click={sell} title="ask for change in the text" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">suggest text change</button>
-                          <button on:click={tr} title="translate to another language" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >translate</button>
-                  <button on:click={()=>goto('/en')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>
+          <button onclick={()=>change("he")} title="למעבר לשפה העברית" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >עברית</button>
+          <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 " onclick={()=>change("ar")}>العربية</button>
+                           <button onclick={sell} title="ask for change in the text" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 ">suggest text change</button>
+                          <button onclick={tr} title="translate to another language" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >translate</button>
+                  <button onclick={()=>goto('/en')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>
 
                            {/if}
           </div>
@@ -567,9 +569,9 @@ $: h = 0
           name="name"
           placeholder="my name"
           required
-                on:blur={handleChange}
+                onblur={handleChange}
 
-          on:change={handleChange}
+          onchange={handleChange}
           bind:value={$form.name}
         /> 
      {#if $errors.name}
@@ -600,8 +602,8 @@ $: h = 0
     id="email"
     name="email"
     required
-          on:blur={handleChange}
-    on:change={handleChange}
+          onblur={handleChange}
+    onchange={handleChange}
     bind:value={$form.email}
     />
  {#if $errors.email}
@@ -609,7 +611,7 @@ $: h = 0
     {/if}
 </div>
     </section>   
-   <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>    
+   <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" onclick={scrollTo}  data-ca3_icon=""></button></div>    
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="ltr" class="amana" id="amana-show">
@@ -641,7 +643,7 @@ $: h = 0
      
 
 
-<form on:submit={handleSubmit}>
+<form onsubmit={handleSubmit}>
 <div class="flexid" bind:clientWidth={w} bind:clientHeight={h}>
    {#if already == false}
 {#if g == false}
@@ -650,7 +652,7 @@ $: h = 0
     <button
      class="button hover:scale-150"
      title="click for freedom"
-     on:submit="{handleSubmit}"
+     onsubmit={handleSubmit}
       type="submit"
       >
     </button>
@@ -879,7 +881,7 @@ small{
     color: var(--gold);
     /* selected options in the dropdown list */
   }
-  :global(li:not(.selected):hover) {
+  :global(li:not(:global(.selected)):hover) {
  color: var(--barbi-pink);
     background-color:var(--lturk);    /* unselected but hovered options in the dropdown list */
   }

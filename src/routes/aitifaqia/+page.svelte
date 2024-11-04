@@ -28,7 +28,7 @@
   border: var(--sms-focus-border, 1pt solid var(--sms-active-color, cornflowerblue))
   /* selected options in the dropdown list */
 }
-:global(li:not(.selected):hover) {
+:global(li:not(:global(.selected)):hover) {
   color: #FF0092;
   /* unselected but hovered options in the dropdown list */
 }

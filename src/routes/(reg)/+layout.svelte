@@ -19,20 +19,10 @@ import { showFoot } from '$lib/stores/showFoot.js';
 
 
 // Initialize Firebase
-/*const app = firebase()
-  import { getMessaging, onMessage } from "firebase/messaging";
-  import firebase from '$lib/func/firebase.js';
 
-$: if(browser){
-  const messaging = getMessaging(app);
-
-onMessage(messaging, (payload) => {
-  console.log('Message received. ', payload);
-  // ...
-});
-}*/
-export let data
-let isAuthed = false;
+  /** @type {{data: any, children?: import('svelte').Snippet}} */
+  let { data, children } = $props();
+let isAuthed = $state(false);
 let token;
 onMount(async () => {
 
@@ -104,15 +94,15 @@ const logi = {"he": "להתחברות", "en": "To Login", "ar": "لتسجيل ا
   }} richColors  closeButton position="top-center" />
       </main>
  {/if}
-  <slot></slot>
+  {@render children?.()}
 
   {:else}
 <div class="a  bg-gradient-to-br from-gra to-grb">
     <div class="b border border-barbi button-bronze">
 <h1 class=" font-bold text-2xl p-2">{info[$lang ?? 'he']}</h1>
 <div class="flex flex-row flex-auto justify-between">
-<button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" on:click={reg}>{registratio[$lang ?? 'he']}</button>
-<button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " on:click={login}>{logi[$lang ?? 'he']}</button>
+<button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" onclick={reg}>{registratio[$lang ?? 'he']}</button>
+<button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " onclick={login}>{logi[$lang ?? 'he']}</button>
 </div></div></div>
 {/if}
 <style>

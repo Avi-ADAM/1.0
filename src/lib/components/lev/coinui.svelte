@@ -24,38 +24,7 @@ import {
 } from 'svelte';
 
 const dispatch = createEventDispatcher();
-export let adder = [],
-    arr1 = [],
-    askedarr = [],
-    declineddarr = [],
-    halu = 17,
-    askma = 17,
-    maap = 13,
-    mashs = 13,
-    pmashd = 13,
-    fia = 13,
-    beta = 13,
-    pen = 17,
-    sug = 17,
-    low = false,
-    nam, wel = 13,
-    ask = 13,
-    picLink, total
-export let milon = {
-    hachla: true,
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-}
-let modal = false;
+let modal = $state(false);
 
 function modali() {
     modal = true;
@@ -123,8 +92,44 @@ function showall(event) {
     }
 
 }
-let h = 500;
-export let sml = false
+let h = $state(500);
+  /** @type {{adder?: any, arr1?: any, askedarr?: any, declineddarr?: any, halu?: number, askma?: number, maap?: number, mashs?: number, pmashd?: number, fia?: number, beta?: number, pen?: number, sug?: number, low?: boolean, nam: any, wel?: number, ask?: number, picLink: any, total: any, milon?: any, sml?: boolean}} */
+  let {
+    adder = [],
+    arr1 = $bindable([]),
+    askedarr = [],
+    declineddarr = [],
+    halu = 17,
+    askma = 17,
+    maap = 13,
+    mashs = 13,
+    pmashd = 13,
+    fia = 13,
+    beta = 13,
+    pen = 17,
+    sug = 17,
+    low = false,
+    nam,
+    wel = 13,
+    ask = 13,
+    picLink,
+    total,
+    milon = $bindable({
+    hachla: true,
+    fiap: true,
+    welc: true,
+    sugg: true,
+    pend: true,
+    asks: true,
+    betaha: true,
+    desi: true,
+    ppmash: true,
+    pmashs: true,
+    pmaap: true,
+    askmap: true
+}),
+    sml = false
+  } = $props();
 </script>
 
 <div id="scree" bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} >

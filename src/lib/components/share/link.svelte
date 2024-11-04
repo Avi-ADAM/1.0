@@ -1,8 +1,12 @@
 <script>
-	export let rel = '';
-	export let target = '';
-	export let href;
-	export let ariaLabel;
+	/** @type {{rel?: string, target?: string, href: any, ariaLabel: any, children?: import('svelte').Snippet}} */
+	let {
+		rel = '',
+		target = '',
+		href,
+		ariaLabel,
+		children
+	} = $props();
 </script>
 
-<a aria-label={ariaLabel} {href} {rel} {target}><slot /></a>
+<a aria-label={ariaLabel} {href} {rel} {target}>{@render children?.()}</a>

@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 const ot = {"he":"עלות חד פעמית","en":"one time"}
 const py = {"he":"ליחידה", "en": "per unit"}
 const pm = {"he": "חודשי","en": "monthly"}

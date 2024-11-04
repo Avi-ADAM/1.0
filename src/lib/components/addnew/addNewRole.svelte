@@ -3,31 +3,24 @@
 import { onMount } from 'svelte';
 import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
-import axios from 'axios';
 import { idr } from '../../stores/idr.js';
 import Addnewskil from './addNewSkillToRole.svelte';
 import MultiSelect from 'svelte-multiselect';
-import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
-export let rn = [];
-export let color = "--gold"
 let idro;
 idr.subscribe(newwork => {
 idro = newwork;
 });
-export let mid = -1;
- let selected;
+ let selected = $state();
  let id;
  let meData = [];
     const placeholder = `${$lang == "he" ? "כישורים קשורים" : "related skills"}`;
 
 let tafkidimslist = [];
 let skillslist = [];
-let roleName_value;
-let desR;
-export let skills2 = [];
+let roleName_value = $state();
+let desR = $state();
 let error1 = null;
-let shgi = false;
+let shgi = $state(false);
 const baseUrl = import.meta.env.VITE_URL
 
 
@@ -73,11 +66,11 @@ onMount(async () => {
     });
 
     function dispatchrole (meData, id) {
-  dispatch('addnewrole', {
+  addnewrole({
     id: id,
     mid: mid,
     skob: meData
-    } );
+    });
 };
 
 async function addrole () {
@@ -162,7 +155,16 @@ skillslist = find_skill_id(selected);
       }
       return arr;
      };
-export let addR = false;
+  /** @type {{rn?: any, color?: string, mid?: any, skills2?: any, addR?: boolean}} */
+  let {
+    addnewrole,
+    b,
+    rn = [],
+    color = "--gold",
+    mid = -1,
+    skills2 = $bindable([]),
+    addR = $bindable(false)
+  } = $props();
 
 const cencel = {"he":"ביטול","en": "cencel"}
 const adds = {"he":"הוספת כישור חדש","en": "Add new Skill"}
@@ -173,11 +175,10 @@ const des = {"he": "תיאור קצר", "en": "Role short description"}
 const btnTitles = {"he": "הוספה", "en": "Add"}
 const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
 const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת כישור חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new skill\" button bellow"}
-let addsk = false;
-let newsk;
+let addsk = $state(false);
 function finnish (event) {
-   const newOb = event.detail.skob;
-   const newN = event.detail.name;
+   const newOb = event.skob;
+   const newN = event.name;
     const newValues = skillslist;
         newValues.push(newOb);
 
@@ -191,8 +192,7 @@ function finnish (event) {
 };
 function dispatchb () {
    addR = false
-  dispatch('b', {
-    } );
+b()
 };
 
 </script>
@@ -201,12 +201,12 @@ function dispatchb () {
 {#if addR == false}
 <button 
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
-on:click={() => addR = true}>{addn[$lang]}</button>
+onclick={() => addR = true}>{addn[$lang]}</button>
 {:else}
 
 
 <button title={cencel[$lang]}
-on:click={dispatchb}
+onclick={dispatchb}
 class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -241,12 +241,12 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
       <br>
       {#if addsk == false}
       <button
-       on:click={() => addsk = true} 
+       onclick={() => addsk = true} 
        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-1 rounded-full"
        >{adds[$lang]}</button>
        <br/>
        <div class="grid items-center justify-center">
-    <button on:click={addrole}
+    <button onclick={addrole}
     title="{btnTitles[$lang]}"
     class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -255,12 +255,12 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
     </div>
       {:else} 
       <button title={cencel[$lang]}
-    on:click={() => addsk = false}
+    onclick={() => addsk = false}
      class=" hover:bg-barbi hover:text-mturk text-gold font-bold p-1 rounded-full"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
-      <Addnewskil {color} rn={skills2.map(c => c.attributes.skillName)} on:finnish={finnish}/>{/if}</div>
+      <Addnewskil {color} rn={skills2.map(c => c.attributes.skillName)} {finnish}/>{/if}</div>
   
     {/if}
    

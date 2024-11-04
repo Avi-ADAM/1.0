@@ -7,31 +7,19 @@
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 
-export let sug = 13;
 let sugg =  "sugg";
-export let pen = 13;
 let pend = "pend";
-export let ask = 17;
 let asks = "asks";
-export let wel = 17;
 let welc = "welc";
-export let beta = 13;
 let betaha = "betaha";
-export let des = 13;
 let desi = "desi";
-export let fia = 99;
 let fiap = "fiap";
-export let pmash = 99;
  let ppmash = "ppmash";
-export let mashs = 17;
  let pmashs = "pmashs";
-export let maap = 17;
  let pmaap = "pmaap";
-export let askma = 13;
  let askmap = "askmap";
-export let hachlot = 9
 // נאחסן את כל המצבים באובייקט אחד
-let states = {
+let states = $state({
   sugg,
   pend,
   asks,
@@ -43,7 +31,7 @@ let states = {
   pmashs,
   pmaap,
   askmap
-};
+});
 
 function showonly(value) { 
     if (value !== "true") {
@@ -107,7 +95,22 @@ dispatch("hover", {id: fir[$lang]});
 
 
 
-export let low = true;
+  /** @type {{sug?: number, pen?: number, ask?: number, wel?: number, beta?: number, des?: number, fia?: number, pmash?: number, mashs?: number, maap?: number, askma?: number, hachlot?: number, low?: boolean}} */
+  let {
+    sug = 13,
+    pen = 13,
+    ask = 17,
+    wel = 17,
+    beta = 13,
+    des = 13,
+    fia = 99,
+    pmash = 99,
+    mashs = 17,
+    maap = 17,
+    askma = 13,
+    hachlot = 9,
+    low = true
+  } = $props();
 let hovered = false;
 function hoverede(x){
         let t = {"he":"לב המערכת", "en": "heart of 1💗1"}
@@ -157,7 +160,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
     // מחזיר true רק אם יש ערך מספרי והוא גדול מ-0
     return valueMap[item.name] > 0;
 }) as key}
-    <button on:click={()=> showonly(key.name)}>
+    <button onclick={()=> showonly(key.name)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}

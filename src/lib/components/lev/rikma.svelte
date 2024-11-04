@@ -10,19 +10,20 @@ import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
   import RichText from '$lib/celim/ui/richText.svelte';
-export let projectId;
-let projectUsers =[];
+  /** @type {{projectId: any}} */
+  let { projectId } = $props();
+let projectUsers =$state([]);
 let token;
 let idL;
-let srcP;
+let srcP = $state();
 let error1 = null;
-let vallues  = []
+let vallues  = $state([])
 const baseUrl = import.meta.env.VITE_URL
 
-      let linkP  =[]
-       let githublink;
-         let fblink, discordlink, twiterlink;
-let projecto = [];
+      let linkP  =$state([])
+       let githublink = $state();
+         let fblink = $state(), discordlink = $state(), twiterlink = $state();
+let projecto = $state([]);
 async function xyd () {
     const cookieValue = document.cookie
   .split('; ')
@@ -102,7 +103,7 @@ async function xyd () {
     function hover(c){
       console.log("hover")
     }
-    let project = xyd();
+    let project = $state(xyd());
 
  const githublinkde = {"he":"לינק לגיטהב של הריקמה","en":"link to the FreeMates GitHub"}
    const fblinkde = {"he":"לינק לפייסבוק של הריקמה","en":"link to the FreeMates Facebook"}
@@ -193,7 +194,7 @@ async function xyd () {
  <div dir="ltr" class="flex items-center justify-center">
     <div dir="ltr" class="flex -space-x-2 ">
         {#each projectUsers as user}
-  <button title="{user.attributes.username}" on:click={()=>us(user.id)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.attributes.profilePic.data != null ? user.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
+  <button title="{user.attributes.username}" onclick={()=>us(user.id)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.attributes.profilePic.data != null ? user.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
   <!--{#if hover}
     <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
     {/if}-->
@@ -205,7 +206,7 @@ async function xyd () {
 
      <h2 class="mt-2 text-sm text-barbi text-center " style="text-shadow: 1px 1px var(--gold);">{vap[$lang]}</h2>
             <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 m-1"> 
-                {#each vallues as vallue}<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                {#each vallues as vallue}<p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold"   word={vallue.attributes.valueName}/></p>{/each}
     </div>
     </div>
@@ -222,8 +223,8 @@ async function xyd () {
 <div style="margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--mturk);"  class="drop-shadow-xl ">
 <h3 style="color: var(--barbi-pink) ;text-shadow: 1px 1px var(--gold);" class="5">{frm[$lang]}</h3>
 <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
-                {#each projecto as om }<p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})}
-                   on:mouseleave={()=>hover("0")} class="m-0 cursor-pointer hover:scale-105	" style="text-shadow:none;" on:click={mesima(om.id)}>
+                {#each projecto as om }<p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})}
+                   onmouseleave={()=>hover("0")} class="m-0 cursor-pointer hover:scale-105	" style="text-shadow:none;" onclick={mesima(om.id)}>
               <Tile bg="wow"   word={om.attributes.name}/></p>{/each}
     </div>
 </div>

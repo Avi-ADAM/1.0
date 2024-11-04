@@ -1,12 +1,12 @@
 <script>
   import {isToday }from '$lib/func/uti/isToday.svelte';
-   export let chats = []
-   export let chatId = 0
    import {lang} from '$lib/stores/lang'
   import { isChatLoading, nowChatId } from '$lib/stores/pendMisMes';
   import { Rainbow } from 'svelte-loading-spinners';
   import { quintOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
+  /** @type {{chats?: any, chatId?: number}} */
+  let { chats = [], chatId = $bindable(0) } = $props();
    console.log(chats)
    function toChat(id){
     nowChatId.set(id)
@@ -31,7 +31,7 @@
                   {/if}
                   {#key chats}
                    {#each chats as chat}
-                    <button on:click={()=>toChat(chat.id)} class="w-full {$lang == "en" ? "text-left" : "text-right"} py-2 focus:outline-none focus-visible:bg-indigo-50 mt-2 p-2 hover:shadow-lg rounded cursor-pointer transition">
+                    <button onclick={()=>toChat(chat.id)} class="w-full {$lang == "en" ? "text-left" : "text-right"} py-2 focus:outline-none focus-visible:bg-indigo-50 mt-2 p-2 hover:shadow-lg rounded cursor-pointer transition">
                         <div class="flex flex-row ">
                         <div class="flex ml-2  basis-3/4">
                              <img 

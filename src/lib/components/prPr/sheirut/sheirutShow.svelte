@@ -12,10 +12,17 @@ const noap = {"he":"השירות עדיין לא אושר בהצבעה","en":"th
     const equaliSplitedFl = {"he":"דמי מנוי","en":"subscription"}
     const equaliSplitedTr = {"he":"חלוקה שווה של ההוצאות","en":"splited equally"}
 const ourse ={"he":"השירותים שלנו","en":"our services"}
-export let sheirutim = [],projectName = "",pid,wb = false,restime
-let alr = {}
-let success = false
-let hovered = false
+  /** @type {{sheirutim?: any, projectName?: string, pid: any, wb?: boolean, restime: any}} */
+  let {
+    sheirutim = [],
+    projectName = "",
+    pid,
+    wb = false,
+    restime
+  } = $props();
+let alr = $state({})
+let success = $state(false)
+let hovered = $state(false)
 async function ask(id,i){
   alr[i] = true
     const cookieValueId = document.cookie
@@ -109,7 +116,7 @@ const aski = {"he":"בקשת הצטרפות לשירות","en":"request service"
     </p>-->
           <div class="flex justify-center">
             {#if alr[i] == false && wb == true}
-          <button on:click={()=>ask(datai.id,i)} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
+          <button onclick={()=>ask(datai.id,i)} onmouseenter={()=>hovered = true} onmouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
             class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">{aski[$lang]}</button>
         {/if}  
         </div>

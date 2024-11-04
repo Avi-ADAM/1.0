@@ -346,7 +346,10 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
                         <label for="name" class='label'>כמות</label>
                         <span class='line'></span>
                     </div>
-                           {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכולה להיות קטנה מ-0</small>{/if}                                    
+                           {#if data.hm < 0}
+                           <small class="bg-red-800 text-slate-50 px-2"
+                           >לא יכולה להיות קטנה מ-0</small>{/if}   
+                </td>                                 
                     {/each}
                     </tr><tr style="display:{ ky  ? "" : "none"};" >
                         <th>תאריך התחלה </th>

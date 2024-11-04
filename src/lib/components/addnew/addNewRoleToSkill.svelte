@@ -1,16 +1,15 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
+
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
   const baseUrl = import.meta.env.VITE_URL
 
-    export let color = "--gold"
-    export let rn = [];
-    let roleName_value;
-        let desS;
+  /** @type {{color?: string, rn?: any}} */
+  let { color = "--gold", rn = [], finnish } = $props();
+    let roleName_value = $state();
+        let desS = $state();
         let meData;
-        let shgi = false;
+        let shgi = $state(false);
   async function add () {
       if (rn.includes(roleName_value)){
   shgi = true;
@@ -44,7 +43,7 @@
 })
   .then(r => r.json())
   .then(data => meData = data);
-         finnish (meData.data.createTafkidim.data.id,meData.data.createTafkidim.data);
+         finnishh (meData.data.createTafkidim.data.id,meData.data.createTafkidim.data);
           let userName_value = liUN.get()
          let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desS}` }
    fetch("/api/ste", {
@@ -72,8 +71,8 @@
         console.log(error1)
                 };}
     };     
-       function finnish (id , sec) {
-  dispatch('finnish', {
+       function finnishh (id , sec) {
+  finnish({
     id: id,
     addro: false,
     rob: meData,
@@ -109,7 +108,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
           
           <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
 
-          <button on:click={add}
+          <button onclick={add}
           title="{btnTitles[$lang]}"
           class=" hover:bg-barbi hover:text-mturk text-gold font-bold  rounded-full" 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

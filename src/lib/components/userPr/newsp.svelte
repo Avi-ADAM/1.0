@@ -272,6 +272,7 @@ import {lang} from '$lib/stores/lang'
   <label for="name" class='label'>כמות</label>
   <span class='line'></span>
 </div>
+      </td>
       {/each}
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>

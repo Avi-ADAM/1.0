@@ -1,11 +1,14 @@
 <script>
-export let user;
-export let projectSrc ="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png";
  const msgk = {"he":"שמחנו מאוד לקבל את הסכמתך להתתנהלות בהסכמה הדדית, נשמח מאוד לראותך נהנה ליצור בהסכמה באתר 1💗1",
                 "en":""}//
  const msg2 = {"he":"להרשמה!","en":"register now!"}//link des 
-export let lang = "he"
-export let link = "https://1lev1.com"
+    /** @type {{user: any, projectSrc?: string, lang?: string, link?: string}} */
+    let {
+        user,
+        projectSrc = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png",
+        lang = "he",
+        link = "https://1lev1.com"
+    } = $props();
 const hallo = {"he":"!","en":"Hello, "}
 const shalom = {"he":"שלום","en":"!"}
 

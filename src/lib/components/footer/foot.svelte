@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   import mapTouchToMouseFor from 'svelte-touch-to-mouse';
 </script>
 
@@ -21,8 +21,7 @@
   import { Canvas } from '@threlte/core';
   import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
   import { initiatePgishot, isOnline, myUserMeeting } from '$lib/stores/pgishot';
-  export let un;
-  let draggable;
+  let draggable = $state();
   onMount(async () => {
     initiatePgishot(idL);
     draggable = (await import('svelte-agnostic-draggable')).draggable;
@@ -32,7 +31,7 @@
   let username = '';
   let iwant = false,
     addP = false,
-    min = true;
+    min = $state(true);
   function addi(kind) {
     if (kind == 'chat') {
       iwant = true;
@@ -43,18 +42,22 @@
       dialogOpen = true;
     }
   }
-  let dialogOpen = false;
+  let dialogOpen = $state(false);
   const close = () => {
     dialogOpen = false;
     iwant = false;
     isChatOpen.set(false);
   };
   let loading = false;
-  let newMeeting = false;
+  let newMeeting = $state(false);
   const cencel = { he: 'ביטול', en: 'cencel' };
-  export let idL
-  export let chatId = 0;
-  export let online = true
+  /** @type {{un: any, idL: any, chatId?: number, online?: boolean}} */
+  let {
+    un,
+    idL,
+    chatId = $bindable(0),
+    online = true
+  } = $props();
   function onlineSwitcher(e) {
     const changedTo = e.detail.checked
     console.log(changedTo, $myUserMeeting)
@@ -94,7 +97,7 @@
 				class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
 			>
 				<div class="flex-1 rounded-t-[10px] p-4">
-          <div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi" />
+          <div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi"></div>
 
 					<div class="mx-auto d overflow-auto flex flex-col ">
 					
@@ -123,11 +126,11 @@
     style="
     display:block; cursor:grab
   "
-    on:draggable:init={onDraggableInit}
-    on:draggable:destroy={onDraggableDestroy}
-    on:drag:start={onDragStart}
-    on:drag:move={onDragMove}
-    on:drag:stop={onDragStop}
+    ondraggable:init={onDraggableInit}
+    ondraggable:destroy={onDraggableDestroy}
+    ondrag:start={onDragStart}
+    ondrag:move={onDragMove}
+    ondrag:stop={onDragStop}
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
     dir="rtl"
     class=" draggable z-[9999] absolute top-0 left-0 w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded"
@@ -137,7 +140,7 @@
       <div class="flex flex-row  items-start justify-start">
       <div>
         <button
-          on:click={close}
+          onclick={close}
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
           title={cencel[$lang]}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -156,7 +159,7 @@
           class="hover:bg-wow justify-end flex text-barbi hover:text-barbi font-bold rounded"
         >
           <button
-            on:click={() => ($nowChatId = 0)}
+            onclick={() => ($nowChatId = 0)}
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
             title={back[$lang]}><Arrow back={true} /></button
           >
@@ -167,7 +170,7 @@
       <div>
         <OnlineSwitch bind:checked={$isOnline} on:change={()=>onlineSwitcher} />
       </div>
-      <button class="h-6 w-6 mx-2 my-1" on:click={() => {
+      <button class="h-6 w-6 mx-2 my-1" onclick={() => {
         isChatOpen.set(false);
         newMeeting = true
         dialogOpen = true
@@ -184,7 +187,7 @@
 {/if}
 <button
   style="position: fixed; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"
-  on:click={() => (min = !min)}
+  onclick={() => (min = !min)}
   class="ww3 items-center flex justify-center text-xl"
 >
   {#if min !== false}
@@ -198,7 +201,7 @@
     <button
       transition:slide|all={{ delay: 150, duration: 1000, easing: quintOut }}
       style="position: fixed; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
-      on:click={() => addi('chat')}
+      onclick={() => addi('chat')}
       class="{online == true ? "online":"ww"} ww2  items-center flex justify-center text-xl"
       ><Chaticon /></button
     >
@@ -206,7 +209,7 @@
   <button
     transition:slide={{ delay: 150, duration: 1000, easing: quintOut }}
     style="position: fixed; color: var(--gold); font-weight:bold; height:50px width:50px; z-index:500;"
-    on:click={() => addi()}
+    onclick={() => addi()}
     class="ww ww1 text-bold sm:text-2xl text-xl items-center flex justify-center"
     ><Plus /></button
   >

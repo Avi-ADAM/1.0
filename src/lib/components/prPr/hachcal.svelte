@@ -1,3 +1,4 @@
+
 <script>
      import pic from './../../celim/pic.js'
 export let fmiData = [];
@@ -135,6 +136,7 @@ x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >טבלת חישוב </h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg"></th>
           {#each ulist as data, i}
@@ -142,7 +144,10 @@ x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
             {i + 1}
         </td>
           {/each}
-    </tr> <tr class="ggr">
+    </tr> 
+    </thead>
+    <tbody>
+    <tr class="ggr">
       <th class="ggr">שם</th>
       {#each ulist as data, i}
             <td class="ggr">{data.username}</td>
@@ -164,6 +169,7 @@ x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
             <td >{data.p.toFixed(2)}%</td>
             {/each}
           </tr> 
+    </tbody>
     </table>
   </div>
   </div>

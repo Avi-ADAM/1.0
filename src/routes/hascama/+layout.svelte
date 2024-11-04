@@ -1,7 +1,8 @@
 <script>
 import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
-export let data
+  /** @type {{data: any, children?: import('svelte').Snippet}} */
+  let { data, children } = $props();
 function getLang() {
   console.log(data)
     let la;
@@ -44,6 +45,6 @@ onMount(async () => {
 })
 </script>
 
-	<slot />
+	{@render children?.()}
 
 

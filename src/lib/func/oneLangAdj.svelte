@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     /*kind = "skillName" || "workWayName" || "roleDescription" */
     export function oneLangAdj (datar,lang,kind = "skillName" || "workWayName" || "roleDescription"){
             /*kind = "skillName" || "workWayName" || "roleDescription" */

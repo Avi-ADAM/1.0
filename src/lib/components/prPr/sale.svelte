@@ -1,45 +1,58 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   	import 'dayjs/locale/he.js';
 	import dayjs from 'dayjs';
 
   	import { Datepicker } from 'svelte-calendar';
   import { lang } from '$lib/stores/lang.js'
-    export let projectUsers = [];
 import MultiSelect from 'svelte-multiselect';
 import { idPr } from '../../stores/idPr.js'
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
- 	$: dayjs.locale($lang);
+ 	run(() => {
+    dayjs.locale($lang);
+  });
 let locale = $lang
-let store
-export let quant;
-let selected;
-let total = 0;
-export let each = 0;
-export let kindUlimit = false 
-let hm = 0;
+let store = $state()
+let selected = $state();
+let total = $state(0);
+let hm = $state(0);
 let where = [];
 let placeholder = `אצל מי הכסף`;
-let already = false;
-export let maid;
-let valid = true;
-$: if (kindUlimit = false ){ 
-        if (hm > quant){
-  valid = false;
-        } else {
-    valid = true;
-        }
-} else if (kindUlimit = true ){
-    valid = true;
-    quant = -1
-}
-$: if (hm > 0 && each > 0 ){
-  total = hm * each;
-  each = total / hm;
-}
-$: if (hm > 0 && total > 0 ){
-  each = total / hm;
-}
+let already = $state(false);
+  /** @type {{projectUsers?: any, quant: any, each?: number, kindUlimit?: boolean, maid: any}} */
+  let {
+    projectUsers = [],
+    quant = $bindable(),
+    each = $bindable(0),
+    kindUlimit = $bindable(false),
+    maid
+  } = $props();
+let valid = $state(true);
+run(() => {
+    if (kindUlimit = false ){ 
+          if (hm > quant){
+    valid = false;
+          } else {
+      valid = true;
+          }
+  } else if (kindUlimit = true ){
+      valid = true;
+      quant = -1
+  }
+  });
+run(() => {
+    if (hm > 0 && each > 0 ){
+    total = hm * each;
+    each = total / hm;
+  }
+  });
+run(() => {
+    if (hm > 0 && total > 0 ){
+    each = total / hm;
+  }
+  });
 
 let bearer1;
 let token;
@@ -192,7 +205,7 @@ let d = new Date
 {#if already == false}
 <div class="flex items-center justify-center">
 <button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={add} >דיווח</button>
+ onclick={add} >דיווח</button>
  </div>
  {/if}<style>
        .textinput {

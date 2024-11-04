@@ -3,35 +3,13 @@
     import {  fly } from 'svelte/transition';
    import { createEventDispatcher } from 'svelte';
        	import { Drawer } from 'vaul-svelte';
-         export let isVisible = false;
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
   import ProgressBar from "@okrad/svelte-progressbar";
   import Lowbtn from '$lib/celim/lowbtn.svelte'
-    export let modal = false
-    let dialogOpen = false
+    let dialogOpen = $state(false)
  const dispatch = createEventDispatcher();
-     export let low = false;
-    export let halukot = []
-    export let hervach = []
-    export let mypos = null;
-    export let coinlapach;
-    export let whyno = [];
-    export let projectName = "";
-    export let name = "";
-    export let src = "coin.png";
-    export let projectId;
-    export let noofusersOk;
-    export let noofusersNo;
-    export let noofusersWaiting;
-    export let noofusers ;
-    export let already = false;
-    export let created_at;
-    export let pendId;
-    export let users;
-    export let diun = [];
-    export let order = diun.length;
     const baseUrl = import.meta.env.VITE_URL
 
     let miDatan = [];
@@ -39,16 +17,16 @@ import { idPr } from '../../stores/idPr.js';
     let bearer1;
     let token;
     let idL;
-    let no = false;
-    let masa = false;
+    let no = $state(false);
+    let masa = $state(false);
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
   } 
 let ok;
 let nook;
-let tryo = "116%";
-let tryot = "-10.5%";
-let tryoti = "-5.25%";
+let tryo = $state("116%");
+let tryot = $state("-10.5%");
+let tryoti = $state("-5.25%");
 let nut;
 async function xyz (){
     ok =  percentage(noofusersOk, noofusers)
@@ -80,7 +58,7 @@ tryot = "-17%"
     return ser
 }
 
-let ser = xyz();
+let ser = $state(xyz());
 
 function coinLapach() {
              isOpen = false;
@@ -288,8 +266,8 @@ async function nego(alr) {
         // send why with userss, create way to show why for all agreed users and for them to response.
 	}
 }
-  let why;
-let isOpen = false;
+  let why = $state();
+let isOpen = $state(false);
 
 async function afterwhy (){
         if (why.length > 20) {
@@ -368,8 +346,10 @@ function afternego (event) {
 }
 
 
-$: pcli = 0
-$: pmcli = 0
+let pcli = $state(0);
+  
+let pmcli = $state(0);
+  
 function linke (){
     pcli += 1;
     if(pcli >= 2){
@@ -383,8 +363,8 @@ function linke (){
     goto("/moach")
     }
   };
-  let rect = false;
-  let allr = false;
+  let rect = $state(false);
+  let allr = $state(false);
 async function react (){
      allr = true;
       rect = true;
@@ -464,9 +444,10 @@ const slideTo = (index) => {
 function toggleShow (){
   slideTo(0)
 }
- $: w = 0;
+ let w = $state(0);
+  
  let u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
-let hovered = false;
+let hovered = $state(false);
 function hover (id){
   if (id == "0"){
  u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
@@ -494,7 +475,32 @@ function hoverede(){
     dispatch("hover", {id: u});
 }
    import Cards from './cards/haluka.svelte'
-export let cards = false;
+  /** @type {{isVisible?: boolean, modal?: boolean, low?: boolean, halukot?: any, hervach?: any, mypos?: any, coinlapach: any, whyno?: any, projectName?: string, name?: string, src?: string, projectId: any, noofusersOk: any, noofusersNo: any, noofusersWaiting: any, noofusers: any, already?: boolean, created_at: any, pendId: any, users: any, diun?: any, order?: any, cards?: boolean}} */
+  let {
+    isVisible = false,
+    modal = $bindable(false),
+    low = false,
+    halukot = [],
+    hervach = [],
+    mypos = null,
+    coinlapach,
+    whyno = [],
+    projectName = "",
+    name = "",
+    src = "coin.png",
+    projectId,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    noofusersWaiting = $bindable(),
+    noofusers,
+    already = $bindable(false),
+    created_at,
+    pendId,
+    users,
+    diun = [],
+    order = $bindable(diun.length),
+    cards = false
+  } = $props();
 function claf (event){
   let o = event.detail.alr
   let d = event.detail.y
@@ -509,14 +515,14 @@ function claf (event){
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">
       <div dir="rtl" class="grid items-center justify-center aling-center">
-              <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+              <button onclick={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
 {#if no === true}
       <input minlength="26"  type="text" bind:value={why} placeholder="יש לנמק מדוע ההצעה נדחית על ידך">
-            <button on:click={afterwhy}>אישור</button>
+            <button onclick={afterwhy}>אישור</button>
             {:else if rect === true}
             <div class="text-center">
   <h1>  ניתן להגיב ולנמק מדוע 
@@ -530,7 +536,7 @@ title="ביטול"
     <br> 
     <lebel for="yu">התגובה שלך</lebel>   
     <input id="yu" minlength="26"  type="text" bind:value={why} placeholder="התשובה שלך">
-            <button on:click={afreact}>אישור</button>  </div> 
+            <button onclick={afreact}>אישור</button>  </div> 
 {:else if masa === true}
 <h2 class="bg-gold text-barbi text-center">   .יבנה במהרה בימינו אמן 
 בנתיים יש להגיב לא ולנמק ואז ליצור משאב חדש עם המאפיינים הרצויים </h2>
@@ -565,15 +571,15 @@ title="ביטול"
 
 <div 
 use:clickOutside
-on:click_outside={toggleShow} 
-on:click={()=>{modal = true
+onclick_outside={toggleShow} 
+onclick={()=>{modal = true
   dispatch("modal")
 dialogOpen = true}}
 role="button"
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()}
 class="hover:scale-290 duration-1000 ease-in" 
 transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
  
@@ -599,7 +605,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 	 id="normSml" 
 > 
 
- <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}  >  
+ <button onclick={()=>project()} onmouseenter={()=>hover(` לחיצה למעבר למוח הריקמה ${projectName}`)} onmouseleave={()=>hover("0")}  >  
       <img class="img"
          src={src}  alt="projectlogo" >
  </button>
@@ -608,14 +614,14 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 
 
        <p class="p">
-         <span on:mouseenter={()=>hover("בעד")} 
-          on:mouseleave={()=>hover("0")} 
+         <span onmouseenter={()=>hover("בעד")} 
+          onmouseleave={()=>hover("0")} 
           style="color:#7EE081;" >{noofusersOk} </span>
-          <span on:mouseenter={()=>hover("לא הצביעו")} 
-            on:mouseleave={()=>hover("0")} 
+          <span onmouseenter={()=>hover("לא הצביעו")} 
+            onmouseleave={()=>hover("0")} 
             style="color:#0000cc;" >{noofusersWaiting} </span>
-          <span on:mouseenter={()=>hover("נגד")} 
-            on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
+          <span onmouseenter={()=>hover("נגד")} 
+            onmouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
    
 </div>
 
@@ -624,9 +630,9 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
     ><div  id="normSmll"
  >
 
-       <button on:click={()=>linke()}
-        on:mouseenter={()=>hover("לחיצה למעבר לדף הציבורי של הריקמה")} 
-            on:mouseleave={()=>hover("0")}   class="ab pn" 
+       <button onclick={()=>linke()}
+        onmouseenter={()=>hover("לחיצה למעבר לדף הציבורי של הריקמה")} 
+            onmouseleave={()=>hover("0")}   class="ab pn" 
         ><h3 class="ab pn pt-8 px-2">{projectName}</h3></button>
         <div class="{`normSmll${pendId}-${projectId}-hdh`}">    </div>
 
@@ -634,31 +640,31 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
      class="bc"
       style:visibility={whyno.length > 0 ? "hidden"  : "visible"}
        style="color:var(--barbi); font-size:10px; font-weight:bold;"
-       on:mouseenter={()=>hover("טענת הנגד האחרונה שעלתה")} 
-            on:mouseleave={()=>hover("0")} 
+       onmouseenter={()=>hover("טענת הנגד האחרונה שעלתה")} 
+            onmouseleave={()=>hover("0")} 
        >{whyno.join(' ~ ')}</h4>{/if} 
    {#if low == false}
      {#if already === false}
-   <button on:mouseenter={()=>hover("אישור")} 
-            on:mouseleave={()=>hover("0")}  on:click={agree} style="margin: 0;" class = "btn a" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
-   <button on:mouseenter={()=>hover("משא ומתן")} 
-            on:mouseleave={()=>hover("0")} on:click= {nego} style="margin: 0;" class = "btn b" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
-   <button on:mouseenter={()=>hover("התנגדות")} 
-            on:mouseleave={()=>hover("0")} on:click={decline} style="margin: 0;" class = "btn c" name="decline" title="התנגדות"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+   <button onmouseenter={()=>hover("אישור")} 
+            onmouseleave={()=>hover("0")}  onclick={agree} style="margin: 0;" class = "btn a" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+   <button onmouseenter={()=>hover("משא ומתן")} 
+            onmouseleave={()=>hover("0")} onclick={nego} style="margin: 0;" class = "btn b" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
+   <button onmouseenter={()=>hover("התנגדות")} 
+            onmouseleave={()=>hover("0")} onclick={decline} style="margin: 0;" class = "btn c" name="decline" title="התנגדות"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
        {:else if already === true && mypos === true && whyno.length > 0 && allr === false}
-       <button on:mouseenter={()=>hover("אישור")} 
-            on:mouseleave={()=>hover("0")} on:click={() => nego("alr")} style="margin: 0;" class = "btn a" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
-       <button on:mouseenter={()=>hover("התנגדות")} 
-            on:mouseleave={()=>hover("0")} on:click={() => decline("alr")} style="margin: 0;" class = "btn b" name="decline" title="התנגדות"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
-       <button on:mouseenter={()=>hover("תגובה")} 
-            on:mouseleave={()=>hover("0")} class="text-barbi bg-gold j c" on:click={() => react()}>תגובה</button>
+       <button onmouseenter={()=>hover("אישור")} 
+            onmouseleave={()=>hover("0")} onclick={() => nego("alr")} style="margin: 0;" class = "btn a" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
+       <button onmouseenter={()=>hover("התנגדות")} 
+            onmouseleave={()=>hover("0")} onclick={() => decline("alr")} style="margin: 0;" class = "btn b" name="decline" title="התנגדות"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+       <button onmouseenter={()=>hover("תגובה")} 
+            onmouseleave={()=>hover("0")} class="text-barbi bg-gold j c" onclick={() => react()}>תגובה</button>
        {:else if already === true && mypos === false && diun.length > 0  && allr === false}
- <button on:mouseenter={()=>hover("אישור")} 
-            on:mouseleave={()=>hover("0")} on:click={() => agree("alr")} style="margin: 0;" class = "btn a" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
-        <button on:mouseenter={()=>hover("משא ומתן")} 
-            on:mouseleave={()=>hover("0")}  on:click={() => nego("alr")} style="margin: 0;" class = "btn b" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
-        <button on:mouseenter={()=>hover("תגובה")} 
-            on:mouseleave={()=>hover("0")} class="c" on:click={() => react()}>תגובה</button>
+ <button onmouseenter={()=>hover("אישור")} 
+            onmouseleave={()=>hover("0")} onclick={() => agree("alr")} style="margin: 0;" class = "btn a" name="requestToJoin" title="אישור"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+        <button onmouseenter={()=>hover("משא ומתן")} 
+            onmouseleave={()=>hover("0")}  onclick={() => nego("alr")} style="margin: 0;" class = "btn b" name="negotiate" title="משא ומתן"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
+        <button onmouseenter={()=>hover("תגובה")} 
+            onmouseleave={()=>hover("0")} class="c" onclick={() => react()}>תגובה</button>
         {/if}
      {:else if low == true}
           <Lowbtn/>

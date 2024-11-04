@@ -3,10 +3,10 @@ import { idPr } from '../../stores/idPr.js'
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
 
-let price;
-let quant;
-let kindOf = [];
-let name;
+let price = $state();
+let quant = $state();
+let kindOf = $state([]);
+let name = $state();
 let bearer1;
 let token;
 let error1;
@@ -58,7 +58,7 @@ already = true;
             console.log(error1);
         }
 }
-let already = false;
+let already = $state(false);
 </script>
  <div dir="rtl" class='textinput'>
   <input type="text"  id="hoursn" name="hoursn"  bind:value={name} class='input' required>
@@ -100,7 +100,7 @@ let already = false;
 {/if}
 {#if already == false}
 <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
- on:click={add} >הוספת מתנה</button>
+ onclick={add} >הוספת מתנה</button>
  {/if}
 <style>
        .textinput {

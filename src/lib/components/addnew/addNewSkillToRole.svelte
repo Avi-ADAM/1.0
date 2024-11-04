@@ -1,15 +1,13 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
+
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
 const baseUrl = import.meta.env.VITE_URL
 
-let skillName_value;
-    let desS;
+let skillName_value = $state();
+    let desS = $state();
     let meData;
-     export let rn = [];
-    let shgi = false;
+    let shgi = $state(false);
 async function addNewSkill () {
    shgi = false;
 if (rn.includes(skillName_value)){
@@ -46,7 +44,7 @@ if (rn.includes(skillName_value)){
   .then(r => r.json())
   .then(data => meData = data);
      const id = meData.data.createSkill.data.id;
-    finnish (id,meData.data.createSkill.data);
+    finnishh (id,meData.data.createSkill.data);
       console.log("some")
           let userName_value = liUN.get()
 
@@ -74,9 +72,9 @@ if (rn.includes(skillName_value)){
     };   
 
 
-function finnish (id,sec) {
+function finnishh (id,sec) {
   console.log("ugu")
-  dispatch('finnish', {
+  finnish({
     id: id,
     addsk: false,
     scob: sec,
@@ -84,7 +82,8 @@ function finnish (id,sec) {
     name: skillName_value
     } );
        };
-       export let color = "--gold"
+  /** @type {{rn?: any, color?: string}} */
+  let { rn = [], color = "--gold", finnish } = $props();
 const adds = {"he":"הוספת כישור חדש","en": "Add new Skill"}
 
 const valn = {"he":"שם הכישור", "en": "Skill name"}
@@ -111,7 +110,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
   <span class='line'></span>
 </div>
 
-  <button on:click={addNewSkill}
+  <button onclick={addNewSkill}
       title="{btnTitles[$lang]}"
       class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

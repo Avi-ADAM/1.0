@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 export function sendEror(uid, data, errorId) {
   const safeData = typeof data === 'object' ? JSON.stringify(data) : String(data);
   

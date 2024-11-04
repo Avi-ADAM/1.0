@@ -1,9 +1,9 @@
 <script>
-	export let title = '';
-	let isHovered = false;
-	let x;
-	let y;
-	export let z = 0;
+	let isHovered = $state(false);
+	let x = $state();
+	let y = $state();
+	/** @type {{title?: string, z?: number, children?: import('svelte').Snippet}} */
+	let { title = '', z = 0, children } = $props();
 	function mouseOver(event) {
 		isHovered = true;
 		x = event.pageX + 5;
@@ -20,11 +20,11 @@
 </script>
 
 <span
-	on:mouseenter={mouseOver}
-  on:mouseleave={mouseLeave}
-	on:mousemove={mouseMove}
+	onmouseenter={mouseOver}
+  onmouseleave={mouseLeave}
+	onmousemove={mouseMove}
    >
-	<slot />
+	{@render children?.()}
 </span>
 
 {#if isHovered}

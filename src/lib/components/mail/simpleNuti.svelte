@@ -12,11 +12,14 @@
 		Text
 	} from 'svelty-email';
 
-	export let head = '';
-    export let body = '';
-    export let username = "x"
-    export let previewText = {};
-    export let lang = "he";
+	/** @type {{head?: string, body?: string, username?: string, previewText?: any, lang?: string}} */
+	let {
+		head = '',
+		body = '',
+		username = "x",
+		previewText = {},
+		lang = "he"
+	} = $props();
   
     const headr = {"he":` שלום ${username}!`,"en":`hallo ${username}!`}
     const tovo = {"he":"לצפיה באתר!","en":"see now!"}

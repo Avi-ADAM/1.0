@@ -7,8 +7,9 @@
 
   const { data, xGet, yGet, xScale, yScale } = getContext('LayerCake');
 
-  /** @type {String} [fill='#00bbff'] - The shape's fill color. This is technically optional because it comes with a default value but you'll likely want to replace it with your own color. */
-  export let fill = 'var(--barbi-pink)';
+  
+  /** @type {{fill?: String}} */
+  let { fill = 'var(--barbi-pink)' } = $props();
 </script>
 
 <g class="bar-group">

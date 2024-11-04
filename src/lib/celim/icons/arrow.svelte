@@ -1,16 +1,13 @@
 <script>
-/**
- * @param {Number} width 
- * @param {Number} height
- * @param {String} color
- * @param {Boolean} back
- * @param {String} fill
- */
-  export let width = 23.7;
-  export let height = 17.85;
-  export let color = 'var(--barbi-pink)';
-  export let fill = 'var(--gold)';
-  export let back = false;
+
+  /** @type {{width?: number, height?: number, color?: string, fill?: string, back?: boolean}} */
+  let {
+    width = 23.7,
+    height = 17.85,
+    color = 'var(--barbi-pink)',
+    fill = 'var(--gold)',
+    back = false
+  } = $props();
 </script>
 
 <svg

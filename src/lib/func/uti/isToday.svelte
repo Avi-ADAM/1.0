@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
    export function isToday(date) {
   const today = new Date();
 

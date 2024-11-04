@@ -86,9 +86,9 @@ let workways3 = [];
 
 let rishon = 0;
 function myMission() {
-     var checkBox = document.getElementById("tomeC");
+     let checkBox = document.getElementById("tomeC");
 
-  var text = document.getElementById("doneC");
+  let text = document.getElementById("doneC");
   console.log(text);
   if (text.style.display == "none"){
     text.style.display = "";
@@ -110,13 +110,13 @@ function myMissionH() {
   .split('=')[1];
   idL = cookieValueId;
 rishonves = idL;
-/*var checkBox = document.getElementById("done");
+/*let checkBox = document.getElementById("done");
   // Get the output text
-  var text = document.getElementById("hoursC");
-  var text2 = document.getElementById("vallueperhourC");
-  var text3 = document.getElementById("vallueperhourN");
-  var text4 = document.getElementById("hoursD");
-  var text5 = document.getElementById("vallueperM");
+  let text = document.getElementById("hoursC");
+  let text2 = document.getElementById("vallueperhourC");
+  let text3 = document.getElementById("vallueperhourN");
+  let text4 = document.getElementById("hoursD");
+  let text5 = document.getElementById("vallueperM");
   // If the checkbox is checked, display the output text
   if (text.style.display == "none"){
     text.style.display = "";
@@ -507,7 +507,7 @@ onMount(async () => {
           .then(parseJSON);
             skills2 = res.data.skills.data
               if ($lang == "he" ){
-              for (var i = 0; i < skills2.length; i++){
+              for (let i = 0; i < skills2.length; i++){
                 if (skills2[i].attributes.localizations.data.length > 0){
                 skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
@@ -516,7 +516,7 @@ onMount(async () => {
             skills2 = skills2
             roles = res.data.tafkidims.data
             if ($lang == "he" ){
-              for (var i = 0; i < roles.length; i++){
+              for (let i = 0; i < roles.length; i++){
                 if (roles[i].attributes.localizations.data.length > 0){
                 roles[i].attributes.roleDescription = roles[i].attributes.localizations.data[0].attributes.roleDescription
                 }
@@ -525,7 +525,7 @@ onMount(async () => {
             roles = roles;
              workways2 = res.data.workWays.data
                        if ($lang == "he" ){
-              for (var i = 0; i < workways2.length; i++){
+              for (let i = 0; i < workways2.length; i++){
                 if (workways2[i].attributes.localizations.data.length > 0){
                 workways2[i].attributes.workWayName = workways2[i].attributes.localizations.data[0].attributes.workWayName
                 }

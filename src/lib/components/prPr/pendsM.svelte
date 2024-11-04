@@ -1,3 +1,4 @@
+
 <script>
   export let pmiData = [];
   export let user_1s = 1;
@@ -68,117 +69,129 @@ function confirm (id) {
 <div class="dd md:items-center border-2 border-gold rounded d">
   <div class="body items-center d" class:full={who == 0}>
   
-  <table dir="rtl" class="d" >
+  <table dir="rtl" class="d">
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{isonly == true ? "פעולה" : "פעולות"} בתהליך אישור</h1>
     </caption>
-   {#if isonly == false}
-  <tr class="gg">
+    {#if isonly == false}
+    <thead>
+      <tr class="gg">
           <th class="gg">אפשרויות</th>
           {#each pmiData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
-        </td>
+          </td>
           {/each}
-    </tr> 
+      </tr> 
+    </thead>
     {/if}
-     <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
-      <th class="ggr">שם</th>
-      {#each pmiData as data, i}
-            <td class="ggr">{data.attributes.name}</td>
-            {/each}
-          </tr> <tr>
-            <th>תיאור</th>
-            {#each pmiData as data, i}
-            <td>
-              {data.attributes.descrip != undefined && data.attributes.descrip != "undefined" ? data.attributes.descrip : ""}</td>
-              {/each}
-            </tr> <tr>
-              <th>כישורים נדרשים</th>
-              {#each pmiData as data, i}
-            <td>
-              {#each data.attributes.skills.data as da}
-                 {` ${da.attributes.skillName} `}
-              {/each}
-              </td>
-            {/each}
-          </tr>  <tr>
-              <th>הגדרת תפקיד</th>
-              {#each pmiData as data, i}
-            <td>
-              {#each data.attributes.tafkidims.data as ta, i}
-                 {` ${ta.attributes.roleDescription} `}
-            {/each}
-            </td>
-            {/each}
-          </tr>
-          <tr>
-              <th>סוג משימה</th>
-              {#each pmiData as data, i}
-            <td>
-              {#each data.attributes.work_ways.data as dm, i}
-                  {` ${dm.attributes.workWayName} `}  
-              {/each}
-              </td>
-            {/each}
-          </tr>
-         <tr>
-              <th>תאריך ביצוע</th>
-              {#each pmiData as data, i}
-            <td>              {#if data.attributes.Sqadualed != undefined}
-              {data.attributes.Sqadualed}
-            {/if}
-            </td>
-            {/each}
-          </tr> <tr>
-            <th>קישורים ציבוריים</th>
-            {#each pmiData as data, i}
-            <td>
-              {#if data.attributes.publicklinks != undefined && data.attributes.publicklinks != "undefined" }
-              {data.attributes.publicklinks}
-              {/if}
-             </td>
-             {/each}
-        </tr><tr>
-          <th>הערות יחודיות לריקמה שלי</th>
-          {#each pmiData as data, i}
-          <td>
-            {#if data.attributes.hearotMeyuchadot != undefined && data.attributes.hearotMeyuchadot != "undefined"}
-            {data.attributes.hearotMeyuchadot}
-            {/if}
-           </td>
-           {/each}
-      </tr><tr>
-        <th>קישורים יחודיים לריקמה שלי</th>
+    <tbody>
+      <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
+        <th class="ggr">שם</th>
         {#each pmiData as data, i}
-        <td>          {#if data.attributes.privatlinks != undefined && data.attributes.privatlinks != "undefined"} 
-
-          {data.attributes.privatlinks} 
-          {/if}
-         </td>
-         {/each}
-    </tr><tr style="display:''" id="hoursD">
-          <th >כמה שעות זה אמור לקחת? </th>
-          {#each pmiData as data, i}
-          <td>
-            {#if data.attributes.noofhours > 0}
-
-           {data.attributes.noofhours}
-           {/if}
-          </td>
+          <td class="ggr">{data.attributes.name}</td>
+        {/each}
+      </tr>
+      <tr>
+        <th>תיאור</th>
+        {#each pmiData as data, i}
+        <td>
+          {data.attributes.descrip != undefined && data.attributes.descrip != "undefined" ? data.attributes.descrip : ""}</td>
+        {/each}
+      </tr>
+      <tr>
+        <th>כישורים נדרשים</th>
+        {#each pmiData as data, i}
+        <td>
+          {#each data.attributes.skills.data as da}
+             {` ${da.attributes.skillName} `}
           {/each}
-        </tr><tr style="display:''" id="vallueperhourN" >
-          <th>כמה שווה שעה ?</th>
-          {#each pmiData as data, i}
-          <td>
-            {#if data.attributes.perhour > 0}
+        </td>
+      {/each}
+    </tr>
+    <tr>
+      <th>הגדרת תפקיד</th>
+      {#each pmiData as data, i}
+      <td>
+        {#each data.attributes.tafkidims.data as ta, i}
+           {` ${ta.attributes.roleDescription} `}
+      {/each}
+      </td>
+    {/each}
+    </tr>
+    <tr>
+      <th>סוג משימה</th>
+      {#each pmiData as data, i}
+      <td>
+        {#each data.attributes.work_ways.data as dm, i}
+            {` ${dm.attributes.workWayName} `}  
+        {/each}
+      </td>
+    {/each}
+    </tr>
+    <tr>
+      <th>תאריך ביצוע</th>
+      {#each pmiData as data, i}
+      <td>              {#if data.attributes.Sqadualed != undefined}
+        {data.attributes.Sqadualed}
+      {/if}
+      </td>
+    {/each}
+    </tr>
+    <tr>
+      <th>קישורים ציבוריים</th>
+      {#each pmiData as data, i}
+      <td>
+        {#if data.attributes.publicklinks != undefined && data.attributes.publicklinks != "undefined" }
+        {data.attributes.publicklinks}
+        {/if}
+       </td>
+       {/each}
+    </tr>
+    <tr>
+      <th>הערות יחודיות לריקמה שלי</th>
+      {#each pmiData as data, i}
+      <td>
+        {#if data.attributes.hearotMeyuchadot != undefined && data.attributes.hearotMeyuchadot != "undefined"}
+        {data.attributes.hearotMeyuchadot}
+        {/if}
+       </td>
+       {/each}
+    </tr>
+    <tr>
+      <th>קישורים יחודיים לריקמה שלי</th>
+      {#each pmiData as data, i}
+      <td>          {#if data.attributes.privatlinks != undefined && data.attributes.privatlinks != "undefined"} 
 
-            {data.attributes.perhour}
-            {/if}
-          </td>
-          {/each}
-        </tr><tr >
+        {data.attributes.privatlinks} 
+        {/if}
+       </td>
+       {/each}
+    </tr>
+    <tr style="display:''" id="hoursD">
+      <th >כמה שעות זה אמור לקחת? </th>
+      {#each pmiData as data, i}
+      <td>
+        {#if data.attributes.noofhours > 0}
+
+       {data.attributes.noofhours}
+       {/if}
+      </td>
+      {/each}
+    </tr>
+    <tr style="display:''" id="vallueperhourN" >
+      <th>כמה שווה שעה ?</th>
+      {#each pmiData as data, i}
+      <td>
+        {#if data.attributes.perhour > 0}
+
+        {data.attributes.perhour}
+        {/if}
+      </td>
+      {/each}
+    </tr>
+    <tr >
       <th>שווי סך הכל למשימה </th>
       {#each pmiData as data, i}
       <td>
@@ -191,10 +204,10 @@ function confirm (id) {
       {/each}
     </tr>
     <tr class="ggd">
-          <th class="ggd"><span style="color:green;"> בעד </span><span style="color:yellow;"> בהמתנה </span><span style="color:red;"> נגד </span></th>
-          {#each pmiData as data, i}
-          <td  style="font-size: 3rem ">
-            
+      <th class="ggd"><span style="color:green;"> בעד </span><span style="color:yellow;"> בהמתנה </span><span style="color:red;"> נגד </span></th>
+      {#each pmiData as data, i}
+      <td  style="font-size: 3rem ">
+        
 <svg style="margin: 0 auto;" height="189.605px" width="60.88px" version="1.1" viewBox="60 -35.561 295.207 956.131" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <linearGradient gradientUnits="userSpaceOnUse" x1="221.872" y1="3.8" x2="221.872" y2="926.161" id="111gradient0" spreadMethod="reflect">
@@ -285,9 +298,9 @@ function confirm (id) {
           </button> 
           <button on:click={confirm(data.id)}> אישור</button>-->
         </td>
-          {/each}
-    </tr> 
-    </table>
+      </tr>
+    </tbody>
+  </table>
   </div>
   </div>
 

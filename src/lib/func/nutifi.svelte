@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 import * as Push from 'push.js'; // if using ES6 
 export async function nutifi(head,text,link) {
   console.log(head,text,link)//if lev visible not but if other page fire anyay

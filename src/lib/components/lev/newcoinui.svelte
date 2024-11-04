@@ -1,22 +1,38 @@
 <script>
-  $: w = 500;
-  $: h = 500 ;
-    $: ow = 500;
-  $: oh = 500 ;
+  import { run } from 'svelte/legacy';
+
+  let w = $state(500);
+  
+  let h = $state(500);
+  
+    let ow = $state(500);
+  
+  let oh = $state(500);
+  
   let screen
-  $: top = 0
-  $: left = 0
-  $: maxW = 100
-  $: maxH = 100
-  $: center = { x: w / 2, y: h / 2 };
-  $: console.log(center)
+  let top = $derived(0)
+  let left = $derived(0)
+  let maxW = $state(100);
+  
+  let maxH = $state(100);
+  
+  let center = $derived({ x: w / 2, y: h / 2 });
+  run(() => {
+    console.log(center)
+  });
   // Call this function whenever you add new circles
   //placeCircles();
 
   // Add your infinite scroll mechanism here
-  $: size = ow>550? 125:115;
-  $: bigsize = ow>550? 225: 100;
-  $: add = ow>550? 70: 70;
+  let size;
+  run(() => {
+    size = ow>550? 125:115;
+  });
+  let bigsize;
+  run(() => {
+    bigsize = ow>550? 225: 100;
+  });
+  let add = $derived(ow>550? 70: 70);
 
   function checkLine(i) {
 
@@ -91,40 +107,7 @@
   import { page } from '$app/stores';
 
   const dispatch = createEventDispatcher();
-  export let adder = [],
-    arr1 = [],
-    askedarr = [],
-    declineddarr = [],
-    halu = 17,
-    askma = 17,
-    maap = 13,
-    mashs = 13,
-    pmashd = 13,
-    fia = 13,
-    beta = 13,
-    pen = 17,
-    sug = 17,
-    low = false,
-    nam,
-    wel = 13,
-    ask = 13,
-    picLink,
-    total;
-  export let milon = {
-    hachla: true,
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-  };
-  let modal = false;
+  let modal = $state(false);
 
   function modali() {
     modal = true;
@@ -189,7 +172,43 @@
       milon[key] = true;
     }
   }
-  export let sml = false;
+  /** @type {{adder?: any, arr1?: any, askedarr?: any, declineddarr?: any, halu?: number, askma?: number, maap?: number, mashs?: number, pmashd?: number, fia?: number, beta?: number, pen?: number, sug?: number, low?: boolean, nam: any, wel?: number, ask?: number, picLink: any, total: any, milon?: any, sml?: boolean}} */
+  let {
+    adder = [],
+    arr1 = $bindable([]),
+    askedarr = [],
+    declineddarr = [],
+    halu = 17,
+    askma = 17,
+    maap = 13,
+    mashs = 13,
+    pmashd = 13,
+    fia = 13,
+    beta = 13,
+    pen = 17,
+    sug = 17,
+    low = false,
+    nam,
+    wel = 13,
+    ask = 13,
+    picLink,
+    total,
+    milon = $bindable({
+    hachla: true,
+    fiap: true,
+    welc: true,
+    sugg: true,
+    pend: true,
+    asks: true,
+    betaha: true,
+    desi: true,
+    ppmash: true,
+    pmashs: true,
+    pmaap: true,
+    askmap: true
+  }),
+    sml = false
+  } = $props();
   function checkLines(arr,w,h){
     let c = {}
     for (let i = 0; i < arr.length; i++) {
@@ -205,7 +224,10 @@
     orders = checkLines(arr1,w,h)
     console.log(orders,w,"mount")
   })
-  $: orders = checkLines(arr1,w,h)
+  let orders;
+  run(() => {
+    orders = checkLines(arr1,w,h)
+  });
   export const snapshot = {
     capture: () => JSON.parse(JSON.stringify(orders)),
     restore: (value) => (orders = value)

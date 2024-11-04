@@ -33,7 +33,8 @@ import { Toaster } from 'svelte-sonner';
 import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
  // import firebase from "$lib/func/firebase";
-export let data
+  /** @type {{data: any, children?: import('svelte').Snippet}} */
+  let { data, children } = $props();
 function getLang() {
   console.log(data)
     let la;
@@ -81,7 +82,7 @@ onMount(async () => {
 
 
 <main>
-	<slot />
+	{@render children?.()}
 <Toaster toastOptions={{
   style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
 }} richColors  closeButton  position="top-center" />

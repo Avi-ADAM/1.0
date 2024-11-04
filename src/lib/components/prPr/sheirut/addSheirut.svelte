@@ -1,4 +1,5 @@
 <script>
+	import  ChoosNed  from '$lib/components/prPr/chosNed.svelte';
   import Close from '$lib/celim/close.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import Chooser from '$lib/celim/ui/chooser.svelte';
@@ -10,8 +11,30 @@
     const dispatch = createEventDispatcher();
     import { toast } from 'svelte-sonner';
   import { createEventDispatcher } from 'svelte';
-    export let restime = "feh", usersNum = 1
-    let name , descrip,oneTime = false,isPublik = false,already = false, success = false , equaliSplited = true
+  import { MultiSelect } from 'svelte-multiselect';
+  import ChoosMission from '../choosMission.svelte';
+  import { missionList, updateM } from '$lib/stores/missionList';
+  let blabla = $state([]);
+  let load = false
+  async function callbackFunction(event) {
+    console.log(event.detail)
+    if (event.detail.type == 'add') {
+      const lim = event.detail.li;
+      if (lim.length > 0 || lim > 0) {
+        //showvd = false;
+        load = true
+        //  await findiM().then();
+          load = false;
+        
+        } else {
+         
+        }
+      } else {
+
+    }
+  }
+
+    let name = $state() , descrip = $state(),oneTime = $state(false),isPublik = false,already = $state(false), success = $state(false) , equaliSplited = true
     const heading = {"he":"יצירת שירות חדש","en":"create new service"}
     const expl = {"he":"","en":""}
     const action = {"he":"יצירת שירות חדש","en":"create new service"}
@@ -28,8 +51,9 @@
     const equaliSplitedFl = {"he":"חלוקה שווה","en":"splited equally"}
     const equaliSplitedTr = {"he":"דמי מנוי","en":"subscription"}
     const fnnn = { he: ' השירות נוצר בהצלחה', en: 'service has created sucsessfully' };
-
-    let open = false
+    const pers = {"he": "משימות בתהליך", "en":"missions in progress"}
+    const role = {"he": "הוספת משימה חדשה", "en":"add new mission"}
+    let open = $state(false)
     async function create(){
         already = true
         let isApruved = false
@@ -122,20 +146,37 @@ let pendque = `mutation {
   }
   }
 }
-    
+    let isFromExsisted = $state(true)
+    let selected = $state([])
+  /** @type {{roles?: any, restime?: string, usersNum?: number, bmiData?: any}} */
+  let {
+    roles = [],
+    restime = "feh",
+    usersNum = 1,
+    bmiData = []
+  } = $props();
+    const placeholder = {"he":`בחירה מרשימה`,"en":"choose from list"};
+    let addMiss = $state(true)
+    const addM = {"he":" הגדרת משימה חדשה שתיווצר כאשר השירות יתחיל","en":"create new mission when the service starts"}
+    const addMissTr = {"he":"הוספת משימות","en":"add missions"}
+    const addmissfl = {"he":"הוספת משאבים","en":"add resources"}	
+    const addMissLeb = {"he":"הוספת משימות או משאבים","en":"add missions or resources"}
+    const fromExFl = {"he":"משאב חדש","en":"new resources"}
+    const fromExTr = {"he":"ממשאבים קיימים","en":"existing resources"}
+    const fromExLeb = {"he":"שימוש במשאבים שכבר קיימים בריקמה או יצירת משאבים חדשים כאשר שירות נמכר","en":"existing resources or new resources"}
 </script>
 <SucssesConf {success} />
 
  {#if open === false}
    <button   
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-        on:click={()=>open = true}>{createLebel[$lang]}
+        onclick={()=>open = true}>{createLebel[$lang]}
     </button>
   {:else} 
       <div class="flex flex-col items-center justify-center sm:w-1/2 p-8 mx-auto bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"> 
         <button   
                 class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-            on:click={()=>open = false}><Close/>
+            onclick={()=>open = false}><Close/>
         </button>
         <h1 class="text-barbi">{heading[$lang]}</h1>
         <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
@@ -151,14 +192,58 @@ let pendque = `mutation {
               <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="es" class='label'>{desde[$lang]}</label>
               <span class='line'></span>
         </div>
-
+        <br>
+                <!----
+                choose between mesimot and mash, after define for each mission how much of it is directly connected to mission/mash
+                choose if add it as task to already defined mission in progress or to create and asign a new mission in progres opon appruval
+                add the posibility for rikma fee(until we dd the option to better calculate it)
+                <Chooser bind:checked={equaliSplited} tr={equaliSplitedTr} level={equaliSplitedLevel} fl={equaliSplitedFl}/>-->
+                <Chooser bind:checked={addMiss} tr={addMissTr} level={addMissLeb} fl={addmissfl}/>
+{#if addMiss == true}
+<div class="flex flex-col p-4 items-center justify-center border border=gold" dir="ltr">
+  <Chooser bind:checked={isFromExsisted} on:change={async()=>{
+    if(isFromExsisted == false){
+     await updateM()
+    }
+  }} tr={pers} level={oneTimeLevel} fl={role}/>
+        {#if isFromExsisted == true}
+      <MultiSelect
+      bind:selected={selected}
+      placeholder={placeholder[$lang]}
+      options={bmiData.map(it=>it.attributes.users_permissions_user.data.attributes.username + " - " + it.attributes.name)}
+      />
+      {:else}
+        <ChoosMission    
+         {roles}
+        mission1={$missionList}
+        bind:selected={blabla}
+        on:message={callbackFunction}>
+        <small>{addM[$lang]}</small>
+        </ChoosMission>
+      {/if}
+</div>
+{:else}
+<div class="flex flex-col p-4 items-center justify-center border border-gold" >
+  <Chooser bind:checked={isFromExsisted} tr={fromExTr} level={fromExLeb} fl={fromExFl}/>
+{#if isFromExsisted == true}
+      <MultiSelect
+      bind:selected={selected}
+      placeholder={placeholder[$lang]}
+      options={bmiData.map(it=>it.attributes.users_permissions_user.data.attributes.username + " - " + it.attributes.name)}
+      />
+      {:else}
+        <ChoosNed/>
+      {/if}
+</div>
+{/if}
         <!----<Chooser bind:checked={equaliSplited} tr={equaliSplitedTr} level={equaliSplitedLevel} fl={equaliSplitedFl}/>-->
         <Chooser bind:checked={oneTime} tr={oneTimeTr} level={oneTimeLevel} fl={oneTimeFl}/>
-        <Chooser bind:checked={equaliSplited} tr={equaliSplitedTr} level={equaliSplitedLevel} fl={equaliSplitedFl}/>
-             {#if already === false}
+     <!---   <Chooser bind:checked={equaliSplited} tr={equaliSplitedTr} level={equaliSplitedLevel} fl={equaliSplitedFl}/>
+-->
+        {#if already === false}
    <button   
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-        on:click={create}>{action[$lang]}
+        onclick={create}>{action[$lang]}
     </button>
     {/if}   
     </div>

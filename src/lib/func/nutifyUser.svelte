@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     /***
      * nutify user by email phone and push
      * @param {number} id  user id to notify
