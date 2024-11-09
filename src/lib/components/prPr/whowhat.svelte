@@ -2,12 +2,7 @@
   import {lang } from '$lib/stores/lang.js'
           import pic from './../../celim/pic.js'
    import { idPr } from '../../stores/idPr.js';
-export let fmiData = [];
-export let rikmashes = [];
-  export let hagdel = false;
    import { onMount } from 'svelte'; 
-   export let salee = [];
-   export let allin = 0
 let revach = allin;
 let x = [];
 let meca = [];
@@ -28,10 +23,8 @@ function confirm (id) {
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
-let ulist = [
-]; 
-export let trili;
-export let users;
+let ulist = $state([
+]); 
 const baseUrl = import.meta.env.VITE_URL
 
 let linkg = baseUrl+"/graphql";
@@ -39,7 +32,29 @@ let dictid = {};
 let dictidi = {};
 let hal = false;
 let error1 = null;
-export let already = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [fmiData]
+   * @property {any} [rikmashes]
+   * @property {boolean} [hagdel]
+   * @property {any} [salee]
+   * @property {number} [allin]
+   * @property {any} trili
+   * @property {any} users
+   * @property {boolean} [already]
+   */
+
+  /** @type {Props} */
+  let {
+    fmiData = [],
+    rikmashes = [],
+    hagdel = false,
+    salee = [],
+    allin = 0,
+    trili,
+    users,
+    already = $bindable(false)
+  } = $props();
 async function ask (){
   already = true;
   let d = new Date
@@ -176,8 +191,8 @@ createHaluka(
 
 
 
-let hatzaa = false;
-let noofok, noofw, noofno = 0;
+let hatzaa = $state(false);
+let noofok = $state(), noofw = $state(), noofno = $state(0);
 onMount(async () => {
 cal()
 
@@ -421,7 +436,7 @@ const noy = {"he": "שעוד לא הצביעו", "en": "that didnt vote yet"}
         <th>{amtog[$lang]}</th>
         {#each ulist as data, i}
         <td>
-          {#if  revach > 0 &&  (data.ihave-data.x) > 0 }
+          {#if  revach > 0 &&  (data.ihave-data.x) > 0}
  {data.noten.toFixed(2)}
  {:else}  
  0      
@@ -446,7 +461,7 @@ const noy = {"he": "שעוד לא הצביעו", "en": "that didnt vote yet"}
         <th>{amtor[$lang]}</th>
         {#each ulist as data, i}
         <td>
-          {#if  revach > 0 && (data.ihave-data.x) < 0 }
+          {#if  revach > 0 && (data.ihave-data.x) < 0}
  {data.meca.toFixed(2)}
  {:else}  
  0      
@@ -463,9 +478,9 @@ const noy = {"he": "שעוד לא הצביעו", "en": "that didnt vote yet"}
     </tbody>
   </table>
 
-  {#if  already === false }<!--//hal === false &&-->
+  {#if  already === false}<!--//hal === false &&-->
   <button  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
- on:click={ask}>{appbu[$lang]}</button>
+ onclick={ask}>{appbu[$lang]}</button>
   {/if}
   {#if hatzaa == true}
   <div class="border border-barbi m-2 p-2">

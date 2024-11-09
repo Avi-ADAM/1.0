@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     export function langAdjast (datar,lang){
             if (lang != "en" ){
               for (let i = 0; i < datar?.attributes.skills?.data.length; i++){

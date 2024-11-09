@@ -9,39 +9,9 @@ import {
 } from 'svelte';
  import {lang} from '$lib/stores/lang'
 const dispatch = createEventDispatcher();
-export let descrip ;
-export let projectName ;
-export let name1 ;
-export let hearotMeyuchadot;
-export let noofhours = 0;
-export let perhour = 0;
-export let projectId;
-export let uids = [];
-export let what = [];
-export let noofusersOk;
-export let noofusersNo;
-export let noofusersWaiting;
-export let total = 0;
-export let noofusers;
-export let already;
-export let mypos;
-export let missionId;
-export let skills;
-export let tafkidims;
-export let workways;
-export let vallues;
-export let publicklinks;
-export let privatlinks = "aaxa"
-export let mdate
-export let mdates;
-export let state = 2
-export let pendId;
-export let users =[];
-export let isKavua;
-export let oldide = 0; //last tg id, if non 0
 
-let isKavua2
-let newcontent = true;
+let isKavua2 = $state()
+let newcontent = $state(true);
 
 let miDatan = [];
 let error1;
@@ -57,31 +27,31 @@ const less = {
   "en":"remove"
 };
 let placeholder4 = `בחירת תפקידים`;
-let roles = $role;
+let roles = $state($role);
 let why = '';
-let skills2 = $skil;
+let skills2 = $state($skil);
 let placeholder1 = `בחירת כישורים`;
 let addS = false;
-let descrip2 = descrip;
-let name2 = name1;
+let descrip2 = $state(descrip);
+let name2 = $state(name1);
 let selected2 = [];
 let selected3 = [];
 let selected1 = [];
-let workways2 = $ww;
+let workways2 = $state($ww);
 let placeholder =`סוג משימה`;
 const plww = {"he":`סוג משימה`,"en":`mission kind`};
-let mdate2 = mdate;
-let mdates2 = mdates;
+let mdate2 = $state(mdate);
+let mdates2 = $state(mdates);
 
-let hearotMeyuchadot2 = hearotMeyuchadot;
-let privatlinks2 = privatlinks;
-let noofhours2 = noofhours;
-let perhour2 = perhour;
+let hearotMeyuchadot2 = $state(hearotMeyuchadot);
+let privatlinks2 = $state(privatlinks);
+let noofhours2 = $state(noofhours);
+let perhour2 = $state(perhour);
 let myM;
 let done;
-let skills3 = [];
-let tafkidims2 = []; 
-let workways3 = [];
+let skills3 = $state([]);
+let tafkidims2 = $state([]); 
+let workways3 = $state([]);
 
 
 let rishon = 0;
@@ -139,9 +109,7 @@ function arraysEqual(a1,a2) {
 function close (){
     dispatch('close')
 }
-export let timegramaId
  let name4 = ``;
- export let ordern = 0
      let descrip4 = ``;
      let hearotMeyuchadot4 = ``; 
      let noofhours4 = ``;
@@ -201,7 +169,6 @@ function objToStringC (obj) {
     }}
     return str;
 }
-export let masaalr = false;
 let userss;
 async function increment() {
     dispatch("load")
@@ -433,7 +400,7 @@ async function increment() {
 }
 let x
 let linkg =  import.meta.env.VITE_URL + "/graphql";
-let dataibno = {"skillName":[],"roleDescription":[],"workWayName":[]}
+let dataibno = $state({"skillName":[],"roleDescription":[],"workWayName":[]})
 function addnew (event){
    const newOb = event.detail.skob;
    const valc = event.detail.valc;
@@ -554,7 +521,6 @@ onMount(async () => {
     x =x
     console.log(new Date(Date.now() + x).toLocaleString(),restime)
 })
-export let restime;
  import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import Elements from '../conf/elements.svelte';
@@ -563,9 +529,84 @@ export let restime;
   import Barb from '../conf/barb.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
+  /**
+   * @typedef {Object} Props
+   * @property {any} descrip
+   * @property {any} projectName
+   * @property {any} name1
+   * @property {any} hearotMeyuchadot
+   * @property {number} [noofhours]
+   * @property {number} [perhour]
+   * @property {any} projectId
+   * @property {any} [uids]
+   * @property {any} [what]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {any} already
+   * @property {any} mypos
+   * @property {any} missionId
+   * @property {any} skills
+   * @property {any} tafkidims
+   * @property {any} workways
+   * @property {any} vallues
+   * @property {any} publicklinks
+   * @property {string} [privatlinks]
+   * @property {any} mdate
+   * @property {any} mdates
+   * @property {number} [state]
+   * @property {any} pendId
+   * @property {any} [users]
+   * @property {any} isKavua
+   * @property {number} [oldide]
+   * @property {any} timegramaId
+   * @property {number} [ordern]
+   * @property {boolean} [masaalr]
+   * @property {any} restime
+   */
+
+  /** @type {Props} */
+  let {
+    descrip,
+    projectName,
+    name1,
+    hearotMeyuchadot,
+    noofhours = 0,
+    perhour = 0,
+    projectId,
+    uids = [],
+    what = [],
+    noofusersOk,
+    noofusersNo,
+    noofusersWaiting,
+    total = 0,
+    noofusers,
+    already,
+    mypos,
+    missionId,
+    skills,
+    tafkidims,
+    workways,
+    vallues,
+    publicklinks,
+    privatlinks = "aaxa",
+    mdate,
+    mdates,
+    state = 2,
+    pendId,
+    users = [],
+    isKavua,
+    oldide = 0,
+    timegramaId,
+    ordern = 0,
+    masaalr = false,
+    restime
+  } = $props();
 
 const tri = tr
-$: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}]
+let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}])
 
 </script>
 <div class="text-barbi " dir={$lang == "he"?"rtl":"ltr"}>
@@ -709,7 +750,7 @@ $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":n
                                 </table>-->
                                   <div class="w-fit mx-auto">
                                     <button
-                                        on:click={increment}
+                                        onclick={increment}
                                         class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
                                         type="submit"
                                         name="addm">{tri?.common.puttovote[$lang]}</button> </div>

@@ -1,10 +1,17 @@
+<!-- @migration-task Error while migrating Svelte code: `</tr>` attempted to close an element that was not open -->
 
 <script>
-  export let pmiData = [];
-  export let user_1s = 1;
-  export let who = 0;
-  let isonly = false;
+  let isonly = $state(false);
    import { onMount } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [pmiData]
+   * @property {number} [user_1s]
+   * @property {number} [who]
+   */
+
+  /** @type {Props} */
+  let { pmiData = $bindable([]), user_1s = 1, who = 0 } = $props();
    onMount(async () => {
  for (var k = 0; k < pmiData.length; k++) {
      const x = pmiData[k].attributes.users
@@ -74,8 +81,9 @@ function confirm (id) {
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{isonly == true ? "פעולה" : "פעולות"} בתהליך אישור</h1>
     </caption>
-    {#if isonly == false}
     <thead>
+
+    {#if isonly == false}
       <tr class="gg">
           <th class="gg">אפשרויות</th>
           {#each pmiData as data, i}
@@ -84,15 +92,15 @@ function confirm (id) {
           </td>
           {/each}
       </tr> 
-    </thead>
     {/if}
-    <tbody>
       <tr class="ggr" style:top={isonly == true ? "1px": "77px"}>
         <th class="ggr">שם</th>
         {#each pmiData as data, i}
           <td class="ggr">{data.attributes.name}</td>
         {/each}
       </tr>
+    </thead>
+    <tbody>
       <tr>
         <th>תיאור</th>
         {#each pmiData as data, i}
@@ -143,7 +151,7 @@ function confirm (id) {
       <th>קישורים ציבוריים</th>
       {#each pmiData as data, i}
       <td>
-        {#if data.attributes.publicklinks != undefined && data.attributes.publicklinks != "undefined" }
+        {#if data.attributes.publicklinks != undefined && data.attributes.publicklinks != "undefined"}
         {data.attributes.publicklinks}
         {/if}
        </td>
@@ -162,8 +170,8 @@ function confirm (id) {
     <tr>
       <th>קישורים יחודיים לריקמה שלי</th>
       {#each pmiData as data, i}
-      <td>          {#if data.attributes.privatlinks != undefined && data.attributes.privatlinks != "undefined"} 
-
+      <td>         
+         {#if data.attributes.privatlinks != undefined && data.attributes.privatlinks != "undefined"} 
         {data.attributes.privatlinks} 
         {/if}
        </td>
@@ -271,11 +279,11 @@ function confirm (id) {
     <path d="M 221.872 3.8 C 221.872 3.8 215.676 13.632 217.617 19.523 C 213.168 22.224 208.09 23.231 203.086 24.183 C 176.825 30.582 156.79 55.578 153.747 82.866 C 153.193 85.776 152.721 89.874 148.512 89.494 C 133.452 89.397 130.037 89.412 108.924 89.758 C 119.492 98.964 116.118 113.564 116.091 126.055 C 99.392 126.238 90.787 126.357 76.352 127.052 C 101.909 163.013 118.056 209.15 115.314 254.177 C 114.952 268.891 115.794 283.609 114.744 298.299 C 98.441 298.578 88.15 297.982 72.472 297.893 C 87.673 320.688 99.076 345.991 107.686 372.126 C 112.068 384.927 114.283 398.513 113.808 412.098 C 113.35 431.35 113.554 450.616 112.896 469.859 C 99.147 470.016 91.096 470.181 77.441 470.459 C 91.749 492.14 100.588 518.856 108.633 543.547 C 111.097 551.119 112.925 559.015 112.7 567.046 C 112.333 596.031 111.806 625 111.591 653.987 C 111.978 659.599 106.638 662.696 103.618 666.56 C 119.448 668.133 135.427 666.767 151.298 667.387 C 153.075 667.377 154.497 668.496 155.818 669.561 C 154.056 672.335 151.949 675.221 151.938 678.682 C 153.595 681.701 157.093 682.462 160.065 683.372 C 161.404 687.255 161.406 922.09 161.483 926.161 C 181.91 926.514 204.756 629.364 224.713 629.155 C 244.671 629.364 261.834 926.514 282.261 926.161 C 282.338 922.085 282.34 687.253 283.68 683.372 C 286.651 682.462 290.149 681.701 291.806 678.682 C 291.795 675.221 289.688 672.335 287.926 669.561 C 289.247 668.496 290.669 667.377 292.447 667.387 C 308.316 666.767 324.295 668.133 340.127 666.56 C 337.106 662.696 331.766 659.6 332.153 653.987 C 331.938 625.003 331.411 596.036 331.044 567.046 C 330.819 559.015 332.647 551.119 335.111 543.547 C 343.157 518.856 351.995 492.14 366.303 470.459 C 352.647 470.181 344.597 470.016 330.849 469.859 C 330.19 450.617 330.394 431.35 329.936 412.098 C 329.461 398.513 331.676 384.927 336.058 372.126 C 344.668 345.991 356.07 320.689 371.272 297.893 C 355.594 297.981 345.304 298.578 329 298.299 C 327.95 283.609 328.792 268.891 328.43 254.177 C 325.689 209.154 341.835 163.017 367.393 127.052 C 352.957 126.357 344.353 126.238 327.653 126.055 C 327.627 113.564 324.251 98.964 334.821 89.758 C 313.707 89.412 310.293 89.397 295.232 89.494 C 291.023 89.874 290.552 85.776 289.997 82.866 C 286.965 55.62 266.925 30.624 240.669 24.224 C 235.661 23.274 230.589 22.267 226.133 19.565 C 228.077 13.674 224.445 8.675 221.885 3.842 L 221.872 3.8 Z" 
     fill="url(#111gradient0)" style=" stroke-width: 8.20334px; stroke-linecap: square; stroke-miterlimit: 35; stroke-dashoffset: 4px; paint-order: stroke markers; " stroke="url(#111gradient4)"   />
     <g>
-      <circle on:click={confirm(data.id)} cy="526.03" cx="221.87" r="70.162" fill="url(#111gradient3)" stroke="url(#111gradient13)"><title>בעד</title></circle>
+      <circle onclick={confirm(data.id)} cy="526.03" cx="221.87" r="70.162" fill="url(#111gradient3)" stroke="url(#111gradient13)"><title>בעד</title></circle>
       <circle 
-          on:click={edit(data.id)}  cx="221.87" cy="358.03" r="70.162" fill="url(#111gradient2)" stroke="url(#111gradient12);"><title>בהמתנה</title></circle>
+          onclick={edit(data.id)}  cx="221.87" cy="358.03" r="70.162" fill="url(#111gradient2)" stroke="url(#111gradient12);"><title>בהמתנה</title></circle>
       <circle 
-             on:click={remove(data.id)} cy="190.03" cx="221.87" r="70.162" fill="url(#111gradient1)" style=" stroke-width: 1.02542px; " stroke="url(#111gradient11)"><title>נגד</title></circle>
+             onclick={remove(data.id)} cy="190.03" cx="221.87" r="70.162" fill="url(#111gradient1)" style=" stroke-width: 1.02542px; " stroke="url(#111gradient11)"><title>נגד</title></circle>
     </g>
   </g>
   <text stroke="url(#111gradient7)" fill="url(#111gradient6)" style=" font-family: Arial, sans-serif; font-size: 28px;  text-anchor: middle; white-space: pre;" transform="matrix(2.003436, 0, 0, 2.003446, 177.6035, 200.825073)"><title>נגד</title>{data.noofusersNo}</text>
@@ -298,6 +306,7 @@ function confirm (id) {
           </button> 
           <button on:click={confirm(data.id)}> אישור</button>-->
         </td>
+        {/each}
       </tr>
     </tbody>
   </table>

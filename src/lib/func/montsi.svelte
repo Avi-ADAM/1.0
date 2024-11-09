@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
    import moment from 'moment'
 
    export function montsi (moy,beg,end,fromIOs){

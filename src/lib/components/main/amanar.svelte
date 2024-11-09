@@ -341,10 +341,10 @@ function find_contry_id(contry_name_arr){
     const placeholder = `الدول التي أنت مواطنها`;
     const required = true;
     
-    let selected = $state($state($state($state([]))));
-       let already = $state($state($state($state(false))));
+    let selected = $state($state($state($state($state($state([]))))));
+       let already = $state($state($state($state($state($state(false))))));
    let datar;
-   let idx = $state($state($state($state(1))));
+   let idx = $state($state($state($state($state($state(1))))));
    let data;
     import { createForm } from "svelte-forms-lib";
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
@@ -395,7 +395,7 @@ function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
   
-}let trans = $state($state($state($state(false))));
+}let trans = $state($state($state($state($state($state(false))))));
 function tran (){
 trans = !trans;
 }
@@ -443,13 +443,13 @@ onMount(async () => {
             error = e
         }
     });
-      let dow = $state($state($state($state())));
+      let dow = $state($state($state($state($state($state())))));
     function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
      
- let isOpen = $state($state($state($state(false))));
-let a = $state($state($state($state(0))));
+ let isOpen = $state($state($state($state($state($state(false))))));
+let a = $state($state($state($state($state($state(0))))));
 
 function sell(){
 isOpen = true;

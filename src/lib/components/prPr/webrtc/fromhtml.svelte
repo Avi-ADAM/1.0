@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string -->
     <style>
             html, body { 
                 background-color: #333; 
@@ -268,8 +269,9 @@
                     })
             }
         </script>
-    <body onload='init()'>
+    <body >
         <!-- 
+        \onload='init()'
         the <video> and <audio> tags are all added and removed dynamically
         in 'onAddStream', 'setup_local_media', and 'removePeer'/'disconnect'
         -->

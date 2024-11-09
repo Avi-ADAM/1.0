@@ -1,4 +1,7 @@
+<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script>
+  import { run } from 'svelte/legacy';
+
 	import Daterange from './../../celim/ui/daterange.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
   import Plus from '$lib/celim/plus.svelte';
@@ -25,36 +28,33 @@
   const dispatch = createEventDispatcher();
   const baseUrl = import.meta.env.VITE_URL;
 
-  export let newcontent = true;
-  export let newcontentR = true;
-  export let newcontentW = true;
   let token;
-  export let pn, pl, restime;
-  $: miData = [
-    {
-      selectedSkills: [],
-      selectedRoles: [],
-      selectedWorkways: [],
-      descrip: '',
-      id: 0,
-      missionName: '',
-      valph: 50,
-      nhours:1,
-      iskvua: false,
-      date: null,
-      dates: null,
-      myM: false
-    }
-  ];
-  $: console.log(miData);
+  let miData;
+  run(() => {
+    miData = [
+      {
+        selectedSkills: [],
+        selectedRoles: [],
+        selectedWorkways: [],
+        descrip: '',
+        id: 0,
+        missionName: '',
+        valph: 50,
+        nhours:1,
+        iskvua: false,
+        date: null,
+        dates: null,
+        myM: false
+      }
+    ];
+  });
+  run(() => {
+    console.log(miData);
+  });
   let error1 = null;
-  export let id;
-  export let userslength = 0;
-  export let projectId;
-  export let name = '';
-  $: roles1 = $role;
+  let roles1 = $derived($role);
   let x = 168;
-  let gloading = false;
+  let gloading = $state(false);
   onMount(async () => {
     if (id !== 0) {
       gloading = true;
@@ -180,8 +180,14 @@
     he: 'בחירת כל הכישורים הרלוונטיים',
     en: 'choose more skills'
   };
-  $: skills2 = $skil;
-  $: roles = $role;
+  let skills2;
+  run(() => {
+    skills2 = $skil;
+  });
+  let roles;
+  run(() => {
+    roles = $role;
+  });
   let selected3;
   const placeholder5 = {
     he: 'בחירת תפקיד',
@@ -203,8 +209,7 @@
     }
     return arr;
   }
-  export let vallues = [];
-  let idL;
+  let idL = $state();
   console.log(miData);
   let miDatana = [];
   let miDatan = [];
@@ -622,7 +627,6 @@
     
   }
 
-  export let pu = [];
 
   let cencel = ' ביטול';
   let addS = false;
@@ -746,16 +750,17 @@
 
     //workways1.set(find_workway_id(selected));
   }
-  $: searchText = ``;
+  let searchText = $state(``);
+  
 
-  let isOpen = false;
+  let isOpen = $state(false);
   const closer = () => {
     isOpen = false;
   };
-  $: addn = {
+  let addn = $derived({
     he: `יצירת והוספת: "${searchText}"`,
     en: `Create "${searchText}"`
-  };
+  });
   const perho = {"he":"לשעה","en":"per hour"}
         const hourss = {"he":"שעות","en":"hours"}
         const monhly = {"he":"בחודש", "en": "per month"}
@@ -768,7 +773,7 @@
     he: 'עריכת סידור המשמרות',
     en: 'edit shifts'
   };
-  let days = [
+  let days = $state([
     {
       name: {
         he: 'ראשון',
@@ -882,7 +887,7 @@
       shiftp: 0,
       shifts: []
     }
-  ];
+  ]);
   const headingd = {
     he: 'יום בשבוע',
     en: 'week day'
@@ -953,11 +958,11 @@
   };
   const nama = { he: 'שם', en: 'name' };
   const des = { he: 'תיאור', en: 'decription' };
-  let shift = [
+  let shift = $state([
     {
       ii: 1
     }
-  ];
+  ]);
   let shifts = 1;
 
   function shifterr(o) {
@@ -1030,28 +1035,59 @@
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import { page } from '$app/stores';
-  let error = false, success = false, loading = false  
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [newcontent]
+   * @property {boolean} [newcontentR]
+   * @property {boolean} [newcontentW]
+   * @property {any} pn
+   * @property {any} pl
+   * @property {any} restime
+   * @property {any} id
+   * @property {number} [userslength]
+   * @property {any} projectId
+   * @property {string} [name]
+   * @property {any} [vallues]
+   * @property {any} [pu]
+   */
+
+  /** @type {Props} */
+  let {
+    newcontent = true,
+    newcontentR = true,
+    newcontentW = true,
+    pn,
+    pl,
+    restime,
+    id,
+    userslength = 0,
+    projectId,
+    name = '',
+    vallues = [],
+    pu = []
+  } = $props();
+  let error = $state(false), success = $state(false), loading = $state(false)  
   const tri = tr;
-  let wid = 0
+  let wid = $state(0)
   //TODO: כמות לכל משימה עד אינסוף
-  let dialog = 1;
-  let misid = 0;
-  let itemid = 0;
-  let editdata = -1;
+  let dialog = $state(1);
+  let misid = $state(0);
+  let itemid = $state(0);
+  let editdata = $state(-1);
   function hover(){
 
   }
-  let dateE = false;
-  let descripE = false;
-  let missionNameE = false;
-  let valphE = false;
-  let ske = false;
-  let roleE = false;
-  let wwe = false;
-  let assignE = false;
-  let shiftE = false;
-  let publinkE = false;
-  let mislinkE = false;
+  let dateE = $state(false);
+  let descripE = $state(false);
+  let missionNameE = $state(false);
+  let valphE = $state(false);
+  let ske = $state(false);
+  let roleE = $state(false);
+  let wwe = $state(false);
+  let assignE = $state(false);
+  let shiftE = $state(false);
+  let publinkE = $state(false);
+  let mislinkE = $state(false);
   function disout (){
 
   }
@@ -1074,7 +1110,7 @@
         >
           <button
             class=" hover:bg-barbi text-mturk rounded-full"
-            on:click={closer}
+            onclick={closer}
             ><Close />
           </button>
           <table
@@ -1087,13 +1123,15 @@
                 {editsi[$lang]}
               </h1>
             </caption>
+            <thead>
             <tr class="gg">
               <th class="gg ddd">{headingd[$lang]}</th>
               {#each days as day}
                 <td class="gg" style="font-size: 1rem">{day.name[$lang]}</td>
               {/each}
             </tr>
-
+            </thead>
+            <tbody>
             <tr>
               <th class="ddd">{headinga[$lang]}</th>
               {#each days as day}
@@ -1126,7 +1164,7 @@
                     <input
                       type="number"
                       id={`shif${i}`}
-                      on:change={() => shifterr(i)}
+                      onchange={() => shifterr(i)}
                       name="parti"
                       bind:value={day.shiftp}
                       class="input"
@@ -1204,6 +1242,7 @@
               </tr>
               <hr />
             {/each}
+            </tbody>
           </table>
         </div>
       {:else if dialog === 2}
@@ -1258,15 +1297,15 @@
             <div class="px-2">
                 {#if missionNameE == false}
             <h2 class="text-barbi text-{$lang == "en" ? 'left' : 'right'}  font-bold text-xl lg:text-4xl underline "
-            >{miData[0].missionName}<button on:click={() => (missionNameE = true)}><EditIcon/></button></h2>
+            >{miData[0].missionName}<button onclick={() => (missionNameE = true)}><EditIcon/></button></h2>
                 {:else}
-                <TextInput bind:text={miData[0].missionName}/><button on:click={() => (missionNameE = false)}><Done/></button>
+                <TextInput bind:text={miData[0].missionName}/><button onclick={() => (missionNameE = false)}><Done/></button>
                 {/if}
           {#if gloading == false}
             <h3 class="text-barbi  
             text-{$lang == "en" ? 'left' : 'right'} 
             font-bold text-lg lg:text-2xl underline "><mark>{tri?.common?.description[$lang]}:</mark><button 
-            on:click={() => (descripE = !descripE)}>{#if descripE}<Done/>{:else}<EditIcon/>{/if}</button></h3>
+            onclick={() => (descripE = !descripE)}>{#if descripE}<Done/>{:else}<EditIcon/>{/if}</button></h3>
             {#if descripE}
             <RichText bind:outpot={miData[0].descrip}  />
             {:else if miData[0].descrip}
@@ -1315,7 +1354,7 @@
             <Chooser bind:checked={miData[0].iskvua} tr={iskvu} fl={iskvuFl}/></span>
             {/if}
           <button
-          on:click={() => (valphE = !valphE)} 
+          onclick={() => (valphE = !valphE)} 
          > {#if valphE}<Done/>{:else}<EditIcon/>{/if}</button>
 
                 </div>
@@ -1334,7 +1373,7 @@
                                   <h2 class="md:text-xl p-1">{datai.shem}</h2>
                                   <button
                                     class="bg-gold p-0.5 m-0.5 rounded text-barb"
-                                    on:click={() => {
+                                    onclick={() => {
                                       dialog = 3;
                                       misid = miData[0].id;
                                       itemid = t;
@@ -1346,7 +1385,7 @@
                                   >
         
                                   <button
-                                    on:click={() => {
+                                    onclick={() => {
                                       dialog = 2;
                                       misid = miData[0].id;
                                       itemid = t;
@@ -1356,7 +1395,7 @@
                                     class="bg-gold p-0.5 m-0.5 rounded">🖍️</button
                                   >
                                   <button
-                                    on:click={() => {
+                                    onclick={() => {
                                       miData[0].checklist.splice(t, 1);
                                       miData = miData;
                                     }}
@@ -1368,7 +1407,7 @@
                           </ul>
         
                           <button
-                            on:click={() => {
+                            onclick={() => {
                               dialog = 3;
                               misid = miData[0].id;
                               itemid = -1;
@@ -1382,7 +1421,7 @@
                         {/if}
                         <button
                           title=" {tri?.mission?.checklistadd[$lang]}"
-                          on:click={() => {
+                          onclick={() => {
                             dialog = 2;
                             misid = miData[0].id;
                             isOpen = true;
@@ -1393,7 +1432,7 @@
                 </div>
                 <div class='my-2'>
                     <mark class="text-barbi  text-sm lg:text-2xl">{requireSkills[$lang]}</mark>
-    <button on:click={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
+    <button onclick={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
     {#if !ske}
     {#if miData[0].selectedSkills.length > 0}
 
@@ -1445,7 +1484,7 @@
                     {addS}
                     roles1={roles}
                   />
-                  <button on:click={()=> ske = false}><Done/></button>
+                  <button onclick={()=> ske = false}><Done/></button>
                             </div>
                 </MobileModal>
       {/if}
@@ -1453,13 +1492,13 @@
     </div>   
     <div class='my-2'>
         <mark class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</mark>
-                <button on:click={() => (roleE = !roleE)}>{#if roleE}<Done/>{:else}<EditIcon/>{/if}</button>
+                <button onclick={() => (roleE = !roleE)}>{#if roleE}<Done/>{:else}<EditIcon/>{/if}</button>
                     {#if !roleE}
                 {#if miData[0].selectedRoles.length > 0}  
 
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each miData[0].selectedRoles as rol}
-                    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                    <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
     <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol} wow={true}/></p>
         {/each}
       </div>
@@ -1499,7 +1538,7 @@
       mid={miData[0].id}
       on:addnewrole={addnewrole}
     />
-    <button on:click={()=> roleE = false}><Done/></button>
+    <button onclick={()=> roleE = false}><Done/></button>
     </div>
   </MobileModal>
   {/if}
@@ -1507,13 +1546,13 @@
     </div>
     <div class='my-2'>
         <mark class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</mark>
-        <button on:click={() => (wwe = !wwe)}>{#if wwe}<Done/>{:else}<EditIcon/>{/if}</button>
+        <button onclick={() => (wwe = !wwe)}>{#if wwe}<Done/>{:else}<EditIcon/>{/if}</button>
         {#if !wwe}
         {#if miData[0].selectedWorkways.length > 0}
 
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each miData[0].selectedWorkways as rol}
-          <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+          <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol}/>
           </p>
           {/each}
@@ -1554,7 +1593,7 @@
                       addW(miData[0].selectedWorkways, miData[0].id, e);
                     }}
                   />
-                  <button on:click={()=> wwe = false}><Done/></button>
+                  <button onclick={()=> wwe = false}><Done/></button>
                   </div>
                   </MobileModal>
                   {/if}
@@ -1583,12 +1622,12 @@
           <p>{tri?.mission?.assingHelp[$lang]}</p>
           <input
               bind:checked={miData[0].myM}
-              type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> miData[0].rishon == idL}>
+              type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> miData[0].rishon == idL}>
           <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
           {/if}
           <button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
             $lang
-          ]}" on:click={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+          ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
         ><Done/></button>
           {/if}
         </div>
@@ -1596,7 +1635,7 @@
             {#if publinkE}
             <mark>{tri?.mission?.publicLinks[$lang]}</mark>
             <TextInput bind:text={miData[0].publicklinks} lebel={tri?.mission?.publicLinks}/>
-            <button on:click={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title='{tri?.mission?.publicLinks[$lang]}'><Done/></button>
             {/if}
         </div>
@@ -1604,7 +1643,7 @@
             {#if mislinkE}
             <mark>{tri?.mission?.linkToMission[$lang]}</mark>
             <TextInput bind:text={miData[0].privatlinks} lebel={tri?.mission?.linkToMission}/>
-            <button on:click={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title="{tri?.mission?.linkToMission[$lang]}"><Done/></button >
             {/if}
         </div>
@@ -1617,28 +1656,28 @@
             id="isss"
             name="is"
             value="no"
-            on:change={() => shifter(miData[0].isshif)}
+            onchange={() => shifter(miData[0].isshif)}
           />
           <label for="isss"><mark>{isshi[$lang]}</mark></label>
           {#if miData[0].isshif == true}
-            <button on:click={() => shifter(miData[0].isshif)}
+            <button onclick={() => shifter(miData[0].isshif)}
                 >{editsi[$lang]}</button
               >
             {/if}
-            <button on:click={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title="{isshi[$lang]}"><Done/></button>
             {/if}
         </div>
         <div class="flex flex-row items-center justify-start my-4 space-x-3"	>
-           {#if !publinkE} <button on:click={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+           {#if !publinkE} <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title='{tri?.mission?.publicLinks[$lang]}'><LinkIcon/></button>{/if}
             {#if !assignE}<button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
                 $lang
-              ]}" on:click={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+              ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
             ><AddPerson/></button>{/if}
-            {#if !mislinkE}<button on:click={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            {#if !mislinkE}<button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                title="{tri?.mission?.linkToMission[$lang]}"><LinkToIcon/></button >{/if}
-               {#if !shiftE} <button on:click={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+               {#if !shiftE} <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                title="{isshi[$lang]}"><ShiftsIcon/></button>{/if}
         </div>
         <div class="align-self-end justify-items-end">
@@ -1826,7 +1865,7 @@
     margin: 0 auto;
   }
 
-  :global(li:not(.selected):hover) {
+  :global(li:not(:global(.selected)):hover) {
     color: var(--barbi-pink);
     background-color: var(--lturk);
     /* unselected but hovered options in the dropdown list */

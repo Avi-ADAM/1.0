@@ -5,9 +5,8 @@
 
   const dispatch = createEventDispatcher();
   let token;
-  export let meData = [];
   let miDatan = [];
-  let error1 = null;
+  let error1 = $state(null);
 
   onMount(async () => {
     const id = meData.id;
@@ -29,7 +28,7 @@
           .toISOString()
           .slice(0, -1);
   }
-  let already = false;
+  let already = $state(false);
   let idL;
   const baseUrl = import.meta.env.VITE_URL;
 
@@ -99,8 +98,8 @@
     }
   }
 
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
   function myMissionH() {
     ky = false;
@@ -144,6 +143,7 @@
     }
   }
   import { lang } from '$lib/stores/lang';
+  let { meData = $bindable([]) } = $props();
   const ot = { he: 'עלות חד פעמית', en: 'one time' };
   const py = { he: 'ליחידה', en: 'per unit' };
   const pm = { he: 'חודשי', en: 'monthly' };
@@ -247,7 +247,7 @@
             <td>
               <select
                 bind:value={meData.kindOf}
-                on:change={() => myMissionH()}
+                onchange={() => myMissionH()}
                 class="round form-select appearance-none
       block
       w-full
@@ -350,7 +350,7 @@
       {#if already === false}
         <button
           class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-          on:click={han}>פרסום משאבים</button
+          onclick={han}>פרסום משאבים</button
         >
       {:else}
         <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"

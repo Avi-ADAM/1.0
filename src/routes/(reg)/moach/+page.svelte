@@ -50,16 +50,16 @@
   import { forum, initialForum, isChatOpen, updSend, nowChatId, newChat } from '$lib/stores/pendMisMes';
   import {SendTo} from '$lib/send/sendTo.svelte';
   let idL;
-  let success = false;
-  let isOpen = false;
-  let a = 0;
-  let fmiData = [];
-  let tahaS = false;
-  let bmiData = [];
-  let mission1 = [];
-  let dow;
-  let cow;
-  let hosaf;
+  let success = $state(false);
+  let isOpen = $state(false);
+  let a = $state(0);
+  let fmiData = $state([]);
+  let tahaS = $state(false);
+  let bmiData = $state([]);
+  let mission1 = $state([]);
+  let dow = $state();
+  let cow = $state();
+  let hosaf = $state();
   let error2 = null;
   async function findM() {
     const cookieValue = document.cookie
@@ -104,9 +104,9 @@
       console.log(e);
     }
   }
-  let bmimData = [];
-  let addN = false;
-  let addM = false;
+  let bmimData = $state([]);
+  let addN = $state(false);
+  let addM = $state(false);
   let hosafa = {
     he: 'הוספת פעולות נדרשות לריקמה',
     en: 'add needed missions to FreeMates'
@@ -116,49 +116,51 @@
     en: 'add needed resources to FreeMates'
   };
   let cencel = { he: 'ביטול', en: 'cencel' };
-  let showvd = false;
+  let showvd = $state(false);
 
-  let totalneed = false;
+  let totalneed = $state(false);
   // total.subscribe(newwork => {
   //  totalneed = newwork;
   //  });
   let error1 = null;
-  let srcP;
-  let desP;
-  let projectname;
+  let srcP = $state();
+  let desP = $state();
+  let projectname = $state();
   let token;
-  let linkP,
-    githublink,
-    fblink,
-    discordlink,
-    drivelink,
-    twiterlink,
-    watsapplink;
-    $: errorM = false
-    $:noneti = ""
+  let linkP = $state(),
+    githublink = $state(),
+    fblink = $state(),
+    discordlink = $state(),
+    drivelink = $state(),
+    twiterlink = $state(),
+    watsapplink = $state();
+    let errorM = $state(false);
+  
+    let noneti = $state("");
+  
   let newcontent = true;
   let newcontentR = true;
   let newcontentW = true;
   let descPri;
-  let omiData = [];
-  let pmiData = [];
-  let project = [];
-  let projectUsers = [];
-  let vallues = [];
+  let omiData = $state([]);
+  let pmiData = $state([]);
+  let project = $state([]);
+  let projectUsers = $state([]);
+  let vallues = $state([]);
   let ata = [];
-  let restime;
-  let valit;
+  let restime = $state();
+  let valit = $state();
   let user = [];
-  let rikmashes = [];
-  let lll;
-  let opmash = [];
+  let rikmashes = $state([]);
+  let lll = $state();
+  let opmash = $state([]);
   let actdata = [];
-  let noofopenm = 0;
-  let salee = [];
-  let trili = [];
-  let projects = prog();
-  let meData = start();
-  let alit = [];
+  let noofopenm = $state(0);
+  let salee = $state([]);
+  let trili = $state([]);
+  let projects = $state(prog());
+  let meData = $state(start());
+  let alit = $state([]);
   //sale {id in}
   async function start() {
     if ($idPr !== 0) {
@@ -500,9 +502,9 @@
   }
 
   let li = [];
-  let miData = [];
-  let blabla = [];
-  let load = false;
+  let miData = $state([]);
+  let blabla = $state([]);
+  let load = $state(false);
   async function callbackFunction(event) {
     if (event.detail.type == 'add') {
       cow.scrollIntoView(true);
@@ -678,13 +680,13 @@
     blabla = [];
   }
 
-  let descripFor;
+  let descripFor = $state();
 
  
-  let openMA = false;
+  let openMA = $state(false);
   let cencel1 = { he: 'סגירה', en: 'close' };
 
-  let openMS = false;
+  let openMS = $state(false);
   const fnnn = { he: 'המשימה נשלחה בהצלחה', en: 'mission has sent ' };
   function close() {
     showvd = false;
@@ -698,7 +700,7 @@
     }, 15000);
     toast.success(`${fnnn[$lang]}`);
   }
-  let meDatamm = [];
+  let meDatamm = $state([]);
   async function updi() {
     let res = [];
     const cookieValue = document.cookie
@@ -747,11 +749,11 @@
     needr = [];
     toast.success(cloma[$lang]);
   }
-  let noofopen = 2;
+  let noofopen = $state(2);
 
-  let pendS = false;
-  let hovered = false;
-  let hoveredd = false;
+  let pendS = $state(false);
+  let hovered = $state(false);
+  let hoveredd = $state(false);
 
   function bighand() {
     hovered = !hovered;
@@ -1100,8 +1102,8 @@
     goto('/moach');
     meData = await start();
   }
-  let needr = [];
-  let loadr = false;
+  let needr = $state([]);
+  let loadr = $state(false);
   async function needad(event) {
     const x = event.detail.x;
     if (x.length > 0 || x > 0) {
@@ -1150,14 +1152,14 @@
       totalneed = false;
     }
   }
-  let hal = false;
+  let hal = $state(false);
   function trym() {
     openMS = true;
   }
   function tryma() {
     openMA = true;
   }
-  let fff;
+  let fff = $state();
   async function masi() {
     addN = true;
     loadr = true;
@@ -1168,7 +1170,7 @@
   function titlel(event) {
     ti = event.detail.ti;
   }
-  let who;
+  let who = $state();
   function openTheDesc(event) {
     const id = event.detail.id;
     const is = id[0].model.classes;
@@ -1204,11 +1206,11 @@
     }
   }
   let hover = false;
-  let bmiss;
-  let pendss;
-  let openss;
-  let finiss;
-  let hagdel = false;
+  let bmiss = $state();
+  let pendss = $state();
+  let openss = $state();
+  let finiss = $state();
+  let hagdel = $state(false);
   function topends() {
     pendS = true;
     pendss.scrollIntoView(true);
@@ -1302,12 +1304,14 @@
   let sid = false;
   let gan = false;
   let bett = false;
-    $: width = 0;
-  let chatId;
+    let width = $state(0);
+  
+  let chatId = $state();
   let newID;
   let smalldes;
   let nameChatPartner;
-  $: clicked = false;
+  let clicked = $state(false);
+  
   let ani;
   let isNew = false
       const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
@@ -1512,7 +1516,8 @@ async function createMes(id,mes){
     pendMisMes.set(forums);
     localStorage.setItem('pendMisMes', JSON.stringify($forum));
   }
-  $: tab = 1
+  let tab = $state(1);
+  
 const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"}
 function add(event){
   console.log(event.detail)
@@ -1556,7 +1561,7 @@ function add(event){
           >
             <button
               class=" hover:bg-barbi text-mturk rounded-full"
-              on:click={closer}
+              onclick={closer}
               title={cencel1[$lang]}><Close /></button
             >
             {#if a == 0}
@@ -1585,7 +1590,7 @@ function add(event){
               <h1>{errmsg[$lang]}</h1>
               <button
                 class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
-                on:click={() => (a = 0)}>לנסות שוב</button
+                onclick={() => (a = 0)}>לנסות שוב</button
               >
             {:else if a == 4}
               <PendsM {who} {pmiData} user_1s={projectUsers.length} />
@@ -1698,7 +1703,7 @@ pointer-events: none;"
             <button
               class="text-barbi hover:bg-barbi hover:text-mturk rounded-full"
               title={editpic[$lang]}
-              on:click={editp}
+              onclick={editp}
               ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -1710,7 +1715,7 @@ pointer-events: none;"
             <button
               class="bg-barbi hover:bg-mturk text-barbi rounded-full"
               title={upload[$lang]}
-              on:click={addp}
+              onclick={addp}
             >
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path
@@ -1723,7 +1728,7 @@ pointer-events: none;"
           <button
             class=" hover:bg-mturk text-barbi rounded-full"
             title={editd[$lang]}
-            on:click={editb}
+            onclick={editb}
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -1846,7 +1851,7 @@ pointer-events: none;"
           <button
             class=" hover:bg-white text-barbi rounded-full"
             title={publicp[$lang]}
-            on:click={goto(`/project/${$idPr}`)}
+            onclick={goto(`/project/${$idPr}`)}
           >
             <Pub />
           </button>
@@ -1859,7 +1864,7 @@ pointer-events: none;"
             {#each projectUsers as user}
               <button
                 title={user.attributes.username}
-                on:click={() => goto(`/user/${user.id}`)}
+                onclick={() => goto(`/user/${user.id}`)}
                 ><img
                   class="inline-block h-8 w-8 rounded-full ring-2 ring-gold"
                   src={user.attributes.profilePic.data != null
@@ -1877,7 +1882,7 @@ pointer-events: none;"
 <!--tab header-->
    <nav class="flex justify-center bg- max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
                   <button
-                on:click={() => (tab = 1)}
+                onclick={() => (tab = 1)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 1 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={maini[$lang]}
                 ><div
@@ -1890,7 +1895,7 @@ pointer-events: none;"
                 </div></button
               >
               <button
-                on:click={() => (tab = 2)}
+                onclick={() => (tab = 2)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 2 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={neww[$lang]}
                 ><div
@@ -1903,7 +1908,7 @@ pointer-events: none;"
                 </div></button
               >
               <button
-                on:click={() => (tab = 3)}
+                onclick={() => (tab = 3)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 3 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={gann[$lang]}
                 ><div
@@ -1916,7 +1921,7 @@ pointer-events: none;"
                 </div></button
               >
               <button
-                on:click={() => (tab = 4)}
+                onclick={() => (tab = 4)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 4 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={haluka[$lang]}
                 ><div
@@ -1930,7 +1935,7 @@ pointer-events: none;"
               >
             {#if bmiData.length > 0}
                 <button
-                  on:click={() => (tab = 5)}
+                  onclick={() => (tab = 5)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 5 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                   title={bet[$lang]}
                   ><div
@@ -1945,7 +1950,7 @@ pointer-events: none;"
             {/if}
             {#if meData?.acts.data.length > 0}
             <button
-            on:click={() => (tab = 9)}
+            onclick={() => (tab = 9)}
             class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 9 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
             title={actL[$lang]}
             ><div
@@ -1958,7 +1963,7 @@ pointer-events: none;"
           >
             {/if}
              <button
-                on:click={() => (tab = 6)}
+                onclick={() => (tab = 6)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={shirutims[$lang]}
                 ><div
@@ -1971,7 +1976,7 @@ pointer-events: none;"
                 </div></button
               >
                <button
-                on:click={() => (tab = 7)}
+                onclick={() => (tab = 7)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={mechirot[$lang]}
                 ><div
@@ -1984,7 +1989,7 @@ pointer-events: none;"
                 </div></button
               >
                <button
-                on:click={() => (tab = 8)}
+                onclick={() => (tab = 8)}
                 class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 8 ? "bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-r from-gra via-grb  to-grc text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={sidd[$lang]}
                 ><div
@@ -2032,7 +2037,7 @@ pointer-events: none;"
 
           <div class=" hhh">
             {#if hovered}
-              <button on:click={hosa} on:mouseleave={bighand}
+              <button onclick={hosa} onmouseleave={bighand}
                 ><img
                   title={hosafa[$lang]}
                   style="max-width:45vw; max-height:45vw;"
@@ -2054,7 +2059,7 @@ pointer-events: none;"
               />
             {/if}
             {#if hoveredd}
-              <button on:click={masi} on:mouseleave={bighandd}
+              <button onclick={masi} onmouseleave={bighandd}
                 ><img
                   title={hosafat[$lang]}
                   style="max-width:45vw; max-height:45vw;"
@@ -2104,7 +2109,7 @@ pointer-events: none;"
                 >
                   <button
                     title={cencel[$lang]}
-                    on:click={closeM}
+                    onclick={closeM}
                     class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2168,7 +2173,7 @@ pointer-events: none;"
               >
                 <button
                   title={cencel[$lang]}
-                  on:click={() => (addN = false)}
+                  onclick={() => (addN = false)}
                   class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2216,27 +2221,27 @@ pointer-events: none;"
               {#if pmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
-                  on:click={topends}>{mwa[$lang]}</button
+                  onclick={topends}>{mwa[$lang]}</button
                 >
               {/if}
 
               {#if omiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges text-pinki hover:text-barbi font-bold px-4 rounded"
-                  on:click={toopens}>{opmi[$lang]}</button
+                  onclick={toopens}>{opmi[$lang]}</button
                 >
               {/if}
               {#if bmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg text-barbi hover:text-barbi font-bold px-4 rounded"
-                  on:click={tobetha}
+                  onclick={tobetha}
                 >{mesimaBetaHe[$lang]}</button
                 >
               {/if}
               {#if fmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-mpink text-pinki hover:text-barbi font-bold px-4 rounded"
-                  on:click={tofinish}
+                  onclick={tofinish}
                 >
                   פעולות שהסתיימו</button
                 >
@@ -2274,7 +2279,7 @@ pointer-events: none;"
                 <br />
                 {#if hal === false}
                   <button
-                    on:click={() => (hal = true)}
+                    onclick={() => (hal = true)}
                     class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
                   >
                     חישוב רווח בגירסה ראשונית
@@ -2282,7 +2287,7 @@ pointer-events: none;"
                 {:else if hal === true}
                   <button
                     title={cencel[$lang]}
-                    on:click={() => (hal = false)}
+                    onclick={() => (hal = false)}
                     class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2351,7 +2356,7 @@ pointer-events: none;"
                 <span >
                   <button
                     title={cencel1[$lang]}
-                    on:click={() => (openMS = false)}
+                    onclick={() => (openMS = false)}
                     class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2365,7 +2370,7 @@ pointer-events: none;"
               {:else if openMS === true && omiData.length == 0}
                 <button
                   title={cencel1[$lang]}
-                  on:click={() => (openMS = false)}
+                  onclick={() => (openMS = false)}
                   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2385,7 +2390,7 @@ pointer-events: none;"
               {#if openMA === true && opmash.length > 0}
                 <button
                   title={cencel1[$lang]}
-                  on:click={() => (openMA = false)}
+                  onclick={() => (openMA = false)}
                   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2398,7 +2403,7 @@ pointer-events: none;"
               {:else if openMA === true && opmash.length == 0}
                 <button
                   title={cencel1[$lang]}
-                  on:click={() => (openMA = false)}
+                  onclick={() => (openMA = false)}
                   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2421,7 +2426,7 @@ pointer-events: none;"
                 {#if pendS === true}
                   <button
                     title={cencel1[$lang]}
-                    on:click={() => (pendS = false)}
+                    onclick={() => (pendS = false)}
                     class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2440,7 +2445,7 @@ pointer-events: none;"
                   {#if tahaS === true}
                     <button
                       title={cencel1[$lang]}
-                      on:click={() => (tahaS = false)}
+                      onclick={() => (tahaS = false)}
                       class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                         <path
@@ -2479,7 +2484,7 @@ pointer-events: none;"
       {#each projects as data, i}
         <button
           class=" border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
-          on:click={() => projectn(data.id)}
+          onclick={() => projectn(data.id)}
         >
           {data.attributes.projectName}
         </button>
@@ -2550,7 +2555,7 @@ pointer-events: none;"
     -webkit-text-stroke: 1px var(--barbi-pink);
   }
 
-  :global(li:not(.selected):hover) {
+  :global(li:not(:global(.selected)):hover) {
     color: var(--barbi-pink);
     background-color: var(
       --lturk

@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     export function sendError(err,location = "",fetch){
         console.error(err)
         

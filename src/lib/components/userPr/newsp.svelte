@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with beforeUpdate. Please migrate by hand. -->
+<!-- @migration-task Error while migrating Svelte code: Mixing old (on:change) and new syntaxes for event handling is not allowed. Use only the onchange syntax -->
 <script>
     import { onMount } from 'svelte';
  import { createEventDispatcher } from 'svelte';
@@ -200,6 +202,7 @@ import {lang} from '$lib/stores/lang'
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >משאבים שנבחרו</h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg">הסרת המשאב שנבחר</th>
           {#each meData as data, i}
@@ -207,11 +210,14 @@ import {lang} from '$lib/stores/lang'
             {i + 1}
             <button
              title='הסרה'
-             on:click={remove(data.id)}><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+             onclick={remove(data.id)}><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path fill="currentColor" d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z" />
           </svg></button></td>
           {/each}
-    </tr> <tr class="ggr">
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="ggr">
       <th class="ggr">שם</th>
       {#each meData as data, i}
             <td class="ggr">
@@ -240,7 +246,7 @@ import {lang} from '$lib/stores/lang'
       {#each meData as data, i}
       <td>
       
-        <select  bind:value={data.kindOf} on:change={() => myMissionH()} class="round form-select appearance-none
+        <select  bind:value={data.kindOf} onchange={() => myMissionH()} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -294,6 +300,7 @@ import {lang} from '$lib/stores/lang'
   <label for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
+</td>
       {/each}
     </tr><tr>
       <th>שווי להשקעה בריקמה</th>
@@ -305,6 +312,7 @@ import {lang} from '$lib/stores/lang'
    <label for="name" class='label'>שווי מבוקש <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{kc ? "" : "none"};">ליחידה</span> </label>
   <span class='line'></span>
 </div>
+      </td>
       {/each}
     </tr><tr>
       <th>הערות מיוחדות</th>
@@ -330,13 +338,14 @@ import {lang} from '$lib/stores/lang'
 </div></td>
         {/each}
   </tr>
+  </tbody>
 </table>
 </div>
 <div>
     {#if already === false}
   <button 
   class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-  on:click={han}
+  onclick={han}
   >פרסום משאבים</button>
   {:else}
            <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>

@@ -12,12 +12,11 @@
   import Mission from "./mission.svelte";
   import { idPr } from '../../stores/idPr.js'
  const dispatch = createEventDispatcher();
- export let pn, pl, restime,projectUsers, alit;
  const baseUrl = import.meta.env.VITE_URL
 
- let newcontent = true;
-let newcontentR = true;
-let newcontentW = true;
+ let newcontent = $state(true);
+let newcontentR = $state(true);
+let newcontentW = $state(true);
 let error8
 async function findT() {
     /*TODO: כאשר מחפשים כישורים וכן לגבי כל שאר האובייקטים להציג את היגרסה העברית והאנגלית כך שהחיפוש יוכל למצוא את כולן*/ 
@@ -101,9 +100,17 @@ async function findT() {
     }
 }
 
-export let selected = [];
 
-export let mission1 = [];
+  let {
+    pn,
+    pl,
+    restime,
+    projectUsers,
+    alit,
+    selected = $bindable([]),
+    mission1 = [],
+    children
+  } = $props();
 
 
 function find_mission_id(mission_name_arr){
@@ -122,10 +129,11 @@ const placeholder = {"he":`בחירה מרשימה או יצירת חדשה`,"en
 
 
 const head = {"he":"הוספת פעולות הנדרשות להקמה או לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
-let id = 0
-$: ugug = ``;
- $: addn = {"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`}
- let name = ""
+let id = $state(0)
+let ugug = $state(``);
+  
+ let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`})
+ let name = $state("")
  function add(){
   let isNew = false
   if (selected.length > 0) {
@@ -144,14 +152,15 @@ $: ugug = ``;
 
  }
 }
- $: before = true
+ let before = $state(true);
+  
  const mn = {
   "he": "שם המשימה",
   "en": "mission name"
 }
 
 let noRiset = true
-let showMobileModal = false;
+let showMobileModal = $state(false);
 
 function openMobileModal() {
   showMobileModal = true;
@@ -170,9 +179,9 @@ function closeMobileModal() {
 </script>
 
 <div dir="{$lang == 'he' ? 'rtl' : 'ltr'}" >
-  <slot>
+  {#if children}{@render children()}{:else}
 <h2 class="text-barbi font-bold">{head[$lang]}</h2>
-  </slot>
+  {/if}
             {#if before}
         <h3>{mn[$lang]}</h3>
       {/if}

@@ -22,7 +22,7 @@
     "svelte": "^5.1.9",
     "svelte-calendar": "^3.1.6",
     "svelte-loading-spinners": "^0.3.6",
-    "svelte-multiselect": "10.3.0",
+    "svelte-multiselect": "11.0.0-rc.1",
     "svelte-range-slider-pips": "^3.1.1",
     "svelte-scrollto": "^0.2.0",
     "svelte-share-buttons-component": "^3.0.0",

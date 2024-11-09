@@ -1,9 +1,15 @@
 
 <script>
-  export let omiData = [];
-     export let who = 0;
-  let isonly = false;
+  let isonly = $state(false);
    import { onMount } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [omiData]
+   * @property {number} [who]
+   */
+
+  /** @type {Props} */
+  let { omiData = $bindable([]), who = 0 } = $props();
    onMount(async () => {
  if (who !== 0){
       isonly = true

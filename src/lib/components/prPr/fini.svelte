@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag -->
 <script>
   import Tooltip from './../../celim/tooltipb.svelte'
   import { lang } from '$lib/stores/lang.js'
@@ -5,11 +6,7 @@
     createEventDispatcher
 } from 'svelte';
         import pic from './../../celim/pic.js' 
-export let fmiData = [];
-  export let hagdel = false;
    import { onMount } from 'svelte'; 
-export let rikmashes = [];
-  export let meData = [];
   const dispatch = createEventDispatcher();
 
 //	import SvelteTooltip from 'svelte-tooltip';
@@ -28,9 +25,8 @@ function confirm (id) {
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
-let ulist = [
-]; 
-export let users;
+let ulist = $state([
+]); 
 let dictid = {};
 onMount(async () => {
 
@@ -130,6 +126,23 @@ function pre (){
 
  
   import moment from 'moment';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [fmiData]
+   * @property {boolean} [hagdel]
+   * @property {any} [rikmashes]
+   * @property {any} [meData]
+   * @property {any} users
+   */
+
+  /** @type {Props} */
+  let {
+    fmiData = [],
+    hagdel = $bindable(false),
+    rikmashes = [],
+    meData = $bindable([]),
+    users
+  } = $props();
 
   onMount(async () => {
     meData = rikmashes
@@ -137,8 +150,8 @@ function pre (){
               });
 
  let km = false;
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
 
 function myMissionH ()  {
@@ -196,7 +209,7 @@ meData[i].totaltotal =  meData[i].easy;
   }
 }
 };
-let fir,ssec;
+let fir = $state(),ssec = $state();
  function x(a,b,c){
    if (a == "x"){
     fir = b;
@@ -225,19 +238,19 @@ let fir,ssec;
     <image href={use.src} x="-15" y="-10" width="100" height="100" />
   </pattern>
 </defs>
-  <circle on:mouseenter={x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
+  <circle onmouseenter={x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
  
  </circle>
   {/each}
 </svg>    </Tooltip>
 </div>
 </div>
-<button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
+<button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" onclick={() => hagdel = true} >פירוט</button><br>
    
 {:else}
      <button
       title="{cl[$lang]}"
-      on:click={() => hagdel = false}
+      onclick={() => hagdel = false}
        class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -250,6 +263,7 @@ let fir,ssec;
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{pehe[$lang]}</h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg">אפשרויות</th>
           {#each fmiData as data, i}
@@ -257,7 +271,10 @@ let fir,ssec;
             {i + 1}
         </td>
           {/each}
-    </tr> <tr class="ggr">
+    </tr> 
+    </thead>
+    <tbody>
+    <tr class="ggr">
       <th class="ggr">שם</th>
       {#each fmiData as data, i}
             <td class="ggr">{data.attributes.missionName}</td>
@@ -349,6 +366,7 @@ let fir,ssec;
              </td>
              {/each}
         </tr>
+        </tbody>
     </table>
 
  
@@ -358,6 +376,7 @@ let fir,ssec;
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >משאבים שהתקבלו ואושרו</h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg"> </th>
           {#each meData as data, i}
@@ -365,7 +384,10 @@ let fir,ssec;
             {i + 1}
             </td>
           {/each}
-    </tr> <tr class="ggr">
+    </tr>
+    </thead>
+    <tbody>
+    <tr class="ggr">
       <th class="ggr">שם</th>
       {#each meData as data, i}
             <td class="ggr">
@@ -422,12 +444,14 @@ let fir,ssec;
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
         {data.attributes.agprice.toFixed(2)}
+        </td>
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >
       <th>עלות סה"כ</th>
       {#each meData as data, i}
       <td  >
       <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.attributes.total.toFixed(2)}</h3>
+      </td>
       {/each}
     </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
@@ -443,6 +467,7 @@ let fir,ssec;
              </td>
              {/each}
         </tr>
+      </tbody>
 </table>
 {/if}
 </div>

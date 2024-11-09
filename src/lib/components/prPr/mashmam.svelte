@@ -1,9 +1,10 @@
+<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 
 <script>
-  export let meData = [];
   import { onMount } from 'svelte';
 
   import moment from 'moment';
+  let { meData = $bindable([]) } = $props();
   function remove(id) {
     console.log(id);
   }
@@ -15,8 +16,8 @@
   });
 
   let km = false;
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
   function myMissionH() {
     km = false;
@@ -95,14 +96,17 @@
           משאבים נדרשים שפורסמו
         </h1>
       </caption>
+      <thead>
       <tr class="gg">
-        <th class="gg" />
+        <th class="gg"></th>
         {#each meData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
           </td>
         {/each}
       </tr>
+      </thead>
+      <tbody>
       <tr class="ggr">
         <th class="ggr">שם</th>
         {#each meData as data, i}
@@ -233,6 +237,7 @@
           </td>
         {/each}
       </tr>
+      </tbody>
     </table>
   </div>
 </div>

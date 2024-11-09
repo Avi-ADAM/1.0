@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with beforeUpdate. Please migrate by hand. -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag -->
 <script>
   import { addslashes } from '$lib/func/uti/string.svelte'
 import {
@@ -192,14 +194,15 @@ function myMissionH() {
     km = false;
     ky = false;
     kc = false;
-    for (var i = 0; i < meData.length; i++) {
+    let a,b
+    for (var i = 0; i < meData.length; i++) 
         meData[i].attributes.price < 0 ? meData[i].attributes.price = 0  : meData[i].attributes.price;
         meData[i].attributes.easy < 0 ? meData[i].attributes.easy =  0 : meData[i].attributes.easy;
                     console.log(meData[i].attributes.easy, "to to")
 
         if (meData[i].attributes.kindOf === "monthly") {
-            var a = moment(meData[i].attributes.datef);
-            var b = moment(meData[i].attributes.dates);
+             a = moment(meData[i].attributes.datef);
+             b = moment(meData[i].attributes.dates);
             meData[i].monts = a.diff(b, 'months', true).toFixed(2);
             ky = true;
             meData[i].m = true;
@@ -210,8 +213,8 @@ function myMissionH() {
             meData[i].total = meData[i].monts * meData[i].attributes.price;
             meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
         } else if (meData[i].attributes.kindOf === "yearly") {
-            var a = moment(meData[i].attributes.datef);
-            var b = moment(meData[i].attributes.dates);
+             a = moment(meData[i].attributes.datef);
+             b = moment(meData[i].attributes.dates);
             meData[i].years = a.diff(b, 'years', true).toFixed(2);
             ky = true;
             meData[i].y = true;
@@ -221,7 +224,7 @@ function myMissionH() {
             meData[i].kc = false;
             meData[i].total = (meData[i].years * meData[i].attributes.price).toFixed(2);
             meData[i].totaltotal = (meData[i].years * meData[i].attributes.easy).toFixed(2);
-        } else if (meData[i].attributes.kindOf === "rent") {
+      }else if (meData[i].attributes.kindOf === "rent") {
             meData[i].y = false;
             ky = true;
             meData[i].r = true;
@@ -251,7 +254,7 @@ function myMissionH() {
             meData[i].total = meData[i].attributes.price;
             meData[i].totaltotal = meData[i].attributes.easy;
         }
-    }
+    
 };
 const ot = {"he":"עלות חד פעמית","en":"one time"}
 const py = {"he":"ליחידה", "en": "per unit"}
@@ -274,6 +277,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
                 <h1 class="md:text-center text-2xl md:text-2xl font-bold"
                     >משאבים שנבחרו</h1>
             </caption>
+            <thead>
             <tr class="gg">
                 <th class="gg">הסרת המשאב שנבחר</th>
                 {#each meData as data, i}
@@ -285,7 +289,10 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
                             <path fill="currentColor" d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z" />
                         </svg></button></td>
                 {/each}
-            </tr> <tr class="ggr">
+            </tr> 
+            </thead>
+            <tbody>
+            <tr class="ggr">
                 <th class="ggr">שם</th>
                 {#each meData as data, i}
                 <td class="ggr">
@@ -384,7 +391,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
                                 <span class='line'></span>
                             </div>
                       {#if data.attributes.price < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכולה להיות קטנה מ-0</small>{/if}
-                          
+                          </td>
                             {/each}
                             </tr><tr>
                                 <th>שווי מקסימלי לחישוב בריקמה</th>
@@ -397,18 +404,21 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
                                         <span class='line'></span>
                                     </div>
                           {#if data.attributes.easy < 0}<small class="bg-red-800 text-slate-50 px-2">לא יכול להיות קטן מ-0</small>{/if}                 
-                                    {/each}
+                                </td>        
+                          {/each}
                                     </tr><tr style="display:{kc || ky ? "" : "none"};" >
                                         <th>עלות סה"כ</th>
                                         {#each meData as data, i}
                                         <td  >
                                             <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc || meData[i].t ? "" : "none"};">{data.total}</h3>
+                                        </td>
                                             {/each}
                                             </tr><tr style="display:{kc || ky ? "" : "none"};">
                                                 <th>שווי מקסימלי סה"כ</th>
                                                 {#each meData as data, i}
                                                 <td   >
                                                     <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc || meData[i].t ? "" : "none"};">{data.totaltotal}</h3>
+                                                </td>
                                                     {/each}
                                                     </tr> <tr>
                                                         <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
@@ -422,6 +432,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
                                                             </div></td>
                                                         {/each}
                                                     </tr>
+                                                    </tbody>
                                                     </table>
                                                     </div>
                                                     <div>
