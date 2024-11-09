@@ -395,6 +395,7 @@ let nameuse = false;
   import Close from '$lib/celim/close.svelte';
   import { scrollToTop } from 'svelte-scrollto';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
+  import { sendError } from '$lib/func/send/senError.svelte';
     let meData =[]
 const { form, errors, state, handleChange, handleSubmit } = createForm({
           initialValues: {
@@ -454,7 +455,7 @@ if (fpp.includes(jjj)){
                 fpval.set(meData.data.id)
             datar = data;
             let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`
-      console.log(`https://1lev1.world?${encodeURIComponent(linko)}`)
+      console.log(`https://www.1lev1.com?${encodeURIComponent(linko)}`)
       linkos.set(linko)           //id con un em ref
               })
   .catch(error => {
@@ -463,9 +464,11 @@ if (fpp.includes(jjj)){
     if (error.response === undefined){
         erorim.msg = "השרת נרדם 😴, הערנו אותו, אנו מנסים שוב";
       // handleSubmit();
+      sendError(JSON.stringify(error) ?? null,"/amana.svelte 467", fetch)
     } else {
         erorim.msg =  ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות לעולם חוזרת, הנה הפרטים היבשים `
-    }
+        sendError(erorim.msg ,"/amana.svelte 470", fetch)
+      }
           });
 
           }}
