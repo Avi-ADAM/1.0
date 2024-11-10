@@ -1,11 +1,10 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with beforeUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Mixing old (on:change) and new syntaxes for event handling is not allowed. Use only the onchange syntax -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
 <script>
     import { onMount } from 'svelte';
  import { createEventDispatcher } from 'svelte';
   import { RingLoader
 } from 'svelte-loading-spinners'
-	import { beforeUpdate } from 'svelte';
 
  const dispatch = createEventDispatcher();
   let token; 
@@ -30,9 +29,9 @@ function vfor(){
    myMissionH()
               myMi ()  
               });
-    beforeUpdate(async () => {
-   myMissionH()
-
+ 
+    $effect.pre(()=>{
+      myMissionH()
     })
  let already = false;
  let idL;

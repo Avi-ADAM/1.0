@@ -2022,22 +2022,22 @@
     three-instanced-uniforms-mesh "^0.49.0"
     troika-three-utils "^0.49.0"
 
-"@threlte/core@^8.0.0-next.23":
-  version "8.0.0-next.23"
-  resolved "https://registry.npmjs.org/@threlte/core/-/core-8.0.0-next.23.tgz"
-  integrity sha512-GqwUejW8QMHpJRyqN632ZAkX9WuluTl229XUaQRelfGRMOgP0BpPfikB2ldydSurpsm37SYCTJwn+29uG4FzZA==
+"@threlte/core@^8.0.0-next.30":
+  version "8.0.0-next.30"
+  resolved "https://registry.npmjs.org/@threlte/core/-/core-8.0.0-next.30.tgz"
+  integrity sha512-ZWjBymP0P77Qk9qAfJ7l9tlwmusAlgHaR0hE9UhduM9/Wgx02RyO57At1mWFAcapTFOXyEqompfP1Upnd2j9oQ==
   dependencies:
     mitt "^3.0.1"
 
-"@threlte/extras@^9.0.0-next.32":
-  version "9.0.0-next.32"
-  resolved "https://registry.npmjs.org/@threlte/extras/-/extras-9.0.0-next.32.tgz"
-  integrity sha512-sxLewfbgeiAn9CI5d+9jiS71aL5dylKp4npFRrrF8IUDroRvKXkcteDfdB8IsUf1PmqFy6Nk46RV9BzT+HWeWQ==
+"@threlte/extras@^9.0.0-next.39":
+  version "9.0.0-next.39"
+  resolved "https://registry.npmjs.org/@threlte/extras/-/extras-9.0.0-next.39.tgz"
+  integrity sha512-FQnYknyqJaEI99tTzLq0WDASfUqmcBDwMs8TwopuqEgj/DP16rChFCiPAN5Dv6epBExh11hqoHIn/6CKoCgQuw==
   dependencies:
     "@threejs-kit/instanced-sprite-mesh" "^2.4.6"
     three-mesh-bvh "^0.7.4"
     three-perf "^1.0.10"
-    troika-three-text "^0.49.1"
+    troika-three-text "^0.50.3"
 
 "@threlte/preprocess@^0.0.2":
   version "0.0.2"
@@ -7804,14 +7804,14 @@ troika-three-text@^0.47.2:
     troika-worker-utils "^0.47.2"
     webgl-sdf-generator "1.1.1"
 
-troika-three-text@^0.49.1:
-  version "0.49.1"
-  resolved "https://registry.npmjs.org/troika-three-text/-/troika-three-text-0.49.1.tgz"
-  integrity sha512-lXGWxgjJP9kw4i4Wh+0k0Q/7cRfS6iOME4knKht/KozPu9GcFA9NnNpRvehIhrUawq9B0ZRw+0oiFHgRO+4Wig==
+troika-three-text@^0.50.3:
+  version "0.50.3"
+  resolved "https://registry.npmjs.org/troika-three-text/-/troika-three-text-0.50.3.tgz"
+  integrity sha512-UzbIrgV3fOFmFbFfWIBcBEXEyQovs+LLu15E5xGpSQbo1oZH49A+J9bul4H8H0xLtaLkRTO+LqEsmkaeDtZQfg==
   dependencies:
     bidi-js "^1.0.2"
-    troika-three-utils "^0.49.0"
-    troika-worker-utils "^0.49.0"
+    troika-three-utils "^0.50.3"
+    troika-worker-utils "^0.50.0"
     webgl-sdf-generator "1.1.1"
 
 troika-three-utils@^0.47.2:
@@ -7824,15 +7824,20 @@ troika-three-utils@^0.49.0:
   resolved "https://registry.npmjs.org/troika-three-utils/-/troika-three-utils-0.49.0.tgz"
   integrity sha512-umitFL4cT+Fm/uONmaQEq4oZlyRHWwVClaS6ZrdcueRvwc2w+cpNQ47LlJKJswpqtMFWbEhOLy0TekmcPZOdYA==
 
+troika-three-utils@^0.50.3:
+  version "0.50.3"
+  resolved "https://registry.npmjs.org/troika-three-utils/-/troika-three-utils-0.50.3.tgz"
+  integrity sha512-asQWCESikU58y9cz4OgIjCRlITkDTwf7ds8T9IyWxn7OB2A7XItg2UbHjfexwooTefM+BYbEC4ZKxOUBfbNVLA==
+
 troika-worker-utils@^0.47.2:
   version "0.47.2"
   resolved "https://registry.npmjs.org/troika-worker-utils/-/troika-worker-utils-0.47.2.tgz"
   integrity sha512-mzss4MeyzUkYBppn4x5cdAqrhBHFEuVmMMgLMTyFV23x6GvQMyo+/R5E5Lsbrt7WSt5RfvewjcwD1DChRTA9lA==
 
-troika-worker-utils@^0.49.0:
-  version "0.49.0"
-  resolved "https://registry.npmjs.org/troika-worker-utils/-/troika-worker-utils-0.49.0.tgz"
-  integrity sha512-1xZHoJrG0HFfCvT/iyN41DvI/nRykiBtHqFkGaGgJwq5iXfIZFBiPPEHFpPpgyKM3Oo5ITHXP5wM2TNQszYdVg==
+troika-worker-utils@^0.50.0:
+  version "0.50.0"
+  resolved "https://registry.npmjs.org/troika-worker-utils/-/troika-worker-utils-0.50.0.tgz"
+  integrity sha512-BxNk0w6+d9NYd7El/3RzlzH/F2vovJI1FX9Zb+D7fArVM1EsUXj6+wVwJSrfucy6/HYhfbZPu/lD6Miiw9Byiw==
 
 ts-interface-checker@^0.1.9:
   version "0.1.13"

@@ -1,5 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with beforeUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
 <script>
   import { addslashes } from '$lib/func/uti/string.svelte'
 import {
@@ -11,9 +11,6 @@ import {
 import {
     RingLoader
 } from 'svelte-loading-spinners'
-import {
-    beforeUpdate
-} from 'svelte';
 import moment from 'moment'
 import { lang } from '$lib/stores/lang.js'
   import { calcX } from '$lib/func/calcX.svelte';
@@ -35,9 +32,9 @@ onMount(async () => {
     myMissionH()
     myMi()
 });
-beforeUpdate(async () => {
-    upd()
 
+$effect.pre(()=>{
+    upd()
 })
 const baseUrl = import.meta.env.VITE_URL
 

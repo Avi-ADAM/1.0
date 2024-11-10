@@ -1,9 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
 <script>
   import { page } from '$app/stores'
     import Lowding from '$lib/celim/lowding.svelte'
@@ -20,11 +16,10 @@
         import Weget from '../../../components/lev/weget.svelte'
         import Hal from '../../../components/lev/halukaask.svelte'
       //import { fly } from 'svelte/transition';
-      import { createEventDispatcher, onMount } from 'svelte';
+      import { createEventDispatcher, onMount, tick } from 'svelte';
     import Header from './../../header/header.svelte'
 const dispatch = createEventDispatcher();
   import { Swiper, SwiperSlide } from "swiper/svelte";
-  import { afterUpdate } from 'svelte'
   // Import Swiper styles
   import "swiper/css";
   import "swiper/css/navigation";
@@ -36,7 +31,7 @@ const dispatch = createEventDispatcher();
   let currentIndex = 0;
   let swiperInstance;
 
-
+/*
   onMount(() => {
     // הסר את האתחול הישיר של Swiper כאן
     // swiperInstance = new Swiper('.swiper', {
@@ -46,7 +41,7 @@ const dispatch = createEventDispatcher();
     //     },
     //   },
     // });
-  });
+  });*/
 
   // הוסף פונקציה לטיפול באירוע swiper
   function handleSwiper(e) {
@@ -60,7 +55,7 @@ const dispatch = createEventDispatcher();
 
   // import required modules
   import {Manipulation, Mousewheel, Keyboard, EffectFade , Navigation} from "swiper";//, Virtual
-  export let low = false;
+  exprt let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
   import DecisionMaking from '../decisionMaking.svelte';
@@ -86,10 +81,13 @@ $:if (indexi != -1){
   }
   let slideIndex;
   export let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}
-afterUpdate(async () => {
-if (swiperRef !== null) {
+
+$effect.pre(()=>{
+  tick().then(()=>{
+    if (swiperRef !== null) {
   swiperRef.update()
 }
+  })
 })
   async function delo (event){
     console.log("slideIndex")
@@ -158,7 +156,7 @@ function hoverc (id){
 
   dispatch("hover", {id: u});
 }
-const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות ��שמאל',"en" : 'Navigation: right side, bottom'}
+const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל',"en" : 'Navigation: right side, bottom'}
 $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
 
 function showonly(event) {

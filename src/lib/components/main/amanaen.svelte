@@ -347,14 +347,14 @@ import { Head } from 'svead'
     const placeholder = `My place`;
     const required = true;
     let nameuse = false;
- let erorim = $state($state($state($state($state($state({st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "baruch@1lev1.com"  }))))))
-    let selected = $state($state($state($state($state($state([]))))));
-       let already = $state($state($state($state($state($state(false))))));
-       let erorims = $state($state($state($state($state($state(false))))));
+ let erorim = $state({st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "baruch@1lev1.com"  })
+    let selected = $state([]);
+       let already = $state(false);
+       let erorims = $state(false);
    let datar;
    let idx = 1;
    let data;
-   let g = $state($state($state($state($state($state(false))))));
+   let g = $state(false);
 	import { useProgress } from '@threlte/extras'
 	const { progress } = useProgress()
     import { createForm } from "svelte-forms-lib";
@@ -362,11 +362,10 @@ import { Head } from 'svead'
   import Scene from './globu.svelte'
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
         let meData =[]
-const { form, errors, state, handleChange, handleSubmit } = createForm({
+const { form, errors, handleChange, handleSubmit } = createForm({
           initialValues: {
             name: "",
             email: "",
-            countries: selected
           },
       validationSchema: yup.object().shape({
         name: yup.string().required(),
@@ -441,18 +440,18 @@ console.log("t")
   const lines = document.getElementById("lines")
   
 }*/
-    let trans = $state($state($state($state($state($state(false))))));
+    let trans = $state(false);
 function tran (){
 trans = !trans;
 }
 let error;
 
-    let dow = $state($state($state($state($state($state())))));
+    let dow = $state();
     function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
-     let isOpen = $state($state($state($state($state($state(false))))));
-let a = $state($state($state($state($state($state(0))))));
+     let isOpen = $state(false);
+let a = $state(0);
 function tr(){
 isOpen = true;
 a = 4;
@@ -492,9 +491,9 @@ function change(la){
     goto("/aitifaqia")
   }
 }
-let w = $state($state($state($state($state($state(0))))));
+let w = $state(0);
   
-let h = $state($state($state($state($state($state(0))))));
+let h = $state(0);
   
 </script>
   <Head {title} {description} {image} {url} />
