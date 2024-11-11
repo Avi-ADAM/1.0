@@ -235,6 +235,12 @@
             descripFor
             publicDescription
              acts{data{id attributes{shem
+               tafkidims {data{ id attributes{ roleDescription ${
+                $lang == 'he'
+                  ? 'localizations{data {attributes{ roleDescription}} }'
+                  : ''
+              } }}}
+                  isAssigned
                 open_mission{data{id attributes {name}}}
                 pendm{data{id attributes{name}}}
                  dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}} myIshur valiIshur status mesimabetahaliches{data{id 
@@ -1551,7 +1557,7 @@ function add(event){
         style="z-index: 700;"
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
-        <DialogContent aria-label="form" class="{a != 8 ? "content" :"chat"}">
+        <DialogContent aria-label="form" class="{a != 8 ? a != 5 ? "content" : "betha" :"chat"}">
           <div style="z-index: 400;"      dir="{$lang == "he" ? "rtl" : "ltr"}"
           >
             <button
@@ -1855,7 +1861,7 @@ pointer-events: none;"
         <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
         class="flex items-center justify-center">
           <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
-          class="flex -space-x-2 overflow-hidden">
+          class="flex -space-x-2 ">
             {#each projectUsers as user}
               <button
                 title={user.attributes.username}

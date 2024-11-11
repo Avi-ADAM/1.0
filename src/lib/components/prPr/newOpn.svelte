@@ -57,9 +57,10 @@ const requiredWW = {
     let wid
     </script>
 
-<div bind:clientWidth={wid} class="h-screen overflow-auto md:items-center border-2 border-gold rounded d">
+<div bind:clientWidth={wid} class="h-screen overflow-auto md:items-center border-2 border-gold rounded d 
+bg-gray-700">
   <div class=" items-center d" class:full={who == 0}>
-          <h1 class="md:text-center text-2xl md:text-2xl font-bold"
+          <h1 class="md:text-center text-2xl md:text-2xl font-bold text-gold"
       >{isonly == true ? " פעולה פתוחה" : "פעולות פתוחות"}</h1>
     {#each omiData as datai, i}
     {@const data = datai.attributes}
@@ -95,7 +96,7 @@ const requiredWW = {
                                   class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
                                 >
                                   <span class="p-1">✅</span>
-                                  <h2 class="md:text-xl p-1">{datai.attributes.shem}</h2>
+                                  <h2 class="md:text-xl p-1 text-gold hover:text-barbi">{datai.attributes.shem}</h2>
                                 </div>
                               </li>
                             {/each}
@@ -109,7 +110,7 @@ const requiredWW = {
         <p 
         on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
         on:mouseleave={()=>hover("0")}  >
-            <Tile sm={wid > 555 ? true : false} pink={true} word={skill.attributes.skillName}/></p>
+            <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
                 </div>
                 {/if}
@@ -118,14 +119,14 @@ const requiredWW = {
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each data.tafkidims.data as rol}
                     <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-    <Tile sm={wid > 555 ? true : false} word={rol.attributes.roleDescription} wow={true}/></p>{/each}
+    <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.roleDescription} wow={true}/></p>{/each}
       </div>
       {/if}
       {#if data.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each data.work_ways.data as rol}
           <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <Tile bg="gold" sm={wid > 555 ? true : false} word={rol.attributes.workWayName}/>
+              <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false} word={rol.attributes.workWayName}/>
           </p>
           {/each}
           </div>
