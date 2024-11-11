@@ -1207,6 +1207,9 @@
     } else if (is == 'openM') {
       isOpen = true;
       a = 6;
+    }else if(is == "assign"){
+      isOpen = true;
+      a = 9
     }
   }
   let hover = false;
@@ -1331,8 +1334,6 @@
     }
     import { onDestroy } from 'svelte';
   import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
-
-  
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1616,6 +1617,10 @@ function add(event){
                 {ani}
               />
               {/key}
+            {:else if a === 9}
+            <span class="text-gold">
+              בבניה , בקרוב יהיה כאן תפריט שיאפשר לך לצרף את המטלה לאחת המשימות שלך
+            </span>
             {/if}
           </div></DialogContent
         >

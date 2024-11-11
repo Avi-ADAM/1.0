@@ -33,8 +33,11 @@
     } else if (isPend) {
       kind = 'pendm';
       id = isPend.id;
+    }else{
+      kind = 'assign';
+      id = row.id
     }
-    console.log(row, type, mid, isOpen, isPend);
+    console.log(row, type, mid, isOpen, isPend,kind,id);
     dispatch('taskClick', {
       id,
       kind
