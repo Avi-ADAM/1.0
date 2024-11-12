@@ -56,7 +56,7 @@ export async function Pend(id,taid){
              hearotMeyuchadot: """${res2.data.pendm.data.attributes.hearotMeyuchadot}""",
              name: """${sanitizeUserInput(res2.data.pendm.data.attributes.name)}""",
              publishedAt: "${d.toISOString()}",
-             descrip: """${sanitizeUserInput(res2.data.pendm.data.attributes.descrip)}""",
+             descrip: """${res2.data.pendm.data.attributes.descrip}""",
              skills: [${res2.data.pendm.data.attributes.skills.data.map(c => c.id)}], 
              tafkidims: [${res2.data.pendm.data.attributes.tafkidims.data.map(c => c.id)}],
              vallues:  [${res2.data.pendm.data.attributes.vallues.data.map(c => c.id)}],
@@ -80,7 +80,7 @@ export async function Pend(id,taid){
       let res3 = await SendTo(qub, VITE_ADMINMONTHER).then((res3) => (res3 = res3));
       console.log(res3,"pend res3 ",res?.errors?.locations)     
       if (res3.data != null) {
-              console.log(res3.data,"pend res3 data ")
+              console.log(res3.data,"pend res3 data ,pend line 83 ")
               //update timegrama to done
               let que4 = `mutation { 
              updateTimegrama(

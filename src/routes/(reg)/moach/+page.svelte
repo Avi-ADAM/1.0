@@ -254,14 +254,15 @@
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
              id attributes{ status  iskvua 
                           forums{data{id}}
-
-            acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahaliches{data{id}}}}}
-              tafkidims {data{ id attributes{ roleDescription ${
-                $lang == 'he'
-                  ? 'localizations{data {attributes{ roleDescription}} }'
-                  : ''
-              } }}}
-              admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
+              acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
+               des dateF vali{data{id}} myIshur valiIshur status mesimabetahaliches{data{id}}}}}
+                tafkidims {data{ id attributes{ roleDescription ${
+                  $lang == 'he'
+                    ? 'localizations{data {attributes{ roleDescription}} }'
+                    : ''
+                } }}}
+             admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks 
+             users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
             open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     acts{data{id attributes{shem dateS}}}
@@ -1334,6 +1335,7 @@
     }
     import { onDestroy } from 'svelte';
   import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
+  import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1619,8 +1621,8 @@ function add(event){
               {/key}
             {:else if a === 9}
             <span class="text-gold">
-              בבניה , בקרוב יהיה כאן תפריט שיאפשר לך לצרף את המטלה לאחת המשימות שלך
             </span>
+            <ChooseM {bmiData} taskId={who} on:close={closer}/>
             {/if}
           </div></DialogContent
         >
@@ -2334,8 +2336,7 @@ pointer-events: none;"
    
             />
           </div>
-{:else if tab === 9}
-<ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>          
+        
 {:else if tab === 7}
           <Hamatanot
               {trili}
@@ -2354,6 +2355,8 @@ pointer-events: none;"
               >
                 <Sidur />
               </div>
+{:else if tab === 9}
+  <ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>                
          
 {/if}              
           </div>
@@ -2425,7 +2428,7 @@ pointer-events: none;"
                 </h2>
               {/if}
             </div>
-          <!--הכל בחלונות נפתחים-->
+          <!-- TODO: הכל בחלונות נפתחים-->
           <div class=" m-4">
             {#if pmiData.length > 0}
               <span bind:this={pendss}>

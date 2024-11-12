@@ -362,6 +362,16 @@ export const qids = {
       }
     }
   }
-}`
+}`,
+"31updateTask": `mutation UpdateTask($id: ID!, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
+     updateAct(id: $id,
+      data: {
+             isAssigned: $isAssigned,
+              my:$uid,
+              mesimabetahaliches: $mesimabetahaliches
+                  }
+    
+  ) {data{id attributes{ shem my {data{id}}}}}
+}`,
 
 };
