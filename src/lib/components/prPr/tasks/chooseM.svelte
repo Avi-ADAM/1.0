@@ -52,6 +52,7 @@
         loading = false
         error = true
     });
+    //TODO: update task on table directly or from io connection
   };
   export let bmiData = [];
   let filtered = bmiData.filter(

@@ -342,7 +342,7 @@
   class="w-full px-2 text-center bg-gold dark:bg-barbi dark:text-gold text-barbi"
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
 >
-  <div class="flex flex-row">
+  <div class="flex flex-row max-w-full overflow-x-auto d">
     <button on:click={() => handleFilterClick(0)}>
       {#key isMyTasksActive}
         <Tile
