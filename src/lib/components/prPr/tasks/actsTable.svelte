@@ -214,24 +214,32 @@
 
   function handleFilterClick(filterIndex) {
     console.log(`Filter ${filterIndex} clicked`,filters);
-    if (filters) {
-      filters.forEach((f, index) => {
-        if (index !== filterIndex) {
-          f.active = false;
-        }
-      });
-      filters[filterIndex].active = !filters[filterIndex].active;
-      filters = [...filters]; // אכיפת עדכון ריאקטיבי
+    if (filters[filterIndex].active) { // אם הפילטר כבר פעיל, ננקה את כל הפילטרים
+        filters.forEach(f => f.active = false);
+        isMyTasksActive = false;
+        isCreatedByMeActive = false;
+        isUnassignedActive = false;
+        filtersUi.forEach(f => f.checked = false);
+        filtersUi = filtersUi; // אכיפת עדכון ריאקטיבי
+        filters = [...filters];
+    } else {
+        filters.forEach((f, index) => {
+            if (index !== filterIndex) {
+                f.active = false;
+            }
+        });
+        filters[filterIndex].active = !filters[filterIndex].active;
+        filters = [...filters]; // אכיפת עדכון ריאקטיבי
 
-      console.log(
-        `Filter ${filterIndex} clicked, new state:`,
-        filters[filterIndex].active,
-        isMyTasksActive,
-        isCreatedByMeActive,
-        isUnassignedActive
-      );
-      console.log('Filtered acts count:', filteredActs.length);
-    }
+        console.log(
+            `Filter ${filterIndex} clicked, new state:`,
+            filters[filterIndex].active,
+            isMyTasksActive,
+            isCreatedByMeActive,
+            isUnassignedActive
+        );
+        console.log('Filtered acts count:', filteredActs.length);
+    
     if (filterIndex === 0) {
       isMyTasksActive = true;
       isCreatedByMeActive = false; // מתחיל דלוק
@@ -269,6 +277,7 @@
           }
       }
       filtersUi = filtersUi;
+    }
     }
     updateFilteredActs();
 
