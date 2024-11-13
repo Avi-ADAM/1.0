@@ -10,7 +10,7 @@ import { Ask } from './ask.svelte';
 import { SendTo } from '$lib/send/sendTo.svelte';
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 async function x(id,kind,taid){
-    console.log(id,kind)
+    console.log(id,kind,"13 server")
     if (kind == "ask"){
               console.log('here');
       await Ask(id,taid)

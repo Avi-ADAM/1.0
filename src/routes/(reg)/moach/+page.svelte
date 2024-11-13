@@ -237,6 +237,12 @@
             descripFor
             publicDescription
              acts{data{id attributes{shem
+               tafkidims {data{ id attributes{ roleDescription ${
+                $lang == 'he'
+                  ? 'localizations{data {attributes{ roleDescription}} }'
+                  : ''
+              } }}}
+                  isAssigned
                 open_mission{data{id attributes {name}}}
                 pendm{data{id attributes{name}}}
                  dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}} myIshur valiIshur status mesimabetahaliches{data{id 
@@ -250,14 +256,15 @@
             mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
              id attributes{ status  iskvua 
                           forums{data{id}}
-
-            acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahaliches{data{id}}}}}
-              tafkidims {data{ id attributes{ roleDescription ${
-                $lang == 'he'
-                  ? 'localizations{data {attributes{ roleDescription}} }'
-                  : ''
-              } }}}
-              admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
+              acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}}
+               des dateF vali{data{id}} myIshur valiIshur status mesimabetahaliches{data{id}}}}}
+                tafkidims {data{ id attributes{ roleDescription ${
+                  $lang == 'he'
+                    ? 'localizations{data {attributes{ roleDescription}} }'
+                    : ''
+                } }}}
+             admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks 
+             users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
             open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
                                     privatlinks publicklinks
                                     acts{data{id attributes{shem dateS}}}
@@ -1203,6 +1210,9 @@
     } else if (is == 'openM') {
       isOpen = true;
       a = 6;
+    }else if(is == "assign"){
+      isOpen = true;
+      a = 9
     }
   }
   let hover = false;
@@ -1329,8 +1339,7 @@
     }
     import { onDestroy } from 'svelte';
   import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
-
-  
+  import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1556,7 +1565,7 @@ function add(event){
         style="z-index: 700;"
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
-        <DialogContent aria-label="form" class="{a != 8 ? "content" :"chat"}">
+        <DialogContent aria-label="form" class="{a != 8 ? a != 5 ? "content" : "betha" :"chat"}">
           <div style="z-index: 400;"      dir="{$lang == "he" ? "rtl" : "ltr"}"
           >
             <button
@@ -1615,6 +1624,10 @@ function add(event){
                 {ani}
               />
               {/key}
+            {:else if a === 9}
+            <span class="text-gold">
+            </span>
+            <ChooseM {bmiData} taskId={who} on:close={closer}/>
             {/if}
           </div></DialogContent
         >
@@ -1860,7 +1873,7 @@ pointer-events: none;"
         <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
         class="flex items-center justify-center">
           <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
-          class="flex -space-x-2 overflow-hidden">
+          class="flex -space-x-2 ">
             {#each projectUsers as user}
               <button
                 title={user.attributes.username}
@@ -2328,8 +2341,7 @@ pointer-events: none;"
    
             />
           </div>
-{:else if tab === 9}
-<ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>          
+        
 {:else if tab === 7}
           <Hamatanot
               {trili}
@@ -2348,6 +2360,8 @@ pointer-events: none;"
               >
                 <Sidur />
               </div>
+{:else if tab === 9}
+  <ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>                
          
 {/if}              
           </div>
@@ -2419,7 +2433,7 @@ pointer-events: none;"
                 </h2>
               {/if}
             </div>
-          <!--הכל בחלונות נפתחים-->
+          <!-- TODO: הכל בחלונות נפתחים-->
           <div class=" m-4">
             {#if pmiData.length > 0}
               <span bind:this={pendss}>

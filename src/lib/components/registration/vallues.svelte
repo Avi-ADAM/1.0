@@ -218,7 +218,7 @@ const newOb = meData.data.createVallue.data;
 {/if}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
-    
+     liSelectedStyle="z-index: 1000;"
       --sms-width={"50vw"}
       createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}

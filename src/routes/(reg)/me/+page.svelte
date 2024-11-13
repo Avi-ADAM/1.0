@@ -60,6 +60,9 @@
   let st = $state(0);
   let stylef = $state('31px');
   let meData = $state(start());
+    function isUCBrowser() {
+    return /UCWEB|UCBrowser/i.test(navigator.userAgent);
+}
   function letters(data) {
     if (data.length >= 2 && data.length < 4) {
       st = 185;
@@ -108,11 +111,17 @@
       st = 125;
       stylef = '14px';
     }
-    // if ((/[\u0590-\u05FF]/).test(data) | (/[\u0600-\u06FF]/).test(data)) {
-    //  st += 20;
-    //  }
-  }
-  //
+   if ((/[\u0590-\u05FF]/).test(data) | (/[\u0600-\u06FF]/).test(data)) {
+    st += 20;
+    if (isUCBrowser()) {
+    meData.username =  reverseString(meData.username)
+    meData = meData;
+    }
+    }
+   
+}
+//
+
   function sendP() {
     const cookieValue = document.cookie
       .split('; ')
