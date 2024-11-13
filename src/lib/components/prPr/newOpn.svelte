@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Mixing old (on:mouseenter) and new syntaxes for event handling is not allowed. Use only the onmouseenter syntax -->
 <script>
 	import  RichText from '$lib/celim/ui/richText.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';

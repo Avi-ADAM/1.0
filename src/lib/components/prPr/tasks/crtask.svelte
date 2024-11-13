@@ -1,15 +1,9 @@
 <script>
-  export let bmiData = [],
-    proles = [];
   import { idPr } from '$lib/stores/idPr.js';
   import moment from 'moment';
   import { createEventDispatcher, onMount } from 'svelte';
-  let isPersonal = true;
-  export let id;
-  export let misid;
-  export let fromMis = false;
-  export let editdata = -1;
-  let isEdit = false;
+  let isPersonal = $state(true);
+  let isEdit = $state(false);
   onMount(() => {
     console.log(editdata);
     if (editdata != -1) {
@@ -32,21 +26,48 @@
   });
 
   const dispatch = createEventDispatcher();
-  export let userMevatzeaId,
-    userMevakeshId,
-    mimatai,
-    adMatai,
-    name = '',
-    teur = '',
-    selected = [],
-    link = '';
-  let seEr = false,
-    neEr = false;
+  let seEr = $state(false),
+    neEr = $state(false);
   import MultiSelect from 'svelte-multiselect';
   import SveltyPicker from 'svelty-picker';
 
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [bmiData]
+   * @property {any} [proles]
+   * @property {any} id
+   * @property {any} misid
+   * @property {boolean} [fromMis]
+   * @property {any} [editdata]
+   * @property {any} userMevatzeaId
+   * @property {any} userMevakeshId
+   * @property {any} mimatai
+   * @property {any} adMatai
+   * @property {string} [name]
+   * @property {string} [teur]
+   * @property {any} [selected]
+   * @property {string} [link]
+   */
+
+  /** @type {Props} */
+  let {
+    bmiData = [],
+    proles = [],
+    id,
+    misid,
+    fromMis = false,
+    editdata = -1,
+    userMevatzeaId = $bindable(),
+    userMevakeshId = $bindable(),
+    mimatai = $bindable(),
+    adMatai = $bindable(),
+    name = $bindable(''),
+    teur = $bindable(''),
+    selected = $bindable([]),
+    link = $bindable('')
+  } = $props();
   function find_tafkidims_id (selected){
     let arr = []
     for(let i = 0; i < selected.length; i++){
@@ -77,9 +98,9 @@
   const baseUrl = import.meta.env.VITE_URL;
 
   let linkg = baseUrl + '/graphql';
-  let loading = false;
-  let success = false;
-  let error = false;
+  let loading = $state(false);
+  let success = $state(false);
+  let error = $state(false);
   async function sub() {
     loading = true;
     if (fromMis == false) {
@@ -365,7 +386,7 @@
     color: var(--gold);
     /* selected options in the dropdown list */
   }
-  :global(li:not(.selected):hover) {
+  :global(li:not(:global(.selected)):hover) {
     color: var(--barbi-pink);
     background-color: var(
       --lturk
