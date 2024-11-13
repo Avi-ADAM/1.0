@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected token -->
 <!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
 <!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
 <script>
@@ -56,7 +55,7 @@ const dispatch = createEventDispatcher();
 
   // import required modules
   import {Manipulation, Mousewheel, Keyboard, EffectFade , Navigation} from "swiper";//, Virtual
-  exprt let low = false;
+  export let low = false;
   export let cards = true;
    import Switch from './../../../celim/switch.svelte'
   import DecisionMaking from '../decisionMaking.svelte';
@@ -157,7 +156,7 @@ function hoverc (id){
 
   dispatch("hover", {id: u});
 }
-const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל',"en" : 'Navigation: right side, bottom'}
+const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות ��שמאל',"en" : 'Navigation: right side, bottom'}
 $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
 
 function showonly(event) {
