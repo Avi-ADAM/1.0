@@ -134,7 +134,7 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
                         <button class:active={active} disabled={!$validity.valid}
                         class="center hover:scale-150 bt "    
                      ></button>
-                     <button class="text-gold bg-barbi px-3 py-1 rounded-md hover:text-barbi hover:bg-gold" on:click={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
+                     <button class="text-gold bg-barbi px-1 py-1 rounded-md hover:text-barbi hover:bg-gold" on:click={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
                      </div>
                   </div>
                 </form>
