@@ -435,7 +435,7 @@
       class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded px-2 py-1"
       > <AddImg/>
       {#if psrc}
-      <img class="rounded-full" height="40" width="40" src={psrc} alt="choosen image"/>
+      <image class="rounded-full" height="40" width="40" src={psrc} alt="choosen image"/>
       {/if}
       </button>
   {:else}

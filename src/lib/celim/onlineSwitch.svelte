@@ -6,7 +6,7 @@
     
     function click() {
       checked = !checked;
-      dispatch('change', { checked });
+      change(checked);
     }
   </script>
   

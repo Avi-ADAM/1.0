@@ -6,9 +6,9 @@ import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
   let htmlon = $state(``)
 
-  /** @type {{state?: number, kindOf: any, lebel?: any, kindOfb?: any, long?: boolean}} */
+  /** @type {{stateKindOf?: number, kindOf: any, lebel?: any, kindOfb?: any, long?: boolean}} */
   let {
-    state = 2,
+    stateKindOf = 2,
     kindOf,
     lebel = {"he":"עריכה", "en": "edit"},
     kindOfb = $bindable(kindOf),

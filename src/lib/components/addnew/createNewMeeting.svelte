@@ -1,7 +1,5 @@
 <script>
   import {username} from '$lib/stores/pendMisMes'
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
   import {page} from '$app/stores'
   import Close from "$lib/celim/close.svelte";
   import Button from "$lib/celim/ui/button.svelte";
@@ -21,7 +19,7 @@ import TextInput from "$lib/celim/ui/input/textInput.svelte";
   "en":	"For the magic to happen, you have to update the status to live when you are avauilable for the meeting, you can update it in the top or through our telegram bot."} 
    let name = $state();
    let sucsses = $state(false);
-  
+   let {close} = $props();
    let loadingBtn = $state(false);
   
    let error = $state(false);
@@ -65,7 +63,7 @@ let me = $page.data.uid
               if(selected.indexOf(us) == selected.length - 1){
                 loadingBtn = false
                 sucsses = true
-                setTimeout(()=>{dispatch("close")}, 5000)
+                setTimeout(()=>{close()}, 5000)
               }
 
             }
@@ -79,7 +77,7 @@ let me = $page.data.uid
               if(selected.indexOf(us) == selected.length - 1){
                 loadingBtn = false
                 sucsses = true
-                setTimeout(()=>{dispatch("close")}, 5000)
+                setTimeout(()=>{close()}, 5000)
               }
 
             }

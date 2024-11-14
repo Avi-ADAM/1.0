@@ -22,9 +22,9 @@ onMount(()=>{
 })
 let edit = $state(false)
 let show2 = $state(false)
-  /** @type {{state?: number, date: any, lebel?: any, long?: boolean, dateb?: any}} */
+  /** @type {{stateDate?: number, date: any, lebel?: any, long?: boolean, dateb?: any}} */
   let {
-    state = 2,
+    stateDate = 2,
     date,
     lebel = {"he":"עריכה", "en": "edit"},
     long = false,

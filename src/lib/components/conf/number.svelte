@@ -1,124 +1,153 @@
 <script>
-    import RangeSlider from "svelte-range-slider-pips";
-    import Barb from './barb.svelte'
-    import tr from '$lib/translations/tr.json'
+  import RangeSlider from 'svelte-range-slider-pips';
+  import Barb from './barb.svelte';
+  import tr from '$lib/translations/tr.json';
 
   import Close from '$lib/celim/close.svelte';
-import { lang } from '$lib/stores/lang.js'
-  /** @type {{status?: any, splebel?: any, state?: number, number: any, numberb?: any, lebel: any}} */
+  import { lang } from '$lib/stores/lang.js';
+  /** @type {{status?: any, splebel?: any, stateNumber?: number, number: any, numberb?: any, lebel: any}} */
   let {
-    status = [10,20],
+    status = [10, 20],
     splebel = null,
-    state = 2,
+    stateNumber = 2,
     number,
     numberb = $bindable(number),
     lebel
   } = $props();
-let datai = $derived([{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}])
-    let edit = $state(false)
-let show2 = $state(false)
-function checkAll(a,b){
-  datai[0].value = b
-  datai[1].value = a
-}
+  let datai = $derived([
+    { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: 100 },
+    { leb: `${tr?.nego?.original[$lang]},${number}`, value: 1000 }
+  ]);
+  let edit = $state(false);
+  let show2 = $state(false);
+  function checkAll(a, b) {
+    datai[0].value = b;
+    datai[1].value = a;
+  }
 </script>
-    <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
- {#if edit == false}
+
+<div
+  class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
+>
+  {#if edit == false}
     <div class="flex hi flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{lebel}: <span class:line-through={splebel == false}
-           class:text-barbi={splebel == false}
-           class:text-wow={splebel == true}
-           class:hidden={splebel == null}>{tr?.mission.perMonth[$lang]}</span></h2>
-       {#if number == numberb} 
-       <p class="text-gold">{number}</p>
-       {:else}
-       <div dir="rtl" class='w-1/2 mx-auto'>
-       <Barb {datai} />
-       </div>
-        {/if}
-       <button onclick={()=>edit = true}>
-            {#if number == numberb}🖍️{:else}✏️{/if}</button>
-        {#if number != numberb && show2 != true}
-        <button onclick={()=>show2 = true}>📑</button>
-        {:else if show2 == true}
-        <div class="flex flex-col align-middle justify-center ">
-        <button onclick={()=>show2 = false}><Close/></button>
-        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
-        <p>{number}</p>
-        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
-        <p class="text-gold">{numberb}</p>
+      <h2 class="underline decoration-mturk">
+        {lebel}:
+        <span
+          class:line-through={splebel == false}
+          class:text-barbi={splebel == false}
+          class:text-wow={splebel == true}
+          class:hidden={splebel == null}>{tr?.mission.perMonth[$lang]}</span
+        >
+      </h2>
+      {#if number == numberb}
+        <p class="text-gold">{number}</p>
+      {:else}
+        <div dir="rtl" class="w-1/2 mx-auto">
+          <Barb {datai} />
         </div>
-        {/if}
+      {/if}
+      <button onclick={() => (edit = true)}>
+        {#if number == numberb}🖍️{:else}✏️{/if}</button
+      >
+      {#if number != numberb && show2 != true}
+        <button onclick={() => (show2 = true)}>📑</button>
+      {:else if show2 == true}
+        <div class="flex flex-col align-middle justify-center">
+          <button onclick={() => (show2 = false)}><Close /></button>
+          <small class:text-right={$lang == 'he'}
+            >{tr?.nego.original[$lang]}:</small
+          >
+          <p>{number}</p>
+          <small class:text-right={$lang == 'he'} class="text-gold"
+            >{tr?.nego.sugestion[$lang]}:</small
+          >
+          <p class="text-gold">{numberb}</p>
         </div>
-  {:else} 
-  <!--    
+      {/if}
+    </div>
+  {:else}
+    <!--    
 <RangeSlider bind:values={status} pipstep="20" float pips all="label" hoverable />
---> 
-<div dir="rtl" class='textinput max-w-sm mx-auto'>
-  <input type="number"  id="numberb" name="numberb" bind:value={numberb} class='input' required>
-  <label for="numberb" class='label' >{lebel}</label>
-  <span class='line '></span>
-</div><button onclick={()=>{if(Number(numberb) >= 0){ edit = false
-checkAll(number,numberb)
-} else{
-  console.log(numberb,Number(numberb))
-  alert(tr.common.noLesFromZero[$lang])
-}}}>✅</button>
-{/if}
+-->
+    <div dir="rtl" class="textinput max-w-sm mx-auto">
+      <input
+        type="number"
+        id="numberb"
+        name="numberb"
+        bind:value={numberb}
+        class="input"
+        required
+      />
+      <label for="numberb" class="label">{lebel}</label>
+      <span class="line"></span>
+    </div>
+    <button
+      onclick={() => {
+        if (Number(numberb) >= 0) {
+          edit = false;
+          checkAll(number, numberb);
+        } else {
+          console.log(numberb, Number(numberb));
+          alert(tr.common.noLesFromZero[$lang]);
+        }
+      }}>✅</button
+    >
+  {/if}
 </div>
+
 <style>
-     .textinput {
-  position: relative;
-  width: 100%;
-  display: block;
-}
+  .textinput {
+    position: relative;
+    width: 100%;
+    display: block;
+  }
 
-.input {
+  .input {
+    border: none;
+    margin: 0;
+    padding: 10px 0;
+    outline: none;
+    border-bottom: solid 1px var(--mturk);
+    font-size: 15px;
+    margin-top: 12px;
+    width: 100%;
+    color: var(--barbi-pink);
+    -webkit-tap-highlight-color: transparent;
+    background: transparent;
+  }
 
-  border: none;
-  margin: 0;
-  padding: 10px 0;
-  outline: none;
-  border-bottom: solid 1px var(--mturk);
-  font-size: 15px;
-  margin-top: 12px;
-  width: 100%;
- color:  var(--barbi-pink);
-  -webkit-tap-highlight-color: transparent;
-  background: transparent;
-}
+  .label {
+    font-size: 15px;
+    position: absolute;
+    right: 0;
+    top: 22px;
+    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+    pointer-events: none;
+    color: var(--mturk);
+    user-select: none;
+  }
 
+  .line {
+    height: 2px;
+    background-color: #2196f3;
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  }
 
-.label {
+  .input:focus ~ .line,
+  .input:valid ~ .line {
+    width: 100%;
+  }
 
-  font-size: 15px;
-  position: absolute;
-  right: 0;
-  top: 22px;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-  pointer-events: none;
-  color:var(--mturk);
-  user-select: none;
-}
-
-.line {
-  height: 2px;
-  background-color: #2196F3;
-  position: absolute;
-  transform: translateX(-50%);
-  left: 50%;
-  bottom: 0;
-  width: 0;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-}
-
-.input:focus ~ .line, .input:valid ~ .line {
-  width: 100%;
-}
-
-.input:focus ~ .label, .input:valid ~ .label {
-  font-size: 11px;
-  color: var(--barbi-pink);
-  top: 0;
-} 
+  .input:focus ~ .label,
+  .input:valid ~ .label {
+    font-size: 11px;
+    color: var(--barbi-pink);
+    top: 0;
+  }
 </style>
