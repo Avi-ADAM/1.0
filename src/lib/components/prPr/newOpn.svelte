@@ -1,6 +1,7 @@
 <!-- @migration-task Error while migrating Svelte code: Mixing old (on:mouseenter) and new syntaxes for event handling is not allowed. Use only the onmouseenter syntax -->
 <!-- @migration-task Error while migrating Svelte code: Mixing old (on:mouseenter) and new syntaxes for event handling is not allowed. Use only the onmouseenter syntax -->
 <!-- @migration-task Error while migrating Svelte code: Mixing old (on:mouseenter) and new syntaxes for event handling is not allowed. Use only the onmouseenter syntax -->
+<!-- @migration-task Error while migrating Svelte code: Mixing old (on:mouseenter) and new syntaxes for event handling is not allowed. Use only the onmouseenter syntax -->
 <script>
 	import  RichText from '$lib/celim/ui/richText.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
@@ -110,8 +111,8 @@ bg-gray-700">
     <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4 ">
         {#each data.skills.data as skill}
         <p 
-        on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
-        on:mouseleave={()=>hover("0")}  >
+        onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
+        onmouseleave={()=>hover("0")}  >
             <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
                 </div>
@@ -120,14 +121,15 @@ bg-gray-700">
                 <small class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</small>
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each data.tafkidims.data as rol}
-                    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                    <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
     <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol.attributes.roleDescription} wow={true}/></p>{/each}
       </div>
       {/if}
       {#if data.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each data.work_ways.data as rol}
-          <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+          <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} 
+            onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false} word={rol.attributes.workWayName}/>
           </p>
           {/each}

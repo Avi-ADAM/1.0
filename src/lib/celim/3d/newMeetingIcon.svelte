@@ -1,4 +1,3 @@
-<!-- src/routes/CreateNewMeetingIcon.svelte -->
 <script>
     import * as THREE from 'three';
   import { T } from '@threlte/core';

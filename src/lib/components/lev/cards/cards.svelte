@@ -1,7 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
-<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
-<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
-<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
 <script>
   import { page } from '$app/stores';
   import Lowding from '$lib/celim/lowding.svelte';
@@ -30,7 +26,7 @@
   import 'swiper/css/keyboard';
   import 'swiper/css/mousewheel';
   import './stylec.css';
-  let currentIndex = 0;
+  let currentIndex = $state(0);
   let swiperInstance;
 
   /*
@@ -106,7 +102,7 @@
   import DecisionMaking from '../decisionMaking.svelte';
   import Filter from './filter.svelte';
   import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
-  let h;
+  let h = $state(0);
 
   let swiperRef = null;
 
@@ -141,8 +137,8 @@
     //
 
     start({cards: false,
-      ani: event.detail.ani,
-      coinlapach: event.detail.coinlapach
+      ani: event.ani,
+      coinlapach: event.coinlapach
   })
     // let oldob = arr1;
     // const x = oldob.map(c => c.coinlapach);
@@ -195,13 +191,13 @@
     hoverEvent({ id: u });
   }
   const nav = {
-    he: 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות ��שמאל',
+    he: 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות משמאל',
     en: 'Navigation: right side, bottom'
   };
   $effect(() => console.log('AAAAAA', $page.data.isDesktop, $page.data));
 
   function showonly(event) {
-    const value = event.detail.data;
+    const value = event.data;
     for (const key in milon) {
       milon[key] = false;
     }
@@ -397,14 +393,14 @@
                 {:else if buble.ani === 'pmashes' && milon.ppmash == true}
                   <SwiperSlide class="swiper-slidec"
                     ><PendingMa
-                      on:hover={hover}
-                      on:proj={proj}
-                      on:user={user}
+                      hover={hover}
+                      proj={proj}
+                      user={user}
                       cards="true"
                       isVisible={currentIndex === i}
                       {low}
                       coinlapach={buble.coinlapach}
-                      on:coinLapach={delo}
+                      coinLapach={delo}
                       restime={buble.restime}
                       ordern={buble.orderon}
                       timegramaId={buble.timegramaId}
@@ -439,10 +435,10 @@
                 {:else if buble.ani === 'pends' && milon.pend == true}
                   <SwiperSlide class="swiper-slidec"
                     ><PendingM
-                      on:hover={hover}
-                      on:proj={proj}
-                      on:user={user}
-                      on:coinLapach={delo}
+                      hover={hover}
+                      proj={proj}
+                      user={user}
+                      coinLapach={delo}
                       timegramaId={buble.timegramaId}
                       {low}
                       isVisible={currentIndex === i}
@@ -489,12 +485,12 @@
                 {:else if buble.ani === 'wegets' && milon.pmaap == true}
                   <SwiperSlide class="swiper-slidec"
                     ><Weget
-                      on:acsept={delo}
+                      acsept={delo}
                       cards="true"
-                      on:decline={delo}
-                      on:hover={hover}
-                      on:proj={proj}
-                      on:user={user}
+                      decline={delo}
+                      hover={hover}
+                      proj={proj}
+                      user={user}
                       {low}
                       isVisible={currentIndex === i}
                       coinlapach={buble.coinlapach}
@@ -539,11 +535,11 @@
                 {:else if buble.ani === 'fiapp' && milon.fiap == true}
                   <SwiperSlide class="swiper-slidec"
                     ><Fiappru
-                      on:acsept={delo}
-                      on:decline={delo}
-                      on:hover={hover}
-                      on:proj={proj}
-                      on:user={user}
+                      acsept={delo}
+                      decline={delo}
+                      hover={hover}
+                      proj={proj}
+                      user={user}
                       cards="true"
                       {low}
                       isVisible={currentIndex === i}
@@ -596,11 +592,11 @@
    -->{:else if buble.ani === 'askedcoin' && milon.asks == true}
                   <SwiperSlide class="swiper-slidec"
                     ><Reqtojoin
-                      on:acsept={delo}
-                      on:hover={hover}
-                      on:proj={proj}
-                      on:user={user}
-                      on:decline={delo}
+                      acsept={delo}
+                      hover={hover}
+                      proj={proj}
+                      user={user}
+                      decline={delo}
                       cards="true"
                       isVisible={currentIndex === i}
                       iskvua={buble.iskvua}
@@ -646,13 +642,13 @@
                 {:else if buble.ani === 'askedm' && milon.askmap == true}
                   <SwiperSlide class="swiper-slidec"
                     ><Reqtom
-                      on:acsept={delo}
-                      on:decline={delo}
-                      on:hover={hover}
-                      on:proj={proj}
+                      acsept={delo}
+                      decline={delo}
+                      hover={hover}
+                      proj={proj}
                       cards="true"
-                      on:user={user}
-                      on:chat={chat}
+                      user={user}
+                      chat={chat}
                       isVisible={currentIndex === i}
                       {low}
                       pid={buble.pid}
@@ -692,10 +688,10 @@
                 {:else if buble.ani === 'meData' && milon.sugg == true}
                   <SwiperSlide class="swiper-slidec"
                     ><ProjectSuggestor
-                      on:less={delo}
-                      on:hover={hover}
-                      on:proj={proj}
-                      on:user={user}
+                      less={delo}
+                      hover={hover}
+                      proj={proj}
+                      user={user}
                       isVisible={currentIndex === i}
                       coinlapach={buble.coinlapach}
                       {low}
@@ -730,11 +726,11 @@
                 {:else if buble.ani === 'huca' && milon.pmashs == true}
                   <SwiperSlide class="swiper-slidec"
                     ><Mashsug
-                      on:less={delo}
+                      less={delo}
                       cards="true"
-                      on:hover={hover}
-                      on:proj={proj}
-                      on:user={user}
+                      hover={hover}
+                      proj={proj}
+                      user={user}
                       messege={buble.messege}
                       {i}
                       isVisible={currentIndex === i}
@@ -764,12 +760,12 @@
                 {:else if buble.ani === 'hachla' && milon.hachla == true}
                   <SwiperSlide class="swiper-slidec"
                     ><DecisionMaking
-                      on:acsept={delo}
-                      on:decline={delo}
-                      on:hover={hover}
-                      on:proj={proj}
+                      acsept={delo}
+                      decline={delo}
+                      hover={hover}
+                      proj={proj}
                       cards="true"
-                      on:chat={chat}
+                      chat={chat}
                       timegramaDate={buble.timegramaDate}
                       timegramaId={buble.timegramaId}
                       restime={buble.restime}
