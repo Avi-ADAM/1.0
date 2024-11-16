@@ -23,7 +23,7 @@ function decline(alr) {
   already = true; 
 dispatch("decline",{alr:alr});
 }
-let isScrolable = false; 
+let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();

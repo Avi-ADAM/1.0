@@ -55,7 +55,7 @@ dispatch("tochat");
       "formonth":{"he":"בכל חודש","en":"every month"}
     }
     const timero = {"he":"מונה זמן לסיום הדיון", "en":"time counter for end of discution"}
-    let isScrolable = false; 
+    let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();

@@ -61,7 +61,7 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
 
 console.log(workways)
 $: console.log("ACTS: ",acts)
-let isScrolable = false; 
+let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();

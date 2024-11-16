@@ -46,7 +46,7 @@ const units = {"he":"יחידות","en":"units"}
 const oneunit = {"he":"יחידה אחת","en":"one unit"}
 const head = {"he":"אישור קבלת משאב בהצלחה","en":"approval of getting a resorce sucsessfully"}
 const totalinfavor = {"he":"סך ההצבעות בעד","en":"total votes in favor"}
-let isScrolable = false; 
+let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();

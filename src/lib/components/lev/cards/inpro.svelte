@@ -53,7 +53,7 @@ const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric
 console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
 $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`}
-let isScrolable = false; 
+let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();
@@ -67,16 +67,7 @@ function preventSwiperScroll(event) {
     }
   }
 </script>
-{#key isVisible}
-{#if tasks.length > 0}
-  <div 
-  on:click={opentask} 
-  on:keypress={opentask}
-  role="button"
-  tabindex="0"
-  class="absolute inline-flex items-center justify-center w-8 h-8 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-[3%] {$lang == "en" ? "right-[3%]" : "left-[3%]"}  dark:border-gray-700">{tasks.length}</div>
-  {/if}
-  {/key}
+
 <div on:wheel={preventSwiperScroll} 
 on:touchmove={preventTouchScroll}
 on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
@@ -97,6 +88,16 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
             <span style=" text-shadow: 1px 1px white;" class=" ml-1 sm:text-2xl text-sm text-barbi ">{projectName}</span>
          </div>
          </div>
+         {#key isVisible}
+{#if tasks.length > 0}
+  <div 
+  on:click={opentask} 
+  on:keypress={opentask}
+  role="button"
+  tabindex="0"
+  class=" inline-flex items-center justify-center w-8 h-8 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full  dark:border-gray-700 p-2 m-2">{tasks.length}</div>
+  {/if}
+  {/key}
          </div>
   <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div   class="mb-8">

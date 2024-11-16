@@ -35,7 +35,7 @@ const tri = import('$lib/translations/tr.json')
 const neged ={"he":"נגד","en":"against"}
 const bead = {"he":"בעד","en":"in favor"}
 const notyet = {"he":"טרם","en":"not yet"}
-let isScrolable = false; 
+let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();

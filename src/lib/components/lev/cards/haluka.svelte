@@ -31,7 +31,7 @@ function tochat (){
 dispatch("tochat");
 }
 const tri = import('$lib/translations/tr.json')
-let isScrolable = false; 
+let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();

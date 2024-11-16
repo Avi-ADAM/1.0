@@ -41,7 +41,7 @@ const askedVal = {
     "he":"הצעה לשיתוף משאב בריקמה",
     "en":"Suggestion for sharing a reasurce with a FreeMates"
   }
-  let isScrolable = false; 
+  let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();

@@ -32,7 +32,7 @@ dispatch("chat");
 const leho = {"he":" בכל חודש " , "en": " per month"}
 
 const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en":"appruval of joining and mission assigned"}
-let isScrolable = false; 
+let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();
