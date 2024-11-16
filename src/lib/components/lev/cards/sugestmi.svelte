@@ -61,17 +61,26 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
 
 console.log(workways)
 $: console.log("ACTS: ",acts)
-let isScrolable = !isMobileOrTablet() 
-   function preventSwiperScroll(event) {
-    console.log("Stopping",isScrolable)
-   if(isScrolable == true)
-      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+let isScrolable = false; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
   }
 </script>
 
 
 <div on:wheel={preventSwiperScroll} 
-on:click={() => (isScrolable = !isScrolable)}
+on:wheel={preventSwiperScroll} 
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"
 tabindex="0" 
 on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d  leading-normal  dark:bg-slate-800  {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''}  leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">

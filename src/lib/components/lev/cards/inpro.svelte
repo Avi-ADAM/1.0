@@ -53,10 +53,18 @@ const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric
 console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
 $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`}
-let isScrolable = !isMobileOrTablet() 
-   function preventSwiperScroll(event) {
-   if(isScrolable == true)
-      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+let isScrolable = false; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
   }
 </script>
 {#key isVisible}
@@ -70,7 +78,8 @@ let isScrolable = !isMobileOrTablet()
   {/if}
   {/key}
 <div on:wheel={preventSwiperScroll} 
-on:click={() => (isScrolable = !isScrolable)}
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"
 tabindex="0" 
 on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal w-[90%] h-[90%] {isScrolable ? "bg-white" : "bg-gray-200"} lg:w-[90%]">

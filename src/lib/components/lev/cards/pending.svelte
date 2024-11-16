@@ -55,10 +55,18 @@ dispatch("tochat");
       "formonth":{"he":"בכל חודש","en":"every month"}
     }
     const timero = {"he":"מונה זמן לסיום הדיון", "en":"time counter for end of discution"}
-    let isScrolable = !isMobileOrTablet() 
-   function preventSwiperScroll(event) {
-   if(isScrolable == true)
-      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+    let isScrolable = false; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
   }
 </script>
 
@@ -66,7 +74,8 @@ dispatch("tochat");
 <div
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
   on:wheel={preventSwiperScroll} 
-  on:click={() => (isScrolable = !isScrolable)}
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
   role="button"
   tabindex="0" 
   on:keypress={preventSwiperScroll}

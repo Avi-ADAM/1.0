@@ -32,16 +32,25 @@ dispatch("chat");
 const leho = {"he":" בכל חודש " , "en": " per month"}
 
 const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en":"appruval of joining and mission assigned"}
-let isScrolable = !isMobileOrTablet() 
-   function preventSwiperScroll(event) {
-   if(isScrolable == true)
-      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+let isScrolable = false; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
   }
 </script>
 
 
 <div on:wheel={preventSwiperScroll} 
-on:click={() => (isScrolable = !isScrolable)}
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"
 tabindex="0" 
 on:keypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%] d">
