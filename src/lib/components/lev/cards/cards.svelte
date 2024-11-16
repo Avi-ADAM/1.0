@@ -60,6 +60,7 @@ const dispatch = createEventDispatcher();
   import DecisionMaking from '../decisionMaking.svelte';
   import Filter from './filter.svelte';
   import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device';
   let h ;
 
 export let askedarr = [], declineddarr = [], arr1 = [];
@@ -173,6 +174,7 @@ function showall(event) {
 }
 let filter = false
 const filterT = {"he":"מיון","en":"filter"}
+$: console.log(isMobileOrTablet())
 </script>
 <style>
 
@@ -187,7 +189,7 @@ const filterT = {"he":"מיון","en":"filter"}
 
 .bg{
         position: absolute;
-        top: 95% ;
+        top: 97% ;
         left: 50%;
       transform: translate(-50%, -50%);
     }
@@ -232,15 +234,17 @@ on:mouseleave={()=> hoverc("0")}>
        {#if arr1.length > 0}
 <div     dir="{$lang == "he" ? "rtl" : "ltr"}" bind:clientWidth={h}
  class="body box-border h-screen">
+ {#if !isMobileOrTablet()}
      <img on:mouseenter={()=> hoverc(nexttitle[$lang])} 
 on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "perv" : "	next"	}" src="{srcb[$lang]}" alt="{$lang == "he" ? "חזרה" : "	next"	}"/>
 
         <img on:mouseenter={()=> hoverc(pretitle[$lang])} 
 on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src="{srca[$lang]}" alt="{$lang == "he" ? "הבא" : "	next"	}"/>
-    <div   
+{/if}   
+<div   
       dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
- style:visibility={low == true  ? "hidden":  "visible"} class="bg">
+ style:visibility={low == true  ? "hidden":  "visible"} class="bg z-[1000]">
  
  <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
 
@@ -248,7 +252,7 @@ on:mouseleave={()=> hoverc("0")}
 <div   
 dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc(filterT[$lang])} 
 on:mouseleave={()=> hoverc("0")} 
-style:visibility={low == true  ? "hidden":  "visible"} class="top-0 absolute left-1/2 -translate-x-1/2 flex flex-row items-center justify-center">
+style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 absolute left-1/2 -translate-x-1/2 flex flex-row items-center justify-center">
 <button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter ? showall() : filter = true}>
   <FilterIcon isX={filter} /></button>
 {#if filter}
@@ -270,6 +274,9 @@ style:visibility={low == true  ? "hidden":  "visible"} class="top-0 absolute lef
 on:mouseleave={()=> hoverede()} >
 {#key arr1}
 <Swiper 
+  direction={!isMobileOrTablet() ? "horizontal" : "vertical"}
+  slidesPerView={isMobileOrTablet() ? 1 : "auto"}
+  spaceBetween={isMobileOrTablet() ? 0 : null}
   on:swiper={handleSwiper}
   keyboard={{
     enabled: true,
@@ -277,20 +284,20 @@ on:mouseleave={()=> hoverede()} >
 mousewheel={{
   eventsTarget: "wrapper",
 }}
-effect={'fade'}
+effect={"slide"}
   grabCursor={true}
-  modules={[Manipulation, Mousewheel, Keyboard,EffectFade, Navigation]}
-  class="mySwiperc swiperc "
+  modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
+  class="mySwiperc {!isMobileOrTablet() ? "swiperc" : "swipermobile"}"
       dir="rtl"
     loop="true"
-    navigation={{
+    navigation={isMobileOrTablet() ? false : {
     nextEl: $lang == "he" ? ".perv" : ".next",
      prevEl: $lang == "he" ? ".next" : ".perv"
   }}
 >
 {#each arr1 as buble, i}
 {#if buble.ani === "haluk" && milon.desi == true}
-<SwiperSlide  class="swiper-slidec "><Hal  
+<SwiperSlide  class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"} "><Hal  
   isVisible={currentIndex === i}  
     user_1s={buble.user_1s}
           on:hover={hover}
@@ -317,7 +324,7 @@ effect={'fade'}
     order={buble.order}
                                /></SwiperSlide>
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
- <SwiperSlide class="swiper-slidec "><MissionInProgress
+ <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"} "><MissionInProgress
   on:proj={proj}
   cards="true"
  on:user={user}  
@@ -351,7 +358,7 @@ effect={'fade'}
     on:done={delo}
     /></SwiperSlide>
 {:else if buble.ani === "pmashes" && milon.ppmash == true}
-  <SwiperSlide class="swiper-slidec"><PendingMa
+  <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><PendingMa
               on:hover={hover}
   on:proj={proj}
  on:user={user}
@@ -391,7 +398,7 @@ effect={'fade'}
                 users={buble.users}
                 /></SwiperSlide>
   {:else if buble.ani === "pends" && milon.pend == true}
-  <SwiperSlide class="swiper-slidec"><PendingM
+  <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><PendingM
               on:hover={hover}
   on:proj={proj}
  on:user={user}
@@ -439,7 +446,7 @@ effect={'fade'}
                 cards="true"
                 /></SwiperSlide>
 {:else if buble.ani === "wegets" && milon.pmaap == true}
-    <SwiperSlide class="swiper-slidec"><Weget
+    <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Weget
             on:acsept={delo}
             cards="true"
             on:decline={delo}
@@ -487,7 +494,7 @@ effect={'fade'}
                 declined={buble.decid}
                 /></SwiperSlide>
     {:else if buble.ani === "fiapp" && milon.fiap == true}
-            <SwiperSlide class="swiper-slidec"><Fiappru
+            <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Fiappru
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
@@ -533,7 +540,7 @@ effect={'fade'}
                 declined={buble.decid}
                 /></SwiperSlide><!--
 {:else if buble.ani === "walcomen" && milon.welc == true}
-   <SwiperSlide class="swiper-slidec"><Welcomt 
+   <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Welcomt 
     id={buble.id}
         coinlapach={buble.coinlapach} 
 
@@ -542,7 +549,7 @@ effect={'fade'}
        projectName={buble.projectName}
        /></SwiperSlide>
    -->{:else if buble.ani === "askedcoin" && milon.asks == true}
-        <SwiperSlide class="swiper-slidec"><Reqtojoin
+        <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Reqtojoin
             on:acsept={delo}
                   on:hover={hover}
             on:proj={proj}
@@ -590,7 +597,7 @@ effect={'fade'}
                 declined={buble.decid}
                 /></SwiperSlide>
 {:else if buble.ani === "askedm" && milon.askmap == true}
-        <SwiperSlide class="swiper-slidec"><Reqtom
+        <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Reqtom
             on:acsept={delo}
             on:decline={delo}
                   on:hover={hover}
@@ -634,7 +641,7 @@ effect={'fade'}
                 spid={buble.spid}
                 /></SwiperSlide>
 {:else if buble.ani === "meData" && milon.sugg == true}
-  <SwiperSlide class="swiper-slidec"><ProjectSuggestor
+  <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><ProjectSuggestor
       on:less={delo}
             on:hover={hover}
       on:proj={proj}
@@ -667,7 +674,7 @@ effect={'fade'}
                 cards="true"
                 /></SwiperSlide>
 {:else if buble.ani === "huca" && milon.pmashs == true}
-    <SwiperSlide class="swiper-slidec"><Mashsug
+    <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Mashsug
       on:less={delo}
       cards="true"
       on:hover={hover}
@@ -699,7 +706,7 @@ effect={'fade'}
                 easy={buble.easy}
                 /></SwiperSlide>
                            {:else if buble.ani === "hachla" && milon.hachla == true}
-                                                <SwiperSlide class="swiper-slidec"><DecisionMaking
+                                                <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><DecisionMaking
                                                     on:acsept={delo}
                                                     on:decline={delo}
                                                     on:hover={hover}
@@ -739,11 +746,11 @@ effect={'fade'}
                           
 {/if}
 {/each}
- <!--- <SwiperSlide class="swiper-slidec">Slide 1</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 2</SwiperSlide
-  ><SwiperSlide class="swiper-slidec">Slide 3</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 4</SwiperSlide
-  ><SwiperSlide class="swiper-slidec">Slide 5</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 6</SwiperSlide
-  ><SwiperSlide class="swiper-slidec">Slide 7</SwiperSlide><SwiperSlide class="swiper-slidec">Slide 8</SwiperSlide
-  ><SwiperSlide class="swiper-slidec">Slide 9</SwiperSlide>-->
+ <!--- <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 1</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 2</SwiperSlide
+  ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 3</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 4</SwiperSlide
+  ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 5</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 6</SwiperSlide
+  ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 7</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 8</SwiperSlide
+  ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 9</SwiperSlide>-->
 </Swiper>
 {/key}
 </div>
