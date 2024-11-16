@@ -9,6 +9,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
      // import Chaticon from '../../../celim/chaticon.svelte'
   import { createEventDispatcher } from 'svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device.js';
  const dispatch = createEventDispatcher();
 function start(){
 dispatch("start");
@@ -52,6 +53,11 @@ const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric
 console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
 $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`}
+let isScrolable = !isMobileOrTablet() 
+   function preventSwiperScroll(event) {
+   if(isScrolable == true)
+      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+  }
 </script>
 {#key isVisible}
 {#if tasks.length > 0}
@@ -63,7 +69,11 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
   class="absolute inline-flex items-center justify-center w-8 h-8 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-[3%] {$lang == "en" ? "right-[3%]" : "left-[3%]"}  dark:border-gray-700">{tasks.length}</div>
   {/if}
   {/key}
-<div dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+<div on:wheel={preventSwiperScroll} 
+on:click={() => (isScrolable = !isScrolable)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -79,7 +89,7 @@ $: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך �
          </div>
          </div>
          </div>
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div   class="mb-8">
        <!--use:textfit={{parent,mode:"multi"}}  bind:this={parent}-->
               <div class="text-mturk font-bold text-lg md:text-4xl  mb-2">{missionName}</div>

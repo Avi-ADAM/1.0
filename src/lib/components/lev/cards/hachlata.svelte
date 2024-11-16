@@ -11,6 +11,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
   import { restim } from '$lib/func/restime.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device';
     export let projectName,restime, src,src2 ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting,deadline,spdata,kind,price
     export let already = false;
      export let timegramaDate
@@ -52,11 +53,19 @@ function linke(t){
   console.log(t)
 }
 const tri = import('$lib/translations/tr.json')
-
+let isScrolable = !isMobileOrTablet() 
+   function preventSwiperScroll(event) {
+   if(isScrolable == true)
+      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+  }
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+<div on:wheel={preventSwiperScroll} 
+on:click={() => (isScrolable = !isScrolable)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
         <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -72,7 +81,7 @@ const tri = import('$lib/translations/tr.json')
          </div>
          </div>
          </div>
-  <div  class="d bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
         {#if kind == "sheirutpends"}
               <h1 class="text-gray-900 font-bold text:2xl sm:text-3xl mb-2">{spdata.sheirut.data.attributes.name}</h1>

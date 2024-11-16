@@ -175,6 +175,8 @@ function showall(event) {
 let filter = false
 const filterT = {"he":"מיון","en":"filter"}
 $: console.log(isMobileOrTablet())
+
+
 </script>
 <style>
 
@@ -274,6 +276,7 @@ style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 abs
 on:mouseleave={()=> hoverede()} >
 {#key arr1}
 <Swiper 
+releaseOnEdges={true}
   direction={!isMobileOrTablet() ? "horizontal" : "vertical"}
   slidesPerView={isMobileOrTablet() ? 1 : "auto"}
   spaceBetween={isMobileOrTablet() ? 0 : null}
@@ -281,9 +284,7 @@ on:mouseleave={()=> hoverede()} >
   keyboard={{
     enabled: true,
   }}  
-mousewheel={{
-  eventsTarget: "wrapper",
-}}
+mousewheel={isMobileOrTablet()}
 effect={"slide"}
   grabCursor={true}
   modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
@@ -297,7 +298,8 @@ effect={"slide"}
 >
 {#each arr1 as buble, i}
 {#if buble.ani === "haluk" && milon.desi == true}
-<SwiperSlide  class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"} "><Hal  
+<SwiperSlide  class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"} "
+><Hal  
   isVisible={currentIndex === i}  
     user_1s={buble.user_1s}
           on:hover={hover}
@@ -398,7 +400,8 @@ effect={"slide"}
                 users={buble.users}
                 /></SwiperSlide>
   {:else if buble.ani === "pends" && milon.pend == true}
-  <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><PendingM
+  <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"
+><PendingM
               on:hover={hover}
   on:proj={proj}
  on:user={user}

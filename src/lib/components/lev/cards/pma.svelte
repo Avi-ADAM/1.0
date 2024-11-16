@@ -8,6 +8,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
  const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
+  import { isMobileOrTablet } from '$lib/utilities/device';
     export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, kindOf, easy, price, monts, yers,hm 
     export let already, allr = false;
 function hover(x){
@@ -28,10 +29,19 @@ dispatch("nego",{alr:alr,y:"n"});
 function tochat (){
 dispatch("tochat");
 }
+let isScrolable = !isMobileOrTablet() 
+   function preventSwiperScroll(event) {
+   if(isScrolable == true)
+      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+  }
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+<div on:wheel={preventSwiperScroll} 
+on:click={() => (isScrolable = !isScrolable)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -47,7 +57,7 @@ dispatch("tochat");
          </div>
          </div>
          </div>
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
          <p style="line-height: 1;" class=" text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>

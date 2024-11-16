@@ -10,6 +10,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device';
     export let projectName,timeToP, acts, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false,hearotMeyuchadot
     export let already, allr = false;
   export let isVisible = false;
@@ -60,10 +61,20 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
 
 console.log(workways)
 $: console.log("ACTS: ",acts)
+let isScrolable = !isMobileOrTablet() 
+   function preventSwiperScroll(event) {
+    console.log("Stopping",isScrolable)
+   if(isScrolable == true)
+      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+  }
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  leading-normal  dark:bg-slate-800  {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''}  leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+<div on:wheel={preventSwiperScroll} 
+on:click={() => (isScrolable = !isScrolable)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d  leading-normal  dark:bg-slate-800  {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''}  leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -83,7 +94,7 @@ $: console.log("ACTS: ",acts)
          <button on:click={project} class="px-2 mx-2 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded text-sm" >{t.watchpr[$lang]}</button >
          </div>
 
-  <div  class=" bg-white dark:bg-slate-800 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row  leading-normal">
+  <div  class="{isScrolable ? "bg-white dark:bg-slate-800" : "bg-gray-200 dark:bg-slate-700"} transition-all-300   rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row  leading-normal">
     
     <div  class="mb-8">
             <div class="sm:text-3xl text-xl text-mturk font-bold  mb-2">{missionName}</div>

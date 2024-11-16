@@ -7,6 +7,7 @@
       export let isVisible = false
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
+  import { isMobileOrTablet } from '$lib/utilities/device';
     export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting,deadline,easy,myp,price
     export let already = false;
     export let src2;
@@ -22,10 +23,19 @@ function decline(alr) {
   already = true; 
 dispatch("decline",{alr:alr});
 }
+let isScrolable = !isMobileOrTablet() 
+   function preventSwiperScroll(event) {
+   if(isScrolable == true)
+      event.stopPropagation(); // מונע מ-Swiper לתפוס את הגלילה
+  }
 </script>
 
 
-<div dir="rtl"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%] d">
+<div on:wheel={preventSwiperScroll} 
+on:click={() => (isScrolable = !isScrolable)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="rtl"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%] d">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -41,7 +51,7 @@ dispatch("decline",{alr:alr});
          </div>
          </div>
          </div>
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
        <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
