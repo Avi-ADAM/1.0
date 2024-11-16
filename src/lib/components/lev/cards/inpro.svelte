@@ -73,7 +73,7 @@ let isScrolable = !isMobileOrTablet()
 on:click={() => (isScrolable = !isScrolable)}
 role="button"
 tabindex="0" 
-on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal w-[90%] h-[90%] {isScrolable ? "bg-white" : "bg-gray-200"} lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -133,7 +133,7 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
       </p>-->
      {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined" && missionDetails.length > 0} <p 
      on:mouseenter={()=>hover(deta[$lang])} on:mouseleave={()=>hover("0")}
-       class="cd d max-h-1/2"><RichText outpot={missionDetails} editable={false} /></p>{/if}
+       class="max-h-1/2"><RichText outpot={missionDetails} editable={false} /></p>{/if}
     {#if hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" && hearotMeyuchadot.length > 0}
      <span role="contentinfo" on:mouseenter={()=>hover(notes[$lang])} on:mouseleave={()=>hover("0")} >
    <RichText editable={false}  outpot={hearotMeyuchadot}/>
