@@ -273,6 +273,35 @@ label, input , p, div ,span{
   font-size: 1.2rem;
 }
 }
+.tiptap p, h1, h2, h3, a,li, ul {
+  background-color: inherit;
+  color: inherit;
+}
+[data-color="pink"] > ::before {
+  content: "❌ ⟵ : ";
+  color: darkred;
+  font-weight: bold;
+}
+
+[data-color="#a7f2a4"] > ::before {
+  content: " ✔ ⟵: ";
+  color: darkgreen;
+  font-weight: bold;
+  
+}
+
+/* היילייט חיצוני */
+[data-color="pink"] {
+  border: 1px solid pink;
+  padding: 5px;
+  background-color: rgba(255, 182, 193, 0.2); /* ורוד חצי שקוף */
+}
+
+[data-color="#a7f2a4"] {
+  border: 1px solid lightgreen;
+  padding: 5px;
+  background-color: #a7f2a4; /* ירוק חצי שקוף */
+}
 @media(min-width: 670px){
   .tiptap h1{
   font-size: 2.5rem;

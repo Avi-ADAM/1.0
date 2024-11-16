@@ -563,6 +563,7 @@ export let restime;
   import Barb from '../conf/barb.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
+  import Rich from '../conf/rich.svelte';
 
 const tri = tr
 $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}]
@@ -573,12 +574,12 @@ $: datai = [{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":n
             >{tri?.nego?.head[$lang]} {name1}</h1>
             <div class="flex  flex-col align-middle justify-center ">
 <Text text={name1} bind:textb={name2} lebel={tri?.common?.name}/>
-<Text long={true} text={descrip} bind:textb={descrip2} lebel={tri?.common?.description}/>
+<Rich  text={descrip} bind:textb={descrip2} lebel={tri?.common?.description}/>
 <Elements dataibn={dataibno.skillName} {newcontent} placeholder={tri?.mission?.addNewSkills} datai={skills.data} alld={skills2} bind:dataib={skills3.data} lebel={tri?.mission?.requireSkills} on:addnew={addnew} valc="skillName" bgi="gold"/>
 <Elements {newcontent} placeholder={tri?.mission?.addNewRoles} datai={tafkidims.data} alld={roles} bind:dataib={tafkidims2.data} lebel={tri?.mission?.requiredRoles} dataibn={dataibno.roleDescription} on:addnew={addnew} valc="roleDescription" bgi="gold"/>
 <Elements {newcontent} placeholder={tri?.mission?.addNewWw} datai={workways.data} alld={workways2} bind:dataib={workways3.data} lebel={tri?.mission?.requiredWW} dataibn={dataibno.workWayName} on:addnew={addnew} valc="workWayName" bgi="gold"/>
-<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
-<Text text={privatlinks} bind:textb={privatlinks2} lebel={tri?.mission?.linkToMission}/>
+<!----<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
+            --><Text text={privatlinks} bind:textb={privatlinks2} lebel={tri?.mission?.linkToMission}/>
 <Number number={noofhours} bind:numberb={noofhours2} lebel={`${tri?.mission?.noOfHours[$lang]} ${isKavua== true && isKavua2 == true ? tri?.mission.perMonth[$lang] : ""}`} splebel={isKavua== true && isKavua2 == true ? null : isKavua== true && isKavua2 == false ? false : isKavua== false && isKavua2 == true ? true : null}/>
 <Number number={perhour} bind:numberb={perhour2} lebel={tri?.mission?.hourlyVallue[$lang]} />
 <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate}/>

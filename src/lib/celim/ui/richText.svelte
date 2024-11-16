@@ -5,12 +5,15 @@
   import { Editor } from '@tiptap/core';
   import TextAlign from '@tiptap/extension-text-align';
   import Link from '@tiptap/extension-link';
+  import Highlight from '@tiptap/extension-highlight';
   import FloatingMenu from '@tiptap/extension-floating-menu';
   import StarterKit from '@tiptap/starter-kit';
   import Underline from '@tiptap/extension-underline';
   import LinkIcon from '../icons/linkIcon.svelte';
   import Separator from './separator.svelte';
   export let outpot = ``;
+  export let showJson = false;
+  export let outjson = [];
   export let trans = false
   export let editable = true;
   export let sml = false
@@ -18,12 +21,12 @@
   let element;
   let editor;
   let menu;
-
+  $: console.log(outjson,showJson,outpot);
   onMount(() => {
     editor = new Editor({
       element: element,
       editable: editable,
-      content: outpot,
+      content: showJson ? outjson : outpot,
       editorProps: {
         attributes: {
           class:
@@ -36,6 +39,9 @@
       extensions: [
         StarterKit,
         Link,
+        Highlight.configure({
+          multicolor: true
+        }),
         TextAlign.configure({
           types: ['heading', 'paragraph'],
           alignments: ['left', 'right', 'center', 'justify'],
@@ -50,6 +56,9 @@
         // force re-render so `editor.isActive` works as expected
         editor = editor;
         const html = editor.getHTML();
+        const jsonc = editor.getJSON();
+        outjson = jsonc;
+        outjson = outjson;
         outpot = html;
         outpot = outpot;
       }
@@ -450,6 +459,9 @@
 </div>
 
 <style>
+ .tiptap p, h1, h2, li, ul {
+    background-color: inherit;
+  }
 svg:focus { outline: none; }
   #dropdownNavbarLink, #dropdownNavbarLink2 {
     background: var(--barbi-pink);
@@ -485,4 +497,6 @@ svg:focus { outline: none; }
       font-size: 2rem;
     }
   }
+
+
 </style>

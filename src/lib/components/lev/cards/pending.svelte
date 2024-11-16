@@ -80,6 +80,9 @@ dispatch("tochat");
             <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.valph[$lang])} on:mouseleave={()=>hover("0")} > {perhour} {tr?.common.perhour[$lang]} </span> * <span role="contentinfo" on:mouseenter={()=>hover(tr?.common.noofhours[$lang])} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr?.common.hours[$lang]} {isKavua == true ? t.formonth[$lang]:"" } </span> = <span role="contentinfo" on:mouseenter={()=>hover(tr.mission.total[$lang])} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {isKavua == true ? t.perMonth[$lang]:"" } </span>
       </p>
       <div  class="text-mturk font-bold text-lg sm:text-2xl mb-2">{name}</div>
+      <div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover(timero[$lang])} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
+        {formatTime(zman)}
+    </span></div> 
      {#if descrip !== null && descrip !== "null"}
           <RichText outpot={descrip} editable={false}/>
 {/if}
@@ -126,9 +129,7 @@ dispatch("tochat");
     <div class="flex items-center">
         <p><span on:mouseenter={()=>hover(tr?.vots.totalin[$lang])} on:mouseleave={()=>hover("0")} role="contentinfo"  style="color:#7EE081;" >{noofusersOk}-{tr?.vots.inFavor[$lang]}</span> <span on:mouseenter={()=>hover(tr?.vots.notyet[$lang])} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{tr?.vots.notyet[$lang]} </span><!---<span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span>--></p>
       </div>
-       <div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover(timero[$lang])} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
-            {formatTime(zman)}
-        </span></div> 
+     
        </div>
        {#if low == false}
  {#if already === false && allr === false}
