@@ -408,6 +408,7 @@ effect={"slide"}
         on:coinLapach={delo}
         timegramaId={buble.timegramaId}
         {low}
+        negopendmissions={buble.negopendmissions}
         isVisible={currentIndex === i}
         createdAt={buble.createdAt}
         restime={buble.restime}

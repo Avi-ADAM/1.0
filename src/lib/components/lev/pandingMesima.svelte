@@ -18,6 +18,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
      export let low = false;
         export let restime;
         let dialogOpen = false
+        export let negopendmissions= [];
+
         export let modal = false
     export let messege = [];
     export let descrip = "";
@@ -639,6 +641,7 @@ function claf (event){
       on:load={()=>loading = true}
               on:close={afternego}
               {timegramaId}
+  {negopendmissions}
         descrip ={descrip}
         projectName ={projectName}
         name1 ={name}
@@ -1114,7 +1117,8 @@ input[type=text]:invalid {
               width: auto !important;
         }
           :global([data-svelte-dialog-content].nego) {
-                overflow-y: auto;
+                overflow: auto;
+              
        z-index: 1000;
       padding: 15px;
       margin-right: 25px;
@@ -1122,7 +1126,7 @@ input[type=text]:invalid {
       margin: 0px;
                 margin-top: 20vh;
                 height: 80vh;
-                width: fit-content;
+                max-width: 100vw;
                 border-radius: 5%;
                 border-top-right-radius: 2%;
                  border-bottom-right-radius: 2%;

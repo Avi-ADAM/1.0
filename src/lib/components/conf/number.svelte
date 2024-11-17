@@ -2,16 +2,30 @@
     import RangeSlider from "svelte-range-slider-pips";
     import Barb from './barb.svelte'
     import tr from '$lib/translations/tr.json'
+    export let old = []
     export let status = [10,20]
     export let splebel = null
     export let state = 2 // original and edit, 3 is original second and edit
 export let number;
 export let numberb = number
+$: datai = []
 
+$: if(old.length > 0){
+  datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":Number(numberb)},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":Number(number)}]
+  for (let i = 0; i < old.length; i++) {
+    console.log(old[i])
+    if(old[i] != null){
+      datai.push({"value":Number(old[i]),"leb":`${tr?.nego?.oldno[$lang]}-${i+1},${old[i]}`})
+    }
+  }
+  datai = datai
+}else{
+  datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
+  datai = datai
+}
 export let lebel;
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
-$: datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
     let edit = false
 let show2 = false
 function checkAll(a,b){
@@ -30,7 +44,9 @@ function checkAll(a,b){
        <p class="text-gold">{number}</p>
        {:else}
        <div dir="rtl" class='w-1/2 mx-auto'>
+        {#key datai}
        <Barb {datai} />
+       {/key}
        </div>
         {/if}
        <button on:click={()=>edit = true}>
@@ -38,12 +54,21 @@ function checkAll(a,b){
         {#if number != numberb && show2 != true}
         <button on:click={()=>show2 = true}>📑</button>
         {:else if show2 == true}
-        <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <div class="flex flex-col items-center flex-wrap justify-center m-4">
+        <button on:click={()=>show2 = false}><Close width={10} height={10}/></button>
+        <div class="flex flex-row">
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{number}</p>
+      </div>
+      <div class="flex flex-row">
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
         <p class="text-gold">{numberb}</p>
+        </div>
+        {#each old  as o, i}
+        <div class="flex flex-row justify-center items-center">
+        <small class:text-right={$lang == "he"} class="text-gold p-4">{tr?.nego.oldno[$lang]}:{i+1}</small>
+        <p class="text-gold">{o ?? number}</p></div>
+        {/each}
         </div>
         {/if}
         </div>

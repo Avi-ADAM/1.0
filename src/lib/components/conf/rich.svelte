@@ -144,6 +144,7 @@ const result = {
   let outjsonb = []
   export let state = 2; // original and edit, 3 is original second and edit
   export let text;
+  export let old = [];
   export let lebel = { he: 'עריכה', en: 'edit' };
   import tr from '$lib/translations/tr.json';
   import Close from '$lib/celim/close.svelte';
@@ -227,6 +228,12 @@ $: console.log(text,textb,outjson,showJson,htmlon);
             >{tr?.nego.sugestion[$lang]}:</small
           >
           <RichText outpot={textb} editable={false} sml={true} />
+          {#each old  as o, i}
+          <small class:text-right={$lang == 'he'} class="text-gold"
+          >{tr?.nego.oldno[$lang]}:{i+1}</small
+        >
+        <RichText outpot={o ?? text} editable={false} sml={true} />
+        {/each}
         </div>
       {/if}
     </div>

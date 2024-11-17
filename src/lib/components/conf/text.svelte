@@ -1,6 +1,7 @@
 <script>
 export let state = 2 // original and edit, 3 is original second and edit
 export let text;
+export let old = [];
 export let lebel = {"he":"עריכה", "en": "edit"}
 import tr from '$lib/translations/tr.json'
   import Close from '$lib/celim/close.svelte';
@@ -78,6 +79,10 @@ function checkAll (a, b){
         <p>{text}</p>
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
         <p class="text-gold">{textb}</p>
+        {#each old  as o, i}
+        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.oldno[$lang]}:{i+1}</small>
+        <p class="text-gold">{o ?? text}</p>
+        {/each}
         </div>
         {/if}
         </div>
