@@ -89,6 +89,7 @@
 
   import { createEventDispatcher, onMount } from 'svelte';
   import { page } from '$app/stores';
+  import { isMobileOrTablet } from '$lib/utilities/device';
 
   const dispatch = createEventDispatcher();
   export let adder = [],
@@ -214,7 +215,7 @@
 <div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} dir="ltr" style=" position:fixed; width:100vw;height:100vh ;overflow: auto; top:0%;
     left: 0%;
     max-width: 100vw;
-    max-height: 100vh;" class="d">
+    max-height:{isMobileOrTablet() ? "calc(100vh - 3rem)" : "100vh"};" class="d">
      {#key arr1}
 
 <div  dir="ltr"  bind:clientWidth={w} bind:clientHeight={h} style=" position: absolute; overflow: auto;top:{top}%;

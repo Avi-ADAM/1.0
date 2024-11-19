@@ -10,13 +10,12 @@
   width: 95% ;
   border-radius: 0%;
 }
-.swipermobile{
+.swipermobile{ 
   position: absolute;
-  top: 50%;
+  top: calc(50% - 1.5rem);
   left: 50%;
   transform: translate(-50%, -50%);
-  
-  height: 100% ;
+  height: calc(100% - 3rem) ;
   width: 100% ;
   border-radius: 0%;
 }

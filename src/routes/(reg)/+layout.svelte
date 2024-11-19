@@ -12,6 +12,8 @@ import { lang } from '$lib/stores/lang.js'
  import { initialWebS } from '$lib/stores/pendMisMes.js';
 import { showFoot } from '$lib/stores/showFoot.js';
   import { initialWebSP } from '$lib/stores/pgishot.js';
+  import Mobile from '$lib/components/front/mobile.svelte';
+  import MobileFooter from '$lib/components/footer/mobileFooter.svelte';
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
@@ -102,7 +104,7 @@ const logi = {"he": "להתחברות", "en": "To Login", "ar": "لتسجيل ا
   <Toaster toastOptions={{
 		style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
   }} richColors  closeButton position="top-center" />
-      </main>
+    </main>
  {/if}
   <slot></slot>
 

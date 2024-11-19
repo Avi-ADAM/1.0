@@ -1,5 +1,6 @@
 
 <script>
+	import { isMobileOrTablet } from '$lib/utilities/device';
     import { liUN } from '$lib/stores/liUN.js';
 
   import Arrow from '$lib/celim/icons/arrow.svelte';
@@ -380,10 +381,10 @@ let addNs1 = true;
       error1 = e;
       console.log(e);
       if (e == 'TypeError: Failed to fetch') {
-        setTimeout(start(), 10000);
+       // setTimeout(start(), 10000);
         const msg = {
-          he: 'נראה שיש בעיה בחיבור לאינטרנט, אנו מנסים שוב',
-          en: 'seems llike we have a internet connection problem, we are trying again'
+          he: 'נראה שיש בעיה בחיבור לאינטרנט, נא לנסות שוב',
+          en: 'seems llike we have a internet connection problem, please try again'
         };
         toast.warning(msg[$lang]);
               //getcetch & show msg this from cetch bcz you have no net
@@ -759,7 +760,7 @@ let width,height
 </svelte:head>
 {#await meData}
 <div class="body button-gold grid items-center justify-center">
-         <Lowding height="100vh" />
+         <Lowding height="30vh" />
          </div>
 {:then meData}
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
@@ -833,29 +834,33 @@ let width,height
 
   {#if addNs1 == true}
   {#key addSl}
-  <div   class="d" class:selected="{current === 'a1'}" class:a1="{current !== 'a1'}">
+  <div class="d {current === 'a1' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a1"}">
           <TourItem message={message2[$lang]}>
     <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={meData.skills.data} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
         </TourItem>
  </div>
-  <div class="d" class:selected="{current === 'a2'}" class:a2="{current !== 'a2'}">
+  <div  class="d {current === 'a2' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a2"}">
           <TourItem message={message3[$lang]}>
     <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={meData.tafkidims.data} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
-  <div class="d" class:selected="{current === 'a3' && mass !== true}" class:a3="{current !== 'a3' }" class:whole="{mass === true}">
+  <div class="d {current === 'a3' && mass !== true ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : ""}" 
+            class:a3={current !== 'a3'}
+       class:whole="{mass === true}">
     <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={meData.sps.data} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
 </div>
           </TourItem>
 
-        <div class:selectedl="{current === 'a4'}" class:a4="{current !== 'a4'}" class="d">
+        <div  class="d {current === 'a4' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a4"}"
+         >
                 <TourItem message={message5[$lang]}>
       <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={meData.vallues.data} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
-        <div class:selectedl="{current === 'a5'}" class:a5="{current !== 'a5'}" class="d">
+        <div 
+        class="d {current === 'a5' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a5"}">
           <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={meData.work_ways.data} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
         </div>
                             </TourItem>
@@ -1962,7 +1967,6 @@ class=" hover:scale-150 "
   position: fixed;
   top: 0;
   right: 0;
-  height: 100vh;
   padding: 2rem 8px 0.6rem;
   border-left: 1px solid #aaa;
   overflow-y: auto;
@@ -1987,7 +1991,6 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
   position: fixed;
   top: 0;
   left: 0;
-  height: 100%;
   padding: 5rem 1rem 0.6rem;
   overflow-y: scroll;
     overflow-x: auto;

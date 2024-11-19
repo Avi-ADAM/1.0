@@ -186,7 +186,6 @@ $: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `$
 </svelte:head>
 
   <div dir="rtl" >
-<Header/>
 
       <div class="middle" bind:clientHeight="{h}" bind:clientWidth="{w}">
         <svg class="bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400" height="100vh" width="100vw" id="eARfSi12ITv1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
@@ -274,11 +273,11 @@ $: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `$
 </foreignObject>
 
  
-    <foreignObject x="710" y="957" height="280" width="500">
+    <foreignObject x="710" y="987" height="280" width="500">
         <div class="flexi">
            <div class="q">
             {#if load == true}
-<h3 >{user.username}</h3>{/if}
+<h1 >{user.username}</h1>{/if}
 </div></div>
  <div class="flex flex-row items-center justify-center">
          {#if discordlink}

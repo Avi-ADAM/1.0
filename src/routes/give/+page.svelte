@@ -2,6 +2,8 @@
   let fpval, selected, liUN, email;
       import MultiSelect from 'svelte-multiselect';
   import { userName } from '$lib/stores/store.js';
+  import Levbtn from '$lib/celim/ui/levbtn.svelte';
+  import Button from '$lib/celim/ui/button.svelte';
 
     const country =  [
      { value: 104 , label: 'Israel', heb: 'ישראל'},
@@ -394,3 +396,4 @@ function find_contry_id(contry_name_arr){
 </form>
 <a href="{`https://telegram.me/onelevone_bot?start=${uid}`}" alt="telegramjoin">tele</a>
 <button on:click={rrrr}>cervrvr</button>
+<Levbtn/>

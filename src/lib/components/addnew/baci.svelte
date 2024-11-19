@@ -230,6 +230,7 @@ export let userName_value;
   import { RingLoader
 } from 'svelte-loading-spinners'
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device.js';
  const closer = () => {
     isOpen = false;
   a = 0;
@@ -369,7 +370,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 
   {#if before == false}
 
-<div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} dir="{$lang == "en" ? "ltr" : "rtl"}" class="jho flex flex-col items-center text-center justify-center">
+<div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} dir="{$lang == "en" ? "ltr" : "rtl"}" class="jho {isMobileOrTablet ? "pb-12" : ""} flex flex-col items-center text-center justify-center">
   <h1 class="text-gold">{crn[$lang]}</h1>
 <br>
 

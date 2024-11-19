@@ -227,10 +227,12 @@ $: console.log(isMobileOrTablet())
     }
 
 </style>
+{#if !isMobileOrTablet()}
 <span  role="contentinfo" on:mouseenter={()=> hoverc(nav[$lang])} 
 on:mouseleave={()=> hoverc("0")}>
        <Header second="/moach" secondTitle={{"he":"למוח","en":"to Brain"}}/>
        </span>
+       {/if}
        {#key arr1}
       {#key low}
        {#if arr1.length > 0}
@@ -242,7 +244,6 @@ on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "perv" : "	next"	}" src
 
         <img on:mouseenter={()=> hoverc(pretitle[$lang])} 
 on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src="{srca[$lang]}" alt="{$lang == "he" ? "הבא" : "	next"	}"/>
-{/if}   
 <div   
       dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
 on:mouseleave={()=> hoverc("0")} 
@@ -272,6 +273,48 @@ style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 abs
 {hachlot}/>
 {/if}
 </div>
+{:else}   
+{#if !low}
+<div class="fixed z-50 max-w-[95%] h-8 sm:max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-12 left-1/2 dark:bg-gray-700 dark:border-gray-600">
+  <div class=" h-full max-w-lg flex space-x-2 flex-row mx-auto justify-center align-middle items-center">
+{#if !filter}
+  <div   
+  dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
+on:mouseleave={()=> hoverc("0")} 
+style:visibility={low == true  ? "hidden":  "visible"} class="px-4 z-[1000]">
+
+<Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
+
+</div>
+{/if}
+<div   
+dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc(filterT[$lang])} 
+on:mouseleave={()=> hoverc("0")} 
+style:visibility={low == true  ? "hidden":  "visible"}
+ class="z-[1000] px-4 flex flex-row items-center justify-center">
+<button class="w-10 h-10 flex items-center justify-center  rounded-full border-1 border-barbi"
+on:click={()=> filter ? showall() : filter = true}>
+<FilterIcon isX={filter} /></button>
+{#if filter}
+<Filter on:showonly={showonly} {sug}
+{pen}
+{ask}
+{wel}
+{beta}
+{des}
+{fia}
+{pmash}
+{mashs}
+{maap}
+{askma}
+{hachlot}/>
+{/if}
+</div>
+</div>
+</div>
+{/if}
+{/if}
+
 <div role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
 {#key arr1}

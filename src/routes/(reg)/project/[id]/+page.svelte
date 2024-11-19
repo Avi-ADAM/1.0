@@ -14,6 +14,7 @@ import { lang } from '$lib/stores/lang.js'
   import SheirutShow from '$lib/components/prPr/sheirut/sheirutShow.svelte';
   import Close from '$lib/celim/close.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device';
 let projectUsers =[];
 const baseUrl = import.meta.env.VITE_URL
 let show = false
@@ -119,17 +120,18 @@ async function xyd () {
 <svelte:head>
   <title>{heass[$lang]}</title>
 </svelte:head>
+{#if !isMobileOrTablet()}
   <Header/>
-
+{/if}
  {#await project}
  <div class="h-screen grid align-middle justify-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
  <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
  </div>
  {:then project}
-<div class="w-screen d overflow-y-auto h-screen bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
+<div class="w-screen d overflow-y-auto h-screen bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400 ">
 <div dir="rtl"  class="h-screen d lg:w-1/2 mx-auto ">
 
-  <div class="4">
+  <div>
     {#if srcP}
     <img
     width="100" height="100" 
@@ -232,7 +234,7 @@ async function xyd () {
 {/each}
 </div>-->
 
-<div style="margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--mturk);"  class="drop-shadow-xl ">
+<div style="margin: 2px; text-align:center; padding: 10px; border: 2px solid var(--mturk);"  class="drop-shadow-xl {isMobileOrTablet() ? "pb-12" : ""}">
 <h3 style="color: var(--barbi-pink) ;text-shadow: 1px 1px var(--gold);" class="5">{frm[$lang]}</h3>
 <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
                 {#each projecto as om }<p on:mouseenter={()=>hover({"he":"משימות פנויות בריקמה","en":"open missions in the FreeMate"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
@@ -246,6 +248,7 @@ async function xyd () {
 <p class="text-gold bg-barbi font-bold hover:text-barbi hover:bg-gold px-2 rounded-xl mb-2 cursor-pointer	"  on:click={mesima(om.id)}>{om.name}</p>
 {/each}-->
 {#if project.attributes.sheiruts?.data?.length >0}
+<div class="{isMobileOrTablet() ? "pb-12" : ""} ">
 {#if show === false}
    <button   
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
@@ -265,6 +268,7 @@ async function xyd () {
      sheirutim={project.attributes.sheiruts}/>
       </div>
     {/if}
+  </div>
     {/if}
 </div>
 </div>

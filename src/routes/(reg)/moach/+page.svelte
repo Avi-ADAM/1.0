@@ -1336,6 +1336,7 @@
     import { onDestroy } from 'svelte';
   import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1636,11 +1637,12 @@ function add(event){
     <div
       dir="{$lang == "he" ? "rtl" : "ltr"}"
       bind:clientWidth={width}
-      class="all text-barbi text-center overflow-y-auto min-h-screen scroll-smooth d"
+      class="all text-barbi text-center overflow-y-auto  {isMobileOrTablet() ? "max-h-[calc(100vh-3rem)]" : "min-h-screen"}  scroll-smooth d"
       style="-webkit-scrollbar:0px;"
     >
-      <Header />
-    
+    {#if !isMobileOrTablet()}
+    <Header />
+    {/if}
       {#if success}
         <div
           style="
@@ -2485,7 +2487,7 @@ pointer-events: none;"
       <Lowding />
     </div>
   {:then projects}
-    <div class=" text-center border-2 border-barbi rounded m-4">
+    <div class=" text-center border-2 border-barbi rounded m-4 {isMobileOrTablet() ? 'pb-12' : ''}">
       <h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">
         {choo[$lang]}
       </h1>
@@ -2554,9 +2556,8 @@ pointer-events: none;"
     justify-content: center;
     flex-wrap: wrap;
   }
-  .all {
-    min-height: 100vh;
-  }
+ 
+  
   .all::-webkit-scrollbar {
     width: 0px;
   }

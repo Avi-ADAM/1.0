@@ -80,7 +80,7 @@ on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable 
   tabindex="0" 
   on:keypress={preventSwiperScroll}
   style="overflow-y:auto"
-  class="d {isVisible ? (lang == 'he' ? 'boxleft' : 'boxright') : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]"
+  class="d {isVisible ? (lang == 'he' ? 'boxleft' : 'boxright') : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]"
 >
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
