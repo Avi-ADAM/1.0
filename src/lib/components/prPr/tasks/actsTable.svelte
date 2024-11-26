@@ -11,6 +11,7 @@
   import { lang } from '$lib/stores/lang';
   import RichText from '$lib/celim/ui/richText.svelte';
   import NameAndPname from '$lib/components/grid/nameAndPname.svelte';
+  import NameField from '$lib/components/grid/nameField.svelte';
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import Tile from '$lib/celim/tile.svelte';
@@ -55,7 +56,9 @@
   let columns = [
     {
       key: 'shem',
-      title: name[$lang]
+      title: name[$lang],
+      accessor: (row) => row.shem,
+      renderComponent: NameField
     },
     {
       key: 'vali',
@@ -282,8 +285,6 @@
     updateFilteredActs();
 
   }
-
-
 
   onMount(() => {
     const reformatArray = (arr) => {
