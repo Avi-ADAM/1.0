@@ -128,6 +128,6 @@ export async function POST({request, cookies, fetch}){
     }
   }
   })
-  sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
+ sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
     return new Response    
 }
