@@ -1459,6 +1459,8 @@ async function createMes(id,mes){
         loading: false,
         messages:[],
         md:{
+          pid:$idPr,
+          mbId:e.detail.id,
           projectName:projectname,
           projectPic:srcP,
           mesimaName:e.detail.smalldes
