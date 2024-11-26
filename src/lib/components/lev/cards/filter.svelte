@@ -1,9 +1,7 @@
 <script>
   import Tile from '$lib/celim/tile.svelte';
     import {lang} from '$lib/stores/lang.js'
-  import { createEventDispatcher } from 'svelte';
-    const dispatch = createEventDispatcher();
-
+ 
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 
@@ -35,7 +33,7 @@ let states = $state({
 
 function showonly(value) { 
     if (value !== "true") {
-        dispatch("showonly", {
+        showonlyD({
             data: value
         });
         
@@ -47,7 +45,7 @@ function showonly(value) {
         // נעדכן את הערך הספציפי
         states[value] = "true";
     } else {
-        dispatch("showall");
+        showall();
         // נאפס את כל הערכים
         Object.keys(states).forEach(key => {
             states[key] = key;
@@ -89,7 +87,7 @@ if (num === "a"){
 } else {
    fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1 heart, click on the diamonds to sort the actions"}
 }
-dispatch("hover", {id: fir[$lang]});
+hoverD({id: fir[$lang]});
 
 }
 
@@ -109,7 +107,10 @@ dispatch("hover", {id: fir[$lang]});
     maap = 17,
     askma = 13,
     hachlot = 9,
-    low = true
+    low = true,
+    hoverD,
+    showall,
+    showonlyD
   } = $props();
 let hovered = false;
 function hoverede(x){
@@ -123,7 +124,7 @@ function hoverede(x){
   } else {
 u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
   }
-  dispatch("hover", {id: u[$lang]});
+  hoverD({id: u[$lang]});
  }
  //{name:"welc",val:true,color:"gray"},
  let milon = [

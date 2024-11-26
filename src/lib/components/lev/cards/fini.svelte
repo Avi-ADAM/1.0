@@ -1,13 +1,11 @@
 <script>
       import Chaticon from '../../../celim/chaticon.svelte'
-  import { createEventDispatcher } from 'svelte';
   import tr from '$lib/translations/tr.json'
   import {lang} from '$lib/stores/lang.js'
 import Lowbtn from '$lib/celim/lowbtn.svelte'
- const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
-  /** @type {{low?: boolean, isVisible?: boolean, projectName: any, whatt: any, src: any, why: any, src2: any, missionBName: any, missionDetails: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, hearotMeyuchadot: any, mypos: any, valph: any, nhours: any, useraplyname: any, already: any, allr?: boolean}} */
+  /** @type {{low?: boolean, isVisible?: boolean, projectName: any, whatt: any, src: any, why: any, src2: any, missionBName: any, missionDetails: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, hearotMeyuchadot: any, mypos: any, valph: any, nhours: any, useraplyname: any, already: any, allr?: boolean, onHover?: function, onAgree?: function, onDecline?: function, onNego?: function, onToChat?: function}} */
   let {
     low = false,
     isVisible = false,
@@ -27,26 +25,39 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     nhours,
     useraplyname,
     already = $bindable(),
-    allr = false
+    allr = false,
+    onHover = /** @param {any} x */ (x) => {},
+    onAgree = /** @param {any} alr */ (alr) => {},
+    onDecline = /** @param {any} alr */ (alr) => {},
+    onNego = /** @param {any} alr */ (alr) => {},
+    onToChat = () => {}
   } = $props();
-function hover(x){
-dispatch("hover",{x:x});
-}
-function agree(alr){
-  already = true;
-dispatch("agree",{alr:alr,y:"a"})
-}
-function decline(alr) {
-  already = true; 
-dispatch("decline",{alr:alr,y:"d"});
-}
-function nego(alr){
-dispatch("nego",{alr:alr,y:"n"});
 
-}
-function tochat (){
-dispatch("tochat");
-}
+  /** @param {any} x */
+  function hover(x) {
+    onHover(x);
+  }
+
+  /** @param {any} alr */
+  function agree(alr) {
+    already = true;
+    onAgree({ alr, y: "a" });
+  }
+
+  /** @param {any} alr */
+  function decline(alr) {
+    already = true; 
+    onDecline({ alr, y: "d" });
+  }
+
+  /** @param {any} alr */
+  function nego(alr) {
+    onNego({ alr, y: "n" });
+  }
+
+  function tochat() {
+    onToChat();
+  }
 console.log(tr)
 const tri = import('$lib/translations/tr.json')
 const neged ={"he":"נגד","en":"against"}
