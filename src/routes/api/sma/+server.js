@@ -32,7 +32,7 @@ export async function POST({ request, fetch }) {
       email:email,
       previewText:head[lango],
       emailText:head[lango] }
-                  fetch('https://www.1lev1.com/api/sendMail', {
+                  fetch('/api/sendMail', {
                   method: 'POST',  
                   headers: {
                     'Content-Type': 'application/json',
@@ -64,7 +64,7 @@ export async function POST({ request, fetch }) {
       email:email,
       previewText:pre[lango],
       emailText:pre[lango] }
-                  fetch('https://www.1lev1.com/api/sendMail', {
+                  fetch('/api/sendMail', {
                   method: 'POST',  
                   headers: {
                     'Content-Type': 'application/json',
