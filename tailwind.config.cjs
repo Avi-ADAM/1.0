@@ -28,6 +28,7 @@ const config = {
     extend: {
       fontFamily: {
         'rubik': ['Rubik', 'sans-serif'],
+        'litt':	['Bellefair', 'Gan']
       },
       backgroundImage: {
         goldGrad:

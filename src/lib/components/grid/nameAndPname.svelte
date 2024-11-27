@@ -137,18 +137,16 @@
         {#if pendingValidation}
             <span class="text-green-500 text-sm">{pendingVal[$lang]}</span>
             {#if isValidator}
-                <Button variant="success" size="sm" on:click={handleValidate}>
-                    {validate[$lang]}
-                </Button>
+                <Button variant="success" size="sm" on:click={handleValidate} text={validate} />
+         
             {/if}
         {/if}
         {#if isCompleted}
             <span class="text-green-600 text-sm font-medium">{completed[$lang]}</span>
         {/if}
         {#if isCurrentUser && isPending}
-            <Button variant="primary" size="sm" on:click={handleApprove}>
-                {approve[$lang]}
-            </Button>
+            <Button variant="primary" size="sm" on:click={handleApprove} text={approve} />
+              
         {/if}
         {#if mname}
             <span 
@@ -176,9 +174,8 @@
 {:else if type === "button"}
 {#if !isAssigned && roles.length == 0}
 
-    <Button variant="primary" size="sm" on:click>
-        {text[$lang]}
-    </Button>
+    <Button variant="primary" size="sm" on:click {text} />
+       
 {:else if !isAssigned && roles.length > 0}
     <div class="flex flex-col gap-1">
         <div class="flex flex-wrap gap-2">
@@ -186,9 +183,7 @@
                 <span class="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded">{role}</span>
             {/each}
         </div>
-        <Button variant="primary" size="sm" on:click>
-            {text[$lang]}
-        </Button>
+        <Button variant="primary" size="sm" on:click text={text} />
     </div>
     {/if}
 {/if}
