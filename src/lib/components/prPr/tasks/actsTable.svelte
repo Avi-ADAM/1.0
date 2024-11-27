@@ -15,6 +15,7 @@
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import Tile from '$lib/celim/tile.svelte';
+  import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/stores';
   const dispatch = createEventDispatcher();
   let paging = new PagingData(
@@ -50,7 +51,8 @@
   const my = { he: 'מבוצע ע"י', en: 'assigned to' };
   const datest = { he: 'תאריך', en: 'date' };
   const vali = { he: 'נוצר ע"י', en: 'created by' };
-  const status = { he: 'סטטוס ביצוע', en: 'status' };
+  const approve = { he: 'אישור', en: 'Approve' };
+  const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
   let theme = PrelineTheme;
 
   let columns = [
@@ -87,7 +89,7 @@
     {
       key: 'my',
       title: my[$lang],
-      sortValue: (row) => row.my.data?.id || 0,
+      sortValue: (row) => row.my?.data?.[0]?.id || 0,
       accessor: (row) => {
         const myData = row.my?.data?.[0]?.attributes;
         const mesima = row.mesimabetahaliches?.data?.[0]?.attributes;
@@ -104,18 +106,28 @@
         const username = myData?.username;
         const mesimaName = mesima?.name;
         const mid = row.mesimabetahaliches?.data?.[0]?.id || false;
-        const type =
-          !username && !mesimaName && !isPend && !isOpen ? 'button' : null;
+        const type = !username && !mesimaName && !isPend && !isOpen ? 'button' : null;
 
         return {
-          type,
           src: profilePic || '',
           pname: username || '',
           mname: mesimaName || '',
-          taskId: row.id,
-          isPend,
+          type,
           isOpen,
-          onClick: () => handleTaskClick(row, type, mid, isOpen, isPend)
+          isPend,
+          isPending: row.isAssigned && !row.myIshur && row.my?.data?.[0]?.id,
+          isCurrentUser: $page.data.uid === row.my?.data?.[0]?.id,
+          isValidator: $page.data.uid === row.vali?.data?.id,
+          isAssigned: row.isAssigned,
+          roles: row.tafkidims?.data?.map(r => r.attributes.roleDescription) || [],
+          isApproved: row.myIshur,
+          naasa: row.naasa,
+          pendingValidation: row.naasa && !row.valiIshur,
+          isCompleted: row.naasa && row.valiIshur,
+          progress: row.status || 0,
+          onClick: () => handleTaskClick(row, type, mid, isOpen, isPend),
+          onApprove: () => handleApprove(row.id),
+          onValidate: () => handleValidate(row.id)
         };
       },
       renderComponent: NameAndPname
@@ -284,6 +296,18 @@
     }
     updateFilteredActs();
 
+  }
+
+  function handleApprove(taskId, event) {
+    console.log(taskId)
+    alert("approve soon!" )
+    dispatch('approve', { id: taskId });
+  }
+
+  function handleValidate(taskId, event) {
+    console.log(taskId)
+    alert("validate soon!" )
+    dispatch('validate', { id: taskId });
   }
 
   onMount(() => {

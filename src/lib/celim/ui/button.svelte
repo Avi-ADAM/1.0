@@ -16,14 +16,14 @@
     $: hover = false
 </script>    
 <button
-        class="cursor-pointer transition-all  px-6 py-2 rounded-lg
-border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px]
-active:border-b-[2px] active:brightness-90 active:translate-y-[2px] 
- border-barbi 
- bg-[length:200%_auto] animate-gradientx
- bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  
-  hover:bg-[linear-gradient(to_right,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.mpink),theme(colors.fuchsia.400),theme(colors.barbi))]
-   font-bold p-2 "
+        class="cursor-pointer transition-all duration-300 px-8 py-2 rounded-xl
+border-b-[4px] hover:brightness-105 hover:-translate-y-[2px] hover:border-b-[6px]
+active:border-b-[2px] active:brightness-95 active:translate-y-[2px] 
+border-barbi shadow-lg hover:shadow-xl
+bg-[length:200%_auto] animate-gradientx
+bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  
+hover:bg-[linear-gradient(to_right,theme(colors.gold),theme(colors.amber.400),theme(colors.yellow.300),theme(colors.amber.400),theme(colors.gold))]
+font-bold font-rubik"
    on:focus={()=>hover = true}
    on:blur={()=>hover = false}
    on:mouseenter={()=>hover = true}
@@ -31,9 +31,9 @@ active:border-b-[2px] active:brightness-90 active:translate-y-[2px]
         on:click={onclick}
         title="{text[$lang]}"
         name="{name}"><div class="flex flex-row align-center justify-center items-center gap-4"><slot>	
-        <h2 class="text-transparent font-extrabold text-xl md:text-2xl  bg-clip-text bg-[length:auto_200%] animate-gradienty 
-        {hover == false  ? "bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.700),theme(colors.wow),theme(colors.fuchsia.700),theme(colors.barbi))]"
-        : "bg-[linear-gradient(to_top,theme(colors.gra),theme(colors.grc),theme(colors.grd),theme(colors.gold),theme(colors.grd),theme(colors.grc),theme(colors.gra))]"}	
+        <h2 class="text-transparent font-extrabold text-xl md:text-2xl  bg-clip-text bg-[length:auto_200%] animate-gradienty transition-all duration-300 tracking-wide
+        {hover == false  ? "bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.pink.400),theme(colors.mpink),theme(colors.pink.400),theme(colors.barbi))]"
+        : "bg-[linear-gradient(to_top,theme(colors.pink.300),theme(colors.fuchsia.400),theme(colors.mpink),theme(colors.fuchsia.400),theme(colors.pink.300))]"}	
 ">{text[$lang]}</h2></slot>
 {#if loading}
 <div class="w-8 h-8">
@@ -46,6 +46,5 @@ active:border-b-[2px] active:brightness-90 active:translate-y-[2px]
 <Err />
 {/if}
 </div>
-</button
-      >
+</button>
 <SucssesConf {success}/>

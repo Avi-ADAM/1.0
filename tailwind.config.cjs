@@ -26,6 +26,9 @@ const config = {
       290: '2.9'
     },
     extend: {
+      fontFamily: {
+        'rubik': ['Rubik', 'sans-serif'],
+      },
       backgroundImage: {
         goldGrad:
           'linear-gradient(to right, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771c, #FBF5B7, #B38728, #FCF6BA, #BF953F)',

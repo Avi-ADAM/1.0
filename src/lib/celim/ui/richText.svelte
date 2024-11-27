@@ -104,7 +104,7 @@
 
 <div
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  class="bg-{trans == false ? "mturk bg-opacity-25" : 'bg-transparent'} {minw ? 'min-w-[50vw]' : ''} " 
+  class="bg-{trans == false ? "mturk bg-opacity-25" : 'bg-transparent'} {minw ? 'max-w-[50vw]' : ''} " 
 >
   {#if editor && editable}
     <div
