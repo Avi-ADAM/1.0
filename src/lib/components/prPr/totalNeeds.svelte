@@ -668,6 +668,17 @@ vots: [${userss},
     }
   }
 
+  const tableHeaders = {
+    startDate: { he: 'תאריך התחלה', en: 'Start Date' },
+    maxValue: { he: 'שווי מקסימלי סה"כ', en: 'Total Maximum Value' },
+    selectedResources: { he: 'משאבים שנבחרו', en: 'Selected Resources' },
+    invalidPrice: { he: 'לא יכולה להיות קטנה מ-0', en: 'Cannot be less than 0' }
+  };
+
+  const buttonText = { 
+    publishResources: { he: 'פרסום משאבים', en: 'Publish Resources' }
+  };
+
   const ot = { he: 'עלות חד פעמית', en: 'one time' };
   const py = { he: 'ליחידה', en: 'per unit' };
   const pm = { he: 'חודשי', en: 'monthly' };
@@ -745,7 +756,7 @@ vots: [${userss},
       <table dir="rtl">
         <caption class="sm:text-right md:text-center text-right">
           <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-            משאבים שנבחרו
+            {tableHeaders.selectedResources[$lang]}
           </h1>
         </caption>
         <tr class="gg">
@@ -937,11 +948,11 @@ vots: [${userss},
                 <span class="line"></span>
               </div>
               {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2"
-                  >לא יכולה להיות קטנה מ-0</small
+                  >{tableHeaders.invalidPrice[$lang]}</small
                 >{/if}
             </td>{/each}
         </tr><tr style="display:{ky ? '' : 'none'};">
-          <th>תאריך התחלה </th>
+          <th>{tableHeaders.startDate[$lang]}</th>
           {#each meData as data, i}
             <td
               ><input
@@ -1013,7 +1024,7 @@ vots: [${userss},
                 <span class="line"></span>
               </div>
               {#if data.attributes.price < 0}<small class="bg-red-800 text-slate-50 px-2"
-                  >לא יכולה להיות קטנה מ-0</small
+                  >{tableHeaders.invalidPrice[$lang]}</small
                 >{/if}
             </td>{/each}
         </tr><tr>
@@ -1043,11 +1054,11 @@ vots: [${userss},
               </div>
               {#if data.attributes.easy < 0}<small
                   class="bg-red-800 text-slate-50 px-2"
-                  >לא יכול להיות קטן מ-0</small
+                  >{tableHeaders.invalidPrice[$lang]}</small
                 >{/if}
             </td>{/each}
         </tr><tr style="display:{kc || ky ? '' : 'none'};">
-          <th>עלות סה"כ</th>
+          <th>{tableHeaders.maxValue[$lang]}</th>
           {#each meData as data, i}
             <td>
               <h3
@@ -1099,7 +1110,7 @@ vots: [${userss},
     <div>
         <br>
         <Button 
-          text={{ he: 'פרסום משאבים', en: 'Create' }}
+          text={buttonText.publishResources}
           on:click={createResources}
           {loading}
           {success}
