@@ -376,7 +376,7 @@ let fir,ssec;
   <tr>
       <th>תיאור</th>
       {#each meData as data, i}
-      <td> {#if data.attributes.deskrip} {data.attributes.deskrip}{/if}
+      <td> {#if data.attributes.descrip} {data.attributes.descrip}{/if}
 </td>
         {/each}
     </tr> <tr>
@@ -419,7 +419,7 @@ let fir,ssec;
       <th>שווי מקסימלי לחישוב בריקמה</th>
       {#each meData as data, i}
       <td>
-  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
+  <small for="name" >שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
         {data.attributes.agprice.toFixed(2)}
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >

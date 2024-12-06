@@ -113,7 +113,9 @@
         <th>תיאור</th>
         {#each meData as data, i}
           <td>
-            {#if data.attributes.deskrip} {data.attributes.deskrip}{/if}
+            {#if data.attributes.descrip}
+            <span class="text-sm">{data.attributes.descrip}</span>
+            {/if}
           </td>
         {/each}
       </tr>
@@ -168,7 +170,7 @@
         <th>עלות</th>
         {#each meData as data, i}
           <td>
-            <small for="name" class="label"
+            <small for="name"
               >שווי כספי <span style="display:{meData[i].m ? '' : 'none'};"
                 >לכל חודש</span
               ><span style="display:{meData[i].y ? '' : 'none'};">לכל שנה</span
@@ -182,7 +184,7 @@
         <th>שווי מקסימלי לחישוב בריקמה</th>
         {#each meData as data, i}
           <td>
-            <small for="name" class="label"
+            <small for="name" 
               >שווי כספי <span style="display:{meData[i].m ? '' : 'none'};"
                 >לכל חודש</span
               ><span style="display:{meData[i].y ? '' : 'none'};">לכל שנה</span

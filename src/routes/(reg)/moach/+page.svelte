@@ -243,7 +243,9 @@
                   isAssigned
                 open_mission{data{id attributes {name}}}
                 pendm{data{id attributes{name}}}
-                 dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}} myIshur valiIshur status mesimabetahaliches{data{id 
+                 dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} 
+                 des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}} 
+                 myIshur valiIshur status mesimabetahaliches{data{id 
                   attributes{name forums{data{id}}}}}}}}
             sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
             sales {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
@@ -701,9 +703,9 @@
     mi.set([]);
     setTimeout(function () {
       success = false;
-      start();
     }, 15000);
     toast.success(`${fnnn[$lang]}`);
+    start();
   }
   let meDatamm = [];
   async function updi() {
@@ -752,7 +754,12 @@
     addN = false;
     meDatamm = [];
     needr = [];
+    success = true;
+    setTimeout(function () {
+      success = false;
+    }, 15000);
     toast.success(cloma[$lang]);
+    start()
   }
   let noofopen = 2;
 

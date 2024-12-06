@@ -322,7 +322,7 @@
         }
       }
 
-      const spnot = data.spnot !== undefined ? addslashes(data.spnot) : '';
+      const spnot = data.spnot !== undefined ? data.spnot : '';
       const hm = data.hm > 0 ? data.hm : 1;
       const price = data.attributes.price > 0 ? data.attributes.price : 0;
       const easy = data.attributes.easy > 0 ? data.attributes.easy : 0;
@@ -346,8 +346,8 @@
           body: JSON.stringify({
             query: `mutation { ${linkop}(
                         data: { 
-                            name: "${addslashes(data.attributes.name)}",
-                            descrip: """${addslashes(data.attributes.descrip)}""",
+                            name: "${data.attributes.name}",
+                            descrip: """${data.attributes.descrip}""",
                             project: "${projectId}",
                             kindOf: ${data.attributes.kindOf},
                             hm: ${hm},
@@ -423,7 +423,7 @@ vots: [${userss},
               project: ${projectId},
               hm: ${hm},
               open_mashaabim: "${hiluz}",
-              spnot: """${spnot}""",
+              spnot: """${spnot + "-" + data.attributes.descrip}""",
               users_permissions_user: "${idL}",
               sp: "${data.spId}",
               ${date}
