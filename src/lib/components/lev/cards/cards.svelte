@@ -29,7 +29,14 @@ const dispatch = createEventDispatcher();
   import "./stylec.css";
   let currentIndex = 0;
   let swiperInstance;
-
+  const noThings = {
+    "he": "לא נמצאו הצעות או פעולות עבורך, מומלץ לגשת לעמוד הפרופיל כדי להוסיף כישורים, משאבים או כדי ליצור ריקמה חדשה, בהצלחה ",
+    "en": "There are no suggestions or actions for you, it is recommended to go to the profile page to add connections, resources or create a new freeMates"
+  }
+  const toProfile = {
+    "he": " לעמוד הפרופיל",
+    "en": "to the profile page"
+  }
 
   onMount(() => {
     // הסר את האתחול הישיר של Swiper כאן
@@ -61,6 +68,8 @@ const dispatch = createEventDispatcher();
   import Filter from './filter.svelte';
   import FilterIcon from '$lib/celim/icons/filterIcon.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
+  import Button from '$lib/celim/ui/button.svelte';
+  import { goto } from '$app/navigation';
   let h ;
 
 export let askedarr = [], declineddarr = [], arr1 = [];
@@ -802,10 +811,16 @@ effect={"slide"}
 {/key}
 </div>
 </div>
-{:else}
+{:else if low == true}
 <div class="body grid items-center justify-center">
          <Lowding height="50vh" />
          </div> 
+         {:else}
+         <div class="body flex flex-col items-center justify-center ">
+          <h1 class="text-2xl font-bold text-barbi text-center">{noThings[$lang]}</h1>
+          <Button on:click={()=> goto("/me")} text={toProfile} />
+          </div>
+
          {/if}
          {/key}
 {/key}
