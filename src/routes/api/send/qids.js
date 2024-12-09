@@ -363,10 +363,11 @@ export const qids = {
     }
   }
 }`,
-"31updateTask": `mutation UpdateTask($id: ID!, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
+"31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
      updateAct(id: $id,
       data: {
              isAssigned: $isAssigned,
+             myIshur: $myIshur,
               my:$uid,
               mesimabetahaliches: $mesimabetahaliches
                   }

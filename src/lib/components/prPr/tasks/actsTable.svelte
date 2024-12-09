@@ -17,6 +17,7 @@
   import Tile from '$lib/celim/tile.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/stores';
+  import { sendToSer } from '$lib/send/sendToSer.svelte';
   const dispatch = createEventDispatcher();
   let paging = new PagingData(
     1, // currentPage
@@ -115,6 +116,7 @@
           type,
           isOpen,
           isPend,
+          id: row.id,
           isPending: row.isAssigned && !row.myIshur && row.my?.data?.[0]?.id,
           isCurrentUser: $page.data.uid === row.my?.data?.[0]?.id,
           isValidator: $page.data.uid === row.vali?.data?.id,
@@ -300,8 +302,17 @@
 
   function handleApprove(taskId, event) {
     console.log(taskId)
-    alert("approve soon!" )
-    dispatch('approve', { id: taskId });
+    const taskIndex = acts.findIndex((act) => act.id === taskId);
+    if (taskIndex === -1) {
+      console.error(`Task with id ${taskId} not found.`);
+      return;
+    }
+    acts = [
+      ...acts.slice(0, taskIndex),
+      { ...acts[taskIndex], myIshur: true },
+      ...acts.slice(taskIndex + 1)
+    ];
+    acts = acts
   }
 
   function handleValidate(taskId, event) {

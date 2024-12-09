@@ -19,7 +19,10 @@
     export let isCompleted = false;
   import Tile from "$lib/celim/tile.svelte";
   import Button from "$lib/celim/ui/button.svelte";
+  import { sendToSer } from "$lib/send/sendToSer.svelte";
   import {lang} from '$lib/stores/lang';
+  import { toast } from 'svelte-sonner';
+    export let id;
   export let text = {"he":"אני אבצע", "en":"assign to me"};
   const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
   const pendingVal = { he: 'ממתין לאישרור', en: 'Pending Validation' };
@@ -28,10 +31,41 @@
   const validate = { he: 'אישור ביצוע', en: 'Validate Completion' };
   const availableRoles = { he: 'תפקידים זמינים:', en: 'Available Roles:' };
   export let onClick = () => {};
+  let loading = false, success = false, error = false;
+  const suc = { he: 'בוצע בהצלחה', en: 'Success' };
     $: console.log(roles,"roles")
-  function handleApprove(event) {
-    event.stopPropagation();
-    onApprove();
+ async function handleApprove() {
+    loading = true;
+    await sendToSer(
+      {
+        id,
+        myIshur: true
+      },
+      '31updateTask',
+      null,
+      null,
+      false,
+      fetch
+    )
+      .then((data) => {
+        if(data.data != null) {
+            success = true;
+            isPending = false;
+        loading = false;
+        //toast
+
+        toast.success(suc[$lang]);
+        onApprove();
+        
+        }else{
+        loading = false;
+        error = true;
+        }
+      })
+      .catch((err) => {
+        error = true;
+        loading = false;
+      });
   }
 
   function handleValidate(event) {
@@ -145,7 +179,7 @@
             <span class="text-green-600 text-sm font-medium">{completed[$lang]}</span>
         {/if}
         {#if isCurrentUser && isPending}
-            <Button variant="primary" size="sm" on:click={handleApprove} text={approve} />
+            <Button {success} {error} {loading} size="sm" on:click={handleApprove} text={approve} />
               
         {/if}
         {#if mname}
