@@ -48,14 +48,14 @@ export const qids = {
   }
 }
 `,
-  '4crtask': `mutation CreateAct($pendm:ID ,$open_mission:ID,$dateS:DateTime, $dateF:DateTime,$myIshur:Boolean ,$shem: String,$des:String,$link:String, $pid : ID, $askId: ID, $assignedId:ID, $mbId: ID , $publishedAt: DateTime)
+  '4crtask': `mutation CreateAct($pendm:ID ,$open_mission:ID,$dateS:DateTime, $dateF:DateTime,$myIshur:Boolean ,$shem: String,$des:String,$link:String, $pid : ID, $askId: ID, $assignedId:[ID], $mbId: [ID] , $publishedAt: DateTime)
                         { createAct(
       data: {project:$pid,
              des: $des,
              my: $assignedId,
              shem: $shem,
              vali: $askId,
-             mesimabetahalich: $mbId,
+             mesimabetahaliches: $mbId,
              link: $link,
              publishedAt:$publishedAt,
              myIshur:$myIshur,
