@@ -33,7 +33,7 @@
 
   const dispatch = createEventDispatcher();
   export let userMevatzeaId,
-    userMevakeshId,
+    userMevakeshId = $page.data.uid,
     mimatai,
     adMatai,
     name = '',
@@ -47,6 +47,7 @@
 
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
+  import { page } from '$app/stores';
   function find_tafkidims_id (selected){
     let arr = []
     for(let i = 0; i < selected.length; i++){
