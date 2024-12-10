@@ -68,8 +68,35 @@
       });
   }
 
-  function handleValidate(event) {
-    event.stopPropagation();
+  async function handleValidate() {
+    loading = true;
+    await sendToSer(
+      {
+        id,
+        valiIshur: true
+      },
+      '31updateTask',
+      null,
+      null,
+      false,
+      fetch
+    )
+      .then((data) => {
+        if(data.data != null) {
+            success = true;
+            pendingValidation = false;
+        loading = false;
+        //toast
+        toast.success(suc[$lang]);
+        onValidate();
+        }else{
+        loading = false;
+        error = true;
+        }
+    }).catch((err) => {
+        error = true;
+        loading = false;
+    });
     onValidate();
   }
 
@@ -171,7 +198,7 @@
         {#if pendingValidation}
             <span class="text-green-500 text-sm">{pendingVal[$lang]}</span>
             {#if isValidator}
-                <Button variant="success" size="sm" on:click={handleValidate} text={validate} />
+                <Button  {success} {error} {loading} size="sm" on:click={handleValidate} text={validate} />
          
             {/if}
         {/if}

@@ -317,8 +317,7 @@
 
   function handleValidate(taskId, event) {
     console.log(taskId)
-    alert("validate soon!" )
-    dispatch('validate', { id: taskId });
+   
   }
 
   onMount(() => {
