@@ -80,5 +80,7 @@ export async function POST({ request, fetch }) {
                     console.error('Error:', error);
                   });
   }
-
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200
+    });
   }

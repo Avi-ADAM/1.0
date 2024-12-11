@@ -19,24 +19,23 @@ import Nego from "$lib/components/prPr/negoPend.svelte";
    // y.push(0)
     //y = y
     //console.log(y,c)
-    let data = {uid:1, title: {"en":"בודק בדיקה","he":"בודק בדיקה"}, body: {"en":"uiuituy7 והתיאור:  tesrt test test  ", "he":"uiuituy7 והתיאור: tesrt test test "}}
-   fetch("/api/nutiUser", {
-  method: 'POST', 
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
-
-  })
-  .catch((error) => {
-    console.error('Error:', error);
+    let data = {user: "useraplyname", projectName :"projectName", projectSrc: "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png", missionName: "openmissionName", email: "babayofnet@gmail.com", lang: "he" , kind: "exeptedMission"}//username email projectname projectsrc lang openmissionName
+            fetch('/api/sma', {
+            method: 'POST',  
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            body: JSON.stringify(data),
+          })
+            .then((response) => response)
+            .then((data) => {
+              console.log('Success:', data);            
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+          }
   
-  })
-  }
 
 
 
