@@ -57,13 +57,14 @@ export async function GET(req) {
     if (at.howmanyhoursalready != null && at.howmanyhoursalready > 0){
       //TODO: sheirut users
       if (at.project.data.attributes.user_1s.data.length > 1) {
-        fm = `
+        const monthName = new Date().toLocaleString('default', { month: 'long' });     
+           fm = `
 createFiniapruval(
      data: {
       iskvua: true,
       month:"${formatDate(d)}",
       missname: "${at.name}",
-      why: "auto monthly appruval",
+      why: "auto monthly appruval - ${monthName}" ,
       noofhours: ${at.howmanyhoursalready},
       mesimabetahalich: ${id},
       project: "${at.project.data.id}",
