@@ -12,7 +12,7 @@
     let qu = `{
   finiapruval (id:${id}) {data{ id attributes{
     vots{what users_permissions_user {data {id}}} 
-    archived noofhours missname why
+    archived noofhours missname why iskvua
     mesimabetahalich{data{id attributes{ perhour mission{data{id}}}}}
     project{data{id}}
     what{data{id}}
@@ -47,9 +47,9 @@
                                       perhour: ${res.data.finiapruval.data.attributes.mesimabetahalich.data.attributes.perhour},
                                       noofhours: ${res.data.finiapruval.data.attributes.noofhours ?? 0},
                                       total: ${(res.data.finiapruval.data.attributes.noofhours * res.data.finiapruval.data.attributes.mesimabetahalich.data.attributes.perhour) ?? 0},
-                                      iskvua: true,
+                                     ${res.data.finiapruval.data.attributes.iskvua === true ? `iskvua: true
                                       isFinished: false,
-                                      month: "${res.data.finiapruval.data.attributes.month}",
+                                      month: "${res.data.finiapruval.data.attributes.month}",` : ``} 
                                       mission: "${res.data.finiapruval.data.attributes.mesimabetahalich.data.attributes.mission.data.id}",
                                       why: "${res.data.finiapruval.data.attributes.why}",
                                       mesimabetahalich: "${res.data.finiapruval.data.attributes.mesimabetahalich.data.id}",

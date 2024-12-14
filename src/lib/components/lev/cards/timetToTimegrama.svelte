@@ -12,9 +12,9 @@ function hover(text) {
 }
 let zman
   onMount(()=>{
-    console.log(timegramaDate)
     let cr = new Date(timegramaDate)
        setInterval(() => {
+        //how much time left
    zman = -(Date.now() - cr) 
       }, 1)
   })

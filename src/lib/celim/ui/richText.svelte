@@ -21,7 +21,6 @@
   let element;
   let editor;
   let menu;
-  $: console.log(outjson,showJson,outpot);
   onMount(() => {
     editor = new Editor({
       element: element,
@@ -173,7 +172,6 @@
         <button
           on:click={() => {
             editor.chain().focus().setTextAlign('center').run();
-            console.log('edito', editor.chain().focus().setTextAlign('center'));
             actives = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm-4 4a1 1 0 100-2H6a1 1 0 100 2h8zm5 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-5 5a1 1 0 100-2H6a1 1 0 100 2h8z"></path> </g></svg>`;
             hide = true;
           }}
