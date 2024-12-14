@@ -460,6 +460,8 @@ export let sml = false
                                             st={buble.st}
                                             chat={buble.chat}
                                             declined={buble.decid}
+                                            timegramaId={buble.timegramaId}
+                                            timegramaDate={buble.timegramaDate}
                                             {low}
                                             /></div>
                                             {:else if buble.ani === "askedm" && milon.askmap == true}

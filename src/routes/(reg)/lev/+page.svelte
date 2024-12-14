@@ -508,6 +508,8 @@
         dictasked.push({
           uid: t.users_permissions_user.data.id,
           username: t.users_permissions_user.data.attributes.username,
+          timegramaId: t.timegrama.data.id,
+          timegramaDate: t.timegrama.data.attributes.date,
           src: src22,
           iskvua: t.open_mission.data.attributes.iskvua,
           email: t.users_permissions_user.data.attributes.email,

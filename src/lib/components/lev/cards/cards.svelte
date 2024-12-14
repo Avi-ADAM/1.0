@@ -651,6 +651,8 @@ effect={"slide"}
                 stylef={buble.stylef}
                 st={buble.st}
                 declined={buble.decid}
+                timegramaId={buble.timegramaId}
+                timegramaDate={buble.timegramaDate}
                 /></SwiperSlide>
 {:else if buble.ani === "askedm" && milon.askmap == true}
         <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Reqtom

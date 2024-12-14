@@ -2,6 +2,7 @@
     import { SendTo } from '$lib/send/sendTo.svelte';
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 export async function Ask(id,taid){
+  console.log(id,taid, "ask compo started")
   let d = new Date()
     let qu = `{
   ask (id:${id}) {data{ id attributes{
@@ -13,7 +14,7 @@ export async function Ask(id,taid){
       console.log(res);
       if (res.data != null) {
         console.log(res.data, 'pip',res.data.ask.data.attributes.vots);
-        if(res.data.ask.data.attributes.archived != true)
+        if(res.data.ask.data.attributes.archived != true){
 //check if one of pm appruve and if the requst user is already pm
         if(res.data.ask.data.attributes.vots.length > 0 || res.data.ask.data.attributes.project.data.attributes.user_1s.data.map(c => c.id).includes(res.data.ask.data.attributes.users_permissions_user.data.id) && res.data.ask.data.attributes.vots.map(c => c.users_permissions_user.data.id).includes(res.data.ask.data.attributes.users_permissions_user.data.id)){
            if(!res.data.ask.data.attributes.vots.map(c => c.what).includes(false))
@@ -208,9 +209,33 @@ updateOpenMission(
         
             //TODO: SEND EMAIL! check vots if no no cr mtaha add to p and nutify arcive timegrama ask and openm , otherAsks
         }
-      }
+      }else{
+      let que4 = `mutation { 
+             updateTimegrama(
+     id: ${taid}
+             data:{
+              done: true
+             }){
+              data{id}
+             }
+            }
+              `
+               try {
+      let res4 = await SendTo(que4, VITE_ADMINMONTHER).then((res4) => (res4 = res4));
+      console.log(res4,"ask res4 ")      
+      if (res4.data != null) {
+              console.log(res4.data,"ask res4 ")      
+
+              return "sucsses" + id
+               }
+ } catch (e) {
+      console.error(e);
+    }
+    }
+    }
     } catch (e) {
       console.error(e);
     }
+  
 }
 </script>

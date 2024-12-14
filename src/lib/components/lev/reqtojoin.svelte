@@ -64,6 +64,7 @@ export let chat
 export let mypose = true
 export let order = 1
 export let sqedualed
+export let timegramaId
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -288,6 +289,13 @@ ${adduser}
                                       }
                                     ]}
                         ){data{id}}
+                         updateTimegrama(
+     id: ${timegramaId}
+             data:{
+              done: true
+             }){
+              data{id}
+             }
 }
 `})
                 })
