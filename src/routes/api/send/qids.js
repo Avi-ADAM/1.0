@@ -375,5 +375,11 @@ export const qids = {
     
   ) {data{id attributes{ shem my {data{id}}}}}
 }`,
-
-};
+"32createTimeGrama": `mutation CreateTimegrama($date: DateTime, $finiapruval: ID, $whatami: String, $ask: ID) {
+  createTimegrama(data: {date: $date, whatami: $whatami, ask: $ask, finiapruval: $finiapruval}) {
+    data {
+      id
+    }   
+  }
+}`
+}

@@ -37,6 +37,7 @@ betha.subscribe(value => {
         export let low = false;
         export let status = 0;//tween store
         export let tasks = []
+        export let restime;
     export let tx = 680;
     export let dueDateOrCountToDedline = "11:11"
     export let projectName = "ONE"
@@ -536,6 +537,7 @@ createFiniapruval(
   ]
 }){data {id }}`
 }
+
 //files shit from updatepic - done
     //כמה בפרןויקט אם 1 אז אישור מיידי , ליצור בועת אישור אם חוק דורש - done beside roles
  
@@ -566,6 +568,11 @@ ${tofinished}
                 .then(data => miDatan = data);
             console.log(miDatan);
             if (noofpu > 1) {
+              //timegrama
+              let timegramaId = miDatan.data.createFiniapruval.data.id
+              let x = calcX(restime)
+              let fd = new Date(Date.now() + x)
+              await sendToSer({whatami:"finiapruval",finiapruval:timegramaId,date:fd})
               //nutify project users
  let data = {pn:projectName,pl:src,pu:pu, pid:projectId, uid:idL, kind:"finiappmi", name:missionName}
    fetch("/api/nuti", {
@@ -657,6 +664,8 @@ function hover (id){
     dispatch("hover", {id: u});
 }
    import Cards from './cards/inpro.svelte'
+  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { calcX } from '$lib/func/calcX.svelte';
 export let cards = false;
 function claf (event){
   let o = event.detail.alr

@@ -42,6 +42,7 @@
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
   import { sendToSer } from '$lib/send/sendToSer.svelte';
   import { page } from '$app/stores';
+  import { get } from 'svelte/store';
   export let data;
   let low = true;
   let indexi = -1;
@@ -139,6 +140,10 @@
       mtaha[i].tx = txx(mtahan[i].attributes.name);
       mtaha[i].ani = 'mtaha';
       mtaha[i].azmi = 'mesima';
+      mtaha[i].restime = getProjectData(
+        mtahan[i].attributes.project.data.id,
+        'restime'
+      );
       mtaha[i].pl = 0 + i;
       mtaha[i].usernames =
         data.data.usersPermissionsUser.data.attributes.username;

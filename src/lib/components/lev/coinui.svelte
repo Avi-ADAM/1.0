@@ -221,6 +221,7 @@ export let sml = false
             hoursdon ={buble.howmanyhoursalready}
             hourstotal = {buble.hoursassinged}
             perhour = {buble.perhour}
+            restime={buble.restime}
             on:done={delo}
             {low}
             /></div>

@@ -384,6 +384,7 @@ effect={"slide"}
  on:user={user}  
   on:hover={hover}
     {low}
+    restime={buble.restime}
     isVisible={currentIndex === i}
                 pu={buble.pu}
   hearotMeyuchadot={buble.hearotMeyuchadot}
