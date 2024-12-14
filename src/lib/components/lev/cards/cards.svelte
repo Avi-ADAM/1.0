@@ -559,6 +559,8 @@ effect={"slide"}
  on:user={user}
  cards="true"
  {low}
+ timegramaId={buble.timegramaId}
+ timegramaDate={buble.timegramaDate}
  isVisible={currentIndex === i}
      coinlapach={buble.coinlapach} 
              mId={buble.mId}

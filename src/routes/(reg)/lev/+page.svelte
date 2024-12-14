@@ -278,6 +278,12 @@
           st: rt[2],
           projectId:
             start[i].attributes.finiapruvals.data[j].attributes.project.data.id,
+          timegramaDate:
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
+              .attributes.date,
+          timegramaId:
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
+              .id,  
           projectName: getProjectData(start[i].id, 'pn'),
           noof: getProjectData(start[i].id, 'noof'),
           src2: getProjectData(start[i].id, 'pp'),
@@ -513,8 +519,8 @@
         dictasked.push({
           uid: t.users_permissions_user.data.id,
           username: t.users_permissions_user.data.attributes.username,
-          timegramaId: t.timegrama.data.id,
-          timegramaDate: t.timegrama.data.attributes.date,
+          timegramaId: t.timegrama.data?.id ?? 0,
+          timegramaDate: t.timegrama.data?.attributes.date ?? null,
           src: src22,
           iskvua: t.open_mission.data.attributes.iskvua,
           email: t.users_permissions_user.data.attributes.email,
@@ -2084,6 +2090,7 @@
                             users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}
       									}}}
     			finiapruvals(filters: { archived: { eq: false } }){ data{ id attributes{
+                        timegrama {data{id attributes{date}}}
               			    missname noofhours why what{data{id attributes {url formats}}} 
         					mesimabetahalich {data{id attributes{ perhour hearotMeyuchadot descrip mission {data {id}}}}}
                             vots  {what why id users_permissions_user {data{id}}}

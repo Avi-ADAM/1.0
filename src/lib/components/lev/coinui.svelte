@@ -1,5 +1,4 @@
 <script>
-	import { restim } from '$lib/func/restime.svelte';
 import * as animateScroll from "svelte-scrollto";
 import Vid from './didiget.svelte'
 import Desi from './decisionMaking.svelte'
@@ -401,6 +400,8 @@ export let sml = false
                                     nhours={buble.nhours}
                                     deadline={buble.deadline}
                                     missId={buble.missId}
+                                    timegramaId={buble.timegramaId}
+                                    timegramaDate={buble.timegramaDate}
                                     id={buble.id}
                                     openMid={buble.omid}
                                     stylef={buble.stylef}

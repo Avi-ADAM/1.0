@@ -289,15 +289,15 @@ ${adduser}
                                       }
                                     ]}
                         ){data{id}}
-                         updateTimegrama(
+                        ${timegramaId > 0 ? ` updateTimegrama(
      id: ${timegramaId}
              data:{
               done: true
              }){
               data{id}
              }
-}
-`})
+` : ``}
+                    }`})
                 })
                 .then(r => r.json())
                 .then(data => miDatan = data);

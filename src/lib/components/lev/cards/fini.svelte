@@ -10,7 +10,9 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
   import { isMobileOrTablet } from '$lib/utilities/device';
-    export let projectName,whatt, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours,useraplyname
+  import { formatTime } from '../utils';
+  import TimetToTimegrama from './timetToTimegrama.svelte';
+    export let projectName,whatt,timegramaDate, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours,useraplyname
     export let already, allr = false;
 function hover(x){
 dispatch("hover",{x:x});
@@ -30,7 +32,6 @@ dispatch("nego",{alr:alr,y:"n"});
 function tochat (){
 dispatch("tochat");
 }
-console.log(tr)
 const tri = import('$lib/translations/tr.json')
 const neged ={"he":"נגד","en":"against"}
 const bead = {"he":"בעד","en":"in favor"}
@@ -68,7 +69,7 @@ on:keypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="
             <div class=" text-md mt-1 flex items-center">
                <span class="text-barbi text-center mr-3 sm:text-xl ">{tr.headers.misfini[$lang]}</span>
             </div>
-            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
+            <span class="pn ml-1 text-xl text-barbi ">{projectName}</span>
          </div>
          </div>
          </div>
@@ -76,7 +77,7 @@ on:keypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover(`${tri.common.valph[$lang]}`)} on:mouseleave={()=>hover("0")} > {valph} {tr.common.perhour[$lang]} </span> * <span on:mouseenter={()=>hover(`${tr.commom.noofhours[$lang]}`)} on:mouseleave={()=>hover("0")}  > {nhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr.common.hours[$lang]} </span> = <span on:mouseenter={()=>hover(`${tr.common.total[$lang]}`)} on:mouseleave={()=>hover("0")}>{(nhours * valph).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+            <span on:mouseenter={()=>hover(`${tri.common.valph[$lang]}`)} on:mouseleave={()=>hover("0")} > {valph} {tr.common.perhour[$lang]} </span> * <span on:mouseenter={()=>hover(`${tri.commom.noofhours[$lang]}`)} on:mouseleave={()=>hover("0")}  > {nhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr.common.hours[$lang]} </span> = <span on:mouseenter={()=>hover(`${tr.common.total[$lang]}`)} on:mouseleave={()=>hover("0")}>{(nhours * valph).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionBName}</div>
      {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined" && missionDetails !== undefined} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
@@ -104,6 +105,7 @@ on:keypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="
       </div>
     </div>
        </div>
+<TimetToTimegrama {timegramaDate} />
        {#if low == false}
  {#if already === false && allr === false}
                 <button on:mouseenter={()=>hover({"he":"אישור","en":"appruve"})}

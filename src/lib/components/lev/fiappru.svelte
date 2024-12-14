@@ -55,6 +55,8 @@ export let uids;
 export let whatt;
 export let noofusersOk;
 export let noofusersNo;
+export let timegramaDate;
+export let timegramaId
 export let already = false;
 let resP = [];
 let lang;
@@ -571,6 +573,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   on:hover={hoverc}
   {why}
   {useraplyname}
+  {timegramaDate}
   {src2}
   {missionBName}
   {already} 
@@ -603,6 +606,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   {already} 
   {missionDetails}
   {projectName}
+  {timegramaDate}
    {src} 
    {nhours}
    {noofusersWaiting} 
