@@ -23,13 +23,13 @@ let placeholder = `אצל מי הכסף`;
 let already = false;
 export let maid;
 let valid = true;
-$: if (kindUlimit = false ){ 
+$: if (kindUlimit === false ){ 
         if (hm > quant){
   valid = false;
         } else {
     valid = true;
         }
-} else if (kindUlimit = true ){
+} else if (kindUlimit === true ){
     valid = true;
     quant = -1
 }
