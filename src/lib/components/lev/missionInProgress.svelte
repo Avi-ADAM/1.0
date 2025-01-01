@@ -160,7 +160,6 @@ async function azor () {
       zmani += lapse;
       x += lapse;
       lapse = 0;
-      console.log(x,"מאחר")
         tdtd[coinlapach-1].stname = "stopi"
         tdtd[coinlapach-1].timer = x
         tdtd[coinlapach-1].hoursdon = false

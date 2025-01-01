@@ -60,7 +60,7 @@ function getLang() {
    //     return navigator.languages[0];
    // return navigator.language;
     lang.set(la)
-    document.cookie = `lang=${$lang}; expires=` + new Date(2025, 0, 1).toUTCString();
+    document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
 }
 
 onMount(async () => {
