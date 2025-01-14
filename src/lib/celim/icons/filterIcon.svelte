@@ -299,7 +299,7 @@
      <text x="0" y="20" font-size="10" fill="black">📁</text>
   {:else if filterType === 'cardType'}
     <!-- Card type icon (card) -->
-      <text x="0" y="20" font-size="10" fill="black">🃏</text>
+      <text x="0" y="20" font-size="10" fill="black">📊</text>
   {/if} 
 </svg>
 </div>
