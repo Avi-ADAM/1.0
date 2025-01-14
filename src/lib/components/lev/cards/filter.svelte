@@ -1,12 +1,14 @@
 <script>
   import Tile from '$lib/celim/tile.svelte';
     import {lang} from '$lib/stores/lang.js'
-  import { createEventDispatcher } from 'svelte';
+  import { createEventDispatcher, onMount } from 'svelte';
     const dispatch = createEventDispatcher();
 
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-
+export let allIds = []
+export let filterKind = "projects"
+console.log(allIds,"allIds")
 export let sug = 13;
 let sugg =  "sugg";
 export let pen = 13;
@@ -44,12 +46,32 @@ let states = {
   pmaap,
   askmap
 };
-
-function showonly(value) { 
+onMount(async () => {
+    if(filterKind === "projects"){
+        milon = []
+        for (let i = 0; i < allIds.length; i++) {
+            milon.push({
+                id: allIds[i].projectId,
+                name:allIds[i].projectName, 
+                val:true, 
+                color:"blue", 
+                word:{
+                    he:`${allIds[i].projectName} - (${allIds[i].count})`, 
+                    en:`${allIds[i].projectName} - (${allIds[i].count})`
+                }
+        })
+        }
+        milon = milon
+        console.log(milon,"milon")
+    }
+})
+function showonly(value,id=null) { 
     if (value !== "true") {
         dispatch("showonly", {
-            data: value
-        });
+            data: value,
+            kind: filterKind,
+            id: id
+                });
         
         // נאפס את כל הערכים
         Object.keys(states).forEach(key => {
@@ -138,6 +160,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
 ]
 </script>
 <div class="flex flex-nowrap overflow-x-auto whitespace-nowrap w-full sm:max-w-[calc(100vw-200px)] max-w-[calc(100vw-180px)] d">
+{#if filterKind == "kind"}
 {#each milon.filter(item => {
     // מיפוי של שמות ה-items לערכים המספריים שלהם
     const valueMap = {
@@ -166,5 +189,17 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
         />
     </button>
 {/each}
+{:else}
+{#each milon as key}
+    <button on:click={()=> showonly(key.name,key.id)}>
+        <Tile 
+            bg={key.color} 
+            word={key.word[$lang]}
+            openi={states[key.name] === "true"} 
+            closei={states[key.name] !== "true"}
+        />
+    </button>
+{/each}
+{/if}
 </div>
 

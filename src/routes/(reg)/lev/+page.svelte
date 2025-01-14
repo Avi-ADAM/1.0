@@ -144,6 +144,7 @@
         mtahan[i].attributes.project.data.id,
         'restime'
       );
+      mtaha[i].projectId = mtahan[i].attributes.project.data.id;
       mtaha[i].pl = 0 + i;
       mtaha[i].usernames =
         data.data.usersPermissionsUser.data.attributes.username;

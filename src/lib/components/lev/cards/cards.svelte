@@ -164,26 +164,56 @@ function hoverc (id){
 }
 const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות ��שמאל',"en" : 'Navigation: right side, bottom'}
 $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
-
+//exclude meData huca 
 function showonly(event) {
+  if (event.detail.kind !== "projects") {
     const value = event.detail.data;
     for (const key in milon) {
         milon[key] = false
     }
 
     milon[value] = true;
+  }else{
+    const id = event.detail.id;
+    console.log(id,"FILTER+id")
+    filterByProjectId(id);
+  }
 }
 
 function showall(event) {
   filter = false
+  filter2 = false
+  clearFilters();
     for (const key in milon) {
         milon[key] = true
     }
 
 }
-let filter = false
+let filter = false, filter2 = false;
 const filterT = {"he":"מיון","en":"filter"}
 $: console.log(isMobileOrTablet())
+$: filteredArr = arr1;
+
+
+function filterByProjectId(projectId) {
+    filteredArr = arr1.filter(item => item.projectId && item.projectId === projectId);
+    console.log(filteredArr)
+  }
+
+  function clearFilters() {
+    filteredArr = arr1;
+  }
+  $: uniqueProjects =Array.from(
+    arr1.reduce((map, item) => {
+      if (item.projectId && item.projectName) {
+        if (!map.has(item.projectId)) {
+          map.set(item.projectId, { projectName: item.projectName, count: 0 });
+        }
+        map.get(item.projectId).count++;
+      }
+      return map;
+    }, new Map())
+  ).map(([projectId, { projectName, count }]) => ({ projectId, projectName, count }));
 
 
 </script>
@@ -266,7 +296,7 @@ dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc(filterT[$lang])}
 on:mouseleave={()=> hoverc("0")} 
 style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 absolute left-1/2 -translate-x-1/2 flex flex-row items-center justify-center">
 <button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter ? showall() : filter = true}>
-  <FilterIcon isX={filter} /></button>
+  <FilterIcon filterType="cardType" isX={filter} /></button>
 {#if filter}
 <Filter on:showonly={showonly} {sug}
 {pen}
@@ -279,7 +309,14 @@ style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 abs
 {mashs}
 {maap}
 {askma}
-{hachlot}/>
+{hachlot}
+filterKind="kind"/>
+{/if}
+<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter2 ? showall() : filter2 = true}>
+  <FilterIcon isX={filter2} /></button>
+{#if filter2}
+<Filter allIds={uniqueProjects} filterKind="projects" on:showonly={showonly}
+/>
 {/if}
 </div>
 {:else}   
@@ -303,7 +340,7 @@ style:visibility={low == true  ? "hidden":  "visible"}
  class="z-[1000] px-4 flex flex-row items-center justify-center">
 <button class="w-10 h-10 flex items-center justify-center  rounded-full border-1 border-barbi"
 on:click={()=> filter ? showall() : filter = true}>
-<FilterIcon isX={filter} /></button>
+<FilterIcon isX={filter} filterType="cardType"/></button>
 {#if filter}
 <Filter on:showonly={showonly} {sug}
 {pen}
@@ -316,7 +353,14 @@ on:click={()=> filter ? showall() : filter = true}>
 {mashs}
 {maap}
 {askma}
-{hachlot}/>
+{hachlot}
+filterKind="kind"/>
+{/if}
+<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter2 ? showall() : filter2 = true}>
+  <FilterIcon isX={filter2} /></button>
+{#if filter2}
+<Filter allIds={uniqueProjects} filterKind="projects" on:showonly={showonly}
+/>
 {/if}
 </div>
 </div>
@@ -326,7 +370,7 @@ on:click={()=> filter ? showall() : filter = true}>
 
 <div role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  
 on:mouseleave={()=> hoverede()} >
-{#key arr1}
+{#key filteredArr}
 <Swiper 
 releaseOnEdges={true}
   direction={!isMobileOrTablet() ? "horizontal" : "vertical"}
@@ -348,7 +392,7 @@ effect={"slide"}
      prevEl: $lang == "he" ? ".next" : ".perv"
   }}
 >
-{#each arr1 as buble, i}
+{#each filteredArr as buble, i}
 {#if buble.ani === "haluk" && milon.desi == true}
 <SwiperSlide  class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"} "
 ><Hal  
@@ -400,7 +444,7 @@ effect={"slide"}
     mId={buble.id}
     missId={buble.mission.data.id}
     missionName={buble.name}
-    projectId={buble.project.data.id}
+    projectId={buble.projectId}
     projectName={buble.projectName}
     missionDetails={buble.descrip}
     src={buble.src}

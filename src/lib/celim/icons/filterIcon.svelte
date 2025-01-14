@@ -1,5 +1,6 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 <script>
+   export let filterType = "projects";
     export let width = "32px";
     export let height = "32px";
     export let isX = false;
@@ -291,6 +292,14 @@
          rx="0.061538465"
          ry="0.030769233" />
     </g>
+  
   </g>
+  {#if filterType === 'projects'}
+    <!-- Project icon (folder) -->
+     <text x="0" y="20" font-size="10" fill="black">📁</text>
+  {:else if filterType === 'cardType'}
+    <!-- Card type icon (card) -->
+      <text x="0" y="20" font-size="10" fill="black">🃏</text>
+  {/if} 
 </svg>
 </div>
