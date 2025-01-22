@@ -107,6 +107,7 @@ on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable 
       <div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover(timero[$lang])} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
         {formatTime(zman)}
     </span></div> 
+    
      {#if descrip !== null && descrip !== "null"}
           <RichText outpot={descrip} editable={false}/>
 {/if}

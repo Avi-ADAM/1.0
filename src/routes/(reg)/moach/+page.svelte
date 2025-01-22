@@ -2592,9 +2592,9 @@ pointer-events: none;"
   }
   :global([data-svelte-dialog-content].content) {
     background: #60b9b6;
-    background: -webkit-radial-gradient(center, #050117, #0f0248, #60b9b6);
-    background: -moz-radial-gradient(center, #050117, #0f0248, #60b9b6);
-    background: radial-gradient(ellipse at center, #050117, #0f0248, #60b9b6);
+    background: -webkit-radial-gradient(center, #050117, #0f0248);
+    background: -moz-radial-gradient(center, #050117, #0f0248);
+    background: radial-gradient(ellipse at center, #050117, #0f0248);
     width: 80vw;
   }
   @media (min-width: 768px) {

@@ -3,7 +3,7 @@
  import Cropper from "svelte-easy-crop";
 	import { getCroppedImg } from "./canvasUtils"
   import { lang } from '$lib/stores/lang.js'
-
+export let aspect = 1
 	      let file;
 let dataU;
 	let image, fileinput, pixelCrop, croppedImage;
@@ -105,8 +105,8 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 	<div id="cr" >
 		<Cropper
 			{image}
-      cropShape={'round'}
-			aspect={1}
+      cropShape={aspect == 1  ? 'round' : null}
+			aspect={aspect}
 			zoom=1
 			crop={{x:0, y:0}}
 			on:cropcomplete={previewCrop}
