@@ -7,8 +7,8 @@
   import {SendTo} from '$lib/send/sendTo.svelte';
   import { idPr } from '$lib/stores/idPr';
   import { lang } from '$lib/stores/lang'
-    const dispatch = createEventDispatcher();
-    import { toast } from 'svelte-sonner';
+  const dispatch = createEventDispatcher();
+  import { toast } from 'svelte-sonner';
   import { createEventDispatcher } from 'svelte';
     export let restime = "feh", usersNum = 1
     let name , descrip,oneTime = false,isPublik = false,already = false, success = false , equaliSplited = true
