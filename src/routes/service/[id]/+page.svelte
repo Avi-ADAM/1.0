@@ -1,5 +1,5 @@
 <script>
-    import { addToast } from 'as-toast';
+  import { toast } from 'svelte-sonner';
 import SucssesConf from '$lib/celim/sucssesConf.svelte'
 import Tile from '$lib/celim/tile.svelte'
 import Share from '$lib/components/share/shareButtons/index.svelte'
@@ -113,7 +113,7 @@ async function ask() {
      setTimeout(function(){  
     success = false
   },15000)
-   addToast(`${fnnn[$lang]}`, 'info');
+  toast.success(`${fnnn[$lang]}`);
 }
     }
 }
