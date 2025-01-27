@@ -26,7 +26,7 @@ async function ask() {
   //TODO: if only me in the freemates and its me create mesimabetahalich
     alr = true
     const inD  = data.alld
-  const cookieValueId = document.cookie
+ /* const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];           
@@ -115,7 +115,7 @@ async function ask() {
   },15000)
   toast.success(`${fnnn[$lang]}`);
 }
-    }
+    }*/
 }
 
 export let data
@@ -167,7 +167,7 @@ function login () {
     let wid
     const mand = {"he": "המשימה אוישה בהצלחה", "en": "the mission has already assigned"}
     const alri = {"he": "כבר הגשת בקשה לבצע את המשימה הזו", "en": "you have already requested to do this mission"}
-const iwantto = {"he":"אני אשמח לבצע!","en":"I want to do it!"}
+const iwantto = {"he":"אני אשמח לקבל!","en":"I want to get it!"}
 const info ={"he": "בכדי לבקש להצטרף לצוות ולבצע את המשימה וגם בכדי לקבל הצעות למשימות, לפתוח רקמות (פרויקטים) חדשות ולהתנהל בהן בהסכמה יש להתחבר או להירשם","en":"You are not connected" }
 const registratio = { "he": "להרשמה", "en": "To Registration"} 
 const logi = { "he": "להתחברות", "en":"To Login"} 
@@ -184,48 +184,52 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description = $page.data.alld?.descrip || om[$lang]
   let url = $page.url.toString()
-  //TODO: header nav menu 
+ $: console.log(data.alld)
+  //TODO: header nav menu $page.a.title[$lang] ??
 </script>
-
-<Head title="{$page.data.alld?.title[$lang] ?? headi[$lang]}" {description} {image} {url} />
+<Head title="{ headi[$lang]}" {description} {image} {url} />
 <SucssesConf {success} />
-{#if data.alld?.fullfild == false}
+{#await data.alld}
 <div class="fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 flex align-middle content-center justify-center ">
 <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
 </div>
-{:else}
+{:then a}
 {#if data != null}
 {#if data.archived != true}
 <div bind:clientWidth={wid} dir="rtl"  style="overflow-y:auto" class=" d mb-4 sm:pt-4 w-full   lg:w-1/2 mx-auto">
     <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->
     <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
-        <div class="relative flex items-center space-x-1">
+   
+      <div class="relative flex items-center space-x-1">
             <div class="relative">
-                <img src={data.alld.attributes.project.data.attributes.profilePic.data?.attributes.url}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+                <img src={a.projectcreates?.data[0].attributes.profilePic.data?.attributes.url}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
             </div>
             <div class="flex flex-col leading-tight">
                 <div class="sm:text-sm text-md mt-1 flex items-center">
                     <span class="text-barbi text-center mr-3 sm:text-2xl lg:text-4xl text-xl">{headi[$lang]}</span>
                 </div>
-                <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200 ">{data.alld.project.data.attributes.projectName}</span>
+                <span class="pn ml-1 text-lg sm:text-xl lg:text-2xl text-grey-200 ">{a.projectcreates?.data[0].attributes.projectName}</span>
             </div>
         </div>
         <div>
-    <button on:click={()=>project(data.alld.project.data.id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4" >{seePr[$lang]}</button>
+    <button on:click={()=>project(a.projectcreates.data[0].id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4" >{seePr[$lang]}</button>
         </div>
     </div>
+    {#if a.pic.data}
+    <img src={a.pic.data.attributes.url} alt="cover image" class="w-full h-48 object-cover rounded-t lg:rounded-t-none lg:rounded-l"/>
+    {/if}
     <div  class=" lg:bg-gray-700 bg-transparent rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
          <div  class="mb-8">
               <div class="  mb-2">
         <div class="flex flex-row justify-between">
             <div class="px-2">
-            <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{data.alld.name}</h2>
-          <!--- {#if data.alld.descrip !== null && data.alld.descrip !== "null"  && data.alld.descrip !== "undefined"  && data.alld.descrip !== undefined} 
-           <RichText outpot={data.alld.descrip} editable={false}/>
+            <h2 class="text-barbi font-bold text-xl lg:text-4xl underline ">{a.name}</h2>
+          {#if a.desc !== null && a.desc !== "null"  && a.desc !== "undefined"  && a.desc !== undefined}
+           <RichText outpot={a.desc} editable={false}/>
            {/if}
    
-    {#if data.alld.sqadualed || data.alld.dates}
+    {#if a.sqadualed || a.dates}
                                 <p
                   style="line-height: 1;"
                   class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
@@ -235,45 +239,82 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
                     src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
                     alt="howmuch"
                   />
-                {#if data.alld.sqadualed}
-                <span> {new Date(data.alld?.sqadualed).toLocaleDateString($lang)}</span>
+                {#if a.sqadualed}
+                <span> {new Date(a.sqadualed).toLocaleDateString($lang)}</span>
                 {/if}
-                 {#if data.alld.dates}
-                <span> - {new Date(data.alld?.dates).toLocaleDateString()}</span>
+                 {#if a.dates}
+                <span> - {new Date(a.dates).toLocaleDateString()}</span>
                 {/if}
                   </p>
-                {/if} --> 
-                {#each data.alld.project.data.attributes.openMissions.data as open }
-                  <MissionCard data={open} />  
+                {/if}
+                {#if a.projectcreates?.data[0].attributes.open_missions.data.length > 1}
+                <h3 class="text-barbi font-bold text-xl lg:text-2xl underline ">{om[$lang]}</h3>
+                {#each a.projectcreates?.data[0].attributes.open_missions.data as open }
+                  <MissionCard data={open.attributes} />
                 {/each}
+                {/if}
      <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span> 
-        {data.alld.price.toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+        <span>
+        {a.price ? a.price.toLocaleString('en-US', {maximumFractionDigits:2}) : ``}
+        {#if a.kindOf == "perhour"}
+        {perho[$lang]}
+        {a.noofhours} {hourss[$lang]}
+        {/if}
+        {#if a.kindOf == "monthly"}
+        {monhly[$lang]}
+        {/if}
+         </span>
     </p>
         </div>
             <div class="">
-                <Share 
+                <Share
                 slug="{"services/"+$page.data.mId}"
-	 title="{data.alld.title[$lang]}"
+	 title="{a.title ? a.title[$lang] : null}"
      desc="servise"
      hashtags={['1💗1','consensus']}
-	 quote="{data.alld.title[$lang]}"
+	 quote="{a.title ? a.title[$lang] : null}"
 	 related={[]}
 	 via={''}
 	 />
-            </div>     
+            </div>
         </div>
-                   
-   
+        <div>
+          <!----
+        {#if a.skills?.data.length > 0}
+        <h3 class="text-barbi font-bold text-xl lg:text-2xl underline ">{requireSkills[$lang]}</h3>
+        <ul class="list-disc">
+            {#each a.skills.data as skill}
+            <li class="text-md text-gray-100 flex items-center lg:text-xl m-2" >{skill.attributes.skillName}</li>
+            {/each}
+        </ul>
+        {/if}
+        {#if a.tafkidims.data.length > 0}
+                <h3 class="text-barbi font-bold text-xl lg:text-2xl underline ">{requiredRoles[$lang]}</h3>
+        <ul class="list-disc">
+            {#each a.tafkidims.data as role}
+            <li class="text-md text-gray-100 flex items-center lg:text-xl m-2" >{role.attributes.roleDescription}</li>
+            {/each}
+        </ul>
+        {/if}
+        {#if a.work_ways.data.length > 0}
+                <h3 class="text-barbi font-bold text-xl lg:text-2xl underline ">{requiredWW[$lang]}</h3>
+        <ul class="list-disc">
+            {#each a.work_ways.data as workWay}
+            <li class="text-md text-gray-100 flex items-center lg:text-xl m-2" >{workWay.attributes.workWayName}</li>
+            {/each}
+        </ul>
+        {/if}-->
+        </div>
+
           {#if $page.data.tok != false}
           <div class="flex justify-center">
-            {#if alr == false && !data.alld.users.data.map(c => c.id).includes(data.uid)}
-          <button on:click={ask} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
+            {#if alr == false && !a.users?.data.map(c => c.id).includes(data.uid)}
+          <button on:click={ask} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}
             class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">{iwantto[$lang]}</button>
-        {:else if data.alld.users.data.map(c => c.id).includes(data.uid)}
+        {:else if a.users.data.map(c => c.id).includes(data.uid)}
         <h3 class="button-perl text-barbi px-4 py-1">{alri[$lang]}</h3>
-            {/if}  
+            {/if}
         </div>
           {:else}
           <div class="flex justify-center">
@@ -289,7 +330,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           </div>
           </div>
           </div>
-          </div>
+          </div >
           {:else}
           <div class="text-center pt-14">
           <h1 class="text-barbi sm:text-xl my-5">{mand[$lang]}</h1>
@@ -322,5 +363,4 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           {/if}
                 </div>
           {/if}
-          {/if}
-          
+          {/await}

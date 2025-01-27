@@ -4,7 +4,7 @@
   import Tile from '$lib/celim/tile.svelte';
   import {lang} from '$lib/stores/lang'
   export let data = [];
-
+  export let myId
   export let projectName
    import { onMount } from 'svelte';
   import { langAdjast } from '$lib/func/langAdjast.svelte';
@@ -73,7 +73,7 @@ const requiredWW = {
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
         <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
     </p>
-       {#if data.acts.data.length > 0}
+       {#if data.acts && data.acts.data.length > 0}
                           <ul>
                             {#each data.acts.data as datai, t}
                               <li>
@@ -127,7 +127,7 @@ const requiredWW = {
             <div class="basis-14" >
                 
                 <Share
-                slug="{"/availableMission/"+datai.id}"
+                slug="{"/availableMission/"+myId}"
 	 title="{title[$lang]}"
      desc="its new thing"
      hashtags={['1💗1','consensus']}
