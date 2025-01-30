@@ -51,9 +51,9 @@ const requiredWW = {
               }
     </script>
 
-<div bind:clientWidth={wid} class="h-screen overflow-auto md:items-center border-2 border-gold rounded d">
+<div bind:clientWidth={wid} class=" overflow-auto md:items-center border-2 border-gold rounded d">
        
-    <div dir="rtl"  style="overflow-y:auto" class="lg:w-1/2 d mb-4 pt-4 w-full  mx-auto">
+    <div dir="rtl"  style="overflow-y:auto" class=" d mb-4 pt-4 w-full  mx-auto">
     <div  class=" bg-gray-700  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal ">
          <div  class="mb-8">
               <div class="  mb-2 text-start">
@@ -124,6 +124,7 @@ const requiredWW = {
         {/if}  
         </div>-->
            </div>
+           <!--
             <div class="basis-14" >
                 
                 <Share
@@ -135,7 +136,7 @@ const requiredWW = {
 	 related={[]}
 	 via={''}
 	 />
-            </div>     
+            </div>     -->
         </div>
           </div>
           
