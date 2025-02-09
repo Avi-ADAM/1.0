@@ -1932,6 +1932,16 @@
     lang.set(data.lang);
     console.log($lang, 'start');
     miDataold = miData;
+    const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('jwt='))
+        .split('=')[1];
+      const cookieValueId = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('id='))
+        .split('=')[1];
+      idL = cookieValueId;
+      token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let link = baseUrl+'/graphql';
     try {

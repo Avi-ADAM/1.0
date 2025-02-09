@@ -52,6 +52,7 @@ onMount(async () => {
   }
   }
     if (data.tok){
+      console.log("auted")
     isAuthed = true
     initialForum(true,[],data.uid)
     console.log(data.uid,$forum)

@@ -16,6 +16,7 @@
   let isOpen = false;
   let a = 0;
   export let bmiData = [];
+  console.log(bmiData);
   import { RingLoader } from 'svelte-loading-spinners';
   import Close from '$lib/celim/close.svelte';
   let fermatana = {};
@@ -95,6 +96,7 @@
       }
     }
   }
+  let kindOf;
   let kindUlimit = false;
   export let projectUsers = [];
   let quant, each, maid;
@@ -102,8 +104,12 @@
     maid = id;
     each = v;
     quant = z;
+    kindOf = isto;
     if (isto == 'unlimited') {
+      console.log('unlimited',isto);
       kindUlimit = true;
+    }else{
+      kindUlimit = false;
     }
     isOpen = true;
     a = 0;
@@ -192,8 +198,8 @@
     style="z-index: 700;"
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
   >
-    <DialogContent aria-label="form">
-      <div style="z-index: 400;" dir="rtl">
+    <DialogContent class="content" aria-label="form">
+      <div style="z-index: 400;" dir="{$lang == 'he' ? 'rtl' : 'ltr'}">
         <button
           class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}>{cencel[$lang]}</button
@@ -205,6 +211,7 @@
             {quant}
             {kindUlimit}
             {maid}
+            {kindOf}
             on:doner={closer}
             on:done={sale}
             on:eror={() => (a = 3)}
@@ -219,7 +226,7 @@
             ></RingLoader>
           </div>
         {:else if a == 3}
-          <h1>{errmsg[$lang]}</h1>
+          <h1 class="text-center text-barbi text-bold underline decoration-mturk">{errmsg[$lang]}</h1>
           <button
             class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
             on:click={() => (a = 0)}>{trya[$lang]}</button
