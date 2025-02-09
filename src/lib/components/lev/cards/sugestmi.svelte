@@ -11,6 +11,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
+<<<<<<< HEAD
   /** @type {{low?: boolean, projectName: any, timeToP: any, acts: any, src: any, perhour: any, noOfHours: any, missionDetails: any, missionName: any, skills?: any, role?: any, workways?: any, totalminyearone?: number, totalmaxyearone?: number, totalminyearsec?: number, totalmaxyearsec?: number, totalinyearone?: number, totalinyearsec?: number, isMonthly?: boolean, alreadyi?: boolean, hearotMeyuchadot: any, already: any, allr?: boolean, isVisible?: boolean}} */
   let {
     low = false,
@@ -38,6 +39,12 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     allr = false,
     isVisible = false
   } = $props();
+=======
+  import { isMobileOrTablet } from '$lib/utilities/device';
+    export let projectName,timeToP, acts, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false,hearotMeyuchadot
+    export let already, allr = false;
+  export let isVisible = false;
+>>>>>>> main
 function hover(x){
 dispatch("hover",{x:x});
 }
@@ -84,13 +91,36 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
         const monhly = {"he":"בחודש", "en": "per month"}
 
 console.log(workways)
+<<<<<<< HEAD
 run(() => {
     console.log("ACTS: ",acts)
   });
+=======
+$: console.log("ACTS: ",acts)
+let isScrolable = true; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+>>>>>>> main
 </script>
 
 
-<div dir="rtl"  style="overflow-y:auto" class=" d  leading-normal  dark:bg-slate-800  {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''}  leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+<div on:wheel={preventSwiperScroll} 
+on:wheel={preventSwiperScroll} 
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d  leading-normal  dark:bg-slate-800  {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''}  leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -110,7 +140,7 @@ run(() => {
          <button onclick={project} class="px-2 mx-2 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded text-sm" >{t.watchpr[$lang]}</button >
          </div>
 
-  <div  class=" bg-white dark:bg-slate-800 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row  leading-normal">
+  <div  class="{isScrolable ? "bg-white dark:bg-slate-800" : "bg-gray-200 dark:bg-slate-700"} transition-all-300   rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row  leading-normal">
     
     <div  class="mb-8">
             <div class="sm:text-3xl text-xl text-mturk font-bold  mb-2">{missionName}</div>

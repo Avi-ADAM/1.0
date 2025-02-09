@@ -238,11 +238,13 @@
     idPr.set(resP.data.createProject.data.id);
     goto('/moach');
   }
+  import { isMobileOrTablet } from '$lib/utilities/device.js';
+
   import { RingLoader } from 'svelte-loading-spinners';
   import RichText from '$lib/celim/ui/richText.svelte';
   /** @type {{userName_value: any}} */
   let { userName_value } = $props();
-  const closer = () => {
+ const closer = () => {
     isOpen = false;
     a = 0;
   };
@@ -428,6 +430,7 @@
     <h1 class="text-gold">{crn[$lang]}</h1>
     <br />
 
+<<<<<<< HEAD
     <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
       <input
         name="des"
@@ -448,6 +451,22 @@
         >{naex[$lang]}</small
       >{/if}
     <!----
+=======
+  {#if before == false}
+
+<div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} dir="{$lang == "en" ? "ltr" : "rtl"}" class="jho {isMobileOrTablet ? "pb-12" : ""} flex flex-col items-center text-center justify-center">
+  <h1 class="text-gold">{crn[$lang]}</h1>
+<br>
+
+        <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
+  <input name="des" bind:value={projectName_value}  
+ type='text' class='input'required >
+  <label style:right={$lang == "he" ? "0" : "none"} style:left={$lang == "en" ? "0" : "none"} for="des" class='label'>{frn[$lang]}</label>
+  <span class='line'></span>
+</div>
+{#if shgi == true}<small class="text-red-600 bg-slate-50">{naex[$lang]}</small>{/if}
+<!----
+>>>>>>> main
     <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <textarea name="es"  bind:value={desP}    
  type='text' class='input d' required ></textarea>

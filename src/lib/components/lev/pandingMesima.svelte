@@ -12,7 +12,54 @@ import { RingLoader
 } from 'svelte-loading-spinners';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
  const dispatch = createEventDispatcher();
+<<<<<<< HEAD
         let dialogOpen = $state(false)
+=======
+ export let coinlapach;
+ export let isVisible = false;
+ export let mypos = null;
+     export let low = false;
+        export let restime;
+        let dialogOpen = false
+        export let negopendmissions= [];
+
+        export let modal = false
+    export let messege = [];
+    export let descrip = "";
+    export let projectName = "";
+    export let name = "";
+    export let hearotMeyuchadot = "";
+    export let noofhours = 0;
+    export let src = "coin.png";
+    export let perhour = 0;
+    export let projectId;
+    export let uids = [];
+    export let what = [];
+    export let noofusersOk;
+    export let noofusersNo;
+    export let noofusersWaiting;
+    export let total = 0;
+    export let noofusers ;
+    export let already = false;
+    export let missionId;
+    export let skills = [];
+    export let tafkidims = [];
+    export let workways = [];
+    export let vallues;
+    export let publicklinks;
+    export let privatlinks;
+    export let mdate;
+    export let isKavua = false
+        export let mdates;
+        export let timegramaDate
+         export let timegramaId                     
+        export let createdAt;
+    export let pendId;
+    export let users;
+     export let mysrc;
+    export let diun = [];
+    export let order = diun.length;
+>>>>>>> main
     let miDatan = [];
     let error1;
     let bearer1;
@@ -645,6 +692,7 @@ function claf (event){
       on:load={()=>loading = true}
               on:close={afternego}
               {timegramaId}
+  {negopendmissions}
         descrip ={descrip}
         projectName ={projectName}
         name1 ={name}
@@ -1120,7 +1168,8 @@ input[type=text]:invalid {
               width: auto !important;
         }
           :global([data-svelte-dialog-content].nego) {
-                overflow-y: auto;
+                overflow: auto;
+              
        z-index: 1000;
       padding: 15px;
       margin-right: 25px;
@@ -1128,7 +1177,7 @@ input[type=text]:invalid {
       margin: 0px;
                 margin-top: 20vh;
                 height: 80vh;
-                width: fit-content;
+                max-width: 100vw;
                 border-radius: 5%;
                 border-top-right-radius: 2%;
                  border-bottom-right-radius: 2%;

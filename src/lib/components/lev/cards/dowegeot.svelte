@@ -3,6 +3,7 @@
   import { lang } from '$lib/stores/lang.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
+<<<<<<< HEAD
   import No from '../../../celim/no.svelte';
   /** @type {{low?: boolean, isVisible?: boolean, agprice: any, useraplyname: any, src2: any, missionBName: any, already?: boolean, yers: any, projectName: any, src: any, kindOf: any, noofusersWaiting: any, noofusersOk: any, noofusersNo: any, monts: any, hm?: number, spnot: any, allr?: boolean}} */
   let {
@@ -35,6 +36,15 @@
     tochat = () => {}
   } = $props();
   /*
+=======
+  import No from '../../../celim/no.svelte'
+  import { isMobileOrTablet } from '$lib/utilities/device';
+    export let  agprice,useraplyname,src2,missionBName ,already = false ,yers ,projectName ,src, kindOf,noofusersWaiting,noofusersOk,noofusersNo,monts,hm = 1,spnot
+    export let  allr = false;
+function hover(x){
+dispatch("hover",{x:x});
+}
+>>>>>>> main
 function agree(alr){
   already = true;
 dispatch("agree",{alr:alr,y:"a"})
@@ -44,6 +54,7 @@ function decline(alr) {
 dispatch("decline",{alr:alr,y:"d"});
 }*/
 
+<<<<<<< HEAD
   const neged = { he: 'נדרש בירור', en: 'negotiation needed' };
   const negedT = {
     he: 'סך ההצבעות להליך בירור',
@@ -223,6 +234,83 @@ dispatch("decline",{alr:alr,y:"d"});
       {#if spnot !== null && spnot !== 'null' && spnot !== 'undefined' && spnot !== undefined}
         <p class="cd d max-h-16 text-gray-700 text-base">{spnot}</p>{/if}
       <!-- {#if hearotMeyuchadot}
+=======
+}
+function tochat (){
+dispatch("tochat");
+}
+const neged ={"he":"נדרש בירור","en":"negotiation needed"}
+const negedT = {"he":"סך ההצבעות להליך בירור","en":"total votes for negotiation"}
+const bead = {"he":"בעד","en":"in favor"}
+const notyet = {"he":"טרם","en":"not yet"}
+const notyetT ={"he":"לא הצביעו","en":"not voted yet"}
+const leshana = {"he":"לשנה","en":"per year"}
+const oneyear = {"he":"שנה אחת","en":"one year"}
+const years = {"he":"שנים","en":"years"} 
+const intotal = {"he":"סך הכל","en":"in total"}
+const onemonth = {"he":"חודש אחד","en":"one month"}
+const lehodesh = {"he":"לחודש","en":"per month"}
+const months = {"he":"חודשים","en":"months"}
+const perunit = {"he":"ליחידה","en":"per unit"}
+const units = {"he":"יחידות","en":"units"}
+const oneunit = {"he":"יחידה אחת","en":"one unit"}
+const head = {"he":"אישור קבלת משאב בהצלחה","en":"approval of getting a resorce sucsessfully"}
+const totalinfavor = {"he":"סך ההצבעות בעד","en":"total votes in favor"}
+let isScrolable = true; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+</script>
+
+
+<div on:wheel={preventSwiperScroll} 
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"} style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''}  leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
+ <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
+  </div>-->
+   <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-liteGoldTobr">
+      <div class="relative flex items-center space-x-1">
+         <div class="relative">
+         <img src={src2}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+         </div>
+         <div class="flex flex-col leading-tight">
+            <div class="sm:text-sm text-md mt-1 flex items-center">
+               <span class="text-barbi text-center mr-3 sm:text-2xl text-xl">{head[$lang]}</span>
+            </div>
+            <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-lg sm:text-xl  text-barbi ">{projectName}</span>
+         </div>
+         </div>
+         </div>
+  <div  class=" {isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+    <div  class="mb-8">
+         <div style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
+            <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
+      {#if kindOf === "perUnit"}
+       <p ><span on:mouseenter={()=>hover({"he":"שווי ליחידה","en":"per unit vallue"})} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{agprice.toLocaleString('en-US', {maximumFractionDigits:2})} {perunit[$lang]}</span> * <span on:mouseenter={()=>hover({"he":"כמות","en":"amount"})} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink);" >{hm == 1 ? `${oneunit[$lang]}` : `${hm} ${units[$lang]}`}</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en":"in total"})} on:mouseleave={()=>hover("0")} >{(agprice * hm).toLocaleString('en-US', {maximumFractionDigits:2}) } {intotal[$lang]}</span> </p>
+   {:else if kindOf === "total" || kindOf === "rent"}
+       <p ><span on:mouseenter={()=>hover({"he":"שווי מוצע","en":"offered vallue"})} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{agprice.toLocaleString('en-US', {maximumFractionDigits:2})}</span></p>
+          {:else if kindOf === "monthly"}
+       <p ><span on:mouseenter={()=>hover({"he":"שווי לחודש","en":"monthly vallue"})} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{agprice.toLocaleString('en-US', {maximumFractionDigits:2})} {lehodesh[$lang]}</span> * <span on:mouseenter={()=>hover({"he":"כמות חודשים","en":"number of months"})} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{monts == 1 ?  `${onemonth[$lang]}` : `${monts} ${months[$lang]}`}</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en":"in total"})} on:mouseleave={()=>hover("0")} > {intotal[$lang]} {(agprice * monts).toLocaleString('en-US', {maximumFractionDigits:2}) }</span> </p>
+          {:else if kindOf === "yearly"}
+       <p ><span on:mouseenter={()=>hover({"he":"שווי לשנה","en":"yearly vallue"})} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{agprice.toLocaleString('en-US', {maximumFractionDigits:2})} {leshana[$lang]}</span> * <span on:mouseenter={()=>hover({"he":"מספר השנים","en":"number of years"})} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{yers == 1 ?  `${oneyear[$lang]}`: `${yers} ${years[$lang]}`}</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en":"in total"})} on:mouseleave={()=>hover("0")} > {intotal[$lang]} { (agprice * yers).toLocaleString('en-US', {maximumFractionDigits:2}) }</span> </p>
+{/if}
+         </div>
+      <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionBName}</div>
+     {#if spnot !== null && spnot !== "null" && spnot !== "undefined" && spnot !== undefined} <p class="cd d max-h-16 text-gray-700 text-base">{spnot}</p>{/if}
+   <!-- {#if hearotMeyuchadot}
+>>>>>>> main
      <p on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
      {/if} 
      <div class="flex items-center border border-gold" >

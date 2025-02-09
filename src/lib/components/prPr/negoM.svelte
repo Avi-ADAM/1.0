@@ -1,6 +1,42 @@
 <script>
-  import { role, ww, skil} from '$lib/components/prPr/mi.js'
+  import { role, ww, skil } from '$lib/components/prPr/mi.js';
+  import { createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte';
+  import { lang } from '$lib/stores/lang';
+  const dispatch = createEventDispatcher();
+  export let negopendmissions = []
+  export let descrip;
+  export let projectName;
+  export let name1;
+  export let hearotMeyuchadot;
+  export let noofhours = 0;
+  export let perhour = 0;
+  export let projectId;
+  export let uids = [];
+  export let what = [];
+  export let noofusersOk;
+  export let noofusersNo;
+  export let noofusersWaiting;
+  export let total = 0;
+  export let noofusers;
+  export let already;
+  export let mypos;
+  export let missionId;
+  export let skills;
+  export let tafkidims;
+  export let workways;
+  export let vallues;
+  export let publicklinks;
+  export let privatlinks = 'aaxa';
+  export let mdate;
+  export let mdates;
+  export let state = 2;
+  export let pendId;
+  export let users = [];
+  export let isKavua;
+  export let oldide = 0; //last tg id, if non 0
 
+<<<<<<< HEAD
 import {
     createEventDispatcher
 } from 'svelte';
@@ -81,6 +117,78 @@ function myMissionH() {
   idL = cookieValueId;
 rishonves = idL;
 /*let checkBox = document.getElementById("done");
+=======
+  let isKavua2;
+  let newcontent = true;
+
+  let miDatan = [];
+  let error1;
+  let bearer1;
+  let token;
+  let idL;
+  let no = false;
+  let masa = false;
+  let data;
+  let isOpen;
+  const less = {
+    he: 'הסרה',
+    en: 'remove'
+  };
+  let placeholder4 = `בחירת תפקידים`;
+  let roles = $role;
+  let why = '';
+  let skills2 = $skil;
+  let placeholder1 = `בחירת כישורים`;
+  let addS = false;
+  let descrip2 = descrip;
+  let name2 = name1;
+  let selected2 = [];
+  let selected3 = [];
+  let selected1 = [];
+  let workways2 = $ww;
+  let placeholder = `סוג משימה`;
+  const plww = { he: `סוג משימה`, en: `mission kind` };
+  let mdate2 = mdate;
+  let mdates2 = mdates;
+
+  let hearotMeyuchadot2 = hearotMeyuchadot;
+  let privatlinks2 = privatlinks;
+  let noofhours2 = noofhours;
+  let perhour2 = perhour;
+  let myM;
+  let done;
+  let skills3 = [];
+  let tafkidims2 = [];
+  let workways3 = [];
+
+  let rishon = 0;
+  function myMission() {
+    var checkBox = document.getElementById('tomeC');
+
+    var text = document.getElementById('doneC');
+    console.log(text);
+    if (text.style.display == 'none') {
+      text.style.display = '';
+    } else {
+      text.style.display = 'none';
+    }
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    rishon = idL;
+  }
+  let rishonves = 0;
+  function myMissionH() {
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    rishonves = idL;
+    /*var checkBox = document.getElementById("done");
+>>>>>>> main
   // Get the output text
   let text = document.getElementById("hoursC");
   let text2 = document.getElementById("vallueperhourC");
@@ -101,8 +209,9 @@ rishonves = idL;
     text4.style.display = "";
     text5.style.display = "";
   }*/
-}
+  }
 
+<<<<<<< HEAD
 function arraysEqual(a1,a2) {
     return JSON.stringify(a1)==JSON.stringify(a2);
 }
@@ -121,53 +230,77 @@ function close (){
           let rishonves4 = ``;
           let what4 = true;
 function objToString (obj) {
+=======
+  function arraysEqual(a1, a2) {
+    return JSON.stringify(a1) == JSON.stringify(a2);
+  }
+  function close() {
+    dispatch('close');
+  }
+  export let timegramaId;
+  let name4 = ``;
+  export let ordern = 0;
+  let descrip4 = ``;
+  let hearotMeyuchadot4 = ``;
+  let noofhours4 = ``;
+  let perhour4 = ``;
+  let skills4 = ``;
+  let roles4 = ``;
+  let ww4 = ``;
+  let rishon4 = ``;
+  let rishonves4 = ``;
+  let what4 = true;
+  function objToString(obj) {
+>>>>>>> main
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-        
-     const length = Object.keys(obj[i]).length;
-        let t = 0;
-    for (const [p, val] of Object.entries(obj[i])) {
-      const last = t === length - 1; 
+      const length = Object.keys(obj[i]).length;
+      let t = 0;
+      for (const [p, val] of Object.entries(obj[i])) {
+        const last = t === length - 1;
         t++;
-        if (typeof(val) == "string") {
-        str += `${p}:"${val}"\n`;
-    } else if (typeof(val) == "number"|"boolean") {
-        str += `${p}:${val}\n`;
-    } else if (typeof(val) == 'null'){
-      str += `${p}:${val.map(c => c.id)}\n`;
-    }
+        if (typeof val == 'string') {
+          str += `${p}:"${val}"\n`;
+        } else if ((typeof val == 'number') | 'boolean') {
+          str += `${p}:${val}\n`;
+        } else if (typeof val == 'null') {
+          str += `${p}:${val.map((c) => c.id)}\n`;
+        }
         if (last) {
-          str += "},"
+          str += '},';
+        }
+        if (t == 1) {
+          str += '{';
+        }
+      }
     }
-    if (t == 1){
-      str += "{"
-    }
-    }}
     return str;
-}
-function objToStringC (obj) {
+  }
+  function objToStringC(obj) {
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-        const length = Object.keys(obj[i]).length;
-        let t = 0;
-    for (const [p, val] of Object.entries(obj[i])) {
-      const last = t === length - 1; 
+      const length = Object.keys(obj[i]).length;
+      let t = 0;
+      for (const [p, val] of Object.entries(obj[i])) {
+        const last = t === length - 1;
         t++;
-        if (typeof(val) == "string") {
-        str += `${p}:"${val}"\n`;
-    } else if (typeof(val) == "number"|"boolean") {
-        str += `${p}:${val}\n`;
-    } else if (typeof(val) == 'null'){
-      str += `${p}:${val.map(c => c.id)}\n`;
-    }
+        if (typeof val == 'string') {
+          str += `${p}:"${val}"\n`;
+        } else if ((typeof val == 'number') | 'boolean') {
+          str += `${p}:${val}\n`;
+        } else if (typeof val == 'null') {
+          str += `${p}:${val.map((c) => c.id)}\n`;
+        }
         if (last) {
-          str += "},"
+          str += '},';
+        }
+        if (t == 1) {
+          str += '{';
+        }
+      }
     }
-    if (t == 1){
-      str += "{"
-    }
-    }}
     return str;
+<<<<<<< HEAD
 }
 let userss;
 async function increment() {
@@ -176,23 +309,49 @@ async function increment() {
   let date4 = ``, dates4 = ``,iskvua4 = ``, iskvua4nego = ``, date4nego, dates4nego, namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
   let d = new Date()
       const negoss = ``;
+=======
+  }
+  export let masaalr = false;
+  let userss;
+  async function increment() {
+    dispatch('load');
+    //TODO: update timegrama, add now pend that is changed to nego
+    let date4 = ``,
+      dates4 = ``,
+      iskvua4 = ``,
+      iskvua4nego = ``,
+      date4nego,
+      dates4nego,
+      namefornego,
+      descrip4nego,
+      hearotMeyuchadot4nego,
+      noofhours4nego,
+      perhour4nego,
+      skills4nego,
+      roles4nego,
+      ww4nego,
+      rishon4nego,
+      rishonves4nego;
+    let d = new Date();
+    const negoss = ``;
+>>>>>>> main
     const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
-    token  = cookieValue; 
-     bearer1 = 'bearer' + ' ' + token;
-    if (rishon !== 0){
-        rishon4= `rishon: "${rishon}"`
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    bearer1 = 'bearer' + ' ' + token;
+    if (rishon !== 0) {
+      rishon4 = `rishon: "${rishon}"`;
     } else {
-        rishon4 = ``;
+      rishon4 = ``;
     }
-     /* if (rishonves !== 0){
+    /* if (rishonves !== 0){
         rishonves4= `rishonves: "${rishonves}"`
     } else {
         rishonves4 = ``;
@@ -205,129 +364,139 @@ async function increment() {
     ${rishonves4},
     iskvua
     */
-    if (isKavua === isKavua2){
-          iskvua4 = ``
-          iskvua4nego = ``
-     } else {
-         iskvua4nego =  ` isMonth: ${isKavua ?? false},`
-         iskvua4 = ` iskvua: ${isKavua2 ?? false},`
-         what4 = false;
-     }
-     if (mdates === mdates2){
-          dates4 = ``
-          dates4nego = ``
-     } else {
-        let momebtt = moment(mdates2, "HH:mm DD/MM/YYYY ") || null
-         dates4nego =  (mdates != null && mdates != undefined) ? ` dates: "${mdates}",` : ``;
-         dates4 =  (mdates2 != null && mdates2 != undefined) ? ` dates: "${momebtt.toISOString()}",` : ``;
-         what4 = false;
-     }
-     if (mdate === mdate2){
-          date4 = ``
-          date4nego = ``
-     } else {
-        let momebtt = moment(mdate2, "HH:mm DD/MM/YYYY ") || null
-         date4nego =  (mdate != null && mdate != undefined) ? ` date: "${mdate}",` : ``;
-         date4 =  (mdate2 != null && mdate2 != undefined) ? ` sqadualed: "${momebtt.toISOString()}",` : ``;
-         what4 = false;
-     }
-      if (name1 === name2){
-          name4 = ``
-          namefornego = ``
-     } else {
-         name4 = `name: "${name2}",`
-         namefornego = `name: "${name1}",`
-         what4 = false;
-     }
-      if (descrip === descrip2){
-          descrip4 = ``
-          descrip4nego = ``
-     } else {
-         descrip4 = `descrip: "${descrip2}",`
-         descrip4nego = `descrip: "${descrip}",`
-                  what4 = false;
-     }
-    if (hearotMeyuchadot === hearotMeyuchadot2){
-          hearotMeyuchadot4 = ``
-          hearotMeyuchadot4nego = ``
-     } else {
-         hearotMeyuchadot4 = `hearotMeyuchadot: "${hearotMeyuchadot2}",`
-         hearotMeyuchadot4nego = `hearotMeyuchadot: "${hearotMeyuchadot}",`
-         what4 = false;
-
-     }
-     if (noofhours === noofhours2){
-          noofhours4 = ``
-          noofhours4nego = ``
-     } else {
-         noofhours4 = `noofhours: ${noofhours2},`
-         noofhours4nego = `noofhours: ${noofhours},`
-         what4 = false;
-     }
-     if (perhour === perhour2){
-         perhour4 = ``;
-         perhour4nego = ``
-     } else {
-         perhour4 = `perhour: ${perhour2},`;
-         perhour4nego = `perhour: ${perhour},`
-         what4 = false;
-     }
-     const skillsId = skills.data.map(c => c.id);
-     const skills2Id = skills3.data.map(c => c.id);
-     const roId = tafkidims.data.map(c => c.id);
-     const ro2Id = tafkidims2.data.map(c => c.id);
-     const wwId = workways.data.map(c => c.id);
-     const ww2Id = workways3.data.map(c => c.id);
-     if (arraysEqual(skillsId, skills2Id) === false){
-            skills4 = ` skills: [${skills2Id}], `;
-            skills4nego = ` skills: [${skillsId}], `;
-                     what4 = false;
+    if (isKavua === isKavua2) {
+      iskvua4 = ``;
+      iskvua4nego = ``;
     } else {
-        skills4 =``;
-        skills4nego = ``;
+      iskvua4nego = ` isMonth: ${isKavua ?? false},`;
+      iskvua4 = ` iskvua: ${isKavua2 ?? false},`;
+      what4 = false;
     }
-     if (arraysEqual(roId, ro2Id) === false){
-            roles4 = ` tafkidims: [${ro2Id}], `;
-            roles4nego = ` tafkidims: [${roId}], `;
-                     what4 = false;
-    }  else {
-            roles4 = ``;
-            roles4nego = ``
-    }
-     if (arraysEqual(wwId, ww2Id) === false){
-            ww4 = ` work_ways: [${ww2Id}], `;
-            ww4nego = ` work_ways: [${wwId}], `;
-                     what4 = false;
-
+    if (mdates === mdates2) {
+      dates4 = ``;
+      dates4nego = ``;
     } else {
-        ww4 = ``;
-        ww4nego = ``;
+      let momebtt = moment(mdates2, 'HH:mm DD/MM/YYYY ') || null;
+      dates4nego =
+        mdates != null && mdates != undefined ? ` dates: "${mdates}",` : ``;
+      dates4 =
+        mdates2 != null && mdates2 != undefined
+          ? ` dates: "${momebtt.toISOString()}",`
+          : ``;
+      what4 = false;
     }
-    let another = ``
-     if (what4 == true && masaalr == true && mypos == false || what4 == true && masaalr == false || what4 == false){
-
-    if (what4 == false){
-    another = `,{
+    if (mdate === mdate2) {
+      date4 = ``;
+      date4nego = ``;
+    } else {
+      let momebtt = moment(mdate2, 'HH:mm DD/MM/YYYY ') || null;
+      date4nego =
+        mdate != null && mdate != undefined ? ` date: "${mdate}",` : ``;
+      date4 =
+        mdate2 != null && mdate2 != undefined
+          ? ` sqadualed: "${momebtt.toISOString()}",`
+          : ``;
+      what4 = false;
+    }
+    if (name1 === name2) {
+      name4 = ``;
+      namefornego = ``;
+    } else {
+      name4 = `name: "${name2}",`;
+      namefornego = `name: "${name1}",`;
+      what4 = false;
+    }
+    if (descrip === descrip2) {
+      descrip4 = ``;
+      descrip4nego = ``;
+    } else {
+      descrip4 = `descrip: "${descrip2}",`;
+      descrip4nego = `descrip: "${descrip}",`;
+      what4 = false;
+    }
+    if (hearotMeyuchadot === hearotMeyuchadot2) {
+      hearotMeyuchadot4 = ``;
+      hearotMeyuchadot4nego = ``;
+    } else {
+      hearotMeyuchadot4 = `hearotMeyuchadot: "${hearotMeyuchadot2}",`;
+      hearotMeyuchadot4nego = `hearotMeyuchadot: "${hearotMeyuchadot}",`;
+      what4 = false;
+    }
+    if (noofhours === noofhours2) {
+      noofhours4 = ``;
+      noofhours4nego = ``;
+    } else {
+      noofhours4 = `noofhours: ${noofhours2},`;
+      noofhours4nego = `noofhours: ${noofhours},`;
+      what4 = false;
+    }
+    if (perhour === perhour2) {
+      perhour4 = ``;
+      perhour4nego = ``;
+    } else {
+      perhour4 = `perhour: ${perhour2},`;
+      perhour4nego = `perhour: ${perhour},`;
+      what4 = false;
+    }
+    const skillsId = skills.data.map((c) => c.id);
+    const skills2Id = skills3.data.map((c) => c.id);
+    const roId = tafkidims.data.map((c) => c.id);
+    const ro2Id = tafkidims2.data.map((c) => c.id);
+    const wwId = workways.data.map((c) => c.id);
+    const ww2Id = workways3.data.map((c) => c.id);
+    if (arraysEqual(skillsId, skills2Id) === false) {
+      skills4 = ` skills: [${skills2Id}], `;
+      skills4nego = ` skills: [${skillsId}], `;
+      what4 = false;
+    } else {
+      skills4 = ``;
+      skills4nego = ``;
+    }
+    if (arraysEqual(roId, ro2Id) === false) {
+      roles4 = ` tafkidims: [${ro2Id}], `;
+      roles4nego = ` tafkidims: [${roId}], `;
+      what4 = false;
+    } else {
+      roles4 = ``;
+      roles4nego = ``;
+    }
+    if (arraysEqual(wwId, ww2Id) === false) {
+      ww4 = ` work_ways: [${ww2Id}], `;
+      ww4nego = ` work_ways: [${wwId}], `;
+      what4 = false;
+    } else {
+      ww4 = ``;
+      ww4nego = ``;
+    }
+    let another = ``;
+    if (
+      (what4 == true && masaalr == true && mypos == false) ||
+      (what4 == true && masaalr == false) ||
+      what4 == false
+    ) {
+      if (what4 == false) {
+        another = `,{
       what: true
       users_permissions_user: "${idL}"
       order: 4
-    }`
-    } 
-     if (masaalr == true){
-        userss = objToStringC(users)
-  } else{
-        userss = objToString(users)
-  }
-  let fd = new Date(Date.now() + x)
- try {
-             await fetch(linkg, {
-              method: 'POST',
-        headers: {
-            'Authorization': bearer1,
+    }`;
+      }
+      if (masaalr == true) {
+        userss = objToStringC(users);
+      } else {
+        userss = objToString(users);
+      }
+      let fd = new Date(Date.now() + x);
+      try {
+        await fetch(linkg, {
+          method: 'POST',
+          headers: {
+            Authorization: bearer1,
             'Content-Type': 'application/json'
-                  },
-        body: //${negoss} {rishons} {rishonveses}?
-        JSON.stringify({query:`mutation { 
+          },
+          //${negoss} {rishons} {rishonveses}?
+          body: JSON.stringify({
+            query: `mutation { 
              updateTimegrama(
      id: ${timegramaId}
              data:{
@@ -370,7 +539,7 @@ async function increment() {
      {
       what: true
       users_permissions_user: "${idL}"
-      order: ${ordern+1}
+      order: ${ordern + 1}
       zman:"${d.toISOString()}"
       ide:${idL}
     }
@@ -382,21 +551,21 @@ async function increment() {
       }
   ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
 } `
-// make coin desapire
-} )})
-  .then(r => r.json())
-  .then(data => miDatan = data);
-         console.log(miDatan)
-        toast.success(tr?.toasts.suc[$lang])
+            // make coin desapire
+          })
+        })
+          .then((r) => r.json())
+          .then((data) => (miDatan = data));
+        console.log(miDatan);
+        toast.success(tr?.toasts.suc[$lang]);
 
-         close();
-        } catch (e) {
-            error1 = e
-            console.log(error1)
-           toast.warning(tr?.toasts.er[$lang])
-
-        }
+        close();
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
+        toast.warning(tr?.toasts.er[$lang]);
       }
+<<<<<<< HEAD
 }
 let x
 let linkg =  import.meta.env.VITE_URL + "/graphql";
@@ -405,51 +574,69 @@ function addnew (event){
    const newOb = event.detail.skob;
    const valc = event.detail.valc;
      const dataibn = event.detail.dataibn;
+=======
+    }
+  }
+  let x;
+  let linkg = import.meta.env.VITE_URL + '/graphql';
+  let dataibno = { skillName: [], roleDescription: [], workWayName: [] };
+  function addnew(event) {
+    const newOb = event.detail.skob;
+    const valc = event.detail.valc;
+    const dataibn = event.detail.dataibn;
+>>>>>>> main
     const newN = event.detail.skob.attributes[valc];
-  dataibno[valc] = dataibn
-  const newValues = valc == "skillName" ? $skil : valc == "roleDescription" ? $role : valc == "workWayName" ? $ww : [];
+    dataibno[valc] = dataibn;
+    const newValues =
+      valc == 'skillName'
+        ? $skil
+        : valc == 'roleDescription'
+          ? $role
+          : valc == 'workWayName'
+            ? $ww
+            : [];
     newValues.push(newOb);
-    if(valc == "skillName"){
-      skills2 = newValues
-      skil.set(skills2)
-    }else if (valc == "roleDescription"){
-      roles = newValues
-      role.set(roles)
-    }else if ( valc == "workWayName" ){
-      workways2 = newValues
-      ww.set(workways2)
+    if (valc == 'skillName') {
+      skills2 = newValues;
+      skil.set(skills2);
+    } else if (valc == 'roleDescription') {
+      roles = newValues;
+      role.set(roles);
+    } else if (valc == 'workWayName') {
+      workways2 = newValues;
+      ww.set(workways2);
     }
     const newSele = dataib;
     newSele.push(newOb);
-    if(valc == "skillName"){
-      skills3.data = newSele
-    }else if (valc == "roleDescription"){
-      tafkidims2.data = newSele
-    }else if ( valc == "workWayName" ){
-      workways3 = newSele
+    if (valc == 'skillName') {
+      skills3.data = newSele;
+    } else if (valc == 'roleDescription') {
+      tafkidims2.data = newSele;
+    } else if (valc == 'workWayName') {
+      workways3 = newSele;
     }
-    dataibno[valc].push(newN)
-    dataibno = dataibno
-}
-onMount(async () => {
-  isKavua2 = isKavua
- //  skills3 = skills;
- //tafkidims2 = tafkidims; 
- //workways3 = workways;
-  console.log("mounted",$lang)
+    dataibno[valc].push(newN);
+    dataibno = dataibno;
+  }
+  onMount(async () => {
+    isKavua2 = isKavua;
+    //  skills3 = skills;
+    //tafkidims2 = tafkidims;
+    //workways3 = workways;
+    console.log('mounted', $lang);
     const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
     const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
     idL = cookieValueId;
     token = cookieValue;
     bearer1 = 'bearer' + ' ' + token;
- const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-      const checkStatus = (resp) => {
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
       if (resp.status >= 200 && resp.status < 300) {
         return resp;
       }
@@ -457,18 +644,19 @@ onMount(async () => {
         throw resp;
       });
     };
-      try {
-          const res = await fetch(import.meta.env.VITE_URL+"/graphql", {
-              method: "POST",
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                      query: `query {
-    skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ""} }}}
-     tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ""}}}}
-     workWays {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ""} } }}
+    try {
+      const res = await fetch(import.meta.env.VITE_URL + '/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: `query {
+    skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''} }}}
+     tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ''}}}}
+     workWays {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''} } }}
  }
+<<<<<<< HEAD
               `})
            }).then(checkStatus)
           .then(parseJSON);
@@ -504,31 +692,85 @@ onMount(async () => {
             role.set(roles)
             newcontent = false
        
+=======
+              `
+        })
+      })
+        .then(checkStatus)
+        .then(parseJSON);
+      skills2 = res.data.skills.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < skills2.length; i++) {
+          if (skills2[i].attributes.localizations.data.length > 0) {
+            skills2[i].attributes.skillName =
+              skills2[i].attributes.localizations.data[0].attributes.skillName;
+          }
+        }
+      }
+      skills2 = skills2;
+      roles = res.data.tafkidims.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < roles.length; i++) {
+          if (roles[i].attributes.localizations.data.length > 0) {
+            roles[i].attributes.roleDescription =
+              roles[
+                i
+              ].attributes.localizations.data[0].attributes.roleDescription;
+          }
+        }
+      }
+      roles = roles;
+      workways2 = res.data.workWays.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < workways2.length; i++) {
+          if (workways2[i].attributes.localizations.data.length > 0) {
+            workways2[i].attributes.workWayName =
+              workways2[
+                i
+              ].attributes.localizations.data[0].attributes.workWayName;
+          }
+        }
+      }
+      workways2 = workways2;
+      skil.set(skills2);
+      ww.set(workways2);
+      role.set(roles);
+      newcontent = false;
+>>>>>>> main
     } catch (e) {
-        error1 = e
+      error1 = e;
 
-        console.log(error1)
+      console.log(error1);
     }
-     if (restime == "feh") {
-        x = 48 * 60 * 60 * 1000
-    } else if (restime == "sth") {
-        x = 72 * 60 * 60 * 1000 
-    } else if (restime == "nsh") {
-        x = 96 * 60 * 60 * 1000
-    } else if (restime == "sevend") {
-        x = 168 * 60 * 60 * 1000
+    if (restime == 'feh') {
+      x = 48 * 60 * 60 * 1000;
+    } else if (restime == 'sth') {
+      x = 72 * 60 * 60 * 1000;
+    } else if (restime == 'nsh') {
+      x = 96 * 60 * 60 * 1000;
+    } else if (restime == 'sevend') {
+      x = 168 * 60 * 60 * 1000;
     }
+<<<<<<< HEAD
     x =x
     console.log(new Date(Date.now() + x).toLocaleString(),restime)
 })
  import tr from '$lib/translations/tr.json';
+=======
+    x = x;
+    console.log(new Date(Date.now() + x).toLocaleString(), restime);
+  });
+  export let restime;
+  import tr from '$lib/translations/tr.json';
+>>>>>>> main
   import Text from '../conf/text.svelte';
   import Elements from '../conf/elements.svelte';
-    import Number from '../conf/number.svelte';
+  import Number from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
   import Barb from '../conf/barb.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
+<<<<<<< HEAD
   /**
    * @typedef {Object} Props
    * @property {any} descrip
@@ -608,31 +850,144 @@ onMount(async () => {
 const tri = tr
 let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}])
 
+=======
+  import Rich from '../conf/rich.svelte';
+
+  const tri = tr;
+  $: datai = [];
+  $: if(negopendmissions.length > 0){
+  datai = [
+    {
+      leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+      value: noofhours2 * perhour2
+    },
+    {
+      leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+      value: noofhours * perhour
+    }
+  ];
+  for(let i = 0; i < negopendmissions.length; i++){
+    if(negopendmissions[i].attributes.perhour != null || negopendmissions[i].attributes.noofhours != null){
+      datai.push({
+        leb: `${tri?.nego?.oldno[$lang]}-${i+1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
+        value: (negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)
+  })
+    }
+  }
+  datai = datai
+  }else{
+    datai = [
+      {
+        leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+        value: noofhours2 * perhour2
+      },
+      {
+        leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+        value: noofhours * perhour
+      }
+    ];
+    datai = datai
+  }
+  console.log(negopendmissions)
+>>>>>>> main
 </script>
-<div class="text-barbi " dir={$lang == "he"?"rtl":"ltr"}>
- <h1 class="md:text-center text-2xl md:text-2xl font-bold underline"
-            >{tri?.nego?.head[$lang]} {name1}</h1>
-            <div class="flex  flex-col align-middle justify-center ">
-<Text text={name1} bind:textb={name2} lebel={tri?.common?.name}/>
-<Text long={true} text={descrip} bind:textb={descrip2} lebel={tri?.common?.description}/>
-<Elements dataibn={dataibno.skillName} {newcontent} placeholder={tri?.mission?.addNewSkills} datai={skills.data} alld={skills2} bind:dataib={skills3.data} lebel={tri?.mission?.requireSkills} on:addnew={addnew} valc="skillName" bgi="gold"/>
-<Elements {newcontent} placeholder={tri?.mission?.addNewRoles} datai={tafkidims.data} alld={roles} bind:dataib={tafkidims2.data} lebel={tri?.mission?.requiredRoles} dataibn={dataibno.roleDescription} on:addnew={addnew} valc="roleDescription" bgi="gold"/>
-<Elements {newcontent} placeholder={tri?.mission?.addNewWw} datai={workways.data} alld={workways2} bind:dataib={workways3.data} lebel={tri?.mission?.requiredWW} dataibn={dataibno.workWayName} on:addnew={addnew} valc="workWayName" bgi="gold"/>
-<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
-<Text text={privatlinks} bind:textb={privatlinks2} lebel={tri?.mission?.linkToMission}/>
-<Number number={noofhours} bind:numberb={noofhours2} lebel={`${tri?.mission?.noOfHours[$lang]} ${isKavua== true && isKavua2 == true ? tri?.mission.perMonth[$lang] : ""}`} splebel={isKavua== true && isKavua2 == true ? null : isKavua== true && isKavua2 == false ? false : isKavua== false && isKavua2 == true ? true : null}/>
-<Number number={perhour} bind:numberb={perhour2} lebel={tri?.mission?.hourlyVallue[$lang]} />
-<DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate}/>
-<DateNego date={mdates} bind:dateb={mdates2} lebel={tri?.common.finishDate}/>
-<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
-    <div class="flex flex-row align-middle justify-center gap-x-2">
-        <h2 class="underline decoration-mturk">{tr?.mission.iskvua[$lang]}: </h2>
-  <input
-    bind:checked={isKavua2}
-    type="checkbox" id="tomeC" name="isKavua2" >
-</div>
-</div>
-<!---
+
+<div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+  <h1 class="md:text-center text-2xl md:text-2xl font-bold underline">
+    {tri?.nego?.head[$lang]}
+    {name1}
+  </h1>
+  <div class="flex flex-col align-middle justify-center">
+    <Text text={name1} bind:textb={name2} lebel={tri?.common?.name}  
+       old={negopendmissions.map((c) => c?.attributes?.name)}
+      />
+    <Rich
+    old={negopendmissions.map((c) => c?.attributes?.descrip)}
+      text={descrip}
+      bind:textb={descrip2}
+      lebel={tri?.common?.description}
+    />
+    <Elements
+      dataibn={dataibno.skillName}
+      {newcontent}
+      placeholder={tri?.mission?.addNewSkills}
+      datai={skills.data}
+      alld={skills2}
+      bind:dataib={skills3.data}
+      lebel={tri?.mission?.requireSkills}
+      on:addnew={addnew}
+      valc="skillName"
+      bgi="gold"
+    />
+    <Elements
+      {newcontent}
+      placeholder={tri?.mission?.addNewRoles}
+      datai={tafkidims.data}
+      alld={roles}
+      bind:dataib={tafkidims2.data}
+      lebel={tri?.mission?.requiredRoles}
+      dataibn={dataibno.roleDescription}
+      on:addnew={addnew}
+      valc="roleDescription"
+      bgi="gold"
+    />
+    <Elements
+      {newcontent}
+      placeholder={tri?.mission?.addNewWw}
+      datai={workways.data}
+      alld={workways2}
+      bind:dataib={workways3.data}
+      lebel={tri?.mission?.requiredWW}
+      dataibn={dataibno.workWayName}
+      on:addnew={addnew}
+      valc="workWayName"
+      bgi="gold"
+    />
+    <!----<Text long={true} text={hearotMeyuchadot} bind:textb={hearotMeyuchadot2} lebel={tri?.mission?.specialNotes}/>
+            --><Text
+      text={privatlinks}
+      bind:textb={privatlinks2}
+      lebel={tri?.mission?.linkToMission}
+    />
+    <Number
+      old={negopendmissions.map((c) => c?.attributes?.noofhours)}
+      number={noofhours}
+      bind:numberb={noofhours2}
+      lebel={`${tri?.mission?.noOfHours[$lang]} ${isKavua == true && isKavua2 == true ? tri?.mission.perMonth[$lang] : ''}`}
+      splebel={isKavua == true && isKavua2 == true
+        ? null
+        : isKavua == true && isKavua2 == false
+          ? false
+          : isKavua == false && isKavua2 == true
+            ? true
+            : null}
+    />
+    <Number
+    old={negopendmissions.map((c) => c?.attributes?.perhour)}
+      number={perhour}
+      bind:numberb={perhour2}
+      lebel={tri?.mission?.hourlyVallue[$lang]}
+    />
+    <DateNego date={mdate} bind:dateb={mdate2} lebel={tri?.common.startDate} />
+    <DateNego
+      date={mdates}
+      bind:dateb={mdates2}
+      lebel={tri?.common.finishDate}
+    />
+    <div
+      class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
+    >
+      <div class="flex flex-row align-middle justify-center gap-x-2">
+        <h2 class="underline decoration-mturk">{tr?.mission.iskvua[$lang]}:</h2>
+        <input
+          bind:checked={isKavua2}
+          type="checkbox"
+          id="tomeC"
+          name="isKavua2"
+        />
+      </div>
+    </div>
+    <!---
 <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
     <div class="flex flex-row align-middle justify-center gap-x-2">
         <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
@@ -641,21 +996,24 @@ let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`
     type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
 </div>
 </div>-->
-</div>
-<div class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
- <h2 class="underline decoration-mturk">{tri?.mission.total[$lang]}</h2>
-      {#if noofhours == noofhours2 && perhour == perhour2}
-       {#if noofhours > 0 & perhour> 0}
-      {noofhours * perhour}
-      {:else} 
-      <p>0</p>
-      {/if}
+  </div>
+  <div
+    class="border border-gold border-opacity-80 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
+  >
+    <h2 class="underline decoration-mturk">{tri?.mission.total[$lang]}</h2>
+    {#if noofhours == noofhours2 && perhour == perhour2}
+      {#if (noofhours > 0) & (perhour > 0)}
+        {noofhours * perhour}
       {:else}
-      <div class="w-4/5 mx-auto">
-      <Barb {datai}/></div>
+        <p>0</p>
       {/if}
+    {:else}
+      <div class="w-4/5 mx-auto">
+        <Barb {datai} />
       </div>
-      <!---
+    {/if}
+  </div>
+  <!---
 <table dir="rtl" >
       <tr class="ggr">
         <th class="ggr" > </th>
@@ -748,6 +1106,7 @@ let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`
                                     </td>
                                 </tr>
                                 </table>-->
+<<<<<<< HEAD
                                   <div class="w-fit mx-auto">
                                     <button
                                         onclick={increment}
@@ -755,141 +1114,150 @@ let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`
                                         type="submit"
                                         name="addm">{tri?.common.puttovote[$lang]}</button> </div>
                                         </div>
+=======
+  <div class="w-fit mx-auto">
+    <button
+      on:click={increment}
+      class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+      type="submit"
+      name="addm">{tri?.common.puttovote[$lang]}</button
+    >
+  </div>
+</div>
+
+>>>>>>> main
 <style>
-     .gg{ 
-     position: sticky;
-     top: 1px; 
-background-color: #6b0f1a;
-background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-     border-width: 4px;
-  border-color: rgb(103, 232, 249);
-     border-radius: 4%;
-      opacity: 1;
-      color: rgb(132, 241, 223);
-  }
-   .ggd{ 
- 
-background-color: #6b0f1a;
-background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-     border-width: 4px;
-  border-color: rgb(103, 232, 249);
-     border-radius: 4%;
-      opacity: 1;
-                  color: rgb(132, 241, 223);
-
-
-  }
-  .ggr{ 
+  .gg {
     position: sticky;
-     top: 1px; 
-background-color: #6b0f1a;
-background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+    top: 1px;
+    background-color: #6b0f1a;
+    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
 
-     opacity: 1;
-            color: rgb(132, 241, 223);
-
+    border-width: 4px;
+    border-color: rgb(103, 232, 249);
+    border-radius: 4%;
+    opacity: 1;
+    color: rgb(132, 241, 223);
   }
-  .ggr:hover, .gg:hover, .ggd:hover {
-    background:var(--barbi-pink);
-  } 
-    .dd{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      flex-direction: column;
-    }
-    .body {
-      overflow-x: auto;
-      overflow-y: auto;
-     height: 100vh;
-     width: 100vw;
-     padding-left: 0.5em;
-     padding-right: 0.5em;
-    }
-  
-  table, th, td {
-  border-collapse: collapse;
-  border-width: 4px;
-  border-color: rgb(103, 232, 249);
-border-radius: 4%;
+  .ggd {
+    background-color: #6b0f1a;
+    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
+    border-width: 4px;
+    border-color: rgb(103, 232, 249);
+    border-radius: 4%;
+    opacity: 1;
+    color: rgb(132, 241, 223);
+  }
+  .ggr {
+    position: sticky;
+    top: 1px;
+    background-color: #6b0f1a;
+    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+
+    opacity: 1;
+    color: rgb(132, 241, 223);
+  }
+  .ggr:hover,
+  .gg:hover,
+  .ggd:hover {
+    background: var(--barbi-pink);
+  }
+  .dd {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+  }
+  .body {
+    overflow-x: auto;
+    overflow-y: auto;
+    height: 100vh;
+    width: 100vw;
+    padding-left: 0.5em;
+    padding-right: 0.5em;
+  }
+
+  table,
+  th,
+  td {
+    border-collapse: collapse;
+    border-width: 4px;
+    border-color: rgb(103, 232, 249);
+    border-radius: 4%;
   }
   table {
-  text-align: center;
-  color: var(--barbi-pink);
-  margin: 0 auto;
- 
+    text-align: center;
+    color: var(--barbi-pink);
+    margin: 0 auto;
   }
- 
-  th{
-     background-color: #6b0f1a;
-     background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-     color: rgb(132, 241, 223);
-   }
-  td{
-     background-color: #5efaf2;
-     background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
-  }
- th:hover{
-       background:var(--barbi-pink);
 
- }
+  th {
+    background-color: #6b0f1a;
+    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+    color: rgb(132, 241, 223);
+  }
+  td {
+    background-color: #5efaf2;
+    background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
+  }
+  th:hover {
+    background: var(--barbi-pink);
+  }
   td:hover {
-    background:rgb(132, 241, 223);
-  } 
-       .textinput {
-  position: relative;
-  width: 100%;
-  display: block;
-}
+    background: rgb(132, 241, 223);
+  }
+  .textinput {
+    position: relative;
+    width: 100%;
+    display: block;
+  }
 
-.input {
+  .input {
+    border: none;
+    margin: 0;
+    padding: 10px 0;
+    outline: none;
+    border-bottom: solid 1px var(--mturk);
+    font-size: 15px;
+    margin-top: 12px;
+    width: 100%;
+    color: var(--barbi-pink);
+    -webkit-tap-highlight-color: transparent;
+    background: transparent;
+  }
 
-  border: none;
-  margin: 0;
-  padding: 10px 0;
-  outline: none;
-  border-bottom: solid 1px var(--mturk);
-  font-size: 15px;
-  margin-top: 12px;
-  width: 100%;
- color:  var(--barbi-pink);
-  -webkit-tap-highlight-color: transparent;
-  background: transparent;
-}
+  .label {
+    font-size: 15px;
+    position: absolute;
+    right: 0;
+    top: 22px;
+    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+    pointer-events: none;
+    color: var(--mturk);
+    user-select: none;
+  }
 
+  .line {
+    height: 2px;
+    background-color: #2196f3;
+    position: absolute;
+    transform: translateX(-50%);
+    left: 50%;
+    bottom: 0;
+    width: 0;
+    transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
+  }
 
-.label {
+  .input:focus ~ .line,
+  .input:valid ~ .line {
+    width: 100%;
+  }
 
-  font-size: 15px;
-  position: absolute;
-  right: 0;
-  top: 22px;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-  pointer-events: none;
-  color:var(--mturk);
-  user-select: none;
-}
-
-.line {
-  height: 2px;
-  background-color: #2196F3;
-  position: absolute;
-  transform: translateX(-50%);
-  left: 50%;
-  bottom: 0;
-  width: 0;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-}
-
-.input:focus ~ .line, .input:valid ~ .line {
-  width: 100%;
-}
-
-.input:focus ~ .label, .input:valid ~ .label {
-  font-size: 11px;
-  color: var(--barbi-pink);
-  top: 0;
-} 
+  .input:focus ~ .label,
+  .input:valid ~ .label {
+    font-size: 11px;
+    color: var(--barbi-pink);
+    top: 0;
+  }
 </style>

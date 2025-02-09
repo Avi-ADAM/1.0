@@ -5,6 +5,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
+<<<<<<< HEAD
   /** @type {{low?: boolean, isVisible?: boolean, projectName: any, whatt: any, src: any, why: any, src2: any, missionBName: any, missionDetails: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, hearotMeyuchadot: any, mypos: any, valph: any, nhours: any, useraplyname: any, already: any, allr?: boolean, onHover?: function, onAgree?: function, onDecline?: function, onNego?: function, onToChat?: function}} */
   let {
     low = false,
@@ -59,15 +60,57 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     onToChat();
   }
 console.log(tr)
+=======
+  import { isMobileOrTablet } from '$lib/utilities/device';
+  import { formatTime } from '../utils';
+  import TimetToTimegrama from './timetToTimegrama.svelte';
+    export let projectName,whatt,timegramaDate, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours,useraplyname
+    export let already, allr = false;
+function hover(x){
+dispatch("hover",{x:x});
+}
+function agree(alr){
+  already = true;
+dispatch("agree",{alr:alr,y:"a"})
+}
+function decline(alr) {
+  already = true; 
+dispatch("decline",{alr:alr,y:"d"});
+}
+function nego(alr){
+dispatch("nego",{alr:alr,y:"n"});
+
+}
+function tochat (){
+dispatch("tochat");
+}
+>>>>>>> main
 const tri = import('$lib/translations/tr.json')
 const neged ={"he":"נגד","en":"against"}
 const bead = {"he":"בעד","en":"in favor"}
 const notyet = {"he":"טרם","en":"not yet"}
-console.log(whatt)
+let isScrolable = true; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
 </script>
 
 
-<div dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]">
+<div on:wheel={preventSwiperScroll} 
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -79,15 +122,19 @@ console.log(whatt)
             <div class=" text-md mt-1 flex items-center">
                <span class="text-barbi text-center mr-3 sm:text-xl ">{tr.headers.misfini[$lang]}</span>
             </div>
-            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
+            <span class="pn ml-1 text-xl text-barbi ">{projectName}</span>
          </div>
          </div>
          </div>
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
+<<<<<<< HEAD
             <span onmouseenter={()=>hover(`${tri.common.valph[$lang]}`)} onmouseleave={()=>hover("0")} > {valph} {tr.common.perhour[$lang]} </span> * <span onmouseenter={()=>hover(`${tr.commom.noofhours[$lang]}`)} onmouseleave={()=>hover("0")}  > {nhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr.common.hours[$lang]} </span> = <span onmouseenter={()=>hover(`${tr.common.total[$lang]}`)} onmouseleave={()=>hover("0")}>{(nhours * valph).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+=======
+            <span on:mouseenter={()=>hover(`${tri.common.valph[$lang]}`)} on:mouseleave={()=>hover("0")} > {valph} {tr.common.perhour[$lang]} </span> * <span on:mouseenter={()=>hover(`${tri.commom.noofhours[$lang]}`)} on:mouseleave={()=>hover("0")}  > {nhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr.common.hours[$lang]} </span> = <span on:mouseenter={()=>hover(`${tr.common.total[$lang]}`)} on:mouseleave={()=>hover("0")}>{(nhours * valph).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+>>>>>>> main
       </p>
       <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{missionBName}</div>
      {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined" && missionDetails !== undefined} <p class="cd d max-h-16 text-gray-700 text-base">{missionDetails}</p>{/if}
@@ -115,6 +162,7 @@ console.log(whatt)
       </div>
     </div>
        </div>
+<TimetToTimegrama {timegramaDate} />
        {#if low == false}
  {#if already === false && allr === false}
                 <button onmouseenter={()=>hover({"he":"אישור","en":"appruve"})}

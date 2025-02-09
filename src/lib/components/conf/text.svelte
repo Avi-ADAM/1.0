@@ -17,6 +17,7 @@
   let {
     stateText = 2,
     text,
+    old = [],
     lebel = { he: 'עריכה', en: 'edit' },
     long = false,
     textb = $bindable(text)
@@ -70,24 +71,22 @@
 >
   {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
-      <h2 class="underline decoration-mturk">{lebel[$lang]}:</h2>
-      <p class="text-gold">{@html htmlon}</p>
-      <button onclick={() => (edit = true)}>
-        {#if text == textb}🖍️{:else}✏️{/if}</button
-      >
-      {#if text != textb && show2 != true}
-        <button onclick={() => (show2 = true)}>📑</button>
-      {:else if show2 == true}
-        <div class="flex flex-col align-middle justify-center">
-          <button onclick={() => (show2 = false)}><Close /></button>
-          <small class:text-right={$lang == 'he'}
-            >{tr?.nego.original[$lang]}:</small
-          >
-          <p>{text}</p>
-          <small class:text-right={$lang == 'he'} class="text-gold"
-            >{tr?.nego.sugestion[$lang]}:</small
-          >
-          <p class="text-gold">{textb}</p>
+        <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
+        <p class="text-gold">{@html htmlon}</p><button onclick={()=>edit = true}>
+            {#if text == textb}🖍️{:else}✏️{/if}</button>
+        {#if text != textb && show2 != true}
+        <button onclick={()=>show2 = true}>📑</button>
+        {:else if show2 == true}
+        <div class="flex flex-col align-middle justify-center ">
+        <button onclick={()=>show2 = false}><Close/></button>
+        <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
+        <p>{text}</p>
+        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
+        <p class="text-gold">{textb}</p>
+        {#each old  as o, i}
+        <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.oldno[$lang]}:{i+1}</small>
+        <p class="text-gold">{o ?? text}</p>
+        {/each}
         </div>
       {/if}
     </div>

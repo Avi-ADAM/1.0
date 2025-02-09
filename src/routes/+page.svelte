@@ -116,13 +116,13 @@ const word10 = {
 };
 
 const regesh1 = {
-  "he": "רוצה להביא משמעות ושמחה לחיים שלך?",
+  "he": "?רוצה להביא משמעות ושמחה לחיים שלך",
   "en": "Want to bring meaning and joy to your life?",
   "ar": "هل تريد إضفاء الدلالة والفرح على حياتك؟"
 };
 
 const regesh2 = {
-  "he": "רוצה לפתוח דלת אל מציאות חדשה?",
+  "he": "?רוצה לפתוח דלת אל מציאות חדשה",
   "en": "Want to open the door to a new reality?",
   "ar": "هل تريد فتح الباب أمام واقع جديد؟"
 };
@@ -219,20 +219,23 @@ const pagetitle = {
           {/if}
           </div>
 <div dir={$lang === "he" || $lang == "ar" ? "rtl" : "ltr"} class="h-screen w-screen  flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden bg-[length:200%_auto] animate-gradientx">
-	<div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-2/3  sm:h-screen ">
-		<div dir="ltr" style="text-shadow:none;" class="pt-2 sm:pt-6 font-bold sm:text-9xl text-4xl text-transparent 
+  <div id="text" class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-2/3  sm:h-screen ">
+    <img src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png" alt="logo" 
+    class="sm:w-24 mt-2 h-6 w-6 sm:h-24 z-0" >
+
+		<div dir="ltr" style="text-shadow:none;" class="pt-2 sm:pt-6 font-bold sm:text-2xl text-xl text-transparent 
         bg-clip-text bg-[length:auto_200%] animate-gradienty 
         bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] 
         flex-wrap flex flex-row">
         <div class="flip">
-          <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+          <h1  class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
 		>1</h1></div>
-    <div><h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+    <div><h1  class="font-bold mt-2 sm:text-xl text-lg text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
         bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] "
 		>💗</h1>
     </div><div>
-          <h1  class="font-bold sm:text-9xl text-4xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
+          <h1  class="font-bold  sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty 
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] " 
 		>1</h1></div></div>
 	<div class="overflow-auto d  "  dir={$lang !== "en" ? "ltr" : "rtl"}  onscroll={()=>{ scrolli = true

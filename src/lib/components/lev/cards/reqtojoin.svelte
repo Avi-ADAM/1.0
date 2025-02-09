@@ -6,6 +6,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
   import {lang} from '$lib/stores/lang.js'
   import Chaticon from '$lib/celim/chaticon.svelte';
+<<<<<<< HEAD
   /** @type {{low?: boolean, isVisible?: boolean, iskvua: any, projectName: any, src: any, openmissionName: any, missionDetails: any, useraplyname: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, already?: boolean, src2: any, perhour?: number, noofhours?: number}} */
   let {
     low = false,
@@ -24,6 +25,13 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     perhour = 0,
     noofhours = 0
   } = $props();
+=======
+  import { isMobileOrTablet } from '$lib/utilities/device';
+    export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting
+    export let already = false;
+    export let src2;
+    export let perhour = 0, noofhours = 0
+>>>>>>> main
 function hover(x){
 dispatch("hover",{x:x});
 }
@@ -42,10 +50,28 @@ dispatch("chat");
 const leho = {"he":" בכל חודש " , "en": " per month"}
 
 const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en":"appruval of joining and mission assigned"}
+let isScrolable = true; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
 </script>
 
 
-<div dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%] d">
+<div on:wheel={preventSwiperScroll} 
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%] d">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -61,7 +87,7 @@ const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en
          </div>
          </div>
          </div>
-  <div  class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
        <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>

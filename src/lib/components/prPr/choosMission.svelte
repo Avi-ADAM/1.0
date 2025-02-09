@@ -128,12 +128,20 @@ let moving = [];
 const placeholder = {"he":`בחירה מרשימה או יצירת חדשה`,"en":"choose from list or create new"};
 
 
+<<<<<<< HEAD
 const head = {"he":"הוספת פעולות הנדרשות להקמה או לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
 let id = $state(0)
 let ugug = $state(``);
   
  let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`})
  let name = $state("")
+=======
+const head = {"he":"הוספת משימות הנדרשות לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
+let id = 0
+$: ugug = ``;
+ $: addn = {"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`}
+ let name = ""
+>>>>>>> main
  function add(){
   let isNew = false
   if (selected.length > 0) {

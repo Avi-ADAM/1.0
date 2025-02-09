@@ -1,5 +1,4 @@
 <script>
-	import { restim } from '$lib/func/restime.svelte';
 import * as animateScroll from "svelte-scrollto";
 import Vid from './didiget.svelte'
 import Desi from './decisionMaking.svelte'
@@ -217,7 +216,7 @@ let h = $state(500);
             mId={buble.id}
             missId={buble.mission.data.id}
             missionName={buble.name}
-            projectId={buble.project.data.id}
+            projectId={buble.projectId}
             projectName={buble.projectName}
             missionDetails={buble.descrip}
             src={buble.src}
@@ -226,6 +225,7 @@ let h = $state(500);
             hoursdon ={buble.howmanyhoursalready}
             hourstotal = {buble.hoursassinged}
             perhour = {buble.perhour}
+            restime={buble.restime}
             on:done={delo}
             {low}
             /></div>
@@ -278,6 +278,7 @@ let h = $state(500);
                             on:user={user}
                             on:coinLapach={delo}
                             diun={buble.diun}
+                            negopendmissions={buble.negopendmissions}
                             timegramaId={buble.timegramaId}
                             timegramaDate={buble.timegramaDate}
                             publicklinks={buble.publicklinks}
@@ -404,6 +405,8 @@ let h = $state(500);
                                     nhours={buble.nhours}
                                     deadline={buble.deadline}
                                     missId={buble.missId}
+                                    timegramaId={buble.timegramaId}
+                                    timegramaDate={buble.timegramaDate}
                                     id={buble.id}
                                     openMid={buble.omid}
                                     stylef={buble.stylef}
@@ -464,6 +467,8 @@ let h = $state(500);
                                             st={buble.st}
                                             chat={buble.chat}
                                             declined={buble.decid}
+                                            timegramaId={buble.timegramaId}
+                                            timegramaDate={buble.timegramaDate}
                                             {low}
                                             /></div>
                                             {:else if buble.ani === "askedm" && milon.askmap == true}

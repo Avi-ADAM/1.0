@@ -17,6 +17,47 @@ import { idPr } from './../../stores/idPr.js';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
     let dialogOpen = $state(false)
 const dispatch = createEventDispatcher();
+<<<<<<< HEAD
+=======
+export let coinlapach;
+export let mId;
+export let why;
+export let what;
+export let shows = false;
+export let deadline;
+export let projectName = "ONE";
+export let missionBName = "do x";
+export let role = "programer";
+export let skills = ["html", "css"];
+export let useraplyname = "do x like y in z";
+export let src = "coin.png";
+export let src2 = " ";
+export let projectId;
+export let link = "/project/";
+export let linkU = "/user/";
+export let userId;
+export let missionDetails = "";
+export let name;
+export let noofpu = 0;
+export let publicklinks;
+export let privatlinks;
+export let hearotMeyuchadot;
+export let nhours = 0;
+export let valph = 0;
+export let missId;
+export let id;
+export let openMid;
+export let st = 188;
+export let declined = [];
+export let noofusersWaiting;
+export let uids;
+export let whatt;
+export let noofusersOk;
+export let noofusersNo;
+export let timegramaDate;
+export let timegramaId
+export let already = false;
+>>>>>>> main
 let resP = [];
 let lang;
     const baseUrl = import.meta.env.VITE_URL
@@ -578,6 +619,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   on:hover={hoverc}
   {why}
   {useraplyname}
+  {timegramaDate}
   {src2}
   {missionBName}
   {already} 
@@ -610,6 +652,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   {already} 
   {missionDetails}
   {projectName}
+  {timegramaDate}
    {src} 
    {nhours}
    {noofusersWaiting} 

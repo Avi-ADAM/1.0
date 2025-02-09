@@ -17,7 +17,7 @@ axios
   .then(response => {
     // Handle success.
     before = false;
-    console.log('Your user received an email');
+    console.log(response,'Your user received an email');
   })
   .catch(error => {
     // Handle error.

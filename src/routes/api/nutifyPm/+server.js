@@ -16,7 +16,7 @@ export async function POST({request, cookies, fetch}){
   const body = da.body || { he: '', en: '' };
   const lang = cookies.get('lang') || "he";
   const idL = cookies.get('id');
-  console.log(pid,"nutifyPm 15")
+  console.log(pid,idL,"nutifyPm 19")
   let datau = { data: { arg:{pid}, queId: '3projectJSONQue' } };
   let jsonim = []
   await fetch('/api/send', {
@@ -105,6 +105,7 @@ export async function POST({request, cookies, fetch}){
     if(user.attributes.noMail != true){
     return{
       email: user.attributes.email,
+      id: user.id,
       emailHtml:  render({
         template: SimpleNuti,
         props: {
@@ -127,6 +128,6 @@ export async function POST({request, cookies, fetch}){
     }
   }
   })
-  sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
+ sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
     return new Response    
 }

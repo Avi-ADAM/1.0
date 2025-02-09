@@ -1,7 +1,8 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 <script>
   /** @type {{width?: string, height?: string, isX?: boolean}} */
-  let { width = "32px", height = "32px", isX = false } = $props();
+  let { width = "32px", height = "32px", isX = false ,filterType = "projects"} = $props();
+
 </script>
 <div class="relative">
 
@@ -290,6 +291,14 @@
          rx="0.061538465"
          ry="0.030769233" />
     </g>
+  
   </g>
+  {#if filterType === 'projects'}
+    <!-- Project icon (folder) -->
+     <text x="0" y="20" font-size="10" fill="black">📁</text>
+  {:else if filterType === 'cardType'}
+    <!-- Card type icon (card) -->
+      <text x="0" y="20" font-size="10" fill="black">📊</text>
+  {/if} 
 </svg>
 </div>

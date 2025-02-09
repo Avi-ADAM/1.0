@@ -17,15 +17,7 @@ export async function POST({ request }) {
           pass: import.meta.env.VITE_ZOHO,
         },
 });
-console.log(import.meta.env.VITE_ZOHO, 'import.meta.env.VITE_ZOHO')
-    transporter.verify(function (err, success) {
-        if (err) {
-            console.log(err, 'err mail 23')
-        }
-        else {
-            console.log(success, 'success mail 26')	
-        }
-    });
+  
 
 const options = {
     from: "notifications@1lev1.com",
@@ -34,19 +26,17 @@ const options = {
     html: emailHtml,
     text: emailText
 };
-await new Promise((resolve, reject) => {
-    transporter.sendMail(options, (err, info) => {
-        if (err) {
-            console.log(err)
-            reject(err)
-        }
-        else {
-            console.log(info)
-            resolve(info)
-        }
-    });
-
-})
+transporter.sendMail(options);
+  transporter.verify(function(err, success) {
+  if (err) {
+    console.log(err)
+    return 'error';
+} 
+else {
+  console.log(success)
+    return 'OK';
+}
+});
         return new Response('Success to send mail', { status: 200 });
    /* } catch (error) {
         console.error('Error sending mail:', error);

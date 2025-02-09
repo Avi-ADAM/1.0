@@ -48,14 +48,14 @@ export const qids = {
   }
 }
 `,
-  '4crtask': `mutation CreateAct($pendm:ID ,$open_mission:ID,$dateS:DateTime, $dateF:DateTime,$myIshur:Boolean ,$shem: String,$des:String,$link:String, $pid : ID, $askId: ID, $assignedId:ID, $mbId: ID , $publishedAt: DateTime)
+  '4crtask': `mutation CreateAct($pendm:ID ,$open_mission:ID,$dateS:DateTime, $dateF:DateTime,$myIshur:Boolean ,$shem: String,$des:String,$link:String, $pid : ID, $askId: ID, $assignedId:[ID], $mbId: [ID] , $publishedAt: DateTime)
                         { createAct(
       data: {project:$pid,
              des: $des,
              my: $assignedId,
              shem: $shem,
              vali: $askId,
-             mesimabetahalich: $mbId,
+             mesimabetahaliches: $mbId,
              link: $link,
              publishedAt:$publishedAt,
              myIshur:$myIshur,
@@ -363,15 +363,23 @@ export const qids = {
     }
   }
 }`,
-"31updateTask": `mutation UpdateTask($id: ID!, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
+"31updateTask": `mutation UpdateTask($id: ID!,$myIshur: Boolean,$valiIshur: Boolean, $isAssigned: Boolean, $uid: [ID], $mesimabetahaliches: [ID]) {
      updateAct(id: $id,
       data: {
              isAssigned: $isAssigned,
+             myIshur: $myIshur,
+             valiIshur: $valiIshur,
               my:$uid,
               mesimabetahaliches: $mesimabetahaliches
                   }
     
   ) {data{id attributes{ shem my {data{id}}}}}
 }`,
-
-};
+"32createTimeGrama": `mutation CreateTimegrama($date: DateTime, $finiapruval: ID, $whatami: String, $ask: ID) {
+  createTimegrama(data: {date: $date, whatami: $whatami, ask: $ask, finiapruval: $finiapruval}) {
+    data {
+      id
+    }   
+  }
+}`
+}

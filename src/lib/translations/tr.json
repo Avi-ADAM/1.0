@@ -267,6 +267,10 @@
         }
     },
     "nego": {
+        "oldno":{
+            "he":"גרסה",
+            "en":"version No."
+        },
         "moaNego":{
             "he":"שהמשימה תהיה",
             "en":"that the mission will be"

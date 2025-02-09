@@ -12,11 +12,17 @@
   import { lang } from '$lib/stores/lang';
   import RichText from '$lib/celim/ui/richText.svelte';
   import NameAndPname from '$lib/components/grid/nameAndPname.svelte';
+  import NameField from '$lib/components/grid/nameField.svelte';
   import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import Tile from '$lib/celim/tile.svelte';
+  import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/stores';
+<<<<<<< HEAD
   let { acts = $bindable([]) } = $props();
+=======
+  import { sendToSer } from '$lib/send/sendToSer.svelte';
+>>>>>>> main
   const dispatch = createEventDispatcher();
   let paging = $state(new PagingData(
     1, // currentPage
@@ -51,13 +57,16 @@
   const my = { he: 'מבוצע ע"י', en: 'assigned to' };
   const datest = { he: 'תאריך', en: 'date' };
   const vali = { he: 'נוצר ע"י', en: 'created by' };
-  const status = { he: 'סטטוס ביצוע', en: 'status' };
+  const approve = { he: 'אישור', en: 'Approve' };
+  const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
   let theme = PrelineTheme;
 
   let columns = $state([
     {
       key: 'shem',
-      title: name[$lang]
+      title: name[$lang],
+      accessor: (row) => row.shem,
+      renderComponent: NameField
     },
     {
       key: 'vali',
@@ -86,7 +95,7 @@
     {
       key: 'my',
       title: my[$lang],
-      sortValue: (row) => row.my.data?.id || 0,
+      sortValue: (row) => row.my?.data?.[0]?.id || 0,
       accessor: (row) => {
         const myData = row.my?.data?.[0]?.attributes;
         const mesima = row.mesimabetahaliches?.data?.[0]?.attributes;
@@ -103,18 +112,29 @@
         const username = myData?.username;
         const mesimaName = mesima?.name;
         const mid = row.mesimabetahaliches?.data?.[0]?.id || false;
-        const type =
-          !username && !mesimaName && !isPend && !isOpen ? 'button' : null;
+        const type = !username && !mesimaName && !isPend && !isOpen ? 'button' : null;
 
         return {
-          type,
           src: profilePic || '',
           pname: username || '',
           mname: mesimaName || '',
-          taskId: row.id,
-          isPend,
+          type,
           isOpen,
-          onClick: () => handleTaskClick(row, type, mid, isOpen, isPend)
+          isPend,
+          id: row.id,
+          isPending: row.isAssigned && !row.myIshur && row.my?.data?.[0]?.id,
+          isCurrentUser: $page.data.uid === row.my?.data?.[0]?.id,
+          isValidator: $page.data.uid === row.vali?.data?.id,
+          isAssigned: row.isAssigned,
+          roles: row.tafkidims?.data?.map(r => r.attributes.roleDescription) || [],
+          isApproved: row.myIshur,
+          naasa: row.naasa,
+          pendingValidation: row.naasa && !row.valiIshur,
+          isCompleted: row.naasa && row.valiIshur,
+          progress: row.status || 0,
+          onClick: () => handleTaskClick(row, type, mid, isOpen, isPend),
+          onApprove: () => handleApprove(row.id),
+          onValidate: () => handleValidate(row.id)
         };
       },
       renderComponent: NameAndPname
@@ -290,7 +310,25 @@
 
   }
 
+  function handleApprove(taskId, event) {
+    console.log(taskId)
+    const taskIndex = acts.findIndex((act) => act.id === taskId);
+    if (taskIndex === -1) {
+      console.error(`Task with id ${taskId} not found.`);
+      return;
+    }
+    acts = [
+      ...acts.slice(0, taskIndex),
+      { ...acts[taskIndex], myIshur: true },
+      ...acts.slice(taskIndex + 1)
+    ];
+    acts = acts
+  }
 
+  function handleValidate(taskId, event) {
+    console.log(taskId)
+   
+  }
 
   onMount(() => {
     const reformatArray = (arr) => {

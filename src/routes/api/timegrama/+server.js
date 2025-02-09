@@ -6,6 +6,7 @@ import { PendM } from './pendM.svelte';
 
 import {Finiapp} from './finiapp.svelte'
 import { Ask } from './ask.svelte';
+//ask need to creater 0on first vote or on request if the requester is project member4
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
 import { SendTo } from '$lib/send/sendTo.svelte';
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
@@ -32,8 +33,10 @@ export async function GET() {
 
     let qu = `{
   timegramas (filters:{done:{ne: true},date: { lte: "${oneHourFromNow.toISOString()}" }}) {data{ id attributes{
-    whatami date ask{data{id}} 
+    whatami date 
+    ask{data{id}} 
     askm{data{id}} 
+    askwant{data{id}}
     decision{data{id}}
     finiapruval{data{id}} 
     maap{data{id}} 
@@ -43,6 +46,7 @@ export async function GET() {
     pmash{data{id}} 
     act{data{id}} 
     actt{data{id}} 
+    sheirutpend{data{id}}
 }}} 
  }
     `; 

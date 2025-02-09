@@ -1,31 +1,54 @@
 <script>
-  import { preventDefault } from 'svelte/legacy';
-
     import { lang } from '$lib/stores/lang.js'
-
     import { fade } from "svelte/transition";
     import { goto} from '$app/navigation';
     import axios from "axios";
     import { JWT } from '$lib/stores/jwt.js';
     import { idM } from '$lib/stores/idM.js';    
     import { liUN } from '$lib/stores/liUN.js';
+    import { emailValidator, requiredValidator } from '../../lib/celim/validators.js'
+    import { createFieldValidator } from '../../lib/celim/validation.js'
+
     const baseUrl = import.meta.env.VITE_URL
 
-
+    // Props and state
+    let { data } = $props();
+    let mydata = $derived(data);
+    
     let active = $state(false);
     let loginError = $state(null);
     let email = $state("");
     let password = $state("");
-    let username = "";
-    let fillFilds ;
-    let emailenter = {
+    let username = $state("");
+    let fillFilds = $state();
+
+    const emailenter = {
         "en" : "Enter your email",
         "he": "כתובת מייל"
     };
-    let passenter = {
+    
+    const passenter = {
         "en" : "Enter your password",
         "he": "סיסמה"
     }
+
+    const buttonForgot = {
+        "he":"במקרה של סיסמה שאבדה מהזיכרון יש ללחוץ",
+        "en": "if lost password please press me"
+    };
+
+    const iwanttoreg = {
+        "he":"עדיין לא נרשמתי", 
+        "en":"I wand to register"
+    }
+
+    const title = {
+        "he": "התחברות ל-1💗1", 
+        "en":"login to 1💗1"
+    }
+
+    const [ validity, validate ] = createFieldValidator(requiredValidator(), emailValidator())
+
     function login() {
         active = true;
         email = email.trim();
@@ -38,58 +61,45 @@
         loginError = null;
 
         axios
-            .post(baseUrl+'/api/auth/local', {//
+            .post(baseUrl+'/api/auth/local', {
                 identifier: email,
                 password, 
             })
             .then(({ data }) => {
                 console.log(data)
-                document.cookie = `jwt=${data.jwt}; expires=` + new Date(2025, 0, 1).toUTCString();
-                document.cookie = `id=${data.user.id}; expires=` + new Date(2025, 0, 1).toUTCString();
-                document.cookie = `un=${encodeURIComponent(data.user.username)}; expires=` + new Date(2025, 0, 1).toUTCString();
-                document.cookie = `when=${Date.now()}; expires=` + new Date(2025, 0, 1).toUTCString();
-               	   // document.cookie = `guidMe=again; expires=` + new Date(2025, 0, 1).toUTCString();			
+                document.cookie = `jwt=${data.jwt}; expires=` + new Date(2026, 0, 1).toUTCString();
+                document.cookie = `id=${data.user.id}; expires=` + new Date(2026, 0, 1).toUTCString();
+                document.cookie = `un=${encodeURIComponent(data.user.username)}; expires=` + new Date(2026, 0, 1).toUTCString();
+                document.cookie = `when=${Date.now()}; expires=` + new Date(2026, 0, 1).toUTCString();
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);
                 if(mydata.from){
                     goto(mydata.from)
                 }else{
-                goto("/me", )
+                    goto("/me")
                 }
-               // goto("/oneHomeGr", )
-              
             })
             .catch((err) => {
                 if (err.response) {
                     loginError = "";
                     console.log(err.response,"tt",err)
-                        loginError += `${err.response.data.error.message}\n`;
+                    loginError += `${err.response.data.error.message}\n`;
                 } else loginError = err;
             });
-    };
-function handleclick () {
-    goto("/login/passwordReset", )
-};    
-let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון יש ללחוץ",
-                    "en": "if lost password please press me"};
+    }
 
-	import { emailValidator, requiredValidator } from '../../lib/celim/validators.js'
-  import { createFieldValidator } from '../../lib/celim/validation.js'
-  /** @type {{data: any}} */
-  let { data } = $props();
-    const iwanttoreg = {"he":"עדיין לא נרשמתי", "en":"I wand to register"}
-  const [ validity, validate ] = createFieldValidator(requiredValidator(), emailValidator())
-    const title = {"he": "התחברות ל-1💗1", "en":"login to 1💗1"}
-    let mydata = $derived(data)
+    function handleclick() {
+        goto("/login/passwordReset")
+    }
 </script>
 <svelte:head>
   <title>{title[$lang]}</title>
   </svelte:head>
 <div class="body">
  <div class="login">            
-                <form class="fr" onsubmit={preventDefault(login)} in:fade >
-                    <div>
+    <form class="fr" onsubmit={login} in:fade>
+        <div>
                     {#if loginError}
                         <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
                         <button
@@ -137,7 +147,7 @@ let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון
                         <button class:active={active} disabled={!$validity.valid}
                         class="center hover:scale-150 bt "    
                      ></button>
-                     <button class="text-gold bg-barbi px-3 py-1 rounded-md hover:text-barbi hover:bg-gold" onclick={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
+                     <button class="text-gold bg-barbi px-1 py-1 rounded-md hover:text-barbi hover:bg-gold" onclick={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
                      </div>
                   </div>
                 </form>

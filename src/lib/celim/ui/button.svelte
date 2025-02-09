@@ -15,8 +15,10 @@
     text = {"he": "יצירה", "en": "Create"},
     name = "button",
     click,
+    size = "big",
     children
   } = $props();
+ 
    
     function onclick (){
         if(success == false)
@@ -26,14 +28,14 @@
   
 </script>    
 <button
-        class="cursor-pointer transition-all  px-6 py-2 rounded-lg
-border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px]
-active:border-b-[2px] active:brightness-90 active:translate-y-[2px] 
- border-barbi 
- bg-[length:200%_auto] animate-gradientx
- bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  
-  hover:bg-[linear-gradient(to_right,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.mpink),theme(colors.fuchsia.400),theme(colors.barbi))]
-   font-bold p-2 "
+class="cursor-pointer transition-all duration-300 {size === 'sm' ? 'px-4 py-1' : 'px-8 py-2'} rounded-xl
+border-b-[4px] hover:brightness-105 hover:-translate-y-[2px] hover:border-b-[6px]
+active:border-b-[2px] active:brightness-95 active:translate-y-[2px] 
+border-barbi shadow-lg hover:shadow-xl
+bg-[length:200%_auto] animate-gradientx
+bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  
+hover:bg-[linear-gradient(to_right,theme(colors.gold),theme(colors.amber.400),theme(colors.yellow.300),theme(colors.amber.400),theme(colors.gold))]
+font-bold font-rubik"
    onfocus={()=>hover = true}
    onblur={()=>hover = false}
    onmouseenter={()=>hover = true}
@@ -56,6 +58,5 @@ active:border-b-[2px] active:brightness-90 active:translate-y-[2px]
 <Err />
 {/if}
 </div>
-</button
-      >
+</button>
 <SucssesConf {success}/>

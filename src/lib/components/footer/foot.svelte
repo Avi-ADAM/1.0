@@ -21,7 +21,14 @@
   import { Canvas } from '@threlte/core';
   import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
   import { initiatePgishot, isOnline, myUserMeeting } from '$lib/stores/pgishot';
+<<<<<<< HEAD
   let draggable = $state();
+=======
+  import { isMobileOrTablet } from '$lib/utilities/device';
+  import MobileFooter from './mobileFooter.svelte';
+  export let un;
+  let draggable;
+>>>>>>> main
   onMount(async () => {
     initiatePgishot(idL);
     draggable = (await import('svelte-agnostic-draggable')).draggable;
@@ -117,6 +124,7 @@
   </Drawer.Portal>
 </Drawer.Root>
 </div>
+
 {#if $isChatOpen == true}
   <div
     use:draggable={{
@@ -185,6 +193,8 @@
   </div>
 </div>
 {/if}
+{#if !isMobileOrTablet()}
+
 <button
   style="position: fixed; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"
   onclick={() => (min = !min)}
@@ -213,6 +223,9 @@
     class="ww ww1 text-bold sm:text-2xl text-xl items-center flex justify-center"
     ><Plus /></button
   >
+{/if}
+{:else}
+<MobileFooter on:chat={() => addi("chat")} on:new={() => addi()}/>
 {/if}
 
 <style>

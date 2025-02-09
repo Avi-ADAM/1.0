@@ -112,6 +112,7 @@
                         ]`;
     }
 
+    
     let quet =  `mutation { 
           createAskm(
               data:{ 

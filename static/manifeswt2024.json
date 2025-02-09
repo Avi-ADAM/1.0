@@ -1,8 +1,11 @@
 {
     "short_name": "1💗1",
-    "name": "1💗1 we can together",
+    "name": "1💗1",
+    "id": "https://www.1lev1.com/he",
     "start_url": "https://www.1lev1.com/",
     "theme_color": "#EEE8AA",
+    "orientation": "natural",
+    "categories": ["partnership","social","entrepreneurship"],
     "icons": [
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1645704770/maskable_icon_kuuky8.png",
@@ -18,7 +21,8 @@
         }
     ],
     "background_color": "#FF0092",
-    "display": "fullscreen",
+    "display": "standalone",
+    "display_override": ["tabbed","window-controls-overlay","fullscreen","minimal-ui"],
     "scope": "https://www.1lev1.com/",
     "shortcuts": [
         {
@@ -28,8 +32,8 @@
             "url": "https://www.1lev1.com/lev?source=pwa",
             "icons": [
                 {
-                    "src": "https://res.cloudinary.com/love1/image/upload/v1640287109/diamond_uapr5j.png",
-                    "sizes": "3464x3464"
+                    "src": "https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg",
+                    "sizes": "32x32"
                 }
             ]
         },
@@ -196,5 +200,5 @@
             "label": "תצוגה מרוכזת למסך הלב וההצעות"
         }
     ],
-    "description": "ליצור ולהגשים יחד בהסכמה: אתר 1💗1 מאפשר לך למצוא שותפים ושותפות להגשמה של כל מטרה או רעיון עסקי, ליצור ולנות יחד, לקבל החלטות , להתנהל ולחלק את הרווחים בהסכמה, אתר 1💗1 מספק כלים חדשניים לקבלת החלטות משותפת בצורה של קונצנזוס כך שכל הדעות נחשבות וההחלטות בקבוצה מקובלות על הכל, זה הזמן להתחיל!"
+    "description": "!ליצור ולהגשים יחד בהסכמה:  1💗1 מאפשר לך למצוא שותפים ושותפות להגשמה של כל מטרה או רעיון, ליצור ולהינות יחד, לקבל החלטות פה-אחד, להתנהל ביעילות ולנהל משימות ולחלק את הרווחים בהסכמה.  1💗1 מספק כלים חדשניים לקבלת החלטות משותפת, כל הדעות נחשבות וההחלטות בקבוצה מקובלות על הכל, זה הזמן להתחיל!"
 }

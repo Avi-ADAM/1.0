@@ -84,6 +84,7 @@ onMount(async () => {
         bmiData = m;
         bmiData = bmiData
         soter = soter
+        console.log(proles)
 
 })
   const closer = () => {

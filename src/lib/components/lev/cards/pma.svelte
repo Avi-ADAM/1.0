@@ -3,6 +3,7 @@
   import { lang } from '$lib/stores/lang.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
+<<<<<<< HEAD
   import No from '../../../celim/no.svelte';
   /** @type {{low?: boolean, isVisible?: boolean, projectName: any, src: any, name: any, descrip: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, hearotMeyuchadot: any, mypos: any, kindOf: any, easy: any, price: any, monts: any, yers: any, hm: any, already: any, allr?: boolean}} */
   let {
@@ -185,6 +186,80 @@
           hearotMeyuchadot !== 'undefined'
             ? hearotMeyuchadot
             : ''}
+=======
+  import No from '../../../celim/no.svelte'
+  import { isMobileOrTablet } from '$lib/utilities/device';
+    export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, kindOf, easy, price, monts, yers,hm 
+    export let already, allr = false;
+function hover(x){
+dispatch("hover",{x:x});
+}
+function agree(alr){
+  already = true;
+dispatch("agree",{alr:alr,y:"a"})
+}
+function decline(alr) {
+  already = true; 
+dispatch("decline",{alr:alr,y:"d"});
+}
+function nego(alr){
+dispatch("nego",{alr:alr,y:"n"});
+
+}
+function tochat (){
+dispatch("tochat");
+}
+let isScrolable = true; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+</script>
+
+
+<div on:wheel={preventSwiperScroll} 
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
+ <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
+  </div>-->
+   <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
+      <div class="relative flex items-center space-x-1">
+         <div class="relative">
+         <img src={src}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+         </div>
+         <div class="flex flex-col leading-tight">
+            <div class=" text-xl mt-1 flex items-center">
+               <span class="text-barbi text-center mr-3 sm:text-xl "> הצבעה על אישור משאב חדש </span>
+            </div>
+            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-xl text-barbi ">{projectName}</span>
+         </div>
+         </div>
+         </div>
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+    <div  class="mb-8">
+         <p style="line-height: 1;" class=" text-gray-600 flex items-center">
+            <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
+     {#if kindOf === "perUnit"}
+       <span on:mouseenter={()=>hover(" שווי ליחידה")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{easy > 0 ? easy.toLocaleString() : price.toLocaleString()} ליחידה</span> * <span on:mouseenter={()=>hover("כמות")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{hm == 1 ? "יחידה אחת" : `${hm.toLocaleString()} יחידות`} </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? (easy * hm).toLocaleString() : (price * hm).toLocaleString()}</span>
+   {:else if kindOf === "total" || kindOf === "rent"}
+       <span on:mouseenter={()=>hover("שווי מוצע")} on:mouseleave={()=>hover("0")} style="color:var(--barbi-pink)" >{easy > 0 ? easy.toLocaleString() : price.toLocaleString()}</span>
+          {:else if kindOf === "monthly"}
+       <span on:mouseenter={()=>hover("שווי לחודש")} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{easy > 0 ? easy.toLocaleString() : price.toLocaleString()} לחודש</span> * <span on:mouseenter={()=>hover("כמות חודשים")} on:mouseleave={()=>hover("0")}  style="color: var(--barbi-pink)" >{monts == 1 ? "חודש אחד" : `${monts.toLocaleString()} חודשים`}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? (easy * monts).toLocaleString() : (price * monts).toLocaleString()}</span> 
+          {:else if kindOf === "yearly"}
+       <span on:mouseenter={()=>hover("שווי לשנה")} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{easy > 0 ? easy.toLocaleString() : (price).toLocaleString()} לשנה</span> * <span on:mouseenter={()=>hover("מספר שנים")} on:mouseleave={()=>hover("0")}  style="color: var(--barbi-pink)" >{yers === 1 ? "שנה אחת" : `${yers.toLocaleString()} שנים`}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? (easy * yers).toLocaleString() : (price * yers).toLocaleString()}</span> 
+{/if}
+>>>>>>> main
         </p>
       {/if}
     </div>

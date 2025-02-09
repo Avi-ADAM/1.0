@@ -245,11 +245,13 @@
                   isAssigned
                 open_mission{data{id attributes {name}}}
                 pendm{data{id attributes{name}}}
-                 dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}} myIshur valiIshur status mesimabetahaliches{data{id 
+                 dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} 
+                 des dateF vali{data{id attributes{ username profilePic {data{attributes{ url }}}}}} 
+                 myIshur valiIshur status mesimabetahaliches{data{id 
                   attributes{name forums{data{id}}}}}}}}
             sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
             sales {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
-            matanotofs {data{ id attributes{ name price quant kindOf }}}
+            matanotofs {data{ id attributes{ name price quant kindOf startDate finnishDate }}}
             finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
              user_1s {data{ id attributes{email noMail lang username profilePic {data{attributes{ url formats}}}}}}
@@ -703,9 +705,9 @@
     mi.set([]);
     setTimeout(function () {
       success = false;
-      start();
     }, 15000);
     toast.success(`${fnnn[$lang]}`);
+    start();
   }
   let meDatamm = $state([]);
   async function updi() {
@@ -754,7 +756,12 @@
     addN = false;
     meDatamm = [];
     needr = [];
+    success = true;
+    setTimeout(function () {
+      success = false;
+    }, 15000);
     toast.success(cloma[$lang]);
+    start()
   }
   let noofopen = $state(2);
 
@@ -1340,6 +1347,7 @@
     import { onDestroy } from 'svelte';
   import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1462,6 +1470,8 @@ async function createMes(id,mes){
         loading: false,
         messages:[],
         md:{
+          pid:$idPr,
+          mbId:e.detail.id,
           projectName:projectname,
           projectPic:srcP,
           mesimaName:e.detail.smalldes
@@ -1641,11 +1651,12 @@ function add(event){
     <div
       dir="{$lang == "he" ? "rtl" : "ltr"}"
       bind:clientWidth={width}
-      class="all text-barbi text-center overflow-y-auto min-h-screen scroll-smooth d"
+      class="all text-barbi text-center overflow-y-auto  {isMobileOrTablet() ? "max-h-[calc(100vh-3rem)]" : "min-h-screen"}  scroll-smooth d"
       style="-webkit-scrollbar:0px;"
     >
-      <Header />
-    
+    {#if !isMobileOrTablet()}
+    <Header />
+    {/if}
       {#if success}
         <div
           style="
@@ -2490,7 +2501,7 @@ pointer-events: none;"
       <Lowding />
     </div>
   {:then projects}
-    <div class=" text-center border-2 border-barbi rounded m-4">
+    <div class=" text-center border-2 border-barbi rounded m-4 {isMobileOrTablet() ? 'pb-12' : ''}">
       <h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">
         {choo[$lang]}
       </h1>
@@ -2559,9 +2570,8 @@ pointer-events: none;"
     justify-content: center;
     flex-wrap: wrap;
   }
-  .all {
-    min-height: 100vh;
-  }
+ 
+  
   .all::-webkit-scrollbar {
     width: 0px;
   }
@@ -2587,9 +2597,9 @@ pointer-events: none;"
   }
   :global([data-svelte-dialog-content].content) {
     background: #60b9b6;
-    background: -webkit-radial-gradient(center, #050117, #0f0248, #60b9b6);
-    background: -moz-radial-gradient(center, #050117, #0f0248, #60b9b6);
-    background: radial-gradient(ellipse at center, #050117, #0f0248, #60b9b6);
+    background: -webkit-radial-gradient(center, #050117, #0f0248);
+    background: -moz-radial-gradient(center, #050117, #0f0248);
+    background: radial-gradient(ellipse at center, #050117, #0f0248);
     width: 80vw;
   }
   @media (min-width: 768px) {

@@ -28,16 +28,17 @@ export async function POST({ request, fetch }) {
         missionName: missionName 
       }
     });
-    let data = {emailHtml:emailHtml,
+    console.log(emailHtml)
+    let emailData = {emailHtml:emailHtml,
       email:email,
       previewText:head[lango],
       emailText:head[lango] }
-                  fetch('https://www.1lev1.com/api/sendMail', {
+                  fetch('/api/sendMail', {
                   method: 'POST',  
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify(data),
+                  body: JSON.stringify(emailData),
                 })
                   .then((response) => response)
                   .then((data) => {
@@ -60,16 +61,16 @@ export async function POST({ request, fetch }) {
            link:link 
       }
     });
-    let data = {emailHtml:emailHtml,
+    let emailData = {emailHtml:emailHtml,
       email:email,
       previewText:pre[lango],
       emailText:pre[lango] }
-                  fetch('https://www.1lev1.com/api/sendMail', {
+                  fetch('/api/sendMail', {
                   method: 'POST',  
                   headers: {
                     'Content-Type': 'application/json',
                   },
-                  body: JSON.stringify(data),
+                  body: JSON.stringify(emailData),
                 })
                   .then((response) => response)
                   .then((data) => {
@@ -79,6 +80,7 @@ export async function POST({ request, fetch }) {
                     console.error('Error:', error);
                   });
   }
-
+    return new Response(JSON.stringify({ success: true }), {
+      status: 200
+    });
   }
-

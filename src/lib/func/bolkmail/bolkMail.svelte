@@ -9,7 +9,7 @@
      * @param {string} mainlang  "he" "en"
     */
     export async function sendBolkMail(emails = [],myid = 0,title = {"he":"","en":""},body = {"he":"","en":""},mainlang = "he",fetch){
-      console.log(emails) 
+      console.log(emails,"12 sendBolkMail") 
       for (let i = 0; i < emails.length; i++) {
             const element = emails[i];
             if(element.id !== myid){

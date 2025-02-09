@@ -6,8 +6,17 @@
   left: 50%;
   transform: translate(-50%, -50%);
   
-  height: 82% ;
-  width: 77% ;
+  height: 95% ;
+  width: 95% ;
+  border-radius: 0%;
+}
+.swipermobile{ 
+  position: absolute;
+  top: calc(50% - 1.5rem);
+  left: 50%;
+  transform: translate(-50%, -50%);
+  height: calc(100% - 3rem) ;
+  width: 100% ;
   border-radius: 0%;
 }
 
@@ -21,38 +30,25 @@
   width: 100%;
   overflow: hidden; /* שינוי מ-visible ל-hidden */
 }
-
-
-@media (min-width:250px) and (max-width:549px){
-.swiperc{
-  width: 79% ;
-}
-}
-@media (min-width:550px){
-.swiperc{
-  position: absolute;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  height: 85vh ;
-  min-width: 70vw !important;
-  max-width: 80vw !important;
-  border-radius: 0% !important;
-}
-
-.swiper-slidec {
+.swipr-slidemobile {
   display: flex;
   align-items: center;
   justify-content: center;
   border-radius: 18px !important;
   font-size: 22px;
   font-weight: bold;
-  height: 75vh !important;
-  min-width: 70vw !important;
-  max-width: 80vw !important;
+  height: 100%;
+  width: 100%;
   
 }
+
+@media (min-width:250px) and (max-width:549px){
+.swiperc{
+  width: 79% ;
 }
+}
+
+
 /**
 .swiper-slidec:nth-child(1n) {
   background-color: rgb(206, 17, 17);

@@ -7,6 +7,7 @@
   import { lang } from '$lib/stores/lang.js';
   /** @type {{status?: any, splebel?: any, stateNumber?: number, number: any, numberb?: any, lebel: any}} */
   let {
+    old = [],
     status = [10, 20],
     splebel = null,
     stateNumber = 2,
@@ -14,62 +15,82 @@
     numberb = $bindable(number),
     lebel
   } = $props();
-  let datai = $derived([
-    { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: 100 },
-    { leb: `${tr?.nego?.original[$lang]},${number}`, value: 1000 }
-  ]);
+  let datai = $state([]);
   let edit = $state(false);
   let show2 = $state(false);
-  function checkAll(a, b) {
+
+  $effect(() => {
+    if(old.length > 0){
+      datai = [
+        {"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":Number(numberb)},
+        {"leb":`${tr?.nego?.original[$lang]},${number}`,"value":Number(number)}
+      ];
+      
+      for (let i = 0; i < old.length; i++) {
+        if(old[i] != null){
+          datai.push({"value":Number(old[i]),"leb":`${tr?.nego?.oldno[$lang]}-${i+1},${old[i]}`})
+        }
+      }
+    } else {
+      datai = [
+        {"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},
+        {"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}
+      ];
+    }
+  });
+
+  function checkAll(a,b){
     datai[0].value = b;
     datai[1].value = a;
   }
 </script>
 
-<div
-  class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
->
+<div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
   {#if edit == false}
     <div class="flex hi flex-row align-middle justify-center gap-x-2">
-      <h2 class="underline decoration-mturk">
-        {lebel}:
-        <span
-          class:line-through={splebel == false}
-          class:text-barbi={splebel == false}
-          class:text-wow={splebel == true}
-          class:hidden={splebel == null}>{tr?.mission.perMonth[$lang]}</span
-        >
+      <h2 class="underline decoration-mturk">{lebel}: 
+        <span class:line-through={splebel == false}
+           class:text-barbi={splebel == false}
+           class:text-wow={splebel == true}
+           class:hidden={splebel == null}>{tr?.mission.perMonth[$lang]}</span>
       </h2>
-      {#if number == numberb}
+      {#if number == numberb} 
         <p class="text-gold">{number}</p>
       {:else}
-        <div dir="rtl" class="w-1/2 mx-auto">
-          <Barb {datai} />
+        <div dir="rtl" class='w-1/2 mx-auto'>
+          {#key datai}
+            <Barb {datai} />
+          {/key}
         </div>
       {/if}
-      <button onclick={() => (edit = true)}>
-        {#if number == numberb}🖍️{:else}✏️{/if}</button
-      >
+      <button on:click={() => edit = true}>
+        {#if number == numberb}🖍️{:else}✏️{/if}
+      </button>
       {#if number != numberb && show2 != true}
-        <button onclick={() => (show2 = true)}>📑</button>
+        <button on:click={() => show2 = true}>📑</button>
       {:else if show2 == true}
-        <div class="flex flex-col align-middle justify-center">
-          <button onclick={() => (show2 = false)}><Close /></button>
-          <small class:text-right={$lang == 'he'}
-            >{tr?.nego.original[$lang]}:</small
-          >
-          <p>{number}</p>
-          <small class:text-right={$lang == 'he'} class="text-gold"
-            >{tr?.nego.sugestion[$lang]}:</small
-          >
-          <p class="text-gold">{numberb}</p>
+        <div class="flex flex-col items-center flex-wrap justify-center m-4">
+          <button on:click={() => show2 = false}>
+            <Close width={10} height={10}/>
+          </button>
+          <div class="flex flex-row">
+            <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
+            <p>{number}</p>
+          </div>
+          <div class="flex flex-row">
+            <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
+            <p class="text-gold">{numberb}</p>
+          </div>
+          {#each old as o, i}
+            <div class="flex flex-row justify-center items-center">
+              <small class:text-right={$lang == "he"} class="text-gold p-4">{tr?.nego.oldno[$lang]}:{i+1}</small>
+              <p class="text-gold">{o ?? number}</p>
+            </div>
+          {/each}
         </div>
       {/if}
     </div>
   {:else}
-    <!--    
-<RangeSlider bind:values={status} pipstep="20" float pips all="label" hoverable />
--->
     <div dir="rtl" class="textinput max-w-sm mx-auto">
       <input
         type="number"
@@ -83,7 +104,7 @@
       <span class="line"></span>
     </div>
     <button
-      onclick={() => {
+      on:click={() => {
         if (Number(numberb) >= 0) {
           edit = false;
           checkAll(number, numberb);
@@ -91,10 +112,10 @@
           console.log(numberb, Number(numberb));
           alert(tr.common.noLesFromZero[$lang]);
         }
-      }}>✅</button
-    >
+      }}>✅</button>
   {/if}
 </div>
+
 
 <style>
   .textinput {

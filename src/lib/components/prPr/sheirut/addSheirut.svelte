@@ -8,8 +8,8 @@
   import {SendTo} from '$lib/send/sendTo.svelte';
   import { idPr } from '$lib/stores/idPr';
   import { lang } from '$lib/stores/lang'
-    const dispatch = createEventDispatcher();
-    import { toast } from 'svelte-sonner';
+  const dispatch = createEventDispatcher();
+  import { toast } from 'svelte-sonner';
   import { createEventDispatcher } from 'svelte';
   import { MultiSelect } from 'svelte-multiselect';
   import ChoosMission from '../choosMission.svelte';

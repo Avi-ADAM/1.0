@@ -5,6 +5,7 @@
   import { Editor } from '@tiptap/core';
   import TextAlign from '@tiptap/extension-text-align';
   import Link from '@tiptap/extension-link';
+  import Highlight from '@tiptap/extension-highlight';
   import FloatingMenu from '@tiptap/extension-floating-menu';
   import StarterKit from '@tiptap/starter-kit';
   import Underline from '@tiptap/extension-underline';
@@ -16,8 +17,11 @@
     trans = false,
     editable = true,
     sml = false,
-    minw = false
+    minw = false,
+    showJson = false,
+    outjson = []
   } = $props();
+
   let element = $state();
   let editor = $state();
   let menu = $state();
@@ -26,7 +30,7 @@
     editor = new Editor({
       element: element,
       editable: editable,
-      content: outpot,
+      content: showJson ? outjson : outpot,
       editorProps: {
         attributes: {
           class:
@@ -39,6 +43,9 @@
       extensions: [
         StarterKit,
         Link,
+        Highlight.configure({
+          multicolor: true
+        }),
         TextAlign.configure({
           types: ['heading', 'paragraph'],
           alignments: ['left', 'right', 'center', 'justify'],
@@ -53,6 +60,9 @@
         // force re-render so `editor.isActive` works as expected
         editor = editor;
         const html = editor.getHTML();
+        const jsonc = editor.getJSON();
+        outjson = jsonc;
+        outjson = outjson;
         outpot = html;
         outpot = outpot;
       }
@@ -99,7 +109,7 @@
 
 <div
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  class="bg-{trans == false ? "mturk bg-opacity-25" : 'bg-transparent'} {minw ? 'min-w-[50vw]' : ''} " 
+  class="bg-{trans == false ? "mturk bg-opacity-25" : 'bg-transparent'} {minw ? 'max-w-[50vw]' : ''} " 
 >
   {#if editor && editable}
     <div
@@ -168,7 +178,6 @@
         <button
           onclick={() => {
             editor.chain().focus().setTextAlign('center').run();
-            console.log('edito', editor.chain().focus().setTextAlign('center'));
             actives = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm-4 4a1 1 0 100-2H6a1 1 0 100 2h8zm5 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-5 5a1 1 0 100-2H6a1 1 0 100 2h8z"></path> </g></svg>`;
             hide = true;
           }}
@@ -456,6 +465,9 @@
 </div>
 
 <style>
+ .tiptap p, h1, h2, li, ul {
+    background-color: inherit;
+  }
 svg:focus { outline: none; }
   #dropdownNavbarLink, #dropdownNavbarLink2 {
     background: var(--barbi-pink);
@@ -491,4 +503,6 @@ svg:focus { outline: none; }
       font-size: 2rem;
     }
   }
+
+
 </style>

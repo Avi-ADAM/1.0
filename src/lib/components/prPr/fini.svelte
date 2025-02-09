@@ -287,6 +287,7 @@
               </td>
             {/each}
           </tr>
+<<<<<<< HEAD
         </thead>
         <tbody>
           <tr class="ggr">
@@ -478,12 +479,51 @@
                 >
               {/each}
             </tr><!-- <tr>
+=======
+  <tr>
+      <th>תיאור</th>
+      {#each meData as data, i}
+      <td> {#if data.attributes.descrip} {data.attributes.descrip}{/if}
+</td>
+        {/each}
+    </tr> <tr>
+      <th>סוג</th>
+      {#each meData as data, i}
+      <td>
+      <h1>{data.attributes.kindOf}</h1>
+        </td>
+      {/each}
+    </tr> <tr style="display:{kc ? "" : "none"};">
+      <th>כמות</th>
+      {#each meData as data, i}
+      <td >
+       {data.attributes.hm}
+      {/each}
+    </tr><tr style="display:{ ky  ? "" : "none"};" >
+      <th>תאריך התחלה </th>
+      {#each meData as data, i}
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.attributes.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      {/each}
+    </tr> <tr style="display:{ ky  ? "" : "none"};" >
+      <th >תאריך סיום </th>
+      {#each meData as data, i}
+      <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.attributes.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
+      {/each}
+    </tr> <tr>
+      <th>הערות מיוחדות</th>
+      {#each meData as data, i}
+      <td>{#if data.attributes.spnot}
+ {data.attributes.spnot}{/if}</td>
+        {/each}
+  </tr><!-- <tr>
+>>>>>>> main
       <th>עלות</th>
       {#each meData as data, i}
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
   <h2>{data.price.toFixed(2)}</h2>  
   {/each}
+<<<<<<< HEAD
     </tr>--><tr
             >
               <th>שווי מקסימלי לחישוב בריקמה</th>
@@ -539,6 +579,36 @@
       {/if}
     </div>
   </div>
+=======
+    </tr>--><tr>
+      <th>שווי מקסימלי לחישוב בריקמה</th>
+      {#each meData as data, i}
+      <td>
+  <small for="name" >שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
+        {data.attributes.agprice.toFixed(2)}
+      {/each}
+    </tr><tr style="display:{kc || ky ? "" : "none"};" >
+      <th>עלות סה"כ</th>
+      {#each meData as data, i}
+      <td  >
+      <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.attributes.total.toFixed(2)}</h3>
+      {/each}
+    </tr> <tr>
+      <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
+      {#each meData as data, i}
+      <td>{#if data.attributes.linkto}{data.attributes.linkto}{/if}
+</td>
+        {/each}
+  </tr><tr>
+            <th>שותף על ידי</th>
+            {#each meData as data, i}
+            <td>
+              {data.attributes.users_permissions_user.data.attributes.username}
+             </td>
+             {/each}
+        </tr>
+</table>
+>>>>>>> main
 {/if}
 
 <style>

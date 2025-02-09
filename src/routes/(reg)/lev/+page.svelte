@@ -42,10 +42,17 @@
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
   import { sendToSer } from '$lib/send/sendToSer.svelte';
   import { page } from '$app/stores';
+<<<<<<< HEAD
   /** @type {{data: any}} */
   let { data } = $props();
   let low = $state(true);
   let indexi = $state(-1);
+=======
+  import { get } from 'svelte/store';
+  export let data;
+  let low = true;
+  let indexi = -1;
+>>>>>>> main
 
   let isOpen = $state(false);
   //  import Viewport from 'svelte-viewport-info'
@@ -140,6 +147,11 @@
       mtaha[i].tx = txx(mtahan[i].attributes.name);
       mtaha[i].ani = 'mtaha';
       mtaha[i].azmi = 'mesima';
+      mtaha[i].restime = getProjectData(
+        mtahan[i].attributes.project.data.id,
+        'restime'
+      );
+      mtaha[i].projectId = mtahan[i].attributes.project.data.id;
       mtaha[i].pl = 0 + i;
       mtaha[i].usernames =
         data.data.usersPermissionsUser.data.attributes.username;
@@ -274,6 +286,12 @@
           st: rt[2],
           projectId:
             start[i].attributes.finiapruvals.data[j].attributes.project.data.id,
+          timegramaDate:
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
+              .attributes.date,
+          timegramaId:
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
+              .id,  
           projectName: getProjectData(start[i].id, 'pn'),
           noof: getProjectData(start[i].id, 'noof'),
           src2: getProjectData(start[i].id, 'pp'),
@@ -509,6 +527,8 @@
         dictasked.push({
           uid: t.users_permissions_user.data.id,
           username: t.users_permissions_user.data.attributes.username,
+          timegramaId: t.timegrama.data?.id ?? 0,
+          timegramaDate: t.timegrama.data?.attributes.date ?? null,
           src: src22,
           iskvua: t.open_mission.data.attributes.iskvua,
           email: t.users_permissions_user.data.attributes.email,
@@ -1919,6 +1939,16 @@
     lang.set(data.lang);
     console.log($lang, 'start');
     miDataold = miData;
+    const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('jwt='))
+        .split('=')[1];
+      const cookieValueId = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('id='))
+        .split('=')[1];
+      idL = cookieValueId;
+      token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let link = baseUrl+'/graphql';
     try {
@@ -2078,6 +2108,7 @@
                             users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}
       									}}}
     			finiapruvals(filters: { archived: { eq: false } }){ data{ id attributes{
+                        timegrama {data{id attributes{date}}}
               			    missname noofhours why what{data{id attributes {url formats}}} 
         					mesimabetahalich {data{id attributes{ perhour hearotMeyuchadot descrip mission {data {id}}}}}
                             vots  {what why id users_permissions_user {data{id}}}

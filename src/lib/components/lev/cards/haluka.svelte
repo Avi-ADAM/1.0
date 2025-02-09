@@ -3,6 +3,7 @@
   import tr from '$lib/translations/tr.json';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
+<<<<<<< HEAD
   import No from '../../../celim/no.svelte';
   import { lang } from '$lib/stores/lang.js';
   /** @type {{low?: boolean, isVisible?: boolean, projectName: any, src: any, why: any, src2: any, missionBName: any, missionDetails: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, hearotMeyuchadot: any, mypos: any, valph: any, nhours: any, useraplyname: any, already: any, allr?: boolean}} */
@@ -82,6 +83,74 @@
           <span class="text-barbi text-center mr-3 sm:text-xl text-sm"
             >{tr.headers.haluka[$lang]}</span
           >
+=======
+  import No from '../../../celim/no.svelte'
+  import {lang} from '$lib/stores/lang.js';
+  import { isMobileOrTablet } from '$lib/utilities/device';
+    export let projectName, src, why, src2 ,missionBName, missionDetails, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, valph, nhours ,useraplyname
+    export let already, allr = false;
+function hover(x){
+dispatch("hover",{x:x});
+}
+function agree(alr){
+  already = true;
+dispatch("agree",{alr:alr,y:"a"})
+}
+function decline(alr) {
+  already = true; 
+dispatch("decline",{alr:alr,y:"d"});
+}
+function nego(alr){
+dispatch("nego",{alr:alr,y:"n"});
+
+}
+function tochat (){
+dispatch("tochat");
+}
+const tri = import('$lib/translations/tr.json')
+let isScrolable = true; 
+function preventSwiperScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+
+  // מניעת פרופוגציה של גלילה במגע
+  function preventTouchScroll(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.stopPropagation();
+    }
+  }
+</script>
+
+
+<div on:wheel={preventSwiperScroll} 
+on:touchmove={preventTouchScroll}
+on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+role="button"
+tabindex="0" 
+on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
+ <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
+  </div>-->
+   <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
+      <div class="relative flex items-center space-x-1">
+         <div class="relative">
+         <img src={src}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+         </div>
+         <div class="flex flex-col leading-tight">
+            <div class=" text-md mt-1 flex items-center">
+               <span class="text-barbi text-center mr-3 sm:text-xl text-sm">{tr.headers.haluka[$lang]}</span>
+            </div>
+            <span style="font-size: 10px; text-shadow: 1px 1px white;" class="pn ml-1 text-sm text-barbi ">{projectName}</span>
+         </div>
+         </div>
+         </div>
+  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+    <div  class="mb-8">
+      
+     
+     
+>>>>>>> main
         </div>
         <span
           style="font-size: 10px; text-shadow: 1px 1px white;"

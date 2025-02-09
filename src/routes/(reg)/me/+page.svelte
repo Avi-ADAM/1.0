@@ -1,5 +1,10 @@
 <script>
+<<<<<<< HEAD
   import { liUN } from '$lib/stores/liUN.js';
+=======
+	import { isMobileOrTablet } from '$lib/utilities/device';
+    import { liUN } from '$lib/stores/liUN.js';
+>>>>>>> main
 
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Close from '$lib/celim/close.svelte';
@@ -379,10 +384,10 @@
       error1 = e;
       console.log(e);
       if (e == 'TypeError: Failed to fetch') {
-        setTimeout(start(), 10000);
+       // setTimeout(start(), 10000);
         const msg = {
-          he: 'נראה שיש בעיה בחיבור לאינטרנט, אנו מנסים שוב',
-          en: 'seems llike we have a internet connection problem, we are trying again'
+          he: 'נראה שיש בעיה בחיבור לאינטרנט, נא לנסות שוב',
+          en: 'seems llike we have a internet connection problem, please try again'
         };
         toast.warning(msg[$lang]);
         //getcetch & show msg this from cetch bcz you have no net
@@ -776,9 +781,15 @@
   <title>{title[$lang]}</title>
 </svelte:head>
 {#await meData}
+<<<<<<< HEAD
   <div class="body button-gold grid items-center justify-center">
     <Lowding height="100vh" />
   </div>
+=======
+<div class="body button-gold grid items-center justify-center">
+         <Lowding height="30vh" />
+         </div>
+>>>>>>> main
 {:then meData}
   <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
     <div
@@ -838,6 +849,7 @@
     </div>
   </DialogOverlay>
 
+<<<<<<< HEAD
   {#if addP == false}
     <div
       bind:clientWidth={width}
@@ -854,6 +866,28 @@
               src="https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg"
               alt="link to the heart page"
             />
+=======
+  <div class="flexi">
+
+  {#if addNs1 == true}
+  {#key addSl}
+  <div class="d {current === 'a1' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a1"}">
+          <TourItem message={message2[$lang]}>
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={meData.skills.data} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
+        </TourItem>
+ </div>
+  <div  class="d {current === 'a2' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a2"}">
+          <TourItem message={message3[$lang]}>
+    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={meData.tafkidims.data} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
+        </TourItem>
+ </div>
+           <TourItem message={message4[$lang]}>
+  <div class="d {current === 'a3' && mass !== true ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : ""}" 
+            class:a3={current !== 'a3'}
+       class:whole="{mass === true}">
+    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={meData.sps.data} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
+</div>
+>>>>>>> main
           </TourItem>
         </a>
       </div>
@@ -874,6 +908,7 @@
         </svg>
       </div>
 
+<<<<<<< HEAD
       <div class="flexi">
         {#if addNs1 == true}
           {#key addSl}
@@ -1043,6 +1078,20 @@
                 />
               </div>
             </TourItem>
+=======
+        <div  class="d {current === 'a4' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a4"}"
+         >
+                <TourItem message={message5[$lang]}>
+      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={meData.vallues.data} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
+          </TourItem>
+    </div>
+                          <TourItem message={message6[$lang]}>
+        <div 
+        class="d {current === 'a5' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a5"}">
+          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={meData.work_ways.data} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
+        </div>
+                            </TourItem>
+>>>>>>> main
 
           {/key}
         {/if}
@@ -3602,6 +3651,7 @@
   .selected {
     z-index: 77;
 
+<<<<<<< HEAD
     position: fixed;
     top: 0;
     right: 0;
@@ -3618,6 +3668,23 @@
     text-align: center;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
     background-position: right center;
+=======
+  position: fixed;
+  top: 0;
+  right: 0;
+  padding: 2rem 8px 0.6rem;
+  border-left: 1px solid #aaa;
+  overflow-y: auto;
+  overflow-x: auto;
+	width: 230px;
+  display:flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/4nd_w3gv33.svg);
+     background-position:right center;
+>>>>>>> main
     background-repeat: no-repeat;
     background-size: cover;
   }
@@ -3627,12 +3694,20 @@
     background-position: left center;
     background-repeat: no-repeat;
     background-size: cover;
+<<<<<<< HEAD
     position: fixed;
     top: 0;
     left: 0;
     height: 100%;
     padding: 5rem 1rem 0.6rem;
     overflow-y: scroll;
+=======
+  position: fixed;
+  top: 0;
+  left: 0;
+  padding: 5rem 1rem 0.6rem;
+  overflow-y: scroll;
+>>>>>>> main
     overflow-x: auto;
 
     width: 17rem;
