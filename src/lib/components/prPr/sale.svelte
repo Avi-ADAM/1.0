@@ -18,11 +18,10 @@ import { idPr } from '../../stores/idPr.js'
     dayjs.locale($lang);
   });
 let locale = $lang
-<<<<<<< HEAD
 let store = $state()
 let selected = $state();
 let total = $state(0);
-let hm = $state(0);
+let hm = $state(1);
 let where = [];
 let placeholder = `אצל מי הכסף`;
 let already = $state(false);
@@ -35,46 +34,14 @@ let already = $state(false);
     maid
   } = $props();
 let valid = $state(true);
-run(() => {
-    if (kindUlimit = false ){ 
-          if (hm > quant){
-    valid = false;
-          } else {
-      valid = true;
-          }
-  } else if (kindUlimit = true ){
-      valid = true;
-      quant = -1
-  }
-  });
-run(() => {
-    if (hm > 0 && each > 0 ){
-    total = hm * each;
-    each = total / hm;
-  }
-  });
-run(() => {
-    if (hm > 0 && total > 0 ){
-    each = total / hm;
-  }
-  });
-=======
-let store
-export let quant;
-console.log(quant)
-let selected;
-let total = 0;
-export let each = 0;
-export let kindUlimit = false 
+
+
+
  let kindOf = 'monthly';
-let hm = 1;
-let where = [];
-let placeholder = `אצל מי הכסף`;                          
-let already = false;
-export let maid;
 let per = false;
 
-$:if (kindOf == "monthly" || kindOf == "yearly") {
+$effect(() => {
+   if (kindOf == "monthly" || kindOf == "yearly") {
  if(dates !== null && datef !== null) {
   per = false;
   total = 0;
@@ -99,8 +66,7 @@ $:if (kindOf == "monthly" || kindOf == "yearly") {
     per = false;
   total = hm * each;
 }
->>>>>>> main
-
+})
 
 let bearer1;
 let token;
@@ -264,51 +230,6 @@ const optional = {
 };
 
    const change = {"he":"שינוי תאריך מכירה", "en":"change sale date"}
-<<<<<<< HEAD
-
-</script>
-<div dir="rtl" class='textinput'>
-  <input max={quant} type="number" id="hoursn" name="hoursn"  bind:value={hm} class='input' required>
-  <label for="hoursn" class='label'>כמה יחידות? </label>
-  <span class='line'></span>
-  <small style="color: red; display: {valid ? "none" : ""};">מספר היחידות לא יכול להיות גבוה יותר מ{quant}</small>
-</div>
-<div dir="rtl" class='textinput'>
-  <input step="0.01" type="number" id="hoursn" name="hoursn"  bind:value={each} class='input' required>
-  <label for="hoursn"  class='label'>כמה ליחידה? </label>
-  <span class='line'></span>
-</div>
-<div dir="rtl" class='textinput'>
-  <input step="0.01" type="number" id="hoursn" name="hoursn"  bind:value={total} class='input' required>
-  <label for="hoursn" class='label'>סך הכל </label>
-  <span class='line'></span>
-</div>
-<div class="grid justify-center align-center ">
-  <h3>{change[$lang]}</h3>
-<Datepicker  bind:store theme={theme} format={$lang == "en" ? 'MM/DD/YYYY' :'DD/MM/YYYY'}/>
-
-</div>
-
-      
-  <div>
-      <MultiSelect
-      maxSelect={1}
-      bind:selected
-      {placeholder}
-      options={projectUsers.map(c => c.attributes.username)}
-      />
-     </div>
-{#if already == false}
-<div class="flex items-center justify-center">
-<button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- onclick={add} >דיווח</button>
- </div>
- {/if}<style>
-       .textinput {
-  position: relative;
-  width: 100%;
-  display: block;
-=======
    let dates = null,
   datef = null
 const quantT = {
@@ -318,7 +239,6 @@ const quantT = {
 const forEachT = {
   he: 'כמה ליחידה?',
   en: 'How many per unit?',
->>>>>>> main
 }
 const perMonth = {
   he: 'לחודש',

@@ -1,22 +1,13 @@
 <script>
   import Tile from '$lib/celim/tile.svelte';
     import {lang} from '$lib/stores/lang.js'
-<<<<<<< HEAD
- 
-    let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-
-=======
   import { createEventDispatcher, onMount } from 'svelte';
     const dispatch = createEventDispatcher();
 
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-export let allIds = []
-export let filterKind = "projects"
+
 console.log(allIds,"allIds")
-export let sug = 13;
->>>>>>> main
 let sugg =  "sugg";
 let pend = "pend";
 let asks = "asks";
@@ -41,16 +32,7 @@ let states = $state({
   pmashs,
   pmaap,
   askmap
-<<<<<<< HEAD
 });
-
-function showonly(value) { 
-    if (value !== "true") {
-        showonlyD({
-            data: value
-        });
-=======
-};
 onMount(async () => {
     if(filterKind === "projects"){
         milon = []
@@ -77,7 +59,6 @@ function showonly(value,id=null) {
             kind: filterKind,
             id: id
                 });
->>>>>>> main
         
         // נאפס את כל הערכים
         Object.keys(states).forEach(key => {
@@ -149,6 +130,8 @@ hoverD({id: fir[$lang]});
     maap = 17,
     askma = 13,
     hachlot = 9,
+   allIds = [],
+filterKind = "projects",
     low = true,
     hoverD,
     showall,

@@ -6,7 +6,6 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
   import {lang} from '$lib/stores/lang.js'
   import Chaticon from '$lib/celim/chaticon.svelte';
-<<<<<<< HEAD
   /** @type {{low?: boolean, isVisible?: boolean, iskvua: any, projectName: any, src: any, openmissionName: any, missionDetails: any, useraplyname: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, already?: boolean, src2: any, perhour?: number, noofhours?: number}} */
   let {
     low = false,
@@ -25,13 +24,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     perhour = 0,
     noofhours = 0
   } = $props();
-=======
   import { isMobileOrTablet } from '$lib/utilities/device';
-    export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting
-    export let already = false;
-    export let src2;
-    export let perhour = 0, noofhours = 0
->>>>>>> main
 function hover(x){
 dispatch("hover",{x:x});
 }

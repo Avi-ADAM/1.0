@@ -1,41 +1,19 @@
 <script>
-<<<<<<< HEAD
   import { run } from 'svelte/legacy';
 
  import tr from '$lib/translations/tr.json';
-=======
-  import tr from '$lib/translations/tr.json';
->>>>>>> main
   import Text from '../conf/text.svelte';
   import Number from '../conf/number.svelte';
   import DateNego from '../conf/dateNego.svelte';
   import Barb from '../conf/stackBar.svelte';
-<<<<<<< HEAD
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte'
 const tri = tr
-import {
-    createEventDispatcher
-} from 'svelte';
-import {
-    onMount
-} from 'svelte';
- import {lang} from '$lib/stores/lang'
-const dispatch = createEventDispatcher();
-=======
-  import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
-  const tri = tr;
-  import { createEventDispatcher } from 'svelte';
-  import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
   const dispatch = createEventDispatcher();
-  export let restime;
->>>>>>> main
   import { montsi } from '$lib/func/montsi.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
-  import Rich from '../conf/rich.svelte';
 
-<<<<<<< HEAD
 let bearer1;
 let token;
 let idL;
@@ -48,11 +26,10 @@ let descrip2 = $state(descrip);
 let name2 = $state(name1);
 let sqadualed2 = $state(sqadualed);
 let sqadualedf2 = $state(sqadualedf);
-
+let price2 = $state(price)
 let spnot2 = $state(spnot);
 let linkto2 = $state(linkto);
 let hm2 = $state(hm);
-let price2 = $state(price);
 let easy2 = $state(easy);
 let rishon = 0;
 let kindOfb = $state(kindOf)
@@ -69,72 +46,8 @@ function close (){
      let rishon4 = ``;
           let rishonves4 = ``;
           let what4 = true;
-function objToString (obj) {
-=======
-  export let descrip;
-  export let projectName;
-  export let name1;
-  export let spnot;
-  export let easy = 0;
-  export let hm = 0;
-  export let price = 0;
-  export let projectId;
-  export let uids = [];
-  export let what = [];
-  export let noofusersOk;
-  export let noofusersNo;
-  export let noofusersWaiting;
-  export let total = 0;
-  export let noofusers;
-  export let already;
-  export let mypos;
-  export let missionId;
-  export let linkto;
-  export let tafkidims;
-  export let sqadualed;
-  export let sqadualedf;
-  export let state = 2;
-  export let pendId;
-  export let users = [];
-  export let kindOf = 'perUnit';
-  export let oldide = 0; //last tg id, if non 0
-  let bearer1;
-  let token;
-  let idL;
 
-  const less = {
-    he: 'הסרה',
-    en: 'remove'
-  };
-  let descrip2 = descrip;
-  let name2 = name1;
-  let sqadualed2 = sqadualed;
-  let sqadualedf2 = sqadualedf;
-
-  let spnot2 = spnot;
-  let linkto2 = linkto;
-  let hm2 = hm;
-  let price2 = price;
-  let easy2 = easy;
-  let rishon = 0;
-  let kindOfb = kindOf;
-
-  function close() {
-    dispatch('close');
-  }
-  export let timegramaId;
-  let name4 = ``;
-  export let ordern = 0;
-  let descrip4 = ``;
-  let spnot4 = ``;
-  let hm4 = ``;
-  let price4 = ``;
-
-  let rishon4 = ``;
-  let rishonves4 = ``;
-  let what4 = true;
   function objToString(obj) {
->>>>>>> main
     let str = '';
     for (let i = 0; i < obj.length; i++) {
       const length = Object.keys(obj[i]).length;
@@ -159,6 +72,7 @@ function objToString (obj) {
     }
     return str;
   }
+
   function objToStringC(obj) {
     let str = '';
     for (let i = 0; i < obj.length; i++) {
@@ -183,7 +97,6 @@ function objToString (obj) {
       }
     }
     return str;
-<<<<<<< HEAD
 }
 let miDatan = []
 let error1
@@ -223,21 +136,7 @@ let clicked = false
     masaalr = false
   } = $props();
 let userss;
-async function increment() {
-    dispatch("load")
-  //TODO: update timegrama, add now pend that is changed to nego
-  let sqadualedf4 = ``,kindOf4nego  = ``, kindOf4 = ``, sqadualed4 = ``,easy4 = ``, easy4nego = ``, sqadualedf4nego, sqadualed4nego, namefornego, descrip4nego, spnot4nego, hm4nego, price4nego  , rishon4nego, rishonves4nego
-=======
-  }
-  let miDatan = [];
-  let error1;
-  let clicked = false;
-  export let masaalr = false;
-  let userss;
-  async function increment() {
-    dispatch('load');
-    //TODO: update timegrama, add now pend that is changed to nego
-    let sqadualedf4 = ``,
+let sqadualedf4 = ``,
       kindOf4nego = ``,
       kindOf4 = ``,
       sqadualed4 = ``,
@@ -252,7 +151,11 @@ async function increment() {
       price4nego,
       rishon4nego,
       rishonves4nego;
->>>>>>> main
+
+  async function increment() {
+    dispatch('load');
+    //TODO: update timegrama, add now pend that is changed to nego
+ 
 
     const negoss = ``;
     const cookieValue = document.cookie
@@ -462,17 +365,7 @@ async function increment() {
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
 
-<<<<<<< HEAD
-let datai = $derived([{
-  "leb":`${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true)}| ${tri?.mash?.shovile[$lang]},${easy2* hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true)}`,
-  "value":price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true),
-  "vallue2":(easy2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true))- (price2 * hm2 * montsi(kindOfb,sqadualed2,sqadualedf2,true))},
-  {"leb":`${tri?.nego?.original[$lang]},${price * hm * montsi(kindOf,sqadualed,sqadualedf,true)} | ${tri?.mash?.shovile[$lang]},${easy * hm * montsi(kindOf,sqadualed,sqadualedf,true)}`,"value":price * hm * montsi(kindOf,sqadualed,sqadualedf,true), "vallue2":(easy * hm * montsi(kindOf,sqadualed,sqadualedf,true))-(price * hm * montsi(kindOf,sqadualed,sqadualedf,true))}])
-run(() => {
-    console.log(datai)
-  });
-=======
-  $: datai = [
+  let datai = $derived([
     {
       leb: `${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}| ${tri?.mash?.shovile[$lang]},${easy2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}`,
       value: price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true),
@@ -487,9 +380,7 @@ run(() => {
         easy * hm * montsi(kindOf, sqadualed, sqadualedf, true) -
         price * hm * montsi(kindOf, sqadualed, sqadualedf, true)
     }
-  ];
-  $: console.log(datai);
->>>>>>> main
+  ])
 </script>
 
 <div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
@@ -574,17 +465,6 @@ run(() => {
       {:else}
         <p>0</p>
       {/if}
-<<<<<<< HEAD
-      </div>
-  
- <div class="w-fit mx-auto">
-     <button
-         onclick={increment}
-         class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-         type="submit"
-         name="addm">{tri?.common.puttovote[$lang]}</button> </div>
-         </div>
-=======
     {:else}
       {#key datai}
         <div class="w-1/2 mx-auto">
@@ -603,4 +483,3 @@ run(() => {
     >
   </div>
 </div>
->>>>>>> main

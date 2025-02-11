@@ -287,199 +287,8 @@
               </td>
             {/each}
           </tr>
-<<<<<<< HEAD
         </thead>
         <tbody>
-          <tr class="ggr">
-            <th class="ggr">שם</th>
-            {#each fmiData as data, i}
-              <td class="ggr">{data.attributes.missionName}</td>
-            {/each}
-          </tr>
-          <tr>
-            <th>תיאור</th>
-            {#each fmiData as data, i}
-              <td
-                >{#if data.attributes.descrip != 'undefined'}{data.attributes
-                    .descrip}{/if}</td
-              >
-            {/each}
-          </tr>
-          <tr>
-            <th>תאריך ביצוע</th>
-            {#each fmiData as data, i}
-              <td>
-                {#if data.attributes.Sqadualed}
-                  {data.attributes.Sqadualed}
-                {/if}
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th>קישורים ציבוריים</th>
-            {#each fmiData as data, i}
-              <td>
-                {#if data.attributes.publicklinks}
-                  {data.attributes.publicklinks}
-                {/if}
-              </td>
-            {/each}
-          </tr><tr>
-            <th>הערות יחודיות לריקמה שלי</th>
-            {#each fmiData as data, i}
-              <td>
-                {#if data.attributes.hearotMeyuchadot != 'undefined' && data.attributes.hearotMeyuchadot != null}
-                  {data.attributes.hearotMeyuchadot}
-                {/if}
-              </td>
-            {/each}
-          </tr><tr>
-            <th>קישורים יחודיים לריקמה שלי</th>
-            {#each fmiData as data, i}
-              <td>
-                {#if data.attributes.privatlinks}
-                  {data.attributes.privatlinks}
-                {/if}
-              </td>
-            {/each}
-          </tr><tr style="display:''" id="hoursD">
-            <th>כמה שעות זה לקח </th>
-            {#each fmiData as data, i}
-              <td>
-                {#if data.attributes.noofhours > 0}
-                  {data.attributes.noofhours.toLocaleString('en-US', {
-                    maximumFractionDigits: 2
-                  })}
-                {/if}
-              </td>
-            {/each}
-          </tr><tr style="display:''" id="vallueperhourN">
-            <th>כמה שווה שעה</th>
-            {#each fmiData as data, i}
-              <td>
-                {#if data.attributes.perhour > 0}
-                  {data.attributes.perhour.toLocaleString('en-US', {
-                    maximumFractionDigits: 2
-                  })}
-                {/if}
-              </td>
-            {/each}
-          </tr><tr>
-            <th>שווי סך הכל למשימה </th>
-            {#each fmiData as data, i}
-              <td>
-                {data.attributes.total.toLocaleString('en-US', {
-                  maximumFractionDigits: 2
-                })}
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th> הערות סיום</th>
-            {#each fmiData as data, i}
-              <td>
-                {#if data.attributes.why}
-                  {data.attributes.why}
-                {/if}
-              </td>
-            {/each}
-          </tr>
-          <tr>
-            <th>בוצע על ידי</th>
-            {#each fmiData as data, i}
-              <td>
-                {data.attributes.users_permissions_user.data.attributes
-                  .username}
-              </td>
-            {/each}
-          </tr>
-        </tbody>
-      </table>
-
-      {#if meData.length > 0}
-        <table dir="rtl">
-          <caption class="sm:text-right md:text-center text-right">
-            <h1 class="md:text-center text-2xl md:text-2xl font-bold">
-              משאבים שהתקבלו ואושרו
-            </h1>
-          </caption>
-          <thead>
-            <tr class="gg">
-              <th class="gg"> </th>
-              {#each meData as data, i}
-                <td class="gg" style="font-size: 3rem">
-                  {i + 1}
-                </td>
-              {/each}
-            </tr>
-          </thead>
-          <tbody>
-            <tr class="ggr">
-              <th class="ggr">שם</th>
-              {#each meData as data, i}
-                <td class="ggr">
-                  {data.attributes.name}
-                </td>
-              {/each}
-            </tr>
-            <tr>
-              <th>תיאור</th>
-              {#each meData as data, i}
-                <td>
-                  {#if data.attributes.deskrip}
-                    {data.attributes.deskrip}{/if}
-                </td>
-              {/each}
-            </tr>
-            <tr>
-              <th>סוג</th>
-              {#each meData as data, i}
-                <td>
-                  <h1>{data.attributes.kindOf}</h1>
-                </td>
-              {/each}
-            </tr>
-            <tr style="display:{kc ? '' : 'none'};">
-              <th>כמות</th>
-              {#each meData as data, i}
-                <td>
-                  {data.attributes.hm}
-                </td>
-              {/each}
-            </tr><tr style="display:{ky ? '' : 'none'};">
-              <th>תאריך התחלה </th>
-              {#each meData as data, i}
-                <td
-                  ><h1 style="display:{meData[i].ky ? '' : 'none'};">
-                    {moment(data.attributes.sqadualed).format(
-                      'dddd, MMMM Do YYYY, H:mm:ss '
-                    )}
-                  </h1></td
-                >
-              {/each}
-            </tr>
-            <tr style="display:{ky ? '' : 'none'};">
-              <th>תאריך סיום </th>
-              {#each meData as data, i}
-                <td
-                  ><h1 style="display:{meData[i].ky ? '' : 'none'};">
-                    {moment(data.attributes.sqadualedf).format(
-                      'dddd, MMMM Do YYYY, H:mm:ss '
-                    )}
-                  </h1></td
-                >
-              {/each}
-            </tr>
-            <tr>
-              <th>הערות מיוחדות</th>
-              {#each meData as data, i}
-                <td
-                  >{#if data.attributes.spnot}
-                    {data.attributes.spnot}{/if}</td
-                >
-              {/each}
-            </tr><!-- <tr>
-=======
   <tr>
       <th>תיאור</th>
       {#each meData as data, i}
@@ -516,70 +325,12 @@
  {data.attributes.spnot}{/if}</td>
         {/each}
   </tr><!-- <tr>
->>>>>>> main
       <th>עלות</th>
       {#each meData as data, i}
       <td>
   <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
   <h2>{data.price.toFixed(2)}</h2>  
   {/each}
-<<<<<<< HEAD
-    </tr>--><tr
-            >
-              <th>שווי מקסימלי לחישוב בריקמה</th>
-              {#each meData as data, i}
-                <td>
-                  <small for="name" class="label"
-                    >שווי כספי <span
-                      style="display:{meData[i].m ? '' : 'none'};"
-                      >לכל חודש</span
-                    ><span style="display:{meData[i].y ? '' : 'none'};"
-                      >לכל שנה</span
-                    ><span style="display:{meData[i].r ? '' : 'none'};"
-                      >לכל התקופה</span
-                    ><span style="display:{meData[i].kc ? '' : 'none'};"
-                      >ליחידה</span
-                    >
-                  </small>
-                  {data.attributes.agprice.toFixed(2)}
-                </td>
-              {/each}
-            </tr><tr style="display:{kc || ky ? '' : 'none'};">
-              <th>עלות סה"כ</th>
-              {#each meData as data, i}
-                <td>
-                  <h3
-                    style="display:{meData[i].m || meData[i].y || meData[i].kc
-                      ? ''
-                      : 'none'};"
-                  >
-                    {data.attributes.total.toFixed(2)}
-                  </h3>
-                </td>
-              {/each}
-            </tr>
-            <tr>
-              <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
-              {#each meData as data, i}
-                <td
-                  >{#if data.attributes.linkto}{data.attributes.linkto}{/if}
-                </td>
-              {/each}
-            </tr><tr>
-              <th>שותף על ידי</th>
-              {#each meData as data, i}
-                <td>
-                  {data.attributes.users_permissions_user.data.attributes
-                    .username}
-                </td>
-              {/each}
-            </tr>
-          </tbody>
-        </table>
-      {/if}
-    </div>
-  </div>
-=======
     </tr>--><tr>
       <th>שווי מקסימלי לחישוב בריקמה</th>
       {#each meData as data, i}
@@ -607,10 +358,12 @@
              </td>
              {/each}
         </tr>
+      </tbody>
 </table>
->>>>>>> main
+</div>
+</div>
 {/if}
-
+ 
 <style>
   .yy {
     height: 280px;

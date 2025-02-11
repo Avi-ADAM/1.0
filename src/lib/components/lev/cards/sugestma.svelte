@@ -7,7 +7,6 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
-<<<<<<< HEAD
   /** @type {{low?: boolean, isVisible?: boolean, mashName: any, easy: any, myp: any, price: any, total: any, descrip: any, projectName: any, src: any, spnot: any, deadLine: any, sqadualedf: any, already?: boolean}} */
   let {
     low = false,
@@ -25,11 +24,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     sqadualedf,
     already = $bindable(false)
   } = $props();
-=======
   import { isMobileOrTablet } from '$lib/utilities/device';
-    export let mashName,easy,myp,price,total,  descrip,projectName, src, spnot ,deadLine, sqadualedf
-    export let already = false;
->>>>>>> main
+   
 function hover(x){
 dispatch("hover",{x:x});
 }

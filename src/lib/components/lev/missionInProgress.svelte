@@ -31,36 +31,9 @@ betha.subscribe(value => {
 
  const dispatch = createEventDispatcher();
     let show = true;
-<<<<<<< HEAD
     let dialogOpen = $state(false)
-=======
-    export let modal = false
-    let dialogOpen = false
-    export let iskvua = false
-        export let low = false;
-        export let status = 0;//tween store
-        export let tasks = []
-        export let restime;
-    export let tx = 680;
-    export let dueDateOrCountToDedline = "11:11"
-    export let projectName = "ONE"
-    export let missionName = "do x" 
-    export let missionDetails = "do x in y"
-    export let hearotMeyuchadot;
-    export let src = "coin.png"
-    export let link = "https://www.1lev1.world"
-    export let linkDescription = "לביצוע"
-    export let projectId;
-    export let linkP = "/project/"
-    export let hourstotal;
-    export let hoursdon = 0;
-    export let mId;
-    export let missId; //add in gr
-    export let noofpu; //addtopr
-    export let pu;
-    export let perhour;
-    export let usernames;
->>>>>>> main
+   
+      
     let mstotal = hourstotal*3600000
      let idL;
 
@@ -634,9 +607,9 @@ function hover (id){
     dispatch("hover", {id: u});
 }
    import Cards from './cards/inpro.svelte'
-<<<<<<< HEAD
   /** @type {{isVisible?: boolean, coinlapach: any, stname: any, modal?: boolean, iskvua?: boolean, low?: boolean, status?: number, tasks?: any, tx?: number, dueDateOrCountToDedline?: string, projectName?: string, missionName?: string, missionDetails?: string, hearotMeyuchadot: any, src?: string, link?: string, linkDescription?: string, projectId: any, linkP?: string, hourstotal: any, hoursdon?: number, mId: any, missId: any, noofpu: any, pu: any, perhour: any, usernames: any, zman: any, oldzman: any, lapse?: number, cards?: boolean}} */
   let {
+    restime,
     isVisible = false,
     coinlapach,
     stname = $bindable(),
@@ -669,11 +642,8 @@ function hover (id){
     lapse = $bindable(0),
     cards = false
   } = $props();
-=======
   import { sendToSer } from '$lib/send/sendToSer.svelte';
   import { calcX } from '$lib/func/calcX.svelte';
-export let cards = false;
->>>>>>> main
 function claf (event){
   let o = event.detail.alr
   let d = event.detail.y

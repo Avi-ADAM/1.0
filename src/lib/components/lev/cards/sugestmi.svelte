@@ -11,7 +11,6 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
   import No from '$lib/celim/no.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
-<<<<<<< HEAD
   /** @type {{low?: boolean, projectName: any, timeToP: any, acts: any, src: any, perhour: any, noOfHours: any, missionDetails: any, missionName: any, skills?: any, role?: any, workways?: any, totalminyearone?: number, totalmaxyearone?: number, totalminyearsec?: number, totalmaxyearsec?: number, totalinyearone?: number, totalinyearsec?: number, isMonthly?: boolean, alreadyi?: boolean, hearotMeyuchadot: any, already: any, allr?: boolean, isVisible?: boolean}} */
   let {
     low = false,
@@ -39,12 +38,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     allr = false,
     isVisible = false
   } = $props();
-=======
   import { isMobileOrTablet } from '$lib/utilities/device';
-    export let projectName,timeToP, acts, src, perhour, noOfHours, missionDetails, missionName, skills = [], role = [], workways =[], totalminyearone = 1000, totalmaxyearone = 30000, totalminyearsec = 2000, totalmaxyearsec = 60000, totalinyearone = 600, totalinyearsec = 1000, isMonthly = true, alreadyi = false,hearotMeyuchadot
-    export let already, allr = false;
-  export let isVisible = false;
->>>>>>> main
+ 
 function hover(x){
 dispatch("hover",{x:x});
 }
@@ -91,12 +86,9 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
         const monhly = {"he":"בחודש", "en": "per month"}
 
 console.log(workways)
-<<<<<<< HEAD
 run(() => {
     console.log("ACTS: ",acts)
   });
-=======
-$: console.log("ACTS: ",acts)
 let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
@@ -110,7 +102,6 @@ function preventSwiperScroll(event) {
       event.stopPropagation();
     }
   }
->>>>>>> main
 </script>
 
 

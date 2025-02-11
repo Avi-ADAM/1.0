@@ -3,7 +3,6 @@
   import { lang } from '$lib/stores/lang.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '../../../celim/lev.svelte';
-<<<<<<< HEAD
   import No from '../../../celim/no.svelte';
   /** @type {{low?: boolean, isVisible?: boolean, projectName: any, src: any, name: any, descrip: any, noofusersNo: any, noofusersOk: any, noofusersWaiting: any, hearotMeyuchadot: any, mypos: any, kindOf: any, easy: any, price: any, monts: any, yers: any, hm: any, already: any, allr?: boolean}} */
   let {
@@ -49,166 +48,8 @@
   function tochat() {
     onToChat();
   }
-</script>
-
-<div
-  dir="rtl"
-  style="overflow-y:auto"
-  class=" d {isVisible
-    ? $lang == 'he'
-      ? 'boxleft'
-      : 'boxright'
-    : ''} leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]"
->
-  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
-  </div>-->
-  <div
-    class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
-  >
-    <div class="relative flex items-center space-x-1">
-      <div class="relative">
-        <img {src} alt="" class="w-10 sm:w-16 h-10 sm:h-16 rounded-full" />
-      </div>
-      <div class="flex flex-col leading-tight">
-        <div class=" text-xl mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-xl">
-            הצבעה על אישור משאב חדש
-          </span>
-        </div>
-        <span
-          style="font-size: 10px; text-shadow: 1px 1px white;"
-          class="pn ml-1 text-xl text-barbi">{projectName}</span
-        >
-      </div>
-    </div>
-  </div>
-  <div
-    class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
-  >
-    <div class="mb-8">
-      <p style="line-height: 1;" class=" text-gray-600 flex items-center">
-        <img
-          style="width:2.5rem;"
-          class=""
-          src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
-          alt="howmuch"
-        />
-        {#if kindOf === 'perUnit'}
-          <span
-            onmouseenter={() => hover(' שווי ליחידה')}
-            onmouseleave={() => hover('0')}
-            style="color:var(--barbi-pink)"
-            >{easy > 0 ? easy.toLocaleString() : price.toLocaleString()} ליחידה</span
-          >
-          *
-          <span
-            onmouseenter={() => hover('כמות')}
-            onmouseleave={() => hover('0')}
-            style="color:var(--barbi-pink)"
-            >{hm == 1 ? 'יחידה אחת' : `${hm.toLocaleString()} יחידות`}
-          </span>
-          =
-          <span
-            onmouseenter={() => hover('סך הכל')}
-            onmouseleave={() => hover('0')}
-            >{easy > 0
-              ? (easy * hm).toLocaleString()
-              : (price * hm).toLocaleString()}</span
-          >
-        {:else if kindOf === 'total' || kindOf === 'rent'}
-          <span
-            onmouseenter={() => hover('שווי מוצע')}
-            onmouseleave={() => hover('0')}
-            style="color:var(--barbi-pink)"
-            >{easy > 0 ? easy.toLocaleString() : price.toLocaleString()}</span
-          >
-        {:else if kindOf === 'monthly'}
-          <span
-            onmouseenter={() => hover('שווי לחודש')}
-            onmouseleave={() => hover('0')}
-            style="color:var(--barbi-pink)"
-            >{easy > 0 ? easy.toLocaleString() : price.toLocaleString()} לחודש</span
-          >
-          *
-          <span
-            onmouseenter={() => hover('כמות חודשים')}
-            onmouseleave={() => hover('0')}
-            style="color: var(--barbi-pink)"
-            >{monts == 1
-              ? 'חודש אחד'
-              : `${monts.toLocaleString()} חודשים`}</span
-          >
-          =
-          <span
-            onmouseenter={() => hover('סך הכל')}
-            onmouseleave={() => hover('0')}
-            >{easy > 0
-              ? (easy * monts).toLocaleString()
-              : (price * monts).toLocaleString()}</span
-          >
-        {:else if kindOf === 'yearly'}
-          <span
-            onmouseenter={() => hover('שווי לשנה')}
-            onmouseleave={() => hover('0')}
-            style="color:var(--barbi-pink)"
-            >{easy > 0 ? easy.toLocaleString() : price.toLocaleString()} לשנה</span
-          >
-          *
-          <span
-            onmouseenter={() => hover('מספר שנים')}
-            onmouseleave={() => hover('0')}
-            style="color: var(--barbi-pink)"
-            >{yers === 1 ? 'שנה אחת' : `${yers.toLocaleString()} שנים`}</span
-          >
-          =
-          <span
-            onmouseenter={() => hover('סך הכל')}
-            onmouseleave={() => hover('0')}
-            >{easy > 0
-              ? (easy * yers).toLocaleString()
-              : (price * yers).toLocaleString()}</span
-          >
-        {/if}
-      </p>
-      <div style="font-size: 17px;" class="text-mturk font-bold mb-2">
-        {name}
-      </div>
-      {#if descrip !== null && descrip !== 'null'}
-        <p class="cd d max-h-16 text-gray-700 text-base">{descrip}</p>{/if}
-      {#if hearotMeyuchadot}
-        <p
-          onmouseenter={() => hover('הערות')}
-          onmouseleave={() => hover('0')}
-          class="text-grey-700 max-h-16 cd d"
-        >
-          {hearotMeyuchadot !== undefined &&
-          hearotMeyuchadot !== null &&
-          hearotMeyuchadot !== 'undefined'
-            ? hearotMeyuchadot
-            : ''}
-=======
-  import No from '../../../celim/no.svelte'
   import { isMobileOrTablet } from '$lib/utilities/device';
-    export let projectName, src ,name, descrip, noofusersNo, noofusersOk,noofusersWaiting, hearotMeyuchadot, mypos, kindOf, easy, price, monts, yers,hm 
-    export let already, allr = false;
-function hover(x){
-dispatch("hover",{x:x});
-}
-function agree(alr){
-  already = true;
-dispatch("agree",{alr:alr,y:"a"})
-}
-function decline(alr) {
-  already = true; 
-dispatch("decline",{alr:alr,y:"d"});
-}
-function nego(alr){
-dispatch("nego",{alr:alr,y:"n"});
 
-}
-function tochat (){
-dispatch("tochat");
-}
 let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
@@ -259,9 +100,7 @@ on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {
           {:else if kindOf === "yearly"}
        <span on:mouseenter={()=>hover("שווי לשנה")} on:mouseleave={()=>hover("0")}  style="color:var(--barbi-pink)" >{easy > 0 ? easy.toLocaleString() : (price).toLocaleString()} לשנה</span> * <span on:mouseenter={()=>hover("מספר שנים")} on:mouseleave={()=>hover("0")}  style="color: var(--barbi-pink)" >{yers === 1 ? "שנה אחת" : `${yers.toLocaleString()} שנים`}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{easy > 0 ? (easy * yers).toLocaleString() : (price * yers).toLocaleString()}</span> 
 {/if}
->>>>>>> main
         </p>
-      {/if}
     </div>
     <div class="flex items-center">
       <p>

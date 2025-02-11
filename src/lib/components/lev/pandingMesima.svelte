@@ -12,54 +12,10 @@ import { RingLoader
 } from 'svelte-loading-spinners';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
  const dispatch = createEventDispatcher();
-<<<<<<< HEAD
+ 
         let dialogOpen = $state(false)
-=======
- export let coinlapach;
- export let isVisible = false;
- export let mypos = null;
-     export let low = false;
-        export let restime;
-        let dialogOpen = false
-        export let negopendmissions= [];
 
-        export let modal = false
-    export let messege = [];
-    export let descrip = "";
-    export let projectName = "";
-    export let name = "";
-    export let hearotMeyuchadot = "";
-    export let noofhours = 0;
-    export let src = "coin.png";
-    export let perhour = 0;
-    export let projectId;
-    export let uids = [];
-    export let what = [];
-    export let noofusersOk;
-    export let noofusersNo;
-    export let noofusersWaiting;
-    export let total = 0;
-    export let noofusers ;
-    export let already = false;
-    export let missionId;
-    export let skills = [];
-    export let tafkidims = [];
-    export let workways = [];
-    export let vallues;
-    export let publicklinks;
-    export let privatlinks;
-    export let mdate;
-    export let isKavua = false
-        export let mdates;
-        export let timegramaDate
-         export let timegramaId                     
-        export let createdAt;
-    export let pendId;
-    export let users;
-     export let mysrc;
-    export let diun = [];
-    export let order = diun.length;
->>>>>>> main
+     
     let miDatan = [];
     let error1;
     let bearer1;
@@ -612,6 +568,7 @@ function hoverc (event){
   import { Drawer } from 'vaul-svelte';
   /** @type {{coinlapach: any, isVisible?: boolean, mypos?: any, low?: boolean, restime: any, modal?: boolean, messege?: any, descrip?: string, projectName?: string, name?: string, hearotMeyuchadot?: string, noofhours?: number, src?: string, perhour?: number, projectId: any, uids?: any, what?: any, noofusersOk: any, noofusersNo: any, noofusersWaiting: any, total?: number, noofusers: any, already?: boolean, missionId: any, skills?: any, tafkidims?: any, workways?: any, vallues: any, publicklinks: any, privatlinks: any, mdate: any, isKavua?: boolean, mdates: any, timegramaDate: any, timegramaId: any, createdAt: any, pendId: any, users: any, mysrc: any, diun?: any, order?: any, ordern?: number, cards?: boolean}} */
   let {
+    negopendmissions= [],
     coinlapach,
     isVisible = false,
     mypos = null,

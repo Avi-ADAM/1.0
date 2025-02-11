@@ -42,17 +42,11 @@
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
   import { sendToSer } from '$lib/send/sendToSer.svelte';
   import { page } from '$app/stores';
-<<<<<<< HEAD
   /** @type {{data: any}} */
   let { data } = $props();
   let low = $state(true);
   let indexi = $state(-1);
-=======
   import { get } from 'svelte/store';
-  export let data;
-  let low = true;
-  let indexi = -1;
->>>>>>> main
 
   let isOpen = $state(false);
   //  import Viewport from 'svelte-viewport-info'

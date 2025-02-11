@@ -18,11 +18,8 @@
   import Tile from '$lib/celim/tile.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/stores';
-<<<<<<< HEAD
   let { acts = $bindable([]) } = $props();
-=======
   import { sendToSer } from '$lib/send/sendToSer.svelte';
->>>>>>> main
   const dispatch = createEventDispatcher();
   let paging = $state(new PagingData(
     1, // currentPage

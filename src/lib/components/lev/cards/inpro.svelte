@@ -4,8 +4,7 @@
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   // import Chaticon from '../../../celim/chaticon.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
-<<<<<<< HEAD
-
+  import { isMobileOrTablet } from '$lib/utilities/device.js';
   /** @type {{x?: number, tasks?: any, src: any, projectName: any, already: any, zman: any, hearotMeyuchadot: any, status?: number, dueDateOrCountToDedline: any, missionName: any, link: any, missionDetails: any, hoursdon: any, hourstotal: any, show: any, running: any, linkDescription: any, lapse?: number, low?: boolean, iskvua?: boolean, isVisible?: boolean, startDate?: any, onStart?: function, onDone?: function, onSave?: function, onAzor?: function, onClear?: function, onHover?: function, onStatusi?: function, onTask?: function}} */
   let {
     x = 0,
@@ -75,202 +74,8 @@
       ? new Date(dueDateOrCountToDedline)
       : null
   );
-  const sta = {
-    he: 'סטטוס התקדמות ביצוע המשימה',
-    en: 'status of mission progress'
-  };
-  const deta = { he: 'פרטי המשימה', en: 'mission details' };
-  const notes = { he: 'הערות', en: 'notes' };
-  const hoursdonTitle = { he: 'שעות בוצעו ונשמרו', en: 'hours done and saved' };
-  const from = { he: 'מתוך', en: 'from' };
-  const timero = { he: 'מונה זמן', en: 'timer' };
-  const totalTitle = {
-    he: 'מספר השעות שהוקצו למשימה',
-    en: 'total hours assigned to the mission'
-  };
-  const nooftitle = {
-    he: 'מספר השעות שבוצעו ונשמרו',
-    en: 'number of hours done and saved'
-  };
-  const options = {
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric'
-  };
-  console.log(hearotMeyuchadot);
-  const hed = { he: 'משימה בתהליך ביצוע ', en: 'mission in progress' };
-  let totali = $derived({
-    he: `${iskvua == true ? 'שעות חודשיות' : 'שעות סך הכל'}`,
-    en: `${iskvua == true ? 'monthly hours' : 'total hours'}`
-  });
-</script>
-
-{#key isVisible}
-  {#if tasks.length > 0}
-    <div
-      onclick={opentask}
-      onkeypress={opentask}
-      role="button"
-      tabindex="0"
-      class="absolute inline-flex items-center justify-center w-8 h-8 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full top-[3%] {$lang ==
-      'en'
-        ? 'right-[3%]'
-        : 'left-[3%]'}  dark:border-gray-700"
-    >
-      {tasks.length}
-    </div>
-  {/if}
-{/key}
-<div
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  style="overflow-y:auto"
-  class=" d {isVisible
-    ? $lang == 'he'
-      ? 'boxleft'
-      : 'boxright'
-    : ''} pb-16 leading-normal w-[90%] h-[90%] bg-white lg:w-[90%]"
->
-  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
-  </div>-->
-  <div
-    class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
-  >
-    <div class="relative flex items-center space-x-1">
-      <div class="relative">
-        <img {src} alt="" class="w-10 sm:w-16 h-10 sm:h-16 rounded-full" />
-      </div>
-      <div class="flex flex-col leading-tight">
-        <div class=" text-md mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-3xl text-sm"
-            >{hed[$lang]}</span
-          >
-        </div>
-        <span
-          style=" text-shadow: 1px 1px white;"
-          class=" ml-1 sm:text-2xl text-sm text-barbi">{projectName}</span
-        >
-      </div>
-    </div>
-  </div>
-  <div
-    class=" bg-white rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
-  >
-    <div class="mb-8">
-      <!--use:textfit={{parent,mode:"multi"}}  bind:this={parent}-->
-      <div class="text-mturk font-bold text-lg md:text-4xl mb-2">
-        {missionName}
-      </div>
-      <h5
-        style="line-height: 1;"
-        class="sm:text-xl text-lg text-gray-600 flex items-center"
-      >
-        <img
-          style="width:2.5rem;"
-          src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
-          alt="howmuch"
-        />
-        <span
-          onmouseenter={() => hover(nooftitle[$lang])}
-          onmouseleave={() => hover('0')}
-          role="contentinfo"
-          >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} ${hoursdonTitle[$lang]}`}</span
-        >
-        {from[$lang]}
-        <span
-          role="contentinfo"
-          onmouseenter={() => hover(totalTitle[$lang])}
-          onmouseleave={() => hover('0')}>{hourstotal} {totali[$lang]}</span
-        >
-      </h5>
-      {#if std || dueDateOrCountToDedline}
-        <p
-          style="line-height: 1;"
-          class="text-sm text-barbi flex items-center lg:text-2xl m-5"
-        >
-          <img
-            class="w-4 lg:w-8"
-            src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
-            alt="howmuch"
-          />
-          {#if std}
-            <span> {new Date(std).toLocaleDateString($lang, options)}</span>
-          {/if}
-          {#if std && dueDateOrCountToDedline}
-            -
-          {/if}
-          {#if dueDateOrCountToDedline}
-            <span>{eve.toLocaleDateString($lang, options)}</span>
-          {/if}
-        </p>
-      {/if}
-      <div class="flex items-center justify-center m-1">
-        <span
-          class="  bg-goldGrad bg-[length:200%_auto] animate-gradientx text-center text-wow p-2 sm:text-2xl text-xl"
-          style:font-family="Digital"
-          role="contentinfo"
-          onmouseenter={() => hover(timero[$lang])}
-          onmouseleave={() => hover('0')}
-          style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
-        >
-          {formatTime(zman)}
-        </span>
-      </div>
-      <!--<p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
-            <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-            <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
-      </p>-->
-      {#if missionDetails !== null && missionDetails !== 'null' && missionDetails !== 'undefined' && missionDetails.length > 0}
-        <p
-          onmouseenter={() => hover(deta[$lang])}
-          onmouseleave={() => hover('0')}
-          class="cd d max-h-1/2"
-        >
-          <RichText outpot={missionDetails} editable={false} />
-        </p>{/if}
-      {#if hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== 'undefined' && hearotMeyuchadot !== 'null' && hearotMeyuchadot.length > 0}
-        <span
-          role="contentinfo"
-          onmouseenter={() => hover(notes[$lang])}
-          onmouseleave={() => hover('0')}
-        >
-          <RichText editable={false} outpot={hearotMeyuchadot} />
-        </span>
-      {/if}
-      <div
-=======
-  import { isMobileOrTablet } from '$lib/utilities/device.js';
- const dispatch = createEventDispatcher();
-function start(){
-dispatch("start");
-}
-function done(){
-    already = true
-dispatch("done")
-}
-function save() {
-dispatch("save");
-}
-function azor(){
-dispatch("azor");
-
-}
-function clear (){
-dispatch("clear");
-}
-function hover(x){
-dispatch("hover",{x:x});
-}
-function statusi(){
-   dispatch("statusi")
-}
-function opentask(){
-   dispatch("task")
-}
  // import { textfit } from 'svelte-textfit';
  // let parent;
- $: std = startDate != null ? new Date(startDate) : null;
- $: eve = dueDateOrCountToDedline != "undefined" &&  dueDateOrCountToDedline != undefined &&  dueDateOrCountToDedline != null ? new Date(dueDateOrCountToDedline) : null;
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
    const deta = {"he": "פרטי המשימה","en": "mission details"}
    const notes = {"he": "הערות","en": "notes"}
@@ -380,7 +185,6 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
    </span>
      {/if} 
         <div
->>>>>>> main
         role="button"
         tabindex="0"
         onmouseenter={() => hover(sta[$lang])}

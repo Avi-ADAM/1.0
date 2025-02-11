@@ -19,17 +19,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 const dispatch = createEventDispatcher();
     let dialogOpen = $state(false)
 let resP = [];
-<<<<<<< HEAD
-=======
-export let stylef = '24px';
-export let askId;
-export let users;
-export let chat
-export let mypose = true
-export let order = 1
-export let sqedualed
-export let timegramaId
->>>>>>> main
+
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -663,6 +653,7 @@ function hoverede(){
   import { nowId } from "$lib/stores/pendMisMes.js";
   /** @type {{isVisible?: boolean, low?: boolean, iskvua: any, modal?: boolean, email: any, coinlapach: any, deadline: any, projectName: any, openmissionName: any, role?: any, skills: any, useraplyname: any, src?: string, src2?: string, projectId: any, link?: string, linkU?: string, userId: any, missionDetails?: string, name: any, noofpu?: number, publicklinks: any, privatlinks: any, hearotMeyuchadot: any, nhours?: number, valph?: number, missId: any, id: any, openMid: any, st?: number, pid: any, declined?: any, noofusersWaiting: any, uids: any, what: any, noofusersOk: any, noofusersNo: any, already?: boolean, stylef?: string, askId: any, users: any, chat: any, mypose?: boolean, order?: number, sqedualed: any, cards?: boolean}} */
   let {
+    timegramaId,
     isVisible = false,
     low = false,
     iskvua,

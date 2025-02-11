@@ -1,8 +1,7 @@
-<script module>
-  import mapTouchToMouseFor from 'svelte-touch-to-mouse';
-</script>
 
 <script>
+    import mapTouchToMouseFor from 'svelte-touch-to-mouse';
+
   import { sendToSer } from '$lib/send/sendToSer.svelte';
   import NewIwant from '$lib/components/addnew/newIwant.svelte';
   import { quintOut } from 'svelte/easing';
@@ -21,14 +20,9 @@
   import { Canvas } from '@threlte/core';
   import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
   import { initiatePgishot, isOnline, myUserMeeting } from '$lib/stores/pgishot';
-<<<<<<< HEAD
   let draggable = $state();
-=======
   import { isMobileOrTablet } from '$lib/utilities/device';
   import MobileFooter from './mobileFooter.svelte';
-  export let un;
-  let draggable;
->>>>>>> main
   onMount(async () => {
     initiatePgishot(idL);
     draggable = (await import('svelte-agnostic-draggable')).draggable;

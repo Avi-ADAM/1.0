@@ -13,14 +13,10 @@ import { lang } from '$lib/stores/lang.js'
   import SheirutShow from '$lib/components/prPr/sheirut/sheirutShow.svelte';
   import Close from '$lib/celim/close.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
-<<<<<<< HEAD
   /** @type {{data: any}} */
   let { data } = $props();
 let projectUsers =$state([]);
-=======
   import { isMobileOrTablet } from '$lib/utilities/device';
-let projectUsers =[];
->>>>>>> main
 const baseUrl = import.meta.env.VITE_URL
 let show = $state(false)
 let token;

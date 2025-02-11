@@ -26,27 +26,14 @@
   });
 
   const dispatch = createEventDispatcher();
-<<<<<<< HEAD
   let seEr = $state(false),
     neEr = $state(false);
-=======
-  export let userMevatzeaId,
-    userMevakeshId = $page.data.uid,
-    mimatai,
-    adMatai,
-    name = '',
-    teur = '',
-    selected = [],
-    link = '';
-  let seEr = false,
-    neEr = false;
->>>>>>> main
+
   import MultiSelect from 'svelte-multiselect';
   import SveltyPicker from 'svelty-picker';
 
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
-<<<<<<< HEAD
   /**
    * @typedef {Object} Props
    * @property {any} [bmiData]
@@ -73,8 +60,8 @@
     misid,
     fromMis = false,
     editdata = -1,
+    userMevakeshId = $page.data.uid,
     userMevatzeaId = $bindable(),
-    userMevakeshId = $bindable(),
     mimatai = $bindable(),
     adMatai = $bindable(),
     name = $bindable(''),
@@ -82,9 +69,7 @@
     selected = $bindable([]),
     link = $bindable('')
   } = $props();
-=======
   import { page } from '$app/stores';
->>>>>>> main
   function find_tafkidims_id (selected){
     let arr = []
     for(let i = 0; i < selected.length; i++){

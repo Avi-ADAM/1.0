@@ -11,6 +11,7 @@
   import Button from '$lib/celim/ui/button.svelte';
   import Mission from "./mission.svelte";
   import { idPr } from '../../stores/idPr.js'
+  import { effect } from '@melt-ui/svelte/internal/helpers';
  const dispatch = createEventDispatcher();
  const baseUrl = import.meta.env.VITE_URL
 
@@ -128,22 +129,16 @@ let moving = [];
 const placeholder = {"he":`בחירה מרשימה או יצירת חדשה`,"en":"choose from list or create new"};
 
 
-<<<<<<< HEAD
-const head = {"he":"הוספת פעולות הנדרשות להקמה או לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
 let id = $state(0)
 let ugug = $state(``);
   
  let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`})
  let name = $state("")
-=======
 const head = {"he":"הוספת משימות הנדרשות לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
-let id = 0
-$: ugug = ``;
- $: addn = {"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`}
- let name = ""
->>>>>>> main
- function add(){
+
   let isNew = false
+ $effect(()=>{
+
   if (selected.length > 0) {
     before = true
           before = false;
@@ -159,7 +154,7 @@ $: ugug = ``;
   }
 
  }
-}
+ })
  let before = $state(true);
   
  const mn = {
@@ -187,7 +182,9 @@ function closeMobileModal() {
 </script>
 
 <div dir="{$lang == 'he' ? 'rtl' : 'ltr'}" >
-  {#if children}{@render children()}{:else}
+  {#if children}
+  {@render children()}
+  {:else}
 <h2 class="text-barbi font-bold">{head[$lang]}</h2>
   {/if}
             {#if before}

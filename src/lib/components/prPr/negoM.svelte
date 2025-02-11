@@ -4,49 +4,85 @@
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
   const dispatch = createEventDispatcher();
+  /**
+   * @typedef {Object} Props
+   * @property {any} descrip
+   * @property {any} projectName
+   * @property {any} name1
+   * @property {any} hearotMeyuchadot
+   * @property {number} [noofhours]
+   * @property {number} [perhour]
+   * @property {any} projectId
+   * @property {any} [uids]
+   * @property {any} [what]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {any} already
+   * @property {any} mypos
+   * @property {any} missionId
+   * @property {any} skills
+   * @property {any} tafkidims
+   * @property {any} workways
+   * @property {any} vallues
+   * @property {any} publicklinks
+   * @property {string} [privatlinks]
+   * @property {any} mdate
+   * @property {any} mdates
+   * @property {number} [state]
+   * @property {any} pendId
+   * @property {any} [users]
+   * @property {any} isKavua
+   * @property {number} [oldide]
+   * @property {any} timegramaId
+   * @property {number} [ordern]
+   * @property {boolean} [masaalr]
+   * @property {any} restime
+   */
+
+  /** @type {Props} */
+  let {
+    descrip,
+    projectName,
+    name1,
+    hearotMeyuchadot,
+    noofhours = 0,
+    perhour = 0,
+    projectId,
+    uids = [],
+    what = [],
+    noofusersOk,
+    noofusersNo,
+    noofusersWaiting,
+    total = 0,
+    noofusers,
+    already,
+    mypos,
+    missionId,
+    skills,
+    tafkidims,
+    workways,
+    vallues,
+    publicklinks,
+    privatlinks = "aaxa",
+    mdate,
+    mdates,
+    state = 2,
+    pendId,
+    users = [],
+    isKavua,
+    oldide = 0,
+    timegramaId,
+    ordern = 0,
+    masaalr = false,
+    restime
+  } = $props();
+
   export let negopendmissions = []
-  export let descrip;
-  export let projectName;
-  export let name1;
-  export let hearotMeyuchadot;
-  export let noofhours = 0;
-  export let perhour = 0;
-  export let projectId;
-  export let uids = [];
-  export let what = [];
-  export let noofusersOk;
-  export let noofusersNo;
-  export let noofusersWaiting;
-  export let total = 0;
-  export let noofusers;
-  export let already;
-  export let mypos;
-  export let missionId;
-  export let skills;
-  export let tafkidims;
-  export let workways;
-  export let vallues;
-  export let publicklinks;
-  export let privatlinks = 'aaxa';
-  export let mdate;
-  export let mdates;
-  export let state = 2;
-  export let pendId;
-  export let users = [];
-  export let isKavua;
-  export let oldide = 0; //last tg id, if non 0
 
-<<<<<<< HEAD
-import {
-    createEventDispatcher
-} from 'svelte';
-import {
-    onMount
-} from 'svelte';
- import {lang} from '$lib/stores/lang'
-const dispatch = createEventDispatcher();
-
-let isKavua2 = $state()
+  let isKavua2 = $state()
 let newcontent = $state(true);
 
 let miDatan = [];
@@ -89,78 +125,6 @@ let skills3 = $state([]);
 let tafkidims2 = $state([]); 
 let workways3 = $state([]);
 
-
-let rishon = 0;
-function myMission() {
-     let checkBox = document.getElementById("tomeC");
-
-  let text = document.getElementById("doneC");
-  console.log(text);
-  if (text.style.display == "none"){
-    text.style.display = "";
-  } else {
-    text.style.display = "none";
-  }
- const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
-rishon = idL;
-}
-let rishonves = 0;
-function myMissionH() {
- const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
-rishonves = idL;
-/*let checkBox = document.getElementById("done");
-=======
-  let isKavua2;
-  let newcontent = true;
-
-  let miDatan = [];
-  let error1;
-  let bearer1;
-  let token;
-  let idL;
-  let no = false;
-  let masa = false;
-  let data;
-  let isOpen;
-  const less = {
-    he: 'הסרה',
-    en: 'remove'
-  };
-  let placeholder4 = `בחירת תפקידים`;
-  let roles = $role;
-  let why = '';
-  let skills2 = $skil;
-  let placeholder1 = `בחירת כישורים`;
-  let addS = false;
-  let descrip2 = descrip;
-  let name2 = name1;
-  let selected2 = [];
-  let selected3 = [];
-  let selected1 = [];
-  let workways2 = $ww;
-  let placeholder = `סוג משימה`;
-  const plww = { he: `סוג משימה`, en: `mission kind` };
-  let mdate2 = mdate;
-  let mdates2 = mdates;
-
-  let hearotMeyuchadot2 = hearotMeyuchadot;
-  let privatlinks2 = privatlinks;
-  let noofhours2 = noofhours;
-  let perhour2 = perhour;
-  let myM;
-  let done;
-  let skills3 = [];
-  let tafkidims2 = [];
-  let workways3 = [];
-
   let rishon = 0;
   function myMission() {
     var checkBox = document.getElementById('tomeC');
@@ -188,7 +152,6 @@ rishonves = idL;
     idL = cookieValueId;
     rishonves = idL;
     /*var checkBox = document.getElementById("done");
->>>>>>> main
   // Get the output text
   let text = document.getElementById("hoursC");
   let text2 = document.getElementById("vallueperhourC");
@@ -211,35 +174,13 @@ rishonves = idL;
   }*/
   }
 
-<<<<<<< HEAD
-function arraysEqual(a1,a2) {
-    return JSON.stringify(a1)==JSON.stringify(a2);
-}
-function close (){
-    dispatch('close')
-}
- let name4 = ``;
-     let descrip4 = ``;
-     let hearotMeyuchadot4 = ``; 
-     let noofhours4 = ``;
-     let perhour4 = ``;
-     let skills4 = ``;
-     let roles4 = ``;
-     let ww4 = ``;
-     let rishon4 = ``;
-          let rishonves4 = ``;
-          let what4 = true;
-function objToString (obj) {
-=======
   function arraysEqual(a1, a2) {
     return JSON.stringify(a1) == JSON.stringify(a2);
   }
   function close() {
     dispatch('close');
   }
-  export let timegramaId;
   let name4 = ``;
-  export let ordern = 0;
   let descrip4 = ``;
   let hearotMeyuchadot4 = ``;
   let noofhours4 = ``;
@@ -251,7 +192,6 @@ function objToString (obj) {
   let rishonves4 = ``;
   let what4 = true;
   function objToString(obj) {
->>>>>>> main
     let str = '';
     for (let i = 0; i < obj.length; i++) {
       const length = Object.keys(obj[i]).length;
@@ -300,18 +240,7 @@ function objToString (obj) {
       }
     }
     return str;
-<<<<<<< HEAD
-}
-let userss;
-async function increment() {
-    dispatch("load")
-  //TODO: update timegrama, add now pend that is changed to nego
-  let date4 = ``, dates4 = ``,iskvua4 = ``, iskvua4nego = ``, date4nego, dates4nego, namefornego, descrip4nego, hearotMeyuchadot4nego, noofhours4nego, perhour4nego , skills4nego , roles4nego, ww4nego, rishon4nego, rishonves4nego
-  let d = new Date()
-      const negoss = ``;
-=======
   }
-  export let masaalr = false;
   let userss;
   async function increment() {
     dispatch('load');
@@ -334,7 +263,6 @@ async function increment() {
       rishonves4nego;
     let d = new Date();
     const negoss = ``;
->>>>>>> main
     const cookieValue = document.cookie
       .split('; ')
       .find((row) => row.startsWith('jwt='))
@@ -565,16 +493,6 @@ async function increment() {
         console.log(error1);
         toast.warning(tr?.toasts.er[$lang]);
       }
-<<<<<<< HEAD
-}
-let x
-let linkg =  import.meta.env.VITE_URL + "/graphql";
-let dataibno = $state({"skillName":[],"roleDescription":[],"workWayName":[]})
-function addnew (event){
-   const newOb = event.detail.skob;
-   const valc = event.detail.valc;
-     const dataibn = event.detail.dataibn;
-=======
     }
   }
   let x;
@@ -584,7 +502,6 @@ function addnew (event){
     const newOb = event.detail.skob;
     const valc = event.detail.valc;
     const dataibn = event.detail.dataibn;
->>>>>>> main
     const newN = event.detail.skob.attributes[valc];
     dataibno[valc] = dataibn;
     const newValues =
@@ -656,43 +573,6 @@ function addnew (event){
      tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{data {attributes{ roleDescription}} }' : ''}}}}
      workWays {data{ id attributes{ workWayName ${$lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''} } }}
  }
-<<<<<<< HEAD
-              `})
-           }).then(checkStatus)
-          .then(parseJSON);
-            skills2 = res.data.skills.data
-              if ($lang == "he" ){
-              for (let i = 0; i < skills2.length; i++){
-                if (skills2[i].attributes.localizations.data.length > 0){
-                skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
-                }
-              }
-            }
-            skills2 = skills2
-            roles = res.data.tafkidims.data
-            if ($lang == "he" ){
-              for (let i = 0; i < roles.length; i++){
-                if (roles[i].attributes.localizations.data.length > 0){
-                roles[i].attributes.roleDescription = roles[i].attributes.localizations.data[0].attributes.roleDescription
-                }
-              }
-            }
-            roles = roles;
-             workways2 = res.data.workWays.data
-                       if ($lang == "he" ){
-              for (let i = 0; i < workways2.length; i++){
-                if (workways2[i].attributes.localizations.data.length > 0){
-                workways2[i].attributes.workWayName = workways2[i].attributes.localizations.data[0].attributes.workWayName
-                }
-              }
-            }
-            workways2 = workways2;
-            skil.set(skills2)
-            ww.set(workways2)
-            role.set(roles)
-            newcontent = false
-       
-=======
               `
         })
       })
@@ -736,7 +616,6 @@ function addnew (event){
       ww.set(workways2);
       role.set(roles);
       newcontent = false;
->>>>>>> main
     } catch (e) {
       error1 = e;
 
@@ -751,18 +630,10 @@ function addnew (event){
     } else if (restime == 'sevend') {
       x = 168 * 60 * 60 * 1000;
     }
-<<<<<<< HEAD
-    x =x
-    console.log(new Date(Date.now() + x).toLocaleString(),restime)
-})
- import tr from '$lib/translations/tr.json';
-=======
     x = x;
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
-  export let restime;
   import tr from '$lib/translations/tr.json';
->>>>>>> main
   import Text from '../conf/text.svelte';
   import Elements from '../conf/elements.svelte';
   import Number from '../conf/number.svelte';
@@ -770,92 +641,11 @@ function addnew (event){
   import Barb from '../conf/barb.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
-<<<<<<< HEAD
-  /**
-   * @typedef {Object} Props
-   * @property {any} descrip
-   * @property {any} projectName
-   * @property {any} name1
-   * @property {any} hearotMeyuchadot
-   * @property {number} [noofhours]
-   * @property {number} [perhour]
-   * @property {any} projectId
-   * @property {any} [uids]
-   * @property {any} [what]
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {any} noofusersWaiting
-   * @property {number} [total]
-   * @property {any} noofusers
-   * @property {any} already
-   * @property {any} mypos
-   * @property {any} missionId
-   * @property {any} skills
-   * @property {any} tafkidims
-   * @property {any} workways
-   * @property {any} vallues
-   * @property {any} publicklinks
-   * @property {string} [privatlinks]
-   * @property {any} mdate
-   * @property {any} mdates
-   * @property {number} [state]
-   * @property {any} pendId
-   * @property {any} [users]
-   * @property {any} isKavua
-   * @property {number} [oldide]
-   * @property {any} timegramaId
-   * @property {number} [ordern]
-   * @property {boolean} [masaalr]
-   * @property {any} restime
-   */
-
-  /** @type {Props} */
-  let {
-    descrip,
-    projectName,
-    name1,
-    hearotMeyuchadot,
-    noofhours = 0,
-    perhour = 0,
-    projectId,
-    uids = [],
-    what = [],
-    noofusersOk,
-    noofusersNo,
-    noofusersWaiting,
-    total = 0,
-    noofusers,
-    already,
-    mypos,
-    missionId,
-    skills,
-    tafkidims,
-    workways,
-    vallues,
-    publicklinks,
-    privatlinks = "aaxa",
-    mdate,
-    mdates,
-    state = 2,
-    pendId,
-    users = [],
-    isKavua,
-    oldide = 0,
-    timegramaId,
-    ordern = 0,
-    masaalr = false,
-    restime
-  } = $props();
-
-const tri = tr
-let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,"value":noofhours2 * perhour2},{"leb":`${tri?.nego?.original[$lang]},${noofhours * perhour}`,"value":noofhours * perhour}])
-
-=======
   import Rich from '../conf/rich.svelte';
 
-  const tri = tr;
-  $: datai = [];
-  $: if(negopendmissions.length > 0){
+const tri = tr
+let datai = $derived.by(()=>{
+   if(negopendmissions.length > 0){
   datai = [
     {
       leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
@@ -888,8 +678,8 @@ let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`
     ];
     datai = datai
   }
+})
   console.log(negopendmissions)
->>>>>>> main
 </script>
 
 <div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
@@ -1106,18 +896,9 @@ let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`
                                     </td>
                                 </tr>
                                 </table>-->
-<<<<<<< HEAD
-                                  <div class="w-fit mx-auto">
-                                    <button
-                                        onclick={increment}
-                                        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-                                        type="submit"
-                                        name="addm">{tri?.common.puttovote[$lang]}</button> </div>
-                                        </div>
-=======
   <div class="w-fit mx-auto">
     <button
-      on:click={increment}
+      onclick={increment}
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
       name="addm">{tri?.common.puttovote[$lang]}</button
@@ -1125,7 +906,6 @@ let datai = $derived([{"leb":`${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`
   </div>
 </div>
 
->>>>>>> main
 <style>
   .gg {
     position: sticky;
