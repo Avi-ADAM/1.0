@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Mixing old (on:wheel) and new syntaxes for event handling is not allowed. Use only the onwheel syntax -->
 <script>
   import Chaticon from '../../../celim/chaticon.svelte';
   import tr from '$lib/translations/tr.json';

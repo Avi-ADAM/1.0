@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: `<tr>` is invalid inside `<table>` -->
 <script>
   import { run } from 'svelte/legacy';
 

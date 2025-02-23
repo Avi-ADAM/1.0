@@ -1,4 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `$:` is not allowed in runes mode, use `$derived` or `$effect` instead -->
 <script>
       import Tile from '$lib/celim/tile.svelte';
 import { animate, signal, all } from '$lib/func/animation.ts'
@@ -210,13 +209,13 @@ let w = $state(0);
   {#key w,points,h}
   
   <svg  style="height:100%;width:100%;"
-         viewBox="{$svg.x} {$svg.y} {$svg.w} {$svg.h}">
+         viewBox="{svg.x} {svg.y} {svg.w} {svg.h}">
      <line
-          x1={$line.x}
-          y1={$line.y}
-          x2={$line.x2}
-          y2={$line.y2}
-          stroke={$line.fill}
+          x1={line.x}
+          y1={line.y}
+          x2={line.x2}
+          y2={line.y2}
+          stroke={line.fill}
           fill='#fff'
           width="2"
           stroke-width="1.6"

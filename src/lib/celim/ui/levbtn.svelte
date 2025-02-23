@@ -2,8 +2,8 @@
   import Lev from "../lev.svelte";
 
   
-    let isShaking = false;
-    let showBurst = false;
+    let isShaking = $state(false);
+    let showBurst = $state(false);
   
     const runFunction = async () => {
       isShaking = true;
@@ -25,7 +25,7 @@
  
     <button
       class={`heart-btn ${isShaking ? 'shake' : ''} text-barbi hover:text-gold`}
-      on:click={runFunction}
+      onclick={runFunction}
     >
       <Lev/>
     </button>

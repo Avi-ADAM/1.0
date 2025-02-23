@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
 import { generateJSON } from '@tiptap/html'; // הוספת ייבוא של generateJSON
   import TextAlign from '@tiptap/extension-text-align';
   import Highlight from '@tiptap/extension-highlight';
@@ -142,27 +144,32 @@ const result = {
   }
  
   let outjsonb = []
-  export let state = 2; // original and edit, 3 is original second and edit
-  export let text;
-  export let old = [];
-  export let lebel = { he: 'עריכה', en: 'edit' };
   import tr from '$lib/translations/tr.json';
   import Close from '$lib/celim/close.svelte';
   import { lang } from '$lib/stores/lang.js';
   import { onMount, onDestroy } from 'svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
-  let edit = false;
-  let show2 = false;
-  export let textb = text;
+  let edit = $state(false);
+  let show2 = $state(false);
+  /** @type {{state?: number, text: any, old?: any, lebel?: any, textb?: any}} */
+  let {
+    state = 2,
+    text,
+    old = [],
+    lebel = { he: 'עריכה', en: 'edit' },
+    textb = $bindable(text)
+  } = $props();
   onDestroy(() => {
     if (editor) {
       editor.destroy();
     }
   });
   let editor
-  $: showJson = false;
-  $: htmlon = ``;
-  let outjson = []
+  let showJson = $state(false);
+  
+  let htmlon = $state(``);
+  
+  let outjson = $state([])
   onMount(() => {
     editor = new Editor({     
       parseOptions: {
@@ -199,7 +206,9 @@ const result = {
       console.log("!==",text, textb,outjson);
     }
   });
-$: console.log(text,textb,outjson,showJson,htmlon);
+run(() => {
+    console.log(text,textb,outjson,showJson,htmlon);
+  });
  
 </script>
 
@@ -212,14 +221,14 @@ $: console.log(text,textb,outjson,showJson,htmlon);
       {#key htmlon}
         <RichText outpot={htmlon} {outjson} {showJson} editable={false} sml={true} />
       {/key}
-        <button on:click={() => (edit = true)}>
+        <button onclick={() => (edit = true)}>
         {#if text == textb}🖍️{:else}✏️{/if}</button
       >
       {#if text != textb && show2 != true}
-        <button on:click={() => (show2 = true)}>📑</button>
+        <button onclick={() => (show2 = true)}>📑</button>
       {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center">
-          <button on:click={() => (show2 = false)}><Close /></button>
+          <button onclick={() => (show2 = false)}><Close /></button>
           <small class:text-right={$lang == 'he'}
             >{tr?.nego.original[$lang]}:</small
           >
@@ -243,7 +252,7 @@ $: console.log(text,textb,outjson,showJson,htmlon);
 
         <RichText bind:outpot={textb}  editable={true} sml={true} />
     <button
-      on:click={() => {
+      onclick={() => {
         edit = false;
         showJson = true;
         outjson = diffTiptapAndHighlight(text, textb);

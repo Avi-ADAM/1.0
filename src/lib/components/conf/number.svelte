@@ -63,14 +63,14 @@
           {/key}
         </div>
       {/if}
-      <button on:click={() => edit = true}>
+      <button onclick={() => edit = true}>
         {#if number == numberb}🖍️{:else}✏️{/if}
       </button>
       {#if number != numberb && show2 != true}
-        <button on:click={() => show2 = true}>📑</button>
+        <button onclick={() => show2 = true}>📑</button>
       {:else if show2 == true}
         <div class="flex flex-col items-center flex-wrap justify-center m-4">
-          <button on:click={() => show2 = false}>
+          <button onclick={() => show2 = false}>
             <Close width={10} height={10}/>
           </button>
           <div class="flex flex-row">
@@ -104,7 +104,7 @@
       <span class="line"></span>
     </div>
     <button
-      on:click={() => {
+      onclick={() => {
         if (Number(numberb) >= 0) {
           edit = false;
           checkAll(number, numberb);

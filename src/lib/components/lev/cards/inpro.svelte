@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: `$:` is not allowed in runes mode, use `$derived` or `$effect` instead -->
 <script>
   import { formatTime } from './../utils.js';
   import { lang } from '$lib/stores/lang.js';

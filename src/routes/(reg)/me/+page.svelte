@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax -->
 <script>
 	import { isMobileOrTablet } from '$lib/utilities/device';
     import { liUN } from '$lib/stores/liUN.js';

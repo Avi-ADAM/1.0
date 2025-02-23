@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead -->
 <script>
  import { createEventDispatcher } from 'svelte';
  import Cropper from "svelte-easy-crop";

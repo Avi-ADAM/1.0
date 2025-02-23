@@ -334,7 +334,7 @@ const addL = {
     <button
       style="margin: 5px auto;"
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
-      on:click={add}
+      onclick={add}
     >
       {addL[$lang]}    </button>
   </div>

@@ -227,11 +227,11 @@
 </div>
     {#if !pname && !mname}
         {#if isOpen}
-        <button on:click={onClick} >
+        <button onclick={onClick} >
         <Tile bg="pink" word={isOpen.name}/>
         </button>
         {:else if isPend}
-        <button on:click={onClick} >
+        <button onclick={onClick} >
         <Tile bg="gold" word={isPend.name}/>
         </button>
         {/if}

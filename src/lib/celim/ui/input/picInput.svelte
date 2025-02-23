@@ -3,19 +3,22 @@
         import { lang } from '$lib/stores/lang.js';
         import AddImg from '$lib/celim/icons/addImg.svelte';
   import UploadPic from '$lib/components/userPr/uploadPic.svelte';
-        let pic = false
+        let pic = $state(false)
   function openen() {
     pic = true;
   }
- export let files;
   let suc = false;
 
-  export let aspect = 1;
-    export let ladd = { he: 'הוספת תמונה', en: 'add image' };
-    export let cencel = { he: 'ביטול', en: 'cancel' };
-    export let om = { he: 'מעלה תמונה', en: 'uploading image' };
-     let a = 0;
-     let psrc = '';
+  /** @type {{files: any, aspect?: number, ladd?: any, cencel?: any, om?: any}} */
+  let {
+    files = $bindable(),
+    aspect = 1,
+    ladd = { he: 'הוספת תמונה', en: 'add image' },
+    cencel = { he: 'ביטול', en: 'cancel' },
+    om = { he: 'מעלה תמונה', en: 'uploading image' }
+  } = $props();
+     let a = $state(0);
+     let psrc = $state('');
      const closer = () => {
     pic = false;
     a = 0;
@@ -46,7 +49,7 @@
 {#if pic != true}
 <button
 title="{ladd[$lang]}"
-on:click={openen}
+onclick={openen}
 class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded px-2 py-1"
 > <AddImg/>
 {#if psrc}
@@ -56,7 +59,7 @@ class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br fro
 {:else}
 <div> <button
     class=" hover:bg-barbi text-mturk rounded-full"
-    on:click={closer}>{cencel[$lang]}</button
+    onclick={closer}>{cencel[$lang]}</button
   >
   {#if a == 0}
     <UploadPic on:message={callbackFunction} {aspect}/>

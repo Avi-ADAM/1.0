@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 
    export function preventSwiperScroll(event) {
    if(event == true)

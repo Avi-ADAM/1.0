@@ -1,5 +1,5 @@
 
-<script context="module">
+<script module>
   //archive finniapruval
   //else
 

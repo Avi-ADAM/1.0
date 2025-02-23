@@ -3,11 +3,10 @@
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import {lang} from '$lib/stores/lang'
-  export let data = [];
-  export let myId
-  export let projectName
    import { onMount } from 'svelte';
   import { langAdjast } from '$lib/func/langAdjast.svelte';
+  /** @type {{data?: any, myId: any, projectName: any}} */
+  let { data = $bindable([]), myId, projectName } = $props();
    onMount(async () => {
  
       const langd = langAdjast(data.attributes, $lang);
@@ -44,7 +43,7 @@ const requiredWW = {
     "he":"דרכי עבודה מבוקשות:",
     "en":"ways of work for the mission:"
     }
-    let wid
+    let wid = $state()
  let  title = {
                 he: `הצעה למשימה בשם "${data.name}" בריקמה: ${projectName}, באתר 1💗1 `,
                 en: 'come see this mission on 1💗1'
@@ -71,7 +70,7 @@ const requiredWW = {
     {/if}
      <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+        <span onmouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} onmouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span onmouseenter={()=>hover({"he":"סך הכל","en": "total"})} onmouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
     </p>
        {#if data.acts && data.acts.data.length > 0}
                           <ul>
@@ -93,8 +92,8 @@ const requiredWW = {
     <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 lg:p-4 ">
         {#each data.skills.data as skill}
         <p 
-        on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
-        on:mouseleave={()=>hover("0")}  >
+        onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} 
+        onmouseleave={()=>hover("0")}  >
             <Tile sm={wid > 555 ? true : false} pink={true} word={skill.attributes.skillName}/></p>
                 {/each}
                 </div>
@@ -103,14 +102,14 @@ const requiredWW = {
                 <small class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</small>
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each data.tafkidims.data as rol}
-                    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                    <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
     <Tile sm={wid > 555 ? true : false} word={rol.attributes.roleDescription} wow={true}/></p>{/each}
       </div>
       {/if}
       {#if data.work_ways.data.length > 0}  <small class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</small>
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each data.work_ways.data as rol}
-          <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+          <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold" sm={wid > 555 ? true : false} word={rol.attributes.workWayName}/>
           </p>
           {/each}

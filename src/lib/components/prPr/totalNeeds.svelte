@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: `a` has already been declared -->
 <script>
   import { addslashes } from '$lib/func/uti/string.svelte';
   import { page } from '$app/stores';

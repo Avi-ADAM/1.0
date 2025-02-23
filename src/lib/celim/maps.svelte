@@ -8,14 +8,14 @@
 
 	const key = '';
 	
-	export let globally = false;
-	export let map;
+	/** @type {{globally?: boolean, map: any}} */
+	let { globally = false, map = $bindable() } = $props();
 
 	// @ts-ignore
-	let container;
+	let container = $state();
 	let zoom = 8;
 	let center = { lat: 37.5742776, lng: 43.7260158 };
-  let src = '';
+  let src = $state('');
 
 	onMount(() => {
 		Object.assign(window, {
@@ -41,7 +41,7 @@
 	});
 </script>
 
-<div class="w-full h-full" bind:this={container} />
+<div class="w-full h-full" bind:this={container}></div>
 
 <svelte:head>
 	{#if src}

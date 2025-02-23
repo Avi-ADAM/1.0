@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: `$:` is not allowed in runes mode, use `$derived` or `$effect` instead -->
 <script>
   import { page } from '$app/stores';
   import Lowding from '$lib/celim/lowding.svelte';
