@@ -244,6 +244,7 @@
                 console.log(res)
                 element.id = res.data.createMission.data.id;
                 element = element
+                console.log(element)
             });
         }
       if (userslength > 1) {

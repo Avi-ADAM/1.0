@@ -1,5 +1,6 @@
 
 <script>
+	import Dialog from '$lib/celim/ui/dialog.svelte';
 	import { isMobileOrTablet } from '$lib/utilities/device';
     import { liUN } from '$lib/stores/liUN.js';
 
@@ -274,7 +275,7 @@ let addNs1 = true;
             meDataa.data.usersPermissionsUser.data.attributes
               .profilManualAlready != true
           ) {
-            run();
+            showSaveDialog = true; // Show dialog instead of running directly
           }
           meData = meDataa.data.usersPermissionsUser.data.attributes;
           isG =
@@ -752,6 +753,23 @@ const plm = {"he": "בחירת משאבים", "en": "choose resources"}
 const plw = {"he": "בחירת דרכי יצירה", "en": "choose ways of creation"}
 const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
 let width,height
+let showSaveDialog = false;
+const dialogHeader = {
+  he: "הצגת מדריך משתמש",
+  en: "Show User Guide"
+};
+const innerText = { 
+  he: "האם ברצונך לראות מדריך שימוש ב1💗1? \n (ניתן לבטל או להחזיר את הדו שיח הזה בפעמים הבאות בתפריט ההגדרות) ",
+  en: "Would you like to see the user guide?"
+};
+const innerDialogButton = {
+  he: "אשמח",
+  en: "Yes"
+};
+const clearButton = {
+  he: "לא",
+  en: "No" 
+};
 
 </script>
 
@@ -763,6 +781,21 @@ let width,height
          <Lowding height="30vh" />
          </div>
 {:then meData}
+<Dialog 
+  bind:showSaveDialog
+  {dialogHeader}
+  {innerText} 
+  {innerDialogButton}
+  {clearButton}
+  on:save-timer={() => {
+    showSaveDialog = false;
+    run();
+  }}
+  on:clear-timer={() => {
+    showSaveDialog = false;
+    isG = true; // Mark as viewed without showing
+  }}
+/>
  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
