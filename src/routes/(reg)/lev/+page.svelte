@@ -280,11 +280,9 @@
           projectId:
             start[i].attributes.finiapruvals.data[j].attributes.project.data.id,
           timegramaDate:
-            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
-              .attributes.date,
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama?.data?.attributes?.date || null,
           timegramaId:
-            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
-              .id,  
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama?.data?.id || null,  
           projectName: getProjectData(start[i].id, 'pn'),
           noof: getProjectData(start[i].id, 'noof'),
           src2: getProjectData(start[i].id, 'pp'),
