@@ -212,7 +212,7 @@ async function agree() {
               hearotMeyuchadot: "${hearotMeyuchadot}",
               descrip: "${missionDetails}",
               users_permissions_user: "${userId}",
-              finiapruval: "${askId}",
+              finiapruvals: "${askId}",
                       publishedAt: "${d.toISOString()}",
               mission: ${missId}
    
