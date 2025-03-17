@@ -171,7 +171,7 @@ export function forums(dat,myId,all=false) {
           index++
         ) {
           const element = dat.forums.data[t].attributes.messages.data[index];
-          console.log(dat.forums.data[t].attributes.messages.data,element);
+      //    console.log(dat.forums.data[t].attributes.messages.data,element);
           addMes(
             element.attributes.content,
             dat.forums.data[t].id,

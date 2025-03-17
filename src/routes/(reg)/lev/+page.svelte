@@ -516,6 +516,7 @@
         }
         let t = start[i].attributes.asks.data[j].attributes;
         dictasked.push({
+          isRishon: t.open_mission.data.attributes.isRishon,
           uid: t.users_permissions_user.data.id,
           username: t.users_permissions_user.data.attributes.username,
           timegramaId: t.timegrama.data?.id ?? 0,
@@ -667,7 +668,7 @@
     console.log(dictasked);
     let filters = [idL];
 
-    let result = dictasked.filter((val) => !filters.includes(val.uid));
+    let result = dictasked.filter((val) => val.isRishon || !filters.includes(val.uid));
     dictasked = result;
     console.log(dictasked);
 
@@ -1756,7 +1757,7 @@
           update = true;
           let index;
           let isMeData = false;
-          if (datan.data.attributes.users_permissions_user.data.id == idL) {
+          if (datan.data.attributes.users_permissions_user?.data?.id == idL) {
             index = arr1.findIndex(
               (element) => element.ani === 'meData' && element.askId == iddd
             );
@@ -1962,7 +1963,7 @@
             timegrama {data{id attributes{date}}}
             createdAt
             open_mission {data{id attributes{  
-                  name
+                  name isRishon
                 }}}            
             chat{why ide what zman id users_permissions_user {data{id attributes{username profilePic {data{attributes {url formats }}}}}} }
         }}}
@@ -2093,7 +2094,7 @@
                             createdAt
                             chat{why id ide what zman users_permissions_user {data{id}}}
                             open_mission {data{id attributes{  mission {data{id}}
-                                            declined {data{ id}} iskvua sqadualed dates publicklinks tafkidims {data{ id }}
+                                            declined {data{ id}} iskvua isRishon sqadualed dates publicklinks tafkidims {data{ id }}
                                             noofhours perhour privatlinks descrip hearotMeyuchadot name}}}
                             project {data{ id }}
                             users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}
