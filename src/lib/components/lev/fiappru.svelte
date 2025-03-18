@@ -238,6 +238,8 @@ updateMesimabetahalich(
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            //TODO: archive timegrama
+            archiveTimeGrama(timegramaId,fetch)
             dispatch('acsept', {
                 ani: "fini",
                 coinlapach: coinlapach
@@ -424,6 +426,7 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
     dispatch("hover", {id: u});
 }
    import Cards from './cards/fini.svelte'
+  import { archiveTimeGrama } from "$lib/func/send/timeGrama.svelte";
 export let cards = false;
 
 </script>

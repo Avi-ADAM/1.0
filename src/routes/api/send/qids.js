@@ -137,7 +137,11 @@ export const qids = {
               username
               telegramId
               lang 
-              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id attributes{name stname timer howmanyhoursalready hoursassinged project{data{attributes{projectName}}} }}}
+              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id
+               attributes{name stname timer howmanyhoursalready hoursassinged
+              acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
+               activeTimer{data{id
+                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved}}} project{data{id attributes{projectName profilePic{data{attributes{formats url}}}}}} }}}
             }
           }
         }
@@ -381,5 +385,54 @@ export const qids = {
       id
     }   
   }
-}`
+}`,
+'33CreateTimer':`
+        mutation CreateTimer($missionId: ID!, $start: DateTime!, $userId: ID!, $projectId: ID!) {
+          createTimer(
+            data: {
+              activeMesimabetahalich: $missionId,
+              mesimabetahalich: $missionId,
+              users_permissions_user: $userId,
+              project: $projectId,
+              start: $start,
+              isActive: true,
+              totalHours: 0,
+              timers: [{ start: $start }]
+            }
+          ) {
+            data {
+              id
+              attributes {
+              start totalHours timers{start stop} acts{data{id}} isActive saved
+              }
+            }
+          }
+        }
+      `,
+      '34UpdateTimer': `
+      mutation UpdateTimer($timerId: ID!, $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
+        updateTimer(id: $timerId,
+          data: {
+            start: $newStart,
+            isActive: $isActive,
+            timers: $timers,
+            totalHours: $totalHours
+          }
+        ) {
+          data {
+            id
+            attributes {
+             start totalHours timers{start stop} acts{data{id}} isActive saved
+            }
+          }
+        }
+      }
+    `,
+    "35updateTimeGrama": `mutation UpdateTimegrama($date: DateTime,$done: Boolean, $id: ID!) {
+  updateTimegrama(id: $id, data: {date: $date, done: $done}) {
+    data {
+      id
+    }   
+  }
+}`,
 }
