@@ -1190,6 +1190,14 @@
     "@nodelib/fs.scandir" "2.1.5"
     fastq "^1.6.0"
 
+"@number-flow/svelte@^0.3.3":
+  version "0.3.3"
+  resolved "https://registry.npmjs.org/@number-flow/svelte/-/svelte-0.3.3.tgz"
+  integrity sha512-wo5tiU1qKc74k61sNx8GwvnmZ7yKdbfj1onjzaAa67HRXFClRcrfLlXXatBSQ/uK2XTz9156ILs3VmpuSG1sFA==
+  dependencies:
+    esm-env "^1.1.4"
+    number-flow "0.5.3"
+
 "@okrad/svelte-progressbar@^2.2.0":
   version "2.2.0"
   resolved "https://registry.npmjs.org/@okrad/svelte-progressbar/-/svelte-progressbar-2.2.0.tgz"
@@ -3972,10 +3980,10 @@ escape-string-regexp@^4.0.0:
   resolved "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-4.0.0.tgz"
   integrity sha512-TtpcNJ3XAzx3Gq8sWRzJaVajRs0uVxA2YAkdb1jm2YkPz4G6egUFAyA3n5vtEIZefPk5Wa4UXbKuS5fKkJWdgA==
 
-esm-env@^1.0.0:
-  version "1.0.0"
-  resolved "https://registry.npmjs.org/esm-env/-/esm-env-1.0.0.tgz"
-  integrity sha512-Cf6VksWPsTuW01vU9Mk/3vRue91Zevka5SjyNf3nEpokFRuqt/KjUQoGAwq9qMmhpLTHmXzSIrFRw8zxWzmFBA==
+esm-env@^1.0.0, esm-env@^1.1.4:
+  version "1.2.2"
+  resolved "https://registry.npmjs.org/esm-env/-/esm-env-1.2.2.tgz"
+  integrity sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==
 
 esprima@^4.0.0, esprima@~4.0.0:
   version "4.0.1"
@@ -5618,6 +5626,13 @@ nth-check@^2.0.1:
   integrity sha512-lqjrjmaOoAnWfMmBPL+XNnynZh2+swxiX3WUE0s4yEHI6m+AwrK2UZOimIRl3X/4QctVqS8AiZjFqyOGrMXb/w==
   dependencies:
     boolbase "^1.0.0"
+
+number-flow@0.5.3:
+  version "0.5.3"
+  resolved "https://registry.npmjs.org/number-flow/-/number-flow-0.5.3.tgz"
+  integrity sha512-iLKyssImNWQmJ41rza9K7P5lHRZTyishi/9FarWPLQHYY2Ydtl6eiXINEjZ1fa8dHeY0O7+YOD+Py3ZsJddYkg==
+  dependencies:
+    esm-env "^1.1.4"
 
 object-assign@^4, object-assign@^4.0.1, object-assign@^4.1.1:
   version "4.1.1"
@@ -7433,7 +7448,7 @@ svelte-viewport-info@^1.0.2:
   dependencies:
     tslib "^2.6.2"
 
-svelte@*, "svelte@^3.0.0 || ^4.0.0", "svelte@^3.0.0 || ^4.0.0 || ^5.0.0-next.1", "svelte@^3.19.0 || ^4.0.0", "svelte@^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0", "svelte@^3.53.0 || ^4.0.0 || ^5.0.0", svelte@^4.0.0, "svelte@^4.0.0 || ^5.0.0-next.0", "svelte@^4.0.0 || ^5.0.0-next.1", "svelte@^4.0.0 || ^5.0.0-next.100 || ^5.0.0", "svelte@^4.0.0 || ^5.0.0-next.118", svelte@^4.0.1, svelte@^4.0.4, svelte@^4.2.16, svelte@^4.2.19, svelte@^4.2.8, "svelte@>=3 <5", svelte@>=3.49.0, svelte@>=4, "svelte@3 - 4", "svelte@3.x || 4.x || 5.x":
+svelte@*, "svelte@^3.0.0 || ^4.0.0", "svelte@^3.0.0 || ^4.0.0 || ^5.0.0-next.1", "svelte@^3.19.0 || ^4.0.0", "svelte@^3.2.0 || ^4.0.0-next.0 || ^5.0.0-next.0", "svelte@^3.53.0 || ^4.0.0 || ^5.0.0", "svelte@^4 || ^5", svelte@^4.0.0, "svelte@^4.0.0 || ^5.0.0-next.0", "svelte@^4.0.0 || ^5.0.0-next.1", "svelte@^4.0.0 || ^5.0.0-next.100 || ^5.0.0", "svelte@^4.0.0 || ^5.0.0-next.118", svelte@^4.0.1, svelte@^4.0.4, svelte@^4.2.16, svelte@^4.2.19, svelte@^4.2.8, "svelte@>=3 <5", svelte@>=3.49.0, svelte@>=4, "svelte@3 - 4", "svelte@3.x || 4.x || 5.x":
   version "4.2.19"
   resolved "https://registry.npmjs.org/svelte/-/svelte-4.2.19.tgz"
   integrity sha512-IY1rnGr6izd10B0A8LqsBfmlT5OILVuZ7XsI0vdGPEvuonFV7NYEUK4dAkm9Zg2q0Um92kYjTpS1CAP3Nh/KWw==

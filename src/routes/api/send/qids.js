@@ -410,13 +410,14 @@ export const qids = {
         }
       `,
       '34UpdateTimer': `
-      mutation UpdateTimer($timerId: ID!, $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
+      mutation UpdateTimer($timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
         updateTimer(id: $timerId,
           data: {
             start: $newStart,
             isActive: $isActive,
             timers: $timers,
-            totalHours: $totalHours
+            totalHours: $totalHours,
+            acts: $tasks
           }
         ) {
           data {

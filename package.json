@@ -38,6 +38,7 @@
     "@event-calendar/interaction": "^3.4.0",
     "@fontsource/fira-mono": "^5.0.14",
     "@mediakular/gridcraft": "^0.2.8",
+    "@number-flow/svelte": "^0.3.3",
     "@okrad/svelte-progressbar": "^2.2.0",
     "@sentry/sveltekit": "^8.27.0",
     "@svelte-plugins/datepicker": "^1.0.9",
