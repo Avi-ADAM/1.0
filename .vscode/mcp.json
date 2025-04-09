@@ -1,0 +1,8 @@
+{
+    "servers": {
+      "1.0 Docs": {
+        "type": "sse",
+        "url": "https://gitmcp.io/Avi-ADAM/1.0"
+      }
+    }
+  }
