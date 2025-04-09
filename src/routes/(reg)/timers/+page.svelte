@@ -32,8 +32,19 @@
 	
     onMount(async () => {
 		const res = await fetchTimers($page.data.uid,fetch).then((x) => {
-            newState = true
-            orders = checkLines($timers);
+            newState = true;
+            
+            // עדכון מידות
+            updateSizes();
+            
+            // מירכוז התצוגה
+            centerViewOnLoad();
+            
+            // האזנה לשינויי גודל החלון
+            window.addEventListener('resize', () => {
+                updateSizes();
+                centerViewOnLoad();
+            });
         });
 	});
 
@@ -46,8 +57,8 @@
     // center of the *large* timer, NOT the center of the entire container.
     let center = { x: bigsize / 2, y: bigsize / 2 };
 
-    $: w = 500;
-    $: h = 500;
+    $: w = 1200; // הגדלת רוחב אזור הטיימרים
+    $: h = 1200; // הגדלת גובה אזור הטיימרים
     $: ow = 500;
     $: oh = 500;
     $: maxW = 100;
@@ -60,42 +71,83 @@
     $: bigsize = ow > 550 ? 145 : 100;
     $: add = ow > 550 ? 70 : 70;
     
-    function checkLine(i) {
-    // Center timer remains unchanged.
-    if (i === 0) {
-        return { 
-            myline: 0, 
-            lineCircels: 1, 
-            x: w / 2 - bigsize / 2,
-            y: h / 2 - bigsize / 2,
-            big: true 
-        };
-    }
-    // Introduce a gap between coins.
-    let gap = 10; // adjust this value for the desired gap
-    let effectiveSize = size + gap;
-    
-    // Use "previousAcc" to track accumulated timers after the center coin.
-    let myLine = 1;
-    let previousAcc = 1; // index 0 is the center timer
-
-    while (true) {
-        let radius = bigsize / 2 + myLine * (size * 1.1);
-        let circumference = 2 * Math.PI * radius;
-        // Use Math.floor to ensure coins don't exceed the circumference.
-        let thisLineCircles = Math.floor(circumference / effectiveSize);
-
-        if (i - previousAcc < thisLineCircles) {
-            let coinIndex = i - previousAcc;
-            const angle = (coinIndex / thisLineCircles) * 2 * Math.PI;
-            const x = w / 2 + radius * Math.cos(angle) - size / 2;
-            const y = h / 2 + radius * Math.sin(angle) - size / 2;
-            return { myline: myLine, lineCircels: thisLineCircles, x, y };
+    // חישוב אוטומטי של גודל אזור התצוגה לפי מספר הטיימרים
+    $: {
+        if ($timers.length > 50) {
+            w = 2500;
+            h = 2500;
+        } else if ($timers.length > 30) {
+            w = 2000;
+            h = 2000;
+        } else if ($timers.length > 15) {
+            w = 1500;
+            h = 1500;
+        } else {
+            w = 1200;
+            h = 1200;
         }
-        previousAcc += thisLineCircles;
-        myLine += 1;
     }
-}
+
+    function checkLine(i) {
+        // Center timer remains unchanged.
+        if (i === 0) {
+            return { 
+                myline: 0, 
+                lineCircels: 1, 
+                x: w / 2 - bigsize / 2,
+                y: h / 2 - bigsize / 2,
+                big: true 
+            };
+        }
+        
+        // Introduce a gap between coins.
+        let gap = 10; // adjust this value for the desired gap
+        let effectiveSize = size + gap;
+        
+        // Use "previousAcc" to track accumulated timers after the center coin.
+        let myLine = 1;
+        let previousAcc = 1; // index 0 is the center timer
+        let currentLineTimersCount = 0; // כמה טיימרים יש בשורה הנוכחית
+
+        while (true) {
+            let radius = bigsize / 2 + myLine * (size * 1.1);
+            let circumference = 2 * Math.PI * radius;
+            // Use Math.floor to ensure coins don't exceed the circumference.
+            let thisLineCircles = Math.floor(circumference / effectiveSize);
+            
+            // בדיקה אם הטיימר הנוכחי שייך לשורה זו
+            if (i - previousAcc < thisLineCircles) {
+                let coinIndex = i - previousAcc;
+                
+                // מציאת כמות הטיימרים בשורה הנוכחית
+                if (myLine === 1) {
+                    // עבור המעגל הראשון
+                    currentLineTimersCount = Math.min($timers.length - 1, thisLineCircles);
+                } else {
+                    // עבור מעגלים חיצוניים יותר
+                    currentLineTimersCount = Math.min($timers.length - previousAcc, thisLineCircles);
+                }
+                
+                // חישוב זווית עם פיזור אחיד על פני כל המעגל
+                const angleStep = 2 * Math.PI / Math.max(1, currentLineTimersCount);
+                const angle = coinIndex * angleStep;
+                
+                const x = w / 2 + radius * Math.cos(angle) - size / 2;
+                const y = h / 2 + radius * Math.sin(angle) - size / 2;
+                
+                return { 
+                    myline: myLine, 
+                    lineCircels: thisLineCircles, 
+                    totalInLine: currentLineTimersCount,
+                    x, 
+                    y 
+                };
+            }
+            
+            previousAcc += thisLineCircles;
+            myLine += 1;
+        }
+    }
     function checkLines(arr) {
         let c = {};
         for (let i = 0; i < arr.length; i++) {
@@ -105,28 +157,95 @@
     }
 
     $: orders = checkLines($timers);
+
+    // פונקציה נפרדת למירכוז התצוגה - מאפשרת קריאה חוזרת אם צריך
+    function centerViewOnLoad() {
+        setTimeout(() => {
+            const container = document.getElementById('screen');
+            const content = document.getElementById('timer-content');
+            if (container && content) {
+                try {
+                    // גישה חדשה - חישוב מדויק יותר של המרכז
+                    // המרכז האמיתי של התוכן הוא w/2 ו-h/2 יחסית לגודל המכולה
+                    const contentCenter = { x: w / 2, y: h / 2 };
+                    
+                    // חישוב כמה לגלול כדי למרכז את התוכן
+                    const scrollLeft = contentCenter.x - (container.clientWidth / 2);
+                    const scrollTop = contentCenter.y - (container.clientHeight / 2);
+                    
+                    console.log('גלילה אל:', scrollLeft, scrollTop, 'גודל תוכן:', w, h);
+                    
+                    // גלילה למיקום החדש
+                    container.scrollTo({
+                        left: Math.max(0, scrollLeft),
+                        top: Math.max(0, scrollTop),
+                        behavior: 'smooth'
+                    });
+                } catch (err) {
+                    console.error('שגיאה במירכוז:', err);
+                }
+            }
+        }, 400); // הארכת זמן ההמתנה עוד יותר
+    }
+    
+    // גישה חדשה למדידת גודל החלון והתאמת ה-viewport
+    function updateSizes() {
+        // הגדרת גודל סבירים עבור החלון
+        ow = window.innerWidth;
+        oh = window.innerHeight;
+        
+        // התאמת גודל הפריסה של הטיימרים לפי מספר הטיימרים
+        if ($timers.length > 50) {
+            w = 3000;
+            h = 3000;
+        } else if ($timers.length > 30) {
+            w = 2500;
+            h = 2500;
+        } else if ($timers.length > 15) {
+            w = 2000;
+            h = 2000;
+        } else {
+            w = 1500;
+            h = 1500;
+        }
+        
+        // התאמת מידות האלמנטים לפי גודל המסך
+        size = ow > 550 ? 120 : 110;
+        bigsize = ow > 550 ? 145 : 95;
+        
+        // מחשבים מחדש את המיקומים
+        orders = checkLines($timers);
+    }
 </script>
 
-<div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} style="position:fixed; width:100vw; height:100vh; overflow: auto; top:0; left:0; max-width:100vw; max-height:100vh;" class="timer-container d">
-    <div dir="ltr" bind:clientWidth={w} bind:clientHeight={h} 
-    style="position: absolute; overflow: auto; top: 50%; left: 50%; transform: translate(-50%, -50%); width: calc({maxW}vw - 10px); height: {maxH}vh;" 
-    class="screen d">
-        
-        {#each $timers as timer, index (timer.id)}
-        <Timer
-            orders={orders[index]}
-            missionId={timer.mId} 
-            {tx} 
-            {size}
-            {bigsize} 
-            {add} 
-            {center} 
-            {tiltAngle} 
-            {hover} 
-            {project} 
-            {linke}
-        />
-        {/each}
+<div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} 
+     style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;" 
+     class="timer-container d">
+    
+    <div class="center-wrapper">
+        <div id="timer-content" dir="ltr" bind:clientWidth={w} bind:clientHeight={h} 
+            style="position: relative; width: {w}px; height: {h}px;" 
+            class="screen d">
+            
+            {#each $timers as timer, index (timer.id)}
+            <Timer
+                orders={orders[index]}
+                missionId={timer.mId} 
+                {tx} 
+                {size}
+                {bigsize} 
+                {add} 
+                {center} 
+                {tiltAngle} 
+                {hover} 
+                {project} 
+                {linke}
+            />
+            {/each}
+            
+            <!-- סמן מרכז - שימושי לפיתוח - להסרת ההערה לצורך בדיקות -->
+            <!-- <div class="center-marker"></div> -->
+        </div>
     </div>
 </div>
 
@@ -134,10 +253,38 @@
     .timer-container {
         background-color: #000000;
         background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+        overflow: auto;
+        scroll-behavior: smooth;
+        -webkit-overflow-scrolling: touch;
+        padding: 0;
+    }
+    
+    .center-wrapper {
+        display: grid;
+        place-items: center;
+        width: max-content;
+        height: max-content;
+        padding: 10px;
+        min-width: 100%;
+        min-height: 100%;
     }
     
     .screen {
         background: transparent;
+        transform-origin: center center;
+    }
+    
+    /* מרקר למרכז הדף - לפיתוח בלבד */
+    .center-marker {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        width: 20px;
+        height: 20px;
+        background-color: rgba(255, 0, 0, 0.5);
+        border-radius: 50%;
+        transform: translate(-50%, -50%);
+        z-index: 999;
     }
 
 	.timer {
