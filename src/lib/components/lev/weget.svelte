@@ -1,4 +1,5 @@
 <script>
+     import {  Drawer} from 'vaul-svelte';
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
 import Lowbtn from '$lib/celim/lowbtn.svelte'

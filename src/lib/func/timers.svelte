@@ -285,12 +285,143 @@ export async function updateTimer(timer,whatToUpdate,params= {},fetch,isSer=fals
       }
     }
   }
-export function saveTimer(){
-          let newHours = mission.data.howmanyhoursalready + accumulatedTime;
-          const y = sendToSer({mId: mission.data.id,howmanyhoursalready: newHours
-          },'11saveTimer',null,null,isSer,fetch ).then((y) => {
-            console.log("Stopped timer:", y.data);
-          });
+/**
+ * מחשב את סך כל השעות מתוך מערך של timers
+ * @param {Array} timers - מערך של אובייקטי timers עם start ו-stop
+ * @returns {number} - סך כל השעות שהצטברו
+ */
+export function calculateTotalHours(timers) {
+  if (!timers || !Array.isArray(timers) || timers.length === 0) {
+    return 0;
+  }
+  
+  let totalMilliseconds = 0;
+  
+  // עובר על כל הרשומות במערך ומחשב את הזמן הכולל
+  for (const timerEntry of timers) {
+    if (timerEntry.start && timerEntry.stop) {
+      // חישוב הזמן בין ההתחלה לסיום במילישניות
+      const startTime = new Date(timerEntry.start).getTime();
+      const stopTime = new Date(timerEntry.stop).getTime();
+      
+      if (!isNaN(startTime) && !isNaN(stopTime) && stopTime > startTime) {
+        totalMilliseconds += (stopTime - startTime);
+      }
+    }
+  }
+  
+  // המרה משניות לשעות (חלוקה ב-3600000 מילישניות בשעה)
+  return totalMilliseconds / 1000 / 60 / 60;
+}
+
+/**
+ * שומר את הטיימר ומעדכן את המשימה בתהליך עם השעות החדשות
+ * @param {Object} timer - אובייקט הטיימר
+ * @param {string} missionID - מזהה המשימה בתהליך
+ * @param {Function} fetch - פונקציית fetch לביצוע קריאות רשת
+ * @param {boolean} [isSer=false] - האם מדובר בקריאת שרת
+ * @param {Array} [tasks=null] - מערך של מזהי מטלות לקישור לטיימר (אופציונלי)
+ * @returns {Promise<Object>} - אובייקט עם התוצאות של עדכון הטיימר והמשימה בתהליך
+ */
+export async function saveTimer(timer, missionID, fetch, isSer=false, tasks=null) {
+  try {
+    if (!timer || !missionID) {
+      console.error("חסרים פרמטרים לשמירת הטיימר");
+      return null;
+    }
+
+    // שלב 1: עדכן את הטיימר להיות במצב "נשמר" ואם יש מטלות, קשר אותן לטיימר
+    const updateParams = {
+      timerId: timer.attributes.activeTimer.data.id,
+      isActive: false,
+      saved: true
+    };
+
+    // אם יש מטלות, הוסף אותן לפרמטרים של העדכון
+    if (tasks && Array.isArray(tasks) && tasks.length > 0) {
+      updateParams.tasks = tasks.map(taskId => taskId.toString());
+      console.log("מקשר מטלות לטיימר:", updateParams.tasks);
+    }
+
+    const timerUpdateResponse = await sendToSer(
+      updateParams,
+      '34UpdateTimer',
+      null,
+      null,
+      isSer,
+      fetch
+    );
+    
+    console.log("טיימר סומן כנשמר:", timerUpdateResponse.data);
+    
+    // שלב 2: חשב את כמות השעות המצטברת מהטיימר
+    // אפשרות 1: לקחת את ערך totalHours מהטיימר (כפי שחושב על ידי השרת)
+    let totalHours = timer.attributes.activeTimer.data.attributes.totalHours || 0;
+    
+    // אפשרות 2: לחשב מחדש את הזמן הכולל מתוך מערך ה-timers
+    // במקרה שאנחנו לא סומכים על ערך totalHours או רוצים לוודא את דיוק החישוב
+    if (timer.attributes.activeTimer.data.attributes.timers && Array.isArray(timer.attributes.activeTimer.data.attributes.timers)) {
+      const calculatedHours = calculateTotalHours(timer.attributes.activeTimer.data.attributes.timers);
+      
+      // אם יש הבדל משמעותי בין החישובים, הדפס אזהרה
+      if (Math.abs(calculatedHours - totalHours) > 0.01) {
+        console.warn(
+          `אזהרה: הבדל בחישוב השעות - 
+           totalHours מהטיימר: ${totalHours}, 
+           חישוב מתוך מערך ה-timers: ${calculatedHours}`
+        );
+      }
+      
+      // בחר את הערך המדויק יותר (אפשר להחליט להשתמש תמיד בחישוב המקומי)
+      totalHours = calculatedHours;
+    }
+
+    
+    let currentHours = 0;
+    
+    try {
+      // בדיקה אם יש לנו כבר את השעות הקיימות בתוך הטיימר
+      if (timer.attributes.hasOwnProperty('howmanyhoursalready')) {
+        currentHours = timer.attributes.howmanyhoursalready || 0;
+        console.log("נמצאו שעות קיימות בטיימר:", currentHours);
+      } else {
+        // אם אין, ננסה לקבל את זה מהשרת
+        // (אפשר גם לא להשתמש בזה ופשוט להסתמך על מה שיש בשרת)
+        console.log(`נדרש לבדוק שעות קיימות למשימה ${missionID}`);
+      }
+    } catch (e) {
+      console.warn("שגיאה בקבלת שעות קיימות:", e);
+    }
+    
+    // הוסף את השעות החדשות לשעות הקיימות
+    const totalHoursToSave = totalHours + currentHours;
+    console.log(`סך הכל שעות לשמירה: ${totalHoursToSave} (${totalHours} חדשות + ${currentHours} קיימות)`);
+    
+    // שלב 3: עדכן את המשימה בתהליך - הוסף את השעות לשעות הקיימות ואפס את הטיימר הפעיל
+    const missionUpdateResponse = await sendToSer(
+      {
+        mId: missionID,
+        howmanyhoursalready: totalHoursToSave,
+        stname: "saved", 
+        x: 0,
+      },
+      '11saveTimer',
+      null,
+      null,
+      isSer,
+      fetch
+    );
+    
+    console.log("משימה עודכנה עם שעות חדשות:", missionUpdateResponse.data);
+    
+    return {
+      timer: timerUpdateResponse.data?.updateTimer?.data || null,
+      mission: missionUpdateResponse.data?.updateMesimabetahalich?.data || null
+    };
+  } catch (error) {
+    console.error("שגיאה בשמירת הטיימר:", error);
+    return null;
+  }
 }
 </script>
 

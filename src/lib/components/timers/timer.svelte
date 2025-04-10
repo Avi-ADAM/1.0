@@ -1,5 +1,5 @@
 <script>
-  import { startTimer, stopTimer, handleClearAll, handleClearSingle, updateTimer } from '$lib/func/timers.svelte';
+  import { startTimer, stopTimer, handleClearAll, handleClearSingle, updateTimer, saveTimer } from '$lib/func/timers.svelte';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onMount, onDestroy } from 'svelte';
   import { formatTime } from '$lib/func/uti/formatTime';
@@ -54,7 +54,7 @@ let elapsedTime = '00:00:00';
     console.log(res)
     if (res) {
       console.log(res)
-      timer.attributes.activeTimer.data = res;
+      timer.attributes.activeTimer = res;
             timer.attributes.activeTimer.isActive = true; // Make sure to update isActive flag
             
             // Update global timers store
@@ -363,7 +363,63 @@ async function handleUpdateTimer() {
  }
 
 function handleSaveTimerFinal() {
+  if (!timer?.attributes?.activeTimer?.data) {
+    console.error('אין טיימר פעיל לשמור');
+    return;
+  }
   
+  // הכנת מערך המטלות (אם יש) להעברה לפונקציית saveTimer
+  const tasksToSave = selectedTasks && selectedTasks.length > 0 ? selectedTasks : null;
+  
+  // שמירת הטיימר
+  saveTimer(
+    timer, // הטיימר
+    timer.mId, // מזהה המשימה בתהליך
+    fetch, // פונקציית fetch
+    false, // לא שרת
+    tasksToSave // מערך המטלות שנבחרו
+  ).then((result) => {
+    if (result) {
+      console.log('הטיימר נשמר בהצלחה:', result);
+      
+      // עדכון ה-store
+      updateTimers(
+        $timers.map((t) =>
+          t.mId === timer.mId
+            ? {
+                ...t,
+                running: false,
+                attributes: {
+                  ...t.attributes,
+                  howmanyhoursalready: (t.attributes.howmanyhoursalready || 0) + 
+                                        (timer.attributes.activeTimer.data.attributes.totalHours || 0),
+                  activeTimer: null,
+                },
+              }
+            : t
+        )
+      );
+      
+      // סגירת הדיאלוג והצגת הודעת הצלחה
+      showSaveFinal = false;
+      showSaveDialog = false;
+      dialogEdit = false;
+      
+      const successMessage = {
+        he: 'הטיימר נשמר בהצלחה',
+        en: 'Timer saved successfully'
+      };
+      
+      toast.success(successMessage[$lang]);
+    } else {
+      const errorMessage = {
+        he: 'שגיאה בשמירת הטיימר',
+        en: 'Error saving timer'
+      };
+      
+      toast.error(errorMessage[$lang]);
+    }
+  });
 }
 // Modify the handleSaveTimer function
 function handleSaveTimer() {
@@ -565,21 +621,25 @@ const dialogEditT = {
                     on:click={() => handleStartEdit(i, timerEntry)}
                   >
                     <svg viewBox="0 0 24 24" width="20" height="20">
-                      <path fill="currentColor" d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"/>
+                      <path 
+                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
+                        style="fill: blue; cursor: pointer; transform: scale(1.5) translate(-10px, -10px)"
+                        on:click={() => showSaveDialog = true}
+                      />
+                    </svg>
+                  </button>
+                  <button 
+                    class="clear-single-btn"
+                    on:click={() => localHandleClearSingle(i,timer)}
+                  >
+                    <svg viewBox="0 0 24 24" width="20" height="20">
+                      <path 
+                        fill="currentColor" 
+                        d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
+                      />
                     </svg>
                   </button>
                 {/if}
-                <button 
-                  class="clear-single-btn"
-                  on:click={() => localHandleClearSingle(i,timer)}
-                >
-                  <svg viewBox="0 0 24 24" width="20" height="20">
-                    <path 
-                      fill="currentColor" 
-                      d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
-                    />
-                  </svg>
-                </button>
               </div>
             </div>
           {/each}
@@ -1049,90 +1109,118 @@ const dialogEditT = {
       <path d="M300,14l0,12" transform="rotate(18,300,300)" />
       <path d="M300,14l0,12" transform="rotate(24,300,300)" />
     </g>
-    <!-- Project Logo and Name -->
-    <foreignObject
-      x="300"
-      y="105"
-      width="500"
-      height="500"
-      transform="translate(-50 -50)"
-    >
-      <span class={`normSml${timer.perhour}-${timer.projectId}-${timer.mId}`}
-      ></span>
-      <img
-        on:click={() => project()}
-        on:keypress={() => project()}
-        on:mouseenter={() => hover('לוגו הריקמה')}
-        on:mouseleave={() => hover('0')}
-        style=" border-radius: 50%;"
-        src={timer.src}
-        width="120"
-        height="120"
-        alt="logo"
-      />
-    </foreignObject>
-
-    <!-- Project Name -->
-    <g
-      style="overflow:hidden; text-anchor: middle;"
-      on:click={() => linke('p')}
-      on:mouseenter={() => hover('לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה')}
-      on:mouseleave={() => hover('0')}
-    >
-      <!-- Text with glow and outline -->
-      <text
-        x="300"
-        y="210"
-        fill="#FF0092"
-        font-family="Sababa"
-        text-anchor="middle"
-        font-size="62">{timer.projectName}</text
+    
+    <!-- Centered Control Buttons -->
+    <g transform="translate(300,280)"> <!-- Changed Y from 300 to 280 to move up -->
+      <!-- Left Button - Play/Stop -->
+      <g 
+        transform="translate(-80,0)" 
+        class="control-button"
+        on:click={handleToggleTimer}
+        on:keypress={handleToggleTimer}
+        style="cursor: pointer;"
+        role="button"
+        tabindex="0"
+        aria-label={timer.running ? 'עצור טיימר' : 'הפעל טיימר'}
       >
-    </g>
-    <!-- Hands (simplified) -->
-    <g transform="translate(300,300)">
-      <!-- Hour Hand -->
-      <path
-        id="hhand"
-        d="M -9 0 L 0 -110 L 9 0 z"
-        style="fill: #00ffff; stroke: purple;"
-        transform="rotate({rotationh})"
-      />
+        <circle
+          cx="0"
+          cy="0"
+          r="50"
+          class="fill-pink-100"
+          stroke={timer.running ? '#ff3366' : '#00ff88'}
+          stroke-width="3"
+        />
+        {#if timer.running}
+          <rect
+            x="-20"
+            y="-20"
+            width="40"
+            height="40"
+            fill="#ff3366"
+            rx="4"
+          />
+        {:else}
+          <path
+            d="M -16 -24 L 24 0 L -16 24 Z"
+            fill="#00ff88"
+          />
+        {/if}
+      </g>
 
-      <!-- Minute Hand -->
-      <path
-        id="mhand"
-        d="M -5 0 L 0 -180 L 5 0 z"
-        style="fill: lime; stroke: purple;"
-        transform="rotate({rotationm})"
-      />
-
-      <!-- Second Hand -->
-      <path
-        id="shand"
-        d="M -2 0 L 0 -250 L 2 0 z"
-        style="fill: magenta; stroke: purple;"
-        transform="rotate({rotation})"
-      />
-    </g>
-    <g
-      style=""
-      transform="matrix(0.570447, 0, 0, 0.324065, 129.261917, 312.639984)"
-    >
-      <g transform="matrix(1, 0, 0, 1, -1.718234, 136.597931)">
-        <path
-          id="hhand"
-          d="M 291 291.188 L 303.437 111.58 L 309 291.188 L 300 340 L 291 291.188"
-          style=""
+      <!-- Right Button - Edit -->
+      <g 
+        transform="translate(80,0)" 
+        class="control-button"
+        on:click={() => showSaveDialog = true}
+        on:keypress={() => showSaveDialog = true}
+        style="cursor: pointer;"
+        role="button"
+        tabindex="0"
+        aria-label="ערוך טיימר"
+      >
+        <circle
+          cx="0"
+          cy="0"
+          r="50"
+          class="fill-pink-100 button-bg"
+          stroke="#00ffff"
+          stroke-width="3"
         />
         <path
-          id="shand"
-          d="M 292 280.932 L 303.718 92.634 L 307.718 280.932 L 299.859 357 L 292 280.932"
-          style="fill: url(#rg1-0); stroke: url(#gradient-1);"
+          d="M-20 -20 L-20 20 L20 20 L20 -8 L8 -20 Z M-12 12 L-12 -12 L0 -12 L0 12 Z M8 -16 L16 -8 L8 -8 Z"
+          fill="#00ffff"
         />
-      </g> <circle cx="298.282" cy="436.598" r="4" style="fill:url(#rg1);" />
+      </g>
     </g>
-    <g
+       <!-- Timer Display -->
+       <g transform="translate(300,380)">
+        <foreignObject x="-150" y="-20" width="300" height="120">
+          <div
+            style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;"
+          >
+            <NumberFlowGroup>
+              <div
+                style="
+                  font-variant-numeric: tabular-nums;
+                  --number-flow-char-height: 1em;
+                  font-size: 48px;
+                  font-family: 'DS-Digital', 'Seven Segment', monospace;
+                  color: #33ff33;
+                  text-shadow: 0 0 10px rgba(51, 255, 51, 0.7);
+                  font-weight: normal;
+                  letter-spacing: 4px;
+                  background: rgba(0, 0, 0, 0.3);
+                  padding: 8px 15px;
+                  border-radius: 8px;
+                  border: 1px solid rgba(51, 255, 51, 0.3);"
+                class="flex items-baseline"
+              >
+                <NumberFlow
+                  trend={-1}
+                  value={getTimeComponents(localZman).hours}
+                  format={{ minimumIntegerDigits: 2 }}
+                />
+                <NumberFlow
+                  prefix=":"
+                  trend={-1}
+                  value={getTimeComponents(localZman).minutes}
+                  digits={{ 1: { max: 5 } }}
+                  format={{ minimumIntegerDigits: 2 }}
+                />
+                <NumberFlow
+                  prefix=":"
+                  trend={-1}
+                  value={getTimeComponents(localZman).seconds}
+                  digits={{ 1: { max: 2 } }}
+                  format={{ minimumIntegerDigits: 2 }}
+                />
+              </div>
+            </NumberFlowGroup>
+          </div>
+        </foreignObject>
+      </g>
+      <g
       transform="matrix(0.542341, 0, 0, 0.542341, 267.0672, 302.203613)"
       style=""
     >
@@ -1259,6 +1347,79 @@ const dialogEditT = {
         </g>
       </g>
     </g>
+    <!-- Project Logo and Name -->
+    <foreignObject
+      x="300"
+      y="105"
+      width="500"
+      height="500"
+      transform="translate(-50 -50)"
+    >
+      <span class={`normSml${timer.perhour}-${timer.projectId}-${timer.mId}`}
+      ></span>
+      <img
+        on:click={() => project()}
+        on:keypress={() => project()}
+        on:mouseenter={() => hover('לוגו הריקמה')}
+        on:mouseleave={() => hover('0')}
+        style=" border-radius: 50%;"
+        src={timer.src}
+        width="120"
+        height="120"
+        alt="logo"
+      />
+    </foreignObject>
+
+    <!-- Project Name -->
+    <g
+      style="overflow:hidden; text-anchor: middle;"
+      on:click={() => linke('p')}
+      on:mouseenter={() => hover('לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה')}
+      on:mouseleave={() => hover('0')}
+    >
+      <!-- Text with glow and outline -->
+      <text
+        x="300"
+        y="210"
+        fill="#FF0092"
+        font-family="Sababa"
+        text-anchor="middle"
+        font-size="62">{timer.projectName}</text
+      >
+    </g>
+    <!-- Hands (simplified) -->
+    <g transform="translate(300,300)">
+      <!-- Hour Hand -->
+      <path
+        id="hhand"
+        d="M -9 0 L 0 -110 L 9 0 z"
+        style="fill: #00ffff; stroke: purple;"
+        transform="rotate({rotationh})"
+      />
+
+      <!-- Minute Hand -->
+      <path
+        id="mhand"
+        d="M -5 0 L 0 -180 L 5 0 z"
+        style="fill: lime; stroke: purple;"
+        transform="rotate({rotationm})"
+      />
+
+      <!-- Second Hand -->
+      <path
+        id="shand"
+        d="M -2 0 L 0 -250 L 2 0 z"
+        style="fill: magenta; stroke: purple;"
+        transform="rotate({rotation})"
+      />
+    </g>
+    <g
+      style=""
+      transform="matrix(0.570447, 0, 0, 0.324065, 129.261917, 312.639984)"
+    >
+      <circle cx="298.282" cy="436.598" r="4" style="fill:url(#rg1);" />
+    </g>
+ 
     <g transform="translate(300,300)"> <!-- Center point -->
         <g transform={`rotate(${orbitalRotation})`}>
           <g transform="translate(0,-220) rotate(-120)" > <!-- Adjust radius by changing -220 -->
@@ -1286,6 +1447,8 @@ const dialogEditT = {
         font-weight="bold"
         stroke="purple"
         xlink:href="#curveooo8"
+             startOffset="50%"
+        text-anchor="middle"
       >
         <tspan fill="#00ffff" font-weight="bold" stroke="purple" dy="-5"
           >{timer.missionName}</tspan
@@ -1293,85 +1456,8 @@ const dialogEditT = {
       </textPath>
     </text>
   
-    <!-- Timer Display -->
-    <g transform="translate(300,380)">
-      <foreignObject x="-150" y="-40" width="300" height="120">
-        <div
-          style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;"
-        >
-          <NumberFlowGroup>
-            <div
-              style="
-                font-variant-numeric: tabular-nums; 
-                --number-flow-char-height: 0.85em;
-                font-size: 48px;
-                color: #00ffff;
-                text-shadow: 0 0 10px #00ffff;
-                font-weight: bold;"
-              class="flex items-baseline"
-            >
-              <NumberFlow
-                trend={-1}
-                value={getTimeComponents(localZman).hours}
-                format={{ minimumIntegerDigits: 2 }}
-              />
-              <NumberFlow
-                prefix=":"
-                trend={-1}
-                value={getTimeComponents(localZman).minutes}
-                digits={{ 1: { max: 5 } }}
-                format={{ minimumIntegerDigits: 2 }}
-              />
-              <NumberFlow
-                prefix=":"
-                trend={-1}
-                value={getTimeComponents(localZman).seconds}
-                digits={{ 1: { max: 2 } }}
-                format={{ minimumIntegerDigits: 2 }}
-              />
-            </div>
-          </NumberFlowGroup>
-        </div>
-      </foreignObject>
-    </g>
+ 
 
-    <!-- Start/Stop Button -->
-    <g transform="translate(300,450)">
-      <!-- Play/Stop Button -->
-      <g transform="translate(-40, 0)"> <!-- Shift Play/Stop button to the left -->
-        <circle cx="0" cy="0" r="40" fill="rgba(0,0,0,0.3)" />
-        {#if timer.running}
-          <rect
-            x="-15"
-            y="-15"
-            width="30"
-            height="30"
-            fill="red"
-            on:click={handleToggleTimer}
-            style="cursor: pointer;"
-          />
-        {:else}
-          <path
-            d="M -10 -15 L -10 15 L 15 0 Z"
-            fill="green"
-            on:click={handleToggleTimer}
-            style="cursor: pointer;"
-          />
-        {/if}
-      </g>
-    
-  <!-- Edit Button -->
-<g transform="translate(40, 0)"> <!-- Shift Edit button to the right -->
-  <circle cx="0" cy="0" r="40" fill="rgba(0,0,0,0.3)" />
-  <path
-    d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-    fill="blue"
-    transform="scale(1.5) translate(-10, -10)"
-    on:click={() => showSaveDialog = true} 
-    style="cursor: pointer;"
-  />
-</g>
-    </g>
   </g></svg
 >
 
@@ -1748,5 +1834,30 @@ const dialogEditT = {
 .save-btn:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+}
+
+.control-button > g {
+  transform: scale(1);
+  transition: transform 0.2s ease;
+}
+
+.control-button:hover > g {
+  transform: scale(1.1);
+}
+
+.control-button:focus {
+  outline: none;
+}
+
+.control-button:focus .button-bg {
+  filter: brightness(1.2);
+}
+
+.button-bg {
+  transition: filter 0.2s ease; /* Changed from 'all' to just 'filter' to prevent size animation */
+}
+
+.control-button:hover .button-bg {
+  filter: brightness(1.2);
 }
 </style>

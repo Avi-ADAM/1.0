@@ -166,13 +166,14 @@ export const qids = {
   }
  ) {data{id attributes{ stname timer}}}
  }`,
-  '11saveTimer': `mutation SaveTimer($mId: ID!, $stname: String, $x: Float,$howmanyhoursalready: Float){
+  '11saveTimer': `mutation SaveTimer( $mId: ID!, $stname: String, $x: Float,$howmanyhoursalready: Float){
  updateMesimabetahalich(
   id: $mId
   data: {
  howmanyhoursalready:$howmanyhoursalready,
  stname: $stname,
- timer: $x
+ timer: $x,
+ activeTimer:null
   }
  ) {data{id attributes{ stname timer}}}
  }`,
@@ -410,9 +411,10 @@ export const qids = {
         }
       `,
       '34UpdateTimer': `
-      mutation UpdateTimer($timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
+      mutation UpdateTimer($saved: Boolean,$timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
         updateTimer(id: $timerId,
           data: {
+            saved: $saved,
             start: $newStart,
             isActive: $isActive,
             timers: $timers,
