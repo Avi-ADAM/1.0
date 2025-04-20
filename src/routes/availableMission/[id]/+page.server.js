@@ -88,6 +88,7 @@ export async function load({ locals, params }) {
   const mId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;
+  console.log(tok);
   const uid = locals.uid
   let que, alld
   let error;
