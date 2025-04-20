@@ -1,7 +1,7 @@
 import vercel from '@sveltejs/adapter-vercel';
 import adapter from '@sveltejs/adapter-node';
 import staticAdapter from '@sveltejs/adapter-static';
-import preprocess from "svelte-preprocess";
+import { sveltePreprocess } from 'svelte-preprocess'
 
 /** @type {import('@sveltejs/kit').Config} */
 let config;
@@ -17,10 +17,7 @@ if (process.env.ADAPTER === 'vercel') {
       optimizeDeps: {
         include: ['just-throttle', 'dayjs']
       }
-    },
-    preprocess: [preprocess({
-      "postcss": true
-    })]
+    }
   };
 } else if (process.env.ADAPTER === 'static') {
   config = {
@@ -31,9 +28,6 @@ if (process.env.ADAPTER === 'vercel') {
         fallback: null,
         precompress: false
       }),
-      preprocess: [preprocess({
-        "postcss": true
-      })],
       prerender: {
         default: true
       }
@@ -44,13 +38,15 @@ if (process.env.ADAPTER === 'vercel') {
     kit: {
       adapter: adapter({
         out: 'build'
-      }),
-      preprocess: [preprocess({
-        "postcss": true
-      })]
+      })
     }
   };
 }
+
+// הוספת preprocess ברמת הקובץ הראשית
+config.preprocess = [sveltePreprocess({
+  "postcss": true
+})];
 
 export default config;
 
