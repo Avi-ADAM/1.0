@@ -1,18 +1,55 @@
 <script>
-  import { startTimer, stopTimer, handleClearAll, handleClearSingle, updateTimer, saveTimer } from '$lib/func/timers.svelte';
+  import { startTimer, stopTimer } from '$lib/func/timers.svelte';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onMount, onDestroy } from 'svelte';
-  import { formatTime } from '$lib/func/uti/formatTime';
   import { page } from '$app/stores';
-  export let orders;
-  export let tx, size, bigsize, add, center, tiltAngle, hover, project, linke,missionId;
   import { timers, updateTimers } from '$lib/stores/timers';
-  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-import { fly } from 'svelte/transition';
-import { lang } from '$lib/stores/lang';
-let showSaveDialog = false;
-let elapsedTime = '00:00:00';
-  let timer
+  import TimerDialogs from './TimerDialogs.svelte';
+
+  export let orders;
+  export let tx, size, bigsize, add, center, tiltAngle, hover, project, linke, missionId;
+  $: console.log(showSaveDialog)
+  let showSaveDialog = false;
+  let showClearDialog = false;
+  let showSaveFinal = false;
+  let dialogEdit = true;
+  let elapsedTime = '00:00:00';
+  let selectedTasks = [];
+  let taskSearchTerm = '';
+  let timer;
+  onMount(() => {
+    console.log(timer)
+    if(timer.attributes.activeTimer.data?.attributes?.isActive) {
+      console.log("running")  
+    // Get the timers array from the timer data
+    let timers = timer.attributes.activeTimer.data.attributes.timers;
+    
+    if (timers && timers.length > 0) {
+      // Get the most recent timer entry
+      let lastTimer = timers[timers.length - 1];
+      
+      // Calculate elapsed time since the last start
+      let startTime = new Date(lastTimer.start).getTime();
+      let currentTime = Date.now();
+      
+      // Update local state
+      timer.zman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
+      localZman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
+      isRunning = true;
+      timer.running = true;
+      console.log(localZman, isRunning)
+    }
+  }else if(timer.attributes.activeTimer.data?.attributes?.isActive == false){
+    console.log("stopped")
+    let totalHours = timer.attributes.activeTimer.data.attributes.totalHours;
+    timer.zman = totalHours * 3600000;
+    localZman = totalHours * 3600000;
+    isRunning = false;
+    timer.running = false;
+  
+}
+    selectedTasks = timer?.attributes.activeTimer?.data?.attributes.acts.data.map(task => task.id) ?? []
+  })
   $: {
     timer = $timers?.find((t) => t.mId == missionId);
     if (timer) {
@@ -21,6 +58,7 @@ let elapsedTime = '00:00:00';
       console.log("No timer found for missionId:", missionId);
     }
   }
+
   // Local reactive state
   let localZman = timer?.zman || 0;
   let isRunning = timer?.running || false;
@@ -31,9 +69,8 @@ let elapsedTime = '00:00:00';
   $: rotationm = (localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6;
   $: rotationh =
     (localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30;
-
-  // Start/stop timer function
-  async function startTimerLocal(only=false) {
+ // Start/stop timer function
+ async function startTimerLocal(only=false) {
     console.log("start",only)
     if (timerInterval) clearInterval(timerInterval);
     const startTime = Date.now() - localZman;
@@ -125,33 +162,18 @@ let elapsedTime = '00:00:00';
     }
   });
   }
-let dialogEdit = true  
-function closeDialog() {
-  console.log("close")
-  showSaveDialog = false;
-  dialogEdit = true
-}
+
   // Update local state when timer prop changes
   $: {
-    localZman = timer?.zman || 0;
-  isRunning = timer?.running || false;
+    localZman = 1 || 0;
+    isRunning = timer?.running || false;
     if (isRunning && !timerInterval) {
       startTimerLocal(true);
     } else if (!isRunning && timerInterval) {
       stopTimerLocal(true);
     }
   }
-  $: lastTimer = timer?.attributes?.activeTimer?.data?.attributes?.timers?.slice(-1)[0] || null;
 
-  // Function to format the last timer's duration
-  $: lastTimerDuration = lastTimer
-    ? formatTime(
-        lastTimer.stop
-          ? new Date(lastTimer.stop) - new Date(lastTimer.start)
-          : Date.now() - new Date(lastTimer.start),
-        { lang: $lang }
-      )
-    : 'No timer available';
   async function handleToggleTimer() {
     const timerId =
       timer.attributes.activeTimer?.data != null
@@ -171,7 +193,6 @@ function closeDialog() {
       stopTimerLocal();
       timer.zman = localZman;
     }
-
   }
 
   // Cleanup on component destruction
@@ -190,613 +211,69 @@ function closeDialog() {
       seconds: totalSeconds % 60
     };
   }
+
   $: orbitalRotation = (localZman / 60000) * 360; // Complete rotation every minute
-  onMount(() => {
-    console.log(timer)
-    if(timer.attributes.activeTimer.data?.attributes?.isActive) {
-      console.log("running")  
-    // Get the timers array from the timer data
-    let timers = timer.attributes.activeTimer.data.attributes.timers;
-    
-    if (timers && timers.length > 0) {
-      // Get the most recent timer entry
-      let lastTimer = timers[timers.length - 1];
+</script>
+<TimerDialogs
+  bind:timer
+  bind:showSaveDialog
+  bind:showClearDialog
+  bind:showSaveFinal
+  bind:dialogEdit
+  bind:elapsedTime
+  bind:selectedTasks
+  bind:taskSearchTerm
+  on:update-timer={({ detail }) => {
+    if (detail.timer) {
+      timer.attributes.activeTimer.data = detail.timer;
+      timer.attributes.activeTimer.isActive = detail.running;
       
-      // Calculate elapsed time since the last start
-      let startTime = new Date(lastTimer.start).getTime();
-      let currentTime = Date.now();
+      if (detail.hoursdon !== undefined) {
+        timer.attributes.howmanyhoursalready = detail.hoursdon;
+      }
       
-      // Update local state
-      timer.zman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
-      localZman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
-      isRunning = true;
-      timer.running = true;
-      console.log(localZman, isRunning)
-    }
-  }else if(timer.attributes.activeTimer.data?.attributes?.isActive == false){
-    console.log("stopped")
-    let totalHours = timer.attributes.activeTimer.data.attributes.totalHours;
-    timer.zman = totalHours * 3600000;
-    localZman = totalHours * 3600000;
-    isRunning = false;
-    timer.running = false;
-  
-}
-    selectedTasks = timer?.attributes.activeTimer?.data?.attributes.acts.data.map(task => task.id) ?? []
-  })
-  const dialogHeader = {
-    en: 'Save Timer',
-    he: 'שמירת טיימר'
-  }
-  const innerDialogButton = {
-    en: 'Save Timer',
-    he: 'שמירת הטיימר'
-  }
-  const innerButtonT = {
-    en: 'Task update',
-    he: 'עדכון מטלות'
-  }
-  const clearButtonT = {
-    he: 'עריכת זמנים',
-    en: 'Edit Times'
-  }
-  $: innerText = {
-    en : `Timer stopped at ${lastTimerDuration}. Would you like to save this time or clear it?`,
-    he : `הטיימר נעצר לאחר ${lastTimerDuration}. האם ברצונך לשמור את הזמן או לנקות אותו?`
-  }
-  const innerTextT = {
-    he: 'באפשרותך לעדכן אלו מטלות בביצוע כעת או לערוך את הזמנים של הטיימר',
-    en: 'you can update the tasks you are currently working on or edit the timer times'
-  }
-  const clearButton = {
-    en: 'Clear Timer',
-    he: 'ניקוי הטיימר'
-  }
-  function handleClearTimer() {
-    closeDialog() // Close the dialog
-  showClearDialog = true; // Show the clear dialog instead of directly clearing
-}
-
-let showClearDialog = false;
-let dialogContentType = 'save';
-$: showSaveFinal = false
-// Add these constants for the clear dialog text
-const clearDialogText = {
-  title: {
-    he: 'ניהול זמנים',
-    en: 'Manage Times'
-  },
-  clearAll: {
-    he: 'נקה הכל',
-    en: 'Clear All'
-  },
-  noTimers: {
-    he: 'אין זמנים לניהול',
-    en: 'No times to manage'
-  }
-};
-import { slide } from 'svelte/transition';
-  import { quintOut } from 'svelte/easing';
-  import { textblockTypeInputRule } from '@tiptap/core';
-  import { toast } from 'svelte-sonner';
-
-  async function localHandleClearSingle(i, timer) {
-  const originalTimer = JSON.parse(JSON.stringify(timer));
-  const originalTimers = [...timer.attributes.activeTimer.data.attributes.timers];
-
-  // Optimistically update the UI
-  timer.attributes.activeTimer.data.attributes.timers = timer.attributes.activeTimer.data.attributes.timers.filter(
-    (_, index) => index !== i
-  );
-
-  try {
-    const x = await handleClearSingle(i, originalTimer, fetch, false);
-    if (x) {
-      // Update the store
+      // Update global timers store
       updateTimers(
         $timers.map((t) =>
           t.mId === timer.mId
             ? {
                 ...t,
-                running: false,
+                running: detail.running,
                 attributes: {
                   ...t.attributes,
+                  howmanyhoursalready: detail.hoursdon !== undefined ? detail.hoursdon : t.attributes.howmanyhoursalready,
                   activeTimer: {
                     ...t.attributes.activeTimer,
-                    data: x,
-                    isActive: false,
+                    data: detail.timer,
+                    isActive: detail.running,
                   },
                 },
               }
             : t
         )
       );
-    }
-  } catch (error) {
-    console.error("Failed to delete timer:", error);
-    timer.attributes.activeTimer.data.attributes.timers = originalTimers;
-  }
-}
-let selectedTasks =  [];
-    let taskSearchTerm = '';
-const updateButton = {
-  en: 'Update',
-  he: 'עדכון'
-}
-const succsessText = {
-  en: 'Timer updated successfully',
-  he: 'הטיימר עודכן בהצלחה'
-}
-async function handleUpdateTimer() {
-    // Update the timer with the selected tasks
-    const selectedTaskIds = selectedTasks.map(taskId => parseInt(taskId, 10));
-   await updateTimer(timer.attributes.activeTimer.data, 'tasks', {selectedTaskIds}, fetch, false).then((x) => {
-    console.log("Updated timer:", x);
-    //update the timer store with the new data
-   let newData = x;
-    timer.attributes.activeTimer.data = newData;
-            
-            // Update global timers store
-           updateTimers(
-                $timers.map((t) =>
-                  t.mId === timer.mId
-                    ? {
-                        ...t,
-                        attributes: {
-                          ...t.attributes,
-                          activeTimer: {
-                            ...t.attributes.activeTimer,
-                          },
-                        },
-                      }
-                    : t
-                )
-              );
-              //TOAST SUCCESS
-              showSaveFinal = false;
-              showSaveDialog = false;
-              dialogEdit = false;
-              selectedTasks = timer?.attributes.activeTimer?.data?.attributes.acts.data.map(task => task.id) ?? []
-              taskSearchTerm = '';
-              toast.success(`${succsessText[$lang]}`);
-  })
- }
 
-function handleSaveTimerFinal() {
-  if (!timer?.attributes?.activeTimer?.data) {
-    console.error('אין טיימר פעיל לשמור');
-    return;
-  }
-  
-  // הכנת מערך המטלות (אם יש) להעברה לפונקציית saveTimer
-  const tasksToSave = selectedTasks && selectedTasks.length > 0 ? selectedTasks : null;
-  
-  // שמירת הטיימר
-  saveTimer(
-    timer, // הטיימר
-    timer.mId, // מזהה המשימה בתהליך
-    fetch, // פונקציית fetch
-    false, // לא שרת
-    tasksToSave // מערך המטלות שנבחרו
-  ).then((result) => {
-    if (result) {
-      console.log('הטיימר נשמר בהצלחה:', result);
-      
-      // עדכון ה-store
-      updateTimers(
-        $timers.map((t) =>
-          t.mId === timer.mId
-            ? {
-                ...t,
-                running: false,
-                attributes: {
-                  ...t.attributes,
-                  howmanyhoursalready: (t.attributes.howmanyhoursalready || 0) + 
-                                        (timer.attributes.activeTimer.data.attributes.totalHours || 0),
-                  activeTimer: null,
-                },
-              }
-            : t
-        )
-      );
-      
-      // סגירת הדיאלוג והצגת הודעת הצלחה
-      showSaveFinal = false;
-      showSaveDialog = false;
-      dialogEdit = false;
-      
-      const successMessage = {
-        he: 'הטיימר נשמר בהצלחה',
-        en: 'Timer saved successfully'
-      };
-      
-      toast.success(successMessage[$lang]);
+      // Reset localZman specifically for clear operations
+      if (!detail.running && detail.timer?.attributes?.timers?.length === 0) {
+        timer.zman = 0;
+        localZman = 0;
+      } else {
+        // Otherwise, update based on totalHours (for save, update, etc.)
+        timer.zman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
+        localZman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
+      }
+      // Ensure isRunning state is also updated based on the event
+      isRunning = detail.running;
+
     } else {
-      const errorMessage = {
-        he: 'שגיאה בשמירת הטיימר',
-        en: 'Error saving timer'
-      };
-      
-      toast.error(errorMessage[$lang]);
+       // Handle cases where detail.timer might be null or undefined if necessary
+       console.warn("update-timer event received without timer data:", detail);
+      timer.zman = 0;
+       localZman = 0; // Default to 0 if timer data is missing
+       isRunning = false;
     }
-  });
-}
-// Modify the handleSaveTimer function
-function handleSaveTimer() {
-    showSaveDialog = false;
-    dialogEdit = true
-    showSaveFinal = true;
-    const { hours, minutes, seconds } = getTimeComponents(localZman);
-    const totalHours = hours + minutes/60 + seconds/3600;
-    
-    // Update timer with selected tasks
-   
-}
-
-// Add filtered tasks computed property
-$: filteredTasks = timer?.attributes?.acts?.data?.filter(task => 
-    !task.attributes.naasa && 
-    task.attributes.myIshur &&
-    task.attributes.shem.toLowerCase().includes(taskSearchTerm.toLowerCase())
-) || [];
-const choose = {
-  en: 'Choose tasks',
-  he: 'בחירת המטלות בהן עסקת'
-}
-
-// Add to your script section:
-let editingTimer = null;
-
-function handleStartEdit(index, timerEntry) {
-  // Create a copy of the timer entry with editing fields
-  timer.attributes.activeTimer.data.attributes.timers = timer.attributes.activeTimer.data.attributes.timers.map((t, i) => {
-    if (i === index) {
-      return {
-        ...t,
-        isEditing: true,
-        editStart: toLocalDatetimeString(t.start), // Call the function directly
-        editStop: t.stop ? toLocalDatetimeString(t.stop) : null // Call the function directly
-      };
-    }
-    return t;
-  });
-}
-
-async function handleSaveEdit(index, timerEntry) {
-  const originalTimer = JSON.parse(JSON.stringify(timer));
-
-  try {
-    // Get the old lap (before edit)
-    const oldLap = { 
-      start: timer.attributes.activeTimer.data.attributes.timers[index].start, 
-      stop: timer.attributes.activeTimer.data.attributes.timers[index].stop 
-    };
-
-    // Update the timer entry with new values
-    const newLap = {
-      start: new Date(timerEntry.editStart).toISOString(),
-      stop: timerEntry.editStop ? new Date(timerEntry.editStop).toISOString() : null
-    };
-
-    timer.attributes.activeTimer.data.attributes.timers[index] = {
-      ...timerEntry,
-      ...newLap,
-      isEditing: false
-    };
-
-    // API call to update the timer
-    await updateTimer(
-      timer.attributes.activeTimer.data, // Timer object
-      'timers', // Specify what to update
-      { oldLap, newLap, index }, // Pass oldLap, newLap, and index
-      fetch // Fetch function
-    );
-
-    // Update the store with the modified timer
-    updateTimers($timers.map(t => 
-      t.mId === timer.mId ? timer : t
-    ));
-  } catch (error) {
-    console.error('Failed to update timer:', error);
-    // Rollback changes
-    timer = originalTimer;
-  }
-}
-
-function handleCancelEdit(index) {
-  timer.attributes.activeTimer.data.attributes.timers[index].isEditing = false;
-}
-
-async function handleAddInterval() {
-  const now = new Date();
-  const newInterval = {
-    start: now.toISOString(),
-    stop: now.toISOString(),
-    isEditing: true,
-    editStart: now.toISOString().slice(0,16),
-    editStop: now.toISOString().slice(0,16)
-  };
-  
-  timer.attributes.activeTimer.data.attributes.timers.push(newInterval);
-  
-  // Update the store
-  updateTimers(
-    $timers.map((t) =>
-      t.mId === timer.mId ? timer : t
-    )
-  );
-}
-function toLocalDatetimeString(date) {
-  const local = new Date(date);
-  local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
-  return local.toISOString().slice(0, 16);
-}
-const dialogEditT = {
-  en: 'Edit Timer',
-  he: 'עריכת טיימר'
-}
-</script>
-<DialogOverlay 
-  style="z-index: 700;" 
-  isOpen={showClearDialog} 
-  onDismiss={() => showClearDialog = false}
->
-  <div
-    style="z-index: 700;"
-    transition:fly|local={{ y: 450, opacity: 0.5, duration: 1000 }}
-  >
-    <DialogContent
-      aria-label="clear-timer-options"
-      class="timer-dialog"
-    >
-    <button 
-    class="close-button"
-    on:click={() => showClearDialog = false}
-    aria-label="Close dialog"
-  >
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M18 6L6 18M6 6l12 12"/>
-    </svg>
-  </button>
-      <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
-        <h2 class="dialog-title">{clearDialogText.title[$lang]}</h2>
-        
-        {#if timer?.attributes?.activeTimer?.data?.attributes?.timers?.length}
-          <div class="timer-list d">
-            {#each timer.attributes.activeTimer.data.attributes.timers as timerEntry, i (timerEntry.start)}
-            <div class="timer-entry"
-              transition:slide={{delay: 150, duration: 1000, easing: quintOut }}
-            >
-              <div class="timer-info">
-                {#if timerEntry.isEditing}
-                  <div class="edit-fields">
-                    <input 
-                    type="datetime-local" 
-                    bind:value={timerEntry.editStart} 
-                    class="datetime-input"
-                  />
-                  <input 
-                    type="datetime-local" 
-                    bind:value={timerEntry.editStop} 
-                    class="datetime-input"
-                    disabled={!timerEntry.stop}
-                  />
-                    <div class="edit-actions">
-                      <button 
-                        class="save-edit-btn"
-                        on:click={() => handleSaveEdit(i, timerEntry)}
-                      >
-                        <svg viewBox="0 0 24 24" width="20" height="20">
-                          <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
-                        </svg>
-                      </button>
-                      <button 
-                        class="cancel-edit-btn"
-                        on:click={() => handleCancelEdit(i)}
-                      >
-                        <svg viewBox="0 0 24 24" width="20" height="20">
-                          <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
-                        </svg>
-                      </button>
-                    </div>
-                  </div>
-                {:else}
-                  <span class="timer-time">
-                    {new Date(timerEntry.start).toLocaleString($lang)} - 
-                    {timerEntry.stop ? new Date(timerEntry.stop).toLocaleString() : 'Running'}
-                  </span>
-                  <span class="timer-duration">
-                    {formatTime(timerEntry.stop ? 
-                      new Date(timerEntry.stop) - new Date(timerEntry.start) : 
-                      Date.now() - new Date(timerEntry.start),
-                      { lang: $lang }
-                    )}
-                  </span>
-                {/if}
-              </div>
-              <div class="timer-actions">
-                {#if !timerEntry.isEditing}
-                  <button 
-                    class="edit-btn"
-                    on:click={() => handleStartEdit(i, timerEntry)}
-                  >
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                      <path 
-                        d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
-                        style="fill: blue; cursor: pointer; transform: scale(1.5) translate(-10px, -10px)"
-                        on:click={() => showSaveDialog = true}
-                      />
-                    </svg>
-                  </button>
-                  <button 
-                    class="clear-single-btn"
-                    on:click={() => localHandleClearSingle(i,timer)}
-                  >
-                    <svg viewBox="0 0 24 24" width="20" height="20">
-                      <path 
-                        fill="currentColor" 
-                        d="M19,4H15.5L14.5,3H9.5L8.5,4H5V6H19M6,19A2,2 0 0,0 8,21H16A2,2 0 0,0 18,19V7H6V19Z"
-                      />
-                    </svg>
-                  </button>
-                {/if}
-              </div>
-            </div>
-          {/each}
-          
-          {#if timer?.attributes?.activeTimer?.data?.attributes?.timers?.length}
-            <button 
-              class="add-interval-btn"
-              on:click={handleAddInterval}
-            >
-              <svg viewBox="0 0 24 24" width="24" height="24">
-                <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
-              </svg>
-              {$lang === 'he' ? 'הוסף מרווח זמן' : 'Add Time Interval'}
-            </button>
-          {/if}
-          </div>
-          
-          <button 
-            class="clear-all-btn"
-            on:click={() => handleClearAll(timer)}
-          >
-            {clearDialogText.clearAll[$lang]}
-          </button>
-        {:else}
-          <p class="no-timers">{clearDialogText.noTimers[$lang]}</p>
-        {/if}
-      </div>
-    </DialogContent>
-  </div>
-</DialogOverlay>
-<DialogOverlay 
-  style="z-index: 700;" 
-  isOpen={showSaveDialog} 
-  onDismiss={() => closeDialog()}
->
-  <div
-    style="z-index: 700;"
-    transition:fly|local={{ y: 450, opacity: 0.5, duration: 1000 }}
-  >
-    <DialogContent
-      aria-label="timer-options"
-      class="timer-dialog"
-    >
-
-    <button 
-    class="close-button"
-    on:click={()=>closeDialog()}
-    aria-label="Close dialog"
-  >
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-      <path d="M18 6L6 18M6 6l12 12"/>
-    </svg>
-  </button>
-      <div class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
-        <h2 class="dialog-title">{ dialogEdit == true ? dialogEditT[$lang] : dialogHeader[$lang] }</h2>
-        <p class="dialog-message">
-          {dialogEdit == true ?innerTextT[$lang] : innerText[$lang]}
-        </p>
-        <div class="dialog-buttons">
-          <button
-            class="save-btn"
-            on:click={handleSaveTimer}
-          >
-            {dialogEdit == true ? innerButtonT[$lang] : innerDialogButton[$lang]}
-          </button>
-          <button
-            class="clear-btn"
-            on:click={handleClearTimer}
-          >
-            {dialogEdit == true ? clearButtonT[$lang] : clearButton[$lang]}
-          </button>
-        </div>
-      </div>
-    </DialogContent>
-  </div>
-</DialogOverlay>
-<DialogOverlay 
-  style="z-index: 700;" 
-  isOpen={showSaveFinal}
-  on:close={() => showSaveFinal = false}
->
-  <div
-    style="z-index: 700;"
-    transition:fly={{ y: -100, duration: 500 }}
-
-  >
-<DialogContent
-
- aria-label="timer-options" class="timer-dialog">
- <button 
- class="close-button"
- on:click={() => showSaveFinal = false}
- aria-label="Close dialog"
->
-<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-  <path d="M18 6L6 18M6 6l12 12"/>
-</svg>
-</button>
-  <div
-   class="dialog-content mt-4" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
-    <h2 class="dialog-title">{dialogHeader[$lang]}</h2>
-    {#if filteredTasks.length}
-    <h3>{choose[$lang]}</h3>
-    <div class="task-selection">
-      <input
-        type="text"
-        bind:value={taskSearchTerm}
-        placeholder={$lang === 'he' ? 'חיפוש משימות...' : 'Search tasks...'}
-        class="task-search"
-      />
-      
-      <div class="task-list d">
-          {#each filteredTasks as task}
-            <label class="task-item">
-              <input
-                type="checkbox"
-                bind:group={selectedTasks}
-                value={task.id}
-              />
-              <span>{task.attributes.shem}</span>
-            </label>
-          {/each}
-        </div>
-      </div>
-        {/if}
-  
-    {#if dialogEdit != true}
-    <div class="time-summary">
-      <p>{elapsedTime}</p>
-    </div>
-{/if}
-    <div class="dialog-buttons">
-      <button
-      class="px-4 py-2 rounded font-bold text-black bg-gradient-to-r from-green-400 to-blue-400 transform transition-transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
-      on:click={handleSaveTimerFinal}
-        disabled={elapsedTime === '00:00:00' && dialogEdit != true}
-      >
-        {innerDialogButton[$lang]}
-      </button>
-      {#if filteredTasks.length > 0}
-      <button
-       class="px-4 py-2 rounded font-bold text-black bg-gradient-to-r from-yellow-400 to-orange-400 transform transition-transform hover:-translate-y-1"
-      on:click={handleUpdateTimer}>
-      {updateButton[$lang]}
-    </button>
-      {/if}
-      <button
-      class="px-4 py-2 rounded font-bold text-white bg-gradient-to-r from-pink-500 to-red-500 transform transition-transform hover:-translate-y-1"
-      on:click={handleClearTimer}
-      >
-        {clearButton[$lang]}
-      </button>
-    </div>
-  </div>
-</DialogContent>
-</div>
-</DialogOverlay>
+  }}
+/>
 <svg
   class="timer"
   style="width:{orders?.big ? bigsize : size}px;
@@ -1351,17 +828,11 @@ const dialogEditT = {
     <foreignObject
       x="300"
       y="105"
-      width="500"
-      height="500"
+      width="120"
+      height="120"
       transform="translate(-50 -50)"
     >
-      <span class={`normSml${timer.perhour}-${timer.projectId}-${timer.mId}`}
-      ></span>
       <img
-        on:click={() => project()}
-        on:keypress={() => project()}
-        on:mouseenter={() => hover('לוגו הריקמה')}
-        on:mouseleave={() => hover('0')}
         style=" border-radius: 50%;"
         src={timer.src}
         width="120"
@@ -1373,9 +844,6 @@ const dialogEditT = {
     <!-- Project Name -->
     <g
       style="overflow:hidden; text-anchor: middle;"
-      on:click={() => linke('p')}
-      on:mouseenter={() => hover('לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה')}
-      on:mouseleave={() => hover('0')}
     >
       <!-- Text with glow and outline -->
       <text

@@ -1,5 +1,7 @@
 <script>
-      	import { Drawer } from 'vaul-svelte';
+	import { role } from './../prPr/mi.js';
+import TimerDialogs from '../timers/TimerDialogs.svelte';
+import { Drawer } from 'vaul-svelte';
     import {nutifi } from '$lib/func/nutifi.svelte'
     import { toast } from 'svelte-sonner';
   import RangeSlider from "svelte-range-slider-pips";
@@ -10,14 +12,27 @@
     import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
     import { goto } from '$app/navigation';
     import { idPr } from '../../stores/idPr.js';
-    import { onMount } from 'svelte';
+    import { onMount, onDestroy } from 'svelte';
      import { createEventDispatcher } from 'svelte';
      import {betha} from './storess/betha.js'
      import Lowbtn from '$lib/celim/lowbtn.svelte'
      import {SendTo} from '$lib/send/sendTo.svelte';
     import axios from 'axios'
+    import { timers, updateTimers } from '$lib/stores/timers.js';
+    import { startTimer } from '$lib/func/timers.svelte';
+    import { stopTimer } from '$lib/func/timers.svelte';
 const baseUrl = import.meta.env.VITE_URL
-
+let storeTimer;
+let localZman = storeTimer?.zman || 0;
+let isRunning = storeTimer?.running || false;
+$: {
+  storeTimer = $timers?.find((t) => t.mId == mId);
+  if (storeTimer) {
+    console.log("Timer found:", storeTimer);
+  } else {
+    console.log("No timer found for missionId:", mId);
+  }
+}
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -45,7 +60,7 @@ betha.subscribe(value => {
     export let missionDetails = "do x in y"
     export let hearotMeyuchadot;
     export let src = "coin.png"
-    export let link = "https://www.1lev1.world"
+    export let link = "https://www.1lev1.com"
     export let linkDescription = "לביצוע"
     export let projectId;
     export let linkP = "/project/"
@@ -59,6 +74,12 @@ betha.subscribe(value => {
     export let usernames;
     let mstotal = hourstotal*3600000
      let idL;
+     let showSaveDialog = false;
+  let showClearDialog = false;
+  let showSaveFinal = false;
+  let dialogEdit = true;
+  let elapsedTime = '00:00:00';
+  let taskSearchTerm = '';
 
     let x = 0;
     let already = false;
@@ -86,7 +107,8 @@ let zmani;
   let msdonf;
   $: msdonf = hoursdon * 3600000;
   export let zman;
-    export let oldzman;
+  export let oldzman;
+  let selectedTasks =  [];
 
 $: zman = msdonf + lapse + x;
 let miatan;
@@ -104,26 +126,51 @@ onMount(async () => {
   if (tdtd[coinlapach-1].ch == true){
     stname = tdtd[coinlapach-1].stname
     if(tdtd[coinlapach-1].hoursdon !== false){
-    hoursdon = tdtd[coinlapach-1].hoursdon
+      hoursdon = tdtd[coinlapach-1].hoursdon
     }
   }
-    if (stname === "0") {
-  } else if (stname === "stopi") {
-    if (tdtd[coinlapach-1].ch == true && tdtd[coinlapach-1].hoursdon == false){
-    oldzman = tdtd[coinlapach-1].timer
-  }
-    x = oldzman
-  } else {
-     if (tdtd[coinlapach-1].ch == true){
-    oldzman = tdtd[coinlapach-1].timer
+
+  // Get current timer from store
+  const currentTimer = $timers.find(t => t.mId === mId);
+  
+  if (currentTimer?.attributes?.activeTimer?.data) {
+    const timerData = currentTimer.attributes.activeTimer.data;
+    
+    if (timerData.attributes.isActive) {
+      console.log("Timer is running",timerData);
+      
+      // Get the timers array from the timer data
+      let timers = timerData.attributes.timers;
+      
+      if (timers && timers.length > 0) {
+        // Get the most recent timer entry
+        let lastTimer = timers[timers.length - 1];
+        
+        // Calculate elapsed time since the last start
+        let startTime = new Date(lastTimer.start).getTime();
+        let currentTime = Date.now();
+        
+        // Update local state
+        lapse = (currentTime - startTime) + timerData.attributes.totalHours * 3600000;
+        running = true;
+        
+        // Start the timer interval
+        const startTime2 = Date.now() - lapse;
+        timer = setInterval(() => {
+          lapse = Date.now() - startTime2;
+        }, 1);
+        
+      }
+    } else if (timerData.attributes.isActive == false) {
+      console.log("Timer is stopped",timerData);
+      let totalHours = timerData.attributes.totalHours;
+      x = totalHours * 3600000;
+      lapse = totalHours * 3600000;
+      running = false;
     }
-      const startTime = stname - lapse
-      timer = setInterval(() => {
-        lapse = Date.now() - startTime 
-      }, 1)
-        x = oldzman
-    running = true
   }
+
+  selectedTasks = currentTimer?.attributes?.activeTimer?.data?.attributes?.acts?.data?.map(task => task.id) ?? [];
 })
 
 $: if (percentage(zman,mstotal) == 90){
@@ -144,11 +191,12 @@ $: if (mstotal-zman == 300000){
         nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
 
         }
-$: if (percentage(zman,mstotal) >= 100 && running == true){
+/** להוסיף פונקציה לבקשת תוספת שעות
+ * $: if (percentage(zman,mstotal) >= 100 && running == true){
            azor ()
     let text = `שלום ${usernames} הטיימר של  ${missionName} נעצר מפני שמכסת השעות שסוכמה הסתיימה, יש ליצור משימה חדשה` ;
     nutifi("1💗1 טיימר נעצר",text,"lev" )
-        }
+        }**/
 
   let timer;
   let running = false;
@@ -160,114 +208,131 @@ async function azor () {
       zmani += lapse;
       x += lapse;
       lapse = 0;
-        tdtd[coinlapach-1].stname = "stopi"
-        tdtd[coinlapach-1].timer = x
-        tdtd[coinlapach-1].hoursdon = false
-        tdtd[coinlapach-1].ch = true
-        tdtd[coinlapach-1].x = x
-        tdtd[coinlapach-1].lapse = 0
+      tdtd[coinlapach-1].stname = "stopi"
+      tdtd[coinlapach-1].timer = x
+      tdtd[coinlapach-1].hoursdon = false
+      tdtd[coinlapach-1].ch = true
+      tdtd[coinlapach-1].x = x
+      tdtd[coinlapach-1].lapse = 0
       betha.set(tdtd)
-        const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
-    const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-    idL = cookieValueId;
-    token = cookieValue;
-    bearer1 = 'bearer' + ' ' + token;
-        try {
-            await fetch(linkg, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': bearer1,
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        query: `mutation 
-                        { 
- updateMesimabetahalich(
-    id:${mId}
-  data: {
- stname: "stopi",
- timer: ${x}
-  }
- ) { data{id attributes{ stname timer}}}
- }
- `})
-                })
-                .then(r => r.json())
-                .then(data => miCatan = data);
-                toast.info(azori[$lang])
-            console.log(miCatan);
-        } catch (e) {
-            error1 = e
-            toast.warning(er[$lang]);
-            console.log(error1);
+
+      try {
+        // Get current timer from store
+        const currentTimer = $timers.find(t => t.mId === mId)?.attributes?.activeTimer?.data;
+        
+        if (currentTimer) {
+          const result = await stopTimer(currentTimer, fetch, false);
+          
+          if (result) {
+            // Update timers store
+            updateTimers(
+              $timers.map(t =>
+                t.mId === mId
+                  ? {
+                      ...t,
+                      running: false,
+                      attributes: {
+                        ...t.attributes,
+                        activeTimer: {
+                          ...t.attributes.activeTimer,
+                          data: result,
+                          isActive: false
+                        }
+                      }
+                    }
+                  : t
+              )
+            );
+     
+            toast.info(azori[$lang]);
+            const { hours, minutes, seconds } = getTimeComponents(localZman);
+            elapsedTime = `${hours}:${minutes}:${seconds}`;
+            showSaveDialog = true;
+            dialogEdit = false
+          }
         }
+      } catch (e) {
+        error1 = e;
+        toast.warning(er[$lang]);
+        console.error('Error stopping timer:', e);
+      }
 } 
 const azori = {
-  "he":"הטיימר נעצר בהצלחה, יש ללחוץ שמירה כדי לשמור",
-  "en":"timer stopped sucsesfully, click save to save it"
+  "he":"הטיימר נעצר בהצלחה",
+  "en":"timer stopped sucsesfully"
 }
-
+function getTimeComponents(milliseconds) {
+    if (!milliseconds) return { hours: 0, minutes: 0, seconds: 0 };
+    const totalSeconds = Math.floor(milliseconds / 1000);
+    return {
+      hours: Math.floor(totalSeconds / 3600),
+      minutes: Math.floor((totalSeconds % 3600) / 60),
+      seconds: totalSeconds % 60
+    };
+  }
 async function start () {
       const startTime = Date.now() - lapse
       timer = setInterval(() => {
         lapse = Date.now() - startTime 
       }, 1)
-    running = true
-    stname = Date.now()
+      running = true
+      stname = Date.now()
       tdtd[coinlapach-1].stname = stname
-        tdtd[coinlapach-1].timer = x
-        tdtd[coinlapach-1].hoursdon = false
-        tdtd[coinlapach-1].ch = true
-        tdtd[coinlapach-1].x = x
-        tdtd[coinlapach-1].lapse = lapse
-       tdtd[coinlapach-1].running = true
+      tdtd[coinlapach-1].timer = x
+      tdtd[coinlapach-1].hoursdon = false
+      tdtd[coinlapach-1].ch = true
+      tdtd[coinlapach-1].x = x
+      tdtd[coinlapach-1].lapse = lapse
+      tdtd[coinlapach-1].running = true
       betha.set(tdtd)
-      console.log("from start",x,stname)
- const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
-    const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-    idL = cookieValueId;
-    token = cookieValue;
-    bearer1 = 'bearer' + ' ' + token;
-        try {
-            await fetch(linkg, {
-                    method: 'POST',
-                    headers: {
-                        'Authorization': bearer1,
-                        'Content-Type': 'application/json'
-                    },
-                    //add already declined ids
-                    body: JSON.stringify({
-                        query: `mutation 
-                        { 
- updateMesimabetahalich(
-  id: "${mId}"
-  data: {
- stname: "${stname}",
- timer: ${x}
-  }
- ) {data{id attributes{ stname timer}}}
- }
-`})
-                })
-                .then(r => r.json())
-                .then(data => miCatan = data);
-            console.log(miCatan);
-        } catch (e) {
-            error1 = e
-            console.log(error1);
+
+      try {
+        // Get current timer from store if exists
+        const currentTimer = $timers.find(t => t.mId === mId)?.attributes?.activeTimer;
+        const timerId = currentTimer?.data?.id || 0;
+        
+        // Get user ID from cookie
+        const cookieValueId = document.cookie
+          .split('; ')
+          .find(row => row.startsWith('id='))
+          ?.split('=')[1];
+
+        // Start timer using new logic
+        const result = await startTimer(
+          currentTimer,
+          mId,
+          cookieValueId,
+          projectId,
+          timerId,
+          false,
+          fetch
+        );
+
+        if (result) {
+          // Update timers store
+          updateTimers(
+            $timers.map(t =>
+              t.mId === mId
+                ? {
+                    ...t,
+                    running: true,
+                    attributes: {
+                      ...t.attributes,
+                      activeTimer: {
+                        ...t.attributes.activeTimer,
+                        data: result,
+                        isActive: true
+                      }
+                    }
+                  }
+                : t
+            )
+          );
         }
+      } catch (e) {
+        error1 = e;
+        console.error('Error starting timer:', e);
+      }
 }
 
 async function handleClearClick () {
@@ -808,8 +873,74 @@ async function busabe(id){
  const busa = {"he": "בוצע בהצלחה", "en":"done"}
  const success = {"he": "נשמר בהצלחה", "en": "saved successfully"}
  const rega = {"he": "שניה בבקשה", "en": "one moment please"}
- </script>
+ const editButton = {"he": "עריכת הטיימר","en": "edit Timer"}
+onDestroy(() => {
+  if (timer) {
+    clearInterval(timer);
+  }
 
+});
+</script>
+<TimerDialogs
+bind:timer={storeTimer}
+bind:showSaveDialog
+bind:showClearDialog
+bind:showSaveFinal
+bind:dialogEdit
+bind:elapsedTime
+bind:selectedTasks
+bind:taskSearchTerm
+on:update-timer={({ detail }) => {
+  if (detail.timer) {
+    storeTimer.attributes.activeTimer.data = detail.timer;
+    storeTimer.attributes.activeTimer.isActive = detail.running;
+    
+    if (detail.hoursdon !== undefined) {
+      storeTimer.attributes.howmanyhoursalready = detail.hoursdon;
+    }
+    
+    // Update global timers store
+    updateTimers(
+      $timers.map((t) =>
+        t.mId === storeTimer.mId
+          ? {
+              ...t,
+              running: detail.running,
+              attributes: {
+                ...t.attributes,
+                howmanyhoursalready: detail.hoursdon !== undefined ? detail.hoursdon : t.attributes.howmanyhoursalready,
+                activeTimer: {
+                  ...t.attributes.activeTimer,
+                  data: detail.timer,
+                  isActive: detail.running,
+                },
+              },
+            }
+          : t
+      )
+    );
+
+    // Reset localZman specifically for clear operations
+    if (!detail.running && detail.timer?.attributes?.timers?.length === 0) {
+      storeTimer.zman = 0;
+      localZman = 0;
+    } else {
+      // Otherwise, update based on totalHours (for save, update, etc.)
+      storeTimer.zman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
+      localZman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
+    }
+    // Ensure isRunning state is also updated based on the event
+    isRunning = detail.running;
+
+  } else {
+     // Handle cases where detail.timer might be null or undefined if necessary
+     console.warn("update-timer event received without timer data:", detail);
+     storeTimer.zman = 0;
+     localZman = 0; // Default to 0 if timer data is missing
+     isRunning = false;
+  }
+}}
+/>
 
 <!--<svelte:window on:beforeunload={beforeUnload}/>-->
 
@@ -1312,22 +1443,30 @@ out:scale={{duration: 2200, opacity: 0.5}}
     {/if}
   <div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div>
 {#if low == false}
+
+<!---
 {#if lapse !== 0 || x !== 0}
 <button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
 <button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" on:click={save}> הוספה</button>
-{/if}
-    {#if already === false}
-    <button on:mouseenter={()=>hover("לחיצה לסיום המשימה")} on:mouseleave={()=>hover("0")} on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
-     {/if} 
-     {#if show === true}  <button on:mouseenter={()=>hover(`${running ? "עצירת הטיימר" : "הפעלת טיימר"}`)} on:mouseleave={()=>hover("0")} on:click={running ? azor : start} class="btn b" name="start timer" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
-   {/if}
+{/if}-->
+    <div class="flex space-x-4">
+      {#if already === false}
+      <button on:mouseenter={()=>hover("לחיצה לסיום המשימה")} on:mouseleave={()=>hover("0")} on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
+      {/if}
+      {#if storeTimer?.attributes?.activeTimer?.data?.attributes}
+      <!--edit timer button-->
+      <button on:mouseenter={()=>hover("לחיצה לעריכת הטיימר")} on:mouseleave={()=>hover("0")} class="btn c" tabindex="0" role="button" on:keypress={() => showSaveDialog = true} on:click={() => showSaveDialog = true}>✏</button>
+      {/if}
+      {#if show === true}  <button on:mouseenter={()=>hover(`${running ? "עצירת הטיימר" : "הפעלת טיימר"}`)} on:mouseleave={()=>hover("0")} on:click={running ? azor : start} class="btn b" name="start timer" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
+      {/if}
+    </div>
     {:else if low == true}
           <Lowbtn/>
         {/if}
         <!--if stop then opposide sand timer
      <button2 class="btn" title="request more time" name="request more time"><i class="far fa-calendar-plus"></i></button2>-->
- </div>
-</SwiperSlide
+</div>
+     </SwiperSlide
   >
 </Swiper>
 {#if modal}
@@ -1351,7 +1490,9 @@ on:start={start}
      a = 2;
     isOpen = true
   }}
+  bind:showSaveDialog
   {low}
+  {storeTimer}
   {tasks}
   {dueDateOrCountToDedline}
   {hearotMeyuchadot}
@@ -1394,8 +1535,10 @@ on:start={start}
     isOpen = true
   }}
   {isVisible}
+  bind:showSaveDialog
   {low}
   {tasks}
+  {storeTimer}
   {dueDateOrCountToDedline}
   {hearotMeyuchadot}
 {x}
@@ -1475,6 +1618,10 @@ on:start={start}
     }
     .b{
         grid-column: 3/4;
+        margin: 0 auto;
+    }
+    .c{
+        grid-column: 2/3;
         margin: 0 auto;
     }
   .mn{

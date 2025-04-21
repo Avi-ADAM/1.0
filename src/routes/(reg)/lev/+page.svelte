@@ -25,6 +25,7 @@
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { fetchTimers } from '$lib/stores/timers'
   import pkg from 'lodash';
   const {isEqual} = pkg;
   import Rikma from '$lib/components/lev/rikma.svelte';
@@ -1493,6 +1494,7 @@
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
+      fetchTimers($page.data.uid,fetch)
       token = cookieValu;
       const elem = document.getElementById('screen');
 
