@@ -116,7 +116,7 @@ const genAI = new GoogleGenerativeAI(geminiApiKey);
 const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 let allD = [];
-
+let appIds = []
 // --- פונקציות עזר (ללא שינוי מהותי מהגרסה הקודמת) ---
 async function fetchUserData(fetch) {
   try {
