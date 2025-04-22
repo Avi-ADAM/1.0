@@ -139,7 +139,7 @@ export async function POST({ request, fetch }) {
      );
    }); 
    bot.action(
-     /^stopTimer-(\d+)-(\d+)-(\d+)-(\d+)-(\d+(\.\d+)?)$/,
+     /^stopTimer-(\d+)-(\d+)$/,
      async (ctx) => {
        console.log('Action triggered!');
        console.log('Matched data:', ctx.match);
@@ -162,7 +162,6 @@ export async function POST({ request, fetch }) {
 
          if (missionData.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data) {
            const activeTimer = missionData.data.mesimabetahalich.data.attributes.activeTimer.data;
-           const activeTimerId = activeTimer.id;
            
            // Call stopTimer with the active timer
            const stoppedTimer = await stopTimer(activeTimer, fetch, true);
@@ -180,13 +179,13 @@ export async function POST({ request, fetch }) {
                  [
                    Markup.button.callback(
                      '<<update tasks 📝 עדכון משימות>>',
-                     `updateTasks-${ctx.match[1]}-${uid}-${activeTimerId}`
+                     `updateTasks-${ctx.match[1]}-${uid}-${activeTimer.id}`
                    )
                  ],
                  [
                    Markup.button.callback(
                      '<<save timer 🕒 שמירת טיימר>>',
-                     `saveTimer-${ctx.match[1]}-${uid}-${activeTimerId}`
+                     `saveTimer-${ctx.match[1]}-${uid}-${activeTimer.id}`
                    )
                  ]
                ]).resize()
@@ -308,7 +307,8 @@ export async function POST({ request, fetch }) {
                 ) {
                   arr.push([
                     Markup.button.callback(
-                      mname,`stopTimer-${mid}-${ctx.match[1]}-${item.attributes.stname}-${item.attributes.timer}-${item.attributes.howmanyhoursalready}`
+                      mname,
+                      `stopTimer-${mid}-${ctx.match[1]}`
                     )
                   ]);
                 }
