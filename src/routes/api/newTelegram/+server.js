@@ -286,12 +286,6 @@ bot.use(async (ctx, next) => {
     await next();
 });
 
-// Add fetch to context
-bot.use(async (ctx, next) => {
-    ctx.state.fetch = fetch;
-    await next();
-});
-
 // --- Bot Handlers ---
 
 bot.start(async (ctx) => {
@@ -350,7 +344,7 @@ bot.action(/^timerStart-(\d+)$/, async (ctx) => {
   const userId = ctx.match[1];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-  const fetch = ctx.state.fetch;
+  const fetch = ctx.update.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -416,7 +410,7 @@ bot.action(/^timerStop-(\d+)$/, async (ctx) => {
     const userId = ctx.match[1];
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
-    const fetch = ctx.state.fetch;
+    const fetch = ctx.update.fetch;
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
@@ -534,7 +528,7 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     const timerId = ctx.match[3];
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
-    const fetch = ctx.state.fetch;
+    const fetch = ctx.update.fetch;
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
@@ -585,7 +579,7 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
   const taskId = ctx.match[4];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-  const fetch = ctx.state.fetch;
+  const fetch = ctx.update.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -674,7 +668,7 @@ bot.on('text', async (ctx) => {
     const userText = ctx.message.text;
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
-    const fetch = ctx.state.fetch;
+    const fetch = ctx.update.fetch;
 
     if (userText.startsWith('/')) return;
 
@@ -783,6 +777,10 @@ export async function POST({ request, fetch: svelteFetch }) {
 
     await fetchUserData(svelteFetch);
 
+    // Add fetch to context before handling update
+    data.fetch = svelteFetch;
+
+    // Pass svelteFetch to bot.handleUpdate
     await bot.handleUpdate(data);
 
     return new Response('', { status: 200 });
