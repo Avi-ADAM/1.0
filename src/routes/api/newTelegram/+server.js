@@ -18,8 +18,8 @@ const SITE_CONTEXT = `
 // --- תרגומים וקבועים ---
 const translations = {
   he: {
-    welcome: 'ברוך הבא ל-1💗1',
-    welcomeRegistered: '{{username}}, ברוך הבא ל-1💗1', // Changed for clarity
+    welcome: 'ברוך בואך ל-1💗1',
+    welcomeRegistered: '{{username}}, ברוך בואך ל-1💗1', // Changed for clarity
     login: '<<login להתחברות>>',
     register: '<<to registration להרשמה>>',
     registerNotify: '<<register for nutification הרשמה לעדכונים>>',
@@ -41,15 +41,15 @@ const translations = {
     saveTimerBtn: '<<save timer 🕒 שמירת טיימר>>',
     timerSaved: 'הטיימר נשמר בהצלחה',
     aiUnderstandError: 'מצטער, לא הצלחתי להבין את בקשתך. נסה/י לנסח אחרת או השתמש/י בכפתורים.',
-    aiActionFailed: 'מצטער, אירעה שגיאה בעת ביצוע הפעולה המבוקשת.',
+    aiActionFailed: 'אופסס, אירעה שגיאה בעת ביצוע הפעולה המבוקשת.',
     notRegisteredWelcome: `ברוך הבא לבוט של 1💗1!\n1💗1 היא פלטפורמה לשיתוף פעולה מבוסס הסכמה (${SITE_CONTEXT.split('\n')[1].trim()}).\nנראה שחשבון הטלגרם שלך אינו מקושר עדיין לחשבון משתמש פעיל.`,
-    notRegisteredPrompt: 'תוכל להירשם באתר, להתחבר אם יש לך חשבון, או לשאול אותי שאלות על הפלטפורמה.',
-    askAboutPlatform: '<< 🤔 שאל על הפלטפורמה >>', // New button text
+    notRegisteredPrompt: 'ניתן להירשם לאתר, להתחבר אם יש לך חשבון, או לשאול אותי שאלות על הפלטפורמה.',
+    askAboutPlatform: '<< 🤔 שאלות על הפלטפורמה >>', // New button text
     noTasksToStart: 'לא נמצאו משימות פעילות שניתן להתחיל עבורן טיימר.',
     noTasksToStop: 'לא נמצאו טיימרים פעילים שניתן לעצור.',
-    askWhichTaskToStart: 'לאיזו משימה תרצה/י להתחיל טיימר?',
-    askWhichTaskToStop: 'לאיזו משימה תרצה/י לעצור את הטיימר?',
-    generalError: 'אירעה שגיאה, אנא נסה שוב מאוחר יותר.',
+    askWhichTaskToStart: 'לאיזו משימה ברצונך להתחיל טיימר?',
+    askWhichTaskToStop: 'לאיזו משימה ברצונך לעצור את הטיימר?',
+    generalError: 'אירעה שגיאה, יש לנסות שוב מאוחר יותר.',
     timerNotFound: 'הטיימר המבוקש לא נמצא או שאינו פעיל.',
     missionNotFound: 'המשימה המבוקשת לא נמצאה.',
     taskNotFound: 'המטלה המבוקשת לא נמצאה.',
