@@ -141,7 +141,8 @@ export const qids = {
                attributes{name stname timer howmanyhoursalready hoursassinged
               acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
                activeTimer{data{id
-                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved}}} project{data{id attributes{projectName profilePic{data{attributes{formats url}}}}}} }}}
+                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved}}} 
+                project{data{id attributes{projectName profilePic{data{attributes{formats url}}}}}} }}}
             }
           }
         }
@@ -438,4 +439,36 @@ export const qids = {
     }   
   }
 }`,
+'36getMissionTimer': `query GetMissionTimer($missionId: ID!) {
+  mesimabetahalich(id: $missionId) {
+    data {
+      id
+      attributes {
+        name
+         project{data{id}}
+        activeTimer {
+          data {
+            id
+            attributes {
+              start
+              totalHours
+              timers {
+                start
+                stop
+              }
+              acts {
+                data {
+                  id
+                }
+              }
+              isActive
+              saved
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`,
 }

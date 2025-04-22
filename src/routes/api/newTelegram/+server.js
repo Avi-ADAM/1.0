@@ -2,6 +2,10 @@
 import { Telegraf } from 'telegraf';
 import { Markup } from 'telegraf';
 import { sendToSer } from '$lib/send/sendToSer.svelte';
+import { startTimer } from '$lib/func/timers.svelte';
+import { stopTimer } from '$lib/func/timers.svelte';
+import { saveTimer } from '$lib/func/timers.svelte';
+import { updateTimer } from '$lib/func/timers.svelte';
 let allD = []
 let appIds = []
 console.log(appIds)
@@ -88,6 +92,30 @@ const choose = {
 };   
 const stop = { he: 'טיימר נעצר בהצלחה', en: 'timer stopped' }; 
 const chooseStop = { he: 'בחירת משימה לעצירת טיימר', en: 'choose mission to stop timer' };   
+const selectTasks = {
+  he: 'בחירת המטלות שברצונך לקשר לטיימר:',
+  en: 'Select the tasks you want to link to the timer:'
+};
+const taskAdded = {
+  he: 'המטלה "{{name}}" נוספה בהצלחה',
+  en: 'Task "{{name}}" added successfully'
+};
+const taskRemoved = {
+  he: 'המטלה "{{name}}" הוסרה בהצלחה',
+  en: 'Task "{{name}}" removed successfully'
+};
+const tasksUpdated = {
+  he: 'המטלות עודכנו בהצלחה',
+  en: 'Tasks updated successfully'
+};
+const viewTimer = {
+  he: '<< 👁️ צפייה בטיימר>>',
+  en: '<<view timer 👁️>>'
+};
+const saveTasks = {
+  he: '<< 💾 שמירת מטלות>>',
+  en: '<< 💾 save tasks>>'
+};
 import { createServer } from 'https';
 
 createServer(
@@ -115,8 +143,6 @@ export async function POST({ request, fetch }) {
      async (ctx) => {
        console.log('Action triggered!');
        console.log('Matched data:', ctx.match);
-       // Your other logic here
-       console.log('stopTimer');
        const lang =
          allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
            .lang || 'en';
@@ -124,37 +150,49 @@ export async function POST({ request, fetch }) {
 
        //validate that uid is that telegramId and owned that mission in progress
        if (uid == ctx.match[2]) {
-         const x =
-           new Date().getTime() - Number(ctx.match[3]) + Number(ctx.match[4]);
-         await sendToSer(
-           { mId: ctx.match[1], stname: 'stopi', x: x },
-           '10stopTimer',
+         // Get the mission timer data
+         const missionData = await sendToSer(
+           { missionId: ctx.match[1] },
+           '36getMissionTimer',
            0,
            0,
            true,
            fetch
-         ).then((res) => {
-           console.log(res);
-           if (res.data != null) {
+         );
+
+         if (missionData.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data) {
+           const activeTimer = missionData.data.mesimabetahalich.data.attributes.activeTimer.data;
+           const activeTimerId = activeTimer.id;
+           
+           // Call stopTimer with the active timer
+           const stoppedTimer = await stopTimer(activeTimer, fetch, true);
+           
+           if (stoppedTimer && stoppedTimer.attributes.isActive === false) {
              ctx.reply(
                stop[lang],
                Markup.inlineKeyboard([
                  [
-                   Markup.button.callback(
-                     '<<save timer 🕒 שמירת טיימר>>',
-                     `saveTimer-${ctx.match[1]}-${uid}-${ctx.match[4]}-${x}`
+                   Markup.button.url(
+                     '<<edit timer ✏️ עריכת טיימר>>',
+                     'https://1lev1.com/timers'
                    )
                  ],
                  [
                    Markup.button.callback(
-                     '<<clear timer ⏳ ניקוי טיימר>>',
-                     `clearTimer-${ctx.match[1]}-${uid}`
+                     '<<update tasks 📝 עדכון משימות>>',
+                     `updateTasks-${ctx.match[1]}-${uid}-${activeTimerId}`
+                   )
+                 ],
+                 [
+                   Markup.button.callback(
+                     '<<save timer 🕒 שמירת טיימר>>',
+                     `saveTimer-${ctx.match[1]}-${uid}-${activeTimerId}`
                    )
                  ]
                ]).resize()
              );
            }
-         });
+         }
        }
      }
    );
@@ -167,19 +205,41 @@ export async function POST({ request, fetch }) {
         
       //validate that uid is that telegramId and owned that mission in progress
       if(uid == ctx.match[2]){
-       await sendToSer(
-         { mId: ctx.match[1] , stname: String(Date.now()),x:0},
-         '9startTimer',
-         0,
-         0,
-         true,
-         fetch
-       ).then((res) => {
-         console.log(res);
-         if (res.data != null) {
+        const missionId = ctx.match[1];
+        
+        // Get the mission timer data
+        const missionData = await sendToSer(
+          { missionId },
+          '36getMissionTimer',
+          0,
+          0,
+          true,
+          fetch
+        );
+
+        let activeTimer = null;
+        let timerId = 0;
+        const projectId = missionData.data?.mesimabetahalich?.data?.attributes?.project.data.id;
+
+        if (missionData.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data) {
+          activeTimer = missionData.data.mesimabetahalich.data.attributes.activeTimer;
+          timerId = missionData.data.mesimabetahalich.data.attributes.activeTimer.data.id;
+        }
+        
+        // Call startTimer with all required params
+        const res = await startTimer(
+          activeTimer,
+          missionId,
+          uid,
+          projectId,
+          timerId,
+          true, // isSer - true for server calls
+          fetch
+        );
+        
+        if (res) {
           ctx.reply(started[lang]);
-         }
-       });
+        }
       }
      });
     bot.action(/^timerStart-(\d+)$/, async (ctx) => {
@@ -201,7 +261,7 @@ export async function POST({ request, fetch }) {
                 (item) => {
                   const mid = item.id;
                   const mname = item.attributes.name + " ⏲️ " + item.attributes.project.data.attributes.projectName;
-                  if(item.attributes.stname == "stopi" || Number(item.attributes.stname) == 0 ){
+                  if(item.attributes.activeTimer.data && item.attributes.activeTimer.data.attributes.isActive != true || item.attributes.activeTimer.data == null){
                   arr.push( [Markup.button.callback(mname, `startTimer-${mid}-${ctx.match[1]}`)])
                   }
                 }
@@ -243,8 +303,8 @@ export async function POST({ request, fetch }) {
                   ' ⏲️ ' +
                   item.attributes.project.data.attributes.projectName;
                 if (
-                  item.attributes.stname != 'stopi' &&
-                  Number(item.attributes.stname) > 0
+                  item.attributes.activeTimer.data &&
+                  item.attributes.activeTimer.data.attributes.isActive
                 ) {
                   arr.push([
                     Markup.button.callback(
@@ -261,6 +321,231 @@ export async function POST({ request, fetch }) {
         }
       });
     });
+    bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+      console.log('Action triggered!');
+      console.log('Matched data:', ctx.match);
+      const lang =
+        allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
+          .lang || 'en';
+      const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
+
+      //validate that uid is that telegramId and owned that mission in progress
+      if (uid == ctx.match[2]) {
+        // Get the mission timer data
+        const missionData = await sendToSer(
+          { missionId: ctx.match[1] },
+          '36getMissionTimer',
+          0,
+          0,
+          true,
+          fetch
+        );
+
+        if (missionData.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data) {
+          const activeTimer = missionData.data.mesimabetahalich.data.attributes.activeTimer.data;
+          
+          // Call saveTimer with the active timer
+          const savedTimer = await saveTimer(activeTimer, ctx.match[1], fetch, true);
+          
+          if (savedTimer) {
+            ctx.reply(
+              'הטיימר נשמר בהצלחה',
+              Markup.inlineKeyboard([
+                [
+                  Markup.button.url(
+                    '<<view timer 👁️ צפייה בטיימר>>',
+                    'https://1lev1.com/timers'
+                  )
+                ]
+              ]).resize()
+            );
+          }
+        }
+      }
+    });
+    bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+      console.log('Action triggered!');
+      console.log('Matched data:', ctx.match);
+      const lang =
+        allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
+          .lang || 'en';
+      const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
+
+      //validate that uid is that telegramId and owned that mission in progress
+      if (uid == ctx.match[2]) {
+        // Get the mission timer data
+        const missionData = await sendToSer(
+          { missionId: ctx.match[1] },
+          '36getMissionTimer',
+          0,
+          0,
+          true,
+          fetch
+        );
+
+        if (missionData.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data) {
+          const activeTimer = missionData.data.mesimabetahalich.data.attributes.activeTimer.data;
+          
+          // Get the mission's tasks
+          const tasksData = await sendToSer(
+            { missionId: ctx.match[1] },
+            '8getMissionsOnProgress',
+            0,
+            0,
+            true,
+            fetch
+          );
+
+          if (tasksData.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data) {
+            const mission = tasksData.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.find(
+              m => m.id === ctx.match[1]
+            );
+
+            if (mission?.attributes?.acts?.data) {
+              const tasks = mission.attributes.acts.data;
+              const selectedTasks = activeTimer.attributes.acts?.data || [];
+              const selectedTaskIds = selectedTasks.map(t => t.id);
+              
+              // Create buttons for each task
+              const taskButtons = tasks.map(task => {
+                const isSelected = selectedTaskIds.includes(task.id);
+                return [
+                  Markup.button.callback(
+                    `${isSelected ? '✅ ' : '⬜ '}${task.attributes.shem}`,
+                    `toggleTask-${ctx.match[1]}-${uid}-${activeTimer.id}-${task.id}`
+                  )
+                ];
+              });
+
+              // Add a save button
+              taskButtons.push([
+                Markup.button.callback(
+                  '<<save tasks 💾 שמירת מטלות>>',
+                  `saveTasks-${ctx.match[1]}-${uid}-${activeTimer.id}`
+                )
+              ]);
+              ctx.reply(
+                selectTasks[lang],
+                Markup.inlineKeyboard(taskButtons).resize()
+              );
+            }
+          }
+        }
+      }
+    });
+
+    // Handle task toggling
+    bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+      console.log('Action triggered!');
+      console.log('Matched data:', ctx.match);
+      const lang =
+        allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
+          .lang || 'en';
+      const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
+
+      //validate that uid is that telegramId and owned that mission in progress
+      if (uid == ctx.match[2]) {
+        // Get the mission timer data
+        const missionData = await sendToSer(
+          { missionId: ctx.match[1] },
+          '36getMissionTimer',
+          0,
+          0,
+          true,
+          fetch
+        );
+
+        if (missionData.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data) {
+          const activeTimer = missionData.data.mesimabetahalich.data.attributes.activeTimer.data;
+          const selectedTasks = activeTimer.attributes.acts?.data || [];
+          const selectedTaskIds = selectedTasks.map(t => t.id);
+          const taskId = ctx.match[4];
+
+          // Toggle the task selection
+          const newSelectedTaskIds = selectedTaskIds.includes(taskId)
+            ? selectedTaskIds.filter(id => id !== taskId)
+            : [...selectedTaskIds, taskId];
+
+          // Update the timer with the new task selection
+          const updatedTimer = await updateTimer(
+            activeTimer,
+            'tasks',
+            { selectedTaskIds: newSelectedTaskIds },
+            fetch,
+            true
+          );
+
+          if (updatedTimer) {
+            // Get the task name for the message
+            const tasksData = await sendToSer(
+              { missionId: ctx.match[1] },
+              '8getMissionsOnProgress',
+              0,
+              0,
+              true,
+              fetch
+            );
+
+            if (tasksData.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data) {
+              const mission = tasksData.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data.find(
+                m => m.id === ctx.match[1]
+              );
+
+              if (mission?.attributes?.acts?.data) {
+                const task = mission.attributes.acts.data.find(t => t.id === taskId);
+                if (task) {
+                  ctx.reply(
+                    newSelectedTaskIds.includes(taskId)
+                      ? taskAdded[lang].replace('{{name}}', task.attributes.shem)
+                      : taskRemoved[lang].replace('{{name}}', task.attributes.shem)
+                  );
+                }
+              }
+            }
+          }
+        }
+      }
+    });
+
+    // Handle task saving
+    bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+      console.log('Action triggered!');
+      console.log('Matched data:', ctx.match);
+      const lang =
+        allD.find((x) => x.attributes.telegramId == ctx.chat.id).attributes
+          .lang || 'en';
+      const uid = allD.find((x) => x.attributes.telegramId == ctx.chat.id).id;
+
+      //validate that uid is that telegramId and owned that mission in progress
+      if (uid == ctx.match[2]) {
+        // Get the mission timer data
+        const missionData = await sendToSer(
+          { missionId: ctx.match[1] },
+          '36getMissionTimer',
+          0,
+          0,
+          true,
+          fetch
+        );
+
+        if (missionData.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data) {
+          const activeTimer = missionData.data.mesimabetahalich.data.attributes.activeTimer.data;
+          
+          ctx.reply(
+            tasksUpdated[lang],
+            Markup.inlineKeyboard([
+              [
+                Markup.button.url(
+                  viewTimer[lang],
+                  'https://1lev1.com/timers'
+                )
+              ]
+            ]).resize()
+          );
+        }
+      }
+    });
+
     await bot.handleUpdate(data);
     return new Response('', { status: 200 });
   } catch (error) {
