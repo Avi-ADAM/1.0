@@ -114,7 +114,7 @@ if (!geminiApiKey) throw new Error("Gemini API Key not found!");
 
 const bot = new Telegraf(Token);
 const genAI = new GoogleGenerativeAI(geminiApiKey);
-const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
+const geminiModel = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
 
 let allD = [];
 let appIds = [];
