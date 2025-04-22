@@ -286,6 +286,12 @@ bot.use(async (ctx, next) => {
     await next();
 });
 
+// Add fetch to context
+bot.use(async (ctx, next) => {
+    ctx.state.fetch = fetch;
+    await next();
+});
+
 // --- Bot Handlers ---
 
 bot.start(async (ctx) => {
@@ -340,24 +346,24 @@ bot.help((ctx) => {
 // --- Action Handlers (Using global fetch for helpers) ---
 
 // Start Timer - Step 1: Choose Mission
-bot.action(/^timerStart-(\d+)$/, async (ctx, fetch) => {
+bot.action(/^timerStart-(\d+)$/, async (ctx) => {
   const userId = ctx.match[1];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
+  const fetch = ctx.state.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
       const missions = await getUserMissions(userId, fetch, true);
 
       if (missions.length > 0) {
-        // Filled buttons
         const buttons = missions.map(item => [
           Markup.button.callback(
             `${item.name} ⏲️ ${item.projectName}`,
             `startTimer-${item.id}-${userId}`
           )
         ]);
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{}); // Clear previous buttons first
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
         ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
       } else {
         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
@@ -376,6 +382,7 @@ bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
   const userId = ctx.match[2];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
+  const fetch = ctx.state.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -405,17 +412,17 @@ bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
 });
 
 // Stop Timer - Step 1: Choose Mission
-bot.action(/^timerStop-(\d+)$/, async (ctx, fetch) => {
+bot.action(/^timerStop-(\d+)$/, async (ctx) => {
     const userId = ctx.match[1];
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
+    const fetch = ctx.state.fetch;
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
         const missions = await getUserMissions(userId, fetch, false, true);
 
         if (missions.length > 0) {
-           // Filled buttons
            const buttons = missions.map(item => [
              Markup.button.callback(
                `${item.name} ⏲️ ${item.projectName}`,
@@ -441,6 +448,7 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
   const userId = ctx.match[2];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
+  const fetch = ctx.state.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -485,6 +493,7 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
   const timerId = ctx.match[3];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
+  const fetch = ctx.state.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -519,12 +528,13 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 });
 
 // Update Tasks - Show list
-bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
+bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     const missionId = ctx.match[1];
     const userId = ctx.match[2];
     const timerId = ctx.match[3];
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
+    const fetch = ctx.state.fetch;
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
@@ -532,7 +542,6 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
         const currentMission = missionDetails.find(m => m.id == missionId);
         if (!currentMission) throw new Error(`Mission ${missionId} not found`);
 
-        // ** ASSUMPTION: 'getTimerById' endpoint exists **
         const timerData = await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
         const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
         if (!activeTimer) {
@@ -550,7 +559,6 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
             return ctx.answerCbQuery("No tasks found.");
         }
 
-        // Filled buttons
         const taskButtons = allTasks.map(task => {
             const isSelected = selectedTaskIds.includes(task.id);
             return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${task.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${task.id}`)];
@@ -570,17 +578,18 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
 });
 
 // Toggle Task Selection
-bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
+bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
   const missionId = ctx.match[1];
   const userId = ctx.match[2];
   const timerId = ctx.match[3];
   const taskId = ctx.match[4];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
+  const fetch = ctx.state.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-      const timerData =await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
+      const timerData = await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
       const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
       if (!activeTimer) throw new Error(`Timer ${timerId} not found.`);
 
@@ -628,9 +637,7 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
       }
   } catch (error) {
        console.error(`Error toggling task action ${taskId}:`, error);
-       // Try to notify user via callback query first
        if (!ctx.answered) await ctx.answerCbQuery(getText('aiActionFailed', lang));
-       // Optionally try to edit the message to show error, otherwise reply
        try { await ctx.editMessageText(getText('aiActionFailed', lang) + "\n" + getText('selectTasks', lang), ctx.callbackQuery.message.reply_markup); }
        catch (editError) { ctx.reply(getText('aiActionFailed', lang)); }
   }
@@ -641,6 +648,7 @@ bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     const userId = ctx.match[2];
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
+    const fetch = ctx.state.fetch;
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
@@ -662,10 +670,11 @@ bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 });
 
 // --- Text Message Handler (Using global fetch for helpers) ---
-bot.on('text', async (ctx, fetch) => {
+bot.on('text', async (ctx) => {
     const userText = ctx.message.text;
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
+    const fetch = ctx.state.fetch;
 
     if (userText.startsWith('/')) return;
 
@@ -772,9 +781,9 @@ export async function POST({ request, fetch: svelteFetch }) {
     const data = await request.json();
     // console.log("Incoming Telegram Update:", JSON.stringify(data, null, 2));
 
-    await fetchUserData(svelteFetch); // Fetch user data using SvelteKit fetch
+    await fetchUserData(svelteFetch);
 
-    await bot.handleUpdate(data, svelteFetch);
+    await bot.handleUpdate(data);
 
     return new Response('', { status: 200 });
   } catch (error) {
