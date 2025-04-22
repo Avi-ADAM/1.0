@@ -376,7 +376,7 @@ bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
   const userId = ctx.match[2];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-  const fetch = ctx.state.fetch;
+  const fetch = ctx.update.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -442,7 +442,7 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
   const userId = ctx.match[2];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-  const fetch = ctx.state.fetch;
+  const fetch = ctx.update.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -487,7 +487,7 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
   const timerId = ctx.match[3];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-  const fetch = ctx.state.fetch;
+  const fetch = ctx.update.fetch;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
@@ -642,7 +642,7 @@ bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     const userId = ctx.match[2];
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
-    const fetch = ctx.state.fetch;
+    const fetch = ctx.update.fetch;
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
