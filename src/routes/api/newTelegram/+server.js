@@ -340,14 +340,14 @@ bot.help((ctx) => {
 // --- Action Handlers (Using global fetch for helpers) ---
 
 // Start Timer - Step 1: Choose Mission
-bot.action(/^timerStart-(\d+)$/, async (ctx) => {
+bot.action(/^timerStart-(\d+)$/, async (ctx, fetch) => {
   const userId = ctx.match[1];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-      const missions = await getUserMissions(userId, fetch, true); // Use GLOBAL fetch
+      const missions = await getUserMissions(userId, fetch, true);
 
       if (missions.length > 0) {
         // Filled buttons
@@ -405,14 +405,14 @@ bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
 });
 
 // Stop Timer - Step 1: Choose Mission
-bot.action(/^timerStop-(\d+)$/, async (ctx) => {
+bot.action(/^timerStop-(\d+)$/, async (ctx, fetch) => {
     const userId = ctx.match[1];
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
-        const missions = await getUserMissions(userId, fetch, false, true); // Use GLOBAL fetch
+        const missions = await getUserMissions(userId, fetch, false, true);
 
         if (missions.length > 0) {
            // Filled buttons
@@ -519,7 +519,7 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 });
 
 // Update Tasks - Show list
-bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
     const missionId = ctx.match[1];
     const userId = ctx.match[2];
     const timerId = ctx.match[3];
@@ -528,13 +528,13 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
     if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
     try {
-        const missionDetails = await getUserMissions(userId, fetch); // Pass GLOBAL fetch
+        const missionDetails = await getUserMissions(userId, fetch);
         const currentMission = missionDetails.find(m => m.id == missionId);
         if (!currentMission) throw new Error(`Mission ${missionId} not found`);
 
         // ** ASSUMPTION: 'getTimerById' endpoint exists **
-        const timerData = await sendToSer({ timerId: timerId }, 'getTimerById', 0, 0, true, fetch); // GLOBAL fetch
-        const activeTimer = timerData?.data?.timer?.data; // Adjust path
+        const timerData = await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
+        const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
         if (!activeTimer) {
              await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
              ctx.reply(getText('timerNotFound', lang));
@@ -546,7 +546,7 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 
         if (!allTasks || allTasks.length === 0) {
             await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
-            ctx.reply(getText('noTasksToStart', lang)); // Adapting text key
+            ctx.reply(getText('noTasksToStart', lang));
             return ctx.answerCbQuery("No tasks found.");
         }
 
@@ -558,7 +558,7 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
         taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
 
-        await ctx.editMessageReplyMarkup(undefined).catch(()=>{}); // Clear previous keyboard
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
         ctx.reply(getText('selectTasks', lang), Markup.inlineKeyboard(taskButtons).resize());
 
     } catch (error) {
@@ -570,19 +570,18 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 });
 
 // Toggle Task Selection
-bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx, fetch) => {
   const missionId = ctx.match[1];
   const userId = ctx.match[2];
   const timerId = ctx.match[3];
-  const taskId = ctx.match[4]; // This is the task ID being toggled
+  const taskId = ctx.match[4];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-      // ** ASSUMPTION: 'getTimerById' endpoint exists **
-      const timerData = await sendToSer({ timerId: timerId }, 'getTimerById', 0, 0, true, fetch); // GLOBAL fetch
-      const activeTimer = timerData?.data?.timer?.data; // Adjust path
+      const timerData =await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
+      const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
       if (!activeTimer) throw new Error(`Timer ${timerId} not found.`);
 
       const selectedTasks = activeTimer.attributes.acts?.data || [];
@@ -590,14 +589,13 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
       const isCurrentlySelected = selectedTaskIds.includes(taskId);
 
       const newSelectedTaskIds = isCurrentlySelected
-          ? selectedTaskIds.filter(id => id != taskId) // Use != for comparison with string/number flexibility
+          ? selectedTaskIds.filter(id => id != taskId)
           : [...selectedTaskIds, taskId];
 
-      const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds }, fetch, true); // GLOBAL fetch
+      const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds }, fetch, true);
 
       if (updatedTimer) {
-          // Re-fetch mission details to get task name and re-render
-          const missionDetails = await getUserMissions(userId, fetch); // GLOBAL fetch
+          const missionDetails = await getUserMissions(userId, fetch);
           const currentMission = missionDetails.find(m => m.id == missionId);
           if (!currentMission) throw new Error(`Mission ${missionId} not found after task toggle.`);
           const allTasks = currentMission.tasks;
@@ -606,7 +604,6 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 
           const latestSelectedTaskIds = updatedTimer.attributes.acts?.data?.map(t => t.id) || [];
 
-          // Filled buttons
           const taskButtons = allTasks.map(t => {
              const isSelected = latestSelectedTaskIds.includes(t.id);
              return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${t.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${t.id}`)];
@@ -618,9 +615,8 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
             ? getText('taskRemoved', lang, { name: taskName })
             : getText('taskAdded', lang, { name: taskName });
 
-          await ctx.answerCbQuery(confirmationText); // Answer callback first
+          await ctx.answerCbQuery(confirmationText);
 
-          // Edit the message with the updated keyboard
           await ctx.editMessageText(
               getText('selectTasks', lang),
               Markup.inlineKeyboard(taskButtons).resize()
@@ -666,7 +662,7 @@ bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
 });
 
 // --- Text Message Handler (Using global fetch for helpers) ---
-bot.on('text', async (ctx) => {
+bot.on('text', async (ctx, fetch) => {
     const userText = ctx.message.text;
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
@@ -675,27 +671,27 @@ bot.on('text', async (ctx) => {
 
     if (userInfo) {
         // Registered User: Use Gemini for Timer Intent
-        const aiResponse = await understandUserIntent(userText, userInfo.uid, lang, fetch); // GLOBAL fetch
+        const aiResponse = await understandUserIntent(userText, userInfo.uid, lang, fetch);
 
         switch (aiResponse.intent) {
             case 'start_timer':
                 if (aiResponse.parameters?.missionId) {
                     const missionId = aiResponse.parameters.missionId;
                     try {
-                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
+                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
                          const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
                          const timerId = activeTimer?.data?.id || 0;
                          const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
                          if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
-                         const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch); // GLOBAL fetch
-                         if (res) { ctx.reply(getText('timerStarted', lang)); } // Filled reply
+                         const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch);
+                         if (res) { ctx.reply(getText('timerStarted', lang)); }
                          else { throw new Error("Start failed via AI"); }
                     } catch (error) {
                          console.error(`AI Error starting timer:`, error);
-                         ctx.reply(getText('aiActionFailed', lang)); // Filled reply
+                         ctx.reply(getText('aiActionFailed', lang));
                     }
                 } else {
-                     ctx.reply(getText('askWhichTaskToStart', lang)); // Filled reply
+                     ctx.reply(getText('askWhichTaskToStart', lang));
                 }
                 break;
 
@@ -703,15 +699,14 @@ bot.on('text', async (ctx) => {
                  if (aiResponse.parameters?.missionId) {
                      const missionId = aiResponse.parameters.missionId;
                      try {
-                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
+                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
                          const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
                          if (!activeTimerData || !activeTimerData.attributes.isActive) {
-                             ctx.reply(getText('timerNotFound', lang)); // Filled reply
+                             ctx.reply(getText('timerNotFound', lang));
                              return;
                          }
-                         const stoppedTimer = await stopTimer(activeTimerData, fetch, true); // GLOBAL fetch
+                         const stoppedTimer = await stopTimer(activeTimerData, fetch, true);
                          if (stoppedTimer && !stoppedTimer.attributes.isActive) {
-                             // Filled reply with keyboard
                              ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
                                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
                                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
@@ -720,49 +715,46 @@ bot.on('text', async (ctx) => {
                          } else { throw new Error("Stop failed via AI"); }
                      } catch (error) {
                          console.error(`AI Error stopping timer:`, error);
-                         ctx.reply(getText('aiActionFailed', lang)); // Filled reply
+                         ctx.reply(getText('aiActionFailed', lang));
                      }
                  } else {
-                     ctx.reply(getText('askWhichTaskToStop', lang)); // Filled reply
+                     ctx.reply(getText('askWhichTaskToStop', lang));
                  }
                  break;
 
             case 'clarify_start':
-                 const startableMissions = await getUserMissions(userInfo.uid, fetch, true); // GLOBAL fetch
+                 const startableMissions = await getUserMissions(userInfo.uid, fetch, true);
                  if (startableMissions.length > 0) {
-                     // Filled buttons
                      const buttons = startableMissions.map(item => [Markup.button.callback(`${item.name} ⏲️ ${item.projectName}`, `startTimer-${item.id}-${userInfo.uid}`)]);
                      ctx.reply(getText('askWhichTaskToStart', lang), Markup.inlineKeyboard(buttons).resize());
-                 } else { ctx.reply(getText('noTasksToStart', lang)); } // Filled reply
+                 } else { ctx.reply(getText('noTasksToStart', lang)); }
                  break;
 
             case 'clarify_stop':
-                 const stoppableMissions = await getUserMissions(userInfo.uid, fetch, false, true); // GLOBAL fetch
+                 const stoppableMissions = await getUserMissions(userInfo.uid, fetch, false, true);
                  if (stoppableMissions.length > 0) {
-                      // Filled buttons
                      const buttons = stoppableMissions.map(item => [Markup.button.callback(`${item.name} ⏲️ ${item.projectName}`, `stopTimer-${item.id}-${userInfo.uid}`)]);
                      ctx.reply(getText('askWhichTaskToStop', lang), Markup.inlineKeyboard(buttons).resize());
-                 } else { ctx.reply(getText('noTasksToStop', lang)); } // Filled reply
+                 } else { ctx.reply(getText('noTasksToStop', lang)); }
                  break;
 
             case 'ask_help':
-                 ctx.reply(`${getText('helpText', lang)} ${getText('askMeAnything', lang)}`); // Filled reply
+                 ctx.reply(`${getText('helpText', lang)} ${getText('askMeAnything', lang)}`);
                  break;
 
             case 'error':
                  console.error("Gemini intent error:", aiResponse.details);
-                 ctx.reply(getText('aiUnderstandError', lang)); // Fall through or specific error? Let's use standard understand error.
+                 ctx.reply(getText('aiUnderstandError', lang));
                  break;
             case 'unknown':
             default:
-                 ctx.reply(getText('aiUnderstandError', lang)); // Filled reply
+                 ctx.reply(getText('aiUnderstandError', lang));
                  break;
         }
     } else {
         // Unregistered User: Use Gemini for Q&A
         const answer = await answerUnregisteredUserQuery(userText, lang);
-        await ctx.reply(answer); // Filled reply (from Gemini)
-        // Remind how to register/login - Filled keyboard
+        await ctx.reply(answer);
         await ctx.reply(
           getText('notRegisteredPrompt', lang),
           Markup.inlineKeyboard([
@@ -782,7 +774,7 @@ export async function POST({ request, fetch: svelteFetch }) {
 
     await fetchUserData(svelteFetch); // Fetch user data using SvelteKit fetch
 
-    await bot.handleUpdate(data); // Handle update using global data and global fetch for handlers
+    await bot.handleUpdate(data, svelteFetch);
 
     return new Response('', { status: 200 });
   } catch (error) {
