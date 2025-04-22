@@ -1,6 +1,7 @@
-export async function GET(){
+export async function GET(url){
     try{
-        await fetch(import.meta.env.VITE_REND + '/api/timegrama', {
+        let add = url.searchParams.get('mode') == 'wake' ? '' : 'api/timegrama';
+        await fetch(import.meta.env.VITE_REND + add, {
             method: 'GET',
     } );
     }catch(e){
