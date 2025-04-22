@@ -1,8 +1,10 @@
 // create a server with telegraf to listen for new messages
 import { Telegraf, Markup } from 'telegraf';
-import { sendToSer } from '$lib/send/sendToSer.svelte';
-import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.svelte'; // Group timer imports
+import { sendToSer } from '$lib/send/sendToSer.svelte'; // Assuming sendToSer uses fetch internally
+import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.svelte'; // Assuming these use sendToSer or fetch
 import { GoogleGenerativeAI } from '@google/generative-ai';
+// createServer is likely not needed when using SvelteKit endpoint for webhook
+// import { createServer } from 'https';
 
 // --- הקשר האתר למשתמשים לא רשומים ---
 const SITE_CONTEXT = `
@@ -57,10 +59,9 @@ const translations = {
     unauthorized: 'פעולה לא מורשית.',
     askMeAnything: 'את/ה יכול/ה לשאול אותי כל דבר על 1lev1.com!',
     infoSent: 'הנה מידע נוסף על 1lev1:',
-    backToStart: '<< חזרה >>' // New button text
+    backToStart: '<< חזרה >>'
   },
   en: {
-    // ... (Add English translations for new keys like notRegisteredWelcome, notRegisteredPrompt, askAboutPlatform, etc.)
     welcome: 'Welcome to 1💗1',
     welcomeRegistered: '{{username}}, Welcome to 1💗1',
     login: '<<login>>',
@@ -101,7 +102,7 @@ const translations = {
     askMeAnything: 'You can ask me anything about 1lev1.com!',
     infoSent: 'Here is more information about 1lev1:',
     backToStart: '<< Back >>'
-  }
+  } // Add other EN translations if needed
 };
 
 // --- הגדרות ומשתנים גלובליים ---
@@ -116,15 +117,21 @@ const genAI = new GoogleGenerativeAI(geminiApiKey);
 const geminiModel = genAI.getGenerativeModel({ model: "gemini-pro" });
 
 let allD = [];
-let appIds = []
-// --- פונקציות עזר (ללא שינוי מהותי מהגרסה הקודמת) ---
-async function fetchUserData(fetch) {
+let appIds = [];
+
+// --- פונקציות עזר ---
+
+async function fetchUserData(fetchInstance) {
   try {
-    const res = await sendToSer({}, '7getTelegramIds', 0, 0, true, fetch);
+    console.log("fetchUserData: Fetching user data...");
+    const res = await sendToSer({}, '7getTelegramIds', 0, 0, true, fetchInstance);
     allD = res?.data?.usersPermissionsUsers?.data || [];
-    appIds = allD.map(item => item?.attributes?.telegramId ? Number(item.attributes.telegramId) : 0).filter(id => id !== 0);
+    appIds = allD
+      .map(item => item?.attributes?.telegramId ? Number(item.attributes.telegramId) : 0)
+      .filter(id => id !== 0);
+    console.log(`fetchUserData: Fetched ${allD.length} users, ${appIds.length} linked Telegram IDs.`);
   } catch (error) {
-    console.error('Error fetching user data:', error);
+    console.error('fetchUserData Error:', error);
     allD = []; appIds = [];
   }
 }
@@ -135,62 +142,57 @@ function getUserInfo(chatId) {
   return {
     username: userData.attributes.username,
     uid: userData.id,
-    lang: userData.attributes.lang || 'en', // Default to English if lang not set
+    lang: userData.attributes.lang || 'he',
   };
 }
 
-function getText(key, lang = 'en', replacements = {}) {
-    // Fallback logic: if key not found in specified lang, try 'he', then 'en', then return key itself
-    let text = translations[lang]?.[key] ?? translations['he']?.[key] ?? translations['en']?.[key] ?? key;
-    for (const placeholder in replacements) {
-      text = text.replace(`{{${placeholder}}}`, replacements[placeholder]);
-    }
-    return text;
+function getText(key, lang = 'he', replacements = {}) {
+  let text = translations[lang]?.[key] ?? translations['he']?.[key] ?? translations['en']?.[key] ?? key;
+  for (const placeholder in replacements) {
+    text = text.replace(`{{${placeholder}}}`, replacements[placeholder]);
+  }
+  return text;
 }
 
-async function getUserMissions(uid, fetch, onlyStartable = false, onlyStoppable = false) {
+async function getUserMissions(uid, fetchInstance, onlyStartable = false, onlyStoppable = false) {
     try {
-        const res = await sendToSer({ id: uid }, '8getMissionsOnProgress', 0, 0, true, fetch);
+        const res = await sendToSer({ id: uid }, '8getMissionsOnProgress', 0, 0, true, fetchInstance);
         let missions = res?.data?.usersPermissionsUser?.data?.attributes?.mesimabetahaliches?.data ?? [];
 
         if (onlyStartable) {
-            missions = missions.filter(item =>
-                !item.attributes.activeTimer?.data || !item.attributes.activeTimer.data.attributes.isActive
-            );
+            missions = missions.filter(item => !item.attributes.activeTimer?.data || !item.attributes.activeTimer.data.attributes.isActive);
         }
         if (onlyStoppable) {
-            missions = missions.filter(item =>
-                item.attributes.activeTimer?.data?.attributes?.isActive
-            );
+            missions = missions.filter(item => item.attributes.activeTimer?.data?.attributes?.isActive);
         }
+
         return missions.map(item => ({
-            id: item.id,
-            name: item.attributes.name,
+            id: item.id, name: item.attributes.name,
             projectName: item.attributes.project?.data?.attributes?.projectName || 'N/A',
             isActiveTimer: item.attributes.activeTimer?.data?.attributes?.isActive || false,
             timerId: item.attributes.activeTimer?.data?.id || null,
-            tasks: item.attributes.acts?.data?.map(task => ({ // Include tasks for update logic
-                id: task.id,
-                name: task.attributes.shem
-            })) || []
+            tasks: item.attributes.acts?.data?.map(task => ({ id: task.id, name: task.attributes.shem })) || []
         }));
     } catch (error) {
-        console.error(`Error fetching missions for user ${uid}:`, error);
+        console.error(`getUserMissions Error for user ${uid}:`, error);
         return [];
     }
 }
 
-// --- Gemini AI Interaction (Timer Intent) ---
-async function understandUserIntent(userText, uid, lang, fetch) {
-  const userInfo = getUserInfo(allD.find(u => u.id === uid)?.attributes?.telegramId);
-  if (!userInfo) return { intent: 'error', details: 'User not found' };
+// --- Gemini AI Interaction (Timer Intent) - Accepts fetchInstance ---
+async function understandUserIntent(userText, uid, lang, fetchInstance) {
+  // **IMPORTANT**: uid here is the user's database ID (e.g., from allD)
+  // Ensure getUserInfo is adapted if you pass chatId instead of uid here
+  const userInfo = allD.find(u => u.id === uid); // Find user by DB ID
+  if (!userInfo) return { intent: 'error', details: 'User (by ID) not found for intent check' };
 
-  const startableMissions = await getUserMissions(uid, fetch, true);
-  const stoppableMissions = await getUserMissions(uid, fetch, false, true);
+  const startableMissions = await getUserMissions(uid, fetchInstance, true);
+  const stoppableMissions = await getUserMissions(uid, fetchInstance, false, true);
 
-  const missionListText = startableMissions.map(m => `- "${m.name}" (ID: ${m.id}) from project "${m.projectName}"`).join('\n');
-  const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (ID: ${m.id}, Timer ID: ${m.timerId}) from project "${m.projectName}"`).join('\n');
+  const missionListText = startableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
+  const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
 
+  // --- Re-inserting the Gemini Prompt ---
   const prompt = `
 You are a helpful assistant for the 1lev1 platform Telegram bot. Your goal is to understand the user's request regarding starting or stopping timers for their missions.
 
@@ -226,6 +228,7 @@ Examples:
 
 Your JSON response:
 `;
+  // --- End Gemini Prompt ---
 
   try {
     const result = await geminiModel.generateContent(prompt);
@@ -233,13 +236,14 @@ Your JSON response:
     const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
     return JSON.parse(jsonResponse);
   } catch (error) {
-    console.error("Error interacting with Gemini (Timer Intent):", error);
+    console.error("Gemini Timer Intent Error:", error);
     return { intent: 'error', details: error.message };
   }
 }
 
-// --- Gemini AI Interaction (Unregistered User Q&A) ---
+// --- Gemini AI Interaction (Unregistered Q&A - No fetch needed) ---
 async function answerUnregisteredUserQuery(userText, lang) {
+    // --- Re-inserting the Q&A Prompt ---
     const prompt = `
 You are a helpful assistant for the 1lev1 platform Telegram bot. A user who is NOT YET REGISTERED OR LOGGED IN is asking a question.
 Your goal is to answer the user's question based *only* on the provided context about the 1lev1 platform.
@@ -258,13 +262,15 @@ User's Question: "${userText}"
 
 Your Answer (in ${lang}):
 `;
+    // --- End Q&A Prompt ---
     try {
         const result = await geminiModel.generateContent(prompt);
         const response = await result.response;
         return response.text().trim();
     } catch (error) {
-        console.error("Error interacting with Gemini (Unregistered Q&A):", error);
-        return getText('aiActionFailed', lang); // Generic error message
+        console.error("Gemini Q&A Error:", error);
+        const errorLang = ['he', 'en'].includes(lang) ? lang : 'he';
+        return getText('aiActionFailed', errorLang);
     }
 }
 
@@ -272,99 +278,94 @@ Your Answer (in ${lang}):
 bot.use(async (ctx, next) => {
     const chatId = ctx.chat?.id || ctx.callbackQuery?.message?.chat?.id;
     if (chatId) {
-        await fetchUserData(fetch); // Use global fetch or pass from SvelteKit
-        ctx.state.userInfo = getUserInfo(chatId); // Store user info in context state
-        ctx.state.lang = ctx.state.userInfo?.lang || 'he'; // Default language Hebrew
-        // Pass fetch from SvelteKit context if possible: ctx.state.fetch = passedFetch;
+        ctx.state.userInfo = getUserInfo(chatId);
+        ctx.state.lang = ctx.state.userInfo?.lang || 'he';
     } else {
-        console.log("Could not determine chat ID from update.");
+        ctx.state.lang = 'he';
     }
-    await next(); // Continue processing
+    await next();
 });
 
 // --- Bot Handlers ---
 
 bot.start(async (ctx) => {
-  // User info and lang are now in ctx.state from middleware
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
 
   if (userInfo) {
-    // Registered user
+    // Registered user - Filled keyboard
     ctx.reply(
       getText('welcomeRegistered', lang, { username: userInfo.username }),
       Markup.inlineKeyboard([
-        [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')], // Keep login link
+        [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
         [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
         [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
       ]).resize()
     );
   } else {
-    // Unregistered user
+    // Unregistered user - Filled keyboard
     await ctx.reply(getText('notRegisteredWelcome', lang));
     ctx.reply(
       getText('notRegisteredPrompt', lang),
       Markup.inlineKeyboard([
         [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
         [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
-        [Markup.button.callback(getText('askAboutPlatform', lang), 'ask_about_platform')] // New button
+        [Markup.button.callback(getText('askAboutPlatform', lang), 'ask_about_platform')]
       ]).resize()
     );
   }
 });
 
-// Handler for "Ask About Platform" button
 bot.action('ask_about_platform', async (ctx) => {
-    const lang = ctx.state.lang || 'he';
+    const lang = ctx.state.lang;
     await ctx.answerCbQuery();
     await ctx.reply(getText('askMeAnything', lang));
-    await ctx.reply(getText('infoSent', lang) + "\n\n" + SITE_CONTEXT,
-        Markup.inlineKeyboard([
-            [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
-            [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')]
-        ]).resize()
-    );
+    // Provide context again upon request for clarity
+    await ctx.reply(getText('infoSent', lang) + "\n\n" + SITE_CONTEXT);
 });
-
 
 bot.help((ctx) => {
   const lang = ctx.state.lang;
+  // Filled keyboard for help
   ctx.reply(
     getText('helpText', lang),
     Markup.inlineKeyboard([
-        // Keep registration links even in help for easy access
         [Markup.button.url(getText('register', lang), 'https://1lev1.com')],
         [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
-        [Markup.button.url(getText('registerNotify', lang), 'https://1lev1.com/me')] // Link to profile for notification settings
+        [Markup.button.url(getText('registerNotify', lang), 'https://1lev1.com/me')]
     ]).resize()
   );
 });
 
-// --- Action Handlers (Callbacks from Buttons - Restored & Integrated) ---
+// --- Action Handlers (Using global fetch for helpers) ---
 
 // Start Timer - Step 1: Choose Mission
 bot.action(/^timerStart-(\d+)$/, async (ctx) => {
   const userId = ctx.match[1];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
+  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  if (!userInfo || userInfo.uid != userId) {
-    console.warn(`Unauthorized action attempt: timerStart for user ${userId} from chat ${ctx.chat.id}`);
-    return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
+  try {
+      const missions = await getUserMissions(userId, fetch, true); // Use GLOBAL fetch
 
-  const missions = await getUserMissions(userId, fetch, true);
-
-  if (missions.length > 0) {
-    const buttons = missions.map(item => [
-      Markup.button.callback(
-        `${item.name} ⏲️ ${item.projectName}`,
-        `startTimer-${item.id}-${userId}`
-      )
-    ]);
-    ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
-  } else {
-    ctx.reply(getText('noTasksToStart', lang));
+      if (missions.length > 0) {
+        // Filled buttons
+        const buttons = missions.map(item => [
+          Markup.button.callback(
+            `${item.name} ⏲️ ${item.projectName}`,
+            `startTimer-${item.id}-${userId}`
+          )
+        ]);
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{}); // Clear previous buttons first
+        ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
+      } else {
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+        ctx.reply(getText('noTasksToStart', lang));
+      }
+  } catch (error) {
+      console.error("Error in timerStart-1:", error);
+      ctx.reply(getText('aiActionFailed', lang));
   }
   await ctx.answerCbQuery();
 });
@@ -375,490 +376,393 @@ bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
   const userId = ctx.match[2];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-
-  if (!userInfo || userInfo.uid != userId) {
-      console.warn(`Unauthorized action attempt: startTimer for mission ${missionId}, user ${userId} from chat ${ctx.chat.id}`);
-      return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
+  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+      const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
       const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
       const timerId = activeTimer?.data?.id || 0;
       const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+      if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
 
-      if (!projectId) {
-          console.error(`Project ID not found for mission ${missionId}`);
-          ctx.reply(getText('aiActionFailed', lang));
-          return ctx.answerCbQuery(getText('aiActionFailed', lang));
-      }
-
-      const res = await startTimer(activeTimer, missionId, userId, projectId, timerId, true, fetch);
+      const res = await startTimer(activeTimer, missionId, userId, projectId, timerId, true, fetch); // GLOBAL fetch
 
       if (res) {
-          await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup, probably no markup to remove.")); // Remove choice buttons
-          ctx.reply(getText('timerStarted', lang));
+          await ctx.editMessageReplyMarkup(undefined).catch(()=>{}); // Remove choice buttons
+          ctx.reply(getText('timerStarted', lang)); // Filled reply
       } else {
-        throw new Error("startTimer function returned falsy value");
+          await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+          ctx.reply(getText('aiActionFailed', lang)); // Filled reply
+          throw new Error("startTimer failed");
       }
   } catch (error) {
-      console.error(`Error starting timer for mission ${missionId}, user ${userId}:`, error);
-      ctx.reply(getText('aiActionFailed', lang));
+      console.error("Error in startTimer-2:", error);
+      await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+      ctx.reply(getText('aiActionFailed', lang)); // Filled reply
   }
-  await ctx.answerCbQuery();
+  // Answer query only if not answered by error/success paths
+  if (!ctx.answered) await ctx.answerCbQuery();
 });
-
 
 // Stop Timer - Step 1: Choose Mission
 bot.action(/^timerStop-(\d+)$/, async (ctx) => {
-  const userId = ctx.match[1];
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
+    const userId = ctx.match[1];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  if (!userInfo || userInfo.uid != userId) {
-    console.warn(`Unauthorized action attempt: timerStop for user ${userId} from chat ${ctx.chat.id}`);
-    return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
+    try {
+        const missions = await getUserMissions(userId, fetch, false, true); // Use GLOBAL fetch
 
-  const missions = await getUserMissions(userId, fetch, false, true);
-
-  if (missions.length > 0) {
-    const buttons = missions.map(item => [
-      Markup.button.callback(
-        `${item.name} ⏲️ ${item.projectName}`,
-        `stopTimer-${item.id}-${userId}`
-      )
-    ]);
-    ctx.reply(getText('chooseStop', lang), Markup.inlineKeyboard(buttons).resize());
-  } else {
-    ctx.reply(getText('noTasksToStop', lang));
-  }
-  await ctx.answerCbQuery();
+        if (missions.length > 0) {
+           // Filled buttons
+           const buttons = missions.map(item => [
+             Markup.button.callback(
+               `${item.name} ⏲️ ${item.projectName}`,
+               `stopTimer-${item.id}-${userId}`
+             )
+           ]);
+           await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+           ctx.reply(getText('chooseStop', lang), Markup.inlineKeyboard(buttons).resize());
+        } else {
+            await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+            ctx.reply(getText('noTasksToStop', lang));
+        }
+    } catch (error) {
+        console.error("Error in timerStop-1:", error);
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    await ctx.answerCbQuery();
 });
 
-
-// Stop Timer - Step 2: Execute Stop (Restored original keyboard logic)
+// Stop Timer - Step 2: Execute Stop
 bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
   const missionId = ctx.match[1];
   const userId = ctx.match[2];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-
-  if (!userInfo || userInfo.uid != userId) {
-    console.warn(`Unauthorized action attempt: stopTimer for mission ${missionId}, user ${userId} from chat ${ctx.chat.id}`);
-    return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
+  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-    const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+    const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
     const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
-
     if (!activeTimerData || !activeTimerData.attributes.isActive) {
-      await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup."));
-      ctx.reply(getText('timerNotFound', lang)); // Timer already stopped or not found
-      return ctx.answerCbQuery(getText('timerNotFound', lang));
-    }
-
-    const stoppedTimer = await stopTimer(activeTimerData, fetch, true);
-
-    if (stoppedTimer && stoppedTimer.attributes.isActive === false) {
-        await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup.")); // Remove choice buttons
-        ctx.reply(
-            getText('timerStopped', lang),
-            // --- Restored Keyboard ---
-            Markup.inlineKeyboard([
-                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')], // Link to general timers page
-                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)], // Pass timer ID
-                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)] // Pass timer ID
-            ]).resize()
-            // --- End Restored Keyboard ---
-        );
-    } else {
-        throw new Error("stopTimer function failed or returned unexpected result.");
-    }
-  } catch (error) {
-    console.error(`Error stopping timer for mission ${missionId}, user ${userId}:`, error);
-    await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup."));
-    ctx.reply(getText('aiActionFailed', lang));
-  }
-  await ctx.answerCbQuery();
-});
-
-// --- Restored Action Handlers from Original Code (Adapted) ---
-
-// Save Timer (after stopping)
-bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
-  const missionId = ctx.match[1];
-  const userId = ctx.match[2];
-  const timerId = ctx.match[3]; // Timer ID is passed in the action
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
-
-  if (!userInfo || userInfo.uid != userId) {
-    console.warn(`Unauthorized action attempt: saveTimer for timer ${timerId}, user ${userId} from chat ${ctx.chat.id}`);
-    return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
-
-  try {
-    // We need the timer *data* to pass to saveTimer.
-    // Fetch the specific timer using its ID, or reconstruct if possible.
-    // For simplicity, let's assume we fetch it again or have enough info.
-    // A better approach might be to pass the timer data in the callback, but that can be complex.
-    // Let's fetch the mission data again to get the timer. This is inefficient but safer.
-     const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
-     // Find the specific timer (it should be inactive now)
-     const timerToSave = missionData?.data?.mesimabetahalich?.data?.attributes?.timers?.data?.find(t => t.id == timerId); // Search in all timers for the mission
-
-    if (!timerToSave) {
-        await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup."));
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
         ctx.reply(getText('timerNotFound', lang));
         return ctx.answerCbQuery(getText('timerNotFound', lang));
     }
 
-    // Call saveTimer with the specific timer object and mission ID
-    const savedTimer = await saveTimer(timerToSave, missionId, fetch, true);
+    const stoppedTimer = await stopTimer(activeTimerData, fetch, true); // GLOBAL fetch
 
-    if (savedTimer) {
-        await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup.")); // Remove prev buttons
+    if (stoppedTimer && stoppedTimer.attributes.isActive === false) {
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+        // Filled reply with keyboard
         ctx.reply(
-            getText('timerSaved', lang),
+            getText('timerStopped', lang),
             Markup.inlineKeyboard([
-                [Markup.button.url(getText('viewTimer', lang), 'https://1lev1.com/timers')] // Link to general timers page
+                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
+                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)],
+                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)]
             ]).resize()
         );
     } else {
-         throw new Error("saveTimer function failed.");
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+        ctx.reply(getText('aiActionFailed', lang));
+        throw new Error("stopTimer failed");
     }
   } catch (error) {
-      console.error(`Error saving timer ${timerId} for mission ${missionId}, user ${userId}:`, error);
-      await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup."));
+      console.error("Error in stopTimer-2:", error);
+      await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
       ctx.reply(getText('aiActionFailed', lang));
   }
-   await ctx.answerCbQuery();
+  if (!ctx.answered) await ctx.answerCbQuery();
 });
 
-// Update Tasks - Show task list for linking
-bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+// Save Timer
+bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
   const missionId = ctx.match[1];
   const userId = ctx.match[2];
-  const timerId = ctx.match[3]; // Timer ID is passed in the action
+  const timerId = ctx.match[3];
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-
-  if (!userInfo || userInfo.uid != userId) {
-    console.warn(`Unauthorized action attempt: updateTasks for timer ${timerId}, user ${userId} from chat ${ctx.chat.id}`);
-    return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
+  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-      // Fetch mission details to get available tasks and the specific timer's currently linked tasks
-      const missionDetails = await getUserMissions(userId, fetch); // Get all missions including tasks
-      const currentMission = missionDetails.find(m => m.id == missionId);
+     const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
+     const timerToSave = missionData?.data?.mesimabetahalich?.data?.attributes?.timers?.data?.find(t => t.id == timerId);
+     if (!timerToSave) {
+         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+         ctx.reply(getText('timerNotFound', lang));
+         return ctx.answerCbQuery(getText('timerNotFound', lang));
+     }
 
-      if (!currentMission) {
-          throw new Error(`Mission ${missionId} not found for user ${userId}`);
-      }
+     const savedTimer = await saveTimer(timerToSave, missionId, fetch, true); // GLOBAL fetch
 
-      // Fetch the specific timer data again to get its linked tasks
-      const timerData = await sendToSer({ timerId: timerId }, 'getTimerById', 0, 0, true, fetch); // Assuming you have an endpoint like this
-      const activeTimer = timerData?.data?.timer?.data; // Adjust based on your actual API response structure
-
-      if (!activeTimer) {
-          await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup."));
-          ctx.reply(getText('timerNotFound', lang));
-          return ctx.answerCbQuery(getText('timerNotFound', lang));
-      }
-
-      const allTasks = currentMission.tasks; // Tasks associated with the mission
-      const selectedTaskIds = activeTimer.attributes.acts?.data?.map(t => t.id) || []; // Tasks currently linked to the timer
-
-      if (!allTasks || allTasks.length === 0) {
-          await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup."));
-          ctx.reply("לא נמצאו מטלות המשויכות למשימה זו."); // Or use getText
-          return ctx.answerCbQuery("No tasks found.");
-      }
-
-      // Create buttons for each task
-      const taskButtons = allTasks.map(task => {
-          const isSelected = selectedTaskIds.includes(task.id);
-          return [
-              Markup.button.callback(
-                  `${isSelected ? '✅ ' : '⬜ '}${task.name}`, // Use task.name from getUserMissions structure
-                  `toggleTask-${missionId}-${userId}-${timerId}-${task.id}` // Pass all IDs
-              )
-          ];
-      });
-
-      // Add a save button
-      taskButtons.push([
-          Markup.button.callback(
-              getText('saveTasksBtn', lang), // Use translation key
-              `saveTasks-${missionId}-${userId}-${timerId}` // Pass IDs needed for saving context
-          )
-      ]);
-      taskButtons.push([ // Add a back button maybe?
-           Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`) // Go back to main menu
-      ]);
-
-      await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup.")); // Remove previous keyboard
-      ctx.reply(
-          getText('selectTasks', lang), // Use translation key
-          Markup.inlineKeyboard(taskButtons).resize()
-      );
-
-  } catch (error) {
-      console.error(`Error showing tasks for timer ${timerId}, mission ${missionId}, user ${userId}:`, error);
-      await ctx.editMessageReplyMarkup(undefined).catch(e => console.log("Info: Couldn't edit message markup."));
+     if (savedTimer) {
+         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+         // Filled reply with keyboard
+         ctx.reply(
+             getText('timerSaved', lang),
+             Markup.inlineKeyboard([[Markup.button.url(getText('viewTimer', lang), 'https://1lev1.com/timers')]]).resize()
+         );
+     } else {
+         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+         ctx.reply(getText('aiActionFailed', lang));
+         throw new Error("saveTimer failed");
+     }
+  } catch(error) {
+      console.error("Error in saveTimer action:", error);
+      await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
       ctx.reply(getText('aiActionFailed', lang));
   }
-  await ctx.answerCbQuery();
+   if (!ctx.answered) await ctx.answerCbQuery();
 });
 
-// Handle task toggling
+// Update Tasks - Show list
+bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
+    const missionId = ctx.match[1];
+    const userId = ctx.match[2];
+    const timerId = ctx.match[3];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
+
+    try {
+        const missionDetails = await getUserMissions(userId, fetch); // Pass GLOBAL fetch
+        const currentMission = missionDetails.find(m => m.id == missionId);
+        if (!currentMission) throw new Error(`Mission ${missionId} not found`);
+
+        // ** ASSUMPTION: 'getTimerById' endpoint exists **
+        const timerData = await sendToSer({ timerId: timerId }, 'getTimerById', 0, 0, true, fetch); // GLOBAL fetch
+        const activeTimer = timerData?.data?.timer?.data; // Adjust path
+        if (!activeTimer) {
+             await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+             ctx.reply(getText('timerNotFound', lang));
+             return ctx.answerCbQuery(getText('timerNotFound', lang));
+        }
+
+        const allTasks = currentMission.tasks;
+        const selectedTaskIds = activeTimer.attributes.acts?.data?.map(t => t.id) || [];
+
+        if (!allTasks || allTasks.length === 0) {
+            await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+            ctx.reply(getText('noTasksToStart', lang)); // Adapting text key
+            return ctx.answerCbQuery("No tasks found.");
+        }
+
+        // Filled buttons
+        const taskButtons = allTasks.map(task => {
+            const isSelected = selectedTaskIds.includes(task.id);
+            return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${task.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${task.id}`)];
+        });
+        taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
+        taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
+
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{}); // Clear previous keyboard
+        ctx.reply(getText('selectTasks', lang), Markup.inlineKeyboard(taskButtons).resize());
+
+    } catch (error) {
+        console.error("Error in updateTasks action:", error);
+        await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
+        ctx.reply(getText('aiActionFailed', lang));
+    }
+    if (!ctx.answered) await ctx.answerCbQuery();
+});
+
+// Toggle Task Selection
 bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
   const missionId = ctx.match[1];
   const userId = ctx.match[2];
   const timerId = ctx.match[3];
-  const taskId = ctx.match[4];
+  const taskId = ctx.match[4]; // This is the task ID being toggled
   const userInfo = ctx.state.userInfo;
   const lang = ctx.state.lang;
-
-  if (!userInfo || userInfo.uid != userId) {
-    console.warn(`Unauthorized action attempt: toggleTask ${taskId} for timer ${timerId}, user ${userId} from chat ${ctx.chat.id}`);
-    return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
+  if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-      // Fetch the current timer state again (including its tasks)
-      const timerData = await sendToSer({ timerId: timerId }, 'getTimerById', 0, 0, true, fetch);
-      const activeTimer = timerData?.data?.timer?.data;
-
-      if (!activeTimer) {
-        throw new Error(`Timer ${timerId} not found.`);
-      }
+      // ** ASSUMPTION: 'getTimerById' endpoint exists **
+      const timerData = await sendToSer({ timerId: timerId }, 'getTimerById', 0, 0, true, fetch); // GLOBAL fetch
+      const activeTimer = timerData?.data?.timer?.data; // Adjust path
+      if (!activeTimer) throw new Error(`Timer ${timerId} not found.`);
 
       const selectedTasks = activeTimer.attributes.acts?.data || [];
       const selectedTaskIds = selectedTasks.map(t => t.id);
+      const isCurrentlySelected = selectedTaskIds.includes(taskId);
 
-      // Determine the new list of task IDs
-      const newSelectedTaskIds = selectedTaskIds.includes(taskId)
-          ? selectedTaskIds.filter(id => id !== taskId) // Remove task
-          : [...selectedTaskIds, taskId]; // Add task
+      const newSelectedTaskIds = isCurrentlySelected
+          ? selectedTaskIds.filter(id => id != taskId) // Use != for comparison with string/number flexibility
+          : [...selectedTaskIds, taskId];
 
-      // --- !!! IMPORTANT: Call the actual update function !!! ---
-      // This function needs to persist the change in your backend.
-      // Assuming 'updateTimer' can handle updating linked tasks.
-      // The third argument 'value' structure depends on how updateTimer is implemented.
-      // Let's assume it expects an object like { acts: [id1, id2, ...] }
-      const updatedTimer = await updateTimer(
-           activeTimer, // The timer object being updated
-           'tasks', // Indicate what is being updated (you might not need this arg)
-           { acts: newSelectedTaskIds }, // The new value: list of task IDs
-           fetch,
-           true // isSer
-       );
-      // --- End Update Call ---
+      const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds }, fetch, true); // GLOBAL fetch
 
-      if (!updatedTimer) {
-          throw new Error(getText('updateFailed', lang));
+      if (updatedTimer) {
+          // Re-fetch mission details to get task name and re-render
+          const missionDetails = await getUserMissions(userId, fetch); // GLOBAL fetch
+          const currentMission = missionDetails.find(m => m.id == missionId);
+          if (!currentMission) throw new Error(`Mission ${missionId} not found after task toggle.`);
+          const allTasks = currentMission.tasks;
+          const task = allTasks.find(t => t.id == taskId);
+          const taskName = task ? task.name : `ID ${taskId}`;
+
+          const latestSelectedTaskIds = updatedTimer.attributes.acts?.data?.map(t => t.id) || [];
+
+          // Filled buttons
+          const taskButtons = allTasks.map(t => {
+             const isSelected = latestSelectedTaskIds.includes(t.id);
+             return [Markup.button.callback(`${isSelected ? '✅ ' : '⬜ '}${t.name}`, `toggleTask-${missionId}-${userId}-${timerId}-${t.id}`)];
+          });
+          taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
+          taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
+
+          const confirmationText = isCurrentlySelected
+            ? getText('taskRemoved', lang, { name: taskName })
+            : getText('taskAdded', lang, { name: taskName });
+
+          await ctx.answerCbQuery(confirmationText); // Answer callback first
+
+          // Edit the message with the updated keyboard
+          await ctx.editMessageText(
+              getText('selectTasks', lang),
+              Markup.inlineKeyboard(taskButtons).resize()
+          );
+
+      } else {
+          await ctx.answerCbQuery(getText('updateFailed', lang));
+          throw new Error("Update timer failed during toggle");
       }
-
-      // --- Re-render the keyboard with updated state ---
-      // Fetch mission tasks again to get names
-       const missionDetails = await getUserMissions(userId, fetch); // Get all missions including tasks
-       const currentMission = missionDetails.find(m => m.id == missionId);
-       if (!currentMission) throw new Error(`Mission ${missionId} not found.`);
-       const allTasks = currentMission.tasks;
-       const task = allTasks.find(t => t.id == taskId);
-       const taskName = task ? task.name : `ID ${taskId}`;
-
-
-      // Get the LATEST selected tasks from the *updated* timer object
-      const latestSelectedTaskIds = updatedTimer.attributes.acts?.data?.map(t => t.id) || [];
-
-
-      const taskButtons = allTasks.map(t => {
-          const isSelected = latestSelectedTaskIds.includes(t.id);
-          return [
-              Markup.button.callback(
-                  `${isSelected ? '✅ ' : '⬜ '}${t.name}`,
-                  `toggleTask-${missionId}-${userId}-${timerId}-${t.id}`
-              )
-          ];
-      });
-       taskButtons.push([Markup.button.callback(getText('saveTasksBtn', lang), `saveTasks-${missionId}-${userId}-${timerId}`)]);
-       taskButtons.push([Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]);
-
-
-       // Answer the callback query first to stop the loading indicator
-       await ctx.answerCbQuery(
-           newSelectedTaskIds.includes(taskId)
-               ? getText('taskAdded', lang, { name: taskName })
-               : getText('taskRemoved', lang, { name: taskName })
-       );
-
-       // Edit the message with the updated keyboard
-       await ctx.editMessageText(
-           getText('selectTasks', lang), // Keep the same prompt text
-           Markup.inlineKeyboard(taskButtons).resize()
-       );
-
   } catch (error) {
-       console.error(`Error toggling task ${taskId} for timer ${timerId}:`, error);
-       await ctx.answerCbQuery(getText('aiActionFailed', lang)); // Notify user via callback popup
-       // Optionally, try to revert the message or show an error message
-       try {
-           await ctx.editMessageText(getText('aiActionFailed', lang) + "\n" + getText('selectTasks', lang), ctx.callbackQuery.message.reply_markup);
-       } catch (editError) {
-           console.error("Failed to edit message on toggle error:", editError);
-           ctx.reply(getText('aiActionFailed', lang)); // Fallback reply
-       }
+       console.error(`Error toggling task action ${taskId}:`, error);
+       // Try to notify user via callback query first
+       if (!ctx.answered) await ctx.answerCbQuery(getText('aiActionFailed', lang));
+       // Optionally try to edit the message to show error, otherwise reply
+       try { await ctx.editMessageText(getText('aiActionFailed', lang) + "\n" + getText('selectTasks', lang), ctx.callbackQuery.message.reply_markup); }
+       catch (editError) { ctx.reply(getText('aiActionFailed', lang)); }
   }
 });
 
-// Handle task saving confirmation (essentially just confirms the state)
+// Confirm Task Save ("Done" button)
 bot.action(/^saveTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
-  const missionId = ctx.match[1];
-  const userId = ctx.match[2];
-  const timerId = ctx.match[3];
-  const userInfo = ctx.state.userInfo;
-  const lang = ctx.state.lang;
+    const userId = ctx.match[2];
+    const userInfo = ctx.state.userInfo;
+    const lang = ctx.state.lang;
+    if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
-  if (!userInfo || userInfo.uid != userId) {
-    console.warn(`Unauthorized action attempt: saveTasks for timer ${timerId}, user ${userId} from chat ${ctx.chat.id}`);
-    return ctx.answerCbQuery(getText('unauthorized', lang));
-  }
-
-  // In this version, toggling already persists the changes.
-  // This save button acts more like a "Done" button.
-  // We remove the task selection keyboard and show a confirmation.
-  try {
-      await ctx.answerCbQuery(getText('tasksUpdated', lang)); // Show confirmation in popup
-      await ctx.editMessageText(
-          getText('tasksUpdated', lang), // Change message text
-          Markup.inlineKeyboard([ // Provide next logical steps
-              [Markup.button.url(getText('viewTimer', lang), 'https://1lev1.com/timers')],
-              [Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)] // Back to main menu
-          ]).resize()
-      );
-  } catch (error) {
-      console.error(`Error confirming task save for timer ${timerId}:`, error);
-      await ctx.answerCbQuery(getText('aiActionFailed', lang));
-       try {
-           await ctx.editMessageText(getText('aiActionFailed', lang));
-       } catch (editError) {
-            console.error("Failed to edit message on saveTasks error:", editError);
-            ctx.reply(getText('aiActionFailed', lang)); // Fallback reply
-       }
-  }
-
+    try {
+        await ctx.answerCbQuery(getText('tasksUpdated', lang));
+        // Filled reply and keyboard
+        await ctx.editMessageText(
+            getText('tasksUpdated', lang),
+            Markup.inlineKeyboard([
+                [Markup.button.url(getText('viewTimer', lang), 'https://1lev1.com/timers')],
+                [Markup.button.callback(getText('backToStart', lang), `timerStart-${userId}`)]
+            ]).resize()
+        );
+    } catch (error) {
+        console.error(`Error confirming task save action:`, error);
+        if (!ctx.answered) await ctx.answerCbQuery(getText('aiActionFailed', lang));
+        try { await ctx.editMessageText(getText('aiActionFailed', lang)); }
+        catch (editError) { ctx.reply(getText('aiActionFailed', lang)); }
+    }
 });
 
-
-// --- Text Message Handler (Gemini for Timer Intent OR Unregistered Q&A) ---
+// --- Text Message Handler (Using global fetch for helpers) ---
 bot.on('text', async (ctx) => {
     const userText = ctx.message.text;
     const userInfo = ctx.state.userInfo;
     const lang = ctx.state.lang;
 
-    // Ignore commands
-    if (userText.startsWith('/')) {
-        return;
-    }
+    if (userText.startsWith('/')) return;
 
     if (userInfo) {
-        // --- Registered User: Try to understand timer intent ---
-        // console.log(`Processing text from registered user ${userInfo.uid} (${lang}): "${userText}"`);
-        const aiResponse = await understandUserIntent(userText, userInfo.uid, lang, fetch);
-        // console.log("AI Timer Intent Response:", aiResponse);
+        // Registered User: Use Gemini for Timer Intent
+        const aiResponse = await understandUserIntent(userText, userInfo.uid, lang, fetch); // GLOBAL fetch
 
         switch (aiResponse.intent) {
             case 'start_timer':
                 if (aiResponse.parameters?.missionId) {
-                    // Trigger start logic (duplicate of action handler logic)
                     const missionId = aiResponse.parameters.missionId;
                     try {
-                         // ... [Copy/paste startTimer execution logic from action handler above] ...
-                         // Fetch mission data, project id, call startTimer, reply to user
-                        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
-                        const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
-                        const timerId = activeTimer?.data?.id || 0;
-                        const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-                        if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
-                        const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch);
-                        if (res) { ctx.reply(getText('timerStarted', lang)); }
-                        else { throw new Error("startTimer failed"); }
+                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
+                         const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
+                         const timerId = activeTimer?.data?.id || 0;
+                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+                         if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
+                         const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch); // GLOBAL fetch
+                         if (res) { ctx.reply(getText('timerStarted', lang)); } // Filled reply
+                         else { throw new Error("Start failed via AI"); }
                     } catch (error) {
-                         console.error(`AI Error starting timer for mission ${aiResponse.parameters.missionId}:`, error);
-                         ctx.reply(getText('aiActionFailed', lang));
+                         console.error(`AI Error starting timer:`, error);
+                         ctx.reply(getText('aiActionFailed', lang)); // Filled reply
                     }
                 } else {
-                     ctx.reply(getText('askWhichTaskToStart', lang)); // Should be handled by clarify_start ideally
+                     ctx.reply(getText('askWhichTaskToStart', lang)); // Filled reply
                 }
                 break;
 
             case 'stop_timer':
                  if (aiResponse.parameters?.missionId) {
-                    // Trigger stop logic (duplicate of action handler logic)
                      const missionId = aiResponse.parameters.missionId;
                      try {
-                         // ... [Copy/paste stopTimer execution logic from action handler above] ...
-                         // Fetch mission data, get activeTimerData, call stopTimer, reply to user with options keyboard
-                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
                          const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
-                         if (!activeTimerData || !activeTimerData.attributes.isActive) { ctx.reply(getText('timerNotFound', lang)); return; }
-                         const stoppedTimer = await stopTimer(activeTimerData, fetch, true);
-                         if (stoppedTimer && stoppedTimer.attributes.isActive === false) {
+                         if (!activeTimerData || !activeTimerData.attributes.isActive) {
+                             ctx.reply(getText('timerNotFound', lang)); // Filled reply
+                             return;
+                         }
+                         const stoppedTimer = await stopTimer(activeTimerData, fetch, true); // GLOBAL fetch
+                         if (stoppedTimer && !stoppedTimer.attributes.isActive) {
+                             // Filled reply with keyboard
                              ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
                                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
                                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
                                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userInfo.uid}-${activeTimerData.id}`)]
                              ]).resize());
-                         } else { throw new Error("stopTimer failed"); }
+                         } else { throw new Error("Stop failed via AI"); }
                      } catch (error) {
-                         console.error(`AI Error stopping timer for mission ${aiResponse.parameters.missionId}:`, error);
-                         ctx.reply(getText('aiActionFailed', lang));
+                         console.error(`AI Error stopping timer:`, error);
+                         ctx.reply(getText('aiActionFailed', lang)); // Filled reply
                      }
                  } else {
-                    ctx.reply(getText('askWhichTaskToStop', lang)); // Should be handled by clarify_stop ideally
+                     ctx.reply(getText('askWhichTaskToStop', lang)); // Filled reply
                  }
                  break;
 
             case 'clarify_start':
-                 const startableMissions = await getUserMissions(userInfo.uid, fetch, true);
+                 const startableMissions = await getUserMissions(userInfo.uid, fetch, true); // GLOBAL fetch
                  if (startableMissions.length > 0) {
+                     // Filled buttons
                      const buttons = startableMissions.map(item => [Markup.button.callback(`${item.name} ⏲️ ${item.projectName}`, `startTimer-${item.id}-${userInfo.uid}`)]);
                      ctx.reply(getText('askWhichTaskToStart', lang), Markup.inlineKeyboard(buttons).resize());
-                 } else { ctx.reply(getText('noTasksToStart', lang)); }
+                 } else { ctx.reply(getText('noTasksToStart', lang)); } // Filled reply
                  break;
 
             case 'clarify_stop':
-                 const stoppableMissions = await getUserMissions(userInfo.uid, fetch, false, true);
+                 const stoppableMissions = await getUserMissions(userInfo.uid, fetch, false, true); // GLOBAL fetch
                  if (stoppableMissions.length > 0) {
+                      // Filled buttons
                      const buttons = stoppableMissions.map(item => [Markup.button.callback(`${item.name} ⏲️ ${item.projectName}`, `stopTimer-${item.id}-${userInfo.uid}`)]);
                      ctx.reply(getText('askWhichTaskToStop', lang), Markup.inlineKeyboard(buttons).resize());
-                 } else { ctx.reply(getText('noTasksToStop', lang)); }
+                 } else { ctx.reply(getText('noTasksToStop', lang)); } // Filled reply
                  break;
 
             case 'ask_help':
-                 ctx.reply(`${getText('helpText', lang)} ${getText('askMeAnything', lang)}`);
+                 ctx.reply(`${getText('helpText', lang)} ${getText('askMeAnything', lang)}`); // Filled reply
                  break;
 
             case 'error':
-                 console.error("Gemini interaction error:", aiResponse.details);
-                 // Fall through to unknown
-
+                 console.error("Gemini intent error:", aiResponse.details);
+                 ctx.reply(getText('aiUnderstandError', lang)); // Fall through or specific error? Let's use standard understand error.
+                 break;
             case 'unknown':
             default:
-                 ctx.reply(getText('aiUnderstandError', lang));
+                 ctx.reply(getText('aiUnderstandError', lang)); // Filled reply
                  break;
         }
     } else {
-        // --- Unregistered User: Use Gemini for Q&A about the platform ---
-        // console.log(`Processing text from unregistered user (${lang}): "${userText}"`);
+        // Unregistered User: Use Gemini for Q&A
         const answer = await answerUnregisteredUserQuery(userText, lang);
-        await ctx.reply(answer);
-        // Remind them how to register/login
+        await ctx.reply(answer); // Filled reply (from Gemini)
+        // Remind how to register/login - Filled keyboard
         await ctx.reply(
           getText('notRegisteredPrompt', lang),
           Markup.inlineKeyboard([
@@ -870,34 +774,31 @@ bot.on('text', async (ctx) => {
     }
 });
 
-
-// --- SvelteKit Endpoint ---
+// --- SvelteKit POST Endpoint ---
 export async function POST({ request, fetch: svelteFetch }) {
-    try {
-        const data = await request.json();
-        // Pass svelteFetch down if needed via middleware or directly
-        // In middleware: bot.use((ctx, next) => { ctx.state.fetch = svelteFetch; next(); });
-        // Then access via ctx.state.fetch in handlers, or ensure global fetch works.
-        // For simplicity here, assuming global fetch or fetch passed implicitly by Telegraf/env.
-        await bot.handleUpdate(data);
-        return new Response('', { status: 200 });
-    } catch (error) {
-        console.error('Error handling Telegram update in POST:', error);
-        console.error(error.stack);
-        return new Response('Internal Server Error', { status: 500 });
-    }
+  try {
+    const data = await request.json();
+    // console.log("Incoming Telegram Update:", JSON.stringify(data, null, 2));
+
+    await fetchUserData(svelteFetch); // Fetch user data using SvelteKit fetch
+
+    await bot.handleUpdate(data); // Handle update using global data and global fetch for handlers
+
+    return new Response('', { status: 200 });
+  } catch (error) {
+    console.error('--- ERROR in SvelteKit POST Handler ---', error, error.stack);
+    return new Response('Internal Server Error', { status: 500 });
+  }
 }
 
 // --- Fallback Error Handler ---
 bot.catch((err, ctx) => {
-  console.error(`Telegraf Error for ${ctx.updateType}`, err);
-  const lang = ctx?.state?.lang || 'he'; // Try to get lang from context state
-  // Avoid replying if it's an error during callback query handling (already handled)
-  if (ctx.updateType !== 'callback_query') {
-       ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error message:", e));
+  console.error(`Telegraf Error caught for update type ${ctx.updateType}:`, err);
+  const lang = ctx?.state?.lang || 'he';
+  if (ctx.updateType !== 'callback_query' || !ctx.answered) {
+       ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error reply:", e));
   }
 });
 
-// --- Initialization ---
-console.log("Telegram Bot script initialized (Webhook via SvelteKit POST).");
-// No bot.launch() or createServer needed here when using SvelteKit endpoint for webhook.
+// --- Initialization Log ---
+console.log("Telegram Bot script initialized (Webhook setup via SvelteKit POST).");
