@@ -179,21 +179,64 @@ async function getUserMissions(uid, fetchInstance, onlyStartable = false, onlySt
     }
 }
 
+// פונקציה חדשה למציאת משימות רלוונטיות
+async function findRelevantMissions(userText, missions, lang) {
+    const prompt = `
+You are a helpful assistant for the 1lev1 platform Telegram bot. Your goal is to find the most relevant missions based on the user's text input.
+
+User Language: ${lang}
+User Input: "${userText}"
+
+Available missions:
+${missions.map(m => `- "${m.name}" (Project: ${m.projectName}, ID: ${m.id})`).join('\n')}
+
+Analyze the user's input and find the most relevant missions. Consider:
+1. Exact name matches
+2. Partial name matches
+3. Project name matches
+4. Similar sounding names
+5. Common abbreviations
+
+Return ONLY a JSON array of mission IDs that are relevant to the user's request, ordered by relevance (most relevant first).
+If no missions seem relevant, return an empty array.
+
+Example responses:
+- User: "start timer for Design UI" -> ["123"] (if mission "Design UI" exists)
+- User: "start design" -> ["123", "456"] (if multiple design-related missions exist)
+- User: "start something" -> [] (if no clear match)
+
+Your JSON response:
+`;
+
+    try {
+        const result = await geminiModel.generateContent(prompt);
+        const response = await result.response;
+        const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
+        const relevantIds = JSON.parse(jsonResponse);
+        
+        // מחזיר רק את המשימות שקיימות ברשימה המקורית
+        return missions.filter(m => relevantIds.includes(m.id));
+    } catch (error) {
+        console.error("Gemini Relevant Missions Error:", error);
+        return []; // במקרה של שגיאה, מחזיר רשימה ריקה
+    }
+}
+
 // --- Gemini AI Interaction (Timer Intent) - Accepts fetchInstance ---
 async function understandUserIntent(userText, uid, lang, fetchInstance) {
-  // **IMPORTANT**: uid here is the user's database ID (e.g., from allD)
-  // Ensure getUserInfo is adapted if you pass chatId instead of uid here
-  const userInfo = allD.find(u => u.id === uid); // Find user by DB ID
-  if (!userInfo) return { intent: 'error', details: 'User (by ID) not found for intent check' };
+    const userInfo = allD.find(u => u.id === uid);
+    if (!userInfo) return { intent: 'error', details: 'User (by ID) not found for intent check' };
 
-  const startableMissions = await getUserMissions(uid, fetchInstance, true);
-  const stoppableMissions = await getUserMissions(uid, fetchInstance, false, true);
+    const startableMissions = await getUserMissions(uid, fetchInstance, true);
+    const stoppableMissions = await getUserMissions(uid, fetchInstance, false, true);
 
-  const missionListText = startableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
-  const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
+    // מציאת משימות רלוונטיות לבקשה
+    const relevantMissions = await findRelevantMissions(userText, startableMissions, lang);
+    
+    const missionListText = startableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
+    const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n');
 
-  // --- Re-inserting the Gemini Prompt ---
-  const prompt = `
+    const prompt = `
 You are a helpful assistant for the 1lev1 platform Telegram bot. Your goal is to understand the user's request regarding starting or stopping timers for their missions.
 
 User ID: ${uid}
@@ -213,12 +256,17 @@ ${missionListText || "None"}
 Missions with currently ACTIVE timers (can be stopped):
 ${activeTimersText || "None"}
 
+Relevant missions based on user input:
+${relevantMissions.map(m => `- "${m.name}" (ID: ${m.id})`).join('\n') || "None"}
+
 User request: "${userText}"
 
-Analyze the user request considering the available missions and active timers. Respond ONLY with a JSON object containing the identified 'intent' and necessary 'parameters' (like 'missionId'). If the mission name is ambiguous or not found, lean towards 'clarify' or 'unknown'.
+Analyze the user request considering the available missions and active timers. If there are relevant missions found, prioritize them in your response.
+Respond ONLY with a JSON object containing the identified 'intent' and necessary 'parameters' (like 'missionId').
 
 Examples:
-- User: "start timer for Design UI", Mission "Design UI" (ID 123) exists, no active timer -> {"intent": "start_timer", "parameters": {"missionId": "123"}}
+- User: "start timer for Design UI", Mission "Design UI" (ID 123) exists -> {"intent": "start_timer", "parameters": {"missionId": "123"}}
+- User: "start design", Multiple design-related missions exist -> {"intent": "clarify_start", "parameters": {"relevantMissions": ["123", "456"]}}
 - User: "stop the timer for API integration", Mission "API integration" (ID 456) has active timer -> {"intent": "stop_timer", "parameters": {"missionId": "456"}}
 - User: "start a timer", Multiple startable missions exist -> {"intent": "clarify_start"}
 - User: "stop my timer", Only one active timer for mission ID 789 -> {"intent": "stop_timer", "parameters": {"missionId": "789"}}
@@ -228,18 +276,17 @@ Examples:
 
 Your JSON response:
 `;
-  // --- End Gemini Prompt ---
 
-  try {
-    const result = await geminiModel.generateContent(prompt);
-    const response = await result.response;
-    const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
-    console.log('Gemini Timer Intent Response:', JSON.parse(jsonResponse));
-    return JSON.parse(jsonResponse);
-  } catch (error) {
-    console.error("Gemini Timer Intent Error:", error);
-    return { intent: 'error', details: error.message };
-  }
+    try {
+        const result = await geminiModel.generateContent(prompt);
+        const response = await result.response;
+        const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
+        console.log('Gemini Timer Intent Response:', JSON.parse(jsonResponse));
+        return JSON.parse(jsonResponse);
+    } catch (error) {
+        console.error("Gemini Timer Intent Error:", error);
+        return { intent: 'error', details: error.message };
+    }
 }
 
 // --- Gemini AI Interaction (Unregistered Q&A - No fetch needed) ---
@@ -464,8 +511,8 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
             getText('timerStopped', lang),
             Markup.inlineKeyboard([
                  [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
-                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimer.id}`)],
-                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimer.id}`)]
+                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)],
+                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)]
             ]).resize()
         );
     } else {
@@ -674,7 +721,6 @@ bot.on('text', async (ctx) => {
     if (userText.startsWith('/')) return;
 
     if (userInfo) {
-        // Registered User: Use Gemini for Timer Intent
         const aiResponse = await understandUserIntent(userText, userInfo.uid, lang, fetch);
 
         switch (aiResponse.intent) {
@@ -682,20 +728,47 @@ bot.on('text', async (ctx) => {
                 if (aiResponse.parameters?.missionId) {
                     const missionId = aiResponse.parameters.missionId;
                     try {
-                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
-                         const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
-                         const timerId = activeTimer?.data?.id || 0;
-                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
-                         if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
-                         const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch);
-                         if (res) { ctx.reply(getText('timerStarted', lang)); }
-                         else { throw new Error("Start failed via AI"); }
+                        const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
+                        const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
+                        const timerId = activeTimer?.data?.id || 0;
+                        const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+                        if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
+                        const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch);
+                        if (res) { ctx.reply(getText('timerStarted', lang)); }
+                        else { throw new Error("Start failed via AI"); }
                     } catch (error) {
-                         console.error(`AI Error starting timer:`, error);
-                         ctx.reply(getText('aiActionFailed', lang));
+                        console.error(`AI Error starting timer:`, error);
+                        ctx.reply(getText('aiActionFailed', lang));
                     }
                 } else {
-                     ctx.reply(getText('askWhichTaskToStart', lang));
+                    // אם יש משימות רלוונטיות, הצג רק אותן
+                    if (aiResponse.parameters?.relevantMissions?.length > 0) {
+                        const relevantMissions = await getUserMissions(userInfo.uid, fetch, true);
+                        const filteredMissions = relevantMissions.filter(m => 
+                            aiResponse.parameters.relevantMissions.includes(m.id)
+                        );
+                        const buttons = filteredMissions.map(item => [
+                            Markup.button.callback(
+                                `${item.name} ⏲️ ${item.projectName}`,
+                                `startTimer-${item.id}-${userInfo.uid}`
+                            )
+                        ]);
+                        ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
+                    } else {
+                        // אם אין משימות רלוונטיות, הצג את כל המשימות
+                        const startableMissions = await getUserMissions(userInfo.uid, fetch, true);
+                        if (startableMissions.length > 0) {
+                            const buttons = startableMissions.map(item => [
+                                Markup.button.callback(
+                                    `${item.name} ⏲️ ${item.projectName}`,
+                                    `startTimer-${item.id}-${userInfo.uid}`
+                                )
+                            ]);
+                            ctx.reply(getText('askWhichTaskToStart', lang), Markup.inlineKeyboard(buttons).resize());
+                        } else {
+                            ctx.reply(getText('noTasksToStart', lang));
+                        }
+                    }
                 }
                 break;
 
