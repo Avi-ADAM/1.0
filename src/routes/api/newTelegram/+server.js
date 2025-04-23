@@ -205,7 +205,7 @@ Available actions:
 3.  'ask_help': User is asking for general help.
 4.  'clarify_start': User wants to start a timer but didn't specify which one, and multiple options exist.
 5.  'clarify_stop': User wants to stop a timer but didn't specify which one, and multiple options exist.
-6.  'unknown': The user's intent is unclear or unrelated to timer actions.
+6.  'unknown': The user's intent is unclear or unrelated.
 
 Missions available to START a timer for:
 ${missionListText || "None"}
@@ -234,6 +234,7 @@ Your JSON response:
     const result = await geminiModel.generateContent(prompt);
     const response = await result.response;
     const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
+    console.log('Gemini Timer Intent Response:', JSON.parse(jsonResponse));
     return JSON.parse(jsonResponse);
   } catch (error) {
     console.error("Gemini Timer Intent Error:", error);
@@ -463,8 +464,8 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
             getText('timerStopped', lang),
             Markup.inlineKeyboard([
                  [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
-                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimerData.id}`)],
-                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimerData.id}`)]
+                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userId}-${activeTimer.id}`)],
+                 [Markup.button.callback(getText('saveTimerBtn', lang), `saveTimer-${missionId}-${userId}-${activeTimer.id}`)]
             ]).resize()
         );
     } else {
@@ -491,15 +492,15 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
   if (!userInfo || userInfo.uid != userId) return ctx.answerCbQuery(getText('unauthorized', lang));
 
   try {
-     const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch); // GLOBAL fetch
-     const timerToSave = missionData?.data?.mesimabetahalich?.data?.attributes?.timers?.data?.find(t => t.id == timerId);
+     const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
+     const timerToSave = timerData?.data?.mesimabetahalich?.data?.attributes?.timers?.data?.find(t => t.id == timerId);
      if (!timerToSave) {
          await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
          ctx.reply(getText('timerNotFound', lang));
          return ctx.answerCbQuery(getText('timerNotFound', lang));
      }
 
-     const savedTimer = await saveTimer(timerToSave, missionId, fetch, true); // GLOBAL fetch
+     const savedTimer = await saveTimer(timerToSave, missionId, fetch, true);
 
      if (savedTimer) {
          await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
@@ -536,7 +537,7 @@ bot.action(/^updateTasks-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
         const currentMission = missionDetails.find(m => m.id == missionId);
         if (!currentMission) throw new Error(`Mission ${missionId} not found`);
 
-        const timerData = await sendToSer({ missionId: timerId }, '36getMissionTimer', 0, 0, true, fetch);
+        const timerData = await sendToSer({ missionId: missionId }, '36getMissionTimer', 0, 0, true, fetch);
         const activeTimer = timerData?.data?.attributes?.activeTimer?.data;
         if (!activeTimer) {
              await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
@@ -742,7 +743,16 @@ bot.on('text', async (ctx) => {
                  break;
 
             case 'ask_help':
-                 ctx.reply(`${getText('helpText', lang)} ${getText('askMeAnything', lang)}`);
+                 const helpAnswer = await answerUnregisteredUserQuery(userText, lang);
+                 ctx.reply(helpAnswer);
+                 ctx.reply(
+                   getText('helpText', lang),
+                   Markup.inlineKeyboard([
+                       [Markup.button.url(getText('login', lang), 'https://1lev1.com/login')],
+                       [Markup.button.callback(getText('startTimerBtn', lang), `timerStart-${userInfo.uid}`)],
+                       [Markup.button.callback(getText('stopTimerBtn', lang), `timerStop-${userInfo.uid}`)]
+                   ]).resize()
+                 );
                  break;
 
             case 'error':
