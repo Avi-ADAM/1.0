@@ -214,8 +214,8 @@ Your JSON response:
         const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
         const relevantIds = JSON.parse(jsonResponse);
         
-        // מחזיר רק את המשימות שקיימות ברשימה המקורית
-        return missions.filter(m => relevantIds.includes(m.id));
+        // מחזיר רק את ה-IDs של המשימות הרלוונטיות
+        return relevantIds;
     } catch (error) {
         console.error("Gemini Relevant Missions Error:", error);
         return []; // במקרה של שגיאה, מחזיר רשימה ריקה
@@ -802,9 +802,31 @@ bot.on('text', async (ctx) => {
             case 'clarify_start':
                  const startableMissions = await getUserMissions(userInfo.uid, fetch, true);
                  if (startableMissions.length > 0) {
-                     const buttons = startableMissions.map(item => [Markup.button.callback(`${item.name} ⏲️ ${item.projectName}`, `startTimer-${item.id}-${userInfo.uid}`)]);
-                     ctx.reply(getText('askWhichTaskToStart', lang), Markup.inlineKeyboard(buttons).resize());
-                 } else { ctx.reply(getText('noTasksToStart', lang)); }
+                     // אם יש משימות רלוונטיות, הצג רק אותן
+                     if (aiResponse.parameters?.relevantMissions?.length > 0) {
+                         const filteredMissions = startableMissions.filter(m => 
+                             aiResponse.parameters.relevantMissions.includes(m.id)
+                         );
+                         const buttons = filteredMissions.map(item => [
+                             Markup.button.callback(
+                                 `${item.name} ⏲️ ${item.projectName}`,
+                                 `startTimer-${item.id}-${userInfo.uid}`
+                             )
+                         ]);
+                         ctx.reply(getText('chooseStart', lang), Markup.inlineKeyboard(buttons).resize());
+                     } else {
+                         // אם אין משימות רלוונטיות, הצג את כל המשימות
+                         const buttons = startableMissions.map(item => [
+                             Markup.button.callback(
+                                 `${item.name} ⏲️ ${item.projectName}`,
+                                 `startTimer-${item.id}-${userInfo.uid}`
+                             )
+                         ]);
+                         ctx.reply(getText('askWhichTaskToStart', lang), Markup.inlineKeyboard(buttons).resize());
+                     }
+                 } else {
+                     ctx.reply(getText('noTasksToStart', lang));
+                 }
                  break;
 
             case 'clarify_stop':
