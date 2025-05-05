@@ -29,7 +29,7 @@ onMessage(messaging, (payload) => {
 });
 }*/
 import "../app.postcss";
-import { Toaster } from 'svelte-sonner';
+//import { Toaster } from 'svelte-sonner';
 import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
  // import firebase from "$lib/func/firebase";
@@ -65,6 +65,7 @@ function getLang() {
 }
 
 onMount(async () => {
+  console.log('before', $lang)
    getLang()
    let x;
    let user;
@@ -82,8 +83,10 @@ onMount(async () => {
 
 
 <main>
-	{@render children?.()}
-<Toaster toastOptions={{
+  {#if children}
+	{@render children()}
+  {/if}
+<!--<Toaster toastOptions={{
   style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
-}} richColors  closeButton  position="top-center" />
+}} richColors  closeButton  position="top-center" />-->
 </main>

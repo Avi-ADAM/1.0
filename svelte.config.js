@@ -1,8 +1,8 @@
 import vercel from '@sveltejs/adapter-vercel';
 //import adapter from '@sveltejs/adapter-static';
 import preprocess from "svelte-preprocess";
+/** @type {import('@sveltejs/kit').Config} */
 
-///** @type {import('@sveltejs/kit').Config} */
 //let config;
 //if (import.meta.env.VITE_ENVI == "versel") {
  const config = {
