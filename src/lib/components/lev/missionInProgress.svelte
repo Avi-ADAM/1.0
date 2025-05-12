@@ -636,7 +636,7 @@ ${tofinished}
               let timegramaId = miDatan.data.createFiniapruval.data.id
               let x = calcX(restime)
               let fd = new Date(Date.now() + x)
-              await sendToSer({whatami:"finiapruval",finiapruval:timegramaId,date:fd})
+              await sendToSer({whatami:"finiapruval",finiapruval:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch)
               //nutify project users
  let data = {pn:projectName,pl:src,pu:pu, pid:projectId, uid:idL, kind:"finiappmi", name:missionName}
    fetch("/api/nuti", {
