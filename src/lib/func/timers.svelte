@@ -137,15 +137,19 @@
   }
   export async function handleClearSingle(index, timer,fetch,isSer=false) {
   let timers = [...timer.attributes.activeTimer.data.attributes.timers];
+
   let total = timer.attributes.activeTimer.data.attributes.totalTime;
   let newTotal = total - (timers[index].stop - timers[index].start);
   timers.splice(index, 1);
-
+  const timersForMutation = timers.map(t => ({
+    start: t.start,
+    stop: t.stop
+}));
 const x = await sendToSer({
     timerId: timer.attributes.activeTimer.data.id,
     isActive: false,
     totalHours: newTotal,
-    timers
+    timers: timersForMutation
   },'34UpdateTimer',null,null,isSer,fetch).then((x) => {
     console.log("Updated timer:", x.data);
     return x.data.updateTimer.data;
@@ -159,6 +163,7 @@ const x = await sendToSer({
     timerId: timer.attributes.activeTimer.data.id,
     isActive: false,
     totalHours: 0,
+    start: "null",
     timers: []
   },'34UpdateTimer',null,null,isSer,fetch).then((x) => {
     console.log("Updated timer:", x.data);

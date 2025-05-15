@@ -10,11 +10,11 @@ import { Ask } from './ask.svelte';
 //מעביר ראשון ראשון ברסק , אם מישהו ביקש מחכים למענה בעניינו ורק לאחר שיש כן 1 לפחות או לא 1 לפחות  ניתן לקבלו או לא 1 לפחות וניתן להציע לאנשים נוספים, בקשה של הקודם כאשר יש לא נשארת אך ניתן להוסיף עוד סקשות 
 import { SendTo } from '$lib/send/sendTo.svelte';
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
-async function x(id,kind,taid){
+async function x(id,kind,taid, fetch){
     console.log(id,kind,"13 server")
     if (kind == "ask"){
               console.log('here');
-      await Ask(id,taid)
+      await Ask(id,taid, fetch)
      // console.log("here")
     } else if (kind == 'pendm') {
               await Pend(id,taid);
@@ -26,7 +26,7 @@ async function x(id,kind,taid){
     }
     
 }
-export async function GET() {
+export async function GET({ fetch }) {
     let d = new Date();
     let oneHourFromNow = new Date(d.getTime() + 60 * 60 * 1000);
        console.log(oneHourFromNow, 'oneHourFromNow');
@@ -66,14 +66,14 @@ export async function GET() {
         console.log(dateof,myid, " line56");
         if (d >= dateof) {
           // targetDate has passed, execute function x immediately
-          x(myid, element.attributes.whatami, tgid);
+          x(myid, element.attributes.whatami, tgid, fetch);
         } else {
           // Calculate the time difference in milliseconds
           const timeDifference = dateof.getTime() - d.getTime();
             console.log(myid, element.attributes.whatami, timeDifference, "line 63 ");
           // Set a timeout to execute function x after the time difference
           setTimeout(function () {
-            x(myid, element.attributes.whatami);
+            x(myid, element.attributes.whatami, tgid, fetch);
           }, timeDifference);
         }
        }

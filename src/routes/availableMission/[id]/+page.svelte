@@ -24,13 +24,25 @@ export let askedarr = []
 export let alr = false
 async function ask() {
   //TODO: if only me in the freemates and its me create mesimabetahalich
-    alr = true
-    const inD  = data.alld
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];           
- const uId = cookieValueId;
+  alr = true
+    const inD = data.alld
+    if (!inD || !inD.attributes.project || !inD.attributes.project.data) {
+        toast.error("שגיאה בטעינת נתוני הפרויקט");
+        return;
+    }
+
+    const cookieValueId = document.cookie
+        .split('; ')
+        .find(row => row.startsWith('id='))
+        ?.split('=')[1];  
+
+    if (!cookieValueId) {
+        toast.error("נא להתחבר מחדש למערכת");
+        return;
+    }
+
+    const uId = cookieValueId;
+   
  const que1 = `query { usersPermissionsUser (id: ${uId}){
     data {
       id attributes{
@@ -45,17 +57,23 @@ async function ask() {
         askedarr = p;
     }
         let d = new Date
-    let myvote = ``
-    let pid = inD.project.data.attributes.user_1s.data.map(t=>t.id)
-         if(pid.includes(uId)){
-      myvote = `vots: [{
-                        what: true
-                        users_permissions_user: "${uId}"
-                        ide:${uId}
-                        zman:"${d.toISOString()}"
-                          }
-                        ]`
-     }
+    let myvote = ``    
+    try {
+        let pid = inD.attributes.project.data.attributes.user_1s.data.map(t=>t.id)
+        if (pid.includes(uId)) {
+            let d = new Date();
+            myvote = `vots: [{
+                what: true
+                users_permissions_user: "${uId}"
+                ide:${uId}
+                zman:"${d.toISOString()}"
+            }]`
+        }
+      } catch (error) {
+        console.error("שגיאה בעיבוד הבקשה:", error);
+        toast.error("אירעה שגיאה בעיבוד הבקשה");
+        return;
+    }
   const as = askedarr;
     as.push(`${data.mId}`);  
  let que = `mutation { updateUsersPermissionsUser(
@@ -75,7 +93,7 @@ async function ask() {
   }
   createAsk(
       data:{ open_mission: ${data.mId},
-            project: ${inD.project.data.id},
+            project: ${inD.attributes.project.data.id},
             users_permissions_user: ${uId},
             publishedAt: "${d.toISOString()}",
             ${myvote}
@@ -89,7 +107,7 @@ async function ask() {
     const r2 = d2.data
     console.log(r2)
     if (r2 != null){
-      let restime = inD.project.data.attributes.restime
+      let restime = inD.attributes.project.data.attributes.restime
        let x = calcX(restime)
      let fd = new Date(Date.now() + x)
          let hiluzId = r2.createAsk.data.id
@@ -181,7 +199,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
 
   let title = 'This is Svead a Svelte Head Component'
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
-  let description = $page.data.alld?.descrip || om[$lang]
+  let description = $page.data.alld?.attributes?.descrip || om[$lang]
   let url = $page.url.toString()
   //TODO: header nav menu 
 </script>

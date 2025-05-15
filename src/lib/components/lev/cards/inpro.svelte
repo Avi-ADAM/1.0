@@ -4,6 +4,8 @@ export let x = 0,tasks = [], src,projectName,already,zman,hearotMeyuchadot,statu
     import {lang} from '$lib/stores/lang.js' 
     export let low = false;
     export let iskvua = false
+    export let showSaveDialog = false, storeTimer
+
     export let isVisible = false, startDate = null
 import Lowbtn from '$lib/celim/lowbtn.svelte'
      // import Chaticon from '../../../celim/chaticon.svelte'
@@ -66,6 +68,8 @@ function preventSwiperScroll(event) {
       event.stopPropagation();
     }
   }
+  const editButton = {"he": "עריכת הטיימר","en": "edit Timer"}
+
 </script>
 
 <div on:wheel={preventSwiperScroll} 
@@ -162,15 +166,22 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
   
        </div>
        {#if low == false}
-       {#if lapse !== 0 || x !== 0}
+      <!---- {#if lapse !== 0 || x !== 0}
        <div class="flex items-center justify-center space-x-2 mb-12">
 <button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")} 
     class="border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi hover:text-gold  px-4 py-1 rounded hover:from-lturk hover:to-barbi " on:click={clear}>ניקוי</button>
 <button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} 
    class="  bg-gradient-to-br text-gold hover:text-barbi hover:from-graa hover:to-grab 
       px-4 py-1 rounded from-lturk to-barbi " on:click={save}> הוספה</button>
-    </div>{/if}
-    {#if already === false}
+    </div>{/if}-->
+    {#if storeTimer?.attributes?.activeTimer?.data?.attributes}
+    <!--edit timer button-->
+    <div class="flex items-center justify-center space-x-2 mb-12">
+
+    <button on:mouseenter={()=>hover("לחיצה לעריכת הטיימר")} on:mouseleave={()=>hover("0")} class="button-gold mx-auto hover:text-barbi" tabindex="0" role="button" on:keypress={() => showSaveDialog = true} on:click={() => showSaveDialog = true}>✏{editButton[$lang]}</button>
+    </div>
+    {/if}
+        {#if already === false}
     <button on:mouseenter={()=>hover("לחיצה לסיום המשימה")} on:mouseleave={()=>hover("0")} on:click={done}  
                 class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
           name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>

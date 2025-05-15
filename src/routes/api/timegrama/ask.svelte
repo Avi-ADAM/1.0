@@ -1,7 +1,7 @@
 <script context="module">
     import { SendTo } from '$lib/send/sendTo.svelte';
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
-export async function Ask(id,taid){
+export async function Ask(id,taid, fetch){
   console.log(id,taid, "ask compo started")
   let d = new Date()
     let qu = `{
@@ -136,20 +136,14 @@ updateOpenMission(
                         email: emailt, 
                         lang: langi , 
                         kind: "exeptedMission"}//username email projectname projectsrc lang openmissionName
-            fetch('/api/sma', {
+            const response = await fetch('/api/sma', {
             method: 'POST',  
             headers: {
               'Content-Type': 'application/json',
             },
             body: JSON.stringify(data),
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data);            
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
+          });
+          console.log('Success:', response);            
           }
 
            const otherasks = res3.data.updateOpenMission.data.attributes.asks.data
