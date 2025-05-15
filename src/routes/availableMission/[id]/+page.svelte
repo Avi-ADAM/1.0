@@ -284,9 +284,11 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
      <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
         <span 
+        role="contentinfo"
         on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} 
         on:mouseleave={()=>hover("0")} > 
         {data.alld.attributes.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} {perho[$lang]} </span> * <span 
+        role="contentinfo"
         on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} 
         on:mouseleave={()=>hover("0")}  > {data.alld.attributes.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {hourss[$lang]} {data.alld.attributes.iskvua ? monhly[$lang] : "" }</span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.alld.attributes.noofhours * data.alld.attributes.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {data.alld.attributes.iskvua ? monhly[$lang] : "" } </span>
     </p>
@@ -360,7 +362,9 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         </div>
           {:else}
           <div class="flex justify-center">
-                <div class="mx-8 mt-7 text-barbi hover:text-black " on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true} >
+                <div class="mx-8 mt-7 text-barbi hover:text-black "
+                role="contentinfo"
+                 on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true} >
                     <p class="text-center font-bold text-2xl p-2 ">{info[$lang]}</p>
                 <div class="flex flex-row flex-auto justify-between">
                     <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" on:click={reg}>{registratio[$lang]}</button>
