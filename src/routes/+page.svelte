@@ -1,4 +1,5 @@
 <script>
+  import { AnimatedHeadline } from "svelte-animated-headline";
   import { goto } from "$app/navigation";
   import Arrow from "$lib/celim/icons/arrow.svelte";
   import Lowding from "$lib/celim/lowding.svelte";
@@ -12,9 +13,9 @@
 	const url = 'https://1lev1.com/';
 	const title = '1️💗1️';
 	const setitle = {
-  "he": "ליצור יחד בהסכמה",
-  "en": "create together harmoniously",
-  "ar": "الإبداع معًا بتناغم"
+  "he": "ליצור מציאות חדשה, יחד",
+  "en": "Creating a new reality, together",
+  "ar": "خلق واقع جديد، معًا"
 };//"טעם לחיים!"
 function change(lan){
   if (lan == "en"){
@@ -42,77 +43,104 @@ const changel = {
 };
 
 const desc = {
-  "he": 'ליצור צוות מנצח להגשמת כל חלום, להתנהל ו',
-  "en": 'Creating a winning team to fulfill every dream, to manage and',
-  "ar": 'إنشاء فريق رابح لتحقيق كل حلم ، لإدارة و'
+  "he": [
+    "חיבור מתוך חירות",
+    "שותפות מתוך הסכמה",
+    "עשייה מתוך לב"
+  ],
+  "en": [
+    "Connection through freedom",
+    "Partnership through agreement",
+    "Action through heart"
+  ],
+  "ar": [
+    "اتصال من خلال الحرية",
+    "شراكة من خلال الاتفاق",
+    "عمل من خلال القلب"
+  ]
+};
+
+const introQuestions = {
+  "he": {
+    "q1": "האם את מרגישה שיש לך מה לתת – אבל לבד זה קשה",
+    "q2": "האם אתה יודע שאתה נועד ליותר – אבל מחפש את האנשים הנכונים לצעוד איתם     "
+  },
+  "en": {
+    "q1": "Do you feel you have something to give – but it's hard alone?",
+    "q2": "Do you know you're meant for more – but looking for the right people to walk with?"
+  },
+  "ar": {
+    "q1": "هل تشعرين أن لديك ما تقدمينه – لكنه صعب بمفردك؟",
+    "q2": "هل تعرف أنك مخصص لأكثر من ذلك – لكنك تبحث عن الأشخاص المناسبين للمشي معهم؟"
+  }
 };
 
 const desc2 = {
-  "he": "ליצור יחד בהסכמה",
-  "en": " to create together in harmony",
-  "ar": "للإبداع معًا بانسجام"
+  "he": "האם את מרגישה שיש לך מה לתת – אבל לבד זה קשה?",
+  "en": "Do you feel you have something to give – but it's hard alone?",
+  "ar": "هل تشعرين أن لديك ما تقدمينه – لكنه صعب بمفردك؟"
 };
 const word1 = {
-  "he": "מערכת ייחודית לקבלת החלטות פה-אחד",
-  "en": "Unanimous Decision Making: Our unique system facilitates unanimous decision-making among project collaborators.",
-  "ar": "اتخاذ قرارات بالإجماع: نظامنا الفريد يسهل اتخاذ القرارات بالإجماع بين المشاركين في المشروع."
+  "he": "הקמת 'ריקמה' – שותפות דינמית ומבוססת ערכים",
+  "en": "Creating a 'Rikma' – a dynamic, value-based partnership",
+  "ar": "إنشاء 'ريكما' – شراكة ديناميكية قائمة على القيم"
 };
 const wordNew = {
-  "he": "👑 כל אחת היא מלכה וכל אחד הוא מלך! כאן יוצרים, בונים ומרוויחים יחד תוך שמירה על עצמאות אישית וחירות מלאה",
-  "en": "👑 Every woman is a queen, and every man is a king! Here we create, build, and earn together while preserving personal autonomy and complete freedom",
-  "ar": "👑 كل امرأة هي ملكة، وكل رجل هو ملك! هنا نقوم بالإبداع، والبناء، والكسب المشترك مع الحفاظ على الاستقلال الشخصي والحرية الكاملة "
+  "he": "נעים להכיר: 1💗1 – פלטפורמה של שותפות חדשה. כאן, כל אחת היא מלכה. כל אחד הוא מלך. כאן יוצרים יחד – בלי לוותר על העצמאות.",
+  "en": "Welcome to 1💗1 – a new partnership platform. Here, every woman is a queen. Every man is a king. Here we create together – without giving up independence.",
+  "ar": "مرحبًا بك في 1💗1 – منصة شراكة جديدة. هنا، كل امرأة هي ملكة. كل رجل هو ملك. هنا نخلق معًا – دون التخلي عن الاستقلالية."
 };
 
 const word2 = {
-  "he": "לייסד ריקמה (סוג שותפות ייחודי) בקליק ולאתר ולצרף אליה שותפים, שותפות ומשאבים נדרשים בקלות",
-  "en": "Founding a FreeMates project with a click and easily identifying its human and material components",
-  "ar": "تأسيس مشروع FreeMates بنقرة واحدة وتحديد مكوناته البشرية والمادية بسهولة."
+  "he": "הצטרפות לריקמות קיימות שמתאימות בדיוק ללוח הזמנים, הכישורים ולתשוקה שלך",
+  "en": "Joining existing Rikmas that perfectly match your schedule, skills, and passion",
+  "ar": "الانضمام إلى ريكمات موجودة تتطابق تمامًا مع جدولك الزمني ومهاراتك وشغفك"
 };
 const word3 = {
-  "he": "למצוא ולהתחבר לריקמה שמתאימה בדיוק לערכים, הכישורים ולוח הזמנים שלך",
-  "en": "Finding and connecting to a FreeMate that aligns precisely with your values, skills, and work style",
-  "ar": "العثور والاتصال بـ FreeMate الذي يتوافق تمامًا مع قيمك ومهاراتك ونمط عملك"
+  "he": "הכנסות פאסיביות אמיתיות – רווחים לכל החיים, לפי השקעה, לפי הסכמה",
+  "en": "Real passive income – lifetime profits, based on investment, based on agreement",
+  "ar": "دخل سلبي حقيقي – أرباح مدى الحياة، بناءً على الاستثمار، بناءً على الاتفاق"
 };
-
 const word4 = {
-  "he": "פנקס דיגיטלי מבוזר לניהול החשבונות בריקמה לפי ההסכמות",
-  "en": "Distributed digital ledger for accounting management in the FreeMates based on agreements",
-  "ar": "دفتر الأستاذ الرقمي الموزع لإدارة المحاسبة في FreeMates بناءً على الاتفاقات"
+  "he": "ניהול משותף: הצבעות, החלטות, תקציבים – בהסכמה מלאה של כל קבוצת השותפות",
+  "en": "Shared management: voting, decisions, budgets – with full agreement of the entire partnership group",
+  "ar": "إدارة مشتركة: التصويت، القرارات، الميزانيات – بموافقة كاملة من مجموعة الشراكة بأكملها"
 };
 
 const word5 = {
-  "he": "מערכת הצבעות, אישרורים ומשא ומתן לניהול משותף על בסיס הסכמה פה-אחד",
-  "en": "Voting system, approvals, and negotiation for collaborative management based on unanimous agreement",
-  "ar": "نظام التصويت والموافقات والمفاوضات لإدارة تعاونية بناءً على اتفاق بالإجماع"
+  "he": "פנקס דיגיטלי מבוזר – שקיפות מלאה, בלי בירוקרטיה",
+  "en": "Distributed digital ledger – full transparency, no bureaucracy",
+  "ar": "دفتر أستاذ رقمي موزع – شفافية كاملة، بدون بيروقراطية"
 };
+
 const word6 = {
-  "he": "חישוב וחלוקת כספים לפי סך ההשקעה ולפי ההסכמות",
-  "en": "Calculation and distribution of funds based on investment and agreements",
-  "ar": "حساب وتوزيع الأموال استنادًا إلى الاستثمار والاتفاقات"
+  "he": "משימות, לוחות, גרפים, בוט בינה מלאכותית עוזר אישי, וכלים נוספים לניהול שיתופי פשוט ויעיל",
+  "en": "Tasks, boards, graphs, and additional tools for simple and efficient collaborative management",
+  "ar": "مهام، لوحات، رسوم بيانية، وأدوات إضافية لإدارة تعاونية بسيطة وفعالة"
 };
 
 const word7 = {
-  "he": "גרפים, גאנט, לוח משימות ועוד כלים שמתווספים כל הזמן במסך ניהול הריקמה המשותף",
-  "en": "Graphs, Gantt charts, task boards, and other tools that are constantly added to the shared FreeMates management screen",
-  "ar": "رسوم بيانية، جداول Gantt، لوحات المهام، وأدوات أخرى يتم إضافتها باستمرار إلى شاشة إدارة FreeMates المشتركة"
+  "he": "שיתוף חפצים ושפע בין ריקמות ואנשים – ממחזר, מחבר ומרוויח",
+  "en": "Sharing items and abundance between Rikmas and people – recycling, connecting, and earning",
+  "ar": "مشاركة العناصر والوفرة بين الريكمات والناس – إعادة التدوير، الاتصال، والكسب"
 };
 
 const word8 = {
-  "he": "לשתף את החפצים המיותרים שלך עם רקמות שמתאימות לערכים שלך ולהרוויח",
-  "en": "Sharing your unnecessary items with FreeMates that align with your values and earning",
-  "ar": "مشاركة العناصر الزائدة الخاصة بك مع FreeMates التي تتوافق مع قيمك وكسب المال"
+  "he": "רוצה לצעוד איתנו? זה פשוט. עליך להסכים לאמנת החירות העולמית – מסמך של ערכים, לא של חוקים.",
+  "en": "Want to walk with us? It's simple. You need to agree to the Global Freedom Charter – a document of values, not laws.",
+  "ar": "هل تريد المشي معنا؟ الأمر بسيط. عليك الموافقة على ميثاق الحرية العالمي – وثيقة قيم، وليست قوانين."
 };
 
 const word9 = {
-  "he": "הכנסה פאסיבית  - הופכת למציאות! בריקמה לא מקבלים תשלום מוגדר אלא אחוז דינמי מהרווחים לכל אורך חיי הריקמה",
-  "en": "Passive income - becomes a reality! In FreeMates, you don't receive a fixed payment but a dynamic percentage of profits throughout the lifespan of the FreeMate",
-  "ar": "الدخل السلبي - يصبح واقعًا! في FreeMates ، لا تتلقى دفعة محددة ولكن نسبة ديناميكية من الأرباح طوال فترة حياة FreeMate"
+  "he": "כמתך תופיע במפת ההסכמה ותפתח עבורך את הדרך ליצירת מציאות חדשה",
+  "en": "Your agreement will appear on the Agreement Map and open the way for you to create a new reality",
+  "ar": "ستظهر موافقتك على خريطة الاتفاق وستفتح لك الطريق لخلق واقع جديد"
 };
 
 const word10 = {
-  "he": "רקמות הן קבוצות המורכבות מכישורים ומשאבים שונים אשר יוצרות יחד מוצר או נותנות שירות ומתחלקות בהכנסות לפי ההשקעה היחסית ובהסכמה",
-  "en": "FreeMates are groups composed of different skills and resources that come together to create a product or provide a service and share income based on relative investment and agreement",
-  "ar": "FreeMates هي مجموعات مكونة من مهارات وموارد مختلفة تجتمع معًا لإنشاء منتج أو تقديم خدمة وتقاسم الدخل استنادًا إلى الاستثمار النسبي والاتفاق"
+  "he": "ריקמה היא קבוצה של אנשים בעלי כישורים ומשאבים שונים, היוצרים יחד מוצר או נותנים שירות ומתחלקים ברווחים לפי השקעה יחסית והסכמה",
+  "en": "A Rikma is a group of people with different skills and resources, creating together a product or providing a service and sharing profits based on relative investment and agreement",
+  "ar": "الريكما هي مجموعة من الأشخاص ذوي المهارات والموارد المختلفة، يخلقون معًا منتجًا أو يقدمون خدمة ويتقاسمون الأرباح بناءً على الاستثمار النسبي والاتفاق"
 };
 
 const regesh1 = {
@@ -144,25 +172,27 @@ const loadingTitle = {
   "ar": "تحميل عنصر تصميم ثلاثي الأبعاد"
 };
 const agree = {
-  "he": ' כדי להירשם ולהינות מ-1️💗1️ יש להוסיף את ההסכמה שלך ל"אמנת החירות העולמית" שבעמוד הבא, כך נוודא את המחויבות שלך להתנהלות בהסכמה עם השאר. בנוסף הסכמתך תתווסף ל',
-  "ar": 'للتسجيل والاستمتاع ب-1️💗1️ ، يجب إضافة موافقتك على "الميثاق العالمي للحريات" في الصفحة التالية ، وبهذا سنضمن التزامك بالتعامل بموافقة مع الآخرين. بالإضافة إلى ذلك ، سيتم إضافة موافقتك إلى ',
-  "en": "To register and benefit from 1️💗1️, you need to add your agreement to the 'Global Freedom Charter' on the next page, ensuring your commitment to engaging in agreement with others. Additionally, your agreement will be added to"
+  "he": "רוצה להביא משמעות ושמחה לחיים שלך? רוצה לפתוח דלת אל מציאות חדשה? התחבר/י להסכמה – והירשם/י עכשיו. הסכמתך תופיע ב",
+  "en": "Want to bring meaning and joy to your life? Want to open the door to a new reality? Connect to agreement – and register now. Your agreement will appear on the ",
+  "ar": "هل تريد إضفاء المعنى والفرح على حياتك؟ هل تريد فتح الباب أمام واقع جديد؟ تواصل مع الاتفاق – وسجل الآن. ستظهر موافقتك على "
 };
 
 const agree2 = {
-  "he": '"מפת ההסכמה"',
-  "ar": '"خريطة الاتفاق"',
-  "en": '"Agreement Map"'
+  "he": "מפת ההסכמה",
+  "en": "Agreement Map",
+  "ar": "خريطة الاتفاق"
 };
+
+const agree3 = {
+  "he": " ותפתח עבורך את הדרך ליצירת מציאות חדשה. \n יחד ניצור עולם טוב יותר",
+  "en": " and open the way for you to create a new reality. Together we will create a better world",
+  "ar": " وستفتح لك الطريق لخلق واقع جديد. معًا سنخلق عالمًا أفضل"
+};
+
 const mapa = {
   "he": 'מפת ההסכמה',
   "ar": 'خريطة الاتفاق',
   "en": 'Agreement Map'
-};
-const agree3 = {
-  "he": " ויחד ניצור עולם טוב יותר",
-  "ar": " ومعًا سنخلق عالمًا أفضل",
-  "en": "Together we will create a better world"
 };
 
 	$: btna = false
@@ -240,7 +270,28 @@ const pagetitle = {
 	}} >
 		<h2 class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))]  overline decoration-mturk text-xl"
     style="text-shadow:none;">{setitle[$lang]}</h2>
-		<h3 class="text-xl sm:text-2xl p-2 px-2 text-barbi">{desc[$lang]}<span class="underline decoration-lturk" style="font-family: 'Popins','Dorian';">{desc2[$lang]}</span></h3>
+  
+
+		<h3 class="sababa text-2xl sm:text-3xl p-2 px-2 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-goldGrad" 
+    style="font-family: Sababa, system-ui;text-shadow:none;">
+  <AnimatedHeadline
+    texts={desc[$lang]}
+    wait={3000}
+    fade={500}
+    slide={300}
+    y={0}
+  />
+</h3>
+    
+    <div class="intro-questions relative bg-gradient-to-r from-fuchsia-400 via-barbi to-mpink p-4 my-4 rounded-lg shadow-lg border-2 border-">
+      <div class="absolute inset-0 overflow-hidden opacity-10">
+        <span class="absolute text-6xl font-bold text-white">?</span>
+        <span class="absolute right-0 text-6xl font-bold text-white">?</span>
+      </div>
+      <p class="text-xl sm:text-2xl mb-2 text-white font-semibold relative" style="font-family: 'Sababa', sans-serif;">{introQuestions[$lang].q1}</p>
+      <p class="text-xl sm:text-2xl text-white font-semibold relative" style="font-family: 'Sababa', sans-serif;">{introQuestions[$lang].q2}</p>
+    </div>
+
 		<div dir={$lang == "en" ? "ltr" : "rtl"}>
       <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={wordNew[$lang]} />
       <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word1[$lang]}  />
@@ -251,12 +302,15 @@ const pagetitle = {
       <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word6[$lang]} />
       <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word7[$lang]} />
       <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word8[$lang]} />
-      <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]} />
+     <!-- <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]} />-->
 				<Tile bg={"wow"} big={true} sm={true} word={word10[$lang]}/>
-				<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>
+				<!--<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>-->
 			</div>
-		<div class="bg-gradient-to-br from-fuchsia-400 via-barbi  to-mpink px-3 py-4 mt-1 border-4 border-spacing-2 ">
-		<h2 style="text-shadow:none;" class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  ">{regesh1[$lang]}<br>{regesh2[$lang]}</h2>
+		<div class="bg-gradient-to-br from-fuchsia-400 via-barbi to-mpink px-3 py-4 mt-1 border-4 border-spacing-2">
+		<h2 style="text-shadow:none;" class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]">
+    {agree[$lang]}<a class="text-gold hover:text-barbi font-bold underline" href="/love">{agree2[$lang]}</a>
+    {agree3[$lang]}
+  </h2>
     </div>
 	</div>
 		<div style="font-family:Gan, Power;" class="flex flex-row">
@@ -300,7 +354,12 @@ const pagetitle = {
 	</div>
 </div>
 <style>
-	.flip{
+.sababa > span,
+.sababa > div > span {
+  font-family: 'Sababa', system-ui !important;
+  text-shadow: none;
+}
+.flip{
     -moz-transform: scale(-1, 1);
 -webkit-transform: scale(-1, 1);
 -o-transform: scale(-1, 1);

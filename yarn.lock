@@ -7405,6 +7405,11 @@ svelte-agnostic-draggable@^0.2.0:
   dependencies:
     agnostic-draggable "^1.4.6"
 
+svelte-animated-headline@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.npmjs.org/svelte-animated-headline/-/svelte-animated-headline-1.0.7.tgz"
+  integrity sha512-+TPbAxgh5HjJCkl30yIhsBGUHQoSqc8bNw8DSe9dc26pz+DgAchYWca4PBGXM/5goojWEmU9kwca+4jFyLeoXQ==
+
 svelte-calendar@^3.1.6:
   version "3.1.6"
   resolved "https://registry.npmjs.org/svelte-calendar/-/svelte-calendar-3.1.6.tgz"
