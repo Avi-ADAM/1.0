@@ -285,7 +285,7 @@
 </script>
 
 <!-- הקומפוננטה עם הנתונים -->
-<div class="project-timers-calendar bg-white rounded-lg shadow-lg p-6" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+<div class="project-timers-calendar bg-white rounded-lg shadow-lg pt-4 px-1 sm:p-6" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
   <div class="flex justify-between items-center mb-6" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
     <h2 class="text-2xl font-bold text-gray-800">{currentTexts.projectTimers}</h2>
     <div class="flex gap-4 text-sm">

@@ -2380,7 +2380,7 @@ pointer-events: none;"
   <ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>                
          
 {:else if tab === 10}
-  <div class="p-8">
+  <div class="sm:p-8 p-1">
     <TimersOfUsers projectId={$idPr} on:mission={openDescrip} on:tasks={()=>tab = 9} />
   </div>
 {/if}              
