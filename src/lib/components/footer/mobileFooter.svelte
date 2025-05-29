@@ -8,6 +8,7 @@
   import MoachIcon from "$lib/celim/icons/moachIcon.svelte";
   import { createEventDispatcher } from "svelte";
   import Lev from '$lib/celim/lev.svelte';
+  import ProfileMenu from '$lib/components/footer/ProfileMenu.svelte';
   const dispatch = createEventDispatcher();
     function addi(kind){
       if(kind == 'chat'){
@@ -28,17 +29,8 @@
 
 <div class="fixed z-50 w-full h-12 max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-0 left-1/2 dark:bg-gray-700 dark:border-gray-600">
     <div class="grid h-full max-w-lg grid-cols-5 mx-auto" >
-        <button on:click={()=>{
-            activeRoute = "moach"
-            goto("/moach")
-        }} type="button" class="{$page.url.pathname == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-s-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
-            <MoachIcon active={$navigating?.to.url.pathname == "/moach"}/>
-            <span class="sr-only">{brainLeb[$lang]}</span>
-        </button>
-        <div id="tooltip-home" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-            {brainLeb[$lang]}
-            <div class="tooltip-arrow" ></div>
-        </div>
+         <ProfileMenu />
+       
         <button on:click={() => addi('chat')} type="button" 
             class="{$isChatOpen ? "border-b-2 border-gold" :""} inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
             <Chaticon />
@@ -72,18 +64,15 @@
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <button on:click={()=>{
-            activeRoute = "me"
-            goto("/me")
-        }} type="button" class="{$page.url.pathname == "/me" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center text-barbi px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
-              <img
-              class=""
-              src='https://res.cloudinary.com/love1/image/upload/v1641481504/newC_qq5z3l.svg'
-              alt="link to Profile">
-            <span class="sr-only">Profile</span>
+            activeRoute = "moach"
+            goto("/moach")
+        }} type="button" class="{$page.url.pathname == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
+            <MoachIcon active={$navigating?.to.url.pathname == "/moach"}/>
+            <span class="sr-only">{brainLeb[$lang]}</span>
         </button>
-        <div id="tooltip-profile" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-            Profile
-            <div class="tooltip-arrow" data-popper-arrow></div>
+        <div id="tooltip-home" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+            {brainLeb[$lang]}
+            <div class="tooltip-arrow" ></div>
         </div>
     </div>
 </div>

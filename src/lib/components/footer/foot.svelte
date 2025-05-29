@@ -185,7 +185,7 @@
   </div>
 </div>
 {/if}
-{#if !isMobileOrTablet()}
+<!--{#if isMobileOrTablet()}
 
 <button
   style="position: fixed; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"
@@ -216,9 +216,9 @@
     ><Plus /></button
   >
 {/if}
-{:else}
+{:else}{/if}-->
 <MobileFooter on:chat={() => addi("chat")} on:new={() => addi()}/>
-{/if}
+
 
 <style>
    .draggable {

@@ -230,7 +230,7 @@ function filterByProjectId(projectId) {
 
 .bg{
         position: absolute;
-        top: 97% ;
+        top: 7% ;
         left: 50%;
       transform: translate(-50%, -50%);
     }
