@@ -89,7 +89,7 @@
         eventMouseEnter: handleEventMouseEnter,
         eventMouseLeave: handleEventMouseLeave,
         slotMinTime: '06:00:00',
-        slotMaxTime: '22:00:00',
+        slotMaxTime: '24:00:00',
         allDaySlot: false,
         nowIndicator: true,
         eventDisplay: 'block',
@@ -177,7 +177,7 @@
     });
   </script>
   
-  <div class="timers-calendar-container w-full h-full">
+  <div class="timers-calendar-container w-full h-full mb-16">
     <!-- כותרת וסטטיסטיקות -->
     <div class="mb-6 bg-white rounded-lg shadow p-4">
       <h2 class="text-2xl font-bold text-gray-800 mb-4 text-center">לוח הטיימרים שלי</h2>
