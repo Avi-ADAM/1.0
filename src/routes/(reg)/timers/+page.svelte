@@ -2,7 +2,7 @@
 	// +page.svelte
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
-    import { fetchTimers , timers} from '$lib/stores/timers'
+    import { fetchTimers , timers,initialWebS} from '$lib/stores/timers'
     import Timer from '$lib/components/timers/timer.svelte'
 	let hoverText = '0';
 	let tx = 200;
@@ -29,8 +29,13 @@
     }
     let newState = false;
     // Function to fetch timer data
-	
+	$: if($timers){
+        console.log($timers,'noted')
+        
+            
+    }
     onMount(async () => {
+        initialWebS($page.data.tok,$page.data.uid)
 		const res = await fetchTimers($page.data.uid,fetch).then((x) => {
             newState = true;
             
@@ -226,7 +231,6 @@
         <div id="timer-content" dir="ltr" bind:clientWidth={w} bind:clientHeight={h} 
             style="position: relative; width: {w}px; height: {h}px;" 
             class="screen d">
-            
             {#each $timers as timer, index (timer.id)}
             <Timer
                 orders={orders[index]}
@@ -242,7 +246,6 @@
                 {linke}
             />
             {/each}
-            
             <!-- סמן מרכז - שימושי לפיתוח - להסרת ההערה לצורך בדיקות -->
             <!-- <div class="center-marker"></div> -->
         </div>

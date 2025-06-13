@@ -496,6 +496,7 @@
     const start = da.data.usersPermissionsUser.data.attributes.projects_1s.data;
     for (let i = 0; i < start.length; i++) {
       for (let j = 0; j < start[i].attributes.asks.data.length; j++) {
+        console.log(start[i].attributes.asks.data[j],"אסק");
         const rt = letters(
           start[i].attributes.asks.data[j].attributes.open_mission.data
             .attributes.name
@@ -580,6 +581,7 @@
         dictasked[t].noofusersNo = 0;
 
         if (allid.includes(myid)) {
+        //  console.log(dictasked[t].askId,dictasked[t].already, 'already' , dictasked[t].uids, 'uid', dictasked[t].myid, 'myid');	
           dictasked[t].already = true;
           //  dictasked.splice(t, 1);
           //  dictasked. = dictasked
@@ -2179,7 +2181,7 @@
 
       counter += 1;
       localStorage.setItem('miDataL', JSON.stringify(miData));
-      if (isEqual(miData, miDataold) == true && update != true) {
+      if (!isEqual(miData, miDataold) == true && update != true) {
         console.log('nada',nowT - Date.now());
         low = false;
       } else {

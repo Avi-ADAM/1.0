@@ -20,6 +20,7 @@ let messagesArray = forumToArr()
     }
     import { onDestroy } from 'svelte';
   import { meetingsData } from "$lib/stores/pgishot";
+  import AiChatInterface from "../ai/AIChatInterface.svelte";
 
   
 
@@ -106,7 +107,7 @@ let nameChatPartner = {"he":"דיון על משימה בתהליך ","en":"chat 
 {#key messagesArray}
 <ListSmall bind:chatId chats={messagesArray}/>  
 {/key}
-{:else}
+{:else if $nowChatId > 0}
  <Diun
     dont={true}
   rikmaName={$forum[$nowChatId].md.projectName}
@@ -120,4 +121,6 @@ let nameChatPartner = {"he":"דיון על משימה בתהליך ","en":"chat 
   profilePicChatPartner={$forum[$nowChatId].md.projectPic}
   {ani}
 />
+{:else}
+<AiChatInterface/>
 {/if}

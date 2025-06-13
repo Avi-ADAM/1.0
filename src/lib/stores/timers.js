@@ -1,6 +1,9 @@
 import { browser } from '$app/environment';
 import { sendToSer } from '$lib/send/sendToSer.svelte';
 import { writable } from 'svelte/store';
+import { io } from 'socket.io-client';
+
+const baseUrl = import.meta.env.VITE_URL;
 
 // Initialize timers with data from localStorage or empty array
 const storedTimers = browser ? localStorage.getItem('timers') : null;
@@ -10,6 +13,37 @@ export const timers = writable([]);//JSON.parse(storedTimers) ||
 if (browser) {
     timers.subscribe(value => {
         localStorage.setItem('timers', JSON.stringify(value));
+    });
+}
+
+export async function initialWebS(token, id) {
+    const socket = io(baseUrl, {
+        auth: {
+            token: token
+        }
+    });
+
+    socket.on('connect', () => {
+        console.log('connected to timers socket', id);
+        
+        socket.on('timer:update', (data) => {
+            console.log('timer update received:', data);
+            // רענון הטיימרים כאשר מתקבל עדכון
+            if (data && data.data) {
+                // בדיקה אם הטיימר שייך למשתמש הנוכחי
+                timers.subscribe(currentTimers => {
+                    const timerExists = currentTimers.some(timer => 
+                        timer.attributes.activeTimer && 
+                        timer.attributes.activeTimer.id === data.data.id
+                    );
+                    
+                    if (timerExists) {
+                        // אם הטיימר שייך למשתמש, נעדכן את הנתונים
+                        fetchTimers(id, fetch);
+                    }
+                });
+            }
+        });
     });
 }
 

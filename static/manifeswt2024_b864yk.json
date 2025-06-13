@@ -5,7 +5,7 @@
     "start_url": "https://www.1lev1.com/",
     "theme_color": "#EEE8AA",
     "orientation": "natural",
-    "categories": ["partnership","social","entrepreneurship","שותפות","יזמות","הסכמה"],
+    "categories": ["partnership","social","entrepreneurship"],
     "icons": [
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1645704770/maskable_icon_kuuky8.png",
@@ -26,38 +26,14 @@
     "scope": "https://www.1lev1.com/",
     "shortcuts": [
         {
-            "name": "מוח",
-            "short_name": "הרקמות שלי",
-            "description": "עמוד ניהול משותף",
-            "url": "https://www.1lev1.com/moach?source=pwa",
+            "name": "לב",
+            "short_name": "לב",
+            "description": "הצעות עדכונים החלטות - מרכז הפעולות , הלב הפועם",
+            "url": "https://www.1lev1.com/lev?source=pwa",
             "icons": [
                 {
-                    "src": "https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg",
-                    "sizes": "1434x1434"
-                }
-            ]
-        },
-        {
-            "name": "טיימרים",
-            "short_name": "טיימרים",
-            "description": "עמוד לניהול של טיימרים",
-            "url": "https://www.1lev1.com/timers?source=pwa",
-            "icons": [
-                {
-                    "src": "https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg",
+                    "src": "https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg",
                     "sizes": "32x32"
-                }
-            ]
-        },
-        {
-            "name": "לוח השנה שלי",
-            "short_name": "לוח שנה",
-            "description": "עמוד לוח השנה האישי",
-            "url": "https://www.1lev1.com/myCalendar?source=pwa",
-            "icons": [
-                {
-                    "src": "https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg",
-                    "sizes": "450x450"
                 }
             ]
         },
@@ -74,14 +50,14 @@
             ]
         },
         {
-            "name": "לב",
-            "short_name": "לב",
-            "description": "הצעות עדכונים החלטות - מרכז הפעולות , הלב הפועם",
-            "url": "https://www.1lev1.com/lev?source=pwa",
+            "name": "מוח",
+            "short_name": "הרקמות שלי",
+            "description": "עמוד ניהול משותף",
+            "url": "https://www.1lev1.com/moach?source=pwa",
             "icons": [
                 {
-                    "src": "https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg",
-                    "sizes": "32x32"
+                    "src": "https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg",
+                    "sizes": "1434x1434"
                 }
             ]
         },

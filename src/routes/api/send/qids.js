@@ -509,7 +509,7 @@ export const qids = {
                   } }}
           mesimabetahalich{data{id
          attributes{name  howmanyhoursalready hoursassinged
-         
+                 
 }}}
           }
           }

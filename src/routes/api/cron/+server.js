@@ -22,7 +22,7 @@ export async function GET(req) {
       // %0A is url encoded '\n' which is used for new line.
       const Token = import.meta.env.VITE_TELEGRAM_BOT_TOKEN;
       const chatId = import.meta.env.VITE_TELEGRAM_CHAT_ID;
-      const url = `https://api.telegram.org/bot${Token}/sendMessage?chat_id=${chatId}&text=${botMessage}`;
+       const url = `https://api.telegram.org/bot${Token}/sendMessage?chat_id=${chatId}&text=${botMessage}`;
       const rest = await fetch(url);
       let sec = false;
       ab();

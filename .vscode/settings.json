@@ -20,5 +20,9 @@
         "titleBar.inactiveForeground": "#15202b99"
     },
     "peacock.color": "#f9e64f",
-    "references.preferredLocation": "view"
+    "references.preferredLocation": "view",
+    "cSpell.words": [
+        "המידע",
+        "יאחסן"
+    ]
 }

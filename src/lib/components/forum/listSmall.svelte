@@ -7,11 +7,14 @@
   import { Rainbow } from 'svelte-loading-spinners';
   import { quintOut } from 'svelte/easing';
   import { slide } from 'svelte/transition';
+  import AIChatListItem from '$lib/components/ai/AIChatListItem.svelte'; // Import the new component
+
    console.log(chats)
    function toChat(id){
     nowChatId.set(id)
     chatId = id
    }
+  
    //TODO: projectName and image as link to moach or publick page from open dialog - do you want to go to ...
 </script>
 <section transition:slide="{{ duration: 1000, easing: quintOut }}"  class="flex flex-col justify-center antialiased bg-gold text-gray-600  px-2 pb-2 h-max w-full shadow-xl shadow-fuchsia-500 rounded">
@@ -29,6 +32,8 @@
                   <Rainbow />
                   </div>
                   {/if}
+                 <AIChatListItem lang={$lang} on:oneClick={()=>toChat(-2)} />
+
                   {#key chats}
                    {#each chats as chat}
                     <button on:click={()=>toChat(chat.id)} class="w-full {$lang == "en" ? "text-left" : "text-right"} py-2 focus:outline-none focus-visible:bg-indigo-50 mt-2 p-2 hover:shadow-lg rounded cursor-pointer transition">

@@ -1,7 +1,7 @@
 {
     "short_name": "1💗1",
-    "name": "1💗1",
-    "id": "https://www.1lev1.com/he",
+    "name": "1💗1 - We can together",
+    "id": "https://www.1lev1.com/en",
     "start_url": "https://www.1lev1.com/",
     "theme_color": "#EEE8AA",
     "orientation": "natural",
@@ -26,9 +26,9 @@
     "scope": "https://www.1lev1.com/",
     "shortcuts": [
         {
-            "name": "מוח",
-            "short_name": "הרקמות שלי",
-            "description": "עמוד ניהול משותף",
+            "name": "Shared Workspace",
+            "short_name": "My Projects",
+            "description": "Page for shared project management",
             "url": "https://www.1lev1.com/moach?source=pwa",
             "icons": [
                 {
@@ -38,9 +38,9 @@
             ]
         },
         {
-            "name": "טיימרים",
-            "short_name": "טיימרים",
-            "description": "עמוד לניהול של טיימרים",
+            "name": "Timers",
+            "short_name": "Timers",
+            "description": "Page for managing timers",
             "url": "https://www.1lev1.com/timers?source=pwa",
             "icons": [
                 {
@@ -50,9 +50,9 @@
             ]
         },
         {
-            "name": "לוח השנה שלי",
-            "short_name": "לוח שנה",
-            "description": "עמוד לוח השנה האישי",
+            "name": "My Calendar",
+            "short_name": "Calendar",
+            "description": "Personal calendar page",
             "url": "https://www.1lev1.com/myCalendar?source=pwa",
             "icons": [
                 {
@@ -62,9 +62,9 @@
             ]
         },
         {
-            "name": "אני",
-            "short_name": "אני",
-            "description": "לנהל את כל המאפיינים וההיצע שלי",
+            "name": "Me",
+            "short_name": "Me",
+            "description": "Manage my profile and offerings",
             "url": "https://www.1lev1.com/me?source=pwa",
             "icons": [
                 {
@@ -74,9 +74,9 @@
             ]
         },
         {
-            "name": "לב",
-            "short_name": "לב",
-            "description": "הצעות עדכונים החלטות - מרכז הפעולות , הלב הפועם",
+            "name": "Heart",
+            "short_name": "Heart",
+            "description": "Proposals, updates, decisions - the action center, the beating heart",
             "url": "https://www.1lev1.com/lev?source=pwa",
             "icons": [
                 {
@@ -86,9 +86,9 @@
             ]
         },
         {
-            "name": "ההסכמה",
-            "short_name": "הסכמה על שלום וביטחון",
-            "description": "הסכמה ראשונה כדי להירשם",
+            "name": "The Agreement",
+            "short_name": "Peace and Security Agreement",
+            "description": "Initial registration agreement",
             "url": "https://www.1lev1.com/?source=pwa",
             "icons": [
                 {
@@ -98,9 +98,9 @@
             ]
         },
         {
-            "name": "מפת ההסכמה",
-            "short_name": "מפת ההסכמה",
-            "description": "כמה הסכימו מכל מקום",
+            "name": "Agreement Map",
+            "short_name": "Agreement Map",
+            "description": "Geographic agreement distribution",
             "url": "https://www.1lev1.com/love?source=pwa",
             "icons": [
                 {
@@ -116,113 +116,113 @@
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "הצעה למשימה בעמוד הניתן לשיתוף ברשתות"
+            "label": "Proposal for a shareable task on social networks"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702140312/resize-170214026187569534720231209181532_or2mw4.png",
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "לוח בקרה וניהול אישי"
+            "label": "Personal control and management dashboard"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1717456274/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2024-03-17_224316_resized_oyksjg.png",
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "מסך הלב בו מקבלים הצעות ומגיבים להצבעות"
+            "label": "Heart screen for proposals and voting"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702140863/resize-170214082999739420720231209185239_dtt0xd.png",
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "מסך התחלה"
+            "label": "Start screen"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702141130/resize-1702141006139498852420231209183416_k9qero.png",
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "יצירת ריקמה חדשה (פרויקט משותף)"
+            "label": "Create a new collaborative project"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702141241/resize-170214104451484550220231209182114_ictm9o.png",
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "חלק מעמוד ניהול הריקמה המשותף"
+            "label": "Part of the shared project management page"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702141334/resize-170214108624935630520231209182010_ufxiec.png",
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "לוח המשימות בעמוד הניהול המשותף"
+            "label": "Task board on the shared management page"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702141572/resize-170214152972297426320231209181601_p1dzw3.png",
             "sizes": "614x907",
             "type": "image/png",
             "form_factor": "narrow",
-            "label": "עמוד ציבורי"
+            "label": "Public page"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702141781/%D7%A6%D7%99%D7%9C%D7%95%D7%9D_%D7%9E%D7%A1%D7%9A_2023-12-09_180400_fdqqco.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "עמוד הלב לקבלת הצעות ולהצבעות"
+            "label": "Heart page for receiving proposals and votes"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702142202/resize-1702142168154411494920231209180725_ojllkn.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "חלק מעמוד ניהול הריקמה המשותף"
+            "label": "Part of the shared project management page"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702142742/resize-170214240612814816820231209180915_1_pcaar3.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "עמוד ציבורי"
+            "label": "Public page"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702142831/resize-170214249583734452320231209181419_pzs36w.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "הצעה למשימה בעמוד הניתן לשיתוף ברשתות"
+            "label": "Proposal for a shareable task on social networks"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702142882/resize-170214254482280575320231209182031_x9zusr.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "טבלת משימות בתהליך בעמוד ניהול הריקמה המשותף"
+            "label": "In-progress task table on the shared project management page"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702142988/resize-170214259334009577020231209183341_egfilg.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "יצירת ריקמה חדשה (פרויקט משותף)"
+            "label": "Create a new collaborative project"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702143043/resize-1702142624180083780420231209183842_es884j.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "כאן בכל מתחיל"
+            "label": "Everything starts here"
         },
         {
             "src": "https://res.cloudinary.com/love1/image/upload/v1702143101/resize-170214266337353441420231209191323_yuyme2.png",
             "sizes": "1920x911",
             "type": "image/png",
             "form_factor": "wide",
-            "label": "תצוגה מרוכזת למסך הלב וההצעות"
+            "label": "Consolidated view for the Heart screen and proposals"
         }
     ],
-    "description": "!ליצור ולהגשים יחד בהסכמה:  1💗1 מאפשר לך למצוא שותפים ושותפות להגשמה של כל מטרה או רעיון, ליצור ולהינות יחד, לקבל החלטות פה-אחד, להתנהל ביעילות ולנהל משימות ולחלק את הרווחים בהסכמה.  1💗1 מספק כלים חדשניים לקבלת החלטות משותפת, כל הדעות נחשבות וההחלטות בקבוצה מקובלות על הכל, זה הזמן להתחיל!"
+    "description": "Create and achieve together in agreement: The 1💗1 website allows you to find partners to fulfill any goal or business idea, create and collaborate together, make decisions, manage, and share profits in agreement. The 1💗1 website provides innovative tools for joint decision-making in the form of consensus, so all opinions are considered and the group's decisions are acceptable to all. Now is the time to start!"
 }
