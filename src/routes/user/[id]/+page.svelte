@@ -6,167 +6,92 @@
   import { lang } from '$lib/stores/lang.js'
   export let  data
   let userId = data.userId; 
-  import { onMount } from 'svelte';
   import Header from '$lib/components/header/header.svelte'
 
-let user;
-let load = false
-let projects =[];
-let uskill =[];
-let token;
-let fblink, twiterlink, discordlink, githublink
+  let user = data.userData ? data.userData.attributes : null;
+  let load = !!data.userData; // True if userData exists
+  let projects = user && user.projects_1s ? user.projects_1s.data : [];
+  let uskill = user && user.skills ? user.skills.data : [];
+  let fblink = user ? user.fblink : null;
+  let twiterlink = user ? user.twiterlink : null;
+  let discordlink = user ? user.discordlink : null;
+  let githublink = user ? user.githublink : null;
 
-let idL;
-let srcU = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
-let uww = [];
-let fmm = [];
-let ur = [];
-let val = [];
-let mash = []
-let error1 = null;
-const baseUrl = import.meta.env.VITE_URL
+  let srcU = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
+  let uww = user && user.work_ways ? user.work_ways.data : [];
+  let fmm = [];
+  let ur = user && user.tafkidims ? user.tafkidims.data : [];
+  let val = user && user.vallues ? user.vallues.data : [];
+  let mash = user && user.sps ? user.sps.data : [];
+  let error1 = null;
 
-     onMount(async () => {
-    const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
-    token  = cookieValue; 
-    let bearer1 = 'bearer' + ' ' + token;
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json'   
-      }; 
-      let link =baseUrl+"/graphql" ;
-        try {
-             await fetch(link, {
-              method: 'POST',
-       
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query: 
-          `{  usersPermissionsUser (id:${userId}) { data{attributes{
-             fblink twiterlink discordlink githublink
-            bio
-            username 
-                        finnished_missions { data{attributes{ missionName }}}
-            profilePic { data{attributes{url formats }}}
-            projects_1s {data{ id attributes{ projectName}}} 
-            sps (filters: {archived:{eq: false }}) {data{id attributes { name panui}}}
-            skills {data{ id attributes{ skillName ${$lang == 'he' ? 'localizations{  data{attributes{skillName }}}' : ""}} }}
-            tafkidims {data{ id attributes{ roleDescription ${$lang == 'he' ? 'localizations{ data{attributes{roleDescription }}}' : ""}}}}
-            vallues {data{ id attributes{ valueName ${$lang == 'he' ? 'localizations{ data{attributes{valueName }}}' : ""}}}}
-            work_ways {data{ id attributes{workWayName ${$lang == 'he' ? 'localizations{ data{attributes{workWayName }}}' : ""}}}}
-                            }}}
-        }`
-        })
-})
-  .then(r => r.json())
-  .then(data => user = data.data.usersPermissionsUser.data.attributes);
-            console.log(user);
-            projects = user.projects_1s.data;
-            load = true
-            uskill = user.skills.data;
-              fblink = user.fblink
-            twiterlink = user.twiterlink
-             discordlink = user.discordlink
-               githublink = user.githublink
-            let fermatana = {}
-            let fnn = []
-            fnn = user.finnished_missions.data;
-            if (fnn.length > 1){
-             for (let i = 0; i < fnn.length; i++){
-              if (fnn[i].attributes.missionName in fermatana) {
-                    fermatana[fnn[i].attributes.missionName] += 1
-                   } else {
-                    fermatana[fnn[i].attributes.missionName] = 1
-                   }
-              }
-         for (const [key, value] of Object.entries(fermatana)) {
-            const datea = key
-            const ano = value
-            fmm.push({
-              missionName: `${$lang == "en" ?  key : ""}${value > 1 ? ` ${$lang == "en" ?  ":" : ""}${value}${$lang == "he" ?  ":" : ""}` : ""}${$lang == "he" ?  key : ""}`
-            })
-         }
-        }
-        fmm = fmm
-            ur =  user.tafkidims.data;
-              val = user.vallues.data;
-            if ($lang == "he"){
-              for (var i = 0; i < val.length; i++){
-                if (val[i].attributes.localizations.data.length > 0){
-                val[i].attributes.valueName = val[i].attributes.localizations.data[0].attributes.valueName
-                }
-              }
-            }
-            val = val
-            uskill = user.skills.data;
-              if ($lang == "he"){
-              for (var i = 0; i < uskill.length; i++){
-                if (uskill[i].attributes.localizations.data.length > 0){
-                uskill[i].attributes.skillName = uskill[i].attributes.localizations.data[0].attributes.skillName
-                }
-              }
-            }       
-            uskill = uskill   
-            ur = user.tafkidims.data;
-                        if ($lang == "he"){
-              for (var i = 0; i < ur.length; i++){
-                if (ur[i].attributes.localizations.data.length > 0){
-                ur[i].attributes.roleDescription = ur[i].attributes.localizations.data[0].attributes.roleDescription
-                }
-              }
-            }
-            ur = ur
-            mash = user.sps.data;
-            uww = user.work_ways.data;  
-            if ($lang == "he"){
-              for (var i = 0; i < uww.length; i++){
-                if (uww[i].attributes.localizations.data.length > 0){
-                uww[i].attributes.workWayName = uww[i].attributes.localizations.data[0].attributes.workWayName
-                }
-              }
-            }    
-              uww = uww
-              if (user.profilePic.data !=null){
-            srcU =user.profilePic.data.attributes.formats.thumbnail.url
-            srcU =user.profilePic.data.attributes.formats.small.url
-              }
-        } catch (e) {
-            error1 = e
-        }
+  // Process finished missions
+  if (user && user.finnished_missions && user.finnished_missions.data.length > 1) {
+    let fermatana = {};
+    user.finnished_missions.data.forEach(fm => {
+      if (fm.attributes.missionName in fermatana) {
+        fermatana[fm.attributes.missionName]++;
+      } else {
+        fermatana[fm.attributes.missionName] = 1;
+      }
     });
-    let linkP = "https://www.google.co.il" 
+    for (const [key, value] of Object.entries(fermatana)) {
+      fmm.push({
+        missionName: `${$lang == "en" ? key : ""}${value > 1 ? ` ${$lang == "en" ? ":" : ""}${value}${$lang == "he" ? ":" : ""}` : ""}${$lang == "he" ? key : ""}`
+      });
+    }
+  }
+
+  // Localize data if lang is 'he'
+  if ($lang == "he") {
+    val = val.map(item => ({
+      ...item,
+      attributes: {
+        ...item.attributes,
+        valueName: item.attributes.localizations.data.length > 0 ? item.attributes.localizations.data[0].attributes.valueName : item.attributes.valueName
+      }
+    }));
+    uskill = uskill.map(item => ({
+      ...item,
+      attributes: {
+        ...item.attributes,
+        skillName: item.attributes.localizations.data.length > 0 ? item.attributes.localizations.data[0].attributes.skillName : item.attributes.skillName
+      }
+    }));
+    ur = ur.map(item => ({
+      ...item,
+      attributes: {
+        ...item.attributes,
+        roleDescription: item.attributes.localizations.data.length > 0 ? item.attributes.localizations.data[0].attributes.roleDescription : item.attributes.roleDescription
+      }
+    }));
+    uww = uww.map(item => ({
+      ...item,
+      attributes: {
+        ...item.attributes,
+        workWayName: item.attributes.localizations.data.length > 0 ? item.attributes.localizations.data[0].attributes.workWayName : item.attributes.workWayName
+      }
+    }));
+  }
+
+  if (user && user.profilePic && user.profilePic.data != null) {
+    srcU = user.profilePic.data.attributes.url; // Use 'url' directly from the query
+  }
+
+  let linkP = "https://www.google.co.il"
 const towel = {"he":"לינק","en":"link"}
 let h,w;
 let issm = false
-let viewBox="0 0 1920 1080"
+let viewBox="0 0 1920 1180"
 $: if (w/h < 1.3 && w/h > 1){
     issm = true
-  viewBox="320 280 1220 480"
+  viewBox="320 280 1220 587"
 } else if (w/h < 1 ){
     issm = true
- viewBox="450 280 1020 480"
+ viewBox="450 280 1020 587"
 } else {
     issm = false
-  viewBox="0 0 1920 1080"
+  viewBox="0 0 1920 1180"
 }
 const sk = {"he": "כישורים", "en":"skills"}
 const ro = {"he": "תפקידים", "en":"roles"}
@@ -184,11 +109,13 @@ $: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `$
   <svelte:head>
   <title>{title[$lang]}</title>
 </svelte:head>
-
+{#if data.isRegisteredUser}
+<Header/>
+{/if}
   <div dir="rtl" >
 
       <div class="middle" bind:clientHeight="{h}" bind:clientWidth="{w}">
-        <svg class="bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400" height="100vh" width="100vw" id="eARfSi12ITv1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
+        <svg class="bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400" width="100vw" height="100vh" id="eARfSi12ITv1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
     viewBox="{viewBox}" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
      {#if srcU }
 <foreignObject class="stroke-1 stroke-barbi" x='768' y='348' width='384' height='384' > <img
@@ -273,7 +200,7 @@ $: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `$
 </foreignObject>
 
  
-    <foreignObject x="710" y="987" height="280" width="500">
+<foreignObject x="710" y="987" height="280" width="500">
         <div class="flexi">
            <div class="q">
             {#if load == true}
@@ -330,6 +257,21 @@ $: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `$
           </a>
                       {/if}
     </foreignObject>
+
+
+    {#if !data.isRegisteredUser}
+      <foreignObject x="710" y="0" height="100" width="500">
+        <div class="flex flex-row align-middle  items-center justify-center bg-yellow-200 p-2 rounded-lg shadow-lg">
+          <p class="text-lg font-semibold text-gray-800 text-center mr-4">
+            {$lang == 'he' ? 'הצטרפו אלינו כדי לראות את כל הפרטים, להקים פרופיל, לשתף פעולה וליצור יחד!' : 'Join us to see full details, create a profile, collaborate, and create together!'}
+          </p>
+          <a href="/" class="px-4 py-1 bg-blue-500 text-white rounded-md hover:bg-blue-600">
+            {$lang == 'he' ? 'הירשמו עכשיו!' : 'Register Now!'}
+          </a>
+        </div>
+      </foreignObject>
+    {/if}
+
   </svg>
   
       </div>
@@ -423,4 +365,4 @@ color: var(--barbi-pink);
   .ee{
 
   }
-    </style>         
+    </style>
