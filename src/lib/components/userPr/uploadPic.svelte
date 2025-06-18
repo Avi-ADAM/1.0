@@ -1,30 +1,35 @@
 <script>
- import { createEventDispatcher } from 'svelte';
  import Cropper from "svelte-easy-crop";
 	import { getCroppedImg } from "./canvasUtils"
   import { lang } from '$lib/stores/lang.js'
+	      let file;
+  /**
+   * @typedef {Object} MessagePayload
+   * @property {FormData} files
+   */
+
   /**
    * @typedef {Object} Props
    * @property {number} [aspect]
+   * @property {(payload: MessagePayload) => void} [onMessage] - Callback for the message event.
    */
 
   /** @type {Props} */
-  let { aspect = 1 } = $props();
-	      let file;
+  let { aspect = 1, onMessage } = $props();
 let dataU;
 	let image = $state(), fileinput = $state(), pixelCrop, croppedImage;
 
-   var imgBase64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCA";
+   let imgBase64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCA";
 //	async function DataURIToBlob(dataURI) {
 //    dataU = dataURI;
 //   
 //        console.log(dataU);
 //          dataU.split(',') ; 
 //           console.log(dataU);
-//        var splitDataURI;
+//        let splitDataURI;
 //        
-//        var byteString = dataU[0].indexOf('base64') >= 0 ? atob(dataU[1]) : decodeURI(dataU[1])
-//        var mimeString = dataU[0].split(':')[1].split(';')[0]
+//        let byteString = dataU[0].indexOf('base64') >= 0 ? atob(dataU[1]) : decodeURI(dataU[1])
+//        let mimeString = dataU[0].split(':')[1].split(';')[0]
 function DataURIToBlob(dataURI) {
         const splitDataURI = dataURI.split(',')
         const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
@@ -36,7 +41,28 @@ function DataURIToBlob(dataURI) {
         return new Blob([ia], { type: mimeString })//
       }
 	
-    const dispatch = createEventDispatcher();
+
+//	async function DataURIToBlob(dataURI) {
+//    dataU = dataURI;
+//   
+//        console.log(dataU);
+//          dataU.split(',') ; 
+//           console.log(dataU);
+//        let splitDataURI;
+//        
+//        let byteString = dataU[0].indexOf('base64') >= 0 ? atob(dataU[1]) : decodeURI(dataU[1])
+//        let mimeString = dataU[0].split(':')[1].split(';')[0]
+function DataURIToBlob(dataURI) {
+        const splitDataURI = dataURI.split(',')
+        const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
+        const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
+        const ia = new Uint8Array(byteString.length)
+        for (let i = 0; i < byteString.length; i++){
+            ia[i] = byteString.charCodeAt(i)}
+
+        return new Blob([ia], { type: mimeString })//
+      }
+	
   async function sendP(data) { 
                console.log(pixelCrop)
         const formData = new FormData()
@@ -59,7 +85,7 @@ formData.append('files', file, 'image.jpg')
     //   const data = croppedImage.replace(/^data:image\/\w+;base64,/, "");
     
  
-    dispatch('message', {
+    onMessage?.({
     files: formData
     })
   };

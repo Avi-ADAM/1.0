@@ -1,6 +1,4 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-    const dispatch = createEventDispatcher();
     /**
      * @typedef {Object} Props
      * @property {string} [name]
@@ -8,6 +6,7 @@
      * @property {string} [lang]
      * @property {boolean} [value]
      * @property {any} [helpText]
+     * @property {() => void} [onChange]
      */
 
     /** @type {Props} */
@@ -16,12 +15,13 @@
         lebel = {"he":"","en":""},
         lang = "he",
         value = $bindable(false),
-        helpText = null
+        helpText = null,
+        onChange
     } = $props();
 
     let diff = Math.random()
     function handle (){
-        dispatch('change')
+        onChange?.()
     }
 </script>
 <div class="flex mb-4">

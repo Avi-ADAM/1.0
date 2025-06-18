@@ -8,12 +8,10 @@
   import { lang } from '$lib/stores/lang.js'
 import MultiSelect from 'svelte-multiselect';
 import { idPr } from '../../stores/idPr.js'
- import { createEventDispatcher } from 'svelte';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import { toast } from 'svelte-sonner';
   import {SendTo} from '$lib/send/sendTo.svelte';
 
- const dispatch = createEventDispatcher();
 let locale = $lang
 let store = $state()
 console.log(quant)
@@ -31,6 +29,9 @@ let already = $state(false);
    * @property {number} [each]
    * @property {boolean} [kindUlimit]
    * @property {any} maid
+   * @property {(payload: { id: any; in: any; un: any }) => void} [onDone] - Callback when the sale is successfully added.
+   * @property {() => void} [onDoners] - Callback when the sale is successfully added (no updateMatanot).
+   * @property {() => void} [onEror] - Callback when an error occurs.
    */
 
   /** @type {Props} */
@@ -39,7 +40,10 @@ let already = $state(false);
     quant,
     each = $bindable(0),
     kindUlimit = false,
-    maid
+    maid,
+    onDone,
+    onDoners,
+    onEror
   } = $props();
 let per = $state(false);
 
@@ -187,18 +191,18 @@ async function add() {
           `
          await SendTo(monti).then(console.log("res8 ")).catch(console.log("res8 eror"))
         }
-        dispatch('done', {
+        onDone?.({
           id: miDatan.data.updateMatanot.data.id,
           in: miDatan.data.createSale.data.attributes.in,
           un: miDatan.data.updateMatanot.data.attributes.quant,
         });
       } else {
-        dispatch('doners');
+        onDoners?.();
       }
     } catch (e) {
       error1 = e;
       console.log(error1);
-      dispatch('eror');
+      onEror?.();
     }
   } 
 const optional = {

@@ -13,7 +13,6 @@
    // import AddSkil from './addSkil.svelte';
     import { skillsNew } from '../../stores/skillsNew.js';
     import MultiSelect from 'svelte-multiselect';
-    import { createEventDispatcher } from 'svelte';
     import Addnewsk from '../addnew/addNewSkill.svelte';
     import Addneww from '../addnew/addnewWorkway.svelte';
     import Addnewv from '../addnew/addnewval.svelte';
@@ -27,7 +26,6 @@ import { slide, fly } from 'svelte/transition';
 const baseUrl = import.meta.env.VITE_URL
 
 let newskillslist, idLi, name
- const dispatch = createEventDispatcher();
 
     let token;
     //for the options of multiselect
@@ -167,7 +165,7 @@ async function increment() {
             }
             miData = miData
          addSl = false;
- dispatch('close', {
+ onclose?.({
     linkp: linkp,
     list: miData.updateUsersPermissionsUser.data.attributes[kish].data
     } );
@@ -231,7 +229,7 @@ array3 = [...new Set([...old,...neww])];
 
 const resp = filterByReference(meData, array3);
 const datana = resp;
-  dispatch('add', {
+  onAdd?.({
     data: datana,
     linkp: kish,
     valc: valc,
@@ -257,12 +255,12 @@ const x = oldob.map(c => c.id);
 const indexy = x.indexOf(id);
 oldob.splice(indexy, 1);
 
-dispatch('remove', {
+onRemove?.({
     data: oldob,
     linkp: kish
     } );
   } else if (datan === "mash"){
-    dispatch('delm', {
+    onDelm?.({
     id: id,
     nj: nj
     } );
@@ -272,7 +270,7 @@ dispatch('remove', {
 function open () {
   //if there is no already , but to check changes
 get ();
-  dispatch('open', {
+  onOpen?.({
     linkp: linkp,
     } );
 };
@@ -281,7 +279,7 @@ function bitul () {
   if (yy == 0){
     listt = data;
   }
- dispatch('close', {
+ onClose?.({
     linkp: linkp,
     list: listt,
     } );
@@ -321,7 +319,7 @@ addS = false;
 addR = false;
 addW = false;
 
-dispatch('addnew', {
+onAddnew?.({
     id: array3,
     data: data,
     skob: skob,
@@ -332,7 +330,7 @@ dispatch('addnew', {
 let meDatamm = $state([]);
 function bitulm (){
   masss = false;
-   dispatch('massss', {
+   onMassss?.({
             mass: false
           })
           needr = []
@@ -377,7 +375,7 @@ async function updi (){
     meDatamm = res.data.mashaabims.data
             g = false;
               masss = true;
-             dispatch('massss', {
+             onMassss?.({
             mass: true
           })
     } catch (e) {
@@ -397,12 +395,12 @@ function clodd (event) {
   console.log(id)
 masss = false
 addSl = false
- dispatch('close', {
+ onClose?.({
     linkp: linkp,
     list: data
 
     } );
-   dispatch('massss', {
+   onMassss?.({
             mass: false
           })
         }
@@ -419,7 +417,7 @@ array3 = [...new Set([...old,...neww])];
 
 const resp = filterByReference(meData, array3);
 const datana = resp;
-  dispatch('add', {
+  onAdd?.({
     data: datana,
     linkp: kish,
     valc: valc,
@@ -430,12 +428,12 @@ data = data
   console.log(id)
 masss = false
 addSl = false
- dispatch('close', {
+ onClose?.({
     linkp: linkp,
     list: data
 
     } );
-   dispatch('massss', {
+   onMassss?.({
             mass: false
           })
 }
@@ -461,7 +459,7 @@ if (miDatanew.length > 0) {
    masss = true
 } else {
    masss = false
-    dispatch('massss', {
+    onMassss?.({
             mass: false
           })
 }
@@ -522,7 +520,7 @@ async function edit (id){
                   ed = true;
             g = false;
               masss = true;
-             dispatch('massss', {
+             onMassss?.({
             mass: true
           })
               }
@@ -567,6 +565,13 @@ let searchText = $state(``);
    * @property {boolean} [addR]
    * @property {boolean} [addW]
    * @property {number} [width]
+   * @property {(payload: { linkp: any, list: any[] }) => void} [onClose]
+   * @property {(payload: { data: any[], linkp: any, valc: any, a: any }) => void} [onAdd]
+   * @property {(payload: { id: any, nj: any }) => void} [onDelm]
+   * @property {(payload: { data: any[], linkp: any }) => void} [onRemove]
+   * @property {(payload: { linkp: any }) => void} [onOpen]
+   * @property {(payload: { mass: boolean }) => void} [onMassss]
+   * @property {(payload: { id: any[], data: any[], skob: any, linkp: any }) => void} [onAddnew]
    */
 
   /** @type {Props} */
@@ -585,7 +590,14 @@ let searchText = $state(``);
     masss = $bindable(false),
     addR = $bindable(false),
     addW = $bindable(false),
-    width = 1
+    width = 1,
+    onClose,
+    onAdd,
+    onDelm,
+    onRemove,
+    onOpen,
+    onMassss,
+    onAddnew
   } = $props();
 let anim = $derived(datan == "work" || datan == "val" ? -(width/2) : width/2)
   </script>

@@ -1,3 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
 <script>
     import { page } from '$app/stores';
 
@@ -7,11 +15,28 @@
     import { roles2 } from './roles2.js';
     import { onMount } from 'svelte';
     import Addnewrole from '../addnew/addNewRole.svelte';
- import { createEventDispatcher } from 'svelte';
+/**
+ * מיגרציה ל‑Svelte 5: כל ה‑props מרוכזים בהגדרה אחת.
+ * @typedef {Object} Props
+ * @property {string} [userName_value]
+ * @property {number} [show_value]
+ * @property {(payload: {tx: number, txx: number}) => void} [onProgres]
+ */
+/**
+ * @type {Props}
+ */
+let {
+  userName_value = $bindable(),
+  show_value = $bindable(0),
+  onProgres
+} = $props<{
+  userName_value?: string,
+  show_value?: number,
+  onProgres?: (payload: {tx: number, txx: number}) => void
+}>();
            import { lang } from '$lib/stores/lang.js'
     import jroles from '$lib/data/tafkidim.json'
     import enjrole from '$lib/data/tafkidimEn.json'
- const dispatch = createEventDispatcher();
     let roles1 = $state([]);
     let error1 = null;
     const baseUrl = import.meta.env.VITE_URL
@@ -99,10 +124,7 @@ show.subscribe(newValue => {
 
 function increment() {
 		show.update(n => n + 1);
-     dispatch ('progres',{
-		tx: 0,
-		txx: 11
-	} );
+     onProgres?.({ tx: 0, txx: 11 });
     roles2.set(find_role_id(selected));
    
 	}
@@ -110,17 +132,11 @@ function increment() {
         roles2.set(find_role_id(selected));
 
 		show.set(5);
-    dispatch ('progres',{
-		tx: 0,
-		txx: 4
-	} )
+     onProgres?.({ tx: 0, txx: 4 })
 	}
   function back() {
 		show.update(n => n - 1);
-      dispatch ('progres',{
-		tx: 0,
-		txx: 20
-	} );
+      onProgres?.({ tx: 0, txx: 20 });
     roles2.set(find_role_id(selected));
   
 	}

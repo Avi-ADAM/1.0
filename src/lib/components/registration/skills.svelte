@@ -8,10 +8,8 @@
     import { skills1 } from './skills1.js';
     import { onMount } from 'svelte';
    import Addnewskill from '../addnew/addNewSkill.svelte';
-  import { createEventDispatcher } from 'svelte';
       import jskill from '$lib/data/skills.json'
     import enjskill from '$lib/data/skillsen.json'
- const dispatch = createEventDispatcher();
     let skills2 = $state([]);
     let error1 = null; 
     let addskil = 0;
@@ -98,7 +96,7 @@ show.subscribe(newValue => {
 
 function increment() {
 		show.update(n => n + 1);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 0,
 		txx: 16
 	} );
@@ -108,14 +106,14 @@ function increment() {
         skills1.set(find_skill_id(selected));
 
 		show.set(5);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 0,
 		txx: 4
-	} )
+	} );
 	}
 function back() {
 		show.update(n => n - 1);
-       dispatch ('progres',{
+       onProgres?.({
 		tx: 600,
 		txx: 20
 	} );

@@ -1,6 +1,6 @@
 <script>
   import { sendToSer } from '$lib/send/sendToSer.js';
-	import { createEventDispatcher, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 
 	/** @type {HTMLDivElement}*/
 	let div = $state();
@@ -30,6 +30,7 @@
 	 * @property {string} [redirectURL]
 	 * @property {boolean} [requestAccess]
 	 * @property {number} [buttonRadius]
+	 * @property {(user: any) => void} [onAuth] - Callback for authentication event.
 	 */
 
 	/** @type {Props} */
@@ -40,15 +41,14 @@
 		authType = 'callback',
 		redirectURL = '',
 		requestAccess = false,
-		buttonRadius = 10
+		buttonRadius = 10,
+		onAuth
 	} = $props();
-
-	const dispatch = createEventDispatcher();
 
 	function telegramCallback( user) {
         console.log(user)
         sendToSer({uid,telegramId:user.id.toString()},"6addTelegram",uid,null,false,fetch)
-		dispatch('auth', user);
+		onAuth?.(user);
 	}
 	function cleanStart() {
 		try {

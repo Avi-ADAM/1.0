@@ -2,10 +2,8 @@
   import { lang } from '$lib/stores/lang.js';
   import { fly } from 'svelte/transition';
       	import { Drawer } from 'vaul-svelte';
-  import { createEventDispatcher } from 'svelte';
   import { clickOutside } from './outsidclick.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
-  const dispatch = createEventDispatcher();
     let dialogOpen = $state(false)
   const baseUrl = import.meta.env.VITE_URL
 
@@ -31,7 +29,7 @@
     slideTo(0);
   }
   function less() {
-    dispatch('less', {
+    onLess?.({
       ani: 'mashsu',
       coinlapach: coinlapach
     });
@@ -43,7 +41,7 @@
   function linke() {
     pcli += 1;
     if (pcli >= 2) {
-      dispatch('proj', { id: projectId });
+      onProj?.({ id: projectId });
     }
   }
 
@@ -203,7 +201,7 @@
     } else {
       u = id;
     }
-    dispatch('hover', { id: u });
+    onHover?.({ id: u });
   }
 
   function hoverc(event) {
@@ -212,7 +210,7 @@
     } else {
       u = event.detail.x;
     }
-    dispatch('hover', { id: u });
+    onHover?.({ id: u });
   }
   import Cards from './cards/sugestma.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
@@ -297,7 +295,11 @@
     cards = false,
     chat = $bindable([]),
     order = $bindable(0),
-    askId = 1
+    askId = 1,
+    onLess,
+    onProj,
+    onHover,
+    onModal
   } = $props();
   let isOpen = $state(false),
     diunm = $state(false),
@@ -441,7 +443,7 @@
   <div
     style="position: relative;"
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal()
 dialogOpen = true}}
 role="button"
     style:z-index={hovered === false ? 11 : 16}

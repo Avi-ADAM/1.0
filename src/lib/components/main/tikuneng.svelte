@@ -12,8 +12,7 @@ let amorthq = "I, ||name||, will give up the weapons of the ||country|| Army whe
 let already = $state(false);
   let more = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
+ let { onDone, onErore } = $props<{ onDone?: () => void; onErore?: () => void }>();
 const baseUrl = import.meta.env.VITE_URL
 
 let miDatan = [];
@@ -50,11 +49,11 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch("done")
+            onDone?.()
         } catch (e) {
             error1 = e
             console.log(error1);
-                        dispatch("erore")
+                        onErore?.()
 
         }
 }
@@ -298,6 +297,3 @@ height: 44px;
   top: -20;
 } 
 </style>
-
-
-

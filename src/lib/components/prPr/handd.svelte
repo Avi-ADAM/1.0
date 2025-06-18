@@ -1,13 +1,13 @@
 <script>
-     import { createEventDispatcher } from 'svelte';
-      const dispatch = createEventDispatcher();
-
   /**
    * @typedef {Object} Props
    * @property {boolean} [addN]
    * @property {boolean} [openMA]
    * @property {number} [noofopenm]
    * @property {string} [hosafat]
+   * @property {() => void} [onMasi] - Callback for 'masi' event
+   * @property {() => void} [onBighandd] - Callback for 'bighandd' event
+   * @property {() => void} [onTrym] - Callback for 'trym' event
    */
 
   /** @type {Props} */
@@ -15,16 +15,19 @@
     addN = false,
     openMA = false,
     noofopenm = 0,
-    hosafat = ""
+    hosafat = "",
+    onMasi,
+    onBighandd,
+    onTrym
   } = $props();
 function bighand (){
-dispatch('masi');
+onMasi?.();
 }    
 function bighandd (){
-dispatch('bighandd' ); 
+onBighandd?.(); 
 }
 function trym (){
-    dispatch('trym' );
+    onTrym?.();
 }
 </script>
 <svg style="max-width:45vw; max-height:45vw;" width="240" height="240" viewBox="304.017 285.449 844.373 823.956" id="newsvg4" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">

@@ -1,14 +1,10 @@
 <script>
-  import { run, createBubbler, stopPropagation } from 'svelte/legacy';
-
-  const bubble = createBubbler();
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte';
   import { Calendar } from '@fullcalendar/core';
   import dayGridPlugin from '@fullcalendar/daygrid';
   import timeGridPlugin from '@fullcalendar/timegrid';
   import interactionPlugin from '@fullcalendar/interaction';
   import { lang } from '$lib/stores/lang';
-  const dispatch = createEventDispatcher();
   
   
   let calendarEl = $state();
@@ -18,10 +14,13 @@
    * @property {any} projectId
    * @property {any} [timersData]
    * @property {boolean} [isLoading]
+   * @property {(payload: { timerId: any; timerData: any; mesimabetahalich: any; }) => void} [onTimerClick]
+   * @property {(payload: any) => void} [onShowTaskDetails]
+   * @property {(payload: any) => void} [onShowActsDetails]
    */
 
   /** @type {Props} */
-  let { projectId, timersData = null, isLoading = $bindable(true) } = $props();
+  let { projectId, timersData = null, isLoading = $bindable(true), onTimerClick, onShowTaskDetails, onShowActsDetails } = $props();
   let expandedTimer = $state(null);
   let tooltipEl = null;
   let showTimerModal = $state(false);
@@ -208,7 +207,7 @@
     showTimerModal = true;
     
     // שליחת אירוע למרכיב ההורה עם פרטי הטיימר
-    dispatch('timerClick', selectedTimerData);
+    onTimerClick?.(selectedTimerData);
   }
   
   function handleEventHover(info) {
@@ -263,12 +262,12 @@
   
   function handleTaskDetails(taskData) {
     console.log('נלחץ nahnv:', taskData);
-    dispatch('showTaskDetails', { mesimabetahalich: taskData });
+    onShowTaskDetails?.(taskData);
   }
   
   function handleActsDetails(acts) {
     console.log('פרטי מטלות:', acts);
-    dispatch('showActsDetails', { acts });
+    onShowActsDetails?.(acts);
   }
   
   onMount(() => {
@@ -284,7 +283,7 @@
   });
   
   // עדכון הלוח כאשר הנתונים או השפה משתנים
-  run(() => {
+  $effect(() => {
     if (timersData && calendar) {
       const timers = timersData.project.data.attributes.timers.data;
       const events = createCalendarEvents(timers);
@@ -447,7 +446,7 @@
 <!-- מודאל פרטי טיימר -->
 {#if showTimerModal && selectedTimerData}
   <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onkeypress={(e) => e.key === 'Escape' && closeModal()} onclick={closeModal}>
-    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick={stopPropagation(bubble('click'))} dir={$lang === 'he' ? 'rtl' : 'ltr'} >
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick={(e) => e.stopPropagation()} dir={$lang === 'he' ? 'rtl' : 'ltr'} >
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">
           {selectedTimerData.mesimabetahalich?.name || currentTexts.noTaskName}

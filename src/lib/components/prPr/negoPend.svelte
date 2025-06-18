@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let descrip2 = descrip;` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
 <script>
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
@@ -8,43 +6,13 @@
   import Barb from '../conf/stackBar.svelte';
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
   const tri = tr;
-  import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
-  const dispatch = createEventDispatcher();
-  export let restime;
   import { montsi } from '$lib/func/montsi.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
 
-  export let descrip;
-  export let projectName;
-  export let name1;
-  export let spnot;
-  export let easy = 0;
-  export let hm = 0;
-  export let price = 0;
-  export let projectId;
-  export let uids = [];
-  export let what = [];
-  export let noofusersOk;
-  export let noofusersNo;
-  export let noofusersWaiting;
-  export let total = 0;
-  export let noofusers;
-  export let already;
-  export let mypos;
-  export let missionId;
-  export let linkto;
-  export let tafkidims;
-  export let sqadualed;
-  export let sqadualedf;
-  export let state = 2;
-  export let pendId;
-  export let users = [];
-  export let kindOf = 'perUnit';
-  export let oldide = 0; //last tg id, if non 0
   let bearer1;
   let token;
   let idL;
@@ -53,25 +21,23 @@
     he: 'הסרה',
     en: 'remove'
   };
-  let descrip2 = descrip;
-  let name2 = name1;
-  let sqadualed2 = sqadualed;
-  let sqadualedf2 = sqadualedf;
+  let descrip2 = $state(descrip);
+  let name2 = $state(name1);
+  let sqadualed2 = $state(sqadualed);
+  let sqadualedf2 = $state(sqadualedf);
 
   let spnot2 = spnot;
-  let linkto2 = linkto;
-  let hm2 = hm;
-  let price2 = price;
-  let easy2 = easy;
+  let linkto2 = $state(linkto);
+  let hm2 = $state(hm);
+  let price2 = $state(price);
+  let easy2 = $state(easy);
   let rishon = 0;
-  let kindOfb = kindOf;
+  let kindOfb = $state(kindOf);
 
   function close() {
-    dispatch('close');
+    onClose?.();
   }
-  export let timegramaId;
   let name4 = ``;
-  export let ordern = 0;
   let descrip4 = ``;
   let spnot4 = ``;
   let hm4 = ``;
@@ -133,10 +99,81 @@
   let miDatan = [];
   let error1;
   let clicked = false;
-  export let masaalr = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} restime
+   * @property {any} descrip
+   * @property {any} projectName
+   * @property {any} name1
+   * @property {any} spnot
+   * @property {number} [easy]
+   * @property {number} [hm]
+   * @property {number} [price]
+   * @property {any} projectId
+   * @property {any} [uids]
+   * @property {any} [what]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {any} already
+   * @property {any} mypos
+   * @property {any} missionId
+   * @property {any} linkto
+   * @property {any} tafkidims
+   * @property {any} sqadualed
+   * @property {any} sqadualedf
+   * @property {number} [stepState]
+   * @property {any} pendId
+   * @property {any} [users]
+   * @property {string} [kindOf]
+   * @property {number} [oldide] - last tg id, if non 0
+   * @property {any} timegramaId
+   * @property {number} [ordern]
+   * @property {boolean} [masaalr]
+   */
+
+  /** @type {Props} */
+  let {
+    restime,
+    descrip,
+    projectName,
+    name1,
+    spnot,
+    easy = 0,
+    hm = 0,
+    price = 0,
+    projectId,
+    uids = [],
+    what = [],
+    noofusersOk,
+    noofusersNo,
+    noofusersWaiting,
+    total = 0,
+    noofusers,
+    already,
+    mypos,
+    missionId,
+    linkto,
+    tafkidims,
+    sqadualed,
+    sqadualedf,
+    stepState = 2,
+    pendId,
+    users = [],
+    kindOf = 'perUnit',
+    oldide = 0,
+    timegramaId,
+    ordern = 0,
+    masaalr = false,
+    onClose,
+    onLoad
+  } = $props();
+  
   let userss;
   async function increment() {
-    dispatch('load');
+    onLoad?.();
     //TODO: update timegrama, add now pend that is changed to nego
     let sqadualedf4 = ``,
       kindOf4nego = ``,
@@ -295,7 +332,7 @@
               users_permissions_user:"${idL}",
                 publishedAt: "${d.toISOString()}",
                 pmash:${pendId},
-                 isOriginal:${state == 2 ? true : false},
+                 isOriginal:${stepState == 2 ? true : false},
                  ${kindOf4nego}
     ${easy4nego}             
     ${hm4nego}
@@ -362,7 +399,7 @@
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
 
-  $: datai = [
+  let datai = $derived([
     {
       leb: `${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}| ${tri?.mash?.shovile[$lang]},${easy2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}`,
       value: price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true),
@@ -377,8 +414,10 @@
         easy * hm * montsi(kindOf, sqadualed, sqadualedf, true) -
         price * hm * montsi(kindOf, sqadualed, sqadualedf, true)
     }
-  ];
-  $: console.log(datai);
+  ]);
+  $effect(() => {
+    console.log(datai);
+  });
 </script>
 
 <div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
@@ -474,7 +513,7 @@
 
   <div class="w-fit mx-auto">
     <button
-      on:click={increment}
+      onclick={increment}
       class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
       name="addm">{tri?.common.puttovote[$lang]}</button

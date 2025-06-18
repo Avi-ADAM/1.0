@@ -15,12 +15,8 @@ import {
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
-const dispatch = createEventDispatcher();
     const baseUrl = import.meta.env.VITE_URL
 
 onMount(async () => {

@@ -1,6 +1,4 @@
 <script>
-     import { createEventDispatcher } from 'svelte';
-      const dispatch = createEventDispatcher();
       import {lang} from '$lib/stores/lang.js'
     const text = {he: "פעולות פתוחות", ar: "", en:  "add missions"}		
   /**
@@ -9,6 +7,9 @@
    * @property {boolean} [openMS]
    * @property {number} [noofopen]
    * @property {string} [hosafa]
+   * @property {() => void} [onProgres] - Callback for progress event.
+   * @property {() => void} [onHosa] - Callback for hosa event.
+   * @property {() => void} [onTrym] - Callback for trym event.
    */
 
   /** @type {Props} */
@@ -16,16 +17,19 @@
     addM = false,
     openMS = false,
     noofopen = 0,
-    hosafa = ""
+    hosafa = "",
+    onProgres,
+    onHosa,
+    onTrym
   } = $props();
 function bighand (){
-dispatch('progres');
+onProgres?.();
 }    
 function hosa (){
-dispatch('hosa' ); 
+onHosa?.(); 
 }
 function trym (){
-    dispatch('trym' );
+    onTrym?.();
 }
 </script>
 <svg dir="ltr"	 style="max-width:45vw; max-height:45vw;" width="240" height="240" viewBox="304.017 285.449 844.373 823.956" id="svg2" version="1.1"  >

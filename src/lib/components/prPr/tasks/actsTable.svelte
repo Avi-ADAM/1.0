@@ -13,14 +13,20 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import NameAndPname from '$lib/components/grid/nameAndPname.svelte';
   import NameField from '$lib/components/grid/nameField.svelte';
-  import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import Tile from '$lib/celim/tile.svelte';
   import Button from '$lib/celim/ui/button.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  let { acts = $bindable([]) } = $props();
-  const dispatch = createEventDispatcher();
+
+  /**
+   * @typedef {Object} Props
+   * @property {Array<any>} [acts]
+   * @property {(payload: { id: any; kind: string }) => void} [onTaskClick] - Callback when a task is clicked.
+   */
+
+  /** @type {Props} */
+  let { acts = $bindable([]), onTaskClick } = $props();
   let paging = $state(new PagingData(
     1, // currentPage
     20, // itemsPerPage
@@ -43,7 +49,7 @@
       id = row.id
     }
     console.log(row, type, mid, isOpen, isPend,kind,id);
-    dispatch('taskClick', {
+    onTaskClick?.({
       id,
       kind
     });
@@ -120,8 +126,8 @@
           isPend,
           id: row.id,
           isPending: row.isAssigned && !row.myIshur && row.my?.data?.[0]?.id,
-          isCurrentUser: $page.data.uid === row.my?.data?.[0]?.id,
-          isValidator: $page.data.uid === row.vali?.data?.id,
+          isCurrentUser: page.data.uid === row.my?.data?.[0]?.id,
+          isValidator: page.data.uid === row.vali?.data?.id,
           isAssigned: row.isAssigned,
           roles: row.tafkidims?.data?.map(r => r.attributes.roleDescription) || [],
           isApproved: row.myIshur,
@@ -163,7 +169,7 @@
     }
   ]);
 
-  let myid = $page.data.uid;
+  let myid = page.data.uid;
   let filteredActs = $state([]);
   
     let uiFilters = $state([]);

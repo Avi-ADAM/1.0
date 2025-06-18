@@ -12,14 +12,12 @@
   //how to recive? discution or build in payments to add
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
-  import { createEventDispatcher } from 'svelte';
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
   import moment from 'moment';
   import ProgressBar from '@okrad/svelte-progressbar';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
-  const dispatch = createEventDispatcher();
 
   let miDatan = [];
   let error1;
@@ -77,7 +75,7 @@
   function coinLapach() {
     isOpen = false;
     console.log('here');
-    dispatch('coinLapach', {
+    onCoinLapach?.({
       ani: 'vidu',
       coinlapach: coinlapach
     });
@@ -337,7 +335,7 @@ id: ${pendId}
   function linke() {
     pcli += 1;
     if (pcli >= 2) {
-      dispatch('proj', { id: projectId });
+      onProj?.({ id: projectId });
     }
   }
   function project(id) {
@@ -467,7 +465,7 @@ id: ${pendId}
     } else {
       t = id;
     }
-    dispatch('hover', { id: t });
+    onHover?.({ id: t });
   }
   function hoverede() {
     hovered = !hovered;
@@ -477,7 +475,7 @@ id: ${pendId}
     } else {
       t = u[$lang];
     }
-    dispatch('hover', { id: t });
+    onHover?.({ id: t });
   }
   function hoverc(event) {
     let t;
@@ -486,7 +484,7 @@ id: ${pendId}
     } else {
       t = event.detail.x;
     }
-    dispatch('hover', { id: t });
+    onHover?.({ id: t });
   }
   import Cards from './cards/haluka.svelte';
   /**
@@ -518,6 +516,10 @@ id: ${pendId}
    * @property {any} [messege]
    * @property {any} [order]
    * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: string }) => void} [onCoinLapach] - Callback for 'coinLapach' event
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+   * @property {() => void} [onModal] - Callback for 'modal' event
    */
 
   /** @type {Props} */
@@ -548,7 +550,11 @@ id: ${pendId}
     created_at,
     messege = $bindable([]),
     order = messege.length,
-    cards = false
+    cards = false,
+    onCoinLapach,
+    onHover,
+    onProj,
+    onModal
   } = $props();
   function claf(event) {
     let o = event.detail.alr;
@@ -640,7 +646,7 @@ id: ${pendId}
       use:clickOutside
       onclick_outside={toggleShow}
       onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
       style="position: relative;"

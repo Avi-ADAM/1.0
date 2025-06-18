@@ -7,16 +7,12 @@ import {
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
   import { DialogOverlay, DialogContent 
 } from 'svelte-accessible-dialog';
  import { goto } from '$app/navigation';
 import { idPr } from './../../stores/idPr.js';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
     let dialogOpen = $state(false)
-const dispatch = createEventDispatcher();
 let resP = [];
 let lang;
     const baseUrl = import.meta.env.VITE_URL
@@ -196,7 +192,7 @@ updateMesimabetahalich(
             console.log(miDatan);
             //TODO: archive timegrama
             archiveTimeGrama(timegramaId,fetch)
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "fini",
                 coinlapach: coinlapach
             })
@@ -234,7 +230,7 @@ console.log("just add vote to asked and update to not show for me again")
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
                  ani: "fini",
                 coinlapach: coinlapach
             })
@@ -301,7 +297,7 @@ async function decline() {
                 .then(data => miDatan = data);
             console.log(miDatan);
             isOpen = false;
-            dispatch('decline', {
+            onDecline?.({
                  ani: "fini",
                 coinlapach: coinlapach
             })
@@ -341,7 +337,7 @@ function hoverede(){
   } else {
 u ="בקשה לאישור ביצוע משימה בהצלחה";
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
 function hover (id){
   if (id == "0"){
@@ -349,7 +345,7 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
 let ucli = $state(0);
   
@@ -361,12 +357,12 @@ function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.({id: userId});
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     }
   }
 }
@@ -381,9 +377,9 @@ function linke (s){
    if (event.detail.x == "0"){
 u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
-    u = event.detail.x
+u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
    import Cards from './cards/fini.svelte'
   import { archiveTimeGrama } from "$lib/func/send/timeGrama.svelte";
@@ -434,6 +430,12 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
    * @property {any} askId
    * @property {any} users
    * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
+   * @property {(payload: { id: any }) => void} [onUser]
+   * @property {(payload: { id: any }) => void} [onProj]
    */
 
   /** @type {Props} */
@@ -482,7 +484,13 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
     stylef = '24px',
     askId,
     users,
-    cards = false
+    cards = false,
+    onAcsept,
+    onDecline,
+    onHover,
+    onModal,
+    onUser,
+    onProj
   } = $props();
 
 </script>
@@ -520,7 +528,7 @@ style:z-index={hovered === false ? 11 : 16}
 onmouseenter={()=> hoverede()} 
 onmouseleave={()=> hoverede()} 
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
 use:clickOutside onclick_outside={toggleShow}

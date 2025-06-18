@@ -1,19 +1,18 @@
 <script>
   import { lang } from "$lib/stores/lang.js";
-    import { createEventDispatcher } from "svelte";
-    const dispatch = createEventDispatcher();
   /**
    * @typedef {Object} Props
    * @property {boolean} [checked]
    * @property {string} [title]
+   * @property {(payload: { checked: boolean }) => void} [onChange]
    */
 
   /** @type {Props} */
-  let { checked = $bindable(false), title = "online" } = $props();
+  let { checked = $bindable(false), title = "online", onChange } = $props();
     
     function click() {
       checked = !checked;
-      dispatch('change', { checked });
+      onChange?.({ checked });
     }
   </script>
   
@@ -97,4 +96,3 @@
       </label>
     </div>
   </div>
-  

@@ -1,3 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: Expected token }
+https://svelte.dev/e/expected_token -->
+<!-- @migration-task Error while migrating Svelte code: Expected token }
+https://svelte.dev/e/expected_token -->
+<!-- @migration-task Error while migrating Svelte code: Expected token }
+https://svelte.dev/e/expected_token -->
+<!-- @migration-task Error while migrating Svelte code: Expected token }
+https://svelte.dev/e/expected_token -->
 <script>
   import { run } from 'svelte/legacy';
 
@@ -15,7 +23,6 @@ import { Drawer } from 'vaul-svelte';
     import { goto } from '$app/navigation';
     import { idPr } from '../../stores/idPr.js';
     import { onMount, onDestroy } from 'svelte';
-     import { createEventDispatcher } from 'svelte';
      import {betha} from './storess/betha.js'
      import Lowbtn from '$lib/celim/lowbtn.svelte'
      import {SendTo} from '$lib/send/sendTo.svelte';
@@ -35,7 +42,6 @@ betha.subscribe(value => {
 		tdtd = value;
 	});
 
- const dispatch = createEventDispatcher();
     let show = true;
     let dialogOpen = $state(false)
     let mstotal = hourstotal*3600000
@@ -55,7 +61,7 @@ let pcli = $state(0);
 function linke (s){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     
   }
 }
@@ -595,9 +601,7 @@ ${tofinished}
   })
             }
               isOpen = false;
-              dispatch("done",
-               {ani: "minp",
-                coinlapach: coinlapach})
+              onDone?.({ani: "minp", coinlapach: coinlapach})
         } catch (e) {
             error1 = e
             console.log(error1);
@@ -645,7 +649,7 @@ ${tofinished}
   } else {
 u = "פעולה בתהליך ביצוע"
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
 function hover (id){
   if (id == "0"){
@@ -654,7 +658,7 @@ function hover (id){
     u = id
   }
 
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
 }
 
   function hoverc (event){
@@ -663,7 +667,7 @@ function hover (id){
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
    import Cards from './cards/inpro.svelte'
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -702,6 +706,10 @@ function hover (id){
    * @property {any} oldzman
    * @property {number} [lapse]
    * @property {boolean} [cards]
+   * @property {(payload: { id: any }) => void} [onProj]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDone]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
    */
 
   /** @type {Props} */
@@ -737,7 +745,11 @@ function hover (id){
     zman = $bindable(),
     oldzman,
     lapse = $bindable(0),
-    cards = false
+    cards = false,
+    onProj,
+    onDone,
+    onHover,
+    onModal
   } = $props();
 function claf (event){
   let o = event.detail.alr
@@ -1059,7 +1071,7 @@ on:update-timer={({ detail }) => {
 <div 
 style="position: relative;" 
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
 style:z-index={hovered === false ? 11 : 16}  

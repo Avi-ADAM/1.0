@@ -1,10 +1,9 @@
-<!-- @migration-task Error while migrating Svelte code: `a` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: `<tr>` cannot be a child of `<table>`. `<table>` only allows these children: `<caption>`, `<colgroup>`, `<tbody>`, `<thead>`, `<tfoot>`, `<style>`, `<script>`, `<template>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
+https://svelte.dev/e/node_invalid_placement -->
 <script>
   import { addslashes } from '$lib/func/uti/string.svelte';
   import { page } from '$app/stores';
   import { onMount } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { beforeUpdate } from 'svelte';
   import moment from 'moment';
@@ -15,7 +14,6 @@ https://svelte.dev/e/declaration_duplicate -->
   import { SendTo } from '$lib/send/sendTo.svelte';
   import Button from '$lib/celim/ui/button.svelte';
 
-  const dispatch = createEventDispatcher();
   let token;
   export let needr = [];
   export let projectId;
@@ -555,7 +553,7 @@ vots: [${userss},
   let kc = false;
 
   function myMi() {
-    for (var i = 0; i < meData.length; i++) {
+    for (let i = 0; i < meData.length; i++) {
       meData[i].hm = 1;
       meData[i].attributes.easy = meData[i].attributes.price;
       meData[i].attributes.dates = new Date().toISOString().slice(0, -1);
@@ -571,7 +569,7 @@ vots: [${userss},
     km = false;
     ky = false;
     kc = false;
-    for (var i = 0; i < meData.length; i++) {
+    for (let i = 0; i < meData.length; i++) {
       meData[i].attributes.price < 0
         ? (meData[i].attributes.price = 0)
         : meData[i].attributes.price;
@@ -581,8 +579,8 @@ vots: [${userss},
       console.log(meData[i].attributes.easy, 'to to');
 
       if (meData[i].attributes.kindOf === 'monthly') {
-        var a = moment(meData[i].attributes.datef);
-        var b = moment(meData[i].attributes.dates);
+        let a = moment(meData[i].attributes.datef);
+        let b = moment(meData[i].attributes.dates);
         meData[i].monts = a.diff(b, 'months', true).toFixed(2);
         ky = true;
         meData[i].m = true;
@@ -593,8 +591,8 @@ vots: [${userss},
         meData[i].total = meData[i].monts * meData[i].attributes.price;
         meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
       } else if (meData[i].attributes.kindOf === 'yearly') {
-        var a = moment(meData[i].attributes.datef);
-        var b = moment(meData[i].attributes.dates);
+        let a = moment(meData[i].attributes.datef);
+        let b = moment(meData[i].attributes.dates);
         meData[i].years = a.diff(b, 'years', true).toFixed(2);
         ky = true;
         meData[i].y = true;

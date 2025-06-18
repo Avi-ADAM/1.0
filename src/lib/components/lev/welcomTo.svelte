@@ -1,9 +1,7 @@
 <script>
     import { fly } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
 import { Confetti } from "svelte-confetti"
+let { onHover } = $props<{ onHover?: (payload: { id: string }) => void }>();
 import { lang } from '$lib/stores/lang.js';
 import {
     idPr
@@ -65,7 +63,6 @@ async function project(id) {
         }
     //make it desapire for good
 };
-const dispatch = createEventDispatcher();
 let hovered = $state(false);
 let des = {'he' :"קבלת פנים לרגל הצטרפותך לריקמה חדשה", en: 'welcome to new FreeMates'}
 let dif = {'he':'לב 1💗1', en: 'the heart of 1💗1'}
@@ -81,7 +78,7 @@ function hoverede(){
   } else {
 u = des[$lang]
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
 
 </script>

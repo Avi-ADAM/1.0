@@ -3,7 +3,7 @@
   import ProgressBar from "@okrad/svelte-progressbar";
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
-   import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import Nego from '../prPr/negoM.svelte';
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
@@ -11,7 +11,6 @@ import { idPr } from '../../stores/idPr.js';
 import { RingLoader
 } from 'svelte-loading-spinners';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
- const dispatch = createEventDispatcher();
         let dialogOpen = $state(false)
 
     let miDatan = [];
@@ -77,7 +76,7 @@ let ser = $state(xyz());
 
 
 function coinLapach() {
-        dispatch('coinLapach', {
+        onCoinLapach?.({
      ani: "pendmi",
                 coinlapach: coinlapach
     } );
@@ -487,7 +486,7 @@ function linke (s){
  
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
   }
 }
   function project (id) {
@@ -537,7 +536,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 
 }
 function hoverede(){
@@ -547,7 +546,7 @@ function hoverede(){
   } else {
  u = "הצבעה על פרסום הצעת משימה לריקמה"
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
 }
 
 function hoverc (event){
@@ -556,7 +555,7 @@ function hoverc (event){
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
  import Cards from './cards/pending.svelte'
   import {oneLangAdj} from '$lib/func/oneLangAdj.svelte';
@@ -610,6 +609,10 @@ function hoverc (event){
    * @property {any} [order]
    * @property {number} [ordern]
    * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onCoinLapach]
+   * @property {(payload: { id: any }) => void} [onProj]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
    */
 
   /** @type {Props} */
@@ -657,7 +660,11 @@ function hoverc (event){
     diun = $bindable([]),
     order = $bindable(diun.length),
     ordern = 0,
-    cards = false
+    cards = false,
+    onCoinLapach,
+    onProj,
+    onHover,
+    onModal
   } = $props();
 function claf (event){
   let o = event.detail.alr
@@ -758,7 +765,7 @@ function claf (event){
 role="contentinfo"
 style="position: relative;" 
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true
 }}
 style:z-index={hovered === false ? 11 : 16}  

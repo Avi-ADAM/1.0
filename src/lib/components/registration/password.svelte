@@ -11,7 +11,6 @@ import { contriesi } from './contries.js';
 
  import { RingLoader
 } from 'svelte-loading-spinners';
- import { createEventDispatcher } from 'svelte';
  import { skills1 } from './skills1.js';
 import { roles2 } from './roles2.js';
 import { workways1 } from './workways1.js';
@@ -43,7 +42,14 @@ skills1.subscribe(newskills => {
 roles2.subscribe(newRole => {
   roles2_val = newRole;
 })
- const dispatch = createEventDispatcher();
+/**
+ * @typedef {Object} Props
+ * @property {(payload: { tx: number, txx: number }) => void} [onProgres]
+ */
+
+/** @type {Props} */
+let { onProgres } = $props();
+
 let userName_value = $state();
 
 let emailL;
@@ -124,7 +130,7 @@ if(response.data){
                 .then(data => miDatan = data);
             console.log(miDatan);*/
 
- dispatch ('progres',{
+ onProgres?.({
 		tx: 0,
 		txx: 0
 	} );
@@ -171,7 +177,7 @@ if(response.data){
             console.log(miDatan);
     */       
 }else{
-	 dispatch ('progres',{
+	 onProgres?.({
 		tx: 0,
 		txx: 0
 	} );
@@ -197,10 +203,10 @@ if(response.data){
   
 function back() {
 		show.update(n => n - 1);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 0,
 		txx: 11
-	} )
+	} );
     
 	}
 	let strength = $state(0);
@@ -217,19 +223,19 @@ function back() {
 		//	password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
-		if (validations[0] == true){dispatch ('progres',{
+		if (validations[0] == true){onProgres?.({
 		tx: 0,
 		txx: 6
 	} ) } 
-	if (validations[1] == true ){dispatch ('progres',{
+	if (validations[1] == true ){onProgres?.({
 		tx: 0,
 		txx: 5
 	} ) }
-	if (validations[2] == true ){dispatch ('progres',{
+	if (validations[2] == true ){onProgres?.({
 		tx: 0,
 		txx: 4
 	} ) }
-	if (validations[3] == true ){dispatch ('progres',{
+	if (validations[3] == true ){onProgres?.({
 		tx: 0,
 		txx: 2
 	} ) }

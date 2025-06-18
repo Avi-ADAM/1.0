@@ -1,6 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
-
 <script>
 	import Dialog from '$lib/celim/ui/dialog.svelte';
 	import { isMobileOrTablet } from '$lib/utilities/device';
@@ -29,13 +26,13 @@ import { idPr } from '$lib/stores/idPr.js';
   import { goto } from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, scale } from 'svelte/transition';
-  let iwant = false;
-let isOpen = false;
-  let isG = false;
-  let current = '';
+  let iwant = $state(false);
+let isOpen = $state(false);
+  let isG = $state(false);
+  let current = $state('');
 
     let url1 = `${baseUrl}/api/upload`;
-    let updX = 0;
+    let updX = $state(0);
   let token;
   let files;
   let idLi;
@@ -45,26 +42,26 @@ let isOpen = false;
   let mash = [];
   let val = [];
   let work = [];
-  let total = 0;
+  let total = $state(0);
   let odata = [];
     let allvn;
   let picLink =
-    'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
+    $state('https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png');
   let idL;
   let addSl = false;
-let addSl1 = false;
-let addSl2 = false;
-let addSl3 = false;
-let addSl4 = false;
-let addSl5 = false;
- let a = 0;
-let addNs1 = true;
+let addSl1 = $state(false);
+let addSl2 = $state(false);
+let addSl3 = $state(false);
+let addSl4 = $state(false);
+let addSl5 = $state(false);
+ let a = $state(0);
+let addNs1 = $state(true);
   let error1 = null;
-  let addpic = 0;
-  let addP = false;
-    let st = 0;
-    let stylef = '31px';
-    let meData = start();
+  let addpic = $state(0);
+  let addP = $state(false);
+    let st = $state(0);
+    let stylef = $state('31px');
+    let meData = $state(start());
     function isUCBrowser() {
     return /UCWEB|UCBrowser/i.test(navigator.userAgent);
 }
@@ -211,15 +208,15 @@ let addNs1 = true;
       error1 = e;
         }
     }
-    let meDataa = [];
-  let load = false;
+    let meDataa = $state([]);
+  let load = $state(false);
   function project(id) {
     load = true;
     idPr.set(id);
     goto('/moach');
   }
-  let mail, lango;
-  let cards = true;
+  let mail = $state(), lango;
+  let cards = $state(true);
   async function start() {
     const cookieValue = document.cookie
   .split('; ')
@@ -296,7 +293,7 @@ let addNs1 = true;
               `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
             }
           if ($lang == 'he') {
-            for (var i = 0; i < meData.vallues.data.length; i++) {
+            for (let i = 0; i < meData.vallues.data.length; i++) {
               if (
                 meData.vallues.data[i].attributes.localizations.data.length > 0
               ) {
@@ -308,7 +305,7 @@ let addNs1 = true;
               }
             }
           if ($lang == 'he') {
-            for (var i = 0; i < meData.skills.data.length; i++) {
+            for (let i = 0; i < meData.skills.data.length; i++) {
               if (
                 meData.skills.data[i].attributes.localizations.data.length > 0
               ) {
@@ -322,7 +319,7 @@ let addNs1 = true;
           meData = meData;
 
           if ($lang == 'he') {
-            for (var i = 0; i < meData.tafkidims.data.length; i++) {
+            for (let i = 0; i < meData.tafkidims.data.length; i++) {
               if (
                 meData.tafkidims.data[i].attributes.localizations.data.length >
                 0
@@ -336,7 +333,7 @@ let addNs1 = true;
             }
           meData = meData;
           if ($lang == 'he') {
-            for (var i = 0; i < meData.work_ways.data.length; i++) {
+            for (let i = 0; i < meData.work_ways.data.length; i++) {
               if (
                 meData.work_ways.data[i].attributes.localizations.data.length >
                 0
@@ -364,7 +361,7 @@ let addNs1 = true;
             uPic.set(meData.profilePic.data.attributes.formats.small.url);
             picLink = $uPic;
             let b = '/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max';
-            var output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
+            let output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
             picLink = output;
             } else {
             picLink =
@@ -405,15 +402,15 @@ let addNs1 = true;
     restore: (value) => (meData = value)
   };
 function getCookie(name) {
-    var dc = document.cookie;
-    var prefix = name + '=';
-    var begin = dc.indexOf('; ' + prefix);
+    let dc = document.cookie;
+    let prefix = name + '=';
+    let begin = dc.indexOf('; ' + prefix);
     if (begin == -1) {
         begin = dc.indexOf(prefix);
         if (begin != 0) return null;
     } else {
         begin += 2;
-      var end = document.cookie.indexOf(';', begin);
+      let end = document.cookie.indexOf(';', begin);
         if (end == -1) {
         end = dc.length;
         }
@@ -435,7 +432,7 @@ function getCookie(name) {
 let userName_value;
 let biog;
 let frd;
-  let fblink, twiterlink, discordlink, githublink, noMail;
+  let fblink = $state(), twiterlink = $state(), discordlink = $state(), githublink = $state(), noMail = $state();
   function sendD() {
   //todo refresh data if lang changed
     if (lango == 'en' || lango == 'he') {
@@ -644,7 +641,7 @@ function close (event){
 
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
-let mass = false;
+let mass = $state(false);
 
   function massss(event) {
     console.log('here');
@@ -654,7 +651,7 @@ let mass = false;
     mass = false;
   }
 }
-let messege;
+let messege = $state();
 let spid;
   function delm(event) {
   isOpen = true;
@@ -754,8 +751,8 @@ const pls = {"he": "בחירת כישורים", "en": "choose skills"}
 const plm = {"he": "בחירת משאבים", "en": "choose resources"}
 const plw = {"he": "בחירת דרכי יצירה", "en": "choose ways of creation"}
 const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
-let width,height
-let showSaveDialog = false;
+let width = $state(),height = $state()
+let showSaveDialog = $state(false);
 const dialogHeader = {
   he: "הצגת מדריך משתמש",
   en: "Show User Guide"
@@ -803,7 +800,7 @@ const clearButton = {
   <DialogContent aria-label="form" class="content">
     <div  style="z-index: 400;" dir="rtl" class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
              <button style="margin: 0 auto;" class=" hover:bg-barbi text-mturk rounded-full p-2"
-          on:click={closer}><Close/></button>
+          onclick={closer}><Close/></button>
           {#if a == 0}
             <Addnewp on:message={callbackFunction} />
           {:else if a == 1}
@@ -829,7 +826,7 @@ const clearButton = {
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
           <button
   class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-  on:click={han}
+  onclick={han}
   >{deletew[$lang]}</button>
           </div>
           {:else if a == 2}
@@ -921,7 +918,7 @@ const clearButton = {
     </div>
    {#if updX == 0}
    <button
-     on:click={openen}
+     onclick={openen}
      class=" hover:bg-gold text-mturk hover:text-barbi rounded-full edit"
      title={message7[$lang]}
      >                 <TourItem message={message7[$lang]}>
@@ -947,7 +944,7 @@ const clearButton = {
   {#if addpic == 0}
 
     <button
-      on:click={openen}
+      onclick={openen}
  class=" hover:bg-gold text-mturk hover:text-barbi rounded-full haalaa"
      title={message8[$lang]} >
      <TourItem message={message8[$lang]}>
@@ -972,7 +969,7 @@ const clearButton = {
            {#each meData.projects_1s.data as data, i}
            <div class="cont"  >
             <button
-             on:click={project(data.id)}
+             onclick={project(data.id)}
              class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center sm:text-xl mt-1 mr-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow width={width > 640 ? 47.4:23.7} height={width > 640 ? 35.7:17.85}/></span></div></button>
 
            </div>
@@ -986,7 +983,7 @@ const clearButton = {
 <button
 style="z-index: 7;"
 class=" hover:scale-150 "
-    on:click={() => {
+    onclick={() => {
       iwant = false
       addP = true
     }}
@@ -1489,7 +1486,7 @@ class=" hover:scale-150 "
 {#if a == 0}
 <div class="anothere">
   <button
-  on:click={basic}
+  onclick={basic}
   title={editbas[$lang]}
   class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
   >
@@ -1506,7 +1503,7 @@ class=" hover:scale-150 "
 </div>
 {:else if addP == true}
 <button title="{cencel[$lang]}"
-  on:click={() => addP = false}
+  onclick={() => addP = false}
   style="margin: 0 auto;"
   class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
    ><Close/></button>

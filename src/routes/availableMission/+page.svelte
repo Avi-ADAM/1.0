@@ -11,7 +11,7 @@
   import { onMount } from 'svelte';
   import { RingLoader } from "svelte-loading-spinners";
   import { Head } from "svead";
-  import { page } from "$app/stores";
+  import { page } from "$app/state";
     const intitle = {he:" משימות פתוחות",en:"Open missions"}
     const name = {"he": ' שם ושם הריקמה',"en":"name and project name"}
     const des = {"he":"תיאור","en":'description'}
@@ -210,7 +210,7 @@ let columns = $state([
     let title = {he:"משימות פתוחות",en:"Open missions"}
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description = {he:"משימות פתוחות שאפשר להגיש מועמדות כדי להצטרף ולבצע יחד ב-1💗1",en:"Open missions that you can submit candidates to join and do together in 1💗1"}
-  let url = $page.url.toString()
+  let url = page.url.toString()
     </script>
 <Head title={title[$lang]} description={description[$lang]} {image} {url} />
 <div class="w-full px-2 text-center bg-gold text-barbi" dir={$lang == "he" ? 'rtl':'ltr'}>

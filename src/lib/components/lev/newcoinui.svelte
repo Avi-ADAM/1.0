@@ -126,7 +126,7 @@
   import { fly } from 'svelte/transition';
 
   import { createEventDispatcher, onMount } from 'svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { isMobileOrTablet } from '$lib/utilities/device';
 
   const dispatch = createEventDispatcher();

@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
 <script>
     import Tile from '$lib/celim/tile.svelte'
     	import { Drawer } from 'vaul-svelte';
@@ -15,35 +13,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 	import dayjs from 'dayjs';
   import { nowId } from "$lib/stores/pendMisMes.js";
 const baseUrl = import.meta.env.VITE_URL
-export let isVisible = false;
  const dispatch = createEventDispatcher();
-     export let low = false, alreadyi = false
-     export let timeToP = "more"
-export let hst = 187;
-export let stb = 180;
-export let coinlapach;
-    export let deadLine;
-    export let restime
-        export let deadLinefi;
-    export let projectName;
-    export let missionName;
-    export let role = [];
-    export let skills = [];
-    export let acts = [];
-    export let missionDetails;
-    export let src = "coin.png";
-    export let projectId;
-    export let linki = "/project/";
-    export let oid = 0;
-    export let workways = [];
-    export let noOfHours = 0;
-    export let perhour = 0;
-    export let total = 0;
-    export let askedarr =[];
-    export let declineddarr = [];
-    export let hearotMeyuchadot
-    export let pid;
-let already = false;
+let already = $state(false);
     let token;
     let uId;
 
@@ -248,7 +219,7 @@ const cookieValue = document.cookie
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
 let u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
-let hovered = false;
+let hovered = $state(false);
 function hover (id){
   if (id == "0"){
      u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
@@ -267,7 +238,8 @@ function hoverede(){
   }
   dispatch("hover", {id: u[$lang]});
  }
- $: pclim = 0
+ let pclim = $state(0);
+  
 function mesima (){
   console.log("jjj")
     pclim += 1;
@@ -276,7 +248,8 @@ function mesima (){
         dispatch("mesima", {id: oid});
     }
 }
-$: pcli = 0
+let pcli = $state(0);
+  
 function linke (){
     pcli += 1;
     setTimeout(function() {pcli = 0},6000)
@@ -290,18 +263,18 @@ function project () {
 }
  onMount(function(){
  if ($lang != "en" ){
-              for (var i = 0; i < skills.data.length; i++){
+              for (let i = 0; i < skills.data.length; i++){
                 if (skills.data[i].attributes.localizations.data.length > 0){
                 skills.data[i].attributes.skillName = skills.data[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
-              for (var i = 0; i < role.data.length; i++){
+              for (let i = 0; i < role.data.length; i++){
                 if (role.data[i].attributes.localizations.data.length > 0){
                 role.data[i].attributes.roleDescription = role.data[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
               console.log(workways)
-              for (var i = 0; i < workways?.data.length; i++){
+              for (let i = 0; i < workways?.data.length; i++){
                 if (workways.data[i].attributes.localizations.data.length > 0){
                 workways.data[i].attributes.workWayName = workways.data[i].attributes.localizations.data[0].attributes.workWayName
                 }
@@ -324,7 +297,6 @@ function project () {
   import Diun from './diun.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { sendApi } from '$lib/send/sendApi.svelte';
-export let cards = false;
 function claf (event){
   let o = event.detail.alr
   let d = event.detail.y
@@ -344,16 +316,84 @@ const tt1y = {"he":"צפי רווח: שנה","en":"exp income: 1 year"}
 const tt2y = {"he":"צפי רווח: שנתיים","en":"exp income: 2 years "}
 const ttmor = {"he":"צפי רווח: ארוך טווח","en":"exp income: long term"}
 const ttne = {"he":"ללא רווח","en":"not profitable"}
-let isOpen = false, diunm = false, loading = false 
+let isOpen = $state(false), diunm = $state(false), loading = false 
 const close = () => {
     isOpen = false;
     diunm = false;
 };
 
-let clicked = false
-export let chat = []
-export let askId
-export let order
+let clicked = $state(false)
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [low]
+   * @property {boolean} [alreadyi]
+   * @property {string} [timeToP]
+   * @property {number} [hst]
+   * @property {number} [stb]
+   * @property {any} coinlapach
+   * @property {any} deadLine
+   * @property {any} restime
+   * @property {any} deadLinefi
+   * @property {any} projectName
+   * @property {any} missionName
+   * @property {any} [role]
+   * @property {any} [skills]
+   * @property {any} [acts]
+   * @property {any} missionDetails
+   * @property {string} [src]
+   * @property {any} projectId
+   * @property {string} [linki]
+   * @property {number} [oid]
+   * @property {any} [workways]
+   * @property {number} [noOfHours]
+   * @property {number} [perhour]
+   * @property {number} [total]
+   * @property {any} [askedarr]
+   * @property {any} [declineddarr]
+   * @property {any} hearotMeyuchadot
+   * @property {any} pid
+   * @property {boolean} [cards]
+   * @property {any} [chat]
+   * @property {any} askId
+   * @property {any} order
+   */
+
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    low = false,
+    alreadyi = false,
+    timeToP = "more",
+    hst = 187,
+    stb = 180,
+    coinlapach,
+    deadLine,
+    restime,
+    deadLinefi,
+    projectName,
+    missionName,
+    role = $bindable([]),
+    skills = $bindable([]),
+    acts = [],
+    missionDetails,
+    src = "coin.png",
+    projectId,
+    linki = "/project/",
+    oid = 0,
+    workways = $bindable([]),
+    noOfHours = 0,
+    perhour = 0,
+    total = 0,
+    askedarr = [],
+    declineddarr = [],
+    hearotMeyuchadot,
+    pid,
+    cards = false,
+    chat = $bindable([]),
+    askId,
+    order = $bindable()
+  } = $props();
 let miDatan = []
  async function afreact (event){
  
@@ -419,7 +459,7 @@ function tochat (){
     isOpen = true
     diunm = true
 }
-let dialogOpen = false
+let dialogOpen = $state(false)
 function modal(){
   dispatch("modal")
   dialogOpen=true
@@ -431,7 +471,7 @@ const chatdes2 ={"he":"צ'אט על הצטרפות לריקמה" ,"en":"chat on 
         <div transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="chat" aria-label="form" >
       <div dir="rtl" class="grid items-center justify-center aling-center">
-              <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+              <button onclick={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24"> 
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -485,10 +525,10 @@ title="ביטול"
 <div
 style="position: relative;"
 style:z-index={hovered === false ? 11 : 16}
-on:mouseenter={()=> hoverede()}
-on:mouseleave={()=> hoverede()}
-use:clickOutside on:click_outside={toggleShow}
-on:click={modal}
+onmouseenter={()=> hoverede()}
+onmouseleave={()=> hoverede()}
+use:clickOutside onclick_outside={toggleShow}
+onclick={modal}
 class="hover:scale-290 duration-1000 ease-in"     
 in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 >
@@ -1122,9 +1162,9 @@ in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
   </g>
   </g>
   </g>
-<text transform="matrix(1.005 0 0 1.005 -.7373 -6.4393)" fill="url(#sugzzt)"  font-size="17px" stroke="url(#sugzzz)" stroke-miterlimit="0" stroke-width=".62511px" on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")}  style="white-space:pre; stroke-width: 0 !important; fill: url(#sugzzt) !important; font-weight:bold; font-family: gan, Powerr; " bx:origin="0.5 -0.369851"><textPath startOffset="{hst}" xlink:href="#sugzzm">{projectName}</textPath></text>
+<text transform="matrix(1.005 0 0 1.005 -.7373 -6.4393)" fill="url(#sugzzt)"  font-size="17px" stroke="url(#sugzzz)" stroke-miterlimit="0" stroke-width=".62511px" onclick={()=>linke()} onmouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} onmouseleave={()=>hover("0")}  style="white-space:pre; stroke-width: 0 !important; fill: url(#sugzzt) !important; font-weight:bold; font-family: gan, Powerr; " bx:origin="0.5 -0.369851"><textPath startOffset="{hst}" xlink:href="#sugzzm">{projectName}</textPath></text>
 
-<text on:click={mesima} fill="url(#sugzzs)" font-size="17px" stroke="url(#sugzzy)" stroke-miterlimit="0" stroke-width=".62511px" style="white-space:pre; fill:white; font-family: Gan, Powerr; stroke-width: 0; cursor: pointer;"><textPath startOffset="{stb}" xlink:href="#sugzzl" on:mouseenter={()=>hover({"he":"שם המשימה, 2 לחיצות להרחבה","en": "suggested mission, click 2 times to expand"})} on:mouseleave={()=>hover("0")}>{missionName}</textPath></text>
+<text onclick={mesima} fill="url(#sugzzs)" font-size="17px" stroke="url(#sugzzy)" stroke-miterlimit="0" stroke-width=".62511px" style="white-space:pre; fill:white; font-family: Gan, Powerr; stroke-width: 0; cursor: pointer;"><textPath startOffset="{stb}" xlink:href="#sugzzl" onmouseenter={()=>hover({"he":"שם המשימה, 2 לחיצות להרחבה","en": "suggested mission, click 2 times to expand"})} onmouseleave={()=>hover("0")}>{missionName}</textPath></text>
 
 <text x="503.31" y="223.099" fill="url(#sugzzx)" font-family='"Lobster Two"' font-size="27px" stroke="url(#sugzzw)" stroke-miterlimit="0" stroke-width=".2511px" text-anchor="middle" style="white-space:pre">{total.toLocaleString('en-US', {maximumFractionDigits:2})}</text>
 
@@ -1153,7 +1193,7 @@ in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
         {/if}
    <tspan dx="0" dy="1.2em" font-size="17px"></tspan></text>
 </g></g>
-<image on:click={()=>linke()} on:mouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} on:mouseleave={()=>hover("0")} clip-path="url(#sugclipCircle)" transform="matrix(.068594 0 0 .068593 73.499 125.85)" width="450" height="450" style="" xlink:href={src}>
+<image onclick={()=>linke()} onmouseenter={()=>hover({"he":` לחיצה כפולה לצפיה בעמוד הציבורי של ריקמת ${projectName} `, "en":`click two times to view the publick profile of ${projectName}`})} onmouseleave={()=>hover("0")} clip-path="url(#sugclipCircle)" transform="matrix(.068594 0 0 .068593 73.499 125.85)" width="450" height="450" style="" xlink:href={src}>
 </image>
 <g>
 <path d="m39.377 159.37 102.12 1.34 4.557 10.454-55.753 13.939-55.754-16.887 4.825-8.846z" fill="rgba(216, 216, 216, 0)" stroke="rgba(0, 0, 0, 0)">
@@ -1194,17 +1234,17 @@ in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
   ><SwiperSlide class="swiper-slideg"
     ><div   id="normSmll"
 ><div class="{`normSmll${oid}-${projectId}`} xyz"></div>
-    <div class="ltn ab p-0 d flex flex-wrap items-center justify-center " style="text-shadow:none;" on:mouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} on:mouseleave={()=>hover("0")} >
+    <div class="ltn ab p-0 d flex flex-wrap items-center justify-center " style="text-shadow:none;" onmouseenter={()=>hover({"he":"הכישורים הנדרשים","en": "needed skills"})} onmouseleave={()=>hover("0")} >
       {#each skills.data as skill}
       <Tile  bg="green" word={skill.attributes.skillName}/>
         {/each}
 </div>
-   {#if deadLine != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
-      {#if deadLinefi != undefined && deadLine != "undefined"} <h5 on:mouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} on:mouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
+   {#if deadLine != undefined && deadLine != "undefined"} <h5 onmouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} onmouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
+      {#if deadLinefi != undefined && deadLine != "undefined"} <h5 onmouseenter={()=>hover({"he":"תאריך אחרון לביצוע","en": "last date to do the mission"})} onmouseleave={()=>hover("0")} class="lt bc">{dayjs(deadLine).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
 
-    <h4 on:mouseenter={()=>hover({"he":"פרטי המשימה","en":"mission details"})} on:mouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
-    <div on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})}
-       on:mouseleave={()=>hover("0")}
+    <h4 onmouseenter={()=>hover({"he":"פרטי המשימה","en":"mission details"})} onmouseleave={()=>hover("0")} class="ltn cd d" style=" line-height: 0.9;">{missionDetails}</h4>
+    <div onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})}
+       onmouseleave={()=>hover("0")}
        style="text-shadow:none;"
        class="ltn de d flex flex-wrap items-center justify-middle">
 
@@ -1215,9 +1255,9 @@ in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
     </div>
 {#if low == false}
     {#if already === false}
-    <button on:mouseenter={()=>hover({"he":"אני רוצה","en":"Yes I want"})} on:mouseleave={()=>hover("0")} on:click={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+    <button onmouseenter={()=>hover({"he":"אני רוצה","en":"Yes I want"})} onmouseleave={()=>hover("0")} onclick={agree(oid)} class="btn a" name="requestToJoin" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
    <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
-   -->  <button on:mouseenter={()=>hover({"he":"לא מתאים לי", "en": "not for me"})} on:mouseleave={()=>hover("0")}  on:click={decline(oid)} class="btn b" name="decline" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+   -->  <button onmouseenter={()=>hover({"he":"לא מתאים לי", "en": "not for me"})} onmouseleave={()=>hover("0")}  onclick={decline(oid)} class="btn b" name="decline" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="24" height="24" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
     {/if}
      {:else if low == true}
           <Lowbtn/>

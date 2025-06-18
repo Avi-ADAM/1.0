@@ -6,7 +6,6 @@
   import {lang} from '$lib/stores/lang.js'
   import { format } from 'date-fns';
  import moment from 'moment';
-  import { createEventDispatcher } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {any} start
@@ -14,6 +13,8 @@
    * @property {any} [startplaceholder]
    * @property {any} [finnishplaceholder]
    * @property {string} [dir]
+   * @property {() => void} [onEdit]
+   * @property {() => void} [onEditStop]
    */
 
   /** @type {Props} */
@@ -22,9 +23,10 @@
     finnish = $bindable(),
     startplaceholder = {"he":"תאריך התחלה","en":"start Date"},
     finnishplaceholder = {"he":"תאריך סיום","en":"finnish Date"},
-    dir = "rtl"
+    dir = "rtl",
+    onEdit,
+    onEditStop
   } = $props();
-  const dispatch = createEventDispatcher();
   let startDate = new Date();
   let dateFormat = 'HH:mm MM/dd/yy';
   let showstart = $state(false);
@@ -37,7 +39,7 @@
     return momentx && format(new Date(momentx), dateFormat) || '';
   };
   run(() => {
-    showstart || showend ? dispatch('edit') : dispatch('editStop')
+    showstart || showend ? onEdit?.() : onEditStop?.()
   });
  
 </script>

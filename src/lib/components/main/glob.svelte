@@ -3,9 +3,15 @@
 	import {  Color } from 'three'
 	import { T, useFrame } from '@threlte/core'
 
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 	import {  GLTF } from '@threlte/extras'
+
+/**
+ * @typedef {Object} Props
+ * @property {() => void} [onSubmit] - Callback for when the component submits.
+ */
+
+/** @type {Props} */
+let { onSubmit } = $props();
 
   let rotationt = $state(0)
 		let rotX = 0
@@ -75,7 +81,7 @@ setInterval(() => {
 //	scene.background = new Color(0xeae8e2)
 function sub (){
     console.log("click")
-    dispatch("submit")
+    onSubmit?.()
 }
 let isHovering = $state(false), isPointerDown = $state(false)
 import Globu from './globu.svelte'

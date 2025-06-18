@@ -1,12 +1,10 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
-  import { createEventDispatcher } from 'svelte';
   import {sendToSer} from '$lib/send/sendToSer.js';
-  const dispatch = createEventDispatcher();
    let placeholder = {
     he: 'בחירת משימה בתהליך',
     ar: ' اختيار المهمة المتابعة',
@@ -18,6 +16,16 @@
   
   let success = $state(false);
   
+  /**
+   * @typedef {Object} Props
+   * @property {any} taskId
+   * @property {Array<any>} [bmiData]
+   * @property {() => void} [onClose] - Callback when the component should close.
+   */
+
+  /** @type {Props} */
+  let { taskId, bmiData = [], onClose } = $props();
+
    async function add () {
     loading = true
     
@@ -31,7 +39,7 @@
     await sendToSer (
         {
             mesimabetahaliches: [selectedId],
-            uid: [$page.data.uid],
+            uid: [page.data.uid],
             isAssigned: true,
             id: taskId
         },
@@ -43,7 +51,7 @@
           loading = false
           success = true
           setTimeout(() => {
-            dispatch('close');
+            onClose?.();
           }, 5000);
         }else{
           loading = false
@@ -56,9 +64,8 @@
     });
     //TODO: update task on table directly or from io connection
   };
-  let { taskId, bmiData = [] } = $props();
   let filtered = bmiData.filter(
-    (e) => e.attributes.users_permissions_user.data.id === $page.data.uid
+    (e) => e.attributes.users_permissions_user.data.id === page.data.uid
   );
   
   let selected = $state([]);

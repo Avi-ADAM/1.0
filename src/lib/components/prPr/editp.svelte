@@ -3,8 +3,6 @@
     import AddnewVal from '../addnew/addnewval.svelte';
     import MultiSelect from 'svelte-multiselect';
     import { onMount } from 'svelte';
- import { createEventDispatcher } from 'svelte';
-    const dispatch = createEventDispatcher();
     let basis;
     let token; 
    let idL;
@@ -16,7 +14,7 @@ function sendP () {
   shgi = true; 
 } else{	
   console.log(selected)
-    dispatch('message', {
+    onMessage?.({
       githublink:githublink ,
        fblink: fblink,
         discordlink: discordlink,
@@ -116,7 +114,7 @@ let suc = false;
     projectName_value = $bindable(),
     restime = $bindable(),
     selected = $bindable([])
-  } = $props();
+  } = $props<{ onMessage?: (payload: { githublink: any, fblink: any, discordlink: any, drivelink: any, twiterlink: any, watsapplink: any, linkP: any, desP: any, desPl: any, projectName_value: any, restime: any, valit: any }) => void }>();
     const placeholder = `ערכים ומטרות`;
  
   function addnew (event){

@@ -1,8 +1,5 @@
 <script>
-	const dispatch = createEventDispatcher();
-
   import { onMount } from 'svelte';
-	import { createEventDispatcher } from 'svelte';
 
 	//import mapStyles from './map-styles'; // optional
 
@@ -12,10 +9,11 @@
 	 * @typedef {Object} Props
 	 * @property {boolean} [globally]
 	 * @property {any} map
+	 * @property {(loaded: boolean) => void} [onLoad] - Callback when the map is loaded.
 	 */
 
 	/** @type {Props} */
-	let { globally = false, map = $bindable() } = $props();
+	let { globally = false, map = $bindable(), onLoad } = $props();
 
 	// @ts-ignore
 	let container = $state();
@@ -33,7 +31,7 @@
 					// styles: mapStyles
 				});
 
-        dispatch('load', true);
+        onLoad?.(true);
 
         if (globally) {
 					Object.assign(window, { map });

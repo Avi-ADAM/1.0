@@ -1,20 +1,30 @@
-<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead
+https://svelte.dev/e/legacy_export_invalid -->
 <script>
     import { page } from '$app/stores';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import MultiSelect from 'svelte-multiselect';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import { showFoot } from '$lib/stores/showFoot';
-    import { createEventDispatcher } from 'svelte';
     import {lang } from '$lib/stores/lang.js' 
     import {mi} from './mi.js'
     import { skil, ww, role } from './mi.js';
   import Button from '$lib/celim/ui/button.svelte';
   import Mission from "./mission.svelte";
   import { idPr } from '../../stores/idPr.js'
- const dispatch = createEventDispatcher();
- export let pn, pl, restime,projectUsers, alit;
+
+/**
+ * @typedef {Object} Props
+ * @property {any} pn
+ * @property {any} pl
+ * @property {any} restime
+ * @property {any} projectUsers
+ * @property {any} alit
+ * @property {() => void} [onClose] - Callback when the component should close.
+ */
+
+/** @type {Props} */
+export let { pn, pl, restime, projectUsers, alit, onClose } = $props();
  const baseUrl = import.meta.env.VITE_URL
 
  let newcontent = true;
@@ -59,7 +69,7 @@ async function findT() {
         .then(parseJSON);
     let  skills2 = res.data.skills.data;
       if ($lang == 'he') {
-        for (var i = 0; i < skills2.length; i++) {
+        for (let i = 0; i < skills2.length; i++) {
           if (skills2[i].attributes.localizations.data.length > 0) {
             skills2[i].attributes.skillName =
               skills2[i].attributes.localizations.data[0].attributes.skillName;
@@ -69,7 +79,7 @@ async function findT() {
       skills2 = skills2;
      let roles = res.data.tafkidims.data;
       if ($lang == 'he') {
-        for (var i = 0; i < roles.length; i++) {
+        for (let i = 0; i < roles.length; i++) {
           if (roles[i].attributes.localizations.data.length > 0) {
             roles[i].attributes.roleDescription =
               roles[
@@ -81,7 +91,7 @@ async function findT() {
       roles = roles;
     let  workways2 = res.data.workWays.data;
       if ($lang == 'he') {
-        for (var i = 0; i < workways2.length; i++) {
+        for (let i = 0; i < workways2.length; i++) {
           if (workways2[i].attributes.localizations.data.length > 0) {
             workways2[i].attributes.workWayName =
               workways2[
@@ -109,7 +119,7 @@ export let mission1 = [];
 
 
 function find_mission_id(mission_name_arr){
-     var  arr = [];
+     let  arr = [];
       for (let j = 0; j< mission_name_arr.length; j++ ){
       for (let i = 0; i< mission1.length; i++){
         if(mission1[i].attributes.missionName === mission_name_arr[j]){
@@ -238,9 +248,6 @@ function closeMobileModal() {
         userslength={projectUsers.length}
         vallues={alit}
         projectId={$idPr}
-        on:close={()=>dispatch('close')}/>
+        onClose={onClose}/>
         {/if}
  </div>
-
-
-

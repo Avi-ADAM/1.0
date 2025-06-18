@@ -1,16 +1,41 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
-https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
 <script>
     import { onMount } from 'svelte';
- import { createEventDispatcher } from 'svelte';
   import { RingLoader
 } from 'svelte-loading-spinners'
 	import { beforeUpdate } from 'svelte';
 
- const dispatch = createEventDispatcher();
   let token; 
-  export let needr = [];
-export let meData = [];
+  /**
+   * @typedef {Object} ClosePayload
+   * @property {any} id - The ID of the created resource.
+   * @property {string} name - The name of the created resource.
+   * @property {any} skob - The data object of the created resource.
+   */
+
+  /**
+   * @typedef {Object} RemovePayload
+   * @property {any} id - The ID of the resource to remove.
+   * @property {any[]} data - The updated meData array after removal.
+   */
+
+  /**
+   * Callback function for when a resource is successfully created.
+   * @type {((payload: ClosePayload) => void) | undefined}
+   */
+  let { onClose } = $props<{ onClose?: (payload: { id: any, name: string, skob: any }) => void }>();
+  /**
+   * Callback function for when a resource is removed.
+   * @type {((payload: RemovePayload) => void) | undefined}
+   */
+  let { onRemove, needr = [], meData = [] } = $props<{  onRemove?: (payload: { id: any, data: any[] }) => void }>();
   let miDatan = [];
     let error1 = null;
 async function upd (){
@@ -92,7 +117,7 @@ async function han (){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-             dispatch('close', {
+             onClose?.({
                  id: miDatan.data.createSp.data.id,
                  name: miDatan.data.createSp.data.attributes.name,
                  skob: miDatan.data.createSp.data
@@ -105,7 +130,7 @@ async function han (){
 
 }
 function remove (id) {
-  dispatch("remove",{
+  onRemove?.({
     id: id,
    data: meData
   })
@@ -197,75 +222,75 @@ import {lang} from '$lib/stores/lang'
   <div class="dd md:items-center border-2 border-gold rounded">
   <div class="body items-center">
   
-  <table dir="rtl" >
-    <caption class="sm:text-right md:text-center text-right ">  
+  <table dir="rtl"  >
+    <caption class="sm:text-right md:text-center text-right  "  >  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
+      
       >משאבים שנבחרו</h1>
-    </caption>
-        <tr class="gg">
-          <th class="gg">הסרת המשאב שנבחר</th>
-          {#each meData as data, i}
-          <td class="gg" style="font-size: 3rem">
-            {i + 1}
-            <button
-             title='הסרה'
-             on:click={remove(data.id)}><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-              <path fill="currentColor" d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z" />
-          </svg></button></td>
-          {/each}
-    </tr> <tr class="ggr">
-      <th class="ggr">שם</th>
-      {#each meData as data, i}
-            <td class="ggr">
-                <div dir="rtl" class='textinput'>
-  <input type="text"  id="nam" name="nam" bind:value={data.name} class='input' required>
-  <label for="nam" class='label' >שם</label>
+          <tr class="gg">
+        t   {#each meData as data, i}
+         tut type="text"  id="nam" ="nam" class='label' >שם</label>
   <span class='line'></span>
-</div>
-            </td>
-            {/each}
-          </tr>
+            
+  </div>buton
+            
+            each}
+        </tr>
+r>></button></td
+      <th>{/each}
+תי  או/r> <tr class="ggr"
+      <th{class="ggr">שם</th>
+#ea   {#each meDa a as mata, i}Data as data, i}
+       <td> 
+       <div     dir="rtl" class='textinput'>
+     bind:value={data .descri
+ tlass='input' reed> 
+="name" class='label'>תיאור>
+</div</label>
+  <span class=t'ne'></span>
+   </div>{/each}
+         r
   <tr>
       <th>תיאור</th>
-      {#each meData as data, i}
+     <{#each/meDada as >ata, i}
       <td>
-       <div dir="rtl" class='textinput'>
-  <input         bind:value={data.descrip}
- type="text" class='input' required>
-  <label for="name" class='label'>תיאור</label>
-  <span class='line'></span>
-</div>
-        </td>
-        {/each}
+   {/each}
+ <<input/tr>  <tr
+
+וג/th>nam
+ {eData as data, i}>
+</div
+      <t</td>
+d>    {each}
     </tr>  <tr>
-      <th>סוג</th>
-      {#each meData as data, i}
-      <td>
+  th>סוג<h
+      {#each meData as<data,si}
+      elect  bind:value={data.kindOf} on:change={() => myMissionH()} class="round form-select appearance-none
       
-        <select  bind:value={data.kindOf} on:change={() => myMissionH()} class="round form-select appearance-none
-      block
-      w-full
-      px-3
-      py-1.5
-      text-barbi
-      font-normal
-      bg-gold bg-clip-padding bg-no-repeat
-      border border-solid border-gold
-      rounded
-      transition
-      ease-in-out
-      m-0
-      focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none">
-<option value="total">{ot[$lang]}</option>
-<option value="monthly">{pm[$lang]}</option>
-<option value="yearly">{pye[$lang]}</option>
-<option value="perUnit">{py[$lang]}</option>
-<option value="rent">{re[$lang]}</option>
-</select>
-        </td>
-      {/each}
-    </tr> <tr style="display:{kc ? "" : "none"};">
-      <th>כמות</th>
+ block  
+w-full
+-3
+      
+     tbi
+   fonmal
+ bg-gobg-clip-padding bg-no-repeat
+order order-solid border-gold
+unded
+      on
+    eaout
+  m-0
+focus:xt-barbi focus:bg-gold focus:border-barbi focus:outline-none">
+ value"total">{ot[$lang]}</option>
+"monthly">{pm[$lang]}</option>
+"yearly">{pye[$lang]}</option>
+"perUnit">{py[$lang]}</option>
+"rent">{re[$lang]}</option>
+
+>
+    {/each}
+     <{/each}
+/tr></tr> <tr style="display:{"none"};">
+<th>כמוh>כמות</h
       {#each meData as data, i}
       <td >
         <div style="display:{meData[i].kc ? "" : "none"};" dir="rtl" class='textinput'>

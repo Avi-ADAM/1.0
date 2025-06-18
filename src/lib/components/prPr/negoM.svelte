@@ -1,45 +1,12 @@
-<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
 <script>
+  import { run } from 'svelte/legacy';
+
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
-  import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
-  const dispatch = createEventDispatcher();
-  export let negopendmissions = []
-  export let descrip;
-  export let projectName;
-  export let name1;
-  export let hearotMeyuchadot;
-  export let noofhours = 0;
-  export let perhour = 0;
-  export let projectId;
-  export let uids = [];
-  export let what = [];
-  export let noofusersOk;
-  export let noofusersNo;
-  export let noofusersWaiting;
-  export let total = 0;
-  export let noofusers;
-  export let already;
-  export let mypos;
-  export let missionId;
-  export let skills;
-  export let tafkidims;
-  export let workways;
-  export let vallues;
-  export let publicklinks;
-  export let privatlinks = 'aaxa';
-  export let mdate;
-  export let mdates;
-  export let state = 2;
-  export let pendId;
-  export let users = [];
-  export let isKavua;
-  export let oldide = 0; //last tg id, if non 0
 
-  let isKavua2;
-  let newcontent = true;
+  let isKavua2 = $state();
+  let newcontent = $state(true);
 
   let miDatan = [];
   let error1;
@@ -55,37 +22,37 @@ https://svelte.dev/e/declaration_duplicate -->
     en: 'remove'
   };
   let placeholder4 = `בחירת תפקידים`;
-  let roles = $role;
+  let roles = $state($role);
   let why = '';
-  let skills2 = $skil;
+  let skills2 = $state($skil);
   let placeholder1 = `בחירת כישורים`;
   let addS = false;
-  let descrip2 = descrip;
-  let name2 = name1;
+  let descrip2 = $state(descrip);
+  let name2 = $state(name1);
   let selected2 = [];
   let selected3 = [];
   let selected1 = [];
-  let workways2 = $ww;
+  let workways2 = $state($ww);
   let placeholder = `סוג משימה`;
   const plww = { he: `סוג משימה`, en: `mission kind` };
-  let mdate2 = mdate;
-  let mdates2 = mdates;
+  let mdate2 = $state(mdate);
+  let mdates2 = $state(mdates);
 
   let hearotMeyuchadot2 = hearotMeyuchadot;
-  let privatlinks2 = privatlinks;
-  let noofhours2 = noofhours;
-  let perhour2 = perhour;
+  let privatlinks2 = $state(privatlinks);
+  let noofhours2 = $state(noofhours);
+  let perhour2 = $state(perhour);
   let myM;
   let done;
-  let skills3 = [];
-  let tafkidims2 = [];
-  let workways3 = [];
+  let skills3 = $state([]);
+  let tafkidims2 = $state([]);
+  let workways3 = $state([]);
 
   let rishon = 0;
   function myMission() {
-    var checkBox = document.getElementById('tomeC');
+    let checkBox = document.getElementById('tomeC');
 
-    var text = document.getElementById('doneC');
+    let text = document.getElementById('doneC');
     console.log(text);
     if (text.style.display == 'none') {
       text.style.display = '';
@@ -107,13 +74,13 @@ https://svelte.dev/e/declaration_duplicate -->
       .split('=')[1];
     idL = cookieValueId;
     rishonves = idL;
-    /*var checkBox = document.getElementById("done");
+    /*let checkBox = document.getElementById("done");
   // Get the output text
-  var text = document.getElementById("hoursC");
-  var text2 = document.getElementById("vallueperhourC");
-  var text3 = document.getElementById("vallueperhourN");
-  var text4 = document.getElementById("hoursD");
-  var text5 = document.getElementById("vallueperM");
+  let text = document.getElementById("hoursC");
+  let text2 = document.getElementById("vallueperhourC");
+  let text3 = document.getElementById("vallueperhourN");
+  let text4 = document.getElementById("hoursD");
+  let text5 = document.getElementById("vallueperM");
   // If the checkbox is checked, display the output text
   if (text.style.display == "none"){
     text.style.display = "";
@@ -134,11 +101,9 @@ https://svelte.dev/e/declaration_duplicate -->
     return JSON.stringify(a1) == JSON.stringify(a2);
   }
   function close() {
-    dispatch('close');
+    onClose?.();
   }
-  export let timegramaId;
   let name4 = ``;
-  export let ordern = 0;
   let descrip4 = ``;
   let hearotMeyuchadot4 = ``;
   let noofhours4 = ``;
@@ -199,10 +164,9 @@ https://svelte.dev/e/declaration_duplicate -->
     }
     return str;
   }
-  export let masaalr = false;
   let userss;
   async function increment() {
-    dispatch('load');
+    onLoad?.();
     //TODO: update timegrama, add now pend that is changed to nego
     let date4 = ``,
       dates4 = ``,
@@ -394,7 +358,7 @@ https://svelte.dev/e/declaration_duplicate -->
                 publishedAt: "${d.toISOString()}",
                 pendm:${pendId},
                  users_permissions_user: "${idL}",
-                 isOriginal:${state == 2 ? true : false},
+                 isOriginal:${stepState == 2 ? true : false},
     ${iskvua4nego}             
     ${noofhours4nego}
     ${hearotMeyuchadot4nego}
@@ -456,7 +420,7 @@ https://svelte.dev/e/declaration_duplicate -->
   }
   let x;
   let linkg = import.meta.env.VITE_URL + '/graphql';
-  let dataibno = { skillName: [], roleDescription: [], workWayName: [] };
+  let dataibno = $state({ skillName: [], roleDescription: [], workWayName: [] });
   function addnew(event) {
     const newOb = event.detail.skob;
     const valc = event.detail.valc;
@@ -539,7 +503,7 @@ https://svelte.dev/e/declaration_duplicate -->
         .then(parseJSON);
       skills2 = res.data.skills.data;
       if ($lang == 'he') {
-        for (var i = 0; i < skills2.length; i++) {
+        for (let i = 0; i < skills2.length; i++) {
           if (skills2[i].attributes.localizations.data.length > 0) {
             skills2[i].attributes.skillName =
               skills2[i].attributes.localizations.data[0].attributes.skillName;
@@ -549,7 +513,7 @@ https://svelte.dev/e/declaration_duplicate -->
       skills2 = skills2;
       roles = res.data.tafkidims.data;
       if ($lang == 'he') {
-        for (var i = 0; i < roles.length; i++) {
+        for (let i = 0; i < roles.length; i++) {
           if (roles[i].attributes.localizations.data.length > 0) {
             roles[i].attributes.roleDescription =
               roles[
@@ -561,7 +525,7 @@ https://svelte.dev/e/declaration_duplicate -->
       roles = roles;
       workways2 = res.data.workWays.data;
       if ($lang == 'he') {
-        for (var i = 0; i < workways2.length; i++) {
+        for (let i = 0; i < workways2.length; i++) {
           if (workways2[i].attributes.localizations.data.length > 0) {
             workways2[i].attributes.workWayName =
               workways2[
@@ -592,7 +556,6 @@ https://svelte.dev/e/declaration_duplicate -->
     x = x;
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
-  export let restime;
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';
   import Elements from '../conf/elements.svelte';
@@ -602,30 +565,91 @@ https://svelte.dev/e/declaration_duplicate -->
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [negopendmissions]
+   * @property {any} descrip
+   * @property {any} projectName
+   * @property {any} name1
+   * @property {any} hearotMeyuchadot
+   * @property {number} [noofhours]
+   * @property {number} [perhour]
+   * @property {any} projectId
+   * @property {any} [uids]
+   * @property {any} [what]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {any} already
+   * @property {any} mypos
+   * @property {any} missionId
+   * @property {any} skills
+   * @property {any} tafkidims
+   * @property {any} workways
+   * @property {any} vallues
+   * @property {any} publicklinks
+   * @property {string} [privatlinks]
+   * @property {any} mdate
+   * @property {any} mdates
+   * @property {number} [stepState]
+   * @property {any} pendId
+   * @property {any} [users]
+   * @property {any} isKavua
+   * @property {number} [oldide] - last tg id, if non 0
+   * @property {any} timegramaId
+   * @property {number} [ordern]
+   * @property {boolean} [masaalr]
+   * @property {any} restime
+   */
+
+  /** @type {Props} */
+  let {
+    negopendmissions = [],
+    descrip,
+    projectName,
+    name1,
+    hearotMeyuchadot,
+    noofhours = 0,
+    perhour = 0,
+    projectId,
+    uids = [],
+    what = [],
+    noofusersOk,
+    noofusersNo,
+    noofusersWaiting,
+    total = 0,
+    noofusers,
+    already,
+    mypos,
+    missionId,
+    skills,
+    tafkidims,
+    workways,
+    vallues,
+    publicklinks,
+    privatlinks = 'aaxa',
+    mdate,
+    mdates,
+    stepState = 2,
+    pendId,
+    users = [],
+    isKavua,
+    oldide = 0,
+    timegramaId,
+    ordern = 0,
+    masaalr = false,
+    restime,
+    onClose,
+    onLoad
+  } = $props<{ onClose?: () => void, onLoad?: () => void }>();
 
   const tri = tr;
-  $: datai = [];
-  $: if(negopendmissions.length > 0){
-  datai = [
-    {
-      leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
-      value: noofhours2 * perhour2
-    },
-    {
-      leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
-      value: noofhours * perhour
-    }
-  ];
-  for(let i = 0; i < negopendmissions.length; i++){
-    if(negopendmissions[i].attributes.perhour != null || negopendmissions[i].attributes.noofhours != null){
-      datai.push({
-        leb: `${tri?.nego?.oldno[$lang]}-${i+1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
-        value: (negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)
-  })
-    }
-  }
-  datai = datai
-  }else{
+  let datai = $state([]);
+  
+  run(() => {
+    if(negopendmissions.length > 0){
     datai = [
       {
         leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
@@ -636,8 +660,29 @@ https://svelte.dev/e/declaration_duplicate -->
         value: noofhours * perhour
       }
     ];
+    for(let i = 0; i < negopendmissions.length; i++){
+      if(negopendmissions[i].attributes.perhour != null || negopendmissions[i].attributes.noofhours != null){
+        datai.push({
+          leb: `${tri?.nego?.oldno[$lang]}-${i+1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
+          value: (negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)
+    })
+      }
+    }
     datai = datai
-  }
+    }else{
+      datai = [
+        {
+          leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+          value: noofhours2 * perhour2
+        },
+        {
+          leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+          value: noofhours * perhour
+        }
+      ];
+      datai = datai
+    }
+  });
   console.log(negopendmissions)
 </script>
 
@@ -857,7 +902,7 @@ https://svelte.dev/e/declaration_duplicate -->
                                 </table>-->
   <div class="w-fit mx-auto">
     <button
-      on:click={increment}
+      onclick={increment}
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
       name="addm">{tri?.common.puttovote[$lang]}</button

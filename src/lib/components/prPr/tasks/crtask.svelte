@@ -1,7 +1,7 @@
 <script>
   import { idPr } from '$lib/stores/idPr.js';
   import moment from 'moment';
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   let isPersonal = $state(true);
   let isEdit = $state(false);
   onMount(() => {
@@ -25,7 +25,6 @@
     }
   });
 
-  const dispatch = createEventDispatcher();
   let seEr = $state(false),
     neEr = $state(false);
   import MultiSelect from 'svelte-multiselect';
@@ -33,7 +32,7 @@
 
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   /**
    * @typedef {Object} Props
    * @property {any} [bmiData]
@@ -50,6 +49,8 @@
    * @property {string} [teur]
    * @property {any} [selected]
    * @property {string} [link]
+   * @property {(payload: { id: any; name: any; user: any; }) => void} [onDone]
+   * @property {(payload: { isEdit: boolean; id: any; data: { des: any; shem: any; link: any; dateS: any; dateF: any; }; }) => void} [onAdd]
    */
 
   /** @type {Props} */
@@ -61,13 +62,15 @@
     fromMis = false,
     editdata = -1,
     userMevatzeaId = $bindable(),
-    userMevakeshId = $bindable($page.data.uid),
+    userMevakeshId = $bindable(page.data.uid),
     mimatai = $bindable(),
     adMatai = $bindable(),
     name = $bindable(''),
     teur = $bindable(''),
     selected = $bindable([]),
-    link = $bindable('')
+    link = $bindable(''),
+    onDone,
+    onAdd
   } = $props();
   function find_tafkidims_id (selected){
     let arr = []
@@ -195,7 +198,7 @@
               .then((data) => (miDatan = data));
             loading = false;
             success = true;
-            dispatch('done', {
+            onDone?.({
               id: miDatan.data.createAct.data.id,
               name: miDatan.data.createAct.data.attributes.shem,
               user: miDatan.data.createAct.data.attributes.my?.data?.id ?? null
@@ -204,14 +207,13 @@
             const error1 = e;
             loading = false;
             error = true;
-            /*dispatch('eror')*/
           }
         }
       }
     } else {
       loading = false;
       success = true;
-      dispatch('add', {
+      onAdd?.({
         isEdit,
         id: misid,
         data: {

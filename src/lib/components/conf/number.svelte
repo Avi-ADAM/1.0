@@ -1,39 +1,55 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `$: datai = []` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
 <script>
+  import { run } from 'svelte/legacy';
+
     import RangeSlider from "svelte-range-slider-pips";
     import Barb from './barb.svelte'
-    import tr from '$lib/translations/tr.json'
-    export let old = []
-    export let status = [10,20]
-    export let splebel = null
-    export let state = 2 // original and edit, 3 is original second and edit
-export let number;
-export let numberb = number
-$: datai = []
+    import tr from '$lib/translations/tr.json'
 
-$: if(old.length > 0){
-  datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":Number(numberb)},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":Number(number)}]
-  for (let i = 0; i < old.length; i++) {
-    console.log(old[i])
-    if(old[i] != null){
-      datai.push({"value":Number(old[i]),"leb":`${tr?.nego?.oldno[$lang]}-${i+1},${old[i]}`})
-    }
-  }
-  datai = datai
-}else{
-  datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
-  datai = datai
-}
-export let lebel;
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
-    let edit = false
-let show2 = false
+  /**
+   * @typedef {Object} Props
+   * @property {any} [old]
+   * @property {any} [status]
+   * @property {any} [splebel]
+   * @property {number} [stepState] - original and edit, 3 is original second and edit
+   * @property {any} number
+   * @property {any} [numberb]
+   * @property {any} lebel
+   */
+
+  /** @type {Props} */
+  let {
+    old = [],
+    status = [10,20],
+    splebel = null,
+    stepState = 2,
+    number,
+    numberb = $bindable(number),
+    lebel
+  } = $props();
+    let edit = $state(false)
+let show2 = $state(false)
 function checkAll(a,b){
   datai[0].value = b
   datai[1].value = a
 }
+
+run(() => {
+    if(old.length > 0){
+    datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":Number(numberb)},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":Number(number)}]
+    for (let i = 0; i < old.length; i++) {
+      console.log(old[i])
+      if(old[i] != null){
+        datai.push({"value":Number(old[i]),"leb":`${tr?.nego?.oldno[$lang]}-${i+1},${old[i]}`})
+      }
+    }
+    datai = datai
+  }else{
+    datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
+    datai = datai
+  }
+  });
 </script>
     <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
  {#if edit == false}
@@ -51,13 +67,13 @@ function checkAll(a,b){
        {/key}
        </div>
         {/if}
-       <button on:click={()=>edit = true}>
+       <button onclick={()=>edit = true}>
             {#if number == numberb}🖍️{:else}✏️{/if}</button>
         {#if number != numberb && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col items-center flex-wrap justify-center m-4">
-        <button on:click={()=>show2 = false}><Close width={10} height={10}/></button>
+        <button onclick={()=>show2 = false}><Close width={10} height={10}/></button>
         <div class="flex flex-row">
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{number}</p>
@@ -82,7 +98,7 @@ function checkAll(a,b){
   <input type="number"  id="numberb" name="numberb" bind:value={numberb} class='input' required>
   <label for="numberb" class='label' >{lebel}</label>
   <span class='line '></span>
-</div><button on:click={()=>{if(Number(numberb) >= 0){ edit = false
+</div><button onclick={()=>{if(Number(numberb) >= 0){ edit = false
 checkAll(number,numberb)
 } else{
   console.log(numberb,Number(numberb))

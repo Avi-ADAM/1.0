@@ -6,8 +6,6 @@
 
    //// import { sneed } from '../../stores/sneed.js';
   //  import { total } from '../../stores/total.js';
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
     //let  userName_value;
     let token; 
   //  let error = null
@@ -49,7 +47,7 @@ onMount(async () => {
   .then(r => r.json())
   .then(data => needss = data.data.mashaabims.data);
    console.log(needss)
-   dispatch("str")
+   onStr?.()
     isLow = false
     } catch (e) {
             console.log(e)
@@ -70,7 +68,7 @@ onMount(async () => {
       return arr1;
      };
 
-  let { needss = $bindable([]), selctedi = [], selected = $bindable([]) } = $props();
+  let { needss = $bindable([]), selctedi = [], selected = $bindable([]) , onStr, onAddm, onAdd } = $props<{ onStr?: () => void, onAddm?: (payload: { x: any, skob: any }) => void, onAdd?: (payload: { x: any }) => void }>();
     const placeholder = `הוספת משאבים נדרשים `;
 
 function newn(event) {
@@ -80,14 +78,14 @@ function newn(event) {
   selected.push(event.detail.name)
   needss = needss
   selected = selected
-    dispatch( "addm",{
+    onAddm?.({
       x: event.detail.id, 
       skob: event.detail.skob
     })
 	};
 
 function incremen() {
-    dispatch( "add",{
+    onAdd?.({
       x: find_need_id(selected)
     })
 	};

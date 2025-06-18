@@ -3,7 +3,7 @@
     import {forum, nowChatId,newChat, initialForum} from '$lib/stores/pendMisMes.js'
   import Diun from "../lev/diun.svelte";
     import {lang} from '$lib/stores/lang'
-    import {page} from '$app/stores'
+    import {page} from '$app/state'
   import { createMessage } from "$lib/func/chat/createMessage.svelte";
   import { createForum } from "$lib/func/chat/createForum.svelte";
 	import {toast } from 'svelte-sonner';

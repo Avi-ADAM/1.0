@@ -12,9 +12,16 @@ let amortha = "أنا ||اسم||، سأتخلى عن أسلحة الجيش ||ا�
   let already = $state(false);
   let lang = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 const baseUrl = import.meta.env.VITE_URL
+
+/**
+ * @typedef {Object} Props
+ * @property {() => void} [onDone] - Callback for when the operation is successful.
+ * @property {() => void} [onErore] - Callback for when an error occurs.
+ */
+
+/** @type {Props} */
+let { onDone, onErore } = $props();
 
 let miDatan = [];
 let linkg = baseUrl+'/graphql';
@@ -51,11 +58,11 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch("done")
+            onDone?.()
         } catch (e) {
             error1 = e
             console.log(error1);
-                        dispatch("erore")
+                        onErore?.()
 
         }
 }
@@ -256,4 +263,3 @@ height: 44px;
   top: 0;
 } 
 </style>
-

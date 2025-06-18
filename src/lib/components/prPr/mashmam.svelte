@@ -1,5 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: `b` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: `<tr>` cannot be a child of `<table>`. `<table>` only allows these children: `<caption>`, `<colgroup>`, `<tbody>`, `<thead>`, `<tfoot>`, `<style>`, `<script>`, `<template>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
+https://svelte.dev/e/node_invalid_placement -->
 <script>
   export let meData = [];
   import { onMount } from 'svelte';
@@ -25,10 +25,10 @@ https://svelte.dev/e/declaration_duplicate -->
     kc = false;
     let is = [];
 
-    for (var i = 0; i < meData.length; i++) {
+    for (let i = 0; i < meData.length; i++) {
       if (meData[i].attributes.kindOf === 'monthly') {
-        var b = moment(meData[i].attributes.sqadualed);
-        var a = moment(meData[i].attributes.sqadualedf);
+        let b = moment(meData[i].attributes.sqadualed);
+        let a = moment(meData[i].attributes.sqadualedf);
         meData[i].monts = a.diff(b, 'months', true).toFixed(2);
         ky = true;
         meData[i].m = true;
@@ -39,8 +39,8 @@ https://svelte.dev/e/declaration_duplicate -->
         meData[i].total = meData[i].monts * meData[i].attributes.price;
         meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
       } else if (meData[i].attributes.kindOf === 'yearly') {
-        var b = moment(meData[i].attributes.sqadualed);
-        var a = moment(meData[i].attributes.sqadualedf);
+        let b = moment(meData[i].attributes.sqadualed);
+        let a = moment(meData[i].attributes.sqadualedf);
         meData[i].years = a.diff(b, 'years', true).toFixed(2);
         ky = true;
         meData[i].y = true;

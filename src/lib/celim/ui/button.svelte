@@ -1,6 +1,4 @@
 <script>
-  import { createEventDispatcher } from "svelte";
-        const dispatch = createEventDispatcher();
     import { lang } from "$lib/stores/lang";
     import Lowding from '$lib/celim/lowding.svelte'
   import List from "../icons/list.svelte";
@@ -16,6 +14,7 @@
    * @property {string} [name]
    * @property {string} [size]
    * @property {import('svelte').Snippet} [children]
+   * @property {() => void} [onClick]
    */
 
   /** @type {Props} */
@@ -26,12 +25,13 @@
     text = {"he": "יצירה", "en": "Create"},
     name = "button",
     size = "big",
-    children
+    children,
+    onClick
   } = $props();
    
     function onclick (){
         if(success == false)
-        dispatch("click")
+        onClick?.()
     }
     let hover = $state(false);
   

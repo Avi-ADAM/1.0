@@ -1,3 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: Event attribute must be a JavaScript expression, not a string
+https://svelte.dev/e/attribute_invalid_event_handler -->
+<!-- @migration-task Error while migrating Svelte code: `SIGNALING_SERVER` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: `SIGNALING_SERVER` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: `SIGNALING_SERVER` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
 <!-- @migration-task Error while migrating Svelte code: `SIGNALING_SERVER` has already been declared
 https://svelte.dev/e/declaration_duplicate -->
         <style>
@@ -17,7 +25,7 @@ https://svelte.dev/e/declaration_duplicate -->
             import { browser } from '$app/env';
             /** CONFIG **/
             var SIGNALING_SERVER = "http://localhost:8080";
-            var SIGNALING_SERVER = window.location.protocol + "://" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
+            var SIGNALING_SERVER2 = window.location.protocol + "://" + window.location.hostname + (window.location.port ? ":" + window.location.port : "");
             var USE_AUDIO = true;
             var USE_VIDEO = true;
             var DEFAULT_CHANNEL = 'some-global-channel-name';
@@ -36,7 +44,7 @@ https://svelte.dev/e/declaration_duplicate -->
 
             function init() {
                 console.log("Connecting to signaling server");
-                signaling_socket = io(SIGNALING_SERVER);
+                signaling_socket = io(SIGNALING_SERVER2);
                 signaling_socket = io();
 
                 signaling_socket.on('connect', function() {

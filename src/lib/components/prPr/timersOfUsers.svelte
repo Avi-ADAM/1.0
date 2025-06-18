@@ -1,9 +1,12 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
+https://svelte.dev/e/props_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
+https://svelte.dev/e/props_duplicate -->
 <script>
     import ProjectTimersCalendar from '$lib/components/prPr/ProjectTimersCalendar.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
     import { onMount } from 'svelte';
-    import { createEventDispatcher } from 'svelte';
-    const dispatch = createEventDispatcher();
+    let { onMission, onTasks } = $props();
     let timersData = $state(null);
   let { projectId } = $props();
      let isLoading = $state(true);
@@ -19,7 +22,7 @@
     
     function handleTaskDetails(event) {
               console.log('נלחץ nahnv:', event.detail);
-              dispatch('mission',{id:event.detail.mesimabetahalich.id,kind:'betha'})
+              onMission?.({id:event.detail.mesimabetahalich.id,kind:'betha'})
       // ניווט לפרטי משימה
       //goto(`/tasks/${event.detail.mesimabetahalich.id}`);
     }
@@ -27,7 +30,7 @@
     function handleActsDetails(event) {
       // ניווט לפרטי מטלות
       console.log('פרטי מטלות:', event.detail.acts);
-      dispatch('tasks')
+      onTasks?.()
     }
     
     onMount(() => {

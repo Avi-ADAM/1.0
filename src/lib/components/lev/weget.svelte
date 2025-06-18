@@ -9,15 +9,11 @@ import {
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
   import { DialogOverlay, DialogContent 
 } from 'svelte-accessible-dialog';
 import { idPr } from './../../stores/idPr.js';
   import { onMount } from 'svelte'; 
   import moment from 'moment';
-const dispatch = createEventDispatcher();
     let dialogOpen = $state(false)
 let resP = [];
 let lang;
@@ -239,7 +235,7 @@ updateSp(
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
 ani: "finim",
                 coinlapach: coinlapach             })
 
@@ -341,7 +337,7 @@ updateMaap(
                 .then(data => miDatan = data);
             console.log(miDatan);
             isOpen = false;
-            dispatch('decline', {
+            onDecline?.({
 ani: "finim",
                 coinlapach: coinlapach             })
         } catch (e) {

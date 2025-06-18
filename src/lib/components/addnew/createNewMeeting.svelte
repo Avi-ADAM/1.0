@@ -2,7 +2,7 @@
   import {username} from '$lib/stores/pendMisMes'
   import { createEventDispatcher } from 'svelte';
   const dispatch = createEventDispatcher();
-  import {page} from '$app/stores'
+  import {page} from '$app/state'
   import Close from "$lib/celim/close.svelte";
   import Button from "$lib/celim/ui/button.svelte";
 import TextInput from "$lib/celim/ui/input/textInput.svelte";
@@ -34,7 +34,7 @@ import TextInput from "$lib/celim/ui/input/textInput.svelte";
    onMount(async() => {
       await sendToSer({},"17getUsers",null,null,false,fetch).then((data)=>{users = data.data.
 usersPermissionsUsers.data;
-let me = $page.data.uid
+let me = page.data.uid
       selected.push(users.filter(u => u.id == me)[0].attributes.username)
       selected = selected
       loading = false})
@@ -44,7 +44,7 @@ let me = $page.data.uid
     let d = new Date()
     let publishedAt = d.toISOString()
     sendToSer({name,outpot,publishedAt},"18createNewMeeting",null,null,false,fetch).then((data)=>{
-      let me = $page.data.uid
+      let me = page.data.uid
       if(data.data != null){
         console.log(data, data.data.createPgisha.data.id)
         selected.forEach(us => {
@@ -71,7 +71,7 @@ let me = $page.data.uid
             }
           })
         }else{
-              const uid = encodeURIComponent("meeting-"+data.data.createPgisha.data.id+"-"+$page.data.uid);
+              const uid = encodeURIComponent("meeting-"+data.data.createPgisha.data.id+"-"+page.data.uid);
           sendToSer({id,pgishaId:data.data.createPgisha.data.id,uid,publishedAt},"20CreateUserMeeting",null,null,false,fetch).then((data)=>{
             console.log(data)
             if(data.data != null){

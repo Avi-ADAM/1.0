@@ -1,14 +1,35 @@
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead
+https://svelte.dev/e/legacy_export_invalid -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead
+https://svelte.dev/e/legacy_export_invalid -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead
+https://svelte.dev/e/legacy_export_invalid -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead
+https://svelte.dev/e/legacy_export_invalid -->
 <!-- @migration-task Error while migrating Svelte code: `<tr>` cannot be a child of `<table>`. `<table>` only allows these children: `<caption>`, `<colgroup>`, `<tbody>`, `<thead>`, `<tfoot>`, `<style>`, `<script>`, `<template>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
 https://svelte.dev/e/node_invalid_placement -->
 <script>
     import { onMount } from 'svelte';
- import { createEventDispatcher } from 'svelte';
   import { RingLoader
 } from 'svelte-loading-spinners'
 
- const dispatch = createEventDispatcher();
   let token; 
 export let meData = [];
+
+/**
+ * @typedef {Object} ClosePayload
+ * @property {any} id
+ * @property {any} name
+ * @property {any} skob
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {(payload: ClosePayload) => void} [onClose] - Callback for the close event.
+ */
+
+/** @type {Props} */
+let { onClose } = $props();
   let miDatan = [];
     let error1 = null;
 

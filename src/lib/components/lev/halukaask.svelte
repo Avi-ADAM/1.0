@@ -1,7 +1,6 @@
 <script>
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
-   import { createEventDispatcher } from 'svelte';
        	import { Drawer } from 'vaul-svelte';
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
@@ -9,7 +8,6 @@ import { idPr } from '../../stores/idPr.js';
   import ProgressBar from "@okrad/svelte-progressbar";
   import Lowbtn from '$lib/celim/lowbtn.svelte'
     let dialogOpen = $state(false)
- const dispatch = createEventDispatcher();
     const baseUrl = import.meta.env.VITE_URL
 
     let miDatan = [];
@@ -62,7 +60,7 @@ let ser = $state(xyz());
 
 function coinLapach() {
              isOpen = false;
-        dispatch('coinLapach', {
+        onCoinLapach?.({
      ani: "halu",
                 coinlapach: coinlapach
     } );
@@ -353,7 +351,7 @@ let pmcli = $state(0);
 function linke (){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     }
 }
   function project (id) {
@@ -454,7 +452,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 
 }
 function hoverede(){
@@ -464,7 +462,7 @@ function hoverede(){
   } else {
    u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
 }
   function hoverc (event){
    if (event.detail.x == "0"){
@@ -472,7 +470,7 @@ function hoverede(){
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
    import Cards from './cards/haluka.svelte'
   /**
@@ -500,6 +498,10 @@ function hoverede(){
    * @property {any} [diun]
    * @property {any} [order]
    * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onCoinLapach] - Callback for 'coinLapach' event.
+   * @property {() => void} [onModal] - Callback for 'modal' event.
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event.
+   * @property {(payload: { id: string }) => void} [onHover] - Callback for 'hover' event.
    */
 
   /** @type {Props} */
@@ -526,7 +528,11 @@ function hoverede(){
     users,
     diun = [],
     order = $bindable(diun.length),
-    cards = false
+    cards = false,
+    onCoinLapach,
+    onModal,
+    onProj,
+    onHover
   } = $props();
 function claf (event){
   let o = event.detail.alr

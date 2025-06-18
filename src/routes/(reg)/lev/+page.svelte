@@ -42,7 +42,7 @@
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { get } from 'svelte/store';
   let { data } = $props();
   let low = $state(true);
@@ -1494,7 +1494,7 @@
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
-      fetchTimers($page.data.uid,fetch)
+      fetchTimers(page.data.uid,fetch)
       token = cookieValu;
       const elem = document.getElementById('screen');
 
@@ -1913,7 +1913,7 @@
       localStorage.setItem('arr1Snapshot', JSON.stringify(value));
     }
   }
-  /*   await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
+  /*   await sendToSer({uid: page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON__out_ser",v)
       })*/
 };
@@ -3539,7 +3539,7 @@
     console.log(arr1);
     const x = new Date();
       const d = x.toISOString();
-    /*  await sendToSer({uid: $page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
+    /*  await sendToSer({uid: page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON",v)
       })*/
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart

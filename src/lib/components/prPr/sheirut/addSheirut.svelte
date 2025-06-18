@@ -7,17 +7,16 @@
   import {SendTo} from '$lib/send/sendTo.svelte';
   import { idPr } from '$lib/stores/idPr';
   import { lang } from '$lib/stores/lang'
-  const dispatch = createEventDispatcher();
   import { toast } from 'svelte-sonner';
-  import { createEventDispatcher } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {string} [restime]
    * @property {number} [usersNum]
+   * @property {() => void} [onClose] - Callback when the component should close.
    */
 
   /** @type {Props} */
-  let { restime = "feh", usersNum = 1 } = $props();
+  let { restime = "feh", usersNum = 1, onClose } = $props();
     let name = $state() , descrip = $state(),oneTime = $state(false),isPublik = false,already = $state(false), success = $state(false) , equaliSplited = $state(true)
     const heading = {"he":"יצירת שירות חדש","en":"create new service"}
     const expl = {"he":"","en":""}
@@ -115,7 +114,7 @@ let pendque = `mutation {
     success = false
   },15000)
    toast.success(`${fnnn[$lang]}`);
-   dispatch("close")
+   onClose?.()
 }
     }
   }else{
@@ -125,7 +124,7 @@ let pendque = `mutation {
     success = false
   },15000)
   toast.success(`${fnnn[$lang]}`);
-      dispatch("close")
+      onClose?.()
   }
   }
 }
@@ -170,4 +169,4 @@ let pendque = `mutation {
     {/if}   
     </div>
 
- {/if}    
+ {/if}

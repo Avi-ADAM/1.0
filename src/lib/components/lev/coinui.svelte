@@ -18,11 +18,6 @@ import {
     fly
 } from 'svelte/transition';
 
-import {
-    createEventDispatcher
-} from 'svelte';
-
-const dispatch = createEventDispatcher();
 let modal = $state(false);
 
 function modali() {
@@ -30,95 +25,39 @@ function modali() {
     animateScroll.scrollToTop()
 }
 
-function delo(event) {
-    let oldob = arr1;
-    const x = oldob.map(c => c.coinlapach);
-    const indexy = x.indexOf(event.detail.coinlapach);
-    oldob.splice(indexy, 1);
-    arr1 = oldob
-    dispatch("start", {
-        cards: false,
-        ani: event.detail.ani
-    })
-}
+/**
+ * @typedef {Object} Props
+ * @property {any} [adder]
+ * @property {any} [arr1]
+ * @property {any} [askedarr]
+ * @property {any} [declineddarr]
+ * @property {number} [halu]
+ * @property {number} [askma]
+ * @property {number} [maap]
+ * @property {number} [mashs]
+ * @property {number} [pmashd]
+ * @property {number} [fia]
+ * @property {number} [beta]
+ * @property {number} [pen]
+ * @property {number} [sug]
+ * @property {boolean} [low]
+ * @property {any} nam
+ * @property {number} [wel]
+ * @property {number} [ask]
+ * @property {any} picLink
+ * @property {any} total
+ * @property {any} [milon]
+ * @property {boolean} [sml]
+ * @property {(payload: { cards: boolean, ani: any }) => void} [onStart] - Callback for 'start' event
+ * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
+ * @property {(payload: { id: any }) => void} [onMesima] - Callback for 'mesima' event
+ * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+ * @property {(payload: { cards: boolean }) => void} [onCards] - Callback for 'cards' event
+ * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+ */
 
-function user(event) {
-    dispatch("user", {
-        id: event.detail.id
-    })
-}
-
-function mesima(event) {
-    dispatch("mesima", {
-        id: event.detail.id
-    })
-}
-
-function hover(event) {
-
-    dispatch("hover", {
-        id: event.detail.id
-    })
-
-}
-
-function chat() {}
-
-function cards() {
-    dispatch("cards", {
-        cards: true
-    })
-}
-
-function proj(event) {
-    dispatch("proj", {
-        id: event.detail.id
-    })
-}
-
-function showonly(event) {
-    const value = event.detail.data;
-    for (const key in milon) {
-        milon[key] = false
-    }
-
-    milon[value] = true;
-}
-
-function showall(event) {
-    for (const key in milon) {
-        milon[key] = true
-    }
-
-}
-let h = $state(500);
-  /**
-   * @typedef {Object} Props
-   * @property {any} [adder]
-   * @property {any} [arr1]
-   * @property {any} [askedarr]
-   * @property {any} [declineddarr]
-   * @property {number} [halu]
-   * @property {number} [askma]
-   * @property {number} [maap]
-   * @property {number} [mashs]
-   * @property {number} [pmashd]
-   * @property {number} [fia]
-   * @property {number} [beta]
-   * @property {number} [pen]
-   * @property {number} [sug]
-   * @property {boolean} [low]
-   * @property {any} nam
-   * @property {number} [wel]
-   * @property {number} [ask]
-   * @property {any} picLink
-   * @property {any} total
-   * @property {any} [milon]
-   * @property {boolean} [sml]
-   */
-
-  /** @type {Props} */
-  let {
+/** @type {Props} */
+let {
     adder = [],
     arr1 = $bindable([]),
     askedarr = [],
@@ -139,21 +78,90 @@ let h = $state(500);
     picLink,
     total,
     milon = $bindable({
-    hachla: true,
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-}),
-    sml = false
-  } = $props();
+        hachla: true,
+        fiap: true,
+        welc: true,
+        sugg: true,
+        pend: true,
+        asks: true,
+        betaha: true,
+        desi: true,
+        ppmash: true,
+        pmashs: true,
+        pmaap: true,
+        askmap: true
+    }),
+    sml = false,
+    onStart,
+    onUser,
+    onMesima,
+    onHover,
+    onCards,
+    onProj
+} = $props();
+
+function delo(event) {
+    let oldob = arr1;
+    const x = oldob.map(c => c.coinlapach);
+    const indexy = x.indexOf(event.detail.coinlapach);
+    oldob.splice(indexy, 1);
+    arr1 = oldob
+    onStart?.({
+        cards: false,
+        ani: event.detail.ani
+    })
+}
+
+function user(event) {
+    onUser?.({
+        id: event.detail.id
+    })
+}
+
+function mesima(event) {
+    onMesima?.({
+        id: event.detail.id
+    })
+}
+
+function hover(event) {
+
+    onHover?.({
+        id: event.detail.id
+    })
+
+}
+
+function chat() {}
+
+function cards() {
+    onCards?.({
+        cards: true
+    })
+}
+
+function proj(event) {
+    onProj?.({
+        id: event.detail.id
+    })
+}
+
+function showonly(event) {
+    const value = event.detail.data;
+    for (const key in milon) {
+        milon[key] = false
+    }
+
+    milon[value] = true;
+}
+
+function showall(event) {
+    for (const key in milon) {
+        milon[key] = true
+    }
+
+}
+let h = $state(500);
 </script>
 
 <div id="scree" bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} >

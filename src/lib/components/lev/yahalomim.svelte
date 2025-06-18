@@ -8,10 +8,9 @@
     //על הלב צורה של יהלומים מבולגנת שתביא למצב שכרגע הוא הרגיל, במצב הרגיל איזה סימון של סדר למצב הזה
     //שיבהקו בחשיכה
 
-    import { createEventDispatcher } from 'svelte';
 import Sv from "./sv.svelte";
- const dispatch = createEventDispatcher();
  import pic from "$lib/celim/pic.json" 
+let { onShowonly, onShowall, onHover, onCards } = $props<{ onShowonly?: (payload: { data: any }) => void; onShowall?: () => void; onHover?: (payload: { id: string }) => void; onCards?: (payload: { cards: boolean }) => void }>();
 
 import { lang} from '$lib/stores/lang.js'
 let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
@@ -31,7 +30,7 @@ let fiap = $state("fiap");
 function disp (event) { 
 const value = event.detail.id
     if (value !== "true"){
-   dispatch ("showonly",{
+   onShowonly?.({
       data: value
    });
    if (value === "sugg"){
@@ -58,7 +57,7 @@ fiap = "true";
          askmap = "true";
    }
 }else {
-      dispatch ("showall")
+      onShowall?.()
   sugg =  "sugg";
  pend = "pend";
  asks = "asks";
@@ -158,7 +157,7 @@ ee ="translate(3.8484 -18.405)";
  xx = "translate(-188.36 -539.11)";
 }
 }
-    dispatch("hover", {id: fir[$lang]});
+    onHover?.({id: fir[$lang]});
 
 }
 
@@ -178,7 +177,7 @@ function hoverede(x){
   } else {
 u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
   }
-  dispatch("hover", {id: u[$lang]});
+  onHover?.({id: u[$lang]});
  }
   import Switch from '../../celim/switch.svelte'
   /**
@@ -221,7 +220,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
 
 run(() => {
     if (cards == true){
-          dispatch("cards",{cards:true})
+          onCards?.({cards:true})
   }
   });
 console.log(mashs)

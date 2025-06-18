@@ -3,13 +3,10 @@
   import { fly, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
   import { lang } from '$lib/stores/lang';
-  import { createEventDispatcher } from 'svelte';
   import { toast } from 'svelte-sonner';
   import { formatTime } from '$lib/func/uti/formatTime';
   import { handleClearAll, handleClearSingle, updateTimer, saveTimer } from '$lib/func/timers.js';
   import { timers, updateTimers } from '$lib/stores/timers';
-
-  const dispatch = createEventDispatcher();
 
   /**
    * @typedef {Object} Props
@@ -21,6 +18,7 @@
    * @property {string} [elapsedTime]
    * @property {any} [selectedTasks]
    * @property {string} [taskSearchTerm]
+   * @property {(payload: { timer: any, running: boolean, hoursdon?: any }) => void} [onUpdateTimer]
    */
 
   /** @type {Props} */
@@ -32,7 +30,8 @@
     dialogEdit = $bindable(true),
     elapsedTime = '00:00:00',
     selectedTasks = $bindable([]),
-    taskSearchTerm = $bindable('')
+    taskSearchTerm = $bindable(''),
+    onUpdateTimer
   } = $props();
 
   // טקסטים לדיאלוגים
@@ -141,8 +140,8 @@
             : t
         ));
 
-        // Dispatch event to parent
-        dispatch('update-timer', {
+        // Call the callback prop
+        onUpdateTimer?.({
           timer: updatedActiveTimerData, // Pass the updated active timer data
           running: false // Timer is not running
           // If handleClearAll also affects howmanyhoursalready, pass it:
@@ -182,7 +181,7 @@
     try {
       const x = await handleClearSingle(i, originalTimer, fetch, false);
       if (x) {
-        dispatch('update-timer', {
+        onUpdateTimer?.({
           timer: x,
           running: false
         });
@@ -197,7 +196,7 @@
     const selectedTaskIds = selectedTasks.map(taskId => parseInt(taskId, 10));
     await updateTimer(timer.attributes.activeTimer.data, 'tasks', {selectedTaskIds}, fetch, false).then((x) => {
       if (x) {
-        dispatch('update-timer', {
+        onUpdateTimer?.({
           timer: x,
           running: false
         });
@@ -236,7 +235,7 @@
 
     if (result) {
       console.log('טיימר נשמר בהצלחה', result);
-      dispatch('update-timer', {
+      onUpdateTimer?.({
         timer: result.timer,
         running: false,
         hoursdon: result.mission.attributes.howmanyhoursalready

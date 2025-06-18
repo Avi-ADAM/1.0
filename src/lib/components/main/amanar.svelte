@@ -1,6 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let selected = [];` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
-﻿
 <script>
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
@@ -343,15 +340,15 @@ function find_contry_id(contry_name_arr){
     const placeholder = `الدول التي أنت مواطنها`;
     const required = true;
     
-    let selected = [];
-       let already = false;
+    let selected = $state([]);
+       let already = $state(false);
    let datar;
-   let idx = 1;
+   let idx = $state(1);
    let data;
     import { createForm } from "svelte-forms-lib";
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
     
-const { form, errors, state, handleChange, handleSubmit } = createForm({
+const { form, errors, stepState, handleChange, handleSubmit } = createForm({
           initialValues: {
             name: "",
             email: "",
@@ -397,7 +394,7 @@ function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
   
-}let trans = false;
+}let trans = $state(false);
 function tran (){
 trans = !trans;
 }
@@ -445,13 +442,13 @@ onMount(async () => {
             error = e
         }
     });
-      let dow;
+      let dow = $state();
     function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
      
- let isOpen = false;
-let a = 0;
+ let isOpen = $state(false);
+let a = $state(0);
 
 function sell(){
 isOpen = true;
@@ -483,7 +480,7 @@ function erorer(){
   <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>الغاء</button>
+          onclick={closer}>الغاء</button>
           {#if a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
          
@@ -503,10 +500,10 @@ function erorer(){
          </div> 
          {:else if a == 3}
          <h1>حدث خطأ</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>أعد المحاولة</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 0}>أعد المحاولة</button>
          {:else if a == 5}
          <h1>حدث خطأ</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 4}>أعد المحاولة</button>
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" onclick={()=> a = 4}>أعد المحاولة</button>
         
          {/if}
   </DialogContent>
@@ -517,18 +514,18 @@ function erorer(){
       <div class="all">
           <div style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
               {#if trans === false}
-          <button on:click={tran}><img alt="translation" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
+          <button onclick={tran}><img alt="translation" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
-          <button on:click={tran} class=" text-barbi hover:text-lturk "
+          <button onclick={tran} class=" text-barbi hover:text-lturk "
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button> 
 <!--todo: to home-->
-          <button style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 "   on:click={()=>change("en")} >English</button>
-          <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  on:click={()=>change("he")}>עברית</button>
-                        <button on:click={sell} title=" اطلب تغيير النص" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >اطلب تغيير النص</button>
-                  <button on:click={tr} title="الترجمة إلى لغات أخرى" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >ترجم</button>
-                  <button on:click={()=>goto('/ar')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>
+          <button style="border-bottom-width: 4px; border-color: var(--gold);" class="text-barbi  text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 "   onclick={()=>change("en")} >English</button>
+          <button class="text-barbi text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5 "  onclick={()=>change("he")}>עברית</button>
+                        <button onclick={sell} title=" اطلب تغيير النص" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >اطلب تغيير النص</button>
+                  <button onclick={tr} title="الترجمة إلى لغات أخرى" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " >ترجم</button>
+                  <button onclick={()=>goto('/ar')} title="1💗1" class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5 " ><Text1lev1/></button>
   
                   {/if}
           </div>
@@ -549,9 +546,9 @@ function erorer(){
           name="name"
           placeholder="اسم"
           required
-                on:blur={handleChange}
+                onblur={handleChange}
 
-          on:change={handleChange}
+          onchange={handleChange}
           bind:value={$form.name}
         /> 
      {#if $errors.name}
@@ -577,8 +574,8 @@ function erorer(){
     id="email"
     name="email"
     required
-          on:blur={handleChange}
-    on:change={handleChange}
+          onblur={handleChange}
+    onchange={handleChange}
     bind:value={$form.email}
     />
  {#if $errors.email}
@@ -586,7 +583,7 @@ function erorer(){
     {/if}
 </div>
     </section>
-     <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" on:click={scrollTo}  data-ca3_icon=""></button></div>    
+     <div class="onlym"> <button alt="click-to-scroll-down" class="ca3-scroll-down-link ca3-scroll-down-arrow" data-ca3_iconfont="ETmodules" onclick={scrollTo}  data-ca3_icon=""></button></div>    
     </div> 
     <div class="aab" bind:this={dow}>
 <div dir="rtl" class="amana" id="amana-show">
@@ -617,14 +614,14 @@ function erorer(){
      </div>
 
 
-<form on:submit={handleSubmit}>
+<form onsubmit={handleSubmit}>
 
 <div class="flexid">
    {#if already == false}
 
     <button
      class="button hover:scale-150"
-      on:submit="{handleSubmit}"
+      onsubmit={handleSubmit}
       type="submit"
       ></button> 
       {:else if already == true}

@@ -1,15 +1,24 @@
 <script>
     import { onMount } from 'svelte';
     import moment from 'moment';
-      import { createEventDispatcher } from 'svelte';
     let SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter;
 
- const dispatch = createEventDispatcher();
+   /**
+    * @typedef {Object} Props
+    * @property {Array<any>} [bmiData]
+    * @property {Array<any>} [pmiData]
+    * @property {Array<any>} [omiData]
+    * @property {Array<any>} [fmiData]
+    * @property {(payload: { id: any }) => void} [onSelected] - Callback when a task is selected.
+    */
+
+   /** @type {Props} */
    let {
       bmiData = [],
       pmiData = [],
       omiData = [],
-      fmiData = []
+      fmiData = [],
+      onSelected
    } = $props();
     let options = {}
 

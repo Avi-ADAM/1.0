@@ -18,10 +18,8 @@
      * @exports closeDialog
      */
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-    import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
     import { lang } from '$lib/stores/lang';
-    const dispatch = createEventDispatcher();
   /**
    * @typedef {Object} Props
    * @property {boolean} [showSaveDialog]
@@ -29,6 +27,8 @@
    * @property {any} [innerText]
    * @property {any} [innerDialogButton]
    * @property {any} [clearButton]
+   * @property {() => void} [onSaveTimer]
+   * @property {() => void} [onClearTimer]
    */
 
   /** @type {Props} */
@@ -49,14 +49,16 @@
     clearButton = {
       en: 'Clear',
       he: 'נקה'
-    }
+    },
+    onSaveTimer,
+    onClearTimer
   } = $props();
     function handleSaveButton() {
-      dispatch('save-timer');
+      onSaveTimer?.();
       closeDialog();
     }
     function handleCancelButton() {
-        dispatch('clear-timer');
+        onClearTimer?.();
         closeDialog();
     }
     function closeDialog() {

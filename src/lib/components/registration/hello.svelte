@@ -48,23 +48,22 @@ userName.subscribe(value => {
 show.subscribe(newValue => {
   show_value = newValue;
 });
-import { createEventDispatcher } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {number} [idx]
    * @property {string} [userName_value]
+   * @property {(payload: { tx: number, txx: number }) => void} [onProgres]
    */
 
   /** @type {Props} */
-  let { idx = 1, userName_value = $bindable("") } = $props();
- const dispatch = createEventDispatcher(); 
+  let { idx = 1, userName_value = $bindable(""), onProgres } = $props();
 
 function increment() {
 		show.update(n => n + 1);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 600,
 		txx: 20
-	} )
+	} );
 	};
 
 
@@ -327,4 +326,3 @@ from, to {
  
  
   </style>
-

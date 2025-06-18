@@ -1,5 +1,5 @@
-<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
 <script>
 	import Daterange from './../../celim/ui/daterange.svelte';
   import Crtask from '$lib/components/prPr/tasks/crtask.svelte';
@@ -19,15 +19,14 @@ https://svelte.dev/e/declaration_duplicate -->
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
   import Addnewro from '../addnew/addNewRole.svelte';
-  import { createEventDispatcher } from 'svelte';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { addslashes } from '$lib/func/uti/string.svelte';
-  const dispatch = createEventDispatcher();
   const baseUrl = import.meta.env.VITE_URL;
 
   export let newcontent = true;
+  let { onClose } = $props<{ onClose?: (payload: { md: any }) => void }>();
   export let newcontentR = true;
   export let newcontentW = true;
   let token;
@@ -83,7 +82,7 @@ https://svelte.dev/e/declaration_duplicate -->
         console.log(c.data.mission.data);
         let t = c.data.mission.data;
         if ($lang == 'he') {
-          for (var i = 0; i < t.attributes.skills.data.length; i++) {
+          for (let i = 0; i < t.attributes.skills.data.length; i++) {
             if (t.attributes.skills.data[i].attributes.localizations.data.length > 0) {
               t.attributes.skills.data[i].attributes.skillName =
                 t.attributes.skills.data[
@@ -91,7 +90,7 @@ https://svelte.dev/e/declaration_duplicate -->
                 ].attributes.localizations.data[0].attributes.skillName;
             }
           }
-          for (var i = 0; i < t.attributes.tafkidims.data.length; i++) {
+          for (let i = 0; i < t.attributes.tafkidims.data.length; i++) {
             if (t.attributes.tafkidims.data[i].attributes.localizations.data.length > 0) {
               t.attributes.tafkidims.data[i].attributes.roleDescription =
                 t.attributes.tafkidims.data[
@@ -100,7 +99,7 @@ https://svelte.dev/e/declaration_duplicate -->
             }
           }
           console.log(t.attributes.tafkidims.data, 't.attributes.roles.data');
-          for (var i = 0; i < t.attributes.work_ways.data.length; i++) {
+          for (let i = 0; i < t.attributes.work_ways.data.length; i++) {
             if (t.attributes.work_ways.data[i].attributes.localizations.data.length > 0) {
               t.attributes.work_ways.data[i].attributes.workWayName =
                 t.attributes.work_ways.data[
@@ -144,7 +143,7 @@ https://svelte.dev/e/declaration_duplicate -->
   });
 
   function find_role_id(role_name_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < role_name_arr.length; j++) {
       for (let i = 0; i < roles1.length; i++) {
         if (roles1[i].attributes.roleDescription === role_name_arr[j]) {
@@ -156,7 +155,7 @@ https://svelte.dev/e/declaration_duplicate -->
   }
 
   function find_workway_id(workway_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < workway_arr.length; j++) {
       for (let i = 0; i < $ww.length; i++) {
         if ($ww[i].attributes.workWayName === workway_arr[j]) {
@@ -168,7 +167,7 @@ https://svelte.dev/e/declaration_duplicate -->
   }
 
   function find_user_id(user_name_arr) {
-    var id = 0;
+    let id = 0;
     for (let i = 0; i < pu.length; i++) {
       if (pu[i].attributes.username === user_name_arr[0]) {
         id = pu[i].id;
@@ -195,7 +194,7 @@ https://svelte.dev/e/declaration_duplicate -->
   };
 
   function find_skill_id(skill_name_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < skill_name_arr.length; j++) {
       for (let i = 0; i < skills2.length; i++) {
         if (skills2[i].attributes.skillName === skill_name_arr[j]) {
@@ -489,7 +488,7 @@ https://svelte.dev/e/declaration_duplicate -->
                         loading = false
                         success = true
                       console.log('Success:', data);
-                      dispatch('close', {
+                      onClose?.({
                         md: miDatan
                       });
                     })
@@ -538,7 +537,7 @@ https://svelte.dev/e/declaration_duplicate -->
                   console.log('Success:', data);
                   loading = false
                   success = true
-                  dispatch('close', {
+                  onClose?.({
                     md: miDatan
                   });
                 })
@@ -548,7 +547,7 @@ https://svelte.dev/e/declaration_duplicate -->
             } else {
                 loading = false
                 success = true
-              dispatch('close', {
+              onClose?.({
                 md: miDatan
               });
             }
@@ -617,7 +616,7 @@ https://svelte.dev/e/declaration_duplicate -->
           }
           loading = false
           success = true
-          dispatch('close', {
+          onClose?.({
             md: miDatan
           });
         }

@@ -1,6 +1,5 @@
 <script>
     import { goto } from "$app/navigation";
-    import { createEventDispatcher } from "svelte";
     import { lang } from "$lib/stores/lang";
 
     let showMenu = $state(false);

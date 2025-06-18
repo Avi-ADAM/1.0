@@ -2,23 +2,21 @@
   import { createBubbler, stopPropagation } from 'svelte/legacy';
 
   const bubble = createBubbler();
-    import { createEventDispatcher } from 'svelte';
     import { fade } from 'svelte/transition';
-    
-    const dispatch = createEventDispatcher();
     
   /**
    * @typedef {Object} Props
    * @property {boolean} [isOpen]
    * @property {string} [title]
    * @property {import('svelte').Snippet} [children]
+   * @property {() => void} [onClose]
    */
 
   /** @type {Props} */
-  let { isOpen = false, title = '', children } = $props();
+  let { isOpen = false, title = '', children, onClose } = $props();
   
     function closeModal() {
-      dispatch('close');
+      onClose?.();
     }
   </script>
   

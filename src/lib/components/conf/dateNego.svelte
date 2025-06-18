@@ -1,17 +1,11 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let htmlon = ``` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
 <script>
-export let state = 2 // original and edit, 3 is original second and edit
-export let date;
 import SveltyPicker from 'svelty-picker'
 
-export let lebel = {"he":"עריכה", "en": "edit"}
 import tr from '$lib/translations/tr.json'
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
-  let htmlon = ``
-    export let long = false
+  let htmlon = $state(``)
     const und = {"he":"לא הוגדר","en":"undefined"}
 onMount(()=>{
     if (date == dateb){
@@ -26,11 +20,27 @@ onMount(()=>{
     checkAll(date,dateb)
     }
 })
-let edit = false
-let show2 = false
-export let dateb = date
-$:fdate = new Date(date);
-$:fdateb = new Date(dateb)
+let edit = $state(false)
+let show2 = $state(false)
+  /**
+   * @typedef {Object} Props
+   * @property {number} [stepState] - original and edit, 3 is original second and edit
+   * @property {any} date
+   * @property {any} [lebel]
+   * @property {boolean} [long]
+   * @property {any} [dateb]
+   */
+
+  /** @type {Props} */
+  let {
+    stepState = 2,
+    date,
+    lebel = {"he":"עריכה", "en": "edit"},
+    long = false,
+    dateb = $bindable(date)
+  } = $props();
+let fdate = $derived(new Date(date));
+let fdateb = $derived(new Date(dateb))
 function check (lettera, letterb){
     if(lettera == letterb){
         return true
@@ -60,13 +70,13 @@ function checkAll (a, b){
     {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
         <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
-        <p class="text-gold">{@html htmlon}</p><button on:click={()=>edit = true}>
+        <p class="text-gold">{@html htmlon}</p><button onclick={()=>edit = true}>
             {#if date == dateb}🖍️{:else}✏️{/if}</button>
         {#if date != dateb && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <button onclick={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{fdate.toLocaleDateString($lang)}</p>
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
@@ -80,7 +90,7 @@ function checkAll (a, b){
   <small>{lebel[$lang]}</small>
 
     <SveltyPicker inputClasses="form-control" format="hh:ii dd/mm/yyyy" bind:value={dateb}></SveltyPicker>
-</div><button on:click={()=>{edit = false
+</div><button onclick={()=>{edit = false
 checkAll(date,dateb)
 }}>✅</button>
 {/if}

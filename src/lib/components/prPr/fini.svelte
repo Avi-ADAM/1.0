@@ -1,18 +1,28 @@
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
 https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
+https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
+https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
+https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
+https://svelte.dev/e/block_unexpected_close -->
 <script>
   import Tooltip from './../../celim/tooltipb.svelte'
   import { lang } from '$lib/stores/lang.js'
-  import {
-    createEventDispatcher
-} from 'svelte';
         import pic from './../../celim/pic.js' 
 export let fmiData = [];
   export let hagdel = false;
    import { onMount } from 'svelte'; 
 export let rikmashes = [];
-  export let meData = [];
-  const dispatch = createEventDispatcher();
+export let meData = [];
+
+/**
+ * @param {object} payload - The payload for the 'tit' event.
+ * @param {string} payload.ti - The title string.
+ */
+let { onTit } = $props();
 
 //	import SvelteTooltip from 'svelte-tooltip';
 
@@ -204,7 +214,7 @@ let fir,ssec;
     fir = b;
     ssec = c.toFixed(2);
        xy = true;
-     //  dispatch("tit",{ti: `${fir}: ${ssec}%` })
+       onTit?.({ti: `${fir}: ${ssec}%` })
    } 
  }
  let xy = false;
@@ -559,6 +569,3 @@ border-radius: 4%;
     background:rgb(132, 241, 223);
   } 
   </style>
-      
-        
-   

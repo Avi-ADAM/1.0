@@ -1,3 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
   <script>
     import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
@@ -6,12 +14,11 @@
     import { onMount } from 'svelte';
       import { page } from '$app/stores';
 
- import { createEventDispatcher } from 'svelte';
    import jwork from '$lib/data/workways.json'
     import enjwork from '$lib/data/workwaysEn.json'
- const dispatch = createEventDispatcher();
               import { lang } from '$lib/stores/lang.js'
   import Skip from '$lib/celim/icons/skip.svelte';
+let { onProgres } = $props<{ onProgres?: (payload: { tx: number, txx: number }) => void }>();
     let newcontent = $state(true)
     let workways2 = $state([]);
     let error1 = null
@@ -98,7 +105,7 @@ show.subscribe(newValue => {
 
 function increment() {
 		show.update(n => n + 1);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 0,
 		txx: 8
 	} );
@@ -107,14 +114,14 @@ function increment() {
   function toend() {
   newnew()
 		show.set(5);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 0,
 		txx: 8
 	} )
 	}
 function back() {
 		show.update(n => n - 1);
-     dispatch ('progres',{
+     onProgres?.({
 		tx: 0,
 		txx: 16
 	} );

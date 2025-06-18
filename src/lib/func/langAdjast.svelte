@@ -1,19 +1,17 @@
-<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
-https://svelte.dev/e/declaration_duplicate -->
-<script context="module">
+<script module>
     export function langAdjast (datar,lang){
             if (lang != "en" ){
-              for (var i = 0; i < datar?.attributes.skills?.data.length; i++){
+              for (let i = 0; i < datar?.attributes.skills?.data.length; i++){
                 if (datar.attributes.skills.data[i].attributes.localizations.data.length > 0){
                 datar.attributes.skills.data[i].attributes.skillName = datar.attributes.skills.data[i].attributes.localizations.data[0].attributes.skillName
                 }
               }
-              for (var i = 0; i < datar.attributes.tafkidims.data.length; i++){
+              for (let i = 0; i < datar.attributes.tafkidims.data.length; i++){
                 if (datar.attributes.tafkidims.data[i].attributes.localizations.data.length > 0){
                 datar.attributes.tafkidims.data[i].attributes.roleDescription = datar.attributes.tafkidims.data[i].attributes.localizations.data[0].attributes.roleDescription
                 }
               }
-              for (var i = 0; i < datar.attributes.work_ways.data.length; i++){
+              for (let i = 0; i < datar.attributes.work_ways.data.length; i++){
                 if (datar.attributes.work_ways.data[i].attributes.localizations.data.length > 0){
                 datar.attributes.work_ways.data[i].attributes.workWayName = datar.attributes.work_ways.data[i].attributes.localizations.data[0].attributes.workWayName
                 }

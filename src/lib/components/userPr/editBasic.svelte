@@ -5,7 +5,6 @@ import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js'
   import { toast } from 'svelte-sonner';
   import {SendTo} from '$lib/send/sendTo.svelte'
- import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   let t = $derived(0)
  let sub;
@@ -40,7 +39,7 @@ let res =await SendTo(`mutation { updateUsersPermissionsUser(
       }
   }
 }
-}`)
+`)
 .then (res => res = res);
   console.log(res.data)
    if(res.data !=null){
@@ -53,7 +52,6 @@ let res =await SendTo(`mutation { updateUsersPermissionsUser(
 })
 
 
-    const dispatch = createEventDispatcher();
     const er = {"he":"כרטה שגיעה","en": "an error just occored"}
 const suc ={"he": "נרשמת להתראות במכשיר זה בהצלחה","en":"you sucssesfully registered to nutification on this device"}
  async function askNotificationPermission() {
@@ -170,7 +168,7 @@ function logout() {
 
 function save (){
   localStorage.setItem("cards", checked);
-    dispatch('message', {
+    onMessage?.({
      fblink: fblink,
       twiterlink: twiterlink,
       discordlink: discordlink,
@@ -210,6 +208,8 @@ let before = $state(true);
    * @property {any} frd
    * @property {any} lango
    * @property {any} uid
+   * @property {(payload: { fblink: any, twiterlink: any, discordlink: any, githublink: any, noMail: any, frd: any, bi: any, un: any, em: any, lango: any, cards: any }) => void} [onMessage]
+   * @property {() => void} [onGuid]
    */
 
   /** @type {Props} */
@@ -229,7 +229,9 @@ let before = $state(true);
     bi = $bindable(),
     frd = $bindable(),
     lango = $bindable(),
-    uid = $bindable()
+    uid = $bindable(),
+    onMessage,
+    onGuid
   } = $props();
 let passi = $state();
 const baseUrl = import.meta.env.VITE_URL
@@ -335,7 +337,7 @@ function shaneh () {
   `
   await SendTo(q)
    toast.success(`${guidback[$lang]}`);
-   dispatch("guid")
+   onGuid?.()
    pressed = false
 }
 const teletrue = {"he": "ניהול הרשמתך לקבלת עדכונים בטלגרם","en": "manage your telegram nutification subscription"}
@@ -880,4 +882,3 @@ select{
 		bottom: 0.5rem;
 	}
 </style>
-

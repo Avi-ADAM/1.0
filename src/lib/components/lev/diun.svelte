@@ -1,14 +1,12 @@
 <script>
   import { run } from 'svelte/legacy';
 
-      import { createEventDispatcher } from 'svelte';
    import {BarLoader} from 'svelte-loading-spinners'
 	import ChatMessage from '../../celim/messeges.svelte';
 	import TodayDivider from '../../celim/todaydevider.svelte';
     import {pendMisMes, pendMasMes, askMisMes, meAskMisMes,meAskMasMes,askMasMes,forum, addMes} from '$lib/stores/pendMisMes.js'
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
-	  const dispatch = createEventDispatcher();
    let why = $state("");
   /**
    * @typedef {Object} Props
@@ -27,6 +25,8 @@
    * @property {boolean} [money]
    * @property {any} [messages]
    * @property {boolean} [clicked]
+   * @property {(payload: { why: string }) => void} [onNo] - Callback for 'no' event.
+   * @property {(payload: { why: string }) => void} [onRect] - Callback for 'rect' event.
    */
 
   /** @type {Props} */
@@ -45,7 +45,9 @@
     profilePicChatPartner = '/favicon.ico',
     money = false,
     messages = [],
-    clicked = $bindable(false)
+    clicked = $bindable(false),
+    onNo,
+    onRect
   } = $props();
 
   const scrollToBottom = async (node) => {
@@ -57,12 +59,12 @@ async function click() {
    clicked = true
  if (no == true) {
     if (why.length > 27) {
-            dispatch("no",{why:why})
+            onNo?.({why:why})
       } else{
             alert("מינימום 27 תווים")//todo lang
         }
       } else if (rect == true) {
-            dispatch("rect",{why:why})
+            onRect?.({why:why})
    if(ani === "forum"){
       let picLink =  "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
       if (localStorage.getItem('picLink') !== null) {
@@ -306,4 +308,3 @@ async function click() {
 
    </div>
         </div>
-

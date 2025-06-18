@@ -4,7 +4,7 @@
   import { startTimer, stopTimer } from '$lib/func/timers.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onMount, onDestroy } from 'svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { timers, updateTimers } from '$lib/stores/timers';
   import TimerDialogs from './TimerDialogs.svelte';
 
@@ -81,7 +81,7 @@
  await startTimer(
     timer.attributes?.activeTimer, // Active timer object from props
     timer.mId,                     // Mission ID
-    $page.data.uid,                        // User ID
+    page.data.uid,                        // User ID
     timer.projectId,                     // Project ID
     timer.attributes?.activeTimer?.data?.id || 0, // Timer ID or 0 if none
     false,                         // isSer flag

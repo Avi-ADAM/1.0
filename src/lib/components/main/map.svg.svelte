@@ -1,22 +1,11 @@
 
 <script>
-  import { getContext, createEventDispatcher } from 'svelte';
+  import { getContext } from 'svelte';
   import { geoPath } from 'd3-geo';
   import { raise } from 'layercake';
 
   const { data, width, height, zGet } = getContext('LayerCake');
 
-  
-
-  
-
-  
-
-  
-
-  
-
-  
   /**
    * @typedef {Object} Props
    * @property {any} projection - projection - A D3 projection function. Pass this in as an uncalled function, e.g. `projection={geoAlbersUsa}`.
@@ -25,6 +14,8 @@
    * @property {string} [stroke] - [stroke='#333'] - The shape's stroke color.
    * @property {number} [strokeWidth] - [strokeWidth=0.5] - The shape's stroke width.
    * @property {any} [features] - [features] - A list of GeoJSON features. Use this if you want to draw a subset of the features in `$data` while keeping the zoom on the whole GeoJSON feature set. By default, it plots everything in `$data.features` if left unset.
+   * @property {(payload: { e: MouseEvent, props: any }) => void} [onMousemove] - Callback for mousemove event.
+   * @property {() => void} [onMouseout] - Callback for mouseout event.
    */
 
   /** @type {Props} */
@@ -34,13 +25,10 @@
     fill = undefined,
     stroke = '#333',
     strokeWidth = 0,
-    features = undefined
+    features = undefined,
+    onMousemove,
+    onMouseout
   } = $props();
-
-  /* --------------------------------------------
-   * Here's how you would do cross-component hovers
-   */
-  const dispatch = createEventDispatcher();
 
   let fitSizeRange = $derived(fixedAspectRatio ? [100, 100 / fixedAspectRatio] : [$width, $height]);
 
@@ -54,7 +42,7 @@
       raise(this);
       // When the element gets raised, it flashes 0,0 for a second so skip that
       if (e.layerX !== 0 && e.layerY !== 0) {
-        dispatch('mousemove', { e, props: feature.properties });
+        onMousemove?.({ e, props: feature.properties });
       }
     }
   }
@@ -62,8 +50,8 @@
 
 <g
   class="map-group"
-  onmouseout={(e) => dispatch('mouseout')}
-  onblur={(e) => dispatch('mouseout')}
+  onmouseout={(e) => onMouseout?.()}
+  onblur={(e) => onMouseout?.()}
 >
   {#each (features || $data.features) as feature}
     <path
@@ -72,8 +60,8 @@
       stroke={stroke}
       stroke-width={strokeWidth}
       d="{geoPathFn(feature)}"
-      onmouseover={(e) => dispatch('mousemove', { e, props: feature.properties })}
-      onfocus={(e) => dispatch('mousemove', { e, props: feature.properties })}
+      onmouseover={(e) => onMousemove?.({ e, props: feature.properties })}
+      onfocus={(e) => onMousemove?.({ e, props: feature.properties })}
       onmousemove={handleMousemove(feature)}
     ></path>
   {/each}

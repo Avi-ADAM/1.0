@@ -1,3 +1,11 @@
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected token
+https://svelte.dev/e/js_parse_error -->
 <script>
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
@@ -7,11 +15,28 @@
    import { lang } from '$lib/stores/lang.js'
     import jvals from '$lib/data/vallues.json'
     import enjvals from '$lib/data/valluesEn.json'
- import { createEventDispatcher } from 'svelte';
-  import { page } from '$app/stores';
+/**
+ * Callback prop: יורה כאשר יש שינוי התקדמות.
+ * מיגרציה ל‑Svelte 5: כל ה‑props מרוכזים בהגדרה אחת.
+ * @typedef {Object} Props
+ * @property {string} [userName_value]
+ * @property {number} [show_value]
+ * @property {(payload: {tx: number, txx: number}) => void} [onProgres]
+ */
+/**
+ * @type {Props}
+ */
+let {
+  userName_value = $bindable(),
+  show_value = $bindable(0),
+  onProgres
+} = $props<{
+  userName_value?: string,
+  show_value?: number,
+  onProgres?: (payload: {tx: number, txx: number}) => void
+}>();'$app/stores';
   import Skip from '$lib/celim/icons/skip.svelte';
   import Tile from '$lib/celim/tile.svelte';
- const dispatch = createEventDispatcher(); 
     let vallues = $state([]);
     let error1 = null;
     let newcontent = $state(true)
@@ -91,7 +116,7 @@
    */
 
   /** @type {Props} */
-  let { userName_value = $bindable(), show_value = $bindable(0) } = $props();
+  
 
 userName.subscribe(value => {
   userName_value = value;
@@ -104,27 +129,18 @@ show.subscribe(newValue => {
 function increment() {
   newnew()
 		show.update(n => n + 1);
-    dispatch ('progres',{
-		tx: 0,
-		txx: 20
-	} )
+    onProgres?.({ tx: 0, txx: 20 })
 	}
 function toend() {
   newnew()
 		show.set(5);
-    dispatch ('progres',{
-		tx: 0,
-		txx: 4
-	} )
+    onProgres?.({ tx: 0, txx: 4 })
 	}
 
   function back() {
     newnew()
 		show.update(n => n - 1);
-    dispatch ('progres',{
-		tx: 600,
-		txx: 20
-	} )
+    onProgres?.({ tx: 600, txx: 20 })
 	}
 
  const baseUrl = import.meta.env.VITE_URL

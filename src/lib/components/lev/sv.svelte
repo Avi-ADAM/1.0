@@ -1,7 +1,4 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-
- const dispatch = createEventDispatcher();
  let mainG = "matrix(.38338 0 0 .4039 -156.16 -138.46)"
  let yahaMain ="matrix(.28338 0 0 .2939 -86.16 -18.46)"
   /**
@@ -45,6 +42,8 @@
    * @property {number} [askma]
    * @property {string} [askmap]
    * @property {boolean} [low]
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for hover event.
+   * @property {(payload: { id: any }) => void} [onDisp] - Callback for disp event.
    */
 
   /** @type {Props} */
@@ -87,20 +86,11 @@
     pmaap = "pmaap",
     askma = 100,
     askmap = "askmap",
-    low = true
-  } = $props();
+    low = true,
+    onHover,
+    onDisp
+  } = $props<Props>();
 console.log(mashs)
-function hover (id){
-dispatch("hover",{
-    id: id
-})
-
-}
-function disp (id){
-dispatch("disp",{
-    id: id
-})
-}
 console.log(sml)
     </script>
     <style>
@@ -1520,7 +1510,7 @@ console.log(sml)
     <stop stop-color="#bd8524" offset="1"/>
     </linearGradient>
     <style bx:fonts="Londrina Sketch" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
-    <linearGradient id="levlevaw" x1="-@import url(https://fonts.googleapis.com/css2?family=Londrina+Sketch%3Aital%2Cwght%400%2C400&display=swap);33.774" y2="45.358" gradientUnits="userSpaceOnUse" xlink:href="#levlevah"/>
+    <linearGradient id="levlevaw" x1="-/*$$__STYLE_CONTENT__$$*/.googleapis.com/css2?family=Londrina+Sketch%3Aital%2Cwght%400%2C400&display=swap);33.774" y2="45.358" gradientUnits="userSpaceOnUse" xlink:href="#levlevah"/>
     <radialGradient id="levlevfb" cx="-14.698" cy="39.566" r="10" gradientUnits="userSpaceOnUse">
     <stop stop-color="#ffad55" offset="0"/>
     <stop stop-color="#321814" offset=".462"/>
@@ -2553,7 +2543,7 @@ console.log(sml)
       <path d="m54.194 578.6c0.9061 2.9202 1.8341 5.8479 2.7888 8.785l3.5653-3.3107-6.3541-5.4743z" fill="url(#levlevih)"/>
 </g>
 {#if mashs > 0}
-<g onmouseenter={()=>hover("j")} onmouseleave={()=>hover("j")} onkeypress={()=>disp(pmashs)} onclick={()=>disp(pmashs)} name="number " class="btn am" transform="{jj}">
+<g onmouseenter={() => onHover?.({ id: "j" })} onmouseleave={() => onHover?.({ id: "j" })} onkeypress={() => onDisp?.({ id: pmashs })} onclick={() => onDisp?.({ id: pmashs })} name="number " class="btn am" transform="{jj}">
       {#if sml == true}
       <text x="122.391" y="677.71" fill="url(#levlevdd)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">jhih</text>
       {/if}
@@ -2577,7 +2567,7 @@ console.log(sml)
 </g>
 {/if}
 {#if maap > 0}
-  <g onmouseenter={()=>hover("q")} onmouseleave={()=>hover("q")} onclick={()=>disp(pmaap)} name="number " class="btn aw" transform="{qq}">
+  <g onmouseenter={() => onHover?.({ id: "q" })} onmouseleave={() => onHover?.({ id: "q" })} onclick={() => onDisp?.({ id: pmaap })} name="number " class="btn aw" transform="{qq}">
     <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
     <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevbl)" opacity=".89224" stroke="url(#levlevs)"/>
     <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevbm)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -2601,7 +2591,7 @@ console.log(sml)
 </g>
 {/if}
 {#if sug > 0}
-       <g onmouseenter={()=>hover("a")} onmouseleave={()=>hover("a")} onclick={()=>disp(sugg)} name="number " class="btn a" transform="{aa2}">
+       <g onmouseenter={() => onHover?.({ id: "a" })} onmouseleave={() => onHover?.({ id: "a" })} onclick={() => onDisp?.({ id: sugg })} name="number " class="btn a" transform="{aa2}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapd)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevapc)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -2622,7 +2612,7 @@ console.log(sml)
 </g>
 {/if}
 {#if pen > 0}
-<g  onmouseenter={()=>hover("b")} onmouseleave={()=>hover("b")} onclick={() => disp(pend)}  class="btn"  name="number o"  transform="{bb}">
+<g  onmouseenter={() => onHover?.({ id: "b" })} onmouseleave={() => onHover?.({ id: "b" })} onclick={() => onDisp?.({ id: pend })}  class="btn"  name="number o"  transform="{bb}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="#fff" opacity=".89224" stroke="url(#levlevcn)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevfc)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevcm)" stroke-width=".16015px"/>
@@ -2643,7 +2633,7 @@ console.log(sml)
 </g>
 {/if}
 {#if ask > 0}
-<g onmouseenter={()=>hover("c")} onmouseleave={()=>hover("c")} onclick={() => disp(asks)}  class="btn"  name="number of " transform="{cc}">
+<g onmouseenter={() => onHover?.({ id: "c" })} onmouseleave={() => onHover?.({ id: "c" })} onclick={() => onDisp?.({ id: asks })}  class="btn"  name="number of " transform="{cc}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdf)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevdg)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3193,7 +3183,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {#if des > 0}
 
-<g onmouseenter={()=>hover("d")} onmouseleave={()=>hover("d")} onclick={() => disp(desi)} class="btn"  name="number of o" transform="{dd}">
+<g onmouseenter={() => onHover?.({ id: "d" })} onmouseleave={() => onHover?.({ id: "d" })} onclick={() => onDisp?.({ id: desi })} class="btn"  name="number of o" transform="{dd}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevej)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevek)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3215,7 +3205,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if beta > 0}
 
-<g onmouseenter={()=>hover("e")} onmouseleave={()=>hover("e")} onclick={() => disp(betaha)}  class="btn"  name="number of m" transform="{ee}">
+<g onmouseenter={() => onHover?.({ id: "e" })} onmouseleave={() => onHover?.({ id: "e" })} onclick={() => onDisp?.({ id: betaha })}  class="btn"  name="number of m" transform="{ee}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdt)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevdu)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3236,7 +3226,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {/if}
 
-<g onmouseenter={()=>hover("h")} onmouseleave={()=>hover("h")} transform="{hh}" style="">
+<g onmouseenter={() => onHover?.({ id: "h" })} onmouseleave={() => onHover?.({ id: "h" })} transform="{hh}" style="">
   <a  data-sveltekit-prefetch 
     href="/me" >
 <path d="m-24.698 44.139h20v1.219h-20v-1.219zm0-8.536 5 1.828 5-3.657 5 3.657 5-1.828v7.316h-20v-7.316z" fill="url(#levlevaw)" stroke="url(#levlevfb)" stroke-miterlimit="5" stroke-width=".57906px"/>
@@ -3245,7 +3235,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {#if pmash > 0}
 
-<g onmouseenter={()=>hover("y")} onmouseleave={()=>hover("y")} onclick={()=>disp(ppmash)} name="number " class="btn ap" transform="{yy}">
+<g onmouseenter={() => onHover?.({ id: "y" })} onmouseleave={() => onHover?.({ id: "y" })} onclick={() => onDisp?.({ id: ppmash })} name="number " class="btn ap" transform="{yy}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevav)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevau)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3267,7 +3257,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if askma > 0}
 
- <g onmouseenter={()=>hover("x")} onmouseleave={()=>hover("x")} onclick={()=>disp(askmap)} name="number " class="btn amp" transform="{xx}">
+ <g onmouseenter={() => onHover?.({ id: "x" })} onmouseleave={() => onHover?.({ id: "x" })} onclick={() => onDisp?.({ id: askmap })} name="number " class="btn amp" transform="{xx}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdc)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevdb)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3289,7 +3279,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if wel > 0}
 
-<g onmouseenter={()=>hover("f")} onmouseleave={()=>hover("f")} onclick={() => disp(welc)}  class="btn"  name="number of op" transform="{ff}">
+<g onmouseenter={() => onHover?.({ id: "f" })} onmouseleave={() => onHover?.({ id: "f" })} onclick={() => onDisp?.({ id: welc })}  class="btn"  name="number of op" transform="{ff}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevaqf)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevaqe)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3311,7 +3301,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if fia > 0}
 
-<g onmouseenter={()=>hover("g")} onmouseleave={()=>hover("g")} onclick={() => disp(fiap)}  class="btn" name="number of p" transform="{gg}">
+<g onmouseenter={() => onHover?.({ id: "g" })} onmouseleave={() => onHover?.({ id: "g" })} onclick={() => onDisp?.({ id: fiap })}  class="btn" name="number of p" transform="{gg}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapr)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevapq)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3333,4 +3323,3 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {/if}
 </svg>
-

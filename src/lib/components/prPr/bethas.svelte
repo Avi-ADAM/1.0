@@ -6,7 +6,7 @@
      import Close from '$lib/celim/close.svelte'
       import {  fly } from 'svelte/transition';
     import Tile from '$lib/celim/tile.svelte'
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
   	import { quintOut } from 'svelte/easing';
   import Chaticon from '$lib/celim/chaticon.svelte';
@@ -150,9 +150,9 @@ onMount(async () => {
     let w = $state(0);
    
     let id = $state(0)
-     const dispatch = createEventDispatcher();
+    let { onChat } = $props<{ onChat?: (payload: { id: any, isNew: boolean, smalldes: any, nameChatPartner: { he: string, en: string } }) => void }>();
     function chat (id,isNew,smalldes){
-      dispatch("chat",{id,isNew,smalldes,"nameChatPartner":{"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}})
+      onChat?.({id,isNew,smalldes,"nameChatPartner":{"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}})
     }
 </script>
    

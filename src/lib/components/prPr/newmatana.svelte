@@ -3,8 +3,6 @@
 
 	import { mi } from '$lib/components/prPr/mi.js';
   import { idPr } from '../../stores/idPr.js';
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
   import { lang } from '$lib/stores/lang.js';
   import Checkbox from '$lib/celim/ui/input/checkbox.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';
@@ -132,7 +130,7 @@
         loading = false;
         success = true;
         error = false
-        dispatch('done', {
+        onDone({
           matana: miDatan.data.createMatanot.data,
         });
       
@@ -172,6 +170,13 @@
       totalV = price * quanter;
     }
   });
+  /**
+   * @typedef {Object} Props
+   * @property {(data: { matana: any }) => void} [onDone] - Callback function triggered when the gift creation is complete.
+   */
+
+  /** @type {Props} */
+  let { onDone } = $props();
   //תמונה מלבנית
 </script>
   <div class="flex flex-col align-middle justify-center gap-x-2">

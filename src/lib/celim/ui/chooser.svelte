@@ -1,5 +1,4 @@
 <script>
-     import { createEventDispatcher } from 'svelte';
 import {lang} from '$lib/stores/lang.js'    
   /**
    * @typedef {Object} Props
@@ -7,6 +6,7 @@ import {lang} from '$lib/stores/lang.js'
    * @property {boolean} [checked]
    * @property {any} [tr]
    * @property {any} [fl]
+   * @property {(payload: { checked: boolean }) => void} [onChange]
    */
 
   /** @type {Props} */
@@ -14,12 +14,12 @@ import {lang} from '$lib/stores/lang.js'
     level = [],
     checked = $bindable(true),
     tr = [],
-    fl = []
+    fl = [],
+    onChange
   } = $props();
- const dispatch = createEventDispatcher();
 
 function ch (){
-dispatch("change",{checked:checked})
+onChange?.({checked:checked})
 }
 		const uniqueID = Math.floor(Math.random() * 100)
 		const uniqueIDD = Math.floor(Math.random() * 100)

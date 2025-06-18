@@ -1,18 +1,28 @@
-<!-- @migration-task Error while migrating Svelte code: can't migrate `let htmlon = ``` to `$state` because there's a variable named state.
-     Rename the variable and try again or migrate by hand. -->
 <script>
-export let state = 2 // original and edit, 3 is original second and edit
-export let kindOf;
 
-export let lebel = {"he":"עריכה", "en": "edit"}
 import tr from '$lib/translations/tr.json'
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
-  let htmlon = ``
-  export let kindOfb = kindOf
+  let htmlon = $state(``)
 
-    export let long = false
+  /**
+   * @typedef {Object} Props
+   * @property {number} [stepState] - original and edit, 3 is original second and edit
+   * @property {any} kindOf
+   * @property {any} [lebel]
+   * @property {any} [kindOfb]
+   * @property {boolean} [long]
+   */
+
+  /** @type {Props} */
+  let {
+    stepState = 2,
+    kindOf,
+    lebel = {"he":"עריכה", "en": "edit"},
+    kindOfb = $bindable(kindOf),
+    long = false
+  } = $props();
     const und = {"he":"לא הוגדר","en":"undefined"}
 onMount(()=>{
     console.log(kindOf,kindOfb,tr?.mash[kindOf][$lang])
@@ -27,8 +37,8 @@ onMount(()=>{
     checkAll(kindOf,kindOfb)
     }
 })
-let edit = false
-let show2 = false
+let edit = $state(false)
+let show2 = $state(false)
 function check (lettera, letterb){
     if(lettera == letterb){
         return true
@@ -51,7 +61,7 @@ function checkAll (a, b){
         htmlon += `<span class="text-wow">${tr?.mash[bl][$lang]} </span>`
     }
     }
-    $: first = tr?.mash[kindOf][$lang]
+    let first = $derived(tr?.mash[kindOf][$lang])
     const hekind = {"he":"סוג שווי","en":"kind of vallue"}
 
  const ot = {"he":"עלות חד פעמית","en":"one time"}
@@ -65,13 +75,13 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
     {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
         <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
-        <p class="text-gold">{#if htmlon.length > 0}{@html htmlon} {:else} {first}{/if}</p><button on:click={()=>edit = true}>
+        <p class="text-gold">{#if htmlon.length > 0}{@html htmlon} {:else} {first}{/if}</p><button onclick={()=>edit = true}>
             {#if kindOf == kindOfb}🖍️{:else}✏️{/if}</button>
         {#if kindOf != kindOfb && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <button onclick={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{tr?.mash[kindOf][$lang]}</p>
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
@@ -103,7 +113,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
 <option value="rent">{re[$lang]}</option>
 </select>
 </div>  
-<button on:click={()=>{edit = false
+<button onclick={()=>{edit = false
 checkAll(kindOf,kindOfb)
 }}>✅</button>
 {/if}
