@@ -2,8 +2,6 @@
 <script>
   import { sendToSer } from '$lib/send/sendToSer.js';
     import mapTouchToMouseFor from 'svelte-touch-to-mouse';
-
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
   import NewIwant from '$lib/components/addnew/newIwant.svelte';
   import { quintOut } from 'svelte/easing';
   import { fly, slide } from 'svelte/transition';
