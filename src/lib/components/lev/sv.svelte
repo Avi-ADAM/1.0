@@ -89,7 +89,7 @@
     low = true,
     onHover,
     onDisp
-  } = $props<Props>();
+  } = $props();
 console.log(mashs)
 console.log(sml)
     </script>

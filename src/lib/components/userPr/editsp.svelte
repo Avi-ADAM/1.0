@@ -14,7 +14,6 @@ https://svelte.dev/e/node_invalid_placement -->
 } from 'svelte-loading-spinners'
 
   let token; 
-export let meData = [];
 
 /**
  * @typedef {Object} ClosePayload
@@ -29,7 +28,7 @@ export let meData = [];
  */
 
 /** @type {Props} */
-let { onClose } = $props();
+let { onClose, meData = [] } = $props();
   let miDatan = [];
     let error1 = null;
 
@@ -179,6 +178,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >משאבים שנבחרו</h1>
     </caption>
+    <tbody>
         <tr class="gg">
          <tr class="ggr">
       <th class="ggr">שם</th>
@@ -223,7 +223,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
       <th>סוג</th>
       <td>
       
-        <select  bind:value={meData.kindOf} on:change={() => myMissionH()} class="round form-select appearance-none
+        <select  bind:value={meData.kindOf} onchange={() => myMissionH()} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -279,13 +279,14 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
   <span class='line'></span>
 </div></td>
   </tr>
+</tbody>
 </table>
 </div>
 <div>
     {#if already === false}
   <button 
   class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-  on:click={han}
+  onclick={han}
   >פרסום משאבים</button>
   {:else}
            <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>

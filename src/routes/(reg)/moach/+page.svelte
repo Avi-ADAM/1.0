@@ -41,7 +41,6 @@
   import Hach from '$lib/components/prPr/hachcal.svelte';
   import Finisin from '$lib/components/prPr/finisin.svelte';
 
-  //import { validate_component } from 'svelte/internal';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
   import Sheirut from '$lib/components/prPr/sheirut.svelte';

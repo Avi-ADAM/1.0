@@ -643,7 +643,7 @@
     restime,
     onClose,
     onLoad
-  } = $props<{ onClose?: () => void, onLoad?: () => void }>();
+  } = $props();
 
   const tri = tr;
   let datai = $state([]);

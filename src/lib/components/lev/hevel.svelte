@@ -4,7 +4,7 @@
 
   import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
-  let { userId, onProj } = $props<{ onProj?: (payload: { id: any }) => void }>();
+  let { userId, onProj } = $props();
 function pr (x){
   onProj?.({id:x})
 }

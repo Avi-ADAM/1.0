@@ -1,7 +1,6 @@
 import vercel from '@sveltejs/adapter-vercel';
 import adapter from '@sveltejs/adapter-node';
 import staticAdapter from '@sveltejs/adapter-static';
-import { sveltePreprocess } from 'svelte-preprocess'
 
 /** @type {import('@sveltejs/kit').Config} */
 let config;
@@ -43,10 +42,6 @@ if (process.env.ADAPTER === 'vercel') {
   };
 }
 
-// הוספת preprocess ברמת הקובץ הראשית
-config.preprocess = [sveltePreprocess({
-  "postcss": true
-})];
 
 export default config;
 

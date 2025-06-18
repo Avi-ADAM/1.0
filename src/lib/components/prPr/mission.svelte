@@ -25,13 +25,9 @@ https://svelte.dev/e/js_parse_error -->
   import { addslashes } from '$lib/func/uti/string.svelte';
   const baseUrl = import.meta.env.VITE_URL;
 
-  export let newcontent = true;
-  let { onClose } = $props<{ onClose?: (payload: { md: any }) => void }>();
-  export let newcontentR = true;
-  export let newcontentW = true;
+  let { pu = [], vallues = [], onClose, newcontent = true, newcontentR = true, newcontentW = true, pn, pl, restime, id, userslength = 0, projectId, name = '' } = $props();
   let token;
-  export let pn, pl, restime;
-  $: miData = [
+  let miData = $state([
     {
       selectedSkills: [],
       selectedRoles: [],
@@ -46,14 +42,12 @@ https://svelte.dev/e/js_parse_error -->
       dates: null,
       myM: false
     }
-  ];
-  $: console.log(miData);
+  ]);
+  $effect(() => {
+    console.log(miData);
+  });
   let error1 = null;
-  export let id;
-  export let userslength = 0;
-  export let projectId;
-  export let name = '';
-  $: roles1 = $role;
+  let roles1 = $state($role);
   let x = 168;
   let gloading = false;
   onMount(async () => {
@@ -181,8 +175,8 @@ https://svelte.dev/e/js_parse_error -->
     he: 'בחירת כל הכישורים הרלוונטיים',
     en: 'choose more skills'
   };
-  $: skills2 = $skil;
-  $: roles = $role;
+  let skills2 = $state($skil);
+  let roles = $state($role);
   let selected3;
   const placeholder5 = {
     he: 'בחירת תפקיד',
@@ -204,7 +198,6 @@ https://svelte.dev/e/js_parse_error -->
     }
     return arr;
   }
-  export let vallues = [];
   let idL;
   console.log(miData);
   let miDatana = [];
@@ -624,7 +617,6 @@ https://svelte.dev/e/js_parse_error -->
     
   }
 
-  export let pu = [];
 
   let cencel = ' ביטול';
   let addS = false;
@@ -748,16 +740,16 @@ https://svelte.dev/e/js_parse_error -->
 
     //workways1.set(find_workway_id(selected));
   }
-  $: searchText = ``;
+  let searchText = $state(``);
 
   let isOpen = false;
   const closer = () => {
     isOpen = false;
   };
-  $: addn = {
+  let addn = $state({
     he: `יצירת והוספת: "${searchText}"`,
     en: `Create "${searchText}"`
-  };
+  });
   const perho = {"he":"לשעה","en":"per hour"}
         const hourss = {"he":"שעות","en":"hours"}
         const monhly = {"he":"בחודש", "en": "per month"}
@@ -1076,7 +1068,7 @@ https://svelte.dev/e/js_parse_error -->
         >
           <button
             class=" hover:bg-barbi text-mturk rounded-full"
-            on:click={closer}
+            onclick={closer}
             ><Close />
           </button>
           <table
@@ -1089,13 +1081,15 @@ https://svelte.dev/e/js_parse_error -->
                 {editsi[$lang]}
               </h1>
             </caption>
+            <thead>
             <tr class="gg">
               <th class="gg ddd">{headingd[$lang]}</th>
               {#each days as day}
                 <td class="gg" style="font-size: 1rem">{day.name[$lang]}</td>
               {/each}
             </tr>
-
+            </thead>
+            <tbody>
             <tr>
               <th class="ddd">{headinga[$lang]}</th>
               {#each days as day}
@@ -1128,7 +1122,7 @@ https://svelte.dev/e/js_parse_error -->
                     <input
                       type="number"
                       id={`shif${i}`}
-                      on:change={() => shifterr(i)}
+                      onchange={() => shifterr(i)}
                       name="parti"
                       bind:value={day.shiftp}
                       class="input"
@@ -1204,8 +1198,9 @@ https://svelte.dev/e/js_parse_error -->
                   {/if}
                 {/each}
               </tr>
-              <hr />
+              
             {/each}
+            </tbody>
           </table>
         </div>
       {:else if dialog === 2}
@@ -1213,7 +1208,7 @@ https://svelte.dev/e/js_parse_error -->
           {misid}
           fromMis={true}
           {editdata}
-          on:add={(e) => {
+          onAdd={(e) => {
             const data = e.detail.data;
             const id = e.detail.id;
             const isEdit = e.detail.isEdit;
@@ -1240,7 +1235,7 @@ https://svelte.dev/e/js_parse_error -->
             tasks={itemid != -1
               ? [miData[misid].checklist[itemid]]
               : miData[misid].checklist}
-            on:add={() => (dialog = 2)}
+            onAdd={() => (dialog = 2)}
           />
         </div>
       {/if}
@@ -1260,15 +1255,15 @@ https://svelte.dev/e/js_parse_error -->
             <div class="px-2">
                 {#if missionNameE == false}
             <h2 class="text-barbi text-{$lang == "en" ? 'left' : 'right'}  font-bold text-xl lg:text-4xl underline "
-            >{miData[0].missionName}<button on:click={() => (missionNameE = true)}><EditIcon/></button></h2>
+            >{miData[0].missionName}<button onclick={() => (missionNameE = true)}><EditIcon/></button></h2>
                 {:else}
-                <TextInput bind:text={miData[0].missionName}/><button on:click={() => (missionNameE = false)}><Done/></button>
+                <TextInput bind:text={miData[0].missionName}/><button onclick={() => (missionNameE = false)}><Done/></button>
                 {/if}
           {#if gloading == false}
             <h3 class="text-barbi  
             text-{$lang == "en" ? 'left' : 'right'} 
             font-bold text-lg lg:text-2xl underline "><mark>{tri?.common?.description[$lang]}:</mark><button 
-            on:click={() => (descripE = !descripE)}>{#if descripE}<Done/>{:else}<EditIcon/>{/if}</button></h3>
+            onclick={() => (descripE = !descripE)}>{#if descripE}<Done/>{:else}<EditIcon/>{/if}</button></h3>
             {#if descripE}
             <RichText bind:outpot={miData[0].descrip}  />
             {:else if miData[0].descrip}
@@ -1289,7 +1284,7 @@ https://svelte.dev/e/js_parse_error -->
                     src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
                     alt="howmuch"
                   />
-                  <Daterange on:edit={()=> dateE = true} on:editStop={()=> dateE = false} dir="{$lang == 'he' ? 'rtl' : 'ltr'}" bind:start={miData[0].date} bind:finnish={miData[0].dates} />
+                  <Daterange onEdit={()=> dateE = true} onEditStop={()=> dateE = false} dir="{$lang == 'he' ? 'rtl' : 'ltr'}" bind:start={miData[0].date} bind:finnish={miData[0].dates} />
                   </p>
      <div class="md:text-xl text-lg md:flex-row {valphE ?  "flex-col" : ''} justify-start text-gray-100 flex items-center space-x-2 lg:text-2xl m-5">
        
@@ -1317,7 +1312,7 @@ https://svelte.dev/e/js_parse_error -->
             <Chooser bind:checked={miData[0].iskvua} tr={iskvu} fl={iskvuFl}/></span>
             {/if}
           <button
-          on:click={() => (valphE = !valphE)} 
+          onclick={() => (valphE = !valphE)} 
          > {#if valphE}<Done/>{:else}<EditIcon/>{/if}</button>
 
                 </div>
@@ -1336,7 +1331,7 @@ https://svelte.dev/e/js_parse_error -->
                                   <h2 class="md:text-xl p-1">{datai.shem}</h2>
                                   <button
                                     class="bg-gold p-0.5 m-0.5 rounded text-barb"
-                                    on:click={() => {
+                                    onclick={() => {
                                       dialog = 3;
                                       misid = miData[0].id;
                                       itemid = t;
@@ -1348,7 +1343,7 @@ https://svelte.dev/e/js_parse_error -->
                                   >
         
                                   <button
-                                    on:click={() => {
+                                    onclick={() => {
                                       dialog = 2;
                                       misid = miData[0].id;
                                       itemid = t;
@@ -1358,7 +1353,7 @@ https://svelte.dev/e/js_parse_error -->
                                     class="bg-gold p-0.5 m-0.5 rounded">🖍️</button
                                   >
                                   <button
-                                    on:click={() => {
+                                    onclick={() => {
                                       miData[0].checklist.splice(t, 1);
                                       miData = miData;
                                     }}
@@ -1370,7 +1365,7 @@ https://svelte.dev/e/js_parse_error -->
                           </ul>
         
                           <button
-                            on:click={() => {
+                            onclick={() => {
                               dialog = 3;
                               misid = miData[0].id;
                               itemid = -1;
@@ -1384,7 +1379,7 @@ https://svelte.dev/e/js_parse_error -->
                         {/if}
                         <button
                           title=" {tri?.mission?.checklistadd[$lang]}"
-                          on:click={() => {
+                          onclick={() => {
                             dialog = 2;
                             misid = miData[0].id;
                             isOpen = true;
@@ -1395,7 +1390,7 @@ https://svelte.dev/e/js_parse_error -->
                 </div>
                 <div class='my-2'>
                     <mark class="text-barbi  text-sm lg:text-2xl">{requireSkills[$lang]}</mark>
-    <button on:click={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
+    <button onclick={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
     {#if !ske}
     {#if miData[0].selectedSkills.length > 0}
 
@@ -1413,7 +1408,7 @@ https://svelte.dev/e/js_parse_error -->
         <MultiSelect
         --sms-open-z-index={10000}
         loading={newcontent}
-        on:change={() => mi.set(miData)}
+        onchange={() => mi.set(miData)}
         bind:selected={miData[0].selectedSkills}
         placeholder={placeholder1[$lang]}
         options={$skil.map((c) => c.attributes.skillName)}
@@ -1422,19 +1417,19 @@ https://svelte.dev/e/js_parse_error -->
       <AddNewSkill
         color={'--barbi-pink'}
         mid={miData[0].id}
-        on:addnewskill={addnew}
+        onAddnewskill={addnew}
         {addS}
         roles1={roles}
       />
                 </div>
                 {:else}
-                <MobileModal on:close={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
+                <MobileModal onClose={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
                   <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                     <MultiSelect
                     --sms-open-z-index={10000}
                     loading={newcontent}
-                    on:change={() => mi.set(miData)}
+                    onchange={() => mi.set(miData)}
                     bind:selected={miData[0].selectedSkills}
                     placeholder={placeholder1[$lang]}
                     options={$skil.map((c) => c.attributes.skillName)}
@@ -1443,11 +1438,11 @@ https://svelte.dev/e/js_parse_error -->
                   <AddNewSkill
                     color={'--barbi-pink'}
                     mid={miData[0].id}
-                    on:addnewskill={addnew}
+                    onAddnewskill={addnew}
                     {addS}
                     roles1={roles}
                   />
-                  <button on:click={()=> ske = false}><Done/></button>
+                  <button onclick={()=> ske = false}><Done/></button>
                             </div>
                 </MobileModal>
       {/if}
@@ -1455,13 +1450,13 @@ https://svelte.dev/e/js_parse_error -->
     </div>   
     <div class='my-2'>
         <mark class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</mark>
-                <button on:click={() => (roleE = !roleE)}>{#if roleE}<Done/>{:else}<EditIcon/>{/if}</button>
+                <button onclick={() => (roleE = !roleE)}>{#if roleE}<Done/>{:else}<EditIcon/>{/if}</button>
                     {#if !roleE}
                 {#if miData[0].selectedRoles.length > 0}  
 
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each miData[0].selectedRoles as rol}
-                    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                    <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
     <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol} wow={true}/></p>
         {/each}
       </div>
@@ -1473,35 +1468,35 @@ https://svelte.dev/e/js_parse_error -->
       --sms-open-z-index={10000}
       loading={newcontentR}
       bind:selected={miData[0].selectedRoles}
-      on:change={() => mi.set(miData)}
-      on:add={(event) => console.log(event)}
+      onchange={() => mi.set(miData)}
+      onadd={(event) => console.log(event)}
       placeholder={placeholder5[$lang]}
       options={$role.map((c) => c.attributes.roleDescription)}
     />
     <Addnewro
       color={'--barbi-pink'}
       mid={miData[0].id}
-      on:addnewrole={addnewrole}
+      onAddnewrole={addnewrole}
     />
     </div>
   {:else}
-  <MobileModal on:close={()=> roleE = false} bind:isOpen={roleE} title="{placeholder5[$lang]}">
+  <MobileModal onClose={()=> roleE = false} bind:isOpen={roleE} title="{placeholder5[$lang]}">
     <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
       --sms-open-z-index={10000}
       loading={newcontentR}
       bind:selected={miData[0].selectedRoles}
-      on:change={() => mi.set(miData)}
-      on:add={(event) => console.log(event)}
+      onchange={() => mi.set(miData)}
+      onadd={(event) => console.log(event)}
       placeholder={placeholder5[$lang]}
       options={$role.map((c) => c.attributes.roleDescription)}
     />
     <Addnewro
       color={'--barbi-pink'}
       mid={miData[0].id}
-      on:addnewrole={addnewrole}
+      onAddnewrole={addnewrole}
     />
-    <button on:click={()=> roleE = false}><Done/></button>
+    <button onclick={()=> roleE = false}><Done/></button>
     </div>
   </MobileModal>
   {/if}
@@ -1509,13 +1504,13 @@ https://svelte.dev/e/js_parse_error -->
     </div>
     <div class='my-2'>
         <mark class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</mark>
-        <button on:click={() => (wwe = !wwe)}>{#if wwe}<Done/>{:else}<EditIcon/>{/if}</button>
+        <button onclick={() => (wwe = !wwe)}>{#if wwe}<Done/>{:else}<EditIcon/>{/if}</button>
         {#if !wwe}
         {#if miData[0].selectedWorkways.length > 0}
 
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each miData[0].selectedWorkways as rol}
-          <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+          <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol}/>
           </p>
           {/each}
@@ -1533,14 +1528,14 @@ https://svelte.dev/e/js_parse_error -->
                 bind:selected={miData[0].selectedWorkways}
                 placeholder={placeholder[$lang]}
                 options={$ww.map((c) => c.attributes.workWayName)}
-                on:change={(e) => {
+                onchange={(e) => {
                   addW(miData[0].selectedWorkways, miData[0].id, e);
                 }}
               />
               </div>
              
               {:else}
-              <MobileModal on:close={()=> wwe = false} bind:isOpen={wwe} title="{placeholder[$lang]}">
+              <MobileModal onClose={()=> wwe = false} bind:isOpen={wwe} title="{placeholder[$lang]}">
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                   <MultiSelect
@@ -1552,11 +1547,11 @@ https://svelte.dev/e/js_parse_error -->
                     bind:selected={miData[0].selectedWorkways}
                     placeholder={placeholder[$lang]}
                     options={$ww.map((c) => c.attributes.workWayName)}
-                    on:change={(e) => {
+                    onchange={(e) => {
                       addW(miData[0].selectedWorkways, miData[0].id, e);
                     }}
                   />
-                  <button on:click={()=> wwe = false}><Done/></button>
+                  <button onclick={()=> wwe = false}><Done/></button>
                   </div>
                   </MobileModal>
                   {/if}
@@ -1575,7 +1570,7 @@ https://svelte.dev/e/js_parse_error -->
             placeholder={pll[$lang]}
             options={pu.map((c) => c.attributes.username)}
             maxSelect={1}
-            on:change={function () {
+            onchange={function () {
               miData[0].rishon = find_user_id(miData[0].rishoni);
               miData[0].myM = true;
             }}
@@ -1585,12 +1580,12 @@ https://svelte.dev/e/js_parse_error -->
           <p>{tri?.mission?.assingHelp[$lang]}</p>
           <input
               bind:checked={miData[0].myM}
-              type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> miData[0].rishon == idL}>
+              type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> miData[0].rishon == idL}>
           <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
           {/if}
           <button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
             $lang
-          ]}" on:click={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+          ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
         ><Done/></button>
           {/if}
         </div>
@@ -1598,7 +1593,7 @@ https://svelte.dev/e/js_parse_error -->
             {#if publinkE}
             <mark>{tri?.mission?.publicLinks[$lang]}</mark>
             <TextInput bind:text={miData[0].publicklinks} lebel={tri?.mission?.publicLinks}/>
-            <button on:click={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title='{tri?.mission?.publicLinks[$lang]}'><Done/></button>
             {/if}
         </div>
@@ -1606,7 +1601,7 @@ https://svelte.dev/e/js_parse_error -->
             {#if mislinkE}
             <mark>{tri?.mission?.linkToMission[$lang]}</mark>
             <TextInput bind:text={miData[0].privatlinks} lebel={tri?.mission?.linkToMission}/>
-            <button on:click={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title="{tri?.mission?.linkToMission[$lang]}"><Done/></button >
             {/if}
         </div>
@@ -1619,32 +1614,32 @@ https://svelte.dev/e/js_parse_error -->
             id="isss"
             name="is"
             value="no"
-            on:change={() => shifter(miData[0].isshif)}
+            onchange={() => shifter(miData[0].isshif)}
           />
           <label for="isss"><mark>{isshi[$lang]}</mark></label>
           {#if miData[0].isshif == true}
-            <button on:click={() => shifter(miData[0].isshif)}
+            <button onclick={() => shifter(miData[0].isshif)}
                 >{editsi[$lang]}</button
               >
             {/if}
-            <button on:click={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title="{isshi[$lang]}"><Done/></button>
             {/if}
         </div>
         <div class="flex flex-row items-center justify-start my-4 space-x-3"	>
-           {#if !publinkE} <button on:click={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+           {#if !publinkE} <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title='{tri?.mission?.publicLinks[$lang]}'><LinkIcon/></button>{/if}
             {#if !assignE}<button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
                 $lang
-              ]}" on:click={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+              ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
             ><AddPerson/></button>{/if}
-            {#if !mislinkE}<button on:click={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            {#if !mislinkE}<button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                title="{tri?.mission?.linkToMission[$lang]}"><LinkToIcon/></button >{/if}
-               {#if !shiftE} <button on:click={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+               {#if !shiftE} <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                title="{isshi[$lang]}"><ShiftsIcon/></button>{/if}
         </div>
         <div class="align-self-end justify-items-end">
-            <Button text={acti} on:click={increment} {loading} {success} {error}/>
+            <Button text={acti} onClick={increment} {loading} {success} {error}/>
        </div>
         </div>
           </div>

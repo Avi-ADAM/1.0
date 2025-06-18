@@ -7,6 +7,7 @@ https://svelte.dev/e/js_parse_error -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected token
 https://svelte.dev/e/js_parse_error -->
 <script>
+    import { page } from '$app/state';
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';
     import { show } from './store-show.js';
@@ -30,11 +31,7 @@ let {
   userName_value = $bindable(),
   show_value = $bindable(0),
   onProgres
-} = $props<{
-  userName_value?: string,
-  show_value?: number,
-  onProgres?: (payload: {tx: number, txx: number}) => void
-}>();'$app/stores';
+} = $props();
   import Skip from '$lib/celim/icons/skip.svelte';
   import Tile from '$lib/celim/tile.svelte';
     let vallues = $state([]);
@@ -107,16 +104,6 @@ let {
 
     let selected = $state([]);
     const placeholder = `${$lang == "he" ? " בחירת ערכים ומטרות" : "vallues and goals"}`;
-
- 
-  /**
-   * @typedef {Object} Props
-   * @property {any} userName_value
-   * @property {number} [show_value]
-   */
-
-  /** @type {Props} */
-  
 
 userName.subscribe(value => {
   userName_value = value;
@@ -233,9 +220,9 @@ const newOb = meData.data.createVallue.data;
   <br/>
 {what[$lang]}
 </h1> 
-{#if !focused && !$page.data.isDesktop || $page.data.isDesktop}
+{#if !focused && !page.data.isDesktop || page.data.isDesktop}
 <div class="info">
-<Tile word={info[$lang]} big={$page.data.isDesktop} bg="gold" animate={true} sm={$page.data.isDesktop}/>
+<Tile word={info[$lang]} big={page.data.isDesktop} bg="gold" animate={true} sm={page.data.isDesktop}/>
 </div> 
 {/if}
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">

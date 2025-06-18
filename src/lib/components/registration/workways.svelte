@@ -18,7 +18,7 @@ https://svelte.dev/e/js_parse_error -->
     import enjwork from '$lib/data/workwaysEn.json'
               import { lang } from '$lib/stores/lang.js'
   import Skip from '$lib/celim/icons/skip.svelte';
-let { onProgres } = $props<{ onProgres?: (payload: { tx: number, txx: number }) => void }>();
+let { onProgres } = $props();
     let newcontent = $state(true)
     let workways2 = $state([]);
     let error1 = null

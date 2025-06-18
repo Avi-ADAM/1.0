@@ -6,11 +6,10 @@
     //על כל יהלום באותיות סבירות שם הקטגוריה\
     //לשאוף למינימום קטגוריות הצבעות החלטות משימות מטלות חלוקות בקשות-הצטרפויות הצעות
     //על הלב צורה של יהלומים מבולגנת שתביא למצב שכרגע הוא הרגיל, במצב הרגיל איזה סימון של סדר למצב הזה
-    //שיבהקו בחשיכה
+    //تفكيرקו בחשיכה
 
 import Sv from "./sv.svelte";
  import pic from "$lib/celim/pic.json" 
-let { onShowonly, onShowall, onHover, onCards } = $props<{ onShowonly?: (payload: { data: any }) => void; onShowall?: () => void; onHover?: (payload: { id: string }) => void; onCards?: (payload: { cards: boolean }) => void }>();
 
 import { lang} from '$lib/stores/lang.js'
 let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
@@ -197,10 +196,15 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
    * @property {number} [askma]
    * @property {boolean} [low] - for (let)
    * @property {boolean} [cards]
+   * @property {function({id: string}): void} [onShowonly]
+   * @property {function(): void} [onShowall]
+   * @property {function({id: string}): void} [onHover]
+   * @property {function({cards: boolean}): void} [onCards]
    */
 
   /** @type {Props} */
   let {
+   onShowonly, onShowall, onHover, onCards,
     picLink,
     name = "",
     sug = 13,

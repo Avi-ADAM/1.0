@@ -2,15 +2,11 @@
 <script>
   import Tile from '$lib/celim/tile.svelte'
 
-  import {
-    createEventDispatcher
-} from 'svelte';
- const dispatch = createEventDispatcher();
+  let { onUser, onMesima, projectId } = $props();
 import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
   import RichText from '$lib/celim/ui/richText.svelte';
-  let { projectId } = $props();
 let projectUsers =$state([]);
 let token;
 let idL;
@@ -94,10 +90,10 @@ async function xyd () {
 
     function us (x){
       console.log(x)
-      dispatch('user',{id:x})
+      onUser?.(x);
     }
      function mesima (x){
-      dispatch('mesima',{id:x})
+      onMesima?.(x);
     }
     function hover(c){
       console.log("hover")

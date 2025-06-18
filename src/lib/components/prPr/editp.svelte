@@ -114,7 +114,7 @@ let suc = false;
     projectName_value = $bindable(),
     restime = $bindable(),
     selected = $bindable([])
-  } = $props<{ onMessage?: (payload: { githublink: any, fblink: any, discordlink: any, drivelink: any, twiterlink: any, watsapplink: any, linkP: any, desP: any, desPl: any, projectName_value: any, restime: any, valit: any }) => void }>();
+  } = $props();
     const placeholder = `ערכים ומטרות`;
  
   function addnew (event){

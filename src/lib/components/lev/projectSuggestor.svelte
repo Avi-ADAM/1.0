@@ -6,14 +6,89 @@ import { page } from '$app/stores';
   import {SendTo} from '$lib/send/sendTo.svelte'
      import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
-    import { createEventDispatcher } from 'svelte';
+    // Removed createEventDispatcher as part of Svelte 5 migration
   import { onMount } from 'svelte'
                    import { lang } from '$lib/stores/lang.js'
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 	import dayjs from 'dayjs';
   import { nowId } from "$lib/stores/pendMisMes.js";
 const baseUrl = import.meta.env.VITE_URL
- const dispatch = createEventDispatcher();
+    // All props for Svelte 5 migration, using JSDoc for type definitions
+    /**
+     * @typedef {Object} ComponentProps
+     * @property {function({ani: string, coinlapach: any}): void} [onLess] - Callback for less event
+     * @property {function({id: string}): void} [onHover] - Callback for hover event
+     * @property {function({id: number}): void} [onMesima] - Callback for mesima event
+     * @property {function({id: any}): void} [onProj] - Callback for proj event
+     * @property {boolean} [isVisible] - Visibility flag
+     * @property {boolean} [low] - Low flag
+     * @property {boolean} [alreadyi] - Already flag
+     * @property {string} [timeToP] - Time to profit
+     * @property {number} [hst] - HST value
+     * @property {number} [stb] - STB value
+     * @property {any} coinlapach - Coinlapach data
+     * @property {any} deadLine - Deadline date
+     * @property {any} restime - Restime data
+     * @property {any} deadLinefi - Deadline FI data
+     * @property {any} projectName - Project name
+     * @property {any} missionName - Mission name
+     * @property {any} [role] - Role data
+     * @property {any} [skills] - Skills data
+     * @property {any} [acts] - Acts data
+     * @property {any} missionDetails - Mission details
+     * @property {string} [src] - Source URL
+     * @property {any} projectId - Project ID
+     * @property {string} [linki] - Link URL
+     * @property {number} [oid] - OID value
+     * @property {any} [workways] - Workways data
+     * @property {number} [noOfHours] - Number of hours
+     * @property {number} [perhour] - Per hour rate
+     * @property {number} [total] - Total value
+     * @property {any} [askedarr] - Asked array
+     * @property {any} [declineddarr] - Declined array
+     * @property {any} hearotMeyuchadot - Hearot Meyuchadot data
+     * @property {any} pid - PID value
+     * @property {boolean} [cards] - Cards flag
+     * @property {any} [chat] - Chat data
+     * @property {any} askId - Ask ID
+     * @property {any} order - Order data
+     */
+    /** @type {ComponentProps} */
+    let {
+        onLess, onHover, onMesima, onProj,
+        isVisible = false,
+        low = false,
+        alreadyi = false,
+        timeToP = "more",
+        hst = 187,
+        stb = 180,
+        coinlapach,
+        deadLine,
+        restime,
+        deadLinefi,
+        projectName,
+        missionName,
+        role = $bindable([]),
+        skills = $bindable([]),
+        acts = [],
+        missionDetails,
+        src = "coin.png",
+        projectId,
+        linki = "/project/",
+        oid = 0,
+        workways = $bindable([]),
+        noOfHours = 0,
+        perhour = 0,
+        total = 0,
+        askedarr = [],
+        declineddarr = [],
+        hearotMeyuchadot,
+        pid,
+        cards = false,
+        chat = $bindable([]),
+        askId,
+        order = $bindable()
+    } = $props();
 let already = $state(false);
     let token;
     let uId;
@@ -21,9 +96,7 @@ let already = $state(false);
 
 function less (oid) {
     console.log("less")
-    dispatch('less', {
- ani: "prsug",
-                coinlapach: coinlapach    } );
+    onLess?.({ ani: "prsug", coinlapach: coinlapach });
 }
 let miData = [];
 
@@ -226,7 +299,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u[$lang]});
+    onHover?.({ id: u[$lang] });
 
 }
 function hoverede(){
@@ -236,7 +309,7 @@ function hoverede(){
   } else {
      u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
   }
-  dispatch("hover", {id: u[$lang]});
+  onHover?.({ id: u[$lang] });
  }
  let pclim = $state(0);
   
@@ -245,7 +318,7 @@ function mesima (){
     pclim += 1;
     setTimeout(function() {pclim = 0},6000)
     if(pclim >= 2){
-        dispatch("mesima", {id: oid});
+        onMesima?.({ id: oid });
     }
 }
 let pcli = $state(0);
@@ -254,12 +327,11 @@ function linke (){
     pcli += 1;
     setTimeout(function() {pcli = 0},6000)
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({ id: projectId });
     }
 }
 function project () {
-
-        dispatch("proj", {id: projectId});
+        onProj?.({ id: projectId });
 }
  onMount(function(){
  if ($lang != "en" ){
@@ -284,13 +356,13 @@ function project () {
             skills = skills
             workways = workways;
 })
-  function hoverc (event){
+function hoverc (event){
    if (event.detail.x == "0"){
      u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u[$lang]});
+    onHover?.({ id: u[$lang] });
 }
  import Cards from './cards/sugestmi.svelte'
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
@@ -323,77 +395,7 @@ const close = () => {
 };
 
 let clicked = $state(false)
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [isVisible]
-   * @property {boolean} [low]
-   * @property {boolean} [alreadyi]
-   * @property {string} [timeToP]
-   * @property {number} [hst]
-   * @property {number} [stb]
-   * @property {any} coinlapach
-   * @property {any} deadLine
-   * @property {any} restime
-   * @property {any} deadLinefi
-   * @property {any} projectName
-   * @property {any} missionName
-   * @property {any} [role]
-   * @property {any} [skills]
-   * @property {any} [acts]
-   * @property {any} missionDetails
-   * @property {string} [src]
-   * @property {any} projectId
-   * @property {string} [linki]
-   * @property {number} [oid]
-   * @property {any} [workways]
-   * @property {number} [noOfHours]
-   * @property {number} [perhour]
-   * @property {number} [total]
-   * @property {any} [askedarr]
-   * @property {any} [declineddarr]
-   * @property {any} hearotMeyuchadot
-   * @property {any} pid
-   * @property {boolean} [cards]
-   * @property {any} [chat]
-   * @property {any} askId
-   * @property {any} order
-   */
-
-  /** @type {Props} */
-  let {
-    isVisible = false,
-    low = false,
-    alreadyi = false,
-    timeToP = "more",
-    hst = 187,
-    stb = 180,
-    coinlapach,
-    deadLine,
-    restime,
-    deadLinefi,
-    projectName,
-    missionName,
-    role = $bindable([]),
-    skills = $bindable([]),
-    acts = [],
-    missionDetails,
-    src = "coin.png",
-    projectId,
-    linki = "/project/",
-    oid = 0,
-    workways = $bindable([]),
-    noOfHours = 0,
-    perhour = 0,
-    total = 0,
-    askedarr = [],
-    declineddarr = [],
-    hearotMeyuchadot,
-    pid,
-    cards = false,
-    chat = $bindable([]),
-    askId,
-    order = $bindable()
-  } = $props();
+ 
 let miDatan = []
  async function afreact (event){
  
@@ -461,7 +463,7 @@ function tochat (){
 }
 let dialogOpen = $state(false)
 function modal(){
-  dispatch("modal")
+  onModal?.();
   dialogOpen=true
 }
 const chatdes2 ={"he":"צ'אט על הצטרפות לריקמה" ,"en":"chat on joining"}

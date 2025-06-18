@@ -68,7 +68,7 @@ onMount(async () => {
       return arr1;
      };
 
-  let { needss = $bindable([]), selctedi = [], selected = $bindable([]) , onStr, onAddm, onAdd } = $props<{ onStr?: () => void, onAddm?: (payload: { x: any, skob: any }) => void, onAdd?: (payload: { x: any }) => void }>();
+  let { needss = $bindable([]), selctedi = [], selected = $bindable([]) , onStr, onAddm, onAdd } = $props();
     const placeholder = `הוספת משאבים נדרשים `;
 
 function newn(event) {

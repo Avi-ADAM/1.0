@@ -29,11 +29,7 @@ let {
   userName_value = $bindable(),
   show_value = $bindable(0),
   onProgres
-} = $props<{
-  userName_value?: string,
-  show_value?: number,
-  onProgres?: (payload: {tx: number, txx: number}) => void
-}>();
+} = $props();
            import { lang } from '$lib/stores/lang.js'
     import jroles from '$lib/data/tafkidim.json'
     import enjrole from '$lib/data/tafkidimEn.json'
@@ -110,9 +106,6 @@ let {
     let selected = $state([]);
      const placeholder = `${$lang == "he" ? "תפקידים מועדפים" : "preferred roles"}`;
 
- 
-let userName_value = $state();
-let show_value = 0;
 
 userName.subscribe(value => {
   userName_value = value;

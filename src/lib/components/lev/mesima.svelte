@@ -4,7 +4,7 @@ import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
 const baseUrl = import.meta.env.VITE_URL
-  let { missionId, onProject } = $props<{ onProject?: (payload: { id: any }) => void }>();
+  let { missionId, onProject } = $props();
 let projectUsers =[];
 let token;
 let idL;

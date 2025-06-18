@@ -2,12 +2,10 @@
     import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
     import axios from 'axios';
-    import { createEventDispatcher } from 'svelte';
      import { onMount } from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
- const dispatch = createEventDispatcher();
-
+    // Callback prop used instead of createEventDispatcher for Svelte 5 migration
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -29,6 +27,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {number} [total]
    * @property {any} [askedarr]
    * @property {any} [declineddarr]
+   * @property {(id: number) => void} [onLess] - Callback for 'less' event (Svelte 5 migration)
    */
 
   /** @type {Props} */
@@ -68,9 +67,7 @@ function toggleShow() {
 	};
 function less (oid) {
     console.log("less")
-    dispatch('less', {
-    id: oid
-    } );
+    onLess?.(oid);
 }
 let miData = [];
 

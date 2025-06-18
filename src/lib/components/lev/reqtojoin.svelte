@@ -12,11 +12,7 @@
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
-const dispatch = createEventDispatcher();
     let dialogOpen = $state(false)
 let resP = [];
      function percentage(partialValue, totalValue) {
@@ -78,12 +74,12 @@ function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.({ id: userId });
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({ id: projectId });
     }
   }
 }
@@ -355,7 +351,7 @@ ${adduser}
             console.log(miDatan);
                 after(miDatan,newnew,idL, bearer1)
            
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -423,7 +419,7 @@ ${adduser2}
             //TODO: timegrama if dates
             after(miDatan,newnew,idL, bearer1)
 
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -463,7 +459,7 @@ ${adduser2}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -527,7 +523,7 @@ updateOpenMission(
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('decline', {
+            onDecline?.({
                 ani: "asked",
               coinlapach: coinlapach
             })
@@ -552,7 +548,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({ id: u });
 }
 function hoverc (event){
    if (event.detail.x == "0"){
@@ -560,7 +556,7 @@ function hoverc (event){
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({ id: u });
 }
 let clicked = $state(false)
 async function react (){
@@ -635,7 +631,7 @@ function hoverede(){
   } else {
  u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
   }
-  dispatch("hover", {id: u});
+  onHover?.({ id: u });
  }
  import Card from './cards/reqtojoin.svelte'
   import { DialogContent, DialogOverlay } from "svelte-accessible-dialog";
@@ -692,10 +688,17 @@ function hoverede(){
    * @property {any} sqedualed
    * @property {any} timegramaId
    * @property {boolean} [cards]
+   * @property {any} [onUser]
+   * @property {any} [onProj]
+   * @property {any} [onAcsept]
+   * @property {any} [onDecline]
+   * @property {any} [onHover]
+   * @property {any} [onModal]
    */
 
   /** @type {Props} */
   let {
+    onUser, onProj, onAcsept, onDecline, onHover, onModal,
     isVisible = false,
     low = false,
     iskvua,
@@ -822,7 +825,7 @@ onmouseleave={()=> hoverede()}
 use:clickOutside onclick_outside={toggleShow} 
 class="hover:scale-290 duration-1000 ease-in" 
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 

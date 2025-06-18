@@ -1,7 +1,6 @@
 <script>
     import { fly } from 'svelte/transition';
 import { Confetti } from "svelte-confetti"
-let { onHover } = $props<{ onHover?: (payload: { id: string }) => void }>();
 import { lang } from '$lib/stores/lang.js';
 import {
     idPr
@@ -10,6 +9,7 @@ let error1
 import {
     goto } from '$app/navigation';
   let {
+    onHover,
     id,
     username,
     projectName,

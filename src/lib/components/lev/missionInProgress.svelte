@@ -1107,9 +1107,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
   {/if}
 <svg class="svgg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
    <style bx:fonts="Lobster Two">@import url("https://fonts.googleapis.com/css?family=Lobster+Two:700");</style>
-  <style type="text/css">/*$$__STYLE_CONTENT__$$*/</style>
+  <style type="text/css"> #hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }</style>
   <defs>
- #hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }0%" y="-30%" width="160%" height="160%">
+    <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
     <feGaussianBlur stdDeviation="2 2" result="glow"/>
     <feMerge>
       <feMergeNode in="glow"/>

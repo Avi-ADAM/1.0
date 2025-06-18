@@ -10,14 +10,12 @@
 
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
-  import { createEventDispatcher } from 'svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Card from './cards/rektom.svelte';
   import { nowId } from '$lib/stores/pendMisMes';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
-  const dispatch = createEventDispatcher();
   const baseUrl = import.meta.env.VITE_URL
     let dialogOpen = $state(false)
   let resP = [];
@@ -110,12 +108,12 @@
     if (s == 'u') {
       ucli += 1;
       if (ucli >= 2) {
-        dispatch('user', { id: userId });
+        onUser?.({ id: userId });
       }
     } else if (s == 'p') {
       pcli += 1;
       if (pcli >= 2) {
-        dispatch('proj', { id: projectId });
+        onProj?.({ id: projectId });
       }
     }
   }
@@ -231,7 +229,7 @@
           .then((r) => r.json())
           .then((data) => (miDatan = data));
         console.log(miDatan);
-        dispatch('acsept', {
+        onAcsept?.({
           ani: 'askedma',
           coinlapach: coinlapach
         });
@@ -283,7 +281,7 @@ ${adduser2}
           .then((r) => r.json())
           .then((data) => (miDatan = data));
         console.log(miDatan);
-        dispatch('acsept', {
+        onAcsept?.({
           ani: 'askedma',
           coinlapach: coinlapach
         });
@@ -321,7 +319,7 @@ ${adduser2}
           .then((r) => r.json())
           .then((data) => (miDatan = data));
         console.log(miDatan);
-        dispatch('acsept', {
+        onAcsept?.({
           ani: 'askedma',
           coinlapach: coinlapach
         });
@@ -385,7 +383,7 @@ updateAskm(
           .then((r) => r.json())
           .then((data) => (miDatan = data));
         console.log(miDatan);
-        dispatch('decline', {
+        onDecline?.({
           ani: 'askedma',
           coinlapach: coinlapach
         });
@@ -413,7 +411,7 @@ updateAskm(
     } else {
       ut = id;
     }
-    dispatch('hover', { id: ut });
+    onHover?.({ id: ut });
   }
   function hoverede() {
     hovered = !hovered;
@@ -423,7 +421,7 @@ updateAskm(
     } else {
       ut = u[$lang];
     }
-    dispatch('hover', { id: ut });
+    onHover?.({ id: ut });
   }
 
   function hoverc(event) {
@@ -433,7 +431,7 @@ updateAskm(
     } else {
       ut = event.detail.x;
     }
-    dispatch('hover', { id: ut });
+    onHover?.({ id: ut });
   }
 
   const clicktoup = {
@@ -503,10 +501,17 @@ updateAskm(
    * @property {boolean} [cards]
    * @property {any} [chat]
    * @property {number} [order]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
+   * @property {(payload: { id: any }) => void} [onUser]
+   * @property {(payload: { id: any }) => void} [onProj]
    */
 
   /** @type {Props} */
   let {
+    onUser, onProj, onAcsept, onDecline, onHover, onModal,
     low = false,
     modal = $bindable(false),
     isVisible = false,
@@ -696,7 +701,7 @@ updateAskm(
   {#if cards == false}
     <div
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
       style="position: relative;"

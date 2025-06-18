@@ -96,7 +96,7 @@ onMount(async () => {
     toast.success(doneMes[$lang])
     //TODO: email add to table
   }
-  let { actdata = [], bmiData = $bindable([]) } = $props();
+  let { actdata = [], onChat, bmiData = $bindable([]) } = $props();
     let ohh = $derived(soter.map(c=>c.openi).includes(false));
     function sot(idd , y){
       console.log(ohh, soter.map(c=>c.openi).includes(false),y)
@@ -150,7 +150,6 @@ onMount(async () => {
     let w = $state(0);
    
     let id = $state(0)
-    let { onChat } = $props<{ onChat?: (payload: { id: any, isNew: boolean, smalldes: any, nameChatPartner: { he: string, en: string } }) => void }>();
     function chat (id,isNew,smalldes){
       onChat?.({id,isNew,smalldes,"nameChatPartner":{"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}})
     }

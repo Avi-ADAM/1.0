@@ -125,11 +125,11 @@
   import Hal from './halukaask.svelte';
   import { fly } from 'svelte/transition';
 
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { isMobileOrTablet } from '$lib/utilities/device';
 
-  const dispatch = createEventDispatcher();
+
   let modal = $state(false);
 
   function modali() {
@@ -143,26 +143,26 @@
     const indexy = x.indexOf(event.detail.coinlapach);
     oldob.splice(indexy, 1);
     arr1 = oldob;
-    dispatch('start', {
+    onStart?.({
       cards: false,
       ani: event.detail.ani
     });
   }
 
   function user(event) {
-    dispatch('user', {
+    onUser?.({
       id: event.detail.id
     });
   }
 
   function mesima(event) {
-    dispatch('mesima', {
+    onMesima?.({
       id: event.detail.id
     });
   }
 
   function hover(event) {
-    dispatch('hover', {
+    onHover?.({
       id: event.detail.id
     });
   }
@@ -170,13 +170,13 @@
   function chat() {}
 
   function cards() {
-    dispatch('cards', {
+    onCards?.({
       cards: true
     });
   }
 
   function proj(event) {
-    dispatch('proj', {
+    onProj?.({
       id: event.detail.id
     });
   }
@@ -218,10 +218,17 @@
    * @property {any} total
    * @property {any} [milon]
    * @property {boolean} [sml]
+   * @property {(payload: { cards: boolean, ani: any }) => void} [onStart] - Callback for 'start' event
+   * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
+   * @property {(payload: { id: any }) => void} [onMesima] - Callback for 'mesima' event
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+   * @property {(payload: { cards: boolean }) => void} [onCards] - Callback for 'cards' event
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
    */
 
   /** @type {Props} */
   let {
+    onStart, onUser, onMesima, onHover, onCards, onProj,
     adder = [],
     arr1 = $bindable([]),
     askedarr = [],

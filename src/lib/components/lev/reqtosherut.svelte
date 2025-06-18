@@ -10,12 +10,8 @@
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
-const dispatch = createEventDispatcher();
 let resP = [];
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
@@ -76,12 +72,12 @@ function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.(userId);
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.(projectId);
     }
   }
 }
@@ -283,7 +279,7 @@ ${adduser}
               console.error('Error:', error);
             });
           }
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -423,7 +419,7 @@ ${adduser2}
               console.error('Error:', error);
             });
           }
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -463,7 +459,7 @@ ${adduser2}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -527,9 +523,9 @@ updateOpenMission(
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('decline', {
+            onDecline?.({
                 ani: "asked",
-              coinlapach: coinlapach
+                coinlapach: coinlapach
             })
 
         } catch (e) {
@@ -552,7 +548,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.(u);
 }
 function hoverc (event){
    if (event.detail.x == "0"){
@@ -560,7 +556,7 @@ function hoverc (event){
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.(u);
 }
 let clicked = $state(false)
 async function react (){
@@ -635,7 +631,7 @@ function hoverede(){
   } else {
  u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
   }
-  dispatch("hover", {id: u});
+  onHover?.(u);
  }
  import Card from './cards/reqtojoin.svelte'
   import { DialogContent, DialogOverlay } from "svelte-accessible-dialog";
@@ -689,10 +685,16 @@ function hoverede(){
    * @property {number} [order]
    * @property {any} sqedualed
    * @property {boolean} [cards]
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+   * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept] - Callback for 'acsept' event
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline] - Callback for 'decline' event
    */
 
   /** @type {Props} */
   let {
+    onHover, onUser, onProj, onAcsept, onDecline,
     low = false,
     iskvua,
     isVisible = false,

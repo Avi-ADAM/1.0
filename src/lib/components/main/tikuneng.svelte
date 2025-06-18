@@ -12,7 +12,7 @@ let amorthq = "I, ||name||, will give up the weapons of the ||country|| Army whe
 let already = $state(false);
   let more = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- let { onDone, onErore } = $props<{ onDone?: () => void; onErore?: () => void }>();
+ let { onDone, onErore } = $props();
 const baseUrl = import.meta.env.VITE_URL
 
 let miDatan = [];
