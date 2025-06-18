@@ -1,5 +1,6 @@
 <script>
-  export let acts = [];
+  import { run } from 'svelte/legacy';
+
   import Dates from '$lib/components/grid/dates.svelte';
   import ListOfTiles from '$lib/components/grid/listOfTiles.svelte';
   import {
@@ -18,12 +19,13 @@
   import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/stores';
   import { sendToSer } from '$lib/send/sendToSer.js';
+  let { acts = $bindable([]) } = $props();
   const dispatch = createEventDispatcher();
-  let paging = new PagingData(
+  let paging = $state(new PagingData(
     1, // currentPage
     20, // itemsPerPage
     [10, 20, 50, 100] // itemsPerPageOptions
-  );
+  ));
   function handleTaskClick(row, type, mid, isOpen, isPend) {
     let id;
     let kind;
@@ -46,7 +48,7 @@
       kind
     });
   }
-  let filtersUi  = [];
+  let filtersUi  = $state([]);
   const name = { he: ' שם', en: 'name' };
   const des = { he: 'תיאור', en: 'description' };
   const my = { he: 'מבוצע ע"י', en: 'assigned to' };
@@ -56,7 +58,7 @@
   const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
   let theme = PrelineTheme;
 
-  let columns = [
+  let columns = $state([
     {
       key: 'shem',
       title: name[$lang],
@@ -159,11 +161,13 @@
       },
       renderComponent: Dates
     }
-  ];
+  ]);
 
   let myid = $page.data.uid;
-  $: filteredActs = [];
-    $:uiFilters = [];
+  let filteredActs = $state([]);
+  
+    let uiFilters = $state([]);
+  
   const myTasks = { en: 'my assigned tasks', he: 'מטלות שאני מבצע' };
   const valiTasks = { en: 'tasks I created', he: 'מטלות שיצרתי' };
   const emptyTasks = {
@@ -172,40 +176,43 @@
   };
 
   // משתנים חיצוניים למצב הפילטרים
-  let isMyTasksActive = false; // מתחיל דלוק
-  let isCreatedByMeActive = false; // מתחיל דלוק
-  let isUnassignedActive = false;
+  let isMyTasksActive = $state(false); // מתחיל דלוק
+  let isCreatedByMeActive = $state(false); // מתחיל דלוק
+  let isUnassignedActive = $state(false);
 
-  $: filters = [
-    {
-      key: 'myTasks',
-      columns: 'my',
-      filter: (val) => {
-        if (!filters[0].active) return true;
-        return val?.my?.data?.some((user) => user.id === myid);
+  let filters;
+  run(() => {
+    filters = [
+      {
+        key: 'myTasks',
+        columns: 'my',
+        filter: (val) => {
+          if (!filters[0].active) return true;
+          return val?.my?.data?.some((user) => user.id === myid);
+        },
+        active: false
       },
-      active: false
-    },
-    {
-      key: 'tasksICreated',
-      columns: 'vali',
-      filter: (val) => {
-        if (!filters[1].active) return true;
-        return val?.vali?.data?.id === myid;
+      {
+        key: 'tasksICreated',
+        columns: 'vali',
+        filter: (val) => {
+          if (!filters[1].active) return true;
+          return val?.vali?.data?.id === myid;
+        },
+        active: false
       },
-      active: false
-    },
-    {
-      key: 'unassignedTasks',
-      columns: 'my',
-      filter: (val) => {
-        if (!filters[2].active) return true;
-        return !val?.my?.data || val.my.data.length === 0;
+      {
+        key: 'unassignedTasks',
+        columns: 'my',
+        filter: (val) => {
+          if (!filters[2].active) return true;
+          return !val?.my?.data || val.my.data.length === 0;
+        },
+        active: false
       },
-      active: false
-    },
-    ...uiFilters
-  ];
+      ...uiFilters
+    ];
+  });
   
   function updateFilteredActs() {
     const activeFilter = filters.find((f) => f.active);
@@ -387,7 +394,7 @@
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
 >
   <div class="flex flex-row max-w-full overflow-x-auto d">
-    <button on:click={() => handleFilterClick(0)}>
+    <button onclick={() => handleFilterClick(0)}>
       {#key isMyTasksActive}
         <Tile
           big={false}
@@ -399,7 +406,7 @@
         />
       {/key}
     </button>
-    <button on:click={() => handleFilterClick(1)}>
+    <button onclick={() => handleFilterClick(1)}>
       {#key isCreatedByMeActive}
         <Tile
           big={false}
@@ -411,7 +418,7 @@
         />
       {/key}
     </button>
-    <button on:click={() => handleFilterClick(2)}>
+    <button onclick={() => handleFilterClick(2)}>
       {#key isUnassignedActive}
         <Tile
           big={false}
@@ -426,7 +433,7 @@
     {#if filtersUi.length > 0}
       {#each filtersUi as ui,i}
       {#key filtersUi}
-        <button on:click={() => handleFilterClick(i+3)}>
+        <button onclick={() => handleFilterClick(i+3)}>
             <Tile
               big={false}
               sm={false}

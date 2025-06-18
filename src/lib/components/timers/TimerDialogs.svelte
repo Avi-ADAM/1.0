@@ -11,14 +11,29 @@
 
   const dispatch = createEventDispatcher();
 
-  export let timer;
-  export let showSaveDialog = false;
-  export let showClearDialog = false;
-  export let showSaveFinal = false;
-  export let dialogEdit = true;
-  export let elapsedTime = '00:00:00';
-  export let selectedTasks = [];
-  export let taskSearchTerm = '';
+  /**
+   * @typedef {Object} Props
+   * @property {any} timer
+   * @property {boolean} [showSaveDialog]
+   * @property {boolean} [showClearDialog]
+   * @property {boolean} [showSaveFinal]
+   * @property {boolean} [dialogEdit]
+   * @property {string} [elapsedTime]
+   * @property {any} [selectedTasks]
+   * @property {string} [taskSearchTerm]
+   */
+
+  /** @type {Props} */
+  let {
+    timer = $bindable(),
+    showSaveDialog = $bindable(false),
+    showClearDialog = $bindable(false),
+    showSaveFinal = $bindable(false),
+    dialogEdit = $bindable(true),
+    elapsedTime = '00:00:00',
+    selectedTasks = $bindable([]),
+    taskSearchTerm = $bindable('')
+  } = $props();
 
   // טקסטים לדיאלוגים
   const dialogHeader = {
@@ -46,10 +61,6 @@
     en: 'Edit Times'
   };
 
-  $: innerText = {
-    en: `Timer stopped at ${lastTimerDuration}. Would you like to save this time or clear it?`,
-    he: `הטיימר נעצר לאחר ${lastTimerDuration}. האם ברצונך לשמור את הזמן או לנקות אותו?`
-  };
 
   const innerTextT = {
     he: 'באפשרותך לעדכן אלו מטלות בביצוע כעת או לערוך את הזמנים של הטיימר',
@@ -251,21 +262,6 @@
     }
   }
 
-  // Computed properties
-  $: lastTimer = timer?.attributes?.activeTimer?.data?.attributes?.timers?.slice(-1)[0] || null;
-  $: lastTimerDuration = lastTimer
-    ? formatTime(
-        lastTimer.stop
-          ? new Date(lastTimer.stop) - new Date(lastTimer.start)
-          : Date.now() - new Date(lastTimer.start),
-        { lang: $lang }
-      )
-    : 'No timer available';
-  $: filteredTasks = timer?.attributes?.acts?.data?.filter(task => 
-    !task.attributes.naasa && 
-    task.attributes.myIshur &&
-    task.attributes.shem.toLowerCase().includes(taskSearchTerm.toLowerCase())
-  ) || [];
 
   
 // Add to your script section:
@@ -355,6 +351,25 @@ function toLocalDatetimeString(date) {
   local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
   return local.toISOString().slice(0, 16);
 }
+  // Computed properties
+  let lastTimer = $derived(timer?.attributes?.activeTimer?.data?.attributes?.timers?.slice(-1)[0] || null);
+  let lastTimerDuration = $derived(lastTimer
+    ? formatTime(
+        lastTimer.stop
+          ? new Date(lastTimer.stop) - new Date(lastTimer.start)
+          : Date.now() - new Date(lastTimer.start),
+        { lang: $lang }
+      )
+    : 'No timer available');
+  let innerText = $derived({
+    en: `Timer stopped at ${lastTimerDuration}. Would you like to save this time or clear it?`,
+    he: `הטיימר נעצר לאחר ${lastTimerDuration}. האם ברצונך לשמור את הזמן או לנקות אותו?`
+  });
+  let filteredTasks = $derived(timer?.attributes?.acts?.data?.filter(task => 
+    !task.attributes.naasa && 
+    task.attributes.myIshur &&
+    task.attributes.shem.toLowerCase().includes(taskSearchTerm.toLowerCase())
+  ) || []);
 </script>
 
 <!-- דיאלוג ניקוי -->
@@ -373,7 +388,7 @@ function toLocalDatetimeString(date) {
     >
     <button 
     class="close-button"
-    on:click={() => showClearDialog = false}
+    onclick={() => showClearDialog = false}
     aria-label="Close dialog"
   >
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -408,7 +423,7 @@ function toLocalDatetimeString(date) {
                     <div class="edit-actions">
                       <button 
                         class="save-edit-btn"
-                        on:click={() => handleSaveEdit(i, timerEntry)}
+                        onclick={() => handleSaveEdit(i, timerEntry)}
                       >
                         <svg viewBox="0 0 24 24" width="20" height="20">
                           <path fill="currentColor" d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/>
@@ -416,7 +431,7 @@ function toLocalDatetimeString(date) {
                       </button>
                       <button 
                         class="cancel-edit-btn"
-                        on:click={() => handleCancelEdit(i)}
+                        onclick={() => handleCancelEdit(i)}
                       >
                         <svg viewBox="0 0 24 24" width="20" height="20">
                           <path fill="currentColor" d="M19 6.41L17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/>
@@ -442,19 +457,19 @@ function toLocalDatetimeString(date) {
                 {#if !timerEntry.isEditing}
                   <button 
                     class="edit-btn"
-                    on:click={() => handleStartEdit(i, timerEntry)}
+                    onclick={() => handleStartEdit(i, timerEntry)}
                   >
                     <svg viewBox="0 0 24 24" width="20" height="20">
                       <path 
                         d="M3 17.25V21h3.75L17.81 9.94l-3.75-3.75L3 17.25zM20.71 7.04c.39-.39.39-1.02 0-1.41l-2.34-2.34c-.39-.39-1.02-.39-1.41 0l-1.83 1.83 3.75 3.75 1.83-1.83z"
                         style="fill: blue; cursor: pointer; "
-                        on:click={() => showSaveDialog = true}
+                        onclick={() => showSaveDialog = true}
                       />
                     </svg>
                   </button>
                   <button 
                     class="clear-single-btn"
-                    on:click={() => localHandleClearSingle(i,timer)}
+                    onclick={() => localHandleClearSingle(i,timer)}
                   >
                     <svg viewBox="0 0 24 24" width="20" height="20">
                       <path 
@@ -471,7 +486,7 @@ function toLocalDatetimeString(date) {
           {#if timer?.attributes?.activeTimer?.data?.attributes?.timers}
             <button 
               class="add-interval-btn"
-              on:click={handleAddInterval}
+              onclick={handleAddInterval}
             >
               <svg viewBox="0 0 24 24" width="24" height="24">
                 <path fill="currentColor" d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/>
@@ -483,7 +498,7 @@ function toLocalDatetimeString(date) {
           
           <button 
             class="clear-all-btn"
-            on:click={() => localClearAllTimers()}
+            onclick={() => localClearAllTimers()}
             aria-label="Clear all timers"
           >
             {clearDialogText.clearAll[$lang]}
@@ -512,7 +527,7 @@ function toLocalDatetimeString(date) {
     >
       <button 
         class="close-button"
-        on:click={closeDialog}
+        onclick={closeDialog}
         aria-label="Close dialog"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -527,13 +542,13 @@ function toLocalDatetimeString(date) {
         <div class="dialog-buttons">
           <button
             class="save-btn"
-            on:click={handleSaveTimer}
+            onclick={handleSaveTimer}
           >
             {dialogEdit == true ? innerButtonT[$lang] : innerDialogButton[$lang]}
           </button>
           <button
             class="clear-btn"
-            on:click={handleClearTimer}
+            onclick={handleClearTimer}
           >
             {dialogEdit == true ? clearButtonT[$lang] : clearButton[$lang]}
           </button>
@@ -559,7 +574,7 @@ function toLocalDatetimeString(date) {
     >
       <button 
         class="close-button"
-        on:click={() => showSaveFinal = false}
+        onclick={() => showSaveFinal = false}
         aria-label="Close dialog"
       >
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
@@ -601,7 +616,7 @@ function toLocalDatetimeString(date) {
         <div class="dialog-buttons">
           <button
             class="px-4 py-2 rounded font-bold text-black bg-gradient-to-r from-green-400 to-blue-400 transform transition-transform hover:-translate-y-1 disabled:opacity-50 disabled:cursor-not-allowed"
-            on:click={handleSaveTimerFinal}
+            onclick={handleSaveTimerFinal}
             disabled={elapsedTime === '00:00:00' && dialogEdit != true}
           >
             {innerDialogButton[$lang]}
@@ -609,14 +624,14 @@ function toLocalDatetimeString(date) {
           {#if filteredTasks.length > 0}
             <button
               class="px-4 py-2 rounded font-bold text-black bg-gradient-to-r from-yellow-400 to-orange-400 transform transition-transform hover:-translate-y-1"
-              on:click={handleUpdateTimer}
+              onclick={handleUpdateTimer}
             >
               {updateButton[$lang]}
             </button>
           {/if}
           <button
             class="px-4 py-2 rounded font-bold text-white bg-gradient-to-r from-pink-500 to-red-500 transform transition-transform hover:-translate-y-1"
-            on:click={handleClearTimer}
+            onclick={handleClearTimer}
           >
             {clearButton[$lang]}
           </button>

@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `a` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
 <script context="module">
    import moment from 'moment'
 

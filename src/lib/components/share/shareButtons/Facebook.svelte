@@ -1,8 +1,14 @@
 <script>
 	import FacebookIcon from '$lib/celim/icons/facebook.svelte';
-	export let hashtag = '';
-	export let quote = '';
-	export let url;
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} [hashtag]
+	 * @property {string} [quote]
+	 * @property {any} url
+	 */
+
+	/** @type {Props} */
+	let { hashtag = '', quote = '', url } = $props();
 
 	const FACEBOOK_BLUE = '#3b5998';
 
@@ -44,7 +50,7 @@
 	}
 </script>
 
-<button on:click={handleClick}
+<button onclick={handleClick}
 	><span class="sr-only">Share on Facebook</span><FacebookIcon
 		colour={FACEBOOK_BLUE}
 		width={48}

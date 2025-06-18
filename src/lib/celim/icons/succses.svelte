@@ -1,8 +1,14 @@
 <script>
   import { quintOut } from 'svelte/easing';
     import {draw} from 'svelte/transition'
-    export let size = 24
-    export let color = "var(--barbi-pink)"	
+  /**
+   * @typedef {Object} Props
+   * @property {number} [size]
+   * @property {string} [color]
+   */
+
+  /** @type {Props} */
+  let { size = 24, color = "var(--barbi-pink)" } = $props();
 </script>
 
 <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" width="{size}" height="{size}" viewBox="0 0 256 256" xml:space="preserve">

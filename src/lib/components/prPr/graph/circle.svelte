@@ -3,7 +3,7 @@
 
   import CirclePack from './circlePack.html.svelte';
 
-export let data = [];
+  let { data = [] } = $props();
   const idKey = 'key';
   const valueKey = 'value';
 

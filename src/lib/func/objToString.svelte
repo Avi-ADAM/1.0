@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     export function objToString (obj) {
     let str = '';
     for (let i = 0; i < obj.length; i++) {

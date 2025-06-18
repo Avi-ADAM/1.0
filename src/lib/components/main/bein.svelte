@@ -17,8 +17,8 @@
   import Vallues from '../registration/vallues.svelte'
  // import Scree from '../registration/scree.svelte'
   import {spring } from 'svelte/motion'
-let userName_value;
-let show_value = 0;
+let userName_value = $state();
+let show_value = $state(0);
 
 userName.subscribe(value => {
   userName_value = value;
@@ -27,9 +27,15 @@ userName.subscribe(value => {
 show.subscribe(newValue => {
   show_value = newValue;
 });
-  export let idx = 1;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [idx]
+   */
+
+  /** @type {Props} */
+  let { idx = 1 } = $props();
 let ty = 0;
-let w = 1;
+let w = $state(1);
 let vb = 3322.126 + w;
 const txx = spring(600+(w*20),{stiffness: 0.55,damping: 0.99});
 function add (event){

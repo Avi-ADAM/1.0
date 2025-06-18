@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { startTimer, stopTimer } from '$lib/func/timers.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onMount, onDestroy } from 'svelte';
@@ -6,17 +8,27 @@
   import { timers, updateTimers } from '$lib/stores/timers';
   import TimerDialogs from './TimerDialogs.svelte';
 
-  export let orders;
-  export let tx, size, bigsize, add, center, tiltAngle, hover, project, linke, missionId;
-  $: console.log(showSaveDialog)
-  let showSaveDialog = false;
-  let showClearDialog = false;
-  let showSaveFinal = false;
-  let dialogEdit = true;
-  let elapsedTime = '00:00:00';
-  let selectedTasks = [];
-  let taskSearchTerm = '';
-  let timer;
+  let {
+    orders,
+    tx,
+    size,
+    bigsize,
+    add,
+    center,
+    tiltAngle,
+    hover,
+    project,
+    linke,
+    missionId
+  } = $props();
+  let showSaveDialog = $state(false);
+  let showClearDialog = $state(false);
+  let showSaveFinal = $state(false);
+  let dialogEdit = $state(true);
+  let elapsedTime = $state('00:00:00');
+  let selectedTasks = $state([]);
+  let taskSearchTerm = $state('');
+  let timer = $state();
   onMount(() => {
     console.log(timer)
     if(timer.attributes.activeTimer.data?.attributes?.isActive) {
@@ -50,25 +62,12 @@
 }
     selectedTasks = timer?.attributes.activeTimer?.data?.attributes.acts.data.map(task => task.id) ?? []
   })
-  $: {
-    timer = $timers?.find((t) => t.mId == missionId);
-    if (timer) {
-      console.log("Timer found:", timer);
-    } else {
-      console.log("No timer found for missionId:", missionId);
-    }
-  }
 
   // Local reactive state
-  let localZman = timer?.zman || 0;
-  let isRunning = timer?.running || false;
-  let timerInterval;
+  let localZman = $state(timer?.zman || 0);
+  let isRunning = $state(timer?.running || false);
+  let timerInterval = $state();
 
-  // Reactive rotations based on localZman
-  $: rotation = (localZman / 1000) * 6;
-  $: rotationm = (localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6;
-  $: rotationh =
-    (localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30;
  // Start/stop timer function
  async function startTimerLocal(only=false) {
     console.log("start",only)
@@ -163,16 +162,6 @@
   });
   }
 
-  // Update local state when timer prop changes
-  $: {
-    localZman = 1 || 0;
-    isRunning = timer?.running || false;
-    if (isRunning && !timerInterval) {
-      startTimerLocal(true);
-    } else if (!isRunning && timerInterval) {
-      stopTimerLocal(true);
-    }
-  }
 
   async function handleToggleTimer() {
     const timerId =
@@ -212,7 +201,36 @@
     };
   }
 
-  $: orbitalRotation = (localZman / 60000) * 360; // Complete rotation every minute
+  run(() => {
+    console.log(showSaveDialog)
+  });
+  run(() => {
+    timer = $timers?.find((t) => t.mId == missionId);
+    if (timer) {
+      console.log("Timer found:", timer);
+    } else {
+      console.log("No timer found for missionId:", missionId);
+    }
+  });
+  // Update local state when timer prop changes
+  run(() => {
+    localZman = 1 || 0;
+    isRunning = timer?.running || false;
+    if (isRunning && !timerInterval) {
+      startTimerLocal(true);
+    } else if (!isRunning && timerInterval) {
+      stopTimerLocal(true);
+    }
+  });
+  // Reactive rotations based on localZman
+  let rotation;
+  run(() => {
+    rotation = (localZman / 1000) * 6;
+  });
+  let rotationm = $derived((localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6);
+  let rotationh =
+    $derived((localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30);
+  let orbitalRotation = $derived((localZman / 60000) * 360); // Complete rotation every minute
 </script>
 <TimerDialogs
   bind:timer
@@ -593,8 +611,8 @@
       <g 
         transform="translate(-80,0)" 
         class="control-button"
-        on:click={handleToggleTimer}
-        on:keypress={handleToggleTimer}
+        onclick={handleToggleTimer}
+        onkeypress={handleToggleTimer}
         style="cursor: pointer;"
         role="button"
         tabindex="0"
@@ -629,8 +647,8 @@
       <g 
         transform="translate(80,0)" 
         class="control-button"
-        on:click={() => showSaveDialog = true}
-        on:keypress={() => showSaveDialog = true}
+        onclick={() => showSaveDialog = true}
+        onkeypress={() => showSaveDialog = true}
         style="cursor: pointer;"
         role="button"
         tabindex="0"

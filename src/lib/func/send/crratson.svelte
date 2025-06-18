@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   import { sendToSer } from '$lib/send/sendToSer.js';
   export async function crRatson(
     logo,

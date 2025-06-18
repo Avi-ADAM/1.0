@@ -1,10 +1,11 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   	import 'dayjs/locale/he.js';
 	import dayjs from 'dayjs';
 
   	import { Datepicker } from 'svelte-calendar';
   import { lang } from '$lib/stores/lang.js'
-    export let projectUsers = [];
 import MultiSelect from 'svelte-multiselect';
 import { idPr } from '../../stores/idPr.js'
  import { createEventDispatcher } from 'svelte';
@@ -13,48 +14,35 @@ import { idPr } from '../../stores/idPr.js'
   import {SendTo} from '$lib/send/sendTo.svelte';
 
  const dispatch = createEventDispatcher();
- 	$: dayjs.locale($lang);
 let locale = $lang
-let store
-export let quant;
+let store = $state()
 console.log(quant)
-let selected;
-let total = 0;
-export let each = 0;
-export let kindUlimit = false 
+let selected = $state();
+let total = $state(0);
  let kindOf = 'monthly';
-let hm = 1;
+let hm = $state(1);
 let where = [];
 let placeholder = `אצל מי הכסף`;                          
-let already = false;
-export let maid;
-let per = false;
+let already = $state(false);
+  /**
+   * @typedef {Object} Props
+   * @property {any} [projectUsers]
+   * @property {any} quant
+   * @property {number} [each]
+   * @property {boolean} [kindUlimit]
+   * @property {any} maid
+   */
 
-$:if (kindOf == "monthly" || kindOf == "yearly") {
- if(dates !== null && datef !== null) {
-  per = false;
-  total = 0;
-  let a = new Date(dates);
-  let b = new Date(datef);
-  if (kindOf == 'monthly') {
-    total =
-      ((b.getFullYear() - a.getFullYear()) * 12 +
-      (b.getMonth() - a.getMonth())) *
-        each *
-         hm;
-  } else if (kindOf == 'yearly') {
-    total = (b.getFullYear() - a.getFullYear()) *
-     each * 
-     hm;
-  }
-}else{
-  total = hm * each;
-  per = true;
-}
-  }else{
-    per = false;
-  total = hm * each;
-}
+  /** @type {Props} */
+  let {
+    projectUsers = [],
+    quant,
+    each = $bindable(0),
+    kindUlimit = false,
+    maid
+  } = $props();
+let per = $state(false);
+
 
 
 let bearer1;
@@ -104,7 +92,7 @@ let theme = {
     },
   },
 };
-let noSelectedE = false
+let noSelectedE = $state(false)
 async function add() {
   if(selected[0] == null){
     console.log(dates)
@@ -219,8 +207,8 @@ const optional = {
 };
 
    const change = {"he":"שינוי תאריך מכירה", "en":"change sale date"}
-   let dates = null,
-  datef = null
+   let dates = $state(null),
+  datef = $state(null)
 const quantT = {
   he: 'כמה יחידות?',
   en: 'How many units?',
@@ -237,7 +225,7 @@ const perYear = {
   he: 'לשנה',
   en: 'per year',
 }
-let datesE = false
+let datesE = $state(false)
 let datesEmessage = {
   he: 'אין תאריך התחלה',
   en: 'No start date'
@@ -262,6 +250,36 @@ const addL = {
   he: 'הוספת מכירה',
   en: 'Add Sale'
 }
+ 	run(() => {
+    dayjs.locale($lang);
+  });
+run(() => {
+    if (kindOf == "monthly" || kindOf == "yearly") {
+   if(dates !== null && datef !== null) {
+    per = false;
+    total = 0;
+    let a = new Date(dates);
+    let b = new Date(datef);
+    if (kindOf == 'monthly') {
+      total =
+        ((b.getFullYear() - a.getFullYear()) * 12 +
+        (b.getMonth() - a.getMonth())) *
+          each *
+           hm;
+    } else if (kindOf == 'yearly') {
+      total = (b.getFullYear() - a.getFullYear()) *
+       each * 
+       hm;
+    }
+  }else{
+    total = hm * each;
+    per = true;
+  }
+    }else{
+      per = false;
+    total = hm * each;
+  }
+  });
 </script>
 <div class="flex flex-col align-middle justify-center gap-x-2">
 
@@ -323,7 +341,7 @@ const addL = {
     <button
       style="margin: 5px auto;"
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
-      on:click={add}
+      onclick={add}
     >
       {addL[$lang]}    </button>
   </div>

@@ -1,12 +1,18 @@
 <script>
   import { goto } from '$app/navigation';
     import { lang} from '$lib/stores/lang.js'
-    export let second = "/lev"
-    export let secondTitle = {"he":"ללב 1💗1", "en":"to heart of 1💗1"}
+  /**
+   * @typedef {Object} Props
+   * @property {string} [second]
+   * @property {any} [secondTitle]
+   */
+
+  /** @type {Props} */
+  let { second = "/lev", secondTitle = {"he":"ללב 1💗1", "en":"to heart of 1💗1"} } = $props();
     const title = {"he": "לעמוד הפרופיל האישי","en":"to the profile page"}
     let clicked = false
-    let acli = false
-    let bcli = false
+    let acli = $state(false)
+    let bcli = $state(false)
     function cl(w){
        if (clicked != true){
         clicked  = true
@@ -22,13 +28,13 @@
 }
 </script>
 <span style="overflow:hidden;">
-<img on:keypress={()=>cl("a")} title={title[$lang ?? "he"]}  on:click={()=>cl("a")}
+<img onkeypress={()=>cl("a")} title={title[$lang ?? "he"]}  onclick={()=>cl("a")}
  class:rounda={acli == true}
   class:translate-x-12={acli == false}
   class:-translate-y-12={acli == false}
   class:hover:translate-x-9={acli == false} class:hover:-translate-y-9={acli == false}   class:hover:scale-150={acli == false}
   class="right"  alt="פרופיל אישי" src="https://res.cloudinary.com/love1/image/upload/v1644446152/PicsArt_01-28-06.01.26_1_a7ky2k.png"/>
-<img on:keypress={()=>cl("b")} on:click={()=>cl("b")}
+<img onkeypress={()=>cl("b")} onclick={()=>cl("b")}
     class:roundb={bcli == true} title="{secondTitle[$lang ?? "he"]}"
     class:-translate-x-12={bcli == false} class:-translate-y-12={bcli == false}
      class:hover:-translate-x-9={bcli == false}

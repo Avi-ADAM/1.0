@@ -12,7 +12,7 @@
     import jroles from '$lib/data/tafkidim.json'
     import enjrole from '$lib/data/tafkidimEn.json'
  const dispatch = createEventDispatcher();
-    let roles1 = [];
+    let roles1 = $state([]);
     let error1 = null;
     const baseUrl = import.meta.env.VITE_URL
 
@@ -28,7 +28,7 @@
       }
       return arr;
      };
-      let newcontent = true
+      let newcontent = $state(true)
 
     onMount(async () => {
      if ($lang == "he" ){
@@ -82,11 +82,11 @@
     
 
 
-    let selected = [];
+    let selected = $state([]);
      const placeholder = `${$lang == "he" ? "תפקידים מועדפים" : "preferred roles"}`;
 
  
-let userName_value;
+let userName_value = $state();
 let show_value = 0;
 
 userName.subscribe(value => {
@@ -128,7 +128,7 @@ function increment() {
       import {  fly } from 'svelte/transition';
   import Skip from '$lib/celim/icons/skip.svelte';
 
-let isOpen = false;
+let isOpen = $state(false);
  const close = () => {
     isOpen = false;
    
@@ -156,7 +156,7 @@ selected = newSele;
     const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
   const what = {"he": "יש לך תפקיד מועדף?","en": "Do you have a preferred role?"}
  const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
-  let focused = false
+  let focused = $state(false)
   </script>
  <DialogOverlay {isOpen} onDismiss={close} >
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
@@ -193,17 +193,17 @@ selected = newSele;
 -->
       <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
       <button
-      on:click={() => isOpen = true} 
+      onclick={() => isOpen = true} 
       class="button-silver hover:text-barbi font-bold py-1 px-1 rounded-full"
       >{addn[$lang]}</button>
     </div>
-    <button class="button-in-1-2" on:click="{back}">
+    <button class="button-in-1-2" onclick={back}>
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
-      <button class="button-end bg-sturk hover:bg-mturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+      <button class="button-end bg-sturk hover:bg-mturk p-1 rounded-full" onclick={toend} title="{skipt[$lang]}">
     <Skip/>
     </button>
-  <button class="button-2" on:click="{increment}">
+  <button class="button-2" onclick={increment}>
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
 

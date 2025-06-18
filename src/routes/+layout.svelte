@@ -32,8 +32,15 @@ import "../app.postcss";
 import { Toaster } from 'svelte-sonner';
 import { lang, doesLang, langUs } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
- // import firebase from "$lib/func/firebase";
-export let data
+ 
+  /**
+   * @typedef {Object} Props
+   * @property {any} data - import firebase from "$lib/func/firebase";
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { data, children } = $props();
 function getLang() {
   console.log(data)
     let la;
@@ -81,7 +88,7 @@ onMount(async () => {
 
 
 <main>
-	<slot />
+	{@render children?.()}
 <Toaster toastOptions={{
   style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
 }} richColors  closeButton  position="top-center" />

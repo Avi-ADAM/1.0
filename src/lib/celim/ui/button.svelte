@@ -7,13 +7,34 @@
   import SucssesConf from "../sucssesConf.svelte";
   import Succses from "../icons/succses.svelte";
   import Err from "../icons/err.svelte";
-    export let loading = false, success = false, error = false, text = {"he": "יצירה", "en": "Create"},name = "button", size = "big"
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [loading]
+   * @property {boolean} [success]
+   * @property {boolean} [error]
+   * @property {any} [text]
+   * @property {string} [name]
+   * @property {string} [size]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let {
+    loading = false,
+    success = false,
+    error = false,
+    text = {"he": "יצירה", "en": "Create"},
+    name = "button",
+    size = "big",
+    children
+  } = $props();
    
     function onclick (){
         if(success == false)
         dispatch("click")
     }
-    $: hover = false
+    let hover = $state(false);
+  
 </script>    
 <button
         class="cursor-pointer transition-all duration-300 {size === 'sm' ? 'px-4 py-1' : 'px-8 py-2'} rounded-xl
@@ -24,17 +45,17 @@ bg-[length:200%_auto] animate-gradientx
 bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]  
 hover:bg-[linear-gradient(to_right,theme(colors.gold),theme(colors.amber.400),theme(colors.yellow.300),theme(colors.amber.400),theme(colors.gold))]
 font-bold font-rubik"
-   on:focus={()=>hover = true}
-   on:blur={()=>hover = false}
-   on:mouseenter={()=>hover = true}
-   on:mouseleave={()=>hover = false}
-        on:click={onclick}
+   onfocus={()=>hover = true}
+   onblur={()=>hover = false}
+   onmouseenter={()=>hover = true}
+   onmouseleave={()=>hover = false}
+        {onclick}
         title="{text[$lang]}"
-        name="{name}"><div class="flex flex-row align-center justify-center items-center gap-4"><slot>	
+        name="{name}"><div class="flex flex-row align-center justify-center items-center gap-4">{#if children}{@render children()}{:else}	
         <h2 class=" {size === 'sm' ? 'text-barbi font-litt font-extrabold  text-base md:text-lg' : 'text-transparent font-extrabold text-xl md:text-2xl'} bg-clip-text bg-[length:auto_200%] animate-gradienty transition-all duration-300 tracking-wide
         {hover == false  ? "bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.pink.400),theme(colors.mpink),theme(colors.pink.400),theme(colors.barbi))]"
         : "bg-[linear-gradient(to_top,theme(colors.pink.300),theme(colors.fuchsia.400),theme(colors.mpink),theme(colors.fuchsia.400),theme(colors.pink.300))]"}	
-">{text[$lang]}</h2></slot>
+">{text[$lang]}</h2>{/if}
 {#if loading}
 <div class="w-8 h-8">
 <Lowding color={hover ? "var(--gold)":"var(--barbi-pink)"}/></div>

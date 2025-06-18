@@ -1,13 +1,13 @@
 <svelte:head>
-  <script bind:this={script} src={url} />
+  <script bind:this={script} src={url}></script>
 </svelte:head>
 
 <script>
   import { onMount, createEventDispatcher } from 'svelte';
 
   const dispatch = createEventDispatcher();
-  export let url;
-  let script;
+  let { url } = $props();
+  let script = $state();
 
   onMount(async () => {
     script.addEventListener('load', () => {

@@ -7,15 +7,17 @@
   import { createEventDispatcher } from 'svelte';
   import {sendToSer} from '$lib/send/sendToSer.js';
   const dispatch = createEventDispatcher();
-  export let taskId
    let placeholder = {
     he: 'בחירת משימה בתהליך',
     ar: ' اختيار المهمة المتابعة',
     en: 'choose mission in progress'
   };
-  $: loading = false
-  $: error = false
-  $: success = false
+  let loading = $state(false);
+  
+  let error = $state(false);
+  
+  let success = $state(false);
+  
    async function add () {
     loading = true
     
@@ -54,12 +56,12 @@
     });
     //TODO: update task on table directly or from io connection
   };
-  export let bmiData = [];
+  let { taskId, bmiData = [] } = $props();
   let filtered = bmiData.filter(
     (e) => e.attributes.users_permissions_user.data.id === $page.data.uid
   );
   
-  let selected = [];
+  let selected = $state([]);
   const noM = {
     he: 'לא נמצאו משימות בתהליך עבורך כדאי ליצור משימה חדשה בטאב יצירה',
     en: 'no missions in progress found for you, you may want to create a new one in the "add" tab ',

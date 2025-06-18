@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `$: datai = []` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script>
     import RangeSlider from "svelte-range-slider-pips";
     import Barb from './barb.svelte'

@@ -2,26 +2,28 @@
 
 
 <script>
+  import { run } from 'svelte/legacy';
+
 
   import { lang } from '$lib/stores/lang.js'
-  export let  data
   let userId = data.userId; 
   import Header from '$lib/components/header/header.svelte'
+  let { data } = $props();
 
   let user = data.userData ? data.userData.attributes : null;
   let load = !!data.userData; // True if userData exists
   let projects = user && user.projects_1s ? user.projects_1s.data : [];
-  let uskill = user && user.skills ? user.skills.data : [];
+  let uskill = $state(user && user.skills ? user.skills.data : []);
   let fblink = user ? user.fblink : null;
   let twiterlink = user ? user.twiterlink : null;
   let discordlink = user ? user.discordlink : null;
   let githublink = user ? user.githublink : null;
 
-  let srcU = "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png";
-  let uww = user && user.work_ways ? user.work_ways.data : [];
+  let srcU = $state("https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png");
+  let uww = $state(user && user.work_ways ? user.work_ways.data : []);
   let fmm = [];
-  let ur = user && user.tafkidims ? user.tafkidims.data : [];
-  let val = user && user.vallues ? user.vallues.data : [];
+  let ur = $state(user && user.tafkidims ? user.tafkidims.data : []);
+  let val = $state(user && user.vallues ? user.vallues.data : []);
   let mash = user && user.sps ? user.sps.data : [];
   let error1 = null;
 
@@ -80,19 +82,21 @@
 
   let linkP = "https://www.google.co.il"
 const towel = {"he":"לינק","en":"link"}
-let h,w;
-let issm = false
-let viewBox="0 0 1920 1180"
-$: if (w/h < 1.3 && w/h > 1){
-    issm = true
-  viewBox="320 280 1220 587"
-} else if (w/h < 1 ){
-    issm = true
- viewBox="450 280 1020 587"
-} else {
-    issm = false
-  viewBox="0 0 1920 1180"
-}
+let h = $state(),w = $state();
+let issm = $state(false)
+let viewBox=$state("0 0 1920 1180")
+run(() => {
+    if (w/h < 1.3 && w/h > 1){
+      issm = true
+    viewBox="320 280 1220 587"
+  } else if (w/h < 1 ){
+      issm = true
+   viewBox="450 280 1020 587"
+  } else {
+      issm = false
+    viewBox="0 0 1920 1180"
+  }
+  });
 const sk = {"he": "כישורים", "en":"skills"}
 const ro = {"he": "תפקידים", "en":"roles"}
 const ww = {"he": "דרכי יצירה", "en": "ways of creation"}
@@ -104,7 +108,7 @@ const todis = {"he":"לינק לדיסקורד","en":"link to discord"}
 const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
 const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
 const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
-$: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `${user ? user.username : "" } profile | 1💗1`}
+let title = $derived({"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `${user ? user.username : "" } profile | 1💗1`})
   </script>
   <svelte:head>
   <title>{title[$lang]}</title>
@@ -117,7 +121,7 @@ $: title = {"he": `${user ? user.username : "פרופיל" } | 1💗1`, "en": `$
       <div class="middle" bind:clientHeight="{h}" bind:clientWidth="{w}">
         <svg class="bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400" width="100vw" height="100vh" id="eARfSi12ITv1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink"
     viewBox="{viewBox}" shape-rendering="geometricPrecision" text-rendering="geometricPrecision">
-     {#if srcU }
+     {#if srcU}
 <foreignObject class="stroke-1 stroke-barbi" x='768' y='348' width='384' height='384' > <img
  height="100%" width="100%" 
  class="border-2 border-barbi"

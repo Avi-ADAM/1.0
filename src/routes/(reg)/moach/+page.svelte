@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
 <script>
   // import Scab from '$lib/celim/moach/scad.svelte'
   //   import Siduri from '$lib/celim/moach/siduri.svelte'

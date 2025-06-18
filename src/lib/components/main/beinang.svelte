@@ -17,8 +17,8 @@
   import Vallues from '../registration/vallues.svelte'
  // import Scree from '../registration/scree.svelte'
   
-let userName_value;
-let show_value = 0;
+let userName_value = $state();
+let show_value = $state(0);
 
 userName.subscribe(value => {
   userName_value = value;
@@ -27,12 +27,18 @@ userName.subscribe(value => {
 show.subscribe(newValue => {
   show_value = newValue;
 });
-  export let idx = 1;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [idx]
+   */
+
+  /** @type {Props} */
+  let { idx = 1 } = $props();
 let ty = 0;
-let w;
+let w = $state();
 let vb = 3322.126 + w;
-let tx = 600;
-let txx = 20;
+let tx = $state(600);
+let txx = $state(20);
 function add (event){
   tx = event.detail.tx;
   txx = event.detail.txx;
@@ -92,7 +98,7 @@ function add (event){
 {userName_value}
 <br>
 ולהתראות בקרוב</h1>
-    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
+    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" onclick={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
   </div>
   </div>
 {/if}

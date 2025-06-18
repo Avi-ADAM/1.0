@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
     //לב במרכז נקי היהלומים מסביב עם מספר עליהם שיהיה גם אדום או משהו כזה כשדחוף 
     //לחיצה על היהלום מביאה בדיספאצ' למצב של מיון לפי נושא מסוים
     //על כל יהלום באותיות סבירות שם הקטגוריה\
@@ -9,36 +11,23 @@
     import { createEventDispatcher } from 'svelte';
 import Sv from "./sv.svelte";
  const dispatch = createEventDispatcher();
- export let picLink;
  import pic from "$lib/celim/pic.json" 
 
 import { lang} from '$lib/stores/lang.js'
 let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 
-export let name = "";
-export let sug = 13;
-let sugg =  "sugg";
-export let pen = 13;
-let pend = "pend";
-export let ask = 17;
-let asks = "asks";
-export let wel = 17;
-let welc = "welc";
-export let beta = 13;
-let betaha = "betaha";
-export let des = 13;
-let desi = "desi";
-export let fia = 99;
-let fiap = "fiap";
-export let pmash = 99;
- let ppmash = "ppmash";
-export let mashs = 17;
- let pmashs = "pmashs";
-export let maap = 17;
- let pmaap = "pmaap";
-export let askma = 13;
- let askmap = "askmap";
+let sugg =  $state("sugg");
+let pend = $state("pend");
+let asks = $state("asks");
+let welc = $state("welc");
+let betaha = $state("betaha");
+let desi = $state("desi");
+let fiap = $state("fiap");
+ let ppmash = $state("ppmash");
+ let pmashs = $state("pmashs");
+ let pmaap = $state("pmaap");
+ let askmap = $state("askmap");
 function disp (event) { 
 const value = event.detail.id
     if (value !== "true"){
@@ -86,18 +75,18 @@ fiap = "fiap";
 
 
 }
-let xx = "translate(-188.36 -539.11)";
-let hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)";
-let gg ="translate(-156.85 -287.03)";
-let ff ="translate(164.82 -287.03)";
-let ee ="translate(3.8484 -18.405)";
-let dd ="translate(194.44 -541.85)";
-let cc = "translate(-232.58 -369.63)";
-let bb = "translate(241.91 -369.63)";
-let aa2 = "translate(-140.71 -177.44)";
-let qq = "translate(1246.88 -177.44)";
-let jj = "translate(-140.71 -449.43)";
-let yy = "translate(164.82 -449.43)";
+let xx = $state("translate(-188.36 -539.11)");
+let hh = $state("matrix(8.9511 0 0 8.3182 300.46 -11.017)");
+let gg =$state("translate(-156.85 -287.03)");
+let ff =$state("translate(164.82 -287.03)");
+let ee =$state("translate(3.8484 -18.405)");
+let dd =$state("translate(194.44 -541.85)");
+let cc = $state("translate(-232.58 -369.63)");
+let bb = $state("translate(241.91 -369.63)");
+let aa2 = $state("translate(-140.71 -177.44)");
+let qq = $state("translate(1246.88 -177.44)");
+let jj = $state("translate(-140.71 -449.43)");
+let yy = $state("translate(164.82 -449.43)");
 let hovere = false;
 
 function hover (event){
@@ -174,10 +163,9 @@ ee ="translate(3.8484 -18.405)";
 }
 
 function getAzmi (){
-  // for (let)
+  
 }
 
-export let low = true;
 let hovered = false;
 function hoverede(x){
         let t = {"he":"לב המערכת", "en": "heart of 1💗1"}
@@ -193,11 +181,49 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
   dispatch("hover", {id: u[$lang]});
  }
   import Switch from '../../celim/switch.svelte'
-  export let cards = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} picLink
+   * @property {string} [name]
+   * @property {number} [sug]
+   * @property {number} [pen]
+   * @property {number} [ask]
+   * @property {number} [wel]
+   * @property {number} [beta]
+   * @property {number} [des]
+   * @property {number} [fia]
+   * @property {number} [pmash]
+   * @property {number} [mashs]
+   * @property {number} [maap]
+   * @property {number} [askma]
+   * @property {boolean} [low] - for (let)
+   * @property {boolean} [cards]
+   */
 
-$: if (cards == true){
-        dispatch("cards",{cards:true})
-}
+  /** @type {Props} */
+  let {
+    picLink,
+    name = "",
+    sug = 13,
+    pen = 13,
+    ask = 17,
+    wel = 17,
+    beta = 13,
+    des = 13,
+    fia = 99,
+    pmash = 99,
+    mashs = 17,
+    maap = 17,
+    askma = 13,
+    low = true,
+    cards = $bindable(false)
+  } = $props();
+
+run(() => {
+    if (cards == true){
+          dispatch("cards",{cards:true})
+  }
+  });
 console.log(mashs)
 
 </script>
@@ -234,12 +260,12 @@ console.log(mashs)
 <div 
 id="scree"
  class="midCom "
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()}
 >
 <div
-on:mouseenter={()=> hoverede("x")} 
-on:mouseleave={()=> hoverede()}
+onmouseenter={()=> hoverede("x")} 
+onmouseleave={()=> hoverede()}
  style:visibility={low == true ? "hidden":  "visible"} class="bg">
 <Switch bind:value={cards} design="multi" options={[false, true]} />
 </div>

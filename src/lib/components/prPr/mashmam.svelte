@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `b` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
 <script>
   export let meData = [];
   import { onMount } from 'svelte';

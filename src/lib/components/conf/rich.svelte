@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let edit = false;` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script>
 import { generateJSON } from '@tiptap/html'; // הוספת ייבוא של generateJSON
   import TextAlign from '@tiptap/extension-text-align';

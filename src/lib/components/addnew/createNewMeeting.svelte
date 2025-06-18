@@ -19,15 +19,18 @@ import TextInput from "$lib/celim/ui/input/textInput.svelte";
   "en":"Gold meeting is a meeting without a predefined date, the time of meeting is set in the golden timing when it is compteble for all the participant's."}
   const second = {"he": "בכדי שהקסם יקרה יש לעדכן סטטוס ללייב בכל פעם שיש לך זמן לפגישה, ניתן לעדכן כאן למעלה או דרך הבוט שלנו לטלגרם",
   "en":	"For the magic to happen, you have to update the status to live when you are avauilable for the meeting, you can update it in the top or through our telegram bot."} 
-   let name;
-   $: sucsses = false
-   $: loadingBtn = false
-   $: error = false
+   let name = $state();
+   let sucsses = $state(false);
+  
+   let loadingBtn = $state(false);
+  
+   let error = $state(false);
+  
    let outpot
-   let explanetionOpen = false
-   let users = []
-   let selected = []
-   let loading = true
+   let explanetionOpen = $state(false)
+   let users = $state([])
+   let selected = $state([])
+   let loading = $state(true)
    onMount(async() => {
       await sendToSer({},"17getUsers",null,null,false,fetch).then((data)=>{users = data.data.
 usersPermissionsUsers.data;
@@ -99,12 +102,12 @@ let me = $page.data.uid
   <div  class="text-center gap-2 flex flex-row justify-center items-center" >
 <h1 class="font-bold text-center underline text-decoration-solid"	  style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{head[$lang]}</h1>
 {#if explanetionOpen == false}
-  <button class="text-center ww" style="font-size: 0.8rem; line-height: normal; color: white; " on:click={() => explanetionOpen = true}>?</button>
+  <button class="text-center ww" style="font-size: 0.8rem; line-height: normal; color: white; " onclick={() => explanetionOpen = true}>?</button>
   {/if}
   </div>
   {#if explanetionOpen}
 <div class="text-center justify-center bg-wow bg-opacity-25" style="font-size: 0.8rem; line-height: normal; color: var(--barbi-pink); ">
-  <button class="text-center" style="font-size: 0.8rem; line-height: normal; color: var(--barbi-pink); " on:click={() => explanetionOpen = false}><Close/></button>
+  <button class="text-center" style="font-size: 0.8rem; line-height: normal; color: var(--barbi-pink); " onclick={() => explanetionOpen = false}><Close/></button>
   <p class="text-center" style="font-size: 0.8rem; line-height: normal; color: var(--barbi-pink); ">{explanetion[$lang]}</p>
   <p class="text-center" style="font-size: 0.8rem; line-height: normal; color: var(--barbi-pink); ">{second[$lang]}</p>
  </div>

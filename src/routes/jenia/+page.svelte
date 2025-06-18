@@ -1,11 +1,13 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import RichText from "$lib/celim/ui/richText.svelte";
 import Nego from "$lib/components/prPr/negoPend.svelte";
   import { sanitizeUserInput } from "$lib/func/uti/sanitizeUserInput.svelte";
   import { lang } from "$lib/stores/lang.js";
   import { onMount } from "svelte";
   import { MultiSelect } from "svelte-multiselect";
-  export let data
+  let { data } = $props();
     let tex
 
   let c = []
@@ -82,8 +84,10 @@ let conf = {
    "toolbar": "undo redo | a11ycheck casechange blocks | bold italic backcolor | alignleft aligncenter alignright alignjustify | " +
       "bullist numlist checklist outdent indent | removeformat | code table help"
 }*/
-let outpot = `<hr><hr><hr><hr><hr><hr><hr><hr><hr><h1 style="text-align:center;">     טקסט</h1><hr><hr><hr><hr><hr><hr><hr><p></p>`
-$:console.log(outpot)
+let outpot = $state(`<hr><hr><hr><hr><hr><hr><hr><hr><hr><h1 style="text-align:center;">     טקסט</h1><hr><hr><hr><hr><hr><hr><hr><p></p>`)
+run(() => {
+    console.log(outpot)
+  });
 
 /*
 const publicVapidKey = 'xxxxxx';
@@ -135,7 +139,7 @@ async function run() {
   });
   console.log('Sent push');
 }*/
-let searchText,  selected, addn = {
+let searchText = $state(),  selected = $state(), addn = {
   he: 'הוספת דרך חדשה',	en: 'add new way'}
 let newcontentW
 let placeholder = {
@@ -153,7 +157,7 @@ let ww = []
   options={ww.map((c) => c.attributes.workWayName)}
   
 />
-<button class="w-3.5 h-3.5 me-2 text-green-500 text-barbi bg-gray-500" on:click={oncli}>ooooo</button>
+<button class="w-3.5 h-3.5 me-2 text-green-500 text-barbi bg-gray-500" onclick={oncli}>ooooo</button>
 
 <RichText bind:outpot/>
 <!----

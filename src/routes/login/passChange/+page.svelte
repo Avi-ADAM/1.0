@@ -1,14 +1,16 @@
 <script>
+	import { preventDefault } from 'svelte/legacy';
+
 	import axios from 'axios';
     import { goto} from '$app/navigation';
- 	import { page } from '$app/stores'
-    const email = $page.url.searchParams.get('code')
+ 	import { page } from '$app/state'
+    const email = page.url.searchParams.get('code')
 	import { lang } from '$lib/stores/lang.js'
 	const baseUrl = import.meta.env.VITE_URL
 
 let passwordx;
-let errorl = null;
-let before = true;
+let errorl = $state(null);
+let before = $state(true);
   
 
 function shaneh () {
@@ -34,9 +36,9 @@ axios
   errorl = error.response.data ;
   })};
  
-	let strength = 0;
-	let validations = [];
-	let showPassword = false;
+	let strength = $state(0);
+	let validations = $state([]);
+	let showPassword = $state(false);
 	function validatePassword(e) {
         passwordx = e.target.value
 		const password = e.target.value;
@@ -73,7 +75,7 @@ axios
 
 
 <main>
-	<form on:submit|preventDefault={shaneh}>
+	<form onsubmit={preventDefault(shaneh)}>
 		 
 
 		<div class="field">
@@ -83,13 +85,13 @@ axios
 				name="password"
 				class="input"
 				placeholder={crnp[$lang]}
-				on:input={validatePassword}
-				on:blur={getV}
+				oninput={validatePassword}
+				onblur={getV}
 			/>
 			<span
 				class="toggle-password"
-				on:mouseenter={() => (showPassword = true)}
-				on:mouseleave={() => (showPassword = false)}
+				onmouseenter={() => (showPassword = true)}
+				onmouseleave={() => (showPassword = false)}
 			>
 				{showPassword ? "🔒" : "👁"}
 			</span>
@@ -97,10 +99,10 @@ axios
 				
 
 		<div class="strength">
-			<span class="bar bar-1" class:bar-show={strength > 0} />
-			<span class="bar bar-2" class:bar-show={strength > 1} />
-			<span class="bar bar-3" class:bar-show={strength > 2} />
-			<span class="bar bar-4" class:bar-show={strength > 3} />
+			<span class="bar bar-1" class:bar-show={strength > 0}></span>
+			<span class="bar bar-2" class:bar-show={strength > 1}></span>
+			<span class="bar bar-3" class:bar-show={strength > 2}></span>
+			<span class="bar bar-4" class:bar-show={strength > 3}></span>
 		</div>
 
 		<ul dir="rtl">
@@ -116,7 +118,7 @@ axios
 			</li>-->
 		</ul>
 
-		<button on:click={shaneh} disabled={strength < 4}>{crnp[$lang]}</button>
+		<button onclick={shaneh} disabled={strength < 4}>{crnp[$lang]}</button>
 	</form>
 </main>
 

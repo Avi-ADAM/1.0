@@ -6,16 +6,11 @@
  import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
     let basis;
- export let linkP,githublink, fblink, discordlink,drivelink,twiterlink,watsapplink;
- export let desP;
- export let desPl;
- export let projectName_value;
     let token; 
    let idL;
 let run = [];
 
-  let shgi = false;
- export let restime;
+  let shgi = $state(false);
 function sendP () {
     if (run.includes(projectName_value) && projectName_value !== basis){
   shgi = true; 
@@ -39,9 +34,9 @@ function sendP () {
 };
 
 
-let vallues = [];
+let vallues = $state([]);
     let error1 = null;
-    let addval = false;
+    let addval = $state(false);
     const baseUrl = import.meta.env.VITE_URL
 
     onMount(async () => {
@@ -108,7 +103,20 @@ let suc = false;
       return arr;
      };
 
-export let selected = [];
+  let {
+    linkP = $bindable(),
+    githublink = $bindable(),
+    fblink = $bindable(),
+    discordlink = $bindable(),
+    drivelink = $bindable(),
+    twiterlink = $bindable(),
+    watsapplink = $bindable(),
+    desP = $bindable(),
+    desPl = $bindable(),
+    projectName_value = $bindable(),
+    restime = $bindable(),
+    selected = $bindable([])
+  } = $props();
     const placeholder = `ערכים ומטרות`;
  
   function addnew (event){
@@ -127,7 +135,7 @@ selected = newSele;
 addval == false;
 
   }
-  	let chan = false;
+  	let chan = $state(false);
 	function ch (){
 		chan = true
 	}
@@ -148,7 +156,7 @@ addval == false;
 <br>
 
         <div dir="rtl" class='textinput'>
-  <input on:change={ch}  name="des" bind:value={projectName_value}  
+  <input onchange={ch}  name="des" bind:value={projectName_value}  
  type='text' class='input'required >
   <label for="des" class='label'>שם הריקמה</label>
   <span class='line'></span>
@@ -156,56 +164,56 @@ addval == false;
 {#if shgi == true}<small class="text-red-600">השם כבר קיים</small>{/if}
 
     <div dir="rtl" class='textinput'>
-  <input on:change={ch}  name="es"  bind:value={desP}    
+  <input onchange={ch}  name="es"  bind:value={desP}    
  type='text' class='input' required >
   <label for="es" class='label'>תיאור קצר הגלוי לכול</label>
   <span class='line'></span>
 </div>
    <div dir="rtl" class='textinput'>
-  <input on:change={ch}  name="s"  bind:value={desPl}     
+  <input onchange={ch}  name="s"  bind:value={desPl}     
  type='text' class='input' required>
   <label for="s" class='label'>תיאור מפורט עם נראות סלקטיבית</label>
   <span class='line'></span>
 </div>
  <div dir="rtl" class='textinput'>
-  <input on:change={ch}  name="de"    bind:value={linkP}     
+  <input onchange={ch}  name="de"    bind:value={linkP}     
  type='text' class='input' required>
   <label for="de" class='label'>
 לינק לאתר</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input on:change={ch}  name="de"    bind:value={githublink}     
+  <input onchange={ch}  name="de"    bind:value={githublink}     
  type='text' class='input' required>
   <label for="de" class='label'>{githublinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input on:change={ch}  name="de"    bind:value={watsapplink}     
+  <input onchange={ch}  name="de"    bind:value={watsapplink}     
  type='text' class='input' required>
   <label for="de" class='label'>{watsapplinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input on:change={ch}  name="de"    bind:value={drivelink}     
+  <input onchange={ch}  name="de"    bind:value={drivelink}     
  type='text' class='input' required>
   <label for="de" class='label'>{drivelinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input on:change={ch}  name="de"    bind:value={twiterlink}     
+  <input onchange={ch}  name="de"    bind:value={twiterlink}     
  type='text' class='input' required>
   <label for="de" class='label'>{twiterlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input on:change={ch}  name="de"    bind:value={discordlink}     
+  <input onchange={ch}  name="de"    bind:value={discordlink}     
  type='text' class='input' required>
   <label for="de" class='label'>{discordlinkde[$lang]}</label>
   <span class='line'></span>
 </div>
 <div dir={$lang == "he" ? "rtl" :"ltr"} class='textinput'>
-  <input on:change={ch}  name="de"    bind:value={fblink}     
+  <input onchange={ch}  name="de"    bind:value={fblink}     
  type='text' class='input' required>
   <label for="de" class='label'>{fblinkde[$lang]}</label>
   <span class='line'></span>
@@ -225,14 +233,14 @@ addval == false;
    <div  >
    {#if addval == false}
     <button
-    on:click={() => addval = true} 
+    onclick={() => addval = true} 
     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
   {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 ">
    <h2 class=" text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>
-    <select on:change={ch}  bind:value={restime} class="round form-select appearance-none
+    <select onchange={ch}  bind:value={restime} class="round form-select appearance-none
       block
       w-80
       px-3
@@ -258,7 +266,7 @@ addval == false;
 {#if chan == true}
   <button 
     class="cen bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold p-4 rounded-full"
-     on:click="{sendP}"
+     onclick={sendP}
      name="addm">{svbt[$lang]}</button>
      {/if}
 </div></div>

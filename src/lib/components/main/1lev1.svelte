@@ -13,10 +13,9 @@
     })
  const dispatch = createEventDispatcher();
   let rotationt = 0
-  let poz = {z:0, y:0, x:0};
+  let poz = $state({z:0, y:0, x:0});
   
      let up = true
-export let ss = 0 
  useFrame(() => {
     if (s == false){
       ss =0
@@ -76,7 +75,21 @@ function sub (){
     dispatch("submit")
 }
 let isHovering = false, isPointerDown = false
-export let fi = false, hover = false, scrolli = false
+  /**
+   * @typedef {Object} Props
+   * @property {number} [ss]
+   * @property {boolean} [fi]
+   * @property {boolean} [hover]
+   * @property {boolean} [scrolli]
+   */
+
+  /** @type {Props} */
+  let {
+    ss = $bindable(0),
+    fi = false,
+    hover = false,
+    scrolli = false
+  } = $props();
 </script>
 <!----
 <PerspectiveCamera position={{ x: 600, y: 200, z: 600 }} near={10} far={10000}>

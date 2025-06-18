@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
     import { lang } from '$lib/stores/lang.js';
   import { isChatOpen } from '$lib/stores/pendMisMes.js';
   import { navigating } from '$app/stores';
@@ -17,12 +19,23 @@
         dispatch('new');
       }
     }
-    export let initialRout = ""
-    $: activeRoute = $page.url.pathname
-    $: if($navigating){
-        console.log($navigating?.to)
+  /**
+   * @typedef {Object} Props
+   * @property {string} [initialRout]
+   */
 
-    }
+  /** @type {Props} */
+  let { initialRout = "" } = $props();
+    let activeRoute;
+  run(() => {
+    activeRoute = $page.url.pathname
+  });
+    run(() => {
+    if($navigating){
+          console.log($navigating?.to)
+
+      }
+  });
     const brainLeb= {"he":"מוח הרקמות","en":"brain of organiczations"}
 </script>
 
@@ -31,7 +44,7 @@
     <div class="grid h-full max-w-lg grid-cols-5 mx-auto" >
          <ProfileMenu />
        
-        <button on:click={() => addi('chat')} type="button" 
+        <button onclick={() => addi('chat')} type="button" 
             class="{$isChatOpen ? "border-b-2 border-gold" :""} inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
             <Chaticon />
             <span class="sr-only">Chat</span>
@@ -41,7 +54,7 @@
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
         <div class="flex items-center justify-center">
-            <button on:click={() => addi()} type="button" class="inline-flex items-center justify-center w-10 h-10 font-medium  bg-goldGrad bg-[length:200%_auto] animate-gradientx text-barbi  rounded-full hover:animate-shine group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800">
+            <button onclick={() => addi()} type="button" class="inline-flex items-center justify-center w-10 h-10 font-medium  bg-goldGrad bg-[length:200%_auto] animate-gradientx text-barbi  rounded-full hover:animate-shine group focus:ring-4 focus:ring-blue-300 focus:outline-none dark:focus:ring-blue-800">
                 <svg class="w-4 h-4 text-barbi" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 18 18">
                     <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="4" d="M9 1v16M1 9h16"/>
                 </svg>
@@ -52,7 +65,7 @@
             Create new item
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
-        <button on:click={()=>{
+        <button onclick={()=>{
             activeRoute = "lev"
             goto("/lev")
         }} type="button" class="{$page.url.pathname == "/lev" ? "border-b-2 border-gold" : ""} inline-flex text-barbi flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
@@ -63,7 +76,7 @@
             Lev
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
-        <button on:click={()=>{
+        <button onclick={()=>{
             activeRoute = "moach"
             goto("/moach")
         }} type="button" class="{$page.url.pathname == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group">

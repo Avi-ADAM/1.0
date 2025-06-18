@@ -2,15 +2,13 @@
     import ListSmall from "../forum/listSmall.svelte";
       import {forum, nowChatId,newChat, initialForum} from '$lib/stores/pendMisMes.js'
     import Diun from "../lev/diun.svelte";
-      export let chatId = 0 
       import {lang} from '$lib/stores/lang'
       import {page} from '$app/stores'
     import { createMessage } from "$lib/func/chat/createMessage.svelte";
     import { createForum } from "$lib/func/chat/createForum.svelte";
     import { toast } from 'svelte-sonner';
-    export let un;
        let unsubscribe;
-  let messagesArray = forumToArr()
+  let messagesArray = $state(forumToArr())
   
       function subs() {
           unsubscribe = forum.subscribe(value => {
@@ -18,6 +16,14 @@
           });
       }
       import { onDestroy } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {number} [chatId]
+   * @property {any} un
+   */
+
+  /** @type {Props} */
+  let { chatId = $bindable(0), un } = $props();
   
     
   
@@ -45,7 +51,7 @@
     });
     return messagesArray
   }
-  let clicked = false, ani = "forum"
+  let clicked = $state(false), ani = "forum"
   console.log(messagesArray);
   const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
   

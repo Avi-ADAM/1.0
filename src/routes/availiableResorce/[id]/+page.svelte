@@ -9,22 +9,20 @@
   import { SendTo } from '$lib/send/sendTo.svelte';
     import RangeSlider from "svelte-range-slider-pips";
   //TODO: get asked from server then show you alr .., find a way to get title
-  let selected = []
-  let mash = []
-  let easychoose = false
+  let selected = $state([])
+  let mash = $state([])
+  let easychoose = $state(false)
   let error1 = null;
-  let success = false;
+  let success = $state(false);
   function project(x) {
     goto('/project/' + x);
   }
-  export let askedarr = [];
-  export let alr = false;
-  let alrr = false 
-  let tochoose = false
+  let alrr = $state(false) 
+  let tochoose = $state(false)
   function second (){
     alr = true
   }
-  let loading = true
+  let loading = $state(true)
   async function tochoos(){
     tochoose = true
     loading = true
@@ -53,7 +51,7 @@
       console.log(id)
       ask(id)
   }
-  let easyy = 0
+  let easyy = $state(0)
   const rangehead = {"he":"נא לבחור את השווי בו יוצע המשאב שלך","en":"please choose the vallue you will share it"}
   const okk = {"he":"אישור השווי שלי ובקשת שיתוף","en":"create with this value and ask to share"}
   const ok = {"he":"שיתוף המשאב הנבחר","en":"share selected resorce"}
@@ -176,9 +174,9 @@
   }
 }
 
-  export let data;
 
-  $: hovered = false;
+  let hovered = $state(false);
+  
   function hover(a) {}
   console.log(data);
   const fnnn = { "he": 'הבקשה נשלחה בהצלחה', "en": 'request has sent sucsesfully' };
@@ -211,7 +209,7 @@
   function login() {
     goto(`/login?from=availableResorce/${data.mId}`);
   }
-  let wid;
+  let wid = $state();
   const mand = {
     "he": 'המשאב שותף כבר בהצלחה',
     "en": 'the resorce has already assigned'
@@ -271,6 +269,15 @@
   import { montsi } from '$lib/func/montsi.svelte';
   import { MultiSelect } from 'svelte-multiselect';
   import { find_skill_id } from '$lib/func/findSkillId.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [askedarr]
+   * @property {boolean} [alr]
+   * @property {any} data
+   */
+
+  /** @type {Props} */
+  let { askedarr = [], alr = $bindable(false), data } = $props();
   console.log($page)
   let title = 'This is Svead a Svelte Head Component';
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
@@ -286,7 +293,7 @@
     <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
   </div>
 
-{:then a } 
+{:then a} 
 
 {#if data != null}
 
@@ -333,7 +340,7 @@
         </div>
         <div>
           <button
-            on:click={() => project(data.alld.project.data.id)}
+            onclick={() => project(data.alld.project.data.id)}
             class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4"
             >{seePr[$lang]}</button
           >
@@ -411,8 +418,8 @@
                   {/if}
                 </p>
                   <p
-                    on:mouseenter={() => hover('הערות')}
-                    on:mouseleave={() => hover('0')}
+                    onmouseenter={() => hover('הערות')}
+                    onmouseleave={() => hover('0')}
                     class="text-gray-100 lg:text-2xl max-h-16 cd text-sm d overflow-y-auto mt-2"
                   >
                     {data.alld.spnot !== undefined &&
@@ -426,13 +433,13 @@
                     <div class="flex items-center w-full space-x-2">
                       <div
                         class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-32"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"
-                      />
+></div>
                     </div>
                     <div
                       class="flex items-center w-full space-x-2 max-w-[480px]"
@@ -442,59 +449,59 @@
                       >
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24"
-                      />
+></div>
                     </div>
                     <div
                       class="flex items-center w-full space-x-2 max-w-[400px]"
                     >
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-80"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"
-                      />
+></div>
                     </div>
                     <div
                       class="flex items-center w-full space-x-2 max-w-[480px]"
                     >
                       <div
                         class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-full"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24"
-                      />
+></div>
                     </div>
                     <div
                       class="flex items-center w-full space-x-2 max-w-[440px]"
                     >
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-32"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-24"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-full"
-                      />
+></div>
                     </div>
                     <div
                       class="flex items-center w-full space-x-2 max-w-[360px]"
                     >
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-200 rounded-full dark:bg-gray-700 w-80"
-                      />
+></div>
                       <div
                         class="h-2.5 bg-gray-300 rounded-full dark:bg-gray-600 w-full"
-                      />
+></div>
                     </div>
                     <span class="sr-only">for registered users only...</span>
                   </div>
@@ -503,7 +510,7 @@
                   <div class="flex justify-center">
                   {#if easychoose != true}
                   <button
-                    on:click={torange}
+                    onclick={torange}
                      class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
                     >{creatnew[$lang]}</button
                   >
@@ -518,14 +525,14 @@
                     </div>
                     <!----<input type="range" min=0 max={data.alld.easy} bind:value={easyy}/>-->
                   <button
-                    on:click={()=>ask(0)}
+                    onclick={()=>ask(0)}
                      class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
                     >{okk[$lang]}</button
                   >
                   {/if}
                   {#if tochoose != true && alrr == false}
                   <button
-                    on:click={tochoos}
+                    onclick={tochoos}
                     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
                     >{choosee[$lang]}</button
                   >
@@ -551,7 +558,7 @@
                     {/if}
                     {#if selected.length>0}
                       <button
-                    on:click={afterChoose}
+                    onclick={afterChoose}
                     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
                     >{ok[$lang]}</button
                   > 
@@ -577,9 +584,9 @@
               <div class="flex justify-center min-h-fit">
                 {#if alr == false && !data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
                   <button
-                    on:click={second}
-                    on:mouseenter={() => (hovered = true)}
-                    on:mouseleave={() => (hovered = false)}
+                    onclick={second}
+                    onmouseenter={() => (hovered = true)}
+                    onmouseleave={() => (hovered = false)}
                     class:button-perl={hovered == false}
                     class:button-gold={hovered == true}
                     class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold text-barbi"
@@ -597,8 +604,8 @@
                 <div
                   role="contentinfo"
                   class="mx-8 mt-7 text-barbi hover:text-black"
-                  on:mouseenter={() => (hovered = true)}
-                  on:mouseleave={() => (hovered = false)}
+                  onmouseenter={() => (hovered = true)}
+                  onmouseleave={() => (hovered = false)}
                   class:button-perl={hovered == false}
                   class:button-gold={hovered == true}
                 >
@@ -608,11 +615,11 @@
                   <div class="flex flex-row flex-auto justify-between">
                     <button
                       class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                      on:click={reg}>{registratio[$lang]}</button
+                      onclick={reg}>{registratio[$lang]}</button
                     >
                     <button
                       class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                      on:click={login}>{logi[$lang]}</button
+                      onclick={login}>{logi[$lang]}</button
                     >
                   </div>
                 </div>
@@ -638,11 +645,11 @@
             <div class="flex flex-row flex-auto justify-between">
               <button
                 class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                on:click={reg}>{registratio[$lang]}</button
+                onclick={reg}>{registratio[$lang]}</button
               >
               <button
                 class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-                on:click={login}>{logi[$lang]}</button
+                onclick={login}>{logi[$lang]}</button
               >
             </div>
           </div>
@@ -665,11 +672,11 @@
           <div class="flex flex-row flex-auto justify-between">
             <button
               class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-              on:click={reg}>{registratio[$lang]}</button
+              onclick={reg}>{registratio[$lang]}</button
             >
             <button
               class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-              on:click={login}>{logi[$lang]}</button
+              onclick={login}>{logi[$lang]}</button
             >
           </div>
         </div>
@@ -693,11 +700,11 @@
           <div class="flex flex-row flex-auto justify-between">
             <button
               class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-              on:click={reg}>{registratio[$lang]}</button
+              onclick={reg}>{registratio[$lang]}</button
             >
             <button
               class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-barbi font-bold py-2 px-4"
-              on:click={login}>{logi[$lang]}</button
+              onclick={login}>{logi[$lang]}</button
             >
           </div>
         </div>

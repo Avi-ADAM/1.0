@@ -1,18 +1,26 @@
 <script>
+  import { run } from 'svelte/legacy';
+
     import { onMount } from 'svelte';
     import { Calendar } from '@fullcalendar/core';
     import dayGridPlugin from '@fullcalendar/daygrid';
     import timeGridPlugin from '@fullcalendar/timegrid';
     import interactionPlugin from '@fullcalendar/interaction';
     
-    export let timersData = null; // הנתונים שמגיעים מהשרת
-    export let userId = null; // מזהה המשתמש
+  /**
+   * @typedef {Object} Props
+   * @property {any} [timersData] - הנתונים שמגיעים מהשרת
+   * @property {any} [userId] - מזהה המשתמש
+   */
+
+  /** @type {Props} */
+  let { timersData = null, userId = null } = $props();
     
-    let calendarElement;
-    let calendar;
-    let events = [];
-    let selectedTimer = null;
-    let showTimerDetails = false;
+    let calendarElement = $state();
+    let calendar = $state();
+    let events = $state([]);
+    let selectedTimer = $state(null);
+    let showTimerDetails = $state(false);
     
     // פונקציה להמרת נתוני הטיימרים לאירועים בלוח השנה
     function processTimersToEvents(timersData) {
@@ -142,11 +150,13 @@
     }
     
     // עדכון האירועים כאשר הנתונים משתנים
-    $: if (timersData && calendar) {
-      events = processTimersToEvents(timersData);
-      calendar.removeAllEvents();
-      calendar.addEventSource(events);
-    }
+    run(() => {
+    if (timersData && calendar) {
+        events = processTimersToEvents(timersData);
+        calendar.removeAllEvents();
+        calendar.addEventSource(events);
+      }
+  });
     
     // סגירת חלון הפרטים
     function closeDetails() {
@@ -245,7 +255,7 @@
           <div class="flex justify-between items-start mb-4">
             <h3 class="text-xl font-bold text-gray-800">פרטי הטיימר</h3>
             <button 
-              on:click={closeDetails}
+              onclick={closeDetails}
               class="text-gray-400 hover:text-gray-600 text-2xl"
             >
               ×
@@ -324,7 +334,7 @@
           <!-- כפתור סגירה -->
           <div class="mt-6 text-center">
             <button 
-              on:click={closeDetails}
+              onclick={closeDetails}
               class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2 rounded-lg transition-colors"
             >
               סגור

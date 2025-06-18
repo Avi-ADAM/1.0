@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import { toast } from 'svelte-sonner';
 import SucssesConf from '$lib/celim/sucssesConf.svelte'
 import Tile from '$lib/celim/tile.svelte'
@@ -20,8 +22,6 @@ let success = false
 function project(x) {
     goto('/project/'+x)
 }
-export let askedarr = []
-export let alr = false
 async function ask() {
   //TODO: if only me in the freemates and its me create mesimabetahalich
     alr = true
@@ -118,9 +118,9 @@ async function ask() {
     }*/
 }
 
-export let data
 
-$: hovered = false
+let hovered = $state(false);
+  
 function hover(a){
 }
 console.log(data)
@@ -164,7 +164,7 @@ const requiredWW = {
 function login () { 
     goto (`/login?from=availableMission/${data.mId}`,)
 }
-    let wid
+    let wid = $state()
     const mand = {"he": "המשימה אוישה בהצלחה", "en": "the mission has already assigned"}
     const alri = {"he": "כבר הגשת בקשה לבצע את המשימה הזו", "en": "you have already requested to do this mission"}
 const iwantto = {"he":"אני אשמח לקבל!","en":"I want to get it!"}
@@ -179,12 +179,23 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
   import { calcX } from '$lib/func/calcX.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import MissionCard from '$lib/components/cards/missionCard.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [askedarr]
+   * @property {boolean} [alr]
+   * @property {any} data
+   */
+
+  /** @type {Props} */
+  let { askedarr = [], alr = $bindable(false), data } = $props();
 
   let title = 'service on 1💗1'
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description = $page.data.alld?.descrip || om[$lang]
   let url = $page.url.toString()
- $: console.log(data.alld)
+ run(() => {
+    console.log(data.alld)
+  });
   //TODO: header nav menu $page.a.title[$lang] ??
 </script>
 <Head title="{ headi[$lang]}" {description} {image} {url} />
@@ -213,7 +224,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
             </div>
         </div>
         <div>
-    <button on:click={()=>project(a.projectcreates.data[0].id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4" >{seePr[$lang]}</button>
+    <button onclick={()=>project(a.projectcreates.data[0].id)} class="px-4 py-2 hover:text-barbi text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink rounded text-lg lg:text-2xl font-bold mt-2 mx-4 border-2 border-gold leading-4" >{seePr[$lang]}</button>
         </div>
     </div>
     {#if a.pic.data}
@@ -310,7 +321,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           {#if $page.data.tok != false}
           <div class="flex justify-center">
             {#if alr == false && !a.users?.data.map(c => c.id).includes(data.uid)}
-          <button on:click={ask} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}
+          <button onclick={ask} onmouseenter={()=>hovered = true} onmouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}
             class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">{iwantto[$lang]}</button>
         {:else if a.users.data.map(c => c.id).includes(data.uid)}
         <h3 class="button-perl text-barbi px-4 py-1">{alri[$lang]}</h3>
@@ -318,11 +329,11 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         </div>
           {:else}
           <div class="flex justify-center">
-                <div class="mx-8 mt-7 text-barbi hover:text-black " on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true} >
+                <div class="mx-8 mt-7 text-barbi hover:text-black " onmouseenter={()=>hovered = true} onmouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true} >
                     <p class="text-center font-bold text-2xl p-2 ">{info[$lang]}</p>
                 <div class="flex flex-row flex-auto justify-between">
-                    <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" on:click={reg}>{registratio[$lang]}</button>
-                    <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " on:click={login}>{logi[$lang]}</button>
+                    <button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" onclick={reg}>{registratio[$lang]}</button>
+                    <button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " onclick={login}>{logi[$lang]}</button>
                 </div>
             </div>
         </div>
@@ -341,8 +352,8 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
     <div class="w-1/2 mx-auto border border-barbi button-bronze">
 <h3 class="font-bold text-2xl p-2">{info[$lang]}</h3>
 <div class="flex flex-row flex-auto justify-between">
-<button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" on:click={reg}>{registratio[$lang]}</button>
-<button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " on:click={login}>{logi[$lang]}</button>
+<button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" onclick={reg}>{registratio[$lang]}</button>
+<button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " onclick={login}>{logi[$lang]}</button>
 </div></div></div>
           {/if}
         </div>
@@ -357,8 +368,8 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
     <div class="w-1/2 mx-auto border border-barbi button-bronze">
 <h1 class=" font-bold text-2xl p-2">{info[$lang]}</h1>
 <div class="flex flex-row flex-auto justify-between">
-<button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" on:click={reg}>{registratio[$lang]}</button>
-<button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " on:click={login}>{logi[$lang]}</button>
+<button class=" m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4" onclick={reg}>{registratio[$lang]}</button>
+<button class="m-2 border border-gold hover:border-barbi bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold  py-2 px-4 " onclick={login}>{logi[$lang]}</button>
 </div></div></div>
           {/if}
                 </div>

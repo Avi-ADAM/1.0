@@ -4,9 +4,9 @@
     import { onMount } from 'svelte';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();
-    let timersData = null;
-    export let projectId
-     let isLoading = true;
+    let timersData = $state(null);
+  let { projectId } = $props();
+     let isLoading = $state(true);
     async function loadProjectTimers() {
       timersData = await sendToSer({ id: projectId },'38getProjectTimers',null,null,false,fetch );
         isLoading = false;

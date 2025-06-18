@@ -5,11 +5,10 @@
     import { liUN } from '$lib/stores/liUN.js';
 const baseUrl = import.meta.env.VITE_URL
 
-let skillName_value;
-    let desS;
+let skillName_value = $state();
+    let desS = $state();
     let meData;
-     export let rn = [];
-    let shgi = false;
+    let shgi = $state(false);
 async function addNewSkill () {
    shgi = false;
 if (rn.includes(skillName_value)){
@@ -84,7 +83,14 @@ function finnish (id,sec) {
     name: skillName_value
     } );
        };
-       export let color = "--gold"
+  /**
+   * @typedef {Object} Props
+   * @property {any} [rn]
+   * @property {string} [color]
+   */
+
+  /** @type {Props} */
+  let { rn = [], color = "--gold" } = $props();
 const adds = {"he":"הוספת כישור חדש","en": "Add new Skill"}
 
 const valn = {"he":"שם הכישור", "en": "Skill name"}
@@ -111,7 +117,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
   <span class='line'></span>
 </div>
 
-  <button on:click={addNewSkill}
+  <button onclick={addNewSkill}
       title="{btnTitles[$lang]}"
       class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

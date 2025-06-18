@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
 <script>
     import { page } from '$app/stores';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';

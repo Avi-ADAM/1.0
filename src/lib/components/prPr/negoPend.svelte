@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let descrip2 = descrip;` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script>
   import tr from '$lib/translations/tr.json';
   import Text from '../conf/text.svelte';

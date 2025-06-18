@@ -2,9 +2,9 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
     import TimersCalendar from '$lib/components/timers/TimersCalendar.svelte';
     import {onMount} from 'svelte'
-    export let data
+  let { data } = $props();
     // קריאה לשרת לקבלת הנתונים
-    let timersData = null;
+    let timersData = $state(null);
     let userId = data.uid;
     
     // טען את הנתונים מהשרת

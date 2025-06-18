@@ -4,7 +4,7 @@
   import { slide } from "svelte/transition";
     import {lang} from '$lib/stores/lang.js'
   import { createEventDispatcher } from "svelte";
-    export let tasks = [];
+  let { tasks = [] } = $props();
       const head = {"he":"רשימת מטלות","en":"checklist"}
         const nama = {"he":"שם המטלה ", "en":"action name"}
     const des = {"he":"תיאור","en":"decription"}

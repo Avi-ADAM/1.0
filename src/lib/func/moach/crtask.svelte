@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     import {sendToSer} from "$lib/send/sendToSer.js";
     export async function crTask(pid=0,mbId,assignedId,pendm,open_mission,dateS,dateF,myIshur,shem,des,link,askId){
       const da = new Date()

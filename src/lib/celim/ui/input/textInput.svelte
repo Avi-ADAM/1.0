@@ -1,8 +1,14 @@
 <script>
     import { lang } from "$lib/stores/lang";
-    export let text = "";
-    export let lebel = {"en":"Name", "he":"שם"};
-    export let color = "gold";
+  /**
+   * @typedef {Object} Props
+   * @property {string} [text]
+   * @property {any} [lebel]
+   * @property {string} [color]
+   */
+
+  /** @type {Props} */
+  let { text = $bindable(""), lebel = {"en":"Name", "he":"שם"}, color = "gold" } = $props();
     </script>
      <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
         <input

@@ -1,22 +1,39 @@
 <script>
-  $: w = 1200;
-  $: h = 1200;
-  $: ow = 500;
-  $: oh = 500;
+  import { run } from 'svelte/legacy';
+
+  let w = $state(1200);
+  
+  let h = $state(1200);
+  
+  let ow = $state(500);
+  
+  let oh = $state(500);
+  
   let screen
-  $: top = 0
-  $: left = 0
-  $: maxW = 100
-  $: maxH = 100
-  $: center = { x: w / 2, y: h / 2 };
-  $: console.log('עדכון מרכז:', center);
+  let top = $derived(0)
+  let left = $derived(0)
+  let maxW = $derived(100)
+  let maxH = $derived(100)
+  let center;
+  run(() => {
+    center = { x: w / 2, y: h / 2 };
+  });
+  run(() => {
+    console.log('עדכון מרכז:', center);
+  });
   // Call this function whenever you add new circles
   //placeCircles();
 
   // Add your infinite scroll mechanism here
-  $: size = ow>550? 125:115;
-  $: bigsize = ow>550? 225: 100;
-  $: add = ow>550? 70: 70;
+  let size;
+  run(() => {
+    size = ow>550? 125:115;
+  });
+  let bigsize;
+  run(() => {
+    bigsize = ow>550? 225: 100;
+  });
+  let add = $derived(ow>550? 70: 70);
 
   // פונקציה למירכוז המסך על אזור התוכן
   function centerViewOnLoad() {
@@ -113,40 +130,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
 
   const dispatch = createEventDispatcher();
-  export let adder = [],
-    arr1 = [],
-    askedarr = [],
-    declineddarr = [],
-    halu = 17,
-    askma = 17,
-    maap = 13,
-    mashs = 13,
-    pmashd = 13,
-    fia = 13,
-    beta = 13,
-    pen = 17,
-    sug = 17,
-    low = false,
-    nam,
-    wel = 13,
-    ask = 13,
-    picLink,
-    total;
-  export let milon = {
-    hachla: true,
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-  };
-  let modal = false;
+  let modal = $state(false);
 
   function modali() {
     modal = true;
@@ -211,7 +195,68 @@
       milon[key] = true;
     }
   }
-  export let sml = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [adder]
+   * @property {any} [arr1]
+   * @property {any} [askedarr]
+   * @property {any} [declineddarr]
+   * @property {number} [halu]
+   * @property {number} [askma]
+   * @property {number} [maap]
+   * @property {number} [mashs]
+   * @property {number} [pmashd]
+   * @property {number} [fia]
+   * @property {number} [beta]
+   * @property {number} [pen]
+   * @property {number} [sug]
+   * @property {boolean} [low]
+   * @property {any} nam
+   * @property {number} [wel]
+   * @property {number} [ask]
+   * @property {any} picLink
+   * @property {any} total
+   * @property {any} [milon]
+   * @property {boolean} [sml]
+   */
+
+  /** @type {Props} */
+  let {
+    adder = [],
+    arr1 = $bindable([]),
+    askedarr = [],
+    declineddarr = [],
+    halu = 17,
+    askma = 17,
+    maap = 13,
+    mashs = 13,
+    pmashd = 13,
+    fia = 13,
+    beta = 13,
+    pen = 17,
+    sug = 17,
+    low = false,
+    nam,
+    wel = 13,
+    ask = 13,
+    picLink,
+    total,
+    milon = $bindable({
+    hachla: true,
+    fiap: true,
+    welc: true,
+    sugg: true,
+    pend: true,
+    asks: true,
+    betaha: true,
+    desi: true,
+    ppmash: true,
+    pmashs: true,
+    pmaap: true,
+    askmap: true
+  }),
+    sml = false
+  } = $props();
   function checkLines(arr,w,h){
     let c = {}
     for (let i = 0; i < arr.length; i++) {
@@ -278,7 +323,10 @@
     console.log(orders, w, "mount");
   })
   
-  $: orders = checkLines(arr1, w, h);
+  let orders;
+  run(() => {
+    orders = checkLines(arr1, w, h);
+  });
   
   export const snapshot = {
     capture: () => JSON.parse(JSON.stringify(orders)),
@@ -292,11 +340,11 @@
 
   <!-- כפתורי שליטה -->
   <div class="control-buttons">
-    <button class="control-button center-button" on:click={centerViewOnLoad} title="חזרה למרכז">
+    <button class="control-button center-button" onclick={centerViewOnLoad} title="חזרה למרכז">
       <span>⌘</span>
     </button>
     
-    <button class="control-button redistribute-button" on:click={redistributeElements} title="פיזור מחדש">
+    <button class="control-button redistribute-button" onclick={redistributeElements} title="פיזור מחדש">
       <span>⟳</span>
     </button>
   </div>

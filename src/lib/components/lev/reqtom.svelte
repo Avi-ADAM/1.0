@@ -1,4 +1,7 @@
 <script>
+  import { createBubbler } from 'svelte/legacy';
+
+  const bubble = createBubbler();
   import { lang } from '$lib/stores/lang.js';
   import ProgressBar from '@okrad/svelte-progressbar';
   import { goto } from '$app/navigation';
@@ -15,50 +18,9 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
   const dispatch = createEventDispatcher();
-  export let low = false;
   const baseUrl = import.meta.env.VITE_URL
-    export let modal = false
-    let dialogOpen = false
-    export let isVisible = false;
-  export let coinlapach;
-  export let deadline;
-  export let projectName;
-  export let openmissionName;
-  export let myp;
-  export let easy;
-  export let price;
-  export let useraplyname;
-  export let src = 'coin.png';
-  export let src2 = ' ';
-  export let projectId;
-  export let link = '/project/';
-  export let linkU = '/user/';
-  export let userId;
-  export let missionDetails = '';
-  export let name;
-  export let noofpu = 0;
-  export let publicklinks;
-  export let privatlinks;
-  export let hearotMeyuchadot;
-  export let nhours = 0;
-  export let valph = 0;
-  export let missId;
-  export let id;
-  export let openMid;
-  export let st = 275;
-  export let declined = [];
-  export let noofusersWaiting;
-  export let uids;
-  export let what;
-  export let noofusersOk;
-  export let noofusersNo;
-  export let already = false;
+    let dialogOpen = $state(false)
   let resP = [];
-  export let pid;
-  export let stylef = '24px';
-  export let askId;
-  export let users;
-  export let spid;
 
   let idL;
   let bearer1;
@@ -100,9 +62,9 @@
   }
   let ok;
   let nook;
-  let tryo = '115%';
-  let tryot = '-10.5%';
-  let tryoti = '-5.25%';
+  let tryo = $state('115%');
+  let tryot = $state('-10.5%');
+  let tryoti = $state('-5.25%');
   let nut;
   async function xyz() {
     ok = percentage(noofusersOk, noofpu);
@@ -136,11 +98,14 @@
     return ser;
   }
 
-  let ser = xyz();
+  let ser = $state(xyz());
 
-  $: ucli = 0;
-  $: pcli = 0;
-  $: pmcli = 0;
+  let ucli = $state(0);
+  
+  let pcli = $state(0);
+  
+  let pmcli = $state(0);
+  
   function linke(s) {
     if (s == 'u') {
       ucli += 1;
@@ -432,9 +397,10 @@ updateAskm(
       console.log('if another uprove explain why you decline');
     }
   }
-  let hovered = false;
+  let hovered = $state(false);
 
-  $: w = 0;
+  let w = $state(0);
+  
   const u = {
     he: 'הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה',
     en: 'vote on request to join the FreeMates and share a resorce '
@@ -470,7 +436,6 @@ updateAskm(
     dispatch('hover', { id: ut });
   }
 
-  export let cards = false;
   const clicktoup = {
     he: ` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`,
     en: `click twice to see ${useraplyname} profile`
@@ -491,11 +456,104 @@ updateAskm(
     isOpen = true;
     diunm = true;
   }
-  let clicked = false;
-  export let chat = [];
-  export let order = 0;
-  let isOpen = false,
-    diunm = false,
+  let clicked = $state(false);
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [modal]
+   * @property {boolean} [isVisible]
+   * @property {any} coinlapach
+   * @property {any} deadline
+   * @property {any} projectName
+   * @property {any} openmissionName
+   * @property {any} myp
+   * @property {any} easy
+   * @property {any} price
+   * @property {any} useraplyname
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {string} [linkU]
+   * @property {any} userId
+   * @property {string} [missionDetails]
+   * @property {any} name
+   * @property {number} [noofpu]
+   * @property {any} publicklinks
+   * @property {any} privatlinks
+   * @property {any} hearotMeyuchadot
+   * @property {number} [nhours]
+   * @property {number} [valph]
+   * @property {any} missId
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} what
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {boolean} [already]
+   * @property {any} pid
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {any} spid
+   * @property {boolean} [cards]
+   * @property {any} [chat]
+   * @property {number} [order]
+   */
+
+  /** @type {Props} */
+  let {
+    low = false,
+    modal = $bindable(false),
+    isVisible = false,
+    coinlapach,
+    deadline,
+    projectName,
+    openmissionName,
+    myp,
+    easy,
+    price,
+    useraplyname,
+    src = 'coin.png',
+    src2 = ' ',
+    projectId,
+    link = '/project/',
+    linkU = '/user/',
+    userId,
+    missionDetails = '',
+    name,
+    noofpu = 0,
+    publicklinks,
+    privatlinks,
+    hearotMeyuchadot,
+    nhours = 0,
+    valph = 0,
+    missId,
+    id,
+    openMid,
+    st = 275,
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids,
+    what,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    already = $bindable(false),
+    pid = $bindable(),
+    stylef = '24px',
+    askId,
+    users,
+    spid,
+    cards = false,
+    chat = $bindable([]),
+    order = $bindable(0)
+  } = $props();
+  let isOpen = $state(false),
+    diunm = $state(false),
     loading = false;
   const close = () => {
     isOpen = false;
@@ -575,7 +633,7 @@ updateAskm(
       <DialogContent class="chat" aria-label="form">
         <div dir="rtl" class="grid items-center justify-center aling-center">
           <button
-            on:click={close}
+            onclick={close}
             style="margin: 0 auto;"
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
             title={tit[$lang]}
@@ -637,16 +695,16 @@ updateAskm(
 
   {#if cards == false}
     <div
-on:click={()=>{modal = true
+onclick={()=>{modal = true
   dispatch("modal")
 dialogOpen = true}}
 role="button"
       style="position: relative;"
       style:z-index={hovered === false ? 11 : 16}
-      on:mouseenter={() => hoverede()}
-      on:mouseleave={() => hoverede()}
+      onmouseenter={() => hoverede()}
+      onmouseleave={() => hoverede()}
       use:clickOutside
-      on:click_outside={toggleShow}
+      onclick_outside={toggleShow}
       class="hover:scale-290 duration-1000 ease-in"
       transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
     >
@@ -715,10 +773,10 @@ role="button"
                 <g
                   role="button"
                   tabindex="0"
-                  on:keypress={() => linke('u')}
-                  on:click={() => linke('u')}
-                  on:mouseenter={() => hover(clicktoup[$lang])}
-                  on:mouseleave={() => hover('0')}
+                  onkeypress={() => linke('u')}
+                  onclick={() => linke('u')}
+                  onmouseenter={() => hover(clicktoup[$lang])}
+                  onmouseleave={() => hover('0')}
                   x="0"
                   y="40"
                   style="margin-top: 2px; margin-bottom: 2px"
@@ -730,7 +788,7 @@ role="button"
                     height="56px"
                     transform="translate(-28,-28)"
                   >
-                    <span class={`normSml${askId}-noo`} />
+                    <span class={`normSml${askId}-noo`}></span>
                     <img
                       width="56px"
                       height="56px"
@@ -761,8 +819,8 @@ role="button"
                 >
                   <textPath
                     role="contentinfo"
-                    on:mouseenter={() => hover(resorcename[$lang])}
-                    on:mouseleave={() => hover('0')}
+                    onmouseenter={() => hover(resorcename[$lang])}
+                    onmouseleave={() => hover('0')}
                     color="#EEE8AA"
                     x="-90"
                     y="-90"
@@ -776,10 +834,10 @@ role="button"
                 <g
                   role="button"
                   tabindex="0"
-                  on:keypress={() => linke('p')}
-                  on:click={() => linke('p')}
-                  on:mouseenter={() => hover(clicktofree[$lang])}
-                  on:mouseleave={() => hover('0')}
+                  onkeypress={() => linke('p')}
+                  onclick={() => linke('p')}
+                  onmouseenter={() => hover(clicktofree[$lang])}
+                  onmouseleave={() => hover('0')}
                   data-sveltekit-prefetch
                   x="0"
                   y="-40"
@@ -801,9 +859,9 @@ role="button"
                   transform="translate(-20,-20)"
                 >
                   <button
-                    on:click={() => project()}
-                    on:mouseenter={() => hover(clicktobrain[$lang])}
-                    on:mouseleave={() => hover('0')}
+                    onclick={() => project()}
+                    onmouseenter={() => hover(clicktobrain[$lang])}
+                    onmouseleave={() => hover('0')}
                   >
                     <img
                       style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
@@ -819,20 +877,20 @@ role="button"
                   <p style="margin-top: 10px;">
                     <span
                       role="contentinfo"
-                      on:mouseenter={() => hover('בעד')}
-                      on:mouseleave={() => hover('0')}
+                      onmouseenter={() => hover('בעד')}
+                      onmouseleave={() => hover('0')}
                       style="color:var(--gold)"
                       >{noofusersOk}
                     </span><span
                       role="contentinfo"
-                      on:mouseenter={() => hover('לא הצביעו')}
-                      on:mouseleave={() => hover('0')}
+                      onmouseenter={() => hover('לא הצביעו')}
+                      onmouseleave={() => hover('0')}
                       style="color:aqua"
                       >{noofusersWaiting}
                     </span><span
                       role="contentinfo"
-                      on:mouseenter={() => hover('נגד')}
-                      on:mouseleave={() => hover('0')}
+                      onmouseenter={() => hover('נגד')}
+                      onmouseleave={() => hover('0')}
                       style="color:var(--barbi-pink)"
                       title="נגד"
                       >{noofusersNo}
@@ -844,20 +902,20 @@ role="button"
           </div>
         </SwiperSlide><SwiperSlide class="swiper-slideg"
           ><div id="normSmll">
-            <div class={`normSmll${askId}-noo`} />
+            <div class={`normSmll${askId}-noo`}></div>
             <!--  <button on:click={tochat}><Chaticon/></button>-->
             {#if deadline}
               <p
-                on:mouseenter={() => hover('תאריך הביצוע')}
-                on:mouseleave={() => hover('0')}
+                onmouseenter={() => hover('תאריך הביצוע')}
+                onmouseleave={() => hover('0')}
                 class="hslink ab"
               >
                 {new Date(deadline).toLocaleDateString('he-IL')}
               </p>{/if}
             <p
-              on:m
+              onm={bubble('m')}
               ouseenter={() => hover('שווי')}
-              on:mouseleave={() => hover('0')}
+              onmouseleave={() => hover('0')}
               class="hslink bc"
             >
               {price}
@@ -865,22 +923,22 @@ role="button"
             <p class="hslink cd">
               <span
                 role="contentinfo"
-                on:mouseenter={() => hover('ההצעה שהתקבלה')}
-                on:mouseleave={() => hover('0')}
+                onmouseenter={() => hover('ההצעה שהתקבלה')}
+                onmouseleave={() => hover('0')}
                 style="color: var(--gold)">{myp}</span
               >
               /<span
                 role="contentinfo"
-                on:mouseenter={() => hover('ההצעה של הריקמה')}
-                on:mouseleave={() => hover('0')}
+                onmouseenter={() => hover('ההצעה של הריקמה')}
+                onmouseleave={() => hover('0')}
               >
                 {easy}</span
               >
             </p>
             {#if missionDetails !== null}
               <p
-                on:mouseenter={() => hover('פרטי ההצעה ')}
-                on:mouseleave={() => hover('0')}
+                onmouseenter={() => hover('פרטי ההצעה ')}
+                onmouseleave={() => hover('0')}
                 class="hslink de d"
               >
                 {missionDetails}
@@ -888,9 +946,9 @@ role="button"
             {#if low == false}
               {#if already === false}
                 <button
-                  on:mouseenter={() => hover('אישור')}
-                  on:mouseleave={() => hover('0')}
-                  on:click={agree}
+                  onmouseenter={() => hover('אישור')}
+                  onmouseleave={() => hover('0')}
+                  onclick={agree}
                   class="btn ga"
                   name="requestToJoin"
                   ><svg
@@ -907,9 +965,9 @@ role="button"
                 >
                 <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
                 <button
-                  on:mouseenter={() => hover('דחיה')}
-                  on:mouseleave={() => hover('0')}
-                  on:click={decline}
+                  onmouseenter={() => hover('דחיה')}
+                  onmouseleave={() => hover('0')}
+                  onclick={decline}
                   class="btn gb"
                   name="decline"
                   ><svg

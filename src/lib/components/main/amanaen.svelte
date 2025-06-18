@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let erorim = {st: false, msg: "", msg2: "if the problem continues please contact us at", msg1: "baruch@1lev1.com"  }` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 ﻿<script>
     import MultiSelect from 'svelte-multiselect';
     import { userName } from '../../stores/store.js';

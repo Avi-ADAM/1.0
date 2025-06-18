@@ -12,8 +12,8 @@
  const dispatch = createEventDispatcher();
               import { lang } from '$lib/stores/lang.js'
   import Skip from '$lib/celim/icons/skip.svelte';
-    let newcontent = true
-    let workways2 = [];
+    let newcontent = $state(true)
+    let workways2 = $state([]);
     let error1 = null
     const baseUrl = import.meta.env.VITE_URL
 
@@ -79,13 +79,13 @@
 
 
 
-    let selected = [];
+    let selected = $state([]);
  
      const placeholder = `${$lang == "he" ? "דרכי יצירה מתאימות" : "ways of creation"}`;
 
   
  
-let userName_value;
+let userName_value = $state();
 let show_value = 0;
 
 userName.subscribe(value => {
@@ -194,14 +194,15 @@ async function newnew (){
   workways1.set(find_workway_id(selected));
 
 }
-$: searchText = ``
+let searchText = $state(``);
+  
     const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
-  $: addn = {"he":`הוספת "${searchText}"`,"en": `Create "${searchText}"`}
+  let addn = $derived({"he":`הוספת "${searchText}"`,"en": `Create "${searchText}"`})
     const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
    const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
 
-    let focused = false
+    let focused = $state(false)
   </script>
 
 <h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
@@ -222,13 +223,13 @@ $: searchText = ``
      options={workways2.map(c => c.attributes.workWayName)}
      /></div>
    
-  <button class="button-in-1-2" on:click="{back}">
+  <button class="button-in-1-2" onclick={back}>
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
-      <button class="button-end bg-sturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+      <button class="button-end bg-sturk p-1 rounded-full" onclick={toend} title="{skipt[$lang]}">
     <Skip/>
     </button>
-  <button class="button-2" on:click="{increment}">
+  <button class="button-2" onclick={increment}>
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
 

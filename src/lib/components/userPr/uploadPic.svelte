@@ -3,10 +3,16 @@
  import Cropper from "svelte-easy-crop";
 	import { getCroppedImg } from "./canvasUtils"
   import { lang } from '$lib/stores/lang.js'
-export let aspect = 1
+  /**
+   * @typedef {Object} Props
+   * @property {number} [aspect]
+   */
+
+  /** @type {Props} */
+  let { aspect = 1 } = $props();
 	      let file;
 let dataU;
-	let image, fileinput, pixelCrop, croppedImage;
+	let image = $state(), fileinput = $state(), pixelCrop, croppedImage;
 
    var imgBase64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCA";
 //	async function DataURIToBlob(dataURI) {
@@ -70,7 +76,7 @@ let imageFile;
 		reader.readAsDataURL(imageFile);
 	}
 
-	let profilePicture, style;
+	let profilePicture = $state(), style;
 		
 	function previewCrop(e){
 		pixelCrop = e.detail.pixels;
@@ -98,7 +104,7 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 	<h2 class="text-barbi">
 {up[$lang]}
   </h2>
-	<input class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full a" type="file" accept=".jpg, .jpeg, .png" on:change={(e)=>onFileSelected(e)} bind:this={fileinput} >
+	<input class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full a" type="file" accept=".jpg, .jpeg, .png" onchange={(e)=>onFileSelected(e)} bind:this={fileinput} >
 
 {:else}
 	<h2>{adj[$lang]}</h2>
@@ -124,9 +130,9 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 	
 	<br>
   <div dir="rtl">
-  <button type="button" on:click={cropImage} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full bt">{cut[$lang]}</button>
+  <button type="button" onclick={cropImage} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full bt">{cut[$lang]}</button>
 
-	<button type="button" class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full" on:click={reset}>{re[$lang]}</button>
+	<button type="button" class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full" onclick={reset}>{re[$lang]}</button>
 </div>{/if}
 
 <style>

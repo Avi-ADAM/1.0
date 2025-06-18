@@ -1,4 +1,7 @@
 <script>
+	import { createBubbler, preventDefault } from 'svelte/legacy';
+
+	const bubble = createBubbler();
 import { userName } from '../../stores/store.js';
 import { show } from './store-show.js';
 import { email } from './email.js';  
@@ -41,7 +44,7 @@ roles2.subscribe(newRole => {
   roles2_val = newRole;
 })
  const dispatch = createEventDispatcher();
-let userName_value;
+let userName_value = $state();
 
 let emailL;
 let passwordx;
@@ -59,7 +62,7 @@ const baseUrl = import.meta.env.VITE_URL
 
 let linkg = baseUrl+'/graphql'
 let miDatan;
-let errr = {k: false, m: "", p: false}
+let errr = $state({k: false, m: "", p: false})
 async function increment() {    
 errr.p = true;
  const cookieValue = document.cookie
@@ -143,9 +146,9 @@ function back() {
 	} )
     
 	}
-	let strength = 0;
-	let validations = [];
-	let showPassword = false;
+	let strength = $state(0);
+	let validations = $state([]);
+	let showPassword = $state(false);
 	function validatePassword(e) {
 		        passwordx = e.target.value
 		const password = e.target.value;
@@ -180,7 +183,7 @@ function back() {
 </script>
 
 <main >
-	<form on:submit|preventDefault>
+	<form onsubmit={preventDefault(bubble('submit'))}>
 		 <h1 title="מהי הסיסמה שלך" class="midscreenText-2">
         {userName_value}
       <br>
@@ -194,13 +197,13 @@ function back() {
 				name="email"
 				class="input"
 				placeholder="יצירת סיסמה"
-				on:input={validatePassword}
-				on:blur={getV}
+				oninput={validatePassword}
+				onblur={getV}
 			/>
 			<span
 				class="toggle-password"
-				on:mouseenter={() => (showPassword = true)}
-				on:mouseleave={() => (showPassword = false)}
+				onmouseenter={() => (showPassword = true)}
+				onmouseleave={() => (showPassword = false)}
 			>
 				{showPassword ? "🔒" : "👁"}
 			</span>
@@ -208,10 +211,10 @@ function back() {
 				
 
 		<div class="strength">
-			<span class="bar bar-1" class:bar-show={strength > 0} />
-			<span class="bar bar-2" class:bar-show={strength > 1} />
-			<span class="bar bar-3" class:bar-show={strength > 2} />
-			<span class="bar bar-4" class:bar-show={strength > 3} />
+			<span class="bar bar-1" class:bar-show={strength > 0}></span>
+			<span class="bar bar-2" class:bar-show={strength > 1}></span>
+			<span class="bar bar-3" class:bar-show={strength > 2}></span>
+			<span class="bar bar-4" class:bar-show={strength > 3}></span>
 		</div>
 
 		<ul dir="rtl">
@@ -228,10 +231,10 @@ function back() {
 		</ul>
 	{#if errr.p === false}
 <div class="but">
-		  <button  class="button-in-1-2" class:non={strength < 4} on:click="{increment}"  disabled={strength < 4}>
+		  <button  class="button-in-1-2" class:non={strength < 4} onclick={increment}  disabled={strength < 4}>
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg"/>
     </button>
-  <button class="button-2" on:click="{back}">
+  <button class="button-2" onclick={back}>
     <img alt="go" class="img-4"  src="https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg"/>
     </button>
 </div>

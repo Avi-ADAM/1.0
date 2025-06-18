@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import Header from '$lib/components/header/header.svelte';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -8,7 +10,7 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import Tile from '$lib/celim/tile.svelte';
 
-  export let data;
+  let { data } = $props();
   console.log(data)
   let projectId = data.projectId;
   let project = data.projectData;
@@ -16,7 +18,7 @@
 
   let projectUsers = project.attributes.user_1s.data;
   let projecto = project.attributes.open_missions.data;
-  let vallues = project.attributes.vallues.data;
+  let vallues = $state(project.attributes.vallues.data);
   let srcP = project.attributes.profilePic.data ? project.attributes.profilePic.data.attributes.formats ? project.attributes.profilePic.data.attributes.formats.thumbnail.url : project.attributes.profilePic.data.attributes.url : null;
   let linkP = project.attributes.linkToWebsite;
   let githublink = project.attributes.githubLink;
@@ -27,20 +29,22 @@
 
 
   const showl = {"he":"הצגת השירותים שלנו","en":"show services"}
-  let show = false;
+  let show = $state(false);
 
-  $: unregisteredUserMessage = {
+  let unregisteredUserMessage = $derived({
     "he": "הנך צופה בריקמה (פרויקט שיתופי) זו ללא הרשמה.  <a href=\"/\" class=\"underline\">ביכולתך להירשם</a> כדי להנות מהאתר ולשתף פעולה.",
     "en": "You are viewing this project as an unregistered user. Please <a href=\"/\" class=\"underline\">register</a> to access more features."
-  };
+  });
 
- $: if ($lang == "he"){
-    for (let i = 0; i < vallues.length; i++){
-      if (vallues[i].attributes.localizations.data.length > 0){
-        vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
+ run(() => {
+    if ($lang == "he"){
+      for (let i = 0; i < vallues.length; i++){
+        if (vallues[i].attributes.localizations.data.length > 0){
+          vallues[i].attributes.valueName = vallues[i].attributes.localizations.data[0].attributes.valueName
+        }
       }
     }
-  }
+  });
 
   function us (x){
     console.log(x)
@@ -54,8 +58,9 @@
   function hover(c){
     console.log("hover")
   }
-$: w = 0
-$: isMobileOrTablet = w < 568 ? true : false
+let w = $state(0);
+  
+let isMobileOrTablet = $derived(w < 568 ? true : false)
   const githublinkde = {"he":"לינק לגיטהב של הריקמה","en":"link to the FreeMates GitHub"}
   const fblinkde = {"he":"לינק לפייסבוק של הריקמה","en":"link to the FreeMates Facebook"}
   const discordlinkde = {"he":"לינק לדיסקורד של הריקמה","en":"link to the FreeMates Discord"}
@@ -63,7 +68,7 @@ $: isMobileOrTablet = w < 568 ? true : false
   const tower = {"he": "לינק לאתר", "en": "link to website"}
   const vap = {"he": "ערכים ומטרות", "en": "vallues and objectives"}
   const frm = {"he": " משימות פנויות בריקמה", "en":"Open missions"}
-  $: heass = {"he": ` 1💗1 | ${project.attributes ? project.attributes.projectName : "ריקמה"}` ,"en": ` 1💗1 | ${project.attributes ? project.attributes.projectName : "FreeMate"}`}
+  let heass = $derived({"he": ` 1💗1 | ${project.attributes ? project.attributes.projectName : "ריקמה"}` ,"en": ` 1💗1 | ${project.attributes ? project.attributes.projectName : "FreeMate"}`})
 </script>
 
 <svelte:head>
@@ -157,7 +162,7 @@ $: isMobileOrTablet = w < 568 ? true : false
       <div dir="ltr" class="flex items-center justify-center">
         <div dir="ltr" class="flex -space-x-2 ">
           {#each projectUsers as user}
-            <button title="{user.attributes.username}" on:click={()=>us(user.id)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.attributes.profilePic.data != null ? user.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
+            <button title="{user.attributes.username}" onclick={()=>us(user.id)}><img class="inline-block h-8 w-8 rounded-full ring-2 ring-gold" src="{user.attributes.profilePic.data != null ? user.attributes.profilePic.data.attributes.url : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt=""></button>
           {/each}
         </div>
       </div>
@@ -167,7 +172,7 @@ $: isMobileOrTablet = w < 568 ? true : false
           <h2 class="mt-2 text-sm text-barbi text-center " style="text-shadow: 1px 1px var(--gold);">{vap[$lang]}</h2>
           <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 m-1"> 
             {#each vallues as vallue}
-              <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+              <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
                 <Tile bg="gold" sm={true} big={true}  word={vallue.attributes.valueName}/>
               </p>
             {/each}
@@ -179,8 +184,8 @@ $: isMobileOrTablet = w < 568 ? true : false
         <h3 style="color: var(--barbi-pink) ;text-shadow: 1px 1px var(--gold);" class="5">{frm[$lang]}</h3>
         <div class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 "> 
           {#each projecto as om }
-            <p on:mouseenter={()=>hover({"he":"משימות פנויות בריקמה","en":"open missions in the FreeMate"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
-              <button on:click={()=>mesima(om.id)}>  <Tile bg="wow"  sm={true} big={true} word={om.attributes.name}/></button>
+            <p onmouseenter={()=>hover({"he":"משימות פנויות בריקמה","en":"open missions in the FreeMate"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+              <button onclick={()=>mesima(om.id)}>  <Tile bg="wow"  sm={true} big={true} word={om.attributes.name}/></button>
             </p>
           {/each}
         </div>
@@ -189,13 +194,13 @@ $: isMobileOrTablet = w < 568 ? true : false
             {#if show === false}
               <button   
                 class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-                on:click={()=>show = true}>{showl[$lang]}
+                onclick={()=>show = true}>{showl[$lang]}
               </button>
             {:else} 
               <div class="flex flex-col items-center justify-center  p-8 mx-auto bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"> 
                 <button   
                   class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-                  on:click={()=>show = false}><Close/>
+                  onclick={()=>show = false}><Close/>
                 </button>
                 <SheirutShow
                   wb={true} 

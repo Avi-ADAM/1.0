@@ -1,19 +1,23 @@
 <script>
+    import { run } from 'svelte/legacy';
+
 	// +page.svelte
 	import { onMount } from 'svelte';
 	import { page } from '$app/stores';
     import { fetchTimers , timers} from '$lib/stores/timers'
     import Timer from '$lib/components/timers/timer.svelte'
 	let hoverText = '0';
-	let tx = 200;
-	$: if ($timers.length > 10) {
-		tx = (400 / $timers.length) * 3.6;
-	}
+	let tx = $state(200);
+	run(() => {
+        if ($timers.length > 10) {
+    		tx = (400 / $timers.length) * 3.6;
+    	}
+    });
 
 	//let center = { x: w / 2, y: h / 2 }; // No longer the overall center, see below
-	let size = 150;  // Reduced size, to make room for rotation and spacing.
-	let bigsize = 160; // Increased bigsize for clarity.
-	let add = size/2 + 10 ; //  spacing.  CRUCIAL.
+	let size = $state(150);  // Reduced size, to make room for rotation and spacing.
+	let bigsize = $state(160); // Increased bigsize for clarity.
+	let add = $state(size/2 + 10) ; //  spacing.  CRUCIAL.
 	let tiltAngle = 59; // Rotation angle in degrees
 
 	// Function to format time (you'll likely have this already)
@@ -57,22 +61,32 @@
     // center of the *large* timer, NOT the center of the entire container.
     let center = { x: bigsize / 2, y: bigsize / 2 };
 
-    $: w = 1200; // הגדלת רוחב אזור הטיימרים
-    $: h = 1200; // הגדלת גובה אזור הטיימרים
-    $: ow = 500;
-    $: oh = 500;
-    $: maxW = 100;
-    $: maxH = 100;
-    $: top = 0;
-    $: left = 0;
+    let w = $state(1200);
+     // הגדלת רוחב אזור הטיימרים
+    let h = $state(1200);
+     // הגדלת גובה אזור הטיימרים
+    let ow = $state(500);
+    
+    let oh = $state(500);
+    
+    let maxW = $derived(100);
+    let maxH = $derived(100);
+    let top = $derived(0);
+    let left = $derived(0);
     
     // Adjust sizes based on screen width
-    $: size = ow > 550 ? 120 : 115;
-    $: bigsize = ow > 550 ? 145 : 100;
-    $: add = ow > 550 ? 70 : 70;
+    run(() => {
+        size = ow > 550 ? 120 : 115;
+    });
+    run(() => {
+        bigsize = ow > 550 ? 145 : 100;
+    });
+    run(() => {
+        add = ow > 550 ? 70 : 70;
+    });
     
     // חישוב אוטומטי של גודל אזור התצוגה לפי מספר הטיימרים
-    $: {
+    run(() => {
         if ($timers.length > 50) {
             w = 2500;
             h = 2500;
@@ -86,7 +100,7 @@
             w = 1200;
             h = 1200;
         }
-    }
+    });
 
     function checkLine(i) {
         // Center timer remains unchanged.
@@ -156,7 +170,10 @@
         return c;
     }
 
-    $: orders = checkLines($timers);
+    let orders;
+    run(() => {
+        orders = checkLines($timers);
+    });
 
     // פונקציה נפרדת למירכוז התצוגה - מאפשרת קריאה חוזרת אם צריך
     function centerViewOnLoad() {

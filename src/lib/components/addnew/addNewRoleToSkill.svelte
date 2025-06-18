@@ -5,12 +5,18 @@
     import { liUN } from '$lib/stores/liUN.js';
   const baseUrl = import.meta.env.VITE_URL
 
-    export let color = "--gold"
-    export let rn = [];
-    let roleName_value;
-        let desS;
+  /**
+   * @typedef {Object} Props
+   * @property {string} [color]
+   * @property {any} [rn]
+   */
+
+  /** @type {Props} */
+  let { color = "--gold", rn = [] } = $props();
+    let roleName_value = $state();
+        let desS = $state();
         let meData;
-        let shgi = false;
+        let shgi = $state(false);
   async function add () {
       if (rn.includes(roleName_value)){
   shgi = true;
@@ -109,7 +115,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
           
           <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
 
-          <button on:click={add}
+          <button onclick={add}
           title="{btnTitles[$lang]}"
           class=" hover:bg-barbi hover:text-mturk text-gold font-bold  rounded-full" 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

@@ -7,26 +7,25 @@
   import Uplad from '../userPr/uploadPic.svelte';
   import Chooser from '$lib/celim/ui/chooser.svelte';
   const baseUrl = import.meta.env.VITE_URL;
-  export let idL;
-  let totalbounti
-  let des;
-  let loading = false;
-  let a = 0;
-  let success = false;
-  let before = false;
+  let totalbounti = $state()
+  let des = $state();
+  let loading = $state(false);
+  let a = $state(0);
+  let success = $state(false);
+  let before = $state(false);
   let url1 = baseUrl + '/api/upload';
-  let linkP;
-  let desP;
-  let name = '';
+  let linkP = $state();
+  let desP = $state();
+  let name = $state('');
   let token;
   let timeToP = 'already';
   let run = [];
   let imageId = 50;
   let files;
-  let shgi = false;
-  let restime;
-  let ont = false;
-  let start, finnish
+  let shgi = $state(false);
+  let restime = $state();
+  let ont = $state(false);
+  let start = $state(), finnish = $state()
   function openForum(){
 
   }
@@ -125,7 +124,7 @@
     }
   }
 
-  let vallues = [];
+  let vallues = $state([]);
   let error1 = null;
   let addval = false;
 
@@ -180,7 +179,7 @@
     }
   });
 
-  let suc = false;
+  let suc = $state(false);
   function find_value_id(value_name_arr) {
     var arr = [];
     for (let j = 0; j < value_name_arr.length; j++) {
@@ -193,11 +192,10 @@
     return arr;
   }
 
-  let selected;
+  let selected = $state();
   const placeholder = `${$lang == 'he' ? 'ערכים ומטרות' : 'vallues and goals'}`;
 
 
-  export let userName_value;
   import { RingLoader } from 'svelte-loading-spinners';
   import RichText from '$lib/celim/ui/richText.svelte';
   import AddImg from '$lib/celim/icons/addImg.svelte';
@@ -205,11 +203,12 @@
   import { crRatson } from '$lib/func/send/crratson.svelte';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import moment from 'moment';
+  let { idL, userName_value } = $props();
   const closer = () => {
     pic = false;
     a = 0;
   };
-  let psrc
+  let psrc = $state()
   function callbackFunction(event) {
     a = 2;
     files = event.detail.files;
@@ -231,7 +230,7 @@
     pic = false;
     suc = true;
   }
-  let pic = false
+  let pic = $state(false)
   function openen() {
     pic = true;
   }
@@ -301,10 +300,11 @@
     }
   }
 
-  $: ugug = ``;
-  let others = false;
-  let newcontent = true;
-  $: addne = { he: `הוספת "${ugug}"`, en: `Create "${ugug}"` };
+  let ugug = $state(``);
+  
+  let others = $state(false);
+  let newcontent = $state(true);
+  let addne = $derived({ he: `הוספת "${ugug}"`, en: `Create "${ugug}"` });
   const timeto = {
     he: 'כמה זמן עד שהריקמה תכניס כסף',
     en: 'how much time until the FreeMates will be profitable'
@@ -342,10 +342,10 @@
   const teurek = { he: 'תיאור תמציתי', en: 'short description' };
 
   const wel = { he: 'לינק לאתר (אם יש)', en: 'link to a website (if any)' };
-  let naex = {
+  let naex = $state({
     he: 'השם כבר קיים נא לבחור שם אחר',
     en: 'name already exists please try another name'
-  };
+  });
   const whva = {
     he: 'תיוג ערכים ומטרות שהצורך מגשים',
     en: 'which vallues and goals this wish to fullfile'
@@ -430,7 +430,7 @@
       {#if pic != true}
       <button
       title="{ladd[$lang]}"
-      on:click={openen}
+      onclick={openen}
       class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded px-2 py-1"
       > <AddImg/>
       {#if psrc}
@@ -440,7 +440,7 @@
   {:else}
   <div> <button
           class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>{cencel[$lang]}</button
+          onclick={closer}>{cencel[$lang]}</button
         >
         {#if a == 0}
           <Uplad on:message={callbackFunction} />
@@ -539,7 +539,7 @@
 border-b-[4px] hover:brightness-110 hover:-translate-y-[1px] hover:border-b-[6px]
 active:border-b-[2px] active:brightness-90 active:translate-y-[2px] 
  border-barbi  bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 "
-        on:click={sendP}
+        onclick={sendP}
         name="addm">{cree[$lang]}</button
       >
     {:else}

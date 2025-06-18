@@ -5,7 +5,12 @@
     let SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter;
 
  const dispatch = createEventDispatcher();
-    export let bmiData = [], pmiData = [], omiData = [], fmiData = []; 
+   let {
+      bmiData = [],
+      pmiData = [],
+      omiData = [],
+      fmiData = []
+   } = $props();
     let options = {}
 
     let currentStart ;
@@ -257,8 +262,8 @@
     }
 </style>
  <div width="100%">
-    <button class="btnl" on:click={()=>onSetNextDay()} value=">"><svg class="w-4 sm:w-8 h-4 sm:h-8" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
-        <button class="btnr" on:click={()=>onSetPreviousDay()} value="<"><svg class="w-4 sm:w-8 h-4 sm:h-8" style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+    <button class="btnl" onclick={()=>onSetNextDay()} value=">"><svg class="w-4 sm:w-8 h-4 sm:h-8" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+        <button class="btnr" onclick={()=>onSetPreviousDay()} value="<"><svg class="w-4 sm:w-8 h-4 sm:h-8" style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
    </div>
 <div class="container">
    

@@ -190,7 +190,7 @@
     <inkscape:path-effect
        is_visible="true"
        id="path-effect4445"
-       effect="spiro" />
+       effect="spiro"></inkscape:path-effect>
     <inkscape:path-effect
        fuse_tolerance="0"
        vertical_pattern="false"
@@ -204,7 +204,7 @@
        pattern="M 0,5 C 0,2.24 2.24,0 5,0 7.76,0 10,2.24 10,5 10,7.76 7.76,10 5,10 2.24,10 0,7.76 0,5 z"
        is_visible="true"
        id="path-effect4447"
-       effect="skeletal" />
+       effect="skeletal"></inkscape:path-effect>
     <linearGradient
        id="linearGradient4461">
       <stop
@@ -673,7 +673,7 @@
        empspacing="5"
        visible="true"
        enabled="true"
-       snapvisiblegridlinesonly="true" />
+       snapvisiblegridlinesonly="true"></inkscape:grid>
   </sodipodi:namedview>
   <metadata
      id="metadata7">
@@ -682,8 +682,8 @@
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title />
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
+        <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>
   </metadata>

@@ -3,13 +3,12 @@
     import { show } from './store-show.js';
         import { lang } from '$lib/stores/lang.js'
 
-    export let idx = 1;
      import {
     fly
 } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 import { onMount } from 'svelte';
-let first = {"he":"         לחיצה לפתיחת ", "en": "click to open          "}
+let first = $state({"he":"         לחיצה לפתיחת ", "en": "click to open          "})
 let second = {"he":"               1💗1", "en": "1💗1               "}
 let sh = {"he":"שלום", "en": "Hello"}
 let sh2 = {"he":" הסכמתך התקבלה!", "en": ""}
@@ -40,7 +39,6 @@ onMount(async () =>{
             css: (t, u) => `translateY:(-40%); translateX: (50% ,100%); transform: ${existingTransform} scale(${t}); opacity: ${t};`
         };
     }
-export let userName_value ="";
 let show_value;
 
 userName.subscribe(value => {
@@ -51,6 +49,14 @@ show.subscribe(newValue => {
   show_value = newValue;
 });
 import { createEventDispatcher } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {number} [idx]
+   * @property {string} [userName_value]
+   */
+
+  /** @type {Props} */
+  let { idx = 1, userName_value = $bindable("") } = $props();
  const dispatch = createEventDispatcher(); 
 
 function increment() {
@@ -79,7 +85,7 @@ function increment() {
  -->
 <button 
 out:fly={{y: -600, x: 2000,  opacity: 0.6, duration: 2200}} 
-title={sh6[$lang]} class="button" on:click="{increment}">
+title={sh6[$lang]} class="button" onclick={increment}>
 <svg class="key" height="80%" width="80%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`600 80 2222 918.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient gradientUnits="userSpaceOnUse" cx="1023.699" cy="448.468" r="843.488" id="gradient-1" gradientTransform="matrix(1.964807, -0.050779, 0.025836, 0.999666, -1004.848942, 91.27403)">

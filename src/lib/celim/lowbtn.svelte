@@ -1,5 +1,11 @@
 <script>
-    export let isCart = false;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isCart]
+   */
+
+  /** @type {Props} */
+  let { isCart = false } = $props();
     </script>
 <dib class:z={isCart == false} class:y={isCart == true}>
 <svg id="btnlow" viewBox="0 0 500 500" version="1.1" xmlns="http://www.w3.org/2000/svg">

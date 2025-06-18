@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: can't migrate `let htmlon = ``` to `$state` because there's a variable named state.
+     Rename the variable and try again or migrate by hand. -->
 <script>
 export let state = 2 // original and edit, 3 is original second and edit
 export let kindOf;

@@ -1,5 +1,7 @@
 <script>
-  let fpval, selected, liUN, email;
+  import { preventDefault } from 'svelte/legacy';
+
+  let fpval = $state(), selected = $state(), liUN = $state(), email = $state();
       import MultiSelect from 'svelte-multiselect';
   import { userName } from '$lib/stores/store.js';
   import Levbtn from '$lib/celim/ui/levbtn.svelte';
@@ -379,11 +381,11 @@ function find_contry_id(contry_name_arr){
 <!--
 <button on:click={tverya}>tverya</button>
 -->
-<button on:click={onSubmiti}>tttt</button>
-<form on:submit|preventDefault={submitForm}>
+<button onclick={onSubmiti}>tttt</button>
+<form onsubmit={preventDefault(submitForm)}>
   <button type="submit">Submit</button>
 </form>
-<form on:submit|preventDefault={submitFormb}>
+<form onsubmit={preventDefault(submitFormb)}>
   <input type="text" bind:value={fpval} placeholder="id">
     <input type="text" bind:value={liUN} placeholder="username">
     <input type="text" bind:value={email} placeholder="email">
@@ -395,5 +397,5 @@ function find_contry_id(contry_name_arr){
   <button type="submit">Submit</button>
 </form>
 <a href="{`https://telegram.me/onelevone_bot?start=${uid}`}" alt="telegramjoin">tele</a>
-<button on:click={rrrr}>cervrvr</button>
+<button onclick={rrrr}>cervrvr</button>
 <Levbtn/>

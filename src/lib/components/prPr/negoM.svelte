@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
 <script>
   import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { createEventDispatcher } from 'svelte';

@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     export function calcMinMaxIn (myinvest, minIn, maxIn ,totalInvest){
      let min = minIn * ((totalInvest /  myinvest) * 100)
      let max = maxIn * ((totalInvest /  myinvest) * 100)

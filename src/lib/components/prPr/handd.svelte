@@ -2,10 +2,21 @@
      import { createEventDispatcher } from 'svelte';
       const dispatch = createEventDispatcher();
 
-    export let addN = false;
-    export let openMA = false;
-    export let noofopenm = 0;
-    export let hosafat = "";
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [addN]
+   * @property {boolean} [openMA]
+   * @property {number} [noofopenm]
+   * @property {string} [hosafat]
+   */
+
+  /** @type {Props} */
+  let {
+    addN = false,
+    openMA = false,
+    noofopenm = 0,
+    hosafat = ""
+  } = $props();
 function bighand (){
 dispatch('masi');
 }    
@@ -111,7 +122,7 @@ function trym (){
     <circle style="fill: url(#newlinearGradient4196); fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;" id="newpath4180" cx="365.389" cy="538.166" r="100"/>
             {#if addN === false} 
 
-    <a on:click={bighand}  on:mouseenter={bighandd} id="newbutton" class="buttonadd">
+    <a onclick={bighand}  onmouseenter={bighandd} id="newbutton" class="buttonadd">
         
       <circle r="100" cy="-538.166" cx="-365.389" id="newbutton" style="opacity: 0.3; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; fill: url(#newlinearGradient4172-0);" transform="matrix(-1, 0, 0, -1, 0, 0)"/>
     </a>
@@ -190,7 +201,7 @@ function trym (){
   </g>
         {/if}
         {#if openMA === false}
-    <g  transform="matrix(1, 0, 0, 1, 359.919037, 204.900604)"  on:click={trym} style="">
+    <g  transform="matrix(1, 0, 0, 1, 359.919037, 204.900604)"  onclick={trym} style="">
         <g class="gg">
       <title>הצגת בקשות למשאבים</title>
       <rect  style="opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-11" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>

@@ -1,12 +1,11 @@
 <script>
-export let message;
-export let status;
    import Header from "../header/header.svelte"
    const er = {
     "he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל  ",
     "en": "error: please try again, if the problem continue contact at baruch@1lev1.com"
 }
 import { lang } from "$lib/stores/lang";
+   let { message, status } = $props();
 </script>
 <Header/>
 <div class="grid items-center text-center justify-center aling-center bg-goldGrad" style="min-height: 100vh;">

@@ -4,10 +4,9 @@
   import ErrorScreen from '../lib/components/screens/ErrorScreen.svelte'; // your own Error screen component
   import NotFoundScreen from '../lib/components/screens/NotFoundScreen.svelte'; // your own 404 screen component
 
-  export let message = $page.error.message;
-  export let status = $page.status;
 
   import { page } from '$app/stores';
+  let { message = $page.error.message, status = $page.status } = $props();
 
 </script>
 

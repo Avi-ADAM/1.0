@@ -8,22 +8,19 @@
  //   import { skillIdStore } from './store/skillIdStore.js'
     import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
-export let roles1 = [];
-export let mid = -1;
- let selected;
+ let selected = $state();
  let id;
      const placeholder = `${$lang == "he" ? "תפקידים קשורים" : "related Roles"}`;
     const baseUrl = import.meta.env.VITE_URL
 
-    let addro = false;    
+    let addro = $state(false);    
 
     let tafkidimslist = [];
-    let skillName_value;
-    let desS;
+    let skillName_value = $state();
+    let desS = $state();
     let meData;
     let error1 = null;
-    export let rn = [];
-    let shgi = false;
+    let shgi = $state(false);
     onMount(async () => {
       const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       const checkStatus = (resp) => {
@@ -151,7 +148,6 @@ if (rn.includes(skillName_value)){
                 };}
     };     
 
-export let addS = false;
 export const nobr = true
        const cencel = {"he":"ביטול","en": "cencel"}
 const adds = {"he":"הוספת כישור חדש","en": "Add new Skill"}
@@ -183,16 +179,32 @@ function dispatchb () {
   dispatch('b', {
     } );
 };
-export let color = "--gold";
+  /**
+   * @typedef {Object} Props
+   * @property {any} [roles1]
+   * @property {any} [mid]
+   * @property {any} [rn]
+   * @property {boolean} [addS]
+   * @property {string} [color]
+   */
+
+  /** @type {Props} */
+  let {
+    roles1 = $bindable([]),
+    mid = -1,
+    rn = [],
+    addS = $bindable(false),
+    color = "--gold"
+  } = $props();
   </script>
   <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
 {#if addS == false}
 <button style="--the:{color};"
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
-on:click={() => addS = true}>{adds[$lang]}</button>
+onclick={() => addS = true}>{adds[$lang]}</button>
 {:else}
 <button title={cencel[$lang]}
-on:click={dispatchb}
+onclick={dispatchb}
               class=" hover:bg-barbi text-gold hover:text-lturk font-bold py-1 px-1 rounded-full text-center"
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -231,14 +243,14 @@ on:click={dispatchb}
 <div>
   {#if addro == false}
   <button
-   on:click={() => addro = true} 
+   onclick={() => addro = true} 
    class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold  px-1 rounded-full"
    >{addn[$lang]}</button>
       <br>
    <br>
 
    <div class="grid align-middle justify-center">
-<button on:click={addNewSkill}
+<button onclick={addNewSkill}
 title="{btnTitles[$lang]}"
 class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -249,7 +261,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-fu
   {:else} 
   <br>
   <button title={cencel[$lang]}
-on:click={() => addro = false}
+onclick={() => addro = false}
  class=" hover:bg-barbi hover:text-mturk  font-bold p-1 rounded-full" class:text-mturk={nobr == true} class:text-gold={nobr == false}
  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />

@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `i` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
 <script>
     import Tile from '$lib/celim/tile.svelte'
     	import { Drawer } from 'vaul-svelte';

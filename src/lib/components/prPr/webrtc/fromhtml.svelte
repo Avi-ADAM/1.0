@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: `SIGNALING_SERVER` has already been declared
+https://svelte.dev/e/declaration_duplicate -->
         <style>
             html, body { 
                 background-color: #333; 

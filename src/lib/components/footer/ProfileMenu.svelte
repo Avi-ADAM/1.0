@@ -3,7 +3,7 @@
     import { createEventDispatcher } from "svelte";
     import { lang } from "$lib/stores/lang";
 
-    let showMenu = false;
+    let showMenu = $state(false);
 
     const translations = {
         he: {
@@ -36,7 +36,7 @@
 </script>
 
 <div class="relative inline-flex flex-col items-center justify-center h-full px-5 rounded-e-full">
-    <button on:click={toggleMenu} type="button" class="inline-flex flex-col items-center justify-center text-barbi h-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
+    <button onclick={toggleMenu} type="button" class="inline-flex flex-col items-center justify-center text-barbi h-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
         <svg
             class="w-6 h-6 transition-transform duration-200 {showMenu ? 'rotate-180' : ''}"
             fill="none"
@@ -52,15 +52,15 @@
     {#if showMenu}
         <div class="absolute bottom-full mb-2 bg-white rounded-md shadow-lg ring-1 ring-black ring-opacity-5 focus:outline-none dark:bg-gray-800">
             <div class="py-1" role="menu" aria-orientation="vertical" aria-labelledby="options-menu">
-                <button on:click={() => navigateTo("/me")} class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
+                <button onclick={() => navigateTo("/me")} class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
                     {@html profileIcon}
                     <span class="ml-2">{$lang === 'he' ? translations.he.profile : translations.en.profile}</span>
                 </button>
-                <button on:click={() => navigateTo("/timers")} class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
+                <button onclick={() => navigateTo("/timers")} class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
                     {@html timersIcon}
                     <span class="ml-2">{$lang === 'he' ? translations.he.timers : translations.en.timers}</span>
                 </button>
-                <button on:click={() => navigateTo("/myCalander")} class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
+                <button onclick={() => navigateTo("/myCalander")} class="flex items-center w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:text-gray-200 dark:hover:bg-gray-700" role="menuitem">
                     {@html calendarIcon}
                     <span class="ml-2">{$lang === 'he' ? translations.he.calendar : translations.en.calendar}</span>
                 </button>

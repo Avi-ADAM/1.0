@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
    export function sanitizeUserInput(input) {
   // Replace potentially harmful characters with their HTML entity equivalents
   if(input != undefined && input !=  null){

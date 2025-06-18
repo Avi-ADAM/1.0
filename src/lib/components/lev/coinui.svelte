@@ -23,38 +23,7 @@ import {
 } from 'svelte';
 
 const dispatch = createEventDispatcher();
-export let adder = [],
-    arr1 = [],
-    askedarr = [],
-    declineddarr = [],
-    halu = 17,
-    askma = 17,
-    maap = 13,
-    mashs = 13,
-    pmashd = 13,
-    fia = 13,
-    beta = 13,
-    pen = 17,
-    sug = 17,
-    low = false,
-    nam, wel = 13,
-    ask = 13,
-    picLink, total
-export let milon = {
-    hachla: true,
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-}
-let modal = false;
+let modal = $state(false);
 
 function modali() {
     modal = true;
@@ -122,8 +91,69 @@ function showall(event) {
     }
 
 }
-let h = 500;
-export let sml = false
+let h = $state(500);
+  /**
+   * @typedef {Object} Props
+   * @property {any} [adder]
+   * @property {any} [arr1]
+   * @property {any} [askedarr]
+   * @property {any} [declineddarr]
+   * @property {number} [halu]
+   * @property {number} [askma]
+   * @property {number} [maap]
+   * @property {number} [mashs]
+   * @property {number} [pmashd]
+   * @property {number} [fia]
+   * @property {number} [beta]
+   * @property {number} [pen]
+   * @property {number} [sug]
+   * @property {boolean} [low]
+   * @property {any} nam
+   * @property {number} [wel]
+   * @property {number} [ask]
+   * @property {any} picLink
+   * @property {any} total
+   * @property {any} [milon]
+   * @property {boolean} [sml]
+   */
+
+  /** @type {Props} */
+  let {
+    adder = [],
+    arr1 = $bindable([]),
+    askedarr = [],
+    declineddarr = [],
+    halu = 17,
+    askma = 17,
+    maap = 13,
+    mashs = 13,
+    pmashd = 13,
+    fia = 13,
+    beta = 13,
+    pen = 17,
+    sug = 17,
+    low = false,
+    nam,
+    wel = 13,
+    ask = 13,
+    picLink,
+    total,
+    milon = $bindable({
+    hachla: true,
+    fiap: true,
+    welc: true,
+    sugg: true,
+    pend: true,
+    asks: true,
+    betaha: true,
+    desi: true,
+    ppmash: true,
+    pmashs: true,
+    pmaap: true,
+    askmap: true
+}),
+    sml = false
+  } = $props();
 </script>
 
 <div id="scree" bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} >

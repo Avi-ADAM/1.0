@@ -1,4 +1,6 @@
 <script>
+  import { run } from 'svelte/legacy';
+
 	import { mi } from '$lib/components/prPr/mi.js';
   import { idPr } from '../../stores/idPr.js';
   import { createEventDispatcher } from 'svelte';
@@ -12,16 +14,16 @@
   import UploadPic from '../userPr/uploadPic.svelte';
   import PicInput from '$lib/celim/ui/input/picInput.svelte';
   import axios from 'axios';
-  let oneForeProject = false
-  let description = '';
-  let loading = false;
-  let success = false;
-  let error = false;
-  let price = 0;
-  let unlimitedM = false;
-  let quant = 1;
-  let kindOf = 'total';
-  let name;
+  let oneForeProject = $state(false)
+  let description = $state('');
+  let loading = $state(false);
+  let success = $state(false);
+  let error = $state(false);
+  let price = $state(0);
+  let unlimitedM = $state(false);
+  let quant = $state(1);
+  let kindOf = $state('total');
+  let name = $state();
   let bearer1;
   let token;
   let error1;
@@ -44,7 +46,7 @@
   const addG = { he: 'הוספת מתנה', en: 'Add Gift' };
   const optional = { he: 'לא חובה למלא', en: 'optional' };
 
-  let croppedImage = null;
+  let croppedImage = $state(null);
   const baseUrl = import.meta.env.VITE_URL;
 
   let url1 = baseUrl + '/api/upload';
@@ -141,32 +143,35 @@
       loading = false;
     }
   }
-  $: totalV = 0;
-  let already = false, dates = null, datef = null;
-  $: if (dates !== null && datef !== null) {
-    totalV = 0;
-    let quanter = unlimitedM === true ? 1 : quant;
-    let a = new Date(dates);
-    let b = new Date(datef);
-    if (kindOf == 'monthly') {
-      totalV =
-        ((b.getFullYear() - a.getFullYear()) * 12 +
-          (b.getMonth() - a.getMonth())) *
-        price *
-        quanter;
-      console.log(
-        (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()),
-        price,
-        quant,
-        totalV
-      );
-    } else if (kindOf == 'yearly') {
-      totalV = (b.getFullYear() - a.getFullYear()) * price * quant;
+  let totalV = $state(0);
+  
+  let already = false, dates = $state(null), datef = $state(null);
+  run(() => {
+    if (dates !== null && datef !== null) {
+      totalV = 0;
+      let quanter = unlimitedM === true ? 1 : quant;
+      let a = new Date(dates);
+      let b = new Date(datef);
+      if (kindOf == 'monthly') {
+        totalV =
+          ((b.getFullYear() - a.getFullYear()) * 12 +
+            (b.getMonth() - a.getMonth())) *
+          price *
+          quanter;
+        console.log(
+          (b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth()),
+          price,
+          quant,
+          totalV
+        );
+      } else if (kindOf == 'yearly') {
+        totalV = (b.getFullYear() - a.getFullYear()) * price * quant;
+      }
+    } else {
+      let quanter = unlimitedM === true || kindOf == 'unlimited' ? 1 : quant;
+      totalV = price * quanter;
     }
-  } else {
-    let quanter = unlimitedM === true || kindOf == 'unlimited' ? 1 : quant;
-    totalV = price * quanter;
-  }
+  });
   //תמונה מלבנית
 </script>
   <div class="flex flex-col align-middle justify-center gap-x-2">

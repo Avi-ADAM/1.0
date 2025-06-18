@@ -1,53 +1,88 @@
 <script>
+  import { run } from 'svelte/legacy';
+
   import {lang} from '$lib/stores/lang.js'
      import Grow from '$lib/celim/icons/grow.svelte'
-     export let animate = false
-  export let gr = false
-  export let pic = false
-  export let src = ""
-  export let alt = ""
-  export let single = false
-  export let reverse = false
-  export let big = false
-  export let sm = false
-    export let openi = false;
-    export let closei = false;
-   export let blue = false;
-   export let gray = false;
-   export let red = false;
-   export let green = false;
-   export let yellow = false;
-   export let indigo = false;
-   export let purple = false;
-   export let pink = false;
-      export let wow = false;
-     export let gold = false;
-     export let neww = false;
-   export let word = "word";
-   export let bg = "blue"
-   $: if (bg == "blue"){
-    blue = true;
-   } else if (bg == "pink"){
-    pink = true;
-   } else if (bg == "yellow"){
-    yellow = true;
-   } else if (bg == "green"){
-    green = true;
-   } else if (bg == "indigo"){
-    indigo = true;
-   } else if (bg == "gray"){
-    gray = true;
-   } else if (bg == "red"){
-    red = true;
-   } else if (bg == "purple"){
-    purple = true;
-   } else if (bg == "wow"){
-     wow = true;
-   }else if (bg == "gold"){
-     gold = true;
-   }else if(bg == "neww"){
-     neww = true;
-   }
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [animate]
+   * @property {boolean} [gr]
+   * @property {boolean} [pic]
+   * @property {string} [src]
+   * @property {string} [alt]
+   * @property {boolean} [single]
+   * @property {boolean} [reverse]
+   * @property {boolean} [big]
+   * @property {boolean} [sm]
+   * @property {boolean} [openi]
+   * @property {boolean} [closei]
+   * @property {boolean} [blue]
+   * @property {boolean} [gray]
+   * @property {boolean} [red]
+   * @property {boolean} [green]
+   * @property {boolean} [yellow]
+   * @property {boolean} [indigo]
+   * @property {boolean} [purple]
+   * @property {boolean} [pink]
+   * @property {boolean} [wow]
+   * @property {boolean} [gold]
+   * @property {boolean} [neww]
+   * @property {string} [word]
+   * @property {string} [bg]
+   */
+
+  /** @type {Props} */
+  let {
+    animate = false,
+    gr = false,
+    pic = false,
+    src = "",
+    alt = "",
+    single = false,
+    reverse = false,
+    big = false,
+    sm = false,
+    openi = false,
+    closei = false,
+    blue = $bindable(false),
+    gray = $bindable(false),
+    red = $bindable(false),
+    green = $bindable(false),
+    yellow = $bindable(false),
+    indigo = $bindable(false),
+    purple = $bindable(false),
+    pink = $bindable(false),
+    wow = $bindable(false),
+    gold = $bindable(false),
+    neww = $bindable(false),
+    word = "word",
+    bg = "blue"
+  } = $props();
+   run(() => {
+    if (bg == "blue"){
+      blue = true;
+     } else if (bg == "pink"){
+      pink = true;
+     } else if (bg == "yellow"){
+      yellow = true;
+     } else if (bg == "green"){
+      green = true;
+     } else if (bg == "indigo"){
+      indigo = true;
+     } else if (bg == "gray"){
+      gray = true;
+     } else if (bg == "red"){
+      red = true;
+     } else if (bg == "purple"){
+      purple = true;
+     } else if (bg == "wow"){
+       wow = true;
+     }else if (bg == "gold"){
+       gold = true;
+     }else if(bg == "neww"){
+       neww = true;
+     }
+  });
    //gray red green yellow indigo purple pink
 </script>
 <span class:line-through={closei == true}

@@ -28,21 +28,12 @@ const baseUrl = import.meta.env.VITE_URL
 
 let newskillslist, idLi, name
  const dispatch = createEventDispatcher();
-//export let addNs;
-export let bgi = "wow"
-    export let valc = "skillName";
-    export let data = [];
-    export let meData = [];
-    export let datan ="";
+
     let token;
     //for the options of multiselect
-    let allvn = []
-     export let addS = false;
+    let allvn = $state([])
     let listt = [];
-    export let kish;
-    export let linkp = "skills";
     let error1 = null;
-    export let addSl = false;
    async function get  () {
       const cookieValue = document.cookie
   .split('; ')
@@ -99,7 +90,6 @@ export let bgi = "wow"
           }
       };
 
-  export let placeholder =" בחירת כישורים" ;
   skillsNew.subscribe(newwork => {
     newskillslist  = newwork;
     });
@@ -114,8 +104,8 @@ if (index > -1) {
 console.log("skillslist",skillslist);
 };    */
 let miData = [];
-let g = false;
-let needr = [];
+let g = $state(false);
+let needr = $state([]);
 
 async function increment() {
       g = true;
@@ -193,9 +183,7 @@ async function increment() {
 
   import { RingLoader
 } from 'svelte-loading-spinners'
-export let Valname = "כישורים";
-let yy = 0;
-export let masss = false;
+let yy = $state(0);
 function find_id(arra){
      var  arr = [];
       for (let j = 0; j< arra.length; j++ ){
@@ -299,8 +287,6 @@ function bitul () {
     } );
 };
 
-export let addR = false;
-export let addW = false;
 function addnewM (event) {
   console.log(needr);
   const id = event.detail.id;
@@ -343,7 +329,7 @@ dispatch('addnew', {
     } );
 
 };
-let meDatamm = [];
+let meDatamm = $state([]);
 function bitulm (){
   masss = false;
    dispatch('massss', {
@@ -480,9 +466,9 @@ if (miDatanew.length > 0) {
           })
 }
 }
-let newcontent = true;
-let xd = []
-let ed = false;
+let newcontent = $state(true);
+let xd = $state([])
+let ed = $state(false);
 async function edit (id){
   g = true
   console.log(id)
@@ -560,11 +546,48 @@ const adaf = {"he":" נוספים", "en": ""}
 const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 const onin = {"he":"מושקע בריקמה", "en": "invested on FreeMates"}
 //add new msg
-$: searchText = ``
-  $: addn = {"he": ` \"${searchText}\" לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור  \"הוספת חדש\" שלמטה`,"en":`\"${searchText}\" Not on the list yet , add it with the \"Add new\" button bellow`}
+let searchText = $state(``);
+  
+  let addn = $derived({"he": ` \"${searchText}\" לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור  \"הוספת חדש\" שלמטה`,"en":`\"${searchText}\" Not on the list yet , add it with the \"Add new\" button bellow`})
 
-export let width = 1
-$: anim = datan == "work" || datan == "val" ? -(width/2) : width/2
+  /**
+   * @typedef {Object} Props
+   * @property {string} [bgi] - export let addNs;
+   * @property {string} [valc]
+   * @property {any} [data]
+   * @property {any} [meData]
+   * @property {string} [datan]
+   * @property {boolean} [addS]
+   * @property {any} kish
+   * @property {string} [linkp]
+   * @property {boolean} [addSl]
+   * @property {string} [placeholder]
+   * @property {string} [Valname]
+   * @property {boolean} [masss]
+   * @property {boolean} [addR]
+   * @property {boolean} [addW]
+   * @property {number} [width]
+   */
+
+  /** @type {Props} */
+  let {
+    bgi = "wow",
+    valc = "skillName",
+    data = $bindable([]),
+    meData = $bindable([]),
+    datan = "",
+    addS = $bindable(false),
+    kish,
+    linkp = "skills",
+    addSl = $bindable(false),
+    placeholder = " בחירת כישורים",
+    Valname = "כישורים",
+    masss = $bindable(false),
+    addR = $bindable(false),
+    addW = $bindable(false),
+    width = 1
+  } = $props();
+let anim = $derived(datan == "work" || datan == "val" ? -(width/2) : width/2)
   </script>
 {#if masss === true}
 
@@ -572,7 +595,7 @@ $: anim = datan == "work" || datan == "val" ? -(width/2) : width/2
 <button class=" hover:bg-barbi text-gold font-bold rounded-full"
 style="width:24px; height:24px; margin: 0 auto;"
 title="{cencel[$lang]}"
-on:click={bitulm}
+onclick={bitulm}
 ><svg  style="width:24px; height:24px;" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
@@ -606,7 +629,7 @@ on:click={bitulm}
 <button
 class=" hover:bg-barbi text-mturk rounded-full h-6 w-6"
 title="{edito[$lang]}"
-on:click={open}
+onclick={open}
 ><svg  class="e" viewBox="0 0 24 24">
  <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
 </svg>
@@ -617,7 +640,7 @@ on:click={open}
 <div>
 <button class=" hover:bg-barbi text-gold  font-bold rounded-full"
 title="{cencel[$lang]}"
-on:click={bitul}
+onclick={bitul}
 ><svg  style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
@@ -627,15 +650,15 @@ on:click={bitul}
       {#each data as da, i}
   <div transition:slide|local="{{delay: 150, duration: 1000, easing: quintOut }}" class="text-center text-sm text-lturk md:text-xl">
 
-    {#if datan === "mash" }
+    {#if datan === "mash"}
     {#if da.attributes.panui != false}
-       <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+       <button class="text-gold hover:text-barbi"  title={less[$lang]} onclick={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg></button>
     <button
 class=" hover:bg-barbi text-mturk rounded-full "
 title="{edito[$lang]}"
-on:click={edit(da.id)}
+onclick={edit(da.id)}
 ><svg  style="width:17px;height:17px" viewBox="0 0 24 24">
  <path fill="currentColor" d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />
 </svg>
@@ -647,7 +670,7 @@ title="{onin[$lang]}">
 <Grow width="17" height="17"/></button>
 {/if}
 {:else}
-   <button class="text-gold hover:text-barbi"  title={less[$lang]} on:click={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+   <button class="text-gold hover:text-barbi"  title={less[$lang]} onclick={min(da.id , da.attributes[valc])}><svg style="width:17px;height:17px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" />
     </svg></button>
 {/if}{da.attributes[valc]}
@@ -656,7 +679,7 @@ title="{onin[$lang]}">
    {/each}
    {#if datan === "mash" && yy == 2}
    <button
-        on:click={increment}
+        onclick={increment}
          title="{rem[$lang]}{Valname} "
     class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -679,7 +702,7 @@ title="{onin[$lang]}">
       loading={newcontent}
       />
       {#if datan === "mash" && data?.selected2?.length > 0}
-      <button on:click={adm(data.selected2)}>✅</button>
+      <button onclick={adm(data.selected2)}>✅</button>
       {/if}
     </div>
   </div>
@@ -704,7 +727,7 @@ title="{onin[$lang]}">
 {/if} </div>
   {#if datan !== "mash" && yy > 0}
       <button
-        on:click={increment}
+        onclick={increment}
          title="{adbf[$lang]}{Valname}{adaf[$lang]}"
     class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

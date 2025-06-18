@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     export function sharLimud (miData){
         console.log(miData)
         return [2]

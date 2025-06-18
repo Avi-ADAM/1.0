@@ -21,19 +21,19 @@
     const taft = {'he': 'תפקיד','en': 'role'}
     const seet = {'he':'הרחבה והגשת מועמדות', 'en':'see more'}
     const wwt = {'he':'דרך העבודה','en': 'work ways'}
-    export let data;
-    let alld;
-    let isLoading = true;
+  let { data } = $props();
+    let alld = $state();
+    let isLoading = $state(true);
 
 // יצירת אובייקט PagingData חדש
-let paging = new PagingData(
+let paging = $state(new PagingData(
     1,      // currentPage
     20,     // itemsPerPage
     [10, 20, 50, 100] // itemsPerPageOptions
-);
+));
 
 let allMissions = []; // מערך שישמור את כל המשימות
-let isLoadingMore = false;
+let isLoadingMore = $state(false);
 let hasMoreData = true;
 const BATCH_SIZE = 20;
 const LOAD_DELAY = 2000; // 2 seconds delay between loads
@@ -114,7 +114,7 @@ let theme = PrelineTheme;
 // האזנה לשינויים בגודל העמוד
 
 
-let columns = [
+let columns = $state([
         { 
             key: 'name', 
             title: name[$lang],
@@ -204,8 +204,9 @@ let columns = [
         },
         renderComponent: GoButton
     }
-    ];
-    $: activUpd = 0
+    ]);
+    let activUpd = $state(0);
+  
     let title = {he:"משימות פתוחות",en:"Open missions"}
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description = {he:"משימות פתוחות שאפשר להגיש מועמדות כדי להצטרף ולבצע יחד ב-1💗1",en:"Open missions that you can submit candidates to join and do together in 1💗1"}

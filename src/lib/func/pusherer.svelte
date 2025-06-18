@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     /***
      * push to devices
      * @param {Array} jsonim  of all machshirs with user feild that contains id, and as attributes username and lang

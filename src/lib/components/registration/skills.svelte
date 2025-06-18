@@ -12,12 +12,12 @@
       import jskill from '$lib/data/skills.json'
     import enjskill from '$lib/data/skillsen.json'
  const dispatch = createEventDispatcher();
-    let skills2 = [];
+    let skills2 = $state([]);
     let error1 = null; 
     let addskil = 0;
     const baseUrl = import.meta.env.VITE_URL
 
-    let newcontent = true
+    let newcontent = $state(true)
     onMount(async () => {
            if ($lang == "he" ){
        skills2 = jskill
@@ -81,11 +81,11 @@
      };
 
 
-    let selected = [];  
+    let selected = $state([]);  
     const placeholder = `${$lang == "he" ? "הכישורים שלי" : "My skills"}`;
 
 	
-    let userName_value;
+    let userName_value = $state();
     let show_value = 0;
 
 userName.subscribe(value => {
@@ -125,7 +125,7 @@ function back() {
       import {  fly } from 'svelte/transition';
   import Skip from '$lib/celim/icons/skip.svelte';
 
-let isOpen = false;
+let isOpen = $state(false);
  const close = () => {
     isOpen = false;
   };
@@ -148,7 +148,7 @@ selected = newSele;
   const ws = {"he": "מה הן היכולות שלך?","en": "What you can do?"}
  const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
 
-  let focused=false
+  let focused=$state(false)
  </script>
   
  <DialogOverlay {isOpen} onDismiss={close} >
@@ -179,17 +179,17 @@ selected = newSele;
   /></div>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
   <button
-  on:click={() => isOpen = true} 
+  onclick={() => isOpen = true} 
       class="button-silver hover:text-barbi font-bold py-1 px-2 rounded-full"
   >{addn[$lang]}</button>
   </div>
-    <button class="button-in-1-2" on:click="{back}">
+    <button class="button-in-1-2" onclick={back}>
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
-       <button class="button-end bg-sturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+       <button class="button-end bg-sturk p-1 rounded-full" onclick={toend} title="{skipt[$lang]}">
     <Skip/>
     </button>
-  <button class="button-2" on:click="{increment}">
+  <button class="button-2" onclick={increment}>
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
 

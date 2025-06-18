@@ -1,3 +1,4 @@
+<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script>
   import { page } from '$app/stores'
     import Lowding from '$lib/celim/lowding.svelte'

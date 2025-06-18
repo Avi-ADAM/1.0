@@ -7,15 +7,13 @@
      const dispatch = createEventDispatcher();
     
    
-    export let mid = -1;
      let id;
      let meData = [];
   
-    let Name_value;
+    let Name_value = $state();
     let error1 = null;
     
-    export let rn = [];
-    let shgi = false;
+    let shgi = $state(false);
    
     
         function dispatchww (meData) {
@@ -88,7 +86,6 @@ let link =baseUrl+"/graphql" ;
     };    
     
 
-    export let addW = false;
        const cencel = {"he":"ביטול","en": "cencel"}
 const adds = {"he":"הוספת דרך יצירה חדשה","en": "Add new Way of creation"}
 
@@ -100,19 +97,33 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
   dispatch('b', {
     } );
 };
-export let color = "--gold";
+  /**
+   * @typedef {Object} Props
+   * @property {any} [mid]
+   * @property {any} [rn]
+   * @property {boolean} [addW]
+   * @property {string} [color]
+   */
+
+  /** @type {Props} */
+  let {
+    mid = -1,
+    rn = [],
+    addW = $bindable(false),
+    color = "--gold"
+  } = $props();
     </script>
     <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
       
     {#if addW == false}
     <button style="--the:{color};"
     class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-    on:click={() => addW = true}>{adds[$lang]}</button>
+    onclick={() => addW = true}>{adds[$lang]}</button>
     {:else}
 
     
     <button title={cencel[$lang]}
-    on:click={dispatchb}
+    onclick={dispatchb}
     class=" hover:bg-barbi text-gold hover:text-mturk font-bold  p-0.5 rounded-full"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -133,7 +144,7 @@ export let color = "--gold";
 <br/>
 
 
-       <button on:click={addww}
+       <button onclick={addww}
        title="{btnTitles[$lang]}"
        class=" hover:bg-barbi hover:text-mturk text-gold font-bold py-1 px-2 rounded-full" 
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

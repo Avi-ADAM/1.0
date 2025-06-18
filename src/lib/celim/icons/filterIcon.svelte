@@ -1,9 +1,20 @@
 <!-- Uploaded to: SVG Repo, www.svgrepo.com, Generator: SVG Repo Mixer Tools -->
 <script>
-   export let filterType = "projects";
-    export let width = "32px";
-    export let height = "32px";
-    export let isX = false;
+  /**
+   * @typedef {Object} Props
+   * @property {string} [filterType]
+   * @property {string} [width]
+   * @property {string} [height]
+   * @property {boolean} [isX]
+   */
+
+  /** @type {Props} */
+  let {
+    filterType = "projects",
+    width = "32px",
+    height = "32px",
+    isX = false
+  } = $props();
 </script>
 <div class="relative">
 
@@ -190,7 +201,7 @@
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="Filter" />
+     inkscape:current-layer="Filter"></sodipodi:namedview>
   <title
      id="title1">Filter</title>
   <g

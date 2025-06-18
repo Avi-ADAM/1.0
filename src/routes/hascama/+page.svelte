@@ -12,6 +12,8 @@ defer>
 </svelte:head>
 
     <script>
+  import { preventDefault } from 'svelte/legacy';
+
     import {
         liUN
     } from '$lib/stores/liUN.js';
@@ -24,8 +26,8 @@ import {
 } from '$lib/stores/lang.js'
 import {
     page
-} from '$app/stores'
-//const emaili = $page.url.searchParams.get('code')
+} from '$app/state'
+//const emaili = page.url.searchParams.get('code')
 import {
     goto
 } from '$app/navigation';
@@ -57,28 +59,28 @@ import {
     linkos
 } from '$lib/stores/linkos.js'
 
-let idx = 1;
+let idx = $state(1);
 let error;
 const baseUrl = import.meta.env.VITE_URL
 
 let user = 0;
 
-let kvar;
+let kvar = $state();
 onMount(async () => {
-    const x = $page.url.searchParams.get('ref')
+    const x = page.url.searchParams.get('ref')
     if (x != null) {
-        userName.set($page.url.searchParams.get('un'))
-        kvar = $page.url.searchParams.get('em');
-        email.set($page.url.searchParams.get('em'));
+        userName.set(page.url.searchParams.get('un'))
+        kvar = page.url.searchParams.get('em');
+        email.set(page.url.searchParams.get('em'));
         //cuontry freeppid
-        document.cookie = `email=${$page.url.searchParams.get('em')}; expires=` + new Date(2026, 0, 1).toUTCString();
-        document.cookie = `un=${encodeURIComponent($page.url.searchParams.get('un'))}; expires=` + new Date(2026, 0, 1).toUTCString();
-        liUN.set(decodeURIComponent($page.url.searchParams.get('un')));
-        const array = $page.url.searchParams.get('con').split(',');
+        document.cookie = `email=${page.url.searchParams.get('em')}; expires=` + new Date(2026, 0, 1).toUTCString();
+        document.cookie = `un=${encodeURIComponent(page.url.searchParams.get('un'))}; expires=` + new Date(2026, 0, 1).toUTCString();
+        liUN.set(decodeURIComponent(page.url.searchParams.get('un')));
+        const array = page.url.searchParams.get('con').split(',');
 
         contriesi.set(array)
         regHelper.set(1);
-        fpval.set($page.url.searchParams.get('id'))
+        fpval.set(page.url.searchParams.get('id'))
         console.log(x, kvar, user, $contriesi)
 
     }
@@ -187,7 +189,7 @@ onMount(async () => {
 
 });
 
-let regHelperL = -1;
+let regHelperL = $state(-1);
 
 regHelper.subscribe(value => {
     regHelperL = value;
@@ -232,7 +234,7 @@ function beforeUnload(event) {
 }
 </script>
 
-<svelte:window on:beforeunload|preventDefault={beforeUnload}/>
+<svelte:window onbeforeunload={preventDefault(beforeUnload)}/>
 
 <div class="main">
 <!--{#if user > 0}

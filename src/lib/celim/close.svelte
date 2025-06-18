@@ -1,7 +1,13 @@
 <script>
-   export let width = 24
-   export let height = 24 
-   export let inl = false
+  /**
+   * @typedef {Object} Props
+   * @property {number} [width]
+   * @property {number} [height]
+   * @property {boolean} [inl]
+   */
+
+  /** @type {Props} */
+  let { width = 24, height = 24, inl = false } = $props();
     </script>
 
 <svg  style="width:{width}px;height:{height}px; display:{inl == false ? 'block' : 'inline'};" viewBox="3 3 18 18">

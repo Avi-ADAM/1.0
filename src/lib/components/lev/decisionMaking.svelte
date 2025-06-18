@@ -1,8 +1,9 @@
 <script>
+  import { run } from 'svelte/legacy';
+
     import { pinch } from 'svelte-gestures';
   import * as animateScroll from "svelte-scrollto";
     	import { Drawer } from 'vaul-svelte';
-      export let isVisible = false;
   import ProgressBar from "@okrad/svelte-progressbar";
  import { goto } from '$app/navigation';
  import { lang } from '$lib/stores/lang.js';
@@ -20,32 +21,6 @@ import {
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
 const dispatch = createEventDispatcher();
-    export let low = false, kind, messege, myid, userId,spdata;
-    export let newpicid;  
-export let coinlapach;
-export let deadline;
-export let projectName;
-export let openmissionName;
-export let src = "coin.png";
-export let src2 = " ";
-export let projectId;
-export let created_at;
-export let missionDetails = "";
-export let noofpu = 0;
-export let id;
-export let openMid;
-export let st = 205;
-export let declined = [];
-export let noofusersWaiting;
-export let uids;
-export let noofusersOk;
-export let noofusersNo;
-export let already = false;
-export let pid
-export let stylef = '24px';
-export let askId;
-export let users;
-export let timegramaDate, restime,timegramaId
     const baseUrl = import.meta.env.VITE_URL
 
 onMount(async () => {
@@ -103,9 +78,9 @@ let linkg = baseUrl+'/graphql';
 
 let ok;
 let nook;
-let tryo = "115%";
-let tryot = "-10.5%";
-let tryoti = "-5.25%";
+let tryo = $state("115%");
+let tryot = $state("-10.5%");
+let tryoti = $state("-5.25%");
 let nut;
 async function xyz (){
 
@@ -140,11 +115,14 @@ ser = ser
 return ser
 }
 
-let ser = xyz();
+let ser = $state(xyz());
  
-$: ucli = 0
-$: pcli = 0
-$: pmcli = 0
+let ucli = $state(0);
+  
+let pcli = $state(0);
+  
+let pmcli = $state(0);
+  
 function linke (s){
  if (s == "u"){
  ucli += 1
@@ -368,12 +346,14 @@ async function decline() {
    
 }
 
-let hovered = false;
+let hovered = $state(false);
 function tochat () {
   dispatch("chat");
 }
- $: w = 0;
- $:h = 0
+ let w = $state(0);
+  
+ let h = $state(0);
+  
  let u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
 
 function hover (id){
@@ -406,13 +386,91 @@ function hoverc (event){
 }
  import Card from './cards/hachlata.svelte'
   import {SendTo} from '$lib/send/sendTo.svelte';
-export let cards = false;
-export let tx = 200;
 const newlogo = {"he":"הלוגו החדש שמוצע","en":"new Logo offered"}
 const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
-    export let modal = false
-    let dialogOpen = false
-    let top;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [low]
+   * @property {any} kind
+   * @property {any} messege
+   * @property {any} myid
+   * @property {any} userId
+   * @property {any} spdata
+   * @property {any} newpicid
+   * @property {any} coinlapach
+   * @property {any} deadline
+   * @property {any} projectName
+   * @property {any} openmissionName
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {any} created_at
+   * @property {string} [missionDetails]
+   * @property {number} [noofpu]
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {boolean} [already]
+   * @property {any} pid
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {any} timegramaDate
+   * @property {any} restime
+   * @property {any} timegramaId
+   * @property {boolean} [cards]
+   * @property {number} [tx]
+   * @property {boolean} [modal]
+   */
+
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    low = false,
+    kind,
+    messege,
+    myid,
+    userId,
+    spdata,
+    newpicid,
+    coinlapach,
+    deadline,
+    projectName,
+    openmissionName = $bindable(),
+    src = "coin.png",
+    src2 = " ",
+    projectId,
+    created_at,
+    missionDetails = "",
+    noofpu = 0,
+    id,
+    openMid,
+    st = $bindable(205),
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    already = $bindable(false),
+    pid,
+    stylef = '24px',
+    askId,
+    users,
+    timegramaDate,
+    restime,
+    timegramaId,
+    cards = false,
+    tx = 200,
+    modal = $bindable(false)
+  } = $props();
+    let dialogOpen = $state(false)
+    let top = $state();
 function tomodal(){
   modal = false;
   animateScroll.scrollToTop()
@@ -422,29 +480,32 @@ console.log("oh")
 function handler (event){
   console.log(event.detail)
 }
-$: ww = 0
-  let scale = 1
- $: if (ww < h){
-    if(ww < 380){
-      scale = ww/92
-    } else if(ww < 430){
-      scale = ww/102
-    } else if(ww < 470){
-      scale = ww/112
+let ww = $state(0);
+  
+  let scale = $state(1)
+ run(() => {
+    if (ww < h){
+      if(ww < 380){
+        scale = ww/92
+      } else if(ww < 430){
+        scale = ww/102
+      } else if(ww < 470){
+        scale = ww/112
+      } else {
+        scale = ww/132
+      } 
     } else {
-      scale = ww/132
-    } 
-  } else {
-    if(ww < 380){
-      scale = h/92
-    } else if(ww < 430){
-      scale = h/102
-    } else if(ww < 470){
-      scale = h/112
-    } else {
-      scale = h/132
-    } 
-  }
+      if(ww < 380){
+        scale = h/92
+      } else if(ww < 430){
+        scale = h/102
+      } else if(ww < 470){
+        scale = h/112
+      } else {
+        scale = h/132
+      } 
+    }
+  });
 
 </script>
 {#await ser}
@@ -453,18 +514,18 @@ $: ww = 0
 {#if cards == false}
 
 <div 
-on:click={()=>{modal = true
+onclick={()=>{modal = true
   dispatch("modal")
 dialogOpen = true}}
 role="button"
-on:dblclick={tomodal}
+ondblclick={tomodal}
  bind:clientWidth={ww}
  bind:clientHeight={h}
 style="position: relative;" 
 style:z-index={hovered === false && modal == true ? 11 : 58}  
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
-use:clickOutside on:click_outside={toggleShow}
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()}
+use:clickOutside onclick_outside={toggleShow}
 class:hover:scale-290={modal == true}
 class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 <div bind:this={top}
@@ -472,10 +533,10 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 {#if modal == false}
 <div 
  style="position: absolute; top: 24px; left:50%; transform: translate(-50%,-50%); z-index:99999;">
-  <button  class="text-barbi hover:text-gold" on:click={()=> modal = true}><Close /></button>
+  <button  class="text-barbi hover:text-gold" onclick={()=> modal = true}><Close /></button>
 </div>
 {/if}
-<span use:clickOutside on:click_outside={() =>modal = true}
+<span use:clickOutside onclick_outside={() =>modal = true}
  style:transform={modal == false ? `scale(${scale})` : ""}>
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
@@ -513,7 +574,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
     >
 <svg version="1.1" id="desLayer_1" x="0px" y="0px" viewBox="1194.702695 779.45875 162.446096 162.190653" enable-background="new 0 0 2103.3203 1667.9167" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
         <defs>
-                <bx:grid x="-23.43558" y="159.787667" width="100" height="100"/>
+                <bx:grid x="-23.43558" y="159.787667" width="100" height="100"></bx:grid>
                 <linearGradient id="deslinearGradient4172">
                         <stop style="stop-opacity: 1; stop-color: rgb(105, 197, 209);" offset="0" id="desstop4174"/>
                         <stop offset="0.083" style="stop-color: rgb(255, 172, 64);"/>
@@ -638,7 +699,7 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
                 </g>
         </g>
         <path d="M 1275.254748 881.616379 Q 1277.371544 881.308248 1279.48834 881.616379 L 1280.975819 881.832903 Q 1283.092615 882.141034 1285.002205 883.035265 L 1286.344079 883.663644 Q 1288.253668 884.557875 1289.769127 885.950672 L 1290.834044 886.929395 Q 1292.349503 888.322192 1293.322488 890.077219 L 1294.006207 891.310481 Q 1294.979191 893.065508 1295.314459 895.010971 L 1295.550052 896.378053 Q 1295.88532 898.323515 1295.550052 900.268977 L 1295.314459 901.636059 Q 1294.979191 903.581522 1294.006207 905.336549 L 1293.322488 906.569811 Q 1292.349503 908.324838 1290.834044 909.717635 L 1289.769127 910.696358 Q 1288.253668 912.089155 1286.344079 912.983386 L 1285.002205 913.611765 Q 1283.092615 914.505996 1280.975819 914.814127 L 1279.48834 915.030651 Q 1277.371544 915.338782 1275.254748 915.030651 L 1273.767269 914.814127 Q 1271.650473 914.505996 1269.740883 913.611765 L 1268.399009 912.983386 Q 1266.48942 912.089155 1264.973961 910.696358 L 1263.909044 909.717635 Q 1262.393585 908.324838 1261.4206 906.569811 L 1260.736881 905.336549 Q 1259.763897 903.581522 1259.428629 901.636059 L 1259.193036 900.268977 Q 1258.857768 898.323515 1259.193036 896.378053 L 1259.428629 895.010971 Q 1259.763897 893.065508 1260.736881 891.310481 L 1261.4206 890.077219 Q 1262.393585 888.322192 1263.909044 886.929395 L 1264.973961 885.950672 Q 1266.48942 884.557875 1268.399009 883.663644 L 1269.740883 883.035265 Q 1271.650473 882.141034 1273.767269 881.832903 Z" style="stroke: url(#desgradient-2); stroke-miterlimit: 17; fill: url(#desgradient-1); stroke-width: 2px;" transform="matrix(-1, 1e-12, 2e-12, -1, 2553.297363280778, 1717.467407226184)" bx:shape="n-gon 1277.371544 898.323515 18.513776 17.015267 20 0.37 1@f7764595"/>
-           <foreignObject role="button" tabindex="0" on:click={()=>linke("u")} on:keypress={()=>linke("u")} on:mouseenter={()=>hover({"he":"הלוגו העכשווי", "en":"old Logo"})} on:mouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
+           <foreignObject role="button" tabindex="0" onclick={()=>linke("u")} onkeypress={()=>linke("u")} onmouseenter={()=>hover({"he":"הלוגו העכשווי", "en":"old Logo"})} onmouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
                                                   <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
                                                         width='38px'
@@ -650,12 +711,12 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
                           </foreignObject> 
                         {#if kind == "pic"} 
              <foreignObject x='1276' y='892' width='50px' height='50px' transform="translate(-25,-25)" >
-              <img on:mouseenter={()=>hover(newlogo[$lang])} on:mouseleave={()=>hover("0")} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="50" height="50" alt="new project logo" >
+              <img onmouseenter={()=>hover(newlogo[$lang])} onmouseleave={()=>hover("0")} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="50" height="50" alt="new project logo" >
             </foreignObject>
             {/if}
         <path transform="matrix(0.90,0,0,0.90,1275,872)" id="curveeuu" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
         <text  style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;" >
-            <textPath role="contentinfo" on:mouseenter={()=>hover({"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"})} on:mouseleave={()=>hover("0")} style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;"  class="curved-text" startOffset={st} xlink:href="#curveeuu">
+            <textPath role="contentinfo" onmouseenter={()=>hover({"he": `הצבעה על שינוי הלוגו`, "en": "vote on Logo change"})} onmouseleave={()=>hover("0")} style="fill: url(#desgradient-5); font-family: &quot;hooge 05_55&quot;; paint-order: stroke; stroke: url(#desgradient-8-9); stroke-linecap: round; stroke-linejoin: round; stroke-miterlimit: 1; stroke-width: 1.26413px; text-anchor: middle; white-space: pre;"  class="curved-text" startOffset={st} xlink:href="#curveeuu">
                 {openmissionName[$lang]}
             </textPath>
         </text>
@@ -733,25 +794,25 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 <div class="{`normSmll${askId}-noo`}"></div>
              <p style="margin-top: 10px;">
               <span role="contentinfo"
-               on:mouseenter={()=>hover({"he":"בעד", "en":"in favor"})} 
-               on:mouseleave={()=>hover("0")} style="color:var(--gold)" 
+               onmouseenter={()=>hover({"he":"בעד", "en":"in favor"})} 
+               onmouseleave={()=>hover("0")} style="color:var(--gold)" 
                >{noofusersOk} </span><span 
-               on:mouseenter={()=>hover({"he":"לא הצביעו","en":"not voted yet"})} 
-               on:mouseleave={()=>hover("0")} 
+               onmouseenter={()=>hover({"he":"לא הצביעו","en":"not voted yet"})} 
+               onmouseleave={()=>hover("0")} 
                role="contentinfo"
                style="color:aqua">{noofusersWaiting} </span><span 
-               on:mouseenter={()=>hover({"he":"נגד","en": "against"})} 
-               on:mouseleave={()=>hover("0")} 
+               onmouseenter={()=>hover({"he":"נגד","en": "against"})} 
+               onmouseleave={()=>hover("0")} 
                role="contentinfo"
                style="color:var(--barbi-pink)" >{noofusersNo} </span></p>
 
                     <!--  <button on:click={tochat}><Chaticon/></button>-->
-                 {#if deadline}    <p on:mouseenter={()=>hover({"he":"תאריך הביצוע", "en": "date"})} on:mouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
+                 {#if deadline}    <p onmouseenter={()=>hover({"he":"תאריך הביצוע", "en": "date"})} onmouseleave={()=>hover("0")}  class="hslink ab">{new Date(deadline).toLocaleDateString("he-IL")}</p>{/if}
               {#if low == false}
                  {#if already === false}
-            <button on:mouseenter={()=>hover({"he":"אישור", "en":"approve"})} on:mouseleave={()=>hover("0")} on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+            <button onmouseenter={()=>hover({"he":"אישור", "en":"approve"})} onmouseleave={()=>hover("0")} onclick={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
-            <button on:mouseenter={()=>hover({"he":"דחיה","en": "reject"})} on:mouseleave={()=>hover("0")} on:click={decline}  class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+            <button onmouseenter={()=>hover({"he":"דחיה","en": "reject"})} onmouseleave={()=>hover("0")} onclick={decline}  class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
          {:else if low == true}
           <Lowbtn/>

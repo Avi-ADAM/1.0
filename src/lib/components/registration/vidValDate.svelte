@@ -3,7 +3,7 @@
     import { show } from './store-show.js';
  import { createEventDispatcher } from 'svelte';
  const dispatch = createEventDispatcher();
-  let userName_value;
+  let userName_value = $state();
 let show_value = 0;
 
 userName.subscribe(value => {
@@ -34,7 +34,7 @@ function increment() {
    <div  class="input-2">
    <input type="date" class="input">
    </div>
-   <button class="button-in" on:click="{increment}">
+   <button class="button-in" onclick={increment}>
 להמשיך      </button>
 
 

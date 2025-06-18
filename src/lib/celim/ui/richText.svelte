@@ -11,16 +11,30 @@
   import Underline from '@tiptap/extension-underline';
   import LinkIcon from '../icons/linkIcon.svelte';
   import Separator from './separator.svelte';
-  export let outpot = ``;
-  export let showJson = false;
-  export let outjson = [];
-  export let trans = false
-  export let editable = true;
-  export let sml = false
-  export let minw = false
-  let element;
-  let editor;
-  let menu;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [outpot]
+   * @property {boolean} [showJson]
+   * @property {any} [outjson]
+   * @property {boolean} [trans]
+   * @property {boolean} [editable]
+   * @property {boolean} [sml]
+   * @property {boolean} [minw]
+   */
+
+  /** @type {Props} */
+  let {
+    outpot = $bindable(``),
+    showJson = false,
+    outjson = $bindable([]),
+    trans = false,
+    editable = true,
+    sml = false,
+    minw = false
+  } = $props();
+  let element = $state();
+  let editor = $state();
+  let menu = $state();
   onMount(() => {
     editor = new Editor({
       element: element,
@@ -83,9 +97,9 @@
   const h3Leb = { he: `<h3>כותרת משנית</h3>`, en: `<h3>secondery header</h3>` };
   const linkLeb = { he: 'לינק', en: 'link' };
   const bet = { he: 'ב', en: 'B' };
-  let hide = true;
-  let active = parLeb[$lang];
-  let hides = true;
+  let hide = $state(true);
+  let active = $state(parLeb[$lang]);
+  let hides = $state(true);
   function setLink() {
     const previousUrl = editor.getAttributes('link').href;
     const url = window.prompt(linkPro[$lang], previousUrl);
@@ -97,8 +111,9 @@
   }
   let leftsvg = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm-8 4a1 1 0 100-2H2a1 1 0 100 2h8zm9 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-9 5a1 1 0 100-2H2a1 1 0 100 2h8z"></path> </g></svg>`;
   let rightsvg = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm0 4a1 1 0 100-2h-8a1 1 0 100 2h8zm1 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-1 5a1 1 0 100-2h-8a1 1 0 100 2h8z"></path> </g></svg>`;
-  let actives = $lang == 'he' ? rightsvg : leftsvg;
-  $: show = false
+  let actives = $state($lang == 'he' ? rightsvg : leftsvg);
+  let show = $state(false);
+  
 </script>
 
 <div
@@ -110,31 +125,31 @@
       class="max-w-screen flex flex-wrap items-top justify-right mx-auto pb-0 pr-2 p-4 "
     >
       <button
-        on:click={() => editor.chain().focus().toggleBold().run()}
+        onclick={() => editor.chain().focus().toggleBold().run()}
         class:active={editor.isActive('bold')}
       >
         <p><strong>{bet[$lang]}</strong></p>
       </button>
       <button
-        on:click={() => editor.chain().focus().toggleStrike().run()}
+        onclick={() => editor.chain().focus().toggleStrike().run()}
         class:active={editor.isActive('strike')}
       >
         <p><s>{bet[$lang]}</s></p>
       </button>
       <button
-        on:click={() => editor.chain().focus().toggleItalic().run()}
+        onclick={() => editor.chain().focus().toggleItalic().run()}
         class:active={editor.isActive('italic')}
       >
         <p><em>{bet[$lang]}</em></p>
       </button>
       <button
-        on:click={() => editor.chain().focus().toggleUnderline().run()}
+        onclick={() => editor.chain().focus().toggleUnderline().run()}
         class:active={editor.isActive('underline')}
       >
         <p><u>{bet[$lang]}</u></p>
       </button>
       <button
-        on:click={!editor.isActive('link')
+        onclick={!editor.isActive('link')
           ? setLink()
           : () => editor.chain().focus().unsetLink().run()}
         class={editor.isActive('link') ? 'active' : ''}
@@ -143,7 +158,7 @@
       <div class="flex" class:flex-col={!hides}>
       <button
         id="dropdownNavbarLink"
-        on:click={() => (hides = !hides)}
+        onclick={() => (hides = !hides)}
         class=" text-gold rounded bg-barbi"
         ><div
           class="flex flex-row justify-center items-center text-gold rounded bg-barbi"
@@ -170,7 +185,7 @@
         class="z-10 font-normal bg-gold divide-x divide-gray-100 rounded-lg shadow flex-row flex"
       >
         <button
-          on:click={() => {
+          onclick={() => {
             editor.chain().focus().setTextAlign('center').run();
             actives = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm-4 4a1 1 0 100-2H6a1 1 0 100 2h8zm5 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-5 5a1 1 0 100-2H6a1 1 0 100 2h8z"></path> </g></svg>`;
             hide = true;
@@ -196,7 +211,7 @@
           ></button
         >
         <button
-          on:click={() => {
+          onclick={() => {
             editor.chain().focus().setTextAlign('left').run();
             actives = leftsvg;
             hide = true;
@@ -206,7 +221,7 @@
         >
 
         <button
-          on:click={() => {
+          onclick={() => {
             editor.chain().focus().setTextAlign('right').run();
             actives = rightsvg;
             hide = true;
@@ -216,7 +231,7 @@
         >
 
         <button
-          on:click={() => {
+          onclick={() => {
             editor.chain().focus().setTextAlign('justify').run();
             actives = `<svg height="30" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg" fill="none"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path fill="currentColor" fill-rule="evenodd" d="M18 5a1 1 0 100-2H2a1 1 0 000 2h16zm0 4a1 1 0 100-2H2a1 1 0 100 2h16zm1 3a1 1 0 01-1 1H2a1 1 0 110-2h16a1 1 0 011 1zm-1 5a1 1 0 100-2H2a1 1 0 100 2h16z"></path> </g></svg>`;
             hide = true;
@@ -244,7 +259,7 @@
       </div>
 
       <button
-        on:click={() => editor.chain().focus().undo().run()}
+        onclick={() => editor.chain().focus().undo().run()}
         class:disabled={!editor.can().chain().focus().undo().run()}
         ><svg
           height="30"
@@ -279,7 +294,7 @@
         ></button
       >
       <button
-        on:click={() => editor.chain().focus().redo().run()}
+        onclick={() => editor.chain().focus().redo().run()}
         class:disabled={!editor.can().chain().focus().redo().run()}
         ><svg
           height="30"
@@ -320,28 +335,30 @@
   <div
     class="border-gold border rounded {sml ? "" : "m-2 p-8"} text-barbi bg-{trans == false ? "gold" : "transparent"}"
     bind:this={element}
-  />
+></div>
   {#if editor && editable}
   <Separator gradient={true}>
-    <div slot="label" class="border px-2 py-2 rounded-full">
-      <svg
-        on:click={()=> show = !show}
-        on:keypress={()=> show = !show}
-        role="button"
-        tabindex="0"
-        xmlns="http://www.w3.org/2000/svg"
-        width="24"
-        height="24"
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke="currentColor"
-        stroke-width="2"
-        stroke-linecap="round"
-        stroke-linejoin="round"
-        class="lucide lucide-plus focus:border-none focus:ring-0"
-        ><path d="M5 12h14" />{#if show != true}<path d="M12 5v14" />{/if}</svg
-      >
-    </div>
+    {#snippet label()}
+            <div  class="border px-2 py-2 rounded-full">
+        <svg
+          onclick={()=> show = !show}
+          onkeypress={()=> show = !show}
+          role="button"
+          tabindex="0"
+          xmlns="http://www.w3.org/2000/svg"
+          width="24"
+          height="24"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          stroke-width="2"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          class="lucide lucide-plus focus:border-none focus:ring-0"
+          ><path d="M5 12h14" />{#if show != true}<path d="M12 5v14" />{/if}</svg
+        >
+      </div>
+          {/snippet}
   </Separator>
   {/if}
   {#if editor && editable && show}
@@ -353,7 +370,7 @@
         <div>
           <button
             id="dropdownNavbarLink2"
-            on:click={() => (hide = !hide)}
+            onclick={() => (hide = !hide)}
             class="  w-full py-2 px-3 text-gold rounded bg-barbi"
             ><div
               class="flex flex-row justify-center items-center text-gold rounded bg-barbi"
@@ -381,7 +398,7 @@
             class="z-10 bg-gold divide-y divide-gray-100 rounded-lg shadow flex-row flex"
           >
             <button
-              on:click={() => {
+              onclick={() => {
                 editor.chain().focus().toggleHeading({ level: 1 }).run();
                 active = h1Leb[$lang];
                 hide = true;
@@ -391,7 +408,7 @@
             >
 
             <button
-              on:click={() => {
+              onclick={() => {
                 editor.chain().focus().toggleHeading({ level: 3 }).run();
                 active = h3Leb[$lang];
                 hide = true;
@@ -402,7 +419,7 @@
             </button>
 
             <button
-              on:click={() => {
+              onclick={() => {
                 editor.chain().focus().setParagraph().run();
                 active = parLeb[$lang];
                 hide = true;
@@ -413,7 +430,7 @@
             </button>
 
             <button
-              on:click={() => {
+              onclick={() => {
                 editor.chain().focus().toggleBulletList().run();
                 active = listLeb[$lang];
                 hide = true;
@@ -423,7 +440,7 @@
             >
 
             <button
-              on:click={() => {
+              onclick={() => {
                 editor.chain().focus().toggleOrderedList().run();
                 active = listNLeb[$lang];
                 hide = true;
@@ -432,7 +449,7 @@
               >{listNLeb[$lang]}</button
             >
             <button
-              on:click={() => {
+              onclick={() => {
                 editor.chain().focus().toggleBlockquote().run();
                 active = quoteLeb[$lang];
                 hide = true;
@@ -444,10 +461,10 @@
           </div>
         </div>
         <button
-          on:click={() => editor.chain().focus().setHorizontalRule().run()}
+          onclick={() => editor.chain().focus().setHorizontalRule().run()}
           >{lineLeb[$lang]}</button
         >
-        <button on:click={() => editor.chain().focus().setHardBreak().run()}
+        <button onclick={() => editor.chain().focus().setHardBreak().run()}
           >{spaceLeb[$lang]}</button
         >
         <div></div>

@@ -6,34 +6,20 @@
 
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-export let allIds = []
-export let filterKind = "projects"
 console.log(allIds,"allIds")
-export let sug = 13;
 let sugg =  "sugg";
-export let pen = 13;
 let pend = "pend";
-export let ask = 17;
 let asks = "asks";
-export let wel = 17;
 let welc = "welc";
-export let beta = 13;
 let betaha = "betaha";
-export let des = 13;
 let desi = "desi";
-export let fia = 99;
 let fiap = "fiap";
-export let pmash = 99;
  let ppmash = "ppmash";
-export let mashs = 17;
  let pmashs = "pmashs";
-export let maap = 17;
  let pmaap = "pmaap";
-export let askma = 13;
  let askmap = "askmap";
-export let hachlot = 9
 // נאחסן את כל המצבים באובייקט אחד
-let states = {
+let states = $state({
   sugg,
   pend,
   asks,
@@ -45,7 +31,7 @@ let states = {
   pmashs,
   pmaap,
   askmap
-};
+});
 onMount(async () => {
     if(filterKind === "projects"){
         milon = []
@@ -129,7 +115,43 @@ dispatch("hover", {id: fir[$lang]});
 
 
 
-export let low = true;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [allIds]
+   * @property {string} [filterKind]
+   * @property {number} [sug]
+   * @property {number} [pen]
+   * @property {number} [ask]
+   * @property {number} [wel]
+   * @property {number} [beta]
+   * @property {number} [des]
+   * @property {number} [fia]
+   * @property {number} [pmash]
+   * @property {number} [mashs]
+   * @property {number} [maap]
+   * @property {number} [askma]
+   * @property {number} [hachlot]
+   * @property {boolean} [low]
+   */
+
+  /** @type {Props} */
+  let {
+    allIds = [],
+    filterKind = "projects",
+    sug = 13,
+    pen = 13,
+    ask = 17,
+    wel = 17,
+    beta = 13,
+    des = 13,
+    fia = 99,
+    pmash = 99,
+    mashs = 17,
+    maap = 17,
+    askma = 13,
+    hachlot = 9,
+    low = true
+  } = $props();
 let hovered = false;
 function hoverede(x){
         let t = {"he":"לב המערכת", "en": "heart of 1💗1"}
@@ -145,7 +167,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
   dispatch("hover", {id: u[$lang]});
  }
  //{name:"welc",val:true,color:"gray"},
- let milon = [
+ let milon = $state([
   {name:"fiap", val:true, color:"blue", word:{he:`אשרורי סיום (${fia})`, en:`Mission Completion Approvals (${fia})`}}, 
   {name:"sugg", val:true, color:"green", word:{he:`הצעות למשימות (${sug})`, en:`Mission Proposals (${sug})`}},
   {name:"pend", val:true, color:"yellow", word:{he:`משימות בתהליך אישור (${pen})`, en:`Missions Pending Approval (${pen})`}},
@@ -157,7 +179,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
   {name:"pmaap", val:true, color:"wow", word:{he:`אשרור קבלת משאבים (${maap})`, en:`Resource Reception Approvals (${maap})`}}, 
   {name:"askmap", val:true, color:"red", word:{he:`אשרור השמה למשאבים (${askma})`, en:`Resource Assignment Approvals (${askma})`}},
   {name:"hachla", val:true, color:"gray", word:{he:`אשרורים כלליים (${hachlot})`, en:`General Approvals (${hachlot})`}}
-]
+])
 </script>
 <div class="flex flex-nowrap overflow-x-auto whitespace-nowrap w-full sm:max-w-[calc(100vw-200px)] max-w-[calc(100vw-180px)] d">
 {#if filterKind == "kind"}
@@ -180,7 +202,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
     // מחזיר true רק אם יש ערך מספרי והוא גדול מ-0
     return valueMap[item.name] > 0;
 }) as key}
-    <button on:click={()=> showonly(key.name)}>
+    <button onclick={()=> showonly(key.name)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
@@ -191,7 +213,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
 {/each}
 {:else}
 {#each milon as key}
-    <button on:click={()=> showonly(key.name,key.id)}>
+    <button onclick={()=> showonly(key.name,key.id)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
