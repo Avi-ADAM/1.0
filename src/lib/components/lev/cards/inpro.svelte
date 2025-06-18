@@ -1,18 +1,23 @@
 <!-- @migration-task Error while migrating Svelte code: `$:` is not allowed in runes mode, use `$derived` or `$effect` instead -->
 <script>
-  import { formatTime } from './../utils.js';
-  import { lang } from '$lib/stores/lang.js';
-  import Lowbtn from '$lib/celim/lowbtn.svelte';
-  // import Chaticon from '../../../celim/chaticon.svelte'
+
+    import { formatTime } from './../utils.js';
+    import {lang} from '$lib/stores/lang.js' 
+
+import Lowbtn from '$lib/celim/lowbtn.svelte'
+     // import Chaticon from '../../../celim/chaticon.svelte'
+  import { createEventDispatcher } from 'svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
-  /** @type {{x?: number, tasks?: any, src: any, projectName: any, already: any, zman: any, hearotMeyuchadot: any, status?: number, dueDateOrCountToDedline: any, missionName: any, link: any, missionDetails: any, hoursdon: any, hourstotal: any, show: any, running: any, linkDescription: any, lapse?: number, low?: boolean, iskvua?: boolean, isVisible?: boolean, startDate?: any, onStart?: function, onDone?: function, onSave?: function, onAzor?: function, onClear?: function, onHover?: function, onStatusi?: function, onTask?: function}} */
-  let {
+/** @type {{x?: number, tasks?: any, src: any, projectName: any, already: any, zman: any, hearotMeyuchadot: any, status?: number, dueDateOrCountToDedline: any, missionName: any, link: any, missionDetails: any, hoursdon: any, hourstotal: any, show: any, running: any, linkDescription: any, lapse?: number, low?: boolean, iskvua?: boolean, isVisible?: boolean, startDate?: any, onStart?: function, onDone?: function, onSave?: function, onAzor?: function, onClear?: function, onHover?: function, onStatusi?: function, onTask?: function}} */
+let {
+    showSaveDialog = false,
+     storeTimer,
     x = 0,
     tasks = [],
     src,
     projectName,
-    already = $bindable(),
+    already,
     zman,
     hearotMeyuchadot,
     status = 0,
@@ -44,7 +49,9 @@
     onStart();
   }
   function done() {
-    already = true;
+    // Note: Assigning to 'already' here won't update the parent.
+    // The parent should use the 'onDone' callback to update its state if needed.
+    // already = true; 
     onDone();
   }
   function save() {
@@ -88,7 +95,7 @@
 const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
 console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
-$: totali = {"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`}
+const totali = $derived({"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`});
 let isScrolable = true; 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
@@ -102,14 +109,16 @@ function preventSwiperScroll(event) {
       event.stopPropagation();
     }
   }
+  const editButton = {"he": "עריכת הטיימר","en": "edit Timer"}
+
 </script>
 
-<div on:wheel={preventSwiperScroll} 
-on:touchmove={preventTouchScroll}
-on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+<div onwheel={preventSwiperScroll} 
+ontouchmove={preventTouchScroll}
+onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"
 tabindex="0" 
-on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} {isScrolable ? "bg-white" : "bg-gray-200"} lg:w-[90%]">
+onkeypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} {isScrolable ? "bg-white" : "bg-gray-200"} lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -127,8 +136,8 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
          {#key isVisible}
 {#if tasks.length > 0}
   <div 
-  on:click={opentask} 
-  on:keypress={opentask}
+  onclick={opentask} 
+  onkeypress={opentask}
   role="button"
   tabindex="0"
   class=" inline-flex items-center justify-center w-8 h-8 text-xl font-bold text-gold bg-barbi border-2 border-white rounded-full  dark:border-gray-700 p-2 m-2">{tasks.length}</div>
@@ -141,9 +150,9 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
               <div class="text-mturk font-bold text-lg md:text-4xl  mb-2">{missionName}</div>
               <h5 style="line-height: 1;" class="sm:text-xl text-lg text-gray-600  flex items-center">
                <img style="width:2.5rem;"   src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-                                 <span on:mouseenter={()=>hover(nooftitle[$lang])} on:mouseleave={()=>hover("0")} role="contentinfo"
+                                 <span onmouseenter={()=>hover(nooftitle[$lang])} onmouseleave={()=>hover("0")} role="contentinfo"
                    >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0} ${hoursdonTitle[$lang]}`}</span> {from[$lang]} <span
-                   role="contentinfo" on:mouseenter={()=>hover(totalTitle[$lang])} on:mouseleave={()=>hover("0")}>{hourstotal} {totali[$lang]}</span></h5>
+                   role="contentinfo" onmouseenter={()=>hover(totalTitle[$lang])} onmouseleave={()=>hover("0")}>{hourstotal} {totali[$lang]}</span></h5>
                    {#if std || dueDateOrCountToDedline}
                                 <p
                   style="line-height: 1;"
@@ -169,7 +178,7 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
          class="  bg-goldGrad bg-[length:200%_auto] animate-gradientx text-center text-wow p-2 sm:text-2xl text-xl" 
          style:font-family="Digital" 
          role="contentinfo"
-         on:mouseenter={()=>hover(timero[$lang])} on:mouseleave={()=>hover("0")}  
+         onmouseenter={()=>hover(timero[$lang])} onmouseleave={()=>hover("0")}  
          style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
             {formatTime(zman)}
         </span></div> 
@@ -178,10 +187,10 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
             <span on:mouseenter={()=>hover("שווי לשעה")} on:mouseleave={()=>hover("0")} > {perhour} לשעה </span> * <span on:mouseenter={()=>hover("כמות השעות")} on:mouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
       </p>-->
      {#if missionDetails !== null && missionDetails !== "null" && missionDetails !== "undefined" && missionDetails.length > 0} <p 
-     on:mouseenter={()=>hover(deta[$lang])} on:mouseleave={()=>hover("0")}
+     onmouseenter={()=>hover(deta[$lang])} onmouseleave={()=>hover("0")}
        class="max-h-1/2"><RichText outpot={missionDetails} editable={false} /></p>{/if}
     {#if hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" && hearotMeyuchadot !== "null" && hearotMeyuchadot.length > 0}
-     <span role="contentinfo" on:mouseenter={()=>hover(notes[$lang])} on:mouseleave={()=>hover("0")} >
+     <span role="contentinfo" onmouseenter={()=>hover(notes[$lang])} onmouseleave={()=>hover("0")} >
    <RichText editable={false}  outpot={hearotMeyuchadot}/>
    </span>
      {/if} 
@@ -207,27 +216,30 @@ on:keypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="ov
         </div>
       </div>
     </div>
-  </div>
-  {#if low == false}
-    {#if lapse !== 0 || x !== 0}
-      <div class="flex items-center justify-center space-x-2 mb-12">
-        <button
-          onmouseenter={() => hover('לחיצה לאיפוס הטיימר מבלי לשמור')}
-          onmouseleave={() => hover('0')}
-          class="border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi hover:text-gold px-4 py-1 rounded hover:from-lturk hover:to-barbi"
-          onclick={clear}>ניקוי</button
-        >
-        <button
-          onmouseenter={() => hover('לחיצה לעצירת הטיימר ושמירת הזמן שבוצע')}
-          onmouseleave={() => hover('0')}
-          class="  bg-gradient-to-br text-gold hover:text-barbi hover:from-graa hover:to-grab
-      px-4 py-1 rounded from-lturk to-barbi"
-          onclick={save}
-        >
-          הוספה</button
-        >
-      </div>{/if}
-    {#if already === false}
+  
+       </div>
+       {#if low == false}
+      <!---- {#if lapse !== 0 || x !== 0}
+       <div class="flex items-center justify-center space-x-2 mb-12">
+<button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")} 
+    class="border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi hover:text-gold  px-4 py-1 rounded hover:from-lturk hover:to-barbi " on:click={clear}>ניקוי</button>
+<button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} 
+   class="  bg-gradient-to-br text-gold hover:text-barbi hover:from-graa hover:to-grab 
+      px-4 py-1 rounded from-lturk to-barbi " on:click={save}> הוספה</button>
+    </div>{/if}-->
+    {#if storeTimer?.attributes?.activeTimer?.data?.attributes}
+    <!--edit timer button-->
+    <div class="flex items-center justify-center space-x-2 mb-12">
+
+    <button onmouseenter={()=>hover("לחיצה לעריכת הטיימר")} onmouseleave={()=>hover("0")} class="button-gold mx-auto hover:text-barbi" tabindex="0" role="button" onkeypress={() => showSaveDialog = true} onclick={() => showSaveDialog = true}>✏{editButton[$lang]}</button>
+    </div>
+    {/if}
+        {#if already === false}
+    <button onmouseenter={()=>hover("לחיצה לסיום המשימה")} onmouseleave={()=>hover("0")} onclick={done}  
+                class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
+          name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
+     {/if} 
+     {#if show === true} 
       <button
         onmouseenter={() => hover('לחיצה לסיום המשימה')}
         onmouseleave={() => hover('0')}

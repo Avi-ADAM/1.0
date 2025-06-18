@@ -170,7 +170,7 @@ async function agree() {
               hearotMeyuchadot: "${hearotMeyuchadot}",
               descrip: "${missionDetails}",
               users_permissions_user: "${userId}",
-              finiapruval: "${askId}",
+              finiapruvals: "${askId}",
                       publishedAt: "${d.toISOString()}",
               mission: ${missId}
    
@@ -196,6 +196,8 @@ updateMesimabetahalich(
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
+            //TODO: archive timegrama
+            archiveTimeGrama(timegramaId,fetch)
             dispatch('acsept', {
                 ani: "fini",
                 coinlapach: coinlapach
@@ -434,6 +436,7 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
   timegramaDate,
   timegramaId
   } = $props();
+  import { archiveTimeGrama } from "$lib/func/send/timeGrama.svelte";
 
 </script>
 {#await ser}

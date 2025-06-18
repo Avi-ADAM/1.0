@@ -37,17 +37,24 @@ export async function POST({ request, cookies }) {
     .then((data) => {
         newd = data
       console.log('server:', newd);
-      if(newd.data != null){
-        console.log("here")
-        
-      }else{
-      error(500, newd.errors[0].message);
-      }
-    })
-    .catch((e) => {
-      console.error('Error:', e);
-      error(500,e);
-    });
+    
+      if (newd.data != null) {
+        console.log("here");
+    } else if (newd.error && newd.error.status === 401 && newd.error.name === 'UnauthorizedError') {
+        // Redirect the client to the login page
+        throw json({ redirect: '/login' }, { status: 401 });
+    } else {
+        throw error(500, newd.errors[0].message);
+    }
+})
+.catch((e) => {
+    if (e.body && e.body.redirect) {
+        // Return the redirect response
+        return e;
+    }
+    console.error('Error:', e);
+    throw error(500, e);
+});
     return json(newd);
 }
 /*

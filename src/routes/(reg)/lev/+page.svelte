@@ -25,6 +25,7 @@
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
+  import { fetchTimers } from '$lib/stores/timers'
   import pkg from 'lodash';
   const {isEqual} = pkg;
   import Rikma from '$lib/components/lev/rikma.svelte';
@@ -281,11 +282,9 @@
           projectId:
             start[i].attributes.finiapruvals.data[j].attributes.project.data.id,
           timegramaDate:
-            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
-              .attributes.date,
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama?.data?.attributes?.date || null,
           timegramaId:
-            start[i].attributes.finiapruvals.data[j].attributes.timegrama.data
-              .id,  
+            start[i].attributes.finiapruvals.data[j].attributes.timegrama?.data?.id || null,  
           projectName: getProjectData(start[i].id, 'pn'),
           noof: getProjectData(start[i].id, 'noof'),
           src2: getProjectData(start[i].id, 'pp'),
@@ -519,6 +518,7 @@
         }
         let t = start[i].attributes.asks.data[j].attributes;
         dictasked.push({
+          isRishon: t.open_mission.data.attributes.isRishon,
           uid: t.users_permissions_user.data.id,
           username: t.users_permissions_user.data.attributes.username,
           timegramaId: t.timegrama.data?.id ?? 0,
@@ -670,7 +670,7 @@
     console.log(dictasked);
     let filters = [idL];
 
-    let result = dictasked.filter((val) => !filters.includes(val.uid));
+    let result = dictasked.filter((val) => val.isRishon || !filters.includes(val.uid));
     dictasked = result;
     console.log(dictasked);
 
@@ -1495,6 +1495,7 @@
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
+      fetchTimers($page.data.uid,fetch)
       token = cookieValu;
       const elem = document.getElementById('screen');
 
@@ -1759,7 +1760,7 @@
           update = true;
           let index;
           let isMeData = false;
-          if (datan.data.attributes.users_permissions_user.data.id == idL) {
+          if (datan.data.attributes.users_permissions_user?.data?.id == idL) {
             index = arr1.findIndex(
               (element) => element.ani === 'meData' && element.askId == iddd
             );
@@ -1965,7 +1966,7 @@
             timegrama {data{id attributes{date}}}
             createdAt
             open_mission {data{id attributes{  
-                  name
+                  name isRishon
                 }}}            
             chat{why ide what zman id users_permissions_user {data{id attributes{username profilePic {data{attributes {url formats }}}}}} }
         }}}
@@ -2096,7 +2097,7 @@
                             createdAt
                             chat{why id ide what zman users_permissions_user {data{id}}}
                             open_mission {data{id attributes{  mission {data{id}}
-                                            declined {data{ id}} iskvua sqadualed dates publicklinks tafkidims {data{ id }}
+                                            declined {data{ id}} iskvua isRishon sqadualed dates publicklinks tafkidims {data{ id }}
                                             noofhours perhour privatlinks descrip hearotMeyuchadot name}}}
                             project {data{ id }}
                             users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}

@@ -137,7 +137,12 @@ export const qids = {
               username
               telegramId
               lang 
-              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id attributes{name stname timer howmanyhoursalready hoursassinged project{data{attributes{projectName}}} }}}
+              mesimabetahaliches(filters:{finnished:{ne: true },forappruval: { ne: true }}) {data{id
+               attributes{name stname timer howmanyhoursalready hoursassinged
+              acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
+               activeTimer{data{id
+                attributes{start totalHours timers{start stop} acts{data{id}} isActive saved}}} 
+                project{data{id attributes{projectName profilePic{data{attributes{formats url}}}}}} }}}
             }
           }
         }
@@ -162,13 +167,14 @@ export const qids = {
   }
  ) {data{id attributes{ stname timer}}}
  }`,
-  '11saveTimer': `mutation SaveTimer($mId: ID!, $stname: String, $x: Float,$howmanyhoursalready: Float){
+  '11saveTimer': `mutation SaveTimer( $mId: ID!, $stname: String, $x: Float,$howmanyhoursalready: Float){
  updateMesimabetahalich(
   id: $mId
   data: {
  howmanyhoursalready:$howmanyhoursalready,
  stname: $stname,
- timer: $x
+ timer: $x,
+ activeTimer:null
   }
  ) {data{id attributes{ stname timer}}}
  }`,
@@ -381,5 +387,88 @@ export const qids = {
       id
     }   
   }
-}`
+}`,
+'33CreateTimer':`
+        mutation CreateTimer($missionId: ID!, $start: DateTime!, $userId: ID!, $projectId: ID!) {
+          createTimer(
+            data: {
+              activeMesimabetahalich: $missionId,
+              mesimabetahalich: $missionId,
+              users_permissions_user: $userId,
+              project: $projectId,
+              start: $start,
+              isActive: true,
+              totalHours: 0,
+              timers: [{ start: $start }]
+            }
+          ) {
+            data {
+              id
+              attributes {
+              start totalHours timers{start stop} acts{data{id}} isActive saved
+              }
+            }
+          }
+        }
+      `,
+      '34UpdateTimer': `
+      mutation UpdateTimer($saved: Boolean,$timerId: ID!,$tasks: [ID], $newStart: DateTime , $timers:[ComponentNewTimesInput], $totalHours:Float, $isActive: Boolean) {
+        updateTimer(id: $timerId,
+          data: {
+            saved: $saved,
+            start: $newStart,
+            isActive: $isActive,
+            timers: $timers,
+            totalHours: $totalHours,
+            acts: $tasks
+          }
+        ) {
+          data {
+            id
+            attributes {
+             start totalHours timers{start stop} acts{data{id}} isActive saved
+            }
+          }
+        }
+      }
+    `,
+    "35updateTimeGrama": `mutation UpdateTimegrama($date: DateTime,$done: Boolean, $id: ID!) {
+  updateTimegrama(id: $id, data: {date: $date, done: $done}) {
+    data {
+      id
+    }   
+  }
+}`,
+'36getMissionTimer': `query GetMissionTimer($missionId: ID!) {
+  mesimabetahalich(id: $missionId) {
+    data {
+      id
+      attributes {
+        name
+         project{data{id}}
+        activeTimer {
+          data {
+            id
+            attributes {
+              start
+              totalHours
+              timers {
+                start
+                stop
+              }
+              acts {
+                data {
+                  id
+                }
+              }
+              isActive
+              saved
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`,
 }

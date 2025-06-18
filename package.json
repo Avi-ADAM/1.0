@@ -9,6 +9,8 @@
   "devDependencies": {
     "@event-calendar/core": "^3.4.0",
     "@event-calendar/time-grid": "^3.4.0",
+    "@sveltejs/adapter-node": "^5.2.12",
+    "@sveltejs/adapter-static": "^3.0.8",
     "@sveltejs/adapter-vercel": "^5.4.3",
     "@sveltejs/kit": "^2.7.4",
     "@sveltejs/vite-plugin-svelte": "^4.0.0",
@@ -37,7 +39,9 @@
     "@event-calendar/day-grid": "^3.4.0",
     "@event-calendar/interaction": "^3.4.0",
     "@fontsource/fira-mono": "^5.0.14",
+    "@google/generative-ai": "^0.24.0",
     "@mediakular/gridcraft": "^0.2.8",
+    "@number-flow/svelte": "^0.3.3",
     "@okrad/svelte-progressbar": "^2.2.0",
     "@sentry/sveltekit": "^8.27.0",
     "@svelte-plugins/datepicker": "^1.0.9",

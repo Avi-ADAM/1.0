@@ -67,10 +67,11 @@
             })
             .then(({ data }) => {
                 console.log(data)
-                document.cookie = `jwt=${data.jwt}; expires=` + new Date(2026, 0, 1).toUTCString();
-                document.cookie = `id=${data.user.id}; expires=` + new Date(2026, 0, 1).toUTCString();
-                document.cookie = `un=${encodeURIComponent(data.user.username)}; expires=` + new Date(2026, 0, 1).toUTCString();
-                document.cookie = `when=${Date.now()}; expires=` + new Date(2026, 0, 1).toUTCString();
+                document.cookie = `jwt=${data.jwt}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
+                document.cookie = `id=${data.user.id}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
+                document.cookie = `un=${encodeURIComponent(data.user.username)}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
+                document.cookie = `when=${Date.now()}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
+                // document.cookie = `guidMe=again; path=/; expires=` + new Date(2026, 0, 1).toUTCString();	
                 JWT.set(data.jwt);
                 idM.set(data.user.id);
                 liUN.set(data.user.username);

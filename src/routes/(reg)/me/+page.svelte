@@ -1,5 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: Mixing old (on:click) and new syntaxes for event handling is not allowed. Use only the onclick syntax -->
 <script>
+	import Dialog from '$lib/celim/ui/dialog.svelte';
 	import { isMobileOrTablet } from '$lib/utilities/device';
     import { liUN } from '$lib/stores/liUN.js';
 
@@ -274,7 +275,7 @@
             meDataa.data.usersPermissionsUser.data.attributes
               .profilManualAlready != true
           ) {
-            run();
+            showSaveDialog = true; // Show dialog instead of running directly
           }
           meData = meDataa.data.usersPermissionsUser.data.attributes;
           isG =
@@ -703,75 +704,65 @@
   function guid() {
     isG = true;
     run();
-  }
-  const title = { he: 'פרופיל והגדרות 1💗1', en: '1💗1 profile and settings' };
-  const deletew = { he: 'מחיקה', en: 'delete' };
-  const om = { he: 'רק רגע בבקשה', en: 'one moment please' };
-  const message1 = {
-    he: 'לחיצה על הכתר מובילה ללב 1💗1, שם נמצאות ההצעות, ההצבעות והפעולות השונות',
-    en: 'click on the crown to move to the heart of 1💗1, there are offers, voting and various actions'
-  };
-  const levtitle = { he: 'ללב 1💗1', en: 'to the heart of 1💗1' };
-  const message2 = {
-    he: 'רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים',
-    en: 'list of your skills, press the edit button below to add more skills or to remove some from your list'
-  };
-  const message3 = {
-    he: 'רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר',
-    en: 'youre roles list, after adding or removing remember to press the button below to save your edit'
-  };
-  const message4 = {
-    he: 'רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת',
-    en: "Bottom right is youre resource list, on the heart you'll get offers from FreeMates who need them"
-  };
-  const message5 = {
-    he: 'רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת',
-    en: 'list of your Vallues, we will offer you FreeMates who promoting those vallues'
-  };
-  const message6 = {
-    he: 'רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת',
-    en: 'Bottom left are your ways of creation list, we will offer you missions that accsept those terms'
-  };
-  const message7 = {
-    he: 'עריכת תמונת הפרופיל',
-    en: 'edit your profile picture'
-  };
-  const message8 = {
-    he: ' העלאת תמונת פרופיל חדשה',
-    en: 'upload new profile picture'
-  };
-  const message9 = {
-    he: 'רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה',
-    en: 'your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates'
-  };
-  const myfr = { he: 'הרקמות שלי', en: 'My FreeMates' };
-  const crnfr = { he: 'יצירת ריקמה חדשה', en: 'create a new FreeMates' };
-  const message10 = {
-    he: 'כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן',
-    en: 'The Diamond down shows how much you earn from FreeMates so far'
-  };
-  const sofartit = { he: 'סך הכל הרווחתי', en: 'total earnings' };
-  const editbas = {
-    he: 'עריכת פרטים בסיסיים והגדרות',
-    en: 'Edit Basic Information and Settings'
-  };
-  const message11 = {
-    he: 'עריכת פרטים והגדרות, הפעלת התראות במכשיר, בחירת יום חופשי וביטול הצגת המדריך',
-    en: 'edit your info, settings, add device alerts, choosing a free day and cencel guid'
-  };
-  const cencel = { he: 'ביטול', en: 'cencel' };
-  const sk = { he: 'כישורים', en: 'skills' };
-  const rl = { he: 'תפקידים', en: 'roles' };
-  const ms = { he: 'משאבים', en: 'resources' };
-  const ar = { he: 'ערכים', en: 'Vallues' };
-  const asia = {"he":'עשיה',"en":"duing"}
-  const ww = { he: 'דרכי היצירה', en: 'ways of creation' };
-  const plv = { he: 'בחירת ערכים', en: 'choose Vallues' };
-  const pls = { he: 'בחירת כישורים', en: 'choose skills' };
-  const plm = { he: 'בחירת משאבים', en: 'choose resources' };
-  const plw = { he: 'בחירת דרכי יצירה', en: 'choose ways of creation' };
-  const pla = { he: 'בחירה מרשיחמה', en: 'choose from list' };
-  let width = $state(), height = $state();
+}
+const title = {"he": "פרופיל והגדרות 1💗1", "en": "1💗1 profile and settings"}
+const deletew = {"he": "מחיקה" , "en": "delete"};
+const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
+const message1 = {"he":"לחיצה על הכתר מובילה ללב 1💗1, שם נמצאות ההצעות, ההצבעות והפעולות השונות",
+                  "en":"click on the crown to move to the heart of 1💗1, there are offers, voting and various actions"}
+const levtitle = {"he": "ללב 1💗1", "en": "to the heart of 1💗1"}
+const message2 = {"he": "רשימת הכישורים שלך, לחיצה על כפתור העריכה להוספת או הסרת כישורים",
+                   "en": "list of your skills, press the edit button below to add more skills or to remove some from your list"}
+const message3 = {"he": "רשימת התפקידים, עריכה להוספת או הסרת תפקידים, יש ללחוץ על כפתור האישור למטה כדי שהעריכה תישמר",
+                "en": "youre roles list, after adding or removing remember to press the button below to save your edit"}
+const message4 = {"he":"רשימת המשאבים שלך (למטה מימין), נציע לך רקמות שנדרשים להן המשאבים שהצעת",
+              "en": "Bottom right is youre resource list, on the heart you'll get offers from FreeMates who need them"}
+const message5 = {"he":"רשימת הערכים שלך, אנו נציע לך רקמות שמקדמות ערכים כמו אלו שבחרת",
+                  "en":"list of your Vallues, we will offer you FreeMates who promoting those vallues"};
+const message6 = {"he":"רשימת דרכי היצירה שלך (למטה משמאל), אנו נציע לך משימות שעשייתן היא בתנאים שהצבת",
+                  "en": "Bottom left are your ways of creation list, we will offer you missions that accsept those terms"}
+const message7 = {"he":"עריכת תמונת הפרופיל", "en": "edit your profile picture"}
+const message8 = {"he":" העלאת תמונת פרופיל חדשה", "en": "upload new profile picture"}
+const message9 = {"he":"רשימת הרקמות שלך, ריקמה היא קבוצה שמשתפת פעולה, לחיצה על שם הריקמה למעבר למוח שלה, המנורה למטה משמשת בכדי ליצור ריקמה חדשה",
+                  "en":"your FreeMates list, FreeMates is a group who Collaborate, press on FreeMates name to go to her Brain, the lamp bellow is for creating a new FreeMates"}
+const myfr = {"he": "הרקמות שלי", "en": "My FreeMates"};
+const crnfr = {"he": "יצירת ריקמה חדשה", "en": "create a new FreeMates"}
+const message10 = {"he" :"כמה הרווחת עד כה (היהלום למטה במרכז), סכום הכסף הכולל שקיבלת מרקמות מופיע כאן",
+                    "en": "The Diamond down shows how much you earn from FreeMates so far"}
+const sofartit = {"he": "סך הכל הרווחתי", "en": "total earnings"}
+const editbas = {"he": "עריכת פרטים בסיסיים והגדרות", "en":"Edit Basic Information and Settings"}
+const message11 ={"he": "עריכת פרטים והגדרות, הפעלת התראות במכשיר, בחירת יום חופשי וביטול הצגת המדריך" ,
+                   "en": "edit your info, settings, add device alerts, choosing a free day and cencel guid"}
+const cencel = {"he":"ביטול","en": "cencel"}
+const sk = {"he":"כישורים", "en": "skills"}
+const rl = {"he": "תפקידים", "en": "roles"}
+const ms = {"he": "משאבים","en": "resources"}
+const ar = {"he":"ערכים", "en": "Vallues"}
+const ww = {"he": "דרכי היצירה", "en" : "ways of creation"}
+const plv = {"he": "בחירת ערכים", "en": "choose Vallues"}
+const pls = {"he": "בחירת כישורים", "en": "choose skills"}
+const plm = {"he": "בחירת משאבים", "en": "choose resources"}
+const plw = {"he": "בחירת דרכי יצירה", "en": "choose ways of creation"}
+const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
+let width,height
+let showSaveDialog = false;
+const dialogHeader = {
+  he: "הצגת מדריך משתמש",
+  en: "Show User Guide"
+};
+const innerText = { 
+  he: "האם ברצונך לראות מדריך שימוש ב1💗1? \n (ניתן לבטל או להחזיר את הדו שיח הזה בפעמים הבאות בתפריט ההגדרות) ",
+  en: "Would you like to see the user guide?"
+};
+const innerDialogButton = {
+  he: "אשמח",
+  en: "Yes"
+};
+const clearButton = {
+  he: "לא",
+  en: "No" 
+};
+
 </script>
 
 <svelte:head>
@@ -782,22 +773,27 @@
          <Lowding height="30vh" />
          </div>
 {:then meData}
-  <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
-    <div
-      style="z-index: 700;"
-      transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
-    >
-      <DialogContent aria-label="form" class="content">
-        <div
-          style="z-index: 400;"
-          dir="rtl"
-          class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"
-        >
-          <button
-            style="margin: 0 auto;"
-            class=" hover:bg-barbi text-mturk rounded-full p-2"
-            onclick={closer}><Close /></button
-          >
+<Dialog 
+  bind:showSaveDialog
+  {dialogHeader}
+  {innerText} 
+  {innerDialogButton}
+  {clearButton}
+  on:save-timer={() => {
+    showSaveDialog = false;
+    run();
+  }}
+  on:clear-timer={() => {
+    showSaveDialog = false;
+    isG = true; // Mark as viewed without showing
+  }}
+/>
+ <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+        <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
+  <DialogContent aria-label="form" class="content">
+    <div  style="z-index: 400;" dir="rtl" class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
+             <button style="margin: 0 auto;" class=" hover:bg-barbi text-mturk rounded-full p-2"
+          onclick={closer}><Close/></button>
           {#if a == 0}
             <Addnewp on:message={callbackFunction} />
           {:else if a == 1}
@@ -919,7 +915,7 @@
       </div>
      {#if updX == 0}
      <button
-       on:click={openen}
+       onclick={openen}
        class=" hover:bg-gold text-mturk hover:text-barbi rounded-full edit"
        title={message7[$lang]}
        >                 <TourItem message={message7[$lang]}>
@@ -945,7 +941,7 @@
     {#if addpic == 0}
   
       <button
-        on:click={openen}
+        onclick={openen}
    class=" hover:bg-gold text-mturk hover:text-barbi rounded-full haalaa"
        title={message8[$lang]} >
        <TourItem message={message8[$lang]}>
@@ -970,7 +966,7 @@
              {#each meData.projects_1s.data as data, i}
              <div class="cont"  >
               <button
-               on:click={project(data.id)}
+               onclick={project(data.id)}
                class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center sm:text-xl mt-1 mr-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow width={width > 640 ? 47.4:23.7} height={width > 640 ? 35.7:17.85}/></span></div></button>
   
              </div>
@@ -984,7 +980,7 @@
   <button
   style="z-index: 7;"
   class=" hover:scale-150 "
-      on:click={() => {
+      onclick={() => {
         iwant = false
         addP = true
       }}
@@ -1487,7 +1483,7 @@
   {#if a == 0}
   <div class="anothere">
     <button
-    on:click={basic}
+    onclick={basic}
     title={editbas[$lang]}
     class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
     >
@@ -1504,7 +1500,7 @@
   </div>
   {:else if addP == true}
   <button title="{cencel[$lang]}"
-    on:click={() => addP = false}
+    onclick={() => addP = false}
     style="margin: 0 auto;"
     class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
      ><Close/></button>
