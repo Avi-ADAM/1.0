@@ -17,7 +17,7 @@
   import Yahalomim from '$lib/components/lev/yahalomim.svelte';
   import { toast } from 'svelte-sonner';
   import Mesima from '$lib/components/lev/mesima.svelte';
-  import { sendEror } from '$lib/func/sendEror.svelte';
+  import { sendEror } from '$lib/func/sendEror.js';
   import { betha } from '$lib/components/lev/storess/betha.js';
   import { RingLoader } from 'svelte-loading-spinners';
   import Cardsui from '$lib/components/lev/cards/cards.svelte';
@@ -41,7 +41,7 @@
   import Love from '$lib/func/lev/love.svelte';
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   import { page } from '$app/stores';
   /** @type {{data: any}} */
   let { data } = $props();

@@ -17,9 +17,9 @@ const myErrorHandler = ({ error, event }) => {
 // export const handleError = handleErrorWithSentry();
 
 const manifestLink = {
-  he: "https://res.cloudinary.com/love1/raw/upload/v1731841751/manifeswt2024_b864yk.json",
-  en: "https://res.cloudinary.com/love1/raw/upload/v1717496587/eng-mani_y3dmpm.json",
-  ar: "https://res.cloudinary.com/love1/raw/upload/v1717496587/eng-mani_y3dmpm.json"
+  he: "https://res.cloudinary.com/love1/raw/upload/v1749551626/manifest_with_new_routes_qktyc3.json?v=3",
+  en: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2",
+  ar: "https://res.cloudinary.com/love1/raw/upload/v1749552534/eng-mani-updated_xpcxdf.json?v=2"
 };
 
 const desc = {

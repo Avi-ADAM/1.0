@@ -1318,6 +1318,7 @@
 
   const maini = {he: "ראשי", en:"main"}
   const choo = { he: 'בחירת ריקמה', en: 'choose FreeMate' };
+  const timers = {he: 'טיימרים', en: 'timers'};
   let sid = false;
   let gan = false;
   let bett = false;
@@ -1348,6 +1349,7 @@
   import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
+  import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1986,6 +1988,17 @@ pointer-events: none;"
             </div></button
           >
             {/if}
+            <button
+                on:click={() => (tab = 10)}
+                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 10 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={timers[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 10 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {timers[$lang]}
+                  </h2>
+                </div></button>
              <button
                 onclick={() => (tab = 6)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
@@ -1997,8 +2010,7 @@ pointer-events: none;"
                     {shirutims[$lang]}
                   </h2>
                   <!--<Siduri/>-->
-                </div></button
-              >
+                </div></button>
                <button
                 onclick={() => (tab = 7)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
@@ -2010,8 +2022,7 @@ pointer-events: none;"
                     {mechirot[$lang]}
                   </h2>
                   <!--<Siduri/>-->
-                </div></button
-              >
+                </div></button>
                <button
                 onclick={() => (tab = 8)}
                 class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 8 ? "bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-r from-gra via-grb  to-grc text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
@@ -2023,8 +2034,7 @@ pointer-events: none;"
                     {sidd[$lang]}
                   </h2>
                   <!--<Siduri/>-->
-                </div></button
-              >
+                </div></button>
               </nav>
 <!--tabs-->
 <div class="border-t-2 border-mturk">
@@ -2374,6 +2384,10 @@ pointer-events: none;"
 {:else if tab === 9}
   <ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>                
          
+{:else if tab === 10}
+  <div class="sm:p-8 p-1">
+    <TimersOfUsers projectId={$idPr} on:mission={openDescrip} on:tasks={()=>tab = 9} />
+  </div>
 {/if}              
           </div>
                    <div class=" m-4" bind:this={openss}>

@@ -1,5 +1,5 @@
 // src/routes/api/search.js
-import { sendToSer } from '$lib/send/sendToSer.svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
 import { json } from '@sveltejs/kit';
 
 const OPENAI_API_KEY = import.meta.env.OPENAI;

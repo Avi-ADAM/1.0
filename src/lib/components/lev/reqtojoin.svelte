@@ -643,7 +643,7 @@ function hoverede(){
   import { RingLoader } from "svelte-loading-spinners";
   import Diun from "./diun.svelte";
   import { nowId } from "$lib/stores/pendMisMes.js";
-  import { sendToSer } from "$lib/send/sendToSer.svelte";
+  import { sendToSer } from "$lib/send/sendToSer.js";
   /** @type {{isVisible?: boolean, low?: boolean, iskvua: any, modal?: boolean, email: any, coinlapach: any, deadline: any, projectName: any, openmissionName: any, role?: any, skills: any, useraplyname: any, src?: string, src2?: string, projectId: any, link?: string, linkU?: string, userId: any, missionDetails?: string, name: any, noofpu?: number, publicklinks: any, privatlinks: any, hearotMeyuchadot: any, nhours?: number, valph?: number, missId: any, id: any, openMid: any, st?: number, pid: any, declined?: any, noofusersWaiting: any, uids: any, what: any, noofusersOk: any, noofusersNo: any, already?: boolean, stylef?: string, askId: any, users: any, chat: any, mypose?: boolean, order?: number, sqedualed: any, cards?: boolean}} */
   let {
     timegramaId,

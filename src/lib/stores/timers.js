@@ -1,5 +1,5 @@
 import { browser } from '$app/environment';
-import { sendToSer } from '$lib/send/sendToSer.svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
 import { writable } from 'svelte/store';
 
 // Initialize timers with data from localStorage or empty array

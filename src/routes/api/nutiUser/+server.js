@@ -5,7 +5,7 @@ import SimpleNuti from '$lib/components/mail/simpleNuti.svelte';
 import {sendBolkMail} from '$lib/func/bolkmail/bolkMail.svelte';
 import { pusherer } from '$lib/func/pusherer.svelte'
 import { sendBolkTelegram } from '$lib/func/telegram/sendBolkTelegram.svelte';
-import { sendToSer } from '$lib/send/sendToSer.svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
 import { render } from 'svelty-email';
 
 //b sendMessages

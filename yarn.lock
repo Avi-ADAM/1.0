@@ -917,6 +917,30 @@
   resolved "https://registry.npmjs.org/@fontsource/fira-mono/-/fira-mono-5.1.1.tgz"
   integrity sha512-JDZUQuQQFTvPJgwOftXg44LOa7XYNqwTHHquEpi8rY6SK8m7Q5rWxmMX7nUOvRF2g+jc02mqmK2Y+WmviF9+VQ==
 
+"@fullcalendar/core@^6.1.17", "@fullcalendar/core@~6.1.17":
+  version "6.1.17"
+  resolved "https://registry.npmjs.org/@fullcalendar/core/-/core-6.1.17.tgz"
+  integrity sha512-0W7lnIrv18ruJ5zeWBeNZXO8qCWlzxDdp9COFEsZnyNjiEhUVnrW/dPbjRKYpL0edGG0/Lhs0ghp1z/5ekt8ZA==
+  dependencies:
+    preact "~10.12.1"
+
+"@fullcalendar/daygrid@^6.1.17", "@fullcalendar/daygrid@~6.1.17":
+  version "6.1.17"
+  resolved "https://registry.npmjs.org/@fullcalendar/daygrid/-/daygrid-6.1.17.tgz"
+  integrity sha512-K7m+pd7oVJ9fW4h7CLDdDGJbc9szJ1xDU1DZ2ag+7oOo1aCNLv44CehzkkknM6r8EYlOOhgaelxQpKAI4glj7A==
+
+"@fullcalendar/interaction@^6.1.17":
+  version "6.1.17"
+  resolved "https://registry.npmjs.org/@fullcalendar/interaction/-/interaction-6.1.17.tgz"
+  integrity sha512-AudvQvgmJP2FU89wpSulUUjeWv24SuyCx8FzH2WIPVaYg+vDGGYarI7K6PcM3TH7B/CyaBjm5Rqw9lXgnwt5YA==
+
+"@fullcalendar/timegrid@^6.1.17":
+  version "6.1.17"
+  resolved "https://registry.npmjs.org/@fullcalendar/timegrid/-/timegrid-6.1.17.tgz"
+  integrity sha512-K4PlA3L3lclLOs3IX8cvddeiJI9ZVMD7RA9IqaWwbvac771971foc9tFze9YY+Pqesf6S+vhS2dWtEVlERaGlQ==
+  dependencies:
+    "@fullcalendar/daygrid" "~6.1.17"
+
 "@google/generative-ai@^0.24.0":
   version "0.24.0"
   resolved "https://registry.npmjs.org/@google/generative-ai/-/generative-ai-0.24.0.tgz"
@@ -6526,6 +6550,11 @@ pprof-format@^2.1.0:
   resolved "https://registry.npmjs.org/pprof-format/-/pprof-format-2.1.0.tgz"
   integrity sha512-0+G5bHH0RNr8E5hoZo/zJYsL92MhkZjwrHp3O2IxmY8RJL9ooKeuZ8Tm0ZNBw5sGZ9TiM71sthTjWoR2Vf5/xw==
 
+preact@~10.12.1:
+  version "10.12.1"
+  resolved "https://registry.npmjs.org/preact/-/preact-10.12.1.tgz"
+  integrity sha512-l8386ixSsBdbreOAkqtrwqHwdvR35ID8c3rKPa8lCWuO86dBi32QWHV4vfsZK1utLLFMvw+Z5Ad4XLkZzchscg==
+
 prettier-plugin-svelte@^3.2.6:
   version "3.3.3"
   resolved "https://registry.npmjs.org/prettier-plugin-svelte/-/prettier-plugin-svelte-3.3.3.tgz"
@@ -7557,6 +7586,11 @@ svelte-agnostic-draggable@^0.2.0:
   integrity sha512-wNOMUHgLO7Gbrdrz7ekH2cV1GhKb0FZBVoVp/5C6G9+58OLZa6pn1mhaylbjOvOqElSD33t4A+cIoFWxUw6MIQ==
   dependencies:
     agnostic-draggable "^1.4.6"
+
+svelte-animated-headline@^1.0.7:
+  version "1.0.7"
+  resolved "https://registry.npmjs.org/svelte-animated-headline/-/svelte-animated-headline-1.0.7.tgz"
+  integrity sha512-+TPbAxgh5HjJCkl30yIhsBGUHQoSqc8bNw8DSe9dc26pz+DgAchYWca4PBGXM/5goojWEmU9kwca+4jFyLeoXQ==
 
 svelte-calendar@^3.1.6:
   version "3.1.6"

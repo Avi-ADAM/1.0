@@ -471,4 +471,52 @@ export const qids = {
   }
 }
 `,
+'37getUserTimers':  `query GetUserTimers($id: ID!) {
+  usersPermissionsUser(id: $id) {
+    data{
+      id
+      attributes{
+       timers{
+        data{
+          id
+          attributes{
+          start totalHours timers{start stop} isActive saved 
+          mesimabetahalich{data{id
+         attributes{name  howmanyhoursalready hoursassinged
+}}}
+          project{data{id attributes{projectName profilePic{data{attributes{formats url}}}}}} 
+          }
+          }
+       }
+        lang 
+        
+      }
+    }
+  }
+ }
+`,
+'38getProjectTimers':  `query GetProjectTimers($id: ID!) {
+  project(id: $id) {
+    data{
+      id
+      attributes{
+       timers{
+        data{
+          id
+          attributes{
+          start totalHours timers{start stop} isActive saved acts{data{id attributes{
+                  shem
+                  } }}
+          mesimabetahalich{data{id
+         attributes{name  howmanyhoursalready hoursassinged
+         
+}}}
+          }
+          }
+       }        
+      }
+    }
+  }
+ }
+`,
 }

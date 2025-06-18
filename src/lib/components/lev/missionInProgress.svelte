@@ -22,8 +22,8 @@ import TimerDialogs from '../timers/TimerDialogs.svelte';
      import {SendTo} from '$lib/send/sendTo.svelte';
     import axios from 'axios'
     import { timers, updateTimers } from '$lib/stores/timers.js';
-    import { startTimer } from '$lib/func/timers.svelte';
-    import { stopTimer } from '$lib/func/timers.svelte';
+    import { startTimer } from '$lib/func/timers.js';
+    import { stopTimer } from '$lib/func/timers.js';
 const baseUrl = import.meta.env.VITE_URL
 let storeTimer;
 let localZman = storeTimer?.zman || 0;
@@ -579,7 +579,7 @@ ${tofinished}
               let timegramaId = miDatan.data.createFiniapruval.data.id
               let x = calcX(restime)
               let fd = new Date(Date.now() + x)
-              await sendToSer({whatami:"finiapruval",finiapruval:timegramaId,date:fd})
+              await sendToSer({whatami:"finiapruval",finiapruval:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch)
               //nutify project users
  let data = {pn:projectName,pl:src,pu:pu, pid:projectId, uid:idL, kind:"finiappmi", name:missionName}
    fetch("/api/nuti", {
@@ -706,7 +706,7 @@ function hover (id){
     lapse = $bindable(0),
     cards = false
   } = $props();
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   import { calcX } from '$lib/func/calcX.svelte';
 function claf (event){
   let o = event.detail.alr
@@ -1833,4 +1833,3 @@ width:50vw;
   }
       }
 </style>
-

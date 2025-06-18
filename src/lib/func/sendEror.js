@@ -1,4 +1,7 @@
+<<<<<<< HEAD:src/lib/func/sendEror.svelte
 <script module>
+=======
+>>>>>>> main:src/lib/func/sendEror.js
 export function sendEror(uid, data, errorId) {
   const safeData = typeof data === 'object' ? JSON.stringify(data) : String(data);
   
@@ -26,4 +29,3 @@ export function sendEror(uid, data, errorId) {
     console.error('Error:', error);
   });
 }
-</script>

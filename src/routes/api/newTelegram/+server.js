@@ -1,6 +1,6 @@
 // create a server with telegraf to listen for new messages
 import { Telegraf, Markup } from 'telegraf';
-import { sendToSer } from '$lib/send/sendToSer.svelte'; // Assuming sendToSer uses fetch internally
+import { sendToSer } from '$lib/send/sendToSer.js'; // Assuming sendToSer uses fetch internally
 import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.svelte'; // Assuming these use sendToSer or fetch
 import { GoogleGenerativeAI } from '@google/generative-ai';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
@@ -29,6 +29,7 @@ const translations = {
     stopTimerBtn: '<<stop timer ⌛ עצירת טיימר>>',
     helpText: 'כאן תוכל להירשם לעדכונים מפלטפורמת 1💗1 שלנו, או להשתמש בי כעוזר לניהול הטיימרים שלך.',
     timerStarted: 'טיימר הופעל בהצלחה',
+    timerStartedMission: 'טיימר הופעל בהצלחה למשימה "{{missionName}}"',
     chooseStart: 'בחירת משימה להפעלת טיימר',
     timerStopped: 'טיימר נעצר בהצלחה',
     chooseStop: 'בחירת משימה לעצירת טיימר',
@@ -71,6 +72,7 @@ const translations = {
     stopTimerBtn: '<<stop timer ⌛>>',
     helpText: 'Here you can register for updates from our 1💗1 platform, or use me as an assistant to manage your timers.',
     timerStarted: 'Timer started successfully',
+    timerStartedMission: 'Timer started successfully for mission "{{missionName}}"',
     chooseStart: 'Choose mission to start timer',
     timerStopped: 'Timer stopped successfully',
     chooseStop: 'Choose mission to stop timer',
@@ -243,7 +245,7 @@ User ID: ${uid}
 User Language: ${lang}
 
 Available actions:
-1.  'start_timer': User wants to start a timer for a specific mission. Requires 'missionId'.
+1.  'start_timer': User wants to start a timer for a specific mission. Requires 'missionId' and 'missionName'.
 2.  'stop_timer': User wants to stop an active timer. Requires 'missionId'.
 3.  'ask_help': User is asking for general help.
 4.  'clarify_start': User wants to start a timer but didn't specify which one, and multiple options exist.
@@ -265,7 +267,7 @@ Analyze the user request considering the available missions and active timers. I
 Respond ONLY with a JSON object containing the identified 'intent' and necessary 'parameters' (like 'missionId').
 
 Examples:
-- User: "start timer for Design UI", Mission "Design UI" (ID 123) exists -> {"intent": "start_timer", "parameters": {"missionId": "123"}}
+- User: "start timer for Design UI", Mission "Design UI" (ID 123) exists -> {"intent": "start_timer", "parameters": {"missionId": "123", "missionName": "Design UI"}}
 - User: "start design", Multiple design-related missions exist -> {"intent": "clarify_start", "parameters": {"relevantMissions": ["123", "456"]}}
 - User: "stop the timer for API integration", Mission "API integration" (ID 456) has active timer -> {"intent": "stop_timer", "parameters": {"missionId": "456"}}
 - User: "start a timer", Multiple startable missions exist -> {"intent": "clarify_start"}
@@ -727,6 +729,7 @@ bot.on('text', async (ctx) => {
             case 'start_timer':
                 if (aiResponse.parameters?.missionId) {
                     const missionId = aiResponse.parameters.missionId;
+                    const missionName = aiResponse.parameters.missionName;
                     try {
                         const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, true, fetch);
                         const activeTimer = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer;
@@ -734,7 +737,7 @@ bot.on('text', async (ctx) => {
                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
                         if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
                         const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch);
-                        if (res) { ctx.reply(getText('timerStarted', lang)); }
+                        if (res) { ctx.reply(getText('timerStartedMission', lang, { missionName })); }
                         else { throw new Error("Start failed via AI"); }
                     } catch (error) {
                         console.error(`AI Error starting timer:`, error);
@@ -903,6 +906,3 @@ bot.catch((err, ctx) => {
        ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error reply:", e));
   }
 });
-
-// --- Initialization Log ---
-console.log("Telegram Bot script initialized (Webhook setup via SvelteKit POST).");

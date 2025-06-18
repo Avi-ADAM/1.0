@@ -1,34 +1,26 @@
 <script>
-  import Tile from '$lib/celim/tile.svelte';
-  import Button from '$lib/celim/ui/button.svelte';
-  import { lang } from '$lib/stores/lang';
-  /** @type {{src?: string, pname?: string, mname?: string, type?: string, isOpen?: boolean, isPend?: boolean, text?: any, onClick?: any}} */
-  let {
-    src = '',
-    pname = '',
-    mname = '',
-    type = '',
-    isOpen = false,
-    isPend = false,
-    text = { he: 'אני אבצע', en: 'assign to me' },
-    onClick = () => {},
-    isPending = false,
-    isCurrentUser = false,
-    isValidator = false,
-    isAssigned = false,
-    roles = [],
-    onApprove = () => {},
-    onValidate = () => {},
-    progress = 0,
-    isApproved = false,
-    naasa = false,
-    pendingValidation = false,
-    isCompleted = false,
-    id
-  } = $props();
- 
-
+    export let src = '';
+    export let pname = '';
+    export let mname = '';
+    export let type = '';
+    export let isOpen = false;
+    export let isPend = false;
+    export let isPending = false;
+    export let isCurrentUser = false;
+    export let isValidator = false;
+    export let isAssigned = false;
+    export let roles = [];
+    export let onApprove = () => {};
+    export let onValidate = () => {};
+    export let progress = 0;
+    export let isApproved = false;
+    export let naasa = false;
+    export let pendingValidation = false;
+    export let isCompleted = false;
+  import Tile from "$lib/celim/tile.svelte";
+  import Button from "$lib/celim/ui/button.svelte";
   import { sendToSer } from "$lib/send/sendToSer.svelte";
+  import {lang} from '$lib/stores/lang';
   import { toast } from 'svelte-sonner';
   const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
   const pendingVal = { he: 'ממתין לאישרור', en: 'Pending Validation' };
