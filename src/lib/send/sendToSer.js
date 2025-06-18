@@ -1,4 +1,3 @@
-<script context="module">
 const NODE_URL = import.meta.env.VITE_NURL
     export async function sendToSer(arg = {},queId = "", me = 0, project = 0, isSer = false, fetch) {
          
@@ -22,4 +21,3 @@ const NODE_URL = import.meta.env.VITE_NURL
   })
   return da
     }
-</script>

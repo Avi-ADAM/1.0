@@ -6,7 +6,7 @@
   import { createEventDispatcher } from 'svelte';
   import { toast } from 'svelte-sonner';
   import { formatTime } from '$lib/func/uti/formatTime';
-  import { handleClearAll, handleClearSingle, updateTimer, saveTimer } from '$lib/func/timers.svelte';
+  import { handleClearAll, handleClearSingle, updateTimer, saveTimer } from '$lib/func/timers.js';
   import { timers, updateTimers } from '$lib/stores/timers';
 
   const dispatch = createEventDispatcher();

@@ -1,5 +1,5 @@
 <script>
-  import { startTimer, stopTimer } from '$lib/func/timers.svelte';
+  import { startTimer, stopTimer } from '$lib/func/timers.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/stores';

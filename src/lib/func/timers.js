@@ -1,5 +1,4 @@
-<script context="module">
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
     // Function to start (or resume) the timer for a mission
     /**
      * Starts a timer for tracking activities
@@ -281,7 +280,7 @@ export async function updateTimer(timer,whatToUpdate,params= {},fetch,isSer=fals
         const res = await fetch('/graphql', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query: mutation, variables })
+          body: JSON.stringify({ query, variables })
         });
         const result = await res.json();
         timer = result.data.updateTimer.data;
@@ -428,5 +427,3 @@ export async function saveTimer(timer, missionID, fetch, isSer=false, tasks=null
     return null;
   }
 }
-</script>
-

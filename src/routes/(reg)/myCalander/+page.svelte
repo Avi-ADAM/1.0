@@ -1,5 +1,5 @@
 <script>
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
     import TimersCalendar from '$lib/components/timers/TimersCalendar.svelte';
     import {onMount} from 'svelte'
     export let data

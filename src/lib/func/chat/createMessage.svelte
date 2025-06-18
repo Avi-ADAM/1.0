@@ -1,6 +1,6 @@
 <script context="module">
   import { sendApi } from "$lib/send/sendApi.svelte";
-  import {sendToSer} from "$lib/send/sendToSer.svelte";
+  import {sendToSer} from "$lib/send/sendToSer.js";
   import { nowId, updSend } from "$lib/stores/pendMisMes";
 
     export async function createMessage(id=0,mes="",md={},un=""){

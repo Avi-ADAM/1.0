@@ -7,7 +7,7 @@
   import RichText from "$lib/celim/ui/richText.svelte";
   import NameAndPname from "$lib/components/grid/nameAndPname.svelte";
   import Vallue from "$lib/components/grid/vallue.svelte";
-  import {sendToSer} from "$lib/send/sendToSer.svelte";
+  import {sendToSer} from "$lib/send/sendToSer.js";
   import { onMount } from 'svelte';
   import { RingLoader } from "svelte-loading-spinners";
   import { Head } from "svead";

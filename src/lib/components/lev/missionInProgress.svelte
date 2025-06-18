@@ -19,8 +19,8 @@ import { Drawer } from 'vaul-svelte';
      import {SendTo} from '$lib/send/sendTo.svelte';
     import axios from 'axios'
     import { timers, updateTimers } from '$lib/stores/timers.js';
-    import { startTimer } from '$lib/func/timers.svelte';
-    import { stopTimer } from '$lib/func/timers.svelte';
+    import { startTimer } from '$lib/func/timers.js';
+    import { stopTimer } from '$lib/func/timers.js';
 const baseUrl = import.meta.env.VITE_URL
 let storeTimer;
 let localZman = storeTimer?.zman || 0;
@@ -728,7 +728,7 @@ function hover (id){
     dispatch("hover", {id: u});
 }
    import Cards from './cards/inpro.svelte'
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   import { calcX } from '$lib/func/calcX.svelte';
 export let cards = false;
 function claf (event){
@@ -1807,4 +1807,3 @@ width:50vw;
   }
       }
 </style>
-

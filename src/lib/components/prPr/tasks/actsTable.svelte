@@ -17,7 +17,7 @@
   import Tile from '$lib/celim/tile.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { page } from '$app/stores';
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   const dispatch = createEventDispatcher();
   let paging = new PagingData(
     1, // currentPage

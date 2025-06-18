@@ -1,5 +1,5 @@
 <script context="module">
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   export async function crRatson(
     logo,
     startDate,

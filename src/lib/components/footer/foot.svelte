@@ -3,7 +3,7 @@
 </script>
 
 <script>
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
   import NewIwant from '$lib/components/addnew/newIwant.svelte';
   import { quintOut } from 'svelte/easing';
   import { fly, slide } from 'svelte/transition';

@@ -1,4 +1,4 @@
-import { sendToSer } from "$lib/send/sendToSer.svelte";
+import { sendToSer } from "$lib/send/sendToSer.js";
 import { io } from "socket.io-client";
 import { writable, get } from "svelte/store";
 const baseUrl = import.meta.env.VITE_URL

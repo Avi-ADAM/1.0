@@ -19,7 +19,7 @@
     export let isCompleted = false;
   import Tile from "$lib/celim/tile.svelte";
   import Button from "$lib/celim/ui/button.svelte";
-  import { sendToSer } from "$lib/send/sendToSer.svelte";
+  import { sendToSer } from "$lib/send/sendToSer.js";
   import {lang} from '$lib/stores/lang';
   import { toast } from 'svelte-sonner';
     export let id;

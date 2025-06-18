@@ -1,5 +1,5 @@
 <script>
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
 	import { createEventDispatcher, onMount } from 'svelte';
 
 	/** @type {HTMLDivElement}*/

@@ -1,6 +1,6 @@
 <script>
     import ProjectTimersCalendar from '$lib/components/prPr/ProjectTimersCalendar.svelte';
-  import { sendToSer } from '$lib/send/sendToSer.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
     import { onMount } from 'svelte';
     import { createEventDispatcher } from 'svelte';
     const dispatch = createEventDispatcher();

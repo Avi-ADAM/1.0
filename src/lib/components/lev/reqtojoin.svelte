@@ -684,7 +684,7 @@ function hoverede(){
   import { RingLoader } from "svelte-loading-spinners";
   import Diun from "./diun.svelte";
   import { nowId } from "$lib/stores/pendMisMes.js";
-  import { sendToSer } from "$lib/send/sendToSer.svelte";
+  import { sendToSer } from "$lib/send/sendToSer.js";
 export let cards = false;
 function tochat (){
   isOpen = true

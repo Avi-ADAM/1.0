@@ -1,6 +1,6 @@
 // create a server with telegraf to listen for new messages
 import { Telegraf, Markup } from 'telegraf';
-import { sendToSer } from '$lib/send/sendToSer.svelte'; // Assuming sendToSer uses fetch internally
+import { sendToSer } from '$lib/send/sendToSer.js'; // Assuming sendToSer uses fetch internally
 import { startTimer, stopTimer, saveTimer, updateTimer } from '$lib/func/timers.svelte'; // Assuming these use sendToSer or fetch
 import { GoogleGenerativeAI } from '@google/generative-ai';
 // createServer is likely not needed when using SvelteKit endpoint for webhook
@@ -906,4 +906,3 @@ bot.catch((err, ctx) => {
        ctx.reply(getText('generalError', lang)).catch(e => console.error("Error sending error reply:", e));
   }
 });
-

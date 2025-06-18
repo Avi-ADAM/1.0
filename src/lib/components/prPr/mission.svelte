@@ -1017,7 +1017,7 @@
   import { quintOut } from 'svelte/easing';
   import Expand from '$lib/celim/icons/expand.svelte';
   import { crTask } from '$lib/func/moach/crtask.svelte';
-  import  { sendToSer } from '$lib/send/sendToSer.svelte';
+  import  { sendToSer } from '$lib/send/sendToSer.js';
   import Button from '$lib/celim/ui/button.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import TextInput from '$lib/celim/ui/input/textInput.svelte';

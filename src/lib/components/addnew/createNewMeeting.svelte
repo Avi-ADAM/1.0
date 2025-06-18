@@ -7,7 +7,7 @@
   import Button from "$lib/celim/ui/button.svelte";
 import TextInput from "$lib/celim/ui/input/textInput.svelte";
   import RichText from "$lib/celim/ui/richText.svelte";
-  import { sendToSer } from "$lib/send/sendToSer.svelte";
+  import { sendToSer } from "$lib/send/sendToSer.js";
   import { lang } from "$lib/stores/lang";
   import { onMount } from "svelte";
   import { MultiSelect } from "svelte-multiselect";

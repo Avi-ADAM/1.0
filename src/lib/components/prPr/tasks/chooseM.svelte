@@ -5,7 +5,7 @@
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
   import { createEventDispatcher } from 'svelte';
-  import {sendToSer} from '$lib/send/sendToSer.svelte';
+  import {sendToSer} from '$lib/send/sendToSer.js';
   const dispatch = createEventDispatcher();
   export let taskId
    let placeholder = {

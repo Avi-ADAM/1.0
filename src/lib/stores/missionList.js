@@ -1,4 +1,4 @@
-import { sendToSer } from "$lib/send/sendToSer.svelte";
+import { sendToSer } from "$lib/send/sendToSer.js";
 import { writable } from "svelte/store";
 
 export const missionList = writable([]);
