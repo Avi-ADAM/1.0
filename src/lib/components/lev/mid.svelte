@@ -100,28 +100,27 @@ fiap = "fiap";
 <style bx:fonts="Biryani" bx:pinned="t@imp/*$$__STYLE_CONTENT__$$*/cito" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>/*$$__STYLE_CONTENT__$$*/</style>
 <style bx/*$$__STYLE_CONTENT__$$*/gleapis.com/css2?family=Bahianita%3Aital%2Cwght%400%2C400&amp;display=swap);_$$*/d@import url(https://fonts.googleapis.com/css2?family=Ba
 <style bx:fonts="Caesar Dressing" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>/*$$__STYLE_CONTENT__$$*/</style>
-<style bx:fonts="Charm" bx:pinn@import url(https://fonts.googleapis.com/css2?family=Biryan/*$$__STYLE_CONTENT__$$*/0%2C400&amp;display=swap);NT__$$*/%3B0%2C300%3B0%2C400%3B0%2C6
+<style bx/*$$__STYLE_CONTENT__$$*/port url(https://fonts.googleapis.com/css2?family=Biryan/*$$__STYLE_CONTENT__$$*/0%2C400&amp;display=swap);NT__$$*/%3B0%2C300%3B0%2C400%3B0%2C6
 <style bx:fonts="Chelsea Market" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>/*$$__STYLE_CONTENT__$$*/</style>
-<style bx:fonts="Almendra SC" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx/*$$__STYLE_CONTENT__$$*/inned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <style bx:@import url(https://fonts.google/*$$__STYLE_CONTENT__$$*/0%2C900&amp;display=swap);TENT__$$*/ar+Dressing%3Aital%2Cwght%400%2C400&amp;displa
-<style bx:fonts="Almendra Display" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</*$$__STYLE_CONTENT__$$*/"Abril Fatface" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
-/*$$__STYLE_CONTENT__$$*/tps://fonts.googleapis.com/css2?family=Cherish%3Aital%2Cwght%400%2C400&amp;display=s/*$$__STYLE_CONTENT__$$*/YLE_CONTENT__$$*/_STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Almendra Display" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+/*$$__STYLE_CONTENT__$$*/tps://fonts.googl/*$$__STYLE_CONTENT__$$*/</*$$__STYLE_CONTENT__$$*/"Abril Fatface" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/rish%3Aital%2Cwght%400%2C400&amp;display=s/*$$__STYLE_CONTENT__$$*/YLE_CONTENT__$$*/_STYLE_CONTENT__$$*/</style>
 </*$$__STYLE_CONTENT__$$*/x:pinned="true">/*$$/*$$__STYLE_CONTENT__$$*/yle>
 <style b/*$$__STYLE_CONTENT__$$*/nts.googleapis.com/css2?family=Chelsea+Market%3Aital%2Cwght%400%2C400&amp;display=swap);rue">/*$$__STYLE_CONTENT__$$*/</style>
 <style bx:f/*$$__STYLE_CONTENT__$$*/ed="true">/*$$__STYLE_CONTENT__$$*/</style>
-<style /*$$__STYLE_CONTENT__$$*/://fonts.googleapis.com/css2?family=Charm%3Aital%2Cwght%400%2C400%3B0%2C700&amp;display=swap);="t/*$$__STYLE_CONTENT__$$*/_$$*/</style>/*$$__STYLE_CONTENT__$$*/Girls" bx:pinned=/*$$__STYLE_CONTENT__$$*/T__$$*/</style/*$$__STYLE_CONTENT__$$*/@import url(https://fonts.googleapis.com/css2?family=Almendra+Display%3Aital%2Cwght%400%2C400&amp;display/*$$__STYLE_CONTENT__$$*/TENT__$$*/</st/*$$__STYLE_CONTENT__$$*/mon" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
-</*$$__STYLE_CONTENT__$$*/ike @import url(https://fonts.googleapis.com/css2?family=Almendra+SC%3Aital%2Cwght%400%2C400&amp;display=swap);">/*$$__STYLE_CONTENT__$$*/</style>/*$$__STYLE_CONTENT__$$*/ Swash Caps" bx:pinned="true">/*$$__STYLE_CONTENT__/*$$__STYLE_CONTENT__$$*/import url(https://fonts.googleapis.com/css2?family=Aclonica%3Aital%2Cwght%400%2C400&amp;display=swap);" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/<//*$$__STYLE_CONTENT__$$*/Miss Fajardose" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</styl/*$$__STYLE_CONTENT__$$*/onts.googleapis.com/css2?family=Abril+Fatface%3Aital%2Cwght%400%2C400&amp;display=swap); Quest" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</sty/*$$__STYLE_CONTENT__$$*/zuru" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<style /*$$__STYLE_CONTENT__$$*/://fonts.goog/*$$__STYLE_CONTENT__$$*/arm%3Aital%2Cwght%400%2C400%3B0%2C700&amp;display=swap);/*$$__STYLE_CONTENT__$$*/$*/_$$*/</style>/*$$__STYLE_CONTENT__$$*/</style>
+</*$$__STYLE_CONTENT__$$*/ike @import url(https://fonts.googleapis.com/css2?family=Almendra+SC%3Aital%2Cwght%400%2C400&amp;dis/*$$__STYLE_CONTENT__$$*/Girls" bx:pinned=/*$$__STYLE_CONTENT__$$*/T__$$*/</style/*$$__STYLE_CONTENT__$$*/@import url(https://fonts.googleapis.com/css2?family=Almendra+Display%3Aital%2Cwght%400%2C400&amp;display/*$$__STYLE_CONTENT__$$*/TENT__$$*/</st/*$$__STYLE_CONTENT__$$*/mon" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/CONTENT__$$*/</style>/*$$__STYLE_CONTENT__$$*/ Swash Caps" bx:pinned="true">/*$$__STYLE_CONTENT__/*$$__STYLE_CONTENT__$$*/import url(https://fonts.googleapis.com/css2?family=Aclonica%3Aital%2Cwght%400%2C400&amp;display=swap);" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/<//*$$__STYLE_CONTENT__$$*/Miss Fajardose" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</styl/*$$__STYLE_CONTENT__$$*/onts.googleapis.com/css2?family=Abril+Fatface%3Aital%2Cwght%400%2C400&amp;display=swap); Quest" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</sty/*$$__STYLE_CONTENT__$$*/zuru" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <s/*$$__STYLE_CONTENT__$$*/fonts.googleapis.com/css2?family=Aguafina+Script%3Aital%2Cwght%400%2C400&amp;display=swap);inned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <style bx:fonts="Stick" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <style /*$$__STYLE_CONTENT__$$*///fonts.googleapis.com/css2?family=Angkor%3Aital%2Cwght%400%2C400&amp;display=swap);ed="true">/*$$__STYLE_CONTENT__$$*/</style>
-<style bx:fo/*$$__STYLE_CONTENT__$$*/"true">/*$$_/*$$__STYLE_CONTENT__$$*/le>
+<style bx:fo/*$$__STYLE_CONTENT__$$*/"true">/*$$__STYLE_CONTENT__$$*/</style>
+<style bx:fonts="Raleway" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+<li@import url(https://fonts.googleapis.com/css2?f/*$$__STYLE_CONTENT__$$*/%2Cwght%400%2C/*$$__STYLE_CONTE/*$$__STYLE_CONTENT__$$*/(/*$$__STYLE_CONTENT__$$*/com/css2?family=Atomic+Age%3Aital%2Cwght%400%2C400&am/*$$__STYLE_CONTENT__$$*/ncisco" bx:pinned="true">/*$$__S/*$$__STYLE_CONTENT__$$*/2="1662.1" y1="528.96" y2="564.08" gradientUnits="user/*$$_/*$$__STYLE_CONTENT__$$*/le>
 <sty@impo/*$$__STYLE_CONTENT__$$*/leapis.com/css2?family=Asset%3Aital%2Cwght%400%2C400&amp;display=swap);oat" bx:pinned="true">/*$$/*$$__STYLE_CONTENT__$$*/yle>
 <style b/*$$__STYLE_CONTENT__$$*/ned="true">/*$$/*$$__STYLE_CONTENT__$$*/yle>
-<style b/*$$__STYLE_CONTENT__$$*/pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
-<style bx:fonts="Raleway" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
-<li@import url(https://fonts.googleapis.com/css2?f/*$$__STYLE_CONTENT__$$*/%2Cwght%400%2C/*$$__STYLE_CONTENT__$$*/</styl@import url(/*$$__STYLE_CONTENT__$$*/com/css2?family=Atomic+Age%3Aital%2Cwght%400%2C400&am/*$$__STYLE_CONTENT__$$*/ncisco" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/62.1" x2="1662.1" y1="528.96" y2="564.08" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
-<linearGradient id="bhm" x1="1644" x2="1644" y1=@import url(https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop%3Aital%2Cwght%400%2C/*$$__STYLE_CONTENT__$$@import url(https://fonts.googleapis.com/css2?family=Cherry+Swash%3Aital%2Cwght%400%2C400%3B0%2C700&amp;display=swap);ts="Raleway Dots" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/tUnits="userSpaceOnUse" xlink:href="#a"/>
-<linearGradient id="bhn" x1="1644.3" x2="1644.3" y1="435.08" y2="487.08" gradientUnits="us@import url(https://fonts.googleapis.com/css2?family=Lemon%3Aital%2Cwght%400%2C400&amp;display=s/*$$__STYLE_CONTENT__$$*/ent id="bho" x1="1665.8" x2="1665.8" y1="421.78" y2="443.71" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
+<style b/*$$__STYLE_CONTENT__$$*/pinned="true">/*$$__STYLE_CONTENT__$$*/a"/>
+<linearGradient id="bhm" x1="1644" x2="1644" y1=@import url(https://fonts.googleapis.com/css2?family=Hachi+Maru+Pop%3Aital%2Cwght%400%2C/*$$__STYLE_CONTENT__$$@import url(https://fonts.googleapis.com/css2?family=Cherry+Swash%3Aital%2Cwght%400%2C400%3B0%2C700&amp;display=swap);ts="Raleway Dots" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/tUnits="userSpaceOnUse" xlink:hre/*$$__STYLE_CONTENT__$$*/ id="bhn" x1="1644.3" x2="1644.3" y1="435.08" y2="487.08" gradientUnits="us@import url(https://fonts.googleapis.com/css2?family=Lemon%3Aital%2Cwght%400%2C400&amp;display=s/*$$__STYLE_CONTENT__$$*/ent id="bho" x1="1665.8" x2="1665.8" y1="421.78" y2="443.71" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
 <linearGradi@import url(https://fonts.googleapis.com/css2?family=Love+Ya+Like+A+Sister%3Aital%2Cwght%400%2C400&amp;display=swap);x2="1665.5" y1="335.55" y2="435.08" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
 <linearGradient id="bhq" x1="1657.7" x2="1657.7" y1="563.24" y2="579.6@import url(https://fonts.googleapis.com/css2?family=Macondo+Swash+Caps%3Aital%2Cwght%400%2C400&amp;display=swap);ceOnUse" xlink:href="#a"/>
 <linearGradient id="bhr" x1="1657.5" x2="1657.5" y1="293.56" y2="326.88" gradientUnits="userSpaceOnUse" xlink:href="#a"/>
@@ -1538,7 +1537,7 @@ fiap = "fiap";
 </linearGradient>
 <linearGradient id="af1111" x/*$$__STYLE_CONTENT__$$*/="460.46" y2="481.94" gradientUnits="userSpaceOnUse">
 <stop stop-color="rgba(106, 185, 114, 1)" offset="0"/>
-<stop stop-color="#dae8dc" offset="1"/>
+<stop stop-colo/*$$__STYLE_CONTENT__$$*/
 </linearGradient>
 <linearGradient id="ad1111" x1="122.75" x2="122.75" y1="460.09" y2="481.96" gradientUnits="userSpaceOnUse">
 <stop stop-color="#eeada3" offset="0"/>
