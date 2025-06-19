@@ -252,8 +252,8 @@ function filterByProjectId(projectId) {
 
 </style>
 {#if !isMobileOrTablet()}
-<span  role="contentinfo" on:mouseenter={()=> hoverc(nav[$lang])} 
-on:mouseleave={()=> hoverc("0")}>
+<span  role="contentinfo" onmouseenter={()=> hoverc(nav[$lang])} 
+onmouseleave={()=> hoverc("0")}>
        <Header second="/moach" secondTitle={{"he":"למוח","en":"to Brain"}}/>
        </span>
        {/if}
@@ -263,24 +263,24 @@ on:mouseleave={()=> hoverc("0")}>
 <div     dir="{$lang == "he" ? "rtl" : "ltr"}" bind:clientWidth={h}
  class="body box-border h-screen">
  {#if !isMobileOrTablet()}
-     <img on:mouseenter={()=> hoverc(nexttitle[$lang])} 
-on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "perv" : "	next"	}" src="{srcb[$lang]}" alt="{$lang == "he" ? "חזרה" : "	next"	}"/>
+     <img onmouseenter={()=> hoverc(nexttitle[$lang])} 
+onmouseleave={()=> hoverc("0")} class="{$lang == "he" ? "perv" : "	next"	}" src="{srcb[$lang]}" alt="{$lang == "he" ? "חזרה" : "	next"	}"/>
 
-        <img on:mouseenter={()=> hoverc(pretitle[$lang])} 
-on:mouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src="{srca[$lang]}" alt="{$lang == "he" ? "הבא" : "	next"	}"/>
+        <img onmouseenter={()=> hoverc(pretitle[$lang])} 
+onmouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src="{srca[$lang]}" alt="{$lang == "he" ? "הבא" : "	next"	}"/>
 <div   
-      dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
-on:mouseleave={()=> hoverc("0")} 
+      dir="ltr" role="contentinfo" onmouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
+onmouseleave={()=> hoverc("0")} 
  style:visibility={low == true  ? "hidden":  "visible"} class="bg z-[1000]">
  
  <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
 
 </div>
 <div   
-dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc(filterT[$lang])} 
-on:mouseleave={()=> hoverc("0")} 
+dir="ltr" role="contentinfo" onmouseenter={()=> hoverc(filterT[$lang])} 
+onmouseleave={()=> hoverc("0")} 
 style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 absolute left-1/2 -translate-x-1/2 flex flex-row items-center justify-center">
-<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter ? showall() : filter = true}>
+<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" onclick={()=> filter ? showall() : filter = true}>
   <FilterIcon filterType="cardType" isX={filter} /></button>
 {#if filter}
 <Filter on:showonly={showonly} {sug}
@@ -297,7 +297,7 @@ style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 abs
 {hachlot}
 filterKind="kind"/>
 {/if}
-<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter2 ? showall() : filter2 = true}>
+<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" onclick={()=> filter2 ? showall() : filter2 = true}>
   <FilterIcon isX={filter2} /></button>
 {#if filter2}
 <Filter allIds={uniqueProjects} filterKind="projects" on:showonly={showonly}
@@ -310,8 +310,8 @@ filterKind="kind"/>
   <div class=" h-full max-w-lg flex space-x-2 flex-row mx-auto justify-center align-middle items-center">
 {#if !filter}
   <div   
-  dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
-on:mouseleave={()=> hoverc("0")} 
+  dir="ltr" role="contentinfo" onmouseenter={()=> hoverc("שינוי התצוגה מקלפים למטבעות")} 
+onmouseleave={()=> hoverc("0")} 
 style:visibility={low == true  ? "hidden":  "visible"} class="px-4 z-[1000]">
 
 <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
@@ -319,12 +319,12 @@ style:visibility={low == true  ? "hidden":  "visible"} class="px-4 z-[1000]">
 </div>
 {/if}
 <div   
-dir="ltr" role="contentinfo" on:mouseenter={()=> hoverc(filterT[$lang])} 
-on:mouseleave={()=> hoverc("0")} 
+dir="ltr" role="contentinfo" onmouseenter={()=> hoverc(filterT[$lang])} 
+onmouseleave={()=> hoverc("0")} 
 style:visibility={low == true  ? "hidden":  "visible"}
  class="z-[1000] px-4 flex flex-row items-center justify-center">
 <button class="w-10 h-10 flex items-center justify-center  rounded-full border-1 border-barbi"
-on:click={()=> filter ? showall() : filter = true}>
+onclick={()=> filter ? showall() : filter = true}>
 <FilterIcon isX={filter} filterType="cardType"/></button>
 {#if filter}
 <Filter on:showonly={showonly} {sug}
@@ -341,7 +341,7 @@ on:click={()=> filter ? showall() : filter = true}>
 {hachlot}
 filterKind="kind"/>
 {/if}
-<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" on:click={()=> filter2 ? showall() : filter2 = true}>
+<button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" onclick={()=> filter2 ? showall() : filter2 = true}>
   <FilterIcon isX={filter2} /></button>
 {#if filter2}
 <Filter allIds={uniqueProjects} filterKind="projects" on:showonly={showonly}
@@ -353,8 +353,8 @@ filterKind="kind"/>
 {/if}
 {/if}
 
-<div role="contentinfo" class="swi"  on:mouseenter={()=> hoverede()}  
-on:mouseleave={()=> hoverede()} >
+<div role="contentinfo" class="swi"  onmouseenter={()=> hoverede()}  
+onmouseleave={()=> hoverede()} >
 {#key filteredArr}
 <Swiper 
 releaseOnEdges={true}

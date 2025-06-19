@@ -1,5 +1,9 @@
 <!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
 https://svelte.dev/e/props_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
+https://svelte.dev/e/props_duplicate -->
+<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
+https://svelte.dev/e/props_duplicate -->
 <script>
     //https://res.cloudinary.com/barb1/image/upload/v1676238523/%D7%A4%D7%AA%D7%A6%D7%95%D7%92%D7%94%D7%9C%D7%95%D7%A4%D7%A4%D7%99%D7%95%D7%9F_kkymez.glb
 	import {  useFrame } from '@threlte/core'

@@ -2,7 +2,7 @@
     import { lang } from '$lib/stores/lang.js'
     import { Confetti } from "svelte-confetti"
    import { quintOut } from "svelte/easing";
-    import {addslashes} from '$lib/func/uti/string.svelte'
+    import {addslashes} from '$lib/func/uti/string.js'
     import { idPr } from '../../stores/idPr.js';
     import axios from 'axios';
     import { goto } from '$app/navigation';

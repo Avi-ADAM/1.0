@@ -1,3 +1,5 @@
+<!-- @migration-task Error while migrating Svelte code: Expected token }
+https://svelte.dev/e/expected_token -->
 <script>
   import { run } from 'svelte/legacy';
 
@@ -1099,9 +1101,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
   {/if}
 <svg class="svgg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
    <style bx:fonts="Lobster Two">@import url("https://fonts.googleapis.com/css?family=Lobster+Two:700");</style>
-  <style type="text/css">#hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }</style>
+  <style type="text/css">/*$$__STYLE_CONTENT__$$*/</style>
   <defs>
- <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+ #hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }" y="-30%" width="160%" height="160%">
     <feGaussianBlur stdDeviation="2 2" result="glow"/>
     <feMerge>
       <feMergeNode in="glow"/>
@@ -1141,7 +1143,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
     <path id="arrow1" stroke="none" fill="#000000" transform="scale(0.01)" d="M 0.3,0 L -2.2,2.25 L 3.8,0 L -2.2,-2.25 L 0.3,0 Z"/>
     <path id="path-75" stroke="none" fill="#000000" transform="scale(0.01)" d="M 0.3,0 L -2.2,2.25 L 3.8,0 L -2.2,-2.25 L 0.3,0 Z"/>
     <linearGradient id="linearGradient3938" bx:pinned="true">
- @/*$$__STYLE_CONTENT__$$*/googleapis.com/css2?family=Abel%3Aital%2Cwght%400%2C400&amp;display=swap);style="stop-color:#ffdd55;stop-opacity:1" offset="0.257"/>
+ /*$$__STYLE_CONTENT__$$*//googleapis.com/css2?family=Abel%3Aital%2Cwght%400%2C400&amp;display=swap);style="stop-color:#ffdd55;stop-opacity:1" offset="0.257"/>
       <stop offset="0.455" style="stop-color: rgb(247, 0, 128);"/>
       <stop offset="0.587" style="stop-color: rgb(255, 3, 121);"/>
       <stop id="stop3958" style="stop-opacity: 1; stop-color: rgb(255, 196, 0);" offset="0.741"/>

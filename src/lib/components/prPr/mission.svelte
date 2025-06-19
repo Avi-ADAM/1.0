@@ -22,7 +22,7 @@ https://svelte.dev/e/js_parse_error -->
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
-  import { addslashes } from '$lib/func/uti/string.svelte';
+  import { addslashes } from '$lib/func/uti/string.js';
   const baseUrl = import.meta.env.VITE_URL;
 
   let { pu = [], vallues = [], onClose, newcontent = true, newcontentR = true, newcontentW = true, pn, pl, restime, id, userslength = 0, projectId, name = '' } = $props();

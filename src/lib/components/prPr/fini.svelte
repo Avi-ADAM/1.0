@@ -10,6 +10,10 @@ https://svelte.dev/e/block_unexpected_close -->
 https://svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
 https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
+https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
+https://svelte.dev/e/block_unexpected_close -->
 <script>
   import Tooltip from './../../celim/tooltipb.svelte'
   import { lang } from '$lib/stores/lang.js'
@@ -408,6 +412,7 @@ let fir,ssec;
       {#each meData as data, i}
       <td >
        {data.attributes.hm}
+       </td>
       {/each}
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>

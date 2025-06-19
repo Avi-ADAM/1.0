@@ -1,5 +1,5 @@
 <script>
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import MultiSelect from 'svelte-multiselect';
   import Arrow from '$lib/celim/icons/arrow.svelte';
@@ -22,7 +22,7 @@
  */
 
 /** @type {Props} */
- let { pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]) } = $props();
+ let { children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]) } = $props();
  const baseUrl = import.meta.env.VITE_URL
 
  let newcontent = $state(true);
@@ -163,14 +163,14 @@ let showMobileModal = $state(false);
 
 function openMobileModal() {
   showMobileModal = true;
-  if ($page.data.isDesktop === false) {
+  if (page.data.isDesktop === false) {
     showFoot.set(false);
   }
 }
 
 function closeMobileModal() {
   showMobileModal = false;
-  if ($page.data.isDesktop === false) {
+  if (page.data.isDesktop === false) {
     showFoot.set(true);
   }
 }
@@ -178,14 +178,14 @@ function closeMobileModal() {
 </script>
 
 <div dir="{$lang == 'he' ? 'rtl' : 'ltr'}" >
-  <slot>
+  {#if children}{@render children()}{:else}
 <h2 class="text-barbi font-bold">{head[$lang]}</h2>
-  </slot>
+  {/if}
             {#if before}
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      {#if $page.data.isDesktop}
+      {#if page.data.isDesktop}
       <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
           <MultiSelect
           closeDropdownOnSelect='desktop'
@@ -214,8 +214,8 @@ function closeMobileModal() {
             ulOptionsClass="bg-gold"
             liSelectedClass='bg-barbi text-gold'
           loading={mission1.length > 0 ? false : true}
-          on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
-          on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
+          on:focus={() => {!page?.data?.isDesktop ?  showFoot.set(false) : null}}
+          on:blur={() => {!page?.data?.isDesktop ?  showFoot.set(true) : null}}
           createOptionMsg={addn[$lang]}
           allowUserOptions={"append"}
            bind:searchText={ugug}

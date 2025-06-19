@@ -1,4 +1,6 @@
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (error to error_1) making the component unusable -->
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (error to error_1) making the component unusable -->
+<!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot (error to error_1) making the component unusable -->
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
 <!-- @migration-task Error while migrating Svelte code: This migration would change the name of a slot making the component unusable -->
