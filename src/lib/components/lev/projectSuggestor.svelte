@@ -6,14 +6,12 @@ import { page } from '$app/stores';
   import {SendTo} from '$lib/send/sendTo.svelte'
      import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
-    // Removed createEventDispatcher as part of Svelte 5 migration
   import { onMount } from 'svelte'
                    import { lang } from '$lib/stores/lang.js'
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 	import dayjs from 'dayjs';
   import { nowId } from "$lib/stores/pendMisMes.js";
 const baseUrl = import.meta.env.VITE_URL
-    // All props for Svelte 5 migration, using JSDoc for type definitions
     /**
      * @typedef {Object} ComponentProps
      * @property {function({ani: string, coinlapach: any}): void} [onLess] - Callback for less event

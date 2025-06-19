@@ -1,6 +1,4 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
 const baseUrl = import.meta.env.VITE_URL
@@ -75,7 +73,7 @@ if (rn.includes(skillName_value)){
 
 function finnish (id,sec) {
   console.log("ugu")
-  dispatch('finnish', {
+  onFinnish?.({
     id: id,
     addsk: false,
     scob: sec,
@@ -87,10 +85,11 @@ function finnish (id,sec) {
    * @typedef {Object} Props
    * @property {any} [rn]
    * @property {string} [color]
+   * @property {(payload: { id: any, addsk: boolean, scob: any, rob: any, name: any }) => void} [onFinnish] - Callback for finnish event
    */
 
   /** @type {Props} */
-  let { rn = [], color = "--gold" } = $props();
+  let { rn = [], color = "--gold", onFinnish } = $props();
 const adds = {"he":"הוספת כישור חדש","en": "Add new Skill"}
 
 const valn = {"he":"שם הכישור", "en": "Skill name"}

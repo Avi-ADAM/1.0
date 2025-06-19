@@ -7,8 +7,6 @@ import axios from 'axios';
 import { idr } from '../../stores/idr.js';
 import Addnewskil from './addNewSkillToRole.svelte';
 import MultiSelect from 'svelte-multiselect';
-import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 let idro;
 idr.subscribe(newwork => {
 idro = newwork;
@@ -69,7 +67,7 @@ onMount(async () => {
     });
 
     function dispatchrole (meData, id) {
-  dispatch('addnewrole', {
+  onAddnewrole?.({
     id: id,
     mid: mid,
     skob: meData
@@ -117,7 +115,7 @@ skillslist = find_skill_id(selected);
       //  skillIdStore.set(meData.id);
         id = meData.data.createTafkidim.data.id;
   //  skillslist.push(idro);
-        dispatchrole (meData.data.createTafkidim.data, id);
+        onAddnewrole?.(meData.data.createTafkidim.data, id);
         addR = false;
         let userName_value = $liUN
          let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desR} והכישורים: ${selected.join(" , ")}` }
@@ -165,6 +163,8 @@ skillslist = find_skill_id(selected);
    * @property {any} [mid]
    * @property {any} [skills2]
    * @property {boolean} [addR]
+   * @property {(detail: { id: any, mid: any, skob: any }) => void} [onAddnewrole] - Callback for when a new role is added.
+   * @property {() => void} [onB] - Callback for the 'b' event (cencel).
    */
 
   /** @type {Props} */
@@ -173,7 +173,9 @@ skillslist = find_skill_id(selected);
     color = "--gold",
     mid = -1,
     skills2 = $bindable([]),
-    addR = $bindable(false)
+    addR = $bindable(false),
+    onAddnewrole,
+    onB
   } = $props();
 
 const cencel = {"he":"ביטול","en": "cencel"}
@@ -203,7 +205,7 @@ function finnish (event) {
 };
 function dispatchb () {
    addR = false
-  dispatch('b', {
+  onB?.({
     } );
 };
 
@@ -341,5 +343,3 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
  
 }
 </style>
-
-

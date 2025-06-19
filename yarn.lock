@@ -15,6 +15,10 @@
     "@jridgewell/gen-mapping" "^0.3.5"
     "@jridgewell/trace-mapping" "^0.3.24"
 
+"@avitest/gridcraft@github:Avi-ADAM/gridcraft":
+  version "1.0.0-beta"
+  resolved "git+ssh://git@github.com/Avi-ADAM/gridcraft.git#4949318d521e47cee2c8a18e2ecfffe4ad5cbf1c"
+
 "@babel/code-frame@^7.0.0", "@babel/code-frame@^7.24.7":
   version "7.24.7"
   resolved "https://registry.npmjs.org/@babel/code-frame/-/code-frame-7.24.7.tgz"
@@ -1185,11 +1189,6 @@
     nopt "^8.0.0"
     semver "^7.5.3"
     tar "^7.4.0"
-
-"@mediakular/gridcraft@^0.2.8":
-  version "0.2.8"
-  resolved "https://registry.npmjs.org/@mediakular/gridcraft/-/gridcraft-0.2.8.tgz"
-  integrity sha512-NK+KJiqptjKNhnpLO7AQmFaqy7Kuscbcek4Th5dTH0nc0qAU34IK9iQqhgAeVKqbeN32wyAbdABQvz9833EJGw==
 
 "@melt-ui/svelte@0.76.2":
   version "0.76.2"

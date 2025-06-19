@@ -5,7 +5,6 @@
      import { onMount } from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
-    // Callback prop used instead of createEventDispatcher for Svelte 5 migration
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]

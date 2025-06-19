@@ -19,11 +19,11 @@
         import Weget from '../../../components/lev/weget.svelte'
         import Hal from '../../../components/lev/halukaask.svelte'
       //import { fly } from 'svelte/transition';
-      import { createEventDispatcher, onMount } from 'svelte';
+      import { onMount } from 'svelte';
     import Header from './../../header/header.svelte'
-const dispatch = createEventDispatcher();
   import { Swiper, SwiperSlide } from "swiper/svelte";
-  import { afterUpdate } from 'svelte'
+  // Svelte 5: Define callback props instead of using createEventDispatcher
+  let { onCards, onStart, onUser, onHover, onProj } = $props();
   // Import Swiper styles
   import "swiper/css";
   import "swiper/css/navigation";
@@ -91,14 +91,14 @@ $:if (indexi != -1){
   function change(){
     console.log(cards,"change")
       console.log("will change")
-        dispatch("cards",{cards:false})
+        onCards?.({cards:false}) // Svelte 5: Replaced dispatch with callback prop
   }
   let slideIndex;
   export let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}
-afterUpdate(async () => {
-if (swiperRef !== null) {
-  swiperRef.update()
-}
+$effect(() => { // Svelte 5: Replaced afterUpdate with $effect
+  if (swiperRef !== null) {
+    swiperRef.update()
+  }
 })
   async function delo (event){
     console.log("slideIndex")
@@ -107,7 +107,7 @@ if (swiperRef !== null) {
  // swiperRef.removeSlide(slideIndex)
   //  	
 
-   dispatch("start", {cards: false,ani:event.detail.ani,coinlapach:event.detail.coinlapach})
+   onStart?.({cards: false,ani:event.detail.ani,coinlapach:event.detail.coinlapach}) // Svelte 5: Replaced dispatch with callback prop
 // let oldob = arr1;
 // const x = oldob.map(c => c.coinlapach);
 // const indexy = x.indexOf(event.detail.coinlapach);
@@ -119,18 +119,18 @@ if (swiperRef !== null) {
 // arr1 = [...arr1] 
 }
 function user (event) {
- dispatch("user", {id: event.detail.id})
+ onUser?.({id: event.detail.id}) // Svelte 5: Replaced dispatch with callback prop
 }
 
 function hover (event) {
     
- dispatch("hover", {id: event.detail.id})
+ onHover?.({id: event.detail.id}) // Svelte 5: Replaced dispatch with callback prop
 }
 function chat(){}
 
 function proj (event){
   console.log(event.detail.id)
-     dispatch("proj", {id: event.detail.id})
+     onProj?.({id: event.detail.id}) // Svelte 5: Replaced dispatch with callback prop
 }
 let hovered = false
 const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
@@ -156,7 +156,7 @@ function hoverede(){
     if (hovered == false){
     u = d[$lang]
   } 
-  dispatch("hover", {id: u});
+  onHover?.({id: u}); // Svelte 5: Replaced dispatch with callback prop
  }
 function hoverc (id){
   if (id == "0"){
@@ -165,9 +165,9 @@ function hoverc (id){
     u = id
   }
 
-  dispatch("hover", {id: u});
+  onHover?.({id: u}); // Svelte 5: Replaced dispatch with callback prop
 }
-const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות ��שמאל',"en" : 'Navigation: right side, bottom'}
+const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות שמאל',"en" : 'Navigation: right side, bottom'}
 $: console.log('AAAAAA',$page.data.isDesktop,$page.data)
 //exclude meData huca 
 function showonly(event) {

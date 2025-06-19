@@ -1,11 +1,7 @@
 <script>
-  import { run, handlers } from 'svelte/legacy';
-
   import Tile from '$lib/celim/tile.svelte'
       import Chaticon from '$lib/celim/chaticon.svelte'
       import {lang} from '$lib/stores/lang.js'
-  import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '$lib/celim/lev.svelte';
@@ -38,6 +34,12 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} already
    * @property {boolean} [allr]
    * @property {boolean} [isVisible]
+   * @property {(x: any) => void} [onHover] - Callback for hover event
+   * @property {(alr: any, y: string) => void} [onAgree] - Callback for agree event
+   * @property {(alr: any, y: string) => void} [onDecline] - Callback for decline event
+   * @property {(alr: any, y: string) => void} [onNego] - Callback for negotiate event
+   * @property {() => void} [onProject] - Callback for project event
+   * @property {() => void} [onTochat] - Callback for tochat event
    */
 
   /** @type {Props} */
@@ -65,28 +67,34 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     hearotMeyuchadot,
     already = $bindable(),
     allr = false,
-    isVisible = false
+    isVisible = false,
+    onHover,
+    onAgree,
+    onDecline,
+    onNego,
+    onProject,
+    onTochat
   } = $props();
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.(x);
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr,y:"a"})
+onAgree?.(alr,"a")
 }
 function decline(alr) {
   already = true;
-dispatch("decline",{alr:alr,y:"d"});
+onDecline?.(alr,"d");
 }
 function nego(alr){
-dispatch("nego",{alr:alr,y:"n"});
+onNego?.(alr,"n");
 
 }
 function project () {
-dispatch("project")
+onProject?.()
 }
 function tochat (){
-dispatch("tochat");
+onTochat?.();
 }
 const ttal = {"he":"נכנס כבר כסף","en":"already has income"}
 const ttwe = {"he":"צפי רווח: שבוע","en":"exp income: one week "}
@@ -113,9 +121,6 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
         const monhly = {"he":"בחודש", "en": "per month"}
 
 console.log(workways)
-run(() => {
-    console.log("ACTS: ",acts)
-  });
 let isScrolable = $state(true); 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
@@ -132,7 +137,7 @@ function preventSwiperScroll(event) {
 </script>
 
 
-<div onwheel={handlers(preventSwiperScroll, preventSwiperScroll)} 
+<div onwheel={preventSwiperScroll} 
 ontouchmove={preventTouchScroll}
 onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"

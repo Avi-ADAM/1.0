@@ -9,24 +9,23 @@
   import { goto } from "$app/navigation";
   import Chaticon from "$lib/celim/chaticon.svelte";
   import MoachIcon from "$lib/celim/icons/moachIcon.svelte";
-  import { createEventDispatcher } from "svelte";
   import Lev from '$lib/celim/lev.svelte';
   import ProfileMenu from '$lib/components/footer/ProfileMenu.svelte';
-  const dispatch = createEventDispatcher();
-    function addi(kind){
-      if(kind == 'chat'){
-        dispatch('chat');
-      }else{
-        dispatch('new');
-      }
-    }
   /**
    * @typedef {Object} Props
    * @property {string} [initialRout]
+   * @property {() => void} [onChat] - Callback for chat event
+   * @property {() => void} [onNew] - Callback for new item creation event
    */
+  let { initialRout = "", onChat, onNew } = $props();
+    function addi(kind){
+      if(kind == 'chat'){
+        onChat?.();
+      }else{
+        onNew?.();
+      }
+    }
 
-  /** @type {Props} */
-  let { initialRout = "" } = $props();
     let activeRoute;
   run(() => {
     activeRoute = page.url.pathname

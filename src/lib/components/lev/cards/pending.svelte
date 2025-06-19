@@ -1,8 +1,7 @@
 <script>
       import Chaticon from '../../../celim/chaticon.svelte'
-  import { createEventDispatcher, onMount } from 'svelte';
+  import { onMount } from 'svelte';
       import tr from '$lib/translations/tr.json'
- const dispatch = createEventDispatcher();
  import {lang} from '$lib/stores/lang.js'
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
@@ -35,6 +34,11 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} already
    * @property {boolean} [allr]
    * @property {any} timegramaDate
+   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { alr: any, y: string }) => void} [onAgree] - Callback for agree event
+   * @property {(payload: { alr: any, y: string }) => void} [onDecline] - Callback for decline event
+   * @property {(payload: { alr: any, y: string }) => void} [onNego] - Callback for nego event
+   * @property {() => void} [onTochat] - Callback for tochat event
    */
 
   /** @type {Props} */
@@ -60,7 +64,12 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     createdAt,
     already = $bindable(),
     allr = false,
-    timegramaDate
+    timegramaDate,
+    onHover,
+    onAgree,
+    onDecline,
+    onNego,
+    onTochat
   } = $props();
     let zman = $state()
   onMount(()=>{
@@ -73,22 +82,22 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
       }, 1)
   })
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.({x:x});
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr,y:"a"})
+onAgree?.({alr:alr,y:"a"})
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr,y:"d"});
+onDecline?.({alr:alr,y:"d"});
 }
 function nego(alr){
-dispatch("nego",{alr:alr,y:"n"});
+onNego?.({alr:alr,y:"n"});
 
 }
 function tochat (){
-dispatch("tochat");
+onTochat?.();
 }
     const t = {
       "wwneed" : {"he":"דרכי עבודה מבוקשות:","en":"ways of work for the mission:"},

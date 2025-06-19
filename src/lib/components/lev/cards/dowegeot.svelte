@@ -2,8 +2,6 @@
       import Chaticon from '../../../celim/chaticon.svelte'
           import {lang} from '$lib/stores/lang.js'
 import Lowbtn from '$lib/celim/lowbtn.svelte'
-  import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
   import { isMobileOrTablet } from '$lib/utilities/device';
@@ -27,6 +25,11 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {number} [hm]
    * @property {any} spnot
    * @property {boolean} [allr]
+   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { alr: any, y: string }) => void} [onAgree] - Callback for agree event
+   * @property {(payload: { alr: any, y: string }) => void} [onDecline] - Callback for decline event
+   * @property {(payload: { alr: any, y: string }) => void} [onNego] - Callback for nego event
+   * @property {() => void} [onTochat] - Callback for tochat event
    */
 
   /** @type {Props} */
@@ -48,25 +51,30 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     monts,
     hm = 1,
     spnot,
-    allr = false
+    allr = false,
+    onHover,
+    onAgree,
+    onDecline,
+    onNego,
+    onTochat
   } = $props();
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.({x:x});
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr,y:"a"})
+onAgree?.({alr:alr,y:"a"})
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr,y:"d"});
+onDecline?.({alr:alr,y:"d"});
 }
 function nego(alr){
-dispatch("nego",{alr:alr,y:"n"});
+onNego?.({alr:alr,y:"n"});
 
 }
 function tochat (){
-dispatch("tochat");
+onTochat?.();
 }
 const neged ={"he":"נדרש בירור","en":"negotiation needed"}
 const negedT = {"he":"סך ההצבעות להליך בירור","en":"total votes for negotiation"}

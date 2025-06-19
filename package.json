@@ -34,6 +34,7 @@
     "typescript": "^5.5.4"
   },
   "dependencies": {
+    "@avitest/gridcraft": "github:Avi-ADAM/gridcraft",
     "@capacitor/android": "^6.1.2",
     "@capacitor/cli": "^6.1.2",
     "@capacitor/core": "^6.1.2",
@@ -45,7 +46,6 @@
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
     "@google/generative-ai": "^0.24.0",
-    "@mediakular/gridcraft": "^0.2.8",
     "@number-flow/svelte": "^0.3.3",
     "@okrad/svelte-progressbar": "^2.2.0",
     "@sentry/sveltekit": "^8.27.0",

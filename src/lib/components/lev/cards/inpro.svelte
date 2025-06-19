@@ -4,7 +4,6 @@
 
 import Lowbtn from '$lib/celim/lowbtn.svelte'
      // import Chaticon from '../../../celim/chaticon.svelte'
-  import { createEventDispatcher } from 'svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
   /**
@@ -33,6 +32,14 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} storeTimer
    * @property {boolean} [isVisible]
    * @property {any} [startDate]
+   * @property {() => void} [onStart] - Callback for start event
+   * @property {() => void} [onDone] - Callback for done event
+   * @property {() => void} [onSave] - Callback for save event
+   * @property {() => void} [onAzor] - Callback for azor event
+   * @property {() => void} [onClear] - Callback for clear event
+   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
+   * @property {() => void} [onStatusi] - Callback for statusi event
+   * @property {() => void} [onOpentask] - Callback for task event
    */
 
   /** @type {Props} */
@@ -60,34 +67,41 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     showSaveDialog = $bindable(false),
     storeTimer,
     isVisible = false,
-    startDate = null
+    startDate = null,
+    onStart,
+    onDone,
+    onSave,
+    onAzor,
+    onClear,
+    onHover,
+    onStatusi,
+    onOpentask
   } = $props();
- const dispatch = createEventDispatcher();
 function start(){
-dispatch("start");
+onStart?.();
 }
 function done(){
     already = true
-dispatch("done")
+onDone?.()
 }
 function save() {
-dispatch("save");
+onSave?.();
 }
 function azor(){
-dispatch("azor");
+onAzor?.();
 
 }
 function clear (){
-dispatch("clear");
+onClear?.();
 }
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.({x:x});
 }
 function statusi(){
-   dispatch("statusi")
+   onStatusi?.()
 }
 function opentask(){
-   dispatch("task")
+   onOpentask?.()
 }
  // import { textfit } from 'svelte-textfit';
  // let parent;

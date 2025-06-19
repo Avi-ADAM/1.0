@@ -1,7 +1,5 @@
 <script>
       import Chaticon from '../../../celim/chaticon.svelte'
-  import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
        import tr from '$lib/translations/tr.json'
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
@@ -28,6 +26,11 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} useraplyname
    * @property {any} already
    * @property {boolean} [allr]
+   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { alr: any, y: string }) => void} [onAgree] - Callback for agree event
+   * @property {(payload: { alr: any, y: string }) => void} [onDecline] - Callback for decline event
+   * @property {(payload: { alr: any, y: string }) => void} [onNego] - Callback for nego event
+   * @property {() => void} [onTochat] - Callback for tochat event
    */
 
   /** @type {Props} */
@@ -49,25 +52,30 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     nhours,
     useraplyname,
     already = $bindable(),
-    allr = false
+    allr = false,
+    onHover,
+    onAgree,
+    onDecline,
+    onNego,
+    onTochat
   } = $props();
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.({x:x});
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr,y:"a"})
+onAgree?.({alr:alr,y:"a"})
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr,y:"d"});
+onDecline?.({alr:alr,y:"d"});
 }
 function nego(alr){
-dispatch("nego",{alr:alr,y:"n"});
+onNego?.({alr:alr,y:"n"});
 
 }
 function tochat (){
-dispatch("tochat");
+onTochat?.();
 }
 const tri = import('$lib/translations/tr.json')
 let isScrolable = $state(true); 

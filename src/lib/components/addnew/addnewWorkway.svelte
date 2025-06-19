@@ -1,12 +1,8 @@
 
 <script>
-    import { createEventDispatcher } from 'svelte';
                import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
 
-     const dispatch = createEventDispatcher();
-    
-   
      let id;
      let meData = [];
   
@@ -15,10 +11,29 @@
     
     let shgi = $state(false);
    
-    
+    /**
+     * @typedef {Object} Props
+     * @property {any} [mid]
+     * @property {any} [rn]
+     * @property {boolean} [addW]
+     * @property {string} [color]
+     * @property {(detail: { id: any, mid: any, skob: any, name: string }) => void} [onAddww] - Callback function when a new workway is added.
+     * @property {() => void} [onB] - Callback function when the operation is cancelled.
+     */
+
+    /** @type {Props} */
+    let {
+      mid = -1,
+      rn = [],
+      addW = $bindable(false),
+      color = "--gold",
+      onAddww,
+      onB
+    } = $props();
+
         function dispatchww (meData) {
           console.log(meData);
-      dispatch('addww', {
+      onAddww?.({
         id: meData.data.createWorkWay.data.id,
         mid: mid,
         skob: meData.data.createWorkWay.data,
@@ -94,24 +109,8 @@ const btnTitles = {"he": "הוספה", "en": "Add"}
 const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
   function dispatchb () {
    addW = false
-  dispatch('b', {
-    } );
+  onB?.();
 };
-  /**
-   * @typedef {Object} Props
-   * @property {any} [mid]
-   * @property {any} [rn]
-   * @property {boolean} [addW]
-   * @property {string} [color]
-   */
-
-  /** @type {Props} */
-  let {
-    mid = -1,
-    rn = [],
-    addW = $bindable(false),
-    color = "--gold"
-  } = $props();
     </script>
     <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
       
@@ -215,9 +214,3 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
  
 }
 </style>
-
-    
-        
-      
-    
-    

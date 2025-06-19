@@ -1,12 +1,9 @@
 <script>
-  import { createBubbler } from 'svelte/legacy';
-
-  const bubble = createBubbler();
   import { lang } from '$lib/stores/lang.js';
   import ProgressBar from '@okrad/svelte-progressbar';
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
-      	import { Drawer } from 'vaul-svelte';
+  import { Drawer } from 'vaul-svelte';
 
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
@@ -17,7 +14,7 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
   const baseUrl = import.meta.env.VITE_URL
-    let dialogOpen = $state(false)
+  let dialogOpen = $state(false)
   let resP = [];
 
   let idL;
@@ -117,6 +114,8 @@
       }
     }
   }
+  import { idPr } from '$lib/stores/idPr.js';
+
   function project(id) {
     pmcli += 1;
     if (pmcli >= 2) {
@@ -918,8 +917,7 @@ role="button"
                 {new Date(deadline).toLocaleDateString('he-IL')}
               </p>{/if}
             <p
-              onm={bubble('m')}
-              ouseenter={() => hover('שווי')}
+              onmouseenter={() => hover('שווי')}
               onmouseleave={() => hover('0')}
               class="hslink bc"
             >
@@ -1111,7 +1109,6 @@ role="button"
   }
   #normSmll {
     background: url(https://res.cloudinary.com/love1/image/upload/v1650979768/coinnn_oatfhw.svg);
-
     white-space: normal;
     text-align: center;
     align-items: center;

@@ -6,8 +6,6 @@
                import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
  //   import { skillIdStore } from './store/skillIdStore.js'
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
  let selected = $state();
  let id;
      const placeholder = `${$lang == "he" ? "תפקידים קשורים" : "related Roles"}`;
@@ -74,7 +72,7 @@
       return arr;
      };
 function dispatchskillid (meData, id) {
-  dispatch('addnewskill', {
+  onAddnewskill?.({
     id: id,
     mid: mid,
     skob: meData.data.createSkill.data
@@ -176,8 +174,7 @@ function finnish (event) {
 }
 function dispatchb () {
    addS = false
-  dispatch('b', {
-    } );
+  onB?.();
 };
   /**
    * @typedef {Object} Props
@@ -186,6 +183,8 @@ function dispatchb () {
    * @property {any} [rn]
    * @property {boolean} [addS]
    * @property {string} [color]
+   * @property {(payload: { id: any, mid: any, skob: any }) => void} [onAddnewskill] - Callback for addnewskill event
+   * @property {() => void} [onB] - Callback for b event
    */
 
   /** @type {Props} */
@@ -194,7 +193,9 @@ function dispatchb () {
     mid = -1,
     rn = [],
     addS = $bindable(false),
-    color = "--gold"
+    color = "--gold",
+    onAddnewskill,
+    onB
   } = $props();
   </script>
   <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">

@@ -2,11 +2,9 @@
 import MultiSelect from 'svelte-multiselect';
 import { missionNew } from '../../stores/missionNew';
   import { onMount } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
              import { lang } from '$lib/stores/lang.js'
 const baseUrl = import.meta.env.VITE_URL
 
- const dispatch = createEventDispatcher();
 function inc() {
      missionNew.set(find_role_id(selected));
   };

@@ -1,8 +1,7 @@
 <script>
   import Tile from '$lib/celim/tile.svelte';
     import {lang} from '$lib/stores/lang.js'
-  import { createEventDispatcher, onMount } from 'svelte';
-    const dispatch = createEventDispatcher();
+  import { onMount } from 'svelte';
 
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
@@ -132,6 +131,9 @@ dispatch("hover", {id: fir[$lang]});
    * @property {number} [askma]
    * @property {number} [hachlot]
    * @property {boolean} [low]
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { data: any, kind: string, id: any }) => void} [onShowonly] - Callback for showonly event
+   * @property {() => void} [onShowall] - Callback for showall event
    */
 
   /** @type {Props} */
@@ -150,7 +152,10 @@ dispatch("hover", {id: fir[$lang]});
     maap = 17,
     askma = 13,
     hachlot = 9,
-    low = true
+    low = true,
+    onHover,
+    onShowonly,
+    onShowall
   } = $props();
 let hovered = false;
 function hoverede(x){
@@ -164,7 +169,7 @@ function hoverede(x){
   } else {
 u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
   }
-  dispatch("hover", {id: u[$lang]});
+  onHover?.({id: u[$lang]});
  }
  //{name:"welc",val:true,color:"gray"},
  let milon = $state([
@@ -202,7 +207,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
     // מחזיר true רק אם יש ערך מספרי והוא גדול מ-0
     return valueMap[item.name] > 0;
 }) as key}
-    <button onclick={()=> showonly(key.name)}>
+    <button onclick={()=> onShowonly?.(key.name)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
@@ -213,7 +218,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
 {/each}
 {:else}
 {#each milon as key}
-    <button onclick={()=> showonly(key.name,key.id)}>
+    <button onclick={()=> onShowonly?.(key.name,key.id)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
@@ -224,4 +229,3 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
 {/each}
 {/if}
 </div>
-

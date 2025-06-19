@@ -1,8 +1,7 @@
 <script>
 
         import tr from '$lib/translations/tr.json'
-  import { createEventDispatcher, onMount } from 'svelte';
- const dispatch = createEventDispatcher();
+  import { onMount } from 'svelte';
   import Lev from '../../../celim/lev.svelte';
   import {lang} from '$lib/stores/lang.js'
         import { formatTime } from '../utils';
@@ -30,6 +29,9 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} price
    * @property {boolean} [already]
    * @property {any} timegramaDate
+   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { alr: any }) => void} [onAgree] - Callback for agree event
+   * @property {(payload: { alr: any }) => void} [onDecline] - Callback for decline event
    */
 
   /** @type {Props} */
@@ -51,7 +53,10 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     kind,
     price,
     already = $bindable(false),
-    timegramaDate
+    timegramaDate,
+    onHover,
+    onAgree,
+    onDecline
   } = $props();
     let zman = $state()
   onMount(()=>{
@@ -77,15 +82,15 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
     const newlogo = {"he":"הלוגו החדש", "en":"new logo"}
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.({x:x});
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr})
+onAgree?.({alr:alr})
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr});
+onDecline?.({alr:alr});
 }
 function linke(t){
   console.log(t)

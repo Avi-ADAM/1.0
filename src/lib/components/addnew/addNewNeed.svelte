@@ -1,11 +1,9 @@
 <script>
  let idNewNeed;
- import { createEventDispatcher } from 'svelte';
 const baseUrl = import.meta.env.VITE_URL
 
            import { lang } from '$lib/stores/lang.js'
 
- const dispatch = createEventDispatcher();
  let clicked = $state(false)
 let token;
 let needName = $state();
@@ -50,7 +48,7 @@ async function subm() {
              .then(r => r.json())
   .then(data => meData = data);
         console.log(meData)
-    dispatch("newn",{
+    onNewn?.({
   id: meData.data.createMashaabim.data.id,
   skob: meData.data.createMashaabim.data,
   name: meData.data.createMashaabim.data.attributes.name,
@@ -67,6 +65,7 @@ addnee = false
    * @property {number} [rr]
    * @property {string} [color]
    * @property {boolean} [addnee]
+   * @property {function(Object): void} [onNewn] - Callback for newn event
    */
 
   /** @type {Props} */
@@ -74,7 +73,8 @@ addnee = false
     onmo = false,
     rr = 24,
     color = "--gold",
-    addnee = $bindable(false)
+    addnee = $bindable(false),
+    onNewn
   } = $props();
 const hekind = {"he":"סוג שווי","en":"kind of vallue"}
 const val = {"he":"שווי כספי ","en":"vallue"}

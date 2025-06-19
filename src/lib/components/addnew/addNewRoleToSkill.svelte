@@ -1,6 +1,4 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
   const baseUrl = import.meta.env.VITE_URL
@@ -12,7 +10,7 @@
    */
 
   /** @type {Props} */
-  let { color = "--gold", rn = [] } = $props();
+  let { color = "--gold", rn = [], onFinnish } = $props(); // Svelte 5: Define callback prop
     let roleName_value = $state();
         let desS = $state();
         let meData;
@@ -79,7 +77,7 @@
                 };}
     };     
        function finnish (id , sec) {
-  dispatch('finnish', {
+  onFinnish?.({ // Svelte 5: Replaced dispatch with callback prop
     id: id,
     addro: false,
     rob: meData,

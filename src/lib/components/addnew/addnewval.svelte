@@ -1,6 +1,4 @@
 <script>
-     import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
                import { liUN } from '$lib/stores/liUN.js';
 const baseUrl = import.meta.env.VITE_URL
@@ -76,7 +74,7 @@ if (rn.includes(name_value)){
 
  
 function dispatchvall (meData) {
-  dispatch('addnew', {
+  onAddnew?.({
     id: meData.data.createVallue.data.id,
     skob: meData.data.createVallue.data
     } );
@@ -85,8 +83,7 @@ function dispatchvall (meData) {
 
 function dispatchb () {
    addS = false
-  dispatch('b', {
-    } );
+  onB?.();
 };
   /**
    * @typedef {Object} Props
@@ -94,6 +91,8 @@ function dispatchb () {
    * @property {any} vallId
    * @property {any} [rn]
    * @property {boolean} [addS]
+   * @property {(payload: { id: any, skob: any }) => void} [onAddnew] - Callback for addnew event
+   * @property {() => void} [onB] - Callback for b event
    */
 
   /** @type {Props} */
@@ -101,7 +100,9 @@ function dispatchb () {
     color = "--gold",
     vallId,
     rn = [],
-    addS = $bindable(false)
+    addS = $bindable(false),
+    onAddnew,
+    onB
   } = $props();
 
 const cencel = {"he":"ביטול","en": "cencel"}

@@ -1,7 +1,7 @@
 <script>
   import Dates from "$lib/components/grid/dates.svelte";
   import ListOfTiles from "$lib/components/grid/listOfTiles.svelte";
-    import { Grid , PrelineTheme,PlainTableCssTheme ,CardsPlusTheme ,PagingData, GridFooter} from "@mediakular/gridcraft";
+    import { Grid , PrelineTheme,PlainTableCssTheme ,CardsPlusTheme ,PagingData, GridFooter} from "@avitest/gridcraft";
     import { lang } from "$lib/stores/lang";
   import GoButton from "$lib/components/grid/GoButton.svelte";
   import RichText from "$lib/celim/ui/richText.svelte";
@@ -218,6 +218,7 @@ let columns = $state([
     <RingLoader size={30}/>
      {/if}</h2>
 {#key activUpd}
+{#if alld}
     <Grid 
     bind:data={alld} 
     bind:columns {theme} {paging}/>
@@ -225,5 +226,6 @@ let columns = $state([
        bind:data={alld} 
        {theme}
     bind:paging/>
-    {/key}
+    {/if}
+{/key}
 </div>

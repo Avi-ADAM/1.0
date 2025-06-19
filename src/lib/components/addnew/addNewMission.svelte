@@ -8,15 +8,16 @@ let addro = false;
 import MultiSelect from 'svelte-multiselect';
 import { onMount } from 'svelte';
 //import ChoosRole from './choosRole.svelte';
-import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
-let newName;
-  let { missionNewId = $bindable(), skills2 = $bindable([]), roles = $bindable([]) } = $props();
+/**
+ * @param {Object} props - Component properties
+ * @param {(detail: { id: any, name: any }) => void} [props.onNew] - Callback for when a new mission is created.
+ */
+let { missionNewId = $bindable(), skills2 = $bindable([]), roles = $bindable([]), onNew } = $props();
 let error1 = null
 let token;
 let meData = [];
 function dis () {
-  dispatch('new', {
+  onNew?.({
     id: missionNewId,
     name: newName,
     } );

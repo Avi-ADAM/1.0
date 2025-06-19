@@ -1,8 +1,6 @@
 <script>
     //  import Chaticon from '../../../celim/chaticon.svelte'
-  import { createEventDispatcher } from 'svelte';
   import {lang} from '$lib/stores/lang.js'
- const dispatch = createEventDispatcher();
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
@@ -24,6 +22,11 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} deadLine
    * @property {any} sqadualedf
    * @property {boolean} [already]
+   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { alr: any, y: string }) => void} [onAgree] - Callback for agree event
+   * @property {(payload: { alr: any, y: string }) => void} [onDecline] - Callback for decline event
+   * @property {(payload: { alr: any, y: string }) => void} [onNego] - Callback for nego event
+   * @property {() => void} [onTochat] - Callback for tochat event
    */
 
   /** @type {Props} */
@@ -41,25 +44,30 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     spnot,
     deadLine,
     sqadualedf,
-    already = $bindable(false)
+    already = $bindable(false),
+    onHover,
+    onAgree,
+    onDecline,
+    onNego,
+    onTochat
   } = $props();
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.({x:x});
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr,y:"a"})
+onAgree?.({alr:alr,y:"a"})
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr,y:"d"});
+onDecline?.({alr:alr,y:"d"});
 }
 function nego(alr){
-dispatch("nego",{alr:alr,y:"n"});
+onNego?.({alr:alr,y:"n"});
 
 }
 function tochat (){
-dispatch("tochat");
+onTochat?.();
 }
 const askedVal = {
   "en": "asked vallue",

@@ -1,6 +1,4 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import Lev from '../../../celim/lev.svelte';
   import No from '../../../celim/no.svelte'
@@ -24,6 +22,10 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} src2
    * @property {number} [perhour]
    * @property {number} [noofhours]
+   * @property {(x: any) => void} [onHover] - Callback for hover event
+   * @property {(alr: any) => void} [onAgree] - Callback for agree event
+   * @property {(alr: any) => void} [onDecline] - Callback for decline event
+   * @property {() => void} [onChat] - Callback for chat event
    */
 
   /** @type {Props} */
@@ -42,21 +44,25 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     already = $bindable(false),
     src2,
     perhour = 0,
-    noofhours = 0
+    noofhours = 0,
+    onHover,
+    onAgree,
+    onDecline,
+    onChat
   } = $props();
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.(x);
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr})
+onAgree?.(alr)
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr});
+onDecline?.(alr);
 }
 function tochat() {
-dispatch("chat");
+onChat?.();
 }
 
 const leho = {"he":" בכל חודש " , "en": " per month"}

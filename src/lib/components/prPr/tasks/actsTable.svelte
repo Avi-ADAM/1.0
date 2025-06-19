@@ -8,7 +8,7 @@
     PrelineTheme,
     GridFooter,
     PagingData
-  } from '@mediakular/gridcraft';
+  } from '@avitest/gridcraft';
   import { lang } from '$lib/stores/lang';
   import RichText from '$lib/celim/ui/richText.svelte';
   import NameAndPname from '$lib/components/grid/nameAndPname.svelte';

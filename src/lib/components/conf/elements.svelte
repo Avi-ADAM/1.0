@@ -9,7 +9,6 @@
   import AddNewRole from "../addnew/addNewRole.svelte";
   import AddnewWorkway from "../addnew/addnewWorkway.svelte";
   import { onMount } from "svelte";
-  //const dispatch = createEventDispatcher();
   onMount(()=>{
     console.log("datai",datai,dataib)
     if(datai != dataib && datai.length > 0 && dataib.length == 0){
@@ -56,27 +55,17 @@
     nom = {},
     addS = false,
     roles = [],
-    dataibn = $bindable([])
+    dataibn = $bindable([]),
+    onAddnew // Svelte 5: Callback prop for addnew event
   } = $props();
+
 function addnew(event) {
     const newOb = event.detail.skob;
     const newN = event.detail.skob.attributes[valc];
-    /*    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes[valc];
-    dispatch("addnew",{newOb,newN,valc,dataibn})*/
-    const newValues = alld;
-    newValues.push(newOb);
-    alld = newValues;
-    const newSele = dataib;
-    const datairosh = datai;
-        console.log(dataib,datai)
-    newSele.push(newOb);
-    dataib = newSele;
-    datai = datairosh
-    console.log(dataib,datai)
-    dataibn.push(newN)
-    dataibn = dataibn
+    // Svelte 5: Replaced dispatch with callback prop
+    onAddnew?.({newOb,newN,valc,dataibn});
 }
+
 function check (lettera, letterb){
     if(lettera == letterb){
         return true
@@ -84,6 +73,7 @@ function check (lettera, letterb){
         return false
     }
 }
+
 function checkAll (){
     const allId = find_skill_id(dataibn,alld,valc);
     const allob = alld.filter(t=>allId.includes(t.id))

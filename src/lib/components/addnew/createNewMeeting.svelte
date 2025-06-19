@@ -1,8 +1,11 @@
 <script>
   import {username} from '$lib/stores/pendMisMes'
-  import { createEventDispatcher } from 'svelte';
-  const dispatch = createEventDispatcher();
   import {page} from '$app/state'
+  /**
+   * Callback function when the meeting creation process is closed.
+   * @type {() => void}
+   */
+  let { onClose } = $props();
   import Close from "$lib/celim/close.svelte";
   import Button from "$lib/celim/ui/button.svelte";
 import TextInput from "$lib/celim/ui/input/textInput.svelte";
@@ -65,7 +68,7 @@ let me = page.data.uid
               if(selected.indexOf(us) == selected.length - 1){
                 loadingBtn = false
                 sucsses = true
-                setTimeout(()=>{dispatch("close")}, 5000)
+                setTimeout(()=>{onClose?.()}, 5000)
               }
 
             }
@@ -79,7 +82,7 @@ let me = page.data.uid
               if(selected.indexOf(us) == selected.length - 1){
                 loadingBtn = false
                 sucsses = true
-                setTimeout(()=>{dispatch("close")}, 5000)
+                setTimeout(()=>{onClose?.()}, 5000)
               }
 
             }

@@ -7,7 +7,6 @@ import { RingLoader
    import Chaticon from '../../celim/chaticon.svelte'
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
-   import { createEventDispatcher } from 'svelte';
   import Nego from '../prPr/negoPend.svelte';
   import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
@@ -16,7 +15,6 @@ import { idPr } from '../../stores/idPr.js';
  import { onMount } from 'svelte';
  import Lowbtn from '$lib/celim/lowbtn.svelte'
  import {lang} from '$lib/stores/lang.js'
-  const dispatch = createEventDispatcher();
   const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
     let dialogOpen = $state(false)
     const baseUrl = import.meta.env.VITE_URL
@@ -96,7 +94,7 @@ onMount(async () => {
 
 function coinLapach() {
              isOpen = false;
-        dispatch('coinLapach', {
+        onCoinLapach?.({
  ani: "pendma",
                 coinlapach: coinlapach    } );
 };
@@ -279,7 +277,7 @@ async function agree(alr) {
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-        dispatch("coinLapach",{ ani: "pendma",
+        onCoinLapach?.({ ani: "pendma",
                 coinlapach: coinlapach})
         } catch (e) {
             error1 = e
@@ -411,7 +409,7 @@ function linke (){
  
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     }
   
 }
@@ -595,7 +593,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
 function hoverede(){
    hovered = !hovered
@@ -604,7 +602,7 @@ function hoverede(){
   } else {
  u = "הצבעה על בקשת משאב לריקמה"
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
  
 function hoverc (event){
@@ -613,7 +611,7 @@ function hoverc (event){
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
  import Cards from './cards/pma.svelte'
   import { nowId } from '$lib/stores/pendMisMes';
@@ -657,6 +655,7 @@ function hoverc (event){
    * @property {any} timegramaId
    * @property {any} restime
    * @property {boolean} [cards]
+   * @property {() => void} [onModal]
    */
 
   /** @type {Props} */
@@ -666,6 +665,7 @@ function hoverc (event){
     modal = $bindable(false),
     coinlapach,
     mypos = null,
+    onModal,
     messege = [],
     descrip = "",
     projectName = "",
@@ -788,7 +788,7 @@ title="ביטול"
 <div 
 use:clickOutside
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
 onclick_outside={toggleShow} 
