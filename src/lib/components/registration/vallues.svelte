@@ -1,11 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
-<!-- @migration-task Error while migrating Svelte code: Unexpected token
-https://svelte.dev/e/js_parse_error -->
 <script>
     import { page } from '$app/state';
     import MultiSelect from 'svelte-multiselect';
@@ -18,7 +10,6 @@ https://svelte.dev/e/js_parse_error -->
     import enjvals from '$lib/data/valluesEn.json'
 /**
  * Callback prop: יורה כאשר יש שינוי התקדמות.
- * מיגרציה ל‑Svelte 5: כל ה‑props מרוכזים בהגדרה אחת.
  * @typedef {Object} Props
  * @property {string} [userName_value]
  * @property {number} [show_value]

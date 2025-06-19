@@ -9,10 +9,16 @@ https://svelte.dev/e/node_invalid_placement -->
 <!-- @migration-task Error while migrating Svelte code: `<tr>` cannot be a child of `<table>`. `<table>` only allows these children: `<caption>`, `<colgroup>`, `<tbody>`, `<thead>`, `<tfoot>`, `<style>`, `<script>`, `<template>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
 https://svelte.dev/e/node_invalid_placement -->
 <script>
-  export let omiData = [];
-     export let who = 0;
-  let isonly = false;
+  let isonly = $state(false);
    import { onMount } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [omiData]
+   * @property {number} [who]
+   */
+
+  /** @type {Props} */
+  let { omiData = $bindable([]), who = 0 } = $props();
    onMount(async () => {
  if (who !== 0){
       isonly = true
@@ -39,6 +45,7 @@ function edit (id) {
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{isonly == true ? " פעולה פתוחה" : "פעולות פתוחות"}</h1>
     </caption>
+    <thead>
            {#if isonly == false}
 
         <tr class="gg">
@@ -170,6 +177,7 @@ function edit (id) {
       </td>
       {/each}
     </tr>
+    </thead>
     </table>
   </div>
   </div>

@@ -1023,7 +1023,7 @@ https://svelte.dev/e/js_parse_error -->
   import LinkToIcon from '$lib/celim/icons/linkToIcon.svelte';
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   let error = false, success = false, loading = false  
   const tri = tr;
   let wid = 0
@@ -1402,7 +1402,7 @@ https://svelte.dev/e/js_parse_error -->
         </div>
         {/if}
         {:else}
-        {#if $page.data.isDesktop}
+        {#if page.data.isDesktop}
         <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
         <MultiSelect
@@ -1462,7 +1462,7 @@ https://svelte.dev/e/js_parse_error -->
       </div>
       {/if}
       {:else}
-      {#if $page.data.isDesktop}
+      {#if page.data.isDesktop}
       <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
       --sms-open-z-index={10000}
@@ -1517,7 +1517,7 @@ https://svelte.dev/e/js_parse_error -->
           </div>
           {/if}
           {:else}
-          {#if $page.data.isDesktop}
+          {#if page.data.isDesktop}
           <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
             <MultiSelect
               --sms-open-z-index={10000}

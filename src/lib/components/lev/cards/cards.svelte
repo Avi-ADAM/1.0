@@ -1,8 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
-<!-- @migration-task Error while migrating Svelte code: Can't migrate code with afterUpdate. Please migrate by hand. -->
 <script>
   import { page } from '$app/stores'
     import Lowding from '$lib/celim/lowding.svelte'
@@ -23,7 +18,7 @@
     import Header from './../../header/header.svelte'
   import { Swiper, SwiperSlide } from "swiper/svelte";
   // Svelte 5: Define callback props instead of using createEventDispatcher
-  let { onCards, onStart, onUser, onHover, onProj } = $props();
+  let { onCards, onStart, onUser, onHover, onProj, low = false, cards = true, askedarr = [], declineddarr = [], arr1 = [], indexi = -1, milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}, sug = 13, pen = 13, ask = 17, wel = 17, beta = 13, des = 13, fia = 99, pmash = 99, mashs = 17, maap = 17, askma = 13, hachlot = 9 } = $props();
   // Import Swiper styles
   import "swiper/css";
   import "swiper/css/navigation";
@@ -66,8 +61,6 @@
 
   // import required modules
   import {Manipulation, Mousewheel, Keyboard, EffectFade , Navigation} from "swiper";//, Virtual
-  export let low = false;
-  export let cards = true;
    import Switch from './../../../celim/switch.svelte'
   import DecisionMaking from '../decisionMaking.svelte';
   import Filter from './filter.svelte';
@@ -75,27 +68,26 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import Button from '$lib/celim/ui/button.svelte';
   import { goto } from '$app/navigation';
-  let h ;
+  let h = $state();
 
-export let askedarr = [], declineddarr = [], arr1 = [];
 let swiperRef = null;
-export let indexi = -1
 
-$:if (indexi != -1){
-  swiperRef.slideTo(indexi)
-  indexi = -1
-}
+$effect(() => {
+  if (indexi != -1) {
+    swiperRef.slideTo(indexi)
+    indexi = -1
+  }
+})
   const setSwiperRef = (e) => {
     swiperRef = e.detail[0];
   };
   function change(){
     console.log(cards,"change")
       console.log("will change")
-        onCards?.({cards:false}) // Svelte 5: Replaced dispatch with callback prop
+        onCards?.({cards:false}) 
   }
   let slideIndex;
-  export let milon = {fiap : true, welc: true, sugg: true, pend: true, asks: true, betaha: true, desi: true, ppmash: true, pmashs: true, pmaap: true, askmap: true,hachla: true}
-$effect(() => { // Svelte 5: Replaced afterUpdate with $effect
+$effect(() => { 
   if (swiperRef !== null) {
     swiperRef.update()
   }
@@ -139,18 +131,6 @@ let d = {"he":"לב 1💗1","en":"heart of 1💗1"};
 let u = {"he":"לב 1💗1","en":"heart of 1💗1"};
 const nexttitle = {"he":" יאללה נקסט!","en":"  next!"}
 const pretitle = {"he":"רגע, מה זה היה?","en":"wait.. what was that?"}
-export let sug = 13;
-export let pen = 13;
-export let ask = 17;
-export let wel = 17;
-export let beta = 13;
-export let des = 13;
-export let fia = 99;
-export let pmash = 99;
-export let mashs = 17;
-export let maap = 17;
-export let askma = 13;
-export let hachlot = 9
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
@@ -168,7 +148,7 @@ function hoverc (id){
   onHover?.({id: u}); // Svelte 5: Replaced dispatch with callback prop
 }
 const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות שמאל',"en" : 'Navigation: right side, bottom'}
-$: console.log('AAAAAA',$page.data.isDesktop,$page.data)
+$effect(() => { console.log('AAAAAA',$page.data.isDesktop,$page.data) })
 //exclude meData huca 
 function showonly(event) {
   if (event.detail.kind !== "projects") {
@@ -196,8 +176,8 @@ function showall(event) {
 }
 let filter = false, filter2 = false;
 const filterT = {"he":"מיון","en":"filter"}
-$: console.log(isMobileOrTablet())
-$: filteredArr = arr1;
+$effect(() => { console.log(isMobileOrTablet()) })
+let filteredArr = $derived(arr1);
 
 
 function filterByProjectId(projectId) {
@@ -208,7 +188,7 @@ function filterByProjectId(projectId) {
   function clearFilters() {
     filteredArr = arr1;
   }
-  $: uniqueProjects =Array.from(
+  let uniqueProjects = $derived(Array.from(
     arr1.reduce((map, item) => {
       if (item.projectId && item.projectName) {
         if (!map.has(item.projectId)) {
@@ -218,7 +198,7 @@ function filterByProjectId(projectId) {
       }
       return map;
     }, new Map())
-  ).map(([projectId, { projectName, count }]) => ({ projectId, projectName, count }));
+  ).map(([projectId, { projectName, count }]) => ({ projectId, projectName, count })));
 
 
 </script>

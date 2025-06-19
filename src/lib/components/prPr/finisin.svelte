@@ -10,10 +10,16 @@ https://svelte.dev/e/node_invalid_placement -->
 https://svelte.dev/e/node_invalid_placement -->
 <script>
  
-export let fmiData = [];
-   export let who = 0;
-  let isonly = false;
+  let isonly = $state(false);
    import { onMount } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [fmiData]
+   * @property {number} [who]
+   */
+
+  /** @type {Props} */
+  let { fmiData = $bindable([]), who = 0 } = $props();
    onMount(async () => {
  if (who !== 0){
       isonly = true
@@ -36,6 +42,7 @@ export let fmiData = [];
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{isonly == true ? " פעולה שבוצעה ואושרה " : "פעולות שבוצעו ואושרו"} </h1>
     </caption>
+    <thead>
                {#if isonly == false}
 
         <tr class="gg">
@@ -139,6 +146,7 @@ export let fmiData = [];
              </td>
              {/each}
         </tr>
+      </thead>
     </table>
 
  

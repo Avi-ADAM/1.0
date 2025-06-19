@@ -3,7 +3,7 @@
     import * as THREE from 'three';
   import { T } from '@threlte/core';
 
-	import {  useFrame } from '@threlte/core'
+	import {  useTask } from '@threlte/core'
 
     const participantGeometry = new THREE.SphereGeometry(1, 32, 32);
 
@@ -35,7 +35,7 @@ let position = $state([
   const speed = 0.01;
 
   // Rotate the participants around the plus sign
-  useFrame(() => {
+  useTask(() => {
     participants.forEach((participant, i) => {
       const radius = 2; // Adjust radius as needed
 

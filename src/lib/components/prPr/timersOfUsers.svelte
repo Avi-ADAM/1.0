@@ -1,15 +1,10 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
-https://svelte.dev/e/props_duplicate -->
-<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
-https://svelte.dev/e/props_duplicate -->
 <script>
     import ProjectTimersCalendar from '$lib/components/prPr/ProjectTimersCalendar.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
     import { onMount } from 'svelte';
-    let { onMission, onTasks } = $props();
+    let { onMission, onTasks, projectId } = $props();
     let timersData = $state(null);
-  let { projectId } = $props();
-     let isLoading = $state(true);
+    let isLoading = $state(true);
     async function loadProjectTimers() {
       timersData = await sendToSer({ id: projectId },'38getProjectTimers',null,null,false,fetch );
         isLoading = false;

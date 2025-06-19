@@ -1,7 +1,7 @@
 <script>
     import Tile from '$lib/celim/tile.svelte'
     	import { Drawer } from 'vaul-svelte';
-import { page } from '$app/stores';
+import { page } from '$app/state';
   import {calcX} from '$lib/func/calcX.svelte'
   import {SendTo} from '$lib/send/sendTo.svelte'
      import { clickOutside } from './outsidclick.js';
@@ -189,9 +189,9 @@ const cookieValue = document.cookie
 SendTo(quee)
          // שליחת התראה לחברי הפרויקט באמצעות שרת ה-nutifyPm שלנו
          sendApi({pid:projectId,
-        title:{"he":projectName+" - "+missionName+": "+$page.data.un + " רוצה לבצע את המשימה ","en":projectName+" - "+missionName+": "+$page.data.un + "wants to do the mission"},
-      body:{"he":$page.data.un + " רוצה לבצע את המשימה "+ missionName + " .ביכולתך לאשר את הבקשה או לשוחח בצ'אט כדי לוודא את ההתאמה קודם ",
-      "en":$page.data.un + " wants to do the mission "+ missionName + ". You can approve the request or chat to make sure the match is right"}
+        title:{"he":projectName+" - "+missionName+": "+page.data.un + " רוצה לבצע את המשימה ","en":projectName+" - "+missionName+": "+page.data.un + "wants to do the mission"},
+      body:{"he":page.data.un + " רוצה לבצע את המשימה "+ missionName + " .ביכולתך לאשר את הבקשה או לשוחח בצ'אט כדי לוודא את ההתאמה קודם ",
+      "en":page.data.un + " wants to do the mission "+ missionName + ". You can approve the request or chat to make sure the match is right"}
       },
       "nutifyPm")
          less (oid);

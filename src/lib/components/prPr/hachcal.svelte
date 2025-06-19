@@ -9,10 +9,9 @@ https://svelte.dev/e/node_invalid_placement -->
 <!-- @migration-task Error while migrating Svelte code: `<tr>` cannot be a child of `<table>`. `<table>` only allows these children: `<caption>`, `<colgroup>`, `<tbody>`, `<thead>`, `<tfoot>`, `<style>`, `<script>`, `<template>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
 https://svelte.dev/e/node_invalid_placement -->
 <script>
+  import { run } from 'svelte/legacy';
+
      import pic from './../../celim/pic.js'
-export let fmiData = [];
-export let rikmashes = [];
-  export let hagdel = false;
    import { onMount } from 'svelte'; 
 
 // what about hours alrerady done to  mission in progres 
@@ -29,9 +28,23 @@ function confirm (id) {
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
-let ulist = [
-]; 
-export let users;
+let ulist = $state([
+]); 
+  /**
+   * @typedef {Object} Props
+   * @property {any} [fmiData]
+   * @property {any} [rikmashes]
+   * @property {boolean} [hagdel]
+   * @property {any} users
+   */
+
+  /** @type {Props} */
+  let {
+    fmiData = [],
+    rikmashes = [],
+    hagdel = false,
+    users
+  } = $props();
 let dictid = {};
 onMount(async () => {
 
@@ -126,12 +139,15 @@ function pre (){
     ulist = ulist
 
 }
-$: revach = 0;
-let x = [];
-$: for (let i = 0; i <ulist.length; i++) {
-  console.log(ulist)
-x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
-}
+let revach = $state(0);
+  
+let x = $state([]);
+run(() => {
+    for (let i = 0; i <ulist.length; i++) {
+    console.log(ulist)
+  x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
+  }
+  });
 </script>
 
 <h1>יש להזין את סכום הרווח שנצבר והמחשבון יציג כמה מגיע לכל 1</h1>
@@ -145,6 +161,7 @@ x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >טבלת חישוב </h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg"></th>
           {#each ulist as data, i}
@@ -174,6 +191,7 @@ x[i] = ((ulist[i].p / 100) * revach).toFixed(2)
             <td >{data.p.toFixed(2)}%</td>
             {/each}
           </tr> 
+    </thead>
     </table>
   </div>
   </div>

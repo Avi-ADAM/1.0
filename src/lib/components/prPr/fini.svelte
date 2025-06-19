@@ -8,6 +8,8 @@ https://svelte.dev/e/block_unexpected_close -->
 https://svelte.dev/e/block_unexpected_close -->
 <!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
 https://svelte.dev/e/block_unexpected_close -->
+<!-- @migration-task Error while migrating Svelte code: Unexpected block closing tag
+https://svelte.dev/e/block_unexpected_close -->
 <script>
   import Tooltip from './../../celim/tooltipb.svelte'
   import { lang } from '$lib/stores/lang.js'
@@ -262,6 +264,7 @@ let fir,ssec;
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{pehe[$lang]}</h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg">אפשרויות</th>
           {#each fmiData as data, i}
@@ -361,6 +364,7 @@ let fir,ssec;
              </td>
              {/each}
         </tr>
+      </thead>
     </table>
 
  
@@ -370,6 +374,7 @@ let fir,ssec;
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >משאבים שהתקבלו ואושרו</h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg"> </th>
           {#each meData as data, i}
@@ -454,6 +459,7 @@ let fir,ssec;
              </td>
              {/each}
         </tr>
+      </thead>
 </table>
 {/if}
 </div>

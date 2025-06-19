@@ -1,7 +1,4 @@
-<!-- @migration task: review uses of `navigating` -->
 <script>
-  import { run } from 'svelte/legacy';
-
     import { lang } from '$lib/stores/lang.js';
   import { isChatOpen } from '$lib/stores/pendMisMes.js';
   import { navigating } from '$app/state';
@@ -26,16 +23,8 @@
       }
     }
 
-    let activeRoute;
-  run(() => {
-    activeRoute = page.url.pathname
-  });
-    run(() => {
-    if(navigating){
-          console.log(navigating?.to)
-
-      }
-  });
+    let activeRoute = $derived(page.url.pathname);
+   
     const brainLeb= {"he":"מוח הרקמות","en":"brain of organiczations"}
 </script>
 
@@ -68,7 +57,7 @@
         <button onclick={()=>{
             activeRoute = "lev"
             goto("/lev")
-        }} type="button" class="{page.url.pathname == "/lev" ? "border-b-2 border-gold" : ""} inline-flex text-barbi flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
+        }} type="button" class="{activeRoute == "/lev" ? "border-b-2 border-gold" : ""} inline-flex text-barbi flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
            <Lev/>
             <span class="sr-only">Lev</span>
         </button>
@@ -79,8 +68,8 @@
         <button onclick={()=>{
             activeRoute = "moach"
             goto("/moach")
-        }} type="button" class="{page.url.pathname == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
-            <MoachIcon active={navigating?.to.url.pathname == "/moach"}/>
+        }} type="button" class="{activeRoute == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
+            <MoachIcon active={navigating?.to?.url.pathname == "/moach"}/>
             <span class="sr-only">{brainLeb[$lang]}</span>
         </button>
         <div id="tooltip-home" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">

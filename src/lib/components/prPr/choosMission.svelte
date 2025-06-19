@@ -1,5 +1,3 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot use `export let` in runes mode — use `$props()` instead
-https://svelte.dev/e/legacy_export_invalid -->
 <script>
     import { page } from '$app/stores';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
@@ -24,12 +22,12 @@ https://svelte.dev/e/legacy_export_invalid -->
  */
 
 /** @type {Props} */
-export let { pn, pl, restime, projectUsers, alit, onClose } = $props();
+ let { pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]) } = $props();
  const baseUrl = import.meta.env.VITE_URL
 
- let newcontent = true;
-let newcontentR = true;
-let newcontentW = true;
+ let newcontent = $state(true);
+let newcontentR = $state(true);
+let newcontentW = $state(true);
 let error8
 async function findT() {
     /*TODO: כאשר מחפשים כישורים וכן לגבי כל שאר האובייקטים להציג את היגרסה העברית והאנגלית כך שהחיפוש יוכל למצוא את כולן*/ 
@@ -113,9 +111,7 @@ async function findT() {
     }
 }
 
-export let selected = [];
-
-export let mission1 = [];
+let mission1 = $state([]);
 
 
 function find_mission_id(mission_name_arr){
@@ -129,26 +125,26 @@ function find_mission_id(mission_name_arr){
       }
       return arr;
 };
-let moving = [];
+let moving = $state([]);
 const placeholder = {"he":`בחירה מרשימה או יצירת חדשה`,"en":"choose from list or create new"};
 
 
 const head = {"he":"הוספת משימות הנדרשות לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
-let id = 0
-$: ugug = ``;
- $: addn = {"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`}
- let name = ""
+let id = $state(0)
+let ugug = $state(``);
+let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`});
+let name = $state("")
  function add(){
   let isNew = false
   if (selected.length > 0) {
-    before = true
+    before = true;
           before = false;
           findT()
           
   if (!mission1.map(c => c.attributes.missionName).includes(selected[0])){
     isNew = true
     name = selected[0]
-    id = 0
+    id = 0;
   }else{
     name = selected[0]   
     id = find_mission_id(selected)
@@ -156,14 +152,14 @@ $: ugug = ``;
 
  }
 }
- $: before = true
+let before = $state(true);
  const mn = {
   "he": "שם המשימה",
   "en": "mission name"
 }
 
-let noRiset = true
-let showMobileModal = false;
+let noRiset = $state(true)
+let showMobileModal = $state(false);
 
 function openMobileModal() {
   showMobileModal = true;

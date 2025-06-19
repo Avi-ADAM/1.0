@@ -1,10 +1,10 @@
 <!-- @migration-task Error while migrating Svelte code: `<tr>` cannot be a child of `<table>`. `<table>` only allows these children: `<caption>`, `<colgroup>`, `<tbody>`, `<thead>`, `<tfoot>`, `<style>`, `<script>`, `<template>`. The browser will 'repair' the HTML (by moving, removing, or inserting elements) which breaks Svelte's assumptions about the structure of your components.
 https://svelte.dev/e/node_invalid_placement -->
 <script>
-  export let meData = [];
   import { onMount } from 'svelte';
 
   import moment from 'moment';
+  let { meData = $bindable([]) } = $props();
   function remove(id) {
     console.log(id);
   }
@@ -16,8 +16,8 @@ https://svelte.dev/e/node_invalid_placement -->
   });
 
   let km = false;
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
   function myMissionH() {
     km = false;
@@ -95,8 +95,9 @@ https://svelte.dev/e/node_invalid_placement -->
           משאבים נדרשים שפורסמו
         </h1>
       </caption>
+      <thead>
       <tr class="gg">
-        <th class="gg" />
+        <th class="gg"></th>
         {#each meData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
@@ -235,6 +236,7 @@ https://svelte.dev/e/node_invalid_placement -->
           </td>
         {/each}
       </tr>
+    </thead>
     </table>
   </div>
 </div>
