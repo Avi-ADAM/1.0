@@ -398,7 +398,7 @@ let nameuse = $state(false);
    let data;
     import { createForm } from "svelte-forms-lib";
   import Close from '$lib/celim/close.svelte';
-  import { scrollToTop } from 'svelte-scrollto';
+  import { scrollToTop } from 'svelte-scrollto-element';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
   import { sendError } from '$lib/func/send/senError.svelte';
   /**
