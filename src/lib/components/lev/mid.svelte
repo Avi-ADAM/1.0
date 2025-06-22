@@ -33,7 +33,7 @@ let fiap = $state("fiap");
 function disp (value) { 
   console.log(value)
    if (value !== "true"){
-   dispatch ("showonly",{
+   onShowonly?.({
       data: value
    });
    if (value === "sugg"){
@@ -53,8 +53,7 @@ desi = "true";
 fiap = "true";
    } 
   } else {
-      dispatch ("showall",{
-   })
+      onShowall?.()
   sugg =  "sugg";
  pend = "pend";
  asks = "asks";
@@ -110,7 +109,9 @@ fiap = "fiap";
 <style b/*$$__STYLE_CONTENT__$$*/nts.googleapis.com/css2?family=Chelsea+Market%3Aital%2Cwght%400%2C400&amp;display=swap);rue">/*$$__STYLE_CONTENT__$$*/</style>
 <style bx:f/*$$__STYLE_CONTENT__$$*/ed="true">/*$$__STYLE_CONTENT__$$*/</style>
 <style /*$$__STYLE_CONTENT__$$*/://fonts.goog/*$$__STYLE_CONTENT__$$*/arm%3Aital%2Cwght%400%2C400%3B0%2C700&amp;display=swap);/*$$__STYLE_CONTENT__$$*/$*/_$$*/</style>/*$$__STYLE_CONTENT__$$*/</style>
-</*$$__STYLE_CONTENT__$$*/ike @import url(https://fonts.googleapis.com/css2?family=Almendra+SC%3Aital%2Cwght%400%2C400&amp;dis/*$$__STYLE_CONTENT__$$*/Girls" bx:pinned=/*$$__STYLE_CONTENT__$$*/T__$$*/</style/*$$__STYLE_CONTENT__$$*/@import url(https://fonts.googleapis.com/css2?family=Almendra+Display%3Aital%2Cwght%400%2C400&amp;display/*$$__STYLE_CONTENT__$$*/TENT__$$*/</st/*$$__STYLE_CONTENT__$$*/mon" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/CONTENT__$$*/</style>/*$$__STYLE_CONTENT__$$*/ Swash Caps" bx:pinned="true">/*$$__STYLE_CONTENT__/*$$__STYLE_CONTENT__$$*/import url(https://fonts.googleapis.com/css2?family=Aclonica%3Aital%2Cwght%400%2C400&amp;display=swap);" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/<//*$$__STYLE_CONTENT__$$*/Miss Fajardose" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</styl/*$$__STYLE_CONTENT__$$*/onts.googleapis.com/css2?family=Abril+Fatface%3Aital%2Cwght%400%2C400&amp;display=swap); Quest" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</sty/*$$__STYLE_CONTENT__$$*/zuru" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+</*$$__STYLE_CONTENT__$$*/ike @import url(https://fonts.googleapis.com/css2?family=Almendra+SC%3Aital%2Cwght%400%2C400&amp;dis
+/*$$__STYLE_CONTENT__$$*/Girls" bx:pinned=/*$$__STYLE_CONTENT__$$*/T__$$*/</style/*$$__STYLE_CONTENT__$$*/@import url(https://fonts.googleapis.com/css2?family=Almendra+Display%3Aital%2Cwght%400%2C400&amp;display/*$$__STYLE_CONTENT__$$*/TENT__$$*/</st/*$$__STYLE_CONTENT__$$*/mon" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/CONTENT__$$*/</style>
+/*$$__STYLE_CONTENT__$$*/ Swash Caps" bx:pinned="true">/*$$__STYLE_CONTENT__/*$$__STYLE_CONTENT__$$*/import url(https://fonts.googleapis.com/css2?family=Aclonica%3Aital%2Cwght%400%2C400&amp;display=swap);" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/<//*$$__STYLE_CONTENT__$$*/Miss Fajardose" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</styl/*$$__STYLE_CONTENT__$$*/onts.googleapis.com/css2?family=Abril+Fatface%3Aital%2Cwght%400%2C400&amp;display=swap); Quest" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</sty/*$$__STYLE_CONTENT__$$*/zuru" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <s/*$$__STYLE_CONTENT__$$*/fonts.googleapis.com/css2?family=Aguafina+Script%3Aital%2Cwght%400%2C400&amp;display=swap);inned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <style bx:fonts="Stick" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
 <style /*$$__STYLE_CONTENT__$$*///fonts.googleapis.com/css2?family=Angkor%3Aital%2Cwght%400%2C400&amp;display=swap);ed="true">/*$$__STYLE_CONTENT__$$*/</style>
@@ -2531,6 +2532,8 @@ ee ="matrix(1.4501 0 0 1.2385 -298.08 -520.09)";
    * @property {number} [des]
    * @property {number} [fia]
    * @property {boolean} [low] 
+   * @property {(payload: any) => void} [onShowonly]
+   * @property {(payload: any) => void} [onShowall]
    */
 
   /** @type {Props} */
@@ -2545,7 +2548,9 @@ ee ="matrix(1.4501 0 0 1.2385 -298.08 -520.09)";
     beta = 0,
     des = 0,
     fia = 0,
-    low = true
+    low = true,
+    onShowonly,
+    onShowall
   } = $props();
 let wi = $state("0.2");
 onMount (async () => {

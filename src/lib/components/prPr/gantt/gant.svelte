@@ -74,7 +74,7 @@
     }
     console.log(options)
         window.gantt = gantt = new SvelteGantt({ target: document.getElementById('example-gantt'), props: options });
-    	gantt.api.tasks.on.select((task) => dispatch('selected', { id:task}));
+    	gantt.api.tasks.on.select((task) => onSelected({ id:task}));
 
     });
 	

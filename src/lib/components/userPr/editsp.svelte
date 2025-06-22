@@ -90,7 +90,7 @@ async function han (){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-             dispatch('close', {
+             onClose?.({
                  id: miDatan.data.updateSp.data.id,
                  name: miDatan.data.updateSp.data.attributes.name,
                  skob: miDatan.data.updateSp.data

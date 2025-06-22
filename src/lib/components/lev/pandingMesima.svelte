@@ -1,6 +1,6 @@
 <script>
   import Chaticon from '../../celim/chaticon.svelte'
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
     import { clickOutside } from './outsidclick.js';
     import {  fly } from 'svelte/transition';
   import { onMount } from 'svelte';

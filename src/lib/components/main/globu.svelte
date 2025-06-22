@@ -14,7 +14,7 @@ Command: npx @threlte/gltf@1.0.1 static/3d/withlev.glb
 <script>
     import {spring } from 'svelte/motion'
   import { Group } from 'three'
-  import { useFrame, T } from '@threlte/core'
+  import { useTask, T } from '@threlte/core'
   import { useGltf } from '@threlte/extras'
    import { interactivity } from '@threlte/extras'
   interactivity()
@@ -25,20 +25,20 @@ Command: npx @threlte/gltf@1.0.1 static/3d/withlev.glb
    */
 
   /** @type {Props} */
-  let { onSubmit } = $props();
+  let { onSubmit, fallback, error, children, ref = $bindable(), ...props } = $props()
 
-  export const ref = new Group()
+  
 
   const gltf = useGltf('3d/withlev.glb')
 
-   let rotationt = 0
-		let isHovering = false, isPointerDown = false
+   let rotationt = $state(0)
+		let isHovering = $state(false), isPointerDown = $state(false)
   let poz = {z:0, y:0, x:0};
   let obPoz = {z:0, y:0, x:0}
- let boll = false
- let bool = false
+ let boll = $state(false)
+ let bool = $state(false)
  const texter = spring(1)
- useFrame(() => {
+ useTask(() => {
 
   if(isHovering == false){
 	rotationt += 0.01
@@ -61,7 +61,7 @@ function sub (){
 
 <T.DirectionalLight  intensity={0.81} position={[ -20,  -5, 5 ]} />
 <T.DirectionalLight  intensity={0.91} position={[0, 10, 10 ]} />
-<T is={ref} dispose={false} {...$$restProps} on:pointerenter={() => (isHovering = true)}
+<T is={ref} dispose={false} {...restProps} on:pointerenter={() => (isHovering = true)}
 on:pointerleave={() => {
   isPointerDown = false
   isHovering = false
@@ -72,9 +72,9 @@ on:pointercancel={() => {
   isPointerDown = false
   isHovering = false
 }}
-on:click={sub} >
+onclick={sub} >
   {#await gltf}
-    <slot name="fallback" />
+    {@render fallback?.()}
   {:then gltf}
         <T.Group  rotation={[0, rotationt, 0.1]} >
 <T.AmbientLight   intensity={0.61} />
@@ -111,8 +111,8 @@ on:click={sub} >
   </T.Group  >
 
   {:catch error}
-    <slot name="error" {error} />
+    {@render error?.({ error: err })}
   {/await}
 
-  <slot {ref} />
+  {@render children?.({ ref })}
 </T>

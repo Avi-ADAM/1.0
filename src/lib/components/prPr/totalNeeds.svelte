@@ -478,7 +478,7 @@ vots: [${userss},
             });
         }
         meData = [];
-        if (miDatan.data) dispatch('close');
+        if (miDatan.data) onClose?.();
       } catch (e) {
         error1 = e;
       }
@@ -634,7 +634,7 @@ vots: [${userss},
   }
 
   function remove(id) {
-    dispatch('remove', {
+    onRemove?.({
       id: id,
       data: meData
     });
@@ -650,6 +650,8 @@ vots: [${userss},
    * @property {any} restime
    * @property {number} [userslength]
    * @property {any} [meData]
+   * @property {(payload: any) => void} [onRemove]
+   * @property {(payload: any) => void} [onClose]
    */
 
   /** @type {Props} */
@@ -661,7 +663,9 @@ vots: [${userss},
     pl,
     restime,
     userslength = 0,
-    meData = $bindable([])
+    meData = $bindable([]),
+    onRemove,
+    onClose
   } = $props();
   let miDatan = [];
   let error1 = $state(null);

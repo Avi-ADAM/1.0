@@ -1,6 +1,6 @@
 <script>
      import {  Drawer} from 'vaul-svelte';
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
  import { goto } from '$app/navigation';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 import {
@@ -15,6 +15,103 @@ import { idPr } from './../../stores/idPr.js';
   import { onMount } from 'svelte'; 
   import moment from 'moment';
     let dialogOpen = $state(false)
+      /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [modal]
+   * @property {boolean} [isVisible]
+   * @property {any} coinlapach
+   * @property {any} mId
+   * @property {any} kindOf
+   * @property {number} [myp]
+   * @property {any} projectName
+   * @property {any} missionBName
+   * @property {any} useraplyname
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {string} [linkU]
+   * @property {any} userId
+   * @property {any} name
+   * @property {any} spid
+   * @property {number} [hm]
+   * @property {number} [noofpu]
+   * @property {any} spnot
+   * @property {number} [price]
+   * @property {number} [easy]
+   * @property {any} [agprice]
+   * @property {any} missId
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} already
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {any} sqadualed
+   * @property {any} sqadualedf
+   * @property {boolean} [cards]
+   * @property {(payload: any) => void} [onUser]
+   * @property {(payload: any) => void} [onProj]
+   * @property {(payload: any) => void} [onAcsept]
+   * @property {(payload: any) => void} [onHover]
+   * @property {(payload: any) => void} [onModal]
+     */
+
+  /** @type {Props} */
+  let {
+    low = false,
+    modal = $bindable(false),
+    isVisible = false,
+    coinlapach,
+    mId,
+    kindOf,
+    myp = 0,
+    projectName,
+    missionBName,
+    useraplyname,
+    src = "coin.png",
+    src2 = " ",
+    projectId,
+    link = "/project/",
+    linkU = "/user/",
+    userId,
+    name,
+    spid,
+    hm = 1,
+    noofpu = 0,
+    spnot,
+    price = 0,
+    easy = 0,
+    agprice = (myp+easy) / 2,
+    missId,
+    id,
+    openMid,
+    st = 188,
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids = $bindable(),
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    already = $bindable(),
+    stylef = '24px',
+    askId,
+    users,
+    sqadualed,
+    sqadualedf,
+    cards = false,
+    onUser,
+    onProj,
+    onAcsept,
+    onHover,
+    onModal
+  } = $props();
 let resP = [];
 let lang;
 
@@ -115,12 +212,12 @@ function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.({id: userId});
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     }
   }
 }
@@ -271,7 +368,7 @@ console.log("just add vote to asked and update to not show for me again")
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
 ani: "finim",
                 coinlapach: coinlapach             })
 
@@ -373,7 +470,7 @@ u = "בקשה לאישור קבלת משאב בהצלחה"
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 
 }
 function hoverede(){
@@ -383,7 +480,7 @@ function hoverede(){
   } else {
 u = "בקשה לאישור קבלת משאב בהצלחה"
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
  
   function hoverc (event){
@@ -392,96 +489,10 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
    import Cards from './cards/dowegeot.svelte'
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [low]
-   * @property {boolean} [modal]
-   * @property {boolean} [isVisible]
-   * @property {any} coinlapach
-   * @property {any} mId
-   * @property {any} kindOf
-   * @property {number} [myp]
-   * @property {any} projectName
-   * @property {any} missionBName
-   * @property {any} useraplyname
-   * @property {string} [src]
-   * @property {string} [src2]
-   * @property {any} projectId
-   * @property {string} [link]
-   * @property {string} [linkU]
-   * @property {any} userId
-   * @property {any} name
-   * @property {any} spid
-   * @property {number} [hm]
-   * @property {number} [noofpu]
-   * @property {any} spnot
-   * @property {number} [price]
-   * @property {number} [easy]
-   * @property {any} [agprice]
-   * @property {any} missId
-   * @property {any} id
-   * @property {any} openMid
-   * @property {number} [st]
-   * @property {any} [declined]
-   * @property {any} noofusersWaiting
-   * @property {any} uids
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {any} already
-   * @property {string} [stylef]
-   * @property {any} askId
-   * @property {any} users
-   * @property {any} sqadualed
-   * @property {any} sqadualedf
-   * @property {boolean} [cards]
-   */
 
-  /** @type {Props} */
-  let {
-    low = false,
-    modal = $bindable(false),
-    isVisible = false,
-    coinlapach,
-    mId,
-    kindOf,
-    myp = 0,
-    projectName,
-    missionBName,
-    useraplyname,
-    src = "coin.png",
-    src2 = " ",
-    projectId,
-    link = "/project/",
-    linkU = "/user/",
-    userId,
-    name,
-    spid,
-    hm = 1,
-    noofpu = 0,
-    spnot,
-    price = 0,
-    easy = 0,
-    agprice = (myp+easy) / 2,
-    missId,
-    id,
-    openMid,
-    st = 188,
-    declined = [],
-    noofusersWaiting = $bindable(),
-    uids = $bindable(),
-    noofusersOk = $bindable(),
-    noofusersNo = $bindable(),
-    already = $bindable(),
-    stylef = '24px',
-    askId,
-    users,
-    sqadualed,
-    sqadualedf,
-    cards = false
-  } = $props();
 
 </script>
 {#await ser}
@@ -515,7 +526,7 @@ title="ביטול"
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
 onmouseenter={()=> hoverede()} 

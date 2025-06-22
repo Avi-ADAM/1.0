@@ -2,9 +2,9 @@
   import { run } from 'svelte/legacy';
 
     import { pinch } from 'svelte-gestures';
-  import * as animateScroll from "svelte-scrollto";
+  import * as animateScroll from "svelte-scrollto-element";
     	import { Drawer } from 'vaul-svelte';
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
  import { goto } from '$app/navigation';
  import { lang } from '$lib/stores/lang.js';
 import Close from '../../celim/close.svelte'
@@ -18,7 +18,99 @@ import {
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
     const baseUrl = import.meta.env.VITE_URL
+/**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [low]
+   * @property {any} kind
+   * @property {any} messege
+   * @property {any} myid
+   * @property {any} userId
+   * @property {any} spdata
+   * @property {any} newpicid
+   * @property {any} coinlapach
+   * @property {any} deadline
+   * @property {any} projectName
+   * @property {any} openmissionName
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {any} created_at
+   * @property {string} [missionDetails]
+   * @property {number} [noofpu]
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {boolean} [already]
+   * @property {any} pid
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {any} timegramaDate
+   * @property {any} restime
+   * @property {any} timegramaId
+   * @property {boolean} [cards]
+   * @property {number} [tx]
+   * @property {boolean} [modal]
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+   * @property {(payload: { id: string }) => void} [onModal] - Callback for 'modal' event
+   * @property {(payload: { id: string }) => void} [onUser] - Callback for 'user' event
+   * @property {(payload: { id: string }) => void} [onChat] - Callback for 'chat' event
+   * @property {(payload: { id: string }) => void} [onAcsept] - Callback for 'acsept' event
+   */
 
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    low = false,
+    kind,
+    messege,
+    myid,
+    userId,
+    spdata,
+    newpicid,
+    coinlapach,
+    deadline,
+    projectName,
+    openmissionName = $bindable(),
+    src = "coin.png",
+    src2 = " ",
+    projectId,
+    created_at,
+    missionDetails = "",
+    noofpu = 0,
+    id,
+    openMid,
+    st = $bindable(205),
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    already = $bindable(false),
+    pid,
+    stylef = '24px',
+    askId,
+    users,
+    timegramaDate,
+    restime,
+    timegramaId,
+    cards = false,
+    tx = 200,
+    modal = $bindable(false),
+    onModal,
+    onHover,
+    onProj,
+    onAcsept,
+    onUser,
+    onChat
+  } = $props();
 onMount(async () => {
   console.log("HACHLATA!!!")
   if (kind == "pic"){
@@ -123,12 +215,12 @@ function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.({id: userId});
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     }
   }
 }
@@ -254,7 +346,7 @@ async function agree() {
       console.log(res4,"ask res4 ")      
       if (res4.data != null) {
               console.log(res4.data,"ask res4 ")      
- dispatch('acsept', {
+ onAcsept?.({
                 ani: "askedma",
                 coinlapach: coinlapach 
             })
@@ -319,7 +411,7 @@ async function agree() {
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
                ani: "askedma",
                 coinlapach: coinlapach 
             })
@@ -344,7 +436,7 @@ async function decline() {
 
 let hovered = $state(false);
 function tochat () {
-  dispatch("chat");
+  onChat?.()
 }
  let w = $state(0);
   
@@ -358,7 +450,7 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u[$lang]});
+    onHover?.({id: u[$lang]});
 
 }
 function hoverede(){
@@ -369,7 +461,7 @@ function hoverede(){
  u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
 
   }
-  dispatch("hover", {id: u[$lang]});
+  onHover?.({id: u[$lang]});
  }
  
 function hoverc (event){
@@ -378,99 +470,19 @@ function hoverc (event){
   } else {
     u = event.detail.x
   }
-    dispatch("hover", {id: u[$lang]});
+    onHover?.({id: u[$lang]});
 }
  import Card from './cards/hachlata.svelte'
   import {SendTo} from '$lib/send/sendTo.svelte';
 const newlogo = {"he":"הלוגו החדש שמוצע","en":"new Logo offered"}
 const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [isVisible]
-   * @property {boolean} [low]
-   * @property {any} kind
-   * @property {any} messege
-   * @property {any} myid
-   * @property {any} userId
-   * @property {any} spdata
-   * @property {any} newpicid
-   * @property {any} coinlapach
-   * @property {any} deadline
-   * @property {any} projectName
-   * @property {any} openmissionName
-   * @property {string} [src]
-   * @property {string} [src2]
-   * @property {any} projectId
-   * @property {any} created_at
-   * @property {string} [missionDetails]
-   * @property {number} [noofpu]
-   * @property {any} id
-   * @property {any} openMid
-   * @property {number} [st]
-   * @property {any} [declined]
-   * @property {any} noofusersWaiting
-   * @property {any} uids
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {boolean} [already]
-   * @property {any} pid
-   * @property {string} [stylef]
-   * @property {any} askId
-   * @property {any} users
-   * @property {any} timegramaDate
-   * @property {any} restime
-   * @property {any} timegramaId
-   * @property {boolean} [cards]
-   * @property {number} [tx]
-   * @property {boolean} [modal]
-   */
-
-  /** @type {Props} */
-  let {
-    isVisible = false,
-    low = false,
-    kind,
-    messege,
-    myid,
-    userId,
-    spdata,
-    newpicid,
-    coinlapach,
-    deadline,
-    projectName,
-    openmissionName = $bindable(),
-    src = "coin.png",
-    src2 = " ",
-    projectId,
-    created_at,
-    missionDetails = "",
-    noofpu = 0,
-    id,
-    openMid,
-    st = $bindable(205),
-    declined = [],
-    noofusersWaiting = $bindable(),
-    uids,
-    noofusersOk = $bindable(),
-    noofusersNo = $bindable(),
-    already = $bindable(false),
-    pid,
-    stylef = '24px',
-    askId,
-    users,
-    timegramaDate,
-    restime,
-    timegramaId,
-    cards = false,
-    tx = 200,
-    modal = $bindable(false)
-  } = $props();
+  
     let dialogOpen = $state(false)
     let top = $state();
 function tomodal(){
   modal = false;
   animateScroll.scrollToTop()
-  dispatch("modal")
+  onModal?.()
 console.log("oh")
 }
 function handler (event){
@@ -511,7 +523,7 @@ let ww = $state(0);
 
 <div 
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
 ondblclick={tomodal}

@@ -1,5 +1,5 @@
 <script>
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
       	import { Drawer } from 'vaul-svelte';
 import {
     clickOutside

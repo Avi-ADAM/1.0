@@ -5,11 +5,71 @@
  import { goto } from '$app/navigation';
 import { idPr } from '../../stores/idPr.js';
   import moment from 'moment'
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
   import Lowbtn from '$lib/celim/lowbtn.svelte'
     let dialogOpen = $state(false)
     const baseUrl = import.meta.env.VITE_URL
+ /**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [modal]
+   * @property {boolean} [low]
+   * @property {any} [halukot]
+   * @property {any} [hervach]
+   * @property {any} [mypos]
+   * @property {any} coinlapach
+   * @property {any} [whyno]
+   * @property {string} [projectName]
+   * @property {string} [name]
+   * @property {string} [src]
+   * @property {any} projectId
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {any} noofusers
+   * @property {boolean} [already]
+   * @property {any} created_at
+   * @property {any} pendId
+   * @property {any} users
+   * @property {any} [diun]
+   * @property {any} [order]
+   * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onCoinLapach] - Callback for 'coinLapach' event.
+   * @property {() => void} [onModal] - Callback for 'modal' event.
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event.
+   * @property {(payload: { id: string }) => void} [onHover] - Callback for 'hover' event.
+   */
 
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    modal = $bindable(false),
+    low = false,
+    halukot = [],
+    hervach = [],
+    mypos = null,
+    coinlapach,
+    whyno = [],
+    projectName = "",
+    name = "",
+    src = "coin.png",
+    projectId,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    noofusersWaiting = $bindable(),
+    noofusers,
+    already = $bindable(false),
+    created_at,
+    pendId,
+    users,
+    diun = [],
+    order = $bindable(diun.length),
+    cards = false,
+    onCoinLapach,
+    onProj,
+    onHover,
+    onModal
+  } = $props();
     let miDatan = [];
     let error1;
     let bearer1;
@@ -473,67 +533,7 @@ function hoverede(){
     onHover?.({id: u});
 }
    import Cards from './cards/haluka.svelte'
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [isVisible]
-   * @property {boolean} [modal]
-   * @property {boolean} [low]
-   * @property {any} [halukot]
-   * @property {any} [hervach]
-   * @property {any} [mypos]
-   * @property {any} coinlapach
-   * @property {any} [whyno]
-   * @property {string} [projectName]
-   * @property {string} [name]
-   * @property {string} [src]
-   * @property {any} projectId
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {any} noofusersWaiting
-   * @property {any} noofusers
-   * @property {boolean} [already]
-   * @property {any} created_at
-   * @property {any} pendId
-   * @property {any} users
-   * @property {any} [diun]
-   * @property {any} [order]
-   * @property {boolean} [cards]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onCoinLapach] - Callback for 'coinLapach' event.
-   * @property {() => void} [onModal] - Callback for 'modal' event.
-   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event.
-   * @property {(payload: { id: string }) => void} [onHover] - Callback for 'hover' event.
-   */
-
-  /** @type {Props} */
-  let {
-    isVisible = false,
-    modal = $bindable(false),
-    low = false,
-    halukot = [],
-    hervach = [],
-    mypos = null,
-    coinlapach,
-    whyno = [],
-    projectName = "",
-    name = "",
-    src = "coin.png",
-    projectId,
-    noofusersOk = $bindable(),
-    noofusersNo = $bindable(),
-    noofusersWaiting = $bindable(),
-    noofusers,
-    already = $bindable(false),
-    created_at,
-    pendId,
-    users,
-    diun = [],
-    order = $bindable(diun.length),
-    cards = false,
-    onCoinLapach,
-    onModal,
-    onProj,
-    onHover
-  } = $props();
+ 
 function claf (event){
   let o = event.detail.alr
   let d = event.detail.y
@@ -606,7 +606,7 @@ title="ביטול"
 use:clickOutside
 onclick_outside={toggleShow} 
 onclick={()=>{modal = true
-  dispatch("modal")
+  onModal?.()
 dialogOpen = true}}
 role="button"
 style="position: relative;" 

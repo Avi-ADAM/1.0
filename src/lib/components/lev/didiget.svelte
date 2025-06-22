@@ -15,7 +15,7 @@
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
   import moment from 'moment';
-  import ProgressBar from '@okrad/svelte-progressbar';
+  import { ProgressBar } from 'progressbar-svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
 

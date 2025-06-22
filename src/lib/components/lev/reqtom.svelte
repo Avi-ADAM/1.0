@@ -1,6 +1,6 @@
 <script>
   import { lang } from '$lib/stores/lang.js';
-  import ProgressBar from '@okrad/svelte-progressbar';
+  import { ProgressBar } from 'progressbar-svelte';
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
   import { Drawer } from 'vaul-svelte';
@@ -14,6 +14,109 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
   const baseUrl = import.meta.env.VITE_URL
+  let clicked = $state(false);
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [modal]
+   * @property {boolean} [isVisible]
+   * @property {any} coinlapach
+   * @property {any} deadline
+   * @property {any} projectName
+   * @property {any} openmissionName
+   * @property {any} myp
+   * @property {any} easy
+   * @property {any} price
+   * @property {any} useraplyname
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {string} [linkU]
+   * @property {any} userId
+   * @property {string} [missionDetails]
+   * @property {any} name
+   * @property {number} [noofpu]
+   * @property {any} publicklinks
+   * @property {any} privatlinks
+   * @property {any} hearotMeyuchadot
+   * @property {number} [nhours]
+   * @property {number} [valph]
+   * @property {any} missId
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} what
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {boolean} [already]
+   * @property {any} pid
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {any} spid
+   * @property {boolean} [cards]
+   * @property {any} [chat]
+   * @property {number} [order]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
+   * @property {(payload: { id: any }) => void} [onUser]
+   * @property {(payload: { id: any }) => void} [onProj]
+   */
+
+  /** @type {Props} */
+  let {
+    onUser, onProj, onAcsept, onDecline, onHover, onModal,
+    low = false,
+    modal = $bindable(false),
+    isVisible = false,
+    coinlapach,
+    deadline,
+    projectName,
+    openmissionName,
+    myp,
+    easy,
+    price,
+    useraplyname,
+    src = 'coin.png',
+    src2 = ' ',
+    projectId,
+    link = '/project/',
+    linkU = '/user/',
+    userId,
+    missionDetails = '',
+    name,
+    noofpu = 0,
+    publicklinks,
+    privatlinks,
+    hearotMeyuchadot,
+    nhours = 0,
+    valph = 0,
+    missId,
+    id,
+    openMid,
+    st = 275,
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids,
+    what,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    already = $bindable(false),
+    pid = $bindable(),
+    stylef = '24px',
+    askId,
+    users,
+    spid,
+    cards = false,
+    chat = $bindable([]),
+    order = $bindable(0)
+  } = $props();
   let dialogOpen = $state(false)
   let resP = [];
 
@@ -453,109 +556,7 @@ updateAskm(
     isOpen = true;
     diunm = true;
   }
-  let clicked = $state(false);
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [low]
-   * @property {boolean} [modal]
-   * @property {boolean} [isVisible]
-   * @property {any} coinlapach
-   * @property {any} deadline
-   * @property {any} projectName
-   * @property {any} openmissionName
-   * @property {any} myp
-   * @property {any} easy
-   * @property {any} price
-   * @property {any} useraplyname
-   * @property {string} [src]
-   * @property {string} [src2]
-   * @property {any} projectId
-   * @property {string} [link]
-   * @property {string} [linkU]
-   * @property {any} userId
-   * @property {string} [missionDetails]
-   * @property {any} name
-   * @property {number} [noofpu]
-   * @property {any} publicklinks
-   * @property {any} privatlinks
-   * @property {any} hearotMeyuchadot
-   * @property {number} [nhours]
-   * @property {number} [valph]
-   * @property {any} missId
-   * @property {any} id
-   * @property {any} openMid
-   * @property {number} [st]
-   * @property {any} [declined]
-   * @property {any} noofusersWaiting
-   * @property {any} uids
-   * @property {any} what
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {boolean} [already]
-   * @property {any} pid
-   * @property {string} [stylef]
-   * @property {any} askId
-   * @property {any} users
-   * @property {any} spid
-   * @property {boolean} [cards]
-   * @property {any} [chat]
-   * @property {number} [order]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
-   * @property {(payload: { id: string }) => void} [onHover]
-   * @property {() => void} [onModal]
-   * @property {(payload: { id: any }) => void} [onUser]
-   * @property {(payload: { id: any }) => void} [onProj]
-   */
-
-  /** @type {Props} */
-  let {
-    onUser, onProj, onAcsept, onDecline, onHover, onModal,
-    low = false,
-    modal = $bindable(false),
-    isVisible = false,
-    coinlapach,
-    deadline,
-    projectName,
-    openmissionName,
-    myp,
-    easy,
-    price,
-    useraplyname,
-    src = 'coin.png',
-    src2 = ' ',
-    projectId,
-    link = '/project/',
-    linkU = '/user/',
-    userId,
-    missionDetails = '',
-    name,
-    noofpu = 0,
-    publicklinks,
-    privatlinks,
-    hearotMeyuchadot,
-    nhours = 0,
-    valph = 0,
-    missId,
-    id,
-    openMid,
-    st = 275,
-    declined = [],
-    noofusersWaiting = $bindable(),
-    uids,
-    what,
-    noofusersOk = $bindable(),
-    noofusersNo = $bindable(),
-    already = $bindable(false),
-    pid = $bindable(),
-    stylef = '24px',
-    askId,
-    users,
-    spid,
-    cards = false,
-    chat = $bindable([]),
-    order = $bindable(0)
-  } = $props();
+ 
   let isOpen = $state(false),
     diunm = $state(false),
     loading = false;

@@ -9,7 +9,7 @@ Command: npx @threlte/gltf@3.0.1 static/3d/withlev.glb
 
   let { fallback, error, children, ref = $bindable(), ...props } = $props()
 
-  const gltf = useGltf('/static\3d\withlev.glb')
+  const gltf = useGltf('3d/withlev.glb')
 </script>
 
 <T.Group

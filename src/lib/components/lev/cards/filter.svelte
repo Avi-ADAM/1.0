@@ -52,7 +52,7 @@ onMount(async () => {
 })
 function showonly(value,id=null) { 
     if (value !== "true") {
-        dispatch("showonly", {
+        onShowonly?.({
             data: value,
             kind: filterKind,
             id: id
@@ -66,7 +66,7 @@ function showonly(value,id=null) {
         // נעדכן את הערך הספציפי
         states[value] = "true";
     } else {
-        dispatch("showall");
+        onShowall?.();
         // נאפס את כל הערכים
         Object.keys(states).forEach(key => {
             states[key] = key;
@@ -108,7 +108,7 @@ if (num === "a"){
 } else {
    fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1 heart, click on the diamonds to sort the actions"}
 }
-dispatch("hover", {id: fir[$lang]});
+onHover?.({id: fir[$lang]});
 
 }
 

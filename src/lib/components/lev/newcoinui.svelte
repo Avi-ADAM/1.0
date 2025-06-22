@@ -108,7 +108,7 @@
     };
   }
 
-  import * as animateScroll from 'svelte-scrollto';
+  import * as animateScroll from 'svelte-scrollto-element';
   import Vid from './didiget.svelte';
   import Desi from './decisionMaking.svelte';
   import Mid from './midi.svelte';
