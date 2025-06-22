@@ -1022,12 +1022,12 @@
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import { page } from '$app/state';
-  let error = false, success = false, loading = false  
+  let error = $state(false), success = $state(false), loading = $state(false)  
   const tri = tr;
-  let wid = 0
+  let wid = $state(0)
   //TODO: כמות לכל משימה עד אינסוף
-  let dialog = 1;
-  let misid = 0;
+  let dialog = $state(1);
+  let misid = $state(0);
   let itemid = 0;
   let editdata = -1;
   function hover(){
