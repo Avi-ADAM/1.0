@@ -1,19 +1,13 @@
-<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
-https://svelte.dev/e/props_duplicate -->
-<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
-https://svelte.dev/e/props_duplicate -->
-<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
-https://svelte.dev/e/props_duplicate -->
-<!-- @migration-task Error while migrating Svelte code: Cannot use `$props()` more than once
-https://svelte.dev/e/props_duplicate -->
 <script>
     //https://res.cloudinary.com/barb1/image/upload/v1676238523/%D7%A4%D7%AA%D7%A6%D7%95%D7%92%D7%94%D7%9C%D7%95%D7%A4%D7%A4%D7%99%D7%95%D7%9F_kkymez.glb
-	import {  useFrame } from '@threlte/core'
+	import {  useTask } from '@threlte/core'
 import { onMount } from 'svelte';
 import Glttf from './11.svelte'
 import { T } from '@threlte/core'
-let s = true
+let s = $state(true)
 onMount(()=>{
+  console.log("GLTFFF")
+
     s = true;
     setTimeout(function () {
         s = false;
@@ -39,11 +33,11 @@ onMount(()=>{
     scrolli = false
   } = $props();
 
-let rotationt = 0
+let rotationt = $state(0)
 let poz = $state({z:0, y:0, x:0});
 
-let up = true
- useFrame(() => {
+let up = $state(true)
+ useTask(() => {
     if (s == false){
       ss =0
     if(poz.y < 2.5 && up == false){

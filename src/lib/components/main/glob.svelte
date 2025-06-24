@@ -1,7 +1,7 @@
 <script>
     //https://res.cloudinary.com/barb1/image/upload/v1676238523/%D7%A4%D7%AA%D7%A6%D7%95%D7%92%D7%94%D7%9C%D7%95%D7%A4%D7%A4%D7%99%D7%95%D7%9F_kkymez.glb
 	import {  Color } from 'three'
-	import { T, useFrame } from '@threlte/core'
+	import { T, useTask } from '@threlte/core'
 
 	import {  GLTF } from '@threlte/extras'
 
@@ -19,7 +19,7 @@ let { onSubmit } = $props();
   let obPoz = {z:0, y:0, x:0}
  let boll = false
  let bool = false
- useFrame(() => {
+ useTask(() => {
 
   if(isHovering == false){
 	rotationt += 0.01

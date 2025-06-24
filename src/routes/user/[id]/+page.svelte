@@ -6,9 +6,9 @@
 
 
   import { lang } from '$lib/stores/lang.js'
-  let userId = data.userId; 
   import Header from '$lib/components/header/header.svelte'
   let { data } = $props();
+  let userId = data.userId; 
 
   let user = data.userData ? data.userData.attributes : null;
   let load = !!data.userData; // True if userData exists

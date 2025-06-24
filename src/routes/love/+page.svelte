@@ -1,7 +1,5 @@
  
 <script>
-  import { run } from 'svelte/legacy';
-
   import { RingLoader
 } from 'svelte-loading-spinners';
   
@@ -20,14 +18,13 @@
  
   // This example loads json data as json using @rollup/plugin-json
   import world from '../../lib/components/main/countries110m.json';
-  import { onMount } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [data]
    */
 
   /** @type {Props} */
-  let { data = null } = $props();
+  let { data  } = $props();
 
   const colorKey = 'agrees';
   const colorKeyy = 'value';
@@ -42,7 +39,7 @@
   const dataLookup = new Map();
   let noof = $state(0);
   
-    run(() => {
+    $effect(() => {
     data.streamed.data.then(function(data) {
         noof = data.total
         data.forEach(d => {
@@ -67,7 +64,7 @@
   'rgb(244, 114, 182)',
   'rgb(209, 146, 255)',
 					"#EEE8AA"];
-     run(() => {
+     $effect(() => {
     console.log(data.streamed.data)
   });
   const addCommas = format(',');
