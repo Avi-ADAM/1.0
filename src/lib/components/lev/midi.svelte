@@ -293,6 +293,6 @@ sml={false}
 {maap} 
 {askmap}
 {pmaap} 
-on:hover={hover}
- on:disp={disp}/>
+onHover={hover}
+ onDisp={disp}/>
  </div>

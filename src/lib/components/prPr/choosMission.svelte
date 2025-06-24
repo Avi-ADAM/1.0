@@ -22,7 +22,7 @@
  */
 
 /** @type {Props} */
- let { children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]) } = $props();
+ let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]) } = $props();
  const baseUrl = import.meta.env.VITE_URL
 
  let newcontent = $state(true);
@@ -111,7 +111,6 @@ async function findT() {
     }
 }
 
-let mission1 = $state([]);
 
 
 function find_mission_id(mission_name_arr){
@@ -201,10 +200,10 @@ function closeMobileModal() {
         maxSelect={1}
           />
           {#if selected[0]}
-        <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
+        <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
         {/if}</div>
         {:else}
-        <Button on:click={openMobileModal}>{placeholder[$lang]}</Button>
+        <Button onClick={openMobileModal}>{placeholder[$lang]}</Button>
 
         <MobileModal isOpen={showMobileModal} title={placeholder[$lang]}>
           <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
@@ -214,8 +213,8 @@ function closeMobileModal() {
             ulOptionsClass="bg-gold"
             liSelectedClass='bg-barbi text-gold'
           loading={mission1.length > 0 ? false : true}
-          on:focus={() => {!page?.data?.isDesktop ?  showFoot.set(false) : null}}
-          on:blur={() => {!page?.data?.isDesktop ?  showFoot.set(true) : null}}
+          onFocus={() => {!page?.data?.isDesktop ?  showFoot.set(false) : null}}
+          onBlur={() => {!page?.data?.isDesktop ?  showFoot.set(true) : null}}
           createOptionMsg={addn[$lang]}
           allowUserOptions={"append"}
            bind:searchText={ugug}
@@ -225,7 +224,7 @@ function closeMobileModal() {
           maxSelect={1}
             />
             {#if selected[0]}
-          <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
+          <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
           {/if}</div>
         </MobileModal>
       {/if}

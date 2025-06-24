@@ -1585,10 +1585,10 @@ function add(event){
               title={cencel1[$lang]}><Close /></button
             >
             {#if a == 0}
-              <Uplad on:message={allbackFunction} />
+              <Uplad onMessage={allbackFunction} />
             {:else if a == 1}
               <Editb
-                on:message={updete}
+                onMessage={updete}
                 selected={valit}
                 {githublink}
                 {fblink}
@@ -1624,7 +1624,7 @@ function add(event){
             {#key clicked}
               <Diun
                 rikmaName={projectname}
-                on:rect={afreact}
+                onRect={afreact}
                 {smalldes}
                 {nameChatPartner}
                 mypos={true}
@@ -1638,7 +1638,7 @@ function add(event){
             {:else if a === 9}
             <span class="text-gold">
             </span>
-            <ChooseM {bmiData} taskId={who} on:close={closer}/>
+            <ChooseM {bmiData} taskId={who} onClose={closer}/>
             {/if}
           </div></DialogContent
         >
@@ -2082,9 +2082,9 @@ pointer-events: none;"
               >
             {:else}
               <Hand
-                on:hosa={hosa}
-                on:progres={bighand}
-                on:trym={trym}
+                onHosa={hosa}
+                onProgres={bighand}
+                onTrym={trym}
                 {noofopen}
                 {openMS}
                 {addM}
@@ -2104,9 +2104,9 @@ pointer-events: none;"
               >
             {:else}
               <Handd
-                on:trym={tryma}
-                on:masi={masi}
-                on:bighandd={bighandd}
+                onTrym={tryma}
+                onMasi={masi}
+                onBighandd={bighandd}
                 {noofopenm}
                 {openMA}
                 {addN}
@@ -2155,9 +2155,9 @@ pointer-events: none;"
                     {roles}
                     {mission1}
                     bind:selected={blabla}
-                    on:message={callbackFunction}
-                    on:add={add}
-                    on:close={close}
+                    onMessage={callbackFunction}
+                    onAdd={add}
+                    onClose={close}
                     pn={projectname}
                     pl={srcP}
                     {restime}
@@ -2190,8 +2190,8 @@ pointer-events: none;"
                   vallues={alit}
                   {miData}
                   projectId={$idPr}
-                  on:remove={removeF}
-                  on:close={close}
+                  onRemove={removeF}
+                  onClose={close}
                 />
               {/key}
             {/if}
@@ -2216,9 +2216,9 @@ pointer-events: none;"
                   </svg></button
                 >
                 <ChoosNeed
-                  on:str={() => (loadr = false)}
-                  on:add={needad}
-                  on:addm={needadm}
+                  onStr={() => (loadr = false)}
+                  onAdd={needad}
+                  onAddm={needadm}
                   selectedi={needr}
                 />
               </div>
@@ -2242,8 +2242,8 @@ pointer-events: none;"
                   userslength={projectUsers.length}
                   {needr}
                   meData={meDatamm}
-                  on:close={clo}
-                  on:remove={wdwd}
+                  onClose={clo}
+                  onRemove={wdwd}
                 />{/if}
             </div>
           </div>
@@ -2290,7 +2290,7 @@ pointer-events: none;"
                   {pmiData}
                   {omiData}
                   {fmiData}
-                  on:selected={openTheDesc}
+                  onSelected={openTheDesc}
                 />
               </div>
               </div>
@@ -2307,7 +2307,7 @@ pointer-events: none;"
                   {hagdel}
                   users={projectUsers}
                   {rikmashes}
-                  on:tit={titlel}
+                  onTit={titlel}
                 />
                 <br />
                 {#if hal === false}
@@ -2347,12 +2347,12 @@ pointer-events: none;"
                 style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
               >
             
-                <Bethas {bmiData} on:chat={openChat} />
+                <Bethas {bmiData} onChat={openChat} />
               </div>
 {:else if tab === 6}
                      <div class="p-8">
             <Sheirut
-            on:new={findM}
+            onNew={findM}
               sheirutim={project?.sheiruts}
               pn={projectname}
               {restime}
@@ -2381,11 +2381,11 @@ pointer-events: none;"
                 <Sidur />
               </div>
 {:else if tab === 9}
-  <ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>                
+  <ActsTable acts={meData.acts.data} onTaskClick={openDescrip}/>                
          
 {:else if tab === 10}
   <div class="sm:p-8 p-1">
-    <TimersOfUsers projectId={$idPr} on:mission={openDescrip} on:tasks={()=>tab = 9} />
+    <TimersOfUsers projectId={$idPr} onMission={openDescrip} onTasks={()=>tab = 9} />
   </div>
 {/if}              
           </div>

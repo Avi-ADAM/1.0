@@ -848,9 +848,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
         <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: rgb(87, 208, 248 ); line-height: 0.7; ">{missionName}</h1>
         <p style="margin-top: 7px; margin-bottom: 13px; font-size: 13px; margin-right:auto; margin-left: auto; line-height: 0.7">{skills.join(' ')}</p>
         {#if total} <p>{total}</p>{/if}
-        <button on:click={agree(oid)} style="margin: 0;" class = "btn" name="requestToJoin" title="אני רוצה"><i class="far fa-check-circle"></i></button>
-        <button on:click={nego(oid)} style="margin: 0;" class = "btn" name="negotiate" title="משא ומתן"><i class="far fa-comments"></i></button>
-        <button on:click={decline(oid)} style="margin: 0;" class = "btn"name="decline" title="לא מתאים לי"><i class="far fa-times-circle"></i></button>
+        <button onclick={agree(oid)} style="margin: 0;" class = "btn" name="requestToJoin" title="אני רוצה"><i class="far fa-check-circle"></i></button>
+        <button onclick={nego(oid)} style="margin: 0;" class = "btn" name="negotiate" title="משא ומתן"><i class="far fa-comments"></i></button>
+        <button onclick={decline(oid)} style="margin: 0;" class = "btn"name="decline" title="לא מתאים לי"><i class="far fa-times-circle"></i></button>
         
 </div>
 

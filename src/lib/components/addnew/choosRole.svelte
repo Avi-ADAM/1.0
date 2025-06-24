@@ -77,7 +77,7 @@ const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed ro
   <lebel for="choos">{adds[$lang]}</lebel>
 <MultiSelect
 id="choos"
-  on:change={inc}
+  onChange={inc}
 bind:selected
 {placeholder}
           noMatchingOptionsMsg={nom[$lang]}

@@ -655,8 +655,8 @@ updateAskm(
 {:else if masa === true}
 
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -679,7 +679,7 @@ updateAskm(
 />-->
           {:else if diunm === true}
             <Diun
-              on:rect={afreact}
+              onRect={afreact}
               smalldes={projectName + '-' + openmissionName}
               nameChatPartner={`${chatdes2[$lang]} ${useraplyname}
    ${projectName} `}
@@ -1003,10 +1003,10 @@ role="button"
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
         <Card
-      on:tochat={tochat}
-      on:agree={() => agree()}
-      on:decline={() => decline()}
-      on:hover={hoverc}
+      onTochat={tochat}
+      onAgree={() => agree()}
+      onDecline={() => decline()}
+      onHover={hoverc}
       {already}
       {projectName}
       {src}
@@ -1031,10 +1031,10 @@ role="button"
       {/if}
   {:else}
     <Card
-      on:tochat={tochat}
-      on:agree={() => agree()}
-      on:decline={() => decline()}
-      on:hover={hoverc}
+      onTochat={tochat}
+      onAgree={() => agree()}
+      onDecline={() => decline()}
+      onHover={hoverc}
       {isVisible}
       {already}
       {projectName}

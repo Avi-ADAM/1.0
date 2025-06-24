@@ -110,7 +110,7 @@
    <Diun
       dont={true}
     rikmaName={$forum[$nowChatId].md.projectName}
-    on:rect={afreact}
+    onRect={afreact}
     smalldes={$forum[$nowChatId].md.mesimaName}
     nameChatPartner={nameChatPartner[$lang]}
     mypos={true}

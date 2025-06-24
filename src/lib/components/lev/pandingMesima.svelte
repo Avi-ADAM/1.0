@@ -699,8 +699,8 @@ function claf (event){
   {:else}
       <Nego
       {masaalr} {mypos}
-      on:load={()=>loading = true}
-              on:close={afternego}
+      onLoad={()=>loading = true}
+              onClose={afternego}
               {timegramaId}
   {negopendmissions}
         descrip ={descrip}
@@ -741,8 +741,8 @@ function claf (event){
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
   {:else}
     <Diun 
-    on:rect={afreact} 
-    on:no={afterwhy} 
+    onRect={afreact} 
+    onNo={afterwhy} 
     {no} 
     bind:clicked
     rect={noofusersOk > 0 && noofusersNo > 0 ? true : false} 
@@ -851,10 +851,10 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
 			<div class="swiper-slidec mx-auto ">
         
 <Cards 
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
-  on:tochat={tochat}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
+  onTochat={tochat}
   {isVisible}
 {skills}
   {timegramaDate}
@@ -874,7 +874,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
    {restime}
    {createdAt}
    {descrip} {mypos} {allr} {noofusersNo}
-   on:nego={claf}
+   onNego={claf}
    />
    </div>
    </Drawer.Content>
@@ -884,10 +884,10 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
 {/if}
 {:else}
 <Cards 
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
-  on:tochat={tochat}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
+  onTochat={tochat}
 {skills}
   {timegramaDate}
     {tafkidims}
@@ -906,7 +906,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
    {restime}
    {createdAt}
    {descrip} {mypos} {allr} {noofusersNo}
-   on:nego={claf}
+   onNego={claf}
    />
 {/if}
 {/await}

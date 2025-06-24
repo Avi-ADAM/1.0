@@ -716,9 +716,9 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
 <Cards 
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
   {why}
   {already} 
   {projectName}
@@ -736,9 +736,9 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 {:else}
 
 <Cards 
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
   {isVisible}
   {why}
   {already} 

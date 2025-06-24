@@ -173,11 +173,11 @@ let h = $state(500);
     {#each arr1 as buble, i}
     {#if buble.ani === "vidu" && milon.desi == true}
     <div class:normSml={modal == false} class="vidu normSml"><Vid
-        on:modal={() =>modal = true}
-        on:hover={hover}
-        on:proj={proj}
-        on:user={user}
-        on:coinLapach={delo}
+        onModal={() =>modal = true}
+        onHover={hover}
+        onProj={proj}
+        onUser={user}
+        onCoinLapach={delo}
         shear={buble.shear}
         hervachti={buble.hervachti}
          sendpropic={buble.sendpropic}
@@ -202,12 +202,12 @@ let h = $state(500);
         /></div>
     {:else if buble.ani === "haluk" && milon.desi == true}
     <div class:normSml={modal == false} class=" halu normSml"><Hal
-        on:modal={() =>modal = true}
-        on:coinLapach={delo}
+        onModal={() =>modal = true}
+        onCoinLapach={delo}
         user_1s={buble.user_1s}
-        on:hover={hover}
-        on:proj={proj}
-        on:user={user}
+        onHover={hover}
+        onProj={proj}
+        onUser={user}
         hervach={buble.hervach}
         halukot={buble.halukot}
         coinlapach={buble.coinlapach}
@@ -231,11 +231,11 @@ let h = $state(500);
         /></div>
         {:else if buble.ani === "mtaha" &&  milon.betaha == true}
         <div class:normSml={modal == false}  class="betaha normSml" ><MissionInProgress
-            on:proj={proj}
-            on:user={user}
-            on:hover={hover}
-            on:coinLapach={delo}
-            on:modal={() =>modal = true}
+            onProj={proj}
+            onUser={user}
+            onHover={hover}
+            onCoinLapach={delo}
+            onModal={() =>modal = true}
             pu={buble.pu}
             tasks={buble.acts.data}
             status={buble.status}
@@ -259,17 +259,17 @@ let h = $state(500);
             hourstotal = {buble.hoursassinged}
             perhour = {buble.perhour}
             restime={buble.restime}
-            on:done={delo}
+            onDone={delo}
             {low}
             /></div>
             {:else if buble.ani === "pmashes" && milon.ppmash == true}
             <div class="normSml ppmash"
                 ><PendingMa
-                    on:hover={hover}
-                    on:proj={proj}
-                    on:user={user}
-                    on:coinLapach={delo}
-                    on:modal={modali}
+                    onHover={hover}
+                    onProj={proj}
+                    onUser={user}
+                    onCoinLapach={delo}
+                    onModal={modali}
                             ordern={buble.orderon}
                     timegramaId={buble.timegramaId}
                     restime={buble.restime}
@@ -305,11 +305,11 @@ let h = $state(500);
                     {:else if buble.ani === "pends" && milon.pend == true}
                     <div  class="normSml pend"
                         ><PendingM
-                            on:hover={hover}
-                            on:modal={modali}
-                            on:proj={proj}
-                            on:user={user}
-                            on:coinLapach={delo}
+                            onHover={hover}
+                            onModal={modali}
+                            onProj={proj}
+                            onUser={user}
+                            onCoinLapach={delo}
                             diun={buble.diun}
                             negopendmissions={buble.negopendmissions}
                             timegramaId={buble.timegramaId}
@@ -353,13 +353,13 @@ let h = $state(500);
                             /></div>
                             {:else if buble.ani === "wegets" && milon.pmaap == true}
                             <div class="pmaap normSml" ><Weget
-                                on:acsept={delo}
-                                on:decline={delo}
-                                on:hover={hover}
-                                on:modal={modali}
+                                onAcsept={delo}
+                                onDecline={delo}
+                                onHover={hover}
+                                onModal={modali}
 
-                                on:proj={proj}
-                                on:user={user}
+                                onProj={proj}
+                                onUser={user}
                                 coinlapach={buble.coinlapach}
                                 mId={buble.mId}
                                 noofusersWaiting={buble.noofusersWaiting}
@@ -401,13 +401,13 @@ let h = $state(500);
                                 /></div>
                                 {:else if buble.ani === "fiapp" && milon.fiap == true}
                                 <div  class="fiap normSml" ><Fiappru
-                                    on:acsept={delo}
-                                    on:decline={delo}
-                                    on:hover={hover}
-                                    on:modal={modali}
+                                    onAcsept={delo}
+                                    onDecline={delo}
+                                    onHover={hover}
+                                    onModal={modali}
 
-                                    on:proj={proj}
-                                    on:user={user}
+                                    onProj={proj}
+                                    onUser={user}
                                     coinlapach={buble.coinlapach}
                                     mId={buble.mId}
                                     noofusersWaiting={buble.noofusersWaiting}
@@ -450,19 +450,19 @@ let h = $state(500);
                                     {:else if buble.ani === "walcomen" && milon.welc == true}
                                     <div  class="welc normSml" ><Welcomt
                                         id={buble.id}
-                                        on:hover={hover}
+                                        onHover={hover}
                                         coinlapach={buble.coinlapach}
                                         username={buble.username}
                                         projectName={buble.projectName}
                                         /></div>
                                         {:else if buble.ani === "askedcoin" && milon.asks == true}
                                         <div  class="asks normSml" ><Reqtojoin
-                                            on:acsept={delo}
-                                            on:hover={hover}
-                                            on:modal={modali}
-                                            on:proj={proj}
-                                            on:user={user}
-                                            on:decline={delo}
+                                            onAcsept={delo}
+                                            onHover={hover}
+                                            onModal={modali}
+                                            onProj={proj}
+                                            onUser={user}
+                                            onDecline={delo}
                                             iskvua={buble.iskvua}
                                             email={buble.email}
                                             role={buble.role}
@@ -506,13 +506,13 @@ let h = $state(500);
                                             /></div>
                                             {:else if buble.ani === "askedm" && milon.askmap == true}
                                             <div  class="askmap normSml" ><Reqtom
-                                                on:acsept={delo}
-                                                on:decline={delo}
-                                                on:hover={hover}
-                                                on:modal={modali}
-                                                on:proj={proj}
-                                                on:user={user}
-                                                on:chat={chat}
+                                                onAcsept={delo}
+                                                onDecline={delo}
+                                                onHover={hover}
+                                                onModal={modali}
+                                                onProj={proj}
+                                                onUser={user}
+                                                onChat={chat}
                                                 coinlapach={buble.coinlapach}
                                                 pid={buble.pid}
                                                 noofusersWaiting={buble.noofusersWaiting}
@@ -549,12 +549,12 @@ let h = $state(500);
                                                 /></div>
                                                 {:else if buble.ani === "hachla" && milon.hachla == true}
                                                 <div class:normSml={modal == false} class="hachla normSml" ><Desi
-                                                    on:acsept={delo}
-                                                    on:decline={delo}
-                                                    on:hover={hover}
-                                                    on:modal={modali}
-                                                    on:proj={proj}
-                                                    on:chat={chat}
+                                                    onAcsept={delo}
+                                                    onDecline={delo}
+                                                    onHover={hover}
+                                                    onModal={modali}
+                                                    onProj={proj}
+                                                    onChat={chat}
                                                     noofpu={buble.noofpu}
                                                     newpicid={buble?.newpicid}
                                                     coinlapach={buble.coinlapach}
@@ -586,11 +586,11 @@ let h = $state(500);
                                                     /></div>
                                                     {:else if buble.ani === "meData" && milon.sugg == true}
                                                     <div class="sugg normSml" ><ProjectSuggestor
-                                                        on:less={delo}
-                                                        on:hover={hover}
-                                                        on:proj={proj}
-                                                        on:user={user}
-                                                        on:mesima={mesima}
+                                                        onLess={delo}
+                                                        onHover={hover}
+                                                        onProj={proj}
+                                                        onUser={user}
+                                                        onMesima={mesima}
                                                         acts={buble.attributes.acts}
                                                         timeToP={buble.attributes.project.data.attributes.timeToP}
                                                         coinlapach={buble.coinlapach}
@@ -620,10 +620,10 @@ let h = $state(500);
                                                         /></div>
                                                         {:else if buble.ani === "huca" && milon.pmashs == true}
                                                         <div  class="pmashs normSml" ><Mashsug
-                                                            on:less={delo}
-                                                            on:hover={hover}
-                                                            on:proj={proj}
-                                                            on:user={user}
+                                                            onLess={delo}
+                                                            onHover={hover}
+                                                            onProj={proj}
+                                                            onUser={user}
                                                             messege={buble.messege}
                                                             i={i}
                                                             restime={buble.restime}
@@ -689,10 +689,10 @@ let h = $state(500);
                                                                 class="midCom">
                                                                 <Mid
                                                                 {sml}
-                                                                    on:cards={cards}
-                                                                    on:hover={hover}
-                                                                    on:showall={showall}
-                                                                    on:showonly={showonly}
+                                                                    onCards={cards}
+                                                                    onHover={hover}
+                                                                    onShowall={showall}
+                                                                    onShowonly={showonly}
                                                                     {total}
                                                                     picLink={picLink} {ask}
                                                                     {wel}

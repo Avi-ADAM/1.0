@@ -173,11 +173,11 @@ function checkAll (){
         />
                 <div class="mx-auto">
         {#if valc == "skillName"}
-            <AddNewSkill color={"--barbi-pink"}  on:addnewskill={addnew} addS={addS} roles1={roles} />
+            <AddNewSkill color={"--barbi-pink"}  onAddnewskill={addnew} addS={addS} roles1={roles} />
         {:else if valc == "roleDescription"} 
-            <AddNewRole color={"--barbi-pink"}  on:addnewrole={addnew}   />
+            <AddNewRole color={"--barbi-pink"}  onAddnewrole={addnew}   />
         {:else if valc == "workWayName"} 
-            <AddnewWorkway color={"--barbi-pink"}  on:addww={addnew}/>
+            <AddnewWorkway color={"--barbi-pink"}  onAddww={addnew}/>
         {/if}
                 </div>
         <button onclick={()=>{edit = false

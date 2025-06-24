@@ -746,8 +746,8 @@ title="ביטול"
 בנתיים יש להגיב לא ולנמק ואז ליצור משאב חדש עם המאפיינים הרצויים </h2>
 -->
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -770,8 +770,8 @@ title="ביטול"
 />
   {:else if diunm === true}
  <Diun
-  on:rect={afreact} 
-  on:no={afterwhy} 
+  onRect={afreact} 
+  onNo={afterwhy} 
   {no} 
   bind:clicked
   rect={true} smalldes={projectName} nameChatPartner={`הצבעה על ${name}`} {mypos}
@@ -887,10 +887,10 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
 			<div class="swiper-slidec mx-auto ">
         
 <Cards 
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
-  on:tochat={tochat}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
+  onTochat={tochat}
   {low}
   {kindOf}
   {hm}
@@ -906,7 +906,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
    {noofusersOk} 
    {name} 
    {descrip} {mypos} {allr} {noofusersNo}
-   on:nego={claf}
+   onNego={claf}
    />
       </div>
       </Drawer.Content>
@@ -916,10 +916,10 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
       {/if}
 {:else}
 <Cards 
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
-  on:tochat={tochat}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
+  onTochat={tochat}
   {isVisible}
   {low}
   {kindOf}
@@ -936,7 +936,7 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
    {noofusersOk} 
    {name} 
    {descrip} {mypos} {allr} {noofusersNo}
-   on:nego={claf}
+   onNego={claf}
    />
 {/if}
 {/await}

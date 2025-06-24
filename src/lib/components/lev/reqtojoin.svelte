@@ -779,8 +779,8 @@ title="ביטול"
 {:else if masa === true}
 
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -946,10 +946,10 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 			<div class="swiper-slidec mx-auto ">
         
 <Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
-  on:chat={tochat}
+  onAgree={()=>agree()}
+  onDecline={()=>decline()}
+  onHover={hoverc} 
+  onChat={tochat}
   {low}
   {already} 
   {projectName}
@@ -971,10 +971,10 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
       {/if}
 {:else}
 <Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
-  on:chat={tochat}
+  onAgree={()=>agree()}
+  onDecline={()=>decline()}
+  onHover={hoverc} 
+  onChat={tochat}
   {isVisible}
   {low}
   {already} 

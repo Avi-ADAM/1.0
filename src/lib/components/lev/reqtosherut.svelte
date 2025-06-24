@@ -772,8 +772,8 @@ title="ביטול"
 {:else if masa === true}
 
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -929,10 +929,10 @@ role="content-info"
 </div>
 {:else}
 <Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
-  on:chat={tochat}
+  onAgree={()=>agree()}
+  onDecline={()=>decline()}
+  onHover={hoverc} 
+  onChat={tochat}
   {isVisible}
   {low}
   {already} 

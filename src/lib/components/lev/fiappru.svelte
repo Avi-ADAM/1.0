@@ -635,9 +635,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 			<div class="swiper-slidec mx-auto ">
         
 <Cards 
- on:agree={agree}
-  on:decline={decline}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={decline}
+  onHover={hoverc}
   {why}
   {useraplyname}
   {timegramaDate}
@@ -662,9 +662,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
       {/if}
 {:else}
 <Cards 
- on:agree={agree}
-  on:decline={decline}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={decline}
+  onHover={hoverc}
   {isVisible}
   {why}
   {useraplyname}

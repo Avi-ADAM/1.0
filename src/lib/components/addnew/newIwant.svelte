@@ -443,7 +443,7 @@
           onclick={closer}>{cencel[$lang]}</button
         >
         {#if a == 0}
-          <Uplad on:message={callbackFunction} />
+          <Uplad onMessage={callbackFunction} />
         {:else if a == 2}
           <div class="sp bg-gold">
             <h3 class="text-barbi">{om[$lang]}</h3>

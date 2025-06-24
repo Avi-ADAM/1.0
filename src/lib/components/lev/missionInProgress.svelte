@@ -943,7 +943,7 @@ bind:dialogEdit
 bind:elapsedTime
 bind:selectedTasks
 bind:taskSearchTerm
-on:update-timer={({ detail }) => {
+onUpdate-timer={({ detail }) => {
   if (detail.timer) {
     storeTimer.attributes.activeTimer.data = detail.timer;
     storeTimer.attributes.activeTimer.isActive = detail.running;
@@ -1500,8 +1500,8 @@ out:scale={{duration: 2200, opacity: 0.5}}
 
 <!---
 {#if lapse !== 0 || x !== 0}
-<button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
-<button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" on:click={save}> הוספה</button>
+<button onmouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} onmouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" onclick={handleClearClick}>ניקוי</button>
+<button onmouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" onclick={save}> הוספה</button>
 {/if}-->
     <div class="flex space-x-4">
       {#if already === false}
@@ -1533,14 +1533,14 @@ out:scale={{duration: 2200, opacity: 0.5}}
 			<div class="swiper-slidec mx-auto ">
         
 <Cards 
-on:start={start}
- on:done={done}
-  on:save={save}
-  on:hover={hoverc}
-  on:task={opentask}
-  on:azor={azor}
-  on:clear={handleClearClick}
-  on:statusi={function(){
+onStart={start}
+ onDone={done}
+  onSave={save}
+  onHover={hoverc}
+  onTask={opentask}
+  onAzor={azor}
+  onClear={handleClearClick}
+  onStatusi={function(){
      a = 2;
     isOpen = true
   }}
@@ -1577,14 +1577,14 @@ on:start={start}
 {:else}
 
 <Cards 
-on:start={start}
- on:done={done}
-  on:save={save}
-  on:hover={hoverc}
-  on:task={opentask}
-  on:azor={azor}
-  on:clear={handleClearClick}
-  on:statusi={function(){
+onStart={start}
+ onDone={done}
+  onSave={save}
+  onHover={hoverc}
+  onTask={opentask}
+  onAzor={azor}
+  onClear={handleClearClick}
+  onStatusi={function(){
      a = 2;
     isOpen = true
   }}

@@ -366,11 +366,11 @@
         {#if buble.ani === 'vidu' && milon.desi == true}
           <div class="vidu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Vid
-              on:modal={() => (modal = true)}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
-              on:coinLapach={delo}
+              onModal={() => (modal = true)}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
+              onCoinLapach={delo}
               shear={buble.shear}
               hervachti={buble.hervachti}
               sendpropic={buble.sendpropic}
@@ -397,12 +397,12 @@
         {:else if buble.ani === 'haluk' && milon.desi == true}
           <div class=" halu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Hal
-              on:modal={() => (modal = true)}
-              on:coinLapach={delo}
+              onModal={() => (modal = true)}
+              onCoinLapach={delo}
               user_1s={buble.user_1s}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
               hervach={buble.hervach}
               halukot={buble.halukot}
               coinlapach={buble.coinlapach}
@@ -428,11 +428,11 @@
         {:else if buble.ani === 'mtaha' && milon.betaha == true}
           <div class="betaha normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <MissionInProgress
-              on:proj={proj}
-              on:user={user}
-              on:hover={hover}
-              on:coinLapach={delo}
-              on:modal={() => (modal = true)}
+              onProj={proj}
+              onUser={user}
+              onHover={hover}
+              onCoinLapach={delo}
+              onModal={() => (modal = true)}
               pu={buble.pu}
               tasks={buble.acts.data}
               status={buble.status}
@@ -456,18 +456,18 @@
               hoursdon={buble.howmanyhoursalready}
               hourstotal={buble.hoursassinged}
               perhour={buble.perhour}
-              on:done={delo}
+              onDone={delo}
               {low}
             />
           </div>
         {:else if buble.ani === 'pmashes' && milon.ppmash == true}
           <div class="normSml ppmash" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <PendingMa
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
-              on:coinLapach={delo}
-              on:modal={modali}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
+              onCoinLapach={delo}
+              onModal={modali}
               ordern={buble.orderon}
               timegramaId={buble.timegramaId}
               restime={buble.restime}
@@ -504,11 +504,11 @@
         {:else if buble.ani === 'pends' && milon.pend == true}
           <div class="normSml pend" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <PendingM
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
-              on:coinLapach={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
+              onCoinLapach={delo}
               diun={buble.diun}
               timegramaId={buble.timegramaId}
               timegramaDate={buble.timegramaDate}
@@ -553,12 +553,12 @@
         {:else if buble.ani === 'wegets' && milon.pmaap == true}
           <div class="pmaap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Weget
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
               coinlapach={buble.coinlapach}
               mId={buble.mId}
               noofusersWaiting={buble.noofusersWaiting}
@@ -602,12 +602,12 @@
         {:else if buble.ani === 'fiapp' && milon.fiap == true}
           <div class="fiap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Fiappru
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
               coinlapach={buble.coinlapach}
               mId={buble.mId}
               noofusersWaiting={buble.noofusersWaiting}
@@ -650,7 +650,7 @@
           <div class="welc normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Welcomt
               id={buble.id}
-              on:hover={hover}
+              onHover={hover}
               coinlapach={buble.coinlapach}
               username={buble.username}
               projectName={buble.projectName}
@@ -659,12 +659,12 @@
         {:else if buble.ani === 'askedcoin' && milon.asks == true}
           <div class="asks normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Reqtojoin
-              on:acsept={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
-              on:decline={delo}
+              onAcsept={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
+              onDecline={delo}
               iskvua={buble.iskvua}
               email={buble.email}
               role={buble.role}
@@ -708,13 +708,13 @@
         {:else if buble.ani === 'askedm' && milon.askmap == true}
           <div class="askmap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Reqtom
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
-              on:chat={chat}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
+              onChat={chat}
               coinlapach={buble.coinlapach}
               pid={buble.pid}
               noofusersWaiting={buble.noofusersWaiting}
@@ -753,12 +753,12 @@
         {:else if buble.ani === 'hachla' && milon.hachla == true}
           <div class="hachla normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Desi
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:chat={chat}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onChat={chat}
               noofpu={buble.noofpu}
               newpicid={buble?.newpicid}
               coinlapach={buble.coinlapach}
@@ -792,12 +792,12 @@
         {:else if buble.ani === 'meData' && milon.sugg == true}
           <div class="sugg normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <ProjectSuggestor
-              on:modal={modali}
-              on:less={delo}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
-              on:mesima={mesima}
+              onModal={modali}
+              onLess={delo}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
+              onMesima={mesima}
               timeToP={buble.attributes.project.data.attributes.timeToP}
               coinlapach={buble.coinlapach}
               restime={buble.attributes.project.data.attributes.restime}
@@ -829,10 +829,10 @@
         {:else if buble.ani === 'huca' && milon.pmashs == true}
           <div class="pmashs normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Mashsug
-              on:less={delo}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
+              onLess={delo}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
               messege={buble.messege}
               {i}
               coinlapach={buble.coinlapach}
@@ -863,10 +863,10 @@
       <div class="midCom">
       <Mid
         {sml}
-        on:cards={cards}
-        on:hover={hover}
-        on:showall={showall}
-        on:showonly={showonly}
+        onCards={cards}
+        onHover={hover}
+        onShowall={showall}
+        onShowonly={showonly}
         {total}
         {picLink}
         {ask}

@@ -599,8 +599,8 @@ id: ${pendId}
             <button onclick={afterwhy}>אישור</button>
           {:else if rect === true}
             <Diun
-              on:rect={afreact}
-              on:no={afterwhy}
+              onRect={afreact}
+              onNo={afterwhy}
               money={true}
               {no}
               rect={true}
@@ -877,9 +877,9 @@ role="button"
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
         <Cards
-      on:agree={claf}
-      on:decline={claf}
-      on:hover={hoverc}
+      onAgree={claf}
+      onDecline={claf}
+      onHover={hoverc}
       {why}
       {already}
       {projectName}
@@ -896,9 +896,9 @@ role="button"
       {/if}
   {:else}
     <Cards
-      on:agree={claf}
-      on:decline={claf}
-      on:hover={hoverc}
+      onAgree={claf}
+      onDecline={claf}
+      onHover={hoverc}
       {why}
       {isVisible}
       {already}

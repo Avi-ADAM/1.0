@@ -482,8 +482,8 @@ title="ביטול"
 {:else if masa === true}
 
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -506,7 +506,7 @@ title="ביטול"
 />-->
   {:else if diunm === true}
  <Diun
-  on:rect={afreact} 
+  onRect={afreact} 
   smalldes={projectName+"-"+missionName} 
   nameChatPartner={`${chatdes2[$lang]} 
   ${projectName}`} 
@@ -1276,11 +1276,11 @@ in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
         <Cards
-on:project={project}
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
-  on:tochat={tochat}
+onProject={project}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
+  onTochat={tochat}
   {acts}
   {low}
   {hearotMeyuchadot}
@@ -1310,11 +1310,11 @@ on:project={project}
 </div>
 {:else}
 <Cards
-on:project={project}
- on:agree={claf}
-  on:decline={claf}
-  on:hover={hoverc}
-  on:tochat={tochat}
+onProject={project}
+ onAgree={claf}
+  onDecline={claf}
+  onHover={hoverc}
+  onTochat={tochat}
   {isVisible}
   {acts}
   {low}

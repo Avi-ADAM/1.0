@@ -638,9 +638,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
         <Cards 
- on:agree={agree}
-  on:decline={open}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={open}
+  onHover={hoverc}
   {low}
   {agprice}
   {useraplyname}
@@ -666,9 +666,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
       {/if}
 {:else}
 <Cards 
- on:agree={agree}
-  on:decline={open}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={open}
+  onHover={hoverc}
   {isVisible}
   {low}
   {agprice}

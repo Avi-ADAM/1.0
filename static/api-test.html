@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>API Test</title>
+</head>
+<body>
+  <h1>API Test</h1>
+  <script>
+    const apiUrl = 'https://tov.1lev1.com/graphql';
+    const query = `query {
+  cuntries {
+    data{
+      id
+      attributes {name free_people{data{id
+    }
+    }
+    } 
+    }
+}
+}   `;
+
+    fetch(apiUrl, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ query: query })
+    })
+    .then(response => response.json())
+    .then(data => {
+      console.log('API Response:', data);
+    })
+    .catch(error => {
+      console.error('API Error:', error);
+    });
+  </script>
+</body>
+</html>

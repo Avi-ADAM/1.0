@@ -12,9 +12,9 @@
 
   /** @type {Props} */
   let {
-    addN = false,
-    openMA = false,
-    noofopenm = 0,
+    addN = $bindable(false),
+    openMA = $bindable(false),
+    noofopenm = $bindable(0),
     hosafat = "",
     onMasi,
     onBighandd,

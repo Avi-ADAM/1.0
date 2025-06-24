@@ -525,6 +525,10 @@ let ww = $state(0);
 onclick={()=>{modal = true
   onModal?.()
 dialogOpen = true}}
+tabindex="0"
+onkeypress={(event)=>{if(event.key === "Enter"){modal = true
+  onModal?.()
+dialogOpen = true}}}
 role="button"
 ondblclick={tomodal}
  bind:clientWidth={ww}
@@ -842,9 +846,9 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
         <Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
+  onAgree={()=>agree()}
+  onDecline={()=>decline()}
+  onHover={hoverc} 
   isVisible={false}
   {already} 
   {projectName}
@@ -869,9 +873,9 @@ class=" duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, dur
       {/if}
 {:else}
 <Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
+  onAgree={()=>agree()}
+  onDecline={()=>decline()}
+  onHover={hoverc} 
   {already} 
   {projectName}
    {src} 

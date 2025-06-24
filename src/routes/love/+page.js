@@ -26,7 +26,6 @@ export const load = async ({fetch}) => {
       })
     })
       .then((data) => {
-        console.log("28",data)
         return data.json();
       })
       .catch(() => {

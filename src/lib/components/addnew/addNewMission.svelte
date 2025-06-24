@@ -222,7 +222,7 @@ selectedrole = newSele;
       />
     
      
-     <Addnewskil on:addnewskill={addnew} nobr={false} color={"--barbi-pink"} />
+     <Addnewskil onAddnewskill={addnew} nobr={false} color={"--barbi-pink"} />
 
      <div dir="{$lang == "en" ? "ltr" : "rtl"}">
   <lebel for="choos">{adds[$lang]}</lebel>
@@ -238,7 +238,7 @@ options={roles.map(c => c.attributes.roleDescription)}
 
 <div>
   
-   <Addnewro  on:addnewrole={addnewrole} rn={roles.map(d=>d.attributes.roleDescription)} color={"--barbi-pink"}/>
+   <Addnewro  onAddnewrole={addnewrole} rn={roles.map(d=>d.attributes.roleDescription)} color={"--barbi-pink"}/>
 <button
  onclick={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-6 px-4 m-4 rounded-full"

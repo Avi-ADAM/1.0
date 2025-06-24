@@ -116,7 +116,7 @@
         {#if newMeeting == false}
         <NewIwant {idL} userName_value={username} />
         {:else}
-        <CreateNewMeeting on:close={()=>{newMeeting = false
+        <CreateNewMeeting onClose={()=>{newMeeting = false
         dialogOpen = false
         }}/>
         {/if}
@@ -228,7 +228,7 @@
   >
 {/if}
 {:else}{/if}-->
-<MobileFooter on:chat={() => addi("chat")} on:new={() => addi()}/>
+<MobileFooter onChat={() => addi("chat")} onNew={() => addi()}/>
 
 
 <style>

@@ -122,7 +122,7 @@ let me = page.data.uid
 <MultiSelect {loading} bind:selected options={users.map(c => c.attributes.username)} placeholder={placeholder[$lang]}/>
 <div class="flex items-center justify-center w-full">
   <div class="w-fit  m-4">
-  <Button on:click={create} loading={loadingBtn} {error} success={sucsses}/>
+  <Button onClick={create} loading={loadingBtn} {error} success={sucsses}/>
   </div></div>
 </div>
 <style>

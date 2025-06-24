@@ -397,8 +397,8 @@
 {:else if masa === true}
 
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -421,7 +421,7 @@
 />-->
         {:else if diunm === true}
           <Diun
-            on:rect={afreact}
+            onRect={afreact}
             smalldes={projectName + '-' + mashName}
             nameChatPartner={`${chatdes2[$lang]}
                               ${projectName} `}
@@ -601,10 +601,10 @@ role="button"
 			<div class="swiper-slidec mx-auto ">
         
   <Cards
-    on:agree={() => agree(oid)}
-    on:decline={() => decline(oid)}
-    on:hover={hoverc}
-    on:tochat={tochat}
+    onAgree={() => agree(oid)}
+    onDecline={() => decline(oid)}
+    onHover={hoverc}
+    onTochat={tochat}
     {low}
     {mashName}
     {easy}
@@ -627,10 +627,10 @@ role="button"
       {/if}
 {:else}
   <Cards
-    on:agree={() => agree(oid)}
-    on:decline={() => decline(oid)}
-    on:hover={hoverc}
-    on:tochat={tochat}
+    onAgree={() => agree(oid)}
+    onDecline={() => decline(oid)}
+    onHover={hoverc}
+    onTochat={tochat}
     {isVisible}
     {low}
     {mashName}

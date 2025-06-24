@@ -355,7 +355,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
              <button class=" hover:bg-barbi text-mturk rounded-full"
           onclick={closer}>{cencel[$lang]}</button>
           {#if a == 0}
-          <Uplad on:message={callbackFunction}/>
+          <Uplad onMessage={callbackFunction}/>
 
           {:else if a == 2}
           <div class="sp bg-gold">

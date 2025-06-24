@@ -71,7 +71,7 @@ class="border flex flex-row border-barbi hover:border-gold bg-gradient-to-br fro
     onclick={closer}>{cencel[$lang]}</button
   >
   {#if a == 0}
-    <UploadPic on:message={callbackFunction} {aspect}/>
+    <UploadPic onMessage={callbackFunction} {aspect}/>
   {:else if a == 2}
     <div class="sp bg-gold">
       <h3 class="text-barbi">{om[$lang]}</h3>
