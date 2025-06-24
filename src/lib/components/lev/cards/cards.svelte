@@ -273,7 +273,7 @@ onmouseleave={()=> hoverc("0")} class="{$lang == "he" ? "next" : "perv"	}" src="
 onmouseleave={()=> hoverc("0")} 
  style:visibility={low == true  ? "hidden":  "visible"} class="bg z-[1000]">
  
- <Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
+ <Switch bind:value={cards} onChange={()=>change()}  design="multi" options={[true, false]} />                
 
 </div>
 <div   
@@ -283,7 +283,7 @@ style:visibility={low == true  ? "hidden":  "visible"} class="z-[1000] top-0 abs
 <button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" onclick={()=> filter ? showall() : filter = true}>
   <FilterIcon filterType="cardType" isX={filter} /></button>
 {#if filter}
-<Filter on:showonly={showonly} {sug}
+<Filter onShowonly={showonly} {sug}
 {pen}
 {ask}
 {wel}
@@ -300,7 +300,7 @@ filterKind="kind"/>
 <button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" onclick={()=> filter2 ? showall() : filter2 = true}>
   <FilterIcon isX={filter2} /></button>
 {#if filter2}
-<Filter allIds={uniqueProjects} filterKind="projects" on:showonly={showonly}
+<Filter allIds={uniqueProjects} filterKind="projects" onShowonly={showonly}
 />
 {/if}
 </div>
@@ -314,7 +314,7 @@ filterKind="kind"/>
 onmouseleave={()=> hoverc("0")} 
 style:visibility={low == true  ? "hidden":  "visible"} class="px-4 z-[1000]">
 
-<Switch bind:value={cards} on:change={()=>change()}  design="multi" options={[true, false]} />                
+<Switch bind:value={cards} onChange={()=>change()}  design="multi" options={[true, false]} />                
 
 </div>
 {/if}
@@ -327,7 +327,7 @@ style:visibility={low == true  ? "hidden":  "visible"}
 onclick={()=> filter ? showall() : filter = true}>
 <FilterIcon isX={filter} filterType="cardType"/></button>
 {#if filter}
-<Filter on:showonly={showonly} {sug}
+<Filter onShowonly={showonly} {sug}
 {pen}
 {ask}
 {wel}
@@ -344,7 +344,7 @@ filterKind="kind"/>
 <button class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi" onclick={()=> filter2 ? showall() : filter2 = true}>
   <FilterIcon isX={filter2} /></button>
 {#if filter2}
-<Filter allIds={uniqueProjects} filterKind="projects" on:showonly={showonly}
+<Filter allIds={uniqueProjects} filterKind="projects" onShowonly={showonly}
 />
 {/if}
 </div>
@@ -383,9 +383,9 @@ effect={"slide"}
 ><Hal  
   isVisible={currentIndex === i}  
     user_1s={buble.user_1s}
-          on:hover={hover}
- on:proj={proj}
- on:user={user}
+          onHover={hover}
+ onProj={proj}
+ onUser={user}
  {low}
  cards="true"
      coinlapach={buble.coinlapach} 
@@ -408,10 +408,10 @@ effect={"slide"}
                                /></SwiperSlide>
 {:else if buble.ani === "mtaha" &&  milon.betaha == true}
  <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"} "><MissionInProgress
-  on:proj={proj}
+  onProj={proj}
   cards="true"
- on:user={user}  
-  on:hover={hover}
+ onUser={user}  
+  onHover={hover}
     {low}
     restime={buble.restime}
     isVisible={currentIndex === i}
@@ -439,18 +439,18 @@ effect={"slide"}
     hoursdon ={buble.howmanyhoursalready}
     hourstotal = {buble.hoursassinged}
     perhour = {buble.perhour}
-    on:done={delo}
+    onDone={delo}
     /></SwiperSlide>
 {:else if buble.ani === "pmashes" && milon.ppmash == true}
   <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><PendingMa
-              on:hover={hover}
-  on:proj={proj}
- on:user={user}
+              onHover={hover}
+  onProj={proj}
+ onUser={user}
          cards="true"
          isVisible={currentIndex === i}
 {low}
      coinlapach={buble.coinlapach} 
-        on:coinLapach={delo}
+        onCoinLapach={delo}
         restime={buble.restime}
         ordern={buble.orderon}
         timegramaId={buble.timegramaId}
@@ -484,10 +484,10 @@ effect={"slide"}
   {:else if buble.ani === "pends" && milon.pend == true}
   <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"
 ><PendingM
-              on:hover={hover}
-  on:proj={proj}
- on:user={user}
-        on:coinLapach={delo}
+              onHover={hover}
+  onProj={proj}
+ onUser={user}
+        onCoinLapach={delo}
         timegramaId={buble.timegramaId}
         {low}
         negopendmissions={buble.negopendmissions}
@@ -533,12 +533,12 @@ effect={"slide"}
                 /></SwiperSlide>
 {:else if buble.ani === "wegets" && milon.pmaap == true}
     <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Weget
-            on:acsept={delo}
+            onAcsept={delo}
             cards="true"
-            on:decline={delo}
-                  on:hover={hover}
-          on:proj={proj}
- on:user={user}
+            onDecline={delo}
+                  onHover={hover}
+          onProj={proj}
+ onUser={user}
  {low}
  isVisible={currentIndex === i}
      coinlapach={buble.coinlapach} 
@@ -581,11 +581,11 @@ effect={"slide"}
                 /></SwiperSlide>
     {:else if buble.ani === "fiapp" && milon.fiap == true}
             <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Fiappru
-            on:acsept={delo}
-            on:decline={delo}
-                  on:hover={hover}
-    on:proj={proj} 
- on:user={user}
+            onAcsept={delo}
+            onDecline={delo}
+                  onHover={hover}
+    onProj={proj} 
+ onUser={user}
  cards="true"
  {low}
  timegramaId={buble.timegramaId}
@@ -632,17 +632,17 @@ effect={"slide"}
     id={buble.id}
         coinlapach={buble.coinlapach} 
 
-          on:hover={hover}
+          onHover={hover}
        username={buble.username}
        projectName={buble.projectName}
        /></SwiperSlide>
    -->{:else if buble.ani === "askedcoin" && milon.asks == true}
         <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Reqtojoin
-            on:acsept={delo}
-                  on:hover={hover}
-            on:proj={proj}
-     on:user={user}
-            on:decline={delo}
+            onAcsept={delo}
+                  onHover={hover}
+            onProj={proj}
+     onUser={user}
+            onDecline={delo}
             cards="true"
             isVisible={currentIndex === i}
             iskvua={buble.iskvua}
@@ -688,13 +688,13 @@ effect={"slide"}
                 /></SwiperSlide>
 {:else if buble.ani === "askedm" && milon.askmap == true}
         <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Reqtom
-            on:acsept={delo}
-            on:decline={delo}
-                  on:hover={hover}
-            on:proj={proj}
+            onAcsept={delo}
+            onDecline={delo}
+                  onHover={hover}
+            onProj={proj}
             cards="true"
- on:user={user}
- on:chat={chat}
+ onUser={user}
+ onChat={chat}
  isVisible={currentIndex === i}
  {low}
             pid={buble.pid}
@@ -732,10 +732,10 @@ effect={"slide"}
                 /></SwiperSlide>
 {:else if buble.ani === "meData" && milon.sugg == true}
   <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><ProjectSuggestor
-      on:less={delo}
-            on:hover={hover}
-      on:proj={proj}
- on:user={user}
+      onLess={delo}
+            onHover={hover}
+      onProj={proj}
+ onUser={user}
  isVisible={currentIndex === i}
      coinlapach={buble.coinlapach} 
     {low}
@@ -765,11 +765,11 @@ effect={"slide"}
                 /></SwiperSlide>
 {:else if buble.ani === "huca" && milon.pmashs == true}
     <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><Mashsug
-      on:less={delo}
+      onLess={delo}
       cards="true"
-      on:hover={hover}
-      on:proj={proj}
- on:user={user}
+      onHover={hover}
+      onProj={proj}
+ onUser={user}
  messege={buble.messege}
       i={i}
       isVisible={currentIndex === i}
@@ -797,12 +797,12 @@ effect={"slide"}
                 /></SwiperSlide>
                            {:else if buble.ani === "hachla" && milon.hachla == true}
                                                 <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}"><DecisionMaking
-                                                    on:acsept={delo}
-                                                    on:decline={delo}
-                                                    on:hover={hover}
-                                                    on:proj={proj}
+                                                    onAcsept={delo}
+                                                    onDecline={delo}
+                                                    onHover={hover}
+                                                    onProj={proj}
                                                           cards="true" 
-                                                    on:chat={chat}
+                                                    onChat={chat}
                                                     timegramaDate={buble.timegramaDate}
                                                     timegramaId={buble.timegramaId}
                                                     restime={buble.restime}                                                    
@@ -852,7 +852,7 @@ effect={"slide"}
          {:else}
          <div class="body flex flex-col items-center justify-center ">
           <h1 class="text-2xl font-bold text-barbi text-center">{noThings[$lang]}</h1>
-          <Button on:click={()=> goto("/me")} text={toProfile} />
+          <Button onClick={()=> goto("/me")} text={toProfile} />
           </div>
 
          {/if}

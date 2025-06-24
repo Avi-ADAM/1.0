@@ -398,7 +398,7 @@ let nameuse = $state(false);
    let data;
     import { createForm } from "svelte-forms-lib";
   import Close from '$lib/celim/close.svelte';
-  import { scrollToTop } from 'svelte-scrollto-element';
+  import { scrolltotop } from 'svelte-scrollto-element';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
   import { sendError } from '$lib/func/send/senError.svelte';
   /**
@@ -429,12 +429,12 @@ onSubmit: values => {
 if (fpp.includes(jjj)){
   console.log("sssss")
   nameuse = true;
-    scrollToTop()
+    scrolltotop()
 } else {
  if (selected.length < 1) {
  console.log("uuuu")
   erorims = true
-  scrollToTop()
+  scrolltotop()
  } else {
    console.log("kkkk")
 
@@ -546,7 +546,7 @@ let w = $state(0);
 let wid = $state(0);
   
 run(() => {
-    if($errors.name || $errors.email) {scrollToTop()}
+    if($errors.name || $errors.email) {scrolltotop()}
   });
 </script>
 <Head {title} {description} {image} {url} />
@@ -558,10 +558,10 @@ run(() => {
              <button class=" hover:bg-barbi text-mturk rounded-full"
           onclick={closer}><Close/></button>
           {#if a == 0}
- <Tikun  on:done={done} on:erore={erore}/>
+ <Tikun  onDone={done} onError={erore}/>
 
                     {:else if a == 4}
- <TRan on:done={done} on:erore={erorer}/>
+ <TRan onDone={done} onError={erorer}/>
 
                     {:else if a == 1}
           <div class="sp bg-gold">
@@ -751,7 +751,7 @@ run(() => {
     {/if}
     <div class="cor">
       <Canvas size={{width:w, height:h}}>
-        <Scene on:click={()=> console.log("hhuibi")} on:submit="{handleSubmit}"/>
+        <Scene onClick={()=> console.log("hhuibi")} onSubmit={handleSubmit}/>
       </Canvas>
     </div>
        {:else if g == true}
