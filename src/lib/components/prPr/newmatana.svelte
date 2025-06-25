@@ -246,5 +246,5 @@
   <PicInput aspect={16/9} bind:files={croppedImage}/>
   <br>
   <Checkbox bind:value={oneForeProject} lebel={{he:"מתנה יחידה לפרויקט",en:"one gift for one project"}} />
-  <Button text={addG} on:click={add} {loading} {success} {error} />
+  <Button text={addG} onClick={add} {loading} {success} {error} />
 </div>

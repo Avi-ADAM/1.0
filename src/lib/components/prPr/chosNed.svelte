@@ -99,10 +99,10 @@ function incremen() {
         {placeholder}
         loading={isLow}
         options={needss.map(c => c.attributes.name)}
-        on:change={incremen}
+        onchange={incremen}
         /></div>
       
-       <Addnewnee {addnee} on:newn={newn} onmo={true} color={"--barbi-pink"}/>
+       <Addnewnee {addnee} onNewn={newn} onmo={true} color={"--barbi-pink"}/>
       </div>
      
     </div>

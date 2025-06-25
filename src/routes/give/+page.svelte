@@ -379,7 +379,7 @@ function find_contry_id(contry_name_arr){
     }
 </script>
 <!--
-<button on:click={tverya}>tverya</button>
+<button onclick={tverya}>tverya</button>
 -->
 <button onclick={onSubmiti}>tttt</button>
 <form onsubmit={preventDefault(submitForm)}>

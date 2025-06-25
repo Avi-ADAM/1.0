@@ -140,7 +140,7 @@ bg-gray-700">
           <!--
           <div class="flex justify-center">
             {#if alr == false}
-          <button on:click={ask} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
+          <button onclick={ask} onmouseenter={()=>hovered = true} onmouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
             class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">אני אשמח לבצע</button>
         {/if}  
         </div>-->

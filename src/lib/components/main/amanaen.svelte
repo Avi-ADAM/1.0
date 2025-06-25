@@ -506,10 +506,10 @@ let h = $state(0);
              <button class=" hover:bg-barbi text-mturk rounded-full"
           onclick={closer}>close</button>
           {#if a == 0}
- <Tikun  on:done={done} on:erore={erore}/>
+ <Tikun  onDone={done} onErore={erore}/>
          
                     {:else if a == 4}
- <TRan on:done={done} on:erore={erorer}/>
+ <TRan onDone={done} onErore={erorer}/>
          
                     {:else if a == 1}
 
@@ -659,7 +659,7 @@ let h = $state(0);
     {/if}
     <div class="cor">
       <Canvas size={{width:w, height:h}}>
-        <Scene en={true} on:click={()=> console.log("hhuibi")} on:submit="{handleSubmit}"/>
+        <Scene en={true} onClick={()=> console.log("hhuibi")} onSubmit="{handleSubmit}"/>
       </Canvas>
     </div>
        {:else if g == true}

@@ -61,14 +61,14 @@ function sub (){
 
 <T.DirectionalLight  intensity={0.81} position={[ -20,  -5, 5 ]} />
 <T.DirectionalLight  intensity={0.91} position={[0, 10, 10 ]} />
-<T is={ref} dispose={false} {...restProps} on:pointerenter={() => (isHovering = true)}
-on:pointerleave={() => {
+<T is={ref} dispose={false} {...restProps} onpointerenter={() => (isHovering = true)}
+onpointerleave={() => {
   isPointerDown = false
   isHovering = false
 }}
-on:pointerdown={() => (isPointerDown = true)}
-on:pointerup={() => (isPointerDown = false)}
-on:pointercancel={() => {
+onpointerdown={() => (isPointerDown = true)}
+onpointerup={() => (isPointerDown = false)}
+onpointercancel={() => {
   isPointerDown = false
   isHovering = false
 }}

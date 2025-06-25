@@ -3699,16 +3699,16 @@
         >
         {#if mode == 1}
           <span>
-            <Hevel userId={eizeish} on:proj={proj} />
+            <Hevel userId={eizeish} onProj={proj} />
           </span>
         {:else if mode == 2}
-          <Rikma projectId={eizep} on:user={user} on:mesima={mesima} />
+          <Rikma projectId={eizep} onUser={user} onMesima={mesima} />
         {:else if mode == 3}
           <Levchat />
         {:else if mode == 4}
           <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
         {:else if mode == 5}
-          <Mesima missionId={eizeme} on:project={proj} />
+          <Mesima missionId={eizeme} onProject={proj} />
         {/if}
       </div>
     </DialogContent>
@@ -3722,12 +3722,12 @@
       <Tooltip title={u} ispic="true">
         <Cardsui
           {low}
-          on:hover={hover}
-          on:cards={cardsi}
-          on:user={user}
-          on:proj={proj}
-          on:chat={chat}
-          on:start={coinLapach}
+          onHover={hover}
+          onCards={cardsi}
+          onUser={user}
+          onProj={proj}
+          onChat={chat}
+          onStart={coinLapach}
           bind:indexi
           {arr1}
           {askedarr}
@@ -3750,15 +3750,15 @@
   {:else if cards == false}
     <Tooltip title={u} ispic="true">
       <Coinsui
-        on:hover={hover}
+        onHover={hover}
         {low}
         {milon}
-        on:mesima={mesima}
-        on:user={user}
-        on:proj={proj}
-        on:chat={chat}
-        on:start={coinLapach}
-        on:cards={cardsi}
+        onMesima={mesima}
+        onUser={user}
+        onProj={proj}
+        onChat={chat}
+        onStart={coinLapach}
+        onCards={cardsi}
         {adder}
         {arr1}
         {askedarr}
@@ -3801,9 +3801,9 @@
     {ask}
     {picLink}
     {total}
-    on:cards={cardsYaron}
-    on:showall={showall}
-    on:showonly={showonly}
+    onCards={cardsYaron}
+    onShowall={showall}
+    onShowonly={showonly}
   />
 {/if}
 

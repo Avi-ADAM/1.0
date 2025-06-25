@@ -2115,16 +2115,16 @@ pointer-events: none;"
             {/if}
 
             <!--{#if gan == false}
-<button on:click={()=>gan = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"title={gann[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{gann[$lang]}</p><Scab/></div></button>
+<button onclick={()=>gan = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"title={gann[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{gann[$lang]}</p><Scab/></div></button>
 {/if}
 
 {#if sid == false}
-<button on:click={()=>sid = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"  title={sidd[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{sidd[$lang]}</p><Siduri/></div></button>
+<button onclick={()=>sid = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"  title={sidd[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{sidd[$lang]}</p><Siduri/></div></button>
 {/if}
 {#if bmiData.length > 0 }
 <br> <br>
 {#if bett == false}
-<button on:click={()=>bett = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold" title={bet[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{bet[$lang]}</p><Taskk/></div></button>
+<button onclick={()=>bett = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold" title={bet[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{bet[$lang]}</p><Taskk/></div></button>
 {/if}
 {/if}
 -->

@@ -900,7 +900,7 @@ vots: [${userss},
                             )}
                             noMatchingOptionsMsg={noResources[$lang]}
                             maxSelect={1}
-                            on:change={() => {
+                            onchange={() => {
                               if (
                                 data.selectedResource &&
                                 data.selectedResource.length > 0
@@ -1136,7 +1136,7 @@ vots: [${userss},
         <br>
         <Button 
           text={buttonText.publishResources}
-          on:click={createResources}
+          onClick={createResources}
           {loading}
           {success}
           {error}

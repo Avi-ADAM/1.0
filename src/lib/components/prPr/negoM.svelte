@@ -709,7 +709,7 @@
       alld={skills2}
       bind:dataib={skills3.data}
       lebel={tri?.mission?.requireSkills}
-      on:addnew={addnew}
+      onAddnew={addnew}
       valc="skillName"
       bgi="gold"
     />
@@ -721,7 +721,7 @@
       bind:dataib={tafkidims2.data}
       lebel={tri?.mission?.requiredRoles}
       dataibn={dataibno.roleDescription}
-      on:addnew={addnew}
+      onAddnew={addnew}
       valc="roleDescription"
       bgi="gold"
     />
@@ -733,7 +733,7 @@
       bind:dataib={workways3.data}
       lebel={tri?.mission?.requiredWW}
       dataibn={dataibno.workWayName}
-      on:addnew={addnew}
+      onAddnew={addnew}
       valc="workWayName"
       bgi="gold"
     />
@@ -787,7 +787,7 @@
         <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
   <input
     bind:checked={myM}
-    type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
+    type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> myMission()}>
 </div>
 </div>-->
   </div>
@@ -841,7 +841,7 @@
                                     <td>
                                         <input
                                             bind:checked={myM}
-                                            type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
+                                            type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> myMission()}>
                                         <label for="tome">השמת המשימה לעצמי</label>
                                     </td>
                                 </tr><tr style="display:none" id="doneC" >
@@ -850,7 +850,7 @@
                                     <td>
                                         <input
                                             bind:checked={done}
-                                            type="checkbox" id="done" name="done" value="done" on:click={()=> myMissionH()}>
+                                            type="checkbox" id="done" name="done" value="done" onclick={()=> myMissionH()}>
                                         <label for="done">ביצעתי כבר את המשימה</label>
                                     </td>
                                 </tr><tr style="display:none" id="hoursC">

@@ -612,9 +612,9 @@ onclick={bitulm}
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
 </svg></button>
 {#if ed === false}
-  <Newsp {needr} meData={meDatamm}  on:close={clohh} on:remove={wdwd}/>
+  <Newsp {needr} meData={meDatamm}  onClose={clohh} onRemove={wdwd}/>
 {:else if ed === true}
-  <Edsp  meData={xd}  on:close={clodd} />
+  <Edsp  meData={xd}  onClose={clodd} />
 {/if}
 </div>
 {:else}
@@ -710,7 +710,7 @@ title="{onin[$lang]}">
       {placeholder}
       options={allvn}
       --sms-width={"200px"}
-      on:change={addSK(data.selected2)}
+      onChange={addSK(data.selected2)}
       loading={newcontent}
       />
       {#if datan === "mash" && data?.selected2?.length > 0}
@@ -721,20 +721,20 @@ title="{onin[$lang]}">
        <!--      allowUserOptions={"append"}-->
 
       {#if datan == "skil"}
-<Addnewsk rn={allvn} on:addnewskill={addnew} addS={addS}/>
+<Addnewsk rn={allvn} onAddnewskill={addnew} addS={addS}/>
 {:else if datan == "taf"}
-<Addnewr rn={allvn} on:addnewrole={addnew} addR={addR}/>
+<Addnewr rn={allvn} onAddnewrole={addnew} addR={addR}/>
 
 {:else if datan == "mash"}
 
-<Addnewn rr={13} on:newn={addnewM} addW={addW}/>
+<Addnewn rr={13} onNewn={addnewM} addW={addW}/>
 
 
 {:else if datan == "val"}
-<Addnewv rn={allvn} on:addnew={addnew}/>
+<Addnewv rn={allvn} onAddnew={addnew}/>
 
 {:else if datan == "work"}
-<Addneww rn={allvn} on:addww={addnew}/>
+<Addneww rn={allvn} onAddww={addnew}/>
 
 {/if} </div>
   {#if datan !== "mash" && yy > 0}

@@ -223,7 +223,7 @@ addval == false;
  <div  >
    <MultiSelect
    bind:selected
-   on:change={ch} 
+   onchange={ch} 
    {placeholder}
    options={vallues.map(c => c.attributes.valueName)}
    --sms-li-selected-bg="var(--gold)"
@@ -234,7 +234,7 @@ addval == false;
     onclick={() => addval = true} 
     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
-  {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} on:addnew={addnew} fn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
+  {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} onAddnew={addnew} fn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 ">
    <h2 class=" text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>

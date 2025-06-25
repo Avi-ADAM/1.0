@@ -214,5 +214,5 @@ descrip="  Lorem ipsum dolor sit amet consectetur adipisicing elit. Dicta, labor
    kindOf="total"
  ></Nego>
     </div>
-    <input bind:value={tex} type="text" on:change={()=>console.log(sanitizeUserInput(tex),tex)}>
+    <input bind:value={tex} type="text" onchange={()=>console.log(sanitizeUserInput(tex),tex)}>
 -->

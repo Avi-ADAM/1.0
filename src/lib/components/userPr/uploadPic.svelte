@@ -132,7 +132,7 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 			aspect={aspect}
 			zoom=1
 			crop={{x:0, y:0}}
-			on:cropcomplete={previewCrop}
+			onCropcomplete={previewCrop}
 		/>
 	</div>
 	<div class="prof-pic-wrapper">

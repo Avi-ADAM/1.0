@@ -227,12 +227,12 @@
             {kindUlimit}
             {maid}
             {kindOf}
-            on:doner={closer}
-            on:done={sale}
-            on:eror={() => (a = 3)}
+            onDoner={closer}
+            onDone={sale}
+            onError={() => (a = 3)}
           />
         {:else if a == 1}
-          <New {projectId} on:done={done} />
+          <New {projectId} onDone={done} />
         {:else if a == 2}
           <div class="sp bg-gold">
             <h3 class="text-barbi">{om[$lang]}</h3>

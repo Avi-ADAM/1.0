@@ -1672,7 +1672,7 @@
       <td>
         <input 
         bind:checked={data.done} 
-        type="checkbox" id="done" name="done" value="done" on:click={()=> myMissionH()}>
+        type="checkbox" id="done" name="done" value="done" onclick={()=> myMissionH()}>
         <label for="done">ביצעתי כבר את המשימה</label>
       </td>
       {/each}

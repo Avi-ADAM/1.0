@@ -58,40 +58,40 @@ const gtl = {"he":" להתחברות לאתר","en": "go to login "}
 {#if show_value == 0}
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="midscreen">
 
-<Hello {idx} on:progres={add}/>
+<Hello {idx} onProgres={add}/>
 </div>
 {:else if show_value == 1}
 <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"
  out:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-<Vallues on:progres={add}/>
+<Vallues onProgres={add}/>
 </div>
 {:else if show_value == 2}
 <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-<Skills on:progres={add}/>
+<Skills onProgres={add}/>
 </div>
 {:else if show_value == 3}
 <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 130, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
- <Roles on:progres={add}/>
+ <Roles onProgres={add}/>
 </div>
   {:else if show_value == 4}
   <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-  <Workways on:progres={add}/>
+  <Workways onProgres={add}/>
   </div>
  <!-- {:else if show_value == 5}  
-<VidValDate on:progres={add}/>
+<VidValDate onProgres={add}/>
  {:else if show_value == 5}
     <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Scree on:progres={add}/> 
+   <Scree onProgres={add}/> 
    </div>  -->
   {:else if show_value == 5}
     <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Password on:progres={add}/> 
+   <Password onProgres={add}/> 
    </div>  
   {:else if show_value == 6}
   <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"

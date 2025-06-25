@@ -37,8 +37,8 @@
     {projectId}
     {isLoading}
     timersData={timersData?.data}
-    on:timerClick={handleTimerClick}
-    on:showTaskDetails={handleTaskDetails}
-    on:showActsDetails={handleActsDetails}
+    onTimerClick={handleTimerClick}
+    onShowTaskDetails={handleTaskDetails}
+    onShowActsDetails={handleActsDetails}
   />
   {/key}

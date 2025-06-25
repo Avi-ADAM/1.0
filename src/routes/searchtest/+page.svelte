@@ -39,7 +39,7 @@ import TextInput from "$lib/celim/ui/input/textInput.svelte";
   <form onsubmit={preventDefault(handleSubmit)}>
     <div class="w-[50vw] flex flex-col space-y-2">
     <TextInput  bind:text={searchText} lebel={{"he":"מה הצורך שלך","en":"what you need"}} />
-    <Button {loading} {error} {succses} on:click={handleSubmit}>תציעו לי</Button>
+    <Button {loading} {error} {succses} onClick={handleSubmit}>תציעו לי</Button>
 
     </div>
   </form>

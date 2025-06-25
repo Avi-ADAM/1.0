@@ -476,7 +476,7 @@
         <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
   <input
     bind:checked={myM}
-    type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
+    type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> myMission()}>
 </div>
 </div>-->
   </div>

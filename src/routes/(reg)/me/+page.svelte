@@ -786,11 +786,11 @@ const clearButton = {
   {innerText} 
   {innerDialogButton}
   {clearButton}
-  on:save-timer={() => {
+  onSave-timer={() => {
     showSaveDialog = false;
     run();
   }}
-  on:clear-timer={() => {
+  onClear-timer={() => {
     showSaveDialog = false;
     isG = true; // Mark as viewed without showing
   }}
@@ -802,7 +802,7 @@ const clearButton = {
              <button style="margin: 0 auto;" class=" hover:bg-barbi text-mturk rounded-full p-2"
           onclick={closer}><Close/></button>
           {#if a == 0}
-            <Addnewp on:message={callbackFunction} />
+            <Addnewp onMessage={callbackFunction} />
           {:else if a == 1}
             <EditB
               machshirs={meData?.machshirs.data}
@@ -819,8 +819,8 @@ const clearButton = {
               {mail}
               un={meData.username}
               bi={meData.bio}
-              on:message={callbackFunctio}
-              on:guid={guid}
+              onMessage={callbackFunctio}
+              onGuid={guid}
             />
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
@@ -868,32 +868,32 @@ const clearButton = {
   {#key addSl}
   <div class="d {current === 'a1' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a1"}">
           <TourItem message={message2[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={meData.skills.data} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
+    <Edit {width}  onAddnew={addnew} onClose={close} onRemove={remove} onOpen={open}   onAdd={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={meData.skills.data} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
         </TourItem>
  </div>
   <div  class="d {current === 'a2' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a2"}">
           <TourItem message={message3[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={meData.tafkidims.data} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
+    <Edit {width}  onAddnew={addnew} onClose={close} onRemove={remove} onOpen={open}  onAdd={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={meData.tafkidims.data} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
   <div class="d {current === 'a3' && mass !== true ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : ""}" 
             class:a3={current !== 'a3'}
        class:whole="{mass === true}">
-    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={meData.sps.data} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
+    <Edit {width} onDelm={delm} onMassss={massss}  onAddnew={addnew} onClose={close} onRemove={remove} onOpen={open}  onAdd={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={meData.sps.data} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
 </div>
           </TourItem>
 
         <div  class="d {current === 'a4' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a4"}"
          >
                 <TourItem message={message5[$lang]}>
-      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={meData.vallues.data} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
+      <Edit {width}  onAddnew={addnew}  onClose={close} onRemove={remove} onOpen={open}   onAdd={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={meData.vallues.data} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
         <div 
         class="d {current === 'a5' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a5"}">
-          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={meData.work_ways.data} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
+          <Edit {width}  onAddnew={addnew}  onClose={close} onRemove={remove} onOpen={open}    onAdd={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={meData.work_ways.data} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
         </div>
                             </TourItem>
 

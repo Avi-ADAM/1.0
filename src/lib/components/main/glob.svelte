@@ -14,11 +14,11 @@
 let { onSubmit } = $props();
 
   let rotationt = $state(0)
-		let rotX = 0
-  let poz = {z:0, y:0, x:0};
-  let obPoz = {z:0, y:0, x:0}
- let boll = false
- let bool = false
+		let rotX = $state(0)
+  let poz = $state({z:0, y:0, x:0});
+  let obPoz = $state({z:0, y:0, x:0})
+ let boll = $state(false)
+ let bool = $state(false)
  useTask(() => {
 
   if(isHovering == false){
@@ -113,19 +113,19 @@ color={0x2DFF34} intensity={180} $poz
 <GLTF
 castShadow receiveShadow
 interactive
-on:pointerenter={() => (isHovering = true)}
-on:pointerleave={() => {
+onpointerenter={() => (isHovering = true)}
+onpointerleave={() => {
   isPointerDown = false
   isHovering = false
 
 }}
-on:pointerdown={() => (isPointerDown = true)}
-on:pointerup={() => (isPointerDown = false)}
-on:pointercancel={() => {
+onpointerdown={() => (isPointerDown = true)}
+onpointerup={() => (isPointerDown = false)}
+onpointercancel={() => {
   isPointerDown = false
   isHovering = false
 }}
-on:click={sub}
+onclick={sub}
 rotation={{y: rotationt
 }}
 	position={obPoz}

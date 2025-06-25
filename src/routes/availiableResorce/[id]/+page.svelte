@@ -520,7 +520,7 @@
 
                     <RangeSlider 
                     float={true}
-                    on:stop={(e) => { console.log(e) }}
+                    onstop={(e) => { console.log(e) }}
                     bind:values={easyy} min=0 max={Number(data.alld.easy) ?? Number(data.alld.price)}  />
                     </div>
                     <!----<input type="range" min=0 max={data.alld.easy} bind:value={easyy}/>-->
