@@ -1,17 +1,30 @@
-
 <script>
-  
+  import { lang } from '$lib/stores/lang.js';
 
-  
   /**
    * @typedef {Object} Props
-   * @property {any} [evt] - evt - A svelte event with event information under `evt.detail.e`.
+   * @property {any} [evt] - evt - A svelte event with event information under `evt.e`.
    * @property {any} [offset] - [offset=-35] - A y-offset from the hover point, in pixels.
    * @property {import('svelte').Snippet<[any]>} [children]
    */
 
   /** @type {Props} */
   let { evt = {}, offset = -35, children } = $props();
+
+  const translations = {
+    name: {
+      en: 'Name',
+      he: 'שם'
+    },
+    iso3: {
+      en: 'ISO3',
+      he: 'ISO3'
+    },
+    agrees: {
+      en: 'Agreements',
+      he: 'הסכמות'
+    }
+  };
 </script>
 
 <style>
@@ -27,14 +40,14 @@
   }
 </style>
 
-{#if evt.detail}
+{#if evt?}
   <div
     class="tooltip"
     style="
-      top:{evt.detail.e.layerY + offset}px;
-      left:{evt.detail.e.layerX}px;
+      top:{evt??.e?.layerY + offset}px;
+      left:{evt??.e?.layerX}px;
     "
   >
-    {@render children?.({ detail: evt.detail, })}
+    {@render children?.({ detail: evt?, translations })}
   </div>
 {/if}

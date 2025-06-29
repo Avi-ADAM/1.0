@@ -1,4 +1,3 @@
- 
 <script>
   import { RingLoader
 } from 'svelte-loading-spinners';
@@ -18,6 +17,7 @@
  
   // This example loads json data as json using @rollup/plugin-json
   import world from '../../lib/components/main/countries110m.json';
+  import { onMount } from 'svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [data]
@@ -38,10 +38,12 @@
   const mapJoinKey = 'name';
   const dataLookup = new Map();
   let noof = $state(0);
-  
-    $effect(() => {
+  let isok = $state(false);
+    onMount(() => {
     data.streamed.data.then(function(data) {
+      isok = true
         noof = data.total
+        console.log(noof , "tesr")
         data.forEach(d => {
       dataLookup.set(d[dataJoinKey], d);
           }
@@ -54,7 +56,7 @@
   const projection = geoMercator;
 
   
-  let evt = $state();
+  let evt = $state({detail:{}});
   let hideTooltip = $state(true);
       const onm = {"he":"רק רגע בבקשה","en":"one moment please","ar":"دقيقة واحدة فقط من فضلك"}
   // Create a flat array of objects that LayerCake can use to measure
@@ -65,7 +67,7 @@
   'rgb(209, 146, 255)',
 					"#EEE8AA"];
      $effect(() => {
-    console.log(data.streamed.data)
+    console.log("test",data.streamed.data)
   });
   const addCommas = format(',');
   const title = {"he":" סך הכל הסכימו","en":"Total agreements","ar":" مجموع الموافقات المستلمة"}
@@ -101,11 +103,12 @@
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> 
-{:then}
+{:then value}
 <div class="ww">
-    <h1 style="font-size:20px;" class="text-barbi text-center">{title[$lang]} - {noof}
+<h1 style="font-size:20px;" class="text-barbi text-center">{title[$lang]} - {noof}
     </h1>
-    <div class="wwa">
+    {#if value.length > 0 && isok}
+<div class="wwa">
 <div class="chart-container">
   <LayerCake
     data={geojson}
@@ -118,8 +121,15 @@
     <Svg>
       <MapSvg
         {projection}
-        onmousemove={event => evt = hideTooltip = event}
         onmouseout={() => hideTooltip = true}
+        onFeatureMousemove={({ e, props }) => {
+          console.log('mousemove in love/+page.svelte', { e, props });
+          evt = { detail: { e, props } };
+          hideTooltip = false;
+        }}
+        onmouseleave={() => {
+          hideTooltip = true;
+        }}
       />
     </Svg>
 
@@ -131,16 +141,20 @@
           {evt}
           
         >
-          {#snippet children({ detail })}
+          {#snippet children({ detail, translations })}
                                 {@const tooltipData = { ...detail.props, ...dataLookup.get(detail.props[mapJoinKey]) }}
             {#each Object.entries(tooltipData) as [key, value]}
               {@const keyCapitalized = key.replace(/^\w/, d => d.toUpperCase())}
-              <div class="row"><span>{keyCapitalized}:</span> {typeof value === 'number' ? addCommas(value) : value}</div>
+              {@const translatedKey = translations[key]?.[$lang] || keyCapitalized}
+              <div class="row" dir={$lang === 'he' ? 'rtl' : 'ltr'}><span>{translatedKey}:</span> {typeof value === 'number' ? addCommas(value) : value}</div>
             {/each}
                                         {/snippet}
                             </Tooltip>
       {/if}
     </Html>
   </LayerCake>
-</div></div></div>
+</div>
+</div>
+{/if}
+</div>
 {/await}

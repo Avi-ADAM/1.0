@@ -128,8 +128,8 @@ let isOpen = $state(false);
     isOpen = false;
   };
    function addnew (event){ 
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.skillName;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.skillName;
     isOpen = false;
     const newValues = skills2 ;
     newValues.push(newOb);   
@@ -154,7 +154,7 @@ selected = newSele;
   <DialogContent class="content"  aria-label="form">
       <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
              
-      <Addnewskill rn={skills2.map(c => c.attributes.skillName)} addS={true} on:b={close} on:addnewskill={addnew}/>
+      <Addnewskill rn={skills2.map(c => c.attributes.skillName)} addS={true} onB={close} onAddnewskill={addnew}/>
   </DialogContent>
   </div>
 </DialogOverlay>
@@ -167,8 +167,8 @@ selected = newSele;
   </h1>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
   <MultiSelect
-        on:focus={()=>focused=true}
-      on:blur={()=>focused=false}
+        onfocus={()=>focused=true}
+      onblur={()=>focused=false}
         loading={newcontent}
   bind:selected
   noMatchingOptionsMsg={nom[$lang]}

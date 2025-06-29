@@ -39,7 +39,7 @@ let w = $state(1);
 let vb = 3322.126 + w;
 const txx = spring(600+(w*20),{stiffness: 0.55,damping: 0.99});
 function add (event){
-  txx.set(event.detail.tx+(w*event.detail.txx));
+  txx.set(event.tx+(w*event.txx));
   console.log(txx)
 }
 let title = {"he": "הרשמה ל-1💗1", "en": "1💗1 registration"};

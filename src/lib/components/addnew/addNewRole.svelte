@@ -163,7 +163,7 @@ skillslist = find_skill_id(selected);
    * @property {any} [mid]
    * @property {any} [skills2]
    * @property {boolean} [addR]
-   * @property {(detail: { id: any, mid: any, skob: any }) => void} [onAddnewrole] - Callback for when a new role is added.
+   * @property {( id: any, mid: any, skob: any ) => void} [onAddnewrole] - Callback for when a new role is added.
    * @property {() => void} [onB] - Callback for the 'b' event (cencel).
    */
 
@@ -190,8 +190,8 @@ const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף
 let addsk = $state(false);
 let newsk;
 function finnish (event) {
-   const newOb = event.detail.skob;
-   const newN = event.detail.name;
+   const newOb = event.skob;
+   const newN = event.name;
     const newValues = skillslist;
         newValues.push(newOb);
 
@@ -274,7 +274,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
-      <Addnewskil {color} rn={skills2.map(c => c.attributes.skillName)} on:finnish={finnish}/>{/if}</div>
+      <Addnewskil {color} rn={skills2.map(c => c.attributes.skillName)} onFinnish={finnish}/>{/if}</div>
   
     {/if}
    

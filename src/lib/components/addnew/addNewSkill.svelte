@@ -158,8 +158,8 @@ const btnTitles = {"he": "הוספה", "en": "Add"}
 const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
 let newrole;
 function finnish (event) {
-  const newOb = event.detail.skob;
-   const newN = event.detail.name;
+  const newOb = event.skob;
+   const newN = event.name;
     const newValues = tafkidimslist;
         newValues.push(newOb);
 
@@ -170,7 +170,7 @@ function finnish (event) {
 
     selected = newSele;
 
-  addro = event.detail.addro;
+  addro = event.addro;
 }
 function dispatchb () {
    addS = false

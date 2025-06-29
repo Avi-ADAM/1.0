@@ -59,8 +59,8 @@
   };
   let hal = $state(false);
   const sale = (event) => {
-    const id = event.detail.id;
-    const un = event.detail.un;
+    const id = event.id;
+    const un = event.un;
     let oldob = bmiData;
     const x = oldob.map((c) => c.id);
     const indexy = x.indexOf(id);
@@ -72,7 +72,7 @@
   function done(event) {
     isOpen = false;
     a = 0;
-    bmiData.push(event.detail.matana);
+    bmiData.push(event.matana);
     bmiData = bmiData;
   }
   function ask() {

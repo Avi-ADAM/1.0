@@ -514,30 +514,30 @@
   let blabla = $state([]);
   let load = $state(false);
   async function callbackFunction(event) {
-    if (event.detail.type == 'add') {
+    if (event.type == 'add') {
       cow.scrollIntoView(true);
       load = true;
-      const lim = event.detail.li;
+      const lim = event.li;
       if (lim.length > 0 || lim > 0) {
         //showvd = false;
         if ($mi.length == 0) {
           addM = false;
-          li = event.detail.li;
+          li = event.li;
           await findiM().then();
           load = false;
           showvd = true;
-          blabla = event.detail.bla;
+          blabla = event.bla;
           addM = true;
           cow.scrollIntoView(true);
         } else {
           addM = false;
           let alrIds = $mi.map((c) => c.id);
-          let chooseIds = event.detail.li;
+          let chooseIds = event.li;
           li = chooseIds.filter((el) => !alrIds.includes(el));
           await findiM().then();
           load = false;
           showvd = true;
-          blabla = event.detail.bla;
+          blabla = event.bla;
           addM = true;
           cow.scrollIntoView(true);
         }
@@ -663,9 +663,9 @@
   }
 
   async function removeF(event) {
-    let miDatanew = event.detail.data;
+    let miDatanew = event.data;
     const y = miDatanew.map((c) => c.id);
-    const id = event.detail.id;
+    const id = event.id;
     const index = y.indexOf(id);
     if (index > -1) {
       miDatanew.splice(index, 1);
@@ -826,7 +826,7 @@
   }
   function allbackFunction(event) {
     a = 2;
-    files = event.detail.files;
+    files = event.files;
     sendP();
   }
   let url1 = baseUrl + '/api/upload';
@@ -943,7 +943,7 @@
     en: 'vote on new Logo has created successfully'
   };
   async function updete(event) {
-    console.log(event.detail.valit);
+    console.log(event.valit);
     a = 2;
     let counter = false;
     let projectnamei = ``;
@@ -958,70 +958,70 @@
     let drivelinkii = ``;
     let twiterlinkii = ``;
     let watsapplinkii = ``;
-    if (event.detail.projectName_value != projectname) {
-      projectnamei = `projectName: "${event.detail.projectName_value}",`;
+    if (event.projectName_value != projectname) {
+      projectnamei = `projectName: "${event.projectName_value}",`;
       counter = true;
     }
-    if (event.detail.desP != desP && event.detail.desP != null) {
-      despi = `publicDescription: "${event.detail.desP}",`;
+    if (event.desP != desP && event.desP != null) {
+      despi = `publicDescription: "${event.desP}",`;
       counter = true;
     }
-    if (event.detail.linkP != linkP && event.detail.linkP != null) {
-      linkPii = `linkToWebsite: "${event.detail.linkP}",`;
+    if (event.linkP != linkP && event.linkP != null) {
+      linkPii = `linkToWebsite: "${event.linkP}",`;
       counter = true;
     }
-    if (event.detail.desPl != descripFor && event.detail.desPl != null) {
-      desPlii = `descripFor: "${event.detail.desPl}",`;
+    if (event.desPl != descripFor && event.desPl != null) {
+      desPlii = `descripFor: "${event.desPl}",`;
       counter = true;
     }
-    const x = event.detail.valit.sort(function (a, b) {
+    const x = event.valit.sort(function (a, b) {
       return a - b;
     });
     const y = alit.sort(function (a, b) {
       return a - b;
     });
     if (!isEqual(x, y)) {
-      valluesii = `vallues: [${event.detail.valit}],`;
+      valluesii = `vallues: [${event.valit}],`;
       counter = true;
     } //array
-    if (event.detail.restime != restime && event.detail.restime != null) {
-      restimeii = `restime: ${event.detail.restime},`;
+    if (event.restime != restime && event.restime != null) {
+      restimeii = `restime: ${event.restime},`;
       counter = true;
     }
     if (
-      event.detail.githublink != githublink &&
-      event.detail.githublink != null
+      event.githublink != githublink &&
+      event.githublink != null
     ) {
-      githublinkii = `githublink: "${event.detail.githublink}",`;
+      githublinkii = `githublink: "${event.githublink}",`;
       counter = true;
     }
-    if (event.detail.fblink != fblink && event.detail.fblink != null) {
-      fblinkii = `fblink: "${event.detail.fblink}",`;
+    if (event.fblink != fblink && event.fblink != null) {
+      fblinkii = `fblink: "${event.fblink}",`;
       counter = true;
     }
     if (
-      event.detail.discordlink != discordlink &&
-      event.detail.discordlink != null
+      event.discordlink != discordlink &&
+      event.discordlink != null
     ) {
-      discordlinkii = `discordlink: "${event.detail.discordlink}",`;
+      discordlinkii = `discordlink: "${event.discordlink}",`;
       counter = true;
     }
-    if (event.detail.drivelink != drivelink && event.detail.drivelink != null) {
-      drivelinkii = `drivelink: "${event.detail.drivelink}",`;
-      counter = true;
-    }
-    if (
-      event.detail.twiterlink != projectname &&
-      event.detail.twiterlink != null
-    ) {
-      twiterlinkii = `twiterlink: "${event.detail.twiterlink}",`;
+    if (event.drivelink != drivelink && event.drivelink != null) {
+      drivelinkii = `drivelink: "${event.drivelink}",`;
       counter = true;
     }
     if (
-      event.detail.watsapplink != watsapplink &&
-      event.detail.watsapplink != null
+      event.twiterlink != projectname &&
+      event.twiterlink != null
     ) {
-      watsapplinkii = `watsapplink: "${event.detail.watsapplink}",`;
+      twiterlinkii = `twiterlink: "${event.twiterlink}",`;
+      counter = true;
+    }
+    if (
+      event.watsapplink != watsapplink &&
+      event.watsapplink != null
+    ) {
+      watsapplinkii = `watsapplink: "${event.watsapplink}",`;
       counter = true;
     }
     const cookieValue = document.cookie
@@ -1118,7 +1118,7 @@
   let needr = $state([]);
   let loadr = $state(false);
   async function needad(event) {
-    const x = event.detail.x;
+    const x = event.x;
     if (x.length > 0 || x > 0) {
       dow.scrollIntoView(true);
       loadr = true;
@@ -1131,8 +1131,8 @@
     }
   }
   async function needadm(event) {
-    const x = event.detail.x;
-    const y = event.detail.scob;
+    const x = event.x;
+    const y = event.scob;
     if (x.length > 0 || x > 0) {
       dow.scrollIntoView(true);
       loadr = true;
@@ -1149,9 +1149,9 @@
   }
 
   async function wdwd(event) {
-    const miDatanew = event.detail.data;
+    const miDatanew = event.data;
     const y = miDatanew.map((c) => c.id);
-    const id = event.detail.id;
+    const id = event.id;
     const index = y.indexOf(id);
     if (index > -1) {
       miDatanew.splice(index, 1);
@@ -1181,11 +1181,11 @@
   }
 
   function titlel(event) {
-    ti = event.detail.ti;
+    ti = event.ti;
   }
   let who = $state();
   function openTheDesc(event) {
-    const id = event.detail.id;
+    const id = event.id;
     const is = id[0].model.classes;
     who = Math.floor(id[0].model.id);
     console.log(id[0].model.classes, Math.floor(id[0].model.id));
@@ -1204,8 +1204,8 @@
     }
   }
   function openDescrip(event) {
-    const id = event.detail.id;
-    const is = event.detail.kind;
+    const id = event.id;
+    const is = event.kind;
     who = id
     if (is == 'pendm') {
       isOpen = true;
@@ -1374,7 +1374,7 @@
 
 
   async function afreact(e) {
-    const m = e.detail.why
+    const m = e.why
     console.log(m)
     let da = new Date
     if(isNew == true){
@@ -1448,23 +1448,23 @@ async function createMes(id,mes){
      }
   }
   function openChat(e) {
-     isNew = e.detail.isNew;
+     isNew = e.isNew;
      console.log(e)
     if (isNew == false) {
-      $nowChatId = e.detail.id
+      $nowChatId = e.id
       $isChatOpen = true
       /*
-       initialForum(false,[e.detail.id],idL)
-      chatId = e.detail.id;
-      smalldes = e.detail.smalldes;
-      nameChatPartner = e.detail.nameChatPartner[$lang];*/
+       initialForum(false,[e.id],idL)
+      chatId = e.id;
+      smalldes = e.smalldes;
+      nameChatPartner = e.nameChatPartner[$lang];*/
       //TODO: meanwhile show loading on chat
     } else {
       $newChat = {
           started:true,
           created: false,
           id: 0,
-          md: { mbId:e.detail.id, pid:$idPr}
+          md: { mbId:e.id, pid:$idPr}
             }
       let tempF = $forum
       tempF[-1] = {
@@ -1472,10 +1472,10 @@ async function createMes(id,mes){
         messages:[],
         md:{
           pid:$idPr,
-          mbId:e.detail.id,
+          mbId:e.id,
           projectName:projectname,
           projectPic:srcP,
-          mesimaName:e.detail.smalldes
+          mesimaName:e.smalldes
         }
       };
       forum.set(tempF)
@@ -1483,9 +1483,9 @@ async function createMes(id,mes){
       $isChatOpen = true
       subs()
       console.log($nowChatId)
-      /*newID = e.detail.id
-      smalldes = e.detail.smalldes;
-      nameChatPartner = e.detail.nameChatPartner[$lang];
+      /*newID = e.id
+      smalldes = e.smalldes;
+      nameChatPartner = e.nameChatPartner[$lang];
       clicked = false;
     ani = 'forum';
     a = 8;
@@ -1540,7 +1540,7 @@ async function createMes(id,mes){
   
 const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"}
 function add(event){
-  console.log(event.detail)
+  console.log(event)
 }
 </script>
 

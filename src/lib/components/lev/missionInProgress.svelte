@@ -654,10 +654,10 @@ function hover (id){
 }
 
   function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
    u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
     onHover?.({id: u});
 }
@@ -744,8 +744,8 @@ function hover (id){
     onModal
   } = $props();
 function claf (event){
-  let o = event.detail.alr
-  let d = event.detail.y
+  let o = event.alr
+  let d = event.y
   console.log(o,d)
 }
  async function stat (){

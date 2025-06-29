@@ -17,7 +17,7 @@
      * @property {any} [rn]
      * @property {boolean} [addW]
      * @property {string} [color]
-     * @property {(detail: { id: any, mid: any, skob: any, name: string }) => void} [onAddww] - Callback function when a new workway is added.
+     * @property {(id: any, mid: any, skob: any, name: string ) => void} [onAddww] - Callback function when a new workway is added.
      * @property {() => void} [onB] - Callback function when the operation is cancelled.
      */
 

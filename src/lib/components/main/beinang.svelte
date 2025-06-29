@@ -40,8 +40,8 @@ let vb = 3322.126 + w;
 let tx = $state(600);
 let txx = $state(20);
 function add (event){
-  tx = event.detail.tx;
-  txx = event.detail.txx;
+  tx = event.tx;
+  txx = event.txx;
 }
 </script>
 <svelte:head>

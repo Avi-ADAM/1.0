@@ -355,10 +355,10 @@ function project () {
             workways = workways;
 })
 function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
      u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
   } else {
-    u = event.detail.x
+    u = event.x
   }
     onHover?.({ id: u[$lang] });
 }
@@ -368,8 +368,8 @@ function hoverc (event){
   import { RingLoader } from 'svelte-loading-spinners';
   import { sendApi } from '$lib/send/sendApi.svelte';
 function claf (event){
-  let o = event.detail.alr
-  let d = event.detail.y
+  let o = event.alr
+  let d = event.y
   console.log(o,d)
   if (d == "a"){
     agree(oid)
@@ -397,7 +397,7 @@ let clicked = $state(false)
 let miDatan = []
  async function afreact (event){
  
-  let why = event.detail.why
+  let why = event.why
   console.log(why)
   let d = new Date()
          //  loading = true;

@@ -631,18 +631,18 @@
   }
 
   async function addW(id, mid, e) {
-    if (e.detail) if (e.detail.type === 'add') console.log(id);
+    if (e) if (e.type === 'add') console.log(id);
     newnew(id);
   }
   let tt = [];
 
   function addnew(event) {
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.skillName;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.skillName;
     const newValues = skills2;
     newValues.push(newOb);
     skills2 = newValues;
-    const mid = event.detail.mid;
+    const mid = event.mid;
     const y = miData.map((c) => c.id);
     const index = y.indexOf(mid);
     const newSele = miData[index].selectedSkills;
@@ -652,12 +652,12 @@
   }
 
   function addnewrole(event) {
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.roleDescription;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.roleDescription;
     const newValues = roles;
     newValues.push(newOb);
     roles = newValues;
-    const mid = event.detail.mid;
+    const mid = event.mid;
     const y = miData.map((c) => c.id);
     const index = y.indexOf(mid);
     const newSele = miData[index].selectedRoles;
@@ -1207,9 +1207,9 @@
           fromMis={true}
           {editdata}
           onAdd={(e) => {
-            const data = e.detail.data;
-            const id = e.detail.id;
-            const isEdit = e.detail.isEdit;
+            const data = e.data;
+            const id = e.id;
+            const isEdit = e.isEdit;
             console.log(isEdit);
             if (!miData[0].checklist) {
               miData[0].checklist = [];

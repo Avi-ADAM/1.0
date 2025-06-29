@@ -119,8 +119,8 @@ let suc = false;
  
   function addnew (event){
     
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.valueName;
+    const newOb = event.skob;
+    const newN = event.skob.valueName;
     const newValues = vallues;
     newValues.push(newOb);
        

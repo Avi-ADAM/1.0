@@ -137,8 +137,8 @@ let isOpen = $state(false);
 
    function addnew (event){
     
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.roleDescription;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.roleDescription;
     isOpen = false;
     const newValues = roles1 ;
     newValues.push(newOb);
@@ -164,8 +164,8 @@ selected = newSele;
   <DialogContent class="content"  aria-label="form">
       <div class="a"dir="{$lang == "en" ? "ltr" : "rtl"}" >
            
-              <Addnewrole rn={roles1.map(c => c.attributes.roleDescription)} on:b={close} 
-                addR={true} on:addnewrole={addnew}/>
+              <Addnewrole rn={roles1.map(c => c.attributes.roleDescription)} onB={close} 
+                addR={true} onAddnewrole={addnew}/>
   </DialogContent>
   </div>
 </DialogOverlay>
@@ -180,8 +180,8 @@ selected = newSele;
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
-           on:focus={()=>focused=true}
-      on:blur={()=>focused=false}
+           onfocus={()=>focused=true}
+      onblur={()=>focused=false}
        --sms-max-width={"60vw"}
           noMatchingOptionsMsg={nom[$lang]}
            loading={newcontent}
@@ -190,7 +190,7 @@ selected = newSele;
      options={roles1.map(c => c.attributes.roleDescription)}
      /></div>
     <!-- 
-           on:change={(e) => alert(`You ${e.detail.type}ed '${e.detail.token}'`)}
+           on:change={(e) => alert(`You ${e.type}ed '${e.token}'`)}
 -->
       <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
       <button

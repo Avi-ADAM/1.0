@@ -237,7 +237,7 @@ let suc = $state(false);
   };
   	function callbackFunction(event) {
     a = 2;
-    files = event.detail.files;
+    files = event.files;
     isOpen = false;
     suc = true;
 	}

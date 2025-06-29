@@ -211,8 +211,8 @@ let searchText = $state(``);
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
-           on:focus={()=>focused=true}
-      on:blur={()=>focused=false}
+           onfocus={()=>focused=true}
+      onblur={()=>focused=false}
      createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
      loading={newcontent}

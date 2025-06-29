@@ -353,7 +353,7 @@ id: ${pendId}
     isOpen = true;
   }
   async function afreact(event) {
-    why = event.detail.why;
+    why = event.why;
     const diunim = objToString(chat);
 
     const cookieValue = document.cookie
@@ -479,10 +479,10 @@ id: ${pendId}
   }
   function hoverc(event) {
     let t;
-    if (event.detail.x == '0') {
+    if (event.x == '0') {
       t = u[$lang];
     } else {
-      t = event.detail.x;
+      t = event.x;
     }
     onHover?.({ id: t });
   }
@@ -557,8 +557,8 @@ id: ${pendId}
     onModal
   } = $props();
   function claf(event) {
-    let o = event.detail.alr;
-    let d = event.detail.y;
+    let o = event.alr;
+    let d = event.y;
     console.log(o, d);
   }
   let apru = {

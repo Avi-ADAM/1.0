@@ -525,18 +525,18 @@ function hoverede(){
   onHover?.({id: u});
 }
   function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
    u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
     onHover?.({id: u});
 }
    import Cards from './cards/haluka.svelte'
  
 function claf (event){
-  let o = event.detail.alr
-  let d = event.detail.y
+  let o = event.alr
+  let d = event.y
   console.log(o,d)
 }
 </script>

@@ -51,7 +51,7 @@
 
   // הוסף פונקציה לטיפול באירוע swiper
   function handleSwiper(e) {
-    const [swiper] = e.detail;
+    const [swiper] = e;
     swiperInstance = swiper;
     setSwiperRef(e);
     swiper.on('slideChange', () => {
@@ -94,15 +94,15 @@ $effect(() => {
 })
   async function delo (event){
     console.log("slideIndex")
-  slideIndex = event.detail.coinlapach 
+  slideIndex = event.coinlapach 
 
  // swiperRef.removeSlide(slideIndex)
   //  	
 
-   onStart?.({cards: false,ani:event.detail.ani,coinlapach:event.detail.coinlapach}) // Svelte 5: Replaced dispatch with callback prop
+   onStart?.({cards: false,ani:event.ani,coinlapach:event.coinlapach}) // Svelte 5: Replaced dispatch with callback prop
 // let oldob = arr1;
 // const x = oldob.map(c => c.coinlapach);
-// const indexy = x.indexOf(event.detail.coinlapach);
+// const indexy = x.indexOf(event.coinlapach);
 // oldob.splice(indexy, 1); 
 // arr1 = oldob 
  
@@ -111,18 +111,18 @@ $effect(() => {
 // arr1 = [...arr1] 
 }
 function user (event) {
- onUser?.({id: event.detail.id}) // Svelte 5: Replaced dispatch with callback prop
+ onUser?.({id: event.id}) // Svelte 5: Replaced dispatch with callback prop
 }
 
 function hover (event) {
     
- onHover?.({id: event.detail.id}) // Svelte 5: Replaced dispatch with callback prop
+ onHover?.({id: event.id}) // Svelte 5: Replaced dispatch with callback prop
 }
 function chat(){}
 
 function proj (event){
-  console.log(event.detail.id)
-     onProj?.({id: event.detail.id}) // Svelte 5: Replaced dispatch with callback prop
+  console.log(event.id)
+     onProj?.({id: event.id}) // Svelte 5: Replaced dispatch with callback prop
 }
 let hovered = false
 const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
@@ -151,15 +151,15 @@ const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין
 $effect(() => { console.log('AAAAAA',$page.data.isDesktop,$page.data) })
 //exclude meData huca 
 function showonly(event) {
-  if (event.detail.kind !== "projects") {
-    const value = event.detail.data;
+  if (event.kind !== "projects") {
+    const value = event.data;
     for (const key in milon) {
         milon[key] = false
     }
 
     milon[value] = true;
   }else{
-    const id = event.detail.id;
+    const id = event.id;
     console.log(id,"FILTER+id")
     filterByProjectId(id);
   }

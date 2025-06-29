@@ -334,7 +334,7 @@ function decline(alr) {
 }
 async function afterwhy (event){
   if (event){
-  why = event.detail.why
+  why = event.why
   whyy = `why: "${why}"`
   }
   loading = true;
@@ -417,7 +417,7 @@ async function afreact (event){
  const diu =  objToString(diun)
  diunim = `${diu}`
   }
-   why = event.detail.why
+   why = event.why
   console.log(why)
   let d = new Date()
          //  loading = true;
@@ -550,10 +550,10 @@ function hoverede(){
 }
 
 function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
  u = "הצבעה על פרסום הצעת משימה לריקמה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
     onHover?.({id: u});
 }
@@ -667,8 +667,8 @@ function hoverc (event){
     onModal
   } = $props();
 function claf (event){
-  let o = event.detail.alr
-  let d = event.detail.y
+  let o = event.alr
+  let d = event.y
   if (d=="a"){
     agree(o)
   } else if (d=="d"){

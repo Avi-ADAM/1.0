@@ -60,8 +60,8 @@
   } = $props();
 
 function addnew(event) {
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes[valc];
+    const newOb = event.skob;
+    const newN = event.skob.attributes[valc];
     // Svelte 5: Replaced dispatch with callback prop
     onAddnew?.({newOb,newN,valc,dataibn});
 }

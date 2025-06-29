@@ -10,7 +10,7 @@ import { onMount } from 'svelte';
 //import ChoosRole from './choosRole.svelte';
 /**
  * @param {Object} props - Component properties
- * @param {(detail: { id: any, name: any }) => void} [props.onNew] - Callback for when a new mission is created.
+ * @param {( { id: any, name: any }) => void} [props.onNew] - Callback for when a new mission is created.
  */
 let { missionNewId = $bindable(), skills2 = $bindable([]), roles = $bindable([]), onNew } = $props();
 let error1 = null
@@ -158,8 +158,8 @@ tafkidimslist= find_role_id(selectedrole)
     };
     
 function addnew (event){ 
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.skillName;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.skillName;
     const newValues = skills2 ;
     newValues.push(newOb);   
     skills2 = newValues;
@@ -170,8 +170,8 @@ selected = newSele;
         const nom = {"he":"חסר ברשימה, ניתן להוסיפו עם הכפתור \"הוספת כישור חדש\" למטה","en": "Missing, you can use the \"Add new Skill\" button bellow to add it"}
  function addnewrole (event){
     console.log("ezra")
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.roleDescription;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.roleDescription;
     const newValues = roles ;
     newValues.push(newOb);
        

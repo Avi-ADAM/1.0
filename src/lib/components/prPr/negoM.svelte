@@ -422,10 +422,10 @@
   let linkg = import.meta.env.VITE_URL + '/graphql';
   let dataibno = $state({ skillName: [], roleDescription: [], workWayName: [] });
   function addnew(event) {
-    const newOb = event.detail.skob;
-    const valc = event.detail.valc;
-    const dataibn = event.detail.dataibn;
-    const newN = event.detail.skob.attributes[valc];
+    const newOb = event.skob;
+    const valc = event.valc;
+    const dataibn = event.dataibn;
+    const newN = event.skob.attributes[valc];
     dataibno[valc] = dataibn;
     const newValues =
       valc == 'skillName'

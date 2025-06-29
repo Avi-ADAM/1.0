@@ -12,19 +12,19 @@
     
     function handleTimerClick(event) {
       // טיפול בלחיצה על טיימר בלוח
-      console.log('נלחץ טיימר:', event.detail);
+      console.log('נלחץ טיימר:', event);
     }
     
     function handleTaskDetails(event) {
-              console.log('נלחץ nahnv:', event.detail);
-              onMission?.({id:event.detail.mesimabetahalich.id,kind:'betha'})
+              console.log('נלחץ nahnv:', event);
+              onMission?.({id:event.mesimabetahalich.id,kind:'betha'})
       // ניווט לפרטי משימה
-      //goto(`/tasks/${event.detail.mesimabetahalich.id}`);
+      //goto(`/tasks/${event.mesimabetahalich.id}`);
     }
     
     function handleActsDetails(event) {
       // ניווט לפרטי מטלות
-      console.log('פרטי מטלות:', event.detail.acts);
+      console.log('פרטי מטלות:', event.acts);
       onTasks?.()
     }
     

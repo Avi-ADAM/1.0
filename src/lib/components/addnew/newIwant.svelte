@@ -211,7 +211,7 @@
   let psrc = $state()
   function callbackFunction(event) {
     a = 2;
-    files = event.detail.files;
+    files = event.files;
     let xst
      for (const value of files.values()) {
     console.log(value);

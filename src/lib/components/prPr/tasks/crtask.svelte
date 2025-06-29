@@ -357,7 +357,7 @@
     <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>
   {/if}
   <hr class="h-2" />
-  <Button on:click={sub} {loading} {success} text={sedes} {error} />
+  <Button onClick={sub} {loading} {success} text={sedes} {error} />
 </div>
 
 <style>

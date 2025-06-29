@@ -63,7 +63,7 @@ const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש �
   const messs = {"he":"הודעתך נשלחה בהצלחה","en":"your message was send succsefully"}
 
 async function afreact (e){
-    const m = e.detail.why
+    const m = e.why
     if($nowChatId != -1){
   let c = await createMessage($nowChatId,m,$forum[$nowChatId].md,un).then(c=>c = c)
     if(c == "sucsses"){

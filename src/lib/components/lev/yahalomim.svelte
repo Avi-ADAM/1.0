@@ -27,7 +27,7 @@ let fiap = $state("fiap");
  let pmaap = $state("pmaap");
  let askmap = $state("askmap");
 function disp (event) { 
-const value = event.detail.id
+const value = event.id
     if (value !== "true"){
    onShowonly?.({
       data: value
@@ -88,7 +88,7 @@ let yy = $state("translate(164.82 -449.43)");
 let hovere = false;
 
 function hover (event){
-    const num = event.detail.id
+    const num = event.id
 hovere = !hovere
 if (hovere === true){
 if (num === "a"){

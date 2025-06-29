@@ -1,4 +1,3 @@
-
 <script>
   import { getContext } from 'svelte';
   import { geoPath } from 'd3-geo';
@@ -14,7 +13,7 @@
    * @property {string} [stroke] - [stroke='#333'] - The shape's stroke color.
    * @property {number} [strokeWidth] - [strokeWidth=0.5] - The shape's stroke width.
    * @property {any} [features] - [features] - A list of GeoJSON features. Use this if you want to draw a subset of the features in `$data` while keeping the zoom on the whole GeoJSON feature set. By default, it plots everything in `$data.features` if left unset.
-   * @property {(payload: { e: MouseEvent, props: any }) => void} [onMousemove] - Callback for mousemove event.
+   * @property {(payload: { e: MouseEvent, props: any }) => void} [onFeatureMousemove] - Callback for mousemove event on a feature.
    * @property {() => void} [onMouseout] - Callback for mouseout event.
    */
 
@@ -26,7 +25,7 @@
     stroke = '#333',
     strokeWidth = 0,
     features = undefined,
-    onMousemove,
+    onFeatureMousemove,
     onMouseout
   } = $props();
 
@@ -36,13 +35,14 @@
     .fitSize(fitSizeRange, $data));
 
   let geoPathFn = $derived(geoPath(projectionFn));
-
+  $effect(()=>{console.log(geoPathFn)})
   function handleMousemove(feature) {
     return function handleMousemoveFn(e) {
       raise(this);
       // When the element gets raised, it flashes 0,0 for a second so skip that
       if (e.layerX !== 0 && e.layerY !== 0) {
-        onMousemove?.({ e, props: feature.properties });
+        console.log('mousemove in MapSvg', feature.properties);
+        onFeatureMousemove?.({ e, props: feature.properties });
       }
     }
   }
@@ -60,8 +60,6 @@
       stroke={stroke}
       stroke-width={strokeWidth}
       d="{geoPathFn(feature)}"
-      onmouseover={(e) => onMousemove?.({ e, props: feature.properties })}
-      onfocus={(e) => onMousemove?.({ e, props: feature.properties })}
       onmousemove={handleMousemove(feature)}
     ></path>
   {/each}

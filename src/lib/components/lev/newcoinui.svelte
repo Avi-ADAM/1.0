@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   let w = $state(1200);
   
   let h = $state(1200);
@@ -15,24 +13,20 @@
   let maxW = $derived(100)
   let maxH = $derived(100)
   let center;
-  run(() => {
+  $effect(() => {
     center = { x: w / 2, y: h / 2 };
   });
-  run(() => {
+  $effect(() => {
     console.log('עדכון מרכז:', center);
   });
   // Call this function whenever you add new circles
   //placeCircles();
 
   // Add your infinite scroll mechanism here
-  let size;
-  run(() => {
-    size = ow>550? 125:115;
-  });
-  let bigsize;
-  run(() => {
-    bigsize = ow>550? 225: 100;
-  });
+  
+
+  let size = $derived(ow>550? 125:115);
+  let bigsize = $derived(ow>550? 225: 100);
   let add = $derived(ow>550? 70: 70);
 
   // פונקציה למירכוז המסך על אזור התוכן
@@ -108,7 +102,7 @@
     };
   }
 
-  import * as animateScroll from 'svelte-scrollto-element';
+  import { animateScroll, scrollto, scrolltobottom, scrolltotop } from 'svelte-scrollto-element';
   import Vid from './didiget.svelte';
   import Desi from './decisionMaking.svelte';
   import Mid from './midi.svelte';
@@ -140,30 +134,30 @@
   function delo(event) {
     let oldob = arr1;
     const x = oldob.map((c) => c.coinlapach);
-    const indexy = x.indexOf(event.detail.coinlapach);
+    const indexy = x.indexOf(event.coinlapach);
     oldob.splice(indexy, 1);
     arr1 = oldob;
     onStart?.({
       cards: false,
-      ani: event.detail.ani
+      ani: event.ani
     });
   }
 
   function user(event) {
     onUser?.({
-      id: event.detail.id
+      id: event.id
     });
   }
 
   function mesima(event) {
     onMesima?.({
-      id: event.detail.id
+      id: event.id
     });
   }
 
   function hover(event) {
     onHover?.({
-      id: event.detail.id
+      id: event.id
     });
   }
 
@@ -177,12 +171,12 @@
 
   function proj(event) {
     onProj?.({
-      id: event.detail.id
+      id: event.id
     });
   }
 
   function showonly(event) {
-    const value = event.detail.data;
+    const value = event.data;
     for (const key in milon) {
       milon[key] = false;
     }
@@ -330,8 +324,8 @@
     console.log(orders, w, "mount");
   })
   
-  let orders;
-  run(() => {
+  let orders = $state([]);
+  $effect(() => {
     orders = checkLines(arr1, w, h);
   });
   

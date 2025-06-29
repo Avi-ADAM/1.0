@@ -241,7 +241,7 @@
   bind:elapsedTime
   bind:selectedTasks
   bind:taskSearchTerm
-  on:update-timer={({ detail }) => {
+  onUpdate-timer={({ detail }) => {
     if (detail.timer) {
       timer.attributes.activeTimer.data = detail.timer;
       timer.attributes.activeTimer.isActive = detail.running;

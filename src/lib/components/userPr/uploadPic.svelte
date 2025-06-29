@@ -96,8 +96,8 @@ let imageFile;
 	let profilePicture = $state(), style;
 		
 	function previewCrop(e){
-		pixelCrop = e.detail.pixels;
-		const { x, y, width } = e.detail.pixels;
+		pixelCrop = e.pixels;
+		const { x, y, width } = e.pixels;
 		const scale = 200 / width;	
 		profilePicture.style=`margin: ${-y*scale}px 0 0 ${-x*scale}px; width: ${profilePicture.naturalWidth * scale}px;`
 	}
@@ -206,7 +206,7 @@ font-size: 8px;
  {image}
  bind:crop
  bind:zoom
- on:cropcomplete={e => console.log(e.detail)}
+ on:cropcomplete={e => console.log(e)}
 />
                <button on:click={sendP}  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full">העלאה</button> 
 

@@ -205,10 +205,10 @@
   }
 
   function hoverc(event) {
-    if (event.detail.x == '0') {
+    if (event.x == '0') {
       u = 'הצעה לשיתוף משאב והצטרפות לריקמה';
     } else {
-      u = event.detail.x;
+      u = event.x;
     }
     onHover?.({ id: u });
   }
@@ -219,8 +219,8 @@
   import Diun from './diun.svelte';
   import { nowId } from '$lib/stores/pendMisMes.js';
   function claf(event) {
-    let o = event.detail.alr;
-    let d = event.detail.y;
+    let o = event.alr;
+    let d = event.y;
     console.log(o, d);
   }
   function tochat() {
@@ -310,7 +310,7 @@
   };
   let miDatan = [];
   async function afreact(event) {
-    let why = event.detail.why;
+    let why = event.why;
     console.log(why);
     let d = new Date();
     //  loading = true;

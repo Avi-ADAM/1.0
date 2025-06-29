@@ -69,7 +69,7 @@
     online = true
   } = $props();
   function onlineSwitcher(e) {
-    const changedTo = e.detail.checked
+    const changedTo = e.checked
     console.log(changedTo, $myUserMeeting)
     if($myUserMeeting == 0){
       console.log(0)

@@ -479,10 +479,10 @@ function erorer(){
              <button class=" hover:bg-barbi text-mturk rounded-full"
           onclick={closer}>ביטול</button>
           {#if a == 0}
- <Tikun  on:done={done} on:erore={erore}/>
+ <Tikun  onDone={done} onErore={erore}/>
           
                     {:else if a == 4}
- <TRan on:done={done} on:erore={erorer}/>
+ <TRan onDone={done} onErore={erorer}/>
          
                     {:else if a == 1}
           <div class="sp bg-gold">

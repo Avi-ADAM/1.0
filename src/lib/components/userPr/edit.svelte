@@ -287,20 +287,20 @@ function bitul () {
 
 function addnewM (event) {
   console.log(needr);
-  const id = event.detail.id;
+  const id = event.id;
 const oldob = needr;
 const old = oldob;
 const newi = [id];
 let array3 = old.concat(newi);
 array3 = [...new Set([...old,...newi])];
-const skob = event.detail.skob;
+const skob = event.skob;
 const slectednew = meData;
 slectednew.push(skob);
 meData = slectednew
  allvn = meData.map(c => c.attributes[valc]);
   needr = array3;
   const oldsel = data.selected2
-  oldsel.push(event.detail.name);
+  oldsel.push(event.name);
   data.selected2 = oldsel;
         updi ()
 }
@@ -308,13 +308,13 @@ meData = slectednew
 function addnew (event) {
   yy = 3;
 listt = data;
-const id = event.detail.id;
+const id = event.id;
 const oldob = data;
 const old = oldob.map(c => c.id);
 const newi = [id];
 let array3 = old.concat(newi);
 array3 = [...new Set([...old,...newi])];
-const skob = event.detail.skob;
+const skob = event.skob;
 addS = false;
 addR = false;
 addW = false;
@@ -383,9 +383,9 @@ async function updi (){
         }
 }
 function clodd (event) {
-  const  id = event.detail.id
-  const  name = event.detail.name
-  const  skob = event.detail.skob
+  const  id = event.id
+  const  name = event.name
+  const  skob = event.skob
   const oldob = data;
   const x = oldob.map(c => c.id);
   const indexy = x.indexOf(id);
@@ -406,9 +406,9 @@ addSl = false
         }
 
 function clohh (event) {
-const  id = event.detail.id
-const  name = event.detail.name
-const  skob = event.detail.skob
+const  id = event.id
+const  name = event.name
+const  skob = event.skob
 const oldob = data;
 const old = oldob.map(c => c.id).map(String);
 const neww = find_id(id);
@@ -438,9 +438,9 @@ addSl = false
           })
 }
 async function wdwd (event) {
-    const miDatanew = event.detail.data;
+    const miDatanew = event.data;
   const y = miDatanew.map(c => c.id);
-const id = event.detail.id;
+const id = event.id;
 const index = y.indexOf(id);
 if (index > -1) {
   miDatanew.splice(index, 1);
@@ -450,7 +450,7 @@ if (miDatanew.length > 0) {
    meDatamm = miDatanew;
    needr = meDatamm.map(c => c.id);
    const old = data.selected2;
-   const tor = find_name(event.detail.id)
+   const tor = find_name(event.id)
    const indexd = old.indexOf(tor);
   if (index > -1) {
   old.splice(indexd, 1);

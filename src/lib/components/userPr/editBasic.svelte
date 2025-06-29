@@ -503,7 +503,7 @@ const changpsw = {"he":"שינוי סיסמה","en":"change your password"}
        {/if}
     </div>
 <main>
-	<form onsubmit={preventDefault(shaneh)}>
+	<form onsubmit={shaneh}>
 		 <div class="field">
 			<input
 				autocomplete="old-password"

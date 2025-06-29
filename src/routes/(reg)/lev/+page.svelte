@@ -93,28 +93,28 @@
 
   function user(event) {
     isOpen = false;
-    eizeish = event.detail.id;
+    eizeish = event.id;
     mode = 1;
     isOpen = true;
   }
 
   function chat(event) {
     isOpen = false;
-    //eizeish = event.detail.id
+    //eizeish = event.id
     mode = 3;
     isOpen = true;
   }
 
   function proj(event) {
     isOpen = false;
-    eizep = event.detail.id;
+    eizep = event.id;
     mode = 2;
     isOpen = true;
   }
   let eizeme = $state();
   function mesima(event) {
     isOpen = false;
-    eizeme = event.detail.id;
+    eizeme = event.id;
     mode = 5;
     isOpen = true;
   }
@@ -3489,12 +3489,12 @@
   function coinLapach(event) {
     // let oldob = arr1;
     //   const x = oldob.map(c => c.coinlapach);
-    //   const indexy = x.indexOf(event.detail.coinlapach);
+    //   const indexy = x.indexOf(event.coinlapach);
     //   oldob.splice(indexy, 1);
     //   arr1 = oldob
     counter = 0;
-    cards == event.detail.cards;
-    let ani = event.detail.ani;
+    cards == event.cards;
+    let ani = event.ani;
     if (ani == 'asked') {
       ask -= 1;
     }
@@ -3548,11 +3548,11 @@
   let u = $state(defaulti[$lang]);
 
   function hover(event) {
-    u = event.detail.id;
+    u = event.id;
   }
   let cards = $state(true);
   async function cardsi(event) {
-    cards = event.detail.cards;
+    cards = event.cards;
     console.log(cards, 'from papa');
   }
   const title = { he: 'לב 1💗1', en: 'heart of 1💗1' };
@@ -3580,7 +3580,7 @@
   let toCoin = $state(true);
 
   function showonly(event) {
-    const value = event.detail.data;
+    const value = event.data;
     for (const key in milon) {
       milon[key] = false;
     }

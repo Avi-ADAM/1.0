@@ -73,14 +73,14 @@ onMount(async () => {
 
 function newn(event) {
   addnee = false;
-    const skob = event.detail.skob
+    const skob = event.skob
   needss.push(skob)
-  selected.push(event.detail.name)
+  selected.push(event.name)
   needss = needss
   selected = selected
     onAddm?.({
-      x: event.detail.id, 
-      skob: event.detail.skob
+      x: event.id, 
+      skob: event.skob
     })
 	};
 

@@ -214,7 +214,7 @@
         return { rows, tasks };
     }
     function onUpdateOptions(opts) {
-      //  const opts = event.detail;
+      //  const opts = event;
         Object.assign(options, opts);
         gantt.$set(options);
     }

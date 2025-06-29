@@ -528,10 +528,10 @@ updateAskm(
 
   function hoverc(event) {
     let ut;
-    if (event.detail.x == '0') {
+    if (event.x == '0') {
       ut = u[$lang];
     } else {
-      ut = event.detail.x;
+      ut = event.x;
     }
     onHover?.({ id: ut });
   }
@@ -565,7 +565,7 @@ updateAskm(
     diunm = false;
   };
   async function afreact(event) {
-    let why = event.detail.why;
+    let why = event.why;
     console.log(why);
     let d = new Date();
     //  loading = true;

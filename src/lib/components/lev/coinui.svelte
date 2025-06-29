@@ -103,31 +103,31 @@ let {
 function delo(event) {
     let oldob = arr1;
     const x = oldob.map(c => c.coinlapach);
-    const indexy = x.indexOf(event.detail.coinlapach);
+    const indexy = x.indexOf(event.coinlapach);
     oldob.splice(indexy, 1);
     arr1 = oldob
     onStart?.({
         cards: false,
-        ani: event.detail.ani
+        ani: event.ani
     })
 }
 
 function user(event) {
     onUser?.({
-        id: event.detail.id
+        id: event.id
     })
 }
 
 function mesima(event) {
     onMesima?.({
-        id: event.detail.id
+        id: event.id
     })
 }
 
 function hover(event) {
 
     onHover?.({
-        id: event.detail.id
+        id: event.id
     })
 
 }
@@ -142,12 +142,12 @@ function cards() {
 
 function proj(event) {
     onProj?.({
-        id: event.detail.id
+        id: event.id
     })
 }
 
 function showonly(event) {
-    const value = event.detail.data;
+    const value = event.data;
     for (const key in milon) {
         milon[key] = false
     }

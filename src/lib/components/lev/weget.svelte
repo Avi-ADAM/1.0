@@ -484,10 +484,10 @@ u = "בקשה לאישור קבלת משאב בהצלחה"
  }
  
   function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
 u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
     onHover?.({id: u});
 }

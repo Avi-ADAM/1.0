@@ -11,7 +11,6 @@
   import Tile from '$lib/celim/tile.svelte';
 
   let { data } = $props();
-  console.log(data)
   let projectId = data.projectId;
   let project = data.projectData;
   let isRegisteredUser = data.isRegisteredUser;
@@ -47,7 +46,6 @@
   });
 
   function us (x){
-    console.log(x)
     goto(`/user/${x}`)   
   }
 
@@ -56,7 +54,6 @@
   }
 
   function hover(c){
-    console.log("hover")
   }
 let w = $state(0);
   

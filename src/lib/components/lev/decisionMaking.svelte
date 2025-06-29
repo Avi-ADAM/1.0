@@ -465,10 +465,10 @@ function hoverede(){
  }
  
 function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
  u ={"he": "הצבעה על שינוי לוגו הריקמה", "en":"vote on changing FreeMates logo"}
   } else {
-    u = event.detail.x
+    u = event.x
   }
     onHover?.({id: u[$lang]});
 }
@@ -486,7 +486,7 @@ function tomodal(){
 console.log("oh")
 }
 function handler (event){
-  console.log(event.detail)
+  console.log(event)
 }
 let ww = $state(0);
   

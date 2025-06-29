@@ -659,10 +659,10 @@ function hover (id){
     onHover?.({ id: u });
 }
 function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
  u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
     onHover?.({ id: u });
 }
@@ -675,7 +675,7 @@ async function react (){
   if (chat !== null){
  const diu =  objToString(chat)
   }
-  let why = event.detail.why
+  let why = event.why
   console.log(why)
   let d = new Date()
          //  loading = true;
@@ -803,7 +803,7 @@ title="ביטול"
 />-->
   {:else if diunm === true}
  <Diun
-  on:rect={afreact} 
+  onRect={afreact} 
   smalldes={projectName+"-"+openmissionName}
   nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`} 
   mypos={true}

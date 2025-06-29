@@ -39,7 +39,7 @@
 
 <button 
 	><span class="sr-only">Copy to clipboard</span>
-    <CopyToClipboard text={url} on:copy={handleSuccessfullyCopied} on:fail={handleFailedCopy} >
+    <CopyToClipboard text={url} oncopy={handleSuccessfullyCopied} onfail={handleFailedCopy} >
       {#snippet children({ copy })}
         <button onclick={copy}><Copy
   		{checked}

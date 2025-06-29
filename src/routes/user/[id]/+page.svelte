@@ -85,7 +85,7 @@ const towel = {"he":"לינק","en":"link"}
 let h = $state(),w = $state();
 let issm = $state(false)
 let viewBox=$state("0 0 1920 1180")
-run(() => {
+$effect(() => {
     if (w/h < 1.3 && w/h > 1){
       issm = true
     viewBox="320 280 1220 587"
@@ -351,22 +351,11 @@ color: var(--barbi-pink);
     animation-duration: 3s;
     animation-name: pulsen;
     animation-iteration-count: infinite;
-      transform-origin: 50% 50%;
+      transform-origin: 50% 45.5%;
   }
   .iss{
       transform-origin: 960px 110% !important;
 
   }
-  .bb{
-    
-  }
-  .cc{
-   
-  }
-  .dd{
-
-  }
-  .ee{
-
-  }
+ 
     </style>

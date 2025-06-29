@@ -490,29 +490,30 @@ let frd;
 
 function callbackFunction(event) {
     a = 2;
-    files = event.detail.files;
+    files = event.files;
     console.log(files);
     sendP();
 	}
   	function callbackFunctio(event) {
+      console.log(event)
     a = 2;
-    fblink = event.detail.fblink;
-     twiterlink = event.detail.twiterlink;
-     discordlink = event.detail.discordlink;
-     githublink = event.detail.githublink;
-    userName_value = event.detail.un;
-   // emailL = event.detail.em;
-    noMail = event.detail.noMail;
-    biog = event.detail.bi;
-    frd = event.detail.frd;
-    lango = event.detail.lango;
-    cards = event.detail.cards;
+    fblink = event.fblink;
+     twiterlink = event.twiterlink;
+     discordlink = event.discordlink;
+     githublink = event.githublink;
+    userName_value = event.un;
+// emailL = event.em;
+    noMail = event.noMail;
+    biog = event.bi;
+    frd = event.frd;
+    lango = event.lango;
+    cards = event.cards;
     sendD();
 }
 
   function remove(event) {
-  const miDatanew = event.detail.data;
-  const linkp = event.detail.linkp;
+  const miDatanew = event.data;
+  const linkp = event.linkp;
   addNs1 = false;
   meData[linkp].data = miDatanew;
     console.log(miDatanew, meData);
@@ -526,10 +527,10 @@ function callbackFunction(event) {
   }
 
   async function add(event) {
- const linkp = event.detail.linkp;
- const miDatanew = event.detail.data;
- const valc = event.detail.valc;
- const a = event.detail.a;
+ const linkp = event.linkp;
+ const miDatanew = event.data;
+ const valc = event.valc;
+ const a = event.a;
  miDatanew.selected2 = [];
     console.log(miDatanew, meData);
  addNs1 = false;
@@ -548,9 +549,9 @@ function callbackFunction(event) {
   }
 
   async function addnew(event) {
-  const linkp = event.detail.linkp;
- const skob = event.detail.skob;
- const miDatanew = event.detail.data;
+  const linkp = event.linkp;
+ const skob = event.skob;
+ const miDatanew = event.data;
  miDatanew.push(skob);
  addNs1 = false;
  const meDatanew = meData;
@@ -587,7 +588,7 @@ const closer = () => {
  addSl3 = false;
  addSl4 = false;
  addSl5 = false;
- const a = event.detail.linkp;
+ const a = event.linkp;
   console.log(addSl);
     if (a == 'tafkidims') {
       current = 'a2';
@@ -613,22 +614,22 @@ const closer = () => {
 };
 
 function close (event){
-  const a = event.detail.linkp;
+  const a = event.linkp;
 
   if (a == "tafkidims"){
-    meData.tafkidims.data = event.detail.list
+    meData.tafkidims.data = event.list
   }
   else if (a == "skills"){
-    meData.skills.data = event.detail.list;
+    meData.skills.data = event.list;
   }
   else if (a == "vallues"){
-  meData.vallues.data = event.detail.list;
+  meData.vallues.data = event.list;
   }
   else if (a == "mashaabims"){
-   meData.sps.data = event.detail.list;
+   meData.sps.data = event.list;
   }
   else if (a == "workWays"){
-    meData.work_ways.data = event.detail.list;
+    meData.work_ways.data = event.list;
   }
   current = "l";
   meData = meData
@@ -645,9 +646,9 @@ let mass = $state(false);
 
   function massss(event) {
     console.log('here');
-    if (event.detail.mass == true) {
+    if (event.mass == true) {
   mass = true;
-    } else if (event.detail.mass == false) {
+    } else if (event.mass == false) {
     mass = false;
   }
 }
@@ -656,8 +657,8 @@ let spid;
   function delm(event) {
   isOpen = true;
     a = 3;
-  const nj = event.detail.nj;
-    spid = event.detail.id;
+  const nj = event.nj;
+    spid = event.id;
     messege =
       $lang == 'he'
         ? `המשאב ${nj} ימחק האם להמשיך?`

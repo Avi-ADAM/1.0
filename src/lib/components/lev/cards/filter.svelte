@@ -77,7 +77,7 @@ function showonly(value,id=null) {
 let hovere = false;
 
 function hover (event){
-    const num = event.detail.id
+    const num = event.id
 hovere = !hovere
 if (hovere === true){
 if (num === "a"){

@@ -88,7 +88,7 @@
       maxSelect={1}
     />
     {#if selected[0]}
-      <Button on:click={add} {loading} {success} {error}
+      <Button onClick={add} {loading} {success} {error}
         ><Arrow back={$lang == 'en' ? true : false} /></Button
       >
     {/if}
