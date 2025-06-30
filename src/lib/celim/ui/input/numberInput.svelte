@@ -1,7 +1,4 @@
-
 <script>
-    import { run } from 'svelte/legacy';
-
     import { lang } from '$lib/stores/lang';
     let diff = Math.random()
     /**
@@ -21,7 +18,7 @@
         placeholder = 1,
         notMin = true
     } = $props();
-    run(() => {
+    $effect(() => {
         if (value < 0 && notMin) value = 0
     });
 </script>

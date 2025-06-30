@@ -1,7 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-	import { role } from './../prPr/mi.js';
+import { role } from './../prPr/mi.js';
 import TimerDialogs from '../timers/TimerDialogs.svelte';
 import { Drawer } from 'vaul-svelte';
     import {nutifi } from '$lib/func/nutifi.svelte'
@@ -891,7 +889,7 @@ onDestroy(() => {
   }
 
 });
-run(() => {
+onMount(() => {
   storeTimer = $timers?.find((t) => t.mId == mId);
   if (storeTimer) {
     console.log("Timer found:", storeTimer);

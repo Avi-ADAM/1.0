@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import SveltyPicker from 'svelty-picker'
   import Arrow from "$lib/celim/icons/arrow.svelte";
   import {lang} from '$lib/stores/lang.js'
@@ -38,7 +36,7 @@
     let momentx = moment(dateString, "HH:mm DD/MM/YYYY ")
     return momentx && format(new Date(momentx), dateFormat) || '';
   };
-  run(() => {
+  $effect(() => {
     showstart || showend ? onEdit?.() : onEditStop?.()
   });
  

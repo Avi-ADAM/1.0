@@ -1,7 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-      import { liUN } from '$lib/stores/liUN.js';
+import { liUN } from '$lib/stores/liUN.js';
       import { Canvas } from '@threlte/core'
   import Scene from './globu.svelte'
       import {  doesLang, langUs } from '$lib/stores/lang.js'
@@ -33,12 +31,6 @@
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description ="הסכמה העולמית על חירות היא חלק מרכזי ב- 1💗1. על ידי הסכמה להצהרה זו, ניתן להירשם לפלטפורמה השיתופית 1💗1 ומשתתפים ביצירת עולם יותר בטוח. על ידי ההתחייבות ההדדית לאי-אלימות, לפתרון סכסוכים בהסכמה ולכבוד הדדי, אנו ניצור עולם בו כוח ואלימות מפסיקים להיות צורות של תקשורת אנושית. הצטרפו אלינו לקידום שלום, הסכמות וחופש. ביחד, אנחנו יכולים ליצור עולם שבו הטוב הבסיסי מנצח ובו חילוקי דעות נפתרים בהסכמה משותפת."
   let url = "https://1lev1.com/hascama"
-  run(() => {
-    userName.set($form.name)
-  });
-  run(() => {
-    email.set($form.email)
-  });
 
 // onMount(async () => {
 //
@@ -545,7 +537,7 @@ let w = $state(0);
   
 let wid = $state(0);
   
-run(() => {
+$effect(() => {
     if($errors.name || $errors.email) {scrolltotop()}
   });
 </script>

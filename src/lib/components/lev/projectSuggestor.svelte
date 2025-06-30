@@ -355,10 +355,13 @@ function project () {
             workways = workways;
 })
 function hoverc (event){
-   if (event.x == "0"){
+   if (event == "0"){
      u = {"he":"הצעה להצטרפות לריקמה", "en":"suggested FreeMates to join and do mission"}
-  } else {
-    u = event.x
+  } else if (typeof event === 'string') {
+    u = {"he": event, "en": event};
+  }
+  else {
+    u = event
   }
     onHover?.({ id: u[$lang] });
 }
@@ -367,16 +370,6 @@ function hoverc (event){
   import Diun from './diun.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { sendApi } from '$lib/send/sendApi.svelte';
-function claf (event){
-  let o = event.alr
-  let d = event.y
-  console.log(o,d)
-  if (d == "a"){
-    agree(oid)
-  } else if (d == "d"){
-    decline(oid)
-  }
-}
 const ttal = {"he":"נכנס כבר כסף","en":"already has income"}
 const ttwe = {"he":"צפי רווח: שבוע","en":"exp income: one week "}
 const ttmo = {"he":"צפי רווח: חודש","en":"exp income: one month "}
@@ -1273,12 +1266,12 @@ in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}"
 	<Drawer.Trigger/>
 	<Drawer.Portal>
 		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
+<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
         <Cards
 onProject={project}
- onAgree={claf}
-  onDecline={claf}
+ onAgree={() => agree(oid)}
+  onDecline={() => decline(oid)}
   onHover={hoverc}
   onTochat={tochat}
   {acts}
@@ -1311,8 +1304,8 @@ onProject={project}
 {:else}
 <Cards
 onProject={project}
- onAgree={claf}
-  onDecline={claf}
+ onAgree={() => agree(oid)}
+  onDecline={() => decline(oid)}
   onHover={hoverc}
   onTochat={tochat}
   {isVisible}

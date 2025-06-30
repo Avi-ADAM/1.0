@@ -1,6 +1,6 @@
 <script>
     import { toast } from 'svelte-sonner';
-    import CopyToClipboard from "svelte-copy-to-clipboard";
+    import { copy } from "svelte-copy";
   import {lang} from '$lib/stores/lang'
   const su = {
     "he": "!העתקת בהצלחה",
@@ -11,6 +11,7 @@
     "en": "error while copying"
   }
   const handleSuccessfullyCopied = (e) => {
+    console.log(e)
         checked = true
         toast.success(su[$lang])
         setTimeout(()=>checked = false,15000)
@@ -37,19 +38,21 @@
   
 </script>
 
-<button 
-	><span class="sr-only">Copy to clipboard</span>
-    <CopyToClipboard text={url} oncopy={handleSuccessfullyCopied} onfail={handleFailedCopy} >
-      {#snippet children({ copy })}
-        <button onclick={copy}><Copy
+    <button  use:copy={{text:url, events: ['click'], 
+    onCopy:handleSuccessfullyCopied, onError({error}){
+       toast.warning(er[$lang])
+       error = true
+        setTimeout(()=>checked = true,15000)
+  }}}  >
+      <span class="sr-only">Copy to clipboard</span>
+      <Copy
   		{checked}
           {error}
   		width={48}
-  	/></button>
-      {/snippet}
-    </CopyToClipboard></button
->
+  	/>
+    </button>
 
+    
 <style>
 	button {
 		background: transparent;

@@ -1,5 +1,5 @@
 <script>
-  import { page } from '$app/stores'
+  import { page } from '$app/state'
     import Lowding from '$lib/celim/lowding.svelte'
     import {lang} from '$lib/stores/lang.js'
      import MissionInProgress from "../../../components/lev/missionInProgress.svelte"
@@ -51,9 +51,9 @@
 
   // הוסף פונקציה לטיפול באירוע swiper
   function handleSwiper(e) {
-    const [swiper] = e;
+    const [swiper] = e.detail;
     swiperInstance = swiper;
-    setSwiperRef(e);
+    swiperRef = swiper;
     swiper.on('slideChange', () => {
       currentIndex = swiper.realIndex;
     });
@@ -78,9 +78,6 @@ $effect(() => {
     indexi = -1
   }
 })
-  const setSwiperRef = (e) => {
-    swiperRef = e.detail[0];
-  };
   function change(){
     console.log(cards,"change")
       console.log("will change")
@@ -148,7 +145,7 @@ function hoverc (id){
   onHover?.({id: u}); // Svelte 5: Replaced dispatch with callback prop
 }
 const nav = {"he" : 'ניווט: לעמוד הפרופיל האישי מימין, למוח הרקמות שמאל',"en" : 'Navigation: right side, bottom'}
-$effect(() => { console.log('AAAAAA',$page.data.isDesktop,$page.data) })
+$effect(() => { console.log('AAAAAA',page.data.isDesktop,page.data) })
 //exclude meData huca 
 function showonly(event) {
   if (event.kind !== "projects") {

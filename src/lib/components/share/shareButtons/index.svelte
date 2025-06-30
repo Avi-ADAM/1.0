@@ -1,7 +1,5 @@
 <script>
-	import { run } from 'svelte/legacy';
-
-    import { lang } from "$lib/stores/lang"
+	import { lang } from "$lib/stores/lang"
 	import { browser } from '$app/environment';
        import { LinkedIn, } from 'svelte-share-buttons-component';
     import  Mail from '$lib/components/share/shareButtons/Mail.svelte'
@@ -18,7 +16,6 @@
 	const { siteTitle, siteUrl } = website;
     let cliced = $state(false)
 
-    const url = `${siteUrl}/${slug}`;
 
 	/**
 	 * @typedef {Object} Props
@@ -41,8 +38,12 @@
 		quote = undefined,
 		related = [],
 		via = '',
-		body = desc + " to see this click on " + url
+		body = "",
 	} = $props();
+    const url = `${siteUrl}/${slug}`;
+	$effect(() => {
+		body = desc + " to see this click on " + url
+	})
 
 
 	const handleWebShare = async () => {
@@ -56,13 +57,8 @@
 			webShareAPISupported = false;
 		}
 	};
-	let webShareAPISupported;
-	run(() => {
-		webShareAPISupported = browser && typeof navigator.share !== 'undefined';
-	});
-	run(() => {
-		handleWebShare;
-	});
+
+	let webShareAPISupported = $derived(browser && typeof navigator.share !== 'undefined');
 </script>
 
 <aside class="container">

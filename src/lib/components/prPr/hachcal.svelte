@@ -1,7 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-     import pic from './../../celim/pic.js'
+ import pic from './../../celim/pic.js'
    import { onMount } from 'svelte'; 
 
 // what about hours alrerady done to  mission in progres 
@@ -132,7 +130,7 @@ function pre (){
 let revach = $state(0);
   
 let x = $state([]);
-run(() => {
+$effect(() => {
     for (let i = 0; i <ulist.length; i++) {
     console.log(ulist)
   x[i] = ((ulist[i].p / 100) * revach).toFixed(2)

@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import Dates from '$lib/components/grid/dates.svelte';
   import ListOfTiles from '$lib/components/grid/listOfTiles.svelte';
   import {
@@ -186,8 +184,8 @@
   let isCreatedByMeActive = $state(false); // מתחיל דלוק
   let isUnassignedActive = $state(false);
 
-  let filters;
-  run(() => {
+  let filters = $state([]);
+  $effect(() => {
     filters = [
       {
         key: 'myTasks',

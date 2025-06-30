@@ -1,7 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-	import { mi } from '$lib/components/prPr/mi.js';
+  import { mi } from '$lib/components/prPr/mi.js';
   import { idPr } from '../../stores/idPr.js';
   import { lang } from '$lib/stores/lang.js';
   import Checkbox from '$lib/celim/ui/input/checkbox.svelte';
@@ -144,7 +142,7 @@
   let totalV = $state(0);
   
   let already = false, dates = $state(null), datef = $state(null);
-  run(() => {
+  $effect(() => {
     if (dates !== null && datef !== null) {
       totalV = 0;
       let quanter = unlimitedM === true ? 1 : quant;

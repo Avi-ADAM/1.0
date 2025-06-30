@@ -1,11 +1,9 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import { toast } from 'svelte-sonner';
 import SucssesConf from '$lib/celim/sucssesConf.svelte'
 import Tile from '$lib/celim/tile.svelte'
 import Share from '$lib/components/share/shareButtons/index.svelte'
-import { page } from '$app/stores'
+import { page } from '$app/state'
 import {
     lang
 } from '$lib/stores/lang.js'
@@ -191,11 +189,9 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
 
   let title = 'service on 1💗1'
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
-  let description = $page.data.alld?.descrip || om[$lang]
-  let url = $page.url.toString()
- run(() => {
-    console.log(data.alld)
-  });
+  let description = page.data.alld?.descrip || om[$lang]
+  let url = page.url.toString()
+
   //TODO: header nav menu $page.a.title[$lang] ??
 </script>
 <Head title="{ headi[$lang]}" {description} {image} {url} />
@@ -280,7 +276,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         </div>
             <div class="">
                 <Share
-                slug="{"services/"+$page.data.mId}"
+                slug="{"services/"+page.data.mId}"
 	 title="{a.title ? a.title[$lang] : null}"
      desc="servise"
      hashtags={['1💗1','consensus']}
@@ -318,7 +314,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
         {/if}-->
         </div>
 
-          {#if $page.data.tok != false}
+          {#if page.data.tok != false}
           <div class="flex justify-center">
             {#if alr == false && !a.users?.data.map(c => c.id).includes(data.uid)}
           <button onclick={ask} onmouseenter={()=>hovered = true} onmouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}
@@ -345,7 +341,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           {:else}
           <div class="text-center pt-14">
           <h1 class="text-barbi sm:text-xl my-5">{mand[$lang]}</h1>
-               {#if $page.data.tok != false}
+               {#if page.data.tok != false}
             <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2  sm:text-xl">לצפיה במשימות אחרות ובכל העדכונים שלך</a>
           {:else}
             <div class="  w-screen">
@@ -361,7 +357,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
           {:else}
           <div class="text-center pt-14 ">
           <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
-                    {#if $page.data.tok != false}
+                    {#if page.data.tok != false}
                     <a href="/lev" class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2  sm:text-xl">לצפיה במשימות אחרות ובכל העדכונים שלך</a>
           {:else}
             <div class="  w-screen">

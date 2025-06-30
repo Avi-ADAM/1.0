@@ -1,9 +1,9 @@
 <script>
-  import { run } from 'svelte/legacy';
 
     import RangeSlider from "svelte-range-slider-pips";
     import Barb from './barb.svelte'
-    import tr from '$lib/translations/tr.json'
+    import tr from '$lib/translations/tr.json'
+
 
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
@@ -35,7 +35,7 @@ function checkAll(a,b){
   datai[1].value = a
 }
 
-run(() => {
+$effect(() => {
     if(old.length > 0){
     datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":Number(numberb)},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":Number(number)}]
     for (let i = 0; i < old.length; i++) {

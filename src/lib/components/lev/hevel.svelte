@@ -1,8 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-
-  import { lang } from '$lib/stores/lang.js'
+ import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
   let { userId, onProj } = $props();
 function pr (x){
@@ -157,7 +154,7 @@ const tofac = {"he":"לינק לפייסבוק" ,"en":"link to Facebook"}
 const togit = {"he":" לינק לגיטהב","en":"link to GitHub"}
 const totwi = {"he":" לינק לטוויטר","en":"link to twitter"}
 let h = $state(),w = $state(), height = $state(),width = $state();
-run(() => {
+$effect(() => {
     if(h > w){
     height = "90vw"
     width = "90vw"

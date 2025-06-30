@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import {lang} from '$lib/stores/lang.js'
      import Grow from '$lib/celim/icons/grow.svelte'
   /**
@@ -58,7 +56,7 @@
     word = "word",
     bg = "blue"
   } = $props();
-   run(() => {
+   $effect(() => {
     if (bg == "blue"){
       blue = true;
      } else if (bg == "pink"){

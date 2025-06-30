@@ -38,7 +38,10 @@
       iskvua: false,
       date: null,
       dates: null,
-      myM: false
+      myM: false,
+      rishoni: [],
+      publicklinks: ``,
+      privatlinks: ``
     }
   ]);
   $effect(() => {
@@ -47,7 +50,7 @@
   let error1 = null;
   let roles1 = $state($role);
   let x = 168;
-  let gloading = false;
+  let gloading = $state(false);
   onMount(async () => {
     if (id !== 0) {
       gloading = true;
@@ -197,9 +200,8 @@
     return arr;
   }
   let idL;
-  console.log(miData);
-  let miDatana = [];
-  let miDatan = [];
+  let miDatana = $state([]);
+  let miDatan = $state([]);
   let linkop;
   let pendq = '';
   let qwerys = ``;
@@ -740,11 +742,11 @@
   }
   let searchText = $state(``);
 
-  let isOpen = false;
+  let isOpen = $state(false);
   const closer = () => {
     isOpen = false;
   };
-  let addn = $state({
+  let addn = $derived({
     he: `יצירת והוספת: "${searchText}"`,
     en: `Create "${searchText}"`
   });
@@ -760,7 +762,7 @@
     he: 'עריכת סידור המשמרות',
     en: 'edit shifts'
   };
-  let days = [
+  let days = $state([
     {
       name: {
         he: 'ראשון',
@@ -874,7 +876,7 @@
       shiftp: 0,
       shifts: []
     }
-  ];
+  ]);
   const headingd = {
     he: 'יום בשבוע',
     en: 'week day'
@@ -945,12 +947,12 @@
   };
   const nama = { he: 'שם', en: 'name' };
   const des = { he: 'תיאור', en: 'decription' };
-  let shift = [
+  let shift = $state([
     {
       ii: 1
     }
-  ];
-  let shifts = 1;
+  ]);
+  let shifts = $state(1);
 
   function shifterr(o) {
     //todo reduce and adding 2 together, not to mention v a l i d a t i o n
@@ -1028,22 +1030,22 @@
   //TODO: כמות לכל משימה עד אינסוף
   let dialog = $state(1);
   let misid = $state(0);
-  let itemid = 0;
-  let editdata = -1;
+  let itemid = $state(0);
+  let editdata = $state(-1);
   function hover(){
 
   }
-  let dateE = false;
-  let descripE = false;
-  let missionNameE = false;
-  let valphE = false;
-  let ske = false;
-  let roleE = false;
-  let wwe = false;
-  let assignE = false;
-  let shiftE = false;
-  let publinkE = false;
-  let mislinkE = false;
+  let dateE = $state(false);
+  let descripE = $state(false);
+  let missionNameE = $state(false);
+  let valphE = $state(false);
+  let ske = $state(false);
+  let roleE = $state(false);
+  let wwe = $state(false);
+  let assignE = $state(false);
+  let shiftE = $state(false);
+  let publinkE = $state(false);
+  let mislinkE = $state(false);
   function disout (){
 
   }
@@ -1380,6 +1382,8 @@
                           onclick={() => {
                             dialog = 2;
                             misid = miData[0].id;
+                            editdata = -1;
+                            itemid = -1;
                             isOpen = true;
                           }}><Plus /></button
                         >

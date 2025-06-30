@@ -1,7 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-  import { role, ww, skil } from '$lib/components/prPr/mi.js';
+ import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
 
@@ -648,7 +646,7 @@
   const tri = tr;
   let datai = $state([]);
   
-  run(() => {
+  $effect(() => {
     if(negopendmissions.length > 0){
     datai = [
       {

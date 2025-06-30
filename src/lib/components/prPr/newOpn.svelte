@@ -3,7 +3,6 @@
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import Tile from '$lib/celim/tile.svelte';
   import {lang} from '$lib/stores/lang'
-  console.log(omiData)
   let isonly = $state(false);
    import { onMount } from 'svelte';
   import { langAdjast } from '$lib/func/langAdjast.svelte';

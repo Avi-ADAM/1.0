@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
     import { onMount } from 'svelte';
     import { Calendar } from '@fullcalendar/core';
     import dayGridPlugin from '@fullcalendar/daygrid';
@@ -150,7 +148,7 @@
     }
     
     // עדכון האירועים כאשר הנתונים משתנים
-    run(() => {
+    $effect(() => {
     if (timersData && calendar) {
         events = processTimersToEvents(timersData);
         calendar.removeAllEvents();

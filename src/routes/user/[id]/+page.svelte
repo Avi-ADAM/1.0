@@ -2,10 +2,7 @@
 
 
 <script>
-  import { run } from 'svelte/legacy';
-
-
-  import { lang } from '$lib/stores/lang.js'
+ import { lang } from '$lib/stores/lang.js'
   import Header from '$lib/components/header/header.svelte'
   let { data } = $props();
   let userId = data.userId; 

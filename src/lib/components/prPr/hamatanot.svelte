@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   //טבלת מתנות כפתור מכירה מקפיץ תפריט של איפה הכסף יושב
   import Col from './column/main.svelte';
   import New from './newmatana.svelte';
@@ -13,16 +11,12 @@
   import Cir from './graph/circle.svelte';
   let isOpen = $state(false);
   let a = $state(0);
-  console.log(bmiData);
   import { RingLoader } from 'svelte-loading-spinners';
   import Close from '$lib/celim/close.svelte';
   let fermatana = $state({});
   let ferdate = $state({});
   let arr = $state([]);
   let arrt = $state([]);
-
-  arr = arr;
-
   let kindOf = $state();
   let kindUlimit = $state(false);
   let {
@@ -123,7 +117,7 @@
   const see = { he: 'צפיה בהצעת החלוקה', en: 'see existed sppliting offer' };
   const sbp = { he: 'התפלגות המכירות לפי מוצר', en: 'sales by product' };
   const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
-  run(() => {
+  $effect(() => {
     for (let i = 0; i < salee.length; i++) {
       if (salee[i].attributes.matanot.data.attributes.name in fermatana) {
         fermatana[salee[i].attributes.matanot.data.attributes.name] +=
@@ -134,7 +128,7 @@
       }
     }
   });
-  run(() => {
+  $effect(() => {
     for (let i = 0; i < salee.length; i++) {
       if (dayjs(salee[i].attributes.date) in ferdate) {
         if (
@@ -158,7 +152,7 @@
       console.log(ferdate);
     }
   });
-  run(() => {
+  $effect(() => {
     if (salee.length > 0) {
       for (const [key, value] of Object.entries(ferdate)) {
         const datea = key;
@@ -192,7 +186,7 @@
       console.log(arrt);
     }
   });
-  run(() => {
+  $effect(() => {
     if (salee.length > 0) {
       for (let key in fermatana) {
         if (fermatana.hasOwnProperty(key)) {
@@ -201,7 +195,7 @@
       }
     }
   });
-  run(() => {
+  $effect(() => {
     for (let i = 0; i < salee.length; i++) {
       allin += salee[i].attributes.in;
     }

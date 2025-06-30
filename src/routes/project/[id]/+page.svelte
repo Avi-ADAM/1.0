@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import Header from '$lib/components/header/header.svelte';
   import { goto } from '$app/navigation';
   import { lang } from '$lib/stores/lang.js';
@@ -35,7 +33,7 @@
     "en": "You are viewing this project as an unregistered user. Please <a href=\"/\" class=\"underline\">register</a> to access more features."
   });
 
- run(() => {
+ $effect(() => {
     if ($lang == "he"){
       for (let i = 0; i < vallues.length; i++){
         if (vallues[i].attributes.localizations.data.length > 0){

@@ -2,7 +2,7 @@
     import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
           import { lang } from '$lib/stores/lang.js';
-            import { page } from '$app/stores';
+            import { page } from '$app/state';
 
     import { show } from './store-show.js';
     import { skills1 } from './skills1.js';
@@ -159,7 +159,7 @@ selected = newSele;
   </div>
 </DialogOverlay>
   
-    <h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
+    <h1 style:margin-top={focused && !page.data.isDesktop ? "1vh": !page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
       
      {userName_value} 
      <br/>

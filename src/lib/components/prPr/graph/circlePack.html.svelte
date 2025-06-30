@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import { stratify, pack, hierarchy } from 'd3-hierarchy'
   import { getContext } from 'svelte';
   import { format } from 'd3-format';
@@ -58,11 +56,11 @@
    */
   let parent = $state({});
   let dataset;
-  run(() => {
+  $effect(() => {
     dataset = $data;
   });
 
-  run(() => {
+  $effect(() => {
     if (parentKey === undefined) {
       parent = { [idKey]: 'all' };
       dataset = [...dataset, parent]

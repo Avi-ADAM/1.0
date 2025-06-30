@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
    import {BarLoader} from 'svelte-loading-spinners'
 	import ChatMessage from '../../celim/messeges.svelte';
 	import TodayDivider from '../../celim/todaydevider.svelte';
@@ -89,10 +87,6 @@ async function click() {
                    ani == "forum"? $forum[pendId]?.messages ?? [] :                  
                    messages)
  let off = $state(0);
-  
- run(() => {
-    console.log(clicked,"diun",off)
-  });
       let loading = $derived(ani == "forum" ? $forum[pendId]?.loading ?? false : false)
 </script>
 

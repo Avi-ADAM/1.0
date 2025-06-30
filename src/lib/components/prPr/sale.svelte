@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   	import 'dayjs/locale/he.js';
 	import dayjs from 'dayjs';
 
@@ -254,10 +252,10 @@ const addL = {
   he: 'הוספת מכירה',
   en: 'Add Sale'
 }
- 	run(() => {
+$effect(() => {
     dayjs.locale($lang);
   });
-run(() => {
+$effect(() => {
     if (kindOf == "monthly" || kindOf == "yearly") {
    if(dates !== null && datef !== null) {
     per = false;

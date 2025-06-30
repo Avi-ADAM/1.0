@@ -4,7 +4,7 @@
     import { show } from './store-show.js';
     import { workways1 } from './workways1.js';
     import { onMount } from 'svelte';
-      import { page } from '$app/stores';
+      import { page } from '$app/state';
 
    import jwork from '$lib/data/workways.json'
     import enjwork from '$lib/data/workwaysEn.json'
@@ -204,7 +204,7 @@ let searchText = $state(``);
     let focused = $state(false)
   </script>
 
-<h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
+<h1 style:margin-top={focused && !page.data.isDesktop ? "1vh": !page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
     {userName_value}
 <br/>
  {ws[$lang]}

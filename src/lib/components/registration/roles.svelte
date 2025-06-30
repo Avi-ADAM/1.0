@@ -1,5 +1,5 @@
 <script>
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
 
     import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
@@ -173,7 +173,7 @@ selected = newSele;
 
 
   
-<h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
+<h1 style:margin-top={focused && !page.data.isDesktop ? "1vh": !page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
     {userName_value}
     <br/>
      {what[$lang]}

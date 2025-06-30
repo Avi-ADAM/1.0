@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import { startTimer, stopTimer } from '$lib/func/timers.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onMount, onDestroy } from 'svelte';
@@ -64,8 +62,8 @@
   })
 
   // Local reactive state
-  let localZman = $state(timer?.zman || 0);
-  let isRunning = $state(timer?.running || false);
+  let localZman = $derived(timer?.zman || 0);
+  let isRunning = $derived(timer?.running || false);
   let timerInterval = $state();
 
  // Start/stop timer function
@@ -201,10 +199,10 @@
     };
   }
 
-  run(() => {
+  $effect(() => {
     console.log(showSaveDialog)
   });
-  run(() => {
+  $effect(() => {
     timer = $timers?.find((t) => t.mId == missionId);
     if (timer) {
       console.log("Timer found:", timer);
@@ -213,7 +211,7 @@
     }
   });
   // Update local state when timer prop changes
-  run(() => {
+  $effect(() => {
     localZman = 1 || 0;
     isRunning = timer?.running || false;
     if (isRunning && !timerInterval) {
@@ -223,10 +221,8 @@
     }
   });
   // Reactive rotations based on localZman
-  let rotation;
-  run(() => {
-    rotation = (localZman / 1000) * 6;
-  });
+  
+  let rotation = $derived((localZman / 1000) * 6);
   let rotationm = $derived((localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6);
   let rotationh =
     $derived((localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30);

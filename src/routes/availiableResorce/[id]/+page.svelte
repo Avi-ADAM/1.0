@@ -2,7 +2,7 @@
     import { toast } from 'svelte-sonner';
     import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import Share from '$lib/components/share/shareButtons/index.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { lang } from '$lib/stores/lang.js';
   import { RingLoader } from 'svelte-loading-spinners';
   import { goto } from '$app/navigation';
@@ -278,11 +278,10 @@
 
   /** @type {Props} */
   let { askedarr = [], alr = $bindable(false), data } = $props();
-  console.log($page)
   let title = 'This is Svead a Svelte Head Component';
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
-  let description = $page?.data.alld?.descrip || om[$lang];
-  let url = $page.url.toString();
+  let description = page?.data.alld?.descrip || om[$lang];
+  let url = page.url.toString();
   //TODO: header nav menu
 </script>
 {#await data.alld}
@@ -301,7 +300,7 @@
     
   {#if data.alld?.archived != true && data.alld != null}
   <Head
-  title={$page.data?.alld?.title[$lang] ?? headi[$lang]}
+  title={page.data?.alld?.title[$lang] ?? headi[$lang]}
   {description}
   {image}
   {url}
@@ -569,7 +568,7 @@
               </div>
               <div class="">
                 <Share
-                  slug={'/availableResorce/' + $page.data?.mId}
+                  slug={'/availableResorce/' + page.data?.mId}
                   title={data.alld?.title[$lang]}
                   desc="it's new thing"
                   hashtags={['1💗1', 'consensus']}
@@ -580,7 +579,7 @@
               </div>
             </div>
 
-            {#if $page.data.tok != false}
+            {#if page.data.tok != false}
               <div class="flex justify-center min-h-fit">
                 {#if alr == false && !data.alld.declinedsps.data.map((c) => c.id).includes(data.uid)}
                   <button
@@ -632,7 +631,7 @@
   {:else if data.alld?.archived == true}
     <div class="text-center pt-14">
       <h1 class="text-barbi sm:text-xl my-5">{mand[$lang]}</h1>
-      {#if $page?.data.tok != false}
+      {#if page?.data.tok != false}
         <a
           href="/lev"
           class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl"
@@ -659,7 +658,7 @@
   {:else}
   <div class="text-center pt-14">
     <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
-    {#if $page.data.tok != false}
+    {#if page.data.tok != false}
       <a
         href="/lev"
         class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl"
@@ -687,7 +686,7 @@
 {:else}
   <div class="text-center pt-14">
     <h3 class="text-barbi sm:text-xl my-5">error | שגיאה</h3>
-    {#if $page.data.tok != false}
+    {#if page.data.tok != false}
       <a
         href="/lev"
         class="text-lturk hover:text-barbi hover:border-barbi border border-gold rounded-xl px-4 py-2 sm:text-xl"

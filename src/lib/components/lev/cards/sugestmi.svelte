@@ -35,8 +35,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {boolean} [allr]
    * @property {boolean} [isVisible]
    * @property {(x: any) => void} [onHover] - Callback for hover event
-   * @property {(alr: any, y: string) => void} [onAgree] - Callback for agree event
-   * @property {(alr: any, y: string) => void} [onDecline] - Callback for decline event
+   * @property {() => void} [onAgree] - Callback for agree event
+   * @property {() => void} [onDecline] - Callback for decline event
    * @property {(alr: any, y: string) => void} [onNego] - Callback for negotiate event
    * @property {() => void} [onProject] - Callback for project event
    * @property {() => void} [onTochat] - Callback for tochat event
@@ -78,13 +78,13 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
 function hover(x){
 onHover?.(x);
 }
-function agree(alr){
+function agree(){
   already = true;
-onAgree?.(alr,"a")
+onAgree?.()
 }
-function decline(alr) {
+function decline() {
   already = true;
-onDecline?.(alr,"d");
+onDecline?.();
 }
 function nego(alr){
 onNego?.(alr,"n");
@@ -312,7 +312,7 @@ onkeypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d  l
  {#if already === false && allr === false && alreadyi == false}
                 <button onmouseenter={()=>hover({"he":"אני רוצה","en":"yes I want"})}
                onmouseleave={()=>hover("0")}
-               onclick={()=>agree("f")}
+               onclick={agree}
                 class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
                  name="requestToJoin">
                 <Lev/>
@@ -327,7 +327,7 @@ onkeypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d  l
             --> <button
              onmouseenter={()=>hover({"he":"לא מתאים לי", "en": "not for me"})}
              onmouseleave={()=>hover("0")}
-             onclick={()=>decline("f")}
+             onclick={decline}
               class = "btnb bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-red-400 hover:scale-110"
               name="decline">
               <No/>

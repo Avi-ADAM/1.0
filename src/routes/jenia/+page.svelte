@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
   import RichText from "$lib/celim/ui/richText.svelte";
 import Nego from "$lib/components/prPr/negoPend.svelte";
   import { sanitizeUserInput } from "$lib/func/uti/sanitizeUserInput.svelte";
@@ -17,26 +15,29 @@ import Nego from "$lib/components/prPr/negoPend.svelte";
     y = c
     lang.set(data.lang)
   })
-  function oncli (){
-   // y.push(0)
-    //y = y
-    //console.log(y,c)
-    let data = {user: "useraplyname", projectName :"projectName", projectSrc: "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png", missionName: "openmissionName", email: "babayofnet@gmail.com", lang: "he" , kind: "exeptedMission"}//username email projectname projectsrc lang openmissionName
-            fetch('/api/sma', {
-            method: 'POST',  
-            headers: {
-              'Content-Type': 'application/json',
-            },
-            body: JSON.stringify(data),
-          })
-            .then((response) => response)
-            .then((data) => {
-              console.log('Success:', data);            
-            })
-            .catch((error) => {
-              console.error('Error:', error);
-            });
-          }
+  async function oncli (){
+    // This is a test function to send a request to the /api/nuti endpoint.
+    // You can modify the 'data' object below with your test data.
+    let data = {"pn":"1❤️1","pl":"https://res.cloudinary.com/onelove1/image/upload/v1642086751/image_b517641fdc.jpg","pu":[{"id":"144","attributes":{"email":"itaylevy7@gmail.com","noMail":null,"lang":null,"username":"לוי איתי","profilePic":{"data":{"attributes":{"url":"https://res.cloudinary.com/onelove1/image/upload/v1699992601/image_b76270977b.jpg","formats":{"large":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1699992602/large_image_b76270977b.jpg","hash":"large_image_b76270977b","mime":"image/jpeg","name":"large_image.jpg","path":null,"size":162.08,"width":1000,"height":1000,"provider_metadata":{"public_id":"large_image_b76270977b","resource_type":"image"}},"small":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1699992602/small_image_b76270977b.jpg","hash":"small_image_b76270977b","mime":"image/jpeg","name":"small_image.jpg","path":null,"size":55.35,"width":500,"height":500,"provider_metadata":{"public_id":"small_image_b76270977b","resource_type":"image"}},"medium":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1699992602/medium_image_b76270977b.jpg","hash":"medium_image_b76270977b","mime":"image/jpeg","name":"medium_image.jpg","path":null,"size":106.22,"width":750,"height":750,"provider_metadata":{"public_id":"medium_image_b76270977b","resource_type":"image"}},"thumbnail":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1699992600/thumbnail_image_b76270977b.jpg","hash":"thumbnail_image_b76270977b","mime":"image/jpeg","name":"thumbnail_image.jpg","path":null,"size":6.15,"width":156,"height":156,"provider_metadata":{"public_id":"thumbnail_image_b76270977b","resource_type":"image"}}}}}}}},{"id":"82","attributes":{"email":"ohad@gmx.us","noMail":null,"lang":null,"username":"אוהד","profilePic":{"data":{"attributes":{"url":"https://res.cloudinary.com/onelove1/image/upload/v1654801950/image_231eb83bfc.jpg","formats":{"thumbnail":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1654801950/thumbnail_image_231eb83bfc.jpg","hash":"thumbnail_image_231eb83bfc","mime":"image/jpeg","name":"thumbnail_image.jpg","path":null,"size":3.26,"width":156,"height":156,"provider_metadata":{"public_id":"thumbnail_image_231eb83bfc","resource_type":"image"}}}}}}}},{"id":"10","attributes":{"email":"adamvampiro666@gmail.com","noMail":null,"lang":null,"username":"מתיתיהו הגלילי","profilePic":{"data":{"attributes":{"url":"https://res.cloudinary.com/onelove1/image/upload/v1645082055/image_1c2942e7c0.jpg","formats":{"small":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1645082057/small_image_1c2942e7c0.jpg","hash":"small_image_1c2942e7c0","mime":"image/jpeg","name":"small_image.jpg","path":null,"size":31.5,"width":500,"height":500,"provider_metadata":{"public_id":"small_image_1c2942e7c0","resource_type":"image"}},"medium":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1645082057/medium_image_1c2942e7c0.jpg","hash":"medium_image_1c2942e7c0","mime":"image/jpeg","name":"medium_image.jpg","path":null,"size":60.41,"width":750,"height":750,"provider_metadata":{"public_id":"medium_image_1c2942e7c0","resource_type":"image"}},"thumbnail":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1645082055/thumbnail_image_1c2942e7c0.jpg","hash":"thumbnail_image_1c2942e7c0","mime":"image/jpeg","name":"thumbnail_image.jpg","path":null,"size":5.54,"width":156,"height":156,"provider_metadata":{"public_id":"thumbnail_image_1c2942e7c0","resource_type":"image"}}}}}}}},{"id":"1","attributes":{"email":"world2019peace@gmail.com","noMail":null,"lang":"he","username":"ברוך בביוף","profilePic":{"data":{"attributes":{"url":"https://res.cloudinary.com/onelove1/image/upload/v1706576516/image_e568378c00.jpg","formats":{"small":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1706576516/small_image_e568378c00.jpg","hash":"small_image_e568378c00","mime":"image/jpeg","name":"small_image.jpg","path":null,"size":75.88,"width":500,"height":500,"provider_metadata":{"public_id":"small_image_e568378c00","resource_type":"image"}},"thumbnail":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1706576516/thumbnail_image_e568378c00.jpg","hash":"thumbnail_image_e568378c00","mime":"image/jpeg","name":"thumbnail_image.jpg","path":null,"size":10.32,"width":156,"height":156,"provider_metadata":{"public_id":"thumbnail_image_e568378c00","resource_type":"image"}}}}}}}},{"id":"8","attributes":{"email":"barbarit111@gmail.com","noMail":null,"lang":null,"username":"Bבר","profilePic":{"data":{"attributes":{"url":"https://res.cloudinary.com/onelove1/image/upload/v1713796944/image_f8120f6eba.jpg","formats":{"large":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1713796946/large_image_f8120f6eba.jpg","hash":"large_image_f8120f6eba","mime":"image/jpeg","name":"large_image.jpg","path":null,"size":181.75,"width":1000,"height":1000,"provider_metadata":{"public_id":"large_image_f8120f6eba","resource_type":"image"}},"small":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1713796945/small_image_f8120f6eba.jpg","hash":"small_image_f8120f6eba","mime":"image/jpeg","name":"small_image.jpg","path":null,"size":64.34,"width":500,"height":500,"provider_metadata":{"public_id":"small_image_f8120f6eba","resource_type":"image"}},"medium":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1713796946/medium_image_f8120f6eba.jpg","hash":"medium_image_f8120f6eba","mime":"image/jpeg","name":"medium_image.jpg","path":null,"size":119.28,"width":750,"height":750,"provider_metadata":{"public_id":"medium_image_f8120f6eba","resource_type":"image"}},"thumbnail":{"ext":".jpg","url":"https://res.cloudinary.com/onelove1/image/upload/v1713796944/thumbnail_image_f8120f6eba.jpg","hash":"thumbnail_image_f8120f6eba","mime":"image/jpeg","name":"thumbnail_image.jpg","path":null,"size":9.84,"width":156,"height":156,"provider_metadata":{"public_id":"thumbnail_image_f8120f6eba","resource_type":"image"}}}}}}}},{"id":"149","attributes":{"email":"shaharnoa18@icloud.com","noMail":null,"lang":null,"username":"Shahar noa zur","profilePic":{"data":null}}},{"id":"176","attributes":{"email":"shoolisa@gmail.com","noMail":false,"lang":null,"username":"שאולי סמואל ","profilePic":{"data":null}}},{"id":"218","attributes":{"email":"itamar.yafe2@gmail.com","noMail":false,"lang":null,"username":"איתמר ","profilePic":{"data":null}}},{"id":"219","attributes":{"email":"britolam1@gmail.com","noMail":false,"lang":null,"username":"יניב ","profilePic":{"data":null}}}],"pid":"1","uid":"1","kind":"pend","name":"אפיון עיצוב"};
+
+    await fetch('/api/nuti', {
+      method: 'POST',  
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    })
+    .then((response) => {
+      console.log('Response status:', response.status);
+      return response.text();
+    })
+    .then((text) => {
+      console.log('Success:', text);
+    })
+    .catch((error) => {
+      console.error('Error:', error);
+    });
+  }
   
 
 
@@ -85,9 +86,7 @@ let conf = {
       "bullist numlist checklist outdent indent | removeformat | code table help"
 }*/
 let outpot = $state(`<hr><hr><hr><hr><hr><hr><hr><hr><hr><h1 style="text-align:center;">     טקסט</h1><hr><hr><hr><hr><hr><hr><hr><p></p>`)
-run(() => {
-    console.log(outpot)
-  });
+
 
 /*
 const publicVapidKey = 'xxxxxx';
@@ -146,20 +145,9 @@ let placeholder = {
   he: 'הוספת דרך חדשה',	en: 'add new way'}
 let ww = []
 </script>
-<MultiSelect
---sms-open-z-index={10000}
-  createOptionMsg={addn[$lang]}
-  allowUserOptions={true}
-  bind:searchText
-  loading={newcontentW}
-  bind:selected
-  placeholder={placeholder[$lang]}
-  options={ww.map((c) => c.attributes.workWayName)}
-  
-/>
+
 <button class="w-3.5 h-3.5 me-2 text-green-500 text-barbi bg-gray-500" onclick={oncli}>ooooo</button>
 
-<RichText bind:outpot/>
 <!----
 <main>
   <h1>Hello Tiny</h1>

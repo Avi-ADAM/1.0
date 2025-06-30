@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
       import Tile from '$lib/celim/tile.svelte';
 import { animate, signal, all } from '$lib/func/animation.ts'
   import { onMount } from 'svelte';// afterUpdate,
@@ -108,7 +106,7 @@ import { animate, signal, all } from '$lib/func/animation.ts'
       order:6
     }*/
   ]);
-  run(() => {
+  $effect(() => {
     for (let i = 0; i < points.length; i++) {
       const element = points[i];
       points[i].distance.sum = (points[i].location + points[i + 1]?.location) / 2;

@@ -1,7 +1,5 @@
 <script>
-  import { run } from 'svelte/legacy';
-
-    import { pinch } from 'svelte-gestures';
+ import { pinch } from 'svelte-gestures';
   import * as animateScroll from "svelte-scrollto-element";
     	import { Drawer } from 'vaul-svelte';
   import { ProgressBar } from "progressbar-svelte";
@@ -491,7 +489,7 @@ function handler (event){
 let ww = $state(0);
   
   let scale = $state(1)
- run(() => {
+ $effect(() => {
     if (ww < h){
       if(ww < 380){
         scale = ww/92

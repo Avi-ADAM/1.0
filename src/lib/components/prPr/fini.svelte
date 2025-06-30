@@ -29,9 +29,9 @@ function confirm (id) {
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
-let ulist = [
-]; 
-let dictid = {};
+let ulist = $state([
+]); 
+let dictid = $state({});
 onMount(async () => {
 
 pre ()

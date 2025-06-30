@@ -538,7 +538,7 @@ vots: [${userss},
   let x = calcX(restime);
   let linkop = ``;
   let already = false;
-  let idL = $page.data.uid;
+  let idL = page.data.uid;
   let qwerys = ``;
   let pendq = ``;
 
@@ -755,7 +755,7 @@ vots: [${userss},
     } else {
       // If not assigned, add current user
       data.assignedTo = [
-        pu.find((user) => user.id === $page.data.uid).attributes.username
+        pu.find((user) => user.id === page.data.uid).attributes.username
       ];
       meData[index] = data;
       // Activate handleAssignment when assigning

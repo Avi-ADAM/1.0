@@ -1,23 +1,18 @@
 <script>
-    import { run } from 'svelte/legacy';
-
-	// +page.svelte
-	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
+    import { onMount } from 'svelte';
+	import { page } from '$app/state';
     import { fetchTimers , timers} from '$lib/stores/timers'
     import Timer from '$lib/components/timers/timer.svelte'
 	let hoverText = '0';
 	let tx = $state(200);
-	run(() => {
+	$effect(() => {
         if ($timers.length > 10) {
     		tx = (400 / $timers.length) * 3.6;
     	}
     });
 
 	//let center = { x: w / 2, y: h / 2 }; // No longer the overall center, see below
-	let size = $state(150);  // Reduced size, to make room for rotation and spacing.
-	let bigsize = $state(160); // Increased bigsize for clarity.
-	let add = $state(size/2 + 10) ; //  spacing.  CRUCIAL.
+
 	let tiltAngle = 59; // Rotation angle in degrees
 
 	// Function to format time (you'll likely have this already)
@@ -35,7 +30,7 @@
     // Function to fetch timer data
 	
     onMount(async () => {
-		const res = await fetchTimers($page.data.uid,fetch).then((x) => {
+		const res = await fetchTimers(page.data.uid,fetch).then((x) => {
             newState = true;
             
             // עדכון מידות
@@ -75,18 +70,12 @@
     let left = $derived(0);
     
     // Adjust sizes based on screen width
-    run(() => {
-        size = ow > 550 ? 120 : 115;
-    });
-    run(() => {
-        bigsize = ow > 550 ? 145 : 100;
-    });
-    run(() => {
-        add = ow > 550 ? 70 : 70;
-    });
+    let size = $derived(ow > 550 ? 120 : 115);
+    let bigsize = $derived(ow > 550 ? 145 : 100);
+    let add = $derived(ow > 550 ? 70 : 70);
     
     // חישוב אוטומטי של גודל אזור התצוגה לפי מספר הטיימרים
-    run(() => {
+    $effect(() => {
         if ($timers.length > 50) {
             w = 2500;
             h = 2500;
@@ -170,8 +159,8 @@
         return c;
     }
 
-    let orders;
-    run(() => {
+    let orders = $state({});
+    $effect(() => {
         orders = checkLines($timers);
     });
 

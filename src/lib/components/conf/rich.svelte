@@ -1,6 +1,4 @@
 <script>
-  import { run } from 'svelte/legacy';
-
 import { generateJSON } from '@tiptap/html'; // הוספת ייבוא של generateJSON
   import TextAlign from '@tiptap/extension-text-align';
   import Highlight from '@tiptap/extension-highlight';
@@ -215,9 +213,7 @@ const result = {
       console.log("!==",text, textb,outjson);
     }
   });
-run(() => {
-    console.log(text,textb,outjson,showJson,htmlon);
-  });
+
  
 </script>
 
