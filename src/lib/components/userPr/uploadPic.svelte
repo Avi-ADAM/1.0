@@ -17,7 +17,8 @@
   /** @type {Props} */
   let { aspect = 1, onMessage } = $props();
 let dataU;
-	let image = $state(), fileinput = $state(), pixelCrop, croppedImage;
+	let image = $state(), fileinput = $state(), pixelCrop = $state({x:0, y:0});
+  let displayImage = $state();
 
    let imgBase64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCA";
 //	async function DataURIToBlob(dataURI) {
@@ -83,33 +84,41 @@ formData.append('files', file, 'image.jpg')
      let before = true;
 
 let files;
-let imageFile;
+let imageFile = $state();
 	function onFileSelected(e) {
   	 imageFile = e.target.files[0];
 		let reader = new FileReader();
 		reader.onload = e => {
-			image = e.target.result
+			image = e.target.result;
+      displayImage = e.target.result;
 		};
 		reader.readAsDataURL(imageFile);
+    console.log(imageFile)
 	}
 
-	let profilePicture = $state(), style;
+	let profilePicture = $state();
 		
 	function previewCrop(e){
-		pixelCrop = e.pixels;
-		const { x, y, width } = e.pixels;
-		const scale = 200 / width;	
-		profilePicture.style=`margin: ${-y*scale}px 0 0 ${-x*scale}px; width: ${profilePicture.naturalWidth * scale}px;`
+    console.log(e.detail); // Log e.detail to see its structure
+		pixelCrop = e.detail.pixels;
+		// Removed direct style manipulation of profilePicture here
 	}
 	
 	async function cropImage(){
-		 await getCroppedImg(image, pixelCrop).then(data =>  sendP(data)
-    )
+    if (!pixelCrop) {
+      alert("Please select an area to crop first.");
+      return;
+    }
+		const croppedDataUrl = await getCroppedImg(image, pixelCrop);
+    displayImage = croppedDataUrl;
+    pixelCrop = null; // Reset pixelCrop after cropping
+    sendP(croppedDataUrl);
 	}
 	
 	function reset() {
-		croppedImage = null;
 		image = null;
+    displayImage = null; // Clear displayImage on reset
+		pixelCrop = null;
 	}
  const up = {"he":"העלאת תמונה", "en": "upload picture"} 
 const adj = {"he":"התאמת גודל התמונה", "en": "adjust picture size"}
@@ -131,17 +140,16 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
       cropShape={aspect == 1  ? 'round' : null}
 			aspect={aspect}
 			zoom=1
-			crop={{x:0, y:0}}
-			onCropcomplete={previewCrop}
+			bind:crop={pixelCrop}
+			onCropcomplete={(e)=>previewCrop(e.detail)}
 		/>
 	</div>
 	<div class="prof-pic-wrapper">
 		<img
 			bind:this={profilePicture}
 			class="prof-pic"
-			src={image}
+			src={displayImage}
 			alt="Profile example"
-			{style}
 		/>
 	</div>
 	
@@ -175,7 +183,7 @@ font-size: 8px;
         position: relative;
         border: solid;
         overflow: hidden;
-        display: none;
+        /* display: none; */ /* Removed to make the preview visible */
     }
     #cr{
       position: relative;
@@ -183,7 +191,8 @@ font-size: 8px;
       aspect-ratio: 1;
     }
     .prof-pic{
-        position: absolute;
+        max-width: 100%; /* Ensure it fits within the wrapper */
+        height: auto; /* Maintain aspect ratio */
     }
 </style>
  

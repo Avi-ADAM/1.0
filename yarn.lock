@@ -7336,12 +7336,10 @@ svelte-copy@^2.0.0:
   resolved "https://registry.npmjs.org/svelte-copy/-/svelte-copy-2.0.0.tgz"
   integrity sha512-wJ784qrc9CF7EtrlT2kwJfHnqae/pp4fkgzYeUxex4iFBm6HosT2904t5cZZ1GAZzg/z9V+lCZVP5rpiYsN6Tw==
 
-svelte-easy-crop@^3.0.1:
-  version "3.0.1"
-  resolved "https://registry.npmjs.org/svelte-easy-crop/-/svelte-easy-crop-3.0.1.tgz"
-  integrity sha512-0/qGWkoEJfIOGJOejjsLvyvZEQlH+VS4PhD7jFAWvbVrotqpcnKF0StAHvs1TEkQ1RvJW6Tpm7QBHVAxTuZ5zA==
-  dependencies:
-    svelte "^4.2.8"
+svelte-easy-crop@^4.0.1:
+  version "4.0.1"
+  resolved "https://registry.npmjs.org/svelte-easy-crop/-/svelte-easy-crop-4.0.1.tgz"
+  integrity sha512-0k7vVpHVLrPyobSXqey5IJUmFVxOoCaQrobFEsFXpSCyK8N5jTkRj1VX6NuCOZK8XXcMAqUvV0MktB8D5x1oCw==
 
 svelte-forms-lib@^2.0.1:
   version "2.0.1"
@@ -7438,26 +7436,6 @@ svelte-viewport-info@^1.0.2:
     tslib "^2.6.2"
 
 svelte@^4.2.19:
-  version "4.2.20"
-  resolved "https://registry.npmjs.org/svelte/-/svelte-4.2.20.tgz"
-  integrity sha512-eeEgGc2DtiUil5ANdtd8vPwt9AgaMdnuUFnPft9F5oMvU/FHu5IHFic+p1dR/UOB7XU2mX2yHW+NcTch4DCh5Q==
-  dependencies:
-    "@ampproject/remapping" "^2.2.1"
-    "@jridgewell/sourcemap-codec" "^1.4.15"
-    "@jridgewell/trace-mapping" "^0.3.18"
-    "@types/estree" "^1.0.1"
-    acorn "^8.9.0"
-    aria-query "^5.3.0"
-    axobject-query "^4.0.0"
-    code-red "^1.0.3"
-    css-tree "^2.3.1"
-    estree-walker "^3.0.3"
-    is-reference "^3.0.1"
-    locate-character "^3.0.0"
-    magic-string "^0.30.4"
-    periscopic "^3.1.0"
-
-svelte@^4.2.8:
   version "4.2.20"
   resolved "https://registry.npmjs.org/svelte/-/svelte-4.2.20.tgz"
   integrity sha512-eeEgGc2DtiUil5ANdtd8vPwt9AgaMdnuUFnPft9F5oMvU/FHu5IHFic+p1dR/UOB7XU2mX2yHW+NcTch4DCh5Q==

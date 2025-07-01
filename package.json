@@ -91,7 +91,7 @@
     "svelte-agnostic-draggable": "^0.2.0",
     "svelte-confetti": "^2.3.1",
     "svelte-copy": "^2.0.0",
-    "svelte-easy-crop": "^3.0.1",
+    "svelte-easy-crop": "^4.0.1",
     "svelte-forms-lib": "^2.0.1",
     "svelte-gantt": "^4.4.2",
     "svelte-gestures": "^5.0.4",

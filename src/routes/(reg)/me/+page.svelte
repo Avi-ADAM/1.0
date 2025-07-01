@@ -48,7 +48,7 @@ let isOpen = $state(false);
   let picLink =
     $state('https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png');
   let idL;
-  let addSl = false;
+  let addSl = $state(false);
 let addSl1 = $state(false);
 let addSl2 = $state(false);
 let addSl3 = $state(false);
@@ -277,6 +277,22 @@ let addNs1 = $state(true);
             showSaveDialog = true; // Show dialog instead of running directly
           }
           meData = meDataa.data.usersPermissionsUser.data.attributes;
+          // Initialize selected2 for the data arrays themselves
+          if (meData.skills && meData.skills.data && meData.skills.data.selected2 === undefined) {
+            meData.skills.data.selected2 = [];
+          }
+          if (meData.tafkidims && meData.tafkidims.data && meData.tafkidims.data.selected2 === undefined) {
+            meData.tafkidims.data.selected2 = [];
+          }
+          if (meData.sps && meData.sps.data && meData.sps.data.selected2 === undefined) {
+            meData.sps.data.selected2 = [];
+          }
+          if (meData.vallues && meData.vallues.data && meData.vallues.data.selected2 === undefined) {
+            meData.vallues.data.selected2 = [];
+          }
+          if (meData.work_ways && meData.work_ways.data && meData.work_ways.data.selected2 === undefined) {
+            meData.work_ways.data.selected2 = [];
+          }
           isG =
             meDataa.data.usersPermissionsUser.data.attributes
               .profilManualAlready;
@@ -614,6 +630,7 @@ const closer = () => {
 };
 
 function close (event){
+  console.log(event);
   const a = event.linkp;
 
   if (a == "tafkidims"){

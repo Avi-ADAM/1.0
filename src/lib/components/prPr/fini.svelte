@@ -136,9 +136,9 @@ function pre (){
    myMissionH()
               });
 
- let km = false;
-  let ky = false;
-  let kc = false;
+ let km = $state(false);
+  let ky = $state(false);
+  let kc = $state(false);
 
 
 function myMissionH ()  {
@@ -196,7 +196,7 @@ meData[i].totaltotal =  meData[i].easy;
   }
 }
 };
-let fir,ssec;
+let fir = $state(),ssec = $state();
  function x(a,b,c){
    if (a == "x"){
     fir = b;
@@ -205,7 +205,7 @@ let fir,ssec;
        onTit?.({ti: `${fir}: ${ssec}%` })
    } 
  }
- let xy = false;
+ let xy = $state(false);
  const hea = {"he":"חלוקת שווי הריקמה", "en": "FreeMate value distribution"}
  const cl = {"he": "סגירת הפירוט", "en": "close the details"}
  const pehe = {"he": "פעולות שבוצעו ואושרו", "en": "approved missions"}

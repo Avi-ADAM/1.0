@@ -1825,17 +1825,6 @@
     margin: 0 auto;
   }
 
-  :global(li:not(.selected):hover) {
-    color: var(--barbi-pink);
-    background-color: var(--lturk);
-    /* unselected but hovered options in the dropdown list */
-  }
-
-  :global(ul.tokens > li) {
-    background-color: var(--barbi-pink);
-    color: var(--lturk);
-  }
-
   th {
     background-color: #6b0f1a;
     background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);

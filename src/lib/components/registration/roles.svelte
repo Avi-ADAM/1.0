@@ -226,10 +226,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 width:78vw;
         }
   }
-  :global(.multiselect) {
-    background-color: var(--gold) !important ;
-  /* top-level wrapper div */
-}
+
  
     .midscreenText-2 {
             transition: all 1s ease-in;

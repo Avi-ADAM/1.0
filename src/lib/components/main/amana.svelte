@@ -998,61 +998,7 @@ justify-self: center;
           border: 1px var(--lturk);
    }
 
-   :global(div.multiselect) {
-    background-color: var(--gold) !important ;
-  /* top-level wrapper div */
-}
-  :global(.multiselect:focus){
-    border: 1px solid var(--barbi-pink) !important;
-  }
-  :global(ul.options){
-    max-height: 40vh;
-  }
-  :global(.multiselect span.token) {
-  color: #ffffff;
-  background: var(--barbi-pink) ;
-    /* selected options */
-  }
- /* :global(.multiselect span.token button),
-  :global(.multiselect .remove-all) {
-
-    /* buttons to remove a single or all selected options at once */
- /* }
-  :global(.multiselect ul) {
-    /* dropdown options */
- /* }
-  :global(.multiselect ul li) {
-    /* dropdown options */
- /* } */
- :global(li.selected) {
-    border: var(--sms-focus-border, 1pt solid var(--sms-active-color, cornflowerblue));
-    color: var(--gold);
-    /* selected options in the dropdown list */
-  }
-  :global(li:not(.selected):hover) {
- color: var(--barbi-pink);
-    background-color:var(--lturk);    /* unselected but hovered options in the dropdown list */
-  }
-  :global(ul.tokens > li){
-    background-color: var(--barbi-pink);
-    color:var(--lturk);
-  }
-  :global(ul.tokens > li):hover{
-    color: var(--barbi-pink);
-background-color:var(--lturk);
-  }
-  /*
-  :global(li.selected:hover) {
-    /* selected and hovered options in the dropdown list */
-    /* probably not necessary to style this state in most cases */
- /* } */
-  :global(li.active) {
-    color:var(--barbi-pink) !important;
-    /* active means element was navigated to with up/down arrow keys */
-    /* ready to be selected by pressing enter */
-  }
- /* :global(li.selected.active) {
-  } */
+ 
 
 #lines{
   display: "";
@@ -1117,9 +1063,7 @@ position: absolute;
   padding: 1.8em 1.8em;
     }
 
-    :global(.multiselect) {
-    max-width: 200px !important;
-  }
+   
 .amanat{
   margin: 0 auto;
   padding: 0;
@@ -1611,8 +1555,4 @@ position: absolute;
     min-width: 170px;
   }
 }
- :global(.multiselect) {
-    max-width: 250px;
-
-  }
   </style>

@@ -21,9 +21,9 @@ let a = $state(0);
 let success = $state(false)
     let before = $state(false);
     let url1 = baseUrl+"/api/upload";
-    let linkP = $state();
-    let desP = $state();
-    let desPl = $state();
+    let linkP = $state("");
+    let desP = $state("");
+    let desPl = $state("");
     let resP;
     let projectName_value = $state("");
     let token; 
@@ -219,7 +219,7 @@ let suc = $state(false);
      };
 
 
-    let selected = $state();
+    let selected = $state([]);
         const placeholder = `${$lang == "he" ? "ערכים ומטרות" : "vallues and goals"}`;
 
  function project (id) {
@@ -424,7 +424,9 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 
 <div  class="input-2">
      <MultiSelect
-  
+     outerDivClass="!bg-gold !text-barbi"
+     inputClass="!bg-gold !text-barbi"
+     liSelectedClass="!bg-barbi !text-gold"
       createOptionMsg={addne[$lang]}
      allowUserOptions={"append"}
       loading={newcontent}
@@ -531,7 +533,6 @@ pointer-events: none;">
 {/if}
 <style>
  
-
   textarea::-webkit-resizer {
   border-width: 8px;
   border-style: solid;

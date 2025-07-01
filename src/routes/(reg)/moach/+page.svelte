@@ -2592,17 +2592,6 @@ pointer-events: none;"
     -webkit-text-stroke: 1px var(--barbi-pink);
   }
 
-  :global(li:not(.selected):hover) {
-    color: var(--barbi-pink);
-    background-color: var(
-      --lturk
-    ); /* unselected but hovered options in the dropdown list */
-  }
-  :global(ul.tokens > li) {
-    background-color: var(--barbi-pink);
-    color: var(--lturk);
-  }
-
   .sp {
     display: grid;
     justify-content: center;

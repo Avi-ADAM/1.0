@@ -260,26 +260,7 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
  </div>
 
 <style>
-:global(.multiselect) {
-    color: #02a2ff;
-    /* top-level wrapper div */
-}
 
-:global(li.selected) {
-    border: var(--sms-focus-border, 1pt solid var(--sms-active-color, cornflowerblue))
-        /* selected options in the dropdown list */
-}
-
-:global(li:not(.selected):hover) {
-    color: #FF0092;
-    /* unselected but hovered options in the dropdown list */
-}
-
-:global(li.active) {
-    color: #EEE8AA;
-    /* active means element was navigated to with up/down arrow keys */
-    /* ready to be selected by pressing enter */
-}
 
 :root {
     --primary-light: #a6f9d6;
