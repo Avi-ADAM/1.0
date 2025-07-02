@@ -54,7 +54,9 @@
     gold = $bindable(false),
     neww = $bindable(false),
     word = "word",
-    bg = "blue"
+    bg = "blue",
+    closeiline = true,
+    children
   } = $props();
    $effect(() => {
     if (bg == "blue"){
@@ -83,7 +85,7 @@
   });
    //gray red green yellow indigo purple pink
 </script>
-<span class:line-through={closei == true}
+<span class:line-through={closei == true && closeiline == true}
 class:hover:bg-blue-400={blue == true}
 class:hover:bg-gold={gold == true}
         class:hover:bg-wow={wow == true}
@@ -127,6 +129,9 @@ class:flex-wrap={pic == true}
 </span>
  {/if}
  {@html word}
+   {#if children}
+     {@render children()}
+   {/if}
  {#if closei}
       <svg aria-hidden="true" class="w-3 h-3 sm:w-5 sm:h-5 bg-slate-100 rounded-full mx-1"  fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
  {/if}

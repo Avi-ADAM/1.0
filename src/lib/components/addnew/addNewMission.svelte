@@ -76,7 +76,7 @@ let selectedrole = $state([])
         
     });
 let missionName_value = $state();
-    let selected = $state();  
+    let selected = $state([]);  
     let skillslist =[];
     let tafkidimslist = [];
   

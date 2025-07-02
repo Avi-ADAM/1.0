@@ -13,7 +13,7 @@ import { idPr } from '../../stores/idPr.js'
 let locale = $lang
 let store = $state()
 console.log(quant)
-let selected = $state();
+let selected = $state([]);
 let total = $state(0);
  let kindOf = 'monthly';
 let hm = $state(1);

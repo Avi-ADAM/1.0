@@ -1,7 +1,7 @@
 <script>
   import { preventDefault } from 'svelte/legacy';
 
-  let fpval = $state(), selected = $state(), liUN = $state(), email = $state();
+  let fpval = $state(), selected = $state([]), liUN = $state(), email = $state();
       import MultiSelect from 'svelte-multiselect';
   import { userName } from '$lib/stores/store.js';
   import Levbtn from '$lib/celim/ui/levbtn.svelte';

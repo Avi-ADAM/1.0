@@ -138,7 +138,7 @@ async function run() {
   });
   console.log('Sent push');
 }*/
-let searchText = $state(),  selected = $state(), addn = {
+let searchText = $state(),  selected = $state([]), addn = {
   he: 'הוספת דרך חדשה',	en: 'add new way'}
 let newcontentW
 let placeholder = {

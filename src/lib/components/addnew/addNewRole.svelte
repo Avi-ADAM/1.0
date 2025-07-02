@@ -11,7 +11,7 @@ let idro;
 idr.subscribe(newwork => {
 idro = newwork;
 });
- let selected = $state();
+ let selected = $state([]);
  let id;
  let meData = [];
     const placeholder = `${$lang == "he" ? "כישורים קשורים" : "related skills"}`;
@@ -217,7 +217,7 @@ function dispatchb () {
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
 onclick={() => addR = true}>{addn[$lang]}</button>
 {:else}
-
+<div class="bg-opacity-10 bg-barbi">
 
 <button title={cencel[$lang]}
 onclick={dispatchb}
@@ -249,6 +249,8 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
       bind:selected
       {placeholder}
       options={skills2.map(c => c.attributes.skillName)}
+        inputClass='!text-barbi'
+            outerDivClass='!text-barbi'
       />
      </div>
      <div>
@@ -275,7 +277,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
       <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button>
       <Addnewskil {color} rn={skills2.map(c => c.attributes.skillName)} onFinnish={finnish}/>{/if}</div>
-  
+      </div>
     {/if}
    
 </div>

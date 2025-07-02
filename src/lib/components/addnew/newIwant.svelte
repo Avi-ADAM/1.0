@@ -192,7 +192,7 @@
     return arr;
   }
 
-  let selected = $state();
+  let selected = $state([]);
   const placeholder = `${$lang == 'he' ? 'ערכים ומטרות' : 'vallues and goals'}`;
 
 

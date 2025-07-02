@@ -6,7 +6,7 @@
                import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
  //   import { skillIdStore } from './store/skillIdStore.js'
- let selected = $state();
+ let selected = $state([]);
  let id;
      const placeholder = `${$lang == "he" ? "תפקידים קשורים" : "related Roles"}`;
     const baseUrl = import.meta.env.VITE_URL
@@ -204,6 +204,7 @@ function dispatchb () {
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
 onclick={() => addS = true}>{adds[$lang]}</button>
 {:else}
+<div class="bg-barbi bg-opacity-10">
 <button title={cencel[$lang]}
 onclick={dispatchb}
               class=" hover:bg-barbi text-gold hover:text-lturk font-bold py-1 px-1 rounded-full text-center"
@@ -239,6 +240,8 @@ onclick={dispatchb}
   {placeholder}
   noMatchingOptionsMsg={nom[$lang]}
   options={roles1.map(c => c.attributes.roleDescription)}
+            inputClass='!text-barbi'
+            outerDivClass='!text-barbi'
   /></div>
   <br>
 <div>
@@ -270,7 +273,7 @@ onclick={() => addro = false}
   <Addnewro {color} rn={roles1.map(c => c.roleDescription)} onFinnish={finnish}/>
   {/if}
 </div>
- 
+</div>
 {/if}
 
 </div>

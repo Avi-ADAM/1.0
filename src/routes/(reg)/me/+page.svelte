@@ -633,6 +633,10 @@ function close (event){
   console.log(event);
   const a = event.linkp;
 
+  if (event.list && event.list.selected2 === undefined) {
+    event.list.selected2 = [];
+  }
+
   if (a == "tafkidims"){
     meData.tafkidims.data = event.list
   }

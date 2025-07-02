@@ -594,15 +594,12 @@ console.log("skillslist",skillslist);
     data = $bindable([]),
     meData = $bindable([]),
     datan = '',
-    addS = $bindable(false),
     kish,
     linkp = 'skills',
     addSl = $bindable(false),
     placeholder = ' בחירת כישורים',
     Valname = 'כישורים',
     masss = $bindable(false),
-    addR = $bindable(false),
-    addW = $bindable(false),
     width = 1,
     onClose,
     onAdd,
@@ -612,6 +609,16 @@ console.log("skillslist",skillslist);
     onMassss,
     onAddnew
   } = $props();
+
+  let addS = $state(false);
+  let addR = $state(false);
+  let addW = $state(false);
+
+  $effect(() => {
+    if (data && data.selected2 === undefined) {
+      data.selected2 = [];
+    }
+  });
 
   let filteredAllvn = $derived(allvn.filter(v => !data.some(d => d.attributes[valc] === v)));
 
@@ -715,67 +722,89 @@ $effect(() => {
         {edbef[$lang]}{Valname}{edaft[$lang]}
       </p>
       {#if data}
-        {#each data as da, i}
+       <div
+        class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"
+      >
+        {#each data as da, i (da.id)}
           <div
             transition:slide|local={{
               delay: 150,
               duration: 1000,
               easing: quintOut
-            }}
-            class="text-center text-sm text-lturk md:text-xl"
-          >
+            }}>
             {#if datan === 'mash'}
-              {#if da.attributes.panui != false}
-                <button
-                  class="text-gold hover:text-barbi"
-                  title={less[$lang]}
-                  onclick={min(da.id, da.attributes[valc])}
-                  ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                    />
-                  </svg></button
-                >
-                <button
-                  class=" hover:bg-barbi text-mturk rounded-full"
-                  title={edito[$lang]}
-                  onclick={edit(da.id)}
-                  ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z"
-                    />
-                  </svg>
-                </button>
-              {:else}
-                <button
-                  class=" hover:bg-barbi text-mturk rounded-full"
-                  title={onin[$lang]}
-                >
-                  <Grow width="17" height="17" /></button
-                >
-              {/if}
-            {:else}
-              <button
-                class="text-gold hover:text-barbi"
-                title={less[$lang]}
-                onclick={min(da.id, da.attributes[valc])}
-                ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                  />
-                </svg></button
+              <Tile
+                big={width > 640}
+                sm={width > 640}
+                bg={bgi}
+                gr={datan === 'mash' && da.attributes.panui === false
+                  ? true
+                  : false}
+                word={da.attributes[valc]}
               >
-            {/if}{da.attributes[valc]}
+                {#if da.attributes.panui != false}
+                  <button
+                    class="text-barbi hover:text-red-700"
+                    title={less[$lang]}
+                    onclick={() => min(da.id, da.attributes[valc])}
+                    aria-label={less[$lang]}
+                    ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                      />
+                    </svg></button
+                  >
+                  <button
+                    class=" hover:bg-gold text-barbi rounded-full"
+                    title={edito[$lang]}
+                    onclick={() => edit(da.id)}
+                    aria-label={edito[$lang]}
+                    ><svg style="width:17px;height:17px" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z"
+                      />
+                    </svg>
+                  </button>
+                {:else}
+                  <button
+                    class=" hover:bg-barbi text-barbi rounded-full"
+                    title={onin[$lang]}
+                    aria-label={onin[$lang]}
+                  >
+                    <Grow width="17" height="17" /></button
+                  >
+                {/if}
+              </Tile>
+            {:else}
+             <div
+                class="text-center text-sm text-lturk md:text-xl"
+                title={less[$lang]}
+                onclick={() => min(da.id, da.attributes[valc])}
+              >
+              <Tile
+                big={width > 640}
+                sm={width > 640}
+                bg={bgi}
+                closei={true}
+                closeiline={false}
+                gr={datan === 'mash' && da.attributes.panui === false
+                  ? true
+                  : false}
+                word={da.attributes[valc]}
+              />
+              </div>
+            {/if}
           </div>
         {/each}
+        </div>
         {#if datan === 'mash' && yy == 2}
           <button
             onclick={increment}
             title="{rem[$lang]}{Valname} "
             class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
+            aria-label="{rem[$lang]}{Valname}"
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -791,7 +820,7 @@ $effect(() => {
         <h3 class="text-center text-sm text-barbi">
           {adbf[$lang]}{Valname}{adaf[$lang]}
         </h3>
-        <div class="flex flex-row-reverse">
+        <div class="flex justify-center">
           <MultiSelect
             bind:selected={data.selected2}
             inputClass='!text-barbi'
@@ -811,15 +840,15 @@ $effect(() => {
       <!--      allowUserOptions={"append"}-->
 
       {#if datan == 'skil'}
-        <Addnewsk rn={allvn} onAddnewskill={addnew} {addS} />
+        <Addnewsk rn={allvn} onAddnewskill={addnew} bind:addS />
       {:else if datan == 'taf'}
-        <Addnewr rn={allvn} onAddnewrole={addnew} {addR} />
+        <Addnewr rn={allvn} onAddnewrole={addnew} bind:addR />
       {:else if datan == 'mash'}
-        <Addnewn rr={13} onNewn={addnewM} {addW} />
+        <Addnewn rr={13} onNewn={addnewM} bind:addW />
       {:else if datan == 'val'}
         <Addnewv rn={allvn} onAddnew={addnew} />
       {:else if datan == 'work'}
-        <Addneww rn={allvn} onAddww={addnew} />
+        <Addneww rn={allvn} onAddww={addnew} bind:addW />
       {/if}
     </div>
     {#if datan !== 'mash' && yy > 0}
@@ -827,6 +856,7 @@ $effect(() => {
         onclick={increment}
         title="{adbf[$lang]}{Valname}{adaf[$lang]}"
         class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
+        aria-label="{adbf[$lang]}{Valname}{adaf[$lang]}"
         ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
           <path
             fill="currentColor"
