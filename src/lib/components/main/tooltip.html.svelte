@@ -9,7 +9,7 @@
    */
 
   /** @type {Props} */
-  let { evt = {}, offset = -35, children } = $props();
+  let { evt, offset = -35, children } = $props();
 
   const translations = {
     name: {
@@ -25,6 +25,12 @@
       he: 'הסכמות'
     }
   };
+
+  let mouseEvent = $derived(evt && evt.detail && evt.detail.e ? evt.detail.e : null);
+  let tooltipData = $derived(evt && evt.detail && evt.detail.props ? evt.detail.props : null);
+
+  let tooltipTop = $derived(mouseEvent ? mouseEvent.layerY + offset : 0);
+  let tooltipLeft = $derived(mouseEvent ? mouseEvent.layerX : 0);
 </script>
 
 <style>
@@ -40,14 +46,14 @@
   }
 </style>
 
-{#if evt?}
+{#if evt && mouseEvent && tooltipData}
   <div
     class="tooltip"
     style="
-      top:{evt??.e?.layerY + offset}px;
-      left:{evt??.e?.layerX}px;
+      top:{tooltipTop}px;
+      left:{tooltipLeft}px;
     "
   >
-    {@render children?.({ detail: evt?, translations })}
+    {@render children?.({ detail: tooltipData, translations })}
   </div>
 {/if}

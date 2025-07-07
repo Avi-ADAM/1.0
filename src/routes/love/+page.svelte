@@ -142,7 +142,7 @@
           
         >
           {#snippet children({ detail, translations })}
-                                {@const tooltipData = { ...detail.props, ...dataLookup.get(detail.props[mapJoinKey]) }}
+                                {@const tooltipData = { ...detail, ...dataLookup.get(detail[mapJoinKey]) }}
             {#each Object.entries(tooltipData) as [key, value]}
               {@const keyCapitalized = key.replace(/^\w/, d => d.toUpperCase())}
               {@const translatedKey = translations[key]?.[$lang] || keyCapitalized}
