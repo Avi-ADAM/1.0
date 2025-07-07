@@ -794,6 +794,7 @@
               onMesima={mesima}
               timeToP={buble.attributes.project.data.attributes.timeToP}
               coinlapach={buble.coinlapach}
+              acts={buble.attributes.acts}
               restime={buble.attributes.project.data.attributes.restime}
               {askedarr}
               {declineddarr}

@@ -271,11 +271,11 @@ let addNs1 = $state(true);
       if (meDataa.data != null) {
         if (meDataa.data.me.id === idL && meDataa.data.me != null) {
           if (
-            meDataa.data.usersPermissionsUser.data.attributes
-              .profilManualAlready != true
+            meDataa.data.usersPermissionsUser.data.attributes.profilManualAlready != true
           ) {
             showSaveDialog = true; // Show dialog instead of running directly
           }
+          console.log(meDataa.data.usersPermissionsUser.data.attributes)
           meData = meDataa.data.usersPermissionsUser.data.attributes;
           // Initialize selected2 for the data arrays themselves
           if (meData.skills && meData.skills.data && meData.skills.data.selected2 === undefined) {

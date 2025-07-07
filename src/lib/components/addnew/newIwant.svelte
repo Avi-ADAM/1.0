@@ -8,14 +8,14 @@
   import Chooser from '$lib/celim/ui/chooser.svelte';
   const baseUrl = import.meta.env.VITE_URL;
   let totalbounti = $state()
-  let des = $state();
+  let des = $state('');
   let loading = $state(false);
   let a = $state(0);
   let success = $state(false);
   let before = $state(false);
   let url1 = baseUrl + '/api/upload';
   let linkP = $state();
-  let desP = $state();
+  let desP = $state('');
   let name = $state('');
   let token;
   let timeToP = 'already';

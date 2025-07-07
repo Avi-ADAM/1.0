@@ -946,7 +946,6 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
   align-items: center;
   justify-content: center;
   border-radius: 18px !important;
-  border: 1px solid var(--barbi-pink);
   font-size: 22px;
   font-weight: bold;
   min-height:100vh;

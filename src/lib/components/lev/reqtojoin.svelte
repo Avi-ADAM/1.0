@@ -997,7 +997,6 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
   align-items: center;
   justify-content: center;
   border-radius: 18px !important;
-  border: 1px solid var(--barbi-pink);
   font-size: 22px;
   font-weight: bold;
   min-height:100vh;

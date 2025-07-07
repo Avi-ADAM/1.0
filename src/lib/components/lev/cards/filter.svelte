@@ -5,7 +5,7 @@
 
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-console.log(allIds,"allIds")
+
 let sugg =  "sugg";
 let pend = "pend";
 let asks = "asks";
@@ -171,6 +171,9 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
   }
   onHover?.({id: u[$lang]});
  }
+ $effect(() => {
+    console.log("milon", milon)
+ })
  //{name:"welc",val:true,color:"gray"},
  let milon = $state([
   {name:"fiap", val:true, color:"blue", word:{he:`אשרורי סיום (${fia})`, en:`Mission Completion Approvals (${fia})`}}, 
@@ -207,7 +210,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
     // מחזיר true רק אם יש ערך מספרי והוא גדול מ-0
     return valueMap[item.name] > 0;
 }) as key}
-    <button onclick={()=> onShowonly?.(key.name)}>
+    <button onclick={()=> showonly?.(key.name)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
@@ -218,7 +221,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
 {/each}
 {:else}
 {#each milon as key}
-    <button onclick={()=> onShowonly?.(key.name,key.id)}>
+    <button onclick={()=> showonly?.(key.name,key.id)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}

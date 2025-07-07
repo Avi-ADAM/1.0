@@ -28,7 +28,7 @@
             seconds: totalSeconds % 60
         };
     }
-    let newState = false;
+    let newState = $state(false);
     // Function to fetch timer data
 	
     onMount(async () => {

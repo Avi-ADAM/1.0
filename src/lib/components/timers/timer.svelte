@@ -26,8 +26,10 @@
   let elapsedTime = $state('00:00:00');
   let selectedTasks = $state([]);
   let taskSearchTerm = $state('');
-  let timer = $state();
+  let timer = $state([]);
   onMount(() => {
+    timer = $timers?.find((t) => t.mId == missionId);
+
     console.log(timer)
     if(timer.attributes.activeTimer.data?.attributes?.isActive) {
       console.log("running")  
@@ -199,17 +201,8 @@
     };
   }
 
-  $effect(() => {
-    console.log(showSaveDialog)
-  });
-  $effect(() => {
-    timer = $timers?.find((t) => t.mId == missionId);
-    if (timer) {
-      console.log("Timer found:", timer);
-    } else {
-      console.log("No timer found for missionId:", missionId);
-    }
-  });
+ 
+
   // Update local state when timer prop changes
   $effect(() => {
     localZman = 1 || 0;
