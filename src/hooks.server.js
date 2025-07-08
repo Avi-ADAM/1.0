@@ -72,6 +72,7 @@ export async function handle({ event, resolve }) {
   event.locals.tok = event.cookies.get('jwt') || false;
   event.locals.uid = event.cookies.get('id') || false;
   event.locals.un = event.cookies.get('un') || false;
+  event.locals.email = event.cookies.get('email') || false;
   console.log(lang,event.url.pathname)
   // Set language cookie based on URL path
   if (event.url.pathname === '/en' || event.url.pathname === '/ar' || event.url.pathname === '/he') {

@@ -71,6 +71,7 @@ export async function fetchTimers(uid, fetch) {
                             src: t.attributes.project?.data?.attributes?.profilePic.data.attributes.url,
                             projectId: t.attributes.project.data.id,
                             mId: t.id,
+                            hoursAssigned: t.attributes.hoursassinged || 0,
                         };
 
                     }

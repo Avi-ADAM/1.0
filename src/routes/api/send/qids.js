@@ -519,4 +519,139 @@ export const qids = {
   }
  }
 `,
+'39GetNegotiation': `
+      query GetNegotiation($id: ID!) {
+        negotiation(id: $id) {
+          data {
+            id
+            attributes {
+              topic
+              description
+              status
+              maxRounds
+              currentRound
+              creator {
+                data {
+                  attributes {
+                    username
+                    email
+                  }
+                }
+              }
+              positions {
+                data {
+                  id
+                  attributes {
+                    heading
+                    description
+                    author{
+                    data{
+                      attributes{
+                        username
+                        email
+                      }
+                    }
+                  }
+                    authorEmail
+                    votes
+                    voters{
+                    data{
+                      attributes{
+                        username
+                        email
+                      }
+                    }
+                  }
+                    location
+                    intensity
+                    tags{
+                    data{
+                      attributes{
+                        name
+                      }
+                    }
+                  }
+                    order
+                  }
+                }
+              }
+              participants {
+                data {
+                  id
+                  attributes {
+                    username
+                    email
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+  '40CreateNegotiation': `
+      mutation CreateNegotiation($data: NegotiationInput!) {
+        createNegotiation(data: $data) {
+          data {
+            id
+            attributes {
+              topic
+              description
+            }
+          }
+        }
+      }
+    `,
+  '41CreatePosition': `
+      mutation CreatePosition($data: PositionInput!) {
+        createPosition(data: $data) {
+          data {
+            id
+            attributes {
+              heading
+              description
+              author{
+              data{
+                attributes{
+                  username
+                  email
+                }
+              }
+            }
+              votes
+              voters{
+              data{
+                attributes{
+                  username
+                  email
+                }
+              }
+            }
+              location
+              order
+            }
+          }
+        }
+      }
+    `,
+  '42UpdatePosition': `
+      mutation UpdatePosition($id: ID!, $data: PositionInput!) {
+        updatePosition(id: $id, data: $data) {
+          data {
+            id
+            attributes {
+              votes
+              voters{
+              data{
+                attributes{
+                  username
+                  email
+                }
+              }
+            }
+            }
+          }
+        }
+      }
+    `,
 }

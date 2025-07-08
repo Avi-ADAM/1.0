@@ -4,6 +4,7 @@
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/state';
   import { timers, updateTimers } from '$lib/stores/timers';
+  import { lang } from '$lib/stores/lang'; // Import the lang store
   import TimerDialogs from './TimerDialogs.svelte';
 
   let {
@@ -17,7 +18,8 @@
     hover,
     project,
     linke,
-    missionId
+    missionId,
+    hoursAssigned // Add this prop
   } = $props();
   let showSaveDialog = $state(false);
   let showClearDialog = $state(false);
@@ -67,6 +69,11 @@
   let localZman = $derived(timer?.zman || 0);
   let isRunning = $derived(timer?.running || false);
   let timerInterval = $state();
+
+  // Calculate total hours done (saved + current running)
+  let totalHoursDone = $derived(
+    (localZman / 3600000) + (timer?.attributes?.howmanyhoursalready || 0)
+  );
 
  // Start/stop timer function
  async function startTimerLocal(only=false) {
@@ -931,6 +938,30 @@
       </textPath>
     </text>
   
+    <!-- New curved path for Total Hours Display --><!-- Adjusted Y position for top curve -->
+    <!-- New curved path for Total Hours Display -->
+    <path
+      fill="none"
+      stroke="none"
+      id="curveHours"
+      d="M 364.7 58.525 A 250 250 0 0 1 516.5 175"
+    />
+    <text fill="#FFFFFF" font-weight="900">
+      <textPath
+        font-size="36"
+        xlink:href="#curveHours"
+        startOffset="50%"
+        text-anchor="middle"
+      >
+        <tspan fill="#FFFFFF" font-weight="900">
+          {#if $lang === 'he'}
+          {Math.floor(totalHoursDone)} / {hoursAssigned} שעות
+          {:else}
+            Hours: {hoursAssigned} / {Math.floor(totalHoursDone)}
+          {/if}
+        </tspan>
+      </textPath>
+    </text>
  
 
   </g></svg

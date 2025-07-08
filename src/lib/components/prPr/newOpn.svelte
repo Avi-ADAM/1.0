@@ -24,10 +24,12 @@
     omiData = filtered;
     }
     for(let i = 0; i < omiData.length; i++){
-      const langd = langAdjast(omiData[i].attributes, $lang);
-      omiData[i].attributes = langd
+      if (omiData[i]?.attributes) { // Add check for attributes existence
+        const langd = langAdjast(omiData[i].attributes, $lang);
+        omiData[i] = { ...omiData[i], attributes: langd };
+      }
     }
-    omiData = omiData
+    // No need for omiData = omiData here as individual items are reassigned
 })
 
 function remove (id) {

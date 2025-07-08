@@ -20,7 +20,7 @@
 /** @type {Props} */
 let { onClose, meData = [] } = $props();
   let miDatan = [];
-    let error1 = null;
+    let error1 = $state(null);
 
   onMount(async () => {
     const id = meData.id
@@ -36,7 +36,7 @@ let { onClose, meData = [] } = $props();
     meData.dates !== undefined || null || 0 ? meData.dates : new Date().toISOString().slice(0, -1);
     meData.datef !== undefined || null || 0 ? meData.datef :  new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().slice(0, -1);
 }
- let already = false;
+ let already = $state(false);
  let idL;
 const baseUrl = import.meta.env.VITE_URL
 
@@ -102,8 +102,8 @@ async function han (){
 }
 
 
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
 function myMissionH ()  {
   ky = false;

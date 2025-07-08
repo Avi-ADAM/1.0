@@ -33,7 +33,7 @@ function sendP () {
 
 
 let vallues = $state([]);
-    let error1 = null;
+    let error1 = $state(null);
     let addval = $state(false);
     const baseUrl = import.meta.env.VITE_URL
 
@@ -113,7 +113,8 @@ let suc = false;
     desPl = $bindable(),
     projectName_value = $bindable(),
     restime = $bindable(),
-    selected = $bindable([])
+    selected = $bindable([]),
+    onMessage
   } = $props();
     const placeholder = `ערכים ומטרות`;
  
@@ -227,6 +228,9 @@ addval == false;
    {placeholder}
    options={vallues.map(c => c.attributes.valueName)}
    --sms-li-selected-bg="var(--gold)"
+   outerDivClass="!bg-gold !text-barbi"
+   inputClass="!bg-gold !text-barbi"
+   liSelectedClass="!bg-barbi !text-gold"
    /></div>
    <div  >
    {#if addval == false}

@@ -11,7 +11,8 @@
     import { liUN } from '$lib/stores/liUN.js';
     const baseUrl = import.meta.env.VITE_URL
 
-
+
+
     let active = $state(false);
     let loginError = $state(null);
     let email = $state("");
@@ -44,10 +45,11 @@
             })
             .then(({ data }) => {
                 console.log(data)
-                document.cookie = `jwt=${data.jwt}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
-                document.cookie = `id=${data.user.id}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
-                document.cookie = `un=${encodeURIComponent(data.user.username)}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
-                document.cookie = `when=${Date.now()}; path=/; expires=` + new Date(2026, 0, 1).toUTCString();
+document.cookie = `jwt=${data.jwt}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
+document.cookie = `id=${data.user.id}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
+document.cookie = `un=${encodeURIComponent(data.user.username)}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
+document.cookie = `when=${Date.now()}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
+document.cookie = `email=${email}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
                 // document.cookie = `guidMe=again; path=/; expires=` + new Date(2026, 0, 1).toUTCString();	
                 JWT.set(data.jwt);
                 idM.set(data.user.id);

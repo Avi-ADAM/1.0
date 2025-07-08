@@ -254,6 +254,7 @@
                 {hover} 
                 {project} 
                 {linke}
+                hoursAssigned={timer.hoursAssigned}
             />
             {/each}
             
