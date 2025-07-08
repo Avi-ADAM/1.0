@@ -29,6 +29,10 @@
   let selectedTasks = $state([]);
   let taskSearchTerm = $state('');
   let timer = $state([]);
+  let localZman = $state(0); // Make localZman a state variable
+  let isRunning = $derived(timer?.running || false); // Keep isRunning derived from timer.running
+  let timerInterval = $state();
+
   onMount(() => {
     timer = $timers?.find((t) => t.mId == missionId);
 
@@ -47,7 +51,6 @@
       let currentTime = Date.now();
       
       // Update local state
-      timer.zman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
       localZman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
       isRunning = true;
       timer.running = true;
@@ -56,7 +59,6 @@
   }else if(timer.attributes.activeTimer.data?.attributes?.isActive == false){
     console.log("stopped")
     let totalHours = timer.attributes.activeTimer.data.attributes.totalHours;
-    timer.zman = totalHours * 3600000;
     localZman = totalHours * 3600000;
     isRunning = false;
     timer.running = false;
@@ -64,11 +66,6 @@
 }
     selectedTasks = timer?.attributes.activeTimer?.data?.attributes.acts.data.map(task => task.id) ?? []
   })
-
-  // Local reactive state
-  let localZman = $derived(timer?.zman || 0);
-  let isRunning = $derived(timer?.running || false);
-  let timerInterval = $state();
 
   // Calculate total hours done (saved + current running)
   let totalHoursDone = $derived(
@@ -212,7 +209,6 @@
 
   // Update local state when timer prop changes
   $effect(() => {
-    localZman = 1 || 0;
     isRunning = timer?.running || false;
     if (isRunning && !timerInterval) {
       startTimerLocal(true);
@@ -269,11 +265,9 @@
 
       // Reset localZman specifically for clear operations
       if (!detail.running && detail.timer?.attributes?.timers?.length === 0) {
-        timer.zman = 0;
         localZman = 0;
       } else {
         // Otherwise, update based on totalHours (for save, update, etc.)
-        timer.zman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
         localZman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
       }
       // Ensure isRunning state is also updated based on the event
@@ -282,7 +276,6 @@
     } else {
        // Handle cases where detail.timer might be null or undefined if necessary
        console.warn("update-timer event received without timer data:", detail);
-      timer.zman = 0;
        localZman = 0; // Default to 0 if timer data is missing
        isRunning = false;
     }

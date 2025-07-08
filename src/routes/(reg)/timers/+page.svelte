@@ -65,12 +65,7 @@
     let ow = $state(500);
     
     let oh = $state(500);
-    
-    let maxW = $derived(100);
-    let maxH = $derived(100);
-    let top = $derived(0);
-    let left = $derived(0);
-    
+ 
     // Adjust sizes based on screen width
     $effect(() => {
         size = ow > 550 ? 160 : 115;

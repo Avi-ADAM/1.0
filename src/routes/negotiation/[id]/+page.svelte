@@ -101,7 +101,7 @@
           positions: attrs.positions?.data?.map(pos => ({
             id: pos.id,
             ...pos.attributes,
-            supporters: JSON.parse(pos.attributes.supporters || '[]')
+            voters: JSON.parse(pos.attributes.voters || '[]')
           })) || [],
           participants: attrs.participants?.data?.map(p => p.attributes) || []
         };
@@ -177,7 +177,7 @@
           data: {
             ...positionData,
             negotiation: negotiationId,
-            supporters: JSON.stringify(positionData.supporters || [])
+            voters: JSON.stringify(positionData.voters || [])
           }
         },'41CreatePosition',0,0,false,fetch
       );
@@ -194,7 +194,7 @@
       const result = await sendToSer({
             id: positionId,
             data: {
-              supporters: JSON.stringify(supporters),
+              voters: JSON.stringify(supporters),
               votes: votes
             }
           },'42UpdatePosition',
@@ -216,7 +216,7 @@
     let weightedY = 0;
     
     pointsArray.forEach(point => {
-      const weight = (point.supporters?.length || 0) + 1;
+      const weight = (point.voters?.length || 0) + 1;
       weightedX += point.location * weight;
       weightedY += point.location * weight;
       totalWeight += weight;
@@ -284,7 +284,7 @@
       author: userName || 'משתמש אנונימי',
       authorEmail: userEmail || '',
       votes: 0,
-      supporters: [],
+      voters: [],
       intensity: customData.intensity || 5,
       tags: customData.tags || [],
       order: location == "top" ? 1 : location == "bottom" ? length + 1 : i + 1,
@@ -327,16 +327,16 @@
 
   async function supportPoint(pointId) {
     const point = points.find(p => p.id === pointId);
-    if (point && !point.supporters.includes(userName)) {
-      point.supporters.push(userName);
+    if (point && !point.voters.includes(userName)) {
+      point.voters.push(userName);
       point.votes++;
       
       try {
-        await updatePositionSupport(pointId, point.supporters, point.votes);
+        await updatePositionSupport(pointId, point.voters, point.votes);
         points = points; // trigger reactivity
       } catch (err) {
         // חזור למצב הקודם במקרה של שגיאה
-        point.supporters = point.supporters.filter(s => s !== userName);
+        point.voters = point.voters.filter(s => s !== userName);
         point.votes--;
         error = 'שגיאה בתמיכה בעמדה';
       }
@@ -674,7 +674,7 @@
                     word={point.heading} 
                     bg={point.color || "red"}
                   />
-                  <p class="text-xs text-gray-500">תמיכות: {point.supporters?.length || 0}</p>
+                  <p class="text-xs text-gray-500">תמיכות: {point.voters?.length || 0}</p>
                 </div>
               </foreignObject>
 

@@ -50,7 +50,7 @@ export async function load({ params, fetch }) {
               author: pos.attributes.author,
               authorEmail: pos.attributes.authorEmail,
               votes: pos.attributes.votes || 0,
-              supporters: JSON.parse(pos.attributes.supporters || '[]'),
+              voters: JSON.parse(pos.attributes.voters || '[]'),
               location: pos.attributes.location || 50,
               intensity: pos.attributes.intensity || 5,
               tags: JSON.parse(pos.attributes.tags || '[]'),
