@@ -1,6 +1,28 @@
 import { browser } from '$app/environment';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { writable } from 'svelte/store';
+import { io } from 'socket.io-client';
+const baseUrl = import.meta.env.VITE_URL
+export async function initialWebSocketForTimer (id){
+    const socket = io(baseUrl, {
+        withCredentials: true,
+      });
+      console.log("cv",socket)
+      //  wait until socket connects before adding event listeners
+      socket.on('connect', () => {
+        console.log('connected',id);
+        socket.on('timer:updated', (datan) => {
+          console.log('io= ', datan);
+          //get array of relevant forum ids\
+                      console.log(
+                        'yallla cvar, geula',
+                        datan,
+                        datan.data
+                      );
+        })
+      
+    })
+}
 
 // Initialize timers with data from localStorage or empty array
 const storedTimers = browser ? localStorage.getItem('timers') : null;

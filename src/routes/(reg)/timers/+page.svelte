@@ -1,7 +1,7 @@
 <script>
 	import { onMount } from 'svelte';
 	import { page } from '$app/state';
-    import { fetchTimers , timers} from '$lib/stores/timers'
+    import { fetchTimers , initialWebSocketForTimer, timers} from '$lib/stores/timers'
     import Timer from '$lib/components/timers/timer.svelte'
 	let hoverText = '0';
 	let tx = $state(200);
@@ -47,6 +47,9 @@
                 centerViewOnLoad();
             });
         });
+        // Call initialWebSocketForTimer without the token, as it will be handled server-side
+        // Assuming page.data.uid is the 'id' needed for the socket connection
+        initialWebSocketForTimer(page.data.uid);
 	});
 
 	function project() {}

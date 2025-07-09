@@ -1,198 +1,169 @@
 <script>
-  import { preventDefault } from 'svelte/legacy';
-
-    import { lang } from '$lib/stores/lang.js'
-
-    import { fade } from "svelte/transition";
-    import { goto} from '$app/navigation';
-    import axios from "axios";
-    import { JWT } from '$lib/stores/jwt.js';
-    import { idM } from '$lib/stores/idM.js';    
-    import { liUN } from '$lib/stores/liUN.js';
-    const baseUrl = import.meta.env.VITE_URL
-
-
+    import { lang } from '$lib/stores/lang.js';
+    import { fade } from 'svelte/transition';
+    import { goto } from '$app/navigation';
+    import { enhance } from '$app/forms'; // Import enhance for form actions
+    import { page } from '$app/state'; // Import page store to access URL parameters
 
     let active = $state(false);
-    let loginError = $state(null);
-    let email = $state("");
-    let password = $state("");
-    let username = "";
-    let fillFilds ;
+    let email = $state('');
+    let password = $state('');
+    let redirectTo = $derived(page.url.searchParams.get('from') || ''); // Get 'from' URL parameter
+
     let emailenter = {
-        "en" : "Enter your email",
-        "he": "כתובת מייל"
+        en: 'Enter your email',
+        he: 'כתובת מייל'
     };
     let passenter = {
-        "en" : "Enter your password",
-        "he": "סיסמה"
-    }
-    function login() {
-        active = true;
-        email = email.trim();
-        password = password.trim();
-
-        if (!email || !password) {
-            loginError = `${$lang == "en" ? "Please fill all lines" :  "יש למלא את כל השדות"} ` ;
-            return;
-        }
-        loginError = null;
-
-        axios
-            .post(baseUrl+'/api/auth/local', {//
-                identifier: email,
-                password, 
-            })
-            .then(({ data }) => {
-                console.log(data)
-document.cookie = `jwt=${data.jwt}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
-document.cookie = `id=${data.user.id}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
-document.cookie = `un=${encodeURIComponent(data.user.username)}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
-document.cookie = `when=${Date.now()}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
-document.cookie = `email=${email}; path=/; expires=` + new Date(new Date().setFullYear(new Date().getFullYear() + 1)).toUTCString();
-                // document.cookie = `guidMe=again; path=/; expires=` + new Date(2026, 0, 1).toUTCString();	
-                JWT.set(data.jwt);
-                idM.set(data.user.id);
-                liUN.set(data.user.username);
-                if(mydata.from){
-                    goto(mydata.from)
-                }else{
-                goto("/me", )
-                }
-               // goto("/oneHomeGr", )
-              
-            })
-            .catch((err) => {
-                if (err.response) {
-                    loginError = "";
-                    console.log(err.response,"tt",err)
-                        loginError += `${err.response.data.error.message}\n`;
-                } else loginError = err;
-            });
+        en: 'Enter your password',
+        he: 'סיסמה'
     };
-function handleclick () {
-    goto("/login/passwordReset", )
-};    
-let buttonForgot = {"he":"במקרה של סיסמה שאבדה מהזיכרון יש ללחוץ",
-                    "en": "if lost password please press me"};
 
-	import { emailValidator, requiredValidator } from '../../lib/celim/validators.js'
-  import { createFieldValidator } from '../../lib/celim/validation.js'
-  let { data } = $props();
-    const iwanttoreg = {"he":"עדיין לא נרשמתי", "en":"I wand to register"}
-  const [ validity, validate ] = createFieldValidator(requiredValidator(), emailValidator())
-    const title = {"he": "התחברות ל-1💗1", "en":"login to 1💗1"}
-    let mydata = $derived(data)
+    function handleclick() {
+        goto('/login/passwordReset');
+    }
+
+    let buttonForgot = {
+        he: 'במקרה של סיסמה שאבדה מהזיכרון יש ללחוץ',
+        en: 'if lost password please press me'
+    };
+
+    import { emailValidator, requiredValidator } from '../../lib/celim/validators.js';
+    import { createFieldValidator } from '../../lib/celim/validation.js';
+
+    let { data, form } = $props(); // Receive form data from server action
+
+    const iwanttoreg = { he: 'עדיין לא נרשמתי', en: 'I wand to register' };
+    const [validity, validate] = createFieldValidator(requiredValidator(), emailValidator());
+    const title = { he: 'התחברות ל-1💗1', en: 'login to 1💗1' };
+    let mydata = $derived(data);
+
+    // Handle server-side errors
+    $effect(() => {
+        if (form?.error) {
+            loginError = form.error;
+            active = false; // Deactivate loading state on error
+        } else if (form?.success) {
+            // If login is successful, the server will handle the redirect
+            // No need for client-side goto here unless you want to handle data.from
+            // For now, rely on server redirect
+        }
+    });
+
+    let loginError = $state(null); // State for displaying login errors
 </script>
+
 <svelte:head>
-  <title>{title[$lang]}</title>
-  </svelte:head>
+    <title>{title[$lang]}</title>
+</svelte:head>
 <div class="body">
- <div class="login">            
-                <form class="fr" onsubmit={preventDefault(login)} in:fade >
-                    <div>
-                    {#if loginError}
-                        <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
-                        <button
-                         onclick={handleclick} 
-                         title={buttonForgot[$lang]}  
-                         in:fade  
-                                style=" position: fixed;
+    <div class="login">
+        <form class="fr" method="POST" action="?/login" use:enhance={() => { active = true; return async ({ update }) => { await update(); active = false; }; }} in:fade>
+            <div>
+                {#if loginError}
+                    <h1 style="background-color: white; color:var(--barbi-pink); font-size:13px; font-weight:bold background-color: white; opacity: 0.7;">{loginError} </h1>
+                    <button
+                        onclick={handleclick}
+                        title={buttonForgot[$lang]}
+                        in:fade
+                        style=" position: fixed;
                                 top: 70%;
                                 left: 50%;
                                 transform: translate(-50%, -50%);
                                 ">
-                            <svg style="width:48px; height:48px" viewBox="0 0 24 24">
+                        <svg style="width:48px; height:48px" viewBox="0 0 24 24">
                             <path
-                             fill="var(--barbi-pink)" 
-                             d="M12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8H17V6A5,5 0 0,0 12,1M12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6C8.9,4.29 10.29,2.9 12,2.9M12.19,10.5C13.13,10.5 13.88,10.71 14.42,11.12C14.96,11.54 15.23,12.1 15.23,12.8C15.23,13.24 15.08,13.63 14.79,14C14.5,14.36 14.12,14.64 13.66,14.85C13.4,15 13.23,15.15 13.14,15.32C13.05,15.5 13,15.72 13,16H11C11,15.5 11.1,15.16 11.29,14.92C11.5,14.68 11.84,14.4 12.36,14.08C12.62,13.94 12.83,13.76 13,13.54C13.14,13.33 13.22,13.08 13.22,12.8C13.22,12.5 13.13,12.28 12.95,12.11C12.77,11.93 12.5,11.85 12.19,11.85C11.92,11.85 11.7,11.92 11.5,12.06C11.34,12.2 11.24,12.41 11.24,12.69H9.27C9.22,12 9.5,11.4 10.05,11.04C10.59,10.68 11.3,10.5 12.19,10.5M11,17H13V19H11V17Z" />
+                                fill="var(--barbi-pink)"
+                                d="M12,1A5,5 0 0,0 7,6V8H6A2,2 0 0,0 4,10V20A2,2 0 0,0 6,22H18A2,2 0 0,0 20,20V10A2,2 0 0,0 18,8H17V6A5,5 0 0,0 12,1M12,2.9C13.71,2.9 15.1,4.29 15.1,6V8H8.9V6C8.9,4.29 10.29,2.9 12,2.9M12.19,10.5C13.13,10.5 13.88,10.71 14.42,11.12C14.96,11.54 15.23,12.1 15.23,12.8C15.23,13.24 15.08,13.63 14.79,14C14.5,14.36 14.12,14.64 13.66,14.85C13.4,15 13.23,15.15 13.14,15.32C13.05,15.5 13,15.72 13,16H11C11,15.5 11.1,15.16 11.29,14.92C11.5,14.68 11.84,14.4 12.36,14.08C12.62,13.94 12.83,13.76 13,13.54C13.14,13.33 13.22,13.08 13.22,12.8C13.22,12.5 13.13,12.28 12.95,12.11C12.77,11.93 12.5,11.85 12.19,11.85C11.92,11.85 11.7,11.92 11.5,12.06C11.34,12.2 11.24,12.41 11.24,12.69H9.27C9.22,12 9.5,11.4 10.05,11.04C10.59,10.68 11.3,10.5 12.19,10.5M11,17H13V19H11V17Z" />
                         </svg></button>
-                    {/if}
-        </div>
-         
-<div dir="rtl"> 
-                        <input
-                            type="text"
-                          bind:value={email}
-                		class:field-danger={!$validity.valid}
-	            		class:field-success={$validity.valid}
-                        use:validate={email}
-                            placeholder={emailenter[$lang]}
-                            id="email"
-                             aria-required="true" 
-                            autocomplete="email"
-                             />
-</div>                 
-<div dir="rtl">                      
-                        <input
-                            type="password"
-                            bind:value={password}
-                            placeholder={passenter[$lang]}
-                            id="password"
-                            aria-required="true"
-                            autocomplete="current-password"
-                           />
-</div>                  
-                 <div>
-                    <div class="flex flex-col align-middle justify-center">
-                        <button class:active={active} disabled={!$validity.valid}
-                        class="center hover:scale-150 bt "    
-                     ></button>
-                     <button class="text-gold bg-barbi px-1 py-1 rounded-md hover:text-barbi hover:bg-gold" onclick={()=>goto(`/${data.params ? `?from={data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
-                     </div>
-                  </div>
-                </form>
-            
-        </div>
- <!-- כפתור זכור אותי בפעם הבאה כדי לשמור קוקיות 
+                {/if}
+            </div>
+
+            <div dir="rtl">
+                <input
+                    type="text"
+                    name="email" 
+                    bind:value={email}
+                    class:field-danger={!$validity.valid}
+                    class:field-success={$validity.valid}
+                    use:validate={email}
+                    placeholder={emailenter[$lang]}
+                    id="email"
+                    aria-required="true"
+                    autocomplete="email"
+                />
+            </div>
+            <div dir="rtl">
+                <input
+                    type="password"
+                    name="password"
+                    bind:value={password}
+                    placeholder={passenter[$lang]}
+                    id="password"
+                    aria-required="true"
+                    autocomplete="current-password"
+                />
+            </div>
+            {#if redirectTo}
+                <input type="hidden" name="from" value={redirectTo} />
+            {/if}
+            <div>
+                <div class="flex flex-col align-middle justify-center">
+                    <button type="submit" class:active={active} disabled={!$validity.valid}
+                            class="center hover:scale-150 bt "
+                    ></button>
+                    <button class="text-gold bg-barbi px-1 py-1 rounded-md hover:text-barbi hover:bg-gold" onclick={()=>goto(`/${data.params ? `?from=${data.params}` : ``}`)}>{iwanttoreg[$lang]}</button>
+                </div>
+            </div>
+        </form>
+
+    </div>
+    <!-- כפתור זכור אותי בפעם הבאה כדי לשמור קוקיות
 ולוגאאוט שיהיה שמוחק קוקיות-->
 </div>
 <style>
-
-
-
     @media (max-width: 600px) {
         .login {
             width: 126%;
         }
-           
-    .center{
-        margin: 0 auto;
-    }
-    }
-  .active{
-   cursor:wait;
-     -webkit-animation:spin 17s linear infinite;
-    -moz-animation:spin 17s linear infinite;
-    animation:spin 17s linear infinite;
-  }
-  @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
-@-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
-@keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
- input:focus {
-color: var(--barbi-pink);
-border: 1px solid var(--barbi-pink);
-}
-.body {
-min-height: 100vh;
 
-    width: 100vw;
-    height: 100vh;
-      background: url(https://res.cloudinary.com/love1/image/upload/v1640287148/nicelove_o5pzyv.svg) !important;
-      background-position: center; 
-      background-size: cover;
-      background-repeat: no-repeat; 
-	margin: 0;
-/*	background-color: var(--primary-color);
-	background: linear-gradient(
-		180deg,
-		skyblue 28.45%,
-		var(--tertiary-color) 40.35%
-	);*/
-}
-   
-input{
-        
+        .center{
+            margin: 0 auto;
+        }
+    }
+    .active{
+        cursor:wait;
+        -webkit-animation:spin 17s linear infinite;
+        -moz-animation:spin 17s linear infinite;
+        animation:spin 17s linear infinite;
+    }
+    @-moz-keyframes spin { 100% { -moz-transform: rotate(360deg); } }
+    @-webkit-keyframes spin { 100% { -webkit-transform: rotate(360deg); } }
+    @keyframes spin { 100% { -webkit-transform: rotate(360deg); transform:rotate(360deg); } }
+    input:focus {
+        color: var(--barbi-pink);
+        border: 1px solid var(--barbi-pink);
+    }
+    .body {
+        min-height: 100vh;
+
+        width: 100vw;
+        height: 100vh;
+        background: url(https://res.cloudinary.com/love1/image/upload/v1640287148/nicelove_o5pzyv.svg) !important;
+        background-position: center;
+        background-size: cover;
+        background-repeat: no-repeat;
+        margin: 0;
+        /*	background-color: var(--primary-color);
+            background: linear-gradient(
+                180deg,
+                skyblue 28.45%,
+                var(--tertiary-color) 40.35%
+            );*/
+    }
+
+    input{
+
         background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png) !important;
         border: 1px solid var(--gold);
         background-position: center;
@@ -206,46 +177,46 @@ input{
     }
     .center{
         background-image: url(https://res.cloudinary.com/love1/image/upload/v1640287183/coin512_ux4m6e.png);
- background-repeat: no-repeat;
-margin:  0.5em 4em;
- background-size: 100px;
- align-self: center;
- min-height: 100px;
- min-width: 100px;
- border-radius: 50%;
+        background-repeat: no-repeat;
+        margin:  0.5em 4em;
+        background-size: 100px;
+        align-self: center;
+        min-height: 100px;
+        min-width: 100px;
+        border-radius: 50%;
         cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
 
     }
-   
-.login {
-       cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
 
-position: fixed;
-top: 50%;
-left: 50%;
-display: grid;
-grid-template-columns: auto;
-grid-template-rows: auto   ;
-align-items: center;
-justify-content: center;
+    .login {
+        cursor: url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg), auto;
 
-transform: translate(-50%, -50%);
-min-height: 100%;
-min-width: 100%;
-border-radius: 50%;
- background-image: url(https://res.cloudinary.com/love1/image/upload/v1640287109/diamond_uapr5j.png);
- background-position: center;
- background-repeat: no-repeat;
- 
- background-size: contain;
-margin: 0 auto;
- align-self: center;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        display: grid;
+        grid-template-columns: auto;
+        grid-template-rows: auto   ;
+        align-items: center;
+        justify-content: center;
 
-}
-.fr{
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    flex-direction: column;
-}
+        transform: translate(-50%, -50%);
+        min-height: 100%;
+        min-width: 100%;
+        border-radius: 50%;
+        background-image: url(https://res.cloudinary.com/love1/image/upload/v1640287109/diamond_uapr5j.png);
+        background-position: center;
+        background-repeat: no-repeat;
+
+        background-size: contain;
+        margin: 0 auto;
+        align-self: center;
+
+    }
+    .fr{
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        flex-direction: column;
+    }
 </style>
