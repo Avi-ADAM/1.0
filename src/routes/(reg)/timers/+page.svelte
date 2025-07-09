@@ -49,7 +49,7 @@
         });
         // Call initialWebSocketForTimer without the token, as it will be handled server-side
         // Assuming page.data.uid is the 'id' needed for the socket connection
-        initialWebSocketForTimer(page.data.uid);
+        initialWebSocketForTimer(page.data.uid,page.data.tok,fetch);
 	});
 
 	function project() {}

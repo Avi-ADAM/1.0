@@ -1,17 +1,27 @@
 import { browser } from '$app/environment';
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
 import { io } from 'socket.io-client';
 const baseUrl = import.meta.env.VITE_URL
-export async function initialWebSocketForTimer (id){
+
+let currentUid = null;
+let currentFetch = null;
+
+export async function initialWebSocketForTimer (id,token, fetch){
+    currentUid = id;
+    currentFetch = fetch;
+
     const socket = io(baseUrl, {
-        withCredentials: true,
+        auth: {
+          token: token,
+          id: id
+        },
       });
       console.log("cv",socket)
       //  wait until socket connects before adding event listeners
       socket.on('connect', () => {
         console.log('connected',id);
-        socket.on('timer:updated', (datan) => {
+        socket.on('timer:update', (datan) => {
           console.log('io= ', datan);
           //get array of relevant forum ids\
                       console.log(
@@ -19,6 +29,21 @@ export async function initialWebSocketForTimer (id){
                         datan,
                         datan.data
                       );
+          if (datan && datan.data && datan.data.id) {
+            const updatedTimerId = datan.data.id;
+            const currentTimers = get(timers);
+
+            const isOurTimer = currentTimers.some(timer => timer.id === updatedTimerId);
+
+            if (isOurTimer) {
+              console.log(`Timer with ID ${updatedTimerId} updated. Reloading timers.`);
+              if (currentUid && currentFetch) {
+                fetchTimers(currentUid, currentFetch);
+              } else {
+                console.error('Cannot reload timers: uid or fetch not available.');
+              }
+            }
+          }
         })
       
     })
