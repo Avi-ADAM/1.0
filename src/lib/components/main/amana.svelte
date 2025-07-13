@@ -11,8 +11,7 @@
         import { contriesi } from '../registration/contries.js';
     import {fpval} from '../registration/fpval.js';
     import { regHelper } from '../../stores/regHelper.js';
-    import * as yup from "yup";
-        import axios from 'axios';
+
           import { RingLoader
 } from 'svelte-loading-spinners';
  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -31,8 +30,6 @@
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description ="הסכמה העולמית על חירות היא חלק מרכזי ב- 1💗1. על ידי הסכמה להצהרה זו, ניתן להירשם לפלטפורמה השיתופית 1💗1 ומשתתפים ביצירת עולם יותר בטוח. על ידי ההתחייבות ההדדית לאי-אלימות, לפתרון סכסוכים בהסכמה ולכבוד הדדי, אנו ניצור עולם בו כוח ואלימות מפסיקים להיות צורות של תקשורת אנושית. הצטרפו אלינו לקידום שלום, הסכמות וחופש. ביחד, אנחנו יכולים ליצור עולם שבו הטוב הבסיסי מנצח ובו חילוקי דעות נפתרים בהסכמה משותפת."
   let url = "https://1lev1.com/hascama"
-  $: userName.set($form.name)
-  $: email.set($form.email)
 
 // onMount(async () => {
 //
@@ -379,144 +376,181 @@ function find_contry_id(contry_name_arr){
                   ];
     const name = `countries`;
         let lang ="he";
-let nameuse = false;
+let nameuse = $state(false);
     const placeholdr = {he: "", ar: "", en: ""};
     const pl = `${placeholdr}.${lang}`;
     const placeholder =`המקום שלי`;
     const required = true;
-    let erorim = {st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "baruch@1lev1.com"  }
-    let selected = [];
-       let already = false;
-       let erorims = false;
+    let erorim = $state({st: false, msg: "", msg2: "אם הבעיה נמשכת ניתן לפנות ל", msg1: "baruch@1lev1.com"  })
+    let selected = $state([]);
+       let already = $state(false);
+       let erorims = $state(false);
+       
+   // Form state variables
+   let formName = $state("");
+   let formEmail = $state("");
+   let formErrors = $state({ name: "", email: "" });
+   let g = $state(false);
    let datar;
   export let idx = 1;
    let data;
-    import { createForm } from "svelte-forms-lib";
-  import Close from '$lib/celim/close.svelte';
+    import Close from '$lib/celim/close.svelte';
   import { scrollToTop } from 'svelte-scrollto';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
   import { sendError } from '$lib/func/send/senError.svelte';
     let meData =[]
-const { form, errors, state, handleChange, handleSubmit } = createForm({
-          initialValues: {
-            name: "",
-            email: "",
-            countries: selected
-          },
-      validationSchema: yup.object().shape({
-        name: yup.string().required(),
-        email: yup
-          .string()
-          .email()
-          .required()
-      }),
-onSubmit: values => {
+
+// Manual validation function
+function validate() {
+  let valid = true;
+  $formErrors = { name: "", email: "" };
+  
+  if (!$formName) {
+    $formErrors.name = "יש למלא שם";
+    valid = false;
+  }
+  
+  if (!$formEmail || !/^[^@]+@[^@]+\.[^@]+$/.test($formEmail)) {
+    $formErrors.email = "יש למלא מייל תקין";
+    valid = false;
+  }
+  
+  if ($selected.length < 1) {
+    $erorims = true;
+    valid = false;
+  } else {
+    $erorims = false;
+  }
+  
+  return valid;
+}
+
+// Form submit handler
+async function handleSubmit(event) {
+  event.preventDefault();
   track('tryToSign', {}, { flags: ['tryToSign'] });
-  nameuse = false;
-  const jjj = $form.name
-if (fpp.includes(jjj)){
-  console.log("sssss")
-  nameuse = true;
-    scrollToTop()
-} else {
- if (selected.length < 1) {
- console.log("uuuu")
-  erorims = true
-  scrollToTop()
- } else {
-   console.log("kkkk")
+  $nameuse = false;
+  
+  if (!validate()) {
+         scrollToTop();
+    return;
+  }
+  
+  const jjj = $formName;
+     if (fpp.includes(jjj)){
+     console.log("sssss")
+     $nameuse = true;
+     scrollToTop()
+     return;
+   }
 
-  g = true;
- erorims = false
- const mail = $form.email.toLowerCase().trim()
-  axios
-  .post(baseUrl+'/api/chezins', {
-      "data": {
-     name: $form.name,
-        email: mail,
-        countries: find_contry_id(selected)
+  $g = true;
+  $erorim.st = false;
+  const mail = $formEmail.toLowerCase().trim();
+  
+  try {
+    const response = await fetch(baseUrl + "/graphql", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        query: `
+          mutation CreateChezin($name: String!, $email: String!, $countries: [ID]!) {
+            createChezin(data: { name: $name, email: $email, countries: $countries }) {
+              data { 
+                id 
+                attributes {
+                  name
+                  email
+                }
               }
-            },
-  {
-  headers: {
-        'Content-Type': 'application/json',
-            }})
-  .then(response => {
-    g = false;
-   already = true;
-   document.cookie = `email=${mail}; expires=` + new Date(2026, 0, 1).toUTCString();
-   document.cookie = `un=${encodeURIComponent($form.name)}; expires=` + new Date(2026, 0, 1).toUTCString();
-   userName.set($form.name);
-           liUN.set($form.name);
-            email.set(mail);
-            contriesi.set(find_contry_id(selected))
-            regHelper.set(1);
-                    meData = response.data;
-                fpval.set(meData.data.id)
-            datar = data;
-            let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`
-      console.log(`https://www.1lev1.com?${encodeURIComponent(linko)}`)
-      linkos.set(linko)           //id con un em ref
-              })
-  .catch(error => {
-    g = false;
-    erorim.st = true
-    if (error.response === undefined){
-        erorim.msg = "השרת נרדם 😴, הערנו אותו, אנו מנסים שוב";
-      // handleSubmit();
-      sendError(JSON.stringify(error) ?? null,"/amana.svelte 467", fetch)
-    } else {
-        erorim.msg =  ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות לעולם חוזרת, הנה הפרטים היבשים `
-        sendError(erorim.msg ,"/amana.svelte 470", fetch)
-      }
-          });
-
-          }}
+            }
+          }
+        `,
+        variables: {
+          name: $formName,
+          email: mail,
+          countries: find_contry_id($selected)
         }
-        });
-let dow;
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.errors) {
+      throw new Error(result.errors[0].message);
+    }
+    
+    $g = false;
+    $already = true;
+    document.cookie = `email=${mail}; expires=` + new Date(2026, 0, 1).toUTCString();
+    document.cookie = `un=${encodeURIComponent($formName)}; expires=` + new Date(2026, 0, 1).toUTCString();
+    userName.set($formName);
+    liUN.set($formName);
+    email.set(mail);
+    contriesi.set(find_contry_id($selected));
+    regHelper.set(1);
+    meData = result.data.createChezin;
+    fpval.set(meData.data.id);
+    datar = data;
+    let linko = `ref=true&id=${$fpval}&con=${find_contry_id($selected)}&un=${$liUN}&em=${$email}`;
+    console.log(`https://www.1lev1.com?${encodeURIComponent(linko)}`);
+    linkos.set(linko);
+    
+  } catch (error) {
+    $g = false;
+    $erorim.st = true;
+    if (!error.response) {
+      $erorim.msg = "השרת נרדם 😴, הערנו אותו, אנו מנסים שוב";
+      sendError(JSON.stringify(error) ?? null, "/amana.svelte 467", fetch);
+    } else {
+      $erorim.msg = ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות לעולם חוזרת, הנה הפרטים היבשים `;
+      sendError($erorim.msg, "/amana.svelte 470", fetch);
+    }
+  }
+}
+let dow = $state();
 /*function show (){
   const amana = document.getElementById("amana-show")
   const lines = document.getElementById("lines")
 
 }*/
-let trans = false;
+let trans = $state(false);
 function tran (){
-trans = !trans;
+$trans = !$trans;
 }
 function scrollTo() {
 		dow.scrollIntoView({ behavior: 'smooth' });
 	}
 
- let isOpen = false;
-let a = 0, h
+ let isOpen = $state(false);
+let a = $state(0), h = $state()
 
 function sell(){
-isOpen = true;
-a = 0;
+$isOpen = true;
+$a = 0;
 }
 function info(){
-isOpen = true;
-a = 6;
+$isOpen = true;
+$a = 6;
 }
 function tr(){
-isOpen = true;
-a = 4;
+$isOpen = true;
+$a = 4;
 }
 const closer = () => {
-    isOpen = false;
-  a = 0;
+    $isOpen = false;
+  $a = 0;
 };
 function done(){
-  a = 1;
+  $a = 1;
 }
 
 function erore(){
-  a = 3;
+  $a = 3;
 }
 
 function erorer(){
-  a = 5;
+  $a = 5;
 }
 function change(la){
   if (la == "en"){
@@ -529,42 +563,45 @@ function change(la){
     goto("aitifaqia")
   }
 }
-$: w = 0
-$: wid = 0
-$: if($errors.name || $errors.email) {scrollToTop()}
+let w = $state(0);
+let wid = $state(0);
+  
+$effect(() => {
+    if($formErrors.name || $formErrors.email) {scrollToTop()}
+  });
 </script>
 <Head {title} {description} {image} {url} />
 
-<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
+<DialogOverlay style="z-index: 700;" isOpen={$isOpen} onDismiss={closer} >
         <div style="z-index: 700;" transition:fly={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="content" aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
           on:click={closer}><Close/></button>
-          {#if a == 0}
+          {#if $a == 0}
  <Tikun  on:done={done} on:erore={erore}/>
 
-                    {:else if a == 4}
+                    {:else if $a == 4}
  <TRan on:done={done} on:erore={erorer}/>
 
-                    {:else if a == 1}
+                    {:else if $a == 1}
           <div class="sp bg-gold">
             <h3 class="text-barbi"> נשלח בהצלחה, תודה רבה לך נעמוד בקשר</h3>
           </div>
-                    {:else if a == 2}
+                    {:else if $a == 2}
 
           <div class="flex text-center items-center justify-center bg-gold">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div>
-         {:else if a == 3}
+         {:else if $a == 3}
          <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 0}>לנסות שוב</button>
-          {:else if a == 5}
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> $a = 0}>לנסות שוב</button>
+          {:else if $a == 5}
          <h1> אירעה שגיאה</h1>
-         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> a = 4}>לנסות שוב</button>
-         {:else if a == 6}
+         <button class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full" on:click={()=> $a = 4}>לנסות שוב</button>
+         {:else if $a == 6}
          <Maze/>
          {/if}
   </DialogContent>
@@ -588,8 +625,8 @@ $: if($errors.name || $errors.email) {scrollToTop()}
      <button style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px; z-index:500;" on:click={()=>info()} class="ww" >?</button>
      <div bind:clientWidth={wid} class="all">
        <a   data-sveltekit-prefetch href="/login" ><img title="התחברות ל-1💗1" style="opacity:1; z-index:17;" class=" right overlay  rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150 " alt="התחברות ל-1💗1" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/></a>
-          <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
-              {#if trans === false}
+                      <div  style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;">
+                {#if $trans === false}
           <button on:click={tran}><img class="shadow-xl	rounded" alt="translat-icon-by-barbi" src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"></button>
           {:else}
           <button on:click={tran} class=" text-barbi hover:text-gold p-0.5 "
@@ -623,14 +660,12 @@ $: if($errors.name || $errors.email) {scrollToTop()}
           name="name"
           placeholder="השם שלי"
           required
-                on:blur={handleChange}
-          on:change={handleChange}
-          bind:value={$form.name}
+          bind:value={$formName}
         />
-     {#if $errors.name}
-      <small style="color: red;">יש למלא שם</small>
+     {#if $formErrors.name}
+      <small style="color: red;">{$formErrors.name}</small>
     {/if}
-    {#if nameuse}
+    {#if $nameuse}
       <small style="color: red;">השם שנבחר כבר תפוס</small>
     {/if}
 </div>
@@ -647,7 +682,7 @@ $: if($errors.name || $errors.email) {scrollToTop()}
       options={country.map(c => c.heb)}
        />
        </div>
-   {#if erorims == true}
+   {#if $erorims == true}
       <small style="color: red;">יש לבחור לפחות מקום 1</small>
     {/if}
    </div>
@@ -661,12 +696,10 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     id="email"
     name="email"
     required
-          on:blur={handleChange}
-    on:change={handleChange}
-    bind:value={$form.email}
+    bind:value={$formEmail}
     />
- {#if $errors.email}
-      <small style="color: red;">{$errors.email}</small>
+ {#if $formErrors.email}
+      <small style="color: red;">{$formErrors.email}</small>
     {/if}
 </div>
     </section>
@@ -679,17 +712,17 @@ $: if($errors.name || $errors.email) {scrollToTop()}
   <div class="card-inner d overflow-y-auto ">
      <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
      הצהרת העצמאות של
-        <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$form.name ? $form.name : "__"}</span>
+        <span style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';">{$formName ? $formName : "__"}</span>
         :
     </h1>
           <span style="font-family:David;" class="text-bold text-transparent bg-clip-text  bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]">
               <span  style="font-family:StamSefarad,David;">
-                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span>  לא רוצה לפגוע באף אדם ולעולם לא אפגע באף אדם.<!--חיובי-->
+                אני <span style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$formName ? $formName : "__"}</span>  לא רוצה לפגוע באף אדם ולעולם לא אפגע באף אדם.<!--חיובי-->
                    <br>
            כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק פגיעה באדם, אלימות וכפיה בכוח.
               <br>
               <div class="text-center justify-center flex items-center text-bold text-transparent bg-clip-text bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]" style="flex-wrap: wrap; font-family:StamSefarad,David;">
-              אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" on:keypress={()=>info()} on:click={()=>info()}>"רקמות"</span> המתנהלות באתר 		<div dir="ltr" style="text-shadow:none;" class=" font-bold  mx-2 mt-2 text-transparent 
+              אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$formName ? $formName : "__"}</span> תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span role="contentinfo" class="hover:text-barbi" on:keypress={()=>info()} on:click={()=>info()}>"רקמות"</span> המתנהלות באתר 		<div dir="ltr" style="text-shadow:none;" class=" font-bold  mx-2 mt-2 text-transparent 
               bg-clip-text bg-[length:auto_200%] animate-gradienty 
               bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))] 
               flex-wrap flex flex-row">
@@ -708,9 +741,9 @@ $: if($errors.name || $errors.email) {scrollToTop()}
              <!----
    אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב הבסיסי שבאדם, ולכך מקווה ומצפה שכאשר כל האנושות כולה תסכים אלימות, קרבות וכפיה בכוח יפסיקו להיות צורה של תקשורת אנושית.
               <br> -->
-              כאשר כל אוכלוסיית  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join( " וכל אוכלוסיית " )}`  : "__"}</span>  תסכים ותחיה לפי אמנה זו אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר עם כל השאר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ומדינת ")}` : "__"}</span>  {selected.length > 1 ? "ממנות" : "ממנה" } בשמי ונחיה בחופשיות ובהסכמה הדדית. 
+              כאשר כל אוכלוסיית  <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{$selected.length > 0 ? `${$selected.length < 2 ? $selected : $selected.join( " וכל אוכלוסיית " )}`  : "__"}</span>  תסכים ותחיה לפי אמנה זו אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$formName ? $formName : "__"}</span> אוותר עם כל השאר על כלי הנשק שלי ועל השוטרים החמושים שמדינת <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{$selected.length > 0 ? `${$selected.length < 2 ? $selected : $selected.join(" ומדינת ")}` : "__"}</span>  {$selected.length > 1 ? "ממנות" : "ממנה" } בשמי ונחיה בחופשיות ובהסכמה הדדית. 
               <br>
-               כאשר כל האנושות תסכים ותחיה לפי אמנה זו אני <span style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{selected.length > 0 ? `${selected.length < 2 ? selected : selected.join(" ושל צבא ") }`+ "." : "__."}</span> כאשר בו זמנית יוותרו כל צבאות העולם על נשקם ונהפוך לאנושות מפורזת וחופשית
+                                כאשר כל האנושות תסכים ותחיה לפי אמנה זו אני <span style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);">{$formName ? $formName : "__"}</span> אוותר על כלי הנשק של צבא <span style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);">{$selected.length > 0 ? `${$selected.length < 2 ? $selected : $selected.join(" ושל צבא ") }`+ "." : "__."}</span> כאשר בו זמנית יוותרו כל צבאות העולם על נשקם ונהפוך לאנושות מפורזת וחופשית
             </span>
           </span>
     </div>
@@ -721,8 +754,8 @@ $: if($errors.name || $errors.email) {scrollToTop()}
 <form on:submit={handleSubmit}>
 
 <div class="flexid" bind:clientWidth={w} bind:clientHeight={h}>
-   {#if already == false}
-{#if g == false}
+   {#if $already == false}
+{#if $g == false}
 {#if $progress < 1}
 
     <button
@@ -734,19 +767,19 @@ $: if($errors.name || $errors.email) {scrollToTop()}
     </button>
     {/if}
     <div class="cor">
-      <Canvas size={{width:w, height:h}}>
+             <Canvas size={{width:w, height:h}}>
         <Scene on:click={()=> console.log("hhuibi")} on:submit="{handleSubmit}"/>
       </Canvas>
     </div>
-       {:else if g == true}
+       {:else if $g == true}
           <div class="sp text-center">
             <h3 class="text-barbi">רק רגע בבקשה</h3>
           <br>
          <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> {/if}
-      {#if erorim.st == true}
+      {#if $erorim.st == true}
 
-      <small  style="color:red; text-align: center;">{erorim.msg} <br/><span dir="rtl"> {erorim.msg2} - {erorim.msg1}</span> </small>
+      <small  style="color:red; text-align: center;">{$erorim.msg} <br/><span dir="rtl"> {$erorim.msg2} - {$erorim.msg1}</span> </small>
       {/if}
 
   {/if}
