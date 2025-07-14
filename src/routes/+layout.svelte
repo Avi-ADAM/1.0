@@ -31,7 +31,22 @@ onMessage(messaging, (payload) => {
 import "../app.postcss";
 import { Toaster } from 'svelte-sonner';
 import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+import { theme, themeConfig } from '$lib/stores/theme';
   import { onMount } from 'svelte';
+import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
+  // עדכון המשנה בטעינה
+  onMount(() => {
+    const unsubscribe = theme.subscribe((currentTheme) => {
+      // עדכון classes על ה-document
+      document.documentElement.classList.remove('personal', 'business');
+      document.documentElement.classList.add(currentTheme);
+      
+      // עדכון data attribute
+      document.documentElement.setAttribute('data-theme', currentTheme);
+    });
+
+    return unsubscribe;
+  });
  
   /**
    * @typedef {Object} Props
@@ -88,6 +103,7 @@ onMount(async () => {
 
 
 <main>
+  <ThemeToggle />
 	{@render children?.()}
 <Toaster toastOptions={{
   style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,

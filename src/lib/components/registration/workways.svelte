@@ -201,18 +201,19 @@ let searchText = $state(``);
     const ws = {"he": "מה הם העדפות היצירה שלך?","en": "How do you preffer to Create?"}
    const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
 
-    let focused = $state(false)
   </script>
 
-<h1 style:margin-top={focused && !page.data.isDesktop ? "1vh": !page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
+<h1  class="midscreenText-2 mt-[26vh]">
     {userName_value}
 <br/>
  {ws[$lang]}
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
-           onfocus={()=>focused=true}
-      onblur={()=>focused=false}
+     --sms-width={page.data.isDesktop ? '' : '30vw'}
+     outerDivClass="!bg-gold !text-barbi"
+     inputClass="!bg-gold !text-barbi"
+     liSelectedClass="!bg-barbi !text-gold"
      createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
      loading={newcontent}
@@ -244,7 +245,6 @@ let searchText = $state(``);
   line-height: normal;
 text-shadow: 1px 1px purple;
   color: var(--barbi-pink);
-  margin-top: 59px;
   background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
  background-size: 29.5rem 9.75rem;
   height: 9.75rem;
@@ -262,12 +262,7 @@ text-shadow: 1px 1px purple;
   font-size: 0.9rem;
   margin-top: 26vh;
 	 }
- .input-2{
-    grid-column: 2/4;
-    grid-row: 2/3;
-        margin-top:0;
 
-    }
 }
     
    
@@ -292,12 +287,7 @@ text-shadow: 1px 1px purple;
     .input-2{
     grid-column: 2/4;
     grid-row: 2/3;
-        margin-top: -8vh;
 
     }
-    .input-2-2{
-    grid-column: 1/5;
-    grid-row: 5/6;
-    text-align: center;
-    }
+ 
 </style>

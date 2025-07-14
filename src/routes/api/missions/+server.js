@@ -1,15 +1,13 @@
-
-
 import { sendToSer } from "$lib/send/sendToSer.js";
+import { json } from "@sveltejs/kit";
 
-export async function load({ locals, url, fetch }) {
+export async function GET({ locals, url, fetch }) {
   const lang = locals.lang;
   const tok = locals.tok;
   const uid = locals.uid;
 
-  // For initial load, fetch only the first batch
-  const start = 0;
-  const limit = 10;
+  const start = parseInt(url.searchParams.get('start') || '0');
+  const limit = parseInt(url.searchParams.get('limit') || '10');
 
   let userLang = lang;
   let isReg = tok == false ? false : true;
@@ -39,15 +37,12 @@ export async function load({ locals, url, fetch }) {
           hasMoreData = start + limit < pagination.total;
       }
   } catch (error) {
-      console.error("Error fetching initial missions on server:", error);
+      console.error("Error fetching missions on server (API endpoint):", error);
   }
 
-  return {
-    uid,
-    lang,
-    tok: tok == false ? false : true,
+  return json({
     missions,
     total,
     hasMoreData
-  };
+  });
 }

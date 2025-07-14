@@ -9,7 +9,7 @@
     import jvals from '$lib/data/vallues.json'
     import enjvals from '$lib/data/valluesEn.json'
 /**
- * Callback prop: יורה כאשר יש שינוי התקדמות.
+ * Callback prop:  כאשר יש שינוי התקדמות.
  * @typedef {Object} Props
  * @property {string} [userName_value]
  * @property {number} [show_value]
@@ -219,7 +219,10 @@ const newOb = meData.data.createVallue.data;
    <div  class="input-2" dir="{$lang == "en" ? "ltr" : "rtl"}">
      <MultiSelect
      liSelectedStyle="z-index: 1000;"
-      --sms-width={"50vw"}
+      --sms-width={page.data.isDesktop ? "" : "30vw"}
+      outerDivClass="!bg-gold !text-barbi"
+   inputClass="!bg-gold !text-barbi"
+   liSelectedClass="!bg-barbi !text-gold"
       createOptionMsg={addn[$lang]}
      allowUserOptions={"append"}
       loading={newcontent}

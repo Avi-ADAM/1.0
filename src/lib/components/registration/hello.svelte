@@ -41,9 +41,6 @@ onMount(async () =>{
     }
 let show_value;
 
-userName.subscribe(value => {
-  userName_value = value;
-});
 
 show.subscribe(newValue => {
   show_value = newValue;
@@ -51,12 +48,12 @@ show.subscribe(newValue => {
   /**
    * @typedef {Object} Props
    * @property {number} [idx]
-   * @property {string} [userName_value]
    * @property {(payload: { tx: number, txx: number }) => void} [onProgres]
    */
 
   /** @type {Props} */
-  let { idx = 1, userName_value = $bindable(""), onProgres } = $props();
+  let { idx = 1,onProgres } = $props();
+
 
 function increment() {
 		show.update(n => n + 1);
@@ -71,7 +68,7 @@ function increment() {
 <div class="midscreenText-2">
     <h1 class="a1"  dir={dira[$lang]}>
      {sh[$lang]}
-   {userName_value} 
+   {$userName} 
         </h1>  <h1 class="a2"  dir={dira[$lang]}>
 {sh2[$lang]}
           {sh3[$lang]}{idx}{sh1[$lang]} 

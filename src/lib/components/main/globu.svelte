@@ -16,24 +16,24 @@ Command: npx @threlte/gltf@1.0.1 static/3d/withlev.glb
   import { Group } from 'three'
   import { useTask, T } from '@threlte/core'
   import { useGltf } from '@threlte/extras'
-   import { interactivity } from '@threlte/extras'
+  import { interactivity } from '@threlte/extras'
   interactivity()
-
   /**
    * @typedef {Object} Props
    * @property {() => void} [onSubmit] - Callback for when the component submits.
    */
 
   /** @type {Props} */
-  let { onSubmit, fallback, error, children, ref = $bindable(), ...props } = $props()
+  let { onSubmit, fallback, error, children, onClick = () => {},  ...props } = $props()
+  let ref = $state(null)
 
-  
+  console.log('globu')
 
   const gltf = useGltf('3d/withlev.glb')
 
    let rotationt = $state(0)
 		let isHovering = $state(false), isPointerDown = $state(false)
-  let poz = {z:0, y:0, x:0};
+  let poz = $state({z:0, y:0, x:0});
   let obPoz = {z:0, y:0, x:0}
  let boll = $state(false)
  let bool = $state(false)
@@ -61,7 +61,11 @@ function sub (){
 
 <T.DirectionalLight  intensity={0.81} position={[ -20,  -5, 5 ]} />
 <T.DirectionalLight  intensity={0.91} position={[0, 10, 10 ]} />
-<T is={ref} dispose={false} {...restProps} onpointerenter={() => (isHovering = true)}
+<T dispose={false} {...props}>
+  {#await gltf}
+    {@render fallback?.()}
+  {:then gltf}
+        <T.Group bind:ref={ref} interactive={true} rotation={[0, rotationt, 0.1]} onpointerenter={() => (isHovering = true)}
 onpointerleave={() => {
   isPointerDown = false
   isHovering = false
@@ -73,10 +77,6 @@ onpointercancel={() => {
   isHovering = false
 }}
 onclick={sub} >
-  {#await gltf}
-    {@render fallback?.()}
-  {:then gltf}
-        <T.Group  rotation={[0, rotationt, 0.1]} >
 <T.AmbientLight   intensity={0.61} />
 
 <T.SpotLight position={poz} />

@@ -8,10 +8,10 @@
   import NameAndPname from "$lib/components/grid/nameAndPname.svelte";
   import Vallue from "$lib/components/grid/vallue.svelte";
   import {sendToSer} from "$lib/send/sendToSer.js";
-  import { onMount } from 'svelte';
   import { RingLoader } from "svelte-loading-spinners";
   import { Head } from "svead";
-  import { page } from "$app/state";
+  import { page } from "$app/state"; // Changed from $app/state to $app/stores
+  import { goto } from '$app/navigation'; // Import goto for URL manipulation
     const intitle = {he:" משימות פתוחות",en:"Open missions"}
     const name = {"he": ' שם ושם הריקמה',"en":"name and project name"}
     const des = {"he":"תיאור","en":'description'}
@@ -21,102 +21,66 @@
     const taft = {'he': 'תפקיד','en': 'role'}
     const seet = {'he':'הרחבה והגשת מועמדות', 'en':'see more'}
     const wwt = {'he':'דרך העבודה','en': 'work ways'}
+  import { onMount } from 'svelte';
   let { data } = $props();
-    let alld = $state();
-    let isLoading = $state(true);
+    let alld = $state([]); // Initialize as empty, will be populated in onMount
+    let isLoading = $state(true); // Initial loading is handled by onMount
+    let isLoadingMore = $state(false);
+    let hasMoreData = $state(false);
 
 // יצירת אובייקט PagingData חדש
 let paging = $state(new PagingData(
     1,      // currentPage
-    20,     // itemsPerPage
+    10,     // itemsPerPage (Changed to 10)
     [10, 20, 50, 100] // itemsPerPageOptions
 ));
 
-let allMissions = []; // מערך שישמור את כל המשימות
-let isLoadingMore = $state(false);
-let hasMoreData = true;
-const BATCH_SIZE = 20;
+const BATCH_SIZE = 10; // Changed to 10
 const LOAD_DELAY = 2000; // 2 seconds delay between loads
 
-async function loadBatch(start) {
-    try {
-        let userLang = data.lang;
-        let isReg = data.tok;
-        const qid = userLang != "en" 
-            ? isReg ? "27GetOpenMissionsRegTr" : "29GetOpenMissionsNonregTr" 
-            : isReg ? "28GetOpenMissionsReg" : "30GetOpenMissionsNonreg";
-        
-        const variables = {
-            start: start,
-            limit: BATCH_SIZE
-        };
-        
-        const response = await sendToSer(variables, qid, null, null, !isReg, fetch);
-        
-        if (response.data.openMissions.data) {
-            const newData = response.data.openMissions.data;
-            const pagination = response.data.openMissions.meta.pagination;
-            
-            const reformatArray = arr => arr.map(({id, attributes}) => ({id, ...attributes}));
-            const formattedData = reformatArray(newData);
-            
-            // בדיקה אם יש עוד נתונים לטעון
-            hasMoreData = start + BATCH_SIZE < pagination.total;
-            
-            return {
-                data: formattedData,
-                total: pagination.total
-            };
-        }
-        return null;
-    } catch (error) {
-        console.error(error);
-        return null;
+onMount(async () => {
+    // Initial data from server load
+    if (data.missions && data.missions.length > 0) {
+        alld = data.missions;
+        hasMoreData = data.hasMoreData;
     }
-}
+    isLoading = false;
+});
 
-async function loadAllData() {
+async function fetchMoreMissions() {
     if (isLoadingMore || !hasMoreData) return;
-    
+
     isLoadingMore = true;
-    const currentStart = allMissions.length;
-    
+    paging.currentPage++;
+    const newStart = (paging.currentPage - 1) * BATCH_SIZE;
+
     try {
-        const result = await loadBatch(currentStart);
-        if (result) {
-            allMissions = [...allMissions, ...result.data];
-            alld = allMissions
-            alld = alld
-            console.log(alld)
-            activUpd += 1
-            // אם יש עוד נתונים, נטען אותם אחרי השהייה
-            if (hasMoreData) {
-                setTimeout(() => {
-                    loadAllData();
-                }, LOAD_DELAY);
-            }
+        const response = await fetch(`/api/missions?start=${newStart}&limit=${BATCH_SIZE}`);
+        const result = await response.json();
+
+        if (result.missions && result.missions.length > 0) {
+            alld = [...alld, ...result.missions];
+            hasMoreData = result.hasMoreData;
+        } else {
+            hasMoreData = false;
         }
+    } catch (error) {
+        console.error("Error fetching more missions:", error);
+        // Handle error, maybe show a toast notification
     } finally {
         isLoadingMore = false;
     }
 }
 
-onMount(async () => {
-    isLoading = true;
-    await loadAllData();
-    isLoading = false;
-});
-
-// עדכון הקומפוננטה כך שתשתמש ב-allMissions במקום ב-alld
-
 let theme = PrelineTheme;
+
 
 // האזנה לשינויים בגודל העמוד
 
 
 let columns = $state([
-        { 
-            key: 'name', 
+        {
+            key: 'name',
             title: name[$lang],
             accessor: (row) => {
                 return{
@@ -127,8 +91,8 @@ let columns = $state([
             },
             renderComponent: NameAndPname
         },
-        { 
-            key: 'descrip', 
+        {
+            key: 'descrip',
             title: des[$lang],
             sortable: false,
             accessor: (row) => {
@@ -142,8 +106,8 @@ let columns = $state([
             renderComponent: RichText
         },
 
-        { 
-            key: 'noofhours', 
+        {
+            key: 'noofhours',
             title: shovi[$lang],
             accessor: (row) => {
                 return{
@@ -154,16 +118,16 @@ let columns = $state([
             },
             renderComponent: Vallue
         },
-        { 
-        key: 'sqadualed', 
+        {
+        key: 'sqadualed',
         title: datest[$lang],
-        accessor: (row) => { 
+        accessor: (row) => {
             return {
                 value: row.sqadualed,
                 value2: row.dates
             }
         },
-        renderComponent: Dates 
+        renderComponent: Dates
     },{
         key: 'skills',
         title: sklt[$lang],
@@ -205,27 +169,48 @@ let columns = $state([
         renderComponent: GoButton
     }
     ]);
-    let activUpd = $state(0);
   
     let title = {he:"משימות פתוחות",en:"Open missions"}
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`
   let description = {he:"משימות פתוחות שאפשר להגיש מועמדות כדי להצטרף ולבצע יחד ב-1💗1",en:"Open missions that you can submit candidates to join and do together in 1💗1"}
   let url = page.url.toString()
+        function loadMoreMissions() {
+            isLoadingMore = true;
+            paging.currentPage++;
+            const newStart = (paging.currentPage - 1) * BATCH_SIZE;
+            const currentUrl = new URL(page.url);
+            currentUrl.searchParams.set('start', newStart.toString());
+            currentUrl.searchParams.set('limit', BATCH_SIZE.toString());
+            goto(currentUrl.toString(), { invalidateAll: true, replaceState: true });
+        }
     </script>
 <Head title={title[$lang]} description={description[$lang]} {image} {url} />
 <div class="w-full px-2 text-center bg-gold text-barbi" dir={$lang == "he" ? 'rtl':'ltr'}>
 <h2 class="flex justify-center items-center">{intitle[$lang]}{#if isLoading || isLoadingMore}
     <RingLoader size={30}/>
      {/if}</h2>
-{#key activUpd}
 {#if alld}
-    <Grid 
-    bind:data={alld} 
+    <Grid
+    bind:data={alld}
     bind:columns {theme} {paging}/>
-    <GridFooter  
-       bind:data={alld} 
+    {#if hasMoreData}
+        <button
+            class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 disabled:opacity-50"
+            onclick={() => loadMoreMissions()}
+            disabled={isLoadingMore}
+        >
+            {#if isLoadingMore}
+                Loading...
+            {:else}
+                Load More
+            {/if}
+        </button>
+    {/if}
+    <GridFooter
+       bind:data={alld}
        {theme}
     bind:paging/>
     {/if}
-{/key}
 </div>
+
+

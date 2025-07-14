@@ -17,12 +17,8 @@
   import Vallues from '../registration/vallues.svelte'
  // import Scree from '../registration/scree.svelte'
   import {spring } from 'svelte/motion'
-let userName_value = $state();
 let show_value = $state(0);
 
-userName.subscribe(value => {
-  userName_value = value;
-});
 
 show.subscribe(newValue => {
   show_value = newValue;
@@ -99,7 +95,7 @@ const gtl = {"he":" להתחברות לאתר","en": "go to login "}
     <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="midscreenText-3"><h1>
       {tu[$lang]}
       <br>
-{userName_value}
+{$userName}
 <br>
 {see[$lang]}
 </h1>

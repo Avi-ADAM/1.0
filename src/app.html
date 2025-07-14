@@ -4,6 +4,51 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script>
+  // מניעת flash של עיצוב לא נכון
+  (function() {
+    try {
+      const theme = localStorage.getItem('theme') || 'personal';
+      document.documentElement.classList.add(theme);
+      document.documentElement.setAttribute('data-theme', theme);
+      
+      // עדכון CSS Variables מיד
+      const themeConfigs = {
+        personal: {
+          '--color-primary': '#3b82f6',
+          '--color-secondary': '#10b981',
+          '--color-background': '#f9fafb',
+          '--color-text': '#1f2937',
+          '--color-card': '#ffffff',
+          '--color-accent': '#8b5cf6',
+          '--color-muted': '#6b7280',
+          '--border-radius': '0.75rem',
+          '--shadow': '0 10px 15px -3px rgba(0, 0, 0, 0.1)'
+        },
+        business: {
+          '--color-primary': '#1f2937',
+          '--color-secondary': '#374151',
+          '--color-background': '#f3f4f6',
+          '--color-text': '#111827',
+          '--color-card': '#ffffff',
+          '--color-accent': '#059669',
+          '--color-muted': '#9ca3af',
+          '--border-radius': '0.25rem',
+          '--shadow': '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
+        }
+      };
+      
+      const config = themeConfigs[theme];
+      if (config) {
+        Object.entries(config).forEach(([key, value]) => {
+          document.documentElement.style.setProperty(key, value);
+        });
+      }
+    } catch (e) {
+      console.warn('Theme initialization failed:', e);
+    }
+  })();
+</script>
   <!--
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
   --><!--

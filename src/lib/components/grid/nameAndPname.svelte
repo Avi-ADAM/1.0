@@ -135,7 +135,7 @@
 {#if type !== "button"}
 <div class="flex items-center gap-2">
     {#if src}
-        <img src={src} alt={pname} class="w-8 h-8 rounded-full" />
+        <img src={src} alt={pname} class="w-8 h-8 rounded-full" loading="lazy" />
     {/if}
     <div class="flex flex-col text-start">
         <div class="flex items-center gap-2">

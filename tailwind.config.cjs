@@ -2,6 +2,7 @@
 //  mode: 'jit',
 /** @type {import('tailwindcss').Config} */
 const defaultTheme = require('tailwindcss/defaultTheme');
+const plugin = require('tailwindcss/plugin');
 
 const config = {
   content: ['./src/**/*.{html,js,svelte,ts}', './node_modules/@avitest/gridcraft/dist/themes/**/*.svelte'],
@@ -62,34 +63,122 @@ const config = {
         
       },
       colors: {
-        blu: '#04619f',
-        silver: '#BBC2CC',
-        stgold: '#574010',
-        gra: '#BF953F',
-        grb: '#FCF6BA',
-        grc: '#B38728',
-        grd: '#FBF5B7',
-        gre: '#AA771c',
-        graa: '#ffc857',
-        grbb: '#3e2f5b',
-        barbi: '#FF0092',
-        gold: '#EEE8AA',
-        neww: '#49f3df',
-        lturk: 'rgb(103, 232, 249)',
-        mturk: 'rgb(34, 211, 238)',
-        sturk: '#CCFBF1',
-        lpink: 'rgb(251, 207, 232)',
-        mpink: 'rgb(244, 114, 182)',
-        pinki: 'rgb(242, 229, 242)',
-        wow: 'rgb(2, 255, 187)',
-        wow2: 'rgb(144, 255, 17)',
-        blueg: 'rgb(116, 191, 255)',
-        oranges: 'rgb(254, 172, 49);',
-        wowt: 'rgb(3, 55, 47)'
+        greeni: '#2effa8',
+        blu: 'var(--blu)',
+        silver: 'var(--silver)',
+        stgold: 'var(--stgold)',
+        gra: 'var(--gra)',
+        grb: 'var(--grb)',
+        grc: 'var(--grc)',
+        grd: 'var(--grd)',
+        gre: 'var(--gre)',
+        graa: 'var(--graa)',
+        grbb: 'var(--grbb)',
+        barbi: 'var(--barbi-pink)',
+        gold: 'var(--gold)',
+        neww: 'var(--neww)',
+        lturk: 'var(--lturk)',
+        mturk: 'var(--mturk)',
+        sturk: 'var(--sturk)',
+        lpink: 'var(--lpink)',
+        mpink: 'var(--mpink)',
+        pinki: 'var(--pinki)',
+        wow: 'var(--wow)',
+        wow2: 'var(--wow2)',
+        blueg: 'var(--blueg)',
+        oranges: 'var(--oranges)',
+        wowt: 'var(--wowt)'
       }
     }
   },
-  Plugins:[]
+  Plugins:[
+    plugin(function({ addVariant, addUtilities }) {
+      // הוספת variants עבור personal ו-business
+      addVariant('personal', '.personal &');
+      addVariant('business', '.business &');
+      
+      // variants עם מצבים נוספים
+      addVariant('personal-hover', '.personal &:hover');
+      addVariant('business-hover', '.business &:hover');
+      addVariant('personal-focus', '.personal &:focus');
+      addVariant('business-focus', '.business &:focus');
+      
+      // variants עם responsive
+      addVariant('personal-sm', '@media (min-width: 640px) { .personal & }');
+      addVariant('personal-md', '@media (min-width: 768px) { .personal & }');
+      addVariant('personal-lg', '@media (min-width: 1024px) { .personal & }');
+      addVariant('business-sm', '@media (min-width: 640px) { .business & }');
+      addVariant('business-md', '@media (min-width: 768px) { .business & }');
+      addVariant('business-lg', '@media (min-width: 1024px) { .business & }');
+      addUtilities({
+        '.bg-theme-primary': {
+          'background-color': 'var(--color-primary)',
+        },
+        '.bg-theme-secondary': {
+          'background-color': 'var(--color-secondary)',
+        },
+        '.bg-theme-background': {
+          'background-color': 'var(--color-background)',
+        },
+        '.bg-theme-card': {
+          'background-color': 'var(--color-card)',
+        },
+        '.bg-theme-accent': {
+          'background-color': 'var(--color-accent)',
+        },
+        '.text-theme-primary': {
+          'color': 'var(--color-primary)',
+        },
+        '.text-theme-secondary': {
+          'color': 'var(--color-secondary)',
+        },
+        '.text-theme-text': {
+          'color': 'var(--color-text)',
+        },
+        '.text-theme-accent': {
+          'color': 'var(--color-accent)',
+        },
+        '.text-theme-muted': {
+          'color': 'var(--color-muted)',
+        },
+        '.border-theme-primary': {
+          'border-color': 'var(--color-primary)',
+        },
+        '.border-theme-secondary': {
+          'border-color': 'var(--color-secondary)',
+        },
+        '.border-theme-accent': {
+          'border-color': 'var(--color-accent)',
+        },
+        '.rounded-theme': {
+          'border-radius': 'var(--border-radius)',
+        },
+        '.shadow-theme': {
+          'box-shadow': 'var(--shadow)',
+        },
+        '.gradient-personal': {
+          'background': 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)',
+        },
+        '.gradient-business': {
+          'background': 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
+        },
+      });
+    }),
+    
+      plugin(function({ addUtilities }) {
+        addUtilities({
+          '.animate-fade-in-up': {
+            'animation': 'fadeInUp 0.6s ease-out',
+          },
+          '.animate-slide-in-right': {
+            'animation': 'slideInRight 0.5s ease-out',
+          },
+          '.animate-bounce-in': {
+            'animation': 'bounceIn 0.8s ease-out',
+          },
+        });
+      }),
+  ]
 };
 
 module.exports = config;
