@@ -68,9 +68,9 @@ let isOpen = false;
 let loading = false;
 
 onMount(()=>{
-  skills = oneLangAdj(skills,$lang,"skillName")
-  tafkidims = oneLangAdj(tafkidims,$lang,"roleDescription")
-  workways = oneLangAdj(workways,$lang,"workWayName")
+  skills = oneLangAdj({data: skills},$lang,"skillName").data || []
+  tafkidims = oneLangAdj({data: tafkidims},$lang,"roleDescription").data || []
+  workways = oneLangAdj({data: workways},$lang,"workWayName").data || []
 })
     function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
@@ -211,8 +211,7 @@ async function agree(alr) {
   noofusersWaiting -= 1;
   ser = xyz();
       }
-    const date = (mdate !== undefined) ? ` sqadualed: "${mdate}"` : ``;
-        const dates = (mdate !== undefined) ? ` sqadualed: "${mdate}"` : ``;
+    const date = (mdate !== undefined && mdate !== null) ? ` sqadualed: "${mdate.toISOString()}"` : ``;
 
     const cookieValue = document.cookie
   .split('; ')
@@ -226,10 +225,11 @@ async function agree(alr) {
     token  = cookieValue; 
      bearer1 = 'bearer' + ' ' + token;
           if (noofusersOk === noofusers){
-              const skillsa = skills.map(c => c.id);
-             const tafkidimsa = tafkidims.map(c => c.id);
-              const workwaysa = workways.map(c => c.id);
-              const valluesa = vallues.map(c => c.id);
+            console.log(skills)
+              const skillsa = skills.data.map(c => c.id);
+             const tafkidimsa = tafkidims.data.map(c => c.id);
+              const workwaysa = workways.data.map(c => c.id);
+              const valluesa = vallues.data.map(c => c.id);
     try {
              await fetch(linkg, {
               method: 'POST',
@@ -256,8 +256,7 @@ async function agree(alr) {
              perhour: ${perhour},   
              privatlinks: "${privatlinks}",
              publicklinks: "${publicklinks}",
-             ${date} 
-             ${dates}
+             ${date}
     }
   ) {data{attributes {project{data{ id} }}}}
   updatePendm(
@@ -608,7 +607,9 @@ export let cards = false;
 function claf (event){
   let o = event.detail.alr
   let d = event.detail.y
+  console.log(o,d)
   if (d=="a"){
+    console.log("agree")
     agree(o)
   } else if (d=="d"){
     decline(o)
