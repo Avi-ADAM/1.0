@@ -49,6 +49,7 @@
     "@number-flow/svelte": "^0.3.3",
     "@sentry/sveltekit": "^8.27.0",
     "@svelte-plugins/datepicker": "^1.0.9",
+    "@tailwindcss/vite": "^4.1.11",
     "@tiptap/core": "^2.6.6",
     "@tiptap/extension-floating-menu": "^2.6.6",
     "@tiptap/extension-highlight": "^2.9.1",
