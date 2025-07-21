@@ -341,7 +341,7 @@
                   <button
                     class=" hover:bg-gold rounded-full p-0.5"
                     title={res[$lang]}
-                    onclick={sell(
+                    onclick={()=>sell(
                       data.id,
                       data.attributes.price,
                       data.attributes.quant,

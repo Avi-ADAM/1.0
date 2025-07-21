@@ -137,20 +137,41 @@ let addNs1 = $state(true);
     token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let link = `${baseUrl}/api/users/${idLi}`;
-  //  let fd = new FormData();
-     //   fd.append('files', files[0]);
+    // Check if FormData is empty
+    let hasFiles = false;
+    for (let pair of files.entries()) {
+        hasFiles = true;
+        break;
+    }
+
+    if (!hasFiles) {
+        const msg = {
+            he: 'נא לבחור קובץ להעלאה',
+            en: 'Please select a file to upload'
+        };
+        toast.warning(msg[$lang]);
+        return;
+    }
+
       axios
       .post(url1, files, {
                     headers: {
           Authorization: bearer1
+          // 'Content-Type': 'multipart/form-data' is automatically set by axios for FormData
         }
                 })
                 .then(({ data }) => {
                     const imageId = data[0].id;
+                    console.log(imageId);
         sendpg(imageId);
      })
       .catch((error) => {
         console.log('צריך לתקן:', error.response);
+        const msg = {
+          he: error.response?.data?.message || 'שגיאה בהעלאת קובץ',
+          en: error.response?.data?.message || 'Error uploading file'
+        };
+        toast.error(msg[$lang]);
                 });
   }
 
@@ -197,9 +218,9 @@ let addNs1 = $state(true);
         .then((r) => r.json())
         .then((data) => (res = data.data.updateUsersPermissionsUser.data));
       console.log(res);
-            uPic.set(res.attributes.profilePic.data.attributes.formats.thumbnail.url);
+            uPic.set(res.attributes.profilePic.data.attributes.formats?.thumbnail?.url || res.attributes.profilePic.data.attributes.url);
       picLink = $uPic;
-            uPic.set(res.attributes.profilePic.data.attributes.formats.small.url);
+            uPic.set(res.attributes.profilePic.data.attributes.formats?.small?.url || res.attributes.profilePic.data.attributes.url);
       picLink = $uPic;
     updX = 0;
     isOpen = false;
@@ -372,9 +393,9 @@ let addNs1 = $state(true);
             githublink = meData.githublink;
           noMail = meData.noMail;
           if (meData.profilePic.data != null) {
-            uPic.set(meData.profilePic.data.attributes.formats.thumbnail.url);
+            uPic.set(meData.profilePic.data.attributes.formats?.thumbnail?.url || meData.profilePic.data.attributes.url);
             picLink = $uPic;
-            uPic.set(meData.profilePic.data.attributes.formats.small.url);
+            uPic.set(meData.profilePic.data.attributes.formats?.small?.url || meData.profilePic.data.attributes.url);
             picLink = $uPic;
             let b = '/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max';
             let output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
@@ -506,7 +527,7 @@ let frd;
 
 function callbackFunction(event) {
     a = 2;
-    files = event.files;
+    files = event.files; // files is already a FormData object from the Addnewp component
     console.log(files);
     sendP();
 	}

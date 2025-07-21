@@ -12,7 +12,109 @@ import { RingLoader
 } from 'svelte-loading-spinners';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
         let dialogOpen = $state(false)
+/**
+   * @typedef {Object} Props
+   * @property {any} coinlapach
+   * @property {boolean} [isVisible]
+   * @property {any} [mypos]
+   * @property {boolean} [low]
+   * @property {any} restime
+   * @property {any} [negopendmissions]
+   * @property {boolean} [modal]
+   * @property {any} [messege]
+   * @property {string} [descrip]
+   * @property {string} [projectName]
+   * @property {string} [name]
+   * @property {string} [hearotMeyuchadot]
+   * @property {number} [noofhours]
+   * @property {string} [src]
+   * @property {number} [perhour]
+   * @property {any} projectId
+   * @property {any} [uids]
+   * @property {any} [what]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {boolean} [already]
+   * @property {any} missionId
+   * @property {any} [skills]
+   * @property {any} [tafkidims]
+   * @property {any} [workways]
+   * @property {any} vallues
+   * @property {any} publicklinks
+   * @property {any} privatlinks
+   * @property {any} mdate
+   * @property {boolean} [isKavua]
+   * @property {any} mdates
+   * @property {any} timegramaDate
+   * @property {any} timegramaId
+   * @property {any} createdAt
+   * @property {any} pendId
+   * @property {any} users
+   * @property {any} mysrc
+   * @property {any} [diun]
+   * @property {any} [order]
+   * @property {number} [ordern]
+   * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onCoinLapach]
+   * @property {(payload: { id: any }) => void} [onProj]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
+   */
 
+  /** @type {Props} */
+  let {
+    coinlapach,
+    isVisible = false,
+    mypos = null,
+    low = false,
+    restime,
+    negopendmissions = [],
+    modal = $bindable(false),
+    messege = [],
+    descrip = "",
+    projectName = "",
+    name = "",
+    hearotMeyuchadot = "",
+    noofhours = 0,
+    src = "coin.png",
+    perhour = 0,
+    projectId,
+    uids = [],
+    what = [],
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    noofusersWaiting = $bindable(),
+    total = 0,
+    noofusers,
+    already = $bindable(false),
+    missionId,
+    skills = $bindable([]),
+    tafkidims = $bindable([]),
+    workways = $bindable([]),
+    vallues,
+    publicklinks,
+    privatlinks,
+    mdate,
+    isKavua = false,
+    mdates,
+    timegramaDate,
+    timegramaId,
+    createdAt,
+    pendId,
+    users,
+    mysrc,
+    diun = $bindable([]),
+    order = $bindable(diun.length),
+    ordern = 0,
+    cards = false,
+    onCoinLapach,
+    onProj,
+    onHover,
+    onModal
+  } = $props();
     let miDatan = [];
     let error1;
     let bearer1;
@@ -563,109 +665,7 @@ function hoverc (event){
   import { nowId } from '$lib/stores/pendMisMes';
   import { toast } from 'svelte-sonner';
   import { Drawer } from 'vaul-svelte';
-  /**
-   * @typedef {Object} Props
-   * @property {any} coinlapach
-   * @property {boolean} [isVisible]
-   * @property {any} [mypos]
-   * @property {boolean} [low]
-   * @property {any} restime
-   * @property {any} [negopendmissions]
-   * @property {boolean} [modal]
-   * @property {any} [messege]
-   * @property {string} [descrip]
-   * @property {string} [projectName]
-   * @property {string} [name]
-   * @property {string} [hearotMeyuchadot]
-   * @property {number} [noofhours]
-   * @property {string} [src]
-   * @property {number} [perhour]
-   * @property {any} projectId
-   * @property {any} [uids]
-   * @property {any} [what]
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {any} noofusersWaiting
-   * @property {number} [total]
-   * @property {any} noofusers
-   * @property {boolean} [already]
-   * @property {any} missionId
-   * @property {any} [skills]
-   * @property {any} [tafkidims]
-   * @property {any} [workways]
-   * @property {any} vallues
-   * @property {any} publicklinks
-   * @property {any} privatlinks
-   * @property {any} mdate
-   * @property {boolean} [isKavua]
-   * @property {any} mdates
-   * @property {any} timegramaDate
-   * @property {any} timegramaId
-   * @property {any} createdAt
-   * @property {any} pendId
-   * @property {any} users
-   * @property {any} mysrc
-   * @property {any} [diun]
-   * @property {any} [order]
-   * @property {number} [ordern]
-   * @property {boolean} [cards]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onCoinLapach]
-   * @property {(payload: { id: any }) => void} [onProj]
-   * @property {(payload: { id: string }) => void} [onHover]
-   * @property {() => void} [onModal]
-   */
-
-  /** @type {Props} */
-  let {
-    coinlapach,
-    isVisible = false,
-    mypos = null,
-    low = false,
-    restime,
-    negopendmissions = [],
-    modal = $bindable(false),
-    messege = [],
-    descrip = "",
-    projectName = "",
-    name = "",
-    hearotMeyuchadot = "",
-    noofhours = 0,
-    src = "coin.png",
-    perhour = 0,
-    projectId,
-    uids = [],
-    what = [],
-    noofusersOk = $bindable(),
-    noofusersNo = $bindable(),
-    noofusersWaiting = $bindable(),
-    total = 0,
-    noofusers,
-    already = $bindable(false),
-    missionId,
-    skills = $bindable([]),
-    tafkidims = $bindable([]),
-    workways = $bindable([]),
-    vallues,
-    publicklinks,
-    privatlinks,
-    mdate,
-    isKavua = false,
-    mdates,
-    timegramaDate,
-    timegramaId,
-    createdAt,
-    pendId,
-    users,
-    mysrc,
-    diun = $bindable([]),
-    order = $bindable(diun.length),
-    ordern = 0,
-    cards = false,
-    onCoinLapach,
-    onProj,
-    onHover,
-    onModal
-  } = $props();
+  
 function claf (event){
   let o = event.alr
   let d = event.y

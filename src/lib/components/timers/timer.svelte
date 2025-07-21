@@ -6,10 +6,9 @@
   import { timers, updateTimers } from '$lib/stores/timers';
   import { lang } from '$lib/stores/lang'; // Import the lang store
   import TimerDialogs from './TimerDialogs.svelte';
-
+  let tx = $state(0);
   let {
     orders,
-    tx,
     size,
     bigsize,
     add,

@@ -1,8 +1,6 @@
 <script>
  import Cropper from "svelte-easy-crop";
-	import { getCroppedImg } from "./canvasUtils"
   import { lang } from '$lib/stores/lang.js'
-	      let file;
   /**
    * @typedef {Object} MessagePayload
    * @property {FormData} files
@@ -17,73 +15,21 @@
   /** @type {Props} */
   let { aspect = 1, onMessage } = $props();
 let dataU;
-	let image = $state(), fileinput = $state(), pixelCrop = $state({x:0, y:0});
+	let image = $state(), fileinput = $state(), pixelCrop = $state({x:0, y:0, width: 0, height: 0});
   let displayImage = $state();
+  let canCrop = $state(false); // New state variable
 
    let imgBase64 = "data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCA";
-//	async function DataURIToBlob(dataURI) {
-//    dataU = dataURI;
-//   
-//        console.log(dataU);
-//          dataU.split(',') ; 
-//           console.log(dataU);
-//        let splitDataURI;
-//        
-//        let byteString = dataU[0].indexOf('base64') >= 0 ? atob(dataU[1]) : decodeURI(dataU[1])
-//        let mimeString = dataU[0].split(':')[1].split(';')[0]
 
-	
-
-//	async function DataURIToBlob(dataURI) {
-//    dataU = dataURI;
-//   
-//        console.log(dataU);
-//          dataU.split(',') ; 
-//           console.log(dataU);
-//        let splitDataURI;
-//        
-//        let byteString = dataU[0].indexOf('base64') >= 0 ? atob(dataU[1]) : decodeURI(dataU[1])
-//        let mimeString = dataU[0].split(':')[1].split(';')[0]
-function DataURIToBlob(dataURI) {
-        const splitDataURI = dataURI.split(',')
-        const byteString = splitDataURI[0].indexOf('base64') >= 0 ? atob(splitDataURI[1]) : decodeURI(splitDataURI[1])
-        const mimeString = splitDataURI[0].split(':')[1].split(';')[0]
-        const ia = new Uint8Array(byteString.length)
-        for (let i = 0; i < byteString.length; i++){
-            ia[i] = byteString.charCodeAt(i)}
-
-        return new Blob([ia], { type: mimeString })//
-      }
-	
-  async function sendP(data) { 
-               console.log(pixelCrop)
+  async function sendP(fileToSend) {
         const formData = new FormData()
-      //croppedImage = await getCroppedImg(image, pixelCrop)
-      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
-           file = imageFile
-        } else{
-      // console.log(croppedImage)
-   file = DataURIToBlob(data) 
-        }
-formData.append('files', file, 'image.jpg')
-
-     // .then(
-      
-       //  formpic.append('my-file', blob, 'filename.png')
-//formData.append("image_data", image))
-
- // formData.append('my-file', croppedImage, 'filename.png'))
-    //  console.log("bafs", croppedImage)
-    //   const data = croppedImage.replace(/^data:image\/\w+;base64,/, "");
-    
+        formData.append('files', fileToSend, 'image.jpg')
  
     onMessage?.({
     files: formData
     })
   };
-     let before = true;
-
-let files;
+    
 let imageFile = $state();
 	function onFileSelected(e) {
   	 imageFile = e.target.files[0];
@@ -91,39 +37,73 @@ let imageFile = $state();
 		reader.onload = e => {
 			image = e.target.result;
       displayImage = e.target.result;
+      canCrop = false; // Reset canCrop when a new image is selected
 		};
 		reader.readAsDataURL(imageFile);
-    console.log(imageFile)
 	}
 
 	let profilePicture = $state();
 		
-	function previewCrop(e){
-    console.log(e.detail); // Log e.detail to see its structure
-		pixelCrop = e.detail.pixels;
-		// Removed direct style manipulation of profilePicture here
-	}
 	
 	async function cropImage(){
-    if (!pixelCrop) {
-      alert("Please select an area to crop first.");
-      return;
-    }
-		const croppedDataUrl = await getCroppedImg(image, pixelCrop);
-    displayImage = croppedDataUrl;
-    pixelCrop = null; // Reset pixelCrop after cropping
-    sendP(croppedDataUrl);
+	   console.log("cropImage: Function started."); // Log at the very beginning
+	   if (!imageFile || !pixelCrop || !image || pixelCrop.width === 0 || pixelCrop.height === 0) {
+	     alert("Please select an image and adjust the crop area first.");
+	     console.error("cropImage: Prerequisites not met. imageFile:", imageFile, "pixelCrop:", pixelCrop, "image:", !!image);
+	     return;
+	   }
+
+	   const imageElement = new Image();
+	   imageElement.src = image;
+
+	   imageElement.onload = async () => {
+	       console.log("cropImage: imageElement loaded."); // Log inside onload
+	       const canvas = document.createElement('canvas');
+	       const ctx = canvas.getContext('2d');
+
+	       canvas.width = pixelCrop.width;
+	       canvas.height = pixelCrop.height;
+
+	       ctx.drawImage(
+	           imageElement,
+	           pixelCrop.x,
+	           pixelCrop.y,
+	           pixelCrop.width,
+	           pixelCrop.height,
+	           0,
+	           0,
+	           pixelCrop.width,
+	           pixelCrop.height
+	       );
+
+	       canvas.toBlob(async (blob) => {
+	           console.log("cropImage: canvas.toBlob callback executed. Blob:", blob); // Log inside toBlob callback
+	           if (blob) {
+	               const croppedFile = new File([blob], imageFile.name, { type: imageFile.type });
+	               sendP(croppedFile);
+	           } else {
+	               alert("Failed to crop image.");
+	               console.error("cropImage: Blob is null. Failed to create image blob.");
+	           }
+	       }, imageFile.type);
+	   };
 	}
 	
 	function reset() {
 		image = null;
     displayImage = null; // Clear displayImage on reset
-		pixelCrop = null;
+    canCrop = false; // Reset canCrop on reset
+		// pixelCrop is reset in the reset function
 	}
- const up = {"he":"העלאת תמונה", "en": "upload picture"} 
+ const up = {"he":"העלאת תמונה", "en": "upload picture"}
 const adj = {"he":"התאמת גודל התמונה", "en": "adjust picture size"}
 const cut = {"he":"לחתוך!","en": "cut!"}
 const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
+
+import { getFileFromUrl } from '$lib/components/ui/image-cropper';
+	import * as ImageCropper from '$lib/components/ui/image-cropper';
+	import { toast } from 'svelte-sonner';
+
 </script>
 
 {#if !image}
@@ -133,15 +113,45 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 	<input class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full a" type="file" accept=".jpg, .jpeg, .png" onchange={(e)=>onFileSelected(e)} bind:this={fileinput} >
 
 {:else}
-	<h2>{adj[$lang]}</h2>
+<h2>{adj[$lang]}</h2>
+
+<ImageCropper.Root
+	src={image}
+	onCropped={async (url) => {
+		// if you need the file for a form you can call getFileFromUrl with the cropped url
+		const file = await getFileFromUrl(url);
+
+		console.log(file);
+	}}
+	onUnsupportedFile={(file) => {
+		toast.error(`Unsupported file type: ${file.type}`);
+	}}
+>
+	<ImageCropper.UploadTrigger>
+		<ImageCropper.Preview />
+	</ImageCropper.UploadTrigger>
+	<ImageCropper.Dialog>
+		<ImageCropper.Cropper />
+		<ImageCropper.Controls>
+			<ImageCropper.Cancel />
+			<ImageCropper.Crop />
+		</ImageCropper.Controls>
+	</ImageCropper.Dialog>
+</ImageCropper.Root>
+<!---	<h2>{adj[$lang]}</h2>
+
 	<div id="cr" >
 		<Cropper
-			{image}
+			bind:image
       cropShape={aspect == 1  ? 'round' : null}
 			aspect={aspect}
 			zoom=1
-			bind:crop={pixelCrop}
-			onCropcomplete={(e)=>previewCrop(e.detail)}
+			onCropcomplete={(e)=>{
+        console.log("onCropcomplete: canCrop set to true. pixelCrop:", e); // Log canCrop state
+				pixelCrop = e.detail.croppedAreaPixels;
+        canCrop = true; // Enable crop button once crop area is defined
+        console.log("onCropcomplete: canCrop set to true. pixelCrop:", pixelCrop); // Log canCrop state
+			}}
 		/>
 	</div>
 	<div class="prof-pic-wrapper">
@@ -155,10 +165,12 @@ const re = {"he":"להתחיל הכל מהתחלה?", "en": "start over"}
 	
 	<br>
   <div dir="rtl">
-  <button type="button" onclick={cropImage} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full bt">{cut[$lang]}</button>
+  <button type="button" onclick={() => { alert("Cut button clicked!"); cropImage(); }} class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full bt">{cut[$lang]}</button>
 
 	<button type="button" class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full" onclick={reset}>{re[$lang]}</button>
-</div>{/if}
+</div>
+-->
+{/if}
 
 <style>
   @media (max-width: 568px) {

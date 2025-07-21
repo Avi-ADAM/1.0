@@ -37,7 +37,7 @@ let show2 = $state(false)
     date,
     lebel = {"he":"עריכה", "en": "edit"},
     long = false,
-    dateb = $bindable(date)
+    dateb = $bindable()
   } = $props();
 let fdate = $derived(new Date(date));
 let fdateb = $derived(new Date(dateb))

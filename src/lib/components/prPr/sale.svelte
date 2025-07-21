@@ -322,6 +322,9 @@ $effect(() => {
 
 <div>
   <MultiSelect
+  outerDivClass="!bg-gold !text-barbi"
+  inputClass="!bg-gold !text-barbi"
+  liSelectedClass="!bg-barbi !text-gold"
     maxSelect={1}
     bind:selected
     {placeholder}

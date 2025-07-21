@@ -6,6 +6,7 @@ const baseUrl = import.meta.env.VITE_URL
 
 let currentUid = null;
 let currentFetch = null;
+let fetchTimeout = null; // Add a variable to hold the timeout ID
 
 export async function initialWebSocketForTimer (id,token, fetch){
     currentUid = id;
@@ -32,13 +33,21 @@ export async function initialWebSocketForTimer (id,token, fetch){
           if (datan && datan.data && datan.data.id) {
             const updatedTimerId = datan.data.id;
             const currentTimers = get(timers);
-
-            const isOurTimer = currentTimers.some(timer => timer.id === updatedTimerId);
+            console.log("currentTimers",currentTimers,updatedTimerId)
+            const isOurTimer = currentTimers.some(timer => timer.attributes?.activeTimer?.data?.id == updatedTimerId);
 
             if (isOurTimer) {
               console.log(`Timer with ID ${updatedTimerId} updated. Reloading timers.`);
               if (currentUid && currentFetch) {
-                fetchTimers(currentUid, currentFetch);
+                // Clear any existing timeout to prevent multiple rapid fetches
+                if (fetchTimeout) {
+                  clearTimeout(fetchTimeout);
+                }
+                // Set a new timeout to debounce the fetchTimers call
+                fetchTimeout = setTimeout(() => {
+                  fetchTimers(currentUid, currentFetch);
+                  fetchTimeout = null; // Clear the timeout ID after execution
+                }, 300); // Adjust debounce time as needed (e.g., 300ms)
               } else {
                 console.error('Cannot reload timers: uid or fetch not available.');
               }

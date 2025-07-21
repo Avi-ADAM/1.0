@@ -2,7 +2,132 @@
  import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
+  import tr from '$lib/translations/tr.json';
+  import Text from '../conf/text.svelte';
+  import Elements from '../conf/elements.svelte';
+  import Number from '../conf/number.svelte';
+  import DateNego from '../conf/dateNego.svelte';
+  import Barb from '../conf/barb.svelte';
+  import moment from 'moment';
+  import { toast } from 'svelte-sonner';
+  import Rich from '../conf/rich.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [negopendmissions]
+   * @property {any} descrip
+   * @property {any} projectName
+   * @property {any} name1
+   * @property {any} hearotMeyuchadot
+   * @property {number} [noofhours]
+   * @property {number} [perhour]
+   * @property {any} projectId
+   * @property {any} [uids]
+   * @property {any} [what]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {any} already
+   * @property {any} mypos
+   * @property {any} missionId
+   * @property {any} skills
+   * @property {any} tafkidims
+   * @property {any} workways
+   * @property {any} vallues
+   * @property {any} publicklinks
+   * @property {string} [privatlinks]
+   * @property {any} mdate
+   * @property {any} mdates
+   * @property {number} [stepState]
+   * @property {any} pendId
+   * @property {any} [users]
+   * @property {any} isKavua
+   * @property {number} [oldide] - last tg id, if non 0
+   * @property {any} timegramaId
+   * @property {number} [ordern]
+   * @property {boolean} [masaalr]
+   * @property {any} restime
+   */
 
+  /** @type {Props} */
+  let {
+    negopendmissions = [],
+    descrip,
+    projectName,
+    name1,
+    hearotMeyuchadot,
+    noofhours = 0,
+    perhour = 0,
+    projectId,
+    uids = [],
+    what = [],
+    noofusersOk,
+    noofusersNo,
+    noofusersWaiting,
+    total = 0,
+    noofusers,
+    already,
+    mypos,
+    missionId,
+    skills,
+    tafkidims,
+    workways,
+    vallues,
+    publicklinks,
+    privatlinks = 'aaxa',
+    mdate,
+    mdates,
+    stepState = 2,
+    pendId,
+    users = [],
+    isKavua,
+    oldide = 0,
+    timegramaId,
+    ordern = 0,
+    masaalr = false,
+    restime,
+    onClose,
+    onLoad
+  } = $props();
+
+  let datai = $state([]);
+  
+  $effect(() => {
+    if(negopendmissions.length > 0){
+    datai = [
+      {
+        leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+        value: noofhours2 * perhour2
+      },
+      {
+        leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+        value: noofhours * perhour
+      }
+    ];
+    for(let i = 0; i < negopendmissions.length; i++){
+      if(negopendmissions[i].attributes.perhour != null || negopendmissions[i].attributes.noofhours != null){
+        datai.push({
+          leb: `${tri?.nego?.oldno[$lang]}-${i+1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
+          value: (negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)
+    })
+      }
+    }
+    }else{
+      datai = [
+        {
+          leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+          value: noofhours2 * perhour2
+        },
+        {
+          leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+          value: noofhours * perhour
+        }
+      ];
+    }
+  });
+  console.log(negopendmissions)
+  const tri = tr;
   let isKavua2 = $state();
   let newcontent = $state(true);
 
@@ -42,8 +167,8 @@
   let perhour2 = $state(perhour);
   let myM;
   let done;
-  let skills3 = $state([]);
-  let tafkidims2 = $state([]);
+  let skills3 = $state({ data: [] });
+  let tafkidims2 = $state({ data: [] });
   let workways3 = $state([]);
 
   let rishon = 0;
@@ -458,9 +583,9 @@
   }
   onMount(async () => {
     isKavua2 = isKavua;
-    //  skills3 = skills;
-    //tafkidims2 = tafkidims;
-    //workways3 = workways;
+    skills3 = JSON.parse(JSON.stringify(skills));
+    tafkidims2 = JSON.parse(JSON.stringify(tafkidims));
+    workways3 = JSON.parse(JSON.stringify(workways.data));
     console.log('mounted', $lang);
     const cookieValue = document.cookie
       .split('; ')
@@ -554,134 +679,7 @@
     x = x;
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
-  import tr from '$lib/translations/tr.json';
-  import Text from '../conf/text.svelte';
-  import Elements from '../conf/elements.svelte';
-  import Number from '../conf/number.svelte';
-  import DateNego from '../conf/dateNego.svelte';
-  import Barb from '../conf/barb.svelte';
-  import moment from 'moment';
-  import { toast } from 'svelte-sonner';
-  import Rich from '../conf/rich.svelte';
-  /**
-   * @typedef {Object} Props
-   * @property {any} [negopendmissions]
-   * @property {any} descrip
-   * @property {any} projectName
-   * @property {any} name1
-   * @property {any} hearotMeyuchadot
-   * @property {number} [noofhours]
-   * @property {number} [perhour]
-   * @property {any} projectId
-   * @property {any} [uids]
-   * @property {any} [what]
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {any} noofusersWaiting
-   * @property {number} [total]
-   * @property {any} noofusers
-   * @property {any} already
-   * @property {any} mypos
-   * @property {any} missionId
-   * @property {any} skills
-   * @property {any} tafkidims
-   * @property {any} workways
-   * @property {any} vallues
-   * @property {any} publicklinks
-   * @property {string} [privatlinks]
-   * @property {any} mdate
-   * @property {any} mdates
-   * @property {number} [stepState]
-   * @property {any} pendId
-   * @property {any} [users]
-   * @property {any} isKavua
-   * @property {number} [oldide] - last tg id, if non 0
-   * @property {any} timegramaId
-   * @property {number} [ordern]
-   * @property {boolean} [masaalr]
-   * @property {any} restime
-   */
-
-  /** @type {Props} */
-  let {
-    negopendmissions = [],
-    descrip,
-    projectName,
-    name1,
-    hearotMeyuchadot,
-    noofhours = 0,
-    perhour = 0,
-    projectId,
-    uids = [],
-    what = [],
-    noofusersOk,
-    noofusersNo,
-    noofusersWaiting,
-    total = 0,
-    noofusers,
-    already,
-    mypos,
-    missionId,
-    skills,
-    tafkidims,
-    workways,
-    vallues,
-    publicklinks,
-    privatlinks = 'aaxa',
-    mdate,
-    mdates,
-    stepState = 2,
-    pendId,
-    users = [],
-    isKavua,
-    oldide = 0,
-    timegramaId,
-    ordern = 0,
-    masaalr = false,
-    restime,
-    onClose,
-    onLoad
-  } = $props();
-
-  const tri = tr;
-  let datai = $state([]);
-  
-  $effect(() => {
-    if(negopendmissions.length > 0){
-    datai = [
-      {
-        leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
-        value: noofhours2 * perhour2
-      },
-      {
-        leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
-        value: noofhours * perhour
-      }
-    ];
-    for(let i = 0; i < negopendmissions.length; i++){
-      if(negopendmissions[i].attributes.perhour != null || negopendmissions[i].attributes.noofhours != null){
-        datai.push({
-          leb: `${tri?.nego?.oldno[$lang]}-${i+1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
-          value: (negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)
-    })
-      }
-    }
-    datai = datai
-    }else{
-      datai = [
-        {
-          leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
-          value: noofhours2 * perhour2
-        },
-        {
-          leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
-          value: noofhours * perhour
-        }
-      ];
-      datai = datai
-    }
-  });
-  console.log(negopendmissions)
+ 
 </script>
 
 <div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>

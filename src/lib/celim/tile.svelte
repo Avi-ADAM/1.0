@@ -42,23 +42,38 @@
     sm = false,
     openi = false,
     closei = false,
-    blue = $bindable(false),
-    gray = $bindable(false),
-    red = $bindable(false),
-    green = $bindable(false),
-    yellow = $bindable(false),
-    indigo = $bindable(false),
-    purple = $bindable(false),
-    pink = $bindable(false),
-    wow = $bindable(false),
-    gold = $bindable(false),
-    neww = $bindable(false),
+    blue = false,
+    gray = false,
+    red = false,
+    green = false,
+    yellow = false,
+    indigo = false,
+    purple = false,
+    pink = false,
+    wow = false,
+    gold = false,
+    neww = false,
     word = "word",
     bg = "blue",
     closeiline = true,
     children
   } = $props();
    $effect(() => {
+    console.log(bg);
+    // Reset all color flags to false first
+    blue = false;
+    gray = false;
+    red = false;
+    green = false;
+    yellow = false;
+    indigo = false;
+    purple = false;
+    pink = false;
+    wow = false;
+    gold = false;
+    neww = false;
+
+    // Set the appropriate color flag based on bg prop
     if (bg == "blue"){
       blue = true;
      } else if (bg == "pink"){

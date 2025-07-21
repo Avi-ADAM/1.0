@@ -22,7 +22,7 @@
         onNew?.();
       }
     }
-
+    console.log("page.url.pathname",page.url.pathname)
     let activeRoute = $derived(page.url.pathname);
    
     const brainLeb= {"he":"מוח הרקמות","en":"brain of organiczations"}

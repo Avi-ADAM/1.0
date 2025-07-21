@@ -9,19 +9,6 @@
   import AddNewRole from "../addnew/addNewRole.svelte";
   import AddnewWorkway from "../addnew/addnewWorkway.svelte";
   import { onMount } from "svelte";
-  onMount(()=>{
-    console.log("datai",datai,dataib)
-    if(datai != dataib && datai.length > 0 && dataib.length == 0){
-        if(datai[0].remuved != true){
-            dataib = JSON.parse(JSON.stringify(datai));  
-        }
-    }
-        if(dataib.length > 0){
-            dataibn = dataib.map(c=>c.attributes[valc])
-        }
-    
-  })
-    let dati = $state(datai)
   /**
    * @typedef {Object} Props
    * @property {any} [datai]
@@ -43,7 +30,7 @@
   /** @type {Props} */
   let {
     datai = $bindable([]),
-    dataib = $bindable([]),
+    dataib = $bindable(),
     show2 = $bindable(false),
     lebel = {"he":"","en":""},
     valc,
@@ -58,7 +45,21 @@
     dataibn = $bindable([]),
     onAddnew // Svelte 5: Callback prop for addnew event
   } = $props();
+  let dati = $state(datai)
 
+  onMount(()=>{
+    console.log("datai",datai,dataib)
+    if(datai != dataib && datai.length > 0 && dataib.length == 0){
+        if(datai[0].remuved != true){
+            dataib = JSON.parse(JSON.stringify(datai));  
+        }
+    }
+        if(dataib && dataib.length > 0){
+            dataibn = dataib.map(c=>c.attributes[valc])
+        }
+    
+  })
+ 
 function addnew(event) {
     const newOb = event.skob;
     const newN = event.skob.attributes[valc];
