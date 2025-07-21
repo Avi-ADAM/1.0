@@ -1,6 +1,6 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { sentrySvelteKit } from '@sentry/sveltekit';
-
+import tailwindcss from "@tailwindcss/vite";
 
 /** @type {import('vite').UserConfig} */
 const config = {
@@ -16,7 +16,9 @@ const config = {
         rewrite: false,
       },
     }),*/
-    sveltekit()]
+    sveltekit(),
+    tailwindcss()
+  ]
 };
 
 export default config;

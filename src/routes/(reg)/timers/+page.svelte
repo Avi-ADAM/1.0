@@ -229,11 +229,11 @@
         orders = checkLines($timers);
     }
 </script>
+{#key $timers}
 
 <div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} 
      style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;" 
      class="timer-container d">
-    {#key $timers}
     <div class="center-wrapper">
         <div id="timer-content" dir="ltr" bind:clientWidth={w} bind:clientHeight={h} 
             style="position: relative; width: {w}px; height: {h}px;" 
@@ -260,8 +260,8 @@
             <!-- <div class="center-marker"></div> -->
         </div>
     </div>
-    {/key}
 </div>
+{/key}
 
 <style>
     .timer-container {

@@ -654,4 +654,26 @@ export const qids = {
         }
       }
     `,
+    "43updateProfilePic":  `
+mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
+  updateProject(
+    id: $projectId,
+    data: { profilePic: $imageId }
+  ) {
+    data {
+      id
+      attributes {
+        profilePic {
+          data {
+            attributes {
+              url
+              formats
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`,
 }

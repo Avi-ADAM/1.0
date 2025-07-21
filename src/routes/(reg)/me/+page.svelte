@@ -28,6 +28,7 @@ import { idPr } from '$lib/stores/idPr.js';
   import { fly, scale } from 'svelte/transition';
   let iwant = $state(false);
 let isOpen = $state(false);
+let isOpenM = $state(false);
   let isG = $state(false);
   let current = $state('');
 
@@ -223,7 +224,7 @@ let addNs1 = $state(true);
             uPic.set(res.attributes.profilePic.data.attributes.formats?.small?.url || res.attributes.profilePic.data.attributes.url);
       picLink = $uPic;
     updX = 0;
-    isOpen = false;
+    isOpenM = false;
     a = 0;
         } catch (e) {
       error1 = e;
@@ -514,7 +515,7 @@ let frd;
       )
       .then((response) => {
         meData = response.data;
-
+        isOpenM = false;
     isOpen = false;
     a = 0;
         start();
@@ -605,6 +606,7 @@ function callbackFunction(event) {
   }
 const closer = () => {
     isOpen = false;
+    isOpenM = false;
     updX = 0;
   addpic = 0;
   a = 0;
@@ -614,7 +616,7 @@ const closer = () => {
       a = 1;
 }
   function openen() {
-  isOpen = true;
+  isOpenM = true;
   updX = 1;
   addpic = 1;
 }
@@ -844,9 +846,8 @@ const clearButton = {
     <div  style="z-index: 400;" dir="rtl" class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
              <button style="margin: 0 auto;" class=" hover:bg-barbi text-mturk rounded-full p-2"
           onclick={closer}><Close/></button>
-          {#if a == 0}
-            <Addnewp onMessage={callbackFunction} />
-          {:else if a == 1}
+
+          {#if a == 1}
             <EditB
               machshirs={meData?.machshirs.data}
               projectIds={meData.projects_1s.data.map((c) => c.id)}
@@ -881,7 +882,18 @@ const clearButton = {
   </DialogContent>
   </div>
 </DialogOverlay>
-
+{#if a == 0 && isOpenM}
+  <div class="center-upload">
+    <Addnewp onMessage={callbackFunction} current={picLink}/>
+    <button onclick={closer}>{cencel[$lang]}</button>
+  </div>
+  {:else if a == 2 && isOpenM}
+  <div class="center-upload">
+    <h3 class="text-barbi">{om[$lang]}</h3>
+  <br>
+ <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ </div> 
+ {/if}
 {#if addP == false}
 
 <div bind:clientWidth={width} bind:clientHeight={height}  class="body button-whitegold"  style="--the:{stylef};">
@@ -1556,7 +1568,20 @@ class=" hover:scale-150 "
 {/await}
 
   <style>
-
+.center-upload {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+  background: white;
+  border-radius: 1em;
+  box-shadow: 0 0 20px #0002;
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
   .name { transition: all .2s ease-in-out;
     transform-origin: center;
 

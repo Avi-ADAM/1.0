@@ -51,6 +51,7 @@
   let idL;
   let success = $state(false);
   let isOpen = $state(false);
+  let isOpenM = $state(false);
   let a = $state(0);
   let fmiData = $state([]);
   let tahaS = $state(false);
@@ -777,11 +778,11 @@
   function addp() {
     if (projectUsers.length == 1) {
       a = 0;
-      isOpen = true;
+      isOpenM = true;
     } else {
       toast.success(tovote[$lang]);
       a = 0;
-      isOpen = true;
+      M = true;
     }
     //if project users more then 1
   }
@@ -797,11 +798,11 @@
   function editp() {
     if (projectUsers.length == 1) {
       a = 0;
-      isOpen = true;
+      isOpenM = true;
     } else {
       toast.success(`${tovote[$lang]}`);
       a = 0;
-      isOpen = true;
+      isOpenM = true;
     }
     //if project users more then 1
   }
@@ -816,7 +817,7 @@
   }
 
   const closer = () => {
-    isOpen = false;
+    isOpenM = false;
     a = 0;
   };
   let files;
@@ -825,6 +826,7 @@
     a = 1;
   }
   function allbackFunction(event) {
+    console.log(event);
     a = 2;
     files = event.files;
     sendP();
@@ -856,35 +858,24 @@
       })
       .then(({ data }) => {
         const imageId = data[0].id;
-        if (projectUsers.length == 1) {
-          axios
-            .put(
-              linkdi,
-              {
-                profilePic: imageId
-              },
-              {
-                headers: {
-                  Authorization: bearer1
-                }
-              }
-            )
-            .then((response) => {
-              meDatap = response.data;
-              srcP = meDatap.profilePic.formats.thumbnail.url;
-              srcP = meDatap.profilePic.formats.small.url;
-              srcP = meDatap.profilePic.url;
-              isOpen = false;
+        if(projectUsers.length == 1){
+        sendToSer({projectId: $idPr, imageId: imageId}, "43updateProfilePic",null,null,true,fetch)
+        .then((data) => {
+          console.log(data);
+          meDatap = data;
+              srcP = meDatap.data.updateProject.data.attributes.profilePic.formats.thumbnail.url;
+              srcP = meDatap.data.updateProject.data.attributes.profilePic.formats.small.url;
+              srcP = meDatap.data.updateProject.data.attributes.profilePic.url;
+              isOpenM = false;
               a = 0;
               toast.success(`${picupsu[$lang]}`);
-            })
-            .catch((error) => {
-              console.log('צריך לתקן:', error.response);
-              if (error.response != undefined) {
-                a = 3;
-              }
-            });
-        } else {
+        })
+      .catch((error) => {
+        console.log(error);
+        a = 3;
+      });
+
+    } else {
           let linkg = baseUrl + '/graphql';
           try {
             fetch(linkg, {
@@ -917,7 +908,7 @@
             })
               .then((r) => r.json())
               .then((data) => (meDatap = data));
-            isOpen = false;
+            isOpenM = false;
             a = 0;
             toast.success(`${picvots[$lang]}`);
           } catch (e) {
@@ -1349,6 +1340,8 @@
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
+  import { RingLoader } from 'svelte-loading-spinners';
+  import { sendToSer } from '$lib/send/sendToSer';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1570,13 +1563,24 @@ function add(event){
       <Lowding />
     </div>
   {:then meData}
+  {#if a == 0 && isOpenM}
+  <div class="center-upload">
+    <Uplad onMessage={allbackFunction} current={srcP}/>
+    <button onclick={closer}>{cencel[$lang]}</button>
+  </div>
+  {:else if a == 2 && isOpenM}
+  <div class="center-upload">
+ <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ </div> 
+ {/if}
     <!--   <Tooltip title="{ti}" >-->
     <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
       <div
         style="z-index: 700;"
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
-        <DialogContent aria-label="form" class="{a != 8 ? a != 5 ? "content" : "betha" :"chat"}">
+        <DialogContent aria-label="form"
+         class="{a != 8 ? a != 5 ? "content" : "betha" :"chat"}">
           <div style="z-index: 400;"      dir="{$lang == "he" ? "rtl" : "ltr"}"
           >
             <button
@@ -1584,9 +1588,7 @@ function add(event){
               onclick={closer}
               title={cencel1[$lang]}><Close /></button
             >
-            {#if a == 0}
-              <Uplad onMessage={allbackFunction} />
-            {:else if a == 1}
+            {#if a == 1}
               <Editb
                 onMessage={updete}
                 selected={valit}
@@ -2613,4 +2615,18 @@ pointer-events: none;"
       flex-direction: row;
     }
   }
+  .center-upload {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+  background: white;
+  border-radius: 1em;
+  box-shadow: 0 0 20px #0002;
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 </style>

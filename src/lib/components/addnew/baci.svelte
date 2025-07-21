@@ -243,7 +243,7 @@ let suc = $state(false);
 	}
   function openen () {
   isOpen = true;
- 
+    a = 1
 }
 
 
@@ -348,24 +348,23 @@ const sur = {"he":"הריקמה נוצרה בהצלחה", "en":"new FreeMates ha
 const tob = {"he":"מעבר לניהול הריקמה במוח הריקמה", "en":"to the FreeMates brain"}
 const inc = {"he":"ניתן להזין את הערך המוערך של ההכנסה אם ידוע, אחרת ניתן יהיה לחשב בהמשך מדף הניהול","en":"if you know the aproximate vallue of income, else you can later caculate it"}
  </script>  
-<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer} >
-        <div style="z-index: 700;" transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent aria-label="form">
-      <div style="z-index: 400;" dir="rtl" >
+{#if isOpen}
+      <div class="center-upload" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
           onclick={closer}>{cencel[$lang]}</button>
-          {#if a == 0}
-          <Uplad onMessage={callbackFunction}/>
+          {#if a == 1}
+          <Uplad current="https://res.cloudinary.com/onelove1/image/upload/v1645805397/pngegg_2_8aeb98b032.png" onMessage={callbackFunction}/>
 
-          {:else if a == 2}
+          {:else if a == 2 && isOpen}
           <div class="sp bg-gold">
             <h3 class="text-barbi">{om[$lang]}</h3>
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
-         </div> {/if}
-  </DialogContent>
-  </div>
-</DialogOverlay>
+         </div> 
+         {/if}
+         </div>
+{/if}
+
 <div transition:scale={{ delay: 250, duration: 300, easing: quintOut }} class="a"></div>
 
 
@@ -413,9 +412,15 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   <span class='line'></span>
 </div>
 <br>
-<button onclick={openen} class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded-full p-2" >{ladd[$lang]}</button>
+<div class="">
+<h2 
+ class=" text-barbi " >{ladd[$lang]}</h2>
+<Uplad
+  noHeader={true}
+ current="https://res.cloudinary.com/onelove1/image/upload/v1645805397/pngegg_2_8aeb98b032.png" onMessage={callbackFunction}/>
+
 {#if suc == true}<small class="text-barbi">{su[$lang]}</small>{/if}
-         
+</div>         
 <h1 class="midscreenText-2 text-center text-gold">
   {userName_value} 
   {whva[$lang]}
@@ -532,7 +537,20 @@ pointer-events: none;">
 </div>
 {/if}
 <style>
- 
+ .center-upload {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+  background: white;
+  border-radius: 1em;
+  box-shadow: 0 0 20px #0002;
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
   textarea::-webkit-resizer {
   border-width: 8px;
   border-style: solid;

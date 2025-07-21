@@ -900,7 +900,7 @@
   dependencies:
     "@floating-ui/utils" "^0.2.9"
 
-"@floating-ui/dom@^1.4", "@floating-ui/dom@^1.4.5":
+"@floating-ui/dom@^1.4", "@floating-ui/dom@^1.4.5", "@floating-ui/dom@^1.7.1":
   version "1.7.1"
   resolved "https://registry.npmjs.org/@floating-ui/dom/-/dom-1.7.1.tgz"
   integrity sha512-cwsmW/zyw5ltYTUeeYJ60CnQuPqmGwuGVhG9w0PRaRKkAyi38BT5CKrpIbb+jtahSwUl04cWzSx9ZOIxeS6RsQ==
@@ -1141,6 +1141,11 @@
   dependencies:
     "@jridgewell/resolve-uri" "^3.1.0"
     "@jridgewell/sourcemap-codec" "^1.4.14"
+
+"@lucide/svelte@^0.525.0":
+  version "0.525.0"
+  resolved "https://registry.npmjs.org/@lucide/svelte/-/svelte-0.525.0.tgz"
+  integrity sha512-dyUxkXzepagLUzL8jHQNdeH286nC66ClLACsg+Neu/bjkRJWPWMzkT+H0DKlE70QdkicGCfs1ZGmXCc351hmZA==
 
 "@lukeed/ms@^2.0.1":
   version "2.0.2"
@@ -2885,6 +2890,18 @@ bits-ui@^0.21.7:
     "@melt-ui/svelte" "0.76.2"
     nanoid "^5.0.5"
 
+bits-ui@^2.8.11:
+  version "2.8.11"
+  resolved "https://registry.npmjs.org/bits-ui/-/bits-ui-2.8.11.tgz"
+  integrity sha512-lKN9rAk69my6j7H1D4B87r8LrHuEtfEsf1xCixBj9yViql2BdI3f04HyyyT7T1GOCpgb9+8b0B+nm3LN81Konw==
+  dependencies:
+    "@floating-ui/core" "^1.7.1"
+    "@floating-ui/dom" "^1.7.1"
+    esm-env "^1.1.2"
+    runed "^0.29.1"
+    svelte-toolbelt "^0.9.3"
+    tabbable "^6.2.0"
+
 blueimp-canvas-to-blob@^3.29.0:
   version "3.29.0"
   resolved "https://registry.npmjs.org/blueimp-canvas-to-blob/-/blueimp-canvas-to-blob-3.29.0.tgz"
@@ -4349,7 +4366,7 @@ escape-string-regexp@^5.0.0:
   resolved "https://registry.npmjs.org/escape-string-regexp/-/escape-string-regexp-5.0.0.tgz"
   integrity sha512-/veY75JbMK4j1yjvuUxuVsiS/hr/4iHs9FTT6cgTexxdE0Ly/glccBAkloH/DofkjRbZU3bnoj38mOmhkZ0lHw==
 
-esm-env@^1.1.4, esm-env@^1.2.1, esm-env@^1.2.2:
+esm-env@^1.0.0, esm-env@^1.1.2, esm-env@^1.1.4, esm-env@^1.2.1, esm-env@^1.2.2:
   version "1.2.2"
   resolved "https://registry.npmjs.org/esm-env/-/esm-env-1.2.2.tgz"
   integrity sha512-Epxrv+Nr/CaL4ZcFGPJIYLWFom+YeV1DqMLHJoEd9SYRxNbaFruBwfEX/kkHUJf55j2+TUbmDcmuilbP1TmXHA==
@@ -5203,6 +5220,11 @@ ini@^4.1.1:
   version "4.1.3"
   resolved "https://registry.npmjs.org/ini/-/ini-4.1.3.tgz"
   integrity sha512-X7rqawQBvfdjS10YU1y1YVreA3SsLrW9dX2CewP2EbBJM4ypVNLDkO5y04gejPwKIY9lR+7r9gn3rFPt/kmWFg==
+
+inline-style-parser@0.2.4:
+  version "0.2.4"
+  resolved "https://registry.npmjs.org/inline-style-parser/-/inline-style-parser-0.2.4.tgz"
+  integrity sha512-0aO8FkhNZlj/ZIbNi7Lxxr12obT7cL1moPfE4tg1LkX7LlLfC6DeX4l2ZEud1ukP9jNQyNnfzQVqwbwmAATY4Q==
 
 int64-buffer@^0.1.9:
   version "0.1.10"
@@ -7662,6 +7684,13 @@ run-parallel@^1.1.9:
   dependencies:
     queue-microtask "^1.2.2"
 
+runed@^0.29.0, runed@^0.29.1:
+  version "0.29.2"
+  resolved "https://registry.npmjs.org/runed/-/runed-0.29.2.tgz"
+  integrity sha512-0cq6cA6sYGZwl/FvVqjx9YN+1xEBu9sDDyuWdDW1yWX7JF2wmvmVKfH+hVCZs+csW+P3ARH92MjI3H9QTagOQA==
+  dependencies:
+    esm-env "^1.0.0"
+
 rw@1:
   version "1.3.3"
   resolved "https://registry.npmjs.org/rw/-/rw-1.3.3.tgz"
@@ -8145,6 +8174,13 @@ stubborn-fs@^1.2.5:
   resolved "https://registry.npmjs.org/stubborn-fs/-/stubborn-fs-1.2.5.tgz"
   integrity sha512-H2N9c26eXjzL/S/K+i/RHHcFanE74dptvvjM8iwzwbVcWY/zjBbgRqF3K0DY4+OD+uTTASTBvDoxPDaPN02D7g==
 
+style-to-object@^1.0.8:
+  version "1.0.9"
+  resolved "https://registry.npmjs.org/style-to-object/-/style-to-object-1.0.9.tgz"
+  integrity sha512-G4qppLgKu/k6FwRpHiGiKPaPTFcG3g4wNVX/Qsfu+RqQM30E7Tyu/TEgxcL9PNLF5pdRLwQdE3YKKf+KF2Dzlw==
+  dependencies:
+    inline-style-parser "0.2.4"
+
 stylehacks@^7.0.5:
   version "7.0.5"
   resolved "https://registry.npmjs.org/stylehacks/-/stylehacks-7.0.5.tgz"
@@ -8312,6 +8348,15 @@ svelte-sonner@^0.3.28:
   resolved "https://registry.npmjs.org/svelte-sonner/-/svelte-sonner-0.3.28.tgz"
   integrity sha512-K3AmlySeFifF/cKgsYNv5uXqMVNln0NBAacOYgmkQStLa/UoU0LhfAACU6Gr+YYC8bOCHdVmFNoKuDbMEsppJg==
 
+svelte-toolbelt@^0.9.3:
+  version "0.9.3"
+  resolved "https://registry.npmjs.org/svelte-toolbelt/-/svelte-toolbelt-0.9.3.tgz"
+  integrity sha512-HCSWxCtVmv+c6g1ACb8LTwHVbDqLKJvHpo6J8TaqwUme2hj9ATJCpjCPNISR1OCq2Q4U1KT41if9ON0isINQZw==
+  dependencies:
+    clsx "^2.1.1"
+    runed "^0.29.0"
+    style-to-object "^1.0.8"
+
 svelte-touch-to-mouse@^1.0.0:
   version "1.0.0"
   resolved "https://registry.npmjs.org/svelte-touch-to-mouse/-/svelte-touch-to-mouse-1.0.0.tgz"
@@ -8423,6 +8468,18 @@ tailwind-merge@^2.5.2:
   version "2.6.0"
   resolved "https://registry.npmjs.org/tailwind-merge/-/tailwind-merge-2.6.0.tgz"
   integrity sha512-P+Vu1qXfzediirmHOC3xKGAYeZtPcV9g76X+xg2FD4tYgR71ewMA35Y3sCz3zhiN/dwefRpJX0yBcgwi1fXNQA==
+
+tailwind-merge@3.0.2:
+  version "3.0.2"
+  resolved "https://registry.npmjs.org/tailwind-merge/-/tailwind-merge-3.0.2.tgz"
+  integrity sha512-l7z+OYZ7mu3DTqrL88RiKrKIqO3NcpEO8V/Od04bNpvk0kiIFndGEoqfuzvj4yuhRkHKjRkII2z+KS2HfPcSxw==
+
+tailwind-variants@^1.0.0:
+  version "1.0.0"
+  resolved "https://registry.npmjs.org/tailwind-variants/-/tailwind-variants-1.0.0.tgz"
+  integrity sha512-2WSbv4ulEEyuBKomOunut65D8UZwxrHoRfYnxGcQNnHqlSCp2+B7Yz2W+yrNDrxRodOXtGD/1oCcKGNBnUqMqA==
+  dependencies:
+    tailwind-merge "3.0.2"
 
 tailwindcss@^3.4.10:
   version "3.4.17"
