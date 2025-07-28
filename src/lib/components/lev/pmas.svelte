@@ -1131,6 +1131,13 @@ input[type=text]:invalid {
     :global([data-svelte-dialog-overlay].overlay) {
     z-index: 1000;
   }
+   :global([data-svelte-dialog-content].full) {
+          z-index: 1000;
+      padding: 10px;
+      background-color: #242526;
+      width:80vw;
+
+        }
   @media (min-width: 600px){
         :global([data-svelte-dialog-content].chat) {
        z-index: 1000;

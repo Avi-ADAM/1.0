@@ -186,6 +186,11 @@ $effect(() => {
 
   const changes = getChanges();
 
+  function stripHtml(html) {
+    if (!html) return '';
+    return String(html).replace(/(<([^>]+)>)/gi, '');
+  }
+
 function hover(x){
 onHover?.({x:x});
 }
@@ -313,10 +318,19 @@ onkeypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {i
           <strong>השיפורים שבוצעו:</strong>
           <ul class="mt-1 mr-4">
             {#each changes as change}
+              {@const oldText = change.type === 'descrip' ? stripHtml(change.old) : change.old?.toString()}
+              {@const newText = change.type === 'descrip' ? stripHtml(change.new) : change.new?.toString() ?? ''}
               <li class="flex items-center gap-2 mb-1">
                 <span class="font-medium">{change.label}:</span>
-                <span class="text-gray-500 line-through text-xs max-w-[100px] truncate">{change.old?.toString()}</span>
-                <span class="text-green-600 font-medium">{$lang == 'he' ? '←' : '→'} {change.new?.toString().slice(0, 50)}{change.new?.toString().length > 50 ? '...' : ''}</span>
+                <span class="text-gray-500 line-through text-xs max-w-[100px] truncate">
+                  {oldText}
+                </span>
+                <span class="text-green-600 font-medium">
+                  {$lang == 'he' ? '←' : '→'}
+                </span>
+                <span class="text-green-600 font-medium max-w-[100px] truncate">
+                  {newText}
+                </span>
               </li>
             {/each}
           </ul>
