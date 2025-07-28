@@ -1024,7 +1024,7 @@ const clearButton = {
            {#each meData.projects_1s.data as data, i}
            <div class="cont"  >
             <button
-             onclick={project(data.id)}
+             onclick={()=>project(data.id)}
              class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center sm:text-xl mt-1 mr-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow width={width > 640 ? 47.4:23.7} height={width > 640 ? 35.7:17.85}/></span></div></button>
 
            </div>

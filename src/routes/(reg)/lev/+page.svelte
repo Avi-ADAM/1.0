@@ -1595,6 +1595,7 @@
           if (index != -1 || null) {
             // indexi = index
             if (
+              arr1[index].diun &&
               arr1[index].diun.length == datan.data.attributes.diun.length &&
               datan.data.attributes.diun[datan.data.attributes.diun.length - 1]
                 .id != $nowId
@@ -2179,7 +2180,7 @@
 
       counter += 1;
       localStorage.setItem('miDataL', JSON.stringify(miData));
-      if (isEqual(miData, miDataold) == true && update != true) {
+      if (!isEqual(miData, miDataold) == true && update != true) {
         console.log('nada',nowT - Date.now());
         low = false;
       } else {
@@ -2675,8 +2676,10 @@
           descrip: pend.descrip,
           kindOf: pend.kindOf,
           created_at: pend.createdAt,
-          nego_mashes: pend.nego_mashes.data,
+          nego_mashes: pend.nego_mashes,
           timegramaId: pend.timegrama.data.id,
+          timeGramaDate: pend.timegrama.data.attributes.date,
+          nego_mashes: pend.nego_mashes.data,
           restime: getProjectData(proj.id, 'restime'),
           projectName: getProjectData(proj.id, 'pn'),
           user_1s: getProjectData(proj.id, 'us'),

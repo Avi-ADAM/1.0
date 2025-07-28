@@ -301,6 +301,8 @@ let h = $state(500);
                     pendId={buble.pendId}
                     users={buble.users}
                     {low}
+                    nego_mashes={buble.nego_mashes || []}
+                      timeGramaDate={buble.timeGramaDate}
                     /></div>
                     {:else if buble.ani === "pends" && milon.pend == true}
                     <div  class="normSml pend"

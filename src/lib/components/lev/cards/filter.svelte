@@ -17,6 +17,7 @@ let fiap = "fiap";
  let pmashs = "pmashs";
  let pmaap = "pmaap";
  let askmap = "askmap";
+let selectedProjectName = $state(null);
 // נאחסן את כל המצבים באובייקט אחד
 let states = $state({
   sugg,
@@ -33,13 +34,14 @@ let states = $state({
 });
 onMount(async () => {
     if(filterKind === "projects"){
+        const colors = ["blue", "green", "yellow", "indigo", "purple", "pink", "gold", "neww", "wow", "red", "gray"];
         milon = []
         for (let i = 0; i < allIds.length; i++) {
             milon.push({
                 id: allIds[i].projectId,
                 name:allIds[i].projectName, 
                 val:true, 
-                color:"blue", 
+                color: colors[i % colors.length], 
                 word:{
                     he:`${allIds[i].projectName} - (${allIds[i].count})`, 
                     en:`${allIds[i].projectName} - (${allIds[i].count})`
@@ -51,26 +53,36 @@ onMount(async () => {
     }
 })
 function showonly(value,id=null) { 
-    if (value !== "true") {
-        onShowonly?.({
-            data: value,
-            kind: filterKind,
-            id: id
-                });
-        
-        // נאפס את כל הערכים
-        Object.keys(states).forEach(key => {
-            states[key] = key;
-        });
-        
-        // נעדכן את הערך הספציפי
-        states[value] = "true";
+    if (filterKind === 'projects') {
+        if (selectedProjectName === value) {
+            selectedProjectName = null;
+            onShowall?.();
+        } else {
+            selectedProjectName = value;
+            onShowonly?.({ data: value, kind: filterKind, id: id });
+        }
     } else {
-        onShowall?.();
-        // נאפס את כל הערכים
-        Object.keys(states).forEach(key => {
-            states[key] = key;
-        });
+        if (value !== "true") {
+            onShowonly?.({
+                data: value,
+                kind: filterKind,
+                id: id
+                    });
+            
+            // נאפס את כל הערכים
+            Object.keys(states).forEach(key => {
+                states[key] = key;
+            });
+            
+            // נעדכן את הערך הספציפי
+            states[value] = "true";
+        } else {
+            onShowall?.();
+            // נאפס את כל הערכים
+            Object.keys(states).forEach(key => {
+                states[key] = key;
+            });
+        }
     }
 }
 
@@ -225,8 +237,8 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
-            openi={states[key.name] === "true"} 
-            closei={states[key.name] !== "true"}
+            openi={selectedProjectName === null || selectedProjectName === key.name}
+            closei={selectedProjectName !== null && selectedProjectName !== key.name}
         />
     </button>
 {/each}

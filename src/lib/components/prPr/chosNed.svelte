@@ -3,7 +3,7 @@
     import { onMount } from 'svelte';
     import Addnewnee from '../addnew/addNewNeed.svelte';
     const baseUrl = import.meta.env.VITE_URL
-
+    import { lang } from '$lib/stores/lang';
    //// import { sneed } from '../../stores/sneed.js';
   //  import { total } from '../../stores/total.js';
     //let  userName_value;
@@ -89,9 +89,13 @@ function incremen() {
       x: find_need_id(selected)
     })
 	};
+  const addNewNeedLebel = {
+    he: 'הוספת משאבים נדרשים',
+    en: 'Add needed resources'
+  };
   </script>
   <div dir="rtl" style="max-width: 100%" >
-    <h1 >הוספת משאבים נדרשים </h1>
+    <h1>{addNewNeedLebel[$lang]}</h1>
     <div class="items-center">
       <div class="gg w-min	pb-1">
         <MultiSelect

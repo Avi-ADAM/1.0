@@ -118,7 +118,7 @@
   let swiperRef = null;
 
   $effect(() => {
-    if (indexi != -1) {
+    if (swiperRef && indexi != -1) {
       swiperRef.slideTo(indexi);
       indexi = -1;
     }
@@ -130,7 +130,9 @@
   }
   let slideIndex;
   $effect(() => {
-    if (swiperRef !== null) {
+    if (swiperRef) {
+      // re-run when filteredArr changes
+      filteredArr;
       swiperRef.update();
     }
   });
@@ -589,6 +591,8 @@ $effect(() => {
                       linkto={buble.linkto}
                       pendId={buble.pendId}
                       users={buble.users}
+                      nego_mashes={buble.nego_mashes || []}
+                      timeGramaDate={buble.timeGramaDate}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'pends' && milon.pend == true}

@@ -39,41 +39,70 @@ function check (lettera, letterb){
         return false
     }
 }
-function checkAll (a, b){
-    let al = a && a.length > 0 ? a.split(" ") : []
-    let bl = b && b.length > 0 ? b.split(" ") : []
-    let t = 0
-    htmlon = ``
-    if(al.length > 0 && bl.length >0){
-  for(let i =0; i < bl.length; i++){
+function checkAll(a, b) {
+    const al = a && a.length > 0 ? a.split(" ") : [];
+    const bl = b && b.length > 0 ? b.split(" ") : [];
+    let html = '';
+    let i = 0; // pointer for al
+    let j = 0; // pointer for bl
 
-    if (check(al[i+t], bl[i]) == true){
-        htmlon += `${al[i+t]} `
-    } else if(check(al[i+1], bl[i]) == true){
-            t = 1
-            htmlon += `${al[i+t]} `
-        }else if(check(al[i+2], bl[i]) == true){
-            t = 2
-            htmlon += `${al[i+t]} `
-        }else if(check(al[i-1], bl[i]) == true){
-            t = -1
-            htmlon += `${al[i+t]} `
-        }else if(check(al[i-2], bl[i]) == true){
-            t = -2
-            htmlon += `${al[i+t]} `
-        }else{
-             if(al[i] != undefined){
-        htmlon+= `<span class="line-through text-barbi">${al[i]}</span> `
+    while (i < al.length || j < bl.length) {
+        if (i < al.length && j < bl.length && al[i] === bl[j]) {
+            // Words match
+            html += al[i] + ' ';
+            i++;
+            j++;
+        } else {
+            // Words don't match. Look ahead to find a sync point.
+            let found_b_in_a = -1;
+            if (j < bl.length) {
+                for (let k = i; k < al.length; k++) {
+                    if (al[k] === bl[j]) {
+                        found_b_in_a = k;
+                        break;
+                    }
+                }
+            }
+
+            let found_a_in_b = -1;
+            if (i < al.length) {
+                for (let k = j; k < bl.length; k++) {
+                    if (bl[k] === al[i]) {
+                        found_a_in_b = k;
+                        break;
+                    }
+                }
+            }
+
+            if (found_b_in_a !== -1 && (found_a_in_b === -1 || found_b_in_a - i <= found_a_in_b - j)) {
+                // It's more likely a deletion from 'a'.
+                // Mark words from i to found_b_in_a - 1 as deleted.
+                for (let k = i; k < found_b_in_a; k++) {
+                    html += `<span class="line-through text-barbi">${al[k]}</span> `;
+                }
+                i = found_b_in_a;
+            } else if (found_a_in_b !== -1) {
+                // It's more likely an insertion into 'b'.
+                // Mark words from j to found_a_in_b - 1 as added.
+                for (let k = j; k < found_a_in_b; k++) {
+                    html += `<span class="text-wow">${bl[k]} </span>`;
+                }
+                j = found_a_in_b;
+            } else {
+                // No sync point found. Mark al[i] as deleted and bl[j] as added.
+                if (i < al.length) {
+                    html += `<span class="line-through text-barbi">${al[i]}</span> `;
+                    i++;
+                }
+                if (j < bl.length) {
+                    html += `<span class="text-wow">${bl[j]} </span>`;
+                    j++;
+                }
+            }
         }
-        htmlon += `<span class="text-wow">${bl[i]} </span>`
     }
-  }
-}else if(al.length > 0 && bl.length == 0){
-        htmlon+= `<span class="line-through text-barbi">${a}</span> `
-}else if(al.length == 0 && bl.length >0){
-        htmlon += `<span class="text-wow">${b}</span>`    
-}
-  console.log(htmlon)
+    htmlon = html.trim();
+    console.log(htmlon);
 }
     </script>
     <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">

@@ -16,87 +16,7 @@
   let bearer1;
   let token;
   let idL;
-
-  const less = {
-    he: 'הסרה',
-    en: 'remove'
-  };
-  let descrip2 = $state(descrip);
-  let name2 = $state(name1);
-  let sqadualed2 = $state(sqadualed);
-  let sqadualedf2 = $state(sqadualedf);
-
-  let spnot2 = spnot;
-  let linkto2 = $state(linkto);
-  let hm2 = $state(hm);
-  let price2 = $state(price);
-  let easy2 = $state(easy);
-  let rishon = 0;
-  let kindOfb = $state(kindOf);
-
-  function close() {
-    onClose?.();
-  }
-  let name4 = ``;
-  let descrip4 = ``;
-  let spnot4 = ``;
-  let hm4 = ``;
-  let price4 = ``;
-
-  let rishon4 = ``;
-  let rishonves4 = ``;
-  let what4 = true;
-  function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
-        }
-      }
-    }
-    return str;
-  }
-  function objToStringC(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
-        }
-      }
-    }
-    return str;
-  }
-  let miDatan = [];
+ let miDatan = [];
   let error1;
   let clicked = false;
   /**
@@ -172,6 +92,63 @@
   } = $props();
   
   let userss;
+  const less = {
+    he: 'הסרה',
+    en: 'remove'
+  };
+  let descrip2 = $state(descrip);
+  let name2 = $state(name1);
+  let sqadualed2 = $state(sqadualed);
+  let sqadualedf2 = $state(sqadualedf);
+
+  let spnot2 = spnot;
+  let linkto2 = $state(linkto);
+  let hm2 = $state(hm);
+  let price2 = $state(price);
+  let easy2 = $state(easy);
+  let rishon = 0;
+  let kindOfb = $state(kindOf);
+
+  function close() {
+    onClose?.();
+  }
+  let name4 = ``;
+  let descrip4 = ``;
+  let spnot4 = ``;
+  let hm4 = ``;
+  let price4 = ``;
+
+  let rishon4 = ``;
+  let rishonves4 = ``;
+  let what4 = true;
+  function objToString(obj) {
+    if (!obj || !Array.isArray(obj)) return '';
+    return obj
+      .map((item) => {
+        const props = Object.entries(item)
+          .filter(([key]) => key !== '__typename' && item[key] !== null && item[key] !== undefined)
+          .map(([key, val]) => {
+            let formattedVal;
+            if (key === 'users_permissions_user' && typeof val === 'object' && val !== null) {
+              formattedVal = `"${val.data.id}"`;
+            } else if (typeof val === 'string') {
+              formattedVal = `"${val.replace(/"/g, '\\"')}"`;
+            } else if (val === null) {
+              formattedVal = 'null';
+            } else {
+              formattedVal = val;
+            }
+            return `${key}:${formattedVal}`;
+          })
+          .join(',');
+        return `{${props}}`;
+      })
+      .join(',');
+  }
+  function objToStringC(obj) {
+    return objToString(obj);
+  }
+ 
   async function increment() {
     onLoad?.();
     //TODO: update timegrama, add now pend that is changed to nego
@@ -239,24 +216,24 @@
       name4 = ``;
       namefornego = ``;
     } else {
-      name4 = `name: "${name2}",`;
-      namefornego = `name: "${name1}",`;
+      name4 = `name: ${JSON.stringify(name2)},`;
+      namefornego = `name: ${JSON.stringify(name1)},`;
       what4 = false;
     }
     if (descrip === descrip2) {
       descrip4 = ``;
       descrip4nego = ``;
     } else {
-      descrip4 = `descrip: "${descrip2}",`;
-      descrip4nego = `descrip: "${descrip}",`;
+      descrip4 = `descrip: """${descrip2}""",`;
+      descrip4nego = `descrip: """${descrip}""",`;
       what4 = false;
     }
     if (spnot === spnot2) {
       spnot4 = ``;
       spnot4nego = ``;
     } else {
-      spnot4 = `spnot: "${spnot2}",`;
-      spnot4nego = `spnot: "${spnot}",`;
+      spnot4 = `spnot: ${JSON.stringify(spnot2)},`;
+      spnot4nego = `spnot: ${JSON.stringify(spnot)},`;
       what4 = false;
     }
     if (easy === easy2) {
@@ -356,7 +333,7 @@
     ${price4}
     ${sqadualedf4}
     ${sqadualed4}
-        users:[  ${userss}, 
+        users:[  ${userss}${userss ? ',' : ''}
      {
       what: true
       users_permissions_user: "${idL}"
@@ -415,9 +392,6 @@
         price * hm * montsi(kindOf, sqadualed, sqadualedf, true)
     }
   ]);
-  $effect(() => {
-    console.log(datai);
-  });
 </script>
 
 <div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>

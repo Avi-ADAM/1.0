@@ -366,7 +366,7 @@
           .then((data) => (miDatan = data));
         console.log(miDatan);
         if (isAssigned) {
-          let hiluz = miDatan.data.createOpenMashaabim.data.id;
+          let hiluz = miDatan.data[linkop].data.id;
           let que = ``;
           if (!isReceived) {
             que = `mutation 
@@ -436,7 +436,7 @@ vots: [${userss},
           let v = await SendTo(que);
           console.log(v);
         }
-        if (userslength > 1 && data.assignedTo && data.assignedTo.length > 0) {
+        if (userslength > 1) {
           let fd = new Date(Date.now() + x);
           let hiluzpend = miDatan.data.createPmash.data.id;
           let quee = `mutation 
@@ -452,7 +452,8 @@ vots: [${userss},
                 }`;
           let v = await SendTo(quee);
           console.log(v);
-          let data = {
+          const name = addslashes(data.attributes.name);
+          let dataOf = {
             pu: pu,
             pn: pn,
             pl: pl,
@@ -460,14 +461,14 @@ vots: [${userss},
             pid: projectId,
             uid: idL,
             kind: 'pendmash',
-            name: addslashes(data.attributes.name)
+            name: name
           };
           fetch('/api/nuti', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(dataOf)
           })
             .then((response) => response)
             .then((data) => {

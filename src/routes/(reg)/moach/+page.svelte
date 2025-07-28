@@ -1654,7 +1654,7 @@ function add(event){
     <div
       dir="{$lang == "he" ? "rtl" : "ltr"}"
       bind:clientWidth={width}
-      class="all text-barbi text-center overflow-y-auto  {isMobileOrTablet() ? "max-h-[calc(100vh-3rem)]" : "min-h-screen"}  scroll-smooth d"
+      class="all text-barbi text-center  overflow-y-auto max-h-[calc(100vh-3rem)]  scroll-smooth d mb-12"
       style="-webkit-scrollbar:0px;"
     >
     {#if !isMobileOrTablet()}

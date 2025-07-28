@@ -59,7 +59,6 @@
     children
   } = $props();
    $effect(() => {
-    console.log(bg);
     // Reset all color flags to false first
     blue = false;
     gray = false;

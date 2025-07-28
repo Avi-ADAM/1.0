@@ -78,9 +78,10 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     let crr = cr.getTime() //if nego then use last nego creationtime
   console.log(zman , Date.now() , crr , x)
        setInterval(() => {
-   zman = -((Date.now() - cr) - x)
+   zman = -((Date.now() - cr))
       }, 1)
   })
+  
 function hover(x){
 onHover?.({x:x});
 }

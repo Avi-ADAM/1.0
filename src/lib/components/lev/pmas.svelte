@@ -15,6 +15,96 @@ import { idPr } from '../../stores/idPr.js';
  import { onMount } from 'svelte';
  import Lowbtn from '$lib/celim/lowbtn.svelte'
  import {lang} from '$lib/stores/lang.js'
+  import Cards from './cards/pma.svelte'
+  import { nowId } from '$lib/stores/pendMisMes';
+  import { toast } from 'svelte-sonner';
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [isVisible]
+   * @property {boolean} [modal]
+   * @property {any} coinlapach
+   * @property {any} [mypos]
+   * @property {any} [messege]
+   * @property {string} [descrip]
+   * @property {string} [projectName]
+   * @property {string} [name]
+   * @property {string} [hearotMeyuchadot]
+   * @property {string} [kindOf]
+   * @property {string} [src]
+   * @property {any} projectId
+   * @property {any} [link]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {boolean} [already]
+   * @property {any} created_at
+   * @property {any} mshaabId
+   * @property {any} hm
+   * @property {any} price
+   * @property {any} easy
+   * @property {any} sqadualed
+   * @property {any} sqadualedf
+   * @property {any} pendId
+   * @property {any} users
+   * @property {any} linkto
+   * @property {any} mysrc
+   * @property {any} [diun]
+   * @property {any} [order]
+   * @property {number} [ordern]
+   * @property {any} timegramaId
+   * @property {any} restime
+   * @property {boolean} [cards]
+   * @property {() => void} [onModal]
+   */
+
+  /** @type {Props} */
+  let {
+    low = false,
+    isVisible = false,
+    modal = $bindable(false),
+    coinlapach,
+    mypos = null,
+    onModal,
+    messege = [],
+    descrip = "",
+    projectName = "",
+    name = "",
+    hearotMeyuchadot = "",
+    kindOf = "",
+    src = "coin.png",
+    projectId,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    noofusersWaiting = $bindable(),
+    total = 0,
+    noofusers,
+    already = $bindable(false),
+    created_at,
+    mshaabId,
+    hm,
+    price,
+    easy,
+    sqadualed,
+    sqadualedf,
+    pendId,
+    users,
+    linkto,
+    mysrc,
+    diun = $bindable([]),
+    order = $bindable(diun.length),
+    ordern = 0,
+    timegramaId,
+    restime,
+    cards = false,
+    onCoinLapach,
+    onHover,
+    onProj = () => {},
+    nego_mashes = [],
+    timeGramaDate = null
+    } = $props();
   const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
     let dialogOpen = $state(false)
     const baseUrl = import.meta.env.VITE_URL
@@ -39,50 +129,42 @@ function tochat (){
 }
 
     function percentage(partialValue, totalValue) {
-   return (100 * partialValue) / totalValue;
+      if (!totalValue) return 0;
+      return (100 * partialValue) / totalValue;
 } 
-let ok;
-let nook;
-let tryo = $state("116%");
-let tryot = $state("-10.5%");
-let tryoti = $state("-5.25%");
-let nut;
+
+let ok = $derived(percentage(noofusersOk, noofusers));
+let nook = $derived(percentage(noofusersNo, noofusers));
+let nut = $derived(percentage(noofusersWaiting, noofusers));
+
+let tryo = $derived((nut > 0 && nook > 0) ? "129%" : "116%");
+let tryot = $derived((nut > 0 && nook > 0) ? "-17%" : "-10.5%");
+let tryoti = $derived((nut > 0 && nook > 0) ? "-11.5%" : "-5.25%");
+
+let ser = $derived(() => {
+  const s = [];
+  s.push({
+    perc: ok,
+    color: '#7EE081'
+  });
+
+  if (nut > 0) {
+    s.push({
+      perc: nut,
+      color: '#0000cc'
+    });
+  }
+  if (nook > 0) {
+    s.push({
+      perc: nook,
+      color: '#80037e'
+    });
+  }
+  console.log(pendId, s);
+  return s;
+});
+
 let yers = $state();
-async function xyz (){
-
-ok =  percentage(noofusersOk, noofusers)
-nook = percentage(noofusersNo, noofusers) 
-nut = percentage(noofusersWaiting, noofusers) 
-let ser = [];
- ser.push({
-perc: ok,
-color: '#7EE081'
-}) 
-
-if (nut > 0){
-  ser.push({
-perc: nut,
-color: '#0000cc'
-}) 
-}
-if (nook > 0){
-  ser.push({
-perc: nook,
-color: '#80037e'
-}) 
-}
-if (nut > 0 && nook > 0 ){
-  tryo = "129%"
-  tryot = "-17%"
-  tryoti = "-11.5%"
-}
-
-ser = ser
-console.log(pendId,ser)
-return ser
-}
-
-let ser = $state(xyz());
 
 onMount(async () => {
     var a = moment(sqadualedf);
@@ -173,13 +255,11 @@ async function agree(alr) {
           already = true;
        noofusersOk += 1;
   noofusersNo -= 1;
-  ser = xyz();
     userss = objToStringC(users)
       } else{
   already = true;
    noofusersOk += 1;
   noofusersWaiting -= 1;
-  ser = xyz();
       }
     const date = (sqadualed !== undefined) ? `sqadualed: "${new Date(sqadualed).toISOString()}",` : ``;
         const sdate = (sqadualedf !== undefined) ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",` : ``;
@@ -305,7 +385,6 @@ function decline(alr) {
               already = true;
          noofusersNo += 1;
   noofusersOk -= 1;
-  ser = xyz();
    userss = objToStringC(users)
     if (noofusersNo === noofusers){
    archivedtru  = `archived: true,`;
@@ -329,7 +408,6 @@ async function afterwhy (event){
   loading = true;
   noofusersNo += 1;
   noofusersWaiting -= 1;
-  ser = xyz();
          const cookieValue = document.cookie
   .split('; ')
   .find(row => row.startsWith('jwt='))
@@ -613,92 +691,7 @@ function hoverc (event){
   }
     onHover?.({id: u});
 }
- import Cards from './cards/pma.svelte'
-  import { nowId } from '$lib/stores/pendMisMes';
-  import { toast } from 'svelte-sonner';
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [low]
-   * @property {boolean} [isVisible]
-   * @property {boolean} [modal]
-   * @property {any} coinlapach
-   * @property {any} [mypos]
-   * @property {any} [messege]
-   * @property {string} [descrip]
-   * @property {string} [projectName]
-   * @property {string} [name]
-   * @property {string} [hearotMeyuchadot]
-   * @property {string} [kindOf]
-   * @property {string} [src]
-   * @property {any} projectId
-   * @property {any} [link]
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {any} noofusersWaiting
-   * @property {number} [total]
-   * @property {any} noofusers
-   * @property {boolean} [already]
-   * @property {any} created_at
-   * @property {any} mshaabId
-   * @property {any} hm
-   * @property {any} price
-   * @property {any} easy
-   * @property {any} sqadualed
-   * @property {any} sqadualedf
-   * @property {any} pendId
-   * @property {any} users
-   * @property {any} linkto
-   * @property {any} mysrc
-   * @property {any} [diun]
-   * @property {any} [order]
-   * @property {number} [ordern]
-   * @property {any} timegramaId
-   * @property {any} restime
-   * @property {boolean} [cards]
-   * @property {() => void} [onModal]
-   */
 
-  /** @type {Props} */
-  let {
-    low = false,
-    isVisible = false,
-    modal = $bindable(false),
-    coinlapach,
-    mypos = null,
-    onModal,
-    messege = [],
-    descrip = "",
-    projectName = "",
-    name = "",
-    hearotMeyuchadot = "",
-    kindOf = "",
-    src = "coin.png",
-    projectId,
-    link = baseUrl+"/api/project/",
-    noofusersOk = $bindable(),
-    noofusersNo = $bindable(),
-    noofusersWaiting = $bindable(),
-    total = 0,
-    noofusers,
-    already = $bindable(false),
-    created_at,
-    mshaabId,
-    hm,
-    price,
-    easy,
-    sqadualed,
-    sqadualedf,
-    pendId,
-    users,
-    linkto,
-    mysrc,
-    diun = $bindable([]),
-    order = $bindable(diun.length),
-    ordern = 0,
-    timegramaId,
-    restime,
-    cards = false
-  } = $props();
 function claf (event){
   let o = event.alr
   let d = event.y
@@ -906,6 +899,8 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
    {noofusersOk} 
    {name} 
    {descrip} {mypos} {allr} {noofusersNo}
+   {nego_mashes}
+  {timeGramaDate}
    onNego={claf}
    />
       </div>
@@ -937,6 +932,8 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}
    {name} 
    {descrip} {mypos} {allr} {noofusersNo}
    onNego={claf}
+   {nego_mashes}
+  {timeGramaDate}
    />
 {/if}
 {/await}

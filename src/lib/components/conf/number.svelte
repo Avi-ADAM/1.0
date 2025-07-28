@@ -30,26 +30,35 @@ import { lang } from '$lib/stores/lang.js'
   } = $props();
     let edit = $state(false)
 let show2 = $state(false)
+let datai = $state([])
 function checkAll(a,b){
   datai[0].value = b
   datai[1].value = a
 }
 
-$effect(() => {
-    if(old.length > 0){
-    datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":Number(numberb)},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":Number(number)}]
+function updateDatai() {
+  if (old.length > 0) {
+    datai = [
+      { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: Number(numberb) },
+      { leb: `${tr?.nego?.original[$lang]},${number}`, value: Number(number) }
+    ];
     for (let i = 0; i < old.length; i++) {
-      console.log(old[i])
-      if(old[i] != null){
-        datai.push({"value":Number(old[i]),"leb":`${tr?.nego?.oldno[$lang]}-${i+1},${old[i]}`})
+      console.log(old[i]);
+      if (old[i] != null) {
+        datai.push({ value: Number(old[i]), leb: `${tr?.nego?.oldno[$lang]}-${i + 1},${old[i]}` });
       }
     }
-    datai = datai
-  }else{
-    datai = [{"leb":`${tr?.nego?.new[$lang]},${numberb}`,"value":100},{"leb":`${tr?.nego?.original[$lang]},${number}`,"value":1000}]
-    datai = datai
+  } else {
+    datai = [
+      { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: 100 },
+      { leb: `${tr?.nego?.original[$lang]},${number}`, value: 1000 }
+    ];
   }
-  });
+}
+
+$effect.pre(() => {
+  updateDatai();
+});
 </script>
     <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
  {#if edit == false}
@@ -100,6 +109,7 @@ $effect(() => {
   <span class='line '></span>
 </div><button onclick={()=>{if(Number(numberb) >= 0){ edit = false
 checkAll(number,numberb)
+updateDatai()
 } else{
   console.log(numberb,Number(numberb))
   alert(tr.common.noLesFromZero[$lang])
