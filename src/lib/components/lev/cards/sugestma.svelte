@@ -151,7 +151,9 @@ onkeypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="o
                   </p>
                 {/if}  
               <div style="font-size: 17px;" class="text-mturk font-bold  mb-2">{mashName}</div>
-     {#if descrip !== null && descrip !== "null"} <p class="cd d max-h-32 text-gray-700 text-base">{descrip}</p>{/if}
+     {#if descrip !== null && descrip !== "null"}       
+      <RichText  outpot={descrip} editable={false}/>
+{/if}
     {#if spnot && spnot !== undefined && spnot !== null && spnot !== "undefined"}
      <p onmouseenter={()=>hover("הערות")} onmouseleave={()=>hover("0")} class="text-grey-700 max-h-1/2 cd d">
        <RichText  outpot={spnot} editable={false}/> </p>

@@ -4,6 +4,7 @@
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
   import { isMobileOrTablet } from '$lib/utilities/device';
+  import RichText from '$lib/celim/ui/richText.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -109,7 +110,7 @@ onkeypress={preventSwiperScroll} dir="rtl"  class="{isVisible ? $lang == 'he' ? 
         </p>
               <h3 onmouseenter={()=>hover("שווי")} onmouseleave={()=>hover("0")} class="ltn" >{price} <span>שווי מקובל</span></h3>
       <div class="text-gray-900 font-bold text-xl mb-2">{openmissionName}</div>
-     {#if missionDetails} <p class="text-gray-700 text-base">{missionDetails}</p>{/if}
+     {#if missionDetails} <RichText outpot={missionDetails} editable={false} />{/if}
     </div>
     <div class="flex items-center">
       <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">

@@ -286,9 +286,9 @@ async function agree(alr) {
         JSON.stringify({query:
           `mutation { createOpenMashaabim(
       data: {project: "${projectId}",
-             spnot: "${hearotMeyuchadot}",
+             spnot: """${hearotMeyuchadot}""",
              name: "${name}",
-             descrip: "${descrip}",
+             descrip: """${descrip}""",
              kindOf: ${kindOf},
              hm: ${hm},
              price: ${price},
@@ -315,6 +315,12 @@ async function agree(alr) {
  archived: true
  }
   ){data{attributes { users { users_permissions_user {data{ id}}}}}}
+  updateTimegrama(
+    id: ${timegramaId}
+    data: {
+      done: true
+    }
+  ){data{id}}
  } `   
 //update pendm add consent from second and  archived,,, make coin desapire
 //TODO: archive timegrama

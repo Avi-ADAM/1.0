@@ -228,6 +228,12 @@ console.log("skillslist",skillslist);
     return res;
   };
 
+  function handleAdd() {
+    if (datan !== 'mash') {
+      addSK(data.selected2);
+    }
+  }
+
   function addSK(id) {
     if (datan !== 'mash') {
       yy = 1;
@@ -625,13 +631,6 @@ console.log("skillslist",skillslist);
   let anim = $derived(
     datan == 'work' || datan == 'val' ? -(width / 2) : width / 2
   );
-$effect(() => {
-  // This block runs whenever data.selected2 changes
-  if (data.selected2 && data.selected2.length > 0 && datan !== "mash") {
-    // Call addSK with the current value of data.selected2
-    addSK(data.selected2);
-  }
-});
 </script>
 
 {#if masss === true}
@@ -721,7 +720,7 @@ $effect(() => {
       <p class="text-center text-md text-white">
         {edbef[$lang]}{Valname}{edaft[$lang]}
       </p>
-      {#if data}
+      {#if data.length > 0}
        <div
         class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1"
       >
@@ -831,9 +830,10 @@ $effect(() => {
             options={filteredAllvn}
             --sms-width={'200px'}
             loading={newcontent}
+            on:add={handleAdd}
           />
           {#if datan === 'mash' && data?.selected2?.length > 0}
-            <button onclick={adm(data.selected2)}>✅</button>
+            <button onclick={() => adm(data.selected2)}>✅</button>
           {/if}
         </div>
       </div>

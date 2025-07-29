@@ -180,7 +180,7 @@ $effect(() => {
         label: 'כמות'
       });
     }
-    
+    console.log(changes)
     return changes;
   }
 

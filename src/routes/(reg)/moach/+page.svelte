@@ -908,6 +908,10 @@
             })
               .then((r) => r.json())
               .then((data) => (meDatap = data));
+              let timegramaId = meDatap.data.createDecision.data.id
+              let x = calcX(restime)
+              let fd = new Date(Date.now() + x)
+              sendToSer({whatami:"decision",decision:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch)
             isOpenM = false;
             a = 0;
             toast.success(`${picvots[$lang]}`);
@@ -1342,6 +1346,7 @@
   import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { sendToSer } from '$lib/send/sendToSer';
+  import { calcX } from '$lib/func/calcX.svelte';
 
     onDestroy(() => {
         if (unsubscribe) {

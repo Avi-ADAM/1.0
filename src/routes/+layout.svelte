@@ -103,7 +103,6 @@ onMount(async () => {
 
 
 <main>
-  <ThemeToggle />
 	{@render children?.()}
 <Toaster toastOptions={{
   style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,

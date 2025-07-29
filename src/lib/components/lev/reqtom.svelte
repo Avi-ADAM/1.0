@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
   import { Drawer } from 'vaul-svelte';
+    import {  getProjectData } from '$lib/stores/projectStore.js';
 
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
@@ -246,6 +247,7 @@
   async function agree() {
     let d = new Date();
     already = true;
+    let isFirst = noofusersOk === 0 && noofusersNo === 0;
     noofusersOk += 1;
     noofusersWaiting -= 1;
     ser = xyz();
@@ -317,7 +319,7 @@
  updateAskm(
                id: "${askId}" 
                                 data: { archived: true,
-                                    vots: [${userss}, 
+                                    vots: [${userss}${userss ? "," : ""}
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
@@ -369,7 +371,7 @@ ${adduser2}
  updateAskm(
             id: "${askId}" 
                                 data: { archived: true,
-                                    vots: [${userss}, 
+                                    vots: [${userss}${userss ? "," : ""}
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
@@ -393,6 +395,19 @@ ${adduser2}
       }
     } else {
       console.log('just add vote to asked and update to not show for me again');
+      let timeG = ``;
+      if(isFirst){
+        let fd = getProjectData(projectId, 'finishDate');
+        timeG = `createTimegrama(
+          data: {
+            date: "${fd.toISOString()}",
+            whatami: "askm",
+            askm: "${askId}"
+          }
+        ){
+            data {id}
+          }`
+      }
       try {
         await fetch(linkg, {
           method: 'POST',
@@ -405,15 +420,14 @@ ${adduser2}
                         {
                             updateAskm(
                           id: "${askId}" 
-                                data: { vots: [${userss}, 
+                                data: { vots: [${userss}${userss ? "," : ""} 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
                                       }
                                     ]}
-                            }
                         ){data{id}}
-                     
+                        ${timeG}
                     }
 `
           })
@@ -469,7 +483,7 @@ ${adduser2}
                         { 
 updateAskm(
   id: "${id}"
-  data: {vots: [${userss}, 
+  data: {vots: [${userss}${userss ? "," : ""}
                                        {
                                         what: false
                                         users_permissions_user: "${idL}"
@@ -495,6 +509,8 @@ updateAskm(
       }
     } else if (noofpu > 1) {
       console.log('if another uprove explain why you decline');
+      //TODO: add decline reason to db
+
     }
   }
   let hovered = $state(false);

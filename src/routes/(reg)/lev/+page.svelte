@@ -44,6 +44,7 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { page } from '$app/state';
   import { get } from 'svelte/store';
+  import { projects, userId, getProjectData } from '$lib/stores/projectStore.js';
   let { data } = $props();
   let low = $state(true);
   let indexi = $state(-1);
@@ -1596,8 +1597,8 @@
             // indexi = index
             if (
               arr1[index].diun &&
-              arr1[index].diun.length == datan.data.attributes.diun.length &&
-              datan.data.attributes.diun[datan.data.attributes.diun.length - 1]
+              arr1[index].diun.length == datan.data.attributes?.diun?.length &&
+              datan.data.attributes.diun[datan.data.attributes?.diun?.length - 1]
                 .id != $nowId
             ) {
               start();
@@ -2179,8 +2180,10 @@
       console.log('nologin');
 
       counter += 1;
+      projects.set(miData.data.usersPermissionsUser.data.attributes.projects_1s.data);
+      userId.set(miData.data.usersPermissionsUser.data.id);
       localStorage.setItem('miDataL', JSON.stringify(miData));
-      if (!isEqual(miData, miDataold) == true && update != true) {
+      if (isEqual(miData, miDataold) && update != true) {
         console.log('nada',nowT - Date.now());
         low = false;
       } else {
@@ -2365,8 +2368,8 @@
           user_1s: getProjectData(proj.id, 'us'),
           src: getProjectData(proj.id, 'pp'),
           noofpu: getProjectData(proj.id, 'noof'),
-          timegramaId:pend.timegrama.data.id,
-          timegramaDate:pend.timegrama.data.attributes.date,
+          timegramaId:pend.timegrama?.data?.id || null,
+          timegramaDate:pend.timegrama?.data?.attributes?.date || null,
           restime:getProjectData(proj.id, 'restime'),
           users: pend.vots,
           myid: myid,
@@ -2391,8 +2394,8 @@
           user_1s: getProjectData(proj.id, 'us'),
           src: getProjectData(proj.id, 'pp'),
           noofpu: getProjectData(proj.id, 'noof'),
-          timegramaId:pend.timegrama.data.id,
-          timegramaDate:pend.timegrama.data.attributes.date,
+          timegramaId:pend.timegrama?.data?.id || null,
+          timegramaDate:pend.timegrama?.data?.attributes?.date || null,
           restime:getProjectData(proj.id, 'restime'),
           users: pend.vots,
           myid: myid,
@@ -3069,81 +3072,6 @@
     localStorage.setItem('sdsa', sdsa);
   }
   let walcomen = [];
-  function getProjectData(id, thing, uid) {
-    const projects =
-      miData.data.usersPermissionsUser.data.attributes.projects_1s.data;
-    if (projects.length > 0) {
-      for (let i = 0; i < projects.length; i++) {
-        if (projects[i].id == id) {
-          if (thing == 'pn') {
-            return projects[i].attributes.projectName;
-          } else if (thing == 'pp') {
-            let srcP = '';
-            if (projects[i].attributes.profilePic.data != null) {
-              if (
-                projects[i].attributes.profilePic.data.attributes.formats
-                  .thumbnail
-              ) {
-                srcP =
-                  projects[i].attributes.profilePic.data.attributes.formats
-                    .thumbnail.url;
-              } else {
-                srcP = projects[i].attributes.url;
-              }
-            } else {
-              srcP =
-                'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
-            }
-            return srcP;
-          } else if (thing == 'noof') {
-            return projects[i].attributes.user_1s.data.length;
-          } else if (thing == 'uids') {
-            return projects[i].attributes.user_1s.data.map((c) => c.id);
-          } else if (thing == 'us') {
-            return projects[i].attributes.user_1s.data;
-          } else if (thing == 'upic') {
-            for (
-              let t = 0;
-              t < projects[i].attributes.user_1s.data.length;
-              t++
-            ) {
-              if (projects[i].attributes.user_1s.data[t].id == uid) {
-                let pic = null;
-                if (
-                  projects[i].attributes.user_1s.data[t].attributes.profilePic
-                    .data !== null
-                ) {
-                  pic =
-                    projects[i].attributes.user_1s.data[t].attributes.profilePic
-                      .data.attributes.formats.thumbnail.url;
-                } else {
-                  pic = null;
-                }
-                return pic;
-              }
-            }
-          } else if (thing == 'un') {
-            for (
-              let t = 0;
-              t < projects[i].attributes.user_1s.data.length;
-              t++
-            ) {
-              if (projects[i].attributes.user_1s.data[t].id == uid) {
-                return projects[i].attributes.user_1s.data[t].attributes
-                  .username;
-              }
-            }
-          } else if (thing == 'restime') {
-            return projects[i].attributes.restime;
-          }
-        }
-      }
-    } else {
-      sendEror(miData.data.usersPermissionsUser.data.id, thing, 2000);
-      return null;
-      //why am i here send error report to telegram
-    }
-  }
   function makeWalcom(ata) {
     const usernames = ata.data.usersPermissionsUser.data.attributes.username;
     for (
@@ -3153,9 +3081,21 @@
     ) {
       const wal =
         ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i];
+      console.log(
+        "welcomen",
+        ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i],
+        getProjectData(
+          wal.attributes.project.data.id,
+          'pp'
+        )
+      )
       walcomen.push({
         id: wal.attributes.project.data.id,
         username: usernames,
+        src: getProjectData(
+          wal.attributes.project.data.id,
+          'pp'
+        ),
         projectName: getProjectData(wal.attributes.project.data.id, 'pn'),
         ani: 'walcomen',
         azmi: 'mesima',

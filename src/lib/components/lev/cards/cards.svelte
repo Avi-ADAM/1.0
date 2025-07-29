@@ -7,7 +7,7 @@
   import Reqtojoin from '../../../components/lev/reqtojoin.svelte';
   import PendingM from '../../../components/lev/pandingMesima.svelte';
   import PendingMa from '../../../components/lev/pmas.svelte';
-  import Welcomt from '../../../components/lev/welcomTo.svelte';
+  import Welcomt from '../../../components/lev/cards/welcomeToCard.svelte';
   import Fiappru from '../../../components/lev/fiappru.svelte';
   import Mashsug from '../../../components/lev/mashsuggest.svelte';
   import Reqtom from '../../../components/lev/reqtom.svelte';
@@ -764,7 +764,22 @@ $effect(() => {
        username={buble.username}
        projectName={buble.projectName}
        /></SwiperSlide>
-   -->{:else if buble.ani === 'askedcoin' && milon.asks == true}
+
+   -->
+       {:else if buble.ani === "walcomen" && milon.welc == true}
+                                     <SwiperSlide
+                    class={isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'}
+                    ><Welcomt
+                                        id={buble.id}
+                                        src={buble.src}
+                                        onHover={hover}
+                                        coinlapach={buble.coinlapach}
+                                        username={buble.username}
+                                        projectName={buble.projectName}
+                                        /></SwiperSlide>
+   {:else if buble.ani === 'askedcoin' && milon.asks == true}
                   <SwiperSlide
                     class={isMobileOrTablet()
                       ? 'swipr-slidemobile'

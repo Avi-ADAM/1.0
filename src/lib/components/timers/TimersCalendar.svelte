@@ -16,7 +16,7 @@
     
     let calendarElement = $state();
     let calendar = $state();
-    let events = $state([]);
+    let events = [];
     let selectedTimer = $state(null);
     let showTimerDetails = $state(false);
     
@@ -94,7 +94,7 @@
         eventClick: handleEventClick,
         eventMouseEnter: handleEventMouseEnter,
         eventMouseLeave: handleEventMouseLeave,
-        slotMinTime: '06:00:00',
+        slotMinTime: '00:00:00',
         slotMaxTime: '24:00:00',
         allDaySlot: false,
         nowIndicator: true,
@@ -150,9 +150,9 @@
     // עדכון האירועים כאשר הנתונים משתנים
     $effect(() => {
     if (timersData && calendar) {
-        events = processTimersToEvents(timersData);
+        const newEvents = processTimersToEvents(timersData);
         calendar.removeAllEvents();
-        calendar.addEventSource(events);
+        calendar.addEventSource(newEvents);
       }
   });
     
