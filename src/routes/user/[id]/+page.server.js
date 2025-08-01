@@ -51,7 +51,8 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  skillName ${lang == 'he' ? 'localizations{data{attributes{skillName}}}' : ''}
+                  skill Name 
+ localizations{data{attributes{skillName}}}
                 }
               }
             }
@@ -59,7 +60,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  roleDescription ${lang == 'he' ? 'localizations{data{attributes{roleDescription}}}' : ''}
+                  roleDescription  localizations{data{attributes{roleDescription}}}
                 }
               }
             }
@@ -67,7 +68,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  valueName ${lang == 'he' ? 'localizations{data{attributes{valueName}}}' : ''}
+                  valueName  localizations{data{attributes{valueName}}}
                 }
               }
             }
@@ -75,7 +76,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  workWayName ${lang == 'he' ? 'localizations{data{attributes{workWayName}}}' : ''}
+                  workWayName  localizations{data{attributes{workWayName}}}
                 }
               }
             }
@@ -132,7 +133,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  skillName ${lang == 'he' ? 'localizations{data{attributes{skillName}}}' : ''}
+                  skillName  localizations{data{attributes{skillName}}}
                 }
               }
             }
@@ -140,7 +141,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  roleDescription ${lang == 'he' ? 'localizations{data{attributes{roleDescription}}}' : ''}
+                  roleDescription  localizations{data{attributes{roleDescription}}}
                 }
               }
             }
@@ -148,7 +149,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  valueName ${lang == 'he' ? 'localizations{data{attributes{valueName}}}' : ''}
+                  valueName  localizations{data{attributes{valueName}}}
                 }
               }
             }
@@ -156,7 +157,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  workWayName ${lang == 'he' ? 'localizations{data{attributes{workWayName}}}' : ''}
+                  workWayName  localizations{data{attributes{workWayName}}}
                 }
               }
             }
