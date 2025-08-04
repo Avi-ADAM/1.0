@@ -408,6 +408,10 @@ async function save() {
 
 
 function done() {
+  if (hoursdon == 0 || hoursdon == undefined || hoursdon == null ||$timers.find(t => t.mId === mId)?.attributes?.activeTimer?.data != null) {
+    toast.warning("יש זמן טיימר שלא נשמר. יש לשמור או לאפס לפני הגשה.");
+    return;
+  }
   already = true;
   a = 1
   //file upload in a chlon kofetz and then archived,, future build smart contracts on blockchain

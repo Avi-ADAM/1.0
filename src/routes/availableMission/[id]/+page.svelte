@@ -16,6 +16,16 @@ import {
   import {SendTo} from '$lib/send/sendTo.svelte';
 //TODO: get asked from server then show you alr .., find a way to get title
 let error1 = null;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [askedarr]
+   * @property {boolean} [alr]
+   * @property {any} data
+   */
+
+  /** @type {Props} */
+  let { askedarr = $bindable([]), alr = $bindable(false), data } = $props();
+
 let success = $state(false)
 function project(x) {
     goto('/project/'+x)
@@ -194,15 +204,6 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
  import { Head } from 'svead'
   import { calcX } from '$lib/func/calcX.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
-  /**
-   * @typedef {Object} Props
-   * @property {any} [askedarr]
-   * @property {boolean} [alr]
-   * @property {any} data
-   */
-
-  /** @type {Props} */
-  let { askedarr = $bindable([]), alr = $bindable(false), data } = $props();
 
   let title = 'This is Svead a Svelte Head Component'
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`

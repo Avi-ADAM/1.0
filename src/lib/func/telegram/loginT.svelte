@@ -6,21 +6,6 @@
 	let div = $state();
 	/** @type {HTMLScriptElement}*/
 	let script;
-
-	
-
-    
-
-
-	
-
-	
-
-	
-
-	
-
-	
 	/**
 	 * @typedef {Object} Props
 	 * @property {string} [username]

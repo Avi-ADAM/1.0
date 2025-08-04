@@ -2,16 +2,36 @@
 import { Confetti } from "svelte-confetti";
 import { fly } from 'svelte/transition';
 import { lang } from '$lib/stores/lang';
+  import { goto } from "$app/navigation";
+  import { idPr } from "$lib/stores/idPr";
+  import RichText from "$lib/celim/ui/richText.svelte";
+  import Close from "$lib/celim/close.svelte";
+  import { sendToSer } from "$lib/send/sendToSer";
 let {
+  onCoinLapach,
+  coinlapach,
+  welcomId,
+  projectId,
+  pd,
   username = "New Partner",
   projectName = "Amazing FreeMates Project",
-  partnershipDetails = "Welcome to our collaborative network! This is the beginning of an exciting partnership.",
+  partnershipDetails,
   onWelcomeClick = () => console.log("Welcome clicked!"),
-  onChatClick = () => console.log("Chat clicked!"),
-  onProjectClick = () => console.log("Project clicked!"),
   src = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png"
 } = $props();
-
+const onProjectClick = () => {idPr.set(projectId); goto("/moach")}
+async function onChatClick  () { 
+  console.log(welcomId," clicked to chat"
+  )
+  await sendToSer({ id: welcomId, clicked: true },'44updateWelcomeCard',null,null,false,fetch)
+  .then((data) => {
+    if (data?.data?.updateWelcomTop?.data.attributes.clicked == true) {
+      onCoinLapach?.({coinlapach:coinlapach})
+    } else {
+      console.error("Error updating welcome card:", data);
+    }
+  })
+}
 let isHovered = $state(false);
 let showConfetti = $state(false);
 let isScrolable = $state(true);
@@ -30,16 +50,16 @@ let texts = $derived({
   he: {
     welcome: `ברוך הבא ${username} לרקמה ${projectName}!`,
     partnership: `הצטרפת לרקמה ${projectName}`,
-    enterProject: `לכניסה ל${projectName}`,
-    chat: "צ'אט",
-    celebrate: "חגיגה! 🎉",
+    enterProject: `לכניסה למטה "${projectName}"`,
+    notAgain: "לא להציג שוב",
+    celebrate: "קונפטי כדי לחגוג! 🎉",
     heartOf: "לב השותפות 💗"
   },
   en: {
     welcome: `Welcome ${username} to ${projectName}!`,
     partnership: `You joined ${projectName}`,
-    enterProject: `Enter ${projectName} HQ`,
-    chat: "Chat",
+    enterProject: `Enter "${projectName}" HQ`,
+    notAgain: "Don't show again",
     celebrate: "Celebrate! 🎉",
     heartOf: "Heart of Partnership 💗"
   }
@@ -49,12 +69,17 @@ let texts = $derived({
 
 <div 
   class="welcome-card-container"
+  onkeydown={(event) => {
+    if (event.key === 'Enter' || event.key === ' ') {
+      handleCardClick();
+    }
+  }}
   role="button" 
   tabindex="0"
   onclick={handleCardClick}
   onmouseenter={() => handleHover(true)}
   onmouseleave={() => handleHover(false)}
-  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000}}
+  out:fly|local={{ y: -500, duration: 400, opacity: 0 }}
 >
   <!-- Confetti Effect -->
   {#if showConfetti}
@@ -147,14 +172,19 @@ z-index: 9999;"
         {texts[$lang].celebrate}
       </div>
       <h2 class="welcome-title">{texts[$lang].welcome}</h2>
-      <div class="heart-subtitle">{isHovered ? texts[$lang].heartOf : texts[$lang].welcome}</div>
+  <!---   <div class="heart-subtitle">{isHovered ? texts[$lang].heartOf : texts[$lang].welcome}</div>-->
     </div>
   </div>
 
   <!-- Card Body -->
-  <div class="card-body">
-    <div class="partnership-details">
-      <p class="details-text">{partnershipDetails}</p>
+  <div class="card-body sm:h-[66%] h-[50%]">
+    <div class="partnership-details overflow-y-auto d h-[90%] sm:h-[80%]">
+      {#if partnershipDetails && partnershipDetails != undefined && partnershipDetails != "undefined"}
+      <RichText outpot={partnershipDetails} editable={false} trans={true}/>
+      {/if}
+      {#if pd && pd != undefined && pd != "undefined"}
+        <RichText outpot={pd} editable={false} trans={true}/>
+        {/if}
     </div>
 
     <!-- Action Buttons -->
@@ -164,7 +194,7 @@ z-index: 9999;"
         onclick={onProjectClick}
       >
         <span>{texts[$lang].enterProject}</span>
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+        <svg class="btn-icon {$lang == "he" ? "rotate-180":""}" viewBox="0 0 24 24" fill="none" stroke="currentColor">
           <path d="m9 18 6-6-6-6"/>
         </svg>
       </button>
@@ -173,10 +203,8 @@ z-index: 9999;"
         class="btn-secondary"
         onclick={onChatClick}
       >
-        <span>{texts[$lang].chat}</span>
-        <svg class="btn-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-          <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-        </svg>
+        <span>{texts[$lang].notAgain}</span>
+        <Close />
       </button>
     </div>
   </div>
@@ -185,8 +213,8 @@ z-index: 9999;"
 <style>
 .welcome-card-container {
   position: relative;
-  max-width: 500px;
-  width: 100%;
+  width: 90%;
+  height: 90%;
   background: linear-gradient(135deg, #FFF5A5 0%, #FFD4DA 25%, #99D2E4 50%, #5bf875 75%, #5efaf2 100%);
   border-radius: 20px;
   box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
@@ -373,10 +401,16 @@ z-index: 9999;"
 .card-body {
   padding: 2rem;
   background: rgba(255, 255, 255, 0.95);
+  display: flex; /* Enable flexbox */
+  flex-direction: column; /* Stack children vertically */
+  flex-grow: 1; /* Allow card-body to grow */
+  overflow: hidden; /* Hide overflow for the card-body itself */
 }
 
 .partnership-details {
   margin-bottom: 2rem;
+  flex-grow: 1; /* Allow partnership-details to take available space */
+  overflow-y: auto; /* Ensure scrolling for content */
 }
 
 .details-text {

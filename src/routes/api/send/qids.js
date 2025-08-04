@@ -676,4 +676,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }
 }
 `,
+"44updateWelcomeCard": `mutation UpdateWelcomeCard($id: ID!, $clicked: Boolean!) {
+  updateWelcomTop(
+    id: $id,
+    data: { clicked: $clicked }
+  ) {
+    data {
+      id
+      attributes {
+        clicked
+      }
+    }
+  }
+}`,
+'45deleteMachshir': `mutation deleteMachshir($endpoint: String!) {
+    deleteMachshir(endpoint: $endpoint) {
+      data {
+        id
+      }
+    }
+  }`
 }

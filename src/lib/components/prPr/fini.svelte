@@ -11,7 +11,10 @@
  * @param {object} payload - The payload for the 'tit' event.
  * @param {string} payload.ti - The title string.
  */
-let { onTit, fmiData = [], hagdel = false, rikmashes = [], meData = [], users } = $props();
+let { onTit, fmiData = [], hagdel: hagdelProp = false, rikmashes = [], users } = $props();
+
+let hagdel = $state(hagdelProp);
+let meData = $state([]);
 
 //	import SvelteTooltip from 'svelte-tooltip';
 
@@ -32,13 +35,10 @@ function percentage(partialValue, totalValue) {
 let ulist = $state([
 ]); 
 let dictid = $state({});
-onMount(async () => {
-
-pre ()
-})
 
 function pre (){
     console.log(users, fmiData)
+    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#839192'];
     for (let i = 0; i < users.length; i++){
         for (let j = 0; j <fmiData.length; j++){
           
@@ -114,8 +114,9 @@ function pre (){
                       d: dictid["pmcounter"],
                         o: "visible",
                          c: `url(#img${dictid["counter"]})`,
-                          imid: `img${dictid["counter"]}`
-                })
+                          imid: `img${dictid["counter"]}`,
+                          color: colors[(dictid["counter"]-1) % colors.length]
+               })
   }
     }
 
@@ -132,6 +133,7 @@ function pre (){
   import moment from 'moment';
 
   onMount(async () => {
+    pre();
     meData = rikmashes
    myMissionH()
               });
@@ -202,7 +204,7 @@ let fir = $state(),ssec = $state();
     fir = b;
     ssec = c.toFixed(2);
        xy = true;
-       onTit?.({ti: `${fir}: ${ssec}%` })
+   //    onTit?.({ti: `${fir}: ${ssec}%` })
    } 
  }
  let xy = $state(false);
@@ -225,7 +227,8 @@ let fir = $state(),ssec = $state();
     <image href={use.src} x="-15" y="-10" width="100" height="100" />
   </pattern>
 </defs>
-  <circle onmouseenter={x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
+  <circle class="pie-border" r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d} stroke={use.color} />
+  <circle onmouseenter={() => x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
  
  </circle>
   {/each}
@@ -471,8 +474,13 @@ let fir = $state(),ssec = $state();
 
 .pie circle {
   fill: none;
-  stroke-width: 32;
   animation: rotate 4.5s ease-in;
+}
+.pie circle:not(.pie-border) {
+  stroke-width: 32;
+}
+.pie .pie-border {
+  stroke-width: 34;
 }
 
 @keyframes rotate {

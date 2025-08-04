@@ -23,6 +23,118 @@ let token;
  function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
+  import Cards from './cards/fini.svelte'
+  import { archiveTimeGrama } from "$lib/func/send/timeGrama.svelte";
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [low]
+   * @property {boolean} [modal]
+   * @property {any} coinlapach
+   * @property {any} mId
+   * @property {any} why
+   * @property {any} what
+   * @property {boolean} [shows]
+   * @property {any} deadline
+   * @property {string} [projectName]
+   * @property {string} [missionBName]
+   * @property {string} [role]
+   * @property {any} [skills]
+   * @property {string} [useraplyname]
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {string} [linkU]
+   * @property {any} userId
+   * @property {string} [missionDetails]
+   * @property {any} name
+   * @property {number} [noofpu]
+   * @property {any} publicklinks
+   * @property {any} privatlinks
+   * @property {any} hearotMeyuchadot
+   * @property {number} [nhours]
+   * @property {number} [valph]
+   * @property {any} missId
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} whatt
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} timegramaDate
+   * @property {any} timegramaId
+   * @property {boolean} [already]
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
+   * @property {(payload: { id: any }) => void} [onUser]
+   * @property {(payload: { id: any }) => void} [onProj]
+   */
+
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    low = false,
+    modal = $bindable(false),
+    coinlapach,
+    mId,
+    why,
+    what,
+    shows = false,
+    deadline,
+    projectName = "ONE",
+    missionBName = "do x",
+    role = "programer",
+    skills = ["html", "css"],
+    useraplyname = "do x like y in z",
+    src = "coin.png",
+    src2 = " ",
+    projectId,
+    link = "/project/",
+    linkU = "/user/",
+    userId,
+    missionDetails = "",
+    name,
+    noofpu = 0,
+    publicklinks,
+    privatlinks,
+    hearotMeyuchadot,
+    nhours = 0,
+    valph = 0,
+    missId,
+    id,
+    openMid,
+    st = 188,
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids = $bindable(),
+    whatt,
+    noofusersOk = $bindable(),
+    noofusersNo,
+    timegramaDate,
+    timegramaId,
+    already = $bindable(false),
+    stylef = '24px',
+    askId,
+    users,
+    cards = false,
+    onAcsept,
+    onDecline,
+    onHover,
+    onModal,
+    onUser,
+    onProj
+  } = $props();
+
 let ok;
 let nook;
 let nut;
@@ -381,118 +493,7 @@ u = event.x
   }
     onHover?.({id: u});
 }
-   import Cards from './cards/fini.svelte'
-  import { archiveTimeGrama } from "$lib/func/send/timeGrama.svelte";
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [isVisible]
-   * @property {boolean} [low]
-   * @property {boolean} [modal]
-   * @property {any} coinlapach
-   * @property {any} mId
-   * @property {any} why
-   * @property {any} what
-   * @property {boolean} [shows]
-   * @property {any} deadline
-   * @property {string} [projectName]
-   * @property {string} [missionBName]
-   * @property {string} [role]
-   * @property {any} [skills]
-   * @property {string} [useraplyname]
-   * @property {string} [src]
-   * @property {string} [src2]
-   * @property {any} projectId
-   * @property {string} [link]
-   * @property {string} [linkU]
-   * @property {any} userId
-   * @property {string} [missionDetails]
-   * @property {any} name
-   * @property {number} [noofpu]
-   * @property {any} publicklinks
-   * @property {any} privatlinks
-   * @property {any} hearotMeyuchadot
-   * @property {number} [nhours]
-   * @property {number} [valph]
-   * @property {any} missId
-   * @property {any} id
-   * @property {any} openMid
-   * @property {number} [st]
-   * @property {any} [declined]
-   * @property {any} noofusersWaiting
-   * @property {any} uids
-   * @property {any} whatt
-   * @property {any} noofusersOk
-   * @property {any} noofusersNo
-   * @property {any} timegramaDate
-   * @property {any} timegramaId
-   * @property {boolean} [already]
-   * @property {string} [stylef]
-   * @property {any} askId
-   * @property {any} users
-   * @property {boolean} [cards]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
-   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
-   * @property {(payload: { id: string }) => void} [onHover]
-   * @property {() => void} [onModal]
-   * @property {(payload: { id: any }) => void} [onUser]
-   * @property {(payload: { id: any }) => void} [onProj]
-   */
-
-  /** @type {Props} */
-  let {
-    isVisible = false,
-    low = false,
-    modal = $bindable(false),
-    coinlapach,
-    mId,
-    why,
-    what,
-    shows = false,
-    deadline,
-    projectName = "ONE",
-    missionBName = "do x",
-    role = "programer",
-    skills = ["html", "css"],
-    useraplyname = "do x like y in z",
-    src = "coin.png",
-    src2 = " ",
-    projectId,
-    link = "/project/",
-    linkU = "/user/",
-    userId,
-    missionDetails = "",
-    name,
-    noofpu = 0,
-    publicklinks,
-    privatlinks,
-    hearotMeyuchadot,
-    nhours = 0,
-    valph = 0,
-    missId,
-    id,
-    openMid,
-    st = 188,
-    declined = [],
-    noofusersWaiting = $bindable(),
-    uids = $bindable(),
-    whatt,
-    noofusersOk = $bindable(),
-    noofusersNo,
-    timegramaDate,
-    timegramaId,
-    already = $bindable(false),
-    stylef = '24px',
-    askId,
-    users,
-    cards = false,
-    onAcsept,
-    onDecline,
-    onHover,
-    onModal,
-    onUser,
-    onProj
-  } = $props();
-
+ 
 </script>
 {#await ser}
 <h1>..</h1>

@@ -105,7 +105,8 @@ onTochat?.();
       "skneed" : {"he":"הכישורים הנדרשים:","en": "needed skills:"},
       "rneed" : {"he":"תפקיד מבוקש:", "en":"requested role:"},
       "perMonth":{"he":"לחודש","en":"per month"},
-      "formonth":{"he":"בכל חודש","en":"every month"}
+      "formonth":{"he":"בכל חודש","en":"every month"},
+      "onPrevious":{"he":"על גרסה קודמת","en":"on previous version"}
     }
     const timero = {"he":"מונה זמן לסיום הדיון", "en":"time counter for end of discution"}
     let isScrolable = $state(true); 
@@ -205,7 +206,7 @@ onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable =
 
     </div>
     <div class="flex items-center">
-        <p><span onmouseenter={()=>hover(tr?.vots.totalin[$lang])} onmouseleave={()=>hover("0")} role="contentinfo"  style="color:#7EE081;" >{noofusersOk}-{tr?.vots.inFavor[$lang]}</span> <span onmouseenter={()=>hover(tr?.vots.notyet[$lang])} onmouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{tr?.vots.notyet[$lang]} </span><!---<span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span>--></p>
+        <p><span onmouseenter={()=>hover(tr?.vots.totalin[$lang])} onmouseleave={()=>hover("0")} role="contentinfo"  style="color:#7EE081;" >{noofusersOk}-{tr?.vots.inFavor[$lang]}</span> <span onmouseenter={()=>hover(tr?.vots.notyet[$lang])} onmouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-{tr?.vots.notyet[$lang]} </span><span onmouseenter={()=>hover(t.onPrevious[$lang])} onmouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-{t.onPrevious[$lang]}</span></p>
       </div>
      
        </div>

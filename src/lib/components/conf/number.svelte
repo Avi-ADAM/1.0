@@ -50,8 +50,8 @@ function updateDatai() {
     }
   } else {
     datai = [
-      { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: 100 },
-      { leb: `${tr?.nego?.original[$lang]},${number}`, value: 1000 }
+      { leb: `${tr?.nego?.new[$lang]},${numberb}`, value: Number(numberb) },
+      { leb: `${tr?.nego?.original[$lang]},${number}`, value: Number(number) }
     ];
   }
 }

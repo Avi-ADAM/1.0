@@ -184,12 +184,12 @@ function closeMobileModal() {
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      {#if page.data.isDesktop}
-      <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
+      <div  class=" w-full flex-row	flex items-center justify-center space-x-2">
           <MultiSelect
           closeDropdownOnSelect='desktop'
-          ulOptionsClass="bg-gold"
-          liSelectedClass='bg-barbi text-gold'
+          outerDivClass="!bg-gold !text-barbi"
+          inputClass="!bg-gold !text-barbi"
+          liSelectedClass="!bg-barbi !text-gold"
         loading={mission1.length > 0 ? false : true}
         createOptionMsg={addn[$lang]}
         allowUserOptions={"append"}
@@ -202,8 +202,8 @@ function closeMobileModal() {
           {#if selected[0]}
         <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
         {/if}</div>
-        {:else}
-        <Button onClick={openMobileModal}>{placeholder[$lang]}</Button>
+      <!--  {:else}
+        <Button onClick={openMobileModal} text={placeholder} />
 
         <MobileModal isOpen={showMobileModal} title={placeholder[$lang]}>
           <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
@@ -227,7 +227,7 @@ function closeMobileModal() {
           <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
           {/if}</div>
         </MobileModal>
-      {/if}
+      {/if}-->
         {/if}
 {#if before == false}
         <Mission    

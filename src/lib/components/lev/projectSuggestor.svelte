@@ -388,7 +388,6 @@
             ].attributes.localizations.data[0].attributes.roleDescription;
         }
       }
-      console.log(workways);
       for (let i = 0; i < workways?.data.length; i++) {
         if (workways.data[i].attributes.localizations.data.length > 0) {
           workways.data[i].attributes.workWayName =

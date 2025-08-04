@@ -19,6 +19,7 @@
   import Addnewn from '../addnew/addNewNeed.svelte';
   import Newsp from './newsp.svelte';
   import Edsp from './editsp.svelte';
+  import Button from '$lib/celim/ui/button.svelte';
 
   import { slide, fly } from 'svelte/transition';
   const baseUrl = import.meta.env.VITE_URL;
@@ -229,6 +230,7 @@ console.log("skillslist",skillslist);
   };
 
   function handleAdd() {
+    console.log(data);
     if (datan !== 'mash') {
       addSK(data.selected2);
     }
@@ -237,6 +239,7 @@ console.log("skillslist",skillslist);
   function addSK(id) {
     if (datan !== 'mash') {
       yy = 1;
+      console.log(data);
       listt = data;
       const oldob = data;
       const old = oldob.map((c) => c.id); //.map(String)
@@ -554,6 +557,7 @@ console.log("skillslist",skillslist);
   const edito = { he: 'עריכה', en: 'edit' };
   const edbef = { he: 'עריכת ה', en: 'edit My ' };
   const edaft = { he: ' שלי ', en: '' };
+  const save = { he: 'שמירה', en: 'save' };
   const rem = { he: 'הסרת ', en: 'remove ' };
   const adbf = { he: ' בחירת ', en: 'choose more ' };
   const adaf = { he: ' נוספים', en: '' };
@@ -822,23 +826,22 @@ console.log("skillslist",skillslist);
         <div class="flex justify-center">
           <MultiSelect
             bind:selected={data.selected2}
-            inputClass='!text-barbi'
-            outerDivClass='!text-barbi'
+            outerDivClass="!bg-gold !text-barbi"
+            inputClass="!bg-gold !text-barbi"
+            liSelectedClass="!bg-barbi !text-gold"
             bind:searchText
             noMatchingOptionsMsg={addn[$lang]}
             {placeholder}
             options={filteredAllvn}
             --sms-width={'200px'}
             loading={newcontent}
-            on:add={handleAdd}
+            onadd={handleAdd}
           />
-          {#if datan === 'mash' && data?.selected2?.length > 0}
-            <button onclick={() => adm(data.selected2)}>✅</button>
-          {/if}
+         
         </div>
       </div>
       <!--      allowUserOptions={"append"}-->
-
+     
       {#if datan == 'skil'}
         <Addnewsk rn={allvn} onAddnewskill={addnew} bind:addS />
       {:else if datan == 'taf'}
@@ -851,19 +854,26 @@ console.log("skillslist",skillslist);
         <Addneww rn={allvn} onAddww={addnew} bind:addW />
       {/if}
     </div>
+    <br/>
+    {#if datan === 'mash' && data?.selected2?.length > 0}
+    <Button onClick={() => adm(data.selected2)} text={save} aria-label={save}>✅</Button>
+  {/if}
     {#if datan !== 'mash' && yy > 0}
-      <button
-        onclick={increment}
-        title="{adbf[$lang]}{Valname}{adaf[$lang]}"
-        class="bt hover:bg-barbi text-gold hover:text-mturk font-bold py-1 px-2 m-4 rounded-full hover:scale-150"
-        aria-label="{adbf[$lang]}{Valname}{adaf[$lang]}"
-        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+      <Button
+        variant="default"
+        size="default"
+        text={save}
+        aria-label={save}
+        onClick={increment}
+        loading={g}
+      >
+        <svg style="width:24px;height:24px" viewBox="0 0 24 24">
           <path
             fill="currentColor"
             d="M14.3 21.7C13.6 21.9 12.8 22 12 22C6.5 22 2 17.5 2 12S6.5 2 12 2C13.3 2 14.6 2.3 15.8 2.7L14.2 4.3C13.5 4.1 12.8 4 12 4C7.6 4 4 7.6 4 12S7.6 20 12 20C12.4 20 12.9 20 13.3 19.9C13.5 20.6 13.9 21.2 14.3 21.7M7.9 10.1L6.5 11.5L11 16L21 6L19.6 4.6L11 13.2L7.9 10.1M18 14V17H15V19H18V22H20V19H23V17H20V14H18Z"
           />
         </svg>
-      </button>
+      </Button>
     {/if}
   {:else if g == true}
     <div class="sp">

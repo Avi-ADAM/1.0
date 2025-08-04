@@ -119,7 +119,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     order = $bindable(1),
     sqedualed,
     timegramaId,
-    cards = false
+    cards = false,
+    isRishon = false
   } = $props();
     let dialogOpen = $state(false)
 let resP = [];
@@ -236,14 +237,27 @@ let linkg = baseUrl+'/graphql';
 function objToString (obj) {
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-        
-    for (const [p, val] of Object.entries(obj[i])) {
-        if (typeof(val) == "string"|"number"|"boolean") {
-        str += `{${p}:"${val}"\n},`;
-    } else if (typeof(val) == 'null'){
-                str += `{${p}:${val.map(c => c.id)}\n},`;
+        let innerStr = '';
+        for (const [p, val] of Object.entries(obj[i])) {
+            if (p === 'users_permissions_user' && typeof val === 'object' && val !== null && val.data && val.data.id) {
+                innerStr += `${p}:"${val.data.id}"\n`;
+            } else if (typeof val === "string") {
+                innerStr += `${p}:"${val}"\n`;
+            } else if (typeof val === "number" || typeof val === "boolean") {
+                innerStr += `${p}:${val}\n`;
+            } else if (val === null) {
+                // Handle null values if needed, based on the desired output.
+                // The example output shows `why: null` is omitted, so we might omit it too.
+                // For now, let's explicitly include it as `key:null` if it's a direct null.
+                // If it's an array that was null, the original code had `val.map(c => c.id)`, which would error.
+                // Based on the example, `why: null` was just omitted.
+                // Let's omit nulls for now, as the example output doesn't show `why: null`.
+            }
+        }
+        if (innerStr.length > 0) {
+            str += `{${innerStr}},`;
+        }
     }
-    }}
     return str;
 }
 
@@ -264,7 +278,7 @@ async function after(miDatan,newnew){
                 ${sqedualed != undefined && sqedualed != null ? `start: "${sqedualed > d ? sqedualed : d.toISOString()}"` : `start: "${d.toISOString()}"`}
                 ${deadline != undefined && deadline != null ? `finish: "${deadline}"` : ``}
               }
-            )
+        ){data{id}}
           `
         }
    
@@ -408,14 +422,14 @@ adduser = `updateProject(
                         { createMesimabetahalich(
       data: {project: "${projectId}",
              mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
-             name: "${openmissionName}",
-             descrip: "${missionDetails}",
+             hearotMeyuchadot: """${hearotMeyuchadot}""",
+             name: """${openmissionName}""",
+             descrip: """${missionDetails}""",
              hoursassinged: ${nhours},
              perhour: ${valph}, 
              iskvua:${iskvua},  
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
+             privatlinks: """${privatlinks}""",
+             publicklinks: """${publicklinks}""", 
              users_permissions_user: "${userId}",
               tafkidims: [${tafkidimsa}],
                       publishedAt: "${d.toISOString()}",
@@ -484,14 +498,14 @@ ${adduser}
                         { createMesimabetahalich(
       data: {project: "${projectId}",
              mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
-             name: "${openmissionName}",
-             descrip: "${missionDetails}",
+             hearotMeyuchadot: """${hearotMeyuchadot}""",
+             name: """${openmissionName}""",
+             descrip: """${missionDetails}""",
              hoursassinged: ${nhours},
              perhour: ${valph},  
               iskvua:${iskvua},   
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
+             privatlinks: """${privatlinks}""",
+             publicklinks: """${publicklinks}""", 
              users_permissions_user: "${userId}",
              tafkidims: [${tafkidimsa}],
                      publishedAt: "${d.toISOString()}",
@@ -539,6 +553,7 @@ ${adduser2}
         } else {
 
         console.log("just add vote to asked and update to not show for me again")
+        console.log(userss,users)
          try {
             await fetch(linkg, {
                     method: 'POST',
@@ -962,6 +977,7 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
    perhour={valph}
    {openmissionName} 
    {iskvua}
+   {isRishon}
    {missionDetails} {noofusersNo}/>
       </div>
       </Drawer.Content>
@@ -988,6 +1004,7 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
    perhour={valph}
    {openmissionName} 
    {iskvua}
+   {isRishon}
    {missionDetails} {noofusersNo}/>
 {/if}
 {/await}

@@ -1776,8 +1776,11 @@
           console.log(index, arr1[index]);
           if (index != -1 || null) {
             // indexi = index
+            start();
+            /*
             if (
-              arr1[index].chat.length == datan.data.attributes.chat.length &&
+              arr1[index].chat &&
+              arr1[index]?.chat?.length == datan.data.attributes?.chat?.length &&
               datan.data.attributes.chat[datan.data.attributes.chat.length - 1]
                 .id != $nowId
             ) {
@@ -1876,7 +1879,7 @@
                   nutifi(head, body);
                 }
               }
-            }
+            }*/
           }
         });
       });
@@ -1992,7 +1995,7 @@
                                 acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
             			   }}}
       welcom_tops (filters: { clicked: { eq: false } }){ data{ id attributes{
-                	 project{data{id}}
+                	 project{data{id attributes{descripFor publicDescription}}}
    								   }}}
       skills{data{id attributes{ 
             			 open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
@@ -3090,7 +3093,10 @@
         )
       )
       walcomen.push({
+        welcomId: wal.id,
         id: wal.attributes.project.data.id,
+        details:wal.attributes.project.data.attributes.publicDescription,
+        pd: wal.attributes.project.data.attributes.descripFor,
         username: usernames,
         src: getProjectData(
           wal.attributes.project.data.id,
@@ -3430,11 +3436,12 @@
   }
 
   function coinLapach(event) {
-    // let oldob = arr1;
-    //   const x = oldob.map(c => c.coinlapach);
-    //   const indexy = x.indexOf(event.coinlapach);
-    //   oldob.splice(indexy, 1);
-    //   arr1 = oldob
+    const indexy = arr1.findIndex(c => c.coinlapach === event.coinlapach);
+    if (indexy > -1) {
+      arr1.splice(indexy, 1);
+      arr1 = [...arr1];
+    }
+    
     counter = 0;
     cards == event.cards;
     let ani = event.ani;
@@ -3443,7 +3450,7 @@
     }
     //harchava mesima ishrur ziruf hazaa hachla
     console.log('im starting 2');
-    start();
+     start();
   }
 
   // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....

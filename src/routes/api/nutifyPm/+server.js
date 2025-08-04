@@ -99,35 +99,34 @@ export async function POST({request, cookies, fetch}){
         console.log('after', transformedDataTel);
         sendBolkTelegram(transformedDataTel, idL,title,body,lang,fetch);
         
-  const transformedDataMail =
-  jsonim.data.project.data.attributes.user_1s.data.flatMap((user) => {
-    //filter by if email not null or undefined
-    if(user.attributes.noMail != true){
-    return{
-      email: user.attributes.email,
-      id: user.id,
-      emailHtml:  render({
-        template: SimpleNuti,
-        props: {
-          head: title,
-         body: body,
-         username: user.attributes.username,
-         previewText: title,
-         lang :user.attributes.lang == "he" || user.attributes.lang ==  "en" ? user.attributes.lang : lang
-        }
-      }),
-      users_permission_user: {
-        data: {
-          id: user.id,
-          attributes: {
-            userName: user.attributes.username,
-            lang: user.attributes.lang
+  const transformedDataMailPromises = jsonim.data.project.data.attributes.user_1s.data
+    .filter(user => user.attributes.noMail !== true)
+    .map(async (user) => {
+      const emailHtml = await render(SimpleNuti, {
+        head: title,
+        body: body,
+        username: user.attributes.username,
+        previewText: title,
+        lang: user.attributes.lang === "he" || user.attributes.lang === "en" ? user.attributes.lang : lang
+      });
+
+      return {
+        email: user.attributes.email,
+        id: user.id,
+        emailHtml: emailHtml,
+        users_permission_user: {
+          data: {
+            id: user.id,
+            attributes: {
+              userName: user.attributes.username,
+              lang: user.attributes.lang
+            }
           }
         }
-      }
-    }
-  }
-  })
- sendBolkMail(transformedDataMail,idL,title,body,lang,fetch)
+      };
+    });
+
+  const transformedDataMail = await Promise.all(transformedDataMailPromises);
+  sendBolkMail(transformedDataMail, idL, title, body, lang, fetch);
     return new Response    
 }

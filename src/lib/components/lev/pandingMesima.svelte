@@ -269,8 +269,8 @@ async function agree(alr) {
   noofusersWaiting -= 1;
   ser = xyz();
       }
-    const date = (mdate !== undefined) ? ` sqadualed: "${mdate}"` : ``;
-        const dates = (mdate !== undefined) ? ` sqadualed: "${mdate}"` : ``;
+    const date = (mdate !== undefined && mdate !== null) ? ` sqadualed: "${mdate}"` : ``;
+    const dates = (mdates !== undefined && mdates !== null) ? ` dates: "${mdates}"` : ``;
 
     const cookieValue = document.cookie
   .split('; ')
@@ -284,10 +284,10 @@ async function agree(alr) {
     token  = cookieValue; 
      bearer1 = 'bearer' + ' ' + token;
           if (noofusersOk === noofusers){
-              const skillsa = skills.map(c => c.id);
-             const tafkidimsa = tafkidims.map(c => c.id);
-              const workwaysa = workways.map(c => c.id);
-              const valluesa = vallues.map(c => c.id);
+              const skillsa = (skills?.data || skills)?.map(c => c.id) || [];
+             const tafkidimsa = (tafkidims?.data || tafkidims)?.map(c => c.id) || [];
+              const workwaysa = (workways?.data || workways)?.map(c => c.id) || [];
+              const valluesa = (vallues?.data || vallues)?.map(c => c.id) || [];
     try {
              await fetch(linkg, {
               method: 'POST',
@@ -303,17 +303,17 @@ async function agree(alr) {
              mission:  "${missionId}",
              iskvua: ${isKavua},
              work_ways: [${workwaysa}],
-             hearotMeyuchadot: "${hearotMeyuchadot}",
+             hearotMeyuchadot: """${hearotMeyuchadot}""",
              name: "${name}",
                      publishedAt: "${d.toISOString()}",
-             descrip: "${descrip}",
+             descrip: """${descrip}""",
              skills: [${skillsa}], 
              tafkidims: [${tafkidimsa}],
              vallues:  [${valluesa}],
              noofhours: ${noofhours},
              perhour: ${perhour},   
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}",
+             privatlinks: """${privatlinks}""",
+             publicklinks: """${publicklinks}""",
              ${date} 
              ${dates}
     }

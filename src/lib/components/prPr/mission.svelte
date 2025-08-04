@@ -44,9 +44,7 @@
       privatlinks: ``
     }
   ]);
-  $effect(() => {
-    console.log(miData);
-  });
+  
   let error1 = null;
   let roles1 = $state($role);
   let x = 168;
@@ -233,6 +231,7 @@
         const skills = find_skill_id(element.selectedSkills);
       const work_ways = find_workway_id(element.selectedWorkways);
       const tafkidims = find_role_id(element.selectedRoles);
+      console.log(skills,work_ways,tafkidims,element.selectedRoles)
         if (element.id === 0) {
             await sendToSer({skills,tafkidims,descrip:element.descrip,missionName:element.missionName,publishedAt:fd},'21createMission',null,null,null,fetch).then((res) => {
                 console.log(res)
@@ -365,7 +364,6 @@
              ${rishonves4}
              ${pendq} 
             ${toadd}
-
     }
   ) {data{id attributes{ project{data{ id} }}}}
 } `
@@ -647,9 +645,8 @@
     const mid = event.mid;
     const y = miData.map((c) => c.id);
     const index = y.indexOf(mid);
-    const newSele = miData[index].selectedSkills;
     miData[index].selectedSkills.push(newN);
-    miData[index].selectedSkills = newSele;
+    miData = miData;
     mi.set(miData);
   }
 
@@ -662,9 +659,8 @@
     const mid = event.mid;
     const y = miData.map((c) => c.id);
     const index = y.indexOf(mid);
-    const newSele = miData[index].selectedRoles;
     miData[index].selectedRoles.push(newN);
-    miData[index].selectedRoles = newSele;
+    miData = miData;
   }
   //תהיה חזק,רגוע ושמח
   //add new workway option
@@ -1408,9 +1404,12 @@
         <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
         <MultiSelect
+        outerDivClass="!bg-gold !text-barbi"
+        inputClass="!bg-gold !text-barbi"
+        liSelectedClass="!bg-barbi !text-gold"
         --sms-open-z-index={10000}
         loading={newcontent}
-        onchange={() => mi.set(miData)}
+        onchange={() => (miData = miData)}
         bind:selected={miData[0].selectedSkills}
         placeholder={placeholder1[$lang]}
         options={$skil.map((c) => c.attributes.skillName)}
@@ -1429,9 +1428,12 @@
                   <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                     <MultiSelect
+                    outerDivClass="!bg-gold !text-barbi"
+                    inputClass="!bg-gold !text-barbi"
+                    liSelectedClass="!bg-barbi !text-gold"
                     --sms-open-z-index={10000}
                     loading={newcontent}
-                    onchange={() => mi.set(miData)}
+                    onchange={() => (miData = miData)}
                     bind:selected={miData[0].selectedSkills}
                     placeholder={placeholder1[$lang]}
                     options={$skil.map((c) => c.attributes.skillName)}
@@ -1467,10 +1469,13 @@
       {#if page.data.isDesktop}
       <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
       --sms-open-z-index={10000}
       loading={newcontentR}
       bind:selected={miData[0].selectedRoles}
-      onchange={() => mi.set(miData)}
+      onchange={() => (miData = miData)}
       onadd={(event) => console.log(event)}
       placeholder={placeholder5[$lang]}
       options={$role.map((c) => c.attributes.roleDescription)}
@@ -1485,10 +1490,13 @@
   <MobileModal onClose={()=> roleE = false} bind:isOpen={roleE} title="{placeholder5[$lang]}">
     <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
       --sms-open-z-index={10000}
       loading={newcontentR}
       bind:selected={miData[0].selectedRoles}
-      onchange={() => mi.set(miData)}
+      onchange={() => (miData = miData)}
       onadd={(event) => console.log(event)}
       placeholder={placeholder5[$lang]}
       options={$role.map((c) => c.attributes.roleDescription)}
@@ -1522,6 +1530,9 @@
           {#if page.data.isDesktop}
           <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
             <MultiSelect
+              outerDivClass="!bg-gold !text-barbi"
+              inputClass="!bg-gold !text-barbi"
+              liSelectedClass="!bg-barbi !text-gold"
               --sms-open-z-index={10000}
                 createOptionMsg={addn[$lang]}
                 allowUserOptions={true}
@@ -1541,6 +1552,9 @@
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                   <MultiSelect
+                  outerDivClass="!bg-gold !text-barbi"
+                  inputClass="!bg-gold !text-barbi"
+                  liSelectedClass="!bg-barbi !text-gold"
                   --sms-open-z-index={10000}
                     createOptionMsg={addn[$lang]}
                     allowUserOptions={true}
@@ -1567,6 +1581,9 @@
                 $lang
               ]}</p>
             <MultiSelect
+            outerDivClass="!bg-gold !text-barbi"
+            inputClass="!bg-gold !text-barbi"
+            liSelectedClass="!bg-barbi !text-gold"
             --sms-open-z-index={10000}
             bind:selected={miData[0].rishoni}
             placeholder={pll[$lang]}

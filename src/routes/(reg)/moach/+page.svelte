@@ -2145,7 +2145,7 @@ pointer-events: none;"
               {#if addM === true}
                 <div
                   bind:this={hosaf}
-                  class=" m-4 border-2 border-barbi rounded"
+                  class=" m-4 border-2 h-screen border-barbi rounded"
                 >
                   <button
                     title={cencel[$lang]}
@@ -2528,7 +2528,7 @@ pointer-events: none;"
 
       {#each projects as data, i}
         <button
-          class=" border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
+          class="md:text-xl border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
           onclick={() => projectn(data.id)}
         >
           {data.attributes.projectName}
@@ -2555,8 +2555,14 @@ pointer-events: none;"
         :global([data-svelte-dialog-content].chat) {
               width: 80vw;
         }
+     
       }
-  @media (min-width: 600px){
+ @media (max-width: 800px){
+  :global([data-svelte-dialog-content].betha) {
+          width: 92vw;
+        }
+ }
+  @media (min-width: 720px){
         :global([data-svelte-dialog-content].chat) {
                 overflow-y: auto;
        z-index: 1000;

@@ -510,7 +510,7 @@ updateAskm(
     } else if (noofpu > 1) {
       console.log('if another uprove explain why you decline');
       //TODO: add decline reason to db
-
+      alert("soon")
     }
   }
   let hovered = $state(false);

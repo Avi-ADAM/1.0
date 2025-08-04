@@ -291,6 +291,7 @@ $effect(() => {
         class="body box-border h-screen"
       >
         {#if !isMobileOrTablet()}
+ 
           <img
             onmouseenter={() => hoverc(nexttitle[$lang])}
             onmouseleave={() => hoverc('0')}
@@ -298,16 +299,16 @@ $effect(() => {
             src={srcb[$lang]}
             alt={$lang == 'he' ? 'חזרה' : '	next'}
           />
-
           <img
             onmouseenter={() => hoverc(pretitle[$lang])}
             onmouseleave={() => hoverc('0')}
             class={$lang == 'he' ? 'next' : 'perv'}
+            class:hidden={currentIndex == 0}
             src={srca[$lang]}
             alt={$lang == 'he' ? 'הבא' : '	next'}
           />
           <div
-            dir="ltr"
+                      dir="ltr"
             role="contentinfo"
             onmouseenter={() => hoverc('שינוי התצוגה מקלפים למטבעות')}
             onmouseleave={() => hoverc('0')}
@@ -316,6 +317,7 @@ $effect(() => {
           >
             <Switch
               bind:value={cards}
+
               onChange={() => change()}
               design="multi"
               options={[true, false]}
@@ -466,8 +468,7 @@ $effect(() => {
               class="mySwiperc {!isMobileOrTablet()
                 ? 'swiperc'
                 : 'swipermobile'}"
-              dir="rtl"
-              loop="true"
+              dir={$lang == 'he' ? 'rtl' : 'ltr'}
               navigation={isMobileOrTablet()
                 ? false
                 : {
@@ -641,6 +642,7 @@ $effect(() => {
                       tafkidims={buble.tafkidims}
                       workways={buble.workways}
                       mdate={buble.mdate}
+                      mdates={buble.dates}
                       vallues={buble.vallues}
                       pendId={buble.pendId}
                       isKavua={buble.isKavua}
@@ -772,12 +774,17 @@ $effect(() => {
                       ? 'swipr-slidemobile'
                       : 'swiper-slidec'}
                     ><Welcomt
+                                        welcomId={buble.welcomId}
                                         id={buble.id}
                                         src={buble.src}
                                         onHover={hover}
                                         coinlapach={buble.coinlapach}
+                                        onCoinLapach={delo}
                                         username={buble.username}
                                         projectName={buble.projectName}
+                                        projectId={buble.id}
+                                        partnershipDetails={buble.details}
+                                        pd={buble.pd}
                                         /></SwiperSlide>
    {:else if buble.ani === 'askedcoin' && milon.asks == true}
                   <SwiperSlide
@@ -810,7 +817,7 @@ $effect(() => {
                       projectName={buble.projectName}
                       useraplyname={buble.username}
                       userId={buble.uid}
-                      missionDetails={buble.descrip}
+                      missionDetails={buble.missionDetails}
                       src={buble.src}
                       src2={buble.src2}
                       openmissionName={buble.openName}
@@ -829,6 +836,7 @@ $effect(() => {
                       openMid={buble.omid}
                       stylef={buble.stylef}
                       st={buble.st}
+                      isRishon={buble.isRishon}
                       declined={buble.decid}
                       timegramaId={buble.timegramaId}
                       timegramaDate={buble.timegramaDate}
@@ -1006,6 +1014,21 @@ $effect(() => {
                   >
                 {/if}
               {/each}
+              <SwiperSlide
+                class="{isMobileOrTablet() ? 'swipr-slidemobile' : 'swiper-slidec'}"
+              >
+                <div
+                  class="flex flex-col items-center justify-center h-full w-full"
+                >
+                  <h2 class="text-2xl font-bold mb-4">
+                    {$lang === 'he' ? 'התעדכנת בהכל' : 'End of the line'}
+                  </h2>
+                  <Button
+                    onClick={() => swiperRef?.slideTo(0)}
+                    text={{ he: 'חזרה להתחלה', en: 'Back to Start' }}
+                  />
+                </div>
+              </SwiperSlide>
               <!--- <SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 1</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 2</SwiperSlide
   ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 3</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 4</SwiperSlide
   ><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 5</SwiperSlide><SwiperSlide class="{isMobileOrTablet() ? "swipr-slidemobile" : "swiper-slidec"}">Slide 6</SwiperSlide

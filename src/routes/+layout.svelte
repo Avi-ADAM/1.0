@@ -59,13 +59,13 @@ import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
 function getLang() {
   console.log(data)
     let la;
-    if(!data.lang){
-    const fromSe = data.userAgent
+    if(!data?.lang){
+    const fromSe = data?.userAgent
     if ($doesLang == false) {
        
-   if (fromSe.includes("he")){
+   if (fromSe?.includes("he")){
         la = "he"
-  } else if (fromSe.includes("ar")){
+  } else if (fromSe?.includes("ar")){
         la = "ar"
    } else{
       la = "en"
@@ -85,20 +85,20 @@ function getLang() {
     document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
 }
 
-onMount(async () => {
-   getLang()
-   let x;
-   let user;
-   if($lang != "he" && $lang != "ar" && x == null && user == 0){
-        console.log('after', $lang)
-    goto("/en")
-  } else if($lang == "ar" && x == null && user == 0){
-      console.log('Registration', $lang)
-
-    goto("/ar")
+onMount(() => {
+  if (data) {
+    getLang();
+    let x;
+    let user;
+    if ($lang != "he" && $lang != "ar" && x == null && user == 0) {
+      console.log('after', $lang);
+      goto("/en");
+    } else if ($lang == "ar" && x == null && user == 0) {
+      console.log('Registration', $lang);
+      goto("/ar");
+    }
   }
-  
-})
+});
 </script>
 
 

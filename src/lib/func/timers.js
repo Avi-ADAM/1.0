@@ -25,7 +25,8 @@ import { sendToSer } from '$lib/send/sendToSer.js';
       return x;
       }else if (timerId != 0 && activeTimer.data.attributes && !activeTimer.data.attributes.isActive) {
       //get old timers json and update it with the new start time
-      let timers = activeTimer.data.attributes.timers;
+      // Clean the timers array to only include 'start' and 'stop' properties
+      let timers = activeTimer.data.attributes.timers.map(t => ({ start: t.start, stop: t.stop }));
       timers.push({ start: new Date().toISOString() }); 
       const x = await sendToSer({timerId: timerId,isActive: true, newStart: new Date().toISOString(), timers: timers},'34UpdateTimer',null,null,isSer,fetch).then((x) => {
         console.log("Resumed timer:", x.data);
@@ -180,14 +181,15 @@ export async function updateTimer(timer,whatToUpdate,params= {},fetch,isSer=fals
       const newLap = params.newLap;
       const index = params.index;
 
-      // Create a clean copy of the timers array without frontend-only fields
-      let timers = [...timer.attributes.timers].map((t) => {
-        const { isEditing, editStart, editStop, ...cleanTimer } = t; // Remove unnecessary fields
-        return cleanTimer;
+      // Create a clean copy of the timers array with only the properties required by the backend
+      const timers = timer.attributes.timers.map((t, i) => {
+        if (i === index) {
+          // For the updated timer, use the new data
+          return { start: newLap.start, stop: newLap.stop };
+        }
+        // For all other timers, just keep their start and stop times
+        return { start: t.start, stop: t.stop };
       });
-
-      // Update the specific timer entry
-      timers[index] = { ...timers[index], start: newLap.start, stop: newLap.stop };
 
       // Calculate the new total time
       const totalTime =

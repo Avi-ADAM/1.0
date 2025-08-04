@@ -20,6 +20,17 @@ export async function POST({ request }) {
   await webPush
     .sendNotification(jsoni, JSON.stringify(data))
     .then(() => console.log('notification sent'))
-    .catch(console.error);
+    .catch((err) => {
+      if (err.statusCode === 410) {
+        console.log('Subscription has unsubscribed or expired, deleting...');
+        fetch('/api/deletePush', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ endpoint: err.endpoint }),
+        });
+      } else {
+        console.error(err);
+      }
+    });
   return new Response();
 }

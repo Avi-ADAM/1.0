@@ -5,6 +5,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import {lang} from '$lib/stores/lang.js'
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
+  import RichText from '$lib/celim/ui/richText.svelte';
+  
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -48,7 +50,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     onHover,
     onAgree,
     onDecline,
-    onChat
+    onChat,
+    isRishon = false
   } = $props();
 function hover(x){
 onHover?.(x);
@@ -67,7 +70,13 @@ onChat?.();
 
 const leho = {"he":" בכל חודש " , "en": " per month"}
 
-const hed = {"he":"אישור צירוף לריקמה והשמת משימה","en":"appruval of joining and mission assigned"}
+const hed = isRishon ? {
+  "he":"אישור והשמת משימה",
+  "en":"appruval and mission assigned"
+} : {
+  "he":"אישור צירוף לריקמה והשמת משימה",
+  "en":"appruval of joining and mission assigned"
+}
 let isScrolable = $state(true); 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
@@ -89,7 +98,9 @@ ontouchmove={preventTouchScroll}
 onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"
 tabindex="0" 
-onkeypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%] d">
+onkeypress={preventSwiperScroll} 
+dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  
+class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%] d">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -99,9 +110,9 @@ onkeypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  class="{
          </div>
          <div class="flex flex-col leading-tight">
             <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-sm">{hed[$lang]}</span>
+               <span class="text-barbi text-center mr-3 sm:text-3xl text-sm">{hed[$lang]}</span>
             </div>
-            <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
+            <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-lg sm:text-2xl text-barbi ">{projectName}</span>
          </div>
          </div>
          </div>
@@ -120,7 +131,7 @@ onkeypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  class="{
               {#if iskvua == true} {leho[$lang]}{/if}
       </p>
       <div class="text-gray-900 font-bold md:text-3xl mb-2">{openmissionName}</div>
-     {#if missionDetails} <p class="text-gray-700 text-base">{missionDetails}</p>{/if}
+{#if missionDetails !== ""} <RichText outpot={missionDetails} editable={false} trans={true}/>{/if}
     </div>
     <div class="flex items-center">
       <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">

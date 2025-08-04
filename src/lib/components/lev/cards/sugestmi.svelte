@@ -120,7 +120,6 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
         const hourss = {"he":"שעות","en":"hours"}
         const monhly = {"he":"בחודש", "en": "per month"}
 
-console.log(workways)
 let isScrolable = $state(true); 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
