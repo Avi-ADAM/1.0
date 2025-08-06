@@ -96,7 +96,8 @@ onMount(async () => {
     toast.success(doneMes[$lang])
     //TODO: email add to table
   }
-  let { actdata = [], onChat, bmiData = $bindable([]) } = $props();
+  let { actdata = [], onChat, bmiData: propBmiData = [] } = $props();
+  let bmiData = $state(JSON.parse(JSON.stringify(propBmiData)));
     let ohh = $derived(soter.map(c=>c.openi).includes(false));
     function sot(idd , y){
       console.log(ohh, soter.map(c=>c.openi).includes(false),y)
@@ -161,7 +162,7 @@ onMount(async () => {
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
           onclick={closer}><Close/></button>
-          <Crtask {id} {proles} {bmiData} on:done={done}/>
+          <Crtask {id} {proles} {bmiData} onDone={done}/>
       </div>
   </DialogContent>
   </div>

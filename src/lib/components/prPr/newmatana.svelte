@@ -8,7 +8,6 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import UploadPic from '../userPr/uploadPic.svelte';
-  import PicInput from '$lib/celim/ui/input/picInput.svelte';
   import axios from 'axios';
   let oneForeProject = $state(false)
   let description = $state('');
@@ -19,7 +18,7 @@
   let unlimitedM = $state(false);
   let quant = $state(1);
   let kindOf = $state('total');
-  let name = $state();
+  let name = $state('');
   let bearer1;
   let token;
   let error1;
@@ -241,7 +240,7 @@
   </h2>
 
   <br>
-  <PicInput aspect={16/9} bind:files={croppedImage}/>
+  <UploadPic aspect={16/9} cropShape='rect' onMessage={(e) => croppedImage = e.files} color={true} current={'/cover.png'} />
   <br>
   <Checkbox bind:value={oneForeProject} lebel={{he:"מתנה יחידה לפרויקט",en:"one gift for one project"}} />
   <Button text={addG} onClick={add} {loading} {success} {error} />

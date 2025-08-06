@@ -115,6 +115,14 @@
     he: 'הוספת משאבים נדרשים לריקמה',
     en: 'add needed resources to FreeMates'
   };
+  const noVallue = {
+    "he": "לא נשמרו עדיין משאבים שהתקבלו או משימות שהסתיימו בהצלחה ברקמה זו, לכך השווי הוא 0 ואי אפשר לחלק לפיו, יש ליצור ולשמור משאבים ומשימות כדי שניתן יהיה לחלק",
+    "en": "No values were saved yet for resources received or missions completed successfully in this FreeMates, so the value is 0 and it cannot be divided, you must create and save resources and missions in order to divide."
+  }
+  const crNow = {
+    "he": "ליצור עכשיו",
+    "en": "create now!"
+  }
   let cencel = { he: 'ביטול', en: 'cencel' };
   let showvd = $state(false);
 
@@ -817,6 +825,7 @@
   }
 
   const closer = () => {
+    isOpen = false;
     isOpenM = false;
     a = 0;
   };
@@ -1236,7 +1245,7 @@
   }
   function tofinish() {
     hagdel = true;
-    tab = 8
+    tab = 4
     finiss.scrollIntoView(true);
   }
   const title = { he: 'מוח הריקמה 1💗1', en: '1💗1 FreeMates Brain' };
@@ -1347,6 +1356,7 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import { sendToSer } from '$lib/send/sendToSer';
   import { calcX } from '$lib/func/calcX.svelte';
+  import Button from '$lib/celim/ui/button.svelte';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1585,7 +1595,7 @@ function add(event){
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
         <DialogContent aria-label="form"
-         class="{a != 8 ? a != 5 ? "content" : "betha" :"chat"}">
+         class={a != 8 ? a != 5 ? "content" : "betha" :"chat"}>
           <div style="z-index: 400;"      dir="{$lang == "he" ? "rtl" : "ltr"}"
           >
             <button
@@ -2005,7 +2015,7 @@ pointer-events: none;"
                     {timers[$lang]}
                   </h2>
                 </div></button>
-             <button
+            <!-- <button
                 onclick={() => (tab = 6)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={shirutims[$lang]}
@@ -2015,8 +2025,7 @@ pointer-events: none;"
                   <h2 style="{tab == 6 ? "": "text-shadow:1px 1px #fff ;"}">
                     {shirutims[$lang]}
                   </h2>
-                  <!--<Siduri/>-->
-                </div></button>
+                </div></button>-->
                <button
                 onclick={() => (tab = 7)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
@@ -2045,11 +2054,11 @@ pointer-events: none;"
 <!--tabs-->
 <div class="border-t-2 border-mturk">
 {#if tab === 1}
-        {#if project.publicDescription != 'undefined' && project.publicDescription != null}
+        {#if project.publicDescription != 'undefined' && project.publicDescription != null && project.publicDescription != ""}
             <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
             <RichText editable={false} outpot={project?.publicDescription} />
         {/if}
-        {#if project.descripFor != 'undefined' && project.descripFor != null}
+        {#if project.descripFor != 'undefined' && project.descripFor != null && project.descripFor != ""}
             <RichText editable={false} outpot={project?.descripFor} />
             <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
         {/if}
@@ -2345,6 +2354,14 @@ pointer-events: none;"
                   />
                 {/if}
               </div>
+              {:else}
+              <div
+                class="m-4 border-2 border-barbi rounded p-4 bg-gold"
+                bind:this={finiss}
+              >
+                <h2 class="text-4xl text-barbi font-bold text-center">{noVallue[$lang]}</h2>
+                <Button onClick={()=> tab = 2} text={crNow} />
+              </div>
             {/if}
           </div>
 {:else if tab === 5}
@@ -2356,7 +2373,7 @@ pointer-events: none;"
             
                 <Bethas {bmiData} onChat={openChat} />
               </div>
-{:else if tab === 6}
+<!--{:else if tab === 6}
                      <div class="p-8">
             <Sheirut
             onNew={findM}
@@ -2367,7 +2384,7 @@ pointer-events: none;"
               {roles}
    
             />
-          </div>
+          </div>-->
         
 {:else if tab === 7}
           <Hamatanot

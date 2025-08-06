@@ -247,7 +247,8 @@ let fir = $state(),ssec = $state();
     </svg></button> 
 <div class="dd md:items-center">
   <div class="body items-center">
-  
+  {#if fmiData.length > 0}
+
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
@@ -356,7 +357,7 @@ let fir = $state(),ssec = $state();
       </thead>
     </table>
 
- 
+ {/if}
   {#if meData.length > 0}
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  

@@ -18,7 +18,6 @@
    * @property {import('svelte').Snippet} [children]
    * @property {() => void} [onClick]
    */
-
   /** @type {Props} */
   let {
     loading = false,

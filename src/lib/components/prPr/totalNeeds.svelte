@@ -14,11 +14,11 @@
 
   let token;
   let mash = [];
-  let showResourceOptions = $derived({}); // לשמירת מצב התצוגה של אפשרויות המשאבים לכל שורה
-  let availableResourcesByRow = $derived({}); // מערך המשאבים הזמינים לכל שורה
-  let loadingByRow = $derived({}); // מצב טעינה לכל שורה
-  let newResourceByRow = $derived({}); // מעקב אחר בחירת משאב חדש לכל שורה
-  let resourceReceivedByRow = $derived({}); // מעקב אחר קבלת משאב לכל שורה
+  let showResourceOptions = $state({}); // לשמירת מצב התצוגה של אפשרויות המשאבים לכל שורה
+  let availableResourcesByRow = $state({}); // מערך המשאבים הזמינים לכל שורה
+  let loadingByRow = $state({}); // מצב טעינה לכל שורה
+  let newResourceByRow = $state({}); // מעקב אחר בחירת משאב חדש לכל שורה
+  let resourceReceivedByRow = $state({}); // מעקב אחר קבלת משאב לכל שורה
 
   // טקסט קבוע ליצירת משאב חדש
   const NEW_RESOURCE_TEXT = {
@@ -65,7 +65,7 @@
   }
 
   async function handleAssignment(element, index) {
-    console.log('Handling assignment for element:', element);
+    console.log('Handling assignment for element:', $state.snapshot(element));
 
     if (!element || !element.id) {
       console.error('Invalid element or missing ID:', element);
@@ -115,9 +115,9 @@
     meData = meData; // מעדכן את הריאקטיביות
     console.log(
       'Creating new resource for:',
-      element,
+      $state.snapshot(element),
       'in meData:',
-      meData[index]
+      $state.snapshot(meData[index])
     );
   }
 
@@ -196,7 +196,7 @@
   }
 
   async function han() {
-    console.log('Handling assignments for meData:', meData);
+    console.log('Handling assignments for meData:', $state.snapshot(meData));
     already = true;
     let d = new Date();
     const cookieValue = document.cookie
@@ -557,6 +557,9 @@ vots: [${userss},
       )
         .toISOString()
         .slice(0, -1);
+      if (meData[i].selectedResource === undefined) {
+        meData[i].selectedResource = [];
+      }
     }
   }
 
@@ -719,6 +722,28 @@ vots: [${userss},
     en: 'No matching resources found'
   };
 
+  const componentTexts = {
+    removeResource: { he: 'הסרת המשאב שנבחר', en: 'Remove selected resource' },
+    remove: { he: 'הסרה', en: 'Remove' },
+    name: { he: 'שם', en: 'Name' },
+    description: { he: 'תיאור', en: 'Description' },
+    type: { he: 'סוג', en: 'Type' },
+    quantity: { he: 'כמות', en: 'Quantity' },
+    addStartDate: { he: 'הוספת תאריך התחלה', en: 'Add start date' },
+    endDate: { he: 'תאריך סיום', en: 'End Date' },
+    addEndDate: { he: 'הוספת תאריך סיום', en: 'Add end date' },
+    specialNotes: { he: 'הערות מיוחדות', en: 'Special Notes' },
+    cost: { he: 'עלות', en: 'Cost' },
+    monetaryValue: { he: 'שווי כספי', en: 'Monetary Value' },
+    perMonth: { he: 'לכל חודש', en: 'per month' },
+    perYear: { he: 'לכל שנה', en: 'per year' },
+    forPeriod: { he: 'לכל התקופה', en: 'for the whole period' },
+    maxValueForRikma: { he: 'שווי מקסימלי לחישוב בריקמה', en: 'Maximum value for calculation' },
+    suggestedValue: { he: 'שווי מוצע', en: 'Suggested Value' },
+    linkForDetails: { he: 'לינק לפרטי מוצר\\ מחיר \\ רכישה', en: 'Link for product details/price/purchase' },
+    link: { he: 'לינק', en: 'Link' }
+  };
+
   function hasAssignment(data) {
     return data.assignedTo && data.assignedTo.length > 0;
   }
@@ -751,18 +776,18 @@ vots: [${userss},
   function toggleSelfAssign(data, index) {
     if (data.assignedTo && data.assignedTo.length > 0) {
       // If already assigned, remove assignment
-      data.assignedTo = [];
-      meData[index] = { ...data };
+      meData[index] = { ...data, assignedTo: [] };
     } else {
       // If not assigned, add current user
-      data.assignedTo = [
-        pu.find((user) => user.id === page.data.uid).attributes.username
-      ];
-      meData[index] = data;
-      // Activate handleAssignment when assigning
-      handleAssignment(data, index);
+      const username = pu.find((user) => user.id === page.data.uid)?.attributes
+        .username;
+      if (username) {
+        meData[index] = { ...data, assignedTo: [username] };
+        // Activate handleAssignment when assigning
+        handleAssignment(meData[index], index);
+      }
     }
-    meData = meData; // Trigger reactivity
+    meData = [...meData]; // Trigger reactivity
   }
 </script>
 
@@ -782,11 +807,11 @@ vots: [${userss},
         </caption>
         <tbody>
           <tr class="gg">
-            <th class="gg">הסרת המשאב שנבחר</th>
+            <th class="gg">{componentTexts.removeResource[$lang]}</th>
             {#each meData as data, i}
               <td class="gg" style="font-size: 3rem">
                 {i + 1}
-                <button title="הסרה" onclick={remove(data.id)}
+                <button title={componentTexts.remove[$lang]} onclick={remove(data.id)}
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
                       fill="currentColor"
@@ -798,7 +823,7 @@ vots: [${userss},
             {/each}
           </tr>
           <tr class="ggr">
-            <th class="ggr">שם</th>
+            <th class="ggr">{componentTexts.name[$lang]}</th>
             {#each meData as data, i}
               <td class="ggr">
                 <div dir="rtl" class="textinput">
@@ -810,14 +835,14 @@ vots: [${userss},
                     class="input"
                     required
                   />
-                  <label for="nam" id="labeli" class="label">שם</label>
+                  <label for="nam" id="labeli" class="label">{componentTexts.name[$lang]}</label>
                   <span class="line"></span>
                 </div>
               </td>
             {/each}
           </tr>
           <tr>
-            <th>תיאור</th>
+            <th>{componentTexts.description[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <div dir="rtl" class="textinput">
@@ -827,14 +852,14 @@ vots: [${userss},
                     class="input d"
                     required
                   ></textarea>
-                  <label for="name" class="label">תיאור</label>
+                  <label for="name" class="label">{componentTexts.description[$lang]}</label>
                   <span class="line"></span>
                 </div>
               </td>
             {/each}
           </tr>
           <tr>
-            <th>סוג</th>
+            <th>{componentTexts.type[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <select
@@ -892,6 +917,7 @@ vots: [${userss},
                       {:else}
                         {#if availableResourcesByRow[i]?.length > 0}
                           <MultiSelect
+
                             --sms-open-z-index={10000}
                             bind:selected={data.selectedResource}
                             placeholder={choosee[$lang]}
@@ -951,7 +977,7 @@ vots: [${userss},
             </tr>
           {/if}
           <tr>
-            <th>כמות</th>
+            <th>{componentTexts.quantity[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <div
@@ -966,7 +992,7 @@ vots: [${userss},
                     class="input"
                     required
                   />
-                  <label for="name" class="label">כמות</label>
+                  <label for="name" class="label">{componentTexts.quantity[$lang]}</label>
                   <span class="line"></span>
                 </div>
                 {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2"
@@ -983,14 +1009,14 @@ vots: [${userss},
                   class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
                   type="datetime-local"
                   style="display:{meData[i].ky ? '' : 'none'};"
-                  placeholder="הוספת תאריך התחלה"
+                  placeholder={componentTexts.addStartDate[$lang]}
                   bind:value={data.attributes.dates}
                 /></td
               >
             {/each}
           </tr>
           <tr style="display:{ky ? '' : 'none'};">
-            <th>תאריך סיום </th>
+            <th>{componentTexts.endDate[$lang]}</th>
             {#each meData as data, i}
               <td
                 ><input
@@ -998,14 +1024,14 @@ vots: [${userss},
                   class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
                   style="display:{meData[i].ky ? '' : 'none'};"
                   type="datetime-local"
-                  placeholder="הוספת תאריך סיום"
+                  placeholder={componentTexts.addEndDate[$lang]}
                   bind:value={data.attributes.datef}
                 /></td
               >
             {/each}
           </tr>
           <tr>
-            <th>הערות מיוחדות</th>
+            <th>{componentTexts.specialNotes[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <div dir="rtl" class="textinput">
@@ -1015,14 +1041,14 @@ vots: [${userss},
                     class="input d"
                     required
                   ></textarea>
-                  <label for="name" class="label">הערות מיוחדות</label>
+                  <label for="name" class="label">{componentTexts.specialNotes[$lang]}</label>
                   <span class="line"></span>
                 </div>
               </td>
             {/each}
           </tr>
           <tr>
-            <th>עלות</th>
+            <th>{componentTexts.cost[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <div dir="rtl" class="textinput">
@@ -1034,14 +1060,14 @@ vots: [${userss},
                     required
                   />
                   <label for="name" class="label"
-                    >שווי כספי <span style="display:{meData[i].m ? '' : 'none'};"
-                      >לכל חודש</span
+                    >{componentTexts.monetaryValue[$lang]} <span style="display:{meData[i].m ? '' : 'none'};"
+                      >{componentTexts.perMonth[$lang]}</span
                     ><span style="display:{meData[i].y ? '' : 'none'};"
-                      >לכל שנה</span
+                      >{componentTexts.perYear[$lang]}</span
                     ><span style="display:{meData[i].r ? '' : 'none'};"
-                      >לכל התקופה</span
+                      >{componentTexts.forPeriod[$lang]}</span
                     ><span style="display:{meData[i].kc ? '' : 'none'};"
-                      >ליחידה</span
+                      >{py[$lang]}</span
                     >
                   </label>
                   <span class="line"></span>
@@ -1052,7 +1078,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr>
-            <th>שווי מקסימלי לחישוב בריקמה</th>
+            <th>{componentTexts.maxValueForRikma[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <div dir="rtl" class="textinput">
@@ -1064,14 +1090,14 @@ vots: [${userss},
                     required
                   />
                   <label for="name" class="label"
-                    >שווי מוצע <span style="display:{meData[i].m ? '' : 'none'};"
-                      >לכל חודש</span
+                    >{componentTexts.suggestedValue[$lang]} <span style="display:{meData[i].m ? '' : 'none'};"
+                      >{componentTexts.perMonth[$lang]}</span
                     ><span style="display:{meData[i].y ? '' : 'none'};"
-                      >לכל שנה</span
+                      >{componentTexts.perYear[$lang]}</span
                     ><span style="display:{meData[i].r ? '' : 'none'};"
-                      >לכל התקופה</span
+                      >{componentTexts.forPeriod[$lang]}</span
                     ><span style="display:{meData[i].kc ? '' : 'none'};"
-                      >ליחידה</span
+                      >{py[$lang]}</span
                     >
                   </label>
                   <span class="line"></span>
@@ -1099,7 +1125,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr style="display:{kc || ky ? '' : 'none'};">
-            <th>שווי מקסימלי סה"כ</th>
+            <th>{tableHeaders.maxValue[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <h3
@@ -1115,7 +1141,7 @@ vots: [${userss},
               </td>{/each}
           </tr>
           <tr>
-            <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
+            <th>{componentTexts.linkForDetails[$lang]}</th>
             {#each meData as data, i}
               <td>
                 <div dir="rtl" class="textinput">
@@ -1125,7 +1151,7 @@ vots: [${userss},
                     class="input"
                     required
                   />
-                  <label for="name" class="label">לינק</label>
+                  <label for="name" class="label">{componentTexts.link[$lang]}</label>
                   <span class="line"></span>
                 </div></td
               >

@@ -18,7 +18,10 @@ let total = $state(0);
  let kindOf = 'monthly';
 let hm = $state(1);
 let where = [];
-let placeholder = `אצל מי הכסף`;                          
+let placeholder = {
+ he: 'אצל מי הכסף',
+ en: 'With whom is the money'
+}
 let already = $state(false);
   /**
    * @typedef {Object} Props
@@ -252,6 +255,10 @@ const addL = {
   he: 'הוספת מכירה',
   en: 'Add Sale'
 }
+const totalT = {
+ he: 'סה"כ',
+ en: 'Total'
+}
 $effect(() => {
     dayjs.locale($lang);
   });
@@ -295,7 +302,7 @@ $effect(() => {
   <input
     class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
     type="datetime-local"
-    placeholder="הוספת תאריך התחלה"
+    placeholder={start[$lang]}
     bind:value={dates}
   />
   {#if datesE}
@@ -305,7 +312,7 @@ $effect(() => {
   <input
     class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
     type="datetime-local"
-    placeholder="הוספת תאריך סיום"
+    placeholder={end[$lang]}
     bind:value={datef}
     min={dates}
   />
@@ -327,14 +334,14 @@ $effect(() => {
   liSelectedClass="!bg-barbi !text-gold"
     maxSelect={1}
     bind:selected
-    {placeholder}
+    placeholder={placeholder[$lang]}
     options={projectUsers.map((c) => c.attributes.username)}
   />
   {#if noSelectedE}
     <small class="text-barbi text-center"><mark>{noSelected[$lang]}</mark></small>
   {/if}
 </div>
-  <small class="text-barbi text-center">סה"כ 
+  <small class="text-barbi text-center">{totalT[$lang]}
     {#if per == true}
       {kindOf === 'monthly' ? perMonth[$lang] : perYear[$lang]}
     {/if}

@@ -17,7 +17,7 @@
     
     function handleTaskDetails(event) {
               console.log('נלחץ nahnv:', event);
-              onMission?.({id:event.mesimabetahalich.id,kind:'betha'})
+              onMission?.({id:event.id,kind:'betha'})
       // ניווט לפרטי משימה
       //goto(`/tasks/${event.mesimabetahalich.id}`);
     }

@@ -21,7 +21,8 @@
   /** @type {Props} */
   let {
     files = $bindable(),
-    aspect = 1,
+    cropShape = 'round',
+		aspect = 1,
     ladd = { he: 'הוספת תמונה', en: 'add image' },
     cencel = { he: 'ביטול', en: 'cancel' },
     om = { he: 'מעלה תמונה', en: 'uploading image' }

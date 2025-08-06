@@ -47,6 +47,7 @@ export async function POST({request, cookies, fetch}){
       const transformedDataMaCH = transformedData.map((machshir) => {
         return {
           jsoni: machshir.attributes.jsoni,
+          machshirId: machshir.id,
           users_permission_user: {
             data: {
               id: uid,
@@ -65,7 +66,7 @@ export async function POST({request, cookies, fetch}){
       'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png';
   
      console.log('before', transformedDataMaCH, transformedDataTel);
-      pusherer(transformedDataMaCH, idL,pic,title,body,lang,fetch);
+      pusherer("https://www.1lev1.com/lev",transformedDataMaCH, idL,pic,title,body,lang,fetch);
         console.log('after', transformedDataTel);
         if(transformedDataTel && transformedDataTel !== null && transformedDataTel !== undefined){
         sendBolkTelegram([{id:uid,attributes:{telegramId:transformedDataTel,lang:jsonim.data.usersPermissionsUser.data.attributes?.lang}}], idL,title,body,jsonim.data.usersPermissionsUser.data.attributes?.lang == "he"	 || "en" ? jsonim.data.usersPermissionsUser.data.attributes?.lang : lang,fetch);

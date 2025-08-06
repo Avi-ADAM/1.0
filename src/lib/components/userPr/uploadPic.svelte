@@ -6,7 +6,8 @@
    */
 
   /** @type {Props} */
-  let { onMessage, noHeader = false, current = 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png' } = $props();
+  let { onMessage,cropShape = 'round',
+  aspect = 1, color=false, noHeader = false, current = 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png' } = $props();
 
 
   async function sendP(fileToSend) {
@@ -31,9 +32,9 @@ import { getFileFromUrl } from '$lib/components/ui/image-cropper';
 
 
 {#if noHeader == false}
-<h2>{up[$lang]}</h2>
+<h2 class="text-center text-barbi">{up[$lang]}</h2>
 {/if}
-
+<div class="flex justify-center items-center">
 <ImageCropper.Root
 	src={current}
 	onCropped={async (url) => {
@@ -47,10 +48,22 @@ import { getFileFromUrl } from '$lib/components/ui/image-cropper';
 	}}
 >
 	<ImageCropper.UploadTrigger>
-		<ImageCropper.Preview />
+		{#if cropShape === 'rect'}
+			<ImageCropper.Preview
+				class="rounded-none"
+				style={`aspect-ratio: ${aspect}; width: 256px;`}
+			>
+				{#snippet child({ src })}
+					<img {src} alt="Preview" class="h-full w-full rounded-none object-cover border-2 border-barbi" />
+				{/snippet}
+			</ImageCropper.Preview>
+		{:else}
+			<ImageCropper.Preview />
+		{/if}
 	</ImageCropper.UploadTrigger>
-	<ImageCropper.Dialog>
-		<ImageCropper.Cropper />
+	<ImageCropper.Dialog class="z-[9999]">
+		<ImageCropper.Cropper {cropShape}
+		{aspect}/>
 		<ImageCropper.Controls>
 			<ImageCropper.Cancel />
 			<ImageCropper.Crop />
@@ -58,3 +71,4 @@ import { getFileFromUrl } from '$lib/components/ui/image-cropper';
 	</ImageCropper.Dialog>
 </ImageCropper.Root>
 
+</div>

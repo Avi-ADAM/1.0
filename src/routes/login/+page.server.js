@@ -46,7 +46,7 @@ export const actions = {
                 secure: process.env.NODE_ENV === 'production',
                 sameSite: 'lax'
             });
-            cookies.set('un', encodeURIComponent(user.username), {
+            cookies.set('un', user.username, {
                 path: '/',
                 expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
                 httpOnly: false,

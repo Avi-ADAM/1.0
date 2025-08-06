@@ -689,8 +689,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }
 }`,
-'45deleteMachshir': `mutation deleteMachshir($endpoint: String!) {
-    deleteMachshir(endpoint: $endpoint) {
+'45deleteMachshir': `mutation deleteMachshir($id: ID!) {
+    deleteMachshir(id: $id) {
+      data {
+        id
+      }
+    }
+  }`,
+  '46getMachshirByEndpoint': `query getMachshirByEndpoint($endpoint: JSON!) {
+    machshirs(filters: { jsoni: { contains: $endpoint }}) {
       data {
         id
       }

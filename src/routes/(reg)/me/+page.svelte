@@ -167,7 +167,7 @@ let addNs1 = $state(true);
         sendpg(imageId);
      })
       .catch((error) => {
-        console.log('צריך לתקן:', error.response);
+        console.log('An error occurred:', error.response);
         const msg = {
           he: error.response?.data?.message || 'שגיאה בהעלאת קובץ',
           en: error.response?.data?.message || 'Error uploading file'
@@ -524,7 +524,7 @@ let frd;
   //  updpic.set(0);
                   })
       .catch((error) => {
-        console.log('צריך לתקן:', error.response);
+        console.log('An error occurred:', error.response);
                 });
   }
 

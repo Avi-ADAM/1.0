@@ -20,7 +20,9 @@
       selected = [
         bmi[0].attributes.users_permissions_user.data.attributes.username +
           ' - ' +
-          bmi[0].attributes.name
+          bmi[0].attributes.name +
+          ' - ' +
+          bmi[0].id
       ];
     }
   });
@@ -89,7 +91,9 @@
       if (
         bmiData[i].attributes.users_permissions_user.data.attributes.username +
           ' - ' +
-          bmiData[i].attributes.name ==
+          bmiData[i].attributes.name +
+          ' - ' +
+          bmiData[i].id ==
         lebel
       ) {
         id = bmiData[i].id;
@@ -335,6 +339,9 @@
     </div>
     {#if isPersonal == true}
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
         bind:selected
         maxSelect=1
         placeholder={placeholder[$lang]}
@@ -342,11 +349,16 @@
           (it) =>
             it.attributes.users_permissions_user.data.attributes.username +
             ' - ' +
-            it.attributes.name
+            it.attributes.name +
+            ' - ' +
+            it.id
         )}
       />
     {:else}
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
         bind:selected
         placeholder={placeholderoles[$lang]}
         options={proles.map((pr) => pr.name)}

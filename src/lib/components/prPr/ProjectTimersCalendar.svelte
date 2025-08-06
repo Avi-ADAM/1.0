@@ -338,7 +338,7 @@
       <div class="space-y-4">
         {#each timersData.project.data.attributes.timers.data as timer}
           {@const timerData = timer.attributes}
-          {@const mesimabetahalich = timerData.mesimabetahalich?.data?.attributes}
+          {@const mesimabetahalich = timerData.mesimabetahalich?.data ? { ...timerData.mesimabetahalich.data.attributes, id: timerData.mesimabetahalich.data.id } : {}}
           
           <div class="border rounded-lg p-4 bg-gray-50 transition-all duration-200 
               {expandedTimer === timer.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''}">

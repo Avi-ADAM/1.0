@@ -560,7 +560,7 @@ meta {
       document.cookie =
         `email=${mail}; expires=` + new Date(2026, 0, 1).toUTCString();
       document.cookie =
-        `un=${encodeURIComponent(formName)}; expires=` +
+        `un=${formName}; expires=` +
         new Date(2026, 0, 1).toUTCString();
       userName.set(formName);
       liUN.set(formName);

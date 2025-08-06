@@ -70,6 +70,7 @@ export async function POST({request, cookies, fetch}){
       return validMachshirs.map((machshir) => {
         return {
           jsoni: machshir.attributes.jsoni,
+          machshirId: machshir.id,
           users_permission_user: {
             data: {
               id: user.id,
