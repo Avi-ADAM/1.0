@@ -117,61 +117,52 @@
   const see = { he: 'צפיה בהצעת החלוקה', en: 'see existed sppliting offer' };
   const sbp = { he: 'התפלגות המכירות לפי מוצר', en: 'sales by product' };
   const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
-  $effect(() => {
-    for (let i = 0; i < salee.length; i++) {
-      if (salee[i].attributes.matanot.data.attributes.name in fermatana) {
-        fermatana[salee[i].attributes.matanot.data.attributes.name] +=
-          salee[i].attributes.in;
-      } else {
-        fermatana[salee[i].attributes.matanot.data.attributes.name] =
-          salee[i].attributes.in;
-      }
-    }
+  $effect.pre(() => {
+    fermatana = salee.reduce((acc, sale) => {
+      const matanaName = sale.attributes.matanot.data.attributes.name;
+      const saleIn = sale.attributes.in;
+      acc[matanaName] = (acc[matanaName] || 0) + saleIn;
+      return acc;
+    }, {});
   });
   $effect(() => {
-    for (let i = 0; i < salee.length; i++) {
-      if (dayjs(salee[i].attributes.date) in ferdate) {
-        if (
-          salee[i].attributes.matanot.data.attributes.name in
-          ferdate[dayjs(salee[i].attributes.date)]
-        ) {
-          ferdate[dayjs(salee[i].attributes.date)][
-            salee[i].attributes.matanot.data.attributes.name
-          ] += salee[i].attributes.in;
-        } else {
-          ferdate[dayjs(salee[i].attributes.date)][
-            salee[i].attributes.matanot.data.attributes.name
-          ] = salee[i].attributes.in;
-        }
-      } else {
-        ferdate[dayjs(salee[i].attributes.date)] = {
-          [salee[i].attributes.matanot.data.attributes.name]:
-            salee[i].attributes.in
-        };
-      }
-      console.log(ferdate);
-    }
-  });
-  $effect(() => {
-    if (salee.length > 0) {
-      for (const [key, value] of Object.entries(ferdate)) {
-        const datea = key;
-        const ano = value;
-        arrt.push({ date: datea });
-        arrt = arrt;
-        const objIndex = arrt.findIndex((obj) => obj.date == datea);
+    const newFerdate = {};
+    for (const sale of salee) {
+      const dateKey = dayjs(sale.attributes.date).format('YYYY-MM-DD');
+      const matanaName = sale.attributes.matanot.data.attributes.name;
+      const saleIn = sale.attributes.in;
 
-        for (const [key, value] of Object.entries(ano)) {
-          arrt[objIndex][key] = value;
-        }
+      if (!newFerdate[dateKey]) {
+        newFerdate[dateKey] = {};
       }
+
+      if (newFerdate[dateKey][matanaName]) {
+        newFerdate[dateKey][matanaName] += saleIn;
+      } else {
+        newFerdate[dateKey][matanaName] = saleIn;
+      }
+    }
+    ferdate = newFerdate;
+  });
+  $effect.pre(() => {
+    if (salee.length > 0) {
+      const newArrt = [];
+      for (const [key, value] of Object.entries(ferdate)) {
+        newArrt.push({ date: key, ...value });
+      }
+
+      if (newArrt.length === 0) {
+        arrt = [];
+        return;
+      }
+
       //get all keys
-      const keys = arrt.reduce(
+      const keys = newArrt.reduce(
         (acc, curr) => (Object.keys(curr).forEach((key) => acc.add(key)), acc),
         new Set()
       );
       //add all matanot to all objects
-      const output = arrt.map((item) =>
+      const output = newArrt.map((item) =>
         [...keys].reduce((acc, key) => ((acc[key] = item[key] ?? ''), acc), {})
       );
       //sort by date
@@ -183,22 +174,19 @@
         return { ...obj, date: dayjs(obj.date).format('D.M.YY') };
       });
       arrt = x;
-      console.log(arrt);
+    } else {
+      arrt = [];
     }
   });
   $effect(() => {
     if (salee.length > 0) {
-      for (let key in fermatana) {
-        if (fermatana.hasOwnProperty(key)) {
-          arr.push({ key: key, value: fermatana[key] });
-        }
-      }
+      arr = Object.entries(fermatana).map(([key, value]) => ({ key, value }));
+    } else {
+      arr = [];
     }
   });
-  $effect(() => {
-    for (let i = 0; i < salee.length; i++) {
-      allin += salee[i].attributes.in;
-    }
+  $effect.pre(() => {
+    allin = salee.reduce((total, s) => total + s.attributes.in, 0);
   });
 </script>
 
@@ -487,7 +475,7 @@
       </div>
     {/if}
   </div>
-  {#if salee.length > 0}
+  {#if salee.length > 0 &&  arr?.length > 0}
     <div class="flex flex-col sm:flex-row-reverse justify-center">
       <div>
         <h1 class="text-center text-barbi text-bold underline decoration-mturk">

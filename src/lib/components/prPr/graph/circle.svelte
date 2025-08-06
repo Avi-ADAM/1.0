@@ -7,10 +7,11 @@
   const idKey = 'key';
   const valueKey = 'value';
 
-  data.forEach(d => {
-    d[valueKey] = +d[valueKey];
-  });
-  console.log(data);
+    data.forEach(d => {
+       d[valueKey] = +d[valueKey];
+    });
+   
+ 
 </script>
 
 <style>
@@ -25,7 +26,6 @@
     height: 100%;
   }
 </style>
-
 <div class="chart-container">
   <LayerCake
     padding={{ top: 0, bottom: 20, left: 30 }}

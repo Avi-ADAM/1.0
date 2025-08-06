@@ -2,19 +2,9 @@
   import { stratify, pack, hierarchy } from 'd3-hierarchy'
   import { getContext } from 'svelte';
   import { format } from 'd3-format';
-
+  const titleCase = d => d.replace(/^\w/, w => w.toUpperCase());
+  const commas = format(',');
   const { width, height, data } = getContext('LayerCake');
-
-
-
-
-
-
-
-
-
-
-
 
   /**
    * @typedef {Object} Props
@@ -35,7 +25,7 @@
   /** @type {Props} */
   let {
     idKey = 'id',
-    parentKey = undefined,
+    parentKey,
     valueKey = 'value',
     labelVisibilityThreshold = r => r > 25,
     fill = '#fff',
@@ -54,51 +44,38 @@
    * Stash $data here so we can add our own parent
    * if there's no `parentKey`
    */
-  let parent = $state({});
-  let dataset;
-  $effect(() => {
-    dataset = $data;
-  });
 
-  $effect(() => {
-    if (parentKey === undefined) {
-      parent = { [idKey]: 'all' };
-      dataset = [...dataset, parent]
-    }
-  });
+   let parent = $derived(parentKey !== undefined ? {} : { [idKey]: 'all' });
+   let dataset = $derived(parentKey !== undefined ? $data : [...$data, parent]);
 
-  let stratifier = $derived(stratify()
-    .id(d => d[idKey])
-    .parentId(d => {
-      if (d[idKey] === parent[idKey]) return '';
-      return d[parentKey] || parent[idKey];
-    }));
-
-  let packer = $derived(pack()
-    .size([$width, $height])
-    .padding(spacing));
-
-  let stratified = $derived(stratifier(dataset));
-
-  let root = $derived(hierarchy(stratified)
-    .sum((d, i) => {
-      return d.data[valueKey] || 1;
-    })
-    .sort(sortBy));
-
-  let packed = $derived(packer(root));
-
-  let descendants = $derived(packed.descendants());
-
-  const titleCase = d => d.replace(/^\w/, w => w.toUpperCase());
-  const commas = format(',');
+   let stratifier = $derived(
+    stratify()
+      .id(d => d[idKey])
+      .parentId(d => {
+        if (d[idKey] === parent[idKey]) return '';
+        if (parentKey === undefined) return parent[idKey];
+        return d[parentKey];
+      })
+  );
+  let descendants = $derived(
+    pack()
+      .size([$width, $height])
+      .padding(spacing)(
+        hierarchy(stratifier(dataset))
+          .sum(d => {
+            return d.data[valueKey] || 1;
+          })
+          .sort(sortBy)
+      )
+      .descendants()
+  );
 </script>
 
 <div class="circle-pack" data-has-parent-key="{parentKey !== undefined}">
   {#each descendants as d}
     <div
       class="circle-group"
-      data-id="{d.data.id}"
+      data-id={d.data.id}
       data-visible="{labelVisibilityThreshold(d.r)}"
     >
       <div

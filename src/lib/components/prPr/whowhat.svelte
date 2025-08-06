@@ -3,6 +3,29 @@
           import pic from './../../celim/pic.js'
    import { idPr } from '../../stores/idPr.js';
    import { onMount } from 'svelte'; 
+    /**
+   * @typedef {Object} Props
+   * @property {any} [fmiData]
+   * @property {any} [rikmashes]
+   * @property {boolean} [hagdel]
+   * @property {any} [salee]
+   * @property {number} [allin]
+   * @property {any} trili
+   * @property {any} users
+   * @property {boolean} [already]
+   */
+
+  /** @type {Props} */
+  let {
+    fmiData = [],
+    rikmashes = [],
+    hagdel = false,
+    salee = [],
+    allin = 0,
+    trili,
+    users,
+    already = $bindable(false)
+  } = $props();
 let revach = allin;
 let x = [];
 let meca = [];
@@ -32,29 +55,7 @@ let dictid = {};
 let dictidi = {};
 let hal = false;
 let error1 = null;
-  /**
-   * @typedef {Object} Props
-   * @property {any} [fmiData]
-   * @property {any} [rikmashes]
-   * @property {boolean} [hagdel]
-   * @property {any} [salee]
-   * @property {number} [allin]
-   * @property {any} trili
-   * @property {any} users
-   * @property {boolean} [already]
-   */
-
-  /** @type {Props} */
-  let {
-    fmiData = [],
-    rikmashes = [],
-    hagdel = false,
-    salee = [],
-    allin = 0,
-    trili,
-    users,
-    already = $bindable(false)
-  } = $props();
+ 
 async function ask (){
   already = true;
   let d = new Date
