@@ -168,7 +168,7 @@ async function add() {
           query: `mutation 
                         { createSale(
       data: ${JSON.stringify(saleData).replace(/"([^(")"]+)":/g, '$1:')}
-    ) {data{id attributes{ in}}}
+    ) {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
   ${quanter}
 }
 `,
@@ -196,6 +196,7 @@ async function add() {
           id: miDatan.data.updateMatanot.data.id,
           in: miDatan.data.createSale.data.attributes.in,
           un: miDatan.data.updateMatanot.data.attributes.quant,
+          matana: miDatan.data.createSale.data,
         });
       } else {
         onDoners?.();

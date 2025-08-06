@@ -132,11 +132,11 @@ function objToString (obj) {
         
     for (const [p, val] of Object.entries(obj[i])) {
         if (typeof(val) == "number"|"boolean") {
-        str += `{${p}:${val}\n},`;
+        str += `{${p}:${val}\n}`;
         } else if (typeof(val) == "string"){
-                  str += `{${p}:"${val}"\n},`;
+                  str += `{${p}:"${val}"\n}`;
     } else if (typeof(val) == 'null'){
-                str += `{${p}:${val.map(c => c.id)}\n},`;
+                str += `{${p}:${val.map(c => c.id)}\n}`;
     }
     }}
     return str;
@@ -179,7 +179,7 @@ if (noofusersOk  === noofusers){
           `mutation { 
   updateTosplit(
       id: ${pendId}
-      data: { vots:[  ${userss},      
+      data: { vots:[  ${userss ? userss + ',' : ''}      
      {
       what: true
       users_permissions_user: "${idL}"
@@ -278,16 +278,15 @@ for (let o = 0; o < hervach.length; o++) {
         body: 
         JSON.stringify({query:
           `mutation {  updateTosplit(
-      input: {
-      where: {id: ${pendId}}
-      data: { vots:[  ${userss},      
+     id: "${pendId}"
+      data: { vots:[  ${userss ? userss + ',' : ''}      
      {
       what: true
       users_permissions_user: "${idL}"
     }
   ],
  }
-  ){data { vots { users_permissions_user {data{ id}}}}}
+  ){data { id}}
  } `   
 // make coin desapire
 } )})
@@ -359,7 +358,7 @@ async function afterwhy (){
         JSON.stringify({query:
           `mutation {  updateTosplit(
 id: ${pendId}
-      data: { vots:[  ${userss},      
+      data: { vots:[  ${userss ? userss + ',' : ''}      
      {
       what: false
       why: "${why}"
@@ -716,8 +715,8 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
 <Cards 
- onAgree={claf}
-  onDecline={claf}
+onAgree={agree}
+onDecline={decline}
   onHover={hoverc}
   {why}
   {already} 
@@ -736,8 +735,8 @@ transition:fly|local={{y:450, duration: 2200, opacity: 0.5}}>
 {:else}
 
 <Cards 
- onAgree={claf}
-  onDecline={claf}
+ onAgree={agree}
+  onDecline={decline}
   onHover={hoverc}
   {isVisible}
   {why}

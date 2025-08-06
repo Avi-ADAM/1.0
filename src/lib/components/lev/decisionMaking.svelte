@@ -377,7 +377,7 @@ async function agree() {
         }){data{id}}
         `
       }else{
-        que `    
+        que = `    
  updateDecision(
               id: "${askId}"
        data: {

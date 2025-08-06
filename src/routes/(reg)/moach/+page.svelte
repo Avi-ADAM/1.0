@@ -887,7 +887,7 @@
     } else {
           let linkg = baseUrl + '/graphql';
           try {
-            fetch(linkg, {
+           fetch(linkg, {
               method: 'POST',
 
               headers: {
@@ -916,14 +916,25 @@
               })
             })
               .then((r) => r.json())
-              .then((data) => (meDatap = data));
-              let timegramaId = meDatap.data.createDecision.data.id
-              let x = calcX(restime)
-              let fd = new Date(Date.now() + x)
-              sendToSer({whatami:"decision",decision:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch)
-            isOpenM = false;
-            a = 0;
-            toast.success(`${picvots[$lang]}`);
+              .then((data) => {
+                meDatap = data;
+                if (meDatap && meDatap.data && meDatap.data.createDecision && meDatap.data.createDecision.data) {
+                  let timegramaId = meDatap.data.createDecision.data.id;
+                  let x = calcX(restime);
+                  let fd = new Date(Date.now() + x);
+                  sendToSer({whatami:"decision",decision:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch);
+                  isOpenM = false;
+                  a = 0;
+                  toast.success(`${picvots[$lang]}`);
+                } else {
+                  console.error('Invalid response structure:', meDatap);
+                  toast.error('שגיאה ביצירת ההחלטה');
+                }
+              })
+              .catch((error) => {
+                console.error('Error creating decision:', error);
+                toast.error('שגיאה ביצירת ההחלטה');
+              });
           } catch (e) {
             console.log(e);
           }
@@ -1357,6 +1368,7 @@
   import { sendToSer } from '$lib/send/sendToSer';
   import { calcX } from '$lib/func/calcX.svelte';
   import Button from '$lib/celim/ui/button.svelte';
+  import { link } from 'd3-shape';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1794,7 +1806,7 @@ pointer-events: none;"
               />
             </a>
           {/if}
-          {#if linkP}
+          {#if linkP && linkP != undefined && linkP != null && linkP != "" && linkP != "null" && linkP != "undefined"}
             <a
               rel="noreferrer"
               target="_blank"
@@ -2392,6 +2404,7 @@ pointer-events: none;"
               {fmiData}
               {rikmashes}
               {salee}
+              {restime}
               {projectUsers}
               bmiData={bmimData}
             />

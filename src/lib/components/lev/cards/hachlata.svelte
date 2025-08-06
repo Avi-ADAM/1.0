@@ -60,6 +60,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   } = $props();
     let zman = $state()
   onMount(()=>{
+    console.log(timegramaDate,"restime")	
         let x = restim(restime)
     let cr = new Date(timegramaDate)
     let crr = cr.getTime() //if nego then use last nego creationtime

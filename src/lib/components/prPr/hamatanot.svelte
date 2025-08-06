@@ -25,8 +25,9 @@
     projectId,
     trili,
     bmiData = $bindable([]),
-    salee = [],
-    projectUsers = []
+    salee = $bindable([]),
+    projectUsers = [],
+    restime
   } = $props();
   let quant = $state(), each = $state(), maid = $state();
   function sell(id, v, z, isto) {
@@ -62,6 +63,7 @@
     bmiData = oldob;
     isOpen = false;
     a = 0;
+    salee.push(event.matana);
   };
   function done(event) {
     isOpen = false;
@@ -117,7 +119,7 @@
   const see = { he: 'צפיה בהצעת החלוקה', en: 'see existed sppliting offer' };
   const sbp = { he: 'התפלגות המכירות לפי מוצר', en: 'sales by product' };
   const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
-  $effect.pre(() => {
+  $effect(() => {
     fermatana = salee.reduce((acc, sale) => {
       const matanaName = sale.attributes.matanot.data.attributes.name;
       const saleIn = sale.attributes.in;
@@ -144,7 +146,7 @@
     }
     ferdate = newFerdate;
   });
-  $effect.pre(() => {
+  $effect(() => {
     if (salee.length > 0) {
       const newArrt = [];
       for (const [key, value] of Object.entries(ferdate)) {
@@ -185,7 +187,7 @@
       arr = [];
     }
   });
-  $effect.pre(() => {
+  $effect(() => {
     allin = salee.reduce((total, s) => total + s.attributes.in, 0);
   });
 </script>
@@ -470,6 +472,7 @@
             {fmiData}
             users={projectUsers}
             {rikmashes}
+            {restime}
           />
         {/if}
       </div>

@@ -149,7 +149,8 @@
           outpot: row.des,
           editable: false,
           sml: true,
-          minw: true
+          minw: true,
+          trans: true
         };
       },
       renderComponent: RichText

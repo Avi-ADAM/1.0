@@ -3,6 +3,8 @@
           import pic from './../../celim/pic.js'
    import { idPr } from '../../stores/idPr.js';
    import { onMount } from 'svelte'; 
+  import { calcX } from '$lib/func/calcX.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
     /**
    * @typedef {Object} Props
    * @property {any} [fmiData]
@@ -22,6 +24,7 @@
     hagdel = false,
     salee = [],
     allin = 0,
+    restime,
     trili,
     users,
     already = $bindable(false)
@@ -183,6 +186,10 @@ createHaluka(
   .then(data => miDatan = data);
          console.log(miDatan)
          //get ids put in tosplitname for now
+         let timegramaId = miDatan.data.createTosplit.data.id
+              let x = calcX(restime)
+              let fd = new Date(Date.now() + x)
+              await sendToSer({whatami:"tosplit",tosplit:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch)
         } catch (e) {
             error1 = e
             console.log(error1)
