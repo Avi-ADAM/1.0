@@ -6,6 +6,9 @@
     "build": "vite build ",
     "preview": "vite preview"
   },
+  "engines": {
+    "node": "20.x"
+  },
   "devDependencies": {
     "@event-calendar/core": "^3.4.0",
     "@event-calendar/time-grid": "^3.4.0",
@@ -30,7 +33,9 @@
     "svelte-share-buttons-component": "^3.0.0",
     "svelte-sitemap": "^2.6.0",
     "tailwindcss": "^3.4.10",
-    "typescript": "^5.5.4"
+    "typescript": "^5.5.4",
+    "bufferutil": "^4.0.8",
+    "utf-8-validate": "^5.0.10"
   },
   "dependencies": {
     "@avitest/gridcraft": "git+https://github.com/Avi-ADAM/gridcraft.git",
