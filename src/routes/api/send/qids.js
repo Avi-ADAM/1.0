@@ -519,4 +519,157 @@ export const qids = {
   }
  }
 `,
+  '39OpenMissionById': `query OpenMissionById($mId: ID!) {
+    openMission(id: $mId) {
+      data {
+        id
+        attributes {
+          sqadualed
+          archived
+          acts { data { attributes { shem } } }
+          users { data { id } }
+          project {
+            data {
+              id
+              attributes {
+                projectName
+                user_1s { data { id } }
+                restime
+                timeToP
+                profilePic { data { attributes { url } } }
+              }
+            }
+          }
+          tafkidims { data { attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          skills { data { attributes { skillName localizations { data { attributes { skillName } } } } } }
+          descrip
+          hearotMeyuchadot
+          name
+          dates
+          iskvua
+          work_ways { data { attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+          noofhours
+          perhour
+        }
+      }
+    }
+  }`,
+  '40OpenMashaabimById': `query OpenMashaabimById($mId: ID!) {
+    openMashaabim(id: $mId) {
+      data {
+        id
+        attributes {
+          archived
+          price
+          descrip
+          spnot
+          kindOf
+          sqadualedf
+          sqadualed
+          linkto
+          createdAt
+          hm
+          name
+          easy
+          declinedsps { data { id } }
+          users { data { id } }
+          mashaabim { data { id } }
+          project {
+            data {
+              id
+              attributes {
+                restime
+                projectName
+                user_1s { data { id } }
+                timeToP
+                profilePic { data { attributes { url } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '41ProjectById': `query ProjectById($pid: ID!) {
+    project(id: $pid) {
+      data {
+        id
+        attributes {
+          projectName
+          user_1s { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          linkToWebsite
+          restime
+          sheiruts(filters: { isApruved: { eq: true } }) { data { id attributes { name descrip equaliSplited oneTime isApruved } } }
+          githublink
+          fblink
+          discordlink
+          twiterlink
+          vallues { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
+          publicDescription
+          profilePic { data { attributes { url formats } } }
+          open_missions(filters: { archived: { eq: false } }) { data { id attributes { name } } }
+        }
+      }
+    }
+  }`,
+  '42MatanotById': `query MatanotById($id: ID!) {
+    matanot(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          pic { data { attributes { url } } }
+          price
+          quant
+          kindOf
+          desc
+          publishedAt
+          archived
+          startDate
+          finnishDate
+          projectcreates { data { id attributes { projectName user_1s { data { id } } restime timeToP profilePic { data { attributes { url } } } open_missions { data { id attributes { sqadualed archived tafkidims { data { attributes { roleDescription localizations { data { attributes { roleDescription } } } } } } skills { data { attributes { skillName localizations { data { attributes { skillName } } } } } } descrip hearotMeyuchadot name dates iskvua work_ways { data { attributes { workWayName localizations { data { attributes { workWayName } } } } } } noofhours perhour } } } } } }
+        }
+      }
+    }
+  }`,
+  '43UserById': `query UserById($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        id
+        attributes {
+          fblink
+          twiterlink
+          discordlink
+          githublink
+          bio
+          username
+          finnished_missions { data { attributes { missionName } } }
+          profilePic { data { attributes { url formats } } }
+          projects_1s { data { id attributes { projectName } } }
+          sps(filters: { archived: { eq: false } }) { data { id attributes { name panui } } }
+          skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
+          work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+        }
+      }
+    }
+  }`,
+  '61ApproveAct': `mutation ApproveAct($id: ID!, $myIshur: Boolean) {
+    updateAct(id: $id, data: { myIshur: $myIshur }) { data { id } }
+  }`,
+  '62MarkActDone': `mutation MarkActDone($id: ID!, $naasa: Boolean) {
+    updateAct(id: $id, data: { naasa: $naasa }) { data { id } }
+  }`,
+  '63SetActStatus': `mutation SetActStatus($id: ID!, $status: Int) {
+    updateAct(id: $id, data: { status: $status }) { data { id } }
+  }`,
+  '44UpdateUserAskeds': `mutation UpdateUserAskeds($uid: ID!, $askeds: [ID]) {
+    updateUsersPermissionsUser(id: $uid, data: { askeds: $askeds }) { data { id } }
+  }`,
+  '45CreateAsk': `mutation CreateAsk($open_mission: ID!, $project: ID!, $users_permissions_user: ID!, $publishedAt: DateTime) {
+    createAsk(data: { open_mission: $open_mission, project: $project, users_permissions_user: $users_permissions_user, publishedAt: $publishedAt }) {
+      data { id }
+    }
+  }`,
 }

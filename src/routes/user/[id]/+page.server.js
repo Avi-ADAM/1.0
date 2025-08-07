@@ -1,181 +1,13 @@
-import { SendTo } from '$lib/send/sendTo.svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
 import { langAdjast } from '$lib/func/langAdjast.svelte';
 
 async function awaitapi(userId, lang, tok) {
-  let que, toc;
-  if (tok != false) {
-    que = `{
-      usersPermissionsUser (id:${userId}) {
-        data {
-          id
-          attributes {
-            fblink
-            twiterlink
-            discordlink
-            githublink
-            bio
-            username
-            finnished_missions {
-              data {
-                attributes {
-                  missionName
-                }
-              }
-            }
-            profilePic {
-              data {
-                attributes {
-                  url
-                  formats
-                }
-              }
-            }
-            projects_1s {
-              data {
-                id
-                attributes {
-                  projectName
-                }
-              }
-            }
-            sps (filters: {archived:{eq: false }}) {
-              data {
-                id
-                attributes {
-                  name
-                  panui
-                }
-              }
-            }
-            skills {
-              data {
-                id
-                attributes {
-                  skill Name 
- localizations{data{attributes{skillName}}}
-                }
-              }
-            }
-            tafkidims {
-              data {
-                id
-                attributes {
-                  roleDescription  localizations{data{attributes{roleDescription}}}
-                }
-              }
-            }
-            vallues {
-              data {
-                id
-                attributes {
-                  valueName  localizations{data{attributes{valueName}}}
-                }
-              }
-            }
-            work_ways {
-              data {
-                id
-                attributes {
-                  workWayName  localizations{data{attributes{workWayName}}}
-                }
-              }
-            }
-          }
-        }
-      }
-    }`;
-    toc = tok;
-  } else {
-    que = `{
-      usersPermissionsUser (id:${userId}) {
-        data {
-          id
-          attributes {
-            fblink
-            twiterlink
-            discordlink
-            githublink
-            bio
-            username
-            finnished_missions {
-              data {
-                attributes {
-                  missionName
-                }
-              }
-            }
-            profilePic {
-              data {
-                attributes {
-                  url
-                  formats
-                }
-              }
-            }
-            projects_1s {
-              data {
-                id
-                attributes {
-                  projectName
-                }
-              }
-            }
-            sps (filters: {archived:{eq: false }}) {
-              data {
-                id
-                attributes {
-                  name
-                  panui
-                }
-              }
-            }
-            skills {
-              data {
-                id
-                attributes {
-                  skillName  localizations{data{attributes{skillName}}}
-                }
-              }
-            }
-            tafkidims {
-              data {
-                id
-                attributes {
-                  roleDescription  localizations{data{attributes{roleDescription}}}
-                }
-              }
-            }
-            vallues {
-              data {
-                id
-                attributes {
-                  valueName  localizations{data{attributes{valueName}}}
-                }
-              }
-            }
-            work_ways {
-              data {
-                id
-                attributes {
-                  workWayName  localizations{data{attributes{workWayName}}}
-                }
-              }
-            }
-          }
-        }
-      }
-    }`;
-    toc = import.meta.env.VITE_ADMINMONTHER;
-  }
-
   let userData = null;
   try {
-    const data = await SendTo(que, toc);
-    console.log(data);
-    if (data.data.usersPermissionsUser.data != null) {
-      let datar = data.data.usersPermissionsUser.data;
-      userData = datar;
-      console.log(userData);
+    const isSer = tok === false;
+    const data = await sendToSer({ uid: userId }, '43UserById', null, null, isSer, fetch);
+    if (data?.data?.usersPermissionsUser?.data) {
+      userData = data.data.usersPermissionsUser.data;
     }
   } catch (error) {
     console.error("Error fetching user data:", error);
@@ -184,7 +16,7 @@ async function awaitapi(userId, lang, tok) {
   return userData;
 }
 
-export const load = async ({ locals, params }) => {
+export const load = async ({ locals, params, fetch }) => {
   const userId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;
