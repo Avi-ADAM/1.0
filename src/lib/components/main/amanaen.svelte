@@ -583,6 +583,9 @@ let h = $state(0);
  style="font-family: StamSefarad, serif; font-size: 1em; font-weight: 700;" dir="ltr">from: </h3> 
     <MultiSelect
       bind:selected
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
       {nameC} 
       {placeholder}
       options={country.map(c => c.label)}

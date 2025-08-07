@@ -386,7 +386,7 @@ onSubmit: values => {
             setTimeout(function() { doesLang.set(true)
                                     langUs.set("en")
                                     lang.set("en")
-                                   goto("/en")}, 2500)
+                                   goto("/convention")}, 2500)
           }
         });
 
@@ -559,6 +559,9 @@ function erorer(){
   <h3        class="amanat " id="m" 
  style="font-family: StamSefarad, serif; font-size: 1em;" dir="rtl">من: </h3> 
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
       bind:selected
       {nameC} 
       {placeholder}

@@ -634,10 +634,12 @@ const lines = document.getElementById("lines")
     if (la == 'en') {
       doesLang.set(true);
       langUs.set('en');
+      lang.set('en');
       goto('/convention');
     } else if (la == 'ar') {
       doesLang.set(true);
       langUs.set('ar');
+      lang.set('ar');
       goto('aitifaqia');
     }
   }
