@@ -8,22 +8,23 @@
 } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 import { onMount } from 'svelte';
-let first = $state({"he":"         לחיצה לפתיחת ", "en": "click to open          "})
-let second = {"he":"               1💗1", "en": "1💗1               "}
-let sh = {"he":"שלום", "en": "Hello"}
-let sh2 = {"he":" הסכמתך התקבלה!", "en": ""}
-let sh3 = {"he":"הגעת למקום ה-", "en": "You are the "}
-let sh1 = {"he":"", "en": "th to agree"}
-let sh4 = {"he":"כעת ביכולתך לפתוח", "en": "Now you can open"}
-let sh5 = {"he":"את", "en": ""}
-let sh6 = {"he":"1💗1 לפתיחת", "en": "Open 1💗1"}
-let dira = {"he":"rtl", "en": "ltr"} 
+let first = {"he":"         לחיצה לפתיחת ", "en": "click to open          ", "ar": "      انقر للفتح"}
+let second = {"he":"               1💗1", "en": "1💗1               ", "ar": "              1💗1"}
+let sh = {"he":"שלום", "en": "Hello", "ar": "مرحبا"}
+let sh2 = {"he":" הסכמתך התקבלה!", "en": "", "ar": "تم استلام موافقتك!"}
+let sh3 = {"he":"הגעת למקום ה-", "en": "You are the ", "ar": "أنت ال "}
+let sh1 = {"he":"", "en": "th to agree", "ar": " للموافقة"}
+let sh4 = {"he":"כעת ביכולתך לפתוח", "en": "Now you can open", "ar": "الآن يمكنك الفتح"}
+let sh5 = {"he":"את", "en": "", "ar": ""}
+let sh6 = {"he":"1💗1 לפתיחת", "en": "Open 1💗1", "ar": "فتح 1💗1"}
+let dira = {"he":"rtl", "en": "ltr", "ar": "rtl"}
     function reverseString(str) {
     return str.split("").reverse().join("");
 }
 onMount(async () =>{
+  console.log($lang)
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
-      if($lang == "he"){
+      if($lang == "he" || $lang == "ar"){
   first = reverseString(first[$lang])
   first = first
       }

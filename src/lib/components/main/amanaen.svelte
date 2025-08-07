@@ -359,7 +359,7 @@ import { Head } from 'svead'
 	const { progress } = useProgress()
     import { createForm } from "svelte-forms-lib";
   import { Canvas } from '@threlte/core';
-  import Scene from './globu.svelte'
+  import Scene from './globu.svelte';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
         let meData =[]
 const { form, errors, stepState, handleChange, handleSubmit } = createForm({
