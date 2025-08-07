@@ -276,18 +276,15 @@ async function agree() {
             }
               `
                try {
-      let res4 = await SendTo(que4, VITE_ADMINMONTHER).then((res4) => (res4 = res4));
-      console.log(res4,"ask res4 ")      
-      if (res4.data != null) {
-              console.log(res4.data,"ask res4 ")      
- dispatch('acsept', {
-                ani: "askedma",
-                coinlapach: coinlapach 
-            })
+                 const res4 = await sendToSer({ id: timegramaId, done: true }, '35updateTimeGrama', null, null, true, fetch);
+                 console.log(res4, "ask res4 ");
+                 if (res4.data != null) {
+                   console.log(res4.data, "ask res4 ");
+                   dispatch('acsept', { ani: "askedma", coinlapach: coinlapach });
+                 }
+               } catch (e) {
+                 console.error(e);
                }
- } catch (e) {
-      console.error(e);
-    }
   }
 
         } catch (e) {
@@ -405,7 +402,7 @@ function hoverc (event){
     dispatch("hover", {id: u[$lang]});
 }
  import Card from './cards/hachlata.svelte'
-  import {SendTo} from '$lib/send/sendTo.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
 export let cards = false;
 export let tx = 200;
 const newlogo = {"he":"הלוגו החדש שמוצע","en":"new Logo offered"}

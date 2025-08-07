@@ -13,7 +13,7 @@ import {
 import {
     goto
 } from '$app/navigation'
-  import {SendTo} from '$lib/send/sendTo.svelte';
+  import { sendToSer } from '$lib/send/sendToSer.js';
 //TODO: get asked from server then show you alr .., find a way to get title
 let error1 = null;
 let success = false
@@ -43,15 +43,8 @@ async function ask() {
 
     const uId = cookieValueId;
    
- const que1 = `query { usersPermissionsUser (id: ${uId}){
-    data {
-      id attributes{
-        askeds{data{id}}
-      }
-    }}}`
-    const d1 = await SendTo(que1) 
-    .then()
-    const r = d1.data.usersPermissionsUser.data.attributes.askeds.data;
+    const d1 = await sendToSer({ uid: uId }, '43UserById', null, null, false, fetch);
+    const r = d1?.data?.usersPermissionsUser?.data?.attributes?.askeds?.data ?? [];
     if (r.length > 0) {
         const p = r.map(c => c.id);
         askedarr = p;
@@ -76,35 +69,11 @@ async function ask() {
     }
   const as = askedarr;
     as.push(`${data.mId}`);  
- let que = `mutation { updateUsersPermissionsUser(
-    id: "${uId}"
-      data: { askeds: [${as}] }
-
-  ){
-      data {
-        attributes{
-          askeds{
-            data{
-              id
-            }
-          }
-        }
-      }
-  }
-  createAsk(
-      data:{ open_mission: ${data.mId},
-            project: ${inD.attributes.project.data.id},
-            users_permissions_user: ${uId},
-            publishedAt: "${d.toISOString()}",
-            ${myvote}
-    }
-  ){
-    data {id}
-  }
-}`
- const d2 = await SendTo(que) 
-    .then()
-    const r2 = d2.data
+ // Update user askeds
+ await sendToSer({ uid: uId, askeds: as.map(x => x.toString()) }, '44UpdateUserAskeds', null, null, false, fetch);
+ // Create Ask
+ const d2 = await sendToSer({ open_mission: data.mId, project: inD.attributes.project.data.id, users_permissions_user: uId, publishedAt: d.toISOString() }, '45CreateAsk', null, null, false, fetch);
+ const r2 = d2.data
     console.log(r2)
     if (r2 != null){
       let restime = inD.attributes.project.data.attributes.restime
@@ -122,8 +91,7 @@ async function ask() {
           data {id}
         }
       }`
-    const d3 = await SendTo(quee)
-    .then()
+    const d3 = await sendToSer({ date: fd.toISOString(), whatami: 'ask', ask: hiluzId }, '32createTimeGrama', null, null, false, fetch);
     const r3 = d3.data
     console.log(r3)
     if (r3 != null){
