@@ -1,6 +1,6 @@
 <script>
  import { pinch } from 'svelte-gestures';
-  import * as animateScroll from "svelte-scrollto-element";
+  import { scrollTo } from "svelte-scrollto-element";
     	import { Drawer } from 'vaul-svelte';
   import { ProgressBar } from "progressbar-svelte";
  import { goto } from '$app/navigation';
@@ -479,7 +479,7 @@ const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
     let top = $state();
 function tomodal(){
   modal = false;
-  animateScroll.scrollToTop()
+  scrollTo({ top: 0 });
   onModal?.()
 console.log("oh")
 }
