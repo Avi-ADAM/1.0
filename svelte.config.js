@@ -9,7 +9,7 @@ if (process.env.ADAPTER === 'vercel') {
   config = {
     kit: {
       adapter: vercel({
-        runtime: 'nodejs18.x'
+        runtime: 'nodejs20.x'
       })
     },
     vite: {
