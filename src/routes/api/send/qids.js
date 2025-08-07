@@ -328,6 +328,7 @@ export const qids = {
 "29GetOpenMissionsNonregTr": `query GetOpenMissionsNonregTr($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
+      id
       attributes{ 
         descrip
         archived noofhours perhour iskvua sqadualed dates
@@ -350,6 +351,7 @@ export const qids = {
 "30GetOpenMissionsNonreg": `query GetOpenMissionsNonreg($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
+      id
       attributes{ 
         descrip
         archived noofhours perhour iskvua sqadualed dates

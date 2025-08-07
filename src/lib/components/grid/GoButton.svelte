@@ -5,8 +5,10 @@
   const go = {'he':'לדף המשימה', 'en':"go to mission page"}
   let { id } = $props();
     function gotoM(){
-        goto('/availableMission/'+id)
+        if (id) {
+            goto('/availableMission/'+id)
+        }
     }
 </script>
-<button onclick={gotoM} title={go[$lang]} class="hover:scale-125 transition-all">
+<button onclick={gotoM} title={go[$lang]} class="hover:scale-125 transition-all" disabled={!id}>
   <Arrow back={$lang !== "he"}/></button>
