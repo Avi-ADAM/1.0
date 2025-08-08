@@ -5,7 +5,30 @@ import tailwindcss from "@tailwindcss/vite";
 /** @type {import('vite').UserConfig} */
 const config = {
   ssr: {
-    noExternal: ['three', 'troika-three-text']
+    noExternal: [
+      'three', 
+      'troika-three-text',
+      'd3-array',
+      'd3-format',
+      'd3-geo',
+      'd3-hierarchy',
+      'd3-scale',
+      'd3-shape',
+      'layercake',
+      'topojson-client'
+    ]
+  },
+  optimizeDeps: {
+    include: [
+      'd3-array',
+      'd3-format',
+      'd3-geo',
+      'd3-hierarchy',
+      'd3-scale',
+      'd3-shape',
+      'layercake',
+      'topojson-client'
+    ]
   },
   plugins: [/*sentrySvelteKit({
       sourceMapsUploadOptions: {

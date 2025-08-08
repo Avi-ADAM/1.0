@@ -14,7 +14,18 @@ if (process.env.ADAPTER === 'vercel') {
     },
     vite: {
       optimizeDeps: {
-        include: ['just-throttle', 'dayjs']
+        include: [
+          'just-throttle', 
+          'dayjs',
+          'd3-array',
+          'd3-format',
+          'd3-geo',
+          'd3-hierarchy',
+          'd3-scale',
+          'd3-shape',
+          'layercake',
+          'topojson-client'
+        ]
       }
     }
   };
