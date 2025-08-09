@@ -1,9 +1,15 @@
 <script>
      import { userName } from '../../stores/store.js';
     import { show } from './store-show.js';
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
-  let userName_value;
+/**
+ * @typedef {Object} Props
+ * @property {(payload: { tx: number, txx: number }) => void} [onProgres]
+ */
+
+/** @type {Props} */
+let { onProgres } = $props();
+
+  let userName_value = $state();
 let show_value = 0;
 
 userName.subscribe(value => {
@@ -16,10 +22,10 @@ show_value = newValue;
 
 function increment() {
       show.update(n => n + 1);
-      dispatch ('progres',{
+      onProgres?.({
 		tx: 0,
 		txx: 10
-	} )
+	} );
   }
 </script>
 
@@ -34,7 +40,7 @@ function increment() {
    <div  class="input-2">
    <input type="date" class="input">
    </div>
-   <button class="button-in" on:click="{increment}">
+   <button class="button-in" onclick={increment}>
 להמשיך      </button>
 
 

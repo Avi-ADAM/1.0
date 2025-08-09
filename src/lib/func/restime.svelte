@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 export function restim(restime){
     let x = 0
      if (restime == "feh") {

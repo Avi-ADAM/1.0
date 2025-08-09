@@ -1,22 +1,30 @@
 <script>
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte';
   import { Calendar } from '@fullcalendar/core';
   import dayGridPlugin from '@fullcalendar/daygrid';
   import timeGridPlugin from '@fullcalendar/timegrid';
   import interactionPlugin from '@fullcalendar/interaction';
   import { lang } from '$lib/stores/lang';
-  const dispatch = createEventDispatcher();
   
-  export let projectId;
-  export let timersData = null;
   
-  let calendarEl;
-  let calendar;
-  export let isLoading = true;
-  let expandedTimer = null;
+  let calendarEl = $state();
+  let calendar = $state();
+  /**
+   * @typedef {Object} Props
+   * @property {any} projectId
+   * @property {any} [timersData]
+   * @property {boolean} [isLoading]
+   * @property {(payload: { timerId: any; timerData: any; mesimabetahalich: any; }) => void} [onTimerClick]
+   * @property {(payload: any) => void} [onShowTaskDetails]
+   * @property {(payload: any) => void} [onShowActsDetails]
+   */
+
+  /** @type {Props} */
+  let { projectId, timersData = null, isLoading = $bindable(true), onTimerClick, onShowTaskDetails, onShowActsDetails } = $props();
+  let expandedTimer = $state(null);
   let tooltipEl = null;
-  let showTimerModal = false;
-  let selectedTimerData = null;
+  let showTimerModal = $state(false);
+  let selectedTimerData = $state(null);
   
   // טקסטים בשפות שונות
   const texts = {
@@ -80,7 +88,7 @@
     }
   };
   
-  $: currentTexts = texts[$lang] || texts.he;
+  let currentTexts = $derived(texts[$lang] || texts.he);
   
   // פונקציה להמרת ISO string לאובייקט Date
   function parseISODate(isoString) {
@@ -199,7 +207,7 @@
     showTimerModal = true;
     
     // שליחת אירוע למרכיב ההורה עם פרטי הטיימר
-    dispatch('timerClick', selectedTimerData);
+    onTimerClick?.(selectedTimerData);
   }
   
   function handleEventHover(info) {
@@ -254,12 +262,12 @@
   
   function handleTaskDetails(taskData) {
     console.log('נלחץ nahnv:', taskData);
-    dispatch('showTaskDetails', { mesimabetahalich: taskData });
+    onShowTaskDetails?.(taskData);
   }
   
   function handleActsDetails(acts) {
     console.log('פרטי מטלות:', acts);
-    dispatch('showActsDetails', { acts });
+    onShowActsDetails?.(acts);
   }
   
   onMount(() => {
@@ -275,13 +283,15 @@
   });
   
   // עדכון הלוח כאשר הנתונים או השפה משתנים
-  $: if (timersData && calendar) {
-    const timers = timersData.project.data.attributes.timers.data;
-    const events = createCalendarEvents(timers);
-    calendar.setOption('events', events);
-    calendar.setOption('locale', $lang === 'he' ? 'he' : 'en');
-    calendar.setOption('direction', $lang === 'he' ? 'rtl' : 'ltr');
-  }
+  $effect(() => {
+    if (timersData && calendar) {
+      const timers = timersData.project.data.attributes.timers.data;
+      const events = createCalendarEvents(timers);
+      calendar.setOption('events', events);
+      calendar.setOption('locale', $lang === 'he' ? 'he' : 'en');
+      calendar.setOption('direction', $lang === 'he' ? 'rtl' : 'ltr');
+    }
+  });
 </script>
 
 <!-- הקומפוננטה עם הנתונים -->
@@ -328,7 +338,7 @@
       <div class="space-y-4">
         {#each timersData.project.data.attributes.timers.data as timer}
           {@const timerData = timer.attributes}
-          {@const mesimabetahalich = timerData.mesimabetahalich?.data?.attributes}
+          {@const mesimabetahalich = timerData.mesimabetahalich?.data ? { ...timerData.mesimabetahalich.data.attributes, id: timerData.mesimabetahalich.data.id } : {}}
           
           <div class="border rounded-lg p-4 bg-gray-50 transition-all duration-200 
               {expandedTimer === timer.id ? 'ring-2 ring-blue-500 bg-blue-50' : ''}">
@@ -377,7 +387,7 @@
               <div class="flex flex-col gap-2">
                 <button
                   class="px-3 py-1 bg-blue-600 text-white rounded text-sm hover:bg-blue-700 transition-colors"
-                  on:click={() => handleTaskDetails(mesimabetahalich)}
+                  onclick={() => handleTaskDetails(mesimabetahalich)}
                 >
                   {currentTexts.taskDetails}
                 </button>
@@ -385,7 +395,7 @@
                 {#if timerData.acts?.data?.length > 0}
                   <button
                     class="px-3 py-1 bg-green-600 text-white rounded text-sm hover:bg-green-700 transition-colors"
-                    on:click={() => handleActsDetails(timerData.acts.data)}
+                    onclick={() => handleActsDetails(timerData.acts.data)}
                   >
                     {currentTexts.taskDetailsTitle}
                   </button>
@@ -393,7 +403,7 @@
                 
                 <button
                   class="px-3 py-1 bg-gray-600 text-white rounded text-sm hover:bg-gray-700 transition-colors"
-                  on:click={() => toggleTimerExpansion(timer.id)}
+                  onclick={() => toggleTimerExpansion(timer.id)}
                 >
                   {expandedTimer === timer.id ? currentTexts.hide : currentTexts.expand}
                 </button>
@@ -435,15 +445,15 @@
 
 <!-- מודאל פרטי טיימר -->
 {#if showTimerModal && selectedTimerData}
-  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" on:keypress={(e) => e.key === 'Escape' && closeModal()} on:click={closeModal}>
-    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" on:click|stopPropagation dir={$lang === 'he' ? 'rtl' : 'ltr'} >
+  <div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50" onkeypress={(e) => e.key === 'Escape' && closeModal()} onclick={closeModal}>
+    <div class="bg-white rounded-lg p-6 max-w-2xl w-full mx-4 max-h-[80vh] overflow-y-auto" onclick={(e) => e.stopPropagation()} dir={$lang === 'he' ? 'rtl' : 'ltr'} >
       <div class="flex justify-between items-center mb-4">
         <h3 class="text-xl font-semibold">
           {selectedTimerData.mesimabetahalich?.name || currentTexts.noTaskName}
         </h3>
         <button 
           class="text-gray-500 hover:text-gray-700 text-xl"
-          on:click={closeModal}
+          onclick={closeModal}
         >
           ×
         </button>
@@ -518,13 +528,13 @@
         <div class="flex justify-end gap-2 pt-4 border-t">
           <button
             class="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
-            on:click={() => handleTaskDetails(selectedTimerData.mesimabetahalich)}
+            onclick={() => handleTaskDetails(selectedTimerData.mesimabetahalich)}
           >
             {currentTexts.taskDetails}
           </button>
           <button
             class="px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
-            on:click={closeModal}
+            onclick={closeModal}
           >
             {currentTexts.close}
           </button>

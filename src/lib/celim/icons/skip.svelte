@@ -1,5 +1,11 @@
 <script>
-    export let height = "5vh"
+  /**
+   * @typedef {Object} Props
+   * @property {string} [height]
+   */
+
+  /** @type {Props} */
+  let { height = "5vh" } = $props();
 </script>
 
   <svg  {height} viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="#000000" transform="matrix(-1, 0, 0, 1, 0, 0)">

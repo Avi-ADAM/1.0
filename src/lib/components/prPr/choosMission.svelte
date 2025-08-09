@@ -1,23 +1,33 @@
 <script>
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   import MultiSelect from 'svelte-multiselect';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import { showFoot } from '$lib/stores/showFoot';
-    import { createEventDispatcher } from 'svelte';
     import {lang } from '$lib/stores/lang.js' 
     import {mi} from './mi.js'
     import { skil, ww, role } from './mi.js';
   import Button from '$lib/celim/ui/button.svelte';
   import Mission from "./mission.svelte";
   import { idPr } from '../../stores/idPr.js'
- const dispatch = createEventDispatcher();
- export let pn, pl, restime,projectUsers, alit;
+
+/**
+ * @typedef {Object} Props
+ * @property {any} pn
+ * @property {any} pl
+ * @property {any} restime
+ * @property {any} projectUsers
+ * @property {any} alit
+ * @property {() => void} [onClose] - Callback when the component should close.
+ */
+
+/** @type {Props} */
+ let { mission1 = [], children, pn, pl, restime, projectUsers, alit, onClose, selected = $bindable([]) } = $props();
  const baseUrl = import.meta.env.VITE_URL
 
- let newcontent = true;
-let newcontentR = true;
-let newcontentW = true;
+ let newcontent = $state(true);
+let newcontentR = $state(true);
+let newcontentW = $state(true);
 let error8
 async function findT() {
     /*TODO: כאשר מחפשים כישורים וכן לגבי כל שאר האובייקטים להציג את היגרסה העברית והאנגלית כך שהחיפוש יוכל למצוא את כולן*/ 
@@ -57,7 +67,7 @@ async function findT() {
         .then(parseJSON);
     let  skills2 = res.data.skills.data;
       if ($lang == 'he') {
-        for (var i = 0; i < skills2.length; i++) {
+        for (let i = 0; i < skills2.length; i++) {
           if (skills2[i].attributes.localizations.data.length > 0) {
             skills2[i].attributes.skillName =
               skills2[i].attributes.localizations.data[0].attributes.skillName;
@@ -67,7 +77,7 @@ async function findT() {
       skills2 = skills2;
      let roles = res.data.tafkidims.data;
       if ($lang == 'he') {
-        for (var i = 0; i < roles.length; i++) {
+        for (let i = 0; i < roles.length; i++) {
           if (roles[i].attributes.localizations.data.length > 0) {
             roles[i].attributes.roleDescription =
               roles[
@@ -79,7 +89,7 @@ async function findT() {
       roles = roles;
     let  workways2 = res.data.workWays.data;
       if ($lang == 'he') {
-        for (var i = 0; i < workways2.length; i++) {
+        for (let i = 0; i < workways2.length; i++) {
           if (workways2[i].attributes.localizations.data.length > 0) {
             workways2[i].attributes.workWayName =
               workways2[
@@ -101,13 +111,10 @@ async function findT() {
     }
 }
 
-export let selected = [];
-
-export let mission1 = [];
 
 
 function find_mission_id(mission_name_arr){
-     var  arr = [];
+     let  arr = [];
       for (let j = 0; j< mission_name_arr.length; j++ ){
       for (let i = 0; i< mission1.length; i++){
         if(mission1[i].attributes.missionName === mission_name_arr[j]){
@@ -117,26 +124,26 @@ function find_mission_id(mission_name_arr){
       }
       return arr;
 };
-let moving = [];
+let moving = $state([]);
 const placeholder = {"he":`בחירה מרשימה או יצירת חדשה`,"en":"choose from list or create new"};
 
 
 const head = {"he":"הוספת משימות הנדרשות לתפקוד הריקמה","en":"choose missions that require to initiate or to oporate the FreeMate"}
-let id = 0
-$: ugug = ``;
- $: addn = {"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`}
- let name = ""
+let id = $state(0)
+let ugug = $state(``);
+let addn = $derived({"he":`יצירת משימה חדשה: "${ugug}"`,"en": `Create new mission: "${ugug}"`});
+let name = $state("")
  function add(){
   let isNew = false
   if (selected.length > 0) {
-    before = true
+    before = true;
           before = false;
           findT()
           
   if (!mission1.map(c => c.attributes.missionName).includes(selected[0])){
     isNew = true
     name = selected[0]
-    id = 0
+    id = 0;
   }else{
     name = selected[0]   
     id = find_mission_id(selected)
@@ -144,25 +151,25 @@ $: ugug = ``;
 
  }
 }
- $: before = true
+let before = $state(true);
  const mn = {
   "he": "שם המשימה",
   "en": "mission name"
 }
 
-let noRiset = true
-let showMobileModal = false;
+let noRiset = $state(true)
+let showMobileModal = $state(false);
 
 function openMobileModal() {
   showMobileModal = true;
-  if ($page.data.isDesktop === false) {
+  if (page.data.isDesktop === false) {
     showFoot.set(false);
   }
 }
 
 function closeMobileModal() {
   showMobileModal = false;
-  if ($page.data.isDesktop === false) {
+  if (page.data.isDesktop === false) {
     showFoot.set(true);
   }
 }
@@ -170,19 +177,19 @@ function closeMobileModal() {
 </script>
 
 <div dir="{$lang == 'he' ? 'rtl' : 'ltr'}" >
-  <slot>
+  {#if children}{@render children()}{:else}
 <h2 class="text-barbi font-bold">{head[$lang]}</h2>
-  </slot>
+  {/if}
             {#if before}
         <h3>{mn[$lang]}</h3>
       {/if}
       {#if before && noRiset}
-      {#if $page.data.isDesktop}
-      <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
+      <div  class=" w-full flex-row	flex items-center justify-center space-x-2">
           <MultiSelect
           closeDropdownOnSelect='desktop'
-          ulOptionsClass="bg-gold"
-          liSelectedClass='bg-barbi text-gold'
+          outerDivClass="!bg-gold !text-barbi"
+          inputClass="!bg-gold !text-barbi"
+          liSelectedClass="!bg-barbi !text-gold"
         loading={mission1.length > 0 ? false : true}
         createOptionMsg={addn[$lang]}
         allowUserOptions={"append"}
@@ -193,10 +200,10 @@ function closeMobileModal() {
         maxSelect={1}
           />
           {#if selected[0]}
-        <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
+        <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
         {/if}</div>
-        {:else}
-        <Button on:click={openMobileModal}>{placeholder[$lang]}</Button>
+      <!--  {:else}
+        <Button onClick={openMobileModal} text={placeholder} />
 
         <MobileModal isOpen={showMobileModal} title={placeholder[$lang]}>
           <div  class=" w-full flex-row	flex items-center justify-center  space-x-2">
@@ -206,8 +213,8 @@ function closeMobileModal() {
             ulOptionsClass="bg-gold"
             liSelectedClass='bg-barbi text-gold'
           loading={mission1.length > 0 ? false : true}
-          on:focus={() => {!$page?.data?.isDesktop ?  showFoot.set(false) : null}}
-          on:blur={() => {!$page?.data?.isDesktop ?  showFoot.set(true) : null}}
+          onFocus={() => {!page?.data?.isDesktop ?  showFoot.set(false) : null}}
+          onBlur={() => {!page?.data?.isDesktop ?  showFoot.set(true) : null}}
           createOptionMsg={addn[$lang]}
           allowUserOptions={"append"}
            bind:searchText={ugug}
@@ -217,10 +224,10 @@ function closeMobileModal() {
           maxSelect={1}
             />
             {#if selected[0]}
-          <Button on:click={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
+          <Button onClick={add} ><Arrow back={$lang == "en" ? true : false}/></Button>
           {/if}</div>
         </MobileModal>
-      {/if}
+      {/if}-->
         {/if}
 {#if before == false}
         <Mission    
@@ -236,9 +243,6 @@ function closeMobileModal() {
         userslength={projectUsers.length}
         vallues={alit}
         projectId={$idPr}
-        on:close={()=>dispatch('close')}/>
+        onClose={onClose}/>
         {/if}
  </div>
-
-
-

@@ -1,14 +1,26 @@
 <script>
     import { onMount } from 'svelte';
- import { createEventDispatcher } from 'svelte';
   import { RingLoader
 } from 'svelte-loading-spinners'
 
- const dispatch = createEventDispatcher();
   let token; 
-export let meData = [];
+
+/**
+ * @typedef {Object} ClosePayload
+ * @property {any} id
+ * @property {any} name
+ * @property {any} skob
+ */
+
+/**
+ * @typedef {Object} Props
+ * @property {(payload: ClosePayload) => void} [onClose] - Callback for the close event.
+ */
+
+/** @type {Props} */
+let { onClose, meData = [] } = $props();
   let miDatan = [];
-    let error1 = null;
+    let error1 = $state(null);
 
   onMount(async () => {
     const id = meData.id
@@ -24,7 +36,7 @@ export let meData = [];
     meData.dates !== undefined || null || 0 ? meData.dates : new Date().toISOString().slice(0, -1);
     meData.datef !== undefined || null || 0 ? meData.datef :  new Date(new Date().setFullYear(new Date().getFullYear() + 2)).toISOString().slice(0, -1);
 }
- let already = false;
+ let already = $state(false);
  let idL;
 const baseUrl = import.meta.env.VITE_URL
 
@@ -78,7 +90,7 @@ async function han (){
   .then(r => r.json())
   .then(data => miDatan = data);
          console.log(miDatan)
-             dispatch('close', {
+             onClose?.({
                  id: miDatan.data.updateSp.data.id,
                  name: miDatan.data.updateSp.data.attributes.name,
                  skob: miDatan.data.updateSp.data
@@ -90,8 +102,8 @@ async function han (){
 }
 
 
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
 function myMissionH ()  {
   ky = false;
@@ -156,6 +168,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >משאבים שנבחרו</h1>
     </caption>
+    <tbody>
         <tr class="gg">
          <tr class="ggr">
       <th class="ggr">שם</th>
@@ -200,7 +213,7 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
       <th>סוג</th>
       <td>
       
-        <select  bind:value={meData.kindOf} on:change={() => myMissionH()} class="round form-select appearance-none
+        <select  bind:value={meData.kindOf} onchange={() => myMissionH()} class="round form-select appearance-none
       block
       w-full
       px-3
@@ -256,13 +269,14 @@ const re = {"he": "השכרה לזמן קצוב", "en": "rent"}
   <span class='line'></span>
 </div></td>
   </tr>
+</tbody>
 </table>
 </div>
 <div>
     {#if already === false}
   <button 
   class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-  on:click={han}
+  onclick={han}
   >פרסום משאבים</button>
   {:else}
            <RingLoader size="80" color="#ff00ae" unit="px" duration="2s"></RingLoader>

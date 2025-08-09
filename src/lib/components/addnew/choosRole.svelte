@@ -2,17 +2,15 @@
 import MultiSelect from 'svelte-multiselect';
 import { missionNew } from '../../stores/missionNew';
   import { onMount } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
              import { lang } from '$lib/stores/lang.js'
 const baseUrl = import.meta.env.VITE_URL
 
- const dispatch = createEventDispatcher();
 function inc() {
      missionNew.set(find_role_id(selected));
   };
-  let roles1 = [];
+  let roles1 = $state([]);
   let error1 = null;
-   let loading = true
+   let loading = $state(true)
   function find_role_id(role_name_arr){
    var  arr = [];
     for (let j = 0; j< role_name_arr.length; j++ ){
@@ -66,7 +64,7 @@ const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       }
   });
 
-export let selected = [];
+  let { selected = $bindable([]) } = $props();
       const placeholder = `${$lang == "he" ? "בחירת תפקידים נדרשים" : "needed roles"}`;
 
 const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed roles"}
@@ -79,7 +77,7 @@ const adds = {"he":"בחירת תפקידים נדרשים","en": "Add needed ro
   <lebel for="choos">{adds[$lang]}</lebel>
 <MultiSelect
 id="choos"
-  on:change={inc}
+  onChange={inc}
 bind:selected
 {placeholder}
           noMatchingOptionsMsg={nom[$lang]}

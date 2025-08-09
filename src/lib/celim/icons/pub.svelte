@@ -36,7 +36,7 @@
       inkscape:window-y="116"
       inkscape:window-height="510"
       inkscape:pageopacity="0.0"
-  />
+></sodipodi:namedview>
   <g
       id="g3"
     >
@@ -252,10 +252,10 @@
         >
         <dc:type
             rdf:resource="http://purl.org/dc/dcmitype/StillImage"
-        />
+></dc:type>
         <cc:license
             rdf:resource="http://creativecommons.org/licenses/publicdomain/"
-        />
+></cc:license>
         <dc:publisher
           >
           <cc:Agent
@@ -327,13 +327,13 @@
         >
         <cc:permits
             rdf:resource="http://creativecommons.org/ns#Reproduction"
-        />
+></cc:permits>
         <cc:permits
             rdf:resource="http://creativecommons.org/ns#Distribution"
-        />
+></cc:permits>
         <cc:permits
             rdf:resource="http://creativecommons.org/ns#DerivativeWorks"
-        />
+></cc:permits>
       </cc:License
       >
     </rdf:RDF

@@ -2,8 +2,8 @@
   import Amana1 from "$lib/components/main/amanaen.svelte"
  
     import { lang , doesLang} from '$lib/stores/lang.js'
-  // import { page } from '$app/stores'
-    //const emaili = $page.url.searchParams.get('code')
+  // import { page } from '$app/state'
+    //const emaili = page.url.searchParams.get('code')
       import { goto } from '$app/navigation';
 
       import { userName } from '$lib/stores/store.js';
@@ -13,7 +13,7 @@
   import { onMount } from 'svelte';
       import { email } from '$lib/components/registration/email.js'
 
-  let idx = 1;
+  let idx = $state(1);
 let error;
 const baseUrl = import.meta.env.VITE_URL
 
@@ -80,9 +80,9 @@ onMount(async () => {
 
              
     });
-	let user;
+	let user = $state();
 
-   let kvar;
+   let kvar = $state();
     onMount(async () => {
     if (document.cookie) {
      
@@ -131,7 +131,7 @@ const cookieValueti = document.cookie
     );
 
 
-  let regHelperL = 0;
+  let regHelperL = $state(0);
 
   
 regHelper.subscribe(value => {
@@ -169,25 +169,6 @@ todo: אמנה חתומה ל5 שניות ואז להעביר לעמוד הבית
 	
 <style>
 
-:global(.multiselect) {
-  color:#02a2ff;
-  /* top-level wrapper div */
-}
-
-:global(li.selected) {
-  border: var(--sms-focus-border, 1pt solid var(--sms-active-color, cornflowerblue))
-  /* selected options in the dropdown list */
-}
-:global(li:not(.selected):hover) {
-  color: #FF0092;
-  /* unselected but hovered options in the dropdown list */
-}
-
-:global(li.active) {
-  color:#EEE8AA;
-  /* active means element was navigated to with up/down arrow keys */
-  /* ready to be selected by pressing enter */
-}
 
 	:root {
   --primary-light: #a6f9d6;

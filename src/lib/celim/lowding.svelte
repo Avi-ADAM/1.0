@@ -1,7 +1,13 @@
 <script>
-export let width = "100%" ;
-export let height = "100%";
-export let color = "var(--barbi-pink)"
+  /**
+   * @typedef {Object} Props
+   * @property {string} [width]
+   * @property {string} [height]
+   * @property {string} [color]
+   */
+
+  /** @type {Props} */
+  let { width = "100%", height = "100%", color = "var(--barbi-pink)" } = $props();
     </script>
 <style>
 #svg2003{
@@ -56,7 +62,7 @@ export let color = "var(--barbi-pink)"
    inkscape:version="0.92.4 (5da689c313, 2019-01-14)"><metadata
      id="metadata2009"><rdf:RDF><cc:Work
          rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
      id="defs2007"><clipPath
        clipPathUnits="userSpaceOnUse"
        id="clipPath2019"><path
@@ -81,7 +87,7 @@ export let color = "var(--barbi-pink)"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g2011" /><g
+     inkscape:current-layer="g2011"></sodipodi:namedview><g
      id="g2011"
      inkscape:groupmode="layer"
      inkscape:label="1122"

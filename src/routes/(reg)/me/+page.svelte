@@ -1,9 +1,7 @@
-
 <script>
-	import Dialog from '$lib/celim/ui/dialog.svelte';
-	import { isMobileOrTablet } from '$lib/utilities/device';
+  import Dialog from '$lib/celim/ui/dialog.svelte';
+  import { isMobileOrTablet } from '$lib/utilities/device';
     import { liUN } from '$lib/stores/liUN.js';
-
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Close from '$lib/celim/close.svelte';
   import Lowding from '$lib/celim/lowding.svelte';
@@ -14,7 +12,7 @@
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
   import { onMount } from 'svelte';
   import axios from 'axios';
-	import { draw } from 'svelte/transition';
+  import { draw } from 'svelte/transition';
  import Addnew from '$lib/components/addnew/baci.svelte';
 import Addnewp from '$lib/components/userPr/uploadPic.svelte';
   import { uPic } from '$lib/stores/uPic.js';
@@ -27,13 +25,14 @@ import { idPr } from '$lib/stores/idPr.js';
   import { goto } from '$app/navigation';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, scale } from 'svelte/transition';
-  let iwant = false;
-let isOpen = false;
-  let isG = false;
-  let current = '';
+  let iwant = $state(false);
+let isOpen = $state(false);
+let isOpenM = $state(false);
+  let isG = $state(false);
+  let current = $state('');
 
     let url1 = `${baseUrl}/api/upload`;
-    let updX = 0;
+    let updX = $state(0);
   let token;
   let files;
   let idLi;
@@ -43,26 +42,26 @@ let isOpen = false;
   let mash = [];
   let val = [];
   let work = [];
-  let total = 0;
+  let total = $state(0);
   let odata = [];
     let allvn;
   let picLink =
-    'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
+    $state('https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png');
   let idL;
-  let addSl = false;
-let addSl1 = false;
-let addSl2 = false;
-let addSl3 = false;
-let addSl4 = false;
-let addSl5 = false;
- let a = 0;
-let addNs1 = true;
+  let addSl = $state(false);
+let addSl1 = $state(false);
+let addSl2 = $state(false);
+let addSl3 = $state(false);
+let addSl4 = $state(false);
+let addSl5 = $state(false);
+ let a = $state(0);
+let addNs1 = $state(true);
   let error1 = null;
-  let addpic = 0;
-  let addP = false;
-    let st = 0;
-    let stylef = '31px';
-    let meData = start();
+  let addpic = $state(0);
+  let addP = $state(false);
+    let st = $state(0);
+    let stylef = $state('31px');
+    let meData = $state(start());
     function isUCBrowser() {
     return /UCWEB|UCBrowser/i.test(navigator.userAgent);
 }
@@ -138,20 +137,41 @@ let addNs1 = true;
     token = cookieValue;
     let bearer1 = 'bearer' + ' ' + token;
     let link = `${baseUrl}/api/users/${idLi}`;
-  //  let fd = new FormData();
-     //   fd.append('files', files[0]);
+    // Check if FormData is empty
+    let hasFiles = false;
+    for (let pair of files.entries()) {
+        hasFiles = true;
+        break;
+    }
+
+    if (!hasFiles) {
+        const msg = {
+            he: 'נא לבחור קובץ להעלאה',
+            en: 'Please select a file to upload'
+        };
+        toast.warning(msg[$lang]);
+        return;
+    }
+
       axios
       .post(url1, files, {
                     headers: {
           Authorization: bearer1
+          // 'Content-Type': 'multipart/form-data' is automatically set by axios for FormData
         }
                 })
                 .then(({ data }) => {
                     const imageId = data[0].id;
+                    console.log(imageId);
         sendpg(imageId);
      })
       .catch((error) => {
-        console.log('צריך לתקן:', error.response);
+        console.log('An error occurred:', error.response);
+        const msg = {
+          he: error.response?.data?.message || 'שגיאה בהעלאת קובץ',
+          en: error.response?.data?.message || 'Error uploading file'
+        };
+        toast.error(msg[$lang]);
                 });
   }
 
@@ -198,26 +218,26 @@ let addNs1 = true;
         .then((r) => r.json())
         .then((data) => (res = data.data.updateUsersPermissionsUser.data));
       console.log(res);
-            uPic.set(res.attributes.profilePic.data.attributes.formats.thumbnail.url);
+            uPic.set(res.attributes.profilePic.data.attributes.formats?.thumbnail?.url || res.attributes.profilePic.data.attributes.url);
       picLink = $uPic;
-            uPic.set(res.attributes.profilePic.data.attributes.formats.small.url);
+            uPic.set(res.attributes.profilePic.data.attributes.formats?.small?.url || res.attributes.profilePic.data.attributes.url);
       picLink = $uPic;
     updX = 0;
-    isOpen = false;
+    isOpenM = false;
     a = 0;
         } catch (e) {
       error1 = e;
         }
     }
-    let meDataa = [];
-  let load = false;
+    let meDataa = $state([]);
+  let load = $state(false);
   function project(id) {
     load = true;
     idPr.set(id);
     goto('/moach');
   }
-  let mail, lango;
-  let cards = true;
+  let mail = $state(), lango;
+  let cards = $state(true);
   async function start() {
     const cookieValue = document.cookie
   .split('; ')
@@ -272,12 +292,28 @@ let addNs1 = true;
       if (meDataa.data != null) {
         if (meDataa.data.me.id === idL && meDataa.data.me != null) {
           if (
-            meDataa.data.usersPermissionsUser.data.attributes
-              .profilManualAlready != true
+            meDataa.data.usersPermissionsUser.data.attributes.profilManualAlready != true
           ) {
             showSaveDialog = true; // Show dialog instead of running directly
           }
+          console.log(meDataa.data.usersPermissionsUser.data.attributes)
           meData = meDataa.data.usersPermissionsUser.data.attributes;
+          // Initialize selected2 for the data arrays themselves
+          if (meData.skills && meData.skills.data && meData.skills.data.selected2 === undefined) {
+            meData.skills.data.selected2 = [];
+          }
+          if (meData.tafkidims && meData.tafkidims.data && meData.tafkidims.data.selected2 === undefined) {
+            meData.tafkidims.data.selected2 = [];
+          }
+          if (meData.sps && meData.sps.data && meData.sps.data.selected2 === undefined) {
+            meData.sps.data.selected2 = [];
+          }
+          if (meData.vallues && meData.vallues.data && meData.vallues.data.selected2 === undefined) {
+            meData.vallues.data.selected2 = [];
+          }
+          if (meData.work_ways && meData.work_ways.data && meData.work_ways.data.selected2 === undefined) {
+            meData.work_ways.data.selected2 = [];
+          }
           isG =
             meDataa.data.usersPermissionsUser.data.attributes
               .profilManualAlready;
@@ -286,15 +322,25 @@ let addNs1 = true;
           letters(meData.username);
             lango = meData.lang;
           if (lango == 'en' || lango == 'he') {
-            lang.set(lango);
-            doesLang.set(true);
-            langUs.set(lango);
-              //add to coocies
-            document.cookie =
-              `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+            // Check if lang store is different from lango
+            if ($lang !== lango) {
+              lang.set(lango);
+              doesLang.set(true);
+              langUs.set(lango);
+              // Add to cookies
+              document.cookie = `lang=${lango}; expires=` + new Date(2026, 0, 1).toUTCString();
+              // Re-fetch data to include new lang data
+              await start();
+              return;
+            } else {
+              lang.set(lango);
+              doesLang.set(true);
+              langUs.set(lango);
+              document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
             }
+          }
           if ($lang == 'he') {
-            for (var i = 0; i < meData.vallues.data.length; i++) {
+            for (let i = 0; i < meData.vallues.data.length; i++) {
               if (
                 meData.vallues.data[i].attributes.localizations.data.length > 0
               ) {
@@ -306,7 +352,7 @@ let addNs1 = true;
               }
             }
           if ($lang == 'he') {
-            for (var i = 0; i < meData.skills.data.length; i++) {
+            for (let i = 0; i < meData.skills.data.length; i++) {
               if (
                 meData.skills.data[i].attributes.localizations.data.length > 0
               ) {
@@ -320,7 +366,7 @@ let addNs1 = true;
           meData = meData;
 
           if ($lang == 'he') {
-            for (var i = 0; i < meData.tafkidims.data.length; i++) {
+            for (let i = 0; i < meData.tafkidims.data.length; i++) {
               if (
                 meData.tafkidims.data[i].attributes.localizations.data.length >
                 0
@@ -334,7 +380,7 @@ let addNs1 = true;
             }
           meData = meData;
           if ($lang == 'he') {
-            for (var i = 0; i < meData.work_ways.data.length; i++) {
+            for (let i = 0; i < meData.work_ways.data.length; i++) {
               if (
                 meData.work_ways.data[i].attributes.localizations.data.length >
                 0
@@ -357,12 +403,12 @@ let addNs1 = true;
             githublink = meData.githublink;
           noMail = meData.noMail;
           if (meData.profilePic.data != null) {
-            uPic.set(meData.profilePic.data.attributes.formats.thumbnail.url);
+            uPic.set(meData.profilePic.data.attributes.formats?.thumbnail?.url || meData.profilePic.data.attributes.url);
             picLink = $uPic;
-            uPic.set(meData.profilePic.data.attributes.formats.small.url);
+            uPic.set(meData.profilePic.data.attributes.formats?.small?.url || meData.profilePic.data.attributes.url);
             picLink = $uPic;
             let b = '/ar_1.0,c_thumb,g_face,w_0.6,z_0.7/r_max';
-            var output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
+            let output = [picLink.slice(0, 48), b, picLink.slice(48)].join('');
             picLink = output;
             } else {
             picLink =
@@ -403,15 +449,15 @@ let addNs1 = true;
     restore: (value) => (meData = value)
   };
 function getCookie(name) {
-    var dc = document.cookie;
-    var prefix = name + '=';
-    var begin = dc.indexOf('; ' + prefix);
+    let dc = document.cookie;
+    let prefix = name + '=';
+    let begin = dc.indexOf('; ' + prefix);
     if (begin == -1) {
         begin = dc.indexOf(prefix);
         if (begin != 0) return null;
     } else {
         begin += 2;
-      var end = document.cookie.indexOf(';', begin);
+      let end = document.cookie.indexOf(';', begin);
         if (end == -1) {
         end = dc.length;
         }
@@ -433,16 +479,8 @@ function getCookie(name) {
 let userName_value;
 let biog;
 let frd;
-  let fblink, twiterlink, discordlink, githublink, noMail;
-  function sendD() {
-  //todo refresh data if lang changed
-    if (lango == 'en' || lango == 'he') {
-      lang.set(lango);
-      doesLang.set(true);
-      langUs.set(lango);
-            } else {
-      lango = 'ar';
-            }
+  let fblink = $state(), twiterlink = $state(), discordlink = $state(), githublink = $state(), noMail = $state();
+  async function sendD() {
     const cookieValue = document.cookie
   .split('; ')
       .find((row) => row.startsWith('jwt='))
@@ -478,42 +516,43 @@ let frd;
       )
       .then((response) => {
         meData = response.data;
-
+        isOpenM = false;
     isOpen = false;
     a = 0;
         start();
   //  updpic.set(0);
                   })
       .catch((error) => {
-        console.log('צריך לתקן:', error.response);
+        console.log('An error occurred:', error.response);
                 });
   }
 
 function callbackFunction(event) {
     a = 2;
-    files = event.detail.files;
+    files = event.files; // files is already a FormData object from the Addnewp component
     console.log(files);
     sendP();
-	}
-  	function callbackFunctio(event) {
+  }
+    function callbackFunctio(event) {
+      console.log(event)
     a = 2;
-    fblink = event.detail.fblink;
-     twiterlink = event.detail.twiterlink;
-     discordlink = event.detail.discordlink;
-     githublink = event.detail.githublink;
-    userName_value = event.detail.un;
-   // emailL = event.detail.em;
-    noMail = event.detail.noMail;
-    biog = event.detail.bi;
-    frd = event.detail.frd;
-    lango = event.detail.lango;
-    cards = event.detail.cards;
+    fblink = event.fblink;
+     twiterlink = event.twiterlink;
+     discordlink = event.discordlink;
+     githublink = event.githublink;
+    userName_value = event.un;
+// emailL = event.em;
+    noMail = event.noMail;
+    biog = event.bi;
+    frd = event.frd;
+    lango = event.lango;
+    cards = event.cards;
     sendD();
 }
 
   function remove(event) {
-  const miDatanew = event.detail.data;
-  const linkp = event.detail.linkp;
+  const miDatanew = event.data;
+  const linkp = event.linkp;
   addNs1 = false;
   meData[linkp].data = miDatanew;
     console.log(miDatanew, meData);
@@ -527,10 +566,11 @@ function callbackFunction(event) {
   }
 
   async function add(event) {
- const linkp = event.detail.linkp;
- const miDatanew = event.detail.data;
- const valc = event.detail.valc;
- const a = event.detail.a;
+    console.log(event);
+ const linkp = event.linkp;
+ const miDatanew = event.data;
+ const valc = event.valc;
+ const a = event.a;
  miDatanew.selected2 = [];
     console.log(miDatanew, meData);
  addNs1 = false;
@@ -549,9 +589,9 @@ function callbackFunction(event) {
   }
 
   async function addnew(event) {
-  const linkp = event.detail.linkp;
- const skob = event.detail.skob;
- const miDatanew = event.detail.data;
+  const linkp = event.linkp;
+ const skob = event.skob;
+ const miDatanew = event.data;
  miDatanew.push(skob);
  addNs1 = false;
  const meDatanew = meData;
@@ -568,6 +608,7 @@ function callbackFunction(event) {
   }
 const closer = () => {
     isOpen = false;
+    isOpenM = false;
     updX = 0;
   addpic = 0;
   a = 0;
@@ -577,7 +618,7 @@ const closer = () => {
       a = 1;
 }
   function openen() {
-  isOpen = true;
+  isOpenM = true;
   updX = 1;
   addpic = 1;
 }
@@ -588,7 +629,7 @@ const closer = () => {
  addSl3 = false;
  addSl4 = false;
  addSl5 = false;
- const a = event.detail.linkp;
+ const a = event.linkp;
   console.log(addSl);
     if (a == 'tafkidims') {
       current = 'a2';
@@ -614,22 +655,27 @@ const closer = () => {
 };
 
 function close (event){
-  const a = event.detail.linkp;
+  console.log(event);
+  const a = event.linkp;
+
+  if (event.list && event.list.selected2 === undefined) {
+    event.list.selected2 = [];
+  }
 
   if (a == "tafkidims"){
-    meData.tafkidims.data = event.detail.list
+    meData.tafkidims.data = event.list
   }
   else if (a == "skills"){
-    meData.skills.data = event.detail.list;
+    meData.skills.data = event.list;
   }
   else if (a == "vallues"){
-  meData.vallues.data = event.detail.list;
+  meData.vallues.data = event.list;
   }
   else if (a == "mashaabims"){
-   meData.sps.data = event.detail.list;
+   meData.sps.data = event.list;
   }
   else if (a == "workWays"){
-    meData.work_ways.data = event.detail.list;
+    meData.work_ways.data = event.list;
   }
   current = "l";
   meData = meData
@@ -642,23 +688,23 @@ function close (event){
 
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
-let mass = false;
+let mass = $state(false);
 
   function massss(event) {
     console.log('here');
-    if (event.detail.mass == true) {
+    if (event.mass == true) {
   mass = true;
-    } else if (event.detail.mass == false) {
+    } else if (event.mass == false) {
     mass = false;
   }
 }
-let messege;
+let messege = $state();
 let spid;
   function delm(event) {
   isOpen = true;
     a = 3;
-  const nj = event.detail.nj;
-    spid = event.detail.id;
+  const nj = event.nj;
+    spid = event.id;
     messege =
       $lang == 'he'
         ? `המשאב ${nj} ימחק האם להמשיך?`
@@ -752,8 +798,8 @@ const pls = {"he": "בחירת כישורים", "en": "choose skills"}
 const plm = {"he": "בחירת משאבים", "en": "choose resources"}
 const plw = {"he": "בחירת דרכי יצירה", "en": "choose ways of creation"}
 const plt = {"he": "בחירת תפקידים", "en": "choose roles"}
-let width,height
-let showSaveDialog = false;
+let width = $state(),height = $state()
+let showSaveDialog = $state(false);
 const dialogHeader = {
   he: "הצגת מדריך משתמש",
   en: "Show User Guide"
@@ -787,11 +833,11 @@ const clearButton = {
   {innerText} 
   {innerDialogButton}
   {clearButton}
-  on:save-timer={() => {
+  onSave-timer={() => {
     showSaveDialog = false;
     run();
   }}
-  on:clear-timer={() => {
+  onClear-timer={() => {
     showSaveDialog = false;
     isG = true; // Mark as viewed without showing
   }}
@@ -801,15 +847,15 @@ const clearButton = {
   <DialogContent aria-label="form" class="content">
     <div  style="z-index: 400;" dir="rtl" class="grid items-center justify-center text-center bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400">
              <button style="margin: 0 auto;" class=" hover:bg-barbi text-mturk rounded-full p-2"
-          on:click={closer}><Close/></button>
-          {#if a == 0}
-            <Addnewp on:message={callbackFunction} />
-          {:else if a == 1}
+          onclick={closer}><Close/></button>
+
+          {#if a == 1}
             <EditB
               machshirs={meData?.machshirs.data}
               projectIds={meData.projects_1s.data.map((c) => c.id)}
               bind:isGuidMe={isG}
               checked={cards}
+              lango={$lang}
               uid={meDataa.data.me.id}
               {fblink}
               {twiterlink}
@@ -820,14 +866,14 @@ const clearButton = {
               {mail}
               un={meData.username}
               bi={meData.bio}
-              on:message={callbackFunctio}
-              on:guid={guid}
+              onMessage={callbackFunctio}
+              onGuid={guid}
             />
           {:else if a == 3}
           <div class="grid items-center text-center justify-center"><h3 class="text-barbi">{messege}</h3>
           <button
   class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
-  on:click={han}
+  onclick={han}
   >{deletew[$lang]}</button>
           </div>
           {:else if a == 2}
@@ -839,7 +885,18 @@ const clearButton = {
   </DialogContent>
   </div>
 </DialogOverlay>
-
+{#if a == 0 && isOpenM}
+  <div class="center-upload">
+    <Addnewp onMessage={callbackFunction} current={picLink}/>
+    <button onclick={closer}>{cencel[$lang]}</button>
+  </div>
+  {:else if a == 2 && isOpenM}
+  <div class="center-upload">
+    <h3 class="text-barbi">{om[$lang]}</h3>
+  <br>
+ <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ </div> 
+ {/if}
 {#if addP == false}
 
 <div bind:clientWidth={width} bind:clientHeight={height}  class="body button-whitegold"  style="--the:{stylef};">
@@ -869,32 +926,32 @@ const clearButton = {
   {#key addSl}
   <div class="d {current === 'a1' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a1"}">
           <TourItem message={message2[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} data={meData.skills.data} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
+    <Edit {width}  onAddnew={addnew} onClose={close} onRemove={remove} onOpen={open}   onAdd={add} addSl={addSl1} meData={odata} allvn={allvn}  Valname={sk[$lang]} valc={"skillName"} bind:data={meData.skills.data} datan={"skil"} linkp={"skills"} kish={"skills"} placeholder ={pls[$lang]}/>
         </TourItem>
  </div>
   <div  class="d {current === 'a2' ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a2"}">
           <TourItem message={message3[$lang]}>
-    <Edit {width}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} data={meData.tafkidims.data} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
+    <Edit {width}  onAddnew={addnew} onClose={close} onRemove={remove} onOpen={open}  onAdd={add} addSl={addSl2} meData={odata} allvn={allvn}  Valname={rl[$lang]} valc={"roleDescription"} bgi={"pink"} bind:data={meData.tafkidims.data} datan={"taf"} linkp={"tafkidims"} kish={"tafkidims"} placeholder ={plt[$lang]}/>
         </TourItem>
  </div>
            <TourItem message={message4[$lang]}>
   <div class="d {current === 'a3' && mass !== true ? `selected ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : ""}" 
             class:a3={current !== 'a3'}
        class:whole="{mass === true}">
-    <Edit {width} on:delm={delm} on:massss={massss}  on:addnew={addnew} on:close={close} on:remove={remove} on:open={open}  on:add={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} data={meData.sps.data} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
+    <Edit {width} onDelm={delm} onMassss={massss}  onAddnew={addnew} onClose={close} onRemove={remove} onOpen={open}  onAdd={add} addSl={addSl3} meData={odata} allvn={allvn} bgi={"indigo"} Valname={ms[$lang]} valc={"name"} bind:data={meData.sps.data} datan={"mash"} linkp={"mashaabims"} kish={"sps"} placeholder ={plm[$lang]}/>
 </div>
           </TourItem>
 
         <div  class="d {current === 'a4' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a4"}"
          >
                 <TourItem message={message5[$lang]}>
-      <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}   on:add={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} data={meData.vallues.data} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
+      <Edit {width}  onAddnew={addnew}  onClose={close} onRemove={remove} onOpen={open}   onAdd={add} addSl={addSl4} meData={odata} allvn={allvn}  Valname={ar[$lang]} bgi={"gold"} valc={"valueName"} bind:data={meData.vallues.data} datan={"val"} linkp={"vallues"} kish={"vallues"} placeholder ={plv[$lang]}/>
           </TourItem>
     </div>
                           <TourItem message={message6[$lang]}>
         <div 
         class="d {current === 'a5' ? `selectedl ${isMobileOrTablet ? "h-[calc(100vh-3rem)]" : "h-screen"}` : " a5"}">
-          <Edit {width}  on:addnew={addnew}  on:close={close} on:remove={remove} on:open={open}    on:add={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} data={meData.work_ways.data} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
+          <Edit {width}  onAddnew={addnew}  onClose={close} onRemove={remove} onOpen={open}    onAdd={add} addSl={addSl5} meData={odata} allvn={allvn}  Valname={ww[$lang]} bgi={"yellow"} valc={"workWayName"} bind:data={meData.work_ways.data} datan={"work"} linkp={"workWays"} kish={"work_ways"} placeholder ={plw[$lang]}/>
         </div>
                             </TourItem>
 
@@ -919,7 +976,7 @@ const clearButton = {
     </div>
    {#if updX == 0}
    <button
-     on:click={openen}
+     onclick={openen}
      class=" hover:bg-gold text-mturk hover:text-barbi rounded-full edit"
      title={message7[$lang]}
      >                 <TourItem message={message7[$lang]}>
@@ -945,7 +1002,7 @@ const clearButton = {
   {#if addpic == 0}
 
     <button
-      on:click={openen}
+      onclick={openen}
  class=" hover:bg-gold text-mturk hover:text-barbi rounded-full haalaa"
      title={message8[$lang]} >
      <TourItem message={message8[$lang]}>
@@ -970,7 +1027,7 @@ const clearButton = {
            {#each meData.projects_1s.data as data, i}
            <div class="cont"  >
             <button
-             on:click={project(data.id)}
+             onclick={()=>project(data.id)}
              class="pt  drop-shadow-lg"> <div class="cont inline-flex items-center sm:text-xl mt-1 mr-2 px-2.5 py-0.5 sm:px-3 sm:py-1 rounded bg-gradient-to-br from-mpink via-transparent via-lpink to-barbi"  >{data.attributes.projectName}<span style="margin-top: 2px ;"><Arrow width={width > 640 ? 47.4:23.7} height={width > 640 ? 35.7:17.85}/></span></div></button>
 
            </div>
@@ -984,64 +1041,64 @@ const clearButton = {
 <button
 style="z-index: 7;"
 class=" hover:scale-150 "
-    on:click={() => {
+    onclick={() => {
       iwant = false
       addP = true
     }}
     title={crnfr[$lang]} >
 <svg class="svgh" width="29" height="29"  version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
-	 viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
+   viewBox="0 0 1209.872 1699.001" style="enable-background:new 0 0 1209.872 1699.001;" xml:space="preserve">
   <g class="n svgh" >
-	<path   class="st2 svgh"  d="M626.407,50.022c-7.193-0.778-14.386-0.539-21.585-0.225c-7.199-0.314-14.392-0.553-21.585,0.225
-		C251.878,55.423,34.711,353.506,78.035,650.425c23.893,167.215,115.647,257.266,171.46,316.006
-		c120.016,126.058,98.977,162.49,139.248,225.625c-21.847,28.048-24.026,71.245-1.648,99.612
-		c-17.364,28.58-17.665,68.765,4.713,94.775c-20.476,31.982-18.608,77.175,8.345,100.906
-		c-5.833,37.263,21.687,100.389,96.352,99.134c1.835,7.057,2.615,35.574,28.544,52.411c22.791,15.301,33.22,8.487,120.829,10.596
-		c13.537,0.213,27.393-2.995,38.715-10.596c25.906-16.821,26.712-45.365,28.544-52.411c69.851,1.174,102.81-57.885,96.352-99.134
-		c27.183-23.933,28.625-69.231,8.345-100.906c22.378-26.01,22.077-66.196,4.713-94.775c22.378-28.367,20.199-71.564-1.648-99.612
-		c18.569-29.111,27.339-62.953,42.134-93.907c40.361-89.323,118.845-144.285,175.146-219.92
-		C1278.898,552.106,1058.01,57.057,626.407,50.022z"/>
-	<g>
-		<path class="st1 svgh" d="M524.2,322.601c48.714,52.887,44.272,124.135-12.19,172.027c46.6,39.059,62.963,107.336,29.43,160.439
-			c-21.599-8.771-47.219-9.905-68.41,0.62c-15.397-10.737-34.816-15.521-53.314-11.269c-14.058-51.802-57.926-76.267-110.562-64.442
-			c0-12.952-2.87-25.904-9.444-37.155c20.766-1.914,41.142-10.418,55.99-25.249c21.952,26.53,58.082,34.106,89.726,13.891
-			c8.221,17.169,22.396,31.539,40.132,38.803c2.906-7.194,5.723-14.405,8.717-21.545c-36.456-15.635-47.837-72.308-8.523-99.453
-			c-4.43-6.414-8.806-12.863-13.236-19.26c-24.93,16.638-38.218,47.839-33.984,77.394c-24.695,20.091-53.098,13.835-68.269-9.143
-			c7.335-14.263,9.798-31.113,5.262-46.617c33.944-20.88,37.112-62.047,22.485-93.251c47.074-1.22,78.651-30.766,80.175-77.022
-			c22.378-7.016,40.061-26.241,45.111-49.168c-7.389-1.931-14.813-3.703-22.307-5.191c-9.078,40.401-58.74,44.695-86.395,13.129
-			c-5.971,5.014-11.747,10.223-17.488,15.468c14.635,16.726,35.472,28.19,57.903,29.271
-			c-12.072,102.836-178.404,29.849-144.847-52.677c9.459-25.101,38.855-44.549,72.096-30.794
-			C493.056,37.494,609.684,207.751,524.2,322.601z M286.208,279.616c15.991,41.547,43.497,61.444,79.91,74.452
-			c32.534,25.859,18.474,85.043-26.028,83.081c25.214,28.823,16.994,54.331-9.639,70.395
-			c-57.774,33.943-73.298-18.663-141.941,17.311c-43.266-51.995,2.963-129.5,66.887-128.263
-			C221.842,360.836,220.778,286.18,286.208,279.616z M278.695,614.9c56.62-24.962,104.915-20.123,119.634,39.707
-			c-17.346,12.793-26.79,34.834-23.867,56.22c-62.888,42.087-43.474,132.334,37.988,140.542
-			c4.057,29.944,26.453,54.98,54.253,65.629c3.154-7.087,5.599-14.44,8.434-21.634c-50.724-20.729-57.526-88.132,2.959-104.308
-			c-1.719-7.53-3.366-15.078-5.05-22.609c-29.82,6.607-52.852,26.297-60.313,59.48c-64.036-8.064-70.705-74.236-11.535-105.141
-			c-14.002-59.62,33.091-71.614,70.324-36.783c66.736-56.035,146.207,56.851,67.755,140.435
-			c92.475,100.044-11.622,222.972-100.392,132.267c-67.741,27.295-108.964-11.979-99.843-80.902
-			c-70.81,20.231-114.179-35.714-93.305-105.424c-66.112-20.811-90.579-79.246-87.564-143.235
-			C167.241,497.084,324.8,511.164,278.695,614.9z"/>
-		<path class="st0 svgh" d="M827.386,201.408c33.147-13.716,62.603,5.603,72.096,30.794c33.577,82.577-132.791,155.377-144.847,52.677
-			c22.431-1.081,43.268-12.545,57.903-29.271c-5.741-5.245-11.517-10.454-17.488-15.468c-27.647,31.557-77.315,27.28-86.395-13.129
-			c-7.495,1.488-14.919,3.26-22.307,5.191c5.05,22.928,22.733,42.152,45.111,49.168c1.524,46.257,33.105,75.801,80.175,77.022
-			c-14.488,30.908-11.75,72.193,22.485,93.251c-4.536,15.504-2.073,32.354,5.262,46.617c-15.126,22.91-43.508,29.288-68.269,9.143
-			c4.235-29.554-9.054-60.756-33.984-77.394c-4.43,6.396-8.806,12.846-13.236,19.26c39.299,27.134,27.947,83.812-8.523,99.453
-			c2.994,7.141,5.812,14.352,8.717,21.545c17.736-7.265,31.911-21.634,40.132-38.803c31.218,19.942,67.449,13.031,89.726-13.891
-			c14.848,14.83,35.224,23.335,55.99,25.249c-6.573,11.251-9.444,24.203-9.444,37.155c-52.583-11.813-96.491,12.589-110.562,64.442
-			c-18.498-4.252-37.917,0.532-53.314,11.269c-21.191-10.525-46.812-9.391-68.41-0.62c-33.571-53.164-17.113-121.428,29.43-160.439
-			c-56.477-47.905-60.891-119.154-12.19-172.027c-75.922-102.004,5.287-223.719,84.02-180.337
-			C794.058,155.889,811.901,178.498,827.386,201.408z M954.25,396.593c63.903-1.237,110.171,76.246,66.887,128.263
-			c-15.694-8.225-37.67-20.541-78.882-8.363c-46.737,13.978-119.009-26.402-72.698-79.343
-			c-44.501,1.961-58.568-57.218-26.028-83.081c35.043-12.519,63.386-31.523,79.91-74.452
-			C988.214,286.114,988.173,360.442,954.25,396.593z M963.906,772.381c20.839,69.591-22.337,125.7-93.305,105.424
-			c9.123,68.938-32.481,108.044-99.843,80.902c-89.352,91.299-192.353-32.78-100.392-132.267
-			c-78.548-83.687,0.915-196.557,67.755-140.435c36.775-34.403,84.439-23.315,70.324,36.783
-			c58.943,30.786,52.747,97.046-11.535,105.141c-7.412-32.964-30.243-52.818-60.313-59.48c-1.683,7.53-3.331,15.078-5.05,22.609
-			c60.391,16.15,53.744,83.554,2.959,104.308c2.835,7.194,5.28,14.547,8.434,21.634c27.8-10.649,50.196-35.685,54.253-65.629
-			c81.536-8.215,100.853-98.471,37.988-140.542c2.924-21.386-6.52-43.428-23.867-56.22c14.762-60.007,63.078-64.641,119.634-39.707
-			c-37.249-83.81,51.987-98.654,90.062-61.323C1069.097,599.65,1069.536,739.131,963.906,772.381z"/>
-	</g>
+  <path   class="st2 svgh"  d="M626.407,50.022c-7.193-0.778-14.386-0.539-21.585-0.225c-7.199-0.314-14.392-0.553-21.585,0.225
+    C251.878,55.423,34.711,353.506,78.035,650.425c23.893,167.215,115.647,257.266,171.46,316.006
+    c120.016,126.058,98.977,162.49,139.248,225.625c-21.847,28.048-24.026,71.245-1.648,99.612
+    c-17.364,28.58-17.665,68.765,4.713,94.775c-20.476,31.982-18.608,77.175,8.345,100.906
+    c-5.833,37.263,21.687,100.389,96.352,99.134c1.835,7.057,2.615,35.574,28.544,52.411c22.791,15.301,33.22,8.487,120.829,10.596
+    c13.537,0.213,27.393-2.995,38.715-10.596c25.906-16.821,26.712-45.365,28.544-52.411c69.851,1.174,102.81-57.885,96.352-99.134
+    c27.183-23.933,28.625-69.231,8.345-100.906c22.378-26.01,22.077-66.196,4.713-94.775c22.378-28.367,20.199-71.564-1.648-99.612
+    c18.569-29.111,27.339-62.953,42.134-93.907c40.361-89.323,118.845-144.285,175.146-219.92
+    C1278.898,552.106,1058.01,57.057,626.407,50.022z"/>
+  <g>
+    <path class="st1 svgh" d="M524.2,322.601c48.714,52.887,44.272,124.135-12.19,172.027c46.6,39.059,62.963,107.336,29.43,160.439
+      c-21.599-8.771-47.219-9.905-68.41,0.62c-15.397-10.737-34.816-15.521-53.314-11.269c-14.058-51.802-57.926-76.267-110.562-64.442
+      c0-12.952-2.87-25.904-9.444-37.155c20.766-1.914,41.142-10.418,55.99-25.249c21.952,26.53,58.082,34.106,89.726,13.891
+      c8.221,17.169,22.396,31.539,40.132,38.803c2.906-7.194,5.723-14.405,8.717-21.545c-36.456-15.635-47.837-72.308-8.523-99.453
+      c-4.43-6.414-8.806-12.863-13.236-19.26c-24.93,16.638-38.218,47.839-33.984,77.394c-24.695,20.091-53.098,13.835-68.269-9.143
+      c7.335-14.263,9.798-31.113,5.262-46.617c33.944-20.88,37.112-62.047,22.485-93.251c47.074-1.22,78.651-30.766,80.175-77.022
+      c22.378-7.016,40.061-26.241,45.111-49.168c-7.389-1.931-14.813-3.703-22.307-5.191c-9.078,40.401-58.74,44.695-86.395,13.129
+      c-5.971,5.014-11.747,10.223-17.488,15.468c14.635,16.726,35.472,28.19,57.903,29.271
+      c-12.072,102.836-178.404,29.849-144.847-52.677c9.459-25.101,38.855-44.549,72.096-30.794
+      C493.056,37.494,609.684,207.751,524.2,322.601z M286.208,279.616c15.991,41.547,43.497,61.444,79.91,74.452
+      c32.534,25.859,18.474,85.043-26.028,83.081c25.214,28.823,16.994,54.331-9.639,70.395
+      c-57.774,33.943-73.298-18.663-141.941,17.311c-43.266-51.995,2.963-129.5,66.887-128.263
+      C221.842,360.836,220.778,286.18,286.208,279.616z M278.695,614.9c56.62-24.962,104.915-20.123,119.634,39.707
+      c-17.346,12.793-26.79,34.834-23.867,56.22c-62.888,42.087-43.474,132.334,37.988,140.542
+      c4.057,29.944,26.453,54.98,54.253,65.629c3.154-7.087,5.599-14.44,8.434-21.634c-50.724-20.729-57.526-88.132,2.959-104.308
+      c-1.719-7.53-3.366-15.078-5.05-22.609c-29.82,6.607-52.852,26.297-60.313,59.48c-64.036-8.064-70.705-74.236-11.535-105.141
+      c-14.002-59.62,33.091-71.614,70.324-36.783c66.736-56.035,146.207,56.851,67.755,140.435
+      c92.475,100.044-11.622,222.972-100.392,132.267c-67.741,27.295-108.964-11.979-99.843-80.902
+      c-70.81,20.231-114.179-35.714-93.305-105.424c-66.112-20.811-90.579-79.246-87.564-143.235
+      C167.241,497.084,324.8,511.164,278.695,614.9z"/>
+    <path class="st0 svgh" d="M827.386,201.408c33.147-13.716,62.603,5.603,72.096,30.794c33.577,82.577-132.791,155.377-144.847,52.677
+      c22.431-1.081,43.268-12.545,57.903-29.271c-5.741-5.245-11.517-10.454-17.488-15.468c-27.647,31.557-77.315,27.28-86.395-13.129
+      c-7.495,1.488-14.919,3.26-22.307,5.191c5.05,22.928,22.733,42.152,45.111,49.168c1.524,46.257,33.105,75.801,80.175,77.022
+      c-14.488,30.908-11.75,72.193,22.485,93.251c-4.536,15.504-2.073,32.354,5.262,46.617c-15.126,22.91-43.508,29.288-68.269,9.143
+      c4.235-29.554-9.054-60.756-33.984-77.394c-4.43,6.396-8.806,12.846-13.236,19.26c39.299,27.134,27.947,83.812-8.523,99.453
+      c2.994,7.141,5.812,14.352,8.717,21.545c17.736-7.265,31.911-21.634,40.132-38.803c31.218,19.942,67.449,13.031,89.726-13.891
+      c14.848,14.83,35.224,23.335,55.99,25.249c-6.573,11.251-9.444,24.203-9.444,37.155c-52.583-11.813-96.491,12.589-110.562,64.442
+      c-18.498-4.252-37.917,0.532-53.314,11.269c-21.191-10.525-46.812-9.391-68.41-0.62c-33.571-53.164-17.113-121.428,29.43-160.439
+      c-56.477-47.905-60.891-119.154-12.19-172.027c-75.922-102.004,5.287-223.719,84.02-180.337
+      C794.058,155.889,811.901,178.498,827.386,201.408z M954.25,396.593c63.903-1.237,110.171,76.246,66.887,128.263
+      c-15.694-8.225-37.67-20.541-78.882-8.363c-46.737,13.978-119.009-26.402-72.698-79.343
+      c-44.501,1.961-58.568-57.218-26.028-83.081c35.043-12.519,63.386-31.523,79.91-74.452
+      C988.214,286.114,988.173,360.442,954.25,396.593z M963.906,772.381c20.839,69.591-22.337,125.7-93.305,105.424
+      c9.123,68.938-32.481,108.044-99.843,80.902c-89.352,91.299-192.353-32.78-100.392-132.267
+      c-78.548-83.687,0.915-196.557,67.755-140.435c36.775-34.403,84.439-23.315,70.324,36.783
+      c58.943,30.786,52.747,97.046-11.535,105.141c-7.412-32.964-30.243-52.818-60.313-59.48c-1.683,7.53-3.331,15.078-5.05,22.609
+      c60.391,16.15,53.744,83.554,2.959,104.308c2.835,7.194,5.28,14.547,8.434,21.634c27.8-10.649,50.196-35.685,54.253-65.629
+      c81.536-8.215,100.853-98.471,37.988-140.542c2.924-21.386-6.52-43.428-23.867-56.22c14.762-60.007,63.078-64.641,119.634-39.707
+      c-37.249-83.81,51.987-98.654,90.062-61.323C1069.097,599.65,1069.536,739.131,963.906,772.381z"/>
+  </g>
 </g>
 </svg>
 
@@ -1487,7 +1544,7 @@ class=" hover:scale-150 "
 {#if a == 0}
 <div class="anothere">
   <button
-  on:click={basic}
+  onclick={basic}
   title={editbas[$lang]}
   class="hover:bg-gold text-mturk hover:text-barbi rounded-full"
   >
@@ -1504,7 +1561,7 @@ class=" hover:scale-150 "
 </div>
 {:else if addP == true}
 <button title="{cencel[$lang]}"
-  on:click={() => addP = false}
+  onclick={() => addP = false}
   style="margin: 0 auto;"
   class=" hover:bg-barbi text-barbi hover:text-gold font-bold  p-0.5 rounded-full"
    ><Close/></button>
@@ -1514,7 +1571,20 @@ class=" hover:scale-150 "
 {/await}
 
   <style>
-
+.center-upload {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+  background: white;
+  border-radius: 1em;
+  box-shadow: 0 0 20px #0002;
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
   .name { transition: all .2s ease-in-out;
     transform-origin: center;
 
@@ -1918,10 +1988,13 @@ class=" hover:scale-150 "
 }
      :global([data-svelte-dialog-content].content) {
     padding: 0px;
+                    margin: auto auto;
+
   }
      :global([data-svelte-dialog-overlay].content) {
     z-index: 700;
                 width: 80vw;
+                margin: auto auto;
   }
   :global(data-svelte-dialog-overlay){
         z-index: 700;
@@ -2004,7 +2077,7 @@ class=" hover:scale-150 "
   border-left: 1px solid #aaa;
   overflow-y: auto;
   overflow-x: auto;
-	width: 230px;
+  width: 230px;
   display:flex;
       flex-direction: column;
       align-items: center;
@@ -2028,7 +2101,7 @@ background-image: url(https://res.cloudinary.com/love1/image/upload/v1640438541/
   overflow-y: scroll;
     overflow-x: auto;
 
-	width: 17rem;
+  width: 17rem;
   display:flex;
       flex-direction: column;
       align-items: center;
@@ -2095,7 +2168,7 @@ background-image: linear-gradient(180deg, #fff000 0%, #ed008c 74%);*/
     }
 
    .another{ /*background: -webkit-linear-gradient( #8f6B29, #FDE08D, #DF9F28);
-	background-image: linear-gradient( #8f6B29, #FDE08D, #DF9F28);
+  background-image: linear-gradient( #8f6B29, #FDE08D, #DF9F28);
          filter: drop-shadow(0 25px 25px rgba(1, 61, 61, 0.15));
 
 

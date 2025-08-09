@@ -1,20 +1,27 @@
 <script>
-let amort = "אני || שם || לעולם לא אנהג באלימות ולא אפגע באף אדם"
-let amorts =  "כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח"
-let amortt = " אני || שם || אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית"
-let amortf = "כאשר כל || שם מקום || תסכים עם אמנה זו אני || שם || אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת || שם מקום || ממנה בשמי"
-let amorth = "אני || שם || אוותר על כלי הנשק של צבא || שם מקום || כאשר כל האנושות תסכים עם האמנה הזו"
+let amort = $state("אני || שם || לעולם לא אנהג באלימות ולא אפגע באף אדם")
+let amorts =  $state("כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח")
+let amortt = $state(" אני || שם || אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית")
+let amortf = $state("כאשר כל || שם מקום || תסכים עם אמנה זו אני || שם || אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת || שם מקום || ממנה בשמי")
+let amorth = $state("אני || שם || אוותר על כלי הנשק של צבא || שם מקום || כאשר כל האנושות תסכים עם האמנה הזו")
 let amortq = "אני || שם || לעולם לא אנהג באלימות ולא אפגע באף אדם"
 let amortsq =  "כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח"
 let amorttq = " אני || שם || אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית"
 let amortfq = "כאשר כל || שם מקום || תסכים עם אמנה זו אני || שם || אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת || שם מקום || ממנה בשמי"
 let amorthq = "אני || שם || אוותר על כלי הנשק של צבא || שם מקום || כאשר כל האנושות תסכים עם האמנה הזו"
-let already = false;
-  let more, come, name, email;
+let already = $state(false);
+  let more = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 const baseUrl = import.meta.env.VITE_URL
+
+/**
+ * @typedef {Object} Props
+ * @property {() => void} [onDone] - Callback for when the operation is successful.
+ * @property {() => void} [onErore] - Callback for when an error occurs.
+ */
+
+/** @type {Props} */
+let { onDone, onErore } = $props();
 
 let miDatan = [];
 let linkg = baseUrl+'/graphql';
@@ -50,11 +57,11 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch("done")
+            onDone?.()
         } catch (e) {
             error1 = e
             console.log(error1);
-                        dispatch("erore")
+                        onErore?.()
 
         }
 }
@@ -114,7 +121,7 @@ already = true;
 {#if already == false}
 <div class="flex items-center justify-center">
 <button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={add} >שליחה</button>
+ onclick={add} >שליחה</button>
  </div>
  {/if}
 <style>
@@ -254,4 +261,3 @@ height: 44px;
   top: 0;
 } 
 </style>
-

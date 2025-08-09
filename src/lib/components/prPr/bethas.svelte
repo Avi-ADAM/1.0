@@ -6,18 +6,18 @@
      import Close from '$lib/celim/close.svelte'
       import {  fly } from 'svelte/transition';
     import Tile from '$lib/celim/tile.svelte'
-    import { createEventDispatcher, onMount } from 'svelte';
+    import { onMount } from 'svelte';
     import { slide } from 'svelte/transition';
   	import { quintOut } from 'svelte/easing';
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { toast } from 'svelte-sonner';
 
-    export let actdata = []
-    let isOpen = false;
+    let isOpen = $state(false);
     let xx = {}
-    let proles = []
-    $: sodata = [];
-    let soter = []
+    let proles = $state([])
+    let sodata = $state([]);
+  
+    let soter = $state([])
 onMount(async () => {
   console.log(bmiData)
     let counter = 0;
@@ -96,8 +96,9 @@ onMount(async () => {
     toast.success(doneMes[$lang])
     //TODO: email add to table
   }
-    export let bmiData = [];
-    $: ohh = soter.map(c=>c.openi).includes(false);
+  let { actdata = [], onChat, bmiData: propBmiData = [] } = $props();
+  let bmiData = $state(JSON.parse(JSON.stringify(propBmiData)));
+    let ohh = $derived(soter.map(c=>c.openi).includes(false));
     function sot(idd , y){
       console.log(ohh, soter.map(c=>c.openi).includes(false),y)
         if (y == true && ohh == false|| ohh == true && y == false){
@@ -147,11 +148,11 @@ onMount(async () => {
     const ro = {"he": "תפקיד", "en": "role"}
     const acts = {"he":"דיון ומטלות","en":"chat & actions"}
     const des = {"he":"תיאור","en":"decription"}
-    $: w = 0 
-    let id = 0
-     const dispatch = createEventDispatcher();
+    let w = $state(0);
+   
+    let id = $state(0)
     function chat (id,isNew,smalldes){
-      dispatch("chat",{id,isNew,smalldes,"nameChatPartner":{"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}})
+      onChat?.({id,isNew,smalldes,"nameChatPartner":{"he":"דיון על משימה בתהליך ","en":"chat on mission in progress"}})
     }
 </script>
    
@@ -160,18 +161,18 @@ onMount(async () => {
   <DialogContent class="formi" aria-label="form">
       <div style="z-index: 400;" dir="rtl" >
              <button class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}><Close/></button>
-          <Crtask {id} {proles} {bmiData} on:done={done}/>
+          onclick={closer}><Close/></button>
+          <Crtask {id} {proles} {bmiData} onDone={done}/>
       </div>
   </DialogContent>
   </div>
 </DialogOverlay>
 <section dir={$lang == "he" ? "rtl": "ltr"} bind:clientWidth={w}>
   <h1>{hed[$lang]}</h1> 
-  <button on:click={() =>isOpen = true} ><Plus/></button>
+  <button onclick={() =>isOpen = true} ><Plus/></button>
   <div>
     {#each soter as x, i}
-    <button on:click={() =>sot(x.id, x.openi)}>
+    <button onclick={() =>sot(x.id, x.openi)}>
     <Tile big={w > 500 ? true:false} sm={w > 500 ? true:false} bg="{x.color}" word={x.word} closei={x.closei} openi={x.openi}/>
     </button>
     {/each}
@@ -201,13 +202,13 @@ onMount(async () => {
         <tr transition:slide="{{ duration: 1000, easing: quintOut }}" class:border-r-2={data.open == true && $lang == "he"} class:border-t-2={data.open} class="border-gold">
           <td>
             {#if data.attributes.forums?.data?.length === 0}
-              <button class="mx-1" on:click={()=>chat(data.id,true,data.attributes.name)}>
+              <button class="mx-1" onclick={()=>chat(data.id,true,data.attributes.name)}>
                 <Chaticon/></button>
                 {:else}
-              <button class="mx-1" on:click={()=>chat(data.attributes.forums.data[0].id,false,data.attributes.name)}>
+              <button class="mx-1" onclick={()=>chat(data.attributes.forums.data[0].id,false,data.attributes.name)}>
                 <Chaticon/></button>                
             {/if}
-            {#if data.hasAct == true}<button on:click={()=> {data.open = !data.open
+            {#if data.hasAct == true}<button onclick={()=> {data.open = !data.open
           console.log(data.open)}}><svg
                 class:rotate-90={data.open == false}
                 class="sm:w-5 sm:h-5 sm:ms-5 h-3 w-3 ms-3"
@@ -225,7 +226,7 @@ onMount(async () => {
                 />
               </svg></button>
               {:else}
-              <button on:click={() =>{isOpen = true
+              <button onclick={() =>{isOpen = true
               id = data.id}} ><Plus/></button>
               {/if}
             </td>
@@ -285,7 +286,7 @@ onMount(async () => {
         </tbody>
     </table>
     </div>
-        <button class="m-2 text-white" on:click={() =>{isOpen = true
+        <button class="m-2 text-white" onclick={() =>{isOpen = true
               id = data.id}} ><Plus/></button>
     </div>
     </div>

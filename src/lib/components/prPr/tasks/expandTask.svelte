@@ -3,15 +3,13 @@
   import { quintOut } from "svelte/easing";
   import { slide } from "svelte/transition";
     import {lang} from '$lib/stores/lang.js'
-  import { createEventDispatcher } from "svelte";
-    export let tasks = [];
+  let { tasks = [], onNew } = $props();
       const head = {"he":"רשימת מטלות","en":"checklist"}
         const nama = {"he":"שם המטלה ", "en":"action name"}
     const des = {"he":"תיאור","en":"decription"}
       const dates = {"he": "תאריכים" , "en":"dates"}
     const button = {"he":"יצירת מטלה חדשה", "en":"create new task"}
     const linkdes = {"he": "לינק", "en": "link"}
-     const dispatch = createEventDispatcher();
     </script>
    {#key tasks}
    <div  class="w-full border-b-2 border-x-2 border-gold">
@@ -47,7 +45,7 @@
         </tbody>
     </table>
     </div>
-       <!--- <button class="m-2 text-white" on:click={() =>{dispatch("new")}} ><Plus/></button>
+       <!--- <button class="m-2 text-white" on:click={() =>{onNew?.()}} ><Plus/></button>
    >--> </div>
     </div>
        

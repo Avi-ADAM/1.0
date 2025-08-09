@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
 const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
 export async function SendTo(dat,toc) {
 	const ep = HTTP_ST_ENDPOINT + "/graphql"

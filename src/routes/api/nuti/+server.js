@@ -28,9 +28,9 @@ async function sendMail(
     },
   });
   
-  const emailHtml = render({
-    template: PendJustCreated,
-    props: {
+  const emailHtmlObj = await render(
+    PendJustCreated,
+    {
       un: un,
       username: username,
       pl: pl,
@@ -41,7 +41,8 @@ async function sendMail(
       lang: lang,
       restime: restime ?? 'feh'
     }
-  });
+  );
+  const emailHtml = emailHtmlObj.html || "";
 
   const options = {
     from:"notifications@1lev1.com",

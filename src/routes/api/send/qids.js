@@ -328,6 +328,7 @@ export const qids = {
 "29GetOpenMissionsNonregTr": `query GetOpenMissionsNonregTr($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
+      id
       attributes{ 
         descrip
         archived noofhours perhour iskvua sqadualed dates
@@ -350,6 +351,7 @@ export const qids = {
 "30GetOpenMissionsNonreg": `query GetOpenMissionsNonreg($start: Int, $limit: Int)
 {  openMissions(pagination: { start: $start, limit: $limit }) {
     data{
+      id
       attributes{ 
         descrip
         archived noofhours perhour iskvua sqadualed dates
@@ -381,8 +383,8 @@ export const qids = {
     
   ) {data{id attributes{ shem my {data{id}}}}}
 }`,
-"32createTimeGrama": `mutation CreateTimegrama($date: DateTime, $finiapruval: ID, $whatami: String, $ask: ID) {
-  createTimegrama(data: {date: $date, whatami: $whatami, ask: $ask, finiapruval: $finiapruval}) {
+"32createTimeGrama": `mutation CreateTimegrama($date: DateTime,$decision: ID,$tosplit: ID, $finiapruval: ID, $whatami: String, $ask: ID) {
+  createTimegrama(data: {date: $date, whatami: $whatami, ask: $ask, finiapruval: $finiapruval,decision:$decision,tosplit:$tosplit}) {
     data {
       id
     }   
@@ -519,4 +521,188 @@ export const qids = {
   }
  }
 `,
+'39GetNegotiation': `
+      query GetNegotiation($id: ID!) {
+        negotiation(id: $id) {
+          data {
+            id
+            attributes {
+              topic
+              description
+              status
+              maxRounds
+              currentRound
+              creator {
+                data {
+                  attributes {
+                    username
+                    email
+                  }
+                }
+              }
+              positions {
+                data {
+                  id
+                  attributes {
+                    heading
+                    description
+                    author{
+                    data{
+                      attributes{
+                        username
+                        email
+                      }
+                    }
+                  }
+                    authorEmail
+                    votes
+                    voters{
+                    data{
+                      attributes{
+                        username
+                        email
+                      }
+                    }
+                  }
+                    location
+                    intensity
+                    tags{
+                    data{
+                      attributes{
+                        name
+                      }
+                    }
+                  }
+                    order
+                  }
+                }
+              }
+              participants {
+                data {
+                  id
+                  attributes {
+                    username
+                    email
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    `,
+  '40CreateNegotiation': `
+      mutation CreateNegotiation($data: NegotiationInput!) {
+        createNegotiation(data: $data) {
+          data {
+            id
+            attributes {
+              topic
+              description
+            }
+          }
+        }
+      }
+    `,
+  '41CreatePosition': `
+      mutation CreatePosition($data: PositionInput!) {
+        createPosition(data: $data) {
+          data {
+            id
+            attributes {
+              heading
+              description
+              author{
+              data{
+                attributes{
+                  username
+                  email
+                }
+              }
+            }
+              votes
+              voters{
+              data{
+                attributes{
+                  username
+                  email
+                }
+              }
+            }
+              location
+              order
+            }
+          }
+        }
+      }
+    `,
+  '42UpdatePosition': `
+      mutation UpdatePosition($id: ID!, $data: PositionInput!) {
+        updatePosition(id: $id, data: $data) {
+          data {
+            id
+            attributes {
+              votes
+              voters{
+              data{
+                attributes{
+                  username
+                  email
+                }
+              }
+            }
+            }
+          }
+        }
+      }
+    `,
+    "43updateProfilePic":  `
+mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
+  updateProject(
+    id: $projectId,
+    data: { profilePic: $imageId }
+  ) {
+    data {
+      id
+      attributes {
+        profilePic {
+          data {
+            attributes {
+              url
+              formats
+            }
+          }
+        }
+      }
+    }
+  }
+}
+`,
+"44updateWelcomeCard": `mutation UpdateWelcomeCard($id: ID!, $clicked: Boolean!) {
+  updateWelcomTop(
+    id: $id,
+    data: { clicked: $clicked }
+  ) {
+    data {
+      id
+      attributes {
+        clicked
+      }
+    }
+  }
+}`,
+'45deleteMachshir': `mutation deleteMachshir($id: ID!) {
+    deleteMachshir(id: $id) {
+      data {
+        id
+      }
+    }
+  }`,
+  '46getMachshirByEndpoint': `query getMachshirByEndpoint($endpoint: JSON!) {
+    machshirs(filters: { jsoni: { contains: $endpoint }}) {
+      data {
+        id
+      }
+    }
+  }`
 }

@@ -9,7 +9,44 @@
   import AddNewRole from "../addnew/addNewRole.svelte";
   import AddnewWorkway from "../addnew/addnewWorkway.svelte";
   import { onMount } from "svelte";
-  //const dispatch = createEventDispatcher();
+  /**
+   * @typedef {Object} Props
+   * @property {any} [datai]
+   * @property {any} [dataib]
+   * @property {boolean} [show2]
+   * @property {any} [lebel]
+   * @property {any} valc
+   * @property {boolean} [edit]
+   * @property {string} [bgi]
+   * @property {boolean} [newcontent]
+   * @property {any} [placeholder]
+   * @property {any} [alld]
+   * @property {any} [nom]
+   * @property {boolean} [addS]
+   * @property {any} [roles]
+   * @property {any} [dataibn]
+   */
+
+  /** @type {Props} */
+  let {
+    datai = $bindable([]),
+    dataib = $bindable(),
+    show2 = $bindable(false),
+    lebel = {"he":"","en":""},
+    valc,
+    edit = $bindable(false),
+    bgi = "gold",
+    newcontent = true,
+    placeholder = {},
+    alld = $bindable([]),
+    nom = {},
+    addS = false,
+    roles = [],
+    dataibn = $bindable([]),
+    onAddnew // Svelte 5: Callback prop for addnew event
+  } = $props();
+  let dati = $state(datai)
+
   onMount(()=>{
     console.log("datai",datai,dataib)
     if(datai != dataib && datai.length > 0 && dataib.length == 0){
@@ -17,45 +54,19 @@
             dataib = JSON.parse(JSON.stringify(datai));  
         }
     }
-        if(dataib.length > 0){
+        if(dataib && dataib.length > 0){
             dataibn = dataib.map(c=>c.attributes[valc])
         }
     
   })
-    export let datai = []
-    export let dataib = []
-    let dati = datai
-    export let show2 = false
-    export let lebel = {"he":"","en":""}
-    export let valc;
-    export let edit = false
-    export let bgi = "gold"
-    export let newcontent = true
-    export let placeholder = {}
-    export let alld = []
-    export let nom = {}
-    export let addS = false
-    export let roles = []
-    export let dataibn = []
+ 
 function addnew(event) {
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes[valc];
-    /*    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes[valc];
-    dispatch("addnew",{newOb,newN,valc,dataibn})*/
-    const newValues = alld;
-    newValues.push(newOb);
-    alld = newValues;
-    const newSele = dataib;
-    const datairosh = datai;
-        console.log(dataib,datai)
-    newSele.push(newOb);
-    dataib = newSele;
-    datai = datairosh
-    console.log(dataib,datai)
-    dataibn.push(newN)
-    dataibn = dataibn
+    const newOb = event.skob;
+    const newN = event.skob.attributes[valc];
+    // Svelte 5: Replaced dispatch with callback prop
+    onAddnew?.({newOb,newN,valc,dataibn});
 }
+
 function check (lettera, letterb){
     if(lettera == letterb){
         return true
@@ -63,6 +74,7 @@ function check (lettera, letterb){
         return false
     }
 }
+
 function checkAll (){
     const allId = find_skill_id(dataibn,alld,valc);
     const allob = alld.filter(t=>allId.includes(t.id))
@@ -119,13 +131,13 @@ function checkAll (){
     <Tile sm={true} big={true} bg="{dat.added ? "green" : dat.remuved ? "red" : bgi}" closei={dat.remuved} openi={dat.added} word={dat.attributes[valc]}/></p>{/each}
     </div>
     {/if}
-    <button on:click={()=>edit = true}>
+    <button onclick={()=>edit = true}>
      {#if datai == dataib}🖍️{:else}✏️{/if}</button>
         {#if datai != dataib && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <button onclick={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         {#if datai.length > 0}
         <div class="  flex sm:flex-row flex-wrap justify-center align-middle d cd p-2 mb-1">
@@ -162,14 +174,14 @@ function checkAll (){
         />
                 <div class="mx-auto">
         {#if valc == "skillName"}
-            <AddNewSkill color={"--barbi-pink"}  on:addnewskill={addnew} addS={addS} roles1={roles} />
+            <AddNewSkill color={"--barbi-pink"}  onAddnewskill={addnew} addS={addS} roles1={roles} />
         {:else if valc == "roleDescription"} 
-            <AddNewRole color={"--barbi-pink"}  on:addnewrole={addnew}   />
+            <AddNewRole color={"--barbi-pink"}  onAddnewrole={addnew}   />
         {:else if valc == "workWayName"} 
-            <AddnewWorkway color={"--barbi-pink"}  on:addww={addnew}/>
+            <AddnewWorkway color={"--barbi-pink"}  onAddww={addnew}/>
         {/if}
                 </div>
-        <button on:click={()=>{edit = false
+        <button onclick={()=>{edit = false
 checkAll(datai,dataib)
 }}>✅</button>
     </div>

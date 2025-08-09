@@ -1,19 +1,18 @@
 <script>
-let amort = "I ,||name||, will never use violence or hurt anyone."
-let amorts =  "Because I, ||name||, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force."
-let amortt = "I,||name||, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication"
-let amortf = "When the entire ||country|| is a signatory to this Convention, I, || name || will relinquish my weapons and the armed policemen from whom the ||country|| State is Appointments in my name."
-let amorth = "I, ||name||, will give up the weapons of the ||country|| Army when all of humanity will be a signatory to this Convention"
+let amort = $state("I ,||name||, will never use violence or hurt anyone.")
+let amorts =  $state("Because I, ||name||, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force.")
+let amortt = $state("I,||name||, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication")
+let amortf = $state("When the entire ||country|| is a signatory to this Convention, I, || name || will relinquish my weapons and the armed policemen from whom the ||country|| State is Appointments in my name.")
+let amorth = $state("I, ||name||, will give up the weapons of the ||country|| Army when all of humanity will be a signatory to this Convention")
 let amortq = "I ,||name||, will never use violence or hurt anyone."
 let amortsq =  "Because I, ||name||, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force."
 let amorttq = "I,||name||, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication"
 let amortfq = "When the entire ||country|| is a signatory to this Convention, I, || name || will relinquish my weapons and the armed policemen from whom the ||country|| State is Appointments in my name."
 let amorthq = "I, ||name||, will give up the weapons of the ||country|| Army when all of humanity will be a signatory to this Convention"
-let already = false;
-  let more, come, name, email;
+let already = $state(false);
+  let more = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
+ let { onDone, onErore } = $props();
 const baseUrl = import.meta.env.VITE_URL
 
 let miDatan = [];
@@ -50,11 +49,11 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch("done")
+            onDone?.()
         } catch (e) {
             error1 = e
             console.log(error1);
-                        dispatch("erore")
+                        onErore?.()
 
         }
 }
@@ -116,7 +115,7 @@ already = true;
 {#if already == false}
 <div class="flex items-center justify-center">
 <button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={add} >send</button>
+ onclick={add} >send</button>
  </div>
  {/if}
 <style>
@@ -298,6 +297,3 @@ height: 44px;
   top: -20;
 } 
 </style>
-
-
-

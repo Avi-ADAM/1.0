@@ -12,10 +12,26 @@ const noap = {"he":"השירות עדיין לא אושר בהצבעה","en":"th
     const equaliSplitedFl = {"he":"דמי מנוי","en":"subscription"}
     const equaliSplitedTr = {"he":"חלוקה שווה של ההוצאות","en":"splited equally"}
 const ourse ={"he":"השירותים שלנו","en":"our services"}
-export let sheirutim = [],projectName = "",pid,wb = false,restime
-let alr = {}
-let success = false
-let hovered = false
+  /**
+   * @typedef {Object} Props
+   * @property {any} [sheirutim]
+   * @property {string} [projectName]
+   * @property {any} pid
+   * @property {boolean} [wb]
+   * @property {any} restime
+   */
+
+  /** @type {Props} */
+  let {
+    sheirutim = [],
+    projectName = "",
+    pid,
+    wb = false,
+    restime
+  } = $props();
+let alr = $state({})
+let success = $state(false)
+let hovered = $state(false)
 async function ask(id,i){
   alr[i] = true
     const cookieValueId = document.cookie
@@ -105,11 +121,11 @@ const aski = {"he":"בקשת הצטרפות לשירות","en":"request service"
  <!---
      <p style="line-height: 1;" class="text-sm text-gray-100 flex items-center lg:text-2xl m-5">
         <img  class="w-12 lg:w-24"  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span on:mouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} on:mouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span on:mouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
+        <span onmouseenter={()=>hover({"he":"שווי לשעה","en":"vallue per hour"})} onmouseleave={()=>hover("0")} > {data.perhour.toLocaleString('en-US', {maximumFractionDigits:2})} לשעה </span> * <span onmouseenter={()=>hover({"he":"כמות השעות", "en":"amount of hours"})} on:mouseleave={()=>hover("0")}  > {data.noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} שעות </span> = <span on:mouseenter={()=>hover({"he":"סך הכל","en": "total"})} on:mouseleave={()=>hover("0")}>{(data.noofhours * data.perhour).toLocaleString('en-US', {maximumFractionDigits:2})} </span>
     </p>-->
           <div class="flex justify-center">
             {#if alr[i] == false && wb == true}
-          <button on:click={()=>ask(datai.id,i)} on:mouseenter={()=>hovered = true} on:mouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
+          <button onclick={()=>ask(datai.id,i)} onmouseenter={()=>hovered = true} onmouseleave={()=>hovered = false} class:button-perl={hovered == false} class:button-gold={hovered == true}  
             class=" mx-auto mt-7 text-3xl px-4 py-3 hover:text-black hover:font-bold  text-barbi">{aski[$lang]}</button>
         {/if}  
         </div>

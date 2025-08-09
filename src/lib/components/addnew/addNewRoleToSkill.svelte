@@ -1,16 +1,20 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
            import { lang } from '$lib/stores/lang.js'
     import { liUN } from '$lib/stores/liUN.js';
   const baseUrl = import.meta.env.VITE_URL
 
-    export let color = "--gold"
-    export let rn = [];
-    let roleName_value;
-        let desS;
+  /**
+   * @typedef {Object} Props
+   * @property {string} [color]
+   * @property {any} [rn]
+   */
+
+  /** @type {Props} */
+  let { color = "--gold", rn = [], onFinnish } = $props(); // Svelte 5: Define callback prop
+    let roleName_value = $state();
+        let desS = $state();
         let meData;
-        let shgi = false;
+        let shgi = $state(false);
   async function add () {
       if (rn.includes(roleName_value)){
   shgi = true;
@@ -73,7 +77,7 @@
                 };}
     };     
        function finnish (id , sec) {
-  dispatch('finnish', {
+  onFinnish?.({ // Svelte 5: Replaced dispatch with callback prop
     id: id,
     addro: false,
     rob: meData,
@@ -109,7 +113,7 @@ const errmsg = {"he": "השם כבר קיים","en":"name already exists"}
           
           <div dir="{$lang == "en" ? "ltr" : "rtl"}" >
 
-          <button on:click={add}
+          <button onclick={add}
           title="{btnTitles[$lang]}"
           class=" hover:bg-barbi hover:text-mturk text-gold font-bold  rounded-full" 
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">

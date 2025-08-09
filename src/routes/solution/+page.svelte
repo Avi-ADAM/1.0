@@ -1,7 +1,7 @@
 <script>
       import Tile from '$lib/celim/tile.svelte';
 import { animate, signal, all } from '$lib/func/animation.ts'
-  import { afterUpdate, onMount } from 'svelte';
+  import { onMount } from 'svelte';// afterUpdate,
       let colors = ["pink" ,"blue", "purple","wow","indigo",  "green", "yellow", "red", "gray"];
 
   onMount(()=>{
@@ -9,9 +9,9 @@ import { animate, signal, all } from '$lib/func/animation.ts'
   })
 
     const line = signal({ x: 2.5, y: 2.5, x2: 1.5, y2: 1.5, fill: 'blue' })
-$: oldH = 0
-$: oldW = 0
-      afterUpdate(async() => {
+
+
+   /*TODO:effect afterUpdate(async() => {
         if(oldH == 0 && oldW== 0){
           oldH = h
           oldW = w
@@ -36,9 +36,11 @@ $: oldW = 0
         // line = signal({ x: 2.5, y: 2.5, x2: 1.5, y2: 1.5, fill: '#00ffff' })
         // animate()
         console.log("updated",h,w)
-      });
-   $: h = 0;
-  $: w = 0;
+      });*/
+   let h = $state(0);
+  
+  let w = $state(0);
+  
       const svg = signal({ x: -2, y: -2, w: 2, h: 2 })
   const text = signal({ count: 0, opacity: 0 })
 
@@ -57,10 +59,10 @@ $: oldW = 0
   })
   let lang = 'he';
 
-  $: ww = 0;
-  $: www = 0;
-  $: portrate = h <= w ? false : true;
-  $: points = [
+  
+  
+  let portrate = $derived(h <= w ? false : true);
+  let points = $derived([
     {
       hover: false,
       heading: { he: 'נקודת ההתחלה' },
@@ -103,11 +105,13 @@ $: oldW = 0
       distance: {sum:0},
       order:6
     }*/
-  ];
-  $: for (let i = 0; i < points.length; i++) {
-    const element = points[i];
-    points[i].distance.sum = (points[i].location + points[i + 1]?.location) / 2;
-  }
+  ]);
+  $effect(() => {
+    for (let i = 0; i < points.length; i++) {
+      const element = points[i];
+      points[i].distance.sum = (points[i].location + points[i + 1]?.location) / 2;
+    }
+  });
   async function addPoint(location="middle",length=1,i=3){
     console.log(location)
     if(length == 1){
@@ -220,8 +224,8 @@ $: oldW = 0
         />
      {#each points as point, i}
       <circle
-        on:mouseenter={() => (point.hover = true)}
-        on:mouseleave={() => (point.hover = false)}
+        onmouseenter={() => (point.hover = true)}
+        onmouseleave={() => (point.hover = false)}
         role="contentinfo"
         class:fill-yellow-200={point.color == "yellow"}
         class:fill-pink-200={point.color == "pink"}
@@ -247,8 +251,8 @@ $: oldW = 0
           <div
                   role="contentinfo"
 
-        on:mouseenter={() => (point.hover = true)}
-        on:mouseleave={() => (point.hover = false)}
+        onmouseenter={() => (point.hover = true)}
+        onmouseleave={() => (point.hover = false)}
            >
           <Tile
           big={point.hover}
@@ -297,7 +301,7 @@ $: oldW = 0
            width=100
           height=100
         >
-          <button on:click={addPoint("middle",points.length,point.order)} class="bg-gold text-barbi rounded-full p-2">➕</button>
+          <button onclick={addPoint("middle",points.length,point.order)} class="bg-gold text-barbi rounded-full p-2">➕</button>
         </foreignObject>
       {/if}
     {/each}
@@ -307,7 +311,7 @@ $: oldW = 0
            width=50
           height=50
         >
-          <button on:click={addPoint("top",points.length)} class="bg-gold text-barbi rounded-full p-2">➕</button>
+          <button onclick={addPoint("top",points.length)} class="bg-gold text-barbi rounded-full p-2">➕</button>
         </foreignObject>
         <foreignObject
           x={points.length > 1 ? points.length > 2 ?  94*(w/100)+25 : 84*(w/100)+25  : 66.6*(w/100)+25}
@@ -315,7 +319,7 @@ $: oldW = 0
            width=50
           height=50
         >
-          <button on:click={addPoint("buttom",points.length)} class="bg-gold text-barbi rounded-full p-2">➕</button>
+          <button onclick={addPoint("buttom",points.length)} class="bg-gold text-barbi rounded-full p-2">➕</button>
         </foreignObject>
   </svg>
   {/key}

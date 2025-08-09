@@ -1,10 +1,9 @@
 <script>
-  import { addslashes } from '$lib/func/uti/string.svelte';
-  import { page } from '$app/stores';
+  import { addslashes } from '$lib/func/uti/string.js';
+  import { page } from '$app/state';
   import { onMount } from 'svelte';
-  import { createEventDispatcher } from 'svelte';
   import { RingLoader } from 'svelte-loading-spinners';
-  import { beforeUpdate } from 'svelte';
+  //import { beforeUpdate } from 'svelte';
   import moment from 'moment';
   import { lang } from '$lib/stores/lang.js';
   import MultiSelect from 'svelte-multiselect';
@@ -13,16 +12,13 @@
   import { SendTo } from '$lib/send/sendTo.svelte';
   import Button from '$lib/celim/ui/button.svelte';
 
-  const dispatch = createEventDispatcher();
   let token;
-  export let needr = [];
-  export let projectId;
   let mash = [];
-  $: showResourceOptions = {}; // לשמירת מצב התצוגה של אפשרויות המשאבים לכל שורה
-  $: availableResourcesByRow = {}; // מערך המשאבים הזמינים לכל שורה
-  $: loadingByRow = {}; // מצב טעינה לכל שורה
-  $: newResourceByRow = {}; // מעקב אחר בחירת משאב חדש לכל שורה
-  $: resourceReceivedByRow = {}; // מעקב אחר קבלת משאב לכל שורה
+  let showResourceOptions = $state({}); // לשמירת מצב התצוגה של אפשרויות המשאבים לכל שורה
+  let availableResourcesByRow = $state({}); // מערך המשאבים הזמינים לכל שורה
+  let loadingByRow = $state({}); // מצב טעינה לכל שורה
+  let newResourceByRow = $state({}); // מעקב אחר בחירת משאב חדש לכל שורה
+  let resourceReceivedByRow = $state({}); // מעקב אחר קבלת משאב לכל שורה
 
   // טקסט קבוע ליצירת משאב חדש
   const NEW_RESOURCE_TEXT = {
@@ -69,7 +65,7 @@
   }
 
   async function handleAssignment(element, index) {
-    console.log('Handling assignment for element:', element);
+    console.log('Handling assignment for element:', $state.snapshot(element));
 
     if (!element || !element.id) {
       console.error('Invalid element or missing ID:', element);
@@ -119,9 +115,9 @@
     meData = meData; // מעדכן את הריאקטיביות
     console.log(
       'Creating new resource for:',
-      element,
+      $state.snapshot(element),
       'in meData:',
-      meData[index]
+      $state.snapshot(meData[index])
     );
   }
 
@@ -200,7 +196,7 @@
   }
 
   async function han() {
-    console.log('Handling assignments for meData:', meData);
+    console.log('Handling assignments for meData:', $state.snapshot(meData));
     already = true;
     let d = new Date();
     const cookieValue = document.cookie
@@ -370,7 +366,7 @@
           .then((data) => (miDatan = data));
         console.log(miDatan);
         if (isAssigned) {
-          let hiluz = miDatan.data.createOpenMashaabim.data.id;
+          let hiluz = miDatan.data[linkop].data.id;
           let que = ``;
           if (!isReceived) {
             que = `mutation 
@@ -440,7 +436,7 @@ vots: [${userss},
           let v = await SendTo(que);
           console.log(v);
         }
-        if (userslength > 1 && data.assignedTo && data.assignedTo.length > 0) {
+        if (userslength > 1) {
           let fd = new Date(Date.now() + x);
           let hiluzpend = miDatan.data.createPmash.data.id;
           let quee = `mutation 
@@ -456,7 +452,8 @@ vots: [${userss},
                 }`;
           let v = await SendTo(quee);
           console.log(v);
-          let data = {
+          const name = addslashes(data.attributes.name);
+          let dataOf = {
             pu: pu,
             pn: pn,
             pl: pl,
@@ -464,14 +461,14 @@ vots: [${userss},
             pid: projectId,
             uid: idL,
             kind: 'pendmash',
-            name: addslashes(data.attributes.name)
+            name: name
           };
           fetch('/api/nuti', {
             method: 'POST',
             headers: {
               'Content-Type': 'application/json'
             },
-            body: JSON.stringify(data)
+            body: JSON.stringify(dataOf)
           })
             .then((response) => response)
             .then((data) => {
@@ -482,7 +479,7 @@ vots: [${userss},
             });
         }
         meData = [];
-        if (miDatan.data) dispatch('close');
+        if (miDatan.data) onClose?.();
       } catch (e) {
         error1 = e;
       }
@@ -534,26 +531,24 @@ vots: [${userss},
     myMissionH();
     myMi();
   });
-  beforeUpdate(async () => {
+  $effect(async () => {
     upd();
   });
   const baseUrl = import.meta.env.VITE_URL;
 
-  export let pu, pn, pl, restime;
   let x = calcX(restime);
   let linkop = ``;
   let already = false;
-  let idL = $page.data.uid;
+  let idL = page.data.uid;
   let qwerys = ``;
   let pendq = ``;
-  export let userslength = 0;
 
   let km = false;
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
   function myMi() {
-    for (var i = 0; i < meData.length; i++) {
+    for (let i = 0; i < meData.length; i++) {
       meData[i].hm = 1;
       meData[i].attributes.easy = meData[i].attributes.price;
       meData[i].attributes.dates = new Date().toISOString().slice(0, -1);
@@ -562,6 +557,9 @@ vots: [${userss},
       )
         .toISOString()
         .slice(0, -1);
+      if (meData[i].selectedResource === undefined) {
+        meData[i].selectedResource = [];
+      }
     }
   }
 
@@ -569,7 +567,7 @@ vots: [${userss},
     km = false;
     ky = false;
     kc = false;
-    for (var i = 0; i < meData.length; i++) {
+    for (let i = 0; i < meData.length; i++) {
       meData[i].attributes.price < 0
         ? (meData[i].attributes.price = 0)
         : meData[i].attributes.price;
@@ -579,8 +577,8 @@ vots: [${userss},
       console.log(meData[i].attributes.easy, 'to to');
 
       if (meData[i].attributes.kindOf === 'monthly') {
-        var a = moment(meData[i].attributes.datef);
-        var b = moment(meData[i].attributes.dates);
+        let a = moment(meData[i].attributes.datef);
+        let b = moment(meData[i].attributes.dates);
         meData[i].monts = a.diff(b, 'months', true).toFixed(2);
         ky = true;
         meData[i].m = true;
@@ -591,8 +589,8 @@ vots: [${userss},
         meData[i].total = meData[i].monts * meData[i].attributes.price;
         meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
       } else if (meData[i].attributes.kindOf === 'yearly') {
-        var a = moment(meData[i].attributes.datef);
-        var b = moment(meData[i].attributes.dates);
+        let a = moment(meData[i].attributes.datef);
+        let b = moment(meData[i].attributes.dates);
         meData[i].years = a.diff(b, 'years', true).toFixed(2);
         ky = true;
         meData[i].y = true;
@@ -640,18 +638,44 @@ vots: [${userss},
   }
 
   function remove(id) {
-    dispatch('remove', {
+    onRemove?.({
       id: id,
       data: meData
     });
   }
 
-  export let meData = [];
+  /**
+   * @typedef {Object} Props
+   * @property {any} [needr]
+   * @property {any} projectId
+   * @property {any} pu
+   * @property {any} pn
+   * @property {any} pl
+   * @property {any} restime
+   * @property {number} [userslength]
+   * @property {any} [meData]
+   * @property {(payload: any) => void} [onRemove]
+   * @property {(payload: any) => void} [onClose]
+   */
+
+  /** @type {Props} */
+  let {
+    needr = [],
+    projectId,
+    pu,
+    pn,
+    pl,
+    restime,
+    userslength = 0,
+    meData = $bindable([]),
+    onRemove,
+    onClose
+  } = $props();
   let miDatan = [];
-  let error1 = null;
-  let loading = false;
-  let success = false;
-  let error = false;
+  let error1 = $state(null);
+  let loading = $state(false);
+  let success = $state(false);
+  let error = $state(false);
 
   async function createResources() {
     loading = true;
@@ -698,6 +722,28 @@ vots: [${userss},
     en: 'No matching resources found'
   };
 
+  const componentTexts = {
+    removeResource: { he: 'הסרת המשאב שנבחר', en: 'Remove selected resource' },
+    remove: { he: 'הסרה', en: 'Remove' },
+    name: { he: 'שם', en: 'Name' },
+    description: { he: 'תיאור', en: 'Description' },
+    type: { he: 'סוג', en: 'Type' },
+    quantity: { he: 'כמות', en: 'Quantity' },
+    addStartDate: { he: 'הוספת תאריך התחלה', en: 'Add start date' },
+    endDate: { he: 'תאריך סיום', en: 'End Date' },
+    addEndDate: { he: 'הוספת תאריך סיום', en: 'Add end date' },
+    specialNotes: { he: 'הערות מיוחדות', en: 'Special Notes' },
+    cost: { he: 'עלות', en: 'Cost' },
+    monetaryValue: { he: 'שווי כספי', en: 'Monetary Value' },
+    perMonth: { he: 'לכל חודש', en: 'per month' },
+    perYear: { he: 'לכל שנה', en: 'per year' },
+    forPeriod: { he: 'לכל התקופה', en: 'for the whole period' },
+    maxValueForRikma: { he: 'שווי מקסימלי לחישוב בריקמה', en: 'Maximum value for calculation' },
+    suggestedValue: { he: 'שווי מוצע', en: 'Suggested Value' },
+    linkForDetails: { he: 'לינק לפרטי מוצר\\ מחיר \\ רכישה', en: 'Link for product details/price/purchase' },
+    link: { he: 'לינק', en: 'Link' }
+  };
+
   function hasAssignment(data) {
     return data.assignedTo && data.assignedTo.length > 0;
   }
@@ -730,18 +776,18 @@ vots: [${userss},
   function toggleSelfAssign(data, index) {
     if (data.assignedTo && data.assignedTo.length > 0) {
       // If already assigned, remove assignment
-      data.assignedTo = [];
-      meData[index] = { ...data };
+      meData[index] = { ...data, assignedTo: [] };
     } else {
       // If not assigned, add current user
-      data.assignedTo = [
-        pu.find((user) => user.id === $page.data.uid).attributes.username
-      ];
-      meData[index] = data;
-      // Activate handleAssignment when assigning
-      handleAssignment(data, index);
+      const username = pu.find((user) => user.id === page.data.uid)?.attributes
+        .username;
+      if (username) {
+        meData[index] = { ...data, assignedTo: [username] };
+        // Activate handleAssignment when assigning
+        handleAssignment(meData[index], index);
+      }
     }
-    meData = meData; // Trigger reactivity
+    meData = [...meData]; // Trigger reactivity
   }
 </script>
 
@@ -759,359 +805,365 @@ vots: [${userss},
             {tableHeaders.selectedResources[$lang]}
           </h1>
         </caption>
-        <tr class="gg">
-          <th class="gg">הסרת המשאב שנבחר</th>
-          {#each meData as data, i}
-            <td class="gg" style="font-size: 3rem">
-              {i + 1}
-              <button title="הסרה" on:click={remove(data.id)}
-                ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                  <path
-                    fill="currentColor"
-                    d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z"
-                  />
-                </svg></button
-              ></td
-            >
-          {/each}
-        </tr>
-        <tr class="ggr">
-          <th class="ggr">שם</th>
-          {#each meData as data, i}
-            <td class="ggr">
-              <div dir="rtl" class="textinput">
-                <input
-                  type="text"
-                  id="inputi"
-                  name="inputi"
-                  bind:value={data.attributes.name}
-                  class="input"
-                  required
-                />
-                <label for="nam" id="labeli" class="label">שם</label>
-                <span class="line"></span>
-              </div>
-            </td>
-          {/each}
-        </tr>
-        <tr>
-          <th>תיאור</th>
-          {#each meData as data, i}
-            <td>
-              <div dir="rtl" class="textinput">
-                <textarea
-                  bind:value={data.attributes.descrip}
-                  type="text"
-                  class="input d"
-                  required
-                ></textarea>
-                <label for="name" class="label">תיאור</label>
-                <span class="line"></span>
-              </div>
-            </td>
-          {/each}
-        </tr>
-        <tr>
-          <th>סוג</th>
-          {#each meData as data, i}
-            <td>
-              <select
-                bind:value={data.attributes.kindOf}
-                on:change={() => myMissionH()}
-                class="round form-select appearance-none
-                        block
-                        w-full
-                        px-3
-                        py-1.5
-                        text-barbi
-                        font-normal
-                        bg-gold bg-clip-padding bg-no-repeat
-                        border border-solid border-gold
-                        rounded
-                        transition
-                        ease-in-out
-                        m-0
-                        focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
-              >
-                <option value="total">{ot[$lang]}</option>
-                <option value="monthly">{pm[$lang]}</option>
-                <option value="yearly">{pye[$lang]}</option>
-                <option value="perUnit">{py[$lang]}</option>
-                <option value="rent">{re[$lang]}</option>
-              </select>
-            </td>
-          {/each}
-        </tr>
-        {#if userslength === 1}
-          <tr>
-            <th>{selfAssign[$lang]}</th>
+        <tbody>
+          <tr class="gg">
+            <th class="gg">{componentTexts.removeResource[$lang]}</th>
             {#each meData as data, i}
-              <td>
-                <div class="space-y-2">
-                  <button
-                    class="w-full px-4 py-2 text-sm text-white rounded hover:bg-blue-600 relative flex items-center justify-center"
-                    class:bg-blue-500={data.assignedTo?.length < 1 ||
-                      !data.assignedTo?.length}
-                    class:bg-green-500={data.assignedTo?.length === 1}
-                    class:hover:bg-green-600={data.assignedTo?.length === 1}
-                    on:click={() => toggleSelfAssign(data, i)}
-                  >
-                    <span>{selfAssign[$lang]}</span>
-                    {#if data.assignedTo?.length}
-                      <span class="ml-2 text-white">✓</span>
-                    {/if}
-                  </button>
-
-                  {#if showResourceOptions[i]}
-                    {#if loadingByRow[i]}
-                      <div class="text-center py-2">
-                        <span class="loading loading-spinner loading-md"></span>
-                      </div>
-                    {:else}
-                      {#if availableResourcesByRow[i]?.length > 0}
-                        <MultiSelect
-                          --sms-open-z-index={10000}
-                          bind:selected={data.selectedResource}
-                          placeholder={choosee[$lang]}
-                          loading={loadingByRow[i]}
-                          options={availableResourcesByRow[i].map(
-                            (res) => res.attributes.name
-                          )}
-                          noMatchingOptionsMsg={noResources[$lang]}
-                          maxSelect={1}
-                          on:change={() => {
-                            if (
-                              data.selectedResource &&
-                              data.selectedResource.length > 0
-                            ) {
-                              newResourceByRow[i] = false;
-                            }
-                          }}
-                        />
-                      {:else}
-                        <div class="text-red-500 text-sm mb-2 text-center">
-                          {noResources[$lang]}
-                        </div>
-                      {/if}
-
-                      <button
-                        class="w-full px-4 py-2 text-sm text-white rounded hover:bg-blue-600 relative flex items-center justify-center"
-                        class:bg-blue-500={!newResourceByRow[i]}
-                        class:bg-green-500={newResourceByRow[i]}
-                        class:hover:bg-green-600={newResourceByRow[i]}
-                        on:click={() => createNewResource(data, i)}
-                      >
-                        <span>{creatnew[$lang]}</span>
-                        {#if newResourceByRow[i]}
-                          <span class="ml-2 text-white">✓</span>
-                        {/if}
-                      </button>
-
-                      {#if data.selectedResource?.length > 0 || newResourceByRow[i]}
-                        <button
-                          class="mt-2 w-full px-4 py-2 text-sm text-white rounded hover:bg-blue-600 relative flex items-center justify-center"
-                          class:bg-blue-500={!resourceReceivedByRow[i]}
-                          class:bg-green-500={resourceReceivedByRow[i]}
-                          class:hover:bg-green-600={resourceReceivedByRow[i]}
-                          on:click={() => toggleResourceReceived(i)}
-                        >
-                          <span>{RESOURCE_RECEIVED_TEXT[$lang]}</span>
-                          {#if resourceReceivedByRow[i]}
-                            <span class="ml-2 text-white">✓</span>
-                          {/if}
-                        </button>
-                      {/if}
-                    {/if}
-                  {/if}
+              <td class="gg" style="font-size: 3rem">
+                {i + 1}
+                <button title={componentTexts.remove[$lang]} onclick={remove(data.id)}
+                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M4,2H11A2,2 0 0,1 13,4V20A2,2 0 0,1 11,22H4A2,2 0 0,1 2,20V4A2,2 0 0,1 4,2M4,10V14H11V10H4M4,16V20H11V16H4M4,4V8H11V4H4M17.59,12L15,9.41L16.41,8L19,10.59L21.59,8L23,9.41L20.41,12L23,14.59L21.59,16L19,13.41L16.41,16L15,14.59L17.59,12Z"
+                    />
+                  </svg></button
+                ></td
+              >
+            {/each}
+          </tr>
+          <tr class="ggr">
+            <th class="ggr">{componentTexts.name[$lang]}</th>
+            {#each meData as data, i}
+              <td class="ggr">
+                <div dir="rtl" class="textinput">
+                  <input
+                    type="text"
+                    id="inputi"
+                    name="inputi"
+                    bind:value={data.attributes.name}
+                    class="input"
+                    required
+                  />
+                  <label for="nam" id="labeli" class="label">{componentTexts.name[$lang]}</label>
+                  <span class="line"></span>
                 </div>
               </td>
             {/each}
           </tr>
-        {/if}
-        <tr>
-          <th>כמות</th>
-          {#each meData as data, i}
-            <td>
-              <div
-                style="display:{kc ? '' : 'none'};"
-                dir="rtl"
-                class="textinput"
+          <tr>
+            <th>{componentTexts.description[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <div dir="rtl" class="textinput">
+                  <textarea
+                    bind:value={data.attributes.descrip}
+                    type="text"
+                    class="input d"
+                    required
+                  ></textarea>
+                  <label for="name" class="label">{componentTexts.description[$lang]}</label>
+                  <span class="line"></span>
+                </div>
+              </td>
+            {/each}
+          </tr>
+          <tr>
+            <th>{componentTexts.type[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <select
+                  bind:value={data.attributes.kindOf}
+                  onchange={() => myMissionH()}
+                  class="round form-select appearance-none
+                          block
+                          w-full
+                          px-3
+                          py-1.5
+                          text-barbi
+                          font-normal
+                          bg-gold bg-clip-padding bg-no-repeat
+                          border border-solid border-gold
+                          rounded
+                          transition
+                          ease-in-out
+                          m-0
+                          focus:text-barbi focus:bg-gold focus:border-barbi focus:outline-none"
+                >
+                  <option value="total">{ot[$lang]}</option>
+                  <option value="monthly">{pm[$lang]}</option>
+                  <option value="yearly">{pye[$lang]}</option>
+                  <option value="perUnit">{py[$lang]}</option>
+                  <option value="rent">{re[$lang]}</option>
+                </select>
+              </td>
+            {/each}
+          </tr>
+          {#if userslength === 1}
+            <tr>
+              <th>{selfAssign[$lang]}</th>
+              {#each meData as data, i}
+                <td>
+                  <div class="space-y-2">
+                    <button
+                      class="w-full px-4 py-2 text-sm text-white rounded hover:bg-blue-600 relative flex items-center justify-center"
+                      class:bg-blue-500={data.assignedTo?.length < 1 ||
+                        !data.assignedTo?.length}
+                      class:bg-green-500={data.assignedTo?.length === 1}
+                      class:hover:bg-green-600={data.assignedTo?.length === 1}
+                      onclick={() => toggleSelfAssign(data, i)}
+                    >
+                      <span>{selfAssign[$lang]}</span>
+                      {#if data.assignedTo?.length}
+                        <span class="ml-2 text-white">✓</span>
+                      {/if}
+                    </button>
+
+                    {#if showResourceOptions[i]}
+                      {#if loadingByRow[i]}
+                        <div class="text-center py-2">
+                          <span class="loading loading-spinner loading-md"></span>
+                        </div>
+                      {:else}
+                        {#if availableResourcesByRow[i]?.length > 0}
+                          <MultiSelect
+
+                            --sms-open-z-index={10000}
+                            bind:selected={data.selectedResource}
+                            placeholder={choosee[$lang]}
+                            loading={loadingByRow[i]}
+                            options={availableResourcesByRow[i].map(
+                              (res) => res.attributes.name
+                            )}
+                            noMatchingOptionsMsg={noResources[$lang]}
+                            maxSelect={1}
+                            onchange={() => {
+                              if (
+                                data.selectedResource &&
+                                data.selectedResource.length > 0
+                              ) {
+                                newResourceByRow[i] = false;
+                              }
+                            }}
+                          />
+                        {:else}
+                          <div class="text-red-500 text-sm mb-2 text-center">
+                            {noResources[$lang]}
+                          </div>
+                        {/if}
+
+                        <button
+                          class="w-full px-4 py-2 text-sm text-white rounded hover:bg-blue-600 relative flex items-center justify-center"
+                          class:bg-blue-500={!newResourceByRow[i]}
+                          class:bg-green-500={newResourceByRow[i]}
+                          class:hover:bg-green-600={newResourceByRow[i]}
+                          onclick={() => createNewResource(data, i)}
+                        >
+                          <span>{creatnew[$lang]}</span>
+                          {#if newResourceByRow[i]}
+                            <span class="ml-2 text-white">✓</span>
+                          {/if}
+                        </button>
+
+                        {#if data.selectedResource?.length > 0 || newResourceByRow[i]}
+                          <button
+                            class="mt-2 w-full px-4 py-2 text-sm text-white rounded hover:bg-blue-600 relative flex items-center justify-center"
+                            class:bg-blue-500={!resourceReceivedByRow[i]}
+                            class:bg-green-500={resourceReceivedByRow[i]}
+                            class:hover:bg-green-600={resourceReceivedByRow[i]}
+                            onclick={() => toggleResourceReceived(i)}
+                          >
+                            <span>{RESOURCE_RECEIVED_TEXT[$lang]}</span>
+                            {#if resourceReceivedByRow[i]}
+                              <span class="ml-2 text-white">✓</span>
+                            {/if}
+                          </button>
+                        {/if}
+                      {/if}
+                    {/if}
+                  </div>
+                </td>
+              {/each}
+            </tr>
+          {/if}
+          <tr>
+            <th>{componentTexts.quantity[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <div
+                  style="display:{kc ? '' : 'none'};"
+                  dir="rtl"
+                  class="textinput"
+                >
+                  <input
+                    onchange={() => myMissionH()}
+                    bind:value={data.hm}
+                    type="number"
+                    class="input"
+                    required
+                  />
+                  <label for="name" class="label">{componentTexts.quantity[$lang]}</label>
+                  <span class="line"></span>
+                </div>
+                {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2"
+                    >{tableHeaders.invalidPrice[$lang]}</small
+                  >{/if}
+              </td>{/each}
+          </tr>
+          <tr style="display:{ky ? '' : 'none'};">
+            <th>{tableHeaders.startDate[$lang]}</th>
+            {#each meData as data, i}
+              <td
+                ><input
+                  onchange={() => myMissionH()}
+                  class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
+                  type="datetime-local"
+                  style="display:{meData[i].ky ? '' : 'none'};"
+                  placeholder={componentTexts.addStartDate[$lang]}
+                  bind:value={data.attributes.dates}
+                /></td
               >
-                <input
-                  on:change={() => myMissionH()}
-                  bind:value={data.hm}
-                  type="number"
-                  class="input"
-                  required
-                />
-                <label for="name" class="label">כמות</label>
-                <span class="line"></span>
-              </div>
-              {#if data.hm < 0}<small class="bg-red-800 text-slate-50 px-2"
-                  >{tableHeaders.invalidPrice[$lang]}</small
-                >{/if}
-            </td>{/each}
-        </tr><tr style="display:{ky ? '' : 'none'};">
-          <th>{tableHeaders.startDate[$lang]}</th>
-          {#each meData as data, i}
-            <td
-              ><input
-                on:change={() => myMissionH()}
-                class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
-                type="datetime-local"
-                style="display:{meData[i].ky ? '' : 'none'};"
-                placeholder="הוספת תאריך התחלה"
-                bind:value={data.attributes.dates}
-              /></td
-            >
-          {/each}
-        </tr>
-        <tr style="display:{ky ? '' : 'none'};">
-          <th>תאריך סיום </th>
-          {#each meData as data, i}
-            <td
-              ><input
-                on:change={() => myMissionH()}
-                class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
-                style="display:{meData[i].ky ? '' : 'none'};"
-                type="datetime-local"
-                placeholder="הוספת תאריך סיום"
-                bind:value={data.attributes.datef}
-              /></td
-            >
-          {/each}
-        </tr>
-        <tr>
-          <th>הערות מיוחדות</th>
-          {#each meData as data, i}
-            <td>
-              <div dir="rtl" class="textinput">
-                <textarea
-                  bind:value={data.spnot}
-                  type="text"
-                  class="input d"
-                  required
-                ></textarea>
-                <label for="name" class="label">הערות מיוחדות</label>
-                <span class="line"></span>
-              </div>
-            </td>
-          {/each}
-        </tr>
-        <tr>
-          <th>עלות</th>
-          {#each meData as data, i}
-            <td>
-              <div dir="rtl" class="textinput">
-                <input
-                  on:change={() => myMissionH()}
-                  bind:value={data.attributes.price}
-                  type="number"
-                  class="input"
-                  required
-                />
-                <label for="name" class="label"
-                  >שווי כספי <span style="display:{meData[i].m ? '' : 'none'};"
-                    >לכל חודש</span
-                  ><span style="display:{meData[i].y ? '' : 'none'};"
-                    >לכל שנה</span
-                  ><span style="display:{meData[i].r ? '' : 'none'};"
-                    >לכל התקופה</span
-                  ><span style="display:{meData[i].kc ? '' : 'none'};"
-                    >ליחידה</span
-                  >
-                </label>
-                <span class="line"></span>
-              </div>
-              {#if data.attributes.price < 0}<small class="bg-red-800 text-slate-50 px-2"
-                  >{tableHeaders.invalidPrice[$lang]}</small
-                >{/if}
-            </td>{/each}
-        </tr><tr>
-          <th>שווי מקסימלי לחישוב בריקמה</th>
-          {#each meData as data, i}
-            <td>
-              <div dir="rtl" class="textinput">
-                <input
-                  on:change={() => myMissionH()}
-                  bind:value={data.attributes.easy}
-                  type="number"
-                  class="input"
-                  required
-                />
-                <label for="name" class="label"
-                  >שווי מוצע <span style="display:{meData[i].m ? '' : 'none'};"
-                    >לכל חודש</span
-                  ><span style="display:{meData[i].y ? '' : 'none'};"
-                    >לכל שנה</span
-                  ><span style="display:{meData[i].r ? '' : 'none'};"
-                    >לכל התקופה</span
-                  ><span style="display:{meData[i].kc ? '' : 'none'};"
-                    >ליחידה</span
-                  >
-                </label>
-                <span class="line"></span>
-              </div>
-              {#if data.attributes.easy < 0}<small
-                  class="bg-red-800 text-slate-50 px-2"
-                  >{tableHeaders.invalidPrice[$lang]}</small
-                >{/if}
-            </td>{/each}
-        </tr><tr style="display:{kc || ky ? '' : 'none'};">
-          <th>{tableHeaders.maxValue[$lang]}</th>
-          {#each meData as data, i}
-            <td>
-              <h3
-                style="display:{meData[i].m ||
-                meData[i].y ||
-                meData[i].kc ||
-                meData[i].t
-                  ? ''
-                  : 'none'};"
+            {/each}
+          </tr>
+          <tr style="display:{ky ? '' : 'none'};">
+            <th>{componentTexts.endDate[$lang]}</th>
+            {#each meData as data, i}
+              <td
+                ><input
+                  onchange={() => myMissionH()}
+                  class="bg-gold hover:bg-mtork border-2 border-barbi rounded"
+                  style="display:{meData[i].ky ? '' : 'none'};"
+                  type="datetime-local"
+                  placeholder={componentTexts.addEndDate[$lang]}
+                  bind:value={data.attributes.datef}
+                /></td
               >
-                {data.total}
-              </h3>
-            </td>{/each}
-        </tr><tr style="display:{kc || ky ? '' : 'none'};">
-          <th>שווי מקסימלי סה"כ</th>
-          {#each meData as data, i}
-            <td>
-              <h3
-                style="display:{meData[i].m ||
-                meData[i].y ||
-                meData[i].kc ||
-                meData[i].t
-                  ? ''
-                  : 'none'};"
+            {/each}
+          </tr>
+          <tr>
+            <th>{componentTexts.specialNotes[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <div dir="rtl" class="textinput">
+                  <textarea
+                    bind:value={data.spnot}
+                    type="text"
+                    class="input d"
+                    required
+                  ></textarea>
+                  <label for="name" class="label">{componentTexts.specialNotes[$lang]}</label>
+                  <span class="line"></span>
+                </div>
+              </td>
+            {/each}
+          </tr>
+          <tr>
+            <th>{componentTexts.cost[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <div dir="rtl" class="textinput">
+                  <input
+                    onchange={() => myMissionH()}
+                    bind:value={data.attributes.price}
+                    type="number"
+                    class="input"
+                    required
+                  />
+                  <label for="name" class="label"
+                    >{componentTexts.monetaryValue[$lang]} <span style="display:{meData[i].m ? '' : 'none'};"
+                      >{componentTexts.perMonth[$lang]}</span
+                    ><span style="display:{meData[i].y ? '' : 'none'};"
+                      >{componentTexts.perYear[$lang]}</span
+                    ><span style="display:{meData[i].r ? '' : 'none'};"
+                      >{componentTexts.forPeriod[$lang]}</span
+                    ><span style="display:{meData[i].kc ? '' : 'none'};"
+                      >{py[$lang]}</span
+                    >
+                  </label>
+                  <span class="line"></span>
+                </div>
+                {#if data.attributes.price < 0}<small class="bg-red-800 text-slate-50 px-2"
+                    >{tableHeaders.invalidPrice[$lang]}</small
+                  >{/if}
+              </td>{/each}
+          </tr>
+          <tr>
+            <th>{componentTexts.maxValueForRikma[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <div dir="rtl" class="textinput">
+                  <input
+                    onchange={() => myMissionH()}
+                    bind:value={data.attributes.easy}
+                    type="number"
+                    class="input"
+                    required
+                  />
+                  <label for="name" class="label"
+                    >{componentTexts.suggestedValue[$lang]} <span style="display:{meData[i].m ? '' : 'none'};"
+                      >{componentTexts.perMonth[$lang]}</span
+                    ><span style="display:{meData[i].y ? '' : 'none'};"
+                      >{componentTexts.perYear[$lang]}</span
+                    ><span style="display:{meData[i].r ? '' : 'none'};"
+                      >{componentTexts.forPeriod[$lang]}</span
+                    ><span style="display:{meData[i].kc ? '' : 'none'};"
+                      >{py[$lang]}</span
+                    >
+                  </label>
+                  <span class="line"></span>
+                </div>
+                {#if data.attributes.easy < 0}<small
+                    class="bg-red-800 text-slate-50 px-2"
+                    >{tableHeaders.invalidPrice[$lang]}</small
+                  >{/if}
+              </td>{/each}
+          </tr>
+          <tr style="display:{kc || ky ? '' : 'none'};">
+            <th>{tableHeaders.maxValue[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <h3
+                  style="display:{meData[i].m ||
+                  meData[i].y ||
+                  meData[i].kc ||
+                  meData[i].t
+                    ? ''
+                    : 'none'};"
+                >
+                  {data.total}
+                </h3>
+              </td>{/each}
+          </tr>
+          <tr style="display:{kc || ky ? '' : 'none'};">
+            <th>{tableHeaders.maxValue[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <h3
+                  style="display:{meData[i].m ||
+                  meData[i].y ||
+                  meData[i].kc ||
+                  meData[i].t
+                    ? ''
+                    : 'none'};"
+                >
+                  {data.totaltotal}
+                </h3>
+              </td>{/each}
+          </tr>
+          <tr>
+            <th>{componentTexts.linkForDetails[$lang]}</th>
+            {#each meData as data, i}
+              <td>
+                <div dir="rtl" class="textinput">
+                  <input
+                    bind:value={data.attributes.linkto}
+                    type="text"
+                    class="input"
+                    required
+                  />
+                  <label for="name" class="label">{componentTexts.link[$lang]}</label>
+                  <span class="line"></span>
+                </div></td
               >
-                {data.totaltotal}
-              </h3>
-            </td>{/each}
-        </tr>
-        <tr>
-          <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
-          {#each meData as data, i}
-            <td>
-              <div dir="rtl" class="textinput">
-                <input
-                  bind:value={data.attributes.linkto}
-                  type="text"
-                  class="input"
-                  required
-                />
-                <label for="name" class="label">לינק</label>
-                <span class="line"></span>
-              </div></td
-            >
-          {/each}
-        </tr>
-      </table>
+            {/each}
+          </tr>
+        </tbody>
     </div>
     <div>
         <br>
         <Button 
           text={buttonText.publishResources}
-          on:click={createResources}
+          onClick={createResources}
           {loading}
           {success}
           {error}

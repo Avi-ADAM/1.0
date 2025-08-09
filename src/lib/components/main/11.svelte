@@ -7,7 +7,7 @@ Command: npx @threlte/gltf@1.0.1 static/3d/11.glb
  
   import {spring } from 'svelte/motion'
   import { CylinderGeometry, Group, SpotLight } from 'three'
-  import { T, forwardEventHandlers } from '@threlte/core'
+  import { T } from '@threlte/core'
   import { useGltf } from '@threlte/extras'
   import { TextureLoader, MirroredRepeatWrapping } from 'three'
   import { useLoader } from '@threlte/core'
@@ -19,14 +19,14 @@ const geometry = new CylinderGeometry( 5, 5, 0.5, 32 );
     top.set(4)
     setTimeout(top.set(0),3000)
   })*/
-  export const ref = new Group()
+  let {s,fallback, error, children, poz = {z:0, y:0, x:0}, ref = new Group() , fi = $bindable(false), hover = $bindable(false), scrolli = $bindable(false) , ...props} = $props()
 
   const gltf = useGltf('3d/11.glb')
 
-  const component = forwardEventHandlers()
    const top = spring(0)
-   export let fi = false, hover = false, scrolli = false
-  $: if(fi == true){
+  $effect(()=>{
+    console.log("GLTFFF")
+   if(fi == true){
     top.set(7,{duration:3000})
   }else if(hover == true){
       console.log("true")
@@ -36,20 +36,17 @@ const geometry = new CylinderGeometry( 5, 5, 0.5, 32 );
   }else{
     top.set(0,{duration:3000})
   }
+  })
    let rotationt = 0
-  export let poz = {z:0, y:0, x:0};
 
     let arr = new Array(100)
     let arr2 = new Array(50)
 </script>
 
-<T is={ref} dispose={false} {...$$restProps} bind:this={$component}>
+<T bind:ref dispose={false} {...props}>
   {#await gltf}
-    <slot name="fallback" />
+  {@render fallback?.()}
   {:then gltf}
-  
- 
-
 
 <T.SpotLight position={{ y: -20, z: -5, x: 5 }} />
 
@@ -156,9 +153,9 @@ const geometry = new CylinderGeometry( 5, 5, 0.5, 32 );
 
             <T.SpotLight position={[-0.01,fi == true? $top*2+(-6) : $top+(-6), 0.01]}/>
 -->
-  {:catch error}
-    <slot name="error" {error} />
-  {/await}
+{:catch err}
+{@render error?.({ error: err })}
+{/await}
 
-  <slot {ref} />
+{@render children?.({ ref })}
 </T>

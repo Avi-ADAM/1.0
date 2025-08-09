@@ -1,11 +1,25 @@
 <script>
     import { onMount } from 'svelte';
     import moment from 'moment';
-      import { createEventDispatcher } from 'svelte';
     let SvelteGantt, SvelteGanttTable, MomentSvelteGanttDateAdapter;
 
- const dispatch = createEventDispatcher();
-    export let bmiData = [], pmiData = [], omiData = [], fmiData = []; 
+   /**
+    * @typedef {Object} Props
+    * @property {Array<any>} [bmiData]
+    * @property {Array<any>} [pmiData]
+    * @property {Array<any>} [omiData]
+    * @property {Array<any>} [fmiData]
+    * @property {(payload: { id: any }) => void} [onSelected] - Callback when a task is selected.
+    */
+
+   /** @type {Props} */
+   let {
+      bmiData = [],
+      pmiData = [],
+      omiData = [],
+      fmiData = [],
+      onSelected
+   } = $props();
     let options = {}
 
     let currentStart ;
@@ -60,7 +74,7 @@
     }
     console.log(options)
         window.gantt = gantt = new SvelteGantt({ target: document.getElementById('example-gantt'), props: options });
-    	gantt.api.tasks.on.select((task) => dispatch('selected', { id:task}));
+    	gantt.api.tasks.on.select((task) => onSelected({ id:task}));
 
     });
 	
@@ -200,7 +214,7 @@
         return { rows, tasks };
     }
     function onUpdateOptions(opts) {
-      //  const opts = event.detail;
+      //  const opts = event;
         Object.assign(options, opts);
         gantt.$set(options);
     }
@@ -257,8 +271,8 @@
     }
 </style>
  <div width="100%">
-    <button class="btnl" on:click={()=>onSetNextDay()} value=">"><svg class="w-4 sm:w-8 h-4 sm:h-8" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
-        <button class="btnr" on:click={()=>onSetPreviousDay()} value="<"><svg class="w-4 sm:w-8 h-4 sm:h-8" style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+    <button class="btnl" onclick={()=>onSetNextDay()} value=">"><svg class="w-4 sm:w-8 h-4 sm:h-8" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
+        <button class="btnr" onclick={()=>onSetPreviousDay()} value="<"><svg class="w-4 sm:w-8 h-4 sm:h-8" style="transform: rotate(180deg);" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" text-rendering="geometricPrecision" image-rendering="optimizeQuality" fill-rule="evenodd" clip-rule="evenodd" viewBox="0 0 312 511.42"><path fill="currentColor" fill-rule="nonzero" d="M35.54 0 312 252.82 29.84 511.42 0 478.8l246.54-225.94L5.7 32.62z"/></svg></button>
    </div>
 <div class="container">
    

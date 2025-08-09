@@ -1,19 +1,33 @@
 <script>
-     import { createEventDispatcher } from 'svelte';
-      const dispatch = createEventDispatcher();
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [addN]
+   * @property {boolean} [openMA]
+   * @property {number} [noofopenm]
+   * @property {string} [hosafat]
+   * @property {() => void} [onMasi] - Callback for 'masi' event
+   * @property {() => void} [onBighandd] - Callback for 'bighandd' event
+   * @property {() => void} [onTrym] - Callback for 'trym' event
+   */
 
-    export let addN = false;
-    export let openMA = false;
-    export let noofopenm = 0;
-    export let hosafat = "";
+  /** @type {Props} */
+  let {
+    addN = $bindable(false),
+    openMA = $bindable(false),
+    noofopenm = $bindable(0),
+    hosafat = "",
+    onMasi,
+    onBighandd,
+    onTrym
+  } = $props();
 function bighand (){
-dispatch('masi');
+onMasi?.();
 }    
 function bighandd (){
-dispatch('bighandd' ); 
+onBighandd?.(); 
 }
 function trym (){
-    dispatch('trym' );
+    onTrym?.();
 }
 </script>
 <svg style="max-width:45vw; max-height:45vw;" width="240" height="240" viewBox="304.017 285.449 844.373 823.956" id="newsvg4" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
@@ -111,7 +125,7 @@ function trym (){
     <circle style="fill: url(#newlinearGradient4196); fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1;" id="newpath4180" cx="365.389" cy="538.166" r="100"/>
             {#if addN === false} 
 
-    <a on:click={bighand}  on:mouseenter={bighandd} id="newbutton" class="buttonadd">
+    <a onclick={bighand}  onmouseenter={bighandd} id="newbutton" class="buttonadd">
         
       <circle r="100" cy="-538.166" cx="-365.389" id="newbutton" style="opacity: 0.3; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; fill: url(#newlinearGradient4172-0);" transform="matrix(-1, 0, 0, -1, 0, 0)"/>
     </a>
@@ -190,7 +204,7 @@ function trym (){
   </g>
         {/if}
         {#if openMA === false}
-    <g  transform="matrix(1, 0, 0, 1, 359.919037, 204.900604)"  on:click={trym} style="">
+    <g  transform="matrix(1, 0, 0, 1, 359.919037, 204.900604)"  onclick={trym} style="">
         <g class="gg">
       <title>הצגת בקשות למשאבים</title>
       <rect  style="opacity: 0.9; fill-opacity: 1; stroke: none; stroke-width: 1.2; stroke-linejoin: bevel; stroke-miterlimit: 4; stroke-dasharray: 14.4, 1.2; stroke-dashoffset: 0; stroke-opacity: 1; " id="rect-11" width="340.857" height="100.571" x="202.619" y="620.895" ry="2.542"/>

@@ -1,14 +1,9 @@
 <script>
-export let state = 2 // original and edit, 3 is original second and edit
-export let text;
-export let old = [];
-export let lebel = {"he":"עריכה", "en": "edit"}
 import tr from '$lib/translations/tr.json'
   import Close from '$lib/celim/close.svelte';
 import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
-  let htmlon = ``
-    export let long = false
+  let htmlon = $state(``)
 onMount(()=>{
     if (text == textb){
     htmlon = text
@@ -16,9 +11,27 @@ onMount(()=>{
     checkAll(text,textb)
     }
 })
-let edit = false
-let show2 = false
-export let textb = text
+let edit = $state(false)
+let show2 = $state(false)
+  /**
+   * @typedef {Object} Props
+   * @property {number} [stepState] - original and edit, 3 is original second and edit
+   * @property {any} text
+   * @property {any} [old]
+   * @property {any} [lebel]
+   * @property {boolean} [long]
+   * @property {any} [textb]
+   */
+
+  /** @type {Props} */
+  let {
+    stepState = 2,
+    text,
+    old = [],
+    lebel = {"he":"עריכה", "en": "edit"},
+    long = false,
+    textb = $bindable(text)
+  } = $props();
 function check (lettera, letterb){
     if(lettera == letterb){
         return true
@@ -26,41 +39,70 @@ function check (lettera, letterb){
         return false
     }
 }
-function checkAll (a, b){
-    let al = a && a.length > 0 ? a.split(" ") : []
-    let bl = b && b.length > 0 ? b.split(" ") : []
-    let t = 0
-    htmlon = ``
-    if(al.length > 0 && bl.length >0){
-  for(let i =0; i < bl.length; i++){
+function checkAll(a, b) {
+    const al = a && a.length > 0 ? a.split(" ") : [];
+    const bl = b && b.length > 0 ? b.split(" ") : [];
+    let html = '';
+    let i = 0; // pointer for al
+    let j = 0; // pointer for bl
 
-    if (check(al[i+t], bl[i]) == true){
-        htmlon += `${al[i+t]} `
-    } else if(check(al[i+1], bl[i]) == true){
-            t = 1
-            htmlon += `${al[i+t]} `
-        }else if(check(al[i+2], bl[i]) == true){
-            t = 2
-            htmlon += `${al[i+t]} `
-        }else if(check(al[i-1], bl[i]) == true){
-            t = -1
-            htmlon += `${al[i+t]} `
-        }else if(check(al[i-2], bl[i]) == true){
-            t = -2
-            htmlon += `${al[i+t]} `
-        }else{
-             if(al[i] != undefined){
-        htmlon+= `<span class="line-through text-barbi">${al[i]}</span> `
+    while (i < al.length || j < bl.length) {
+        if (i < al.length && j < bl.length && al[i] === bl[j]) {
+            // Words match
+            html += al[i] + ' ';
+            i++;
+            j++;
+        } else {
+            // Words don't match. Look ahead to find a sync point.
+            let found_b_in_a = -1;
+            if (j < bl.length) {
+                for (let k = i; k < al.length; k++) {
+                    if (al[k] === bl[j]) {
+                        found_b_in_a = k;
+                        break;
+                    }
+                }
+            }
+
+            let found_a_in_b = -1;
+            if (i < al.length) {
+                for (let k = j; k < bl.length; k++) {
+                    if (bl[k] === al[i]) {
+                        found_a_in_b = k;
+                        break;
+                    }
+                }
+            }
+
+            if (found_b_in_a !== -1 && (found_a_in_b === -1 || found_b_in_a - i <= found_a_in_b - j)) {
+                // It's more likely a deletion from 'a'.
+                // Mark words from i to found_b_in_a - 1 as deleted.
+                for (let k = i; k < found_b_in_a; k++) {
+                    html += `<span class="line-through text-barbi">${al[k]}</span> `;
+                }
+                i = found_b_in_a;
+            } else if (found_a_in_b !== -1) {
+                // It's more likely an insertion into 'b'.
+                // Mark words from j to found_a_in_b - 1 as added.
+                for (let k = j; k < found_a_in_b; k++) {
+                    html += `<span class="text-wow">${bl[k]} </span>`;
+                }
+                j = found_a_in_b;
+            } else {
+                // No sync point found. Mark al[i] as deleted and bl[j] as added.
+                if (i < al.length) {
+                    html += `<span class="line-through text-barbi">${al[i]}</span> `;
+                    i++;
+                }
+                if (j < bl.length) {
+                    html += `<span class="text-wow">${bl[j]} </span>`;
+                    j++;
+                }
+            }
         }
-        htmlon += `<span class="text-wow">${bl[i]} </span>`
     }
-  }
-}else if(al.length > 0 && bl.length == 0){
-        htmlon+= `<span class="line-through text-barbi">${a}</span> `
-}else if(al.length == 0 && bl.length >0){
-        htmlon += `<span class="text-wow">${b}</span>`    
-}
-  console.log(htmlon)
+    htmlon = html.trim();
+    console.log(htmlon);
 }
     </script>
     <div class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2">
@@ -68,13 +110,13 @@ function checkAll (a, b){
     {#if edit == false}
     <div class="flex flex-row align-middle justify-center gap-x-2">
         <h2 class="underline decoration-mturk">{lebel[$lang]}: </h2>
-        <p class="text-gold">{@html htmlon}</p><button on:click={()=>edit = true}>
+        <p class="text-gold">{@html htmlon}</p><button onclick={()=>edit = true}>
             {#if text == textb}🖍️{:else}✏️{/if}</button>
         {#if text != textb && show2 != true}
-        <button on:click={()=>show2 = true}>📑</button>
+        <button onclick={()=>show2 = true}>📑</button>
         {:else if show2 == true}
         <div class="flex flex-col align-middle justify-center ">
-        <button on:click={()=>show2 = false}><Close/></button>
+        <button onclick={()=>show2 = false}><Close/></button>
         <small class:text-right={$lang == "he"}>{tr?.nego.original[$lang]}:</small>
         <p>{text}</p>
         <small class:text-right={$lang == "he"} class="text-gold">{tr?.nego.sugestion[$lang]}:</small>
@@ -90,14 +132,14 @@ function checkAll (a, b){
 
 <div dir="rtl" class='textinput max-w-sm mx-auto'>
     {#if long == false}
-  <input type="text" on:input={(e)=>console.log(e)} id="des" name="des" bind:value={textb} class='input' required>
+  <input type="text" oninput={(e)=>console.log(e)} id="des" name="des" bind:value={textb} class='input' required>
   {:else}
       <textarea name="des"  bind:value={textb}     
  type='text' class='input d' required></textarea>
   {/if}
   <label for="des" class='label' >{lebel[$lang]}</label>
   <span class='line '></span>
-</div><button on:click={()=>{edit = false
+</div><button onclick={()=>{edit = false
 checkAll(text,textb)
 }}>✅</button>
 {/if}

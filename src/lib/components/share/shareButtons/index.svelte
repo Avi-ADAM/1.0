@@ -1,5 +1,5 @@
 <script>
-    import { lang } from "$lib/stores/lang"
+	import { lang } from "$lib/stores/lang"
 	import { browser } from '$app/environment';
        import { LinkedIn, } from 'svelte-share-buttons-component';
     import  Mail from '$lib/components/share/shareButtons/Mail.svelte'
@@ -14,22 +14,38 @@
   import { fly } from 'svelte/transition';
   import Close from '$lib/celim/close.svelte'
 	const { siteTitle, siteUrl } = website;
-    let cliced = false
-	export let slug = "";
-	export let title ="come see this on 1💗1";
-    export let desc = "its new thing"
-    export let hashtags = []; // array of hashtags exclude '#' e.g. ['svelte', 'askRodney']
-	export let quote = undefined;
-	export let related = []; // array of Twitter users (including '@')
-	export let via = ''; // include '@' e.g. '@askRodney'
+    let cliced = $state(false)
 
+
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} [slug]
+	 * @property {string} [title]
+	 * @property {string} [desc]
+	 * @property {any} [hashtags] - array of hashtags exclude '#' e.g. ['svelte', 'askRodney']
+	 * @property {any} [quote]
+	 * @property {any} [related] - array of Twitter users (including '@')
+	 * @property {string} [via] - include '@' e.g. '@askRodney'
+	 * @property {any} [body]
+	 */
+
+	/** @type {Props} */
+	let {
+		slug = "",
+		title = "come see this on 1💗1",
+		desc = "its new thing",
+		hashtags = [],
+		quote = undefined,
+		related = [],
+		via = '',
+		body = "",
+	} = $props();
     const url = `${siteUrl}/${slug}`;
+	$effect(() => {
+		body = desc + " to see this click on " + url
+	})
 
-    export let body = desc + " to see this click on " + url
 
-	$: webShareAPISupported = browser && typeof navigator.share !== 'undefined';
-
-	$: handleWebShare;
 	const handleWebShare = async () => {
 		try {
 			navigator.share({
@@ -41,12 +57,14 @@
 			webShareAPISupported = false;
 		}
 	};
+
+	let webShareAPISupported = $derived(browser && typeof navigator.share !== 'undefined');
 </script>
 
 <aside class="container">
 	<div class="wrapper">
 		 <div class="buttons">
-            <button on:click={()=>cliced = !cliced}>
+            <button onclick={()=>cliced = !cliced}>
                 {#if cliced == false}
             <span class="sr-only">Open Share manu</span>
             <ShareIcon colour="#FF0092" width={48} />
@@ -60,7 +78,7 @@
             {#if cliced == true}
             <span transition:fly|local={{y:-150, duration: 2000}}>
 			{#if webShareAPISupported}
-				<button on:click={handleWebShare}
+				<button onclick={handleWebShare}
 					><span class="sr-only">Share</span><ShareOp width={48} /></button
 				>
 			{/if}

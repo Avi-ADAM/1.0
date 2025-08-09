@@ -1,5 +1,5 @@
 <script>
-import * as animateScroll from "svelte-scrollto";
+import * as animateScroll from "svelte-scrollto-element";
 import Vid from './didiget.svelte'
 import Desi from './decisionMaking.svelte'
 import Mid from "./midi.svelte"
@@ -18,13 +18,48 @@ import {
     fly
 } from 'svelte/transition';
 
-import {
-    createEventDispatcher
-} from 'svelte';
+let modal = $state(false);
 
-const dispatch = createEventDispatcher();
-export let adder = [],
-    arr1 = [],
+function modali() {
+    modal = true;
+    animateScroll.scrollToTop()
+}
+
+/**
+ * @typedef {Object} Props
+ * @property {any} [adder]
+ * @property {any} [arr1]
+ * @property {any} [askedarr]
+ * @property {any} [declineddarr]
+ * @property {number} [halu]
+ * @property {number} [askma]
+ * @property {number} [maap]
+ * @property {number} [mashs]
+ * @property {number} [pmashd]
+ * @property {number} [fia]
+ * @property {number} [beta]
+ * @property {number} [pen]
+ * @property {number} [sug]
+ * @property {boolean} [low]
+ * @property {any} nam
+ * @property {number} [wel]
+ * @property {number} [ask]
+ * @property {any} picLink
+ * @property {any} total
+ * @property {any} [milon]
+ * @property {boolean} [sml]
+ * @property {(payload: { cards: boolean, ani: any }) => void} [onStart] - Callback for 'start' event
+ * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
+ * @property {(payload: { id: any }) => void} [onMesima] - Callback for 'mesima' event
+ * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+ * @property {(payload: { cards: boolean }) => void} [onCards] - Callback for 'cards' event
+ * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+ */
+
+/** @type {Props} */
+let {
+    adder = [],
+    arr1 = $bindable([]),
     askedarr = [],
     declineddarr = [],
     halu = 17,
@@ -37,58 +72,62 @@ export let adder = [],
     pen = 17,
     sug = 17,
     low = false,
-    nam, wel = 13,
+    nam,
+    wel = 13,
     ask = 13,
-    picLink, total
-export let milon = {
-    hachla: true,
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-}
-let modal = false;
-
-function modali() {
-    modal = true;
-    animateScroll.scrollToTop()
-}
+    picLink,
+    total,
+    milon = $bindable({
+        hachla: true,
+        fiap: true,
+        welc: true,
+        sugg: true,
+        pend: true,
+        asks: true,
+        betaha: true,
+        desi: true,
+        ppmash: true,
+        pmashs: true,
+        pmaap: true,
+        askmap: true
+    }),
+    sml = false,
+    onStart,
+    onUser,
+    onMesima,
+    onHover,
+    onCards,
+    onProj
+} = $props();
 
 function delo(event) {
     let oldob = arr1;
     const x = oldob.map(c => c.coinlapach);
-    const indexy = x.indexOf(event.detail.coinlapach);
+    const indexy = x.indexOf(event.coinlapach);
     oldob.splice(indexy, 1);
     arr1 = oldob
-    dispatch("start", {
+    onStart?.({
         cards: false,
-        ani: event.detail.ani
+        ani: event.ani
     })
 }
 
 function user(event) {
-    dispatch("user", {
-        id: event.detail.id
+    onUser?.({
+        id: event.id
     })
 }
 
 function mesima(event) {
-    dispatch("mesima", {
-        id: event.detail.id
+    onMesima?.({
+        id: event.id
     })
 }
 
 function hover(event) {
 
-    dispatch("hover", {
-        id: event.detail.id
+    onHover?.({
+        id: event.id
     })
 
 }
@@ -96,19 +135,19 @@ function hover(event) {
 function chat() {}
 
 function cards() {
-    dispatch("cards", {
+    onCards?.({
         cards: true
     })
 }
 
 function proj(event) {
-    dispatch("proj", {
-        id: event.detail.id
+    onProj?.({
+        id: event.id
     })
 }
 
 function showonly(event) {
-    const value = event.detail.data;
+    const value = event.data;
     for (const key in milon) {
         milon[key] = false
     }
@@ -122,8 +161,7 @@ function showall(event) {
     }
 
 }
-let h = 500;
-export let sml = false
+let h = $state(500);
 </script>
 
 <div id="scree" bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} >
@@ -135,11 +173,11 @@ export let sml = false
     {#each arr1 as buble, i}
     {#if buble.ani === "vidu" && milon.desi == true}
     <div class:normSml={modal == false} class="vidu normSml"><Vid
-        on:modal={() =>modal = true}
-        on:hover={hover}
-        on:proj={proj}
-        on:user={user}
-        on:coinLapach={delo}
+        onModal={() =>modal = true}
+        onHover={hover}
+        onProj={proj}
+        onUser={user}
+        onCoinLapach={delo}
         shear={buble.shear}
         hervachti={buble.hervachti}
          sendpropic={buble.sendpropic}
@@ -164,12 +202,12 @@ export let sml = false
         /></div>
     {:else if buble.ani === "haluk" && milon.desi == true}
     <div class:normSml={modal == false} class=" halu normSml"><Hal
-        on:modal={() =>modal = true}
-        on:coinLapach={delo}
+        onModal={() =>modal = true}
+        onCoinLapach={delo}
         user_1s={buble.user_1s}
-        on:hover={hover}
-        on:proj={proj}
-        on:user={user}
+        onHover={hover}
+        onProj={proj}
+        onUser={user}
         hervach={buble.hervach}
         halukot={buble.halukot}
         coinlapach={buble.coinlapach}
@@ -193,11 +231,11 @@ export let sml = false
         /></div>
         {:else if buble.ani === "mtaha" &&  milon.betaha == true}
         <div class:normSml={modal == false}  class="betaha normSml" ><MissionInProgress
-            on:proj={proj}
-            on:user={user}
-            on:hover={hover}
-            on:coinLapach={delo}
-            on:modal={() =>modal = true}
+            onProj={proj}
+            onUser={user}
+            onHover={hover}
+            onCoinLapach={delo}
+            onModal={() =>modal = true}
             pu={buble.pu}
             tasks={buble.acts.data}
             status={buble.status}
@@ -221,17 +259,17 @@ export let sml = false
             hourstotal = {buble.hoursassinged}
             perhour = {buble.perhour}
             restime={buble.restime}
-            on:done={delo}
+            onDone={delo}
             {low}
             /></div>
             {:else if buble.ani === "pmashes" && milon.ppmash == true}
             <div class="normSml ppmash"
                 ><PendingMa
-                    on:hover={hover}
-                    on:proj={proj}
-                    on:user={user}
-                    on:coinLapach={delo}
-                    on:modal={modali}
+                    onHover={hover}
+                    onProj={proj}
+                    onUser={user}
+                    onCoinLapach={delo}
+                    onModal={modali}
                             ordern={buble.orderon}
                     timegramaId={buble.timegramaId}
                     restime={buble.restime}
@@ -263,15 +301,17 @@ export let sml = false
                     pendId={buble.pendId}
                     users={buble.users}
                     {low}
+                    nego_mashes={buble.nego_mashes || []}
+                      timeGramaDate={buble.timeGramaDate}
                     /></div>
                     {:else if buble.ani === "pends" && milon.pend == true}
                     <div  class="normSml pend"
                         ><PendingM
-                            on:hover={hover}
-                            on:modal={modali}
-                            on:proj={proj}
-                            on:user={user}
-                            on:coinLapach={delo}
+                            onHover={hover}
+                            onModal={modali}
+                            onProj={proj}
+                            onUser={user}
+                            onCoinLapach={delo}
                             diun={buble.diun}
                             negopendmissions={buble.negopendmissions}
                             timegramaId={buble.timegramaId}
@@ -315,13 +355,13 @@ export let sml = false
                             /></div>
                             {:else if buble.ani === "wegets" && milon.pmaap == true}
                             <div class="pmaap normSml" ><Weget
-                                on:acsept={delo}
-                                on:decline={delo}
-                                on:hover={hover}
-                                on:modal={modali}
+                                onAcsept={delo}
+                                onDecline={delo}
+                                onHover={hover}
+                                onModal={modali}
 
-                                on:proj={proj}
-                                on:user={user}
+                                onProj={proj}
+                                onUser={user}
                                 coinlapach={buble.coinlapach}
                                 mId={buble.mId}
                                 noofusersWaiting={buble.noofusersWaiting}
@@ -363,13 +403,13 @@ export let sml = false
                                 /></div>
                                 {:else if buble.ani === "fiapp" && milon.fiap == true}
                                 <div  class="fiap normSml" ><Fiappru
-                                    on:acsept={delo}
-                                    on:decline={delo}
-                                    on:hover={hover}
-                                    on:modal={modali}
+                                    onAcsept={delo}
+                                    onDecline={delo}
+                                    onHover={hover}
+                                    onModal={modali}
 
-                                    on:proj={proj}
-                                    on:user={user}
+                                    onProj={proj}
+                                    onUser={user}
                                     coinlapach={buble.coinlapach}
                                     mId={buble.mId}
                                     noofusersWaiting={buble.noofusersWaiting}
@@ -412,19 +452,19 @@ export let sml = false
                                     {:else if buble.ani === "walcomen" && milon.welc == true}
                                     <div  class="welc normSml" ><Welcomt
                                         id={buble.id}
-                                        on:hover={hover}
+                                        onHover={hover}
                                         coinlapach={buble.coinlapach}
                                         username={buble.username}
                                         projectName={buble.projectName}
                                         /></div>
                                         {:else if buble.ani === "askedcoin" && milon.asks == true}
                                         <div  class="asks normSml" ><Reqtojoin
-                                            on:acsept={delo}
-                                            on:hover={hover}
-                                            on:modal={modali}
-                                            on:proj={proj}
-                                            on:user={user}
-                                            on:decline={delo}
+                                            onAcsept={delo}
+                                            onHover={hover}
+                                            onModal={modali}
+                                            onProj={proj}
+                                            onUser={user}
+                                            onDecline={delo}
                                             iskvua={buble.iskvua}
                                             email={buble.email}
                                             role={buble.role}
@@ -468,13 +508,13 @@ export let sml = false
                                             /></div>
                                             {:else if buble.ani === "askedm" && milon.askmap == true}
                                             <div  class="askmap normSml" ><Reqtom
-                                                on:acsept={delo}
-                                                on:decline={delo}
-                                                on:hover={hover}
-                                                on:modal={modali}
-                                                on:proj={proj}
-                                                on:user={user}
-                                                on:chat={chat}
+                                                onAcsept={delo}
+                                                onDecline={delo}
+                                                onHover={hover}
+                                                onModal={modali}
+                                                onProj={proj}
+                                                onUser={user}
+                                                onChat={chat}
                                                 coinlapach={buble.coinlapach}
                                                 pid={buble.pid}
                                                 noofusersWaiting={buble.noofusersWaiting}
@@ -511,12 +551,12 @@ export let sml = false
                                                 /></div>
                                                 {:else if buble.ani === "hachla" && milon.hachla == true}
                                                 <div class:normSml={modal == false} class="hachla normSml" ><Desi
-                                                    on:acsept={delo}
-                                                    on:decline={delo}
-                                                    on:hover={hover}
-                                                    on:modal={modali}
-                                                    on:proj={proj}
-                                                    on:chat={chat}
+                                                    onAcsept={delo}
+                                                    onDecline={delo}
+                                                    onHover={hover}
+                                                    onModal={modali}
+                                                    onProj={proj}
+                                                    onChat={chat}
                                                     noofpu={buble.noofpu}
                                                     newpicid={buble?.newpicid}
                                                     coinlapach={buble.coinlapach}
@@ -548,11 +588,11 @@ export let sml = false
                                                     /></div>
                                                     {:else if buble.ani === "meData" && milon.sugg == true}
                                                     <div class="sugg normSml" ><ProjectSuggestor
-                                                        on:less={delo}
-                                                        on:hover={hover}
-                                                        on:proj={proj}
-                                                        on:user={user}
-                                                        on:mesima={mesima}
+                                                        onLess={delo}
+                                                        onHover={hover}
+                                                        onProj={proj}
+                                                        onUser={user}
+                                                        onMesima={mesima}
                                                         acts={buble.attributes.acts}
                                                         timeToP={buble.attributes.project.data.attributes.timeToP}
                                                         coinlapach={buble.coinlapach}
@@ -582,10 +622,10 @@ export let sml = false
                                                         /></div>
                                                         {:else if buble.ani === "huca" && milon.pmashs == true}
                                                         <div  class="pmashs normSml" ><Mashsug
-                                                            on:less={delo}
-                                                            on:hover={hover}
-                                                            on:proj={proj}
-                                                            on:user={user}
+                                                            onLess={delo}
+                                                            onHover={hover}
+                                                            onProj={proj}
+                                                            onUser={user}
                                                             messege={buble.messege}
                                                             i={i}
                                                             restime={buble.restime}
@@ -651,10 +691,10 @@ export let sml = false
                                                                 class="midCom">
                                                                 <Mid
                                                                 {sml}
-                                                                    on:cards={cards}
-                                                                    on:hover={hover}
-                                                                    on:showall={showall}
-                                                                    on:showonly={showonly}
+                                                                    onCards={cards}
+                                                                    onHover={hover}
+                                                                    onShowall={showall}
+                                                                    onShowonly={showonly}
                                                                     {total}
                                                                     picLink={picLink} {ask}
                                                                     {wel}

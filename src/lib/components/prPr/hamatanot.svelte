@@ -9,97 +9,27 @@
   import { fly } from 'svelte/transition';
   import Halu from './whowhat.svelte';
   import Cir from './graph/circle.svelte';
-  export let fmiData = [];
-  export let rikmashes = [];
-  export let projectId;
-  export let trili;
-  let isOpen = false;
-  let a = 0;
-  export let bmiData = [];
-  console.log(bmiData);
+  let isOpen = $state(false);
+  let a = $state(0);
   import { RingLoader } from 'svelte-loading-spinners';
   import Close from '$lib/celim/close.svelte';
-  let fermatana = {};
-  let ferdate = {};
-  let arr = [];
-  let arrt = [];
-  export let salee = [];
-  $: for (let i = 0; i < salee.length; i++) {
-    if (salee[i].attributes.matanot.data.attributes.name in fermatana) {
-      fermatana[salee[i].attributes.matanot.data.attributes.name] +=
-        salee[i].attributes.in;
-    } else {
-      fermatana[salee[i].attributes.matanot.data.attributes.name] =
-        salee[i].attributes.in;
-    }
-  }
-  $: for (let i = 0; i < salee.length; i++) {
-    if (dayjs(salee[i].attributes.date) in ferdate) {
-      if (
-        salee[i].attributes.matanot.data.attributes.name in
-        ferdate[dayjs(salee[i].attributes.date)]
-      ) {
-        ferdate[dayjs(salee[i].attributes.date)][
-          salee[i].attributes.matanot.data.attributes.name
-        ] += salee[i].attributes.in;
-      } else {
-        ferdate[dayjs(salee[i].attributes.date)][
-          salee[i].attributes.matanot.data.attributes.name
-        ] = salee[i].attributes.in;
-      }
-    } else {
-      ferdate[dayjs(salee[i].attributes.date)] = {
-        [salee[i].attributes.matanot.data.attributes.name]:
-          salee[i].attributes.in
-      };
-    }
-    console.log(ferdate);
-  }
-  $: if (salee.length > 0) {
-    for (const [key, value] of Object.entries(ferdate)) {
-      const datea = key;
-      const ano = value;
-      arrt.push({ date: datea });
-      arrt = arrt;
-      const objIndex = arrt.findIndex((obj) => obj.date == datea);
-
-      for (const [key, value] of Object.entries(ano)) {
-        arrt[objIndex][key] = value;
-      }
-    }
-    //get all keys
-    const keys = arrt.reduce(
-      (acc, curr) => (Object.keys(curr).forEach((key) => acc.add(key)), acc),
-      new Set()
-    );
-    //add all matanot to all objects
-    const output = arrt.map((item) =>
-      [...keys].reduce((acc, key) => ((acc[key] = item[key] ?? ''), acc), {})
-    );
-    //sort by date
-    output.sort(function (a, b) {
-      return new Date(a.date) - new Date(b.date);
-    });
-    //formate to readble local date
-    const x = output.map((obj) => {
-      return { ...obj, date: dayjs(obj.date).format('D.M.YY') };
-    });
-    arrt = x;
-    console.log(arrt);
-  }
-  arr = arr;
-
-  $: if (salee.length > 0) {
-    for (let key in fermatana) {
-      if (fermatana.hasOwnProperty(key)) {
-        arr.push({ key: key, value: fermatana[key] });
-      }
-    }
-  }
-  let kindOf;
-  let kindUlimit = false;
-  export let projectUsers = [];
-  let quant, each, maid;
+  let fermatana = $state({});
+  let ferdate = $state({});
+  let arr = $state([]);
+  let arrt = $state([]);
+  let kindOf = $state();
+  let kindUlimit = $state(false);
+  let {
+    fmiData = [],
+    rikmashes = [],
+    projectId,
+    trili,
+    bmiData = $bindable([]),
+    salee = $bindable([]),
+    projectUsers = [],
+    restime
+  } = $props();
+  let quant = $state(), each = $state(), maid = $state();
   function sell(id, v, z, isto) {
     maid = id;
     each = v;
@@ -122,10 +52,10 @@
     isOpen = false;
     a = 0;
   };
-  let hal = false;
+  let hal = $state(false);
   const sale = (event) => {
-    const id = event.detail.id;
-    const un = event.detail.un;
+    const id = event.id;
+    const un = event.un;
     let oldob = bmiData;
     const x = oldob.map((c) => c.id);
     const indexy = x.indexOf(id);
@@ -133,21 +63,19 @@
     bmiData = oldob;
     isOpen = false;
     a = 0;
+    salee.push(event.matana);
   };
   function done(event) {
     isOpen = false;
     a = 0;
-    bmiData.push(event.detail.matana);
+    bmiData.push(event.matana);
     bmiData = bmiData;
   }
   function ask() {
     hal = true;
     //ליצור מטבע אישור של חלוקה ליצור טופס של פרטי חלוקה כמה אחוז לחלק וכמה להעמיד להוצאות
   }
-  let allin = 0;
-  $: for (let i = 0; i < salee.length; i++) {
-    allin += salee[i].attributes.in;
-  }
+  let allin = $state(0);
   function getSrc(id) {
     let src;
     for (let i = 0; i < projectUsers.length; i++) {
@@ -191,6 +119,77 @@
   const see = { he: 'צפיה בהצעת החלוקה', en: 'see existed sppliting offer' };
   const sbp = { he: 'התפלגות המכירות לפי מוצר', en: 'sales by product' };
   const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
+  $effect(() => {
+    fermatana = salee.reduce((acc, sale) => {
+      const matanaName = sale.attributes.matanot.data.attributes.name;
+      const saleIn = sale.attributes.in;
+      acc[matanaName] = (acc[matanaName] || 0) + saleIn;
+      return acc;
+    }, {});
+  });
+  $effect(() => {
+    const newFerdate = {};
+    for (const sale of salee) {
+      const dateKey = dayjs(sale.attributes.date).format('YYYY-MM-DD');
+      const matanaName = sale.attributes.matanot.data.attributes.name;
+      const saleIn = sale.attributes.in;
+
+      if (!newFerdate[dateKey]) {
+        newFerdate[dateKey] = {};
+      }
+
+      if (newFerdate[dateKey][matanaName]) {
+        newFerdate[dateKey][matanaName] += saleIn;
+      } else {
+        newFerdate[dateKey][matanaName] = saleIn;
+      }
+    }
+    ferdate = newFerdate;
+  });
+  $effect(() => {
+    if (salee.length > 0) {
+      const newArrt = [];
+      for (const [key, value] of Object.entries(ferdate)) {
+        newArrt.push({ date: key, ...value });
+      }
+
+      if (newArrt.length === 0) {
+        arrt = [];
+        return;
+      }
+
+      //get all keys
+      const keys = newArrt.reduce(
+        (acc, curr) => (Object.keys(curr).forEach((key) => acc.add(key)), acc),
+        new Set()
+      );
+      //add all matanot to all objects
+      const output = newArrt.map((item) =>
+        [...keys].reduce((acc, key) => ((acc[key] = item[key] ?? ''), acc), {})
+      );
+      //sort by date
+      output.sort(function (a, b) {
+        return new Date(a.date) - new Date(b.date);
+      });
+      //formate to readble local date
+      const x = output.map((obj) => {
+        return { ...obj, date: dayjs(obj.date).format('D.M.YY') };
+      });
+      arrt = x;
+    } else {
+      arrt = [];
+    }
+  });
+  $effect(() => {
+    if (salee.length > 0) {
+      arr = Object.entries(fermatana).map(([key, value]) => ({ key, value }));
+    } else {
+      arr = [];
+    }
+  });
+  $effect(() => {
+    allin = salee.reduce((total, s) => total + s.attributes.in, 0);
+  });
 </script>
 
 <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
@@ -202,7 +201,7 @@
       <div style="z-index: 400;" dir="{$lang == 'he' ? 'rtl' : 'ltr'}">
         <button
           class=" hover:bg-barbi text-mturk rounded-full"
-          on:click={closer}>{cencel[$lang]}</button
+          onclick={closer}>{cencel[$lang]}</button
         >
         {#if a == 0}
           <Sale
@@ -212,12 +211,12 @@
             {kindUlimit}
             {maid}
             {kindOf}
-            on:doner={closer}
-            on:done={sale}
-            on:eror={() => (a = 3)}
+            onDoner={closer}
+            onDone={sale}
+            onError={() => (a = 3)}
           />
         {:else if a == 1}
-          <New {projectId} on:done={done} />
+          <New {projectId} onDone={done} />
         {:else if a == 2}
           <div class="sp bg-gold">
             <h3 class="text-barbi">{om[$lang]}</h3>
@@ -229,7 +228,7 @@
           <h1 class="text-center text-barbi text-bold underline decoration-mturk">{errmsg[$lang]}</h1>
           <button
             class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
-            on:click={() => (a = 0)}>{trya[$lang]}</button
+            onclick={() => (a = 0)}>{trya[$lang]}</button
           >
         {/if}
       </div></DialogContent
@@ -250,6 +249,7 @@
                 {our[$lang]}
               </h1>
             </caption>
+            <thead>
             <tr class="gg">
               <th class="gg"></th>
               {#each bmiData as data, i}
@@ -331,7 +331,7 @@
                   <button
                     class=" hover:bg-gold rounded-full p-0.5"
                     title={res[$lang]}
-                    on:click={sell(
+                    onclick={()=>sell(
                       data.id,
                       data.attributes.price,
                       data.attributes.quant,
@@ -406,13 +406,14 @@
                 </td>
               {/each}
             </tr>
+          </thead>
           </table>
         {/if}
       </div>
     </div>
     <button
       class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-      on:click={addnew}>{cr[$lang]}</button
+      onclick={addnew}>{cr[$lang]}</button
     >
     </div>
     {#if salee.length > 0}
@@ -456,12 +457,12 @@
           <button
             id="haluk"
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-            on:click={ask}>{trili.length == 0 ? see[$lang] : req[$lang]}</button
+            onclick={ask}>{trili.length == 0 ? see[$lang] : req[$lang]}</button
           >
         {:else}
          <button
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-            on:click={()=>hal = false}><Close/></button
+            onclick={()=>hal = false}><Close/></button
           >
           <Halu
             {trili}
@@ -471,12 +472,13 @@
             {fmiData}
             users={projectUsers}
             {rikmashes}
+            {restime}
           />
         {/if}
       </div>
     {/if}
   </div>
-  {#if salee.length > 0}
+  {#if salee.length > 0 &&  arr?.length > 0}
     <div class="flex flex-col sm:flex-row-reverse justify-center">
       <div>
         <h1 class="text-center text-barbi text-bold underline decoration-mturk">

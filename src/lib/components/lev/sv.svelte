@@ -1,60 +1,96 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
-
- const dispatch = createEventDispatcher();
  let mainG = "matrix(.38338 0 0 .4039 -156.16 -138.46)"
  let yahaMain ="matrix(.28338 0 0 .2939 -86.16 -18.46)"
-export let sml = true;
-export let hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)";
-export let gg ="translate(-156.85 -287.03)";
-export let ff ="translate(164.82 -287.03)";
-export let ee ="translate(3.8484 -18.405)";
-export let dd ="matrix(1, 0, 0, 1, 194.44, -541.85)";
-export let cc = "translate(-232.58 -369.63)";
-export let bb = "translate(241.91 -369.63)";
-export let aa2 = "translate(-140.71 -177.44)";
-export let qq = "translate(146.88 -177.44)";
-export let jj = "translate(-140.71 -449.43)";
-export let yy = "translate(164.82 -449.43)";
-export let xx = "translate(-188.36 -539.11)";
-export let pic;
-export let picLink;
-export let name = "";
-export let sug = 13;
-export let sugg =  "sugg";
-export let pen = 13;
-export let pend = "pend";
-export let ask = 13;
-export let asks = "asks";
-export let wel = 17;
-export let welc = "welc";
-export let beta = 17;
-export let betaha = "betaha";
-export let des = 17;
-export let desi = "desi";
-export let fia = 99;
-export let fiap = "fiap";
-export let pmash = 99;
-export let ppmash = "ppmash";
-export let mashs = 17;
-export let pmashs = "pmashs";
-export let maap = 100;
-export let pmaap = "pmaap";
-export let askma = 100;
-export let askmap = "askmap";
-export let low = true;
-console.log(mashs)
-function hover (id){
-dispatch("hover",{
-    id: id
-})
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [sml]
+   * @property {string} [hh]
+   * @property {string} [gg]
+   * @property {string} [ff]
+   * @property {string} [ee]
+   * @property {string} [dd]
+   * @property {string} [cc]
+   * @property {string} [bb]
+   * @property {string} [aa2]
+   * @property {string} [qq]
+   * @property {string} [jj]
+   * @property {string} [yy]
+   * @property {string} [xx]
+   * @property {any} pic
+   * @property {any} picLink
+   * @property {string} [name]
+   * @property {number} [sug]
+   * @property {string} [sugg]
+   * @property {number} [pen]
+   * @property {string} [pend]
+   * @property {number} [ask]
+   * @property {string} [asks]
+   * @property {number} [wel]
+   * @property {string} [welc]
+   * @property {number} [beta]
+   * @property {string} [betaha]
+   * @property {number} [des]
+   * @property {string} [desi]
+   * @property {number} [fia]
+   * @property {string} [fiap]
+   * @property {number} [pmash]
+   * @property {string} [ppmash]
+   * @property {number} [mashs]
+   * @property {string} [pmashs]
+   * @property {number} [maap]
+   * @property {string} [pmaap]
+   * @property {number} [askma]
+   * @property {string} [askmap]
+   * @property {boolean} [low]
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for hover event.
+   * @property {(payload: { id: any }) => void} [onDisp] - Callback for disp event.
+   */
 
-}
-function disp (id){
-dispatch("disp",{
-    id: id
-})
-}
+  /** @type {Props} */
+  let {
+    sml = true,
+    hh = "matrix(8.9511 0 0 8.3182 300.46 -11.017)",
+    gg = "translate(-156.85 -287.03)",
+    ff = "translate(164.82 -287.03)",
+    ee = "translate(3.8484 -18.405)",
+    dd = "matrix(1, 0, 0, 1, 194.44, -541.85)",
+    cc = "translate(-232.58 -369.63)",
+    bb = "translate(241.91 -369.63)",
+    aa2 = "translate(-140.71 -177.44)",
+    qq = "translate(146.88 -177.44)",
+    jj = "translate(-140.71 -449.43)",
+    yy = "translate(164.82 -449.43)",
+    xx = "translate(-188.36 -539.11)",
+    pic,
+    picLink,
+    name = "",
+    sug = 13,
+    sugg = "sugg",
+    pen = 13,
+    pend = "pend",
+    ask = 13,
+    asks = "asks",
+    wel = 17,
+    welc = "welc",
+    beta = 17,
+    betaha = "betaha",
+    des = 17,
+    desi = "desi",
+    fia = 99,
+    fiap = "fiap",
+    pmash = 99,
+    ppmash = "ppmash",
+    mashs = 17,
+    pmashs = "pmashs",
+    maap = 100,
+    pmaap = "pmaap",
+    askma = 100,
+    askmap = "askmap",
+    low = true,
+    onHover,
+    onDisp
+  } = $props();
+console.log(mashs)
 console.log(sml)
     </script>
     <style>
@@ -1473,8 +1509,8 @@ console.log(sml)
     <stop stop-color="#fff" offset="0"/>
     <stop stop-color="#bd8524" offset="1"/>
     </linearGradient>
-    <style bx:fonts="Londrina Sketch" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Londrina+Sketch%3Aital%2Cwght%400%2C400&display=swap);</style>
-    <linearGradient id="levlevaw" x1="-14.698" x2="-14.698" y1="33.774" y2="45.358" gradientUnits="userSpaceOnUse" xlink:href="#levlevah"/>
+    <style bx:fonts="Londrina Sketch" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
+    <linearGradient id="levlevaw" x1="-/*$$__STYLE_CONTENT__$$*/.googleapis.com/css2?family=Londrina+Sketch%3Aital%2Cwght%400%2C400&display=swap);33.774" y2="45.358" gradientUnits="userSpaceOnUse" xlink:href="#levlevah"/>
     <radialGradient id="levlevfb" cx="-14.698" cy="39.566" r="10" gradientUnits="userSpaceOnUse">
     <stop stop-color="#ffad55" offset="0"/>
     <stop stop-color="#321814" offset=".462"/>
@@ -2507,7 +2543,7 @@ console.log(sml)
       <path d="m54.194 578.6c0.9061 2.9202 1.8341 5.8479 2.7888 8.785l3.5653-3.3107-6.3541-5.4743z" fill="url(#levlevih)"/>
 </g>
 {#if mashs > 0}
-<g on:mouseenter={()=>hover("j")} on:mouseleave={()=>hover("j")} on:keypress={()=>disp(pmashs)} on:click={()=>disp(pmashs)} name="number " class="btn am" transform="{jj}">
+<g onmouseenter={() => onHover?.({ id: "j" })} onmouseleave={() => onHover?.({ id: "j" })} onkeypress={() => onDisp?.({ id: pmashs })} onclick={() => onDisp?.({ id: pmashs })} name="number " class="btn am" transform="{jj}">
       {#if sml == true}
       <text x="122.391" y="677.71" fill="url(#levlevdd)" class="tt" font-weight="700" stroke="rgb(243, 71, 46)" stroke-miterlimit="1" stroke-width="0px" text-anchor="middle" word-spacing="59.7px" style="white-space:pre" bx:origin="0.47 0.2">jhih</text>
       {/if}
@@ -2531,7 +2567,7 @@ console.log(sml)
 </g>
 {/if}
 {#if maap > 0}
-  <g on:mouseenter={()=>hover("q")} on:mouseleave={()=>hover("q")} on:click={()=>disp(pmaap)} name="number " class="btn aw" transform="{qq}">
+  <g onmouseenter={() => onHover?.({ id: "q" })} onmouseleave={() => onHover?.({ id: "q" })} onclick={() => onDisp?.({ id: pmaap })} name="number " class="btn aw" transform="{qq}">
     <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
     <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevbl)" opacity=".89224" stroke="url(#levlevs)"/>
     <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevbm)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -2555,7 +2591,7 @@ console.log(sml)
 </g>
 {/if}
 {#if sug > 0}
-       <g on:mouseenter={()=>hover("a")} on:mouseleave={()=>hover("a")} on:click={()=>disp(sugg)} name="number " class="btn a" transform="{aa2}">
+       <g onmouseenter={() => onHover?.({ id: "a" })} onmouseleave={() => onHover?.({ id: "a" })} onclick={() => onDisp?.({ id: sugg })} name="number " class="btn a" transform="{aa2}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapd)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevapc)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -2576,7 +2612,7 @@ console.log(sml)
 </g>
 {/if}
 {#if pen > 0}
-<g  on:mouseenter={()=>hover("b")} on:mouseleave={()=>hover("b")} on:click={() => disp(pend)}  class="btn"  name="number o"  transform="{bb}">
+<g  onmouseenter={() => onHover?.({ id: "b" })} onmouseleave={() => onHover?.({ id: "b" })} onclick={() => onDisp?.({ id: pend })}  class="btn"  name="number o"  transform="{bb}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="#fff" opacity=".89224" stroke="url(#levlevcn)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevfc)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevcm)" stroke-width=".16015px"/>
@@ -2597,7 +2633,7 @@ console.log(sml)
 </g>
 {/if}
 {#if ask > 0}
-<g on:mouseenter={()=>hover("c")} on:mouseleave={()=>hover("c")} on:click={() => disp(asks)}  class="btn"  name="number of " transform="{cc}">
+<g onmouseenter={() => onHover?.({ id: "c" })} onmouseleave={() => onHover?.({ id: "c" })} onclick={() => onDisp?.({ id: asks })}  class="btn"  name="number of " transform="{cc}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdf)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevdg)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3147,7 +3183,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {#if des > 0}
 
-<g on:mouseenter={()=>hover("d")} on:mouseleave={()=>hover("d")} on:click={() => disp(desi)} class="btn"  name="number of o" transform="{dd}">
+<g onmouseenter={() => onHover?.({ id: "d" })} onmouseleave={() => onHover?.({ id: "d" })} onclick={() => onDisp?.({ id: desi })} class="btn"  name="number of o" transform="{dd}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevej)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevek)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3169,7 +3205,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if beta > 0}
 
-<g on:mouseenter={()=>hover("e")} on:mouseleave={()=>hover("e")} on:click={() => disp(betaha)}  class="btn"  name="number of m" transform="{ee}">
+<g onmouseenter={() => onHover?.({ id: "e" })} onmouseleave={() => onHover?.({ id: "e" })} onclick={() => onDisp?.({ id: betaha })}  class="btn"  name="number of m" transform="{ee}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdt)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevdu)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3190,7 +3226,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {/if}
 
-<g on:mouseenter={()=>hover("h")} on:mouseleave={()=>hover("h")} transform="{hh}" style="">
+<g onmouseenter={() => onHover?.({ id: "h" })} onmouseleave={() => onHover?.({ id: "h" })} transform="{hh}" style="">
   <a  data-sveltekit-prefetch 
     href="/me" >
 <path d="m-24.698 44.139h20v1.219h-20v-1.219zm0-8.536 5 1.828 5-3.657 5 3.657 5-1.828v7.316h-20v-7.316z" fill="url(#levlevaw)" stroke="url(#levlevfb)" stroke-miterlimit="5" stroke-width=".57906px"/>
@@ -3199,7 +3235,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {#if pmash > 0}
 
-<g on:mouseenter={()=>hover("y")} on:mouseleave={()=>hover("y")} on:click={()=>disp(ppmash)} name="number " class="btn ap" transform="{yy}">
+<g onmouseenter={() => onHover?.({ id: "y" })} onmouseleave={() => onHover?.({ id: "y" })} onclick={() => onDisp?.({ id: ppmash })} name="number " class="btn ap" transform="{yy}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevav)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevau)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3221,7 +3257,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if askma > 0}
 
- <g on:mouseenter={()=>hover("x")} on:mouseleave={()=>hover("x")} on:click={()=>disp(askmap)} name="number " class="btn amp" transform="{xx}">
+ <g onmouseenter={() => onHover?.({ id: "x" })} onmouseleave={() => onHover?.({ id: "x" })} onclick={() => onDisp?.({ id: askmap })} name="number " class="btn amp" transform="{xx}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevdc)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevdb)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3243,7 +3279,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if wel > 0}
 
-<g on:mouseenter={()=>hover("f")} on:mouseleave={()=>hover("f")} on:click={() => disp(welc)}  class="btn"  name="number of op" transform="{ff}">
+<g onmouseenter={() => onHover?.({ id: "f" })} onmouseleave={() => onHover?.({ id: "f" })} onclick={() => onDisp?.({ id: welc })}  class="btn"  name="number of op" transform="{ff}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevaqf)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevaqe)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3265,7 +3301,7 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 {/if}
 {#if fia > 0}
 
-<g on:mouseenter={()=>hover("g")} on:mouseleave={()=>hover("g")} on:click={() => disp(fiap)}  class="btn" name="number of p" transform="{gg}">
+<g onmouseenter={() => onHover?.({ id: "g" })} onmouseleave={() => onHover?.({ id: "g" })} onclick={() => onDisp?.({ id: fiap })}  class="btn" name="number of p" transform="{gg}">
 <g transform="matrix(4.7878 .10835 -.077673 3.4322 -1009.2 -1662.7)" bx:origin="0.493 0.47">
 <path transform="matrix(.061489 .096579 -.2216 .020927 362.87 587.57)" d="m124.25 512.69a21.213 21.466 0 1 1-42.426 0 21.213 21.466 0 1 1 42.426 0z" fill="url(#levlevapr)" opacity=".89224" stroke="url(#levlevs)"/>
 <path d="m253.19 610.06 2.3027 5.9876 2.3651-5.8921c-1.5467 0.27908-3.1217 0.19727-4.6678-0.0955z" fill="url(#levlevapq)" fill-rule="evenodd" opacity=".89224" stroke="url(#levlevt)" stroke-width=".16015px"/>
@@ -3287,4 +3323,3 @@ License: https://creativecommons.org/licenses/by-sa/4.0</desc>
 </g>
 {/if}
 </svg>
-

@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     /***
      * push to devices
      * @param {Array} jsonim  of all machshirs with user feild that contains id, and as attributes username and lang
@@ -16,7 +16,7 @@
 
             console.log(element)
             if(element.users_permission_user.data.id !== myid){
-                let data = {jsoni: element.jsoni, messege :{url, body: body[lango], pic, title: title[lango]}}
+                let data = {jsoni: element.jsoni,machshirId: element.machshirId, messege :{url, body: body[lango], pic, title: title[lango]}}
                 fetch('/api/pusher', {
                 method: 'POST',  
                 headers: {

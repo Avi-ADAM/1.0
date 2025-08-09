@@ -1,26 +1,34 @@
 <script>
-    import { createEventDispatcher } from 'svelte';
+  import { createBubbler, stopPropagation } from 'svelte/legacy';
+
+  const bubble = createBubbler();
     import { fade } from 'svelte/transition';
     
-    const dispatch = createEventDispatcher();
-    
-    export let isOpen = false;
-    export let title = '';
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isOpen]
+   * @property {string} [title]
+   * @property {import('svelte').Snippet} [children]
+   * @property {() => void} [onClose]
+   */
+
+  /** @type {Props} */
+  let { isOpen = false, title = '', children, onClose } = $props();
   
     function closeModal() {
-      dispatch('close');
+      onClose?.();
     }
   </script>
   
   {#if isOpen}
-    <div class="modal-overlay" on:click={closeModal} transition:fade={{ duration: 200 }}>
-      <div class="modal-content" on:click|stopPropagation>
+    <div class="modal-overlay" onclick={closeModal} transition:fade={{ duration: 200 }}>
+      <div class="modal-content" onclick={stopPropagation(bubble('click'))}>
         <div class="modal-header">
           <h2>{title}</h2>
-          <button class="close-button" on:click={closeModal}>&times;</button>
+          <button class="close-button" onclick={closeModal}>&times;</button>
         </div>
         <div class="modal-body">
-          <slot></slot>
+          {@render children?.()}
         </div>
       </div>
     </div>

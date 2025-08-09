@@ -1,20 +1,27 @@
 <script>
-    let amort = ""
-let amorts =  ""
-let amortt = ""
-let amortf = ""
-let amorth = ""
+    let amort = $state("")
+let amorts =  $state("")
+let amortt = $state("")
+let amortf = $state("")
+let amorth = $state("")
 let amorta = "I ,||name||, will never use violence or hurt anyone."
 let amortsa =  "Because I, ||name||, do not want to be a victim of violence, and because there is no authority, value, purpose, faith, money or interest that justifies harming a person's life, violence and coercion by force."
 let amortta = "I,||name||, will trust in the good and that when all humanity signs: violence, fighting and regimentation will cease to be a form of human communication"
 let amortfa = "When the entire ||country|| is a signatory to this Convention, I, || name || will relinquish my weapons and the armed policemen from whom the ||country|| State is Appointments in my name."
 let amortha = "I, ||name||, will give up the weapons of the ||country|| Army when all of humanity will be a signatory to this Convention"
-  let already = false;
-  let lang, come, name, email;
+  let already = $state(false);
+  let lang = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 const baseUrl = import.meta.env.VITE_URL
+
+/**
+ * @typedef {Object} Props
+ * @property {() => void} [onDone] - Callback for when the operation is successful.
+ * @property {() => void} [onErore] - Callback for when an error occurs.
+ */
+
+/** @type {Props} */
+let { onDone, onErore } = $props();
 
 let miDatan = [];
 let linkg = baseUrl+'/graphql';
@@ -52,11 +59,11 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch("done")
+            onDone?.()
         } catch (e) {
             error1 = e
             console.log(error1);
-                        dispatch("erore")
+                        onErore?.()
 
         }
 }
@@ -119,7 +126,7 @@ already = true;
 {#if already == false}
 <div class="flex items-center justify-center">
 <button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={add} >send</button>
+ onclick={add} >send</button>
  </div>
  {/if}
 <style>
@@ -301,4 +308,3 @@ height: 44px;
   top: -20;
 } 
 </style>
-

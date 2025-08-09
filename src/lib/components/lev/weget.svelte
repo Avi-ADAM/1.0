@@ -1,6 +1,6 @@
 <script>
      import {  Drawer} from 'vaul-svelte';
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
  import { goto } from '$app/navigation';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 import {
@@ -9,57 +9,111 @@ import {
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
   import { DialogOverlay, DialogContent 
 } from 'svelte-accessible-dialog';
 import { idPr } from './../../stores/idPr.js';
   import { onMount } from 'svelte'; 
   import moment from 'moment';
-const dispatch = createEventDispatcher();
-    export let low = false;
-    export let modal = false
-    export let isVisible = false;
-    let dialogOpen = false
-export let coinlapach;
-export let mId;
-export let kindOf;
-export let myp = 0;
-export let projectName ;
-export let missionBName ;
-export let useraplyname;
-export let src = "coin.png";
-export let src2 = " ";
-export let projectId;
-export let link = "/project/";
-export let linkU = "/user/";
-export let userId;
-export let name;
-export let spid;
-export let hm = 1;
-export let noofpu = 0;
-export let spnot;
-export let price = 0;
-export let easy = 0;
-export let agprice = (myp+easy) / 2;
-export let missId;
-export let id;
-export let openMid;
-export let st = 188;
-export let declined = [];
-export let noofusersWaiting;
-export let uids;
-export let noofusersOk;
-export let noofusersNo;
-export let already;
+    let dialogOpen = $state(false)
+      /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [modal]
+   * @property {boolean} [isVisible]
+   * @property {any} coinlapach
+   * @property {any} mId
+   * @property {any} kindOf
+   * @property {number} [myp]
+   * @property {any} projectName
+   * @property {any} missionBName
+   * @property {any} useraplyname
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {string} [linkU]
+   * @property {any} userId
+   * @property {any} name
+   * @property {any} spid
+   * @property {number} [hm]
+   * @property {number} [noofpu]
+   * @property {any} spnot
+   * @property {number} [price]
+   * @property {number} [easy]
+   * @property {any} [agprice]
+   * @property {any} missId
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} already
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {any} sqadualed
+   * @property {any} sqadualedf
+   * @property {boolean} [cards]
+   * @property {(payload: any) => void} [onUser]
+   * @property {(payload: any) => void} [onProj]
+   * @property {(payload: any) => void} [onAcsept]
+   * @property {(payload: any) => void} [onHover]
+   * @property {(payload: any) => void} [onModal]
+     */
+
+  /** @type {Props} */
+  let {
+    low = false,
+    modal = $bindable(false),
+    isVisible = false,
+    coinlapach,
+    mId,
+    kindOf,
+    myp = 0,
+    projectName,
+    missionBName,
+    useraplyname,
+    src = "coin.png",
+    src2 = " ",
+    projectId,
+    link = "/project/",
+    linkU = "/user/",
+    userId,
+    name,
+    spid,
+    hm = 1,
+    noofpu = 0,
+    spnot,
+    price = 0,
+    easy = 0,
+    agprice = (myp+easy) / 2,
+    missId,
+    id,
+    openMid,
+    st = 188,
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids = $bindable(),
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    already = $bindable(),
+    stylef = '24px',
+    askId,
+    users,
+    sqadualed,
+    sqadualedf,
+    cards = false,
+    onUser,
+    onProj,
+    onAcsept,
+    onHover,
+    onModal
+  } = $props();
 let resP = [];
 let lang;
-export let stylef = '24px';
-export let askId;
-export let users;
-export let sqadualed;
-export let sqadualedf;    
 
 let idL;
 let bearer1; 
@@ -100,18 +154,18 @@ const baseUrl = import.meta.env.VITE_URL
 let linkg = baseUrl+'/graphql';
 
 
-let monts = 0
+let monts = $state(0)
 let total;
-let yers;
+let yers = $state();
 
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
 let ok;
 let nook;
-let tryo = "115%";
-let tryot = "-10.5%";
-let tryoti = "-5.25%";
+let tryo = $state("115%");
+let tryot = $state("-10.5%");
+let tryoti = $state("-5.25%");
 let nut;
 async function xyz (){
 console.log(noofusersOk,noofpu,noofusersNo,noofusersWaiting)
@@ -146,21 +200,24 @@ ser = ser
 return ser
 }
 
-let ser = xyz();
+let ser = $state(xyz());
   
-$: ucli = 0
-$: pcli = 0
-$: pmcli = 0
+let ucli = $state(0);
+  
+let pcli = $state(0);
+  
+let pmcli = $state(0);
+  
 function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.({id: userId});
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     }
   }
 }
@@ -275,7 +332,7 @@ updateSp(
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
 ani: "finim",
                 coinlapach: coinlapach             })
 
@@ -311,7 +368,7 @@ console.log("just add vote to asked and update to not show for me again")
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
 ani: "finim",
                 coinlapach: coinlapach             })
 
@@ -377,7 +434,7 @@ updateMaap(
                 .then(data => miDatan = data);
             console.log(miDatan);
             isOpen = false;
-            dispatch('decline', {
+            onDecline?.({
 ani: "finim",
                 coinlapach: coinlapach             })
         } catch (e) {
@@ -391,20 +448,21 @@ function open () {
         isOpen = true;
     console.log("if another uprove explain why you decline")
 }
-let isOpen = false;
-let whyy = " ";
-let no;
-let masa;
+let isOpen = $state(false);
+let whyy = $state(" ");
+let no = $state();
+let masa = $state();
 function close() {
      isOpen = false;
     no = false; 
     masa = false;
 }
 
-let hovered = false;
+let hovered = $state(false);
 
 
- $: w = 0;
+ let w = $state(0);
+  
  let  u = "בקשה לאישור קבלת משאב בהצלחה"
 function hover (id){
   if (id == "0"){
@@ -412,7 +470,7 @@ u = "בקשה לאישור קבלת משאב בהצלחה"
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 
 }
 function hoverede(){
@@ -422,19 +480,19 @@ function hoverede(){
   } else {
 u = "בקשה לאישור קבלת משאב בהצלחה"
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
  
   function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
 u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
    import Cards from './cards/dowegeot.svelte'
-export let cards = false;
+
 
 </script>
 {#await ser}
@@ -444,7 +502,7 @@ export let cards = false;
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 1000}}>
   <DialogContent aria-label="form" class="content">
       <div dir="rtl" class="flex items-center flex-col" >
-              <button on:click={close} class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+              <button onclick={close} class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -452,7 +510,7 @@ title="ביטול"
 {#if no === true}
 <h1 style="font-size:2em;">יש לנמק</h1>
       <input  minlength="26"  type="text" bind:value={whyy} placeholder="מה חסר בכדי שניתן יהיה לאשר שהמשאב התקבל">
-         <br/>   <button class="add" disabled={whyy.length < 26} on:click={decline}>אישור</button>
+         <br/>   <button class="add" disabled={whyy.length < 26} onclick={decline}>אישור</button>
 {:else if masa === true}
       <input minlength="26"  type="text" bind:value={whyy} placeholder="יש לנמק  ההצעה  על ">
 <input type="number" placeholder="add moree hours">
@@ -467,13 +525,13 @@ title="ביטול"
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
-on:click={()=>{modal = true
-  dispatch("modal")
+onclick={()=>{modal = true
+  onModal?.()
 dialogOpen = true}}
 role="button"
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
-use:clickOutside on:click_outside={toggleShow} 
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()}
+use:clickOutside onclick_outside={toggleShow} 
 class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
@@ -512,7 +570,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
            <circle stroke-opacity="0.01" r="100" fill-opacity="0.01" fill="url(#lg)" transform="rotate(135)" stroke="url(#lgb)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
             <circle r="80" fill-opacity="0.01" fill="url(#lg)" transform="rotate(315)" stroke="none"/>
                   
-                            <g on:click={()=>linke("u")} on:mouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
+                            <g onclick={()=>linke("u")} onmouseenter={()=>hover(` לחיצה למעבר לעמוד הפרופיל של ${useraplyname}`)} onmouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
                    <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                     <span class="{`normSml${spid}-opo`}"></span>  
                     <img
@@ -527,15 +585,15 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                       </g>   
                    <path id="curve" fill-opacity="0.01"  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                        <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
-                           <textPath on:mouseenter={()=>hover("שם המשאב")} on:mouseleave={()=>hover("0")}  color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
+                           <textPath onmouseenter={()=>hover("שם המשאב")} onmouseleave={()=>hover("0")}  color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
                                {missionBName}
                            </textPath>       
                        </text>
-                 <g on:click={() =>linke("p")} on:mouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  x="0" y="-40">
+                 <g onclick={() =>linke("p")} onmouseenter={()=>hover("לחיצה למעבר לעמוד הציבורי של הריקמה")} onmouseleave={()=>hover("0")}  x="0" y="-40">
                        <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                  </g>
                        <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                                            <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה למעבר למוח ריקמת ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                                            <button onclick={()=>project(projectId)} onmouseenter={()=>hover(` לחיצה למעבר למוח ריקמת ${projectName}`)} onmouseleave={()=>hover("0")}>
                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" title={projectName}>  
                   </button>
                     </foreignObject>
@@ -546,22 +604,22 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   ><SwiperSlide class="swiper-slideg"
     ><div  id="normSmll"
 ><span class="{`normSmll${spid}-opo`}"></span>
-       <p class="ab pnn"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
-         <h2 on:mouseenter={()=>hover("הערות")} on:mouseleave={()=>hover("0")}  class="text-barbi bc">{spnot}</h2>
+       <p class="ab pnn"><span onmouseenter={()=>hover("סך ההצבעות בעד")} onmouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span onmouseenter={()=>hover("לא הצביעו")} onmouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span onmouseenter={()=>hover("כמות ההצבעות נגד")} onmouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
+         <h2 onmouseenter={()=>hover("הערות")} onmouseleave={()=>hover("0")}  class="text-barbi bc">{spnot}</h2>
          {#if kindOf === "perUnit"}
-       <p dir="ltr" class="p cd"><span on:mouseenter={()=>hover(" שווי ליחידה")} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{agprice}</span> * <span on:mouseenter={()=>hover("כמות")} on:mouseleave={()=>hover("0")} style="color: aqua" >{hm}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{(agprice * hm).toFixed(2)}</span> </p>
+       <p dir="ltr" class="p cd"><span onmouseenter={()=>hover(" שווי ליחידה")} onmouseleave={()=>hover("0")} style="color:var(--gold)" >{agprice}</span> * <span onmouseenter={()=>hover("כמות")} onmouseleave={()=>hover("0")} style="color: aqua" >{hm}</span> = <span onmouseenter={()=>hover("סך הכל")} onmouseleave={()=>hover("0")} >{(agprice * hm).toFixed(2)}</span> </p>
    {:else if kindOf === "total" || kindOf === "rent"}
-       <p class="p cd"><span on:mouseenter={()=>hover("שווי מוצע")} on:mouseleave={()=>hover("0")} style="color:var(--gold)" >{agprice}</span></p>
+       <p class="p cd"><span onmouseenter={()=>hover("שווי מוצע")} onmouseleave={()=>hover("0")} style="color:var(--gold)" >{agprice}</span></p>
           {:else if kindOf === "monthly"}
-       <p class="p cd"><span on:mouseenter={()=>hover("שווי לחודש")} on:mouseleave={()=>hover("0")}  style="color:var(--gold)" >{agprice}</span> * <span on:mouseenter={()=>hover("כמות חודשים")} on:mouseleave={()=>hover("0")}  style="color: aqua" >{monts}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{(agprice * monts).toFixed(2)}</span> </p>
+       <p class="p cd"><span onmouseenter={()=>hover("שווי לחודש")} onmouseleave={()=>hover("0")}  style="color:var(--gold)" >{agprice}</span> * <span onmouseenter={()=>hover("כמות חודשים")} onmouseleave={()=>hover("0")}  style="color: aqua" >{monts}</span> = <span onmouseenter={()=>hover("סך הכל")} onmouseleave={()=>hover("0")} >{(agprice * monts).toFixed(2)}</span> </p>
           {:else if kindOf === "yearly"}
-       <p class="p cd"><span on:mouseenter={()=>hover("שווי לשנה")} on:mouseleave={()=>hover("0")}  style="color:var(--gold)" >{agprice}</span> * <span on:mouseenter={()=>hover("מספר שנים")} on:mouseleave={()=>hover("0")}  style="color: aqua" >{yers}</span> = <span on:mouseenter={()=>hover("סך הכל")} on:mouseleave={()=>hover("0")} >{(agprice * yers).toFixed(2)}</span> </p>
+       <p class="p cd"><span onmouseenter={()=>hover("שווי לשנה")} onmouseleave={()=>hover("0")}  style="color:var(--gold)" >{agprice}</span> * <span onmouseenter={()=>hover("מספר שנים")} onmouseleave={()=>hover("0")}  style="color: aqua" >{yers}</span> = <span onmouseenter={()=>hover("סך הכל")} onmouseleave={()=>hover("0")} >{(agprice * yers).toFixed(2)}</span> </p>
 {/if}
             {#if low == false}
             {#if !already}
-            <button on:mouseenter={()=>hover("אישור")} on:mouseleave={()=>hover("0")} on:click={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+            <button onmouseenter={()=>hover("אישור")} onmouseleave={()=>hover("0")} onclick={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
         <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>--> 
-            <button on:mouseenter={()=>hover("התנגדות")} on:mouseleave={()=>hover("0")} on:click={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+            <button onmouseenter={()=>hover("התנגדות")} onmouseleave={()=>hover("0")} onclick={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
         {:else if low == true}
           <Lowbtn/>
@@ -580,9 +638,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
         <Cards 
- on:agree={agree}
-  on:decline={open}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={open}
+  onHover={hoverc}
   {low}
   {agprice}
   {useraplyname}
@@ -608,9 +666,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
       {/if}
 {:else}
 <Cards 
- on:agree={agree}
-  on:decline={open}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={open}
+  onHover={hoverc}
   {isVisible}
   {low}
   {agprice}
@@ -638,7 +696,6 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
   align-items: center;
   justify-content: center;
   border-radius: 18px !important;
-  border: 1px solid var(--barbi-pink);
   font-size: 22px;
   font-weight: bold;
   min-height:100vh;

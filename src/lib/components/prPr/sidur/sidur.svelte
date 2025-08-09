@@ -5,7 +5,7 @@
     import { lang } from '$lib/stores/lang.js';
     import { toast } from 'svelte-sonner';
     import '@event-calendar/core/index.css';
-    let ec;
+    let ec = $state();
     let count = 0;
     let eve = [
     {id:1,start: '2022-08-21 11:00:00',end: '2022-08-21 14:00:00', title: "baruch"},

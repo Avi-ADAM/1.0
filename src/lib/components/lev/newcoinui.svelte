@@ -1,22 +1,33 @@
 <script>
-  $: w = 1200;
-  $: h = 1200;
-  $: ow = 500;
-  $: oh = 500;
+  let w = $state(1200);
+  
+  let h = $state(1200);
+  
+  let ow = $state(500);
+  
+  let oh = $state(500);
+  
   let screen
-  $: top = 0
-  $: left = 0
-  $: maxW = 100
-  $: maxH = 100
-  $: center = { x: w / 2, y: h / 2 };
-  $: console.log('עדכון מרכז:', center);
+  let top = $derived(0)
+  let left = $derived(0)
+  let maxW = $derived(100)
+  let maxH = $derived(100)
+  let center;
+  $effect(() => {
+    center = { x: w / 2, y: h / 2 };
+  });
+  $effect(() => {
+    console.log('עדכון מרכז:', center);
+  });
   // Call this function whenever you add new circles
   //placeCircles();
 
   // Add your infinite scroll mechanism here
-  $: size = ow>550? 125:115;
-  $: bigsize = ow>550? 225: 100;
-  $: add = ow>550? 70: 70;
+  
+
+  let size = $derived(ow>550? 125:115);
+  let bigsize = $derived(ow>550? 225: 100);
+  let add = $derived(ow>550? 70: 70);
 
   // פונקציה למירכוז המסך על אזור התוכן
   function centerViewOnLoad() {
@@ -91,7 +102,7 @@
     };
   }
 
-  import * as animateScroll from 'svelte-scrollto';
+  import { animateScroll, scrollto, scrolltobottom, scrolltotop } from 'svelte-scrollto-element';
   import Vid from './didiget.svelte';
   import Desi from './decisionMaking.svelte';
   import Mid from './midi.svelte';
@@ -108,13 +119,112 @@
   import Hal from './halukaask.svelte';
   import { fly } from 'svelte/transition';
 
-  import { createEventDispatcher, onMount } from 'svelte';
-  import { page } from '$app/stores';
+  import { onMount } from 'svelte';
+  import { page } from '$app/state';
   import { isMobileOrTablet } from '$lib/utilities/device';
 
-  const dispatch = createEventDispatcher();
-  export let adder = [],
-    arr1 = [],
+
+  let modal = $state(false);
+
+  function modali() {
+    modal = true;
+    animateScroll.scrollToTop();
+  }
+
+  function delo(event) {
+    let oldob = arr1;
+    const x = oldob.map((c) => c.coinlapach);
+    const indexy = x.indexOf(event.coinlapach);
+    oldob.splice(indexy, 1);
+    arr1 = oldob;
+    onStart?.({
+      cards: false,
+      ani: event.ani
+    });
+  }
+
+  function user(event) {
+    onUser?.({
+      id: event.id
+    });
+  }
+
+  function mesima(event) {
+    onMesima?.({
+      id: event.id
+    });
+  }
+
+  function hover(event) {
+    onHover?.({
+      id: event.id
+    });
+  }
+
+  function chat() {}
+
+  function cards() {
+    onCards?.({
+      cards: true
+    });
+  }
+
+  function proj(event) {
+    onProj?.({
+      id: event.id
+    });
+  }
+
+  function showonly(event) {
+    const value = event.data;
+    for (const key in milon) {
+      milon[key] = false;
+    }
+
+    milon[value] = true;
+  }
+
+  function showall(event) {
+    for (const key in milon) {
+      milon[key] = true;
+    }
+  }
+  /**
+   * @typedef {Object} Props
+   * @property {any} [adder]
+   * @property {any} [arr1]
+   * @property {any} [askedarr]
+   * @property {any} [declineddarr]
+   * @property {number} [halu]
+   * @property {number} [askma]
+   * @property {number} [maap]
+   * @property {number} [mashs]
+   * @property {number} [pmashd]
+   * @property {number} [fia]
+   * @property {number} [beta]
+   * @property {number} [pen]
+   * @property {number} [sug]
+   * @property {boolean} [low]
+   * @property {any} nam
+   * @property {number} [wel]
+   * @property {number} [ask]
+   * @property {any} picLink
+   * @property {any} total
+   * @property {any} [milon]
+   * @property {boolean} [sml]
+   * @property {(payload: { cards: boolean, ani: any }) => void} [onStart] - Callback for 'start' event
+   * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
+   * @property {(payload: { id: any }) => void} [onMesima] - Callback for 'mesima' event
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+   * @property {(payload: { cards: boolean }) => void} [onCards] - Callback for 'cards' event
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+   */
+
+  /** @type {Props} */
+  let {
+    onStart, onUser, onMesima, onHover, onCards, onProj,
+    adder = [],
+    arr1 = $bindable([]),
     askedarr = [],
     declineddarr = [],
     halu = 17,
@@ -131,8 +241,8 @@
     wel = 13,
     ask = 13,
     picLink,
-    total;
-  export let milon = {
+    total,
+    milon = $bindable({
     hachla: true,
     fiap: true,
     welc: true,
@@ -145,73 +255,9 @@
     pmashs: true,
     pmaap: true,
     askmap: true
-  };
-  let modal = false;
-
-  function modali() {
-    modal = true;
-    animateScroll.scrollToTop();
-  }
-
-  function delo(event) {
-    let oldob = arr1;
-    const x = oldob.map((c) => c.coinlapach);
-    const indexy = x.indexOf(event.detail.coinlapach);
-    oldob.splice(indexy, 1);
-    arr1 = oldob;
-    dispatch('start', {
-      cards: false,
-      ani: event.detail.ani
-    });
-  }
-
-  function user(event) {
-    dispatch('user', {
-      id: event.detail.id
-    });
-  }
-
-  function mesima(event) {
-    dispatch('mesima', {
-      id: event.detail.id
-    });
-  }
-
-  function hover(event) {
-    dispatch('hover', {
-      id: event.detail.id
-    });
-  }
-
-  function chat() {}
-
-  function cards() {
-    dispatch('cards', {
-      cards: true
-    });
-  }
-
-  function proj(event) {
-    dispatch('proj', {
-      id: event.detail.id
-    });
-  }
-
-  function showonly(event) {
-    const value = event.detail.data;
-    for (const key in milon) {
-      milon[key] = false;
-    }
-
-    milon[value] = true;
-  }
-
-  function showall(event) {
-    for (const key in milon) {
-      milon[key] = true;
-    }
-  }
-  export let sml = false;
+  }),
+    sml = false
+  } = $props();
   function checkLines(arr,w,h){
     let c = {}
     for (let i = 0; i < arr.length; i++) {
@@ -278,7 +324,10 @@
     console.log(orders, w, "mount");
   })
   
-  $: orders = checkLines(arr1, w, h);
+  let orders = $state([]);
+  $effect(() => {
+    orders = checkLines(arr1, w, h);
+  });
   
   export const snapshot = {
     capture: () => JSON.parse(JSON.stringify(orders)),
@@ -292,11 +341,11 @@
 
   <!-- כפתורי שליטה -->
   <div class="control-buttons">
-    <button class="control-button center-button" on:click={centerViewOnLoad} title="חזרה למרכז">
+    <button class="control-button center-button" onclick={centerViewOnLoad} title="חזרה למרכז">
       <span>⌘</span>
     </button>
     
-    <button class="control-button redistribute-button" on:click={redistributeElements} title="פיזור מחדש">
+    <button class="control-button redistribute-button" onclick={redistributeElements} title="פיזור מחדש">
       <span>⟳</span>
     </button>
   </div>
@@ -311,11 +360,11 @@
         {#if buble.ani === 'vidu' && milon.desi == true}
           <div class="vidu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Vid
-              on:modal={() => (modal = true)}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
-              on:coinLapach={delo}
+              onModal={() => (modal = true)}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
+              onCoinLapach={delo}
               shear={buble.shear}
               hervachti={buble.hervachti}
               sendpropic={buble.sendpropic}
@@ -342,12 +391,12 @@
         {:else if buble.ani === 'haluk' && milon.desi == true}
           <div class=" halu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Hal
-              on:modal={() => (modal = true)}
-              on:coinLapach={delo}
+              onModal={() => (modal = true)}
+              onCoinLapach={delo}
               user_1s={buble.user_1s}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
               hervach={buble.hervach}
               halukot={buble.halukot}
               coinlapach={buble.coinlapach}
@@ -373,11 +422,11 @@
         {:else if buble.ani === 'mtaha' && milon.betaha == true}
           <div class="betaha normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <MissionInProgress
-              on:proj={proj}
-              on:user={user}
-              on:hover={hover}
-              on:coinLapach={delo}
-              on:modal={() => (modal = true)}
+              onProj={proj}
+              onUser={user}
+              onHover={hover}
+              onCoinLapach={delo}
+              onModal={() => (modal = true)}
               pu={buble.pu}
               tasks={buble.acts.data}
               status={buble.status}
@@ -401,18 +450,18 @@
               hoursdon={buble.howmanyhoursalready}
               hourstotal={buble.hoursassinged}
               perhour={buble.perhour}
-              on:done={delo}
+              onDone={delo}
               {low}
             />
           </div>
         {:else if buble.ani === 'pmashes' && milon.ppmash == true}
           <div class="normSml ppmash" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <PendingMa
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
-              on:coinLapach={delo}
-              on:modal={modali}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
+              onCoinLapach={delo}
+              onModal={modali}
               ordern={buble.orderon}
               timegramaId={buble.timegramaId}
               restime={buble.restime}
@@ -449,11 +498,11 @@
         {:else if buble.ani === 'pends' && milon.pend == true}
           <div class="normSml pend" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <PendingM
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
-              on:coinLapach={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
+              onCoinLapach={delo}
               diun={buble.diun}
               timegramaId={buble.timegramaId}
               timegramaDate={buble.timegramaDate}
@@ -498,12 +547,12 @@
         {:else if buble.ani === 'wegets' && milon.pmaap == true}
           <div class="pmaap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Weget
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
               coinlapach={buble.coinlapach}
               mId={buble.mId}
               noofusersWaiting={buble.noofusersWaiting}
@@ -547,12 +596,12 @@
         {:else if buble.ani === 'fiapp' && milon.fiap == true}
           <div class="fiap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Fiappru
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
               coinlapach={buble.coinlapach}
               mId={buble.mId}
               noofusersWaiting={buble.noofusersWaiting}
@@ -595,7 +644,7 @@
           <div class="welc normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Welcomt
               id={buble.id}
-              on:hover={hover}
+              onHover={hover}
               coinlapach={buble.coinlapach}
               username={buble.username}
               projectName={buble.projectName}
@@ -604,12 +653,12 @@
         {:else if buble.ani === 'askedcoin' && milon.asks == true}
           <div class="asks normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Reqtojoin
-              on:acsept={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
-              on:decline={delo}
+              onAcsept={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
+              onDecline={delo}
               iskvua={buble.iskvua}
               email={buble.email}
               role={buble.role}
@@ -653,13 +702,13 @@
         {:else if buble.ani === 'askedm' && milon.askmap == true}
           <div class="askmap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Reqtom
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:user={user}
-              on:chat={chat}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onUser={user}
+              onChat={chat}
               coinlapach={buble.coinlapach}
               pid={buble.pid}
               noofusersWaiting={buble.noofusersWaiting}
@@ -698,12 +747,12 @@
         {:else if buble.ani === 'hachla' && milon.hachla == true}
           <div class="hachla normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Desi
-              on:acsept={delo}
-              on:decline={delo}
-              on:hover={hover}
-              on:modal={modali}
-              on:proj={proj}
-              on:chat={chat}
+              onAcsept={delo}
+              onDecline={delo}
+              onHover={hover}
+              onModal={modali}
+              onProj={proj}
+              onChat={chat}
               noofpu={buble.noofpu}
               newpicid={buble?.newpicid}
               coinlapach={buble.coinlapach}
@@ -737,14 +786,15 @@
         {:else if buble.ani === 'meData' && milon.sugg == true}
           <div class="sugg normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <ProjectSuggestor
-              on:modal={modali}
-              on:less={delo}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
-              on:mesima={mesima}
+              onModal={modali}
+              onLess={delo}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
+              onMesima={mesima}
               timeToP={buble.attributes.project.data.attributes.timeToP}
               coinlapach={buble.coinlapach}
+              acts={buble.attributes.acts}
               restime={buble.attributes.project.data.attributes.restime}
               {askedarr}
               {declineddarr}
@@ -774,10 +824,10 @@
         {:else if buble.ani === 'huca' && milon.pmashs == true}
           <div class="pmashs normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
             <Mashsug
-              on:less={delo}
-              on:hover={hover}
-              on:proj={proj}
-              on:user={user}
+              onLess={delo}
+              onHover={hover}
+              onProj={proj}
+              onUser={user}
               messege={buble.messege}
               {i}
               coinlapach={buble.coinlapach}
@@ -808,10 +858,10 @@
       <div class="midCom">
       <Mid
         {sml}
-        on:cards={cards}
-        on:hover={hover}
-        on:showall={showall}
-        on:showonly={showonly}
+        onCards={cards}
+        onHover={hover}
+        onShowall={showall}
+        onShowonly={showonly}
         {total}
         {picLink}
         {ask}

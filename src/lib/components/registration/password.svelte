@@ -1,4 +1,7 @@
 <script>
+	import { createBubbler, preventDefault } from 'svelte/legacy';
+
+	const bubble = createBubbler();
 import { userName } from '../../stores/store.js';
 import { show } from './store-show.js';
 import { email } from './email.js';  
@@ -8,7 +11,6 @@ import { contriesi } from './contries.js';
 
  import { RingLoader
 } from 'svelte-loading-spinners';
- import { createEventDispatcher } from 'svelte';
  import { skills1 } from './skills1.js';
 import { roles2 } from './roles2.js';
 import { workways1 } from './workways1.js';
@@ -40,8 +42,15 @@ skills1.subscribe(newskills => {
 roles2.subscribe(newRole => {
   roles2_val = newRole;
 })
- const dispatch = createEventDispatcher();
-let userName_value;
+/**
+ * @typedef {Object} Props
+ * @property {(payload: { tx: number, txx: number }) => void} [onProgres]
+ */
+
+/** @type {Props} */
+let { onProgres } = $props();
+
+let userName_value = $state();
 
 let emailL;
 let passwordx;
@@ -64,8 +73,8 @@ const baseUrl = import.meta.env.VITE_URL
 
 let linkg = baseUrl+'/graphql'
 let miDatan;
-let already = false;
-let errr = {k: false, m: "", p: false}
+let already = $state(false);
+let errr = $state({k: false, m: "", p: false})
 async function increment() {    
 errr.p = true;
 already = true;
@@ -121,7 +130,7 @@ if(response.data){
                 .then(data => miDatan = data);
             console.log(miDatan);*/
 
- dispatch ('progres',{
+ onProgres?.({
 		tx: 0,
 		txx: 0
 	} );
@@ -168,7 +177,7 @@ if(response.data){
             console.log(miDatan);
     */       
 }else{
-	 dispatch ('progres',{
+	 onProgres?.({
 		tx: 0,
 		txx: 0
 	} );
@@ -194,15 +203,15 @@ if(response.data){
   
 function back() {
 		show.update(n => n - 1);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 0,
 		txx: 11
-	} )
+	} );
     
 	}
-	let strength = 0;
-	let validations = [];
-	let showPassword = false;
+	let strength = $state(0);
+	let validations = $state([]);
+	let showPassword = $state(false);
 	function validatePassword(e) {
 		        passwordx = e.target.value
 		const password = e.target.value;
@@ -214,19 +223,19 @@ function back() {
 		//	password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
-		if (validations[0] == true){dispatch ('progres',{
+		if (validations[0] == true){onProgres?.({
 		tx: 0,
 		txx: 6
 	} ) } 
-	if (validations[1] == true ){dispatch ('progres',{
+	if (validations[1] == true ){onProgres?.({
 		tx: 0,
 		txx: 5
 	} ) }
-	if (validations[2] == true ){dispatch ('progres',{
+	if (validations[2] == true ){onProgres?.({
 		tx: 0,
 		txx: 4
 	} ) }
-	if (validations[3] == true ){dispatch ('progres',{
+	if (validations[3] == true ){onProgres?.({
 		tx: 0,
 		txx: 2
 	} ) }
@@ -248,7 +257,7 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 </script>
 
 <main >
-	<form on:submit|preventDefault>
+	<form onsubmit={preventDefault(bubble('submit'))}>
 		 <h1 title="{addn[$lang]}" class="midscreenText-2">
         {userName_value}
       <br>
@@ -262,13 +271,13 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 				name="email"
 				class="input"
 				placeholder="{addn[$lang]}"
-				on:input={validatePassword}
-				on:blur={getV}
+				oninput={validatePassword}
+				onblur={getV}
 			/>
 			<span
 				class="toggle-password"
-				on:mouseenter={() => (showPassword = true)}
-				on:mouseleave={() => (showPassword = false)}
+				onmouseenter={() => (showPassword = true)}
+				onmouseleave={() => (showPassword = false)}
 			>
 				{showPassword ? "🔒" : "👁"}
 			</span>
@@ -276,10 +285,10 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 				
 
 		<div class="strength">
-			<span class="bar bar-1" class:bar-show={strength > 0} />
-			<span class="bar bar-2" class:bar-show={strength > 0} />
-			<span class="bar bar-3" class:bar-show={strength > 1} />
-			<span class="bar bar-4" class:bar-show={strength > 1} />
+			<span class="bar bar-1" class:bar-show={strength > 0}></span>
+			<span class="bar bar-2" class:bar-show={strength > 0}></span>
+			<span class="bar bar-3" class:bar-show={strength > 1}></span>
+			<span class="bar bar-4" class:bar-show={strength > 1}></span>
 		</div>
 
 		<ul dir="rtl">
@@ -296,14 +305,14 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 		</ul>
 	{#if already === false}
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="but">
-		  <button class="button-2"   on:click="{back}"  >
+		  <button class="button-2"   onclick={back}  >
     <img alt="go"  class="img-4"  src="{srca[$lang]}"/>
     </button>
-  <button disabled={strength < 2} class="button-in-1-2" class:non={strength < 2 }  on:click="{increment}">
+  <button disabled={strength < 2} class="button-in-1-2" class:non={strength < 2 }  onclick={increment}>
     <img alt="go" class="img-4"  src="{srcb[$lang]}"/>
     </button>
 </div>
-{:else if already == true }
+{:else if already == true}
           <div style="margin: 0 auto;" class="flex flex-col text-center items-center justify-center">
             <h3 class="text-barbi">{om[$lang]}</h3>
           <br>

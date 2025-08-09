@@ -1,8 +1,8 @@
 <script>
-  export let meData = [];
   import { onMount } from 'svelte';
 
   import moment from 'moment';
+  let { meData = $bindable([]) } = $props();
   function remove(id) {
     console.log(id);
   }
@@ -14,8 +14,8 @@
   });
 
   let km = false;
-  let ky = false;
-  let kc = false;
+  let ky = $state(false);
+  let kc = $state(false);
 
   function myMissionH() {
     km = false;
@@ -23,10 +23,10 @@
     kc = false;
     let is = [];
 
-    for (var i = 0; i < meData.length; i++) {
+    for (let i = 0; i < meData.length; i++) {
       if (meData[i].attributes.kindOf === 'monthly') {
-        var b = moment(meData[i].attributes.sqadualed);
-        var a = moment(meData[i].attributes.sqadualedf);
+        let b = moment(meData[i].attributes.sqadualed);
+        let a = moment(meData[i].attributes.sqadualedf);
         meData[i].monts = a.diff(b, 'months', true).toFixed(2);
         ky = true;
         meData[i].m = true;
@@ -37,8 +37,8 @@
         meData[i].total = meData[i].monts * meData[i].attributes.price;
         meData[i].totaltotal = meData[i].monts * meData[i].attributes.easy;
       } else if (meData[i].attributes.kindOf === 'yearly') {
-        var b = moment(meData[i].attributes.sqadualed);
-        var a = moment(meData[i].attributes.sqadualedf);
+        let b = moment(meData[i].attributes.sqadualed);
+        let a = moment(meData[i].attributes.sqadualedf);
         meData[i].years = a.diff(b, 'years', true).toFixed(2);
         ky = true;
         meData[i].y = true;
@@ -93,8 +93,9 @@
           משאבים נדרשים שפורסמו
         </h1>
       </caption>
+      <thead>
       <tr class="gg">
-        <th class="gg" />
+        <th class="gg"></th>
         {#each meData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
@@ -233,6 +234,7 @@
           </td>
         {/each}
       </tr>
+    </thead>
     </table>
   </div>
 </div>

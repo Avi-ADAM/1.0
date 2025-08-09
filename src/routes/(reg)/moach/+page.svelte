@@ -41,7 +41,6 @@
   import Hach from '$lib/components/prPr/hachcal.svelte';
   import Finisin from '$lib/components/prPr/finisin.svelte';
 
-  //import { validate_component } from 'svelte/internal';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
@@ -50,16 +49,17 @@
   import { forum, initialForum, isChatOpen, updSend, nowChatId, newChat } from '$lib/stores/pendMisMes';
   import {SendTo} from '$lib/send/sendTo.svelte';
   let idL;
-  let success = false;
-  let isOpen = false;
-  let a = 0;
-  let fmiData = [];
-  let tahaS = false;
-  let bmiData = [];
-  let mission1 = [];
-  let dow;
-  let cow;
-  let hosaf;
+  let success = $state(false);
+  let isOpen = $state(false);
+  let isOpenM = $state(false);
+  let a = $state(0);
+  let fmiData = $state([]);
+  let tahaS = $state(false);
+  let bmiData = $state([]);
+  let mission1 = $state([]);
+  let dow = $state();
+  let cow = $state();
+  let hosaf = $state();
   let error2 = null;
   async function findM() {
     const cookieValue = document.cookie
@@ -104,9 +104,9 @@
       console.log(e);
     }
   }
-  let bmimData = [];
-  let addN = false;
-  let addM = false;
+  let bmimData = $state([]);
+  let addN = $state(false);
+  let addM = $state(false);
   let hosafa = {
     he: 'הוספת פעולות נדרשות לריקמה',
     en: 'add needed missions to FreeMates'
@@ -115,50 +115,60 @@
     he: 'הוספת משאבים נדרשים לריקמה',
     en: 'add needed resources to FreeMates'
   };
+  const noVallue = {
+    "he": "לא נשמרו עדיין משאבים שהתקבלו או משימות שהסתיימו בהצלחה ברקמה זו, לכך השווי הוא 0 ואי אפשר לחלק לפיו, יש ליצור ולשמור משאבים ומשימות כדי שניתן יהיה לחלק",
+    "en": "No values were saved yet for resources received or missions completed successfully in this FreeMates, so the value is 0 and it cannot be divided, you must create and save resources and missions in order to divide."
+  }
+  const crNow = {
+    "he": "ליצור עכשיו",
+    "en": "create now!"
+  }
   let cencel = { he: 'ביטול', en: 'cencel' };
-  let showvd = false;
+  let showvd = $state(false);
 
-  let totalneed = false;
+  let totalneed = $state(false);
   // total.subscribe(newwork => {
   //  totalneed = newwork;
   //  });
   let error1 = null;
-  let srcP;
-  let desP;
-  let projectname;
+  let srcP = $state();
+  let desP = $state();
+  let projectname = $state();
   let token;
-  let linkP,
-    githublink,
-    fblink,
-    discordlink,
-    drivelink,
-    twiterlink,
-    watsapplink;
-    $: errorM = false
-    $:noneti = ""
+  let linkP = $state(),
+    githublink = $state(),
+    fblink = $state(),
+    discordlink = $state(),
+    drivelink = $state(),
+    twiterlink = $state(),
+    watsapplink = $state();
+    let errorM = $state(false);
+  
+    let noneti = $state("");
+  
   let newcontent = true;
   let newcontentR = true;
   let newcontentW = true;
   let descPri;
-  let omiData = [];
-  let pmiData = [];
-  let project = [];
-  let projectUsers = [];
-  let vallues = [];
+  let omiData = $state([]);
+  let pmiData = $state([]);
+  let project = $state([]);
+  let projectUsers = $state([]);
+  let vallues = $state([]);
   let ata = [];
-  let restime;
-  let valit;
+  let restime = $state();
+  let valit = $state();
   let user = [];
-  let rikmashes = [];
-  let lll;
-  let opmash = [];
+  let rikmashes = $state([]);
+  let lll = $state();
+  let opmash = $state([]);
   let actdata = [];
-  let noofopenm = 0;
-  let salee = [];
-  let trili = [];
-  let projects = prog();
-  let meData = start();
-  let alit = [];
+  let noofopenm = $state(0);
+  let salee = $state([]);
+  let trili = $state([]);
+  let projects = $state(prog());
+  let meData = $state(start());
+  let alit = $state([]);
   //sale {id in}
   async function start() {
     if ($idPr !== 0) {
@@ -392,7 +402,7 @@
             bmiData = bmiData;
             vallues = project.vallues.data;
             if ($lang == 'he') {
-              for (var i = 0; i < vallues.length; i++) {
+              for (let i = 0; i < vallues.length; i++) {
                 if (vallues[i].attributes.localizations.data.length > 0) {
                   vallues[i].attributes.valueName =
                     vallues[
@@ -509,34 +519,34 @@
   }
 
   let li = [];
-  let miData = [];
-  let blabla = [];
-  let load = false;
+  let miData = $state([]);
+  let blabla = $state([]);
+  let load = $state(false);
   async function callbackFunction(event) {
-    if (event.detail.type == 'add') {
+    if (event.type == 'add') {
       cow.scrollIntoView(true);
       load = true;
-      const lim = event.detail.li;
+      const lim = event.li;
       if (lim.length > 0 || lim > 0) {
         //showvd = false;
         if ($mi.length == 0) {
           addM = false;
-          li = event.detail.li;
+          li = event.li;
           await findiM().then();
           load = false;
           showvd = true;
-          blabla = event.detail.bla;
+          blabla = event.bla;
           addM = true;
           cow.scrollIntoView(true);
         } else {
           addM = false;
           let alrIds = $mi.map((c) => c.id);
-          let chooseIds = event.detail.li;
+          let chooseIds = event.li;
           li = chooseIds.filter((el) => !alrIds.includes(el));
           await findiM().then();
           load = false;
           showvd = true;
-          blabla = event.detail.bla;
+          blabla = event.bla;
           addM = true;
           cow.scrollIntoView(true);
         }
@@ -605,7 +615,7 @@
       for (let z = 0; z < miDatal.length; z++) {
         let skills2 = miDatal[z].attributes.skills.data;
         if ($lang == 'he') {
-          for (var i = 0; i < skills2.length; i++) {
+          for (let i = 0; i < skills2.length; i++) {
             if (skills2[i].attributes.localizations.data.length > 0) {
               skills2[i].attributes.skillName =
                 skills2[
@@ -617,7 +627,7 @@
         miDatal[z].attributes.skills.data = skills2;
         let roles = miDatal[z].attributes.tafkidims.data;
         if ($lang == 'he') {
-          for (var i = 0; i < roles.length; i++) {
+          for (let i = 0; i < roles.length; i++) {
             if (roles[i].attributes.localizations.data.length > 0) {
               roles[i].attributes.roleDescription =
                 roles[
@@ -629,7 +639,7 @@
         miDatal[z].attributes.tafkidims.data = roles;
         let workways2 = miDatal[z].attributes.work_ways.data;
         if ($lang == 'he') {
-          for (var i = 0; i < workways2.length; i++) {
+          for (let i = 0; i < workways2.length; i++) {
             if (workways2[i].attributes.localizations.data.length > 0) {
               workways2[i].attributes.workWayName =
                 workways2[
@@ -662,9 +672,9 @@
   }
 
   async function removeF(event) {
-    let miDatanew = event.detail.data;
+    let miDatanew = event.data;
     const y = miDatanew.map((c) => c.id);
-    const id = event.detail.id;
+    const id = event.id;
     const index = y.indexOf(id);
     if (index > -1) {
       miDatanew.splice(index, 1);
@@ -687,13 +697,13 @@
     blabla = [];
   }
 
-  let descripFor;
+  let descripFor = $state();
 
  
-  let openMA = false;
+  let openMA = $state(false);
   let cencel1 = { he: 'סגירה', en: 'close' };
 
-  let openMS = false;
+  let openMS = $state(false);
   const fnnn = { he: 'המשימה נשלחה בהצלחה', en: 'mission has sent ' };
   function close() {
     showvd = false;
@@ -707,7 +717,7 @@
     toast.success(`${fnnn[$lang]}`);
     start();
   }
-  let meDatamm = [];
+  let meDatamm = $state([]);
   async function updi() {
     let res = [];
     const cookieValue = document.cookie
@@ -761,11 +771,11 @@
     toast.success(cloma[$lang]);
     start()
   }
-  let noofopen = 2;
+  let noofopen = $state(2);
 
-  let pendS = false;
-  let hovered = false;
-  let hoveredd = false;
+  let pendS = $state(false);
+  let hovered = $state(false);
+  let hoveredd = $state(false);
 
   function bighand() {
     hovered = !hovered;
@@ -776,11 +786,11 @@
   function addp() {
     if (projectUsers.length == 1) {
       a = 0;
-      isOpen = true;
+      isOpenM = true;
     } else {
       toast.success(tovote[$lang]);
       a = 0;
-      isOpen = true;
+      M = true;
     }
     //if project users more then 1
   }
@@ -796,11 +806,11 @@
   function editp() {
     if (projectUsers.length == 1) {
       a = 0;
-      isOpen = true;
+      isOpenM = true;
     } else {
       toast.success(`${tovote[$lang]}`);
       a = 0;
-      isOpen = true;
+      isOpenM = true;
     }
     //if project users more then 1
   }
@@ -816,6 +826,7 @@
 
   const closer = () => {
     isOpen = false;
+    isOpenM = false;
     a = 0;
   };
   let files;
@@ -824,8 +835,9 @@
     a = 1;
   }
   function allbackFunction(event) {
+    console.log(event);
     a = 2;
-    files = event.detail.files;
+    files = event.files;
     sendP();
   }
   let url1 = baseUrl + '/api/upload';
@@ -855,38 +867,27 @@
       })
       .then(({ data }) => {
         const imageId = data[0].id;
-        if (projectUsers.length == 1) {
-          axios
-            .put(
-              linkdi,
-              {
-                profilePic: imageId
-              },
-              {
-                headers: {
-                  Authorization: bearer1
-                }
-              }
-            )
-            .then((response) => {
-              meDatap = response.data;
-              srcP = meDatap.profilePic.formats.thumbnail.url;
-              srcP = meDatap.profilePic.formats.small.url;
-              srcP = meDatap.profilePic.url;
-              isOpen = false;
+        if(projectUsers.length == 1){
+        sendToSer({projectId: $idPr, imageId: imageId}, "43updateProfilePic",null,null,true,fetch)
+        .then((data) => {
+          console.log(data);
+          meDatap = data;
+              srcP = meDatap.data.updateProject.data.attributes.profilePic.formats.thumbnail.url;
+              srcP = meDatap.data.updateProject.data.attributes.profilePic.formats.small.url;
+              srcP = meDatap.data.updateProject.data.attributes.profilePic.url;
+              isOpenM = false;
               a = 0;
               toast.success(`${picupsu[$lang]}`);
-            })
-            .catch((error) => {
-              console.log('צריך לתקן:', error.response);
-              if (error.response != undefined) {
-                a = 3;
-              }
-            });
-        } else {
+        })
+      .catch((error) => {
+        console.log(error);
+        a = 3;
+      });
+
+    } else {
           let linkg = baseUrl + '/graphql';
           try {
-            fetch(linkg, {
+           fetch(linkg, {
               method: 'POST',
 
               headers: {
@@ -915,10 +916,25 @@
               })
             })
               .then((r) => r.json())
-              .then((data) => (meDatap = data));
-            isOpen = false;
-            a = 0;
-            toast.success(`${picvots[$lang]}`);
+              .then((data) => {
+                meDatap = data;
+                if (meDatap && meDatap.data && meDatap.data.createDecision && meDatap.data.createDecision.data) {
+                  let timegramaId = meDatap.data.createDecision.data.id;
+                  let x = calcX(restime);
+                  let fd = new Date(Date.now() + x);
+                  sendToSer({whatami:"decision",decision:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch);
+                  isOpenM = false;
+                  a = 0;
+                  toast.success(`${picvots[$lang]}`);
+                } else {
+                  console.error('Invalid response structure:', meDatap);
+                  toast.error('שגיאה ביצירת ההחלטה');
+                }
+              })
+              .catch((error) => {
+                console.error('Error creating decision:', error);
+                toast.error('שגיאה ביצירת ההחלטה');
+              });
           } catch (e) {
             console.log(e);
           }
@@ -942,7 +958,7 @@
     en: 'vote on new Logo has created successfully'
   };
   async function updete(event) {
-    console.log(event.detail.valit);
+    console.log(event.valit);
     a = 2;
     let counter = false;
     let projectnamei = ``;
@@ -957,70 +973,70 @@
     let drivelinkii = ``;
     let twiterlinkii = ``;
     let watsapplinkii = ``;
-    if (event.detail.projectName_value != projectname) {
-      projectnamei = `projectName: "${event.detail.projectName_value}",`;
+    if (event.projectName_value != projectname) {
+      projectnamei = `projectName: "${event.projectName_value}",`;
       counter = true;
     }
-    if (event.detail.desP != desP && event.detail.desP != null) {
-      despi = `publicDescription: "${event.detail.desP}",`;
+    if (event.desP != desP && event.desP != null) {
+      despi = `publicDescription: "${event.desP}",`;
       counter = true;
     }
-    if (event.detail.linkP != linkP && event.detail.linkP != null) {
-      linkPii = `linkToWebsite: "${event.detail.linkP}",`;
+    if (event.linkP != linkP && event.linkP != null) {
+      linkPii = `linkToWebsite: "${event.linkP}",`;
       counter = true;
     }
-    if (event.detail.desPl != descripFor && event.detail.desPl != null) {
-      desPlii = `descripFor: "${event.detail.desPl}",`;
+    if (event.desPl != descripFor && event.desPl != null) {
+      desPlii = `descripFor: "${event.desPl}",`;
       counter = true;
     }
-    const x = event.detail.valit.sort(function (a, b) {
+    const x = event.valit.sort(function (a, b) {
       return a - b;
     });
     const y = alit.sort(function (a, b) {
       return a - b;
     });
     if (!isEqual(x, y)) {
-      valluesii = `vallues: [${event.detail.valit}],`;
+      valluesii = `vallues: [${event.valit}],`;
       counter = true;
     } //array
-    if (event.detail.restime != restime && event.detail.restime != null) {
-      restimeii = `restime: ${event.detail.restime},`;
+    if (event.restime != restime && event.restime != null) {
+      restimeii = `restime: ${event.restime},`;
       counter = true;
     }
     if (
-      event.detail.githublink != githublink &&
-      event.detail.githublink != null
+      event.githublink != githublink &&
+      event.githublink != null
     ) {
-      githublinkii = `githublink: "${event.detail.githublink}",`;
+      githublinkii = `githublink: "${event.githublink}",`;
       counter = true;
     }
-    if (event.detail.fblink != fblink && event.detail.fblink != null) {
-      fblinkii = `fblink: "${event.detail.fblink}",`;
+    if (event.fblink != fblink && event.fblink != null) {
+      fblinkii = `fblink: "${event.fblink}",`;
       counter = true;
     }
     if (
-      event.detail.discordlink != discordlink &&
-      event.detail.discordlink != null
+      event.discordlink != discordlink &&
+      event.discordlink != null
     ) {
-      discordlinkii = `discordlink: "${event.detail.discordlink}",`;
+      discordlinkii = `discordlink: "${event.discordlink}",`;
       counter = true;
     }
-    if (event.detail.drivelink != drivelink && event.detail.drivelink != null) {
-      drivelinkii = `drivelink: "${event.detail.drivelink}",`;
-      counter = true;
-    }
-    if (
-      event.detail.twiterlink != projectname &&
-      event.detail.twiterlink != null
-    ) {
-      twiterlinkii = `twiterlink: "${event.detail.twiterlink}",`;
+    if (event.drivelink != drivelink && event.drivelink != null) {
+      drivelinkii = `drivelink: "${event.drivelink}",`;
       counter = true;
     }
     if (
-      event.detail.watsapplink != watsapplink &&
-      event.detail.watsapplink != null
+      event.twiterlink != projectname &&
+      event.twiterlink != null
     ) {
-      watsapplinkii = `watsapplink: "${event.detail.watsapplink}",`;
+      twiterlinkii = `twiterlink: "${event.twiterlink}",`;
+      counter = true;
+    }
+    if (
+      event.watsapplink != watsapplink &&
+      event.watsapplink != null
+    ) {
+      watsapplinkii = `watsapplink: "${event.watsapplink}",`;
       counter = true;
     }
     const cookieValue = document.cookie
@@ -1081,7 +1097,7 @@
       restime = mecata.restime;
       vallues = mecata.vallues.data;
       if ($lang == 'he') {
-        for (var i = 0; i < vallues.length; i++) {
+        for (let i = 0; i < vallues.length; i++) {
           if (vallues[i].attributes.localizations.data.length > 0) {
             vallues[i].attributes.valueName =
               vallues[i].attributes.localizations.data[0].attributes.valueName;
@@ -1114,10 +1130,10 @@
     goto('/moach');
     meData = await start();
   }
-  let needr = [];
-  let loadr = false;
+  let needr = $state([]);
+  let loadr = $state(false);
   async function needad(event) {
-    const x = event.detail.x;
+    const x = event.x;
     if (x.length > 0 || x > 0) {
       dow.scrollIntoView(true);
       loadr = true;
@@ -1130,8 +1146,8 @@
     }
   }
   async function needadm(event) {
-    const x = event.detail.x;
-    const y = event.detail.scob;
+    const x = event.x;
+    const y = event.scob;
     if (x.length > 0 || x > 0) {
       dow.scrollIntoView(true);
       loadr = true;
@@ -1148,9 +1164,9 @@
   }
 
   async function wdwd(event) {
-    const miDatanew = event.detail.data;
+    const miDatanew = event.data;
     const y = miDatanew.map((c) => c.id);
-    const id = event.detail.id;
+    const id = event.id;
     const index = y.indexOf(id);
     if (index > -1) {
       miDatanew.splice(index, 1);
@@ -1164,14 +1180,14 @@
       totalneed = false;
     }
   }
-  let hal = false;
+  let hal = $state(false);
   function trym() {
     openMS = true;
   }
   function tryma() {
     openMA = true;
   }
-  let fff;
+  let fff = $state();
   async function masi() {
     addN = true;
     loadr = true;
@@ -1180,11 +1196,11 @@
   }
 
   function titlel(event) {
-    ti = event.detail.ti;
+    ti = event.ti;
   }
-  let who;
+  let who = $state();
   function openTheDesc(event) {
-    const id = event.detail.id;
+    const id = event.id;
     const is = id[0].model.classes;
     who = Math.floor(id[0].model.id);
     console.log(id[0].model.classes, Math.floor(id[0].model.id));
@@ -1203,8 +1219,8 @@
     }
   }
   function openDescrip(event) {
-    const id = event.detail.id;
-    const is = event.detail.kind;
+    const id = event.id;
+    const is = event.kind;
     who = id
     if (is == 'pendm') {
       isOpen = true;
@@ -1221,11 +1237,11 @@
     }
   }
   let hover = false;
-  let bmiss;
-  let pendss;
-  let openss;
-  let finiss;
-  let hagdel = false;
+  let bmiss = $state();
+  let pendss = $state();
+  let openss = $state();
+  let finiss = $state();
+  let hagdel = $state(false);
   function topends() {
     pendS = true;
     pendss.scrollIntoView(true);
@@ -1240,7 +1256,7 @@
   }
   function tofinish() {
     hagdel = true;
-    tab = 8
+    tab = 4
     finiss.scrollIntoView(true);
   }
   const title = { he: 'מוח הריקמה 1💗1', en: '1💗1 FreeMates Brain' };
@@ -1320,12 +1336,14 @@
   let sid = false;
   let gan = false;
   let bett = false;
-    $: width = 0;
-  let chatId;
+    let width = $state(0);
+  
+  let chatId = $state();
   let newID;
   let smalldes;
   let nameChatPartner;
-  $: clicked = false;
+  let clicked = $state(false);
+  
   let ani;
   let isNew = false
       const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
@@ -1346,6 +1364,11 @@
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
+  import { RingLoader } from 'svelte-loading-spinners';
+  import { sendToSer } from '$lib/send/sendToSer';
+  import { calcX } from '$lib/func/calcX.svelte';
+  import Button from '$lib/celim/ui/button.svelte';
+  import { link } from 'd3-shape';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1371,7 +1394,7 @@
 
 
   async function afreact(e) {
-    const m = e.detail.why
+    const m = e.why
     console.log(m)
     let da = new Date
     if(isNew == true){
@@ -1445,23 +1468,23 @@ async function createMes(id,mes){
      }
   }
   function openChat(e) {
-     isNew = e.detail.isNew;
+     isNew = e.isNew;
      console.log(e)
     if (isNew == false) {
-      $nowChatId = e.detail.id
+      $nowChatId = e.id
       $isChatOpen = true
       /*
-       initialForum(false,[e.detail.id],idL)
-      chatId = e.detail.id;
-      smalldes = e.detail.smalldes;
-      nameChatPartner = e.detail.nameChatPartner[$lang];*/
+       initialForum(false,[e.id],idL)
+      chatId = e.id;
+      smalldes = e.smalldes;
+      nameChatPartner = e.nameChatPartner[$lang];*/
       //TODO: meanwhile show loading on chat
     } else {
       $newChat = {
           started:true,
           created: false,
           id: 0,
-          md: { mbId:e.detail.id, pid:$idPr}
+          md: { mbId:e.id, pid:$idPr}
             }
       let tempF = $forum
       tempF[-1] = {
@@ -1469,10 +1492,10 @@ async function createMes(id,mes){
         messages:[],
         md:{
           pid:$idPr,
-          mbId:e.detail.id,
+          mbId:e.id,
           projectName:projectname,
           projectPic:srcP,
-          mesimaName:e.detail.smalldes
+          mesimaName:e.smalldes
         }
       };
       forum.set(tempF)
@@ -1480,9 +1503,9 @@ async function createMes(id,mes){
       $isChatOpen = true
       subs()
       console.log($nowChatId)
-      /*newID = e.detail.id
-      smalldes = e.detail.smalldes;
-      nameChatPartner = e.detail.nameChatPartner[$lang];
+      /*newID = e.id
+      smalldes = e.smalldes;
+      nameChatPartner = e.nameChatPartner[$lang];
       clicked = false;
     ani = 'forum';
     a = 8;
@@ -1533,10 +1556,11 @@ async function createMes(id,mes){
     pendMisMes.set(forums);
     localStorage.setItem('pendMisMes', JSON.stringify($forum));
   }
-  $: tab = 1
+  let tab = $state(1);
+  
 const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"}
 function add(event){
-  console.log(event.detail)
+  console.log(event)
 }
 </script>
 
@@ -1566,25 +1590,34 @@ function add(event){
       <Lowding />
     </div>
   {:then meData}
+  {#if a == 0 && isOpenM}
+  <div class="center-upload">
+    <Uplad onMessage={allbackFunction} current={srcP}/>
+    <button onclick={closer}>{cencel[$lang]}</button>
+  </div>
+  {:else if a == 2 && isOpenM}
+  <div class="center-upload">
+ <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+ </div> 
+ {/if}
     <!--   <Tooltip title="{ti}" >-->
     <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
       <div
         style="z-index: 700;"
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
-        <DialogContent aria-label="form" class="{a != 8 ? a != 5 ? "content" : "betha" :"chat"}">
+        <DialogContent aria-label="form"
+         class={a != 8 ? a != 5 ? "content" : "betha" :"chat"}>
           <div style="z-index: 400;"      dir="{$lang == "he" ? "rtl" : "ltr"}"
           >
             <button
               class=" hover:bg-barbi text-mturk rounded-full"
-              on:click={closer}
+              onclick={closer}
               title={cencel1[$lang]}><Close /></button
             >
-            {#if a == 0}
-              <Uplad on:message={allbackFunction} />
-            {:else if a == 1}
+            {#if a == 1}
               <Editb
-                on:message={updete}
+                onMessage={updete}
                 selected={valit}
                 {githublink}
                 {fblink}
@@ -1606,7 +1639,7 @@ function add(event){
               <h1>{errmsg[$lang]}</h1>
               <button
                 class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
-                on:click={() => (a = 0)}>לנסות שוב</button
+                onclick={() => (a = 0)}>לנסות שוב</button
               >
             {:else if a == 4}
               <PendsM {who} {pmiData} user_1s={projectUsers.length} />
@@ -1620,7 +1653,7 @@ function add(event){
             {#key clicked}
               <Diun
                 rikmaName={projectname}
-                on:rect={afreact}
+                onRect={afreact}
                 {smalldes}
                 {nameChatPartner}
                 mypos={true}
@@ -1634,7 +1667,7 @@ function add(event){
             {:else if a === 9}
             <span class="text-gold">
             </span>
-            <ChooseM {bmiData} taskId={who} on:close={closer}/>
+            <ChooseM {bmiData} taskId={who} onClose={closer}/>
             {/if}
           </div></DialogContent
         >
@@ -1648,7 +1681,7 @@ function add(event){
     <div
       dir="{$lang == "he" ? "rtl" : "ltr"}"
       bind:clientWidth={width}
-      class="all text-barbi text-center overflow-y-auto  {isMobileOrTablet() ? "max-h-[calc(100vh-3rem)]" : "min-h-screen"}  scroll-smooth d"
+      class="all text-barbi text-center  overflow-y-auto max-h-[calc(100vh-3rem)]  scroll-smooth d mb-12"
       style="-webkit-scrollbar:0px;"
     >
     {#if !isMobileOrTablet()}
@@ -1724,7 +1757,7 @@ pointer-events: none;"
             <button
               class="text-barbi hover:bg-barbi hover:text-mturk rounded-full"
               title={editpic[$lang]}
-              on:click={editp}
+              onclick={editp}
               ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path
                   fill="currentColor"
@@ -1736,7 +1769,7 @@ pointer-events: none;"
             <button
               class="bg-barbi hover:bg-mturk text-barbi rounded-full"
               title={upload[$lang]}
-              on:click={addp}
+              onclick={addp}
             >
               <svg style="width:24px;height:24px" viewBox="0 0 24 24">
                 <path
@@ -1749,7 +1782,7 @@ pointer-events: none;"
           <button
             class=" hover:bg-mturk text-barbi rounded-full"
             title={editd[$lang]}
-            on:click={editb}
+            onclick={editb}
             ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
               <path
                 fill="currentColor"
@@ -1773,7 +1806,7 @@ pointer-events: none;"
               />
             </a>
           {/if}
-          {#if linkP}
+          {#if linkP && linkP != undefined && linkP != null && linkP != "" && linkP != "null" && linkP != "undefined"}
             <a
               rel="noreferrer"
               target="_blank"
@@ -1872,7 +1905,7 @@ pointer-events: none;"
           <button
             class=" hover:bg-white text-barbi rounded-full"
             title={publicp[$lang]}
-            on:click={goto(`/project/${$idPr}`)}
+            onclick={goto(`/project/${$idPr}`)}
           >
             <Pub />
           </button>
@@ -1885,7 +1918,7 @@ pointer-events: none;"
             {#each projectUsers as user}
               <button
                 title={user.attributes.username}
-                on:click={() => goto(`/user/${user.id}`)}
+                onclick={() => goto(`/user/${user.id}`)}
                 ><img
                   class="inline-block h-8 w-8 rounded-full ring-2 ring-gold"
                   src={user.attributes.profilePic.data != null
@@ -1903,7 +1936,7 @@ pointer-events: none;"
 <!--tab header-->
    <nav class="flex justify-center bg- max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
                   <button
-                on:click={() => (tab = 1)}
+                onclick={() => (tab = 1)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 1 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={maini[$lang]}
                 ><div
@@ -1916,7 +1949,7 @@ pointer-events: none;"
                 </div></button
               >
               <button
-                on:click={() => (tab = 2)}
+                onclick={() => (tab = 2)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 2 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={neww[$lang]}
                 ><div
@@ -1929,7 +1962,7 @@ pointer-events: none;"
                 </div></button
               >
               <button
-                on:click={() => (tab = 3)}
+                onclick={() => (tab = 3)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 3 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={gann[$lang]}
                 ><div
@@ -1942,7 +1975,7 @@ pointer-events: none;"
                 </div></button
               >
               <button
-                on:click={() => (tab = 4)}
+                onclick={() => (tab = 4)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 4 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={haluka[$lang]}
                 ><div
@@ -1956,7 +1989,7 @@ pointer-events: none;"
               >
             {#if bmiData.length > 0}
                 <button
-                  on:click={() => (tab = 5)}
+                  onclick={() => (tab = 5)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 5 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                   title={bet[$lang]}
                   ><div
@@ -1971,7 +2004,7 @@ pointer-events: none;"
             {/if}
             {#if meData?.acts.data.length > 0}
             <button
-            on:click={() => (tab = 9)}
+            onclick={() => (tab = 9)}
             class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 9 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
             title={actL[$lang]}
             ><div
@@ -1984,7 +2017,7 @@ pointer-events: none;"
           >
             {/if}
             <button
-                on:click={() => (tab = 10)}
+                onclick={() => (tab = 10)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 10 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={timers[$lang]}
                 ><div
@@ -1994,8 +2027,8 @@ pointer-events: none;"
                     {timers[$lang]}
                   </h2>
                 </div></button>
-             <button
-                on:click={() => (tab = 6)}
+            <!-- <button
+                onclick={() => (tab = 6)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={shirutims[$lang]}
                 ><div
@@ -2004,10 +2037,9 @@ pointer-events: none;"
                   <h2 style="{tab == 6 ? "": "text-shadow:1px 1px #fff ;"}">
                     {shirutims[$lang]}
                   </h2>
-                  <!--<Siduri/>-->
-                </div></button>
+                </div></button>-->
                <button
-                on:click={() => (tab = 7)}
+                onclick={() => (tab = 7)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={mechirot[$lang]}
                 ><div
@@ -2019,7 +2051,7 @@ pointer-events: none;"
                   <!--<Siduri/>-->
                 </div></button>
                <button
-                on:click={() => (tab = 8)}
+                onclick={() => (tab = 8)}
                 class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 8 ? "bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-r from-gra via-grb  to-grc text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={sidd[$lang]}
                 ><div
@@ -2034,11 +2066,11 @@ pointer-events: none;"
 <!--tabs-->
 <div class="border-t-2 border-mturk">
 {#if tab === 1}
-        {#if project.publicDescription != 'undefined' && project.publicDescription != null}
+        {#if project.publicDescription != 'undefined' && project.publicDescription != null && project.publicDescription != ""}
             <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
             <RichText editable={false} outpot={project?.publicDescription} />
         {/if}
-        {#if project.descripFor != 'undefined' && project.descripFor != null}
+        {#if project.descripFor != 'undefined' && project.descripFor != null && project.descripFor != ""}
             <RichText editable={false} outpot={project?.descripFor} />
             <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
         {/if}
@@ -2066,7 +2098,7 @@ pointer-events: none;"
 
           <div class=" hhh">
             {#if hovered}
-              <button on:click={hosa} on:mouseleave={bighand}
+              <button onclick={hosa} onmouseleave={bighand}
                 ><img
                   title={hosafa[$lang]}
                   style="max-width:45vw; max-height:45vw;"
@@ -2078,9 +2110,9 @@ pointer-events: none;"
               >
             {:else}
               <Hand
-                on:hosa={hosa}
-                on:progres={bighand}
-                on:trym={trym}
+                onHosa={hosa}
+                onProgres={bighand}
+                onTrym={trym}
                 {noofopen}
                 {openMS}
                 {addM}
@@ -2088,7 +2120,7 @@ pointer-events: none;"
               />
             {/if}
             {#if hoveredd}
-              <button on:click={masi} on:mouseleave={bighandd}
+              <button onclick={masi} onmouseleave={bighandd}
                 ><img
                   title={hosafat[$lang]}
                   style="max-width:45vw; max-height:45vw;"
@@ -2100,9 +2132,9 @@ pointer-events: none;"
               >
             {:else}
               <Handd
-                on:trym={tryma}
-                on:masi={masi}
-                on:bighandd={bighandd}
+                onTrym={tryma}
+                onMasi={masi}
+                onBighandd={bighandd}
                 {noofopenm}
                 {openMA}
                 {addN}
@@ -2111,16 +2143,16 @@ pointer-events: none;"
             {/if}
 
             <!--{#if gan == false}
-<button on:click={()=>gan = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"title={gann[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{gann[$lang]}</p><Scab/></div></button>
+<button onclick={()=>gan = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"title={gann[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{gann[$lang]}</p><Scab/></div></button>
 {/if}
 
 {#if sid == false}
-<button on:click={()=>sid = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"  title={sidd[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{sidd[$lang]}</p><Siduri/></div></button>
+<button onclick={()=>sid = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"  title={sidd[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{sidd[$lang]}</p><Siduri/></div></button>
 {/if}
 {#if bmiData.length > 0 }
 <br> <br>
 {#if bett == false}
-<button on:click={()=>bett = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold" title={bet[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{bet[$lang]}</p><Taskk/></div></button>
+<button onclick={()=>bett = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold" title={bet[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{bet[$lang]}</p><Taskk/></div></button>
 {/if}
 {/if}
 -->
@@ -2134,11 +2166,11 @@ pointer-events: none;"
               {#if addM === true}
                 <div
                   bind:this={hosaf}
-                  class=" m-4 border-2 border-barbi rounded"
+                  class=" m-4 border-2 h-screen border-barbi rounded"
                 >
                   <button
                     title={cencel[$lang]}
-                    on:click={closeM}
+                    onclick={closeM}
                     class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2151,9 +2183,9 @@ pointer-events: none;"
                     {roles}
                     {mission1}
                     bind:selected={blabla}
-                    on:message={callbackFunction}
-                    on:add={add}
-                    on:close={close}
+                    onMessage={callbackFunction}
+                    onAdd={add}
+                    onClose={close}
                     pn={projectname}
                     pl={srcP}
                     {restime}
@@ -2186,8 +2218,8 @@ pointer-events: none;"
                   vallues={alit}
                   {miData}
                   projectId={$idPr}
-                  on:remove={removeF}
-                  on:close={close}
+                  onRemove={removeF}
+                  onClose={close}
                 />
               {/key}
             {/if}
@@ -2202,7 +2234,7 @@ pointer-events: none;"
               >
                 <button
                   title={cencel[$lang]}
-                  on:click={() => (addN = false)}
+                  onclick={() => (addN = false)}
                   class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2212,9 +2244,9 @@ pointer-events: none;"
                   </svg></button
                 >
                 <ChoosNeed
-                  on:str={() => (loadr = false)}
-                  on:add={needad}
-                  on:addm={needadm}
+                  onStr={() => (loadr = false)}
+                  onAdd={needad}
+                  onAddm={needadm}
                   selectedi={needr}
                 />
               </div>
@@ -2238,8 +2270,8 @@ pointer-events: none;"
                   userslength={projectUsers.length}
                   {needr}
                   meData={meDatamm}
-                  on:close={clo}
-                  on:remove={wdwd}
+                  onClose={clo}
+                  onRemove={wdwd}
                 />{/if}
             </div>
           </div>
@@ -2250,27 +2282,27 @@ pointer-events: none;"
               {#if pmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
-                  on:click={topends}>{mwa[$lang]}</button
+                  onclick={topends}>{mwa[$lang]}</button
                 >
               {/if}
 
               {#if omiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges text-pinki hover:text-barbi font-bold px-4 rounded"
-                  on:click={toopens}>{opmi[$lang]}</button
+                  onclick={toopens}>{opmi[$lang]}</button
                 >
               {/if}
               {#if bmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg text-barbi hover:text-barbi font-bold px-4 rounded"
-                  on:click={tobetha}
+                  onclick={tobetha}
                 >{mesimaBetaHe[$lang]}</button
                 >
               {/if}
               {#if fmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-mpink text-pinki hover:text-barbi font-bold px-4 rounded"
-                  on:click={tofinish}
+                  onclick={tofinish}
                 >
                   פעולות שהסתיימו</button
                 >
@@ -2286,7 +2318,7 @@ pointer-events: none;"
                   {pmiData}
                   {omiData}
                   {fmiData}
-                  on:selected={openTheDesc}
+                  onSelected={openTheDesc}
                 />
               </div>
               </div>
@@ -2303,12 +2335,12 @@ pointer-events: none;"
                   {hagdel}
                   users={projectUsers}
                   {rikmashes}
-                  on:tit={titlel}
+                  onTit={titlel}
                 />
                 <br />
                 {#if hal === false}
                   <button
-                    on:click={() => (hal = true)}
+                    onclick={() => (hal = true)}
                     class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
                   >
                     חישוב רווח בגירסה ראשונית
@@ -2316,7 +2348,7 @@ pointer-events: none;"
                 {:else if hal === true}
                   <button
                     title={cencel[$lang]}
-                    on:click={() => (hal = false)}
+                    onclick={() => (hal = false)}
                     class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2334,6 +2366,14 @@ pointer-events: none;"
                   />
                 {/if}
               </div>
+              {:else}
+              <div
+                class="m-4 border-2 border-barbi rounded p-4 bg-gold"
+                bind:this={finiss}
+              >
+                <h2 class="text-4xl text-barbi font-bold text-center">{noVallue[$lang]}</h2>
+                <Button onClick={()=> tab = 2} text={crNow} />
+              </div>
             {/if}
           </div>
 {:else if tab === 5}
@@ -2343,12 +2383,12 @@ pointer-events: none;"
                 style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
               >
             
-                <Bethas {bmiData} on:chat={openChat} />
+                <Bethas {bmiData} onChat={openChat} />
               </div>
-{:else if tab === 6}
+<!--{:else if tab === 6}
                      <div class="p-8">
             <Sheirut
-            on:new={findM}
+            onNew={findM}
               sheirutim={project?.sheiruts}
               pn={projectname}
               {restime}
@@ -2356,7 +2396,7 @@ pointer-events: none;"
               {roles}
    
             />
-          </div>
+          </div>-->
         
 {:else if tab === 7}
           <Hamatanot
@@ -2364,6 +2404,7 @@ pointer-events: none;"
               {fmiData}
               {rikmashes}
               {salee}
+              {restime}
               {projectUsers}
               bmiData={bmimData}
             />
@@ -2377,11 +2418,11 @@ pointer-events: none;"
                 <Sidur />
               </div>
 {:else if tab === 9}
-  <ActsTable acts={meData.acts.data} on:taskClick={openDescrip}/>                
+  <ActsTable acts={meData.acts.data} onTaskClick={openDescrip}/>                
          
 {:else if tab === 10}
   <div class="sm:p-8 p-1">
-    <TimersOfUsers projectId={$idPr} on:mission={openDescrip} on:tasks={()=>tab = 9} />
+    <TimersOfUsers projectId={$idPr} onMission={openDescrip} onTasks={()=>tab = 9} />
   </div>
 {/if}              
           </div>
@@ -2390,7 +2431,7 @@ pointer-events: none;"
                 <span >
                   <button
                     title={cencel1[$lang]}
-                    on:click={() => (openMS = false)}
+                    onclick={() => (openMS = false)}
                     class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2404,7 +2445,7 @@ pointer-events: none;"
               {:else if openMS === true && omiData.length == 0}
                 <button
                   title={cencel1[$lang]}
-                  on:click={() => (openMS = false)}
+                  onclick={() => (openMS = false)}
                   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2424,7 +2465,7 @@ pointer-events: none;"
               {#if openMA === true && opmash.length > 0}
                 <button
                   title={cencel1[$lang]}
-                  on:click={() => (openMA = false)}
+                  onclick={() => (openMA = false)}
                   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2437,7 +2478,7 @@ pointer-events: none;"
               {:else if openMA === true && opmash.length == 0}
                 <button
                   title={cencel1[$lang]}
-                  on:click={() => (openMA = false)}
+                  onclick={() => (openMA = false)}
                   class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                   ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                     <path
@@ -2460,7 +2501,7 @@ pointer-events: none;"
                 {#if pendS === true}
                   <button
                     title={cencel1[$lang]}
-                    on:click={() => (pendS = false)}
+                    onclick={() => (pendS = false)}
                     class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2479,7 +2520,7 @@ pointer-events: none;"
                   {#if tahaS === true}
                     <button
                       title={cencel1[$lang]}
-                      on:click={() => (tahaS = false)}
+                      onclick={() => (tahaS = false)}
                       class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                       ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                         <path
@@ -2517,8 +2558,8 @@ pointer-events: none;"
 
       {#each projects as data, i}
         <button
-          class=" border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
-          on:click={() => projectn(data.id)}
+          class="md:text-xl border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
+          onclick={() => projectn(data.id)}
         >
           {data.attributes.projectName}
         </button>
@@ -2544,8 +2585,14 @@ pointer-events: none;"
         :global([data-svelte-dialog-content].chat) {
               width: 80vw;
         }
+     
       }
-  @media (min-width: 600px){
+ @media (max-width: 800px){
+  :global([data-svelte-dialog-content].betha) {
+          width: 92vw;
+        }
+ }
+  @media (min-width: 720px){
         :global([data-svelte-dialog-content].chat) {
                 overflow-y: auto;
        z-index: 1000;
@@ -2588,17 +2635,6 @@ pointer-events: none;"
     -webkit-text-stroke: 1px var(--barbi-pink);
   }
 
-  :global(li:not(.selected):hover) {
-    color: var(--barbi-pink);
-    background-color: var(
-      --lturk
-    ); /* unselected but hovered options in the dropdown list */
-  }
-  :global(ul.tokens > li) {
-    background-color: var(--barbi-pink);
-    color: var(--lturk);
-  }
-
   .sp {
     display: grid;
     justify-content: center;
@@ -2620,4 +2656,18 @@ pointer-events: none;"
       flex-direction: row;
     }
   }
+  .center-upload {
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 9;
+  background: white;
+  border-radius: 1em;
+  box-shadow: 0 0 20px #0002;
+  padding: 2em;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
 </style>

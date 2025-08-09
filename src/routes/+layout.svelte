@@ -31,19 +31,41 @@ onMessage(messaging, (payload) => {
 import "../app.postcss";
 import { Toaster } from 'svelte-sonner';
 import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+import { theme, themeConfig } from '$lib/stores/theme';
   import { onMount } from 'svelte';
- // import firebase from "$lib/func/firebase";
-export let data
+import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
+  // עדכון המשנה בטעינה
+  onMount(() => {
+    const unsubscribe = theme.subscribe((currentTheme) => {
+      // עדכון classes על ה-document
+      document.documentElement.classList.remove('personal', 'business');
+      document.documentElement.classList.add(currentTheme);
+      
+      // עדכון data attribute
+      document.documentElement.setAttribute('data-theme', currentTheme);
+    });
+
+    return unsubscribe;
+  });
+ 
+  /**
+   * @typedef {Object} Props
+   * @property {any} data - import firebase from "$lib/func/firebase";
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let { data, children } = $props();
 function getLang() {
   console.log(data)
     let la;
-    if(!data.lang){
-    const fromSe = data.userAgent
+    if(!data?.lang){
+    const fromSe = data?.userAgent
     if ($doesLang == false) {
        
-   if (fromSe.includes("he")){
+   if (fromSe?.includes("he")){
         la = "he"
-  } else if (fromSe.includes("ar")){
+  } else if (fromSe?.includes("ar")){
         la = "ar"
    } else{
       la = "en"
@@ -63,25 +85,25 @@ function getLang() {
     document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
 }
 
-onMount(async () => {
-   getLang()
-   let x;
-   let user;
-   if($lang != "he" && $lang != "ar" && x == null && user == 0){
-        console.log('after', $lang)
-    goto("/en")
-  } else if($lang == "ar" && x == null && user == 0){
-      console.log('Registration', $lang)
-
-    goto("/ar")
+onMount(() => {
+  if (data) {
+    getLang();
+    let x;
+    let user;
+    if ($lang != "he" && $lang != "ar" && x == null && user == 0) {
+      console.log('after', $lang);
+      goto("/en");
+    } else if ($lang == "ar" && x == null && user == 0) {
+      console.log('Registration', $lang);
+      goto("/ar");
+    }
   }
-  
-})
+});
 </script>
 
 
 <main>
-	<slot />
+	{@render children?.()}
 <Toaster toastOptions={{
   style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
 }} richColors  closeButton  position="top-center" />

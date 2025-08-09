@@ -3,28 +3,28 @@
     import { show } from './store-show.js';
         import { lang } from '$lib/stores/lang.js'
 
-    export let idx = 1;
      import {
     fly
 } from 'svelte/transition';
 	import { cubicOut } from 'svelte/easing';
 import { onMount } from 'svelte';
-let first = {"he":"         לחיצה לפתיחת ", "en": "click to open          "}
-let second = {"he":"               1💗1", "en": "1💗1               "}
-let sh = {"he":"שלום", "en": "Hello"}
-let sh2 = {"he":" הסכמתך התקבלה!", "en": ""}
-let sh3 = {"he":"הגעת למקום ה-", "en": "You are the "}
-let sh1 = {"he":"", "en": "th to agree"}
-let sh4 = {"he":"כעת ביכולתך לפתוח", "en": "Now you can open"}
-let sh5 = {"he":"את", "en": ""}
-let sh6 = {"he":"1💗1 לפתיחת", "en": "Open 1💗1"}
-let dira = {"he":"rtl", "en": "ltr"} 
+let first = {"he":"         לחיצה לפתיחת ", "en": "click to open          ", "ar": "      انقر للفتح"}
+let second = {"he":"               1💗1", "en": "1💗1               ", "ar": "              1💗1"}
+let sh = {"he":"שלום", "en": "Hello", "ar": "مرحبا"}
+let sh2 = {"he":" הסכמתך התקבלה!", "en": "", "ar": "تم استلام موافقتك!"}
+let sh3 = {"he":"הגעת למקום ה-", "en": "You are the ", "ar": "أنت ال "}
+let sh1 = {"he":"", "en": "th to agree", "ar": " للموافقة"}
+let sh4 = {"he":"כעת ביכולתך לפתוח", "en": "Now you can open", "ar": "الآن يمكنك الفتح"}
+let sh5 = {"he":"את", "en": "", "ar": ""}
+let sh6 = {"he":"1💗1 לפתיחת", "en": "Open 1💗1", "ar": "فتح 1💗1"}
+let dira = {"he":"rtl", "en": "ltr", "ar": "rtl"}
     function reverseString(str) {
     return str.split("").reverse().join("");
 }
 onMount(async () =>{
+  console.log($lang)
      if ((navigator.userAgent.indexOf('Safari') != -1 && navigator.userAgent.indexOf('Chrome') == -1)) {
-      if($lang == "he"){
+      if($lang == "he" || $lang == "ar"){
   first = reverseString(first[$lang])
   first = first
       }
@@ -40,25 +40,28 @@ onMount(async () =>{
             css: (t, u) => `translateY:(-40%); translateX: (50% ,100%); transform: ${existingTransform} scale(${t}); opacity: ${t};`
         };
     }
-export let userName_value ="";
 let show_value;
 
-userName.subscribe(value => {
-  userName_value = value;
-});
 
 show.subscribe(newValue => {
   show_value = newValue;
 });
-import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher(); 
+  /**
+   * @typedef {Object} Props
+   * @property {number} [idx]
+   * @property {(payload: { tx: number, txx: number }) => void} [onProgres]
+   */
+
+  /** @type {Props} */
+  let { idx = 1,onProgres } = $props();
+
 
 function increment() {
 		show.update(n => n + 1);
-    dispatch ('progres',{
+    onProgres?.({
 		tx: 600,
 		txx: 20
-	} )
+	} );
 	};
 
 
@@ -66,7 +69,7 @@ function increment() {
 <div class="midscreenText-2">
     <h1 class="a1"  dir={dira[$lang]}>
      {sh[$lang]}
-   {userName_value} 
+   {$userName} 
         </h1>  <h1 class="a2"  dir={dira[$lang]}>
 {sh2[$lang]}
           {sh3[$lang]}{idx}{sh1[$lang]} 
@@ -79,7 +82,7 @@ function increment() {
  -->
 <button 
 out:fly={{y: -600, x: 2000,  opacity: 0.6, duration: 2200}} 
-title={sh6[$lang]} class="button" on:click="{increment}">
+title={sh6[$lang]} class="button" onclick={increment}>
 <svg class="key" height="80%" width="80%" version="1.1" id="Layer_1" x="0px" y="0px" viewBox="{`600 80 2222 918.656`}" enable-background="new 0 0 2722.126 1518.656" xmlns="http://www.w3.org/2000/svg">
   <defs>
     <radialGradient gradientUnits="userSpaceOnUse" cx="1023.699" cy="448.468" r="843.488" id="gradient-1" gradientTransform="matrix(1.964807, -0.050779, 0.025836, 0.999666, -1004.848942, 91.27403)">
@@ -321,4 +324,3 @@ from, to {
  
  
   </style>
-

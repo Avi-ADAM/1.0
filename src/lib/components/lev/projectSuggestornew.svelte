@@ -2,34 +2,58 @@
     import { clickOutside } from './outsidclick.js';
     import { scale, fly } from 'svelte/transition';
     import axios from 'axios';
-    import { createEventDispatcher } from 'svelte';
      import { onMount } from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
 
- const dispatch = createEventDispatcher();
-    export let low = false;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [shows]
+   * @property {string} [deadLine]
+   * @property {string} [projectName]
+   * @property {string} [missionName]
+   * @property {string} [role]
+   * @property {any} [skills]
+   * @property {string} [missionDetails]
+   * @property {any} src
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {number} [oid]
+   * @property {string} [notes]
+   * @property {string} [workways]
+   * @property {number} [noOfHours]
+   * @property {number} [perhour]
+   * @property {number} [total]
+   * @property {any} [askedarr]
+   * @property {any} [declineddarr]
+   * @property {(id: number) => void} [onLess] - Callback for 'less' event (Svelte 5 migration)
+   */
 
-	  export let shows = true;
-    export let deadLine = "11.11.2022";
-    export let projectName = "ONE";
-    export let missionName = "do x";
-    export let role = "programer";
-    export let skills = [];
-    export let missionDetails = "do x like y in z";
-    export let src;
-    export let projectId;
-    export let link = "/project/";
-    export let oid = 0;
-    export let notes = "";
-    export let workways= "";
-    export let noOfHours = 0;
-    export let perhour = 0;
-    export let total = 0;
-    export let askedarr =[];
-    export let declineddarr = [];
+  /** @type {Props} */
+  let {
+    low = false,
+    shows = $bindable(true),
+    deadLine = "11.11.2022",
+    projectName = "ONE",
+    missionName = "do x",
+    role = "programer",
+    skills = [],
+    missionDetails = "do x like y in z",
+    src,
+    projectId,
+    link = "/project/",
+    oid = 0,
+    notes = "",
+    workways = "",
+    noOfHours = 0,
+    perhour = 0,
+    total = 0,
+    askedarr = [],
+    declineddarr = []
+  } = $props();
 
 
-    let missionDetailsa, missionDetailsb, missionDetailsc;
+    let missionDetailsa = $state(), missionDetailsb = $state(), missionDetailsc;
     onMount(async () => {
      missionDetailsa = missionDetails.substring(0,20)
      missionDetailsb = missionDetails.substring(21,40)
@@ -42,9 +66,7 @@ function toggleShow() {
 	};
 function less (oid) {
     console.log("less")
-    dispatch('less', {
-    id: oid
-    } );
+    onLess?.(oid);
 }
 let miData = [];
 
@@ -163,8 +185,8 @@ async function decline(oid) {
 	}
 //out:fly={{duration: 2200, opacity: 0.5, y: 450}}
 let ishover = false;
-let wid = 125;
-let hei = 125; 
+let wid = $state(125);
+let hei = $state(125); 
 function hover () {
 ishover = !ishover;
 if (ishover === true) {
@@ -177,7 +199,7 @@ hei = 125
 }
 </script>
 
-<svg in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}" on:mouseenter={hover} on:mouseleave={hover} width={wid} height={hei} version="1.1" viewBox="6.323 104.09 165.22 165.22" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
+<svg in:scale="{{ duration: 3200, opacity: 0.5, start: 1.56 }}" onmouseenter={hover} onmouseleave={hover} width={wid} height={hei} version="1.1" viewBox="6.323 104.09 165.22 165.22" xmlns="http://www.w3.org/2000/svg" xmlns:bx="https://boxy-svg.com" xmlns:xlink="http://www.w3.org/1999/xlink">
   <defs>
   <linearGradient id="zzk">
   <stop stop-color="#bd8328" offset="0"/>
@@ -826,9 +848,9 @@ out:scale={{duration: 2200, opacity: 0.5}}
         <h1 style="margin: 7px; font-size: 13px; font-weight: bold; color: rgb(87, 208, 248 ); line-height: 0.7; ">{missionName}</h1>
         <p style="margin-top: 7px; margin-bottom: 13px; font-size: 13px; margin-right:auto; margin-left: auto; line-height: 0.7">{skills.join(' ')}</p>
         {#if total} <p>{total}</p>{/if}
-        <button on:click={agree(oid)} style="margin: 0;" class = "btn" name="requestToJoin" title="אני רוצה"><i class="far fa-check-circle"></i></button>
-        <button on:click={nego(oid)} style="margin: 0;" class = "btn" name="negotiate" title="משא ומתן"><i class="far fa-comments"></i></button>
-        <button on:click={decline(oid)} style="margin: 0;" class = "btn"name="decline" title="לא מתאים לי"><i class="far fa-times-circle"></i></button>
+        <button onclick={agree(oid)} style="margin: 0;" class = "btn" name="requestToJoin" title="אני רוצה"><i class="far fa-check-circle"></i></button>
+        <button onclick={nego(oid)} style="margin: 0;" class = "btn" name="negotiate" title="משא ומתן"><i class="far fa-comments"></i></button>
+        <button onclick={decline(oid)} style="margin: 0;" class = "btn"name="decline" title="לא מתאים לי"><i class="far fa-times-circle"></i></button>
         
 </div>
 

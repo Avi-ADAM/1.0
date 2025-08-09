@@ -1,7 +1,7 @@
 <script>
-    let hours = 0;
-  let minutes = 0;
-    export let total = timeDecimal
+    let hours = $state(0);
+  let minutes = $state(0);
+  let { total = timeDecimal } = $props();
   function addMinutes(value) {
     let newMinutes = minutes + value;
     if (newMinutes >= 60) {
@@ -24,7 +24,7 @@
   }
 
   // Simulate sending data to the server
-   $: timeDecimal = convertToDecimal();
+   let timeDecimal = $derived(convertToDecimal());
   
 </script>
 
@@ -38,14 +38,14 @@
   <div class="flex space-x-4">
     <button
       class="px-4 py-2 bg-red-500 text-white rounded-md hover:bg-red-600"
-      on:click={() => addMinutes(-5)}
+      onclick={() => addMinutes(-5)}
     >
       - 5 min
     </button>
 
     <button
       class="px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600"
-      on:click={() => addMinutes(5)}
+      onclick={() => addMinutes(5)}
     >
       + 5 min
     </button>
@@ -54,7 +54,7 @@
   <!-- Button to send the time in decimal format -->
   <button
     class="mt-4 px-6 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600"
-    on:click={sendToServer}
+    onclick={sendToServer}
   >
     Send Time
   </button>

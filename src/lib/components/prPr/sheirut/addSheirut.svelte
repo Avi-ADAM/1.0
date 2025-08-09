@@ -7,11 +7,17 @@
   import {SendTo} from '$lib/send/sendTo.svelte';
   import { idPr } from '$lib/stores/idPr';
   import { lang } from '$lib/stores/lang'
-  const dispatch = createEventDispatcher();
   import { toast } from 'svelte-sonner';
-  import { createEventDispatcher } from 'svelte';
-    export let restime = "feh", usersNum = 1
-    let name , descrip,oneTime = false,isPublik = false,already = false, success = false , equaliSplited = true
+  /**
+   * @typedef {Object} Props
+   * @property {string} [restime]
+   * @property {number} [usersNum]
+   * @property {() => void} [onClose] - Callback when the component should close.
+   */
+
+  /** @type {Props} */
+  let { restime = "feh", usersNum = 1, onClose } = $props();
+    let name = $state() , descrip = $state(),oneTime = $state(false),isPublik = false,already = $state(false), success = $state(false) , equaliSplited = $state(true)
     const heading = {"he":"יצירת שירות חדש","en":"create new service"}
     const expl = {"he":"","en":""}
     const action = {"he":"יצירת שירות חדש","en":"create new service"}
@@ -29,7 +35,7 @@
     const equaliSplitedTr = {"he":"דמי מנוי","en":"subscription"}
     const fnnn = { he: ' השירות נוצר בהצלחה', en: 'service has created sucsessfully' };
 
-    let open = false
+    let open = $state(false)
     async function create(){
         already = true
         let isApruved = false
@@ -108,7 +114,7 @@ let pendque = `mutation {
     success = false
   },15000)
    toast.success(`${fnnn[$lang]}`);
-   dispatch("close")
+   onClose?.()
 }
     }
   }else{
@@ -118,7 +124,7 @@ let pendque = `mutation {
     success = false
   },15000)
   toast.success(`${fnnn[$lang]}`);
-      dispatch("close")
+      onClose?.()
   }
   }
 }
@@ -129,13 +135,13 @@ let pendque = `mutation {
  {#if open === false}
    <button   
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-        on:click={()=>open = true}>{createLebel[$lang]}
+        onclick={()=>open = true}>{createLebel[$lang]}
     </button>
   {:else} 
       <div class="flex flex-col items-center justify-center sm:w-1/2 p-8 mx-auto bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400"> 
         <button   
                 class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-            on:click={()=>open = false}><Close/>
+            onclick={()=>open = false}><Close/>
         </button>
         <h1 class="text-barbi">{heading[$lang]}</h1>
         <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
@@ -158,9 +164,9 @@ let pendque = `mutation {
              {#if already === false}
    <button   
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-        on:click={create}>{action[$lang]}
+        onclick={create}>{action[$lang]}
     </button>
     {/if}   
     </div>
 
- {/if}    
+ {/if}

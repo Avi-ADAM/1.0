@@ -1,13 +1,18 @@
 <script>
   import { lang } from "$lib/stores/lang.js";
-    import { createEventDispatcher } from "svelte";
-    const dispatch = createEventDispatcher();
-    export let checked = false;
-    export let title = "online";
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [checked]
+   * @property {string} [title]
+   * @property {(payload: { checked: boolean }) => void} [onChange]
+   */
+
+  /** @type {Props} */
+  let { checked = $bindable(false), title = "online", onChange } = $props();
     
     function click() {
       checked = !checked;
-      dispatch('change', { checked });
+      onChange?.({ checked });
     }
   </script>
   
@@ -79,7 +84,7 @@
   
   <div {title} dir="ltr" class="flex justify-center items-center">  
     <div class="btn-status">
-      <input on:click={click} type="checkbox" name="checkbox" id="checkbox" class="hidden" />
+      <input onclick={click} type="checkbox" name="checkbox" id="checkbox" class="hidden" />
       <label
         for="checkbox"
         style="{checked ? '--bg-btn: #C6F6D5; --btn-color: #38A169;' : '--bg-btn: #fed7d7; --btn-color: #e53e3e;'}"
@@ -91,4 +96,3 @@
       </label>
     </div>
   </div>
-  

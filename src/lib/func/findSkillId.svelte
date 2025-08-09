@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     export function find_skill_id(skill_name_arr,skills2,valc) {
     var arr = [];
     for (let j = 0; j < skill_name_arr.length; j++) {

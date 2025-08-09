@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
   import mapTouchToMouseFor from 'svelte-touch-to-mouse';
 </script>
 
@@ -23,8 +23,7 @@
   import { initiatePgishot, isOnline, myUserMeeting } from '$lib/stores/pgishot';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import MobileFooter from './mobileFooter.svelte';
-  export let un;
-  let draggable;
+  let draggable = $state();
   onMount(async () => {
     initiatePgishot(idL);
     draggable = (await import('svelte-agnostic-draggable')).draggable;
@@ -45,20 +44,32 @@
       dialogOpen = true;
     }
   }
-  let dialogOpen = false;
+  let dialogOpen = $state(false);
   const close = () => {
     dialogOpen = false;
     iwant = false;
     isChatOpen.set(false);
   };
   let loading = false;
-  let newMeeting = false;
+  let newMeeting = $state(false);
   const cencel = { he: 'ביטול', en: 'cencel' };
-  export let idL
-  export let chatId = 0;
-  export let online = true
+  /**
+   * @typedef {Object} Props
+   * @property {any} un
+   * @property {any} idL
+   * @property {number} [chatId]
+   * @property {boolean} [online]
+   */
+
+  /** @type {Props} */
+  let {
+    un,
+    idL,
+    chatId = $bindable(0),
+    online = true
+  } = $props();
   function onlineSwitcher(e) {
-    const changedTo = e.detail.checked
+    const changedTo = e.checked
     console.log(changedTo, $myUserMeeting)
     if($myUserMeeting == 0){
       console.log(0)
@@ -96,7 +107,7 @@
 				class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
 			>
 				<div class="flex-1 rounded-t-[10px] p-4">
-          <div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi" />
+          <div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi"></div>
 
 					<div class="mx-auto d overflow-auto flex flex-col ">
 					
@@ -105,7 +116,7 @@
         {#if newMeeting == false}
         <NewIwant {idL} userName_value={username} />
         {:else}
-        <CreateNewMeeting on:close={()=>{newMeeting = false
+        <CreateNewMeeting onClose={()=>{newMeeting = false
         dialogOpen = false
         }}/>
         {/if}
@@ -126,11 +137,11 @@
     style="
     display:block; cursor:grab
   "
-    on:draggable:init={onDraggableInit}
-    on:draggable:destroy={onDraggableDestroy}
-    on:drag:start={onDragStart}
-    on:drag:move={onDragMove}
-    on:drag:stop={onDragStop}
+    ondraggable:init={onDraggableInit}
+    ondraggable:destroy={onDraggableDestroy}
+    ondrag:start={onDragStart}
+    ondrag:move={onDragMove}
+    ondrag:stop={onDragStop}
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
     dir="rtl"
     class=" draggable z-[9999] absolute top-0 left-0 w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded"
@@ -140,7 +151,7 @@
       <div class="flex flex-row  items-start justify-start">
       <div>
         <button
-          on:click={close}
+          onclick={close}
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
           title={cencel[$lang]}
           ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
@@ -159,7 +170,7 @@
           class="hover:bg-wow justify-end flex text-barbi hover:text-barbi font-bold rounded"
         >
           <button
-            on:click={() => ($nowChatId = 0)}
+            onclick={() => ($nowChatId = 0)}
             class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
             title={back[$lang]}><Arrow back={true} /></button
           >
@@ -170,7 +181,7 @@
       <div>
         <OnlineSwitch bind:checked={$isOnline} on:change={()=>onlineSwitcher} />
       </div>
-      <button class="h-6 w-6 mx-2 my-1" on:click={() => {
+      <button class="h-6 w-6 mx-2 my-1" onclick={() => {
         isChatOpen.set(false);
         newMeeting = true
         dialogOpen = true
@@ -217,7 +228,7 @@
   >
 {/if}
 {:else}{/if}-->
-<MobileFooter on:chat={() => addi("chat")} on:new={() => addi()}/>
+<MobileFooter onChat={() => addi("chat")} onNew={() => addi()}/>
 
 
 <style>

@@ -2,16 +2,14 @@
   import ListSmall from "../forum/listSmall.svelte";
     import {forum, nowChatId,newChat, initialForum} from '$lib/stores/pendMisMes.js'
   import Diun from "../lev/diun.svelte";
-    export let chatId = 0 
     import {lang} from '$lib/stores/lang'
-    import {page} from '$app/stores'
+    import {page} from '$app/state'
   import { createMessage } from "$lib/func/chat/createMessage.svelte";
   import { createForum } from "$lib/func/chat/createForum.svelte";
 	import {toast } from 'svelte-sonner';
 
-  export let un;
      let unsubscribe;
-let messagesArray = forumToArr()
+let messagesArray = $state(forumToArr())
 
     function subs() {
         unsubscribe = forum.subscribe(value => {
@@ -20,6 +18,14 @@ let messagesArray = forumToArr()
     }
     import { onDestroy } from 'svelte';
   import { meetingsData } from "$lib/stores/pgishot";
+  /**
+   * @typedef {Object} Props
+   * @property {number} [chatId]
+   * @property {any} un
+   */
+
+  /** @type {Props} */
+  let { chatId = $bindable(0), un } = $props();
 
   
 
@@ -50,14 +56,14 @@ function  forumToArr(){
   });
   return messagesArray
 }
-let clicked = false, ani = "forum"
+let clicked = $state(false), ani = "forum"
 console.log(messagesArray);
 const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
 
   const messs = {"he":"הודעתך נשלחה בהצלחה","en":"your message was send succsefully"}
 
 async function afreact (e){
-    const m = e.detail.why
+    const m = e.why
     if($nowChatId != -1){
   let c = await createMessage($nowChatId,m,$forum[$nowChatId].md,un).then(c=>c = c)
     if(c == "sucsses"){
@@ -110,7 +116,7 @@ let nameChatPartner = {"he":"דיון על משימה בתהליך ","en":"chat 
  <Diun
     dont={true}
   rikmaName={$forum[$nowChatId].md.projectName}
-  on:rect={afreact}
+  onRect={afreact}
   smalldes={$forum[$nowChatId].md.mesimaName}
   nameChatPartner={nameChatPartner[$lang]}
   mypos={true}

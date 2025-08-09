@@ -11,14 +11,27 @@
 		Section,
 		Text
 	} from 'svelty-email';
-export let user;
-export let projectName = "1💗1";
-export let missionName = "create something nice";
-export let previewText = {}
-export let projectSrc ="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png";
-const msgk = { "he": `המשימה שלך אושרה פה אחד והנך עכשיו חלק מריקמת ${projectName}`, "en": "your mission was appruved Unanimously, you are now part of the FreeMates:" }
 const msg2 = { "he": "לחיצה כדי להתחיל את המשימה: ", "en": "start your new mission: " }
-export let lang = "he"
+  /**
+   * @typedef {Object} Props
+   * @property {any} user
+   * @property {string} [projectName]
+   * @property {string} [missionName]
+   * @property {string} [previewText]
+   * @property {string} [projectSrc]
+   * @property {string} [lang]
+   */
+
+  /** @type {Props} */
+  let {
+    user,
+    projectName = "1💗1",
+    missionName = "create something nice",
+    previewText = "",
+    projectSrc = "https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png",
+    lang = "he"
+  } = $props();
+const msgk = { "he": `המשימה שלך אושרה פה אחד והנך עכשיו חלק מריקמת ${projectName}`, "en": "your mission was appruved Unanimously, you are now part of the FreeMates:" }
 const hallo = {"he":"!","en":"Hello, "}
 const shalom = {"he":" שלום","en":"!"}
 const mt = {"he":"!מזל טוב", "en": "Congratulations!" }
@@ -98,7 +111,7 @@ const top = {
     </script>
     <Html lang={lang}>
         <Head />
-        <Preview preview={previewText[lang]} />
+        <Preview preview={previewText} />
         <Section style={divi} dir={lang == "he" ? "rtl":"ltr"}>
 			<Img style={top} src="https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png" width="30" height="30" alt="1💗1Logo" />
 			<Heading style={strong}>{hallo[lang]}{user}{shalom[lang]}</Heading>

@@ -1,10 +1,36 @@
-
 <script>
-  /**  evt - A svelte event created via [`dispatch`](https://svelte.dev/docs#createEventDispatcher) with event information under `evt.detail.e`. */
-  export let evt = {};
+  import { lang } from '$lib/stores/lang.js';
 
-  /** [offset=-35] - A y-offset from the hover point, in pixels. */
-  export let offset = -35;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [evt] - evt - A svelte event with event information under `evt.e`.
+   * @property {any} [offset] - [offset=-35] - A y-offset from the hover point, in pixels.
+   * @property {import('svelte').Snippet<[any]>} [children]
+   */
+
+  /** @type {Props} */
+  let { evt, offset = -35, children } = $props();
+
+  const translations = {
+    name: {
+      en: 'Name',
+      he: 'שם'
+    },
+    iso3: {
+      en: 'ISO3',
+      he: 'ISO3'
+    },
+    agrees: {
+      en: 'Agreements',
+      he: 'הסכמות'
+    }
+  };
+
+  let mouseEvent = $derived(evt && evt.detail && evt.detail.e ? evt.detail.e : null);
+  let tooltipData = $derived(evt && evt.detail && evt.detail.props ? evt.detail.props : null);
+
+  let tooltipTop = $derived(mouseEvent ? mouseEvent.layerY + offset : 0);
+  let tooltipLeft = $derived(mouseEvent ? mouseEvent.layerX : 0);
 </script>
 
 <style>
@@ -20,14 +46,14 @@
   }
 </style>
 
-{#if evt.detail}
+{#if evt && mouseEvent && tooltipData}
   <div
     class="tooltip"
     style="
-      top:{evt.detail.e.layerY + offset}px;
-      left:{evt.detail.e.layerX}px;
+      top:{tooltipTop}px;
+      left:{tooltipLeft}px;
     "
   >
-    <slot detail={evt.detail}></slot>
+    {@render children?.({ detail: tooltipData, translations })}
   </div>
 {/if}

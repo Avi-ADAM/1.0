@@ -8,22 +8,21 @@ let addro = false;
 import MultiSelect from 'svelte-multiselect';
 import { onMount } from 'svelte';
 //import ChoosRole from './choosRole.svelte';
-import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
-export let missionNewId;
-let newName;
-export let skills2 = [];
-export let roles = [];
+/**
+ * @param {Object} props - Component properties
+ * @param {( { id: any, name: any }) => void} [props.onNew] - Callback for when a new mission is created.
+ */
+let { missionNewId = $bindable(), skills2 = $bindable([]), roles = $bindable([]), onNew } = $props();
 let error1 = null
 let token;
 let meData = [];
 function dis () {
-  dispatch('new', {
+  onNew?.({
     id: missionNewId,
     name: newName,
     } );
 };      
-let selectedrole = []
+let selectedrole = $state([])
     
     onMount(async () => {
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -54,7 +53,7 @@ let selectedrole = []
           .then(parseJSON);
             skills2 = res.data.skills.data;
              if ($lang == "he" ){
-              for (var i = 0; i < skills2.length; i++){
+              for (let i = 0; i < skills2.length; i++){
                 if (skills2[i].attributes.localizations.data.length > 0){
                 skills2[i].attributes.skillName = skills2[i].attributes.localizations.data[0].attributes.skillName
                 }
@@ -63,7 +62,7 @@ let selectedrole = []
             skills2 = skills2
              roles = res.data.tafkidims.data
                        if ($lang == "he" ){
-              for (var i = 0; i < roles.length; i++){
+              for (let i = 0; i < roles.length; i++){
                 if (roles[i].attributes.localizations.data.length > 0){
                 roles[i].attributes.roleDescription = roles[i].attributes.localizations.data[0].attributes.roleDescription
                 }
@@ -76,14 +75,14 @@ let selectedrole = []
         }
         
     });
-let missionName_value;
-    let selected;  
+let missionName_value = $state();
+    let selected = $state([]);  
     let skillslist =[];
     let tafkidimslist = [];
   
 
     function find_skill_id(skill_name_arr){
-     var  arr = [];
+     let  arr = [];
       for (let j = 0; j< skill_name_arr.length; j++ ){
       for (let i = 0; i< skills2.length; i++){
         if(skills2[i].attributes.skillName === skill_name_arr[j]){
@@ -94,7 +93,7 @@ let missionName_value;
       return arr;
      };
        function find_role_id(role_name_arr){
-   var  arr = [];
+   let  arr = [];
     for (let j = 0; j< role_name_arr.length; j++ ){
     for (let i = 0; i< roles.length; i++){
       if(roles[i].attributes.roleDescription === role_name_arr[j]){
@@ -105,9 +104,9 @@ let missionName_value;
     return arr;
    };
 
-     let desM;
+     let desM = $state();
     const placeholder = {"he":"בחירת כישורים נדרשים","en":"choose needed skills"};
-     let loading = true
+     let loading = $state(true)
 
 async function subm() {
   const cookieValue = document.cookie
@@ -159,8 +158,8 @@ tafkidimslist= find_role_id(selectedrole)
     };
     
 function addnew (event){ 
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.skillName;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.skillName;
     const newValues = skills2 ;
     newValues.push(newOb);   
     skills2 = newValues;
@@ -171,8 +170,8 @@ selected = newSele;
         const nom = {"he":"חסר ברשימה, ניתן להוסיפו עם הכפתור \"הוספת כישור חדש\" למטה","en": "Missing, you can use the \"Add new Skill\" button bellow to add it"}
  function addnewrole (event){
     console.log("ezra")
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.roleDescription;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.roleDescription;
     const newValues = roles ;
     newValues.push(newOb);
        
@@ -223,7 +222,7 @@ selectedrole = newSele;
       />
     
      
-     <Addnewskil on:addnewskill={addnew} nobr={false} color={"--barbi-pink"} />
+     <Addnewskil onAddnewskill={addnew} nobr={false} color={"--barbi-pink"} />
 
      <div dir="{$lang == "en" ? "ltr" : "rtl"}">
   <lebel for="choos">{adds[$lang]}</lebel>
@@ -239,9 +238,9 @@ options={roles.map(c => c.attributes.roleDescription)}
 
 <div>
   
-   <Addnewro  on:addnewrole={addnewrole} rn={roles.map(d=>d.attributes.roleDescription)} color={"--barbi-pink"}/>
+   <Addnewro  onAddnewrole={addnewrole} rn={roles.map(d=>d.attributes.roleDescription)} color={"--barbi-pink"}/>
 <button
- on:click={subm} 
+ onclick={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-6 px-4 m-4 rounded-full"
  >{yeve[$lang]}</button>
  

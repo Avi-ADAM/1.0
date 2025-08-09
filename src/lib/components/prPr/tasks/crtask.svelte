@@ -1,15 +1,9 @@
 <script>
-  export let bmiData = [],
-    proles = [];
   import { idPr } from '$lib/stores/idPr.js';
   import moment from 'moment';
-  import { createEventDispatcher, onMount } from 'svelte';
-  let isPersonal = true;
-  export let id;
-  export let misid;
-  export let fromMis = false;
-  export let editdata = -1;
-  let isEdit = false;
+  import { onMount } from 'svelte';
+  let isPersonal = $state(true);
+  let isEdit = $state(false);
   onMount(() => {
     console.log(editdata);
     if (editdata != -1) {
@@ -26,28 +20,60 @@
       selected = [
         bmi[0].attributes.users_permissions_user.data.attributes.username +
           ' - ' +
-          bmi[0].attributes.name
+          bmi[0].attributes.name +
+          ' - ' +
+          bmi[0].id
       ];
     }
   });
 
-  const dispatch = createEventDispatcher();
-  export let userMevatzeaId,
-    userMevakeshId = $page.data.uid,
-    mimatai,
-    adMatai,
-    name = '',
-    teur = '',
-    selected = [],
-    link = '';
-  let seEr = false,
-    neEr = false;
+  let seEr = $state(false),
+    neEr = $state(false);
   import MultiSelect from 'svelte-multiselect';
   import SveltyPicker from 'svelty-picker';
 
   import { lang } from '$lib/stores/lang.js';
   import Button from '$lib/celim/ui/button.svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [bmiData]
+   * @property {any} [proles]
+   * @property {any} id
+   * @property {any} misid
+   * @property {boolean} [fromMis]
+   * @property {any} [editdata]
+   * @property {any} userMevatzeaId
+   * @property {any} [userMevakeshId]
+   * @property {any} mimatai
+   * @property {any} adMatai
+   * @property {string} [name]
+   * @property {string} [teur]
+   * @property {any} [selected]
+   * @property {string} [link]
+   * @property {(payload: { id: any; name: any; user: any; }) => void} [onDone]
+   * @property {(payload: { isEdit: boolean; id: any; data: { des: any; shem: any; link: any; dateS: any; dateF: any; }; }) => void} [onAdd]
+   */
+
+  /** @type {Props} */
+  let {
+    bmiData = [],
+    proles = [],
+    id,
+    misid,
+    fromMis = false,
+    editdata = -1,
+    userMevatzeaId = $bindable(),
+    userMevakeshId = $bindable(page.data.uid),
+    mimatai = $bindable(),
+    adMatai = $bindable(),
+    name = $bindable(''),
+    teur = $bindable(''),
+    selected = $bindable([]),
+    link = $bindable(''),
+    onDone,
+    onAdd
+  } = $props();
   function find_tafkidims_id (selected){
     let arr = []
     for(let i = 0; i < selected.length; i++){
@@ -65,7 +91,9 @@
       if (
         bmiData[i].attributes.users_permissions_user.data.attributes.username +
           ' - ' +
-          bmiData[i].attributes.name ==
+          bmiData[i].attributes.name +
+          ' - ' +
+          bmiData[i].id ==
         lebel
       ) {
         id = bmiData[i].id;
@@ -78,9 +106,9 @@
   const baseUrl = import.meta.env.VITE_URL;
 
   let linkg = baseUrl + '/graphql';
-  let loading = false;
-  let success = false;
-  let error = false;
+  let loading = $state(false);
+  let success = $state(false);
+  let error = $state(false);
   async function sub() {
     loading = true;
     if (fromMis == false) {
@@ -174,7 +202,7 @@
               .then((data) => (miDatan = data));
             loading = false;
             success = true;
-            dispatch('done', {
+            onDone?.({
               id: miDatan.data.createAct.data.id,
               name: miDatan.data.createAct.data.attributes.shem,
               user: miDatan.data.createAct.data.attributes.my?.data?.id ?? null
@@ -183,14 +211,13 @@
             const error1 = e;
             loading = false;
             error = true;
-            /*dispatch('eror')*/
           }
         }
       }
     } else {
       loading = false;
       success = true;
-      dispatch('add', {
+      onAdd?.({
         isEdit,
         id: misid,
         data: {
@@ -312,6 +339,9 @@
     </div>
     {#if isPersonal == true}
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
         bind:selected
         maxSelect=1
         placeholder={placeholder[$lang]}
@@ -319,11 +349,16 @@
           (it) =>
             it.attributes.users_permissions_user.data.attributes.username +
             ' - ' +
-            it.attributes.name
+            it.attributes.name +
+            ' - ' +
+            it.id
         )}
       />
     {:else}
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
         bind:selected
         placeholder={placeholderoles[$lang]}
         options={proles.map((pr) => pr.name)}
@@ -334,62 +369,6 @@
     <small class="text-red-900 bg-slate-200 px-2">{seerdes[$lang]}</small>
   {/if}
   <hr class="h-2" />
-  <Button on:click={sub} {loading} {success} text={sedes} {error} />
+  <Button onClick={sub} {loading} {success} text={sedes} {error} />
 </div>
 
-<style>
-  :global(.multiselect) {
-    background-color: var(--gold) !important ;
-    /* top-level wrapper div */
-  }
-  :global(.multiselect:focus) {
-    border: 1px solid var(--barbi-pink) !important;
-  }
-  :global(.multiselect span.token) {
-    color: var(--gold);
-    background: var(--barbi-pink);
-    /* selected options */
-  }
-  /* :global(.multiselect span.token button),
-  :global(.multiselect .remove-all) {
-
-    /* buttons to remove a single or all selected options at once */
-  /* } 
-  :global(.multiselect ul) {
-    /* dropdown options */
-  /* }
-  :global(.multiselect ul li) {
-    /* dropdown options */
-  /* } */
-  :global(li.selected) {
-    border: var(--sms-focus-border, 1pt solid var(cornflowerblue));
-    color: var(--gold);
-    /* selected options in the dropdown list */
-  }
-  :global(li:not(.selected):hover) {
-    color: var(--barbi-pink);
-    background-color: var(
-      --lturk
-    ); /* unselected but hovered options in the dropdown list */
-  }
-  :global(ul.tokens > li) {
-    background-color: var(--barbi-pink);
-    color: var(--lturk);
-  }
-  :global(ul.tokens > li):hover {
-    color: var(--barbi-pink);
-    background-color: var(--lturk);
-  }
-  /*
-  :global(li.selected:hover) {
-    /* selected and hovered options in the dropdown list */
-  /* probably not necessary to style this state in most cases */
-  /* } */
-  :global(li.active) {
-    color: var(--barbi-pink) !important;
-    /* active means element was navigated to with up/down arrow keys */
-    /* ready to be selected by pressing enter */
-  }
-  /* :global(li.selected.active) {
-  } */
-</style>

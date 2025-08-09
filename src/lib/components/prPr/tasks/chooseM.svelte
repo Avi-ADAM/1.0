@@ -1,21 +1,31 @@
 <script>
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import Arrow from '$lib/celim/icons/arrow.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
-  import { createEventDispatcher } from 'svelte';
   import {sendToSer} from '$lib/send/sendToSer.js';
-  const dispatch = createEventDispatcher();
-  export let taskId
    let placeholder = {
     he: 'בחירת משימה בתהליך',
     ar: ' اختيار المهمة المتابعة',
     en: 'choose mission in progress'
   };
-  $: loading = false
-  $: error = false
-  $: success = false
+  let loading = $state(false);
+  
+  let error = $state(false);
+  
+  let success = $state(false);
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} taskId
+   * @property {Array<any>} [bmiData]
+   * @property {() => void} [onClose] - Callback when the component should close.
+   */
+
+  /** @type {Props} */
+  let { taskId, bmiData = [], onClose } = $props();
+
    async function add () {
     loading = true
     
@@ -29,7 +39,7 @@
     await sendToSer (
         {
             mesimabetahaliches: [selectedId],
-            uid: [$page.data.uid],
+            uid: [page.data.uid],
             isAssigned: true,
             id: taskId
         },
@@ -41,7 +51,7 @@
           loading = false
           success = true
           setTimeout(() => {
-            dispatch('close');
+            onClose?.();
           }, 5000);
         }else{
           loading = false
@@ -54,12 +64,11 @@
     });
     //TODO: update task on table directly or from io connection
   };
-  export let bmiData = [];
   let filtered = bmiData.filter(
-    (e) => e.attributes.users_permissions_user.data.id === $page.data.uid
+    (e) => e.attributes.users_permissions_user.data.id === page.data.uid
   );
   
-  let selected = [];
+  let selected = $state([]);
   const noM = {
     he: 'לא נמצאו משימות בתהליך עבורך כדאי ליצור משימה חדשה בטאב יצירה',
     en: 'no missions in progress found for you, you may want to create a new one in the "add" tab ',
@@ -79,7 +88,7 @@
       maxSelect={1}
     />
     {#if selected[0]}
-      <Button on:click={add} {loading} {success} {error}
+      <Button onClick={add} {loading} {success} {error}
         ><Arrow back={$lang == 'en' ? true : false} /></Button
       >
     {/if}

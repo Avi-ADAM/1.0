@@ -1,22 +1,66 @@
 <script>
 
         import tr from '$lib/translations/tr.json'
-  import { createEventDispatcher, onMount } from 'svelte';
- const dispatch = createEventDispatcher();
+  import { onMount } from 'svelte';
   import Lev from '../../../celim/lev.svelte';
   import {lang} from '$lib/stores/lang.js'
-      export let low = false;
-      export let isVisible = false;
         import { formatTime } from '../utils';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
   import { restim } from '$lib/func/restime.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
-    export let projectName,restime, src,src2 ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting,deadline,spdata,kind,price
-    export let already = false;
-     export let timegramaDate
-    let zman
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [isVisible]
+   * @property {any} projectName
+   * @property {any} restime
+   * @property {any} src
+   * @property {any} src2
+   * @property {any} openmissionName
+   * @property {any} missionDetails
+   * @property {any} useraplyname
+   * @property {any} noofusersNo
+   * @property {any} noofusersOk
+   * @property {any} noofusersWaiting
+   * @property {any} deadline
+   * @property {any} spdata
+   * @property {any} kind
+   * @property {any} price
+   * @property {boolean} [already]
+   * @property {any} timegramaDate
+   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { alr: any }) => void} [onAgree] - Callback for agree event
+   * @property {(payload: { alr: any }) => void} [onDecline] - Callback for decline event
+   */
+
+  /** @type {Props} */
+  let {
+    low = false,
+    isVisible = false,
+    projectName,
+    restime,
+    src,
+    src2,
+    openmissionName,
+    missionDetails,
+    useraplyname,
+    noofusersNo,
+    noofusersOk,
+    noofusersWaiting,
+    deadline,
+    spdata,
+    kind,
+    price,
+    already = $bindable(false),
+    timegramaDate,
+    onHover,
+    onAgree,
+    onDecline
+  } = $props();
+    let zman = $state()
   onMount(()=>{
+    console.log(timegramaDate,"restime")	
         let x = restim(restime)
     let cr = new Date(timegramaDate)
     let crr = cr.getTime() //if nego then use last nego creationtime
@@ -39,21 +83,21 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     const oldob = {"he":"הלוגו העכשווי", "en":"old Logo"}
     const newlogo = {"he":"הלוגו החדש", "en":"new logo"}
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.({x:x});
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr})
+onAgree?.({alr:alr})
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr});
+onDecline?.({alr:alr});
 }
 function linke(t){
   console.log(t)
 }
 const tri = import('$lib/translations/tr.json')
-let isScrolable = true; 
+let isScrolable = $state(true); 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();
@@ -69,12 +113,12 @@ function preventSwiperScroll(event) {
 </script>
 
 
-<div on:wheel={preventSwiperScroll} 
-on:touchmove={preventTouchScroll}
-on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+<div onwheel={preventSwiperScroll} 
+ontouchmove={preventTouchScroll}
+onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"
 tabindex="0" 
-on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
+onkeypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
         <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -101,7 +145,7 @@ on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {
           <div class="w-full sm:w-3/4 lg:w-1/3">
           <svg class="scale-110" height="100%" width="100%" version="1.1" id="desLayer_1" x="0px" y="0px" viewBox="1194.702695 779.45875 162.446096 162.190653" enable-background="new 0 0 2103.3203 1667.9167" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
         <defs>
-                <bx:grid x="-23.43558" y="159.787667" width="100" height="100"/>
+                <bx:grid x="-23.43558" y="159.787667" width="100" height="100"></bx:grid>
                 <linearGradient id="deslinearGradient4172">
                         <stop style="stop-opacity: 1; stop-color: rgb(105, 197, 209);" offset="0" id="desstop4174"/>
                         <stop offset="0.083" style="stop-color: rgb(255, 172, 64);"/>
@@ -225,10 +269,10 @@ on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {
         <path d="M 1275.254748 881.616379 Q 1277.371544 881.308248 1279.48834 881.616379 L 1280.975819 881.832903 Q 1283.092615 882.141034 1285.002205 883.035265 L 1286.344079 883.663644 Q 1288.253668 884.557875 1289.769127 885.950672 L 1290.834044 886.929395 Q 1292.349503 888.322192 1293.322488 890.077219 L 1294.006207 891.310481 Q 1294.979191 893.065508 1295.314459 895.010971 L 1295.550052 896.378053 Q 1295.88532 898.323515 1295.550052 900.268977 L 1295.314459 901.636059 Q 1294.979191 903.581522 1294.006207 905.336549 L 1293.322488 906.569811 Q 1292.349503 908.324838 1290.834044 909.717635 L 1289.769127 910.696358 Q 1288.253668 912.089155 1286.344079 912.983386 L 1285.002205 913.611765 Q 1283.092615 914.505996 1280.975819 914.814127 L 1279.48834 915.030651 Q 1277.371544 915.338782 1275.254748 915.030651 L 1273.767269 914.814127 Q 1271.650473 914.505996 1269.740883 913.611765 L 1268.399009 912.983386 Q 1266.48942 912.089155 1264.973961 910.696358 L 1263.909044 909.717635 Q 1262.393585 908.324838 1261.4206 906.569811 L 1260.736881 905.336549 Q 1259.763897 903.581522 1259.428629 901.636059 L 1259.193036 900.268977 Q 1258.857768 898.323515 1259.193036 896.378053 L 1259.428629 895.010971 Q 1259.763897 893.065508 1260.736881 891.310481 L 1261.4206 890.077219 Q 1262.393585 888.322192 1263.909044 886.929395 L 1264.973961 885.950672 Q 1266.48942 884.557875 1268.399009 883.663644 L 1269.740883 883.035265 Q 1271.650473 882.141034 1273.767269 881.832903 Z" style="stroke: url(#desgradient-2); stroke-miterlimit: 17; fill: url(#desgradient-1); stroke-width: 2px;" transform="matrix(-1, 1e-12, 2e-12, -1, 2553.297363280778, 1717.467407226184)" bx:shape="n-gon 1277.371544 898.323515 18.513776 17.015267 20 0.37 1@f7764595"/>
            <foreignObject 
            role="button" tabindex="0"
-            on:click={()=>linke("u")}
-             on:keypress={()=>linke("u")}
-              on:mouseenter={()=>hover({"he":"הלוגו העכשווי", "en":"old Logo"})} 
-              on:mouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
+            onclick={()=>linke("u")}
+             onkeypress={()=>linke("u")}
+              onmouseenter={()=>hover({"he":"הלוגו העכשווי", "en":"old Logo"})} 
+              onmouseleave={()=>hover("0")} x='1276' y='820' width='38px' height='38px' transform="translate(-19,-19)" >
                                                   <span class="{`normSml${projectName}-noo`}"></span>
                                                     <img
                                                         width='38px'
@@ -239,7 +283,7 @@ on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {
                                                         /> 
                           </foreignObject> 
              <foreignObject x='1276' y='892' width='50px' height='50px' transform="translate(-25,-25)" >
-              <img on:mouseenter={()=>hover(newlogo)} on:mouseleave={()=>hover("0")} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="50" height="50" alt="new project logo" >
+              <img onmouseenter={()=>hover(newlogo)} onmouseleave={()=>hover("0")} style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="50" height="50" alt="new project logo" >
             </foreignObject>
 
       </svg>
@@ -250,8 +294,8 @@ on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {
     </div>
     <div class="flex items-center">
       <div class="text-lg sm:text-xl">
-        <p class="vo ef"><span role="contentinfo" on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-על גרסאות קודמות</span></p>
-          <div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl" style:font-family="Digital" on:mouseenter={()=>hover(timero[$lang])} on:mouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
+        <p class="vo ef"><span role="contentinfo" onmouseenter={()=>hover("סך ההצבעות בעד")} onmouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span onmouseenter={()=>hover("לא הצביעו")} onmouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span onmouseenter={()=>hover("כמות ההצבעות נגד")} onmouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-על גרסאות קודמות</span></p>
+          <div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl" style:font-family="Digital" onmouseenter={()=>hover(timero[$lang])} onmouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
             {formatTime(zman)}
         </span></div> 
 
@@ -260,18 +304,18 @@ on:keypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {
   </div>
   {#if low == false}
    {#if already === false}
-            <button on:mouseenter={()=>hover("אישור")}
-               on:mouseleave={()=>hover("0")} 
-               on:click={agree} 
+            <button onmouseenter={()=>hover("אישור")}
+               onmouseleave={()=>hover("0")} 
+               onclick={agree} 
                 class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
                  name="requestToJoin">
                 <Lev/>
                 </button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
             <button
-             on:mouseenter={()=>hover("התנגדות")} 
-             on:mouseleave={()=>hover("0")} 
-             on:click={decline} 
+             onmouseenter={()=>hover("התנגדות")} 
+             onmouseleave={()=>hover("0")} 
+             onclick={decline} 
               class = "btnb bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-red-400 hover:scale-110" 
               name="decline">
               <No/>

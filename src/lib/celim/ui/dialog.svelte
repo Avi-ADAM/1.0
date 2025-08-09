@@ -18,33 +18,47 @@
      * @exports closeDialog
      */
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-    import { createEventDispatcher } from 'svelte';
     import { fly } from 'svelte/transition';
     import { lang } from '$lib/stores/lang';
-    const dispatch = createEventDispatcher();
-    export let showSaveDialog = false;
-    export let dialogHeader = {
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [showSaveDialog]
+   * @property {any} [dialogHeader]
+   * @property {any} [innerText]
+   * @property {any} [innerDialogButton]
+   * @property {any} [clearButton]
+   * @property {() => void} [onSaveTimer]
+   * @property {() => void} [onClearTimer]
+   */
+
+  /** @type {Props} */
+  let {
+    showSaveDialog = $bindable(false),
+    dialogHeader = {
       en: 'Save Timer',
       he: 'שמור טיימר'
-    };
-    export let innerText = {
+    },
+    innerText = {
       en: 'Would you like to save this timer?',
       he: 'האם תרצה לשמור את הטיימר הזה?'
-    };
-    export let innerDialogButton = {
+    },
+    innerDialogButton = {
       en: 'Save',
       he: 'שמור'
-    };
-    export let clearButton = {
+    },
+    clearButton = {
       en: 'Clear',
       he: 'נקה'
-    };
+    },
+    onSaveTimer,
+    onClearTimer
+  } = $props();
     function handleSaveButton() {
-      dispatch('save-timer');
+      onSaveTimer?.();
       closeDialog();
     }
     function handleCancelButton() {
-        dispatch('clear-timer');
+        onClearTimer?.();
         closeDialog();
     }
     function closeDialog() {
@@ -73,13 +87,13 @@
         <div class="dialog-buttons">
           <button
             class="save-btn"
-            on:click={handleSaveButton}
+            onclick={handleSaveButton}
           >
             {innerDialogButton[$lang]}
           </button>
           <button
             class="clear-btn"
-            on:click={handleCancelButton}
+            onclick={handleCancelButton}
           >
             {clearButton[$lang]}
           </button>

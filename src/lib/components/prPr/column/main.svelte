@@ -8,8 +8,14 @@
   import AxisX from './_components/AxisX.svelte';
   import AxisY from './_components/AxisY.svelte';
 
-  // This example loads csv data as json using @rollup/plugin-dsv
-  export let data;
+  
+  /**
+   * @typedef {Object} Props
+   * @property {any} data - This example loads csv data as json using @rollup/plugin-dsv
+   */
+
+  /** @type {Props} */
+  let { data } = $props();
 
   const xKey = 'date';
   const yKey = [0, 1];

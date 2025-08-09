@@ -1,20 +1,27 @@
 <script>
-let amort = "أنا||اسم|| لن أستخدم العنف أبدًا أو أؤذي أي شخص"
-let amorts =  "لأنني ||اسم|| لا أريد أن أكون ضحية للعنف ولأنه لا توجد سلطة أو قيمة أو غرض أو معتقد أو مال أو فائدة تبرر الإضرار بحياة الشخص والعنف والإكراه بالقوة."
-let amortt = "أنا ||اسم|| سأمنح ثقتي في الخير وأنه عندما توقع البشرية جمعاء هذه الاتفاقية: سيتوقف العنف والقتال والحكم عن أن يكون شكلاً من أشكال التواصل البشري"
-let amortf = "عندما تكون كل ||اسم مكان|| من الموقعين على هذه المعاهدة أنا ||اسم|| سأتخلى عن أسلحتي ورجال الشرطة المسلحين الذين عينتهم دولة ||اسم مكان|| بالنيابة عني."
-let amorth = "أنا ||اسم||، سأتخلى عن أسلحة الجيش ||اسم مكان|| عندما توقع البشرية جمعاء على هذه الاتفاقية."
+let amort = $state("أنا||اسم|| لن أستخدم العنف أبدًا أو أؤذي أي شخص")
+let amorts =  $state("لأنني ||اسم|| لا أريد أن أكون ضحية للعنف ولأنه لا توجد سلطة أو قيمة أو غرض أو معتقد أو مال أو فائدة تبرر الإضرار بحياة الشخص والعنف والإكراه بالقوة.")
+let amortt = $state("أنا ||اسم|| سأمنح ثقتي في الخير وأنه عندما توقع البشرية جمعاء هذه الاتفاقية: سيتوقف العنف والقتال والحكم عن أن يكون شكلاً من أشكال التواصل البشري")
+let amortf = $state("عندما تكون كل ||اسم مكان|| من الموقعين على هذه المعاهدة أنا ||اسم|| سأتخلى عن أسلحتي ورجال الشرطة المسلحين الذين عينتهم دولة ||اسم مكان|| بالنيابة عني.")
+let amorth = $state("أنا ||اسم||، سأتخلى عن أسلحة الجيش ||اسم مكان|| عندما توقع البشرية جمعاء على هذه الاتفاقية.")
 let amortq = "أنا||اسم|| لن أستخدم العنف أبدًا أو أؤذي أي شخص"
 let amortsq =  "لأنني ||اسم|| لا أريد أن أكون ضحية للعنف ولأنه لا توجد سلطة أو قيمة أو غرض أو معتقد أو مال أو فائدة تبرر الإضرار بحياة الشخص والعنف والإكراه بالقوة."
 let amorttq = "أنا ||اسم|| سأمنح ثقتي في الخير وأنه عندما توقع البشرية جمعاء هذه الاتفاقية: سيتوقف العنف والقتال والحكم عن أن يكون شكلاً من أشكال التواصل البشري"
 let amortfq = "عندما تكون كل ||اسم مكان|| من الموقعين على هذه المعاهدة أنا ||اسم|| سأتخلى عن أسلحتي ورجال الشرطة المسلحين الذين عينتهم دولة ||اسم مكان|| بالنيابة عني."
 let amorthq = "أنا ||اسم||، سأتخلى عن أسلحة الجيش ||اسم مكان|| عندما توقع البشرية جمعاء على هذه الاتفاقية."
-let already = false;
-  let more, come, name, email;
+let already = $state(false);
+  let more = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 const baseUrl = import.meta.env.VITE_URL
+
+/**
+ * @typedef {Object} Props
+ * @property {() => void} [onDone] - Callback for when the operation is successful.
+ * @property {() => void} [onErore] - Callback for when an error occurs.
+ */
+
+/** @type {Props} */
+let { onDone, onErore } = $props();
 
 let miDatan = [];
 let linkg = baseUrl+'/graphql';
@@ -49,11 +56,11 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch("done")
+            onDone?.()
         } catch (e) {
             error1 = e
             console.log(error1);
-                        dispatch("erore")
+                        onErore?.()
 
         }
 }
@@ -114,7 +121,7 @@ already = true;
 {#if already == false}
 <div class="flex items-center justify-center">
 <button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={add} >اتصال</button>
+ onclick={add} >اتصال</button>
  </div>
  {/if}
 <style>
@@ -232,4 +239,3 @@ height: 44px;
   top: 0;
 } 
 </style>
-

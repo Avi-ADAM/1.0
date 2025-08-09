@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     /***
      * send to api - return string
      * @param {object} data  {"x":"t","y":"r"}

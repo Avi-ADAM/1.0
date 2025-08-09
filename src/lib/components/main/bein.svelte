@@ -17,23 +17,25 @@
   import Vallues from '../registration/vallues.svelte'
  // import Scree from '../registration/scree.svelte'
   import {spring } from 'svelte/motion'
-let userName_value;
-let show_value = 0;
+let show_value = $state(0);
 
-userName.subscribe(value => {
-  userName_value = value;
-});
 
 show.subscribe(newValue => {
   show_value = newValue;
 });
-  export let idx = 1;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [idx]
+   */
+
+  /** @type {Props} */
+  let { idx = 1 } = $props();
 let ty = 0;
-let w = 1;
+let w = $state(1);
 let vb = 3322.126 + w;
 const txx = spring(600+(w*20),{stiffness: 0.55,damping: 0.99});
 function add (event){
-  txx.set(event.detail.tx+(w*event.detail.txx));
+  txx.set(event.tx+(w*event.txx));
   console.log(txx)
 }
 let title = {"he": "הרשמה ל-1💗1", "en": "1💗1 registration"};
@@ -52,40 +54,40 @@ const gtl = {"he":" להתחברות לאתר","en": "go to login "}
 {#if show_value == 0}
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="midscreen">
 
-<Hello {idx} on:progres={add}/>
+<Hello {idx} onProgres={add}/>
 </div>
 {:else if show_value == 1}
 <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"
  out:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-<Vallues on:progres={add}/>
+<Vallues onProgres={add}/>
 </div>
 {:else if show_value == 2}
 <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-<Skills on:progres={add}/>
+<Skills onProgres={add}/>
 </div>
 {:else if show_value == 3}
 <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 130, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
- <Roles on:progres={add}/>
+ <Roles onProgres={add}/>
 </div>
   {:else if show_value == 4}
   <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-  <Workways on:progres={add}/>
+  <Workways onProgres={add}/>
   </div>
  <!-- {:else if show_value == 5}  
-<VidValDate on:progres={add}/>
+<VidValDate onProgres={add}/>
  {:else if show_value == 5}
     <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Scree on:progres={add}/> 
+   <Scree onProgres={add}/> 
    </div>  -->
   {:else if show_value == 5}
     <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Password on:progres={add}/> 
+   <Password onProgres={add}/> 
    </div>  
   {:else if show_value == 6}
   <div class="midscreen" dir="{$lang == "en" ? "ltr" : "rtl"}"
@@ -93,7 +95,7 @@ const gtl = {"he":" להתחברות לאתר","en": "go to login "}
     <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="midscreenText-3"><h1>
       {tu[$lang]}
       <br>
-{userName_value}
+{$userName}
 <br>
 {see[$lang]}
 </h1>

@@ -37,7 +37,7 @@
      fit-margin-top="0"
      fit-margin-left="0"
      fit-margin-right="0"
-     fit-margin-bottom="0" />
+     fit-margin-bottom="0"></sodipodi:namedview>
   <metadata
      id="metadata5">
     <rdf:RDF>
@@ -45,7 +45,7 @@
          rdf:about="">
         <dc:format>image/svg+xml</dc:format>
         <dc:type
-           rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+           rdf:resource="http://purl.org/dc/dcmitype/StillImage"></dc:type>
         <dc:title></dc:title>
       </cc:Work>
     </rdf:RDF>

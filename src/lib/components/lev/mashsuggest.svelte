@@ -2,37 +2,9 @@
   import { lang } from '$lib/stores/lang.js';
   import { fly } from 'svelte/transition';
       	import { Drawer } from 'vaul-svelte';
-        export let isVisible = false;
-  import { createEventDispatcher } from 'svelte';
   import { clickOutside } from './outsidclick.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
-  const dispatch = createEventDispatcher();
-      export let modal = false
-    let dialogOpen = false
-  export let coinlapach;
-  export let low = false;
-  export let messege = [];
-  export let shows = true;
-  export let kindOf;
-  export let deadLine, sqedualedf
-  export let projectName;
-  export let mashName;
-  export let descrip;
-  export let src;
-  export let projectId;
-  export let linki = '/project/';
-  export let oid = 0;
-  export let spnot = '';
-  export let easy = 0;
-  export let price = 0;
-  export let myp = 0;
-  export let total = 0;
-  export let askedarr = [];
-  export let declineddarra = [];
-  export let id;
-  export let i;
-  export let restime;
-  export let already = false;
+    let dialogOpen = $state(false)
   const baseUrl = import.meta.env.VITE_URL
 
   let token;
@@ -57,18 +29,19 @@
     slideTo(0);
   }
   function less() {
-    dispatch('less', {
+    onLess?.({
       ani: 'mashsu',
       coinlapach: coinlapach
     });
   }
   let miData = [];
   let error1 = null;
-  $: pcli = 0;
+  let pcli = $state(0);
+  
   function linke() {
     pcli += 1;
     if (pcli >= 2) {
-      dispatch('proj', { id: projectId });
+      onProj?.({ id: projectId });
     }
   }
 
@@ -217,9 +190,9 @@
 
   // import required modules
   import { EffectFlip, Navigation } from 'swiper';
-  let hovered = false;
+  let hovered = $state(false);
 
-  $: w = 0;
+  let w = $derived(0);
   let u = 'הצעה לשיתוף משאב והצטרפות לריקמה';
 
   function hover(id) {
@@ -228,16 +201,16 @@
     } else {
       u = id;
     }
-    dispatch('hover', { id: u });
+    onHover?.({ id: u });
   }
 
   function hoverc(event) {
-    if (event.detail.x == '0') {
+    if (event.x == '0') {
       u = 'הצעה לשיתוף משאב והצטרפות לריקמה';
     } else {
-      u = event.detail.x;
+      u = event.x;
     }
-    dispatch('hover', { id: u });
+    onHover?.({ id: u });
   }
   import Cards from './cards/sugestma.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
@@ -245,22 +218,91 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
   import { nowId } from '$lib/stores/pendMisMes.js';
-  export let cards = false;
   function claf(event) {
-    let o = event.detail.alr;
-    let d = event.detail.y;
+    let o = event.alr;
+    let d = event.y;
     console.log(o, d);
   }
   function tochat() {
     isOpen = true;
     diunm = true;
   }
-  let clicked = false;
-  export let chat = [];
-  export let order = 0;
-  export let askId = 1;
-  let isOpen = false,
-    diunm = false,
+  let clicked = $state(false);
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [modal]
+   * @property {any} coinlapach
+   * @property {boolean} [low]
+   * @property {any} [messege]
+   * @property {boolean} [shows]
+   * @property {any} kindOf
+   * @property {any} deadLine
+   * @property {any} sqedualedf
+   * @property {any} projectName
+   * @property {any} mashName
+   * @property {any} descrip
+   * @property {any} src
+   * @property {any} projectId
+   * @property {string} [linki]
+   * @property {number} [oid]
+   * @property {string} [spnot]
+   * @property {number} [easy]
+   * @property {number} [price]
+   * @property {number} [myp]
+   * @property {number} [total]
+   * @property {any} [askedarr]
+   * @property {any} [declineddarra]
+   * @property {any} id
+   * @property {any} i
+   * @property {any} restime
+   * @property {boolean} [already]
+   * @property {boolean} [cards]
+   * @property {any} [chat]
+   * @property {number} [order]
+   * @property {number} [askId]
+   */
+
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    modal = $bindable(false),
+    coinlapach,
+    low = false,
+    messege = [],
+    shows = true,
+    kindOf,
+    deadLine,
+    sqedualedf,
+    projectName,
+    mashName,
+    descrip,
+    src,
+    projectId,
+    linki = '/project/',
+    oid = 0,
+    spnot = '',
+    easy = 0,
+    price = 0,
+    myp = 0,
+    total = 0,
+    askedarr = [],
+    declineddarra = [],
+    id,
+    i,
+    restime,
+    already = $bindable(false),
+    cards = false,
+    chat = $bindable([]),
+    order = $bindable(0),
+    askId = 1,
+    onLess,
+    onProj,
+    onHover,
+    onModal
+  } = $props();
+  let isOpen = $state(false),
+    diunm = $state(false),
     loading = false;
   const close = () => {
     isOpen = false;
@@ -268,7 +310,7 @@
   };
   let miDatan = [];
   async function afreact(event) {
-    let why = event.detail.why;
+    let why = event.why;
     console.log(why);
     let d = new Date();
     //  loading = true;
@@ -338,7 +380,7 @@
     <DialogContent class="chat" aria-label="form">
       <div dir="rtl" class="grid items-center justify-center aling-center">
         <button
-          on:click={close}
+          onclick={close}
           style="margin: 0 auto;"
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
           title={tit[$lang]}
@@ -355,8 +397,8 @@
 {:else if masa === true}
 
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -379,7 +421,7 @@
 />-->
         {:else if diunm === true}
           <Diun
-            on:rect={afreact}
+            onRect={afreact}
             smalldes={projectName + '-' + mashName}
             nameChatPartner={`${chatdes2[$lang]}
                               ${projectName} `}
@@ -400,15 +442,15 @@
 {#if cards == false}
   <div
     style="position: relative;"
-on:click={()=>{modal = true
-  dispatch("modal")
+onclick={()=>{modal = true
+  onModal()
 dialogOpen = true}}
 role="button"
     style:z-index={hovered === false ? 11 : 16}
-    on:mouseenter={() => (hovered = true)}
-    on:mouseleave={() => (hovered = false)}
+    onmouseenter={() => (hovered = true)}
+    onmouseleave={() => (hovered = false)}
     use:clickOutside
-    on:click_outside={toggleShow}
+    onclick_outside={toggleShow}
     class="hover:scale-290 duration-1000 ease-in"
     transition:fly|local={{ y: 450, duration: 2200, opacity: 0.5 }}
   >
@@ -428,31 +470,31 @@ role="button"
       <SwiperSlide class="swiper-slideg"
         ><div>
           <div id="normSml">
-            <span class={`normSml${oid}`} />
+            <span class={`normSml${oid}`}></span>
             <img
-              on:mouseenter={() => hover('לוגו הריקמה')}
-              on:mouseleave={() => hover('0')}
+              onmouseenter={() => hover('לוגו הריקמה')}
+              onmouseleave={() => hover('0')}
               class="img"
               {src}
               alt="logo"
             />
             <button
-              on:click={() => linke()}
-              on:mouseenter={() => hover('לחיצה למעבר לעמוד הציבורי של הריקמה')}
-              on:mouseleave={() => hover('0')}
+              onclick={() => linke()}
+              onmouseenter={() => hover('לחיצה למעבר לעמוד הציבורי של הריקמה')}
+              onmouseleave={() => hover('0')}
               class="hover:scale-110 lt">{projectName}</button
             >
             <h1
-              on:mouseenter={() => hover('שם המשאב')}
-              on:mouseleave={() => hover('0')}
+              onmouseenter={() => hover('שם המשאב')}
+              onmouseleave={() => hover('0')}
               style="color: var(--barbi-pink); "
               class="ltn"
             >
               {mashName}
             </h1>
             <h3
-              on:mouseenter={() => hover('שווי')}
-              on:mouseleave={() => hover('0')}
+              onmouseenter={() => hover('שווי')}
+              onmouseleave={() => hover('0')}
               class="ltn"
             >
               {price}
@@ -460,22 +502,22 @@ role="button"
             <h3 class="ltn">
               <span
                 role="contentinfo"
-                on:mouseenter={() => hover('ההצעה שלי')}
-                on:mouseleave={() => hover('0')}
+                onmouseenter={() => hover('ההצעה שלי')}
+                onmouseleave={() => hover('0')}
                 style="color: var(--gold)">{easy}</span
               >
               /<span
                 role="contentinfo"
-                on:mouseenter={() => hover('ההצעה של הריקמה')}
-                on:mouseleave={() => hover('0')}
+                onmouseenter={() => hover('ההצעה של הריקמה')}
+                onmouseleave={() => hover('0')}
               >
                 {myp}</span
               >
             </h3>
             {#if total}
               <p
-                on:mouseenter={() => hover('סך הכל')}
-                on:mouseleave={() => hover('0')}
+                onmouseenter={() => hover('סך הכל')}
+                onmouseleave={() => hover('0')}
               >
                 {total}
               </p>{/if}
@@ -483,18 +525,18 @@ role="button"
         </div>
       </SwiperSlide><SwiperSlide class="swiper-slideg"
         ><div id="normSmll">
-          <span class={`normSmll${oid}`} />
+          <span class={`normSmll${oid}`}></span>
 
           {#if descrip !== null}<h6
-              on:mouseenter={() => hover('תיאור')}
-              on:mouseleave={() => hover('0')}
+              onmouseenter={() => hover('תיאור')}
+              onmouseleave={() => hover('0')}
               class="ab"
             >
               {descrip}
             </h6>{/if}
           <h5
-            on:mouseenter={() => hover('הערות')}
-            on:mouseleave={() => hover('0')}
+            onmouseenter={() => hover('הערות')}
+            onmouseleave={() => hover('0')}
             class="bc"
           >
             {spnot}
@@ -502,9 +544,9 @@ role="button"
           {#if low == false}
             {#if already === false}
               <button
-                on:mouseenter={() => hover(' אני רוצה')}
-                on:mouseleave={() => hover('0')}
-                on:click={agree(oid)}
+                onmouseenter={() => hover(' אני רוצה')}
+                onmouseleave={() => hover('0')}
+                onclick={agree(oid)}
                 class="btn a"
                 name="requestToJoin"
                 ><svg
@@ -523,9 +565,9 @@ role="button"
               <!--<button on:click={nego(oid)} name="negotiate" class="btn" title="משא ומתן"><i class="far fa-comments"></i></button>
    -->
               <button
-                on:mouseenter={() => hover('לא מתאים לי')}
-                on:mouseleave={() => hover('0')}
-                on:click={decline(oid)}
+                onmouseenter={() => hover('לא מתאים לי')}
+                onmouseleave={() => hover('0')}
+                onclick={decline(oid)}
                 class="btn b"
                 name="decline"
                 ><svg
@@ -559,10 +601,10 @@ role="button"
 			<div class="swiper-slidec mx-auto ">
         
   <Cards
-    on:agree={() => agree(oid)}
-    on:decline={() => decline(oid)}
-    on:hover={hoverc}
-    on:tochat={tochat}
+    onAgree={() => agree(oid)}
+    onDecline={() => decline(oid)}
+    onHover={hoverc}
+    onTochat={tochat}
     {low}
     {mashName}
     {easy}
@@ -585,10 +627,10 @@ role="button"
       {/if}
 {:else}
   <Cards
-    on:agree={() => agree(oid)}
-    on:decline={() => decline(oid)}
-    on:hover={hoverc}
-    on:tochat={tochat}
+    onAgree={() => agree(oid)}
+    onDecline={() => decline(oid)}
+    onHover={hoverc}
+    onTochat={tochat}
     {isVisible}
     {low}
     {mashName}

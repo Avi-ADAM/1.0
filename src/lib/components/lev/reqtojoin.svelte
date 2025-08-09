@@ -1,5 +1,5 @@
 <script>
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
  import { goto } from '$app/navigation';
    import { Drawer } from 'vaul-svelte';
 
@@ -12,67 +12,126 @@
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
-export let isVisible = false;
-const dispatch = createEventDispatcher();
-    export let low = false;
-    export let iskvua;
-        export let modal = false
-    let dialogOpen = false
-export let email;
-export let coinlapach
-export let deadline
-export let projectName;
-export let openmissionName;
-export let role = [];
-export let skills;
-export let useraplyname;
-export let src = "coin.png";
-export let src2 = " ";
-export let projectId;
-export let link = "/project/";
-export let linkU = "/user/";
-export let userId;
-export let missionDetails = "";
-export let name;
-export let noofpu = 0;
-export let publicklinks;
-export let privatlinks;
-export let hearotMeyuchadot;
-export let nhours = 0;
-export let valph = 0;
-export let missId;
-export let id;
-export let openMid;
-export let st = 188;
-export let pid;
-export let declined = [];
-export let noofusersWaiting;
-export let uids;
-export let what;
-export let noofusersOk;
-export let noofusersNo;
-export let already = false;
+/**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [low]
+   * @property {any} iskvua
+   * @property {boolean} [modal]
+   * @property {any} email
+   * @property {any} coinlapach
+   * @property {any} deadline
+   * @property {any} projectName
+   * @property {any} openmissionName
+   * @property {any} [role]
+   * @property {any} skills
+   * @property {any} useraplyname
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {string} [linkU]
+   * @property {any} userId
+   * @property {string} [missionDetails]
+   * @property {any} name
+   * @property {number} [noofpu]
+   * @property {any} publicklinks
+   * @property {any} privatlinks
+   * @property {any} hearotMeyuchadot
+   * @property {number} [nhours]
+   * @property {number} [valph]
+   * @property {any} missId
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} pid
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} what
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {boolean} [already]
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {any} chat
+   * @property {boolean} [mypose]
+   * @property {number} [order]
+   * @property {any} sqedualed
+   * @property {any} timegramaId
+   * @property {boolean} [cards]
+   * @property {any} [onUser]
+   * @property {any} [onProj]
+   * @property {any} [onAcsept]
+   * @property {any} [onDecline]
+   * @property {any} [onHover]
+   * @property {any} [onModal]
+   */
+
+  /** @type {Props} */
+  let {
+    onUser, onProj, onAcsept, onDecline, onHover, onModal,
+    isVisible = false,
+    low = false,
+    iskvua,
+    modal = $bindable(false),
+    email,
+    coinlapach,
+    deadline,
+    projectName,
+    openmissionName,
+    role = [],
+    skills,
+    useraplyname,
+    src = "coin.png",
+    src2 = " ",
+    projectId,
+    link = "/project/",
+    linkU = "/user/",
+    userId,
+    missionDetails = "",
+    name,
+    noofpu = 0,
+    publicklinks,
+    privatlinks,
+    hearotMeyuchadot,
+    nhours = 0,
+    valph = 0,
+    missId,
+    id,
+    openMid,
+    st = 188,
+    pid = $bindable(),
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids,
+    what,
+    noofusersOk = $bindable(),
+    noofusersNo = $bindable(),
+    already = $bindable(false),
+    stylef = '24px',
+    askId,
+    users,
+    chat = $bindable(),
+    mypose = true,
+    order = $bindable(1),
+    sqedualed,
+    timegramaId,
+    cards = false,
+    isRishon = false
+  } = $props();
+    let dialogOpen = $state(false)
 let resP = [];
-export let stylef = '24px';
-export let askId;
-export let users;
-export let chat
-export let mypose = true
-export let order = 1
-export let sqedualed
-export let timegramaId
      function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
 let ok;
 let nook;
-let tryo = "115%";
-let tryot = "-10.5%";
-let tryoti = "-5.25%";
+let tryo = $state("115%");
+let tryot = $state("-10.5%");
+let tryoti = $state("-5.25%");
 let nut;
 async function xyz (){
 
@@ -107,26 +166,29 @@ ser = ser
 return ser
 }
 
-let ser = xyz();
+let ser = $state(xyz());
     
 
 let idL;
 let bearer1; 
 let token;
   
-$: ucli = 0
-$: pcli = 0
-$: pmcli = 0
+let ucli = $state(0);
+  
+let pcli = $state(0);
+  
+let pmcli = $state(0);
+  
 function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.({ id: userId });
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({ id: projectId });
     }
   }
 }
@@ -175,14 +237,27 @@ let linkg = baseUrl+'/graphql';
 function objToString (obj) {
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-        
-    for (const [p, val] of Object.entries(obj[i])) {
-        if (typeof(val) == "string"|"number"|"boolean") {
-        str += `{${p}:"${val}"\n},`;
-    } else if (typeof(val) == 'null'){
-                str += `{${p}:${val.map(c => c.id)}\n},`;
+        let innerStr = '';
+        for (const [p, val] of Object.entries(obj[i])) {
+            if (p === 'users_permissions_user' && typeof val === 'object' && val !== null && val.data && val.data.id) {
+                innerStr += `${p}:"${val.data.id}"\n`;
+            } else if (typeof val === "string") {
+                innerStr += `${p}:"${val}"\n`;
+            } else if (typeof val === "number" || typeof val === "boolean") {
+                innerStr += `${p}:${val}\n`;
+            } else if (val === null) {
+                // Handle null values if needed, based on the desired output.
+                // The example output shows `why: null` is omitted, so we might omit it too.
+                // For now, let's explicitly include it as `key:null` if it's a direct null.
+                // If it's an array that was null, the original code had `val.map(c => c.id)`, which would error.
+                // Based on the example, `why: null` was just omitted.
+                // Let's omit nulls for now, as the example output doesn't show `why: null`.
+            }
+        }
+        if (innerStr.length > 0) {
+            str += `{${innerStr}},`;
+        }
     }
-    }}
     return str;
 }
 
@@ -203,7 +278,7 @@ async function after(miDatan,newnew){
                 ${sqedualed != undefined && sqedualed != null ? `start: "${sqedualed > d ? sqedualed : d.toISOString()}"` : `start: "${d.toISOString()}"`}
                 ${deadline != undefined && deadline != null ? `finish: "${deadline}"` : ``}
               }
-            )
+        ){data{id}}
           `
         }
    
@@ -347,14 +422,14 @@ adduser = `updateProject(
                         { createMesimabetahalich(
       data: {project: "${projectId}",
              mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
-             name: "${openmissionName}",
-             descrip: "${missionDetails}",
+             hearotMeyuchadot: """${hearotMeyuchadot}""",
+             name: """${openmissionName}""",
+             descrip: """${missionDetails}""",
              hoursassinged: ${nhours},
              perhour: ${valph}, 
              iskvua:${iskvua},  
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
+             privatlinks: """${privatlinks}""",
+             publicklinks: """${publicklinks}""", 
              users_permissions_user: "${userId}",
               tafkidims: [${tafkidimsa}],
                       publishedAt: "${d.toISOString()}",
@@ -398,7 +473,7 @@ ${adduser}
             console.log(miDatan);
                 after(miDatan,newnew,idL, bearer1)
            
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -423,14 +498,14 @@ ${adduser}
                         { createMesimabetahalich(
       data: {project: "${projectId}",
              mission:  "${missId}",
-             hearotMeyuchadot: "${hearotMeyuchadot}",
-             name: "${openmissionName}",
-             descrip: "${missionDetails}",
+             hearotMeyuchadot: """${hearotMeyuchadot}""",
+             name: """${openmissionName}""",
+             descrip: """${missionDetails}""",
              hoursassinged: ${nhours},
              perhour: ${valph},  
               iskvua:${iskvua},   
-             privatlinks: "${privatlinks}",
-             publicklinks: "${publicklinks}", 
+             privatlinks: """${privatlinks}""",
+             publicklinks: """${publicklinks}""", 
              users_permissions_user: "${userId}",
              tafkidims: [${tafkidimsa}],
                      publishedAt: "${d.toISOString()}",
@@ -466,7 +541,7 @@ ${adduser2}
             //TODO: timegrama if dates
             after(miDatan,newnew,idL, bearer1)
 
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -478,6 +553,7 @@ ${adduser2}
         } else {
 
         console.log("just add vote to asked and update to not show for me again")
+        console.log(userss,users)
          try {
             await fetch(linkg, {
                     method: 'POST',
@@ -506,7 +582,7 @@ ${adduser2}
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "asked",
                 coinlapach: coinlapach
             })
@@ -570,7 +646,7 @@ updateOpenMission(
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('decline', {
+            onDecline?.({
                 ani: "asked",
               coinlapach: coinlapach
             })
@@ -584,9 +660,10 @@ updateOpenMission(
 //todo
         }
 }
-let hovered = false;
+let hovered = $state(false);
 
- $: w = 0;
+ let w = $state(0);
+  
  let   u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
 function hover (id){
    if (id == "0"){
@@ -594,17 +671,17 @@ function hover (id){
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({ id: u });
 }
 function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
  u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({ id: u });
 }
-let clicked = false
+let clicked = $state(false)
 async function react (){
      allr = true;
       isOpen = true;
@@ -613,7 +690,7 @@ async function react (){
   if (chat !== null){
  const diu =  objToString(chat)
   }
-  let why = event.detail.why
+  let why = event.why
   console.log(why)
   let d = new Date()
          //  loading = true;
@@ -677,7 +754,7 @@ function hoverede(){
   } else {
  u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
   }
-  dispatch("hover", {id: u});
+  onHover?.({ id: u });
  }
  import Card from './cards/reqtojoin.svelte'
   import { DialogContent, DialogOverlay } from "svelte-accessible-dialog";
@@ -685,12 +762,12 @@ function hoverede(){
   import Diun from "./diun.svelte";
   import { nowId } from "$lib/stores/pendMisMes.js";
   import { sendToSer } from "$lib/send/sendToSer.js";
-export let cards = false;
+  
 function tochat (){
   isOpen = true
   diunm = true
 }
-let isOpen = false, loading = false ,diunm = false
+let isOpen = $state(false), loading = false ,diunm = $state(false)
 const chatdes ={"he":"צ'אט עם","en":"chat with"}
 const chatdes2 ={"he":"על צירופו לריקמה","en":"on joining"}
 const close = () => {
@@ -706,7 +783,7 @@ const close = () => {
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent class="chat" aria-label="form" >
       <div dir="rtl" class="grid items-center justify-center aling-center">
-              <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+              <button onclick={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24"> 
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -717,8 +794,8 @@ title="ביטול"
 {:else if masa === true}
 
 <Nego
-      on:load={()=>loading = true}
-        on:close={afternego}
+      onLoad={()=>loading = true}
+        onClose={afternego}
   descrip ={descrip}
   projectName ={projectName}
   name1 ={name}
@@ -741,7 +818,7 @@ title="ביטול"
 />-->
   {:else if diunm === true}
  <Diun
-  on:rect={afreact} 
+  onRect={afreact} 
   smalldes={projectName+"-"+openmissionName}
   nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`} 
   mypos={true}
@@ -759,12 +836,12 @@ title="ביטול"
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
-use:clickOutside on:click_outside={toggleShow} 
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()}
+use:clickOutside onclick_outside={toggleShow} 
 class="hover:scale-290 duration-1000 ease-in" 
-on:click={()=>{modal = true
-  dispatch("modal")
+onclick={()=>{modal = true
+  onModal?.()
 dialogOpen = true}}
 role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 
@@ -812,7 +889,7 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
                                         <circle r="100" fill="url(#lgg)" transform="rotate(135)" stroke="url(#lgbg)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
                                          <circle r="80" fill="url(#lgg)" transform="rotate(315)" stroke="none"/>
                                                
-                                                         <g on:click={()=>linke("u")} on:mouseenter={()=>hover(` לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
+                                                         <g onclick={()=>linke("u")} onmouseenter={()=>hover(` לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`)} onmouseleave={()=>hover("0")} x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
                                                 <foreignObject  x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                                                    <span class="{`normSml${askId}-noo`}"></span>
                                                     <img
@@ -829,14 +906,14 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
                                             
                                                 <path id="curvee" d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                                                     <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
-                                                        <textPath on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} font-family="Rubik" color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
+                                                        <textPath onmouseenter={()=>hover("שם המשימה")} onmouseleave={()=>hover("0")} font-family="Rubik" color="#EEE8AA" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curvee">
                                                             {openmissionName}
                                                         </textPath>
                                                     </text>
-                                              <g on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  x="0" y="-40" >
+                                              <g onclick={()=>linke("p")} onmouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} onmouseleave={()=>hover("0")}  x="0" y="-40" >
                                                     <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>  </g>  
                                                     <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                                                        <button on:click={()=>project()} on:mouseenter={()=>hover(` לחיצה כפולה למעבר למוח ריקמת ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                                                        <button onclick={()=>project()} onmouseenter={()=>hover(` לחיצה כפולה למעבר למוח ריקמת ${projectName}`)} onmouseleave={()=>hover("0")}>
                                                     <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" >
                                                         </button>
                                                 </foreignObject>
@@ -853,18 +930,18 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
   > <SwiperSlide class="swiper-slideg"
     > <div  id="normSmll"
 >
-        {#if deadline}    <h5 on:mouseenter={()=>hover("תאריך הביצוע")} on:mouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{dayjs(deadline).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
-         {#if missionDetails}   <h6 on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="hslink bc">{missionDetails}</h6>{/if}
+        {#if deadline}    <h5 onmouseenter={()=>hover("תאריך הביצוע")} onmouseleave={()=>hover("0")} class="hslink ab {`normSmll${askId}-noo`}">{dayjs(deadline).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h5>{/if}
+         {#if missionDetails}   <h6 onmouseenter={()=>hover("פרטי המשימה")} onmouseleave={()=>hover("0")} class="hslink bc">{missionDetails}</h6>{/if}
         
  <!-- <h5 on:mouseenter={()=>hover("תפקיד")} on:mouseleave={()=>hover("0")} class="hslink cd">{role}</h5>
 
             <h6 on:mouseenter={()=>hover("כישורים נדרשים")} on:mouseleave={()=>hover("0")} class="hslink de">{skills}</h6>-->
-                   <p class="vo ef"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
+                   <p class="vo ef"><span onmouseenter={()=>hover("סך ההצבעות בעד")} onmouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span onmouseenter={()=>hover("לא הצביעו")} onmouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span onmouseenter={()=>hover("כמות ההצבעות נגד")} onmouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
             {#if low == false}
                    {#if already === false}
-            <button on:mouseenter={()=>hover("אישור")} on:mouseleave={()=>hover("0")} on:click={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+            <button onmouseenter={()=>hover("אישור")} onmouseleave={()=>hover("0")} onclick={agree}  class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
-            <button on:mouseenter={()=>hover("התנגדות")} on:mouseleave={()=>hover("0")} on:click={decline}  class = "btn gb" name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+            <button onmouseenter={()=>hover("התנגדות")} onmouseleave={()=>hover("0")} onclick={decline}  class = "btn gb" name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
          {:else if low == true}
           <Lowbtn/>
@@ -884,10 +961,10 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 			<div class="swiper-slidec mx-auto ">
         
 <Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
-  on:chat={tochat}
+  onAgree={()=>agree()}
+  onDecline={()=>decline()}
+  onHover={hoverc} 
+  onChat={tochat}
   {low}
   {already} 
   {projectName}
@@ -900,6 +977,7 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
    perhour={valph}
    {openmissionName} 
    {iskvua}
+   {isRishon}
    {missionDetails} {noofusersNo}/>
       </div>
       </Drawer.Content>
@@ -909,10 +987,10 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
       {/if}
 {:else}
 <Card
-  on:agree={()=>agree()}
-  on:decline={()=>decline()}
-  on:hover={hoverc} 
-  on:chat={tochat}
+  onAgree={()=>agree()}
+  onDecline={()=>decline()}
+  onHover={hoverc} 
+  onChat={tochat}
   {isVisible}
   {low}
   {already} 
@@ -926,6 +1004,7 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
    perhour={valph}
    {openmissionName} 
    {iskvua}
+   {isRishon}
    {missionDetails} {noofusersNo}/>
 {/if}
 {/await}
@@ -935,7 +1014,6 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
   align-items: center;
   justify-content: center;
   border-radius: 18px !important;
-  border: 1px solid var(--barbi-pink);
   font-size: 22px;
   font-weight: bold;
   min-height:100vh;

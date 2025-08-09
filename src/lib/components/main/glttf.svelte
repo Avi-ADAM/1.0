@@ -12,6 +12,8 @@ Title: Placid Gears
   import { T, forwardEventHandlers } from '@threlte/core'
   import { useGltf, useGltfAnimations } from '@threlte/extras'
 
+  export let s;
+
   export const ref = new Group()
 
   const gltf = useGltf('3d/placid_gears/scene.gltf')

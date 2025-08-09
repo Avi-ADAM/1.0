@@ -1,68 +1,20 @@
 <script>
-  import ProgressBar from "@okrad/svelte-progressbar";
+  import { ProgressBar } from "progressbar-svelte";
       	import { Drawer } from 'vaul-svelte';
-        export let isVisible = false;
 import {
     clickOutside
 } from './outsidclick.js';
 import {
     fly
 } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
   import { DialogOverlay, DialogContent 
 } from 'svelte-accessible-dialog';
  import { goto } from '$app/navigation';
 import { idPr } from './../../stores/idPr.js';
-    export let low = false;
 import Lowbtn from '$lib/celim/lowbtn.svelte'
-    export let modal = false
-    let dialogOpen = false
-const dispatch = createEventDispatcher();
-export let coinlapach;
-export let mId;
-export let why;
-export let what;
-export let shows = false;
-export let deadline;
-export let projectName = "ONE";
-export let missionBName = "do x";
-export let role = "programer";
-export let skills = ["html", "css"];
-export let useraplyname = "do x like y in z";
-export let src = "coin.png";
-export let src2 = " ";
-export let projectId;
-export let link = "/project/";
-export let linkU = "/user/";
-export let userId;
-export let missionDetails = "";
-export let name;
-export let noofpu = 0;
-export let publicklinks;
-export let privatlinks;
-export let hearotMeyuchadot;
-export let nhours = 0;
-export let valph = 0;
-export let missId;
-export let id;
-export let openMid;
-export let st = 188;
-export let declined = [];
-export let noofusersWaiting;
-export let uids;
-export let whatt;
-export let noofusersOk;
-export let noofusersNo;
-export let timegramaDate;
-export let timegramaId
-export let already = false;
+    let dialogOpen = $state(false)
 let resP = [];
 let lang;
-export let stylef = '24px';
-export let askId;
-export let users;
     const baseUrl = import.meta.env.VITE_URL
 
 let idL;
@@ -71,12 +23,124 @@ let token;
  function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
+  import Cards from './cards/fini.svelte'
+  import { archiveTimeGrama } from "$lib/func/send/timeGrama.svelte";
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {boolean} [low]
+   * @property {boolean} [modal]
+   * @property {any} coinlapach
+   * @property {any} mId
+   * @property {any} why
+   * @property {any} what
+   * @property {boolean} [shows]
+   * @property {any} deadline
+   * @property {string} [projectName]
+   * @property {string} [missionBName]
+   * @property {string} [role]
+   * @property {any} [skills]
+   * @property {string} [useraplyname]
+   * @property {string} [src]
+   * @property {string} [src2]
+   * @property {any} projectId
+   * @property {string} [link]
+   * @property {string} [linkU]
+   * @property {any} userId
+   * @property {string} [missionDetails]
+   * @property {any} name
+   * @property {number} [noofpu]
+   * @property {any} publicklinks
+   * @property {any} privatlinks
+   * @property {any} hearotMeyuchadot
+   * @property {number} [nhours]
+   * @property {number} [valph]
+   * @property {any} missId
+   * @property {any} id
+   * @property {any} openMid
+   * @property {number} [st]
+   * @property {any} [declined]
+   * @property {any} noofusersWaiting
+   * @property {any} uids
+   * @property {any} whatt
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} timegramaDate
+   * @property {any} timegramaId
+   * @property {boolean} [already]
+   * @property {string} [stylef]
+   * @property {any} askId
+   * @property {any} users
+   * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onAcsept]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDecline]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
+   * @property {(payload: { id: any }) => void} [onUser]
+   * @property {(payload: { id: any }) => void} [onProj]
+   */
+
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    low = false,
+    modal = $bindable(false),
+    coinlapach,
+    mId,
+    why,
+    what,
+    shows = false,
+    deadline,
+    projectName = "ONE",
+    missionBName = "do x",
+    role = "programer",
+    skills = ["html", "css"],
+    useraplyname = "do x like y in z",
+    src = "coin.png",
+    src2 = " ",
+    projectId,
+    link = "/project/",
+    linkU = "/user/",
+    userId,
+    missionDetails = "",
+    name,
+    noofpu = 0,
+    publicklinks,
+    privatlinks,
+    hearotMeyuchadot,
+    nhours = 0,
+    valph = 0,
+    missId,
+    id,
+    openMid,
+    st = 188,
+    declined = [],
+    noofusersWaiting = $bindable(),
+    uids = $bindable(),
+    whatt,
+    noofusersOk = $bindable(),
+    noofusersNo,
+    timegramaDate,
+    timegramaId,
+    already = $bindable(false),
+    stylef = '24px',
+    askId,
+    users,
+    cards = false,
+    onAcsept,
+    onDecline,
+    onHover,
+    onModal,
+    onUser,
+    onProj
+  } = $props();
+
 let ok;
 let nook;
 let nut;
-let tryo = "116%";
-let tryot = "-10.5%";
-let tryoti = "-5.25%";
+let tryo = $state("116%");
+let tryot = $state("-10.5%");
+let tryoti = $state("-5.25%");
 let whattid;
 async function xyz (){
 
@@ -112,7 +176,7 @@ ser = ser
 return ser
 }
 
-let ser = xyz();
+let ser = $state(xyz());
 
 
  import { Swiper, SwiperSlide } from "swiper/svelte";
@@ -240,7 +304,7 @@ updateMesimabetahalich(
             console.log(miDatan);
             //TODO: archive timegrama
             archiveTimeGrama(timegramaId,fetch)
-            dispatch('acsept', {
+            onAcsept?.({
                 ani: "fini",
                 coinlapach: coinlapach
             })
@@ -278,7 +342,7 @@ console.log("just add vote to asked and update to not show for me again")
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch('acsept', {
+            onAcsept?.({
                  ani: "fini",
                 coinlapach: coinlapach
             })
@@ -345,7 +409,7 @@ async function decline() {
                 .then(data => miDatan = data);
             console.log(miDatan);
             isOpen = false;
-            dispatch('decline', {
+            onDecline?.({
                  ani: "fini",
                 coinlapach: coinlapach
             })
@@ -362,10 +426,10 @@ function open () {
         isOpen = true;
     console.log("if another uprove explain why you decline")
 }
-let isOpen = false;
-let whyy = " ";
-let no;
-let masa;
+let isOpen = $state(false);
+let whyy = $state(" ");
+let no = $state();
+let masa = $state();
 function close() {
      isOpen = false;
     no = false; 
@@ -373,10 +437,11 @@ function close() {
 }
 
 
-$: w = 0;
+let w = $state(0);
+  
  let u ="בקשה לאישור ביצוע משימה בהצלחה";
 
-let hovered = false;
+let hovered = $state(false);
 function hoverede(){
    hovered = !hovered
     if (hovered == false){
@@ -384,7 +449,7 @@ function hoverede(){
   } else {
 u ="בקשה לאישור ביצוע משימה בהצלחה";
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
 function hover (id){
   if (id == "0"){
@@ -392,21 +457,24 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
     u = id
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
-$: ucli = 0
-$: pcli = 0
-$: pmcli = 0
+let ucli = $state(0);
+  
+let pcli = $state(0);
+  
+let pmcli = $state(0);
+  
 function linke (s){
  if (s == "u"){
  ucli += 1
  if(ucli >= 2){
-  dispatch("user", {id: userId});
+  onUser?.({id: userId});
    }
   }else if (s == "p"){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     }
   }
 }
@@ -418,17 +486,14 @@ function linke (s){
     }
   };
   function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
 u ="בקשה לאישור ביצוע משימה בהצלחה"
   } else {
-    u = event.detail.x
+u = event.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
-   import Cards from './cards/fini.svelte'
-  import { archiveTimeGrama } from "$lib/func/send/timeGrama.svelte";
-export let cards = false;
-
+ 
 </script>
 {#await ser}
 <h1>..</h1>
@@ -438,7 +503,7 @@ export let cards = false;
         <div transition:fly|local|local={{y: 450, opacity: 0.5, duration: 1000}}>
   <DialogContent class="content" aria-label="form">
       <div dir="rtl" class="flex items-center flex-col" >
-              <button on:click={close} class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+              <button onclick={close} class=" hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
 ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
   <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -446,7 +511,7 @@ title="ביטול"
 {#if no === true}
 <h1 style="font-size:2em;">יש לנמק מדוע </h1>
       <input  minlength="26"  type="text" bind:value={whyy} placeholder=" מדוע המשימה לא הושלמה">
-         <br/>   <button class="add" disabled={whyy.length < 26} on:click={decline}>אישור</button>
+         <br/>   <button class="add" disabled={whyy.length < 26} onclick={decline}>אישור</button>
 {:else if masa === true}
       <input minlength="26"  type="text" bind:value={whyy} placeholder="יש לנמק מדוע ההצעה נדחית על ידך">
 <input type="number" placeholder="add moree hours">
@@ -461,13 +526,13 @@ title="ביטול"
 <div 
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()} 
-on:click={()=>{modal = true
-  dispatch("modal")
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()} 
+onclick={()=>{modal = true
+  onModal?.()
 dialogOpen = true}}
 role="button"
-use:clickOutside on:click_outside={toggleShow}
+use:clickOutside onclick_outside={toggleShow}
 class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
 <Swiper  dir="rtl"
   on:swiper={setSwiperRef}
@@ -506,7 +571,7 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
            <circle stroke-opacity="0.01" r="100" fill-opacity="0.01" fill="url(#lg)" transform="rotate(135)" stroke="url(#lgb)" stroke-width="6" style="fill-rule: nonzero; paint-order: fill;"/>
             <circle r="80" fill-opacity="0.01" fill="url(#lg)" transform="rotate(315)" stroke="none"/>
                   
-                            <g  on:click={()=>linke("u")} on:touchstart={()=>linke("u")} on:mouseenter={()=>hover(`לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`)} on:mouseleave={()=>hover("0")}  x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
+                            <g  onclick={()=>linke("u")} ontouchstart={()=>linke("u")} onmouseenter={()=>hover(`לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`)} onmouseleave={()=>hover("0")}  x='0' y='40' style="margin-top: 2px; margin-bottom: 2px" >
                    <foreignObject x='0' y='0' width='56px' height='56px' transform="translate(-28,-28)" >
                     <span 	class="{`normSml${mId}-oo`}"></span> 
                     <img
@@ -521,15 +586,15 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
                       </g>   
                    <path id="curve" fill-opacity="0.01"  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"/>
                        <text color="#EEE8AA" width="208.55" x="-90" y="-90" style="white-space: pre-wrap;">
-                           <textPath on:mouseenter={()=>hover("שם המשימה")} on:mouseleave={()=>hover("0")} font-weight="bold" color="#FF0092" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
+                           <textPath onmouseenter={()=>hover("שם המשימה")} onmouseleave={()=>hover("0")} font-weight="bold" color="#FF0092" x="-90" y="-90" class="curved-text" startOffset={st} xlink:href="#curve">
                                {missionBName}
                            </textPath>
                        </text>
-                 <g on:click={()=>linke("p")} on:touchstart={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  x="0" y="-40">
+                 <g onclick={()=>linke("p")} ontouchstart={()=>linke("p")} onmouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} onmouseleave={()=>hover("0")}  x="0" y="-40">
                        <text fill="#FF0092" text-anchor="middle"  x="0" y="-29"   style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;">{projectName}</text>
                  </g>  
                        <foreignObject x='0' y='-60 ' width='40px' height='40px' transform="translate(-20,-20)" >
-                      <button on:click={()=>project(projectId)} on:mouseenter={()=>hover(` לחיצה כפולה למעבר למוח הריקמה ${projectName}`)} on:mouseleave={()=>hover("0")}>
+                      <button onclick={()=>project(projectId)} onmouseenter={()=>hover(` לחיצה כפולה למעבר למוח הריקמה ${projectName}`)} onmouseleave={()=>hover("0")}>
                         <img style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;" src={src2} width="40" height="40" alt="projectlogo" >
                        </button>
                    </foreignObject>
@@ -543,15 +608,15 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
     ><div  id="normSmll"
 ><div class="{`normSmll${mId}-oo`}" 
 ></div>
-       <p class="ab pnn"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
+       <p class="ab pnn"><span onmouseenter={()=>hover("סך ההצבעות בעד")} onmouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk} </span> <span onmouseenter={()=>hover("לא הצביעו")} onmouseleave={()=>hover("0")}  style="color:#0000cc;" >  {noofusersWaiting} </span><span onmouseenter={()=>hover("כמות ההצבעות נגד")} onmouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo} </span></p>
 
-            <h5 on:mouseenter={()=>hover("טקסט אישור של סיום משימה")} on:mouseleave={()=>hover("0")}  class="bc pnn" >{why}</h5>
-          {#if missionDetails}  <h6 class="cd pnn" on:mouseenter={()=>hover("פרטי משימה")} on:mouseleave={()=>hover("0")}  >{missionDetails}</h6>{/if}
+            <h5 onmouseenter={()=>hover("טקסט אישור של סיום משימה")} onmouseleave={()=>hover("0")}  class="bc pnn" >{why}</h5>
+          {#if missionDetails}  <h6 class="cd pnn" onmouseenter={()=>hover("פרטי משימה")} onmouseleave={()=>hover("0")}  >{missionDetails}</h6>{/if}
          {#if low == false}
             {#if already == false}
-            <button on:mouseenter={()=>hover(" אישור")} on:mouseleave={()=>hover("0")}  on:click={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
+            <button onmouseenter={()=>hover(" אישור")} onmouseleave={()=>hover("0")}  onclick={agree} style="margin: 0;" class = "btn ga" name="requestToJoin"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z" /></svg></button>
         <!--   <button on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button>--> 
-            <button on:mouseenter={()=>hover(" התנגדות")} on:mouseleave={()=>hover("0")}  on:click={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
+            <button onmouseenter={()=>hover(" התנגדות")} onmouseleave={()=>hover("0")}  onclick={open} style="margin: 0;" class = "btn gb"name="decline"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z" /></svg></button>
         {/if}
          {:else if low == true}
           <Lowbtn/>
@@ -571,9 +636,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
 			<div class="swiper-slidec mx-auto ">
         
 <Cards 
- on:agree={agree}
-  on:decline={decline}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={decline}
+  onHover={hoverc}
   {why}
   {useraplyname}
   {timegramaDate}
@@ -598,9 +663,9 @@ class="hover:scale-290 duration-1000 ease-in"  transition:fly|local={{y: 250, op
       {/if}
 {:else}
 <Cards 
- on:agree={agree}
-  on:decline={decline}
-  on:hover={hoverc}
+ onAgree={agree}
+  onDecline={decline}
+  onHover={hoverc}
   {isVisible}
   {why}
   {useraplyname}

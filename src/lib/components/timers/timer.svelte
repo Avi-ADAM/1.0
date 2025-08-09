@@ -2,22 +2,39 @@
   import { startTimer, stopTimer } from '$lib/func/timers.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
   import { onMount, onDestroy } from 'svelte';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { timers, updateTimers } from '$lib/stores/timers';
+  import { lang } from '$lib/stores/lang'; // Import the lang store
   import TimerDialogs from './TimerDialogs.svelte';
+  let tx = $state(0);
+  let {
+    orders,
+    size,
+    bigsize,
+    add,
+    center,
+    tiltAngle,
+    hover,
+    project,
+    linke,
+    missionId,
+    hoursAssigned // Add this prop
+  } = $props();
+  let showSaveDialog = $state(false);
+  let showClearDialog = $state(false);
+  let showSaveFinal = $state(false);
+  let dialogEdit = $state(true);
+  let elapsedTime = $state('00:00:00');
+  let selectedTasks = $state([]);
+  let taskSearchTerm = $state('');
+  let timer = $state([]);
+  let localZman = $state(0); // Make localZman a state variable
+  let isRunning = $derived(timer?.running || false); // Keep isRunning derived from timer.running
+  let timerInterval = $state();
 
-  export let orders;
-  export let tx, size, bigsize, add, center, tiltAngle, hover, project, linke, missionId;
-  $: console.log(showSaveDialog)
-  let showSaveDialog = false;
-  let showClearDialog = false;
-  let showSaveFinal = false;
-  let dialogEdit = true;
-  let elapsedTime = '00:00:00';
-  let selectedTasks = [];
-  let taskSearchTerm = '';
-  let timer;
   onMount(() => {
+    timer = $timers?.find((t) => t.mId == missionId);
+
     console.log(timer)
     if(timer.attributes.activeTimer.data?.attributes?.isActive) {
       console.log("running")  
@@ -33,7 +50,6 @@
       let currentTime = Date.now();
       
       // Update local state
-      timer.zman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
       localZman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
       isRunning = true;
       timer.running = true;
@@ -42,7 +58,6 @@
   }else if(timer.attributes.activeTimer.data?.attributes?.isActive == false){
     console.log("stopped")
     let totalHours = timer.attributes.activeTimer.data.attributes.totalHours;
-    timer.zman = totalHours * 3600000;
     localZman = totalHours * 3600000;
     isRunning = false;
     timer.running = false;
@@ -50,25 +65,12 @@
 }
     selectedTasks = timer?.attributes.activeTimer?.data?.attributes.acts.data.map(task => task.id) ?? []
   })
-  $: {
-    timer = $timers?.find((t) => t.mId == missionId);
-    if (timer) {
-      console.log("Timer found:", timer);
-    } else {
-      console.log("No timer found for missionId:", missionId);
-    }
-  }
 
-  // Local reactive state
-  let localZman = timer?.zman || 0;
-  let isRunning = timer?.running || false;
-  let timerInterval;
+  // Calculate total hours done (saved + current running)
+  let totalHoursDone = $derived(
+    (localZman / 3600000) + (timer?.attributes?.howmanyhoursalready || 0)
+  );
 
-  // Reactive rotations based on localZman
-  $: rotation = (localZman / 1000) * 6;
-  $: rotationm = (localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6;
-  $: rotationh =
-    (localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30;
  // Start/stop timer function
  async function startTimerLocal(only=false) {
     console.log("start",only)
@@ -82,7 +84,7 @@
  await startTimer(
     timer.attributes?.activeTimer, // Active timer object from props
     timer.mId,                     // Mission ID
-    $page.data.uid,                        // User ID
+    page.data.uid,                        // User ID
     timer.projectId,                     // Project ID
     timer.attributes?.activeTimer?.data?.id || 0, // Timer ID or 0 if none
     false,                         // isSer flag
@@ -163,16 +165,6 @@
   });
   }
 
-  // Update local state when timer prop changes
-  $: {
-    localZman = 1 || 0;
-    isRunning = timer?.running || false;
-    if (isRunning && !timerInterval) {
-      startTimerLocal(true);
-    } else if (!isRunning && timerInterval) {
-      stopTimerLocal(true);
-    }
-  }
 
   async function handleToggleTimer() {
     const timerId =
@@ -212,7 +204,24 @@
     };
   }
 
-  $: orbitalRotation = (localZman / 60000) * 360; // Complete rotation every minute
+ 
+
+  // Update local state when timer prop changes
+  $effect(() => {
+    isRunning = timer?.running || false;
+    if (isRunning && !timerInterval) {
+      startTimerLocal(true);
+    } else if (!isRunning && timerInterval) {
+      stopTimerLocal(true);
+    }
+  });
+  // Reactive rotations based on localZman
+  
+  let rotation = $derived((localZman / 1000) * 6);
+  let rotationm = $derived((localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6);
+  let rotationh =
+    $derived((localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30);
+  let orbitalRotation = $derived((localZman / 60000) * 360); // Complete rotation every minute
 </script>
 <TimerDialogs
   bind:timer
@@ -223,7 +232,7 @@
   bind:elapsedTime
   bind:selectedTasks
   bind:taskSearchTerm
-  on:update-timer={({ detail }) => {
+  onUpdate-timer={({ detail }) => {
     if (detail.timer) {
       timer.attributes.activeTimer.data = detail.timer;
       timer.attributes.activeTimer.isActive = detail.running;
@@ -255,11 +264,9 @@
 
       // Reset localZman specifically for clear operations
       if (!detail.running && detail.timer?.attributes?.timers?.length === 0) {
-        timer.zman = 0;
         localZman = 0;
       } else {
         // Otherwise, update based on totalHours (for save, update, etc.)
-        timer.zman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
         localZman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
       }
       // Ensure isRunning state is also updated based on the event
@@ -268,7 +275,6 @@
     } else {
        // Handle cases where detail.timer might be null or undefined if necessary
        console.warn("update-timer event received without timer data:", detail);
-      timer.zman = 0;
        localZman = 0; // Default to 0 if timer data is missing
        isRunning = false;
     }
@@ -593,8 +599,8 @@
       <g 
         transform="translate(-80,0)" 
         class="control-button"
-        on:click={handleToggleTimer}
-        on:keypress={handleToggleTimer}
+        onclick={handleToggleTimer}
+        onkeypress={handleToggleTimer}
         style="cursor: pointer;"
         role="button"
         tabindex="0"
@@ -629,8 +635,8 @@
       <g 
         transform="translate(80,0)" 
         class="control-button"
-        on:click={() => showSaveDialog = true}
-        on:keypress={() => showSaveDialog = true}
+        onclick={() => showSaveDialog = true}
+        onkeypress={() => showSaveDialog = true}
         style="cursor: pointer;"
         role="button"
         tabindex="0"
@@ -924,6 +930,30 @@
       </textPath>
     </text>
   
+    <!-- New curved path for Total Hours Display --><!-- Adjusted Y position for top curve -->
+    <!-- New curved path for Total Hours Display -->
+    <path
+      fill="none"
+      stroke="none"
+      id="curveHours"
+      d="M 364.7 58.525 A 250 250 0 0 1 516.5 175"
+    />
+    <text fill="#FFFFFF" font-weight="900">
+      <textPath
+        font-size="36"
+        xlink:href="#curveHours"
+        startOffset="50%"
+        text-anchor="middle"
+      >
+        <tspan fill="#FFFFFF" font-weight="900">
+          {#if $lang === 'he'}
+          {Math.floor(totalHoursDone)} / {hoursAssigned} שעות
+          {:else}
+            Hours: {hoursAssigned} / {Math.floor(totalHoursDone)}
+          {/if}
+        </tspan>
+      </textPath>
+    </text>
  
 
   </g></svg

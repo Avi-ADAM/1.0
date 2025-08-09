@@ -1,13 +1,21 @@
 <script>
+	import { preventDefault, stopPropagation } from 'svelte/legacy';
+
 	import { clamp } from 'yootils';
 
-	export let start = 0;
-	export let end = 1;
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} [start]
+	 * @property {number} [end]
+	 */
 
-	let leftHandle;
+	/** @type {Props} */
+	let { start = $bindable(0), end = $bindable(1) } = $props();
 
-	let body;
-	let slider;
+	let leftHandle = $state();
+
+	let body = $state();
+	let slider = $state();
 
 	function draggable(node) {
 		let x;
@@ -115,7 +123,7 @@
 			class="body"
 			bind:this={body}
 			use:draggable
-			on:dragmove|preventDefault|stopPropagation="{setHandlesFromBody}"
+			ondragmove={stopPropagation(preventDefault(setHandlesFromBody))}
 			style="
 				left: {100 * start}%;
 				right: {100 * (1 - end)}%;
@@ -126,7 +134,7 @@
 			bind:this={leftHandle}
 			data-which="start"
 			use:draggable
-			on:dragmove|preventDefault|stopPropagation="{setHandlePosition('start')}"
+			ondragmove={stopPropagation(preventDefault(setHandlePosition('start')))}
 			style="
 				left: {100 * start}%
 			"
@@ -135,7 +143,7 @@
 			class="handle"
 			data-which="end"
 			use:draggable
-			on:dragmove|preventDefault|stopPropagation="{setHandlePosition('end')}"
+			ondragmove={stopPropagation(preventDefault(setHandlePosition('end')))}
 			style="
 				left: {100 * end}%
 			"

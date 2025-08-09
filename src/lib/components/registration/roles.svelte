@@ -1,18 +1,29 @@
 <script>
-    import { page } from '$app/stores';
+    import { page } from '$app/state';
 
     import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
     import { show } from './store-show.js';
     import { roles2 } from './roles2.js';
     import { onMount } from 'svelte';
-    import Addnewrole from '../addnew/addNewRole.svelte';
- import { createEventDispatcher } from 'svelte';
+/**
+ * @typedef {Object} Props
+ * @property {string} [userName_value]
+ * @property {number} [show_value]
+ * @property {(payload: {tx: number, txx: number}) => void} [onProgres]
+ */
+/**
+ * @type {Props}
+ */
+let {
+  userName_value = $bindable(),
+  show_value = $bindable(0),
+  onProgres
+} = $props();
            import { lang } from '$lib/stores/lang.js'
     import jroles from '$lib/data/tafkidim.json'
     import enjrole from '$lib/data/tafkidimEn.json'
- const dispatch = createEventDispatcher();
-    let roles1 = [];
+    let roles1 = $state([]);
     let error1 = null;
     const baseUrl = import.meta.env.VITE_URL
 
@@ -28,7 +39,7 @@
       }
       return arr;
      };
-      let newcontent = true
+      let newcontent = $state(true)
 
     onMount(async () => {
      if ($lang == "he" ){
@@ -82,12 +93,9 @@
     
 
 
-    let selected = [];
+    let selected = $state([]);
      const placeholder = `${$lang == "he" ? "תפקידים מועדפים" : "preferred roles"}`;
 
- 
-let userName_value;
-let show_value = 0;
 
 userName.subscribe(value => {
   userName_value = value;
@@ -98,112 +106,131 @@ show.subscribe(newValue => {
 });
 
 function increment() {
+  newnew()
 		show.update(n => n + 1);
-     dispatch ('progres',{
-		tx: 0,
-		txx: 11
-	} );
-    roles2.set(find_role_id(selected));
-   
+    onProgres?.({ tx: 0, txx: 11 })
 	}
   function toend() {
-        roles2.set(find_role_id(selected));
-
+    newnew()
 		show.set(5);
-    dispatch ('progres',{
-		tx: 0,
-		txx: 4
-	} )
+    onProgres?.({ tx: 0, txx: 4 })
 	}
   function back() {
+    newnew()
 		show.update(n => n - 1);
-      dispatch ('progres',{
-		tx: 0,
-		txx: 20
-	} );
-    roles2.set(find_role_id(selected));
-  
+    onProgres?.({ tx: 0, txx: 20 })
 	}
- import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-      import {  fly } from 'svelte/transition';
-  import Skip from '$lib/celim/icons/skip.svelte';
+   import Skip from '$lib/celim/icons/skip.svelte';
 
-let isOpen = false;
- const close = () => {
-    isOpen = false;
-   
-  };
 
-   function addnew (event){
-    
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.roleDescription;
-    isOpen = false;
+  let meData = []
+async function newnew (){
+  for (let i = 0; i<selected.length ;i++){
+    if (!roles1.map(c => c.attributes.roleDescription).includes(selected[i])){
+      //create new and update roles
+        console.log(selected,roles1)
+  let link =baseUrl+"/graphql" ;
+  let d = new Date
+        try {
+             await fetch(link, {
+              method: 'POST',
+        
+        headers: {
+            'Content-Type': 'application/json'
+                  },
+        body:
+        JSON.stringify({query:
+           `mutation  createTafkidim {
+  createTafkidim(data: {  roleDescription: "${selected[i]}",
+        publishedAt: "${d.toISOString()}"}) {
+    data {
+      id
+      attributes {
+        roleDescription
+      }
+
+       }
+    }
+}`
+        })
+})
+  .then(r => r.json())
+  .then(data => meData = data);
+const newOb = meData.data.createTafkidim.data;
     const newValues = roles1 ;
     newValues.push(newOb);
        
     roles1 = newValues;
-   const newSele = selected;
+    let userName_value = $userName
+    let data = {"name": userName_value, "action": "create תפקיד חדש בשם:", "det": `${selected[i]}`}
+   fetch("/api/ste", {
+  method: 'POST', // or 'PUT'
+  headers: {
+    'Content-Type': 'application/json',
+  },
+  body: JSON.stringify(data),
+})
+  .then((response) => response)
+  .then((data) => {
+    console.log('Success:', data);
 
-selected.push(newN);
+  })
+  .catch((error) => {
+    console.error('Error:', error);
+  
+  })
+                  }
+      catch(error) {
+        console.log('צריך לתקן:', error.response);
+        error = error1
+        console.log(error1)
+                };}
+              }
+                  roles2.set(find_role_id(selected));
+                      console.log($roles2)
 
-selected = newSele;
+            }
 
-  }
-  const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
+  let ugug = $state(``);
+  
       const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
     const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
-    const addn = {"he":"הוספת תפקיד חדש","en": "Add new Role"}
+  let addn = $derived({"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`})
+  const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
   const what = {"he": "יש לך תפקיד מועדף?","en": "Do you have a preferred role?"}
  const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
-  let focused = false
   </script>
- <DialogOverlay {isOpen} onDismiss={close} >
-        <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="content"  aria-label="form">
-      <div class="a"dir="{$lang == "en" ? "ltr" : "rtl"}" >
-           
-              <Addnewrole rn={roles1.map(c => c.attributes.roleDescription)} on:b={close} 
-                addR={true} on:addnewrole={addnew}/>
-  </DialogContent>
-  </div>
-</DialogOverlay>
 
 
 
   
-<h1 style:margin-top={focused && !$page.data.isDesktop ? "1vh": !$page.data.isDesktop ? "26vh" : ""} class="midscreenText-2">
+<h1 class="midscreenText-2 mt-[26vh]">
     {userName_value}
     <br/>
      {what[$lang]}
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
-           on:focus={()=>focused=true}
-      on:blur={()=>focused=false}
-       --sms-max-width={"60vw"}
-          noMatchingOptionsMsg={nom[$lang]}
-           loading={newcontent}
+     --sms-width={page.data.isDesktop ? '' : '30vw'}
+     outerDivClass="!bg-gold !text-barbi"
+     inputClass="!bg-gold !text-barbi"
+     liSelectedClass="!bg-barbi !text-gold"
+        --sms-max-width={"60vw"}
+           createOptionMsg={addn[$lang]}
+      allowUserOptions={"append"}
+            loading={newcontent}
+       bind:searchText={ugug}
      bind:selected
      {placeholder}
      options={roles1.map(c => c.attributes.roleDescription)}
      /></div>
-    <!-- 
-           on:change={(e) => alert(`You ${e.detail.type}ed '${e.detail.token}'`)}
--->
-      <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2-2">
-      <button
-      on:click={() => isOpen = true} 
-      class="button-silver hover:text-barbi font-bold py-1 px-1 rounded-full"
-      >{addn[$lang]}</button>
-    </div>
-    <button class="button-in-1-2" on:click="{back}">
+    <button class="button-in-1-2" onclick={back}>
     <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
     </button>
-      <button class="button-end bg-sturk hover:bg-mturk p-1 rounded-full" on:click="{toend}" title="{skipt[$lang]}">
+      <button class="button-end bg-sturk hover:bg-mturk p-1 rounded-full" onclick={toend} title="{skipt[$lang]}">
     <Skip/>
     </button>
-  <button class="button-2" on:click="{increment}">
+  <button class="button-2" onclick={increment}>
     <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
     </button>
 
@@ -225,10 +252,7 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 width:78vw;
         }
   }
-  :global(.multiselect) {
-    background-color: var(--gold) !important ;
-  /* top-level wrapper div */
-}
+
  
     .midscreenText-2 {
             transition: all 1s ease-in;

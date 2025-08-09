@@ -1,56 +1,105 @@
 <script>
   import {lang} from '$lib/stores/lang.js'
      import Grow from '$lib/celim/icons/grow.svelte'
-     export let animate = false
-  export let gr = false
-  export let pic = false
-  export let src = ""
-  export let alt = ""
-  export let single = false
-  export let reverse = false
-  export let big = false
-  export let sm = false
-    export let openi = false;
-    export let closei = false;
-   export let blue = false;
-   export let gray = false;
-   export let red = false;
-   export let green = false;
-   export let yellow = false;
-   export let indigo = false;
-   export let purple = false;
-   export let pink = false;
-      export let wow = false;
-     export let gold = false;
-     export let neww = false;
-   export let word = "word";
-   export let bg = "blue"
-   $: if (bg == "blue"){
-    blue = true;
-   } else if (bg == "pink"){
-    pink = true;
-   } else if (bg == "yellow"){
-    yellow = true;
-   } else if (bg == "green"){
-    green = true;
-   } else if (bg == "indigo"){
-    indigo = true;
-   } else if (bg == "gray"){
-    gray = true;
-   } else if (bg == "red"){
-    red = true;
-   } else if (bg == "purple"){
-    purple = true;
-   } else if (bg == "wow"){
-     wow = true;
-   }else if (bg == "gold"){
-     gold = true;
-   }else if(bg == "neww"){
-     neww = true;
-   }
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [animate]
+   * @property {boolean} [gr]
+   * @property {boolean} [pic]
+   * @property {string} [src]
+   * @property {string} [alt]
+   * @property {boolean} [single]
+   * @property {boolean} [reverse]
+   * @property {boolean} [big]
+   * @property {boolean} [sm]
+   * @property {boolean} [openi]
+   * @property {boolean} [closei]
+   * @property {boolean} [blue]
+   * @property {boolean} [gray]
+   * @property {boolean} [red]
+   * @property {boolean} [green]
+   * @property {boolean} [yellow]
+   * @property {boolean} [indigo]
+   * @property {boolean} [purple]
+   * @property {boolean} [pink]
+   * @property {boolean} [wow]
+   * @property {boolean} [gold]
+   * @property {boolean} [neww]
+   * @property {string} [word]
+   * @property {string} [bg]
+   */
+
+  /** @type {Props} */
+  let {
+    animate = false,
+    gr = false,
+    pic = false,
+    src = "",
+    alt = "",
+    single = false,
+    reverse = false,
+    big = false,
+    sm = false,
+    openi = false,
+    closei = false,
+    blue = false,
+    gray = false,
+    red = false,
+    green = false,
+    yellow = false,
+    indigo = false,
+    purple = false,
+    pink = false,
+    wow = false,
+    gold = false,
+    neww = false,
+    word = "word",
+    bg = "blue",
+    closeiline = true,
+    children
+  } = $props();
+   $effect(() => {
+    // Reset all color flags to false first
+    blue = false;
+    gray = false;
+    red = false;
+    green = false;
+    yellow = false;
+    indigo = false;
+    purple = false;
+    pink = false;
+    wow = false;
+    gold = false;
+    neww = false;
+
+    // Set the appropriate color flag based on bg prop
+    if (bg == "blue"){
+      blue = true;
+     } else if (bg == "pink"){
+      pink = true;
+     } else if (bg == "yellow"){
+      yellow = true;
+     } else if (bg == "green"){
+      green = true;
+     } else if (bg == "indigo"){
+      indigo = true;
+     } else if (bg == "gray"){
+      gray = true;
+     } else if (bg == "red"){
+      red = true;
+     } else if (bg == "purple"){
+      purple = true;
+     } else if (bg == "wow"){
+       wow = true;
+     }else if (bg == "gold"){
+       gold = true;
+     }else if(bg == "neww"){
+       neww = true;
+     }
+  });
    //gray red green yellow indigo purple pink
 </script>
-<span class:line-through={closei == true}
+<span class:line-through={closei == true && closeiline == true}
 class:hover:bg-blue-400={blue == true}
 class:hover:bg-gold={gold == true}
         class:hover:bg-wow={wow == true}
@@ -94,6 +143,9 @@ class:flex-wrap={pic == true}
 </span>
  {/if}
  {@html word}
+   {#if children}
+     {@render children()}
+   {/if}
  {#if closei}
       <svg aria-hidden="true" class="w-3 h-3 sm:w-5 sm:h-5 bg-slate-100 rounded-full mx-1"  fill="currentColor" viewBox="0 0 20 20" xmlns="http://www.w3.org/2000/svg"><path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd"></path></svg>
  {/if}
@@ -102,7 +154,7 @@ class:flex-wrap={pic == true}
  {/if}
  {#if gr}
   <span class=" mx-0.5">
- <Grow width="{big ? 26 :13}" height="{big ? 26 :13}"/>
+ <Grow width={big ? 26 :13} height={big ? 26 :13}/>
 </span>
  {/if}
 

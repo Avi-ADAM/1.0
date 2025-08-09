@@ -1,6 +1,62 @@
 import { browser } from '$app/environment';
 import { sendToSer } from '$lib/send/sendToSer.js';
-import { writable } from 'svelte/store';
+import { writable, get } from 'svelte/store';
+import { io } from 'socket.io-client';
+const baseUrl = import.meta.env.VITE_URL
+
+let currentUid = null;
+let currentFetch = null;
+let fetchTimeout = null; // Add a variable to hold the timeout ID
+
+export async function initialWebSocketForTimer (id,token, fetch){
+    currentUid = id;
+    currentFetch = fetch;
+
+    const socket = io(baseUrl, {
+        auth: {
+          token: token,
+          id: id
+        },
+      });
+      console.log("cv",socket)
+      //  wait until socket connects before adding event listeners
+      socket.on('connect', () => {
+        console.log('connected',id);
+        socket.on('timer:update', (datan) => {
+          console.log('io= ', datan);
+          //get array of relevant forum ids\
+                      console.log(
+                        'yallla cvar, geula',
+                        datan,
+                        datan.data
+                      );
+          if (datan && datan.data && datan.data.id) {
+            const updatedTimerId = datan.data.id;
+            const currentTimers = get(timers);
+            console.log("currentTimers",currentTimers,updatedTimerId)
+            const isOurTimer = currentTimers.some(timer => timer.attributes?.activeTimer?.data?.id == updatedTimerId);
+
+            if (isOurTimer) {
+              console.log(`Timer with ID ${updatedTimerId} updated. Reloading timers.`);
+              if (currentUid && currentFetch) {
+                // Clear any existing timeout to prevent multiple rapid fetches
+                if (fetchTimeout) {
+                  clearTimeout(fetchTimeout);
+                }
+                // Set a new timeout to debounce the fetchTimers call
+                fetchTimeout = setTimeout(() => {
+                  fetchTimers(currentUid, currentFetch);
+                  fetchTimeout = null; // Clear the timeout ID after execution
+                }, 300); // Adjust debounce time as needed (e.g., 300ms)
+              } else {
+                console.error('Cannot reload timers: uid or fetch not available.');
+              }
+            }
+          }
+        })
+      
+    })
+}
 
 // Initialize timers with data from localStorage or empty array
 const storedTimers = browser ? localStorage.getItem('timers') : null;
@@ -71,6 +127,7 @@ export async function fetchTimers(uid, fetch) {
                             src: t.attributes.project?.data?.attributes?.profilePic.data.attributes.url,
                             projectId: t.attributes.project.data.id,
                             mId: t.id,
+                            hoursAssigned: t.attributes.hoursassinged || 0,
                         };
 
                     }

@@ -1,4 +1,4 @@
- <script context="module">
+ <script module>
     import tr from '$lib/translations/tr.json'
    export function peace(miData, id,lang,myid) {
     console.log("peace askeds")  /*{data{ id attributes{

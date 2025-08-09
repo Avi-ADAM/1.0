@@ -1,11 +1,24 @@
 <script>
-	export let title = '';
-	let isHovered = false;
-	let x, ix;
-	let y, iy;
-	export let z = 15;
-	export let ispic = false;
-	export let islink = false;
+	let isHovered = $state(false);
+	let x = $state(), ix;
+	let y = $state(), iy;
+	/**
+	 * @typedef {Object} Props
+	 * @property {string} [title]
+	 * @property {number} [z]
+	 * @property {boolean} [ispic]
+	 * @property {boolean} [islink]
+	 * @property {import('svelte').Snippet} [children]
+	 */
+
+	/** @type {Props} */
+	let {
+		title = '',
+		z = 15,
+		ispic = $bindable(false),
+		islink = false,
+		children
+	} = $props();
 
 	function mouseOver(event) {
 		isHovered = true;
@@ -28,11 +41,11 @@
 </script>
 
 <span
-	on:mouseenter={mouseOver}
-  on:mouseleave={mouseLeave}
-	on:mousemove={mouseMove}
+	onmouseenter={mouseOver}
+  onmouseleave={mouseLeave}
+	onmousemove={mouseMove}
    >
-	<slot />
+	{@render children?.()}
 </span>
 
 {#if isHovered}
@@ -48,7 +61,7 @@
         z-index: 999;
 		border: 1px solid rgb(239, 45, 178);
 		box-shadow: 1px 1px 1px rgb(224, 165, 211);
-		background: linear-gradient(to bottom right, #BF953F, #FCF6BA, #FBF5B7, #AA771C);;
+		background: linear-gradient(to bottom right, #BF953F, #FCF6BA, #FBF5B7, #AA771C);
         color: rgb(239, 23, 88);
 		border-radius: 4px;
 		padding: 4px;

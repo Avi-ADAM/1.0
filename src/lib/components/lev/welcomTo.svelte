@@ -1,22 +1,22 @@
 <script>
     import { fly } from 'svelte/transition';
-import {
-    createEventDispatcher
-} from 'svelte';
 import { Confetti } from "svelte-confetti"
 import { lang } from '$lib/stores/lang.js';
 import {
     idPr
 } from './../../stores/idPr.js';
-export let id;
-export let username;
-export let projectName;
-export let projectSrc;
 let error1
 import {
     goto } from '$app/navigation';
+  let {
+    onHover,
+    id,
+    username,
+    projectName,
+    projectSrc
+  } = $props();
  // import { height } from '@event-calendar/common';
-let confe = false
+let confe = $state(false)
 const baseUrl = import.meta.env.VITE_URL
 
 async function project(id) {
@@ -63,8 +63,7 @@ async function project(id) {
         }
     //make it desapire for good
 };
-const dispatch = createEventDispatcher();
-let hovered = false;
+let hovered = $state(false);
 let des = {'he' :"קבלת פנים לרגל הצטרפותך לריקמה חדשה", en: 'welcome to new FreeMates'}
 let dif = {'he':'לב 1💗1', en: 'the heart of 1💗1'}
 const texta = {he: "הצטרפת לרקמה", en: "welcome to the FreeMates"}
@@ -79,15 +78,15 @@ function hoverede(){
   } else {
 u = des[$lang]
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
 
 </script>
 <div
 style="position: relative;" 
 style:z-index={hovered === false ? 11 : 16}  
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()}
 class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000}}>
 {#if confe}
 <div class="absolute   w-full h-full" style="top: 50%; left: 50%; transform: translate(-50, -50)"> 
@@ -207,7 +206,7 @@ class="hover:scale-290 duration-1000 ease-in-out" transition:fly|local={{y: 250,
         <text text-anchor="middle" width="21" overflow="scroll"  x="28.5" y="32" fill="#FF0092" style="font-size:8px; fill: #FF0092; stroke-width: 0.1px;" >{projectName}</text>
      <rect x="8.5" y="34" width="40" height="10" strock="green" fill="pink" fill-opacity="0.4">
         </rect>
-                <text  x="28.5" y="42" text-anchor="middle" on:keypress={() =>project(id)} class="btn" style="font-size:8px;" on:click={() =>project(id)}>{btnText[$lang]}</text>
+                <text  x="28.5" y="42" text-anchor="middle" onkeypress={() =>project(id)} class="btn" style="font-size:8px;" onclick={() =>project(id)}>{btnText[$lang]}</text>
 
     </svg>
 

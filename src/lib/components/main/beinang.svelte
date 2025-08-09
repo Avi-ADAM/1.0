@@ -17,8 +17,8 @@
   import Vallues from '../registration/vallues.svelte'
  // import Scree from '../registration/scree.svelte'
   
-let userName_value;
-let show_value = 0;
+let userName_value = $state();
+let show_value = $state(0);
 
 userName.subscribe(value => {
   userName_value = value;
@@ -27,15 +27,21 @@ userName.subscribe(value => {
 show.subscribe(newValue => {
   show_value = newValue;
 });
-  export let idx = 1;
+  /**
+   * @typedef {Object} Props
+   * @property {number} [idx]
+   */
+
+  /** @type {Props} */
+  let { idx = 1 } = $props();
 let ty = 0;
-let w;
+let w = $state();
 let vb = 3322.126 + w;
-let tx = 600;
-let txx = 20;
+let tx = $state(600);
+let txx = $state(20);
 function add (event){
-  tx = event.detail.tx;
-  txx = event.detail.txx;
+  tx = event.tx;
+  txx = event.txx;
 }
 </script>
 <svelte:head>
@@ -54,34 +60,34 @@ function add (event){
 <div class="midscreen"
  in:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"
  out:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-<Vallues on:progres={add}/>
+<Vallues onProgres={add}/>
 </div>
 {:else if show_value == 2}
 <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
-<Skills on:progres={add}/>
+<Skills onProgres={add}/>
 </div>
 {:else if show_value == 3}
 <div class="midscreen"
  transition:scale="{{duration: 130, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}">
- <Roles on:progres={add}/>
+ <Roles onProgres={add}/>
 </div>
   {:else if show_value == 4}
   <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-  <Workways on:progres={add}/>
+  <Workways onProgres={add}/>
   </div>
  <!-- {:else if show_value == 5}  
-<VidValDate on:progres={add}/>
+<VidValDate onProgres={add}/>
  {:else if show_value == 5}
     <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Scree on:progres={add}/> 
+   <Scree onProgres={add}/> 
    </div>  -->
   {:else if show_value == 5}
     <div class="midscreen"
  transition:scale="{{duration: 1300, delay: 200, opacity: 0.5, start: 0.5, easing: quintOut}}"> 
-   <Password on:progres={add}/> 
+   <Password onProgres={add}/> 
    </div>  
   {:else if show_value == 6}
   <div class="midscreen"
@@ -92,7 +98,7 @@ function add (event){
 {userName_value}
 <br>
 ולהתראות בקרוב</h1>
-    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" on:click={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
+    <button class="text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-2 rounded-full" onclick={()=>goto('/me',)}>לחיצה למעבר לעמוד הפרופיל</button>
   </div>
   </div>
 {/if}

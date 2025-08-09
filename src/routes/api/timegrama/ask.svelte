@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     import { SendTo } from '$lib/send/sendTo.svelte';
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 export async function Ask(id,taid, fetch){

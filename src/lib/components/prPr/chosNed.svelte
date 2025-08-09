@@ -3,17 +3,14 @@
     import { onMount } from 'svelte';
     import Addnewnee from '../addnew/addNewNeed.svelte';
     const baseUrl = import.meta.env.VITE_URL
-
+    import { lang } from '$lib/stores/lang';
    //// import { sneed } from '../../stores/sneed.js';
   //  import { total } from '../../stores/total.js';
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
     //let  userName_value;
     let token; 
- export let needss = [];
   //  let error = null
-    let addnee = false;  
-  let isLow = true
+    let addnee = $state(false);  
+  let isLow = $state(true)
 onMount(async () => {
          const cookieValue = document.cookie
   .split('; ')
@@ -50,7 +47,7 @@ onMount(async () => {
   .then(r => r.json())
   .then(data => needss = data.data.mashaabims.data);
    console.log(needss)
-   dispatch("str")
+   onStr?.()
     isLow = false
     } catch (e) {
             console.log(e)
@@ -71,31 +68,34 @@ onMount(async () => {
       return arr1;
      };
 
-export let selctedi = [];
-export let selected = [];
+  let { needss = $bindable([]), selctedi = [], selected = $bindable([]) , onStr, onAddm, onAdd } = $props();
     const placeholder = `הוספת משאבים נדרשים `;
 
 function newn(event) {
   addnee = false;
-    const skob = event.detail.skob
+    const skob = event.skob
   needss.push(skob)
-  selected.push(event.detail.name)
+  selected.push(event.name)
   needss = needss
   selected = selected
-    dispatch( "addm",{
-      x: event.detail.id, 
-      skob: event.detail.skob
+    onAddm?.({
+      x: event.id, 
+      skob: event.skob
     })
 	};
 
 function incremen() {
-    dispatch( "add",{
+    onAdd?.({
       x: find_need_id(selected)
     })
 	};
+  const addNewNeedLebel = {
+    he: 'הוספת משאבים נדרשים',
+    en: 'Add needed resources'
+  };
   </script>
   <div dir="rtl" style="max-width: 100%" >
-    <h1 >הוספת משאבים נדרשים </h1>
+    <h1>{addNewNeedLebel[$lang]}</h1>
     <div class="items-center">
       <div class="gg w-min	pb-1">
         <MultiSelect
@@ -103,10 +103,10 @@ function incremen() {
         {placeholder}
         loading={isLow}
         options={needss.map(c => c.attributes.name)}
-        on:change={incremen}
+        onchange={incremen}
         /></div>
       
-       <Addnewnee {addnee} on:newn={newn} onmo={true} color={"--barbi-pink"}/>
+       <Addnewnee {addnee} onNewn={newn} onmo={true} color={"--barbi-pink"}/>
       </div>
      
     </div>

@@ -1,14 +1,23 @@
 <script>
     import { lang } from "$lib/stores/lang";
-    export let text = "";
-    export let lebel = {"en":"Name", "he":"שם"};
-    export let color = "gold";
+  /**
+   * @typedef {Object} Props
+   * @property {string} [text]
+   * @property {any} [lebel]
+   * @property {string} [color]
+   * @property {string} [type]
+   * @property {string} [autocomplete]
+   */
+
+  /** @type {Props} */
+  let { text = $bindable(""), lebel = {"en":"Name", "he":"שם"}, color = "gold", type = "text", autocomplete = "off" } = $props();
     </script>
      <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="textinput">
         <input
           name="name"
           bind:value={text}
-          type="text"
+          {type}
+          {autocomplete}
           class="input"
           required
           style={color == "barbi" ? "color:var(--barbi-pink); border-bottom: solid 1px var(--barbi-pink)" : "color:var(--gold); border-bottom: solid 1px var(--gold)"}	

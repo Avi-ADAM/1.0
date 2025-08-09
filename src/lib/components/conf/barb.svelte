@@ -6,7 +6,7 @@
   import AxisX from './AxisX.svelte';
   import AxisY from './AxisY.svelte';
   import Tooltip from './Tooltip.html.svelte';
-  export let datai 
+  let { datai } = $props();
   const xKey = 'value';
   const yKey = 'leb';
 

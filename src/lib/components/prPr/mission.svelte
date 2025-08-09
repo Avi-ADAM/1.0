@@ -17,20 +17,15 @@
   import MultiSelect from 'svelte-multiselect';
   import { lang } from '$lib/stores/lang.js';
   import Addnewro from '../addnew/addNewRole.svelte';
-  import { createEventDispatcher } from 'svelte';
   import AddNewSkill from '../addnew/addNewSkill.svelte';
   //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
-  import { addslashes } from '$lib/func/uti/string.svelte';
-  const dispatch = createEventDispatcher();
+  import { addslashes } from '$lib/func/uti/string.js';
   const baseUrl = import.meta.env.VITE_URL;
 
-  export let newcontent = true;
-  export let newcontentR = true;
-  export let newcontentW = true;
+  let { pu = [], vallues = [], onClose, newcontent = true, newcontentR = true, newcontentW = true, pn, pl, restime, id, userslength = 0, projectId, name = '' } = $props();
   let token;
-  export let pn, pl, restime;
-  $: miData = [
+  let miData = $state([
     {
       selectedSkills: [],
       selectedRoles: [],
@@ -43,18 +38,17 @@
       iskvua: false,
       date: null,
       dates: null,
-      myM: false
+      myM: false,
+      rishoni: [],
+      publicklinks: ``,
+      privatlinks: ``
     }
-  ];
-  $: console.log(miData);
+  ]);
+  
   let error1 = null;
-  export let id;
-  export let userslength = 0;
-  export let projectId;
-  export let name = '';
-  $: roles1 = $role;
+  let roles1 = $state($role);
   let x = 168;
-  let gloading = false;
+  let gloading = $state(false);
   onMount(async () => {
     if (id !== 0) {
       gloading = true;
@@ -81,7 +75,7 @@
         console.log(c.data.mission.data);
         let t = c.data.mission.data;
         if ($lang == 'he') {
-          for (var i = 0; i < t.attributes.skills.data.length; i++) {
+          for (let i = 0; i < t.attributes.skills.data.length; i++) {
             if (t.attributes.skills.data[i].attributes.localizations.data.length > 0) {
               t.attributes.skills.data[i].attributes.skillName =
                 t.attributes.skills.data[
@@ -89,7 +83,7 @@
                 ].attributes.localizations.data[0].attributes.skillName;
             }
           }
-          for (var i = 0; i < t.attributes.tafkidims.data.length; i++) {
+          for (let i = 0; i < t.attributes.tafkidims.data.length; i++) {
             if (t.attributes.tafkidims.data[i].attributes.localizations.data.length > 0) {
               t.attributes.tafkidims.data[i].attributes.roleDescription =
                 t.attributes.tafkidims.data[
@@ -98,7 +92,7 @@
             }
           }
           console.log(t.attributes.tafkidims.data, 't.attributes.roles.data');
-          for (var i = 0; i < t.attributes.work_ways.data.length; i++) {
+          for (let i = 0; i < t.attributes.work_ways.data.length; i++) {
             if (t.attributes.work_ways.data[i].attributes.localizations.data.length > 0) {
               t.attributes.work_ways.data[i].attributes.workWayName =
                 t.attributes.work_ways.data[
@@ -142,7 +136,7 @@
   });
 
   function find_role_id(role_name_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < role_name_arr.length; j++) {
       for (let i = 0; i < roles1.length; i++) {
         if (roles1[i].attributes.roleDescription === role_name_arr[j]) {
@@ -154,7 +148,7 @@
   }
 
   function find_workway_id(workway_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < workway_arr.length; j++) {
       for (let i = 0; i < $ww.length; i++) {
         if ($ww[i].attributes.workWayName === workway_arr[j]) {
@@ -166,7 +160,7 @@
   }
 
   function find_user_id(user_name_arr) {
-    var id = 0;
+    let id = 0;
     for (let i = 0; i < pu.length; i++) {
       if (pu[i].attributes.username === user_name_arr[0]) {
         id = pu[i].id;
@@ -180,8 +174,8 @@
     he: 'בחירת כל הכישורים הרלוונטיים',
     en: 'choose more skills'
   };
-  $: skills2 = $skil;
-  $: roles = $role;
+  let skills2 = $state($skil);
+  let roles = $state($role);
   let selected3;
   const placeholder5 = {
     he: 'בחירת תפקיד',
@@ -193,7 +187,7 @@
   };
 
   function find_skill_id(skill_name_arr) {
-    var arr = [];
+    let arr = [];
     for (let j = 0; j < skill_name_arr.length; j++) {
       for (let i = 0; i < skills2.length; i++) {
         if (skills2[i].attributes.skillName === skill_name_arr[j]) {
@@ -203,11 +197,9 @@
     }
     return arr;
   }
-  export let vallues = [];
   let idL;
-  console.log(miData);
-  let miDatana = [];
-  let miDatan = [];
+  let miDatana = $state([]);
+  let miDatan = $state([]);
   let linkop;
   let pendq = '';
   let qwerys = ``;
@@ -239,6 +231,7 @@
         const skills = find_skill_id(element.selectedSkills);
       const work_ways = find_workway_id(element.selectedWorkways);
       const tafkidims = find_role_id(element.selectedRoles);
+      console.log(skills,work_ways,tafkidims,element.selectedRoles)
         if (element.id === 0) {
             await sendToSer({skills,tafkidims,descrip:element.descrip,missionName:element.missionName,publishedAt:fd},'21createMission',null,null,null,fetch).then((res) => {
                 console.log(res)
@@ -371,7 +364,6 @@
              ${rishonves4}
              ${pendq} 
             ${toadd}
-
     }
   ) {data{id attributes{ project{data{ id} }}}}
 } `
@@ -487,7 +479,7 @@
                         loading = false
                         success = true
                       console.log('Success:', data);
-                      dispatch('close', {
+                      onClose?.({
                         md: miDatan
                       });
                     })
@@ -536,7 +528,7 @@
                   console.log('Success:', data);
                   loading = false
                   success = true
-                  dispatch('close', {
+                  onClose?.({
                     md: miDatan
                   });
                 })
@@ -546,7 +538,7 @@
             } else {
                 loading = false
                 success = true
-              dispatch('close', {
+              onClose?.({
                 md: miDatan
               });
             }
@@ -615,7 +607,7 @@
           }
           loading = false
           success = true
-          dispatch('close', {
+          onClose?.({
             md: miDatan
           });
         }
@@ -623,7 +615,6 @@
     
   }
 
-  export let pu = [];
 
   let cencel = ' ביטול';
   let addS = false;
@@ -640,38 +631,36 @@
   }
 
   async function addW(id, mid, e) {
-    if (e.detail) if (e.detail.type === 'add') console.log(id);
+    if (e) if (e.type === 'add') console.log(id);
     newnew(id);
   }
   let tt = [];
 
   function addnew(event) {
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.skillName;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.skillName;
     const newValues = skills2;
     newValues.push(newOb);
     skills2 = newValues;
-    const mid = event.detail.mid;
+    const mid = event.mid;
     const y = miData.map((c) => c.id);
     const index = y.indexOf(mid);
-    const newSele = miData[index].selectedSkills;
     miData[index].selectedSkills.push(newN);
-    miData[index].selectedSkills = newSele;
+    miData = miData;
     mi.set(miData);
   }
 
   function addnewrole(event) {
-    const newOb = event.detail.skob;
-    const newN = event.detail.skob.attributes.roleDescription;
+    const newOb = event.skob;
+    const newN = event.skob.attributes.roleDescription;
     const newValues = roles;
     newValues.push(newOb);
     roles = newValues;
-    const mid = event.detail.mid;
+    const mid = event.mid;
     const y = miData.map((c) => c.id);
     const index = y.indexOf(mid);
-    const newSele = miData[index].selectedRoles;
     miData[index].selectedRoles.push(newN);
-    miData[index].selectedRoles = newSele;
+    miData = miData;
   }
   //תהיה חזק,רגוע ושמח
   //add new workway option
@@ -747,16 +736,16 @@
 
     //workways1.set(find_workway_id(selected));
   }
-  $: searchText = ``;
+  let searchText = $state(``);
 
-  let isOpen = false;
+  let isOpen = $state(false);
   const closer = () => {
     isOpen = false;
   };
-  $: addn = {
+  let addn = $derived({
     he: `יצירת והוספת: "${searchText}"`,
     en: `Create "${searchText}"`
-  };
+  });
   const perho = {"he":"לשעה","en":"per hour"}
         const hourss = {"he":"שעות","en":"hours"}
         const monhly = {"he":"בחודש", "en": "per month"}
@@ -769,7 +758,7 @@
     he: 'עריכת סידור המשמרות',
     en: 'edit shifts'
   };
-  let days = [
+  let days = $state([
     {
       name: {
         he: 'ראשון',
@@ -883,7 +872,7 @@
       shiftp: 0,
       shifts: []
     }
-  ];
+  ]);
   const headingd = {
     he: 'יום בשבוע',
     en: 'week day'
@@ -954,12 +943,12 @@
   };
   const nama = { he: 'שם', en: 'name' };
   const des = { he: 'תיאור', en: 'decription' };
-  let shift = [
+  let shift = $state([
     {
       ii: 1
     }
-  ];
-  let shifts = 1;
+  ]);
+  let shifts = $state(1);
 
   function shifterr(o) {
     //todo reduce and adding 2 together, not to mention v a l i d a t i o n
@@ -1030,29 +1019,29 @@
   import LinkToIcon from '$lib/celim/icons/linkToIcon.svelte';
   import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
-  import { page } from '$app/stores';
-  let error = false, success = false, loading = false  
+  import { page } from '$app/state';
+  let error = $state(false), success = $state(false), loading = $state(false)  
   const tri = tr;
-  let wid = 0
+  let wid = $state(0)
   //TODO: כמות לכל משימה עד אינסוף
-  let dialog = 1;
-  let misid = 0;
-  let itemid = 0;
-  let editdata = -1;
+  let dialog = $state(1);
+  let misid = $state(0);
+  let itemid = $state(0);
+  let editdata = $state(-1);
   function hover(){
 
   }
-  let dateE = false;
-  let descripE = false;
-  let missionNameE = false;
-  let valphE = false;
-  let ske = false;
-  let roleE = false;
-  let wwe = false;
-  let assignE = false;
-  let shiftE = false;
-  let publinkE = false;
-  let mislinkE = false;
+  let dateE = $state(false);
+  let descripE = $state(false);
+  let missionNameE = $state(false);
+  let valphE = $state(false);
+  let ske = $state(false);
+  let roleE = $state(false);
+  let wwe = $state(false);
+  let assignE = $state(false);
+  let shiftE = $state(false);
+  let publinkE = $state(false);
+  let mislinkE = $state(false);
   function disout (){
 
   }
@@ -1075,7 +1064,7 @@
         >
           <button
             class=" hover:bg-barbi text-mturk rounded-full"
-            on:click={closer}
+            onclick={closer}
             ><Close />
           </button>
           <table
@@ -1088,13 +1077,15 @@
                 {editsi[$lang]}
               </h1>
             </caption>
+            <thead>
             <tr class="gg">
               <th class="gg ddd">{headingd[$lang]}</th>
               {#each days as day}
                 <td class="gg" style="font-size: 1rem">{day.name[$lang]}</td>
               {/each}
             </tr>
-
+            </thead>
+            <tbody>
             <tr>
               <th class="ddd">{headinga[$lang]}</th>
               {#each days as day}
@@ -1127,7 +1118,7 @@
                     <input
                       type="number"
                       id={`shif${i}`}
-                      on:change={() => shifterr(i)}
+                      onchange={() => shifterr(i)}
                       name="parti"
                       bind:value={day.shiftp}
                       class="input"
@@ -1203,8 +1194,9 @@
                   {/if}
                 {/each}
               </tr>
-              <hr />
+              
             {/each}
+            </tbody>
           </table>
         </div>
       {:else if dialog === 2}
@@ -1212,10 +1204,10 @@
           {misid}
           fromMis={true}
           {editdata}
-          on:add={(e) => {
-            const data = e.detail.data;
-            const id = e.detail.id;
-            const isEdit = e.detail.isEdit;
+          onAdd={(e) => {
+            const data = e.data;
+            const id = e.id;
+            const isEdit = e.isEdit;
             console.log(isEdit);
             if (!miData[0].checklist) {
               miData[0].checklist = [];
@@ -1239,7 +1231,7 @@
             tasks={itemid != -1
               ? [miData[misid].checklist[itemid]]
               : miData[misid].checklist}
-            on:add={() => (dialog = 2)}
+            onAdd={() => (dialog = 2)}
           />
         </div>
       {/if}
@@ -1259,15 +1251,15 @@
             <div class="px-2">
                 {#if missionNameE == false}
             <h2 class="text-barbi text-{$lang == "en" ? 'left' : 'right'}  font-bold text-xl lg:text-4xl underline "
-            >{miData[0].missionName}<button on:click={() => (missionNameE = true)}><EditIcon/></button></h2>
+            >{miData[0].missionName}<button onclick={() => (missionNameE = true)}><EditIcon/></button></h2>
                 {:else}
-                <TextInput bind:text={miData[0].missionName}/><button on:click={() => (missionNameE = false)}><Done/></button>
+                <TextInput bind:text={miData[0].missionName}/><button onclick={() => (missionNameE = false)}><Done/></button>
                 {/if}
           {#if gloading == false}
             <h3 class="text-barbi  
             text-{$lang == "en" ? 'left' : 'right'} 
             font-bold text-lg lg:text-2xl underline "><mark>{tri?.common?.description[$lang]}:</mark><button 
-            on:click={() => (descripE = !descripE)}>{#if descripE}<Done/>{:else}<EditIcon/>{/if}</button></h3>
+            onclick={() => (descripE = !descripE)}>{#if descripE}<Done/>{:else}<EditIcon/>{/if}</button></h3>
             {#if descripE}
             <RichText bind:outpot={miData[0].descrip}  />
             {:else if miData[0].descrip}
@@ -1288,7 +1280,7 @@
                     src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
                     alt="howmuch"
                   />
-                  <Daterange on:edit={()=> dateE = true} on:editStop={()=> dateE = false} dir="{$lang == 'he' ? 'rtl' : 'ltr'}" bind:start={miData[0].date} bind:finnish={miData[0].dates} />
+                  <Daterange onEdit={()=> dateE = true} onEditStop={()=> dateE = false} dir="{$lang == 'he' ? 'rtl' : 'ltr'}" bind:start={miData[0].date} bind:finnish={miData[0].dates} />
                   </p>
      <div class="md:text-xl text-lg md:flex-row {valphE ?  "flex-col" : ''} justify-start text-gray-100 flex items-center space-x-2 lg:text-2xl m-5">
        
@@ -1316,7 +1308,7 @@
             <Chooser bind:checked={miData[0].iskvua} tr={iskvu} fl={iskvuFl}/></span>
             {/if}
           <button
-          on:click={() => (valphE = !valphE)} 
+          onclick={() => (valphE = !valphE)} 
          > {#if valphE}<Done/>{:else}<EditIcon/>{/if}</button>
 
                 </div>
@@ -1335,7 +1327,7 @@
                                   <h2 class="md:text-xl p-1">{datai.shem}</h2>
                                   <button
                                     class="bg-gold p-0.5 m-0.5 rounded text-barb"
-                                    on:click={() => {
+                                    onclick={() => {
                                       dialog = 3;
                                       misid = miData[0].id;
                                       itemid = t;
@@ -1347,7 +1339,7 @@
                                   >
         
                                   <button
-                                    on:click={() => {
+                                    onclick={() => {
                                       dialog = 2;
                                       misid = miData[0].id;
                                       itemid = t;
@@ -1357,7 +1349,7 @@
                                     class="bg-gold p-0.5 m-0.5 rounded">🖍️</button
                                   >
                                   <button
-                                    on:click={() => {
+                                    onclick={() => {
                                       miData[0].checklist.splice(t, 1);
                                       miData = miData;
                                     }}
@@ -1369,7 +1361,7 @@
                           </ul>
         
                           <button
-                            on:click={() => {
+                            onclick={() => {
                               dialog = 3;
                               misid = miData[0].id;
                               itemid = -1;
@@ -1383,9 +1375,11 @@
                         {/if}
                         <button
                           title=" {tri?.mission?.checklistadd[$lang]}"
-                          on:click={() => {
+                          onclick={() => {
                             dialog = 2;
                             misid = miData[0].id;
+                            editdata = -1;
+                            itemid = -1;
                             isOpen = true;
                           }}><Plus /></button
                         >
@@ -1394,7 +1388,7 @@
                 </div>
                 <div class='my-2'>
                     <mark class="text-barbi  text-sm lg:text-2xl">{requireSkills[$lang]}</mark>
-    <button on:click={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
+    <button onclick={() => (ske = !ske)}>{#if ske}<Done/>{:else}<EditIcon/>{/if}</button>
     {#if !ske}
     {#if miData[0].selectedSkills.length > 0}
 
@@ -1406,13 +1400,16 @@
         </div>
         {/if}
         {:else}
-        {#if $page.data.isDesktop}
+        {#if page.data.isDesktop}
         <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
         <MultiSelect
+        outerDivClass="!bg-gold !text-barbi"
+        inputClass="!bg-gold !text-barbi"
+        liSelectedClass="!bg-barbi !text-gold"
         --sms-open-z-index={10000}
         loading={newcontent}
-        on:change={() => mi.set(miData)}
+        onchange={() => (miData = miData)}
         bind:selected={miData[0].selectedSkills}
         placeholder={placeholder1[$lang]}
         options={$skil.map((c) => c.attributes.skillName)}
@@ -1421,19 +1418,22 @@
       <AddNewSkill
         color={'--barbi-pink'}
         mid={miData[0].id}
-        on:addnewskill={addnew}
+        onAddnewskill={addnew}
         {addS}
         roles1={roles}
       />
                 </div>
                 {:else}
-                <MobileModal on:close={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
+                <MobileModal onClose={()=> ske = false} bind:isOpen={ske} title="{placeholder1[$lang]}">
                   <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                     <MultiSelect
+                    outerDivClass="!bg-gold !text-barbi"
+                    inputClass="!bg-gold !text-barbi"
+                    liSelectedClass="!bg-barbi !text-gold"
                     --sms-open-z-index={10000}
                     loading={newcontent}
-                    on:change={() => mi.set(miData)}
+                    onchange={() => (miData = miData)}
                     bind:selected={miData[0].selectedSkills}
                     placeholder={placeholder1[$lang]}
                     options={$skil.map((c) => c.attributes.skillName)}
@@ -1442,11 +1442,11 @@
                   <AddNewSkill
                     color={'--barbi-pink'}
                     mid={miData[0].id}
-                    on:addnewskill={addnew}
+                    onAddnewskill={addnew}
                     {addS}
                     roles1={roles}
                   />
-                  <button on:click={()=> ske = false}><Done/></button>
+                  <button onclick={()=> ske = false}><Done/></button>
                             </div>
                 </MobileModal>
       {/if}
@@ -1454,53 +1454,59 @@
     </div>   
     <div class='my-2'>
         <mark class="text-sm text-barbi lg:text-2xl">{requiredRoles[$lang]}</mark>
-                <button on:click={() => (roleE = !roleE)}>{#if roleE}<Done/>{:else}<EditIcon/>{/if}</button>
+                <button onclick={() => (roleE = !roleE)}>{#if roleE}<Done/>{:else}<EditIcon/>{/if}</button>
                     {#if !roleE}
                 {#if miData[0].selectedRoles.length > 0}  
 
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle d  cd p-2">
                     {#each miData[0].selectedRoles as rol}
-                    <p on:mouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+                    <p onmouseenter={()=>hover({"he":"תפקיד מבוקש", "en":"requested role"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
     <Tile sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol} wow={true}/></p>
         {/each}
       </div>
       {/if}
       {:else}
-      {#if $page.data.isDesktop}
+      {#if page.data.isDesktop}
       <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
       --sms-open-z-index={10000}
       loading={newcontentR}
       bind:selected={miData[0].selectedRoles}
-      on:change={() => mi.set(miData)}
-      on:add={(event) => console.log(event)}
+      onchange={() => (miData = miData)}
+      onadd={(event) => console.log(event)}
       placeholder={placeholder5[$lang]}
       options={$role.map((c) => c.attributes.roleDescription)}
     />
     <Addnewro
       color={'--barbi-pink'}
       mid={miData[0].id}
-      on:addnewrole={addnewrole}
+      onAddnewrole={addnewrole}
     />
     </div>
   {:else}
-  <MobileModal on:close={()=> roleE = false} bind:isOpen={roleE} title="{placeholder5[$lang]}">
+  <MobileModal onClose={()=> roleE = false} bind:isOpen={roleE} title="{placeholder5[$lang]}">
     <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
+      outerDivClass="!bg-gold !text-barbi"
+      inputClass="!bg-gold !text-barbi"
+      liSelectedClass="!bg-barbi !text-gold"
       --sms-open-z-index={10000}
       loading={newcontentR}
       bind:selected={miData[0].selectedRoles}
-      on:change={() => mi.set(miData)}
-      on:add={(event) => console.log(event)}
+      onchange={() => (miData = miData)}
+      onadd={(event) => console.log(event)}
       placeholder={placeholder5[$lang]}
       options={$role.map((c) => c.attributes.roleDescription)}
     />
     <Addnewro
       color={'--barbi-pink'}
       mid={miData[0].id}
-      on:addnewrole={addnewrole}
+      onAddnewrole={addnewrole}
     />
-    <button on:click={()=> roleE = false}><Done/></button>
+    <button onclick={()=> roleE = false}><Done/></button>
     </div>
   </MobileModal>
   {/if}
@@ -1508,22 +1514,25 @@
     </div>
     <div class='my-2'>
         <mark class="text-sm lg:text-2xl text-barbi">{requiredWW[$lang]}</mark>
-        <button on:click={() => (wwe = !wwe)}>{#if wwe}<Done/>{:else}<EditIcon/>{/if}</button>
+        <button onclick={() => (wwe = !wwe)}>{#if wwe}<Done/>{:else}<EditIcon/>{/if}</button>
         {#if !wwe}
         {#if miData[0].selectedWorkways.length > 0}
 
       <div class="border border-gold flex sm:flex-row flex-wrap lg:p-4 justify-center align-middle d cd p-2 ">
           {#each miData[0].selectedWorkways as rol}
-          <p on:mouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} on:mouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
+          <p onmouseenter={()=>hover({"he":"דרכי עבודה מבוקשות","en":"ways of work for the mission"})} onmouseleave={()=>hover("0")} class="m-0" style="text-shadow:none;" >
               <Tile bg="gold" sm={wid > 555 ? true : false} big={wid > 555 ? true : false}  word={rol}/>
           </p>
           {/each}
           </div>
           {/if}
           {:else}
-          {#if $page.data.isDesktop}
+          {#if page.data.isDesktop}
           <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
             <MultiSelect
+              outerDivClass="!bg-gold !text-barbi"
+              inputClass="!bg-gold !text-barbi"
+              liSelectedClass="!bg-barbi !text-gold"
               --sms-open-z-index={10000}
                 createOptionMsg={addn[$lang]}
                 allowUserOptions={true}
@@ -1532,17 +1541,20 @@
                 bind:selected={miData[0].selectedWorkways}
                 placeholder={placeholder[$lang]}
                 options={$ww.map((c) => c.attributes.workWayName)}
-                on:change={(e) => {
+                onchange={(e) => {
                   addW(miData[0].selectedWorkways, miData[0].id, e);
                 }}
               />
               </div>
              
               {:else}
-              <MobileModal on:close={()=> wwe = false} bind:isOpen={wwe} title="{placeholder[$lang]}">
+              <MobileModal onClose={()=> wwe = false} bind:isOpen={wwe} title="{placeholder[$lang]}">
                 <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
                   <MultiSelect
+                  outerDivClass="!bg-gold !text-barbi"
+                  inputClass="!bg-gold !text-barbi"
+                  liSelectedClass="!bg-barbi !text-gold"
                   --sms-open-z-index={10000}
                     createOptionMsg={addn[$lang]}
                     allowUserOptions={true}
@@ -1551,11 +1563,11 @@
                     bind:selected={miData[0].selectedWorkways}
                     placeholder={placeholder[$lang]}
                     options={$ww.map((c) => c.attributes.workWayName)}
-                    on:change={(e) => {
+                    onchange={(e) => {
                       addW(miData[0].selectedWorkways, miData[0].id, e);
                     }}
                   />
-                  <button on:click={()=> wwe = false}><Done/></button>
+                  <button onclick={()=> wwe = false}><Done/></button>
                   </div>
                   </MobileModal>
                   {/if}
@@ -1569,12 +1581,15 @@
                 $lang
               ]}</p>
             <MultiSelect
+            outerDivClass="!bg-gold !text-barbi"
+            inputClass="!bg-gold !text-barbi"
+            liSelectedClass="!bg-barbi !text-gold"
             --sms-open-z-index={10000}
             bind:selected={miData[0].rishoni}
             placeholder={pll[$lang]}
             options={pu.map((c) => c.attributes.username)}
             maxSelect={1}
-            on:change={function () {
+            onchange={function () {
               miData[0].rishon = find_user_id(miData[0].rishoni);
               miData[0].myM = true;
             }}
@@ -1584,12 +1599,12 @@
           <p>{tri?.mission?.assingHelp[$lang]}</p>
           <input
               bind:checked={miData[0].myM}
-              type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> miData[0].rishon == idL}>
+              type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> miData[0].rishon == idL}>
           <label for="tome">{tri?.mission?.assingToMe[$lang]}</label>
           {/if}
           <button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
             $lang
-          ]}" on:click={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+          ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
         ><Done/></button>
           {/if}
         </div>
@@ -1597,7 +1612,7 @@
             {#if publinkE}
             <mark>{tri?.mission?.publicLinks[$lang]}</mark>
             <TextInput bind:text={miData[0].publicklinks} lebel={tri?.mission?.publicLinks}/>
-            <button on:click={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title='{tri?.mission?.publicLinks[$lang]}'><Done/></button>
             {/if}
         </div>
@@ -1605,7 +1620,7 @@
             {#if mislinkE}
             <mark>{tri?.mission?.linkToMission[$lang]}</mark>
             <TextInput bind:text={miData[0].privatlinks} lebel={tri?.mission?.linkToMission}/>
-            <button on:click={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title="{tri?.mission?.linkToMission[$lang]}"><Done/></button >
             {/if}
         </div>
@@ -1618,32 +1633,32 @@
             id="isss"
             name="is"
             value="no"
-            on:change={() => shifter(miData[0].isshif)}
+            onchange={() => shifter(miData[0].isshif)}
           />
           <label for="isss"><mark>{isshi[$lang]}</mark></label>
           {#if miData[0].isshif == true}
-            <button on:click={() => shifter(miData[0].isshif)}
+            <button onclick={() => shifter(miData[0].isshif)}
                 >{editsi[$lang]}</button
               >
             {/if}
-            <button on:click={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title="{isshi[$lang]}"><Done/></button>
             {/if}
         </div>
         <div class="flex flex-row items-center justify-start my-4 space-x-3"	>
-           {#if !publinkE} <button on:click={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+           {#if !publinkE} <button onclick={() => (publinkE = !publinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                 title='{tri?.mission?.publicLinks[$lang]}'><LinkIcon/></button>{/if}
             {#if !assignE}<button title="{tri?.mission?.assingTo[$lang] + ' ' + tri?.mission?.assingHelp[
                 $lang
-              ]}" on:click={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+              ]}" onclick={() => (assignE = !assignE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
             ><AddPerson/></button>{/if}
-            {#if !mislinkE}<button on:click={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+            {#if !mislinkE}<button onclick={() => (mislinkE = !mislinkE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                title="{tri?.mission?.linkToMission[$lang]}"><LinkToIcon/></button >{/if}
-               {#if !shiftE} <button on:click={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
+               {#if !shiftE} <button onclick={() => (shiftE = !shiftE)} class="w-5 h-5 hover:scale-125 text-mturk rounded-full"
                title="{isshi[$lang]}"><ShiftsIcon/></button>{/if}
         </div>
         <div class="align-self-end justify-items-end">
-            <Button text={acti} on:click={increment} {loading} {success} {error}/>
+            <Button text={acti} onClick={increment} {loading} {success} {error}/>
        </div>
         </div>
           </div>
@@ -1678,7 +1693,7 @@
       <td>
         <input 
         bind:checked={data.done} 
-        type="checkbox" id="done" name="done" value="done" on:click={()=> myMissionH()}>
+        type="checkbox" id="done" name="done" value="done" onclick={()=> myMissionH()}>
         <label for="done">ביצעתי כבר את המשימה</label>
       </td>
       {/each}
@@ -1825,17 +1840,6 @@
     text-align: center;
     color: var(--barbi-pink);
     margin: 0 auto;
-  }
-
-  :global(li:not(.selected):hover) {
-    color: var(--barbi-pink);
-    background-color: var(--lturk);
-    /* unselected but hovered options in the dropdown list */
-  }
-
-  :global(ul.tokens > li) {
-    background-color: var(--barbi-pink);
-    color: var(--lturk);
   }
 
   th {

@@ -1,39 +1,67 @@
 <script>
-    export let src = '';
-    export let pname = '';
-    export let mname = '';
-    export let type = '';
-    export let isOpen = false;
-    export let isPend = false;
-    export let isPending = false;
-    export let isCurrentUser = false;
-    export let isValidator = false;
-    export let isAssigned = false;
-    export let roles = [];
-    export let onApprove = () => {};
-    export let onValidate = () => {};
-    export let progress = 0;
-    export let isApproved = false;
-    export let naasa = false;
-    export let pendingValidation = false;
-    export let isCompleted = false;
-  import Tile from "$lib/celim/tile.svelte";
+ import Tile from "$lib/celim/tile.svelte";
   import Button from "$lib/celim/ui/button.svelte";
   import { sendToSer } from "$lib/send/sendToSer.js";
   import {lang} from '$lib/stores/lang';
   import { toast } from 'svelte-sonner';
-    export let id;
-  export let text = {"he":"אני אבצע", "en":"assign to me"};
   const pending = { he: 'ממתין לאישור', en: 'Pending Approval' };
   const pendingVal = { he: 'ממתין לאישרור', en: 'Pending Validation' };
   const completed = { he: 'הושלם בהצלחה', en: 'Completed Successfully' };
   const approve = { he: 'אישור', en: 'Approve' };
   const validate = { he: 'אישור ביצוע', en: 'Validate Completion' };
   const availableRoles = { he: 'תפקידים זמינים:', en: 'Available Roles:' };
-  export let onClick = () => {};
-  let loading = false, success = false, error = false;
+  /**
+   * @typedef {Object} Props
+   * @property {string} [src]
+   * @property {string} [pname]
+   * @property {string} [mname]
+   * @property {string} [type]
+   * @property {boolean} [isOpen]
+   * @property {boolean} [isPend]
+   * @property {boolean} [isPending]
+   * @property {boolean} [isCurrentUser]
+   * @property {boolean} [isValidator]
+   * @property {boolean} [isAssigned]
+   * @property {any} [roles]
+   * @property {any} [onApprove]
+   * @property {any} [onValidate]
+   * @property {number} [progress]
+   * @property {boolean} [isApproved]
+   * @property {boolean} [naasa]
+   * @property {boolean} [pendingValidation]
+   * @property {boolean} [isCompleted]
+   * @property {any} id
+   * @property {any} [text]
+   * @property {any} [onClick]
+   */
+
+  /** @type {Props} */
+  let {
+    src = '',
+    pname = '',
+    mname = '',
+    type = '',
+    isOpen = false,
+    isPend = false,
+    isPending = $bindable(false),
+    isCurrentUser = false,
+    isValidator = false,
+    isAssigned = false,
+    roles = [],
+    onApprove = () => {},
+    onValidate = () => {},
+    progress = 0,
+    isApproved = false,
+    naasa = false,
+    pendingValidation = $bindable(false),
+    isCompleted = false,
+    id,
+    text = {"he":"אני אבצע", "en":"assign to me"},
+    onClick = () => {}
+  } = $props();
+  let loading = $state(false), success = $state(false), error = $state(false);
   const suc = { he: 'בוצע בהצלחה', en: 'Success' };
-    $: console.log(roles,"roles")
+
  async function handleApprove() {
     loading = true;
     await sendToSer(
@@ -100,14 +128,14 @@
     onValidate();
   }
 
-  $: strokeDasharray = 2 * Math.PI * 12; // circumference of circle with r=12
-  $: strokeDashoffset = strokeDasharray * (1 - progress / 100);
+  let strokeDasharray = $derived(2 * Math.PI * 12); // circumference of circle with r=12
+  let strokeDashoffset = $derived(strokeDasharray * (1 - progress / 100));
 </script>
 
 {#if type !== "button"}
 <div class="flex items-center gap-2">
     {#if src}
-        <img src={src} alt={pname} class="w-8 h-8 rounded-full" />
+        <img src={src} alt={pname} class="w-8 h-8 rounded-full" loading="lazy" />
     {/if}
     <div class="flex flex-col text-start">
         <div class="flex items-center gap-2">
@@ -198,7 +226,7 @@
         {#if pendingValidation}
             <span class="text-green-500 text-sm">{pendingVal[$lang]}</span>
             {#if isValidator}
-                <Button  {success} {error} {loading} size="sm" on:click={handleValidate} text={validate} />
+                <Button  {success} {error} {loading} size="sm" onClick={handleValidate} text={validate} />
          
             {/if}
         {/if}
@@ -206,7 +234,7 @@
             <span class="text-green-600 text-sm font-medium">{completed[$lang]}</span>
         {/if}
         {#if isCurrentUser && isPending}
-            <Button {success} {error} {loading} size="sm" on:click={handleApprove} text={approve} />
+            <Button {success} {error} {loading} size="sm" onClick={handleApprove} text={approve} />
               
         {/if}
         {#if mname}
@@ -214,7 +242,7 @@
                 class="text-blue-500 cursor-pointer hover:underline" 
                 role="button"
                 tabindex=0
-                on:click={onClick}
+                onclick={onClick}
             >
                 {mname}
             </span>
@@ -223,11 +251,11 @@
 </div>
     {#if !pname && !mname}
         {#if isOpen}
-        <button on:click={onClick} >
+        <button onclick={onClick} >
         <Tile bg="pink" word={isOpen.name}/>
         </button>
         {:else if isPend}
-        <button on:click={onClick} >
+        <button onclick={onClick} >
         <Tile bg="gold" word={isPend.name}/>
         </button>
         {/if}
@@ -235,7 +263,7 @@
 {:else if type === "button"}
 {#if !isAssigned && roles.length == 0}
 
-    <Button variant="primary" size="sm" on:click {text} />
+    <Button variant="primary" size="sm" onClick {text} />
        
 {:else if !isAssigned && roles.length > 0}
     <div class="flex flex-col gap-1">
@@ -244,7 +272,7 @@
                 <span class="text-sm bg-blue-100 text-blue-800 px-2 py-0.5 rounded">{role}</span>
             {/each}
         </div>
-        <Button variant="primary" size="sm" on:click text={text} />
+        <Button variant="primary" size="sm" onClick={onClick} text={text} />
     </div>
     {/if}
 {/if}

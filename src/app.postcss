@@ -208,6 +208,54 @@
 	--sturk: #CCFBF1;
 	--lpink: rgb(251, 207, 232);
 	--mpink: rgb(244, 114, 182);
+  --blu: #04619f;
+--silver: #BBC2CC;
+--stgold: #574010;
+--gra: #BF953F;
+--grb: #FCF6BA;
+--grc: #B38728;
+--grd: #FBF5B7;
+--gre: #AA771c;
+--graa: #ffc857;
+--grbb: #3e2f5b;
+--neww: #49f3df;
+--wow: rgb(2, 255, 187);
+--wow2: rgb(144, 255, 17);
+--blueg: rgb(116, 191, 255);
+--oranges: rgb(254, 172, 49);
+--wowt: rgb(3, 55, 47);
+}
+.business {
+  --gold: #f8fafc;              /* רקע בהיר עדין (במקום זהב בהיר) */
+  --barbi-pink: #1e40af;        /* כחול כהה לטקסטים וכותרות */
+  --pinki: #f1f5f9;             /* רקע בהיר מאוד עדין */
+  
+  --blue: #e0f2fe;              /* כחול בהיר עדין לרקעים */
+  --background-without-opacity: rgba(248, 250, 252, 0.7);
+  --column-width: 42rem;
+  --column-margin-top: 4rem;
+  --naim: #f0f9ff;              /* כחול בהיר מאוד לרקעים */
+  --lturk: #0ea5e9;             /* כחול בהיר לאלמנטים */
+  --mturk: #0284c7;             /* כחול בינוני לאלמנטים */
+  --sturk: #f0f9ff;             /* כחול בהיר מאוד לרקעים */
+  --lpink: #e2e8f0;             /* אפור בהיר לרקעים עדינים */
+  --mpink: #475569;             /* אפור כהה לטקסטים משניים */
+--blu: #1e40af;              /* כחול כהה מקצועי */
+--silver: #e5e7eb;           /* אפור כסף בהיר */
+--stgold: #374151;           /* אפור כהה (במקום זהב כהה) */
+--gra: #6b7280;              /* אפור בינוני */
+--grb: #f9fafb;              /* אפור בהיר מאוד */
+--grc: #4b5563;              /* אפור כהה בינוני */
+--grd: #f3f4f6;              /* אפור בהיר */
+--gre: #374151;              /* אפור כהה */
+--graa: #059669;             /* ירוק עסקי */
+--grbb: #1f2937;             /* אפור כהה מאוד */
+--neww: #06b6d4;             /* כחול-ירוק מקצועי */
+--wow: #10b981;              /* ירוק בהיר */
+--wow2: #84cc16;             /* ירוק חכם */
+--blueg: #3b82f6;            /* כחול בהיר */
+--oranges: #f59e0b;          /* כתום מקצועי */
+--wowt: #064e3b;             /* ירוק כהה מאוד */
 }
 h1, h2 , button{
 	font-family: 'Sababa','Gan','Powerr' ;
@@ -425,6 +473,47 @@ label, input , p, div ,span{
     #ffde45 84%,
     #452100
   );
+}
+.business .button-gold {
+  color: rgba(30, 41, 59, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(71, 85, 105, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(71, 85, 105, 0.1)
+  ;
+  border: 1px solid #cbd5e1;
+  background:
+    linear-gradient(
+      -72deg,
+      #f8fafc,
+      #ffffff 20%,
+      #f1f5f9 35%,
+      #ffffff 50%,
+      #e2e8f0 65%,
+      #ffffff 80%,
+      #f8fafc
+    );
+  transition: all 0.2s ease;
+}
+
+.business .button-gold:hover {
+  box-shadow:
+    0 4px 12px rgba(71, 85, 105, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(71, 85, 105, 0.15)
+  ;
+  transform: translateY(-1px);
+}
+
+.business .button-gold:active {
+  box-shadow:
+    0 1px 4px rgba(71, 85, 105, 0.2),
+    inset 0 2px 4px rgba(71, 85, 105, 0.1)
+  ;
+  transform: translateY(0);
 }
 .button-silver {
   color: rgba(0, 0, 0, 0.5);
@@ -736,7 +825,7 @@ label, input , p, div ,span{
   color: rgba(82, 82, 34, 0.72);
   text-decoration: none;
   font-weight: bold;
-  text-shadow: 1px 1px 0 #ffdeca;
+ /* text-shadow: 1px 1px 0 #ffdeca;*/
   box-shadow:
     2px 2px 0.5em rgba(155, 122, 89, 0.55),
     inset 1px 1px 0 rgba(255, 255, 255, 0.9),
@@ -970,7 +1059,175 @@ label, input , p, div ,span{
     #dea1ca
   );
 }
+.business .button-silver {
+  color: rgba(30, 41, 59, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 2px 8px rgba(71, 85, 105, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(71, 85, 105, 0.1)
+  ;
+  border: 1px solid #cbd5e1;
+  background:
+    linear-gradient(
+      -72deg,
+      #e2e8f0,
+      #ffffff 20%,
+      #f1f5f9 35%,
+      #ffffff 50%,
+      #e2e8f0 65%,
+      #ffffff 80%,
+      #f8fafc
+    );
+}
 
+.business .button-bronze {
+  color: rgba(30, 41, 59, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(71, 85, 105, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(71, 85, 105, 0.1)
+  ;
+  border: 1px solid #94a3b8;
+  background:
+    linear-gradient(
+      -72deg,
+      #94a3b8,
+      #f8fafc 20%,
+      #cbd5e1 35%,
+      #f8fafc 50%,
+      #64748b 65%,
+      #f8fafc 80%,
+      #475569
+    );
+}
+
+.business .button-platinum {
+  color: rgba(30, 41, 59, 0.9);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.9);
+  box-shadow:
+    0 2px 8px rgba(71, 85, 105, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(71, 85, 105, 0.1)
+  ;
+  border: 1px solid #d1d5db;
+  background:
+    linear-gradient(
+      -72deg,
+      #f3f4f6,
+      #ffffff 20%,
+      #f9fafb 35%,
+      #ffffff 50%,
+      #6b7280 65%,
+      #ffffff 80%,
+      #374151
+    );
+}
+
+.business .button-pinkgold {
+  color: rgba(30, 41, 59, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(59, 130, 246, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(59, 130, 246, 0.1)
+  ;
+  border: 1px solid #93c5fd;
+  background:
+    linear-gradient(
+      -72deg,
+      #dbeafe,
+      #ffffff 20%,
+      #bfdbfe 35%,
+      #ffffff 50%,
+      #3b82f6 65%,
+      #ffffff 80%,
+      #1d4ed8
+    );
+}
+
+.business .button-whitegold {
+  color: rgba(30, 41, 59, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(16, 185, 129, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(16, 185, 129, 0.1)
+  ;
+  border: 1px solid #6ee7b7;
+  background:
+    linear-gradient(
+      -72deg,
+      #d1fae5,
+      #ffffff 20%,
+      #a7f3d0 35%,
+      #ffffff 50%,
+      #10b981 65%,
+      #ffffff 80%,
+      #047857
+    );
+}
+
+.business .button-yellowgold {
+  color: rgba(30, 41, 59, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(6, 182, 212, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(6, 182, 212, 0.1)
+  ;
+  border: 1px solid #67e8f9;
+  background:
+    linear-gradient(
+      -72deg,
+      #cffafe,
+      #ffffff 20%,
+      #a5f3fc 35%,
+      #ffffff 50%,
+      #06b6d4 65%,
+      #ffffff 80%,
+      #0891b2
+    );
+}
+
+.business .button-perl {
+  color: rgba(30, 41, 59, 0.8);
+  text-decoration: none;
+  font-weight: 600;
+  text-shadow: 0 1px 0 rgba(255, 255, 255, 0.8);
+  box-shadow:
+    0 2px 8px rgba(71, 85, 105, 0.15),
+    inset 0 1px 0 rgba(255, 255, 255, 0.9),
+    inset 0 -1px 0 rgba(71, 85, 105, 0.1)
+  ;
+  border: 1px solid #cbd5e1;
+  background:
+    linear-gradient(
+      -72deg,
+      #f1f5f9,
+      #ffffff 20%,
+      #e2e8f0 25%,
+      #ffffff 30%,
+      #64748b 40%,
+      #94a3b8 50%,
+      #f1f5f9 65%,
+      #ffffff 80%,
+      #475569
+    );
+}
    .ec-header, .ec-all-day, .ec-body, .ec-days, .ec-day{
             border: 1px solid #04553f;
     }

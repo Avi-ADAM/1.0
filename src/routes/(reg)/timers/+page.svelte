@@ -1,20 +1,21 @@
 <script>
-	// +page.svelte
 	import { onMount } from 'svelte';
-	import { page } from '$app/stores';
-    import { fetchTimers , timers} from '$lib/stores/timers'
+	import { page } from '$app/state';
+    import { fetchTimers , initialWebSocketForTimer, timers} from '$lib/stores/timers'
     import Timer from '$lib/components/timers/timer.svelte'
 	let hoverText = '0';
-	let tx = 200;
-	$: if ($timers.length > 10) {
-		tx = (400 / $timers.length) * 3.6;
-	}
+	let tx = $state(200);
+	$effect(() => {
+        if ($timers.length > 10) {
+    		tx = (400 / $timers.length) * 3.6;
+    	}
+    });
 
 	//let center = { x: w / 2, y: h / 2 }; // No longer the overall center, see below
-	let size = 150;  // Reduced size, to make room for rotation and spacing.
-	let bigsize = 160; // Increased bigsize for clarity.
-	let add = size/2 + 10 ; //  spacing.  CRUCIAL.
-	let tiltAngle = 59; // Rotation angle in degrees
+	let size = $state(150);  // Reduced size, to make room for rotation and spacing.
+	let bigsize = $state(160); // Increased bigsize for clarity.
+	let add = $derived(size/2 + 10) ; //  spacing.  CRUCIAL.
+	let tiltAngle = $state(59); // Rotation angle in degrees
 
 	// Function to format time (you'll likely have this already)
     function getTimeComponents(milliseconds) {
@@ -27,11 +28,11 @@
             seconds: totalSeconds % 60
         };
     }
-    let newState = false;
+    let newState = $state(false);
     // Function to fetch timer data
 	
     onMount(async () => {
-		const res = await fetchTimers($page.data.uid,fetch).then((x) => {
+		const res = await fetchTimers(page.data.uid,fetch).then((x) => {
             newState = true;
             
             // עדכון מידות
@@ -46,6 +47,9 @@
                 centerViewOnLoad();
             });
         });
+        // Call initialWebSocketForTimer without the token, as it will be handled server-side
+        // Assuming page.data.uid is the 'id' needed for the socket connection
+        initialWebSocketForTimer(page.data.uid,page.data.tok,fetch);
 	});
 
 	function project() {}
@@ -55,24 +59,29 @@
 	}
 	// Calculate the center position *once*, based on bigsize.  This is now the
     // center of the *large* timer, NOT the center of the entire container.
-    let center = { x: bigsize / 2, y: bigsize / 2 };
+    let center = $derived({ x: bigsize / 2, y: bigsize / 2 });
 
-    $: w = 1200; // הגדלת רוחב אזור הטיימרים
-    $: h = 1200; // הגדלת גובה אזור הטיימרים
-    $: ow = 500;
-    $: oh = 500;
-    $: maxW = 100;
-    $: maxH = 100;
-    $: top = 0;
-    $: left = 0;
+    let w = $state(1200);
+     // הגדלת רוחב אזור הטיימרים
+    let h = $state(1200);
+     // הגדלת גובה אזור הטיימרים
+    let ow = $state(500);
     
+    let oh = $state(500);
+ 
     // Adjust sizes based on screen width
-    $: size = ow > 550 ? 120 : 115;
-    $: bigsize = ow > 550 ? 145 : 100;
-    $: add = ow > 550 ? 70 : 70;
+    $effect(() => {
+        size = ow > 550 ? 160 : 115;
+    });
+    $effect(() => {
+        bigsize = ow > 550 ? 185 : 100;
+    });
+    $effect(() => {
+        add = ow > 550 ? 70 : 70;
+    });
     
     // חישוב אוטומטי של גודל אזור התצוגה לפי מספר הטיימרים
-    $: {
+    $effect(() => {
         if ($timers.length > 50) {
             w = 2500;
             h = 2500;
@@ -86,7 +95,7 @@
             w = 1200;
             h = 1200;
         }
-    }
+    });
 
     function checkLine(i) {
         // Center timer remains unchanged.
@@ -156,7 +165,10 @@
         return c;
     }
 
-    $: orders = checkLines($timers);
+    let orders = $state({});
+    $effect(() => {
+        orders = checkLines($timers);
+    });
 
     // פונקציה נפרדת למירכוז התצוגה - מאפשרת קריאה חוזרת אם צריך
     function centerViewOnLoad() {
@@ -217,11 +229,11 @@
         orders = checkLines($timers);
     }
 </script>
+{#key $timers}
 
 <div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} 
      style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;" 
      class="timer-container d">
-    
     <div class="center-wrapper">
         <div id="timer-content" dir="ltr" bind:clientWidth={w} bind:clientHeight={h} 
             style="position: relative; width: {w}px; height: {h}px;" 
@@ -240,6 +252,7 @@
                 {hover} 
                 {project} 
                 {linke}
+                hoursAssigned={timer.hoursAssigned}
             />
             {/each}
             
@@ -248,6 +261,7 @@
         </div>
     </div>
 </div>
+{/key}
 
 <style>
     .timer-container {

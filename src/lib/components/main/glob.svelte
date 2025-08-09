@@ -1,19 +1,25 @@
 <script>
     //https://res.cloudinary.com/barb1/image/upload/v1676238523/%D7%A4%D7%AA%D7%A6%D7%95%D7%92%D7%94%D7%9C%D7%95%D7%A4%D7%A4%D7%99%D7%95%D7%9F_kkymez.glb
 	import {  Color } from 'three'
-	import { T, useFrame } from '@threlte/core'
+	import { T, useTask } from '@threlte/core'
 
-    import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 	import {  GLTF } from '@threlte/extras'
 
-  let rotationt = 0
-		let rotX = 0
-  let poz = {z:0, y:0, x:0};
-  let obPoz = {z:0, y:0, x:0}
- let boll = false
- let bool = false
- useFrame(() => {
+/**
+ * @typedef {Object} Props
+ * @property {() => void} [onSubmit] - Callback for when the component submits.
+ */
+
+/** @type {Props} */
+let { onSubmit } = $props();
+
+  let rotationt = $state(0)
+		let rotX = $state(0)
+  let poz = $state({z:0, y:0, x:0});
+  let obPoz = $state({z:0, y:0, x:0})
+ let boll = $state(false)
+ let bool = $state(false)
+ useTask(() => {
 
   if(isHovering == false){
 	rotationt += 0.01
@@ -75,9 +81,9 @@ setInterval(() => {
 //	scene.background = new Color(0xeae8e2)
 function sub (){
     console.log("click")
-    dispatch("submit")
+    onSubmit?.()
 }
-let isHovering = false, isPointerDown = false
+let isHovering = $state(false), isPointerDown = $state(false)
 import Globu from './globu.svelte'
 </script>
 <!----
@@ -107,19 +113,19 @@ color={0x2DFF34} intensity={180} $poz
 <GLTF
 castShadow receiveShadow
 interactive
-on:pointerenter={() => (isHovering = true)}
-on:pointerleave={() => {
+onpointerenter={() => (isHovering = true)}
+onpointerleave={() => {
   isPointerDown = false
   isHovering = false
 
 }}
-on:pointerdown={() => (isPointerDown = true)}
-on:pointerup={() => (isPointerDown = false)}
-on:pointercancel={() => {
+onpointerdown={() => (isPointerDown = true)}
+onpointerup={() => (isPointerDown = false)}
+onpointercancel={() => {
   isPointerDown = false
   isHovering = false
 }}
-on:click={sub}
+onclick={sub}
 rotation={{y: rotationt
 }}
 	position={obPoz}

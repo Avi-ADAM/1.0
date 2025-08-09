@@ -1,5 +1,5 @@
 <script>
-	import { role } from './../prPr/mi.js';
+import { role } from './../prPr/mi.js';
 import TimerDialogs from '../timers/TimerDialogs.svelte';
 import { Drawer } from 'vaul-svelte';
     import {nutifi } from '$lib/func/nutifi.svelte'
@@ -13,7 +13,6 @@ import { Drawer } from 'vaul-svelte';
     import { goto } from '$app/navigation';
     import { idPr } from '../../stores/idPr.js';
     import { onMount, onDestroy } from 'svelte';
-     import { createEventDispatcher } from 'svelte';
      import {betha} from './storess/betha.js'
      import Lowbtn from '$lib/celim/lowbtn.svelte'
      import {SendTo} from '$lib/send/sendTo.svelte';
@@ -22,17 +21,9 @@ import { Drawer } from 'vaul-svelte';
     import { startTimer } from '$lib/func/timers.js';
     import { stopTimer } from '$lib/func/timers.js';
 const baseUrl = import.meta.env.VITE_URL
-let storeTimer;
-let localZman = storeTimer?.zman || 0;
-let isRunning = storeTimer?.running || false;
-$: {
-  storeTimer = $timers?.find((t) => t.mId == mId);
-  if (storeTimer) {
-    console.log("Timer found:", storeTimer);
-  } else {
-    console.log("No timer found for missionId:", mId);
-  }
-}
+let storeTimer = $state();
+let localZman = $derived(storeTimer?.zman || 0);
+let isRunning = $derived(storeTimer?.running || false);
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
@@ -41,55 +32,26 @@ betha.subscribe(value => {
 		tdtd = value;
 	});
 
- const dispatch = createEventDispatcher();
- export let isVisible = false;
- export let coinlapach
-    export let stname;
     let show = true;
-    export let modal = false
-    let dialogOpen = false
-    export let iskvua = false
-        export let low = false;
-        export let status = 0;//tween store
-        export let tasks = []
-        export let restime;
-    export let tx = 680;
-    export let dueDateOrCountToDedline = "11:11"
-    export let projectName = "ONE"
-    export let missionName = "do x" 
-    export let missionDetails = "do x in y"
-    export let hearotMeyuchadot;
-    export let src = "coin.png"
-    export let link = "https://www.1lev1.com"
-    export let linkDescription = "לביצוע"
-    export let projectId;
-    export let linkP = "/project/"
-    export let hourstotal;
-    export let hoursdon = 0;
-    export let mId;
-    export let missId; //add in gr
-    export let noofpu; //addtopr
-    export let pu;
-    export let perhour;
-    export let usernames;
+    let dialogOpen = $state(false)
     let mstotal = hourstotal*3600000
      let idL;
-     let showSaveDialog = false;
-  let showClearDialog = false;
-  let showSaveFinal = false;
-  let dialogEdit = true;
-  let elapsedTime = '00:00:00';
-  let taskSearchTerm = '';
+     let showSaveDialog = $state(false);
+  let showClearDialog = $state(false);
+  let showSaveFinal = $state(false);
+  let dialogEdit = $state(true);
+  let elapsedTime = $state('00:00:00');
+  let taskSearchTerm = $state('');
 
-    let x = 0;
-    let already = false;
-
-$: pcli = 0
-$: pmcli = 0
+    let x = $state(0);
+    let already = $state(false);
+let pcli = $state(0);
+  let pmcli = $state(0);
+  
 function linke (s){
     pcli += 1;
     if(pcli >= 2){
-        dispatch("proj", {id: projectId});
+        onProj?.({id: projectId});
     
   }
 }
@@ -104,13 +66,9 @@ function linke (s){
   };
 let zmani;
 
-  let msdonf;
-  $: msdonf = hoursdon * 3600000;
-  export let zman;
-  export let oldzman;
-  let selectedTasks =  [];
+  let msdonf = $derived(hoursdon * 3600000);
+  let selectedTasks =  $state([]);
 
-$: zman = msdonf + lapse + x;
 let miatan;
 onMount(async () => {
   if (status == null){
@@ -172,25 +130,7 @@ onMount(async () => {
 
   selectedTasks = currentTimer?.attributes?.activeTimer?.data?.attributes?.acts?.data?.map(task => task.id) ?? [];
 })
-
-$: if (percentage(zman,mstotal) == 90){
- let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-          nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
-
-        } else if (percentage(zman,mstotal) == 95){
- let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-          nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
-
-        } 
-$: if (mstotal-zman == 300000){
- let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-         nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
-  }else if (mstotal-zman == 60000){
-          console.log("timer stop min")
- let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
-        nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
-
-        }
+ 
 /** להוסיף פונקציה לבקשת תוספת שעות
  * $: if (percentage(zman,mstotal) >= 100 && running == true){
            azor ()
@@ -199,7 +139,7 @@ $: if (mstotal-zman == 300000){
         }**/
 
   let timer;
-  let running = false;
+  let running = $state(false);
   let error1;
   
 async function azor () {
@@ -455,25 +395,23 @@ async function save() {
             error1 = e
             console.log(error1);
 }}
-    export let lapse = 0;
 
 
-    // lapse refers to the number of milliseconds in the stopwatch
-
-    // rotation refers to the degrees applied to the minutes dial to have a full rotation for 60 seconds
-    // multiply the value by 60 for the seconds dial to have a full rotation every second
-    $: rotation = ((lapse / 1000 / 60) * 360) % 360;
 
     // this is a very imperfect way to have the dials rotate smoothly back to 0
     // set a transition on the minutes and seconds dial, but only when lapse is set to 0
     // remove it when lapse is then more than 0
-    let seconds;
-    let minutes;
+    let seconds = $state();
+    let minutes = $state();
     // to avoid constantly setting transition to none add a boolean to short-circuit the second conditional
     let transitioned;
 
 
 function done() {
+  if (hoursdon == 0 || hoursdon == undefined || hoursdon == null ||$timers.find(t => t.mId === mId)?.attributes?.activeTimer?.data != null) {
+    toast.warning("יש זמן טיימר שלא נשמר. יש לשמור או לאפס לפני הגשה.");
+    return;
+  }
   already = true;
   a = 1
   //file upload in a chlon kofetz and then archived,, future build smart contracts on blockchain
@@ -483,23 +421,23 @@ function opentask(){
   a = 4
   isOpen = true;
 }
-let isOpen = false;
+let isOpen = $state(false);
 function close() {
   isOpen = false;
   already = false;
 }
 let errorM = {ein:"יש להעלות קובץ המכיל את ביצוע המשימה או לתאר במילים",
                timer: " יש לכבות את הטיימר לפני הגשת המשימה לאישור"   };
-let activE;
-let why;
-let what;
+let activE = $state();
+let why = $state();
+let what = $state();
 let tofinished = ``;
 let tofinished1 = ``;
 let tofinished2 = ``;
 let toapprove1 = ``; 
 let toapprove = ``; 
 let appi = ``;
-let butt = false
+let butt = $state(false)
 async function afterwhy () {
  
    butt = true
@@ -657,9 +595,7 @@ ${tofinished}
   })
             }
               isOpen = false;
-              dispatch("done",
-               {ani: "minp",
-                coinlapach: coinlapach})
+              onDone?.({ani: "minp", coinlapach: coinlapach})
         } catch (e) {
             error1 = e
             console.log(error1);
@@ -697,7 +633,7 @@ ${tofinished}
 
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
- let hovered = false;
+ let hovered = $state(false);
  
  let  u = "משימה בתהליך ביצוע"
  function hoverede(){
@@ -707,7 +643,7 @@ ${tofinished}
   } else {
 u = "פעולה בתהליך ביצוע"
   }
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
  }
 function hover (id){
   if (id == "0"){
@@ -716,24 +652,102 @@ function hover (id){
     u = id
   }
 
-  dispatch("hover", {id: u});
+  onHover?.({id: u});
 }
 
   function hoverc (event){
-   if (event.detail.x == "0"){
+   if (event.x == "0"){
    u = "הצבעה על בקשה לחלוקת הרווחים שנצברו לריקמה"
   } else {
-    u = event.detail.x
+    u = event.x
   }
-    dispatch("hover", {id: u});
+    onHover?.({id: u});
 }
    import Cards from './cards/inpro.svelte'
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { calcX } from '$lib/func/calcX.svelte';
-export let cards = false;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [isVisible]
+   * @property {any} coinlapach
+   * @property {any} stname
+   * @property {boolean} [modal]
+   * @property {boolean} [iskvua]
+   * @property {boolean} [low]
+   * @property {number} [status] - tween store
+   * @property {any} [tasks]
+   * @property {any} restime
+   * @property {number} [tx]
+   * @property {string} [dueDateOrCountToDedline]
+   * @property {string} [projectName]
+   * @property {string} [missionName]
+   * @property {string} [missionDetails]
+   * @property {any} hearotMeyuchadot
+   * @property {string} [src]
+   * @property {string} [link]
+   * @property {string} [linkDescription]
+   * @property {any} projectId
+   * @property {string} [linkP]
+   * @property {any} hourstotal
+   * @property {number} [hoursdon]
+   * @property {any} mId
+   * @property {any} missId - add in gr
+   * @property {any} noofpu - addtopr
+   * @property {any} pu
+   * @property {any} perhour
+   * @property {any} usernames
+   * @property {any} zman
+   * @property {any} oldzman
+   * @property {number} [lapse]
+   * @property {boolean} [cards]
+   * @property {(payload: { id: any }) => void} [onProj]
+   * @property {(payload: { ani: string, coinlapach: any }) => void} [onDone]
+   * @property {(payload: { id: string }) => void} [onHover]
+   * @property {() => void} [onModal]
+   */
+
+  /** @type {Props} */
+  let {
+    isVisible = false,
+    coinlapach,
+    stname = $bindable(),
+    modal = $bindable(false),
+    iskvua = false,
+    low = false,
+    status = $bindable(0),
+    tasks = [],
+    restime,
+    tx = 680,
+    dueDateOrCountToDedline = "11:11",
+    projectName = "ONE",
+    missionName = "do x",
+    missionDetails = "do x in y",
+    hearotMeyuchadot,
+    src = "coin.png",
+    link = "https://www.1lev1.com",
+    linkDescription = "לביצוע",
+    projectId,
+    linkP = "/project/",
+    hourstotal,
+    hoursdon = $bindable(0),
+    mId,
+    missId,
+    noofpu,
+    pu,
+    perhour,
+    usernames,
+    zman = $bindable(),
+    oldzman,
+    lapse = $bindable(0),
+    cards = false,
+    onProj,
+    onDone,
+    onHover,
+    onModal
+  } = $props();
 function claf (event){
-  let o = event.detail.alr
-  let d = event.detail.y
+  let o = event.alr
+  let d = event.y
   console.log(o,d)
 }
  async function stat (){
@@ -784,7 +798,6 @@ function claf (event){
 }
 
  }
- $: op = {}
     function clicked (t){
       op[t] = true
       console.log(t,"rfweiofjw",op)
@@ -865,7 +878,7 @@ async function busabe(id){
   toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
   }
     }
-  let a = 1;
+  let a = $state(1);
   const suc = {"he": "בוצע בהצלחה","en":"appruved sucssefully!"}
   const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
   const sta = {"he": "סטטוס התקדמות ביצוע המשימה","en": "status of mission progress"}
@@ -880,6 +893,48 @@ onDestroy(() => {
   }
 
 });
+onMount(() => {
+  storeTimer = $timers?.find((t) => t.mId == mId);
+  if (storeTimer) {
+    console.log("Timer found:", storeTimer);
+  } else {
+    console.log("No timer found for missionId:", mId);
+  }
+});
+
+
+  
+$effect(() => {
+    zman = msdonf + lapse + x;
+  });
+$effect(() => {
+    if (percentage(zman,mstotal) == 90){
+   let text = `שלום ${usernames} נשארו רק עשרה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+            nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
+
+          } else if (percentage(zman,mstotal) == 95){
+   let text = `שלום ${usernames} נשארו רק חמישה אחוזים לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+            nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
+
+          }
+  });
+$effect(() => {
+    if (mstotal-zman == 300000){
+   let text = `שלום ${usernames} נשארו רק חמש דקות לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+           nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
+    }else if (mstotal-zman == 60000){
+            console.log("timer stop min")
+   let text = `שלום ${usernames} נשארה רק דקה לטיימר של  ${missionName} כדאי להתכונן וליצור משימה חדשה` ;
+          nutifi("1💗1 טיימר קרוב לסיום",text,"lev" )
+
+          }
+  });
+    // lapse refers to the number of milliseconds in the stopwatch
+
+    // rotation refers to the degrees applied to the minutes dial to have a full rotation for 60 seconds
+    // multiply the value by 60 for the seconds dial to have a full rotation every second
+    let rotation = $derived(((lapse / 1000 / 60) * 360) % 360);
+ let op = $derived({})
 </script>
 <TimerDialogs
 bind:timer={storeTimer}
@@ -890,7 +945,7 @@ bind:dialogEdit
 bind:elapsedTime
 bind:selectedTasks
 bind:taskSearchTerm
-on:update-timer={({ detail }) => {
+onUpdate-timer={({ detail }) => {
   if (detail.timer) {
     storeTimer.attributes.activeTimer.data = detail.timer;
     storeTimer.attributes.activeTimer.isActive = detail.running;
@@ -949,12 +1004,12 @@ on:update-timer={({ detail }) => {
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
       <div dir="rtl" >
-              <button on:click={close}>ביטול</button>
+              <button onclick={close}>ביטול</button>
              {#if a == 1}
               <h5>יש להעלות קובץ סיום משימה או לתאר במילים</h5>
       <input  type="file" bind:files={what} >
       <input class="border border-gold" type="text" bind:value={why} placeholder="יש לתאר במילים את סיום המשימה">
-          {#if butt == false}  <button class="bg-gold p-2 m-1 rounded-xl" on:click={afterwhy}>אישור</button>
+          {#if butt == false}  <button class="bg-gold p-2 m-1 rounded-xl" onclick={afterwhy}>אישור</button>
            {:else} <small>כמה שניות בבקשה</small>{/if}
       <br/> {#if activE}<small>{activE}</small>{/if}
         {:else if a == 2}
@@ -963,7 +1018,7 @@ on:update-timer={({ detail }) => {
 <div class="w-full">
 <RangeSlider bind:values={status} suffix="%" pipstep="20" float pips all="label" hoverable />
 </div>
-<button on:click={stat} class="text-center text-barbi border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb to-gr-c">{ishur[$lang]}</button>       
+<button onclick={stat} class="text-center text-barbi border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb to-gr-c">{ishur[$lang]}</button>       
 </div> 
 {:else if a == 3}
 <h2>{rega[$lang]}</h2> 
@@ -977,10 +1032,10 @@ on:update-timer={({ detail }) => {
 {#if op[i] != true}
 
  <div
-  on:mouseenter={()=>hover(sta[$lang])} 
-  on:mouseleave={()=>hover("0")}
-  on:click={()=>clicked(i)}
-  on:keypress={()=>clicked(i)}
+  onmouseenter={()=>hover(sta[$lang])} 
+  onmouseleave={()=>hover("0")}
+  onclick={()=>clicked(i)}
+  onkeypress={()=>clicked(i)}
   role="button"
   tabindex="0"
   class=" border rounded-2xl border-barbi hover:border-gold " 
@@ -990,13 +1045,13 @@ on:update-timer={({ detail }) => {
 {:else if op[i] == true}
 <RangeSlider 
   bind:values={task.attributes.status} suffix="%" pipstep="20" float pips all="label" hoverable />
-  <button on:click={()=>updStat(task.id,task.attributes.status,i)} class="button-gold px-5 py-1 mx-auto hover:text-barbi">{ishur[$lang]}</button>
+  <button onclick={()=>updStat(task.id,task.attributes.status,i)} class="button-gold px-5 py-1 mx-auto hover:text-barbi">{ishur[$lang]}</button>
 {/if}
 {/key}
   {#if task.attributes.myIshur == false}
-    <button on:click={taskishor(task.id)} class="mx-auto button-silver my-1 px-5 py-1 hover:text-barbi" >{ishur[$lang]}</button>
+    <button onclick={taskishor(task.id)} class="mx-auto button-silver my-1 px-5 py-1 hover:text-barbi" >{ishur[$lang]}</button>
     {:else}
-    <button on:click={busabe(task.id)} class="button-pinkgold mx-auto my-1 px-5 py-1 hover:text-barbi" >{busa[$lang]}</button>
+    <button onclick={busabe(task.id)} class="button-pinkgold mx-auto my-1 px-5 py-1 hover:text-barbi" >{busa[$lang]}</button>
   {/if}
 </div>
   {/each}
@@ -1009,14 +1064,14 @@ on:update-timer={({ detail }) => {
 
 <div 
 style="position: relative;" 
-on:click={()=>{modal = true
-  dispatch("modal")
+onclick={()=>{modal = true
+  onModal?.()
 dialogOpen = true}}
 role="button"
 style:z-index={hovered === false ? 11 : 16}  
-on:mouseenter={()=> hoverede()} 
-on:mouseleave={()=> hoverede()}
-use:clickOutside on:click_outside={toggleShow} 
+onmouseenter={()=> hoverede()} 
+onmouseleave={()=> hoverede()}
+use:clickOutside onclick_outside={toggleShow} 
 class="hover:scale-290 duration-1000 ease-in"     
 in:scale={{duration: 3200, opacity: 1, start: 0.1}}
 out:scale={{duration: 2200, opacity: 0.5}}
@@ -1040,15 +1095,16 @@ out:scale={{duration: 2200, opacity: 0.5}}
 >  
 {#if tasks.length > 0}
   <div 
-  on:click={opentask} 
-  on:keypress={opentask}
+  onclick={opentask} 
+  onkeypress={opentask}
   class="absolute inline-flex items-center justify-center w-8 h-8 text-sm font-bold text-white bg-red-500 border-2 border-white rounded-full top-0 right-0 dark:border-gray-900">{tasks.length}</div>
   {/if}
 <svg class="svgg" viewBox="0 0 600 600" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" xmlns:bx="https://boxy-svg.com">
    <style bx:fonts="Lobster Two">@import url("https://fonts.googleapis.com/css?family=Lobster+Two:700");</style>
-  <style type="text/css">#hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }</style>
+  <style type="text/css"> #hours { stroke: #00ffff; }#hhand { fill: #00ffff; stroke: purple; }#minutes { stroke: lime; }#mhand { fill: lime; stroke: purple; }#seconds { stroke: magenta; }#shand { fill: magenta; stroke: purple; }.tics { stroke: purple; stroke-width: 2px; }.dots { fill: purple; stroke: none; } text { fill: #00ffff; stroke: purple; stroke-width: 0.75px; }
+</style>
   <defs>
-   <filter id="glow" x="-30%" y="-30%" width="160%" height="160%">
+    <filter id="glow" y="-30%" width="160%" height="160%">
     <feGaussianBlur stdDeviation="2 2" result="glow"/>
     <feMerge>
       <feMergeNode in="glow"/>
@@ -1084,11 +1140,11 @@ out:scale={{duration: 2200, opacity: 0.5}}
       <stop offset="0" style="stop-color: rgba(0, 128, 60, 1)"/>
       <stop offset="1" style="stop-color: rgba(0, 26, 12, 1)"/>
     </linearGradient>
-    <style bx:fonts="Abel" bx:pinned="true">@import url(https://fonts.googleapis.com/css2?family=Abel%3Aital%2Cwght%400%2C400&amp;display=swap);</style>
+    <style bx:fonts="Abel" bx:pinned="true">/*$$__STYLE_CONTENT__$$*/</style>
     <path id="arrow1" stroke="none" fill="#000000" transform="scale(0.01)" d="M 0.3,0 L -2.2,2.25 L 3.8,0 L -2.2,-2.25 L 0.3,0 Z"/>
     <path id="path-75" stroke="none" fill="#000000" transform="scale(0.01)" d="M 0.3,0 L -2.2,2.25 L 3.8,0 L -2.2,-2.25 L 0.3,0 Z"/>
     <linearGradient id="linearGradient3938" bx:pinned="true">
-      <stop id="stop3940" style="stop-color:#ffdd55;stop-opacity:1" offset="0.257"/>
+ /*$$__STYLE_CONTENT__$$*//googleapis.com/css2?family=Abel%3Aital%2Cwght%400%2C400&amp;display=swap);style="stop-color:#ffdd55;stop-opacity:1" offset="0.257"/>
       <stop offset="0.455" style="stop-color: rgb(247, 0, 128);"/>
       <stop offset="0.587" style="stop-color: rgb(255, 3, 121);"/>
       <stop id="stop3958" style="stop-opacity: 1; stop-color: rgb(255, 196, 0);" offset="0.741"/>
@@ -1136,7 +1192,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
       <stop id="stop3936" style="stop-opacity: 1; stop-color: rgb(120, 105, 234);" offset="0.5"/>
       <stop id="stop3932" style="stop-color:#bb8930;stop-opacity:1" offset="1"/>
     </linearGradient>
-    <bx:grid x="92.274" y="87.642" width="166.141" height="126.038"/>
+    <bx:grid x="92.274" y="87.642" width="166.141" height="126.038"></bx:grid>
     <path id="text-path-0" d="M 100.38671826695645 154.8521511401658 Q 153.42986825880143 111.41786914965459 206.47301825064642 153.87258003183285"/>
     <linearGradient id="color-0" bx:pinned="true">
       <stop style="stop-color: #40e0d0;" offset="0"/>
@@ -1329,7 +1385,7 @@ out:scale={{duration: 2200, opacity: 0.5}}
       </g>
     </g>
   </g>
-  <text fill="#00ffff"  stroke="purple" on:mouseenter={()=>hover("טיימר")} on:mouseleave={()=>hover("0")} text-anchor="middle" style="font-family: Abel; font-size: 151.8557px; stroke: url(#linearGradient3938-0); white-space: pre;" transform="matrix(0.402832, 0, 0, 0.402832, 160.187408, 123.860977)"><tspan x="348.475" y="383.502">{formatTime(zman)}</tspan><tspan x="348.475" dy="1em">​</tspan><tspan x="348.475" dy="1em">​</tspan></text>
+  <text fill="#00ffff"  stroke="purple" onmouseenter={()=>hover("טיימר")} onmouseleave={()=>hover("0")} text-anchor="middle" style="font-family: Abel; font-size: 151.8557px; stroke: url(#linearGradient3938-0); white-space: pre;" transform="matrix(0.402832, 0, 0, 0.402832, 160.187408, 123.860977)"><tspan x="348.475" y="383.502">{formatTime(zman)}</tspan><tspan x="348.475" dy="1em">​</tspan><tspan x="348.475" dy="1em">​</tspan></text>
   <g transform="matrix(0.868491, 0, 0, 0.709487, 222.545898, 86.737846)" style="">
     <g transform="matrix(0.7, 0, 0, 0.7, 0, -44)">
       <path style="stroke-width: 3.50234px; fill: url(#linearGradient3938-4); stroke: url(#color-0-2);" d="M 229.346 122.539 C 232.896 117.184 234.287 110.89 234.287 104.595 C 234.287 93.632 228.098 87.224 221.694 83.859 C 223.325 82.12 224.62 80.266 225.58 78.572 C 232.056 67.265 231.912 52.754 225.22 41.562 C 223.133 38.083 220.087 35.795 217.424 32.796 C 219.943 31.629 222.054 29.981 223.061 27.395 C 223.997 24.9 223.709 22.016 222.293 19.75 C 222.126 19.476 221.862 19.155 221.526 19.155 C 221.238 19.155 220.998 19.338 220.782 19.521 C 219.391 20.78 218.072 22.131 216.537 23.206 C 213.442 25.358 209.484 26.273 205.67 26.044 C 200.441 25.724 195.74 21.261 195.74 21.261 C 195.74 21.261 203.08 10.069 203.703 1.852 C 204.399 -7.326 200.849 -12.43 197.731 -15.085 C 193.557 -18.678 187.992 -19.8 184.418 -19.022 C 179.26 -17.923 177.581 -15.268 177.581 -15.268 C 173.6 -22.409 168.154 -27.765 161.726 -30.695 C 157.384 -32.663 151.867 -32.983 147.238 -32.228 C 142.416 -37.836 135.148 -41.429 127.016 -41.429 C 118.885 -41.429 111.617 -37.836 106.819 -32.251 C 102.19 -33.006 96.673 -32.709 92.331 -30.717 C 85.902 -27.788 80.433 -22.409 76.475 -15.291 C 76.475 -15.291 74.82 -17.946 69.639 -19.045 C 66.065 -19.8 60.5 -18.678 56.326 -15.108 C 53.232 -12.453 49.682 -7.349 50.353 1.829 C 50.977 10.069 58.317 21.238 58.317 21.238 C 58.317 21.238 53.616 25.724 48.387 26.021 C 44.549 26.25 40.615 25.335 37.52 23.183 C 35.961 22.108 34.666 20.734 33.275 19.498 C 33.059 19.315 32.819 19.109 32.531 19.132 C 32.195 19.155 31.931 19.453 31.763 19.727 C 30.324 21.993 30.036 24.877 30.996 27.372 C 31.979 29.981 34.114 31.629 36.633 32.773 C 33.946 35.772 30.924 38.06 28.837 41.539 C 22.145 52.732 22.001 67.242 28.477 78.549 C 29.437 80.243 30.732 82.097 32.363 83.836 C 25.959 87.201 19.77 93.609 19.77 104.572 C 19.77 110.867 21.161 117.184 24.711 122.517 C 29.101 129.108 36.849 133.892 38.552 137.943 C 39.583 140.369 39.487 143.482 37.4 145.198 C 35.242 146.938 32.051 146.617 29.269 146.045 C 28.405 145.862 27.374 145.725 26.726 146.32 C 26.246 146.778 26.222 147.51 26.294 148.151 C 26.582 150.875 28.165 153.461 30.54 155.017 C 32.915 156.574 36.009 157.077 38.768 156.345 C 37.976 158.794 35.026 164.539 37.017 172.87 C 39.343 182.666 45.124 192.576 55.127 195.689 C 60.38 197.314 66.089 196.833 67.648 196.33 C 69.159 204.821 75.204 212.466 83.24 216.54 C 91.755 220.866 100.751 219.95 107.995 217.455 C 115.263 214.526 122.651 226.565 127.064 226.244 C 130.734 225.97 139.418 215.029 146.134 217.455 C 153.378 219.95 162.374 220.866 170.889 216.54 C 178.901 212.466 184.969 204.821 186.481 196.33 C 188.04 196.833 193.749 197.314 199.002 195.689 C 209.005 192.576 214.785 182.666 217.112 172.87 C 219.103 164.539 216.153 158.794 215.361 156.345 C 218.144 157.077 221.238 156.574 223.589 155.017 C 225.963 153.461 227.547 150.875 227.834 148.151 C 227.906 147.51 227.858 146.778 227.403 146.32 C 226.779 145.725 225.748 145.862 224.86 146.045 C 222.102 146.595 218.887 146.938 216.728 145.198 C 214.642 143.505 214.546 140.392 215.577 137.943 C 217.232 133.915 224.98 129.131 229.346 122.539 Z M 109.794 -26.048 C 109.866 -25.98 109.938 -25.934 110.01 -25.865 C 112.264 -24.217 115.239 -17.191 116.27 -11.537 L 127.016 -11.675 L 137.739 -11.537 C 138.77 -17.191 141.745 -24.24 143.999 -25.865 C 144.071 -25.911 144.143 -25.98 144.215 -26.048 C 145.391 -23.691 146.062 -21.059 146.062 -18.267 C 146.062 -8.242 137.499 -0.071 126.992 -0.071 C 116.486 -0.071 107.923 -8.242 107.923 -18.267 C 107.947 -21.036 108.618 -23.668 109.794 -26.048 Z M 127.016 -36.462 C 133.781 -36.462 139.706 -33.075 143.088 -28.017 C 142.584 -28.108 142.08 -28.177 141.577 -28.154 C 139.25 -28.131 136.947 -27.399 135.028 -26.117 C 134.692 -25.888 134.357 -25.636 133.949 -25.614 C 132.773 -25.522 130.974 -30.603 130.495 -31.564 C 129.847 -32.892 129.175 -34.219 128.528 -35.547 C 128.24 -36.165 127.616 -36.462 127.016 -36.462 C 126.417 -36.462 125.793 -36.165 125.505 -35.547 C 124.858 -34.219 124.186 -32.892 123.538 -31.564 C 123.059 -30.626 121.26 -25.545 120.084 -25.614 C 119.676 -25.636 119.341 -25.888 119.005 -26.117 C 117.11 -27.399 114.783 -28.108 112.456 -28.154 C 111.953 -28.154 111.425 -28.108 110.945 -28.017 C 114.327 -33.075 120.252 -36.462 127.016 -36.462 Z M 213.106 128.65 C 211.355 130.253 208.693 133.297 207.277 134.922 C 204.591 138.057 202.288 141.994 203.991 148.38 L 196.723 154.834 C 200.609 156.528 207.469 160.487 206.75 173.968 C 206.438 180.102 202.504 186.625 196.363 189.006 C 196.363 189.006 197.827 184.611 196.363 181.476 C 194.78 178.111 191.566 176.097 188.112 176.234 C 185.833 176.28 183.65 177.012 181.971 178.248 C 179.524 180.057 178.181 182.895 178.301 186.03 C 178.325 186.74 178.445 187.449 178.613 188.136 C 179.764 196.398 176.862 202.899 169.738 207.362 C 160.67 213.015 150.14 208.3 143.376 202.67 L 110.681 202.67 C 103.917 208.3 93.386 213.015 84.319 207.362 C 77.195 202.899 74.293 196.398 75.444 188.136 C 75.612 187.449 75.732 186.74 75.756 186.03 C 75.876 182.872 74.533 180.034 72.086 178.248 C 70.383 177.012 68.2 176.303 65.945 176.234 C 62.491 176.097 59.277 178.111 57.694 181.476 C 56.23 184.611 57.694 189.006 57.694 189.006 C 51.553 186.602 47.619 180.102 47.307 173.968 C 46.611 160.487 53.448 156.528 57.334 154.834 L 50.042 148.38 C 51.745 141.994 49.442 138.057 46.755 134.922 C 45.364 133.297 42.678 130.253 40.927 128.65 C 35.194 123.409 29.053 119.793 29.053 108.212 C 29.053 95.372 41.214 94.548 42.654 94.365 L 43.469 84.042 C 25.311 71.271 33.874 53.601 33.874 53.601 C 35.721 58.637 39.799 64.496 44.836 67.471 L 48.315 62.093 C 44.357 59.758 41.19 54.151 40.807 48.772 C 40.471 44.286 41.766 40.967 45.94 37.58 C 50.497 34.856 53.568 34.192 59.613 34.513 L 70.791 20.551 C 70.191 19.91 69.423 19.247 68.56 18.468 C 65.106 15.47 60.908 12.403 58.629 2.973 C 57.694 -0.918 57.742 -5.793 60.068 -9.272 C 61.148 -10.897 63.259 -12.567 65.297 -12.911 C 68.344 -13.437 71.174 -11.331 69.855 -8.287 C 69.015 -6.342 66.209 -5.564 64.17 -4.259 C 63.474 -3.801 62.779 -3.115 62.875 -2.314 C 62.923 -1.879 63.211 -1.513 63.546 -1.215 C 65.513 0.616 68.416 0.776 70.91 0.112 C 69.807 5.377 69.399 10.801 69.735 16.111 L 78.994 15.585 C 78.562 8.581 77.099 -12.911 93.434 -23.37 C 96.961 -25.636 100.487 -26.506 103.221 -26.506 C 101.83 -23.462 101.038 -20.12 101.038 -16.596 C 101.038 -2.909 112.72 8.238 127.064 8.238 C 141.409 8.238 153.09 -2.909 153.09 -16.596 C 153.09 -20.12 152.299 -23.462 150.908 -26.506 C 153.642 -26.529 157.144 -25.636 160.694 -23.37 C 177.03 -12.911 175.566 8.581 175.135 15.585 L 184.394 16.111 C 184.73 10.801 184.298 5.377 183.218 0.112 C 185.713 0.776 188.615 0.616 190.582 -1.215 C 190.918 -1.513 191.206 -1.879 191.254 -2.314 C 191.35 -3.115 190.654 -3.801 189.959 -4.259 C 187.92 -5.564 185.137 -6.502 184.298 -8.448 C 182.978 -11.492 185.761 -13.437 188.831 -12.934 C 190.87 -12.59 192.981 -10.92 194.061 -9.294 C 196.363 -5.816 196.435 -0.94 195.5 2.951 C 193.245 12.357 189.023 15.447 185.569 18.446 C 184.706 19.201 183.938 19.888 183.338 20.528 L 194.516 34.49 C 200.561 34.192 203.631 34.833 208.189 37.557 C 212.387 40.944 213.658 44.263 213.322 48.749 C 212.938 54.128 209.772 59.735 205.814 62.07 L 209.292 67.448 C 214.33 64.473 218.408 58.614 220.255 53.578 C 220.255 53.578 228.818 71.271 210.66 84.019 L 211.475 94.342 C 212.914 94.525 225.076 95.349 225.076 108.189 C 224.98 119.793 218.839 123.409 213.106 128.65 Z"/>
@@ -1346,10 +1402,10 @@ out:scale={{duration: 2200, opacity: 0.5}}
   </g>
    <foreignObject  x='300' y='105' width='100' height='100' transform='translate(-50 -50)'>   
     <span class="{`normSml${perhour}-${projectId}-${mId}`}"></span>
-        <img on:click={()=>project()} on:keypress={()=>project()} on:mouseenter={()=>hover("לוגו הריקמה")} on:mouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
+        <img onclick={()=>project()} onkeypress={()=>project()} onmouseenter={()=>hover("לוגו הריקמה")} onmouseleave={()=>hover("0")} style=" border-radius: 50%;" src={src} width="24" height="24"   alt="logo">
     </foreignObject> 
   
-        <g style="overflow:hidden; text-anchor: middle;" on:click={()=>linke("p")} on:mouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} on:mouseleave={()=>hover("0")}  >
+        <g style="overflow:hidden; text-anchor: middle;" onclick={()=>linke("p")} onmouseenter={()=>hover("לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה")} onmouseleave={()=>hover("0")}  >
                   <text x="300" y='210' fill="#00ffff" style="filter: url(#glow);"  text-anchor="middle" font-size="42" >{projectName}</text>
                   <text x="300" y='210' fill="black"  text-anchor="middle" font-size="42" >{projectName}</text></g>
 
@@ -1424,40 +1480,40 @@ out:scale={{duration: 2200, opacity: 0.5}}
 <SwiperSlide class="swiper-slideg"
     >
     <div id="normSmll" >
-<div on:mouseenter={()=>hover("זמן שכבר בוצע")} on:mouseleave={()=>hover("0")} class="mn ab  ">{formatTime(zman)}</div>
-  {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p on:mouseenter={()=>hover("פרטי המשימה")} on:mouseleave={()=>hover("0")} class="mn bc">{missionDetails}</p>{/if}
+<div onmouseenter={()=>hover("זמן שכבר בוצע")} onmouseleave={()=>hover("0")} class="mn ab  ">{formatTime(zman)}</div>
+  {#if missionDetails!== undefined &&  missionDetails!== null  &&  missionDetails!==  "undefined"}  <p onmouseenter={()=>hover("פרטי המשימה")} onmouseleave={()=>hover("0")} class="mn bc">{missionDetails}</p>{/if}
 
-  <h5 dir="ltr" class="mn cd "><span on:mouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} on:mouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0}`}</span> / <span on:mouseenter={()=>hover("מספר השעות שהוקצו למשימה")} on:mouseleave={()=>hover("0")}>{hourstotal}</span></h5>
+  <h5 dir="ltr" class="mn cd "><span onmouseenter={()=>hover("מספר השעות שבוצעו ונשמרו")} onmouseleave={()=>hover("0")} >{`${hoursdon ? Math.round((hoursdon + Number.EPSILON) * 100) / 100 : 0}`}</span> / <span onmouseenter={()=>hover("מספר השעות שהוקצו למשימה")} onmouseleave={()=>hover("0")}>{hourstotal}</span></h5>
   
   <div
-  on:mouseenter={()=>hover(sta[$lang])} on:mouseleave={()=>hover("0")}
-  class="de border rounded-2xl border-barbi hover:border-gold " on:click={function(){
+  onmouseenter={()=>hover(sta[$lang])} onmouseleave={()=>hover("0")}
+  class="de border rounded-2xl border-barbi hover:border-gold " onclick={function(){
     a = 2;
     isOpen = true}}
-    on:keypress={function(){
+    onkeypress={function(){
     a = 2;
     isOpen = true}}
     ><div class=" rounded-2xl bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre" style="width: {status == null ? 0 : status[0]}%">{status != null ? status[0] : "0"}%</div></div>
     {#if link != null && link != undefined && link != "undefined"}
-  <a on:mouseenter={()=>hover("לינק לביצוע המשימה")} on:mouseleave={()=>hover("0")} class="mn ef text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
+  <a onmouseenter={()=>hover("לינק לביצוע המשימה")} onmouseleave={()=>hover("0")} class="mn ef text-gold bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  hover:text-barbi p-0 rounded-full "  style="padding: 0px;" href={link}>{linkDescription}</a>
     {/if}
   <div class="{`normSmll${perhour}-${projectId}-${mId}`}"></div>
 {#if low == false}
 
 <!---
 {#if lapse !== 0 || x !== 0}
-<button on:mouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} on:mouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" on:click={handleClearClick}>ניקוי</button>
-<button on:mouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" on:click={save}> הוספה</button>
+<button onmouseenter={()=>hover("לחיצה לאיפוס הטיימר מבלי לשמור")} onmouseleave={()=>hover("0")}  class="  border border-barbi hover:border-gold bg-gradient-to-br from-graa to-grab text-barbi  p-0 rounded-full hover:from-lturk hover:to-barbi ga" onclick={handleClearClick}>ניקוי</button>
+<button onmouseenter={()=>hover("לחיצה לעצירת הטיימר ושמירת הזמן שבוצע")} on:mouseleave={()=>hover("0")} class="  bg-gradient-to-br text-gold hover:from-graa hover:to-grab hover:text-gold   p-0 rounded-full from-lturk to-barbi gb" onclick={save}> הוספה</button>
 {/if}-->
     <div class="flex space-x-4">
       {#if already === false}
-      <button on:mouseenter={()=>hover("לחיצה לסיום המשימה")} on:mouseleave={()=>hover("0")} on:click={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
+      <button onmouseenter={()=>hover("לחיצה לסיום המשימה")} onmouseleave={()=>hover("0")} onclick={done}   class="btn a" name="done"><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path fill="currentColor" d="M12 2C6.5 2 2 6.5 2 12S6.5 22 12 22 22 17.5 22 12 17.5 2 12 2M12 20C7.59 20 4 16.41 4 12S7.59 4 12 4 20 7.59 20 12 16.41 20 12 20M16.59 7.58L10 14.17L7.41 11.59L6 13L10 17L18 9L16.59 7.58Z" /></svg></button>
       {/if}
       {#if storeTimer?.attributes?.activeTimer?.data?.attributes}
       <!--edit timer button-->
-      <button on:mouseenter={()=>hover("לחיצה לעריכת הטיימר")} on:mouseleave={()=>hover("0")} class="btn c" tabindex="0" role="button" on:keypress={() => showSaveDialog = true} on:click={() => showSaveDialog = true}>✏</button>
+      <button onmouseenter={()=>hover("לחיצה לעריכת הטיימר")} onmouseleave={()=>hover("0")} class="btn c" tabindex="0" role="button" onkeypress={() => showSaveDialog = true} onclick={() => showSaveDialog = true}>✏</button>
       {/if}
-      {#if show === true}  <button on:mouseenter={()=>hover(`${running ? "עצירת הטיימר" : "הפעלת טיימר"}`)} on:mouseleave={()=>hover("0")} on:click={running ? azor : start} class="btn b" name="start timer" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
+      {#if show === true}  <button onmouseenter={()=>hover(`${running ? "עצירת הטיימר" : "הפעלת טיימר"}`)} onmouseleave={()=>hover("0")} onclick={running ? azor : start} class="btn b" name="start timer" ><svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1" class="btin" viewBox="0 0 24 24"><path  fill="currentColor" d="M6,2H18V8H18V8L14,12L18,16V16H18V22H6V16H6V16L10,12L6,8V8H6V2M16,16.5L12,12.5L8,16.5V20H16V16.5M12,11.5L16,7.5V4H8V7.5L12,11.5M10,6H14V6.75L12,8.75L10,6.75V6Z" /></svg></button>
       {/if}
     </div>
     {:else if low == true}
@@ -1479,14 +1535,14 @@ out:scale={{duration: 2200, opacity: 0.5}}
 			<div class="swiper-slidec mx-auto ">
         
 <Cards 
-on:start={start}
- on:done={done}
-  on:save={save}
-  on:hover={hoverc}
-  on:task={opentask}
-  on:azor={azor}
-  on:clear={handleClearClick}
-  on:statusi={function(){
+onStart={start}
+ onDone={done}
+  onSave={save}
+  onHover={hoverc}
+  onTask={opentask}
+  onAzor={azor}
+  onClear={handleClearClick}
+  onStatusi={function(){
      a = 2;
     isOpen = true
   }}
@@ -1523,14 +1579,14 @@ on:start={start}
 {:else}
 
 <Cards 
-on:start={start}
- on:done={done}
-  on:save={save}
-  on:hover={hoverc}
-  on:task={opentask}
-  on:azor={azor}
-  on:clear={handleClearClick}
-  on:statusi={function(){
+onStart={start}
+ onDone={done}
+  onSave={save}
+  onHover={hoverc}
+  onTask={opentask}
+  onAzor={azor}
+  onClear={handleClearClick}
+  onStatusi={function(){
      a = 2;
     isOpen = true
   }}
@@ -1564,7 +1620,6 @@ on:start={start}
   align-items: center;
   justify-content: center;
   border-radius: 18px !important;
-  border: 1px solid var(--barbi-pink);
   font-size: 22px;
   font-weight: bold;
   min-height:100vh;

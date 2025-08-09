@@ -1,8 +1,9 @@
 import datai from '$lib/components/main/data.json';
 const baseUrl = import.meta.env.VITE_URL;
+console.log(baseUrl)
 
 export const load = async ({fetch}) => {
-    let data, error, country
+    let error, country,data
 
     const res =  fetch(baseUrl+'/graphql', {
       //api/cuntries?pagination[page]=1&pagination[pageSize]=280
@@ -24,8 +25,8 @@ export const load = async ({fetch}) => {
 }   `
       })
     })
-      .then((response) => {
-        return response.json();
+      .then((data) => {
+        return data.json();
       })
       .catch(() => {
         console.log(error);
@@ -39,6 +40,8 @@ export const load = async ({fetch}) => {
      data: new Promise((resolve) => {
        res
          .then((data) => {
+          console.log("43",data)
+          console.log("API Response:", data); // Added console.log to inspect the response
             country = data.data.cuntries.data;
             let total =0
             data = datai;

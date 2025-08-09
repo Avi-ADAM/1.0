@@ -1,22 +1,29 @@
 <svelte:head>
-  <script bind:this={script} src={url} />
+  <script bind:this={script} src={url}></script>
 </svelte:head>
 
 <script>
-  import { onMount, createEventDispatcher } from 'svelte';
+  import { onMount } from 'svelte';
 
-  const dispatch = createEventDispatcher();
-  export let url;
-  let script;
+  /**
+   * @typedef {Object} Props
+   * @property {string} url - The URL of the script to load.
+   * @property {() => void} [onLoaded] - Callback for when the script is successfully loaded.
+   * @property {() => void} [onError] - Callback for when an error occurs during script loading.
+   */
+
+  /** @type {Props} */
+  let { url, onLoaded, onError } = $props();
+  let script = $state();
 
   onMount(async () => {
     script.addEventListener('load', () => {
-      dispatch('loaded');
+      onLoaded?.();
     })
 
     script.addEventListener('error', (event) => {
       console.error("something went wrong", event);
-      dispatch('error');
+      onError?.();
     });
   });
 </script>

@@ -1,29 +1,71 @@
 <script>
-  import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
  import {lang} from '$lib/stores/lang.js'
   import Lev from '../../../celim/lev.svelte';
-      export let low = false;
-      export let isVisible = false
 import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '../../../celim/no.svelte'
   import { isMobileOrTablet } from '$lib/utilities/device';
-    export let projectName, src ,openmissionName, missionDetails, useraplyname, noofusersNo, noofusersOk,noofusersWaiting,deadline,easy,myp,price
-    export let already = false;
-    export let src2;
-    export let perhour = 0, noofhours = 0
+  import RichText from '$lib/celim/ui/richText.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [low]
+   * @property {boolean} [isVisible]
+   * @property {any} projectName
+   * @property {any} src
+   * @property {any} openmissionName
+   * @property {any} missionDetails
+   * @property {any} useraplyname
+   * @property {any} noofusersNo
+   * @property {any} noofusersOk
+   * @property {any} noofusersWaiting
+   * @property {any} deadline
+   * @property {any} easy
+   * @property {any} myp
+   * @property {any} price
+   * @property {boolean} [already]
+   * @property {any} src2
+   * @property {number} [perhour]
+   * @property {number} [noofhours]
+   * @property {(x: any) => void} [onHover] - Callback for hover event
+   * @property {(alr: any) => void} [onAgree] - Callback for agree event
+   * @property {(alr: any) => void} [onDecline] - Callback for decline event
+   */
+
+  /** @type {Props} */
+  let {
+    low = false,
+    isVisible = false,
+    projectName,
+    src,
+    openmissionName,
+    missionDetails,
+    useraplyname,
+    noofusersNo,
+    noofusersOk,
+    noofusersWaiting,
+    deadline,
+    easy,
+    myp,
+    price,
+    already = $bindable(false),
+    src2,
+    perhour = 0,
+    noofhours = 0,
+    onHover,
+    onAgree,
+    onDecline
+  } = $props();
 function hover(x){
-dispatch("hover",{x:x});
+onHover?.(x);
 }
 function agree(alr){
   already = true;
-dispatch("agree",{alr:alr})
+onAgree?.(alr)
 }
 function decline(alr) {
   already = true; 
-dispatch("decline",{alr:alr});
+onDecline?.(alr);
 }
-let isScrolable = true; 
+let isScrolable = $state(true); 
 function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
       event.stopPropagation();
@@ -39,12 +81,12 @@ function preventSwiperScroll(event) {
 </script>
 
 
-<div on:wheel={preventSwiperScroll} 
-on:touchmove={preventTouchScroll}
-on:click={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
+<div onwheel={preventSwiperScroll} 
+ontouchmove={preventTouchScroll}
+onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
 role="button"
 tabindex="0" 
-on:keypress={preventSwiperScroll} dir="rtl"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%] d">
+onkeypress={preventSwiperScroll} dir="rtl"  class="{isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%] d">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -64,34 +106,34 @@ on:keypress={preventSwiperScroll} dir="rtl"  class="{isVisible ? $lang == 'he' ?
     <div  class="mb-8">
        <p style="line-height: 1;" class="text-sm sm:text-xl text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
-        <span on:mouseenter={()=>hover("ההצעה שהתקבלה")} on:mouseleave={()=>hover("0")} style="color: var(--barbi-pink)" >{myp} השווי המוצע</span> /<span on:mouseenter={()=>hover("ההצעה של הריקמה")} on:mouseleave={()=>hover("0")} > {easy} השווי שהצענו</span>
+        <span onmouseenter={()=>hover("ההצעה שהתקבלה")} onmouseleave={()=>hover("0")} style="color: var(--barbi-pink)" >{myp} השווי המוצע</span> /<span onmouseenter={()=>hover("ההצעה של הריקמה")} onmouseleave={()=>hover("0")} > {easy} השווי שהצענו</span>
         </p>
-              <h3 on:mouseenter={()=>hover("שווי")} on:mouseleave={()=>hover("0")} class="ltn" >{price} <span>שווי מקובל</span></h3>
+              <h3 onmouseenter={()=>hover("שווי")} onmouseleave={()=>hover("0")} class="ltn" >{price} <span>שווי מקובל</span></h3>
       <div class="text-gray-900 font-bold text-xl mb-2">{openmissionName}</div>
-     {#if missionDetails} <p class="text-gray-700 text-base">{missionDetails}</p>{/if}
+     {#if missionDetails} <RichText outpot={missionDetails} editable={false} />{/if}
     </div>
     <div class="flex items-center">
       <img style="width: 2.5rem;" class="w-10 h-10 rounded-full mr-4" src="{src.length > 0 ? src : "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}" alt="">
       <div class="text-sm">
         <p class="text-gray-900 leading-none">{useraplyname}</p>
-        <p class="vo ef"><span on:mouseenter={()=>hover("סך ההצבעות בעד")} on:mouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span on:mouseenter={()=>hover("לא הצביעו")} on:mouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span on:mouseenter={()=>hover("כמות ההצבעות נגד")} on:mouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>
+        <p class="vo ef"><span onmouseenter={()=>hover("סך ההצבעות בעד")} onmouseleave={()=>hover("0")}  style="color:#7EE081;" >{noofusersOk}-בעד</span> <span onmouseenter={()=>hover("לא הצביעו")} onmouseleave={()=>hover("0")}  style="color:#0000cc;" >{noofusersWaiting}-טרם </span><span onmouseenter={()=>hover("כמות ההצבעות נגד")} onmouseleave={()=>hover("0")}  style="color:#80037e;" >{noofusersNo}-נגד</span></p>
       </div>
     </div>
   </div>
   {#if low == false}
    {#if already === false}
-            <button on:mouseenter={()=>hover("אישור")}
-               on:mouseleave={()=>hover("0")} 
-               on:click={agree} 
+            <button onmouseenter={()=>hover("אישור")}
+               onmouseleave={()=>hover("0")} 
+               onclick={agree} 
                 class = "btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
                  name="requestToJoin">
                 <Lev/>
                 </button>
           <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>--> 
             <button
-             on:mouseenter={()=>hover("התנגדות")} 
-             on:mouseleave={()=>hover("0")} 
-             on:click={decline} 
+             onmouseenter={()=>hover("התנגדות")} 
+             onmouseleave={()=>hover("0")} 
+             onclick={decline} 
               class = "btnb bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-red-400 hover:scale-110" 
               name="decline">
               <No/>
@@ -101,4 +143,3 @@ on:keypress={preventSwiperScroll} dir="rtl"  class="{isVisible ? $lang == 'he' ?
           <Lowbtn isCart="true"/>
         {/if}
 </div>
-

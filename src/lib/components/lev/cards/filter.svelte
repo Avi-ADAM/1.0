@@ -1,39 +1,25 @@
 <script>
   import Tile from '$lib/celim/tile.svelte';
     import {lang} from '$lib/stores/lang.js'
-  import { createEventDispatcher, onMount } from 'svelte';
-    const dispatch = createEventDispatcher();
+  import { onMount } from 'svelte';
 
     let fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
 let u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
-export let allIds = []
-export let filterKind = "projects"
-console.log(allIds,"allIds")
-export let sug = 13;
+
 let sugg =  "sugg";
-export let pen = 13;
 let pend = "pend";
-export let ask = 17;
 let asks = "asks";
-export let wel = 17;
 let welc = "welc";
-export let beta = 13;
 let betaha = "betaha";
-export let des = 13;
 let desi = "desi";
-export let fia = 99;
 let fiap = "fiap";
-export let pmash = 99;
  let ppmash = "ppmash";
-export let mashs = 17;
  let pmashs = "pmashs";
-export let maap = 17;
  let pmaap = "pmaap";
-export let askma = 13;
  let askmap = "askmap";
-export let hachlot = 9
+let selectedProjectName = $state(null);
 // נאחסן את כל המצבים באובייקט אחד
-let states = {
+let states = $state({
   sugg,
   pend,
   asks,
@@ -45,16 +31,17 @@ let states = {
   pmashs,
   pmaap,
   askmap
-};
+});
 onMount(async () => {
     if(filterKind === "projects"){
+        const colors = ["blue", "green", "yellow", "indigo", "purple", "pink", "gold", "neww", "wow", "red", "gray"];
         milon = []
         for (let i = 0; i < allIds.length; i++) {
             milon.push({
                 id: allIds[i].projectId,
                 name:allIds[i].projectName, 
                 val:true, 
-                color:"blue", 
+                color: colors[i % colors.length], 
                 word:{
                     he:`${allIds[i].projectName} - (${allIds[i].count})`, 
                     en:`${allIds[i].projectName} - (${allIds[i].count})`
@@ -66,33 +53,43 @@ onMount(async () => {
     }
 })
 function showonly(value,id=null) { 
-    if (value !== "true") {
-        dispatch("showonly", {
-            data: value,
-            kind: filterKind,
-            id: id
-                });
-        
-        // נאפס את כל הערכים
-        Object.keys(states).forEach(key => {
-            states[key] = key;
-        });
-        
-        // נעדכן את הערך הספציפי
-        states[value] = "true";
+    if (filterKind === 'projects') {
+        if (selectedProjectName === value) {
+            selectedProjectName = null;
+            onShowall?.();
+        } else {
+            selectedProjectName = value;
+            onShowonly?.({ data: value, kind: filterKind, id: id });
+        }
     } else {
-        dispatch("showall");
-        // נאפס את כל הערכים
-        Object.keys(states).forEach(key => {
-            states[key] = key;
-        });
+        if (value !== "true") {
+            onShowonly?.({
+                data: value,
+                kind: filterKind,
+                id: id
+                    });
+            
+            // נאפס את כל הערכים
+            Object.keys(states).forEach(key => {
+                states[key] = key;
+            });
+            
+            // נעדכן את הערך הספציפי
+            states[value] = "true";
+        } else {
+            onShowall?.();
+            // נאפס את כל הערכים
+            Object.keys(states).forEach(key => {
+                states[key] = key;
+            });
+        }
     }
 }
 
 let hovere = false;
 
 function hover (event){
-    const num = event.detail.id
+    const num = event.id
 hovere = !hovere
 if (hovere === true){
 if (num === "a"){
@@ -123,13 +120,55 @@ if (num === "a"){
 } else {
    fir = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1 heart, click on the diamonds to sort the actions"}
 }
-dispatch("hover", {id: fir[$lang]});
+onHover?.({id: fir[$lang]});
 
 }
 
 
 
-export let low = true;
+  /**
+   * @typedef {Object} Props
+   * @property {any} [allIds]
+   * @property {string} [filterKind]
+   * @property {number} [sug]
+   * @property {number} [pen]
+   * @property {number} [ask]
+   * @property {number} [wel]
+   * @property {number} [beta]
+   * @property {number} [des]
+   * @property {number} [fia]
+   * @property {number} [pmash]
+   * @property {number} [mashs]
+   * @property {number} [maap]
+   * @property {number} [askma]
+   * @property {number} [hachlot]
+   * @property {boolean} [low]
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for hover event
+   * @property {(payload: { data: any, kind: string, id: any }) => void} [onShowonly] - Callback for showonly event
+   * @property {() => void} [onShowall] - Callback for showall event
+   */
+
+  /** @type {Props} */
+  let {
+    allIds = [],
+    filterKind = "projects",
+    sug = 13,
+    pen = 13,
+    ask = 17,
+    wel = 17,
+    beta = 13,
+    des = 13,
+    fia = 99,
+    pmash = 99,
+    mashs = 17,
+    maap = 17,
+    askma = 13,
+    hachlot = 9,
+    low = true,
+    onHover,
+    onShowonly,
+    onShowall
+  } = $props();
 let hovered = false;
 function hoverede(x){
         let t = {"he":"לב המערכת", "en": "heart of 1💗1"}
@@ -142,10 +181,13 @@ function hoverede(x){
   } else {
 u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפעולות", "en": "1💗1-heart, click on the diamonds to sort the actions"}
   }
-  dispatch("hover", {id: u[$lang]});
+  onHover?.({id: u[$lang]});
  }
+ $effect(() => {
+    console.log("milon", milon)
+ })
  //{name:"welc",val:true,color:"gray"},
- let milon = [
+ let milon = $state([
   {name:"fiap", val:true, color:"blue", word:{he:`אשרורי סיום (${fia})`, en:`Mission Completion Approvals (${fia})`}}, 
   {name:"sugg", val:true, color:"green", word:{he:`הצעות למשימות (${sug})`, en:`Mission Proposals (${sug})`}},
   {name:"pend", val:true, color:"yellow", word:{he:`משימות בתהליך אישור (${pen})`, en:`Missions Pending Approval (${pen})`}},
@@ -157,7 +199,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
   {name:"pmaap", val:true, color:"wow", word:{he:`אשרור קבלת משאבים (${maap})`, en:`Resource Reception Approvals (${maap})`}}, 
   {name:"askmap", val:true, color:"red", word:{he:`אשרור השמה למשאבים (${askma})`, en:`Resource Assignment Approvals (${askma})`}},
   {name:"hachla", val:true, color:"gray", word:{he:`אשרורים כלליים (${hachlot})`, en:`General Approvals (${hachlot})`}}
-]
+])
 </script>
 <div class="flex flex-nowrap overflow-x-auto whitespace-nowrap w-full sm:max-w-[calc(100vw-200px)] max-w-[calc(100vw-180px)] d">
 {#if filterKind == "kind"}
@@ -180,7 +222,7 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
     // מחזיר true רק אם יש ערך מספרי והוא גדול מ-0
     return valueMap[item.name] > 0;
 }) as key}
-    <button on:click={()=> showonly(key.name)}>
+    <button onclick={()=> showonly?.(key.name)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
@@ -191,15 +233,14 @@ u = {"he":"לב המערכת, לחיצה על היהלומים לסינון הפ
 {/each}
 {:else}
 {#each milon as key}
-    <button on:click={()=> showonly(key.name,key.id)}>
+    <button onclick={()=> showonly?.(key.name,key.id)}>
         <Tile 
             bg={key.color} 
             word={key.word[$lang]}
-            openi={states[key.name] === "true"} 
-            closei={states[key.name] !== "true"}
+            openi={selectedProjectName === null || selectedProjectName === key.name}
+            closei={selectedProjectName !== null && selectedProjectName !== key.name}
         />
     </button>
 {/each}
 {/if}
 </div>
-

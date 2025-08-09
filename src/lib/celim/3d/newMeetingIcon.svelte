@@ -3,7 +3,7 @@
     import * as THREE from 'three';
   import { T } from '@threlte/core';
 
-	import {  useFrame } from '@threlte/core'
+	import {  useTask } from '@threlte/core'
 
     const participantGeometry = new THREE.SphereGeometry(1, 32, 32);
 
@@ -12,27 +12,30 @@
       new THREE.Mesh(participantGeometry, new THREE.MeshBasicMaterial({ color: 0x02FFBB })),
       new THREE.Mesh(participantGeometry, new THREE.MeshBasicMaterial({ color: 0x99AABB }))
     ];
-$:  position = [
+let position = $state([
     [-2, 2, 0],   // Adjust the x, y, and z coordinates for the first participant
     [2, 2, 0],    // Adjust the x, y, and z coordinates for the second participant
     [0, -2, 0]    // Adjust the x, y, and z coordinates for the third participant
-];
+]);
+  
     const plusGeometry = new THREE.BufferGeometry().setFromPoints([
       new THREE.Vector3(0, 1.5, 0),
       new THREE.Vector3(0, -1.5, 0),
       new THREE.Vector3(1.5, 0, 0),
       new THREE.Vector3(-1.5, 0, 0)
     ]);
-  $:rotation = [0,0,0]
+  let rotation = $state([0,0,0]);
+  
   let  plusSign = new THREE.LineSegments(plusGeometry, new THREE.LineBasicMaterial({ color: 0x000000 })); 
   // Adjust rotation angle for spinning effect
-  $: angle = 0;
+  let angle = $state(0);
+  
 
   // Define rotation speed
   const speed = 0.01;
 
   // Rotate the participants around the plus sign
-  useFrame(() => {
+  useTask(() => {
     participants.forEach((participant, i) => {
       const radius = 2; // Adjust radius as needed
 

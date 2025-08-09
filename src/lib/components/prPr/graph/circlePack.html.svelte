@@ -2,32 +2,41 @@
   import { stratify, pack, hierarchy } from 'd3-hierarchy'
   import { getContext } from 'svelte';
   import { format } from 'd3-format';
-
+  const titleCase = d => d.replace(/^\w/, w => w.toUpperCase());
+  const commas = format(',');
   const { width, height, data } = getContext('LayerCake');
 
-  export let idKey = 'id';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [idKey]
+   * @property {any} [parentKey]
+   * @property {string} [valueKey]
+   * @property {any} [labelVisibilityThreshold]
+   * @property {string} [fill]
+   * @property {string} [stroke]
+   * @property {number} [strokeWidth]
+   * @property {string} [textColor]
+   * @property {string} [textStroke]
+   * @property {number} [textStrokeWidth]
+   * @property {any} [sortBy] - 'depth' is also a popular choice
+   * @property {number} [spacing]
+   */
 
-  export let parentKey = undefined;
-
-  export let valueKey = 'value';
-
-  export let labelVisibilityThreshold = r => r > 25;
-
-  export let fill = '#fff';
-
-  export let stroke = '#999';
-
-  export let strokeWidth = 1;
-
-  export let textColor = '#333';
-
-  export let textStroke = '#000';
-
-  export let textStrokeWidth = 0;
-
-  export let sortBy = (a, b) => b.value - a.value; // 'depth' is also a popular choice
-
-  export let spacing = 0;
+  /** @type {Props} */
+  let {
+    idKey = 'id',
+    parentKey,
+    valueKey = 'value',
+    labelVisibilityThreshold = r => r > 25,
+    fill = '#fff',
+    stroke = '#999',
+    strokeWidth = 1,
+    textColor = '#333',
+    textStroke = '#000',
+    textStrokeWidth = 0,
+    sortBy = (a, b) => b.value - a.value,
+    spacing = 0
+  } = $props();
 
   /* --------------------------------------------
    * This component will automatically group your data
@@ -35,52 +44,44 @@
    * Stash $data here so we can add our own parent
    * if there's no `parentKey`
    */
-  let parent = {};
-  $: dataset = $data;
 
-  $: if (parentKey === undefined) {
-    parent = { [idKey]: 'all' };
-    dataset = [...dataset, parent]
-  }
+   let parent = $derived(parentKey !== undefined ? {} : { [idKey]: 'all' });
+   let dataset = $derived(parentKey !== undefined ? $data : [...$data, parent]);
 
-  $: stratifier = stratify()
-    .id(d => d[idKey])
-    .parentId(d => {
-      if (d[idKey] === parent[idKey]) return '';
-      return d[parentKey] || parent[idKey];
-    });
-
-  $: packer = pack()
-    .size([$width, $height])
-    .padding(spacing);
-
-  $: stratified = stratifier(dataset);
-
-  $: root = hierarchy(stratified)
-    .sum((d, i) => {
-      return d.data[valueKey] || 1;
-    })
-    .sort(sortBy);
-
-  $: packed = packer(root);
-
-  $: descendants = packed.descendants();
-
-  const titleCase = d => d.replace(/^\w/, w => w.toUpperCase());
-  const commas = format(',');
+   let stratifier = $derived(
+    stratify()
+      .id(d => d[idKey])
+      .parentId(d => {
+        if (d[idKey] === parent[idKey]) return '';
+        if (parentKey === undefined) return parent[idKey];
+        return d[parentKey];
+      })
+  );
+  let descendants = $derived(
+    pack()
+      .size([$width, $height])
+      .padding(spacing)(
+        hierarchy(stratifier(dataset))
+          .sum(d => {
+            return d.data[valueKey] || 1;
+          })
+          .sort(sortBy)
+      )
+      .descendants()
+  );
 </script>
 
 <div class="circle-pack" data-has-parent-key="{parentKey !== undefined}">
   {#each descendants as d}
     <div
       class="circle-group"
-      data-id="{d.data.id}"
+      data-id={d.data.id}
       data-visible="{labelVisibilityThreshold(d.r)}"
     >
       <div
         class="circle"
         style="left:{d.x}px;top:{d.y}px;width:{d.r * 2}px;height:{d.r * 2}px;background-color:{fill};border: {strokeWidth}px solid {stroke};"
-      />
+></div>
         <div
           class="text-group"
           style="

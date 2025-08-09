@@ -1,16 +1,20 @@
 <script>
   import Tooltip from './../../celim/tooltipb.svelte'
   import { lang } from '$lib/stores/lang.js'
-  import {
-    createEventDispatcher
-} from 'svelte';
         import pic from './../../celim/pic.js' 
-export let fmiData = [];
-  export let hagdel = false;
+
    import { onMount } from 'svelte'; 
-export let rikmashes = [];
-  export let meData = [];
-  const dispatch = createEventDispatcher();
+
+   
+
+/**
+ * @param {object} payload - The payload for the 'tit' event.
+ * @param {string} payload.ti - The title string.
+ */
+let { onTit, fmiData = [], hagdel: hagdelProp = false, rikmashes = [], users } = $props();
+
+let hagdel = $state(hagdelProp);
+let meData = $state([]);
 
 //	import SvelteTooltip from 'svelte-tooltip';
 
@@ -28,17 +32,13 @@ function confirm (id) {
 function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
 } 
-let ulist = [
-]; 
-export let users;
-let dictid = {};
-onMount(async () => {
-
-pre ()
-})
+let ulist = $state([
+]); 
+let dictid = $state({});
 
 function pre (){
     console.log(users, fmiData)
+    const colors = ['#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0', '#9966FF', '#FF9F40', '#E7E9ED', '#839192'];
     for (let i = 0; i < users.length; i++){
         for (let j = 0; j <fmiData.length; j++){
           
@@ -114,8 +114,9 @@ function pre (){
                       d: dictid["pmcounter"],
                         o: "visible",
                          c: `url(#img${dictid["counter"]})`,
-                          imid: `img${dictid["counter"]}`
-                })
+                          imid: `img${dictid["counter"]}`,
+                          color: colors[(dictid["counter"]-1) % colors.length]
+               })
   }
     }
 
@@ -132,13 +133,14 @@ function pre (){
   import moment from 'moment';
 
   onMount(async () => {
+    pre();
     meData = rikmashes
    myMissionH()
               });
 
- let km = false;
-  let ky = false;
-  let kc = false;
+ let km = $state(false);
+  let ky = $state(false);
+  let kc = $state(false);
 
 
 function myMissionH ()  {
@@ -196,16 +198,16 @@ meData[i].totaltotal =  meData[i].easy;
   }
 }
 };
-let fir,ssec;
+let fir = $state(),ssec = $state();
  function x(a,b,c){
    if (a == "x"){
     fir = b;
     ssec = c.toFixed(2);
        xy = true;
-     //  dispatch("tit",{ti: `${fir}: ${ssec}%` })
+   //    onTit?.({ti: `${fir}: ${ssec}%` })
    } 
  }
- let xy = false;
+ let xy = $state(false);
  const hea = {"he":"חלוקת שווי הריקמה", "en": "FreeMate value distribution"}
  const cl = {"he": "סגירת הפירוט", "en": "close the details"}
  const pehe = {"he": "פעולות שבוצעו ואושרו", "en": "approved missions"}
@@ -225,31 +227,34 @@ let fir,ssec;
     <image href={use.src} x="-15" y="-10" width="100" height="100" />
   </pattern>
 </defs>
-  <circle on:mouseenter={x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
+  <circle class="pie-border" r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d} stroke={use.color} />
+  <circle onmouseenter={() => x("x",use.un, use.p )}  r="25%" cx="50%" cy="50%" stroke-dasharray="{use.s+1}, 101" stroke-dashoffset={use.d}  stroke={use.c} animation-delay={"0.25s"}>
  
  </circle>
   {/each}
 </svg>    </Tooltip>
 </div>
 </div>
-<button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" on:click={() => hagdel = true} >פירוט</button><br>
+<button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" onclick={() => hagdel = true} >פירוט</button><br>
    
 {:else}
      <button
       title="{cl[$lang]}"
-      on:click={() => hagdel = false}
+      onclick={() => hagdel = false}
        class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
         <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
     </svg></button> 
 <div class="dd md:items-center">
   <div class="body items-center">
-  
+  {#if fmiData.length > 0}
+
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >{pehe[$lang]}</h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg">אפשרויות</th>
           {#each fmiData as data, i}
@@ -349,15 +354,17 @@ let fir,ssec;
              </td>
              {/each}
         </tr>
+      </thead>
     </table>
 
- 
+ {/if}
   {#if meData.length > 0}
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
       >משאבים שהתקבלו ואושרו</h1>
     </caption>
+    <thead>
         <tr class="gg">
           <th class="gg"> </th>
           {#each meData as data, i}
@@ -391,6 +398,7 @@ let fir,ssec;
       {#each meData as data, i}
       <td >
        {data.attributes.hm}
+       </td>
       {/each}
     </tr><tr style="display:{ ky  ? "" : "none"};" >
       <th>תאריך התחלה </th>
@@ -421,12 +429,14 @@ let fir,ssec;
       <td>
   <small for="name" >שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
         {data.attributes.agprice.toFixed(2)}
+        </td>
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >
       <th>עלות סה"כ</th>
       {#each meData as data, i}
       <td  >
       <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.attributes.total.toFixed(2)}</h3>
+      </td>
       {/each}
     </tr> <tr>
       <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
@@ -442,6 +452,7 @@ let fir,ssec;
              </td>
              {/each}
         </tr>
+      </thead>
 </table>
 {/if}
 </div>
@@ -464,8 +475,13 @@ let fir,ssec;
 
 .pie circle {
   fill: none;
-  stroke-width: 32;
   animation: rotate 4.5s ease-in;
+}
+.pie circle:not(.pie-border) {
+  stroke-width: 32;
+}
+.pie .pie-border {
+  stroke-width: 34;
 }
 
 @keyframes rotate {
@@ -557,6 +573,3 @@ border-radius: 4%;
     background:rgb(132, 241, 223);
   } 
   </style>
-      
-        
-   

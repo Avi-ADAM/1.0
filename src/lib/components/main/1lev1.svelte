@@ -1,23 +1,43 @@
 <script>
     //https://res.cloudinary.com/barb1/image/upload/v1676238523/%D7%A4%D7%AA%D7%A6%D7%95%D7%92%D7%94%D7%9C%D7%95%D7%A4%D7%A4%D7%99%D7%95%D7%9F_kkymez.glb
-	import {  useFrame } from '@threlte/core'
-    import { createEventDispatcher, onMount } from 'svelte';
-    import Glttf from './11.svelte'
-      import { T } from '@threlte/core'
-    let s = true
-      onMount(()=>{
-        s = true;
-         setTimeout(function () {
-          s = false;
-        }, 4300);
-    })
- const dispatch = createEventDispatcher();
-  let rotationt = 0
-  let poz = {z:0, y:0, x:0};
-  
-     let up = true
-export let ss = 0 
- useFrame(() => {
+	import {  useTask } from '@threlte/core'
+import { onMount } from 'svelte';
+import Glttf from './11.svelte'
+import { T } from '@threlte/core'
+let s = $state(true)
+onMount(()=>{
+  console.log("GLTFFF")
+
+    s = true;
+    setTimeout(function () {
+        s = false;
+    }, 4300);
+})
+
+
+  /**
+   * @typedef {Object} Props
+   * @property {number} [ss]
+   * @property {boolean} [fi]
+   * @property {boolean} [hover]
+   * @property {boolean} [scrolli]
+   * @property {() => void} [onSubmit] - Callback for when the component submits.
+   */
+
+  /** @type {Props} */
+  let {
+    onSubmit,
+    ss = $bindable(0),
+    fi = false,
+    hover = false,
+    scrolli = false
+  } = $props();
+
+let rotationt = $state(0)
+let poz = $state({z:0, y:0, x:0});
+
+let up = $state(true)
+ useTask(() => {
     if (s == false){
       ss =0
     if(poz.y < 2.5 && up == false){
@@ -73,10 +93,10 @@ setInterval(() => {
 //	scene.background = new Color(0xeae8e2)
 function sub (){
     console.log("click")
-    dispatch("submit")
+    onSubmit?.()
 }
 let isHovering = false, isPointerDown = false
-export let fi = false, hover = false, scrolli = false
+
 </script>
 <!----
 <PerspectiveCamera position={{ x: 600, y: 200, z: 600 }} near={10} far={10000}>

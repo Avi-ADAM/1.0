@@ -1,10 +1,16 @@
 <script>
-  export let bmiData = [];
-  export let who = 0;
-  let isonly = false;
+  let isonly = $state(false);
   import RichText from '$lib/celim/ui/richText.svelte';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang.js';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [bmiData]
+   * @property {number} [who]
+   */
+
+  /** @type {Props} */
+  let { bmiData = $bindable([]), who = 0 } = $props();
   
   onMount(async () => {
     if (who !== 0) {
@@ -70,7 +76,9 @@
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-gray-200 last:border-r-0">
               <div class="max-w-xs">
-                <RichText outpot={data.attributes.descrip} editable={false}/>
+                {#if data.attributes.descrip !== undefined && data.attributes.descrip !== "undefined" && data.attributes.descrip !== null && data.attributes.descrip !== "" && data.attributes.descrip !== "null" }
+                  <RichText outpot={data.attributes.descrip} editable={false}/>
+                {/if}
               </div>
             </td>
           {/each}
@@ -95,7 +103,7 @@
           <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-gray-200">{$lang == 'en' ? "Public Links" : "קישורים ציבוריים"}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-gray-200 last:border-r-0">
-              {#if data.attributes.publicklinks !== undefined && data.attributes.publicklinks !== "undefined"}
+              {#if data.attributes.publicklinks !== undefined && data.attributes.publicklinks !== "undefined" && data.attributes.publicklinks !== null && data.attributes.publicklinks !== "" && data.attributes.publicklinks !== "null"}
                 <a target="_blank" rel="noreferrer" href="{data.attributes.publicklinks}" 
                    class="inline-flex items-center px-4 py-2 bg-green-100 hover:bg-green-200 text-green-800 rounded-lg transition-colors duration-200 font-medium">
                   <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -113,7 +121,7 @@
           <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-gray-200">{$lang == 'en' ? "Special Notes for My Fabric" : "הערות יחודיות לריקמה שלי"}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-gray-200 last:border-r-0">
-              {#if data.attributes.hearotMeyuchadot !== undefined && data.attributes.hearotMeyuchadot !== "undefined"}
+              {#if data.attributes.hearotMeyuchadot !== undefined && data.attributes.hearotMeyuchadot !== "undefined" && data.attributes.hearotMeyuchadot !== null && data.attributes.hearotMeyuchadot !== "" && data.attributes.hearotMeyuchadot !== "null"}
                 <div class="max-w-xs">
                   <RichText outpot={data.attributes.hearotMeyuchadot} editable={false}/>
                 </div>
@@ -127,7 +135,7 @@
           <td class="px-6 py-4 font-semibold text-gray-700 bg-gradient-to-r from-purple-100 to-pink-100 border-r border-gray-200">{$lang == 'en' ? "Private Links for My Fabric" : "קישורים יחודיים לריקמה שלי"}</td>
           {#each bmiData as data, i}
             <td class="px-6 py-4 border-r border-gray-200 last:border-r-0">
-              {#if data.attributes.privatlinks !== undefined && data.attributes.privatlinks !== "undefined"}
+              {#if data.attributes.privatlinks !== undefined && data.attributes.privatlinks !== "undefined" && data.attributes.privatlinks !== null && data.attributes.privatlinks !== "" && data.attributes.privatlinks !== "null"}
                 <a rel="noreferrer" target="_blank" href="{data.attributes.privatlinks}"
                    class="inline-flex items-center px-4 py-2 bg-amber-100 hover:bg-amber-200 text-amber-800 rounded-lg transition-colors duration-200 font-medium">
                   <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -241,7 +249,7 @@
                 <button
                   class="bg-white hover:bg-gray-100 text-purple-600 p-3 rounded-full shadow-lg transition-all duration-200 hover:shadow-xl hover:scale-105"
                   title={$lang == 'en' ? "Edit" : "עריכה"}
-                  on:click={() => edit(data.id)}
+                  onclick={() => edit(data.id)}
                 >
                   <svg class="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
                     <path d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z" />

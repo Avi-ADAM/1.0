@@ -42,20 +42,21 @@
   import SucssesConf from '$lib/celim/sucssesConf.svelte';
   import { sharLimud } from '$lib/func/lev/sharLimud.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
-  import { page } from '$app/stores';
+  import { page } from '$app/state';
   import { get } from 'svelte/store';
-  export let data;
-  let low = true;
-  let indexi = -1;
+  import { projects, userId, getProjectData } from '$lib/stores/projectStore.js';
+  let { data } = $props();
+  let low = $state(true);
+  let indexi = $state(-1);
 
-  let isOpen = false;
+  let isOpen = $state(false);
   //  import Viewport from 'svelte-viewport-info'
   let idL;
   let meData = [];
   let miData = [];
   let token;
-  let askedarr = [];
-  let declineddarr = [];
+  let askedarr = $state([]);
+  let declineddarr = $state([]);
   let d = [];
   let sk = [];
   let dictids = {};
@@ -63,58 +64,58 @@
   let askedcoin = [];
   let error1 = null;
   let mtaha = [];
-  let pmashd = 0;
-  let mashs = 0;
-  let maap = 0;
-  let sug = 0;
-  let pen = 0;
-  let ask = 0;
-  let halu = 0;
-  let wel = 0;
-  let askma = 0;
-  let beta = 0;
+  let pmashd = $state(0);
+  let mashs = $state(0);
+  let maap = $state(0);
+  let sug = $state(0);
+  let pen = $state(0);
+  let ask = $state(0);
+  let halu = $state(0);
+  let wel = $state(0);
+  let askma = $state(0);
+  let beta = $state(0);
   let des = 0;
-  let fia = 0;
-  let hachlot = 0
+  let fia = $state(0);
+  let hachlot = $state(0)
   let fiapp = [];
   let askedm = [];
   let askm = 0;
   let ma = 0;
   let wegets = [];
-  let arr1 = [];
+  let arr1 = $state([]);
   let askWants = [] 
   function close() {
     if (mode !== 4) {
       isOpen = false;
     }
   }
-  let eizeish, eizep;
-  let mode = 0;
+  let eizeish = $state(), eizep = $state();
+  let mode = $state(0);
 
   function user(event) {
     isOpen = false;
-    eizeish = event.detail.id;
+    eizeish = event.id;
     mode = 1;
     isOpen = true;
   }
 
   function chat(event) {
     isOpen = false;
-    //eizeish = event.detail.id
+    //eizeish = event.id
     mode = 3;
     isOpen = true;
   }
 
   function proj(event) {
     isOpen = false;
-    eizep = event.detail.id;
+    eizep = event.id;
     mode = 2;
     isOpen = true;
   }
-  let eizeme;
+  let eizeme = $state();
   function mesima(event) {
     isOpen = false;
-    eizeme = event.detail.id;
+    eizeme = event.id;
     mode = 5;
     isOpen = true;
   }
@@ -440,7 +441,7 @@
     localStorage.setItem('maap', maap);
   }
   let orech;
-  let adder = [];
+  let adder = $state([]);
   let check;
   let wi = 125;
 
@@ -1280,9 +1281,9 @@
 
   // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו
   let tyu = false;
-  let nam = '';
-  let total = '';
-  let picLink = '';
+  let nam = $state('');
+  let total = $state('');
+  let picLink = $state('');
 
   function midd(min) {
     const dd = min.data.usersPermissionsUser.data.attributes;
@@ -1318,7 +1319,7 @@
   let outerFlash = 'rgb(255,55,255)';
   let x = [],
     y = [],
-    xyz = ['1,2'],
+    xyz = $state(['1,2']),
     c = 0;
 
   function sortNumber(a, b) {
@@ -1328,8 +1329,8 @@
   function prcnt(a, b) {
     return parseInt((a * b) / 100, 10);
   }
-  let h,
-    w,
+  let h = $state(),
+    w = $state(),
     initX = 0;
 
   function gen() {
@@ -1494,7 +1495,7 @@
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
-      fetchTimers($page.data.uid,fetch)
+      fetchTimers(page.data.uid,fetch)
       token = cookieValu;
       const elem = document.getElementById('screen');
 
@@ -1595,8 +1596,9 @@
           if (index != -1 || null) {
             // indexi = index
             if (
-              arr1[index].diun.length == datan.data.attributes.diun.length &&
-              datan.data.attributes.diun[datan.data.attributes.diun.length - 1]
+              arr1[index].diun &&
+              arr1[index].diun.length == datan.data.attributes?.diun?.length &&
+              datan.data.attributes.diun[datan.data.attributes?.diun?.length - 1]
                 .id != $nowId
             ) {
               start();
@@ -1774,8 +1776,11 @@
           console.log(index, arr1[index]);
           if (index != -1 || null) {
             // indexi = index
+            start();
+            /*
             if (
-              arr1[index].chat.length == datan.data.attributes.chat.length &&
+              arr1[index].chat &&
+              arr1[index]?.chat?.length == datan.data.attributes?.chat?.length &&
               datan.data.attributes.chat[datan.data.attributes.chat.length - 1]
                 .id != $nowId
             ) {
@@ -1874,7 +1879,7 @@
                   nutifi(head, body);
                 }
               }
-            }
+            }*/
           }
         });
       });
@@ -1913,7 +1918,7 @@
       localStorage.setItem('arr1Snapshot', JSON.stringify(value));
     }
   }
-  /*   await sendToSer({uid: $page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
+  /*   await sendToSer({uid: page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON__out_ser",v)
       })*/
 };
@@ -1990,7 +1995,7 @@
                                 acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
             			   }}}
       welcom_tops (filters: { clicked: { eq: false } }){ data{ id attributes{
-                	 project{data{id}}
+                	 project{data{id attributes{descripFor publicDescription}}}
    								   }}}
       skills{data{id attributes{ 
             			 open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
@@ -2178,8 +2183,10 @@
       console.log('nologin');
 
       counter += 1;
+      projects.set(miData.data.usersPermissionsUser.data.attributes.projects_1s.data);
+      userId.set(miData.data.usersPermissionsUser.data.id);
       localStorage.setItem('miDataL', JSON.stringify(miData));
-      if (isEqual(miData, miDataold) == true && update != true) {
+      if (isEqual(miData, miDataold) && update != true) {
         console.log('nada',nowT - Date.now());
         low = false;
       } else {
@@ -2364,8 +2371,8 @@
           user_1s: getProjectData(proj.id, 'us'),
           src: getProjectData(proj.id, 'pp'),
           noofpu: getProjectData(proj.id, 'noof'),
-          timegramaId:pend.timegrama.data.id,
-          timegramaDate:pend.timegrama.data.attributes.date,
+          timegramaId:pend.timegrama?.data?.id || null,
+          timegramaDate:pend.timegrama?.data?.attributes?.date || null,
           restime:getProjectData(proj.id, 'restime'),
           users: pend.vots,
           myid: myid,
@@ -2390,8 +2397,8 @@
           user_1s: getProjectData(proj.id, 'us'),
           src: getProjectData(proj.id, 'pp'),
           noofpu: getProjectData(proj.id, 'noof'),
-          timegramaId:pend.timegrama.data.id,
-          timegramaDate:pend.timegrama.data.attributes.date,
+          timegramaId:pend.timegrama?.data?.id || null,
+          timegramaDate:pend.timegrama?.data?.attributes?.date || null,
           restime:getProjectData(proj.id, 'restime'),
           users: pend.vots,
           myid: myid,
@@ -2675,8 +2682,10 @@
           descrip: pend.descrip,
           kindOf: pend.kindOf,
           created_at: pend.createdAt,
-          nego_mashes: pend.nego_mashes.data,
+          nego_mashes: pend.nego_mashes,
           timegramaId: pend.timegrama.data.id,
+          timeGramaDate: pend.timegrama.data.attributes.date,
+          nego_mashes: pend.nego_mashes.data,
           restime: getProjectData(proj.id, 'restime'),
           projectName: getProjectData(proj.id, 'pn'),
           user_1s: getProjectData(proj.id, 'us'),
@@ -3066,81 +3075,6 @@
     localStorage.setItem('sdsa', sdsa);
   }
   let walcomen = [];
-  function getProjectData(id, thing, uid) {
-    const projects =
-      miData.data.usersPermissionsUser.data.attributes.projects_1s.data;
-    if (projects.length > 0) {
-      for (let i = 0; i < projects.length; i++) {
-        if (projects[i].id == id) {
-          if (thing == 'pn') {
-            return projects[i].attributes.projectName;
-          } else if (thing == 'pp') {
-            let srcP = '';
-            if (projects[i].attributes.profilePic.data != null) {
-              if (
-                projects[i].attributes.profilePic.data.attributes.formats
-                  .thumbnail
-              ) {
-                srcP =
-                  projects[i].attributes.profilePic.data.attributes.formats
-                    .thumbnail.url;
-              } else {
-                srcP = projects[i].attributes.url;
-              }
-            } else {
-              srcP =
-                'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
-            }
-            return srcP;
-          } else if (thing == 'noof') {
-            return projects[i].attributes.user_1s.data.length;
-          } else if (thing == 'uids') {
-            return projects[i].attributes.user_1s.data.map((c) => c.id);
-          } else if (thing == 'us') {
-            return projects[i].attributes.user_1s.data;
-          } else if (thing == 'upic') {
-            for (
-              let t = 0;
-              t < projects[i].attributes.user_1s.data.length;
-              t++
-            ) {
-              if (projects[i].attributes.user_1s.data[t].id == uid) {
-                let pic = null;
-                if (
-                  projects[i].attributes.user_1s.data[t].attributes.profilePic
-                    .data !== null
-                ) {
-                  pic =
-                    projects[i].attributes.user_1s.data[t].attributes.profilePic
-                      .data.attributes.formats.thumbnail.url;
-                } else {
-                  pic = null;
-                }
-                return pic;
-              }
-            }
-          } else if (thing == 'un') {
-            for (
-              let t = 0;
-              t < projects[i].attributes.user_1s.data.length;
-              t++
-            ) {
-              if (projects[i].attributes.user_1s.data[t].id == uid) {
-                return projects[i].attributes.user_1s.data[t].attributes
-                  .username;
-              }
-            }
-          } else if (thing == 'restime') {
-            return projects[i].attributes.restime;
-          }
-        }
-      }
-    } else {
-      sendEror(miData.data.usersPermissionsUser.data.id, thing, 2000);
-      return null;
-      //why am i here send error report to telegram
-    }
-  }
   function makeWalcom(ata) {
     const usernames = ata.data.usersPermissionsUser.data.attributes.username;
     for (
@@ -3150,9 +3084,24 @@
     ) {
       const wal =
         ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i];
+      console.log(
+        "welcomen",
+        ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i],
+        getProjectData(
+          wal.attributes.project.data.id,
+          'pp'
+        )
+      )
       walcomen.push({
+        welcomId: wal.id,
         id: wal.attributes.project.data.id,
+        details:wal.attributes.project.data.attributes.publicDescription,
+        pd: wal.attributes.project.data.attributes.descripFor,
         username: usernames,
+        src: getProjectData(
+          wal.attributes.project.data.id,
+          'pp'
+        ),
         projectName: getProjectData(wal.attributes.project.data.id, 'pn'),
         ani: 'walcomen',
         azmi: 'mesima',
@@ -3487,20 +3436,21 @@
   }
 
   function coinLapach(event) {
-    // let oldob = arr1;
-    //   const x = oldob.map(c => c.coinlapach);
-    //   const indexy = x.indexOf(event.detail.coinlapach);
-    //   oldob.splice(indexy, 1);
-    //   arr1 = oldob
+    const indexy = arr1.findIndex(c => c.coinlapach === event.coinlapach);
+    if (indexy > -1) {
+      arr1.splice(indexy, 1);
+      arr1 = [...arr1];
+    }
+    
     counter = 0;
-    cards == event.detail.cards;
-    let ani = event.detail.ani;
+    cards == event.cards;
+    let ani = event.ani;
     if (ani == 'asked') {
       ask -= 1;
     }
     //harchava mesima ishrur ziruf hazaa hachla
     console.log('im starting 2');
-    start();
+     start();
   }
 
   // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
@@ -3539,24 +3489,24 @@
     console.log(arr1);
     const x = new Date();
       const d = x.toISOString();
-    /*  await sendToSer({uid: $page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
+    /*  await sendToSer({uid: page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON",v)
       })*/
     //sp;it to 2 4 diif ways , elgo if lengt > 3 split first 3 then 2 , another 5 and 4 ,, pay ottention to heart
   }
   const defaulti = { he: 'מסך הלב', en: 'heart of 1💗1' };
-  let u = defaulti[$lang];
+  let u = $state(defaulti[$lang]);
 
   function hover(event) {
-    u = event.detail.id;
+    u = event.id;
   }
-  let cards = true;
+  let cards = $state(true);
   async function cardsi(event) {
-    cards = event.detail.cards;
+    cards = event.cards;
     console.log(cards, 'from papa');
   }
   const title = { he: 'לב 1💗1', en: 'heart of 1💗1' };
-  let milon = {
+  let milon = $state({
     hachla: true,
     fiap: true,
     welc: true,
@@ -3569,7 +3519,7 @@
     pmashs: true,
     pmaap: true,
     askmap: true
-  };
+  });
 
   function cardsYaron() {
     //  dispatch("cards", {
@@ -3577,10 +3527,10 @@
     //  })
   }
 
-  let toCoin = true;
+  let toCoin = $state(true);
 
   function showonly(event) {
-    const value = event.detail.data;
+    const value = event.data;
     for (const key in milon) {
       milon[key] = false;
     }
@@ -3687,7 +3637,7 @@
       >
         <button
           style="margin: 0 auto;"
-          on:click={close}
+          onclick={close}
           class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
           title="סגירה"
           ><svg style="width:24px;height:24px;z-index:999;" viewBox="0 0 24 24">
@@ -3699,16 +3649,16 @@
         >
         {#if mode == 1}
           <span>
-            <Hevel userId={eizeish} on:proj={proj} />
+            <Hevel userId={eizeish} onProj={proj} />
           </span>
         {:else if mode == 2}
-          <Rikma projectId={eizep} on:user={user} on:mesima={mesima} />
+          <Rikma projectId={eizep} onUser={user} onMesima={mesima} />
         {:else if mode == 3}
           <Levchat />
         {:else if mode == 4}
           <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
         {:else if mode == 5}
-          <Mesima missionId={eizeme} on:project={proj} />
+          <Mesima missionId={eizeme} onProject={proj} />
         {/if}
       </div>
     </DialogContent>
@@ -3722,12 +3672,12 @@
       <Tooltip title={u} ispic="true">
         <Cardsui
           {low}
-          on:hover={hover}
-          on:cards={cardsi}
-          on:user={user}
-          on:proj={proj}
-          on:chat={chat}
-          on:start={coinLapach}
+          onHover={hover}
+          onCards={cardsi}
+          onUser={user}
+          onProj={proj}
+          onChat={chat}
+          onStart={coinLapach}
           bind:indexi
           {arr1}
           {askedarr}
@@ -3750,15 +3700,15 @@
   {:else if cards == false}
     <Tooltip title={u} ispic="true">
       <Coinsui
-        on:hover={hover}
+        onHover={hover}
         {low}
         {milon}
-        on:mesima={mesima}
-        on:user={user}
-        on:proj={proj}
-        on:chat={chat}
-        on:start={coinLapach}
-        on:cards={cardsi}
+        onMesima={mesima}
+        onUser={user}
+        onProj={proj}
+        onChat={chat}
+        onStart={coinLapach}
+        onCards={cardsi}
         {adder}
         {arr1}
         {askedarr}
@@ -3801,9 +3751,9 @@
     {ask}
     {picLink}
     {total}
-    on:cards={cardsYaron}
-    on:showall={showall}
-    on:showonly={showonly}
+    onCards={cardsYaron}
+    onShowall={showall}
+    onShowonly={showonly}
   />
 {/if}
 

@@ -1,4 +1,3 @@
- 
 <script>
   import { RingLoader
 } from 'svelte-loading-spinners';
@@ -15,11 +14,17 @@
     
   import MapSvg from '../../lib/components/main/map.svg.svelte';
   import Tooltip from '../../lib/components/main/tooltip.html.svelte';
- export let data = null
  
   // This example loads json data as json using @rollup/plugin-json
   import world from '../../lib/components/main/countries110m.json';
   import { onMount } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {any} [data]
+   */
+
+  /** @type {Props} */
+  let { data  } = $props();
 
   const colorKey = 'agrees';
   const colorKeyy = 'value';
@@ -32,22 +37,27 @@
   const dataJoinKey = 'name';
   const mapJoinKey = 'name';
   const dataLookup = new Map();
-  $: noof = 0
-    $:  data.streamed.data.then(function(data) {
-      noof = data.total
-      data.forEach(d => {
-    dataLookup.set(d[dataJoinKey], d);
-        }
-        )
-      })
+  let noof = $state(0);
+  let isok = $state(false);
+    onMount(() => {
+    data.streamed.data.then(function(data) {
+      isok = true
+        noof = data.total
+        console.log(noof , "tesr")
+        data.forEach(d => {
+      dataLookup.set(d[dataJoinKey], d);
+          }
+          )
+        })
+  });
 
    
   const geojson = feature(world, world.objects.units);
   const projection = geoMercator;
 
   
-  let evt;
-  let hideTooltip = true;
+  let evt = $state({detail:{}});
+  let hideTooltip = $state(true);
       const onm = {"he":"רק רגע בבקשה","en":"one moment please","ar":"دقيقة واحدة فقط من فضلك"}
   // Create a flat array of objects that LayerCake can use to measure
   // extents for the color scale
@@ -56,7 +66,9 @@
   'rgb(244, 114, 182)',
   'rgb(209, 146, 255)',
 					"#EEE8AA"];
-     $: console.log(data.streamed.data)
+     $effect(() => {
+    console.log("test",data.streamed.data)
+  });
   const addCommas = format(',');
   const title = {"he":" סך הכל הסכימו","en":"Total agreements","ar":" مجموع الموافقات المستلمة"}
 </script>
@@ -91,11 +103,12 @@
           <br>
          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
          </div> 
-{:then}
+{:then value}
 <div class="ww">
-    <h1 style="font-size:20px;" class="text-barbi text-center">{title[$lang]} - {noof}
+<h1 style="font-size:20px;" class="text-barbi text-center">{title[$lang]} - {noof}
     </h1>
-    <div class="wwa">
+    {#if value.length > 0 && isok}
+<div class="wwa">
 <div class="chart-container">
   <LayerCake
     data={geojson}
@@ -108,8 +121,15 @@
     <Svg>
       <MapSvg
         {projection}
-        on:mousemove={event => evt = hideTooltip = event}
-        on:mouseout={() => hideTooltip = true}
+        onmouseout={() => hideTooltip = true}
+        onFeatureMousemove={({ e, props }) => {
+          console.log('mousemove in love/+page.svelte', { e, props });
+          evt = { detail: { e, props } };
+          hideTooltip = false;
+        }}
+        onmouseleave={() => {
+          hideTooltip = true;
+        }}
       />
     </Svg>
 
@@ -119,16 +139,22 @@
       {#if hideTooltip !== true}
         <Tooltip
           {evt}
-          let:detail
+          
         >
-          {@const tooltipData = { ...detail.props, ...dataLookup.get(detail.props[mapJoinKey]) }}
-          {#each Object.entries(tooltipData) as [key, value]}
-            {@const keyCapitalized = key.replace(/^\w/, d => d.toUpperCase())}
-            <div class="row"><span>{keyCapitalized}:</span> {typeof value === 'number' ? addCommas(value) : value}</div>
-          {/each}
-        </Tooltip>
+          {#snippet children({ detail, translations })}
+                                {@const tooltipData = { ...detail, ...dataLookup.get(detail[mapJoinKey]) }}
+            {#each Object.entries(tooltipData) as [key, value]}
+              {@const keyCapitalized = key.replace(/^\w/, d => d.toUpperCase())}
+              {@const translatedKey = translations[key]?.[$lang] || keyCapitalized}
+              <div class="row" dir={$lang === 'he' ? 'rtl' : 'ltr'}><span>{translatedKey}:</span> {typeof value === 'number' ? addCommas(value) : value}</div>
+            {/each}
+                                        {/snippet}
+                            </Tooltip>
       {/if}
     </Html>
   </LayerCake>
-</div></div></div>
+</div>
+</div>
+{/if}
+</div>
 {/await}

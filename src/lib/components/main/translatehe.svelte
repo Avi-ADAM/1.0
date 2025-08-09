@@ -1,21 +1,29 @@
 <script>
-let amort = ""
-let amorts =  ""
-let amortt = ""
-let amortf = ""
-let amorth = ""
+let amort = $state("")
+let amorts =  $state("")
+let amortt = $state("")
+let amortf = $state("")
+let amorth = $state("")
 let amorta = "אני| שם | לעולם לא אנהג באלימות ולא אפגע באף אדם"
 let amortsa =  "כי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר מצדיק פגיעה בחייו של אדם, אלימות וכפיה בכוח"
 let amortta = " אני | שם | אתן את אמוני בטוב ובכך שכאשר כל האנושות תחתום: אלימות, קרבות ומשטור יפסיקו להיות צורה של תקשורת אנושית"
 let amortfa = "כאשר כל | שם מקום | תסכים עם אמנה זו אני | שם | אוותר על כלי הנשק שלי ועל השוטרים החמושים שמדינת | שם מקום | ממנה בשמי"
 let amortha = "אני | שם | אוותר על כלי הנשק של צבא | שם מקום | כאשר כל האנושות תסכים עם האמנה הזו"
-  let already = false;
-  let lang, come, name, email;
+  let already = $state(false);
+  let lang = $state(), come = $state(), name = $state(), email = $state();
 let error1;
- import { createEventDispatcher } from 'svelte';
- const dispatch = createEventDispatcher();
 const baseUrl = import.meta.env.VITE_URL
 //TODO: update text
+
+/**
+ * @typedef {Object} Props
+ * @property {() => void} [onDone] - Callback for when the operation is successful.
+ * @property {() => void} [onErore] - Callback for when an error occurs.
+ */
+
+/** @type {Props} */
+let { onDone, onErore } = $props();
+
 let miDatan = [];
 let linkg = baseUrl+'/graphql';
 async function add (){
@@ -50,12 +58,12 @@ already = true;
                 .then(r => r.json())
                 .then(data => miDatan = data);
             console.log(miDatan);
-            dispatch("done")
+            onDone?.()
             //התראה
         } catch (e) {
             error1 = e
             console.log(error1);
-                        dispatch("erore")
+                        onErore?.()
 
         }
 }
@@ -117,7 +125,7 @@ already = true;
 {#if already == false}
 <div class="flex items-center justify-center">
 <button style="margin: 5px auto;"  class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2  rounded-full"
- on:click={add} >שליחה</button>
+ onclick={add} >שליחה</button>
  </div>
  {/if}
 <style>

@@ -1,12 +1,25 @@
 <script>
     import { cn } from "$lib/utils";
   
-    export let gradient = false;
-    let className = "";
-    export { className as class };
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [gradient]
+   * @property {string} [class]
+   * @property {import('svelte').Snippet} [label]
+   * @property {import('svelte').Snippet} [children]
+   */
+
+  /** @type {Props} */
+  let {
+    gradient = false,
+    class: className = "",
+    label,
+    children
+  } = $props();
+    
   </script>
   
-  {#if $$slots.label}
+  {#if label}
     <div class="flex items-center w-full">
       <div
         class={cn(
@@ -18,7 +31,7 @@
         )}
       ></div>
       <div class="text-gray-600  uppercase w-fit dark:text-gray-300 text-nowrap">
-        <slot name="label"></slot>
+        {@render label?.()}
       </div>
       <div
         class={cn(
@@ -31,7 +44,7 @@
       ></div>
     </div>
   {:else}
-    <slot>
+    {#if children}{@render children()}{:else}
       <div
         class={cn(
           "rounded-full w-full h-[1px]",
@@ -40,7 +53,7 @@
             : "bg-zinc-300 dark:bg-zinc-800",
           className
         )}
-      />
-    </slot>
+></div>
+    {/if}
   {/if}
   

@@ -6,70 +6,113 @@
   import Barb from '../conf/stackBar.svelte';
   import KindOfnego from '$lib/components/conf/kindOfnego.svelte';
   const tri = tr;
-  import { createEventDispatcher } from 'svelte';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
-  const dispatch = createEventDispatcher();
-  export let restime;
   import { montsi } from '$lib/func/montsi.svelte';
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
 
-  export let descrip;
-  export let projectName;
-  export let name1;
-  export let spnot;
-  export let easy = 0;
-  export let hm = 0;
-  export let price = 0;
-  export let projectId;
-  export let uids = [];
-  export let what = [];
-  export let noofusersOk;
-  export let noofusersNo;
-  export let noofusersWaiting;
-  export let total = 0;
-  export let noofusers;
-  export let already;
-  export let mypos;
-  export let missionId;
-  export let linkto;
-  export let tafkidims;
-  export let sqadualed;
-  export let sqadualedf;
-  export let state = 2;
-  export let pendId;
-  export let users = [];
-  export let kindOf = 'perUnit';
-  export let oldide = 0; //last tg id, if non 0
   let bearer1;
   let token;
   let idL;
+ let miDatan = [];
+  let error1;
+  let clicked = false;
+  /**
+   * @typedef {Object} Props
+   * @property {any} restime
+   * @property {any} descrip
+   * @property {any} projectName
+   * @property {any} name1
+   * @property {any} spnot
+   * @property {number} [easy]
+   * @property {number} [hm]
+   * @property {number} [price]
+   * @property {any} projectId
+   * @property {any} [uids]
+   * @property {any} [what]
+   * @property {any} noofusersOk
+   * @property {any} noofusersNo
+   * @property {any} noofusersWaiting
+   * @property {number} [total]
+   * @property {any} noofusers
+   * @property {any} already
+   * @property {any} mypos
+   * @property {any} missionId
+   * @property {any} linkto
+   * @property {any} tafkidims
+   * @property {any} sqadualed
+   * @property {any} sqadualedf
+   * @property {number} [stepState]
+   * @property {any} pendId
+   * @property {any} [users]
+   * @property {string} [kindOf]
+   * @property {number} [oldide] - last tg id, if non 0
+   * @property {any} timegramaId
+   * @property {number} [ordern]
+   * @property {boolean} [masaalr]
+   */
 
+  /** @type {Props} */
+  let {
+    restime,
+    descrip,
+    projectName,
+    name1,
+    spnot,
+    easy = 0,
+    hm = 0,
+    price = 0,
+    projectId,
+    uids = [],
+    what = [],
+    noofusersOk,
+    noofusersNo,
+    noofusersWaiting,
+    total = 0,
+    noofusers,
+    already,
+    mypos,
+    missionId,
+    linkto,
+    tafkidims,
+    sqadualed,
+    sqadualedf,
+    stepState = 2,
+    pendId,
+    users = [],
+    kindOf = 'perUnit',
+    oldide = 0,
+    timegramaId,
+    ordern = 0,
+    masaalr = false,
+    onClose,
+    onLoad
+  } = $props();
+  
+  let userss;
   const less = {
     he: 'הסרה',
     en: 'remove'
   };
-  let descrip2 = descrip;
-  let name2 = name1;
-  let sqadualed2 = sqadualed;
-  let sqadualedf2 = sqadualedf;
+  let descrip2 = $state(descrip);
+  let name2 = $state(name1);
+  let sqadualed2 = $state(sqadualed);
+  let sqadualedf2 = $state(sqadualedf);
 
   let spnot2 = spnot;
-  let linkto2 = linkto;
-  let hm2 = hm;
-  let price2 = price;
-  let easy2 = easy;
+  let linkto2 = $state(linkto);
+  let hm2 = $state(hm);
+  let price2 = $state(price);
+  let easy2 = $state(easy);
   let rishon = 0;
-  let kindOfb = kindOf;
+  let kindOfb = $state(kindOf);
 
   function close() {
-    dispatch('close');
+    onClose?.();
   }
-  export let timegramaId;
   let name4 = ``;
-  export let ordern = 0;
   let descrip4 = ``;
   let spnot4 = ``;
   let hm4 = ``;
@@ -79,62 +122,35 @@
   let rishonves4 = ``;
   let what4 = true;
   function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
-        }
-      }
-    }
-    return str;
+    if (!obj || !Array.isArray(obj)) return '';
+    return obj
+      .map((item) => {
+        const props = Object.entries(item)
+          .filter(([key]) => key !== '__typename' && item[key] !== null && item[key] !== undefined)
+          .map(([key, val]) => {
+            let formattedVal;
+            if (key === 'users_permissions_user' && typeof val === 'object' && val !== null) {
+              formattedVal = `"${val.data.id}"`;
+            } else if (typeof val === 'string') {
+              formattedVal = `"${val.replace(/"/g, '\\"')}"`;
+            } else if (val === null) {
+              formattedVal = 'null';
+            } else {
+              formattedVal = val;
+            }
+            return `${key}:${formattedVal}`;
+          })
+          .join(',');
+        return `{${props}}`;
+      })
+      .join(',');
   }
   function objToStringC(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
-      for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
-        if (typeof val == 'string') {
-          str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
-          str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
-        }
-      }
-    }
-    return str;
+    return objToString(obj);
   }
-  let miDatan = [];
-  let error1;
-  let clicked = false;
-  export let masaalr = false;
-  let userss;
+ 
   async function increment() {
-    dispatch('load');
+    onLoad?.();
     //TODO: update timegrama, add now pend that is changed to nego
     let sqadualedf4 = ``,
       kindOf4nego = ``,
@@ -200,24 +216,24 @@
       name4 = ``;
       namefornego = ``;
     } else {
-      name4 = `name: "${name2}",`;
-      namefornego = `name: "${name1}",`;
+      name4 = `name: ${JSON.stringify(name2)},`;
+      namefornego = `name: ${JSON.stringify(name1)},`;
       what4 = false;
     }
     if (descrip === descrip2) {
       descrip4 = ``;
       descrip4nego = ``;
     } else {
-      descrip4 = `descrip: "${descrip2}",`;
-      descrip4nego = `descrip: "${descrip}",`;
+      descrip4 = `descrip: """${descrip2}""",`;
+      descrip4nego = `descrip: """${descrip}""",`;
       what4 = false;
     }
     if (spnot === spnot2) {
       spnot4 = ``;
       spnot4nego = ``;
     } else {
-      spnot4 = `spnot: "${spnot2}",`;
-      spnot4nego = `spnot: "${spnot}",`;
+      spnot4 = `spnot: ${JSON.stringify(spnot2)},`;
+      spnot4nego = `spnot: ${JSON.stringify(spnot)},`;
       what4 = false;
     }
     if (easy === easy2) {
@@ -293,7 +309,7 @@
               users_permissions_user:"${idL}",
                 publishedAt: "${d.toISOString()}",
                 pmash:${pendId},
-                 isOriginal:${state == 2 ? true : false},
+                 isOriginal:${stepState == 2 ? true : false},
                  ${kindOf4nego}
     ${easy4nego}             
     ${hm4nego}
@@ -317,7 +333,7 @@
     ${price4}
     ${sqadualedf4}
     ${sqadualed4}
-        users:[  ${userss}, 
+        users:[  ${userss}${userss ? ',' : ''}
      {
       what: true
       users_permissions_user: "${idL}"
@@ -360,7 +376,7 @@
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
 
-  $: datai = [
+  let datai = $derived([
     {
       leb: `${tri?.nego?.new[$lang]},${price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}| ${tri?.mash?.shovile[$lang]},${easy2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true)}`,
       value: price2 * hm2 * montsi(kindOfb, sqadualed2, sqadualedf2, true),
@@ -375,8 +391,7 @@
         easy * hm * montsi(kindOf, sqadualed, sqadualedf, true) -
         price * hm * montsi(kindOf, sqadualed, sqadualedf, true)
     }
-  ];
-  $: console.log(datai);
+  ]);
 </script>
 
 <div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
@@ -435,7 +450,7 @@
         <h2 class="underline decoration-mturk">{tr?.mission.assingToMe[$lang]}: </h2>
   <input
     bind:checked={myM}
-    type="checkbox" id="tomeC" name="tome" value="tome" on:click={()=> myMission()}>
+    type="checkbox" id="tomeC" name="tome" value="tome" onclick={()=> myMission()}>
 </div>
 </div>-->
   </div>
@@ -472,7 +487,7 @@
 
   <div class="w-fit mx-auto">
     <button
-      on:click={increment}
+      onclick={increment}
       class="mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
       type="submit"
       name="addm">{tri?.common.puttovote[$lang]}</button

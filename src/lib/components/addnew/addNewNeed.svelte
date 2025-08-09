@@ -1,21 +1,18 @@
 <script>
  let idNewNeed;
- import { createEventDispatcher } from 'svelte';
 const baseUrl = import.meta.env.VITE_URL
 
            import { lang } from '$lib/stores/lang.js'
 
- const dispatch = createEventDispatcher();
- let clicked = false
+ let clicked = $state(false)
 let token;
-let needName;
-let  desN = "";
-let price = 0;
-let valued;
-let linkto = "";
+let needName = $state();
+let  desN = $state("");
+let price = $state(0);
+let valued = $state();
+let linkto = $state("");
 let meData = [];
-// cando choose
-export let onmo = false
+
 async function subm() {
   clicked = true
    const cookieValue = document.cookie
@@ -51,7 +48,7 @@ async function subm() {
              .then(r => r.json())
   .then(data => meData = data);
         console.log(meData)
-    dispatch("newn",{
+    onNewn?.({
   id: meData.data.createMashaabim.data.id,
   skob: meData.data.createMashaabim.data,
   name: meData.data.createMashaabim.data.attributes.name,
@@ -62,9 +59,23 @@ addnee = false
         console.log('צריך לתקן:', error.response);
                 };
     };
-    export let rr = 24;
-export let color = "--gold";
-export let addnee = false;
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [onmo] - cando choose
+   * @property {number} [rr]
+   * @property {string} [color]
+   * @property {boolean} [addnee]
+   * @property {function(Object): void} [onNewn] - Callback for newn event
+   */
+
+  /** @type {Props} */
+  let {
+    onmo = false,
+    rr = 24,
+    color = "--gold",
+    addnee = $bindable(false),
+    onNewn
+  } = $props();
 const hekind = {"he":"סוג שווי","en":"kind of vallue"}
 const val = {"he":"שווי כספי ","en":"vallue"}
   const sho = {"he":"תיאור קצר","en":"short description"}
@@ -82,7 +93,7 @@ const crn = {"he":"יצירת משאב חדש","en":"create new need"}
   </script>
  {#if addnee === false}
 
-      <button on:click={() => addnee = true} 
+      <button onclick={() => addnee = true} 
         class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
         >{adn[$lang]}</button>
       {:else if addnee === true}
@@ -91,7 +102,7 @@ const crn = {"he":"יצירת משאב חדש","en":"create new need"}
       class:bg-slate-900={onmo == true}>
   <button
   title="{cen[$lang]}"
-       on:click={() => addnee = false}
+       onclick={() => addnee = false}
         class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
         ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
          <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
@@ -155,7 +166,7 @@ const crn = {"he":"יצירת משאב חדש","en":"create new need"}
 </div>
 {#if clicked == false}
   <button
- on:click={subm} 
+ onclick={subm} 
  class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 m-4 rounded-full"
  >{crn[$lang]}</button>
  {/if}

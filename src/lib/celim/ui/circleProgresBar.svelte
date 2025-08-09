@@ -1,13 +1,19 @@
 <script>
-	export let progress = 0
-	$: angle = 360 * progress
+	/**
+	 * @typedef {Object} Props
+	 * @property {number} [progress]
+	 */
+
+	/** @type {Props} */
+	let { progress = 0 } = $props();
+	let angle = $derived(360 * progress)
 	
 	// Adapt the logic according to the approach
-	$: background = `radial-gradient(white 50%, transparent 51%),
+	let background = $derived(`radial-gradient(white 50%, transparent 51%),
     conic-gradient(transparent 0deg ${angle}deg, gainsboro ${angle}deg 360deg),
-    conic-gradient(orange 0deg, yellow 90deg, lightgreen 180deg, green);`;
+    conic-gradient(orange 0deg, yellow 90deg, lightgreen 180deg, green);`);
 	
-	$: cssVarStyles = `--background:${background}`
+	let cssVarStyles = $derived(`--background:${background}`)
 </script>
 
 <style>

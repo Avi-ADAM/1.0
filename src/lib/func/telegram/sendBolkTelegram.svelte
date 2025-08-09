@@ -1,4 +1,4 @@
-<script context="module">
+<script module>
     /***
      * push to telegram
      * @param {Array} telegrams   array contains objects with id, and as attributes username lang and telegram chatid
