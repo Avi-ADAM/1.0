@@ -803,80 +803,44 @@ function claf (event){
       console.log(t,"rfweiofjw",op)
     }
     async function taskishor(id){
-      console.log(id)
-      let que = `mutation { 
-  updateAct(
-      id: ${id}
-      data: { 
-        myIshur: true
- }
-  ){data {id}}
- } ` 
-    console.log(que)
- try{
- let res = await SendTo(que)
- .then (res => res = res);
-  console.log(res)
-  if(res.data !=null){
-    toast.success(suc[$lang])
-  }else{
-    toast.warning(er[$lang])
-  }
-}  catch (e) {
-  console.error(e)
-  toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
-  }
+      try{
+        const res = await sendToSer({ id, myIshur: true }, '61ApproveAct', null, null, false, fetch);
+        if(res.data){
+          toast.success(suc[$lang])
+        } else {
+          toast.warning(er[$lang])
+        }
+      } catch (e) {
+        console.error(e)
+        toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
+      }
     }
-async function busabe(id){
-      console.log(id)
-      let que = `mutation { 
-  updateAct(
-      id: ${id}
-      data: { 
-        naasa: true
- }
-  ){data {id}}
- } ` 
-    console.log(que)
- try{
- let res = await SendTo(que)
- .then (res => res = res);
-  console.log(res)
-  if(res.data !=null){
-    toast.success(suc[$lang])
-  }else{
-    toast.warning(er[$lang])
-  }
-}  catch (e) {
-  console.error(e)
-  toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
-  }
+    async function busabe(id){
+      try{
+        const res = await sendToSer({ id, naasa: true }, '62MarkActDone', null, null, false, fetch);
+        if(res.data){
+          toast.success(suc[$lang])
+        }else{
+          toast.warning(er[$lang])
+        }
+      }  catch (e) {
+        console.error(e)
+        toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
+      }
     }
     async function updStat(id,st,i){
-      console.log(id)
-      let que = `mutation { 
-  updateAct(
-      id: ${id}
-      data: { 
-        status: ${st}
- }
-  ){data {id}}
- } ` 
-    console.log(que)
- try{
- let res = await SendTo(que)
- .then (res => res = res);
-  console.log(res)
-  if(res.data !=null){
-    toast.success(suc[$lang])
-    op[i] = false
-  }else{
-    toast.warning(er[$lang])
-  }
-}  catch (e) {
-  console.error(e)
-  toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
-  }
+      try{
+        const res = await sendToSer({ id, status: st[0] }, '63SetActStatus', null, null, false, fetch);
+        if(res.data){
+          toast.success(suc[$lang])
+          op[i] = false
+        }else{
+          toast.warning(er[$lang])
+        }
+      }  catch (e) {
+        console.error(e)
+        toast.warning(`${er[$lang]}`,{description: e.status+ ": "+e.message})
+      }
     }
   let a = $state(1);
   const suc = {"he": "בוצע בהצלחה","en":"appruved sucssefully!"}
@@ -934,7 +898,7 @@ $effect(() => {
     // rotation refers to the degrees applied to the minutes dial to have a full rotation for 60 seconds
     // multiply the value by 60 for the seconds dial to have a full rotation every second
     let rotation = $derived(((lapse / 1000 / 60) * 360) % 360);
- let op = $derived({})
+ let op = $state({})
 </script>
 <TimerDialogs
 bind:timer={storeTimer}
