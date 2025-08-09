@@ -39,7 +39,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {() => void} [onClear] - Callback for clear event
    * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
    * @property {() => void} [onStatusi] - Callback for statusi event
-   * @property {() => void} [onOpentask] - Callback for task event
+   * @property {() => void} [onTask] - Callback for task event
    */
 
   /** @type {Props} */
@@ -75,7 +75,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     onClear,
     onHover,
     onStatusi,
-    onOpentask
+    onTask
   } = $props();
 function start(){
 onStart?.();
@@ -101,7 +101,7 @@ function statusi(){
    onStatusi?.()
 }
 function opentask(){
-   onOpentask?.()
+   onTask?.()
 }
  // import { textfit } from 'svelte-textfit';
  // let parent;

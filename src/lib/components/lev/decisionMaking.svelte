@@ -125,6 +125,7 @@ let idL;
 let bearer1; 
 let token;
 import { Swiper, SwiperSlide } from "swiper/svelte";
+import { sendToSer } from '$lib/send/sendToSer.js';
 
   // Import Swiper styles
   import "swiper/css";

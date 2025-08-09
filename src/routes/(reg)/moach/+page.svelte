@@ -2539,7 +2539,6 @@ pointer-events: none;"
    </div>
    </div>
           
-          <!--<Mindmap/>-->
     <!-- </Tooltip> {:else}
     לשלוח אותו לרקמה ציבורי לקחת ID וכו'
     <h1 class="bg-white">לא מורשה</h1>
