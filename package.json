@@ -38,7 +38,6 @@
     "utf-8-validate": "^5.0.10"
   },
   "dependencies": {
-    "@avitest/gridcraft": "git+https://github.com/Avi-ADAM/gridcraft.git",
     "@capacitor/android": "^6.1.2",
     "@capacitor/cli": "^6.1.2",
     "@capacitor/core": "^6.1.2",
@@ -50,7 +49,9 @@
     "@fullcalendar/interaction": "^6.1.17",
     "@fullcalendar/timegrid": "^6.1.17",
     "@google/generative-ai": "^0.24.0",
+    "@internationalized/date": "^3.8.2",
     "@lucide/svelte": "^0.525.0",
+    "@mediakular/gridcraft": "1.0.5-beta",
     "@number-flow/svelte": "^0.3.3",
     "@sentry/sveltekit": "^8.27.0",
     "@svelte-plugins/datepicker": "^1.0.9",
@@ -121,7 +122,7 @@
     "telegraf": "^4.16.3",
     "three": "^0.168.0",
     "topojson-client": "^3.1.0",
-    "vaul-svelte": "^0.3.2",
+    "vaul-svelte": "^1.0.0-next.7",
     "vite": "^6.3.5",
     "web-push": "^3.6.7",
     "yootils": "^0.3.1",

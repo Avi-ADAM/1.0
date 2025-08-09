@@ -1,7 +1,7 @@
 <script>
   import Dates from "$lib/components/grid/dates.svelte";
   import ListOfTiles from "$lib/components/grid/listOfTiles.svelte";
-    import { Grid , PrelineTheme,PlainTableCssTheme ,CardsPlusTheme ,PagingData, GridFooter} from "@avitest/gridcraft";
+    import { Grid , PrelineTheme,PlainTableCssTheme ,CardsPlusTheme ,PagingData, GridFooter} from "@mediakular/gridcraft";
     import { lang } from "$lib/stores/lang";
   import GoButton from "$lib/components/grid/GoButton.svelte";
   import RichText from "$lib/celim/ui/richText.svelte";
