@@ -705,4 +705,196 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`
+  ,
+  '47GetGiftById': `query GetGiftById($id: ID!) {
+    matanot(id: $id) {
+      data {
+        attributes {
+          name
+          desc
+          price
+          quant
+          kindOf
+          archived
+          publishedAt
+          startDate
+          finnishDate
+          pic { data { attributes { url } } }
+          projectcreates { data { id attributes { projectName profilePic { data { attributes { url } } } } } }
+        }
+      }
+    }
+  }`,
+  '48GetServiceById': `query GetServiceById($id: ID!, $he: Boolean!) {
+    matanot(id: $id) {
+      data {
+        attributes {
+          name
+          pic { data { attributes { url } } }
+          price
+          quant
+          kindOf
+          desc
+          publishedAt
+          archived
+          startDate
+          finnishDate
+          projectcreates {
+            data {
+              id
+              attributes {
+                projectName
+                user_1s { data { id } }
+                restime
+                timeToP
+                profilePic { data { attributes { url } } }
+                open_missions {
+                  data {
+                    id
+                    attributes {
+                      sqadualed
+                      archived
+                      tafkidims { data { attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+                      skills { data { attributes { skillName localizations { data { attributes { skillName } } } } } }
+                      descrip
+                      hearotMeyuchadot
+                      name
+                      dates
+                      iskvua
+                      work_ways { data { attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+                      noofhours
+                      perhour
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '49GetProjectById': `query GetProjectById($id: ID!, $he: Boolean!) {
+    project(id: $id) {
+      data {
+        attributes {
+          projectName
+          user_1s { data { id attributes { username profilePic { data { attributes { url } } } } } }
+          linkToWebsite
+          restime
+          sheiruts(filters: { isApruved: { eq: true } }) { data { id attributes { name descrip equaliSplited oneTime isApruved } } }
+          githublink
+          fblink
+          discordlink
+          twiterlink
+          vallues { data { attributes { valueName localizations { data { attributes { valueName } } } } } }
+          publicDescription
+          profilePic { data { attributes { url formats } } }
+          open_missions(filters: { archived: { eq: false } }) { data { id attributes { name } } }
+        }
+      }
+    }
+  }`,
+  '50GetOpenMashaabimById': `query GetOpenMashaabimById($id: ID!) {
+    openMashaabim(id: $id) {
+      data {
+        id
+        attributes {
+          archived
+          price
+          descrip
+          spnot
+          kindOf
+          sqadualedf
+          sqadualed
+          linkto
+          createdAt
+          hm
+          name
+          easy
+          declinedsps { data { id } }
+          users { data { id } }
+          mashaabim { data { id } }
+          project {
+            data {
+              id
+              attributes {
+                restime
+                projectName
+                user_1s { data { id } }
+                restime
+                timeToP
+                profilePic { data { attributes { url } } }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '51GetOpenMissionById': `query GetOpenMissionById($id: ID!) {
+    openMission(id: $id) {
+      data {
+        attributes {
+          sqadualed
+          archived
+          acts { data { attributes { shem } } }
+          users { data { id } }
+          project { data { id attributes { projectName user_1s { data { id } } restime timeToP profilePic { data { attributes { url } } } } } }
+          tafkidims { data { attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          skills { data { attributes { skillName localizations { data { attributes { skillName } } } } } }
+          descrip
+          hearotMeyuchadot
+          name
+          dates
+          iskvua
+          work_ways { data { attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+          noofhours
+          perhour
+        }
+      }
+    }
+  }`,
+  '52GetUserById': `query GetUserById($id: ID!, $he: Boolean!) {
+    usersPermissionsUser(id: $id) {
+      data {
+        id
+        attributes {
+          fblink
+          twiterlink
+          discordlink
+          githublink
+          bio
+          username
+          finnished_missions { data { attributes { missionName } } }
+          profilePic { data { attributes { url formats } } }
+          projects_1s { data { id attributes { projectName } } }
+          sps(filters: { archived: { eq: false } }) { data { id attributes { name panui } } }
+          skills { data { id attributes { skillName localizations { data { attributes { skillName } } } } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          vallues { data { id attributes { valueName localizations { data { attributes { valueName } } } } } }
+          work_ways { data { id attributes { workWayName localizations { data { attributes { workWayName } } } } } }
+        }
+      }
+    }
+  }`
+  ,
+  '61ApproveAct': `mutation ApproveAct($id: ID!, $myIshur: Boolean) {
+    updateAct(
+      id: $id,
+      data: { myIshur: $myIshur }
+    ) { data { id } }
+  }`,
+  '62MarkActDone': `mutation MarkActDone($id: ID!, $naasa: Boolean) {
+    updateAct(
+      id: $id,
+      data: { naasa: $naasa }
+    ) { data { id } }
+  }`,
+  '63SetActStatus': `mutation SetActStatus($id: ID!, $status: Int) {
+    updateAct(
+      id: $id,
+      data: { status: $status }
+    ) { data { id } }
+  }`
 }
