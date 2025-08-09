@@ -1,0 +1,2588 @@
+<script>
+  // import Scab from '$lib/celim/moach/scad.svelte'
+  //   import Siduri from '$lib/celim/moach/siduri.svelte'
+  //   import Taskk from '$lib/celim/moach/taskkk.svelte'
+  import { mi, role, ww, skil } from '$lib/components/prPr/mi.js';
+  import Tile from '$lib/celim/tile.svelte';
+  import { Confetti } from 'svelte-confetti';
+  const baseUrl = import.meta.env.VITE_URL;
+
+  import { isEqual } from 'lodash';
+  import Bethas from '$lib/components/prPr/bethas.svelte';
+  import Sidur from '$lib/components/prPr/sidur/sidur.svelte';
+  import { addToast } from 'as-toast';
+  import Pub from '$lib/celim/icons/pub.svelte';
+  //	import { draw } from 'svelte/transition';
+  import Close from '$lib/celim/close.svelte';
+  import Gantt from '$lib/components/prPr/gantt/gant.svelte';
+  import Header from '$lib/components/header/header.svelte';
+  import Lowding from '$lib/celim/lowding.svelte';
+  import { lang } from '$lib/stores/lang.js';
+  import Uplad from '$lib/components/userPr/uploadPic.svelte';
+  import axios from 'axios';
+  import Editb from '$lib/components/prPr/editp.svelte';
+  import Hand from '$lib/components/prPr/hand.svelte';
+  import Handd from '$lib/components/prPr/handd.svelte';
+  import Mashman from '$lib/components/prPr/mashmam.svelte';
+  import Hamatanot from '$lib/components/prPr/hamatanot.svelte';
+  import { idPr } from '$lib/stores/idPr.js';
+  // import { idM } from '../../lib/stores/idM.js';
+  import Mission from '$lib/components/prPr/mission.svelte';
+  import ChoosMission from '$lib/components/prPr/choosMission.svelte';
+  import ChoosNeed from '$lib/components/prPr/chosNed.svelte';
+  import TotalNeeds from '$lib/components/prPr/totalNeeds.svelte';
+  //import { total } from '$lib/stores/total.js';
+  //   import { beforeUpdate, tick } from 'svelte';
+  import { goto, invalidateAll } from '$app/navigation';
+  import OpenM from '$lib/components/prPr/newOpn.svelte';
+  import PendsM from '$lib/components/prPr/pendsM.svelte';
+  import Betaha from '$lib/components/prPr/betaha.svelte';
+  import Fini from '$lib/components/prPr/fini.svelte';
+  import Hach from '$lib/components/prPr/hachcal.svelte';
+  import Finisin from '$lib/components/prPr/finisin.svelte';
+
+  //import { validate_component } from 'svelte/internal';
+  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
+  import { fly } from 'svelte/transition';
+  import Sheirut from '$lib/components/prPr/sheirut.svelte';
+  import RichText from '$lib/celim/ui/richText.svelte';
+  import Diun from '$lib/components/lev/diun.svelte';
+  import { forum } from '$lib/stores/pendMisMes';
+  let idL;
+  let success = false;
+  let isOpen = false;
+  let a = 0;
+  let fmiData = [];
+  let tahaS = false;
+  let bmiData = [];
+  let mission1 = [];
+  let dow;
+  let cow;
+  let hosaf;
+  let error2 = null;
+  async function findM() {
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    let bearer1 = 'bearer' + ' ' + token;
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp;
+      }
+      return parseJSON(resp).then((resp) => {
+        throw resp;
+      });
+    };
+    let linkg = baseUrl + '/graphql';
+    try {
+      await fetch(linkg, {
+        method: 'POST',
+
+        headers: {
+          Authorization: bearer1,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: `{  missions {data{id attributes{
+                           missionName
+                            } }}}`
+        })
+      })
+        .then((r) => r.json())
+        .then((data) => (mission1 = data.data.missions.data));
+      console.log(mission1);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+  let bmimData = [];
+  let addN = false;
+  let addM = false;
+  let hosafa = {
+    he: 'הוספת פעולות נדרשות לריקמה',
+    en: 'add needed missions to FreeMates'
+  };
+  let hosafat = {
+    he: 'הוספת משאבים נדרשים לריקמה',
+    en: 'add needed resources to FreeMates'
+  };
+  let cencel = { he: 'ביטול', en: 'cencel' };
+  let showvd = false;
+
+  let totalneed = false;
+  // total.subscribe(newwork => {
+  //  totalneed = newwork;
+  //  });
+  let error1 = null;
+  let srcP;
+  let desP;
+  let projectname;
+  let token;
+  let linkP,
+    githublink,
+    fblink,
+    discordlink,
+    drivelink,
+    twiterlink,
+    watsapplink;
+
+  let newcontent = true;
+  let newcontentR = true;
+  let newcontentW = true;
+  let descPri;
+  let omiData = [];
+  let pmiData = [];
+  let project = [];
+  let projectUsers = [];
+  let vallues = [];
+  let ata = [];
+  let restime;
+  let valit;
+  let user = [];
+  let rikmashes = [];
+  let lll;
+  let opmash = [];
+  let actdata = [];
+  let noofopenm = 0;
+  let salee = [];
+  let trili = [];
+  let projects = prog();
+  let meData = start();
+  let alit = [];
+  //sale {id in}
+  async function start() {
+    if ($idPr !== 0) {
+      // ולידציה שהיוזר חבר ברקמה
+      const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('jwt='))
+        .split('=')[1];
+      const cookieValueId = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('id='))
+        .split('=')[1];
+      let idL = cookieValueId;
+      let token = cookieValue;
+      let bearer1 = 'bearer' + ' ' + token;
+      const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+      const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      try {
+        const res = await fetch(baseUrl + '/graphql', {
+          //+ $idPr
+          method: 'POST',
+          headers: {
+            Authorization: bearer1,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            query: `{project(id:"${$idPr}"){data { attributes{
+            projectName 
+             user_1s { data{id}}}}}
+            me{id}}
+              `
+          })
+        })
+          .then(checkStatus)
+          .then(parseJSON);
+        ata = res.data.project.data.attributes;
+        console.log(res);
+        const users = ata.user_1s.data;
+        const x = users.map((c) => c.id);
+        if (x.includes(res.data.me.id)) {
+          //me from server
+
+          const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+          const checkStatus = (resp) => {
+            if (resp.status >= 200 && resp.status < 300) {
+              return resp;
+            }
+            return parseJSON(resp).then((resp) => {
+              throw resp;
+            });
+          };
+          try {
+            const res = await fetch(baseUrl + '/graphql', {
+              //+ $idPr
+              method: 'POST',
+              headers: {
+                Authorization: bearer1,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                query: `
+        {project(id:${$idPr}){ data{attributes{
+            tosplits (filters: { finished: { eq: false } }){data{attributes{  prectentage vots {what users_permissions_user {data{ id}}}}}}
+            projectName
+            descripFor
+            publicDescription
+            sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
+            sales {data{ id attributes{ in date matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
+            matanotofs {data{ id attributes{ name price quant kindOf }}}
+            finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
+            rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}
+             user_1s {data{ id attributes{email lang username profilePic {data{attributes{ url formats}}}}}}
+            mesimabetahaliches (filters:{finnished:{eq: false}}) {data{
+             id attributes{ status  iskvua 
+              forums{data{id attributes{ subject spec chat{freetext seen when send{data{id}}}}}}
+            acts{data{id attributes{shem dateS naasa my{data{ id attributes{ username profilePic {data{attributes{ url }}}}}} des dateF vali{data{id}} myIshur valiIshur status mesimabetahalich{data{id}}}}}
+              tafkidims {data{ id attributes{ roleDescription ${
+                $lang == 'he'
+                  ? 'localizations{data {attributes{ roleDescription}} }'
+                  : ''
+              } }}}
+              admaticedai  createdAt hearotMeyuchadot howmanyhoursalready name descrip hoursassinged perhour privatlinks publicklinks users_permissions_user {data{ id attributes{ username profilePic {data{attributes{ url }}}}}}}}}
+            open_missions (filters:{archived:{eq: false }}) {data{  id attributes{ name hearotMeyuchadot descrip noofhours perhour sqadualed
+                                    privatlinks publicklinks
+                                    rishon {data{ id}}
+                                    skills {data{ id attributes{ skillName ${
+                                      $lang == 'he'
+                                        ? 'localizations{data {attributes{ skillName}} }'
+                                        : ''
+                                    } }}}
+                                    tafkidims {data{ id attributes{ roleDescription ${
+                                      $lang == 'he'
+                                        ? 'localizations{data {attributes{ roleDescription}} }'
+                                        : ''
+                                    }}}}
+                                    work_ways {data{ id attributes{ workWayName ${
+                                      $lang == 'he'
+                                        ? 'localizations{data {attributes{ workWayName}} }'
+                                        : ''
+                                    } } }}
+                                    mission {data{ id}}
+                                    createdAt
+  } }}
+                        open_mashaabims (filters: {archived:{eq: false }}){data{id attributes{ kindOf hm descrip price easy name spnot sqadualed sqadualedf }}}
+             pendms (filters: {archived:{eq: false }}) {data{id attributes{createdAt dates name hearotMeyuchadot descrip noofhours perhour sqadualed
+                                    privatlinks publicklinks
+                                    rishon {data{ id}}
+                                    skills {data{ id attributes{ skillName ${
+                                      $lang == 'he'
+                                        ? 'localizations{data {attributes{ skillName}} }'
+                                        : ''
+                                    } }}}
+                                    tafkidims {data{ id attributes{ roleDescription ${
+                                      $lang == 'he'
+                                        ? 'localizations{data {attributes{ roleDescription}} }'
+                                        : ''
+                                    }}}}
+                                    work_ways {data{ id attributes{ workWayName  ${
+                                      $lang == 'he'
+                                        ? 'localizations{data {attributes{ workWayName}} }'
+                                        : ''
+                                    }} }}
+                                    mission {data{ id}}
+                                    
+                                    users  {what why id users_permissions_user {data{ id}} }}}}
+            vallues {data{ id attributes { valueName ${
+              $lang == 'he'
+                ? 'localizations{data {attributes{ valueName}} }'
+                : ''
+            }}}}
+            linkToWebsite
+            profilePic {data{attributes{ url  formats }}}
+            restime githublink fblink discordlink drivelink twiterlink watsapplink
+  } }}
+        me{id}}
+          `
+              })
+            })
+              .then(checkStatus)
+              .then(parseJSON);
+            console.log(res);
+            meData = res.data.project.data.attributes;
+            project = res.data.project.data.attributes;
+            projectname = res.data.project.data.attributes.projectName;
+            desP = project.publicDescription;
+            linkP = res.data.project.data.attributes.linkToWebsite;
+            descPri = meData.descripFor;
+            descripFor = meData.descripFor;
+            projectUsers = project.user_1s.data;
+            restime = project.restime;
+            if (project.mesimabetahaliches.data.length > 0) {
+              bmiData = project.mesimabetahaliches.data;
+            } else if (project.mesimabetahaliches.data.length == null) {
+              bmiData.push(project.mesimabetahaliches.data);
+            }
+            if (project.sales.data.length > 0) {
+              salee = project.sales.data;
+            } else if (project.sales.data.length == null) {
+              salee.push(project.sales.data);
+            }
+            salee = salee;
+            if (project.matanotofs?.data?.length > 0) {
+              bmimData = project.matanotofs.data;
+            } else if (project.matanotofs?.data?.length == null) {
+              if (project.matanotofs?.data == null) {
+                //bmimData.push([]);
+              } else {
+                bmimData.push(project.matanotofs.data);
+              }
+            }
+            console.log(project);
+            if (project.open_mashaabims.data.length > 0) {
+              opmash = project.open_mashaabims.data;
+            } else if (project.open_mashaabims.data.length == null) {
+              opmash.push(project.open_mashaabims.data);
+            }
+            if (project.finnished_missions.data.length > 0) {
+              fmiData = project.finnished_missions.data;
+            } else if (project.finnished_missions.data.length == null) {
+              fmiData.push(project.finnished_missions.data);
+            }
+            if (project.rikmashes.data.length > 0) {
+              rikmashes = project.rikmashes.data;
+            } else if (project.rikmashes.data.length == null) {
+              rikmashes.push(project.rikmashes.data);
+            }
+            rikmashes = rikmashes;
+            //  if (project.open_missions.length > 1){
+            bmimData = bmimData;
+
+            omiData = project.open_missions.data;
+            //  } else if (project.open_missions.length == null){
+            //  omiData.push(project.open_missions);
+            //  }
+            if (project.pendms.data.length > 0) {
+              pmiData = project.pendms.data;
+            } else if (project.pendms.data.length == null) {
+              pmiData.push(project.pendms.data);
+            }
+            //    omiData = omiData;
+            pmiData = pmiData;
+            bmiData = bmiData;
+            vallues = project.vallues.data;
+            if ($lang == 'he') {
+              for (var i = 0; i < vallues.length; i++) {
+                if (vallues[i].attributes.localizations.data.length > 0) {
+                  vallues[i].attributes.valueName =
+                    vallues[
+                      i
+                    ].attributes.localizations.data[0].attributes.valueName;
+                }
+              }
+            }
+            valit = vallues.map((c) => c.attributes.valueName);
+            alit = vallues.map((c) => c.id);
+            linkP = meData.linkToWebsite;
+            githublink = meData.githubLink;
+            fblink = meData.fblink;
+            discordlink = meData.discordLink;
+            drivelink = meData.drivelink;
+            twiterlink = meData.twiterLink;
+            watsapplink = meData.watsapplink;
+            noofopenm = opmash.length;
+            noofopen = project.open_missions.data.length;
+            if (project.profilePic.data !== null) {
+              srcP = project.profilePic.data.attributes.url;
+            }
+            trili = meData.tosplits.data;
+            // pre(projectUsers, fmiData)
+          } catch (e) {
+            error1 = e;
+            console.log(error1);
+          }
+        } else {
+          goto('/');
+        }
+      } catch (e) {
+        error1 = e;
+        console.log(error1);
+      }
+      return meData;
+    }
+  }
+  async function prog() {
+    if ($idPr == 0) {
+      const cookieValue = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('jwt='))
+        .split('=')[1];
+      const cookieValueId = document.cookie
+        .split('; ')
+        .find((row) => row.startsWith('id='))
+        .split('=')[1];
+      idL = cookieValueId;
+      token = cookieValue;
+      let bearer1 = 'bearer' + ' ' + token;
+      const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+      const checkStatus = (resp) => {
+        if (resp.status >= 200 && resp.status < 300) {
+          return resp;
+        }
+        return parseJSON(resp).then((resp) => {
+          throw resp;
+        });
+      };
+      let linkg = baseUrl + '/graphql';
+      try {
+        await fetch(linkg, {
+          method: 'POST',
+
+          headers: {
+            Authorization: bearer1,
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            query: `{  usersPermissionsUser (id:${idL}) {data{ attributes{
+                            projects_1s {data {id attributes{ projectName }}}
+                            } }}}`
+          })
+        })
+          .then((r) => r.json())
+          .then((data) => (user = data));
+        console.log(user);
+        if (user.errors) {
+          if (user.errors[0].message === 'Invalid token.') {
+            goto('./login');
+          }
+        }
+        projects =
+          user.data.usersPermissionsUser.data.attributes.projects_1s.data;
+      } catch (e) {
+        console.log(e);
+      }
+      return projects;
+    }
+  }
+
+  let li = [];
+  let miData = [];
+  let blabla = [];
+  let load = false;
+  async function callbackFunction(event) {
+    if (event.detail.type == 'add') {
+      cow.scrollIntoView(true);
+      load = true;
+      const lim = event.detail.li;
+      if (lim.length > 0 || lim > 0) {
+        //showvd = false;
+        if ($mi.length == 0) {
+          await refreshM().then();
+          addM = false;
+          li = event.detail.li;
+          await findiM().then();
+          load = false;
+          showvd = true;
+          blabla = event.detail.bla;
+          addM = true;
+          cow.scrollIntoView(true);
+        } else {
+          addM = false;
+          let alrIds = $mi.map((c) => c.id);
+          let chooseIds = event.detail.li;
+          li = chooseIds.filter((el) => !alrIds.includes(el));
+          await findiM().then();
+          load = false;
+          showvd = true;
+          blabla = event.detail.bla;
+          addM = true;
+          cow.scrollIntoView(true);
+        }
+      }
+    } else {
+      if ($mi.length > 0) {
+        miData = $mi;
+
+        blabla = miData.map((c) => c.attributes.missionName);
+        console.log(blabla, miData);
+      } else {
+        miData = [];
+        blabla = [];
+        showvd = false;
+      }
+    }
+  }
+  async function findiM() {
+    let res = [];
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
+    token = cookieValue;
+    let bearer1 = 'bearer' + ' ' + token;
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp;
+      }
+      return parseJSON(resp).then((resp) => {
+        throw resp;
+      });
+    };
+    let linkg = baseUrl + '/graphql';
+    try {
+      await fetch(linkg, {
+        method: 'POST',
+
+        headers: {
+          Authorization: bearer1,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: `{  missions (filters:{id: {in:[${li}]}}){data{ id attributes{
+          descrip missionName 
+          skills {data{ id attributes{ skillName ${
+            $lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''
+          } }}}
+          tafkidims {data{ id attributes{ roleDescription ${
+            $lang == 'he'
+              ? 'localizations{data {attributes{ roleDescription}} }'
+              : ''
+          }}}}
+          work_ways {data{ id attributes{ workWayName ${
+            $lang == 'he'
+              ? 'localizations{data {attributes{ workWayName}} }'
+              : ''
+          } } }}
+        } }}}`
+        })
+      })
+        .then((r) => r.json())
+        .then((data) => (res = data));
+      let miDatal = res.data.missions.data;
+      for (let z = 0; z < miDatal.length; z++) {
+        let skills2 = miDatal[z].attributes.skills.data;
+        if ($lang == 'he') {
+          for (var i = 0; i < skills2.length; i++) {
+            if (skills2[i].attributes.localizations.data.length > 0) {
+              skills2[i].attributes.skillName =
+                skills2[
+                  i
+                ].attributes.localizations.data[0].attributes.skillName;
+            }
+          }
+        }
+        miDatal[z].attributes.skills.data = skills2;
+        let roles = miDatal[z].attributes.tafkidims.data;
+        if ($lang == 'he') {
+          for (var i = 0; i < roles.length; i++) {
+            if (roles[i].attributes.localizations.data.length > 0) {
+              roles[i].attributes.roleDescription =
+                roles[
+                  i
+                ].attributes.localizations.data[0].attributes.roleDescription;
+            }
+          }
+        }
+        miDatal[z].attributes.tafkidims.data = roles;
+        let workways2 = miDatal[z].attributes.work_ways.data;
+        if ($lang == 'he') {
+          for (var i = 0; i < workways2.length; i++) {
+            if (workways2[i].attributes.localizations.data.length > 0) {
+              workways2[i].attributes.workWayName =
+                workways2[
+                  i
+                ].attributes.localizations.data[0].attributes.workWayName;
+            }
+          }
+        }
+        miDatal[z].attributes.work_ways.data = workways2;
+      }
+      const merged = [...miDatal, ...$mi];
+      miData = merged;
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  let error8;
+  let roles = [];
+  let skills2 = [];
+
+  let workways2 = [];
+  async function findT() {
+    console.log('findT');
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp;
+      }
+      return parseJSON(resp).then((resp) => {
+        throw resp;
+      });
+    };
+    try {
+      const res = await fetch(baseUrl + '/graphql', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: `query {
+    skills {data{ id attributes{ skillName ${
+      $lang == 'he' ? 'localizations{data {attributes{ skillName}} }' : ''
+    } }}}
+     tafkidims {data{ id attributes{ roleDescription ${
+       $lang == 'he'
+         ? 'localizations{data {attributes{ roleDescription}} }'
+         : ''
+     }}}}
+     workWays {data{ id attributes{ workWayName ${
+       $lang == 'he' ? 'localizations{data {attributes{ workWayName}} }' : ''
+     } } }}
+ }
+              `
+        })
+      })
+        .then(checkStatus)
+        .then(parseJSON);
+      skills2 = res.data.skills.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < skills2.length; i++) {
+          if (skills2[i].attributes.localizations.data.length > 0) {
+            skills2[i].attributes.skillName =
+              skills2[i].attributes.localizations.data[0].attributes.skillName;
+          }
+        }
+      }
+      skills2 = skills2;
+      roles = res.data.tafkidims.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < roles.length; i++) {
+          if (roles[i].attributes.localizations.data.length > 0) {
+            roles[i].attributes.roleDescription =
+              roles[
+                i
+              ].attributes.localizations.data[0].attributes.roleDescription;
+          }
+        }
+      }
+      roles = roles;
+      workways2 = res.data.workWays.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < workways2.length; i++) {
+          if (workways2[i].attributes.localizations.data.length > 0) {
+            workways2[i].attributes.workWayName =
+              workways2[
+                i
+              ].attributes.localizations.data[0].attributes.workWayName;
+          }
+        }
+      }
+      workways2 = workways2;
+      skil.set(skills2);
+      ww.set(workways2);
+      role.set(roles);
+      newcontent = false;
+      newcontentR = false;
+      newcontentW = false;
+    } catch (e) {
+      error8 = e;
+      console.log(error8);
+    }
+  }
+
+  async function refreshM() {
+    findT();
+  }
+
+  async function hosa() {
+    addM = true;
+    await findM().then();
+    hosaf.scrollIntoView(true);
+  }
+
+  async function removeF(event) {
+    let miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const id = event.detail.id;
+    const index = y.indexOf(id);
+    if (index > -1) {
+      miDatanew.splice(index, 1);
+    }
+    if (miDatanew.length > 0) {
+      miData = miDatanew;
+      mi.set(miData);
+      blabla = miData.map((c) => c.attributes.missionName);
+      console.log(blabla, miData);
+    } else {
+      miData = miDatanew;
+      blabla = miData.map((c) => c.attributes.missionName);
+      showvd = false;
+    }
+  }
+
+  async function removeS(event) {
+    const miDatanew = event.detail.data;
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+  }
+
+  async function removeR(event) {
+    const miDatanew = event.detail.data;
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+  }
+
+  async function removeW(event) {
+    const miDatanew = event.detail.data;
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+  }
+
+  async function addskills(event) {
+    const mid = event.detail.mid;
+    const miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const index = y.indexOf(mid);
+
+    const id = event.detail.id;
+    const filterByReference = (skills2, id) => {
+      let res = [];
+      res = skills2.filter((el) => {
+        return id.find((element) => {
+          return element === el.id;
+        });
+      });
+      return res;
+    };
+    const resp = filterByReference(skills2, id);
+    console.log(resp);
+    miDatanew[index].attributes.skills.data = resp;
+    miDatanew[index].selected2 = [];
+    console.log(miDatanew);
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+  }
+
+  async function addroles(event) {
+    const mid = event.detail.mid;
+    const miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const index = y.indexOf(mid);
+
+    const id = event.detail.id;
+    const filterByReference = (roles, id) => {
+      let res = [];
+      res = roles.filter((el) => {
+        return id.find((element) => {
+          return element === el.id;
+        });
+      });
+      return res;
+    };
+    const resp = filterByReference(roles, id);
+    miDatanew[index].attributes.tafkidims.data = resp;
+    miDatanew[index].selected3 = [];
+    console.log(miDatanew);
+    showvd = false;
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    addM = true;
+  }
+
+  async function adwww(event) {
+    console.log('fff');
+
+    const mid = event.detail.mid;
+    const miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const index = y.indexOf(mid);
+
+    const id = event.detail.id;
+    const filterByReference = (roles, id) => {
+      let res = [];
+      res = roles.filter((el) => {
+        return id.find((element) => {
+          return element === el.id;
+        });
+      });
+      return res;
+    };
+    const resp = filterByReference(workways2, id);
+    miDatanew[index].attributes.work_ways.data = resp;
+    miDatanew[index].selected1 = [];
+    console.log(miDatanew);
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+    console.log(miData);
+  }
+
+  async function addnewsk(event) {
+    const skob = event.detail.skob;
+    const mid = event.detail.mid;
+    const miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const index = y.indexOf(mid);
+    miDatanew[index].attributes.skills.data.push(skob);
+    console.log(miDatanew);
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+  }
+  async function addnewr(event) {
+    const skob = event.detail.skob;
+    const mid = event.detail.mid;
+    const miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const index = y.indexOf(mid);
+    miDatanew[index].attributes.tafkidims.data.push(skob);
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+  }
+
+  function closeM() {
+    addM = false;
+    showvd = false;
+    blabla = [];
+  }
+
+  let descripFor;
+
+  async function addneww(event) {
+    const skob = event.detail.skob;
+    const mid = event.detail.mid;
+    const miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const index = y.indexOf(mid);
+    miDatanew[index].attributes.work_ways.data.push(skob);
+    showvd = false;
+    await refreshM().then();
+    miData = miDatanew;
+    showvd = true;
+    addM = false;
+    blabla = miData.map((c) => c.attributes.missionName);
+    await findM().then();
+    addM = true;
+  }
+  let openMA = false;
+  let cencel1 = { he: 'סגירה', en: 'close' };
+
+  let openMS = false;
+  const fnnn = { he: 'המשימה נשלחה בהצלחה', en: 'mission has sent ' };
+  function close() {
+    showvd = false;
+    addM = false;
+    blabla = [];
+    success = true;
+    mi.set([]);
+    setTimeout(function () {
+      success = false;
+      start();
+    }, 15000);
+    addToast(`${fnnn[$lang]}`, 'info');
+  }
+  let meDatamm = [];
+  async function updi() {
+    let res = [];
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
+    token = cookieValue;
+    let bearer1 = 'bearer' + ' ' + token;
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp;
+      }
+      return parseJSON(resp).then((resp) => {
+        throw resp;
+      });
+    };
+    let linkg = baseUrl + '/graphql';
+    try {
+      await fetch(linkg, {
+        method: 'POST',
+
+        headers: {
+          Authorization: bearer1,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: `{  mashaabims (filters:{id: {in:[${needr}]}}){data{ id attributes{
+          name descrip kindOf  price linkto 
+        } }}}`
+        })
+      })
+        .then((r) => r.json())
+        .then((data) => (res = data));
+      meDatamm = res.data.mashaabims.data;
+      console.log(meDatamm);
+    } catch (e) {
+      console.log(e);
+    }
+  }
+
+  function clo() {
+    totalneed = false;
+    addN = false;
+    meDatamm = [];
+    needr = [];
+    addToast(cloma[$lang], 'info');
+  }
+  let noofopen = 2;
+
+  let pendS = false;
+  let hovered = false;
+  let hoveredd = false;
+
+  function bighand() {
+    hovered = !hovered;
+  }
+  function bighandd() {
+    hoveredd = !hoveredd;
+  }
+  function addp() {
+    if (projectUsers.length == 1) {
+      a = 0;
+      isOpen = true;
+    } else {
+      addToast(tovote[$lang], 'info');
+      a = 0;
+      isOpen = true;
+    }
+    //if project users more then 1
+  }
+  const tovote = {
+    he: 'התמונה שתיבחר תועלה להצבעה ולאחר אישורה תחליף את הקיימת',
+    en: 'the Logo you choose will be waiting for the approval of all FreeMates members'
+  };
+  const toalart = {
+    he: 'בריקמה עם מס חברים גדול מ-1 יש צורך בהסכמה של כולם, מערכת ההצבעות משתחררת בקרוב ודרכה ניתן יהיה לשנות',
+    en: 'if number of users in freemates is greater than 1 you need everyone to agree, this feature will be released soon'
+  };
+
+  function editp() {
+    if (projectUsers.length == 1) {
+      a = 0;
+      isOpen = true;
+    } else {
+      addToast(`${tovote[$lang]}`, 'info');
+      a = 0;
+      isOpen = true;
+    }
+    //if project users more then 1
+  }
+  function editb() {
+    //if project users more then 1
+    if (projectUsers.length == 1) {
+      a = 1;
+      isOpen = true;
+    } else {
+      alert(toalart[$lang]);
+    }
+  }
+
+  const closer = () => {
+    isOpen = false;
+    a = 0;
+  };
+  let files;
+  function basic() {
+    isOpen = true;
+    a = 1;
+  }
+  function allbackFunction(event) {
+    a = 2;
+    files = event.detail.files;
+    sendP();
+  }
+  let url1 = baseUrl + '/api/upload';
+  let meDatap = [];
+  let mecata = [];
+  async function sendP() {
+    let d = new Date();
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    let bearer1 = 'bearer' + ' ' + token;
+    let linkdi = baseUrl + '/api/projects/' + $idPr;
+    //  let fd = new FormData();
+    //   fd.append('files', files[0]);
+    axios
+      .post(url1, files, {
+        headers: {
+          Authorization: bearer1
+        }
+      })
+      .then(({ data }) => {
+        const imageId = data[0].id;
+        if (projectUsers.length == 1) {
+          axios
+            .put(
+              linkdi,
+              {
+                profilePic: imageId
+              },
+              {
+                headers: {
+                  Authorization: bearer1
+                }
+              }
+            )
+            .then((response) => {
+              meDatap = response.data;
+              srcP = meDatap.profilePic.formats.thumbnail.url;
+              srcP = meDatap.profilePic.formats.small.url;
+              srcP = meDatap.profilePic.url;
+              isOpen = false;
+              a = 0;
+              addToast(`${picupsu[$lang]}`, 'info');
+            })
+            .catch((error) => {
+              console.log('צריך לתקן:', error.response);
+              if (error.response != undefined) {
+                a = 3;
+              }
+            });
+        } else {
+          let linkg = baseUrl + '/graphql';
+          try {
+            fetch(linkg, {
+              method: 'POST',
+
+              headers: {
+                Authorization: bearer1,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                query: ` mutation { createDecision(
+       data: {
+        projects: ${$idPr},
+                publishedAt: "${d.toISOString()}",
+         newpic: ${imageId},
+        kind: pic,
+          vots: [
+        {what: true,
+        users_permissions_user: ${idL}
+        }
+      ]
+    }
+  ){
+         data{
+              id 
+          }
+  }
+ }`
+              })
+            })
+              .then((r) => r.json())
+              .then((data) => (meDatap = data));
+            isOpen = false;
+            a = 0;
+            addToast(`${picvots[$lang]}`, 'info');
+          } catch (e) {
+            console.log(e);
+          }
+        }
+      });
+  }
+  const cloma = {
+    he: 'יצירת המשאב הושלמה בהצלחה',
+    en: 'new need has created successfully'
+  };
+  const editfix = {
+    he: 'המידע עודכן בהצלחה!',
+    en: 'info has updated successfully'
+  };
+  const picupsu = {
+    he: 'הלוגו עודכן בהצלחה',
+    en: 'Logo has updated successfully'
+  };
+  const picvots = {
+    he: 'הלוגו הועלה להצבעה בהצלחה',
+    en: 'vote on new Logo has created successfully'
+  };
+  async function updete(event) {
+    console.log(event.detail.valit);
+    a = 2;
+    let counter = false;
+    let projectnamei = ``;
+    let despi = ``;
+    let linkPii = ``;
+    let desPlii = ``;
+    let valluesii = ``;
+    let restimeii = ``;
+    let githublinkii = ``;
+    let fblinkii = ``;
+    let discordlinkii = ``;
+    let drivelinkii = ``;
+    let twiterlinkii = ``;
+    let watsapplinkii = ``;
+    if (event.detail.projectName_value != projectname) {
+      projectnamei = `projectName: "${event.detail.projectName_value}",`;
+      counter = true;
+    }
+    if (event.detail.desP != desP && event.detail.desP != null) {
+      despi = `publicDescription: "${event.detail.desP}",`;
+      counter = true;
+    }
+    if (event.detail.linkP != linkP && event.detail.linkP != null) {
+      linkPii = `linkToWebsite: "${event.detail.linkP}",`;
+      counter = true;
+    }
+    if (event.detail.desPl != descripFor && event.detail.desPl != null) {
+      desPlii = `descripFor: "${event.detail.desPl}",`;
+      counter = true;
+    }
+    const x = event.detail.valit.sort(function (a, b) {
+      return a - b;
+    });
+    const y = alit.sort(function (a, b) {
+      return a - b;
+    });
+    if (!isEqual(x, y)) {
+      valluesii = `vallues: [${event.detail.valit}],`;
+      counter = true;
+    } //array
+    if (event.detail.restime != restime && event.detail.restime != null) {
+      restimeii = `restime: ${event.detail.restime},`;
+      counter = true;
+    }
+    if (
+      event.detail.githublink != githublink &&
+      event.detail.githublink != null
+    ) {
+      githublinkii = `githublink: "${event.detail.githublink}",`;
+      counter = true;
+    }
+    if (event.detail.fblink != fblink && event.detail.fblink != null) {
+      fblinkii = `fblink: "${event.detail.fblink}",`;
+      counter = true;
+    }
+    if (
+      event.detail.discordlink != discordlink &&
+      event.detail.discordlink != null
+    ) {
+      discordlinkii = `discordlink: "${event.detail.discordlink}",`;
+      counter = true;
+    }
+    if (event.detail.drivelink != drivelink && event.detail.drivelink != null) {
+      drivelinkii = `drivelink: "${event.detail.drivelink}",`;
+      counter = true;
+    }
+    if (
+      event.detail.twiterlink != projectname &&
+      event.detail.twiterlink != null
+    ) {
+      twiterlinkii = `twiterlink: "${event.detail.twiterlink}",`;
+      counter = true;
+    }
+    if (
+      event.detail.watsapplink != watsapplink &&
+      event.detail.watsapplink != null
+    ) {
+      watsapplinkii = `watsapplink: "${event.detail.watsapplink}",`;
+      counter = true;
+    }
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    let bearer1 = 'bearer' + ' ' + token;
+    let linkg = baseUrl + '/graphql';
+    try {
+      await fetch(linkg, {
+        method: 'POST',
+
+        headers: {
+          Authorization: bearer1,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: ` mutation { updateProject(
+     id: ${$idPr}
+       data: {
+        ${projectnamei}
+        ${despi}
+        ${linkPii}
+        ${desPlii}
+        ${valluesii}
+        ${restimeii}
+        ${githublinkii}
+         ${fblinkii} 
+         ${discordlinkii}
+         ${drivelinkii}
+         ${twiterlinkii}
+         ${watsapplinkii}
+       }
+    
+  ){
+         data{attributes{
+           linkToWebsite descripFor projectName publicDescription restime 
+           githublink fblink discordlink drivelink twiterlink watsapplink vallues {data{ attributes{ valueName ${
+             $lang == 'he' ? 'localizations{data{attributes{valueName }}}' : ''
+           }}}}
+          }}}
+  }
+ `
+        })
+      })
+        .then((r) => r.json())
+        .then((data) => (mecata = data));
+      mecata = mecata.data.updateProject.data.attributes;
+      console.log(mecata);
+      projectname = mecata.projectName;
+      desP = mecata.publicDescription;
+      restime = mecata.restime;
+      vallues = mecata.vallues.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < vallues.length; i++) {
+          if (vallues[i].attributes.localizations.data.length > 0) {
+            vallues[i].attributes.valueName =
+              vallues[i].attributes.localizations.data[0].attributes.valueName;
+          }
+        }
+      }
+      valit = vallues.map((c) => c.attributes.valueName);
+      alit = vallues.map((c) => c.id);
+      linkP = mecata.linkToWebsite;
+      githublink = mecata.githubLink;
+      fblink = mecata.fblink;
+      discordlink = mecata.discordLink;
+      drivelink = mecata.drivelink;
+      twiterlink = mecata.twiterLink;
+      watsapplink = mecata.watsapplink;
+      descripFor = mecata.descripFor;
+      isOpen = false;
+      a = 0;
+      addToast(`${editfix[$lang]}`, 'info');
+    } catch (e) {
+      console.log(e);
+      if (e.response != undefined) {
+        a = 3;
+      }
+    }
+  }
+
+  async function projectn(id) {
+    idPr.set(id);
+    goto('/newMoach');
+    meData = await start();
+  }
+  let needr = [];
+  let loadr = false;
+  async function needad(event) {
+    const x = event.detail.x;
+    if (x.length > 0 || x > 0) {
+      dow.scrollIntoView(true);
+      loadr = true;
+      needr = x;
+      totalneed = false;
+      await updi().then();
+      loadr = false;
+      totalneed = true;
+      dow.scrollIntoView(true);
+    }
+  }
+  async function needadm(event) {
+    const x = event.detail.x;
+    const y = event.detail.scob;
+    if (x.length > 0 || x > 0) {
+      dow.scrollIntoView(true);
+      loadr = true;
+      needr.push(x);
+      needr = needr;
+      totalneed = false;
+      await updi().then();
+      loadr = false;
+      totalneed = true;
+      dow.scrollIntoView(true);
+    } else {
+      totalneed = false;
+    }
+  }
+
+  async function wdwd(event) {
+    const miDatanew = event.detail.data;
+    const y = miDatanew.map((c) => c.id);
+    const id = event.detail.id;
+    const index = y.indexOf(id);
+    if (index > -1) {
+      miDatanew.splice(index, 1);
+    }
+    if (miDatanew.length > 0) {
+      totalneed = false;
+      meDatamm = miDatanew;
+      needr = meDatamm.map((c) => c.id);
+      totalneed = true;
+    } else {
+      totalneed = false;
+    }
+  }
+  let hal = false;
+  function trym() {
+    openMS = true;
+  }
+  function tryma() {
+    openMA = true;
+  }
+  let fff;
+  async function masi() {
+    addN = true;
+    loadr = true;
+    //if (addN == true)
+    //	fff.scrollIntoView(true);
+  }
+
+  function titlel(event) {
+    ti = event.detail.ti;
+  }
+  let who;
+  function openTheDesc(event) {
+    const id = event.detail.id;
+    const is = id[0].model.classes;
+    who = Math.floor(id[0].model.id);
+    console.log(id[0].model.classes, Math.floor(id[0].model.id));
+    if (is == 'green') {
+      isOpen = true;
+      a = 4;
+    } else if (is == 'blue') {
+      isOpen = true;
+      a = 5;
+    } else if (is == 'orange') {
+      isOpen = true;
+      a = 6;
+    } else if (is == 'pink') {
+      isOpen = true;
+      a = 7;
+    }
+  }
+  let hover = false;
+  let bmiss;
+  let pendss;
+  let openss;
+  let finiss;
+  let hagdel = false;
+  function topends() {
+    pendS = true;
+    pendss.scrollIntoView(true);
+  }
+  function toopens() {
+    openMS = true;
+    openss.scrollIntoView(true);
+  }
+  function tobetha() {
+    tahaS = true;
+    bmiss.scrollIntoView(true);
+  }
+  function tofinish() {
+    hagdel = true;
+    tab = 8
+    finiss.scrollIntoView(true);
+  }
+  const title = { he: 'מוח הריקמה 1💗1', en: '1💗1 FreeMates Brain' };
+  const mwa = { he: 'פעולות ממתינות לאישור', en: 'panding missions' };
+  const errmsg = { he: ' אירעה שגיאה', en: 'error' };
+  const editpic = {
+    he: 'עריכת תמונת הפרופיל של הריקמה',
+    en: 'edit FreeMates logo'
+  };
+  const upload = {
+    he: 'העלאת תמונת פרופיל לריקמה',
+    en: 'upload logo for your FreeMates'
+  };
+  const editd = { he: 'עריכת פרטי ריקמה', en: 'edit FreeMates details' };
+  const publicp = {
+    he: 'לעמוד הציבורי של הריקמה',
+    en: 'view FreeMates public page'
+  };
+  const tower = { he: 'לינק לאתר', en: 'link to website' };
+  const sidd = { he: 'סידור משמרות', en: 'shifts sqadual' };
+  const gann = { he: 'לוח המשימות שלנו ', en: 'our mission board' };
+  const bet = { he: 'משימות בתהליך ביצוע', en: 'mission in progress' };
+  const towel = {
+    he: 'לינק לגוגל דרייב המשותף',
+    en: 'link to a shared Google Drive'
+  };
+  const githublinkde = {
+    he: 'לינק לגיטהב של הריקמה',
+    en: 'link to the FreeMates GitHub'
+  };
+  const fblinkde = {
+    he: 'לינק לפייסבוק של הריקמה',
+    en: 'link to the FreeMates Facebook'
+  };
+  const discordlinkde = {
+    he: 'לינק לדיסקורד של הריקמה',
+    en: 'link to the FreeMates Discord'
+  };
+  const twiterlinkde = {
+    he: 'לינק לטוויטר של הריקמה',
+    en: 'link to the FreeMates twitter'
+  };
+  const watsapplinkde = {
+    he: 'לינק לווטסאפ של הריקמה',
+    en: 'link to the FreeMates WhatsApp'
+  };
+  const vap = { he: 'ערכים ומטרות', en: 'vallues and objectives' };
+  const opmi = { he: 'משימות פנויות', en: "open mission's" };
+  const noopen = {
+    he: 'אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו',
+    en: ''
+  };
+  const neww = {
+    he:"יצירה",
+    en:"add"
+  }
+  const mechirot ={
+    he:"מכירות",
+    en:"sales"
+  }
+  const haluka = {
+    he:"חלוקה",
+    en:"spliting"
+  }
+  const shirutims ={
+    he:"שירותים",
+    en:"services"
+  }
+
+  const maini = {he: "ראשי", en:"main"}
+  const choo = { he: 'בחירת ריקמה', en: 'choose FreeMate' };
+  let sid = false;
+  let gan = false;
+  let bett = false;
+  function afreact() {}
+  $: width = 0;
+  let chatId;
+  let newID;
+  let smalldes;
+  let nameChatPartner;
+  let clicked = false;
+  let ani;
+  function openChat(e) {
+    const isNew = e.detail.isNew;
+    if (isNew == false) {
+      chatId = e.detail.id;
+    } else {
+      chatId = 0;
+      $forum[0] = [];
+      smalldes = e.detail.smalldes;
+      nameChatPartner = e.detail.nameChatPartner[$lang] + ' ' + projectname;
+    }
+
+    clicked = false;
+    ani = 'forum';
+    a = 8;
+    isOpen = true;
+  }
+  function forums(dat) {
+    let oldForums = $forum;
+    //check for is forum by id if not cr
+    for (let index = 0; index < dat.data.length; index++) {
+      const element = dat.data[index];
+      if (element.attributes.forums != null) {
+        for (let t = 0; t < element.attributes.forums.data.length; t++) {
+          const elementt = element.attributes.forums.data[t];
+          if (elementt.id in oldForums) {
+            //check lenght = lenght
+          } else {
+            //oldForums[]
+          }
+        }
+      }
+    }
+    function addMes() {
+      let arr = [];
+      let datan
+      arr.push({
+        message:
+          datan.data.attributes.diun[datan.data.attributes.diun.length - 1].why,
+        what: datan.data.attributes.diun[datan.data.attributes.diun.length - 1]
+          .what,
+        pic: src22,
+        sentByMe:
+          datan.data.attributes.diun[datan.data.attributes.diun.length - 1]
+            .ide === idL
+            ? true
+            : false,
+        timestamp: new Date(
+          datan.data.attributes.diun[datan.data.attributes.diun.length - 1].zman
+        )
+      });
+
+      arr = arr;
+    }
+    let old = $forum;
+    old[arr1[index].pendId] = arr;
+    pendMisMes.set(forums);
+    localStorage.setItem('pendMisMes', JSON.stringify($forum));
+  }
+  $: tab = 1
+
+</script>
+
+<svelte:head>
+  <title>{title[$lang]}</title>
+  <link
+    rel="preload"
+    as="image"
+    href="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
+  />
+  <link
+    rel="preload"
+    as="image"
+    href=" https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
+  />
+</svelte:head>
+<div class="alli bg-[radial-gradient(circle_at_45%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),theme(colors.black))]"></div>
+
+{#if $idPr}
+  {#await meData}
+    <div class="alli  grid items-center justify-center bg-[radial-gradient(circle_at_45%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),theme(colors.black))]">
+      <!---  <RingLoader size="260" color="#FF0092" unit="px" duration="2s"></RingLoader>-->
+      <Lowding />
+    </div>
+  {:then meData}
+    <!--   <Tooltip title="{ti}" >-->
+    <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
+      <div
+        style="z-index: 700;"
+        transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
+      >
+        <DialogContent aria-label="form" class="content">
+          <div style="z-index: 400;" dir="rtl">
+            <button
+              class=" hover:bg-barbi text-mturk rounded-full"
+              on:click={closer}
+              title={cencel1[$lang]}><Close /></button
+            >
+            {#if a == 0}
+              <Uplad on:message={allbackFunction} />
+            {:else if a == 1}
+              <Editb
+                on:message={updete}
+                selected={valit}
+                {githublink}
+                {fblink}
+                {discordlink}
+                {drivelink}
+                {twiterlink}
+                {watsapplink}
+                {restime}
+                {desP}
+                projectName_value={projectname}
+                desPl={descripFor}
+                {linkP}
+              />
+            {:else if a == 2}
+              <div class="sp bg-gold">
+                <Lowding />
+              </div>
+            {:else if a == 3}
+              <h1>{errmsg[$lang]}</h1>
+              <button
+                class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
+                on:click={() => (a = 0)}>לנסות שוב</button
+              >
+            {:else if a == 4}
+              <PendsM {who} {pmiData} user_1s={projectUsers.length} />
+            {:else if a == 5}
+              <Betaha {who} {bmiData} />
+            {:else if a == 6}
+              <OpenM {who} projectName={projectname} {omiData} />
+            {:else if a == 7}
+              <Finisin {who} {fmiData} />
+            {:else if a === 8}
+              <Diun
+                on:rect={afreact}
+                {smalldes}
+                {nameChatPartner}
+                mypos={true}
+                {clicked}
+                pendId={chatId}
+                rect={true}
+                profilePicChatPartner={srcP}
+                {ani}
+              />
+            {/if}
+          </div></DialogContent
+        >
+      </div>
+    </DialogOverlay>
+    <!--{#if idUst.map(c => c.id) == idUsl} 
+בנוסף במקרה של רענון יעלם האידי של הרקמה
+לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
+
+    <div
+      dir="rtl"
+      bind:clientWidth={width}
+      class=" text-barbi text-center overflow-y-auto h-screen scroll-smooth d"
+      style="-webkit-scrollbar:0px;"
+    >
+      <Header />
+      {#if success}
+        <div
+          style="
+position: fixed;
+top: -50px;
+left: 0;
+height: 100vh;
+width: 100vw;
+display: flex;
+justify-content: center;
+overflow: hidden;
+pointer-events: none;"
+        >
+          <Confetti
+            rounded
+            size="30"
+            x={[-5, 5]}
+            y={[-5, 5]}
+            delay={[0, 50]}
+            amount="200"
+            duration="10000"
+            colorArray={[
+              'url(https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png)'
+            ]}
+            fallDistance="100vh"
+          /><!--colorRange={[0, 120]}-->
+          <Confetti
+            noGravity
+            x={[-5, 5]}
+            y={[-5, 5]}
+            delay={[550, 550]}
+            duration="10000"
+            amount="2000"
+            colorRange={[120, 240]}
+            fallDistance="100vh"
+          />
+          <Confetti
+            noGravity
+            x={[-5, 5]}
+            y={[-5, 5]}
+            delay={[1000, 1050]}
+            duration="10000"
+            amount="200"
+            colorRange={[240, 360]}
+            fallDistance="100vh"
+          />
+          <Confetti
+            x={[-5, 5]}
+            y={[0, 0.1]}
+            delay={[500, 2000]}
+            duration="5000"
+            amount="200"
+          />
+        </div>
+      {/if}
+      <div>
+        {#if srcP !== null}
+          <img
+            width="100"
+            height="100"
+            style="border-radius: 50%; margin-right:auto; margin-left:auto ;"
+            src={srcP}
+            alt="profilePic"
+          />
+        {/if}
+        <div class="flex flex-row items-center justify-center">
+          {#if srcP !== null}
+            <button
+              class="text-barbi hover:bg-barbi hover:text-mturk rounded-full"
+              title={editpic[$lang]}
+              on:click={editp}
+              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M22.7 14.3L21.7 15.3L19.7 13.3L20.7 12.3C20.8 12.2 20.9 12.1 21.1 12.1C21.2 12.1 21.4 12.2 21.5 12.3L22.8 13.6C22.9 13.8 22.9 14.1 22.7 14.3M13 19.9V22H15.1L21.2 15.9L19.2 13.9L13 19.9M11.21 15.83L9.25 13.47L6.5 17H13.12L15.66 14.55L13.96 12.29L11.21 15.83M11 19.9V19.05L11.05 19H5V5H19V11.31L21 9.38V5C21 3.9 20.11 3 19 3H5C3.9 3 3 3.9 3 5V19C3 20.11 3.9 21 5 21H11V19.9Z"
+                />
+              </svg>
+            </button>
+          {:else}
+            <button
+              class="bg-barbi hover:bg-mturk text-barbi rounded-full"
+              title={upload[$lang]}
+              on:click={addp}
+            >
+              <svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M7 19L12 14L13.88 15.88C13.33 16.79 13 17.86 13 19H7M10 10.5C10 9.67 9.33 9 8.5 9S7 9.67 7 10.5 7.67 12 8.5 12 10 11.33 10 10.5M13.09 20H6V4H13V9H18V13.09C18.33 13.04 18.66 13 19 13C19.34 13 19.67 13.04 20 13.09V8L14 2H6C4.89 2 4 2.9 4 4V20C4 21.11 4.89 22 6 22H13.81C13.46 21.39 13.21 20.72 13.09 20M18 15V18H15V20H18V23H20V20H23V18H20V15H18Z"
+                />
+              </svg>
+            </button>
+          {/if}
+          <button
+            class=" hover:bg-mturk text-barbi rounded-full"
+            title={editd[$lang]}
+            on:click={editb}
+            ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+              <path
+                fill="currentColor"
+                d="M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12H20A8,8 0 0,1 12,20A8,8 0 0,1 4,12A8,8 0 0,1 12,4V2M18.78,3C18.61,3 18.43,3.07 18.3,3.2L17.08,4.41L19.58,6.91L20.8,5.7C21.06,5.44 21.06,5 20.8,4.75L19.25,3.2C19.12,3.07 18.95,3 18.78,3M16.37,5.12L9,12.5V15H11.5L18.87,7.62L16.37,5.12Z"
+              />
+            </svg>
+          </button>
+          <!--change to modal with the project component-->
+          {#if discordlink}
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href={discordlink}
+              class=" hover:bg-mturk text-barbi rounded-full"
+              title={discordlinkde[$lang]}
+            >
+              <img
+                style="width:24px;height:24px"
+                src="https://res.cloudinary.com/love1/image/upload/v1662563246/discord-icon-svgrepo-com_d4vk6m.svg"
+                alt="Discord"
+              />
+            </a>
+          {/if}
+          {#if linkP}
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href={linkP}
+              class=" hover:bg-mturk text-barbi rounded-full"
+              title={tower[$lang]}
+            >
+              <svg
+                class="sv"
+                style="width:24px;height:24px"
+                xmlns="http://www.w3.org/2000/svg"
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                ><path
+                  fill="currentColor"
+                  d="M14.851 11.923c-.179-.641-.521-1.246-1.025-1.749-1.562-1.562-4.095-1.563-5.657 0l-4.998 4.998c-1.562 1.563-1.563 4.095 0 5.657 1.562 1.563 4.096 1.561 5.656 0l3.842-3.841.333.009c.404 0 .802-.04 1.189-.117l-4.657 4.656c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-1.952-1.951-1.952-5.12 0-7.071l4.998-4.998c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464.493.493.861 1.063 1.105 1.672l-.787.784zm-5.703.147c.178.643.521 1.25 1.026 1.756 1.562 1.563 4.096 1.561 5.656 0l4.999-4.998c1.563-1.562 1.563-4.095 0-5.657-1.562-1.562-4.095-1.563-5.657 0l-3.841 3.841-.333-.009c-.404 0-.802.04-1.189.117l4.656-4.656c.975-.976 2.256-1.464 3.536-1.464 1.279 0 2.56.488 3.535 1.464 1.951 1.951 1.951 5.119 0 7.071l-4.999 4.998c-.975.976-2.255 1.464-3.535 1.464-1.28 0-2.56-.488-3.535-1.464-.494-.495-.863-1.067-1.107-1.678l.788-.785z"
+                /></svg
+              >
+            </a>
+          {/if}
+          {#if drivelink}
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href={drivelink}
+              class=" hover:bg-mturk text-barbi rounded-full"
+              title={towel[$lang]}
+            >
+              <img
+                style="width:24px;height:24px"
+                src="https://res.cloudinary.com/love1/image/upload/v1662560567/icon-google-drive-new_jxv2oz.avif"
+                alt="Google Drive"
+              />
+            </a>
+          {/if}
+          {#if twiterlink}
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href={twiterlink}
+              class=" hover:bg-white text-barbi rounded-full"
+              title={twiterlinkde[$lang]}
+            >
+              <img
+                style="width:24px;height:24px"
+                src="https://visualpharm.com/assets/700/Twitter-595b40b65ba036ed117d4613.svg"
+                alt="Twitter"
+              />
+            </a>
+          {/if}
+          {#if watsapplink}
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href={watsapplink}
+              class=" hover:bg-white text-barbi rounded-full"
+              title={watsapplinkde[$lang]}
+            >
+              <img
+                style="width:24px;height:24px"
+                src="https://tochat.be/whatsapp-icon-white.png"
+                alt="WhatsApp"
+              />
+            </a>
+          {/if}
+          {#if githublink}
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href={githublink}
+              class=" hover:bg-white text-barbi rounded-full"
+              title={githublinkde[$lang]}
+            >
+              <img
+                style="width:24px;height:24px"
+                src="https://visualpharm.com/assets/720/Github-595b40b65ba036ed117d442f.svg"
+                alt="GitHub"
+              />
+            </a>
+          {/if}
+          {#if fblink}
+            <a
+              rel="noreferrer"
+              target="_blank"
+              href={fblink}
+              class=" hover:bg-white text-barbi rounded-full"
+              title={fblinkde[$lang]}
+            >
+              <img
+                style="width:24px;height:24px"
+                src="https://res.cloudinary.com/love1/image/upload/v1639258134/NicePng_oro-png_2336309_rkhbf8.png"
+                alt="Facebook"
+              />
+            </a>
+          {/if}
+          <button
+            class=" hover:bg-white text-barbi rounded-full"
+            title={publicp[$lang]}
+            on:click={goto(`/project/${$idPr}`)}
+          >
+            <Pub />
+          </button>
+        </div>
+        <h1 class="1">{projectname}</h1>
+        <div dir="ltr" class="flex items-center justify-center">
+          <div dir="ltr" class="flex -space-x-2 overflow-hidden">
+            {#each projectUsers as user}
+              <button
+                title={user.attributes.username}
+                on:click={() => goto(`/user/${user.id}`)}
+                ><img
+                  class="inline-block h-8 w-8 rounded-full ring-2 ring-gold"
+                  src={user.attributes.profilePic.data != null
+                    ? user.attributes.profilePic.data.attributes.url
+                    : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+                  alt=""
+                /></button
+              >
+              <!--{#if hover}
+    <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
+    {/if}-->
+            {/each}
+          </div>
+        </div>
+<!--tab header-->
+   <div class="flex justify-center  max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
+                  <button
+                on:click={() => (tab = 1)}
+                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold  {tab == 1 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={maini[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 1 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {maini[$lang]}
+                  </h2>
+                  <!--<Scab/>-->
+                </div></button
+              >
+              <button
+                on:click={() => (tab = 2)}
+                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 2 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={neww[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 2 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {neww[$lang]}
+                  </h2>
+                  <!--<Scab/>-->
+                </div></button
+              >
+              <button
+                on:click={() => (tab = 3)}
+                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 3 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={gann[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 3 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {gann[$lang]}
+                  </h2>
+                  <!--<Scab/>-->
+                </div></button
+              >
+              <button
+                on:click={() => (tab = 4)}
+                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 4 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={sidd[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 4 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {sidd[$lang]}
+                  </h2>
+                  <!--<Siduri/>-->
+                </div></button
+              >
+            {#if bmiData.length > 0}
+                <button
+                  on:click={() => (tab = 5)}
+                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 5 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                  title={bet[$lang]}
+                  ><div
+                    class="flex flex-col items-center justify-center align-middle"
+                  >
+                  <h2 style="{tab == 5 ? "": "text-shadow:1px 1px #fff ;"}">
+                      {bet[$lang]}
+                    </h2>
+                    <!--<Taskk/>-->
+                  </div></button
+                >
+            {/if}
+             <button
+                on:click={() => (tab = 6)}
+                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={shirutims[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 6 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {shirutims[$lang]}
+                  </h2>
+                  <!--<Siduri/>-->
+                </div></button
+              >
+               <button
+                on:click={() => (tab = 7)}
+                class="border  hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={mechirot[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 7 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {mechirot[$lang]}
+                  </h2>
+                  <!--<Siduri/>-->
+                </div></button
+              >
+               <button
+                on:click={() => (tab = 8)}
+                class="border hover:underline hover:decoration-mturk sm:text-xl border-barbi hover:border-gold hover:bg-gold  {tab == 8 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-br from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
+                title={haluka[$lang]}
+                ><div
+                  class="flex flex-col items-center justify-center align-middle"
+                >
+                  <h2 style="{tab == 8 ? "": "text-shadow:1px 1px #fff ;"}">
+                    {haluka[$lang]}
+                  </h2>
+                  <!--<Siduri/>-->
+                </div></button
+              >
+          </div>
+<!--tabs-->
+<div class="border-t-2 border-mturk">
+{#if tab === 1}
+        {#if project.publicDescription != 'undefined' && project.publicDescription != null}
+          <div class="border-2 border-gold rounded m-2 p-2">
+            <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
+            <RichText editable={false} outpot={desP} />
+          </div>
+        {/if}
+        {#if project.descripFor != 'undefined' && project.descripFor != null}
+          <div class="border-2 border-gold rounded m-2 p-2">
+            <RichText editable={false} outpot={desP} />
+            <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
+          </div>
+        {/if}
+
+        <div>
+          {#if vallues.length > 0}
+            <h2 class="text-sm text-barbi">{vap[$lang]}</h2>
+            <div
+              class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2"
+            >
+              {#each vallues as vallue}<p class="m-0" style="text-shadow:none;">
+                  <Tile
+                    bg="gold"
+                    sm={width > 500 ? true : false}
+                    big={width > 500 ? true : false}
+                    word={vallue.attributes.valueName}
+                  />
+                </p>{/each}
+            </div>{/if}
+            </div>
+{:else if tab == 2}            
+          <!--
+  <div>
+ <Fini users={projectUsers} {fmiData}/></div>-->
+
+          <div class=" hhh">
+            {#if hovered}
+              <button on:click={hosa} on:mouseleave={bighand}
+                ><img
+                  title={hosafa[$lang]}
+                  style="max-width:45vw; max-height:45vw;"
+                  width="240px"
+                  height="240px"
+                  src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
+                  alt="cheked"
+                /></button
+              >
+            {:else}
+              <Hand
+                on:hosa={hosa}
+                on:progres={bighand}
+                on:trym={trym}
+                {noofopen}
+                {openMS}
+                {addM}
+                hosafa={hosafa[$lang]}
+              />
+            {/if}
+            {#if hoveredd}
+              <button on:click={masi} on:mouseleave={bighandd}
+                ><img
+                  title={hosafat[$lang]}
+                  style="max-width:45vw; max-height:45vw;"
+                  width="240px"
+                  height="240px"
+                  src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
+                  alt="cheked"
+                /></button
+              >
+            {:else}
+              <Handd
+                on:trym={tryma}
+                on:masi={masi}
+                on:bighandd={bighandd}
+                {noofopenm}
+                {openMA}
+                {addN}
+                hosafat={hosafat[$lang]}
+              />
+            {/if}
+
+            <!--{#if gan == false}
+<button on:click={()=>gan = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"title={gann[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{gann[$lang]}</p><Scab/></div></button>
+{/if}
+
+{#if sid == false}
+<button on:click={()=>sid = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"  title={sidd[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{sidd[$lang]}</p><Siduri/></div></button>
+{/if}
+{#if bmiData.length > 0 }
+<br> <br>
+{#if bett == false}
+<button on:click={()=>bett = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold" title={bet[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{bet[$lang]}</p><Taskk/></div></button>
+{/if}
+{/if}
+-->
+          </div>
+  
+            <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
+  כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
+כולל לפי יוזרים וכו-->
+
+            <div>
+              {#if addM === true}
+                <div
+                  bind:this={hosaf}
+                  class=" m-4 border-2 border-barbi rounded"
+                >
+                  <button
+                    title={cencel[$lang]}
+                    on:click={closeM}
+                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
+                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                      />
+                    </svg></button
+                  >
+                  <ChoosMission
+                    {roles}
+                    {mission1}
+                    bind:selected={blabla}
+                    on:message={callbackFunction}
+                  />
+                </div>
+              {/if}
+            </div>
+
+          <div bind:this={cow}>
+            {#if load === true}
+              <div
+                class="grid justify-center items-center border-2 border-barbi rounded p-4"
+              >
+                <Lowding />
+              </div>
+            {/if}
+            {#if showvd == true}
+              {#key miData}
+                <Mission
+                  pn={projectname}
+                  pl={srcP}
+                  {restime}
+                  {newcontent}
+                  {newcontentR}
+                  {newcontentW}
+                  pu={projectUsers}
+                  userslength={projectUsers.length}
+                  {workways2}
+                  {skills2}
+                  {roles}
+                  roles1={roles}
+                  vallues={alit}
+                  {miData}
+                  projectId={$idPr}
+                  on:remove={removeF}
+                  on:removeS={removeS}
+                  on:addskills={addskills}
+                  on:addnewsk={addnewsk}
+                  on:removeR={removeR}
+                  on:addroles={addroles}
+                  on:addnewr={addnewr}
+                  on:addneww={addneww}
+                  on:adwww={adwww}
+                  on:removeW={removeW}
+                  on:close={close}
+                />
+              {/key}
+            {/if}
+          </div>
+
+          <div class=" m-4" bind:this={dow}>
+            {#if addN == true}
+              <div
+                bind:this={fff}
+                id="hosafn"
+                class="m-4 border-2 border-barbi rounded"
+              >
+                <button
+                  title={cencel[$lang]}
+                  on:click={() => (addN = false)}
+                  class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                    />
+                  </svg></button
+                >
+                <ChoosNeed
+                  on:str={() => (loadr = false)}
+                  on:add={needad}
+                  on:addm={needadm}
+                  selectedi={needr}
+                />
+              </div>
+            {/if}
+
+            <div class=" m-4" bind:this={lll}>
+              {#if loadr === true}
+                <div
+                  class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                >
+                  <Lowding />
+                </div>
+              {/if}
+              {#if totalneed === true}
+                <TotalNeeds
+                  pn={projectname}
+                  pl={srcP}
+                  {restime}
+                  pu={projectUsers}
+                  projectId={$idPr}
+                  userslength={projectUsers.length}
+                  {needr}
+                  meData={meDatamm}
+                  on:close={clo}
+                  on:remove={wdwd}
+                />{/if}
+            </div>
+          </div>
+{:else if tab == 3}          
+          <div dir="rtl">
+          
+              {#if pmiData.length > 0}
+                <button
+                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
+                  on:click={topends}>{mwa[$lang]}</button
+                >
+              {/if}
+
+              {#if omiData.length > 0}
+                <button
+                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-oranges text-pinki hover:text-barbi font-bold px-4 rounded"
+                  on:click={toopens}>{opmi[$lang]}</button
+                >
+              {/if}
+              {#if bmiData.length > 0}
+                <button
+                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg text-barbi hover:text-barbi font-bold px-4 rounded"
+                  on:click={tobetha}
+                >
+                  פעולות בתהליך ביצוע</button
+                >
+              {/if}
+              {#if fmiData.length > 0}
+                <button
+                  class="border border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-mpink text-pinki hover:text-barbi font-bold px-4 rounded"
+                  on:click={tofinish}
+                >
+                  פעולות שהסתיימו</button
+                >
+              {/if}
+              <div
+                dir="ltr"
+                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 242, 222, 0.8); "
+                class="d"
+              >
+                <Gantt
+                  {bmiData}
+                  {pmiData}
+                  {omiData}
+                  {fmiData}
+                  on:selected={openTheDesc}
+                />
+              </div>
+              </div>
+{:else if tab === 4}
+              
+              <div
+                dir="ltr"
+                style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color: rgba(9, 242, 222, 0.8); "
+                class="d"
+              >
+                <Sidur />
+              </div>
+{:else if tab === 5}
+              <div
+                dir="ltr"
+                style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
+              >
+            
+                <Bethas {bmiData} on:chat={openChat} />
+              </div>
+{:else if tab === 6}
+                     <div class="p-8">
+            <Sheirut
+              sheirutim={project?.sheiruts}
+              pn={projectname}
+              {restime}
+              usersNum={projectUsers.length}
+            />
+          </div>
+{:else if tab === 7}
+          <Hamatanot
+              {trili}
+              {fmiData}
+              {rikmashes}
+              {salee}
+              {projectUsers}
+              bmiData={bmimData}
+            />
+{:else if tab === 8}
+          <div class=" p-2">
+            
+            {#if fmiData.length > 0 || rikmashes.length > 0}
+              <div
+                class="m-4 border-2 border-barbi rounded p-4"
+                bind:this={finiss}
+              >
+                <Fini
+                  {fmiData}
+                  {hagdel}
+                  users={projectUsers}
+                  {rikmashes}
+                  on:tit={titlel}
+                />
+                <br />
+                {#if hal === false}
+                  <button
+                    on:click={() => (hal = true)}
+                    class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+                  >
+                    חישוב רווח בגירסה ראשונית
+                  </button>
+                {:else if hal === true}
+                  <button
+                    title={cencel[$lang]}
+                    on:click={() => (hal = false)}
+                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                      />
+                    </svg></button
+                  >
+
+                  <Hach
+                    meData={rikmashes}
+                    {fmiData}
+                    users={projectUsers}
+                    {rikmashes}
+                  />
+                {/if}
+              </div>
+            {/if}
+          </div>
+{/if}              
+          </div>
+                   <div class=" m-4" bind:this={openss}>
+              {#if openMS === true && omiData.length > 0}
+                <span >
+                  <button
+                    title={cencel1[$lang]}
+                    on:click={() => (openMS = false)}
+                    class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                      />
+                    </svg></button
+                  >
+                  <OpenM {omiData} projectName={projectname} />
+                </span>
+              {:else if openMS === true && omiData.length == 0}
+                <button
+                  title={cencel1[$lang]}
+                  on:click={() => (openMS = false)}
+                  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                    />
+                  </svg></button
+                >
+                <h2>
+                  אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו
+                  <br />
+                  (לחצו על היד המחזיקה מנורה שלמעלה)
+                </h2>
+              {/if}
+            </div>
+            <div class="m-4">
+              {#if openMA === true && opmash.length > 0}
+                <button
+                  title={cencel1[$lang]}
+                  on:click={() => (openMA = false)}
+                  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                    />
+                  </svg></button
+                >
+                <Mashman meData={opmash} />
+              {:else if openMA === true && opmash.length == 0}
+                <button
+                  title={cencel1[$lang]}
+                  on:click={() => (openMA = false)}
+                  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                    />
+                  </svg></button
+                >
+                <h2>
+                  אין משאבים מבוקשים לריקמה זו, מומלץ ליצור כבר עכשיו
+                  <br />
+                  (לחצו על היד המחזיקה מגנט שלמעלה)
+                </h2>
+              {/if}
+            </div>
+          <!--הכל בחלונות נפתחים-->
+          <div class=" m-4">
+            {#if pmiData.length > 0}
+              <span bind:this={pendss}>
+                {#if pendS === true}
+                  <button
+                    title={cencel1[$lang]}
+                    on:click={() => (pendS = false)}
+                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
+                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                      />
+                    </svg></button
+                  >
+                  <PendsM {pmiData} user_1s={projectUsers.length} />
+                {/if}
+              </span>
+            {/if}
+            <div>
+              {#if bmiData.length > 0}
+                <span bind:this={bmiss}>
+                  {#if tahaS === true}
+                    <button
+                      title={cencel1[$lang]}
+                      on:click={() => (tahaS = false)}
+                      class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+                      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                        <path
+                          fill="currentColor"
+                          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                        />
+                      </svg></button
+                    >
+                    <Betaha {bmiData} />
+                  {/if}
+                </span>
+              {/if}
+            </div>
+           
+   </div>
+   </div>
+   </div>
+          
+          <!--<Mindmap/>-->
+    <!-- </Tooltip> {:else}
+    לשלוח אותו לרקמה ציבורי לקחת ID וכו'
+    <h1 class="bg-white">לא מורשה</h1>
+    {/if}-->
+  {/await}
+{:else}
+  {#await projects}
+    <div class="alli grid items-center justify-center bg-[radial-gradient(circle_at_45%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),theme(colors.black))]">
+      <Lowding />
+    </div>
+  {:then projects}
+    <div class=" text-center border-2 border-barbi rounded m-4">
+      <h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">
+        {choo[$lang]}
+      </h1>
+
+      {#each projects as data, i}
+        <button
+          class=" border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
+          on:click={() => projectn(data.id)}
+        >
+          {data.attributes.projectName}
+        </button>
+      {/each}
+    </div>
+  {/await}
+{/if}
+
+<style>
+  .alli {
+    /*   background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%); */
+    /*background: radial-gradient(
+      circle at 0.9%,
+      rgb(2, 255, 187) 0%,
+      rgb(238 232 170) 50%,
+      rgb(2, 255, 187) 100.2%
+    );*/
+    z-index: -1;
+    min-width: 100vw;
+    min-height: 100vh;
+    position: fixed;
+    top: 0;
+    left: 0;
+  }
+  .hhh {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+  .all {
+    min-height: 100vh;
+  }
+  .all::-webkit-scrollbar {
+    width: 0px;
+  }
+  .textlink:hover {
+    -webkit-text-stroke: 1px var(--barbi-pink);
+  }
+
+  :global(li:not(.selected):hover) {
+    color: var(--barbi-pink);
+    background-color: var(
+      --lturk
+    ); /* unselected but hovered options in the dropdown list */
+  }
+  :global(ul.tokens > li) {
+    background-color: var(--barbi-pink);
+    color: var(--lturk);
+  }
+
+  .sp {
+    display: grid;
+    justify-content: center;
+    align-items: center;
+  }
+  :global([data-svelte-dialog-content].content) {
+    background: #60b9b6;
+    background: -webkit-radial-gradient(center, #050117, #0f0248, #60b9b6);
+    background: -moz-radial-gradient(center, #050117, #0f0248, #60b9b6);
+    background: radial-gradient(ellipse at center, #050117, #0f0248, #60b9b6);
+    width: 80vw;
+  }
+  @media (min-width: 768px) {
+    :global([data-svelte-dialog-content].content) {
+      width: 50vw;
+    }
+    .hhh {
+      display: flex;
+      flex-direction: row;
+    }
+  }
+</style>

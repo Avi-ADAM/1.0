@@ -685,6 +685,7 @@ function hoverede(){
   import Diun from "./diun.svelte";
   import { nowId } from "$lib/stores/pendMisMes.js";
   import { sendToSer } from "$lib/send/sendToSer.svelte";
+  import NegoPend from "../prPr/negoPend.svelte";
 export let cards = false;
 function tochat (){
   isOpen = true
@@ -704,7 +705,51 @@ const close = () => {
 {:then ser}
  <DialogOverlay {isOpen} onDismiss={close} class="overlay">
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
-  <DialogContent class="chat" aria-label="form" >
+  {#if masa === true}
+          <DialogContent aria-label="form" class="nego d">
+          <div dir="rtl" class="grid items-center justify-center text-center">
+                        <button style="margin: 0 auto;" on:click={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+          title="ביטול"
+          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+            <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
+          </svg></button>
+  {#if loading === true}
+         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
+  {:else}
+      <NegoPend
+      {masaalr} {mypos}
+      on:load={()=>loading = true}
+              on:close={afternego}
+              {timegramaId}
+  {negopendmissions}
+        descrip ={descrip}
+        projectName ={projectName}
+        name1 ={name}
+        hearotMeyuchadot = {hearotMeyuchadot}
+        noofhours ={noofhours}
+        perhour = {perhour}
+        projectId = {projectId}
+        total ={total}
+        {ordern}
+        noofusers={noofusers}
+        missionId={missionId}
+        skills = {skills}
+        tafkidims = {tafkidims}
+        workways ={workways}
+        mdate={mdate}
+        {mdates}
+        {isKavua}
+        {publicklinks}
+        {privatlinks}
+           {restime}
+        pendId={pendId}
+        users={users}
+      />
+  {/if}
+      </div>
+  </DialogContent>
+{:else}
+          <DialogContent class="chat" aria-label="form" >
       <div dir="rtl" class="grid items-center justify-center aling-center">
               <button on:click={close} style="margin: 0 auto;"class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
 title="ביטול"
@@ -753,6 +798,7 @@ title="ביטול"
 {/if}
       </div>
   </DialogContent>
+  {/if}
   </div>
 </DialogOverlay>
 {#if cards == false}
