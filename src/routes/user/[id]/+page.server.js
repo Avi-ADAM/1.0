@@ -51,7 +51,7 @@ async function awaitapi(userId, lang, tok) {
               data {
                 id
                 attributes {
-                  skill Name 
+                  skillName 
  localizations{data{attributes{skillName}}}
                 }
               }
