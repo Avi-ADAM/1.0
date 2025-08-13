@@ -1,56 +1,37 @@
-import { SendTo } from '$lib/send/sendTo.svelte';
+import { sendToSer } from '$lib/send/sendToSer.js';
 
-async function awaitapi(que,toc,lang) {  
- let alld = []
- await SendTo(que, toc)
-      .then((data) => {
-        console.log(data);
-         if (data.data.openMashaabim.data != null) {
-          const datar = data.data.openMashaabim.data.attributes;
-          console.log(datar);
-          if (datar.archived != true) {
-            data = datar
-            data.archived = false;
-            data.title = {
-              he: `1💗1 | הצעה לשיתוף משאב 
-              "${data.name}" 
-              בריקמה: 
-              ${data.project.data.attributes.projectName}`,
-              en: 'come see this proposal on    '
-            };
-            data.fullfild = true;
-            alld = data
-        } else {
-          data = {title: {he: '1💗1 |  הצעה לשיתוף משאב שאיננה זמינה', en: 'not relevant old proposal'}, archived: true};
-                      alld = data;
-        }
+async function awaitapi(mId, lang, tok, fetch) {  
+  const isSer = tok === false;
+  try {
+    const res = await sendToSer({ id: mId }, '50GetOpenMashaabimById', null, null, isSer, fetch);
+    const node = res?.data?.openMashaabim?.data?.attributes;
+    if (node) {
+      if (node.archived !== true) {
+        const data = { ...node };
+        data.archived = false;
+        data.title = {
+          he: `1💗1 | הצעה לשיתוף משאב "${data.name}" בריקמה: ${data.project?.data?.attributes?.projectName}`,
+          en: 'come see this proposal on'
+        };
+        data.fullfild = true;
+        return data;
       } else {
-        data = {title: {he: '1💗1 |  הצעה לשיתוף משאב שאיננה זמינה', en: 'not relevant old proposal'}, archived: true};
-        alld = data;
+        return { title: { he: '1💗1 |  הצעה לשיתוף משאב שאיננה זמינה', en: 'not relevant old proposal' }, archived: true };
       }
-        return alld;
-      })
-      .catch((error) => {
-        console.log(error);
-        alld = error;
-      });
-  return alld
+    } else {
+      return { title: { he: '1💗1 |  הצעה לשיתוף משאב שאיננה זמינה', en: 'not relevant old proposal' }, archived: true };
+    }
+  } catch (error) {
+    console.log(error);
+    return { title: { he: '1💗1 |  הצעה לשיתוף משאב שאיננה זמינה', en: 'not relevant old proposal' }, archived: true };
+  }
 }
-export async function load({ locals, params }) {
+export async function load({ locals, params, fetch }) {
   const mId = params.id;
   const lang = locals.lang;
   const tok = locals.tok;
   const uid = locals.uid;
-  let que = `{ openMashaabim (id:${mId}) { data {id attributes{ archived price descrip spnot kindOf
-  sqadualedf sqadualed linkto createdAt hm name easy 
-  declinedsps {data{ id }} 
-  users {data{ id }} 
-  mashaabim{data{id}}
-  project {data{ id attributes{ restime projectName user_1s{data{id}} 
-      restime timeToP profilePic {data{ attributes{url  }}}
-    }}}
-}}}
-  }`;
+  let que = ``;
   let alld;
   let error;
   let bdata = [];
@@ -58,12 +39,9 @@ export async function load({ locals, params }) {
   let toc;
   let archived = false;
   if (tok != false) {
-    toc = tok;
     console.log("loged in")
   } else {
-    toc = import.meta.env.VITE_ADMINMONTHER;
         console.log('not loged in');
-
   }
   
   return {
@@ -71,7 +49,7 @@ export async function load({ locals, params }) {
     lang,
     mId,
     tok: tok == false ? false : true,
-      alld: await awaitapi(que,toc,lang),
+      alld: await awaitapi(mId,lang,tok,fetch),
       fullfild
   };
 }

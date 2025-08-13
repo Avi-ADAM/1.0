@@ -725,7 +725,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  '48GetServiceById': `query GetServiceById($id: ID!, $he: Boolean!) {
+  '48GetServiceById': `query GetServiceById($id: ID!) {
     matanot(id: $id) {
       data {
         attributes {
@@ -774,7 +774,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  '49GetProjectById': `query GetProjectById($id: ID!, $he: Boolean!) {
+  '49GetProjectById': `query GetProjectById($id: ID!) {
     project(id: $id) {
       data {
         attributes {
@@ -855,7 +855,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  '52GetUserById': `query GetUserById($id: ID!, $he: Boolean!) {
+  '52GetUserById': `query GetUserById($id: ID!) {
     usersPermissionsUser(id: $id) {
       data {
         id

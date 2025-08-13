@@ -74,11 +74,11 @@ let isMobileOrTablet = $derived(w < 568 ? true : false)
   <Header/>
 {/if}
 {#if project}
-  <div bind:clientWidth={w} class="w-screen d overflow-y-auto h-screen bg-gradient-to-br from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400 ">
+  <div bind:clientWidth={w} class="w-screen d overflow-y-auto h-screen bg-gradient-to-b from-black via-slate-900 via-slate-800 via-slate-600 to-slate-400 ">
     <div dir="rtl"  class="h-screen d lg:w-1/2 mx-auto ">
 
       {#if !isRegisteredUser}
-        <div class="bg-goldShain text-barbi p-4 text-center" style='text-shadow: white 1px 1px 1px'>
+        <div class="bg-goldShain text-xl text-[#131b2e] p-4 text-center" style='text-shadow: black 1px 1px 1px'>
           {@html unregisteredUserMessage[$lang]}
         </div>
       {/if}
@@ -87,9 +87,10 @@ let isMobileOrTablet = $derived(w < 568 ? true : false)
         {#if srcP}
           <img
             width="100" height="100" 
-            style="border-radius: 50%; margin-right:auto; margin-left:auto ;"  
             src={srcP}
-            alt="profilePic">
+            alt="profilePic"
+            class="w-24 h-24 rounded-full border-2 border-wow mx-auto"
+            >
         {/if}
         <div class="flex flex-row items-center justify-center">
           {#if discordlink}

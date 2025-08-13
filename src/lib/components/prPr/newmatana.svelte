@@ -52,7 +52,7 @@
 
   async function add() {
     loading = true;
-
+    console.log(description)
     let imageId = null;
     quant = quant > 0 ? quant : 1;
     price = price > 0 ? price : 0;
