@@ -127,9 +127,9 @@ let isOpen = $state(false);
 let loading = $state(false);
 
 onMount(()=>{
-  skills = oneLangAdj(skills,$lang,"skillName")
-  tafkidims = oneLangAdj(tafkidims,$lang,"roleDescription")
-  workways = oneLangAdj(workways,$lang,"workWayName")
+  skills = oneLangAdj({data: skills},$lang,"skillName").data || []
+  tafkidims = oneLangAdj({data: tafkidims},$lang,"roleDescription").data || []
+  workways = oneLangAdj({data: workways},$lang,"workWayName").data || []
 })
     function percentage(partialValue, totalValue) {
    return (100 * partialValue) / totalValue;
@@ -670,6 +670,7 @@ function claf (event){
   let o = event.alr
   let d = event.y
   if (d=="a"){
+    console.log("agree")
     agree(o)
   } else if (d=="d"){
     decline(o)

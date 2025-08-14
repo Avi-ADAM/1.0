@@ -1,6 +1,7 @@
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { langAdjast } from '$lib/func/langAdjast.svelte';
 
+
 async function awaitapi(userId, lang, tok, fetch) {
   const isSer = tok === false;
   let userData = null;
