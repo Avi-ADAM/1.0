@@ -67,13 +67,12 @@ let user = 0;
 
 let kvar = $state();
 onMount(async () => {
-    const x = page.url.searchParams.get('ref')
-    if (x != null) {
-        userName.set(page.url.searchParams.get('un'))
-        kvar = page.url.searchParams.get('em');
-        email.set(page.url.searchParams.get('em'));
-        lang.set(page.url.params.searchParams.get('lang'))
-        //cuontry freeppid
+  const x = page.url.searchParams.get('ref')
+if (x != null) {
+    userName.set(decodeURIComponent(page.url.searchParams.get('un')))
+    kvar = page.url.searchParams.get('em');
+    email.set(decodeURIComponent(page.url.searchParams.get('em')));
+    lang.set(decodeURIComponent(page.url.searchParams.get('lang'))) //cuontry freeppid
        const oneYearFromNow = new Date();
 oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
