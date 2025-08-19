@@ -72,10 +72,15 @@ onMount(async () => {
         userName.set(page.url.searchParams.get('un'))
         kvar = page.url.searchParams.get('em');
         email.set(page.url.searchParams.get('em'));
+        lang.set(page.url.params.searchParams.get('lang'))
         //cuontry freeppid
-        document.cookie = `email=${page.url.searchParams.get('em')}; expires=` + new Date(2026, 0, 1).toUTCString();
-        document.cookie = `un=${page.url.searchParams.get('un')}; expires=` + new Date(2026, 0, 1).toUTCString();
-        liUN.set(decodeURIComponent(page.url.searchParams.get('un')));
+       const oneYearFromNow = new Date();
+oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
+
+document.cookie = `lang=${page.url.params.searchParams.get('lang')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
+document.cookie = `email=${page.url.searchParams.get('em')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
+document.cookie = `un=${page.url.searchParams.get('un')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
+   liUN.set(decodeURIComponent(page.url.searchParams.get('un')));
         const array = page.url.searchParams.get('con').split(',');
 
         contriesi.set(array)
