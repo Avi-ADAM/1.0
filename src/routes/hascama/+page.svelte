@@ -76,7 +76,7 @@ if (x != null) {
        const oneYearFromNow = new Date();
 oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
-document.cookie = `lang=${page.url.params.searchParams.get('lang')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
+document.cookie = `lang=${page.url.searchParams.get('lang')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
 document.cookie = `email=${page.url.searchParams.get('em')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
 document.cookie = `un=${page.url.searchParams.get('un')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;
    liUN.set(decodeURIComponent(page.url.searchParams.get('un')));
