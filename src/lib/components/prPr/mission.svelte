@@ -1401,7 +1401,7 @@
         {/if}
         {:else}
         {#if page.data.isDesktop}
-        <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
+        <div class="border border-gold flex  lg:p-4 flex-row justify-center align-middle p-2">
 
         <MultiSelect
         outerDivClass="!bg-gold !text-barbi"
@@ -1416,7 +1416,6 @@
         noMatchingOptionsMsg={nom[$lang]}
       />
       <AddNewSkill
-        color={'--barbi-pink'}
         mid={miData[0].id}
         onAddnewskill={addnew}
         {addS}
@@ -1440,7 +1439,6 @@
                     noMatchingOptionsMsg={nom[$lang]}
                   />
                   <AddNewSkill
-                    color={'--barbi-pink'}
                     mid={miData[0].id}
                     onAddnewskill={addnew}
                     {addS}
@@ -1481,7 +1479,6 @@
       options={$role.map((c) => c.attributes.roleDescription)}
     />
     <Addnewro
-      color={'--barbi-pink'}
       mid={miData[0].id}
       onAddnewrole={addnewrole}
     />
@@ -1502,7 +1499,6 @@
       options={$role.map((c) => c.attributes.roleDescription)}
     />
     <Addnewro
-      color={'--barbi-pink'}
       mid={miData[0].id}
       onAddnewrole={addnewrole}
     />

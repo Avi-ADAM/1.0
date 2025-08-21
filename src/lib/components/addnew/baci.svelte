@@ -311,7 +311,17 @@ const newOb = meData.data.createVallue.data;
               }
             }
 
-  
+  function handleFocusIn(event) {
+    if (isMobileOrTablet) {
+        setTimeout(() => {
+            event.currentTarget.scrollIntoView({
+                behavior: 'smooth',
+                block: 'center',
+                inline: 'center'
+            });
+        }, 300);
+    }
+}
 
   let ugug = $state(``);
   
@@ -427,7 +437,7 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
 ?
 </h1> 
 
-<div  class="input-2">
+<div onfocusin={handleFocusIn} class="input-2">
      <MultiSelect
      outerDivClass="!bg-gold !text-barbi"
      inputClass="!bg-gold !text-barbi"

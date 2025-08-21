@@ -198,13 +198,13 @@ function dispatchb () {
     onB
   } = $props();
   </script>
-  <div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
+  <div class='p-4 ' style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
 {#if addS == false}
 <button style="--the:{color};"
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
 onclick={() => addS = true}>{adds[$lang]}</button>
 {:else}
-<div class="bg-barbi bg-opacity-10">
+<div class="bg-barbi bg-opacity-10 p-4">
 <button title={cencel[$lang]}
 onclick={dispatchb}
               class=" hover:bg-barbi text-gold hover:text-lturk font-bold py-1 px-1 rounded-full text-center"
@@ -214,7 +214,7 @@ onclick={dispatchb}
 
 
 
- <h1 style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{adds[$lang]}</h1>    
+ <h1 style="font-size: 1rem; line-height: normal; color: var({color}); ">{adds[$lang]}</h1>    
 
   
   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
@@ -235,13 +235,14 @@ onclick={dispatchb}
      <br>
 <div dir="{$lang == "en" ? "ltr" : "rtl"}">
   <MultiSelect
+    outerDivClass="!bg-gold !text-barbi"
+     inputClass="!bg-gold !text-barbi"
+     liSelectedClass="!bg-barbi !text-gold"
   --sms-max-width={"60vw"}
   bind:selected
   {placeholder}
   noMatchingOptionsMsg={nom[$lang]}
   options={roles1.map(c => c.attributes.roleDescription)}
-            inputClass='!text-barbi'
-            outerDivClass='!text-barbi'
   /></div>
   <br>
 <div>
@@ -284,6 +285,7 @@ onclick={() => addro = false}
   width: 80%;
   display: block;
 }
+
 
 .input {
 

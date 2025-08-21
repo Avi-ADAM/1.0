@@ -211,13 +211,13 @@ function dispatchb () {
 
 </script>
 
-<div style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
+<div class="p-4" style="--the:{`var(${color})`};" dir="{$lang == "en" ? "ltr" : "rtl"}">
 {#if addR == false}
 <button 
 class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-0.5 px-4 rounded-full"
 onclick={() => addR = true}>{addn[$lang]}</button>
 {:else}
-<div class="bg-opacity-10 bg-barbi">
+<div class="bg-opacity-10 bg-barbi p-4">
 
 <button title={cencel[$lang]}
 onclick={dispatchb}
@@ -227,7 +227,7 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
 </svg></button> 
   
 
-    <h1 class="font-bold" style="font-size: 1rem; line-height: normal; color: var(--barbi-pink); ">{addn[$lang]}</h1>    
+    <h1 class="font-bold text-gold" style="font-size: 1rem; line-height: normal; color: var({color}); ">{addn[$lang]}</h1>    
 <div dir="{$lang == "en" ? "ltr" : "rtl"}" class='textinput'>
   <input  bind:value={roleName_value}
  type='text' class='input' required>
