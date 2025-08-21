@@ -230,6 +230,7 @@ let suc = $state(false);
 } from 'svelte-loading-spinners'
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
+  import MobileModal from '$lib/celim/ui/mobileModal.svelte';
   let { userName_value } = $props();
  const closer = () => {
     isOpen = false;
@@ -324,7 +325,7 @@ const newOb = meData.data.createVallue.data;
 }
 
   let ugug = $state(``);
-  
+  let valE = $state(false)
     let newcontent = $state(true)
   let addne = $derived({"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`})
 const timeto = {"he":"כמה זמן עד שהריקמה תכניס כסף", "en":"how much time until the FreeMates will be profitable"}
@@ -436,8 +437,8 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
   {whva[$lang]}
 ?
 </h1> 
-
-<div onfocusin={handleFocusIn} class="input-2">
+{#if !isMobileOrTablet()}
+<div class="input-2">
      <MultiSelect
      outerDivClass="!bg-gold !text-barbi"
      inputClass="!bg-gold !text-barbi"
@@ -451,7 +452,25 @@ const inc = {"he":"ניתן להזין את הערך המוערך של ההכנ�
      options={vallues.map(c => c.attributes.valueName)}
      />
   </div>
+{:else}
+  <MobileModal onClose={()=> valE = false} bind:isOpen={valE} title={placeholder[$lang]}>
+        <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
 
+       <MultiSelect
+     outerDivClass="!bg-gold !text-barbi"
+     inputClass="!bg-gold !text-barbi"
+     liSelectedClass="!bg-barbi !text-gold"
+      createOptionMsg={addne[$lang]}
+     allowUserOptions={"append"}
+      loading={newcontent}
+      bind:searchText={ugug}
+     bind:selected
+     {placeholder}
+     options={vallues.map(c => c.attributes.valueName)}
+     />
+     </div>
+  </MobileModal>
+{/if}
   <br>
  <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="mb-3 xl:w-96 m-2">
       <h2 class="text-center text-gold">{hre[$lang]}</h2>
