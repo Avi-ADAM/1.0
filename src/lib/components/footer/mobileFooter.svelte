@@ -22,14 +22,16 @@
         onNew?.();
       }
     }
-    console.log("page.url.pathname",page.url.pathname)
     let activeRoute = $derived(page.url.pathname);
    
     const brainLeb= {"he":"מוח הרקמות","en":"brain of organiczations"}
 </script>
 
 
-<div class="fixed z-50 w-full h-12 max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-0 left-1/2 dark:bg-gray-700 dark:border-gray-600">
+<div class=" fixed z-50 w-full h-12 max-w-lg -translate-x-1/2 bg-white border border-gray-200 rounded-full bottom-0 left-1/2 dark:bg-gray-700 dark:border-gray-600">
+    {#if navigating && navigating.to}
+        <div class="absolute inset-0 rounded-full border-2 border-gold animate-pulse pointer-events-none"></div>
+    {/if}
     <div class="grid h-full max-w-lg grid-cols-5 mx-auto" >
          <ProfileMenu />
        
@@ -58,7 +60,14 @@
             activeRoute = "lev"
             goto("/lev")
         }} type="button" class="{activeRoute == "/lev" ? "border-b-2 border-gold" : ""} inline-flex text-barbi flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
-           <Lev/>
+           <div class="relative">
+                <Lev/>
+                {#key navigating}
+                {#if navigating && navigating.to?.url.pathname === '/lev'}
+                    <div class="absolute -inset-1 rounded-full border-2 border-transparent border-t-gold animate-spin"></div>
+                {/if}
+                {/key}
+            </div>
             <span class="sr-only">Lev</span>
         </button>
         <div id="tooltip-settings" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
@@ -69,7 +78,12 @@
             activeRoute = "moach"
             goto("/moach")
         }} type="button" class="{activeRoute == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
-            <MoachIcon active={navigating?.to?.url.pathname == "/moach"}/>
+            <div class="relative">
+                <MoachIcon active={navigating?.to?.url.pathname == "/moach"}/>
+                {#if navigating && navigating.to?.url.pathname === '/moach'}
+                    <div class="absolute -inset-1 rounded-full border-2 border-transparent border-t-gold animate-spin"></div>
+                {/if}
+            </div>
             <span class="sr-only">{brainLeb[$lang]}</span>
         </button>
         <div id="tooltip-home" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
