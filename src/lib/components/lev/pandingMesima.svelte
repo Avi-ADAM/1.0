@@ -106,6 +106,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     pendId,
     users,
     mysrc,
+    sqadualed,
+    dates,
     diun = $bindable([]),
     order = $bindable(diun.length),
     ordern = 0,
@@ -873,6 +875,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
    {noofusersOk} 
    {name} 
    {restime}
+   {sqadualed}  {dates}
    {createdAt}
    {descrip} {mypos} {allr} {noofusersNo}
    onNego={claf}
@@ -890,6 +893,7 @@ class="hover:scale-290 duration-1000 ease-in" transition:fly|local={{y:450, dura
   onHover={hoverc}
   onTochat={tochat}
 {skills}
+   {sqadualed}  {dates}
   {timegramaDate}
     {tafkidims}
     {workways}

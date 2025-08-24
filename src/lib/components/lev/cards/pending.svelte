@@ -69,7 +69,9 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     onAgree,
     onDecline,
     onNego,
-    onTochat
+    onTochat,
+    sqadualed,
+    dates
   } = $props();
     let zman = $state()
   onMount(()=>{
@@ -122,6 +124,9 @@ function preventSwiperScroll(event) {
       event.stopPropagation();
     }
   }
+  $effect(() => {
+  console.log("SQWWWWW",dates,sqadualed)
+    });
 </script>
 
 
@@ -157,6 +162,25 @@ onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable =
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
             <span role="contentinfo" onmouseenter={()=>hover(tr?.common.valph[$lang])} onmouseleave={()=>hover("0")} > {perhour} {tr?.common.perhour[$lang]} </span> * <span role="contentinfo" onmouseenter={()=>hover(tr?.common.noofhours[$lang])} onmouseleave={()=>hover("0")}  > {noofhours.toLocaleString('en-US', {maximumFractionDigits:2})} {tr?.common.hours[$lang]} {isKavua == true ? t.formonth[$lang]:"" } </span> = <span role="contentinfo" onmouseenter={()=>hover(tr.mission.total[$lang])} onmouseleave={()=>hover("0")}>{(noofhours * perhour).toLocaleString('en-US', {maximumFractionDigits:2})} {isKavua == true ? t.perMonth[$lang]:"" } </span>
       </p>
+      {#if sqadualed || dates}
+                   <p
+                  style="line-height: 1;"
+                  class="text-md  flex items-center lg:text-2xl lg:m-5"
+                >
+             
+                  <img
+                    class="lg:block lg:w-12 lg:mx-2 "
+                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+                    alt="calendar"
+                  />
+            {#if sqadualed}
+                <span> {new Date(sqadualed).toLocaleDateString($lang)}</span>
+                {/if}
+                 {#if dates}
+                <span> - {new Date(dates).toLocaleDateString($lang)}</span>
+                {/if}
+                  </p>
+                  {/if}
       <div  class="text-mturk font-bold text-lg sm:text-2xl mb-2">{name}</div>
       <div class="flex items-center justify-center m-1 "><span role="contentinfo" aria-label="{timero[$lang]}" class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl" style:font-family="Digital" onmouseenter={()=>hover(timero[$lang])} onmouseleave={()=>hover("0")}  style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;">
         {formatTime(zman)}

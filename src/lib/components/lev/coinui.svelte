@@ -351,6 +351,7 @@ let h = $state(500);
                             vallues={buble.vallues}
                             pendId={buble.pendId}
                             users={buble.users}
+                            sqadualed={buble.sqadualed}
                             {low}
                             /></div>
                             {:else if buble.ani === "wegets" && milon.pmaap == true}

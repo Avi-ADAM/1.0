@@ -3189,6 +3189,7 @@
           publicklinks: pend.attributes.publicklinks,
           mdate: pend.attributes.sqadualed,
           dates: pend.attributes.dates,
+          sqadualed: pend.attributes.sqadualed,
           restime: getProjectData(projects[i].id, 'restime'),
           pendId: pend.id,
           createdAt: pend.attributes.createdAt,

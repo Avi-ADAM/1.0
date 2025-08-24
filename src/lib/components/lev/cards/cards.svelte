@@ -648,6 +648,7 @@ $effect(() => {
                       isKavua={buble.isKavua}
                       diun={buble.diun}
                       users={buble.users}
+                      sqadualed={buble.sqadualed}
                       cards="true"
                     /></SwiperSlide
                   >
