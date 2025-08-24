@@ -115,7 +115,7 @@ skillslist = find_skill_id(selected);
       //  skillIdStore.set(meData.id);
         id = meData.data.createTafkidim.data.id;
   //  skillslist.push(idro);
-        onAddnewrole?.(meData.data.createTafkidim.data, id);
+        dispatchrole?.(meData.data.createTafkidim.data, id);
         addR = false;
         let userName_value = $liUN
          let data = {"name": userName_value, "action": "יצר תפקיד חדש בשם:", "det": `${roleName_value} והתיאור: ${desR} והכישורים: ${selected.join(" , ")}` }
@@ -245,12 +245,12 @@ class=" hover:bg-barbi hover:text-mturk text-gold font-bold rounded-full"
 <br>
    <div dir="{$lang == "en" ? "ltr" : "rtl"}">
       <MultiSelect
+        outerDivClass="!bg-gold !text-barbi"
+        inputClass="!bg-gold !text-barbi"
         noMatchingOptionsMsg={nom[$lang]}
       bind:selected
       {placeholder}
       options={skills2.map(c => c.attributes.skillName)}
-        inputClass='!text-barbi'
-            outerDivClass='!text-barbi'
       />
      </div>
      <div>
