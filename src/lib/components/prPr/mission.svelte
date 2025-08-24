@@ -1484,7 +1484,7 @@
     />
     </div>
   {:else}
-  <MobileModal onClose={()=> roleE = false} bind:isOpen={roleE} title="{placeholder5[$lang]}">
+  <MobileModal onClose={()=> roleE = false} bind:isOpen={roleE} title={placeholder5[$lang]}>
     <div class="border border-gold flex flex-row lg:p-4 flex-wrap justify-center align-middle p-2">
       <MultiSelect
       outerDivClass="!bg-gold !text-barbi"

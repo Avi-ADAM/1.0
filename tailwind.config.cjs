@@ -63,7 +63,12 @@ const config = {
         
       },
       colors: {
+        ...defaultTheme.colors,
+        accentForeground: 'var(--accent-foreground)',
+        primary: 'var(--primary)',
+        secondary: 'var(--secondary)',
         greeni: '#2effa8',
+        accent: '#B38728',
         blu: 'var(--blu)',
         silver: 'var(--silver)',
         stgold: 'var(--stgold)',
@@ -92,7 +97,7 @@ const config = {
     }
   },
   Plugins:[
-    plugin(function({ addVariant, addUtilities }) {
+    plugin(function({ addVariant }) {
       // הוספת variants עבור personal ו-business
       addVariant('personal', '.personal &');
       addVariant('business', '.business &');
@@ -110,61 +115,7 @@ const config = {
       addVariant('business-sm', '@media (min-width: 640px) { .business & }');
       addVariant('business-md', '@media (min-width: 768px) { .business & }');
       addVariant('business-lg', '@media (min-width: 1024px) { .business & }');
-      addUtilities({
-        '.bg-theme-primary': {
-          'background-color': 'var(--color-primary)',
-        },
-        '.bg-theme-secondary': {
-          'background-color': 'var(--color-secondary)',
-        },
-        '.bg-theme-background': {
-          'background-color': 'var(--color-background)',
-        },
-        '.bg-theme-card': {
-          'background-color': 'var(--color-card)',
-        },
-        '.bg-theme-accent': {
-          'background-color': 'var(--color-accent)',
-        },
-        '.text-theme-primary': {
-          'color': 'var(--color-primary)',
-        },
-        '.text-theme-secondary': {
-          'color': 'var(--color-secondary)',
-        },
-        '.text-theme-text': {
-          'color': 'var(--color-text)',
-        },
-        '.text-theme-accent': {
-          'color': 'var(--color-accent)',
-        },
-        '.text-theme-muted': {
-          'color': 'var(--color-muted)',
-        },
-        '.border-theme-primary': {
-          'border-color': 'var(--color-primary)',
-        },
-        '.border-theme-secondary': {
-          'border-color': 'var(--color-secondary)',
-        },
-        '.border-theme-accent': {
-          'border-color': 'var(--color-accent)',
-        },
-        '.rounded-theme': {
-          'border-radius': 'var(--border-radius)',
-        },
-        '.shadow-theme': {
-          'box-shadow': 'var(--shadow)',
-        },
-        '.gradient-personal': {
-          'background': 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-accent) 100%)',
-        },
-        '.gradient-business': {
-          'background': 'linear-gradient(135deg, var(--color-primary) 0%, var(--color-secondary) 100%)',
-        },
-      });
-    }),
-    
+        }),
       plugin(function({ addUtilities }) {
         addUtilities({
           '.animate-fade-in-up': {
@@ -178,7 +129,8 @@ const config = {
           },
         });
       }),
-  ]
+
+  ],  
 };
 
 module.exports = config;

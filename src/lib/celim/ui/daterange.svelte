@@ -1,9 +1,11 @@
 <script>
-  import SveltyPicker from 'svelty-picker'
   import Arrow from "$lib/celim/icons/arrow.svelte";
   import {lang} from '$lib/stores/lang.js'
   import { format } from 'date-fns';
  import moment from 'moment';
+   import SveltyPicker from 'svelty-picker';
+
+ // import Dateandtimeinput from './dateandtimeinput.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} start
@@ -44,7 +46,15 @@
 <div class="flex flex-{showstart || showend ? "col border border-gold p-2 rounded space-y-2" : "row"} sm:flex-row align-middle justify-center space-x-2 sm:text-2xl font-bold items-center  " {dir}>
     <button onclick={toggleDatePicker}>{startplaceholder[$lang]}:</button>
   {#if showstart}
-<SveltyPicker pickerOnly={true}  inputClasses="form-control" format="hh:ii dd/mm/yyyy" bind:value={start}></SveltyPicker>
+<!---<Dateandtimeinput bind:outpot={start}/>-->
+<span dir="rtl">
+ <SveltyPicker
+      placeholder={startplaceholder[$lang]}
+      inputClasses="form-control text-right"
+      format=" hh:ii dd/mm/yyyy"
+      bind:value={start}
+    ></SveltyPicker>
+    </span>
   <button onclick={toggleDatePicker}>✅</button>  
 {:else}
   <button onclick={toggleDatePicker}>{start != undefined ? formatDate(start) : "--"}</button>
@@ -52,31 +62,22 @@
 <Arrow back={dir == "ltr"}/>
     <button onclick={toggleDatePickerend}>{finnishplaceholder[$lang]}:</button>
 {#if showend}
-<SveltyPicker pickerOnly={true}  inputClasses="form-control" format="hh:ii dd/mm/yyyy" bind:value={finnish}></SveltyPicker>
+<span dir="rtl">
+ <SveltyPicker
+      placeholder={finnishplaceholder[$lang]}
+      inputClasses="form-control text-right"
+      format=" hh:ii dd/mm/yyyy"
+      bind:value={finnish}
+      startDate={start}
+    ></SveltyPicker>
+    </span>
+    <!----
+<Dateandtimeinput bind:outpot={finnish} minDate={start}/>-->
   <button onclick={toggleDatePickerend}>✅</button>
 
   {:else}
 
   <button onclick={toggleDatePickerend}>{finnish != undefined ? formatDate(finnish) : " -- "}</button>
   {/if}
-<!---
-<label  for="a">{startplaceholder}</label>
-<input type="datetime-local" id="a" name="a" bind:value={start} class="z-[99999]">
-<Arrow/>
-<label for="b">{finnishplaceholder}</label>
-<input name="b" type="datetime-local"  bind:value={finnish}>
-
-
-<DatePicker bind:isOpen bind:startDate showTimePicker>
-  <input type="text" placeholder="Select date" bind:value={formattedStartDate} on:click={toggleDatePicker} />
-</DatePicker>
--->
 
 </div>
-<style>
-  input[type="text"] {
-    border: 1px solid #e8e9ea;
-    border-radius: 4px;
-    padding: 8px;
-  }
-</style>
