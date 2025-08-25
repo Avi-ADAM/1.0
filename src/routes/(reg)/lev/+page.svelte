@@ -517,10 +517,16 @@
             'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
         }
         let t = start[i].attributes.asks.data[j].attributes;
+        let user = t.users_permissions_user.data.attributes;
         dictasked.push({
           isRishon: t.open_mission.data.attributes.isRishon,
           uid: t.users_permissions_user.data.id,
-          username: t.users_permissions_user.data.attributes.username,
+          username: user.username,
+          userSkills: user.skills,
+          userRole: user.tafkidims,
+          userWorkway: user.work_ways,
+          skills: t.open_mission.data.attributes.skills,
+          workways: t.open_mission.data.attributes.work_ways,
           timegramaId: t.timegrama.data?.id ?? 0,
           timegramaDate: t.timegrama.data?.attributes.date ?? null,
           src: src22,
@@ -2101,10 +2107,24 @@
                             createdAt
                             chat{why id ide what zman users_permissions_user {data{id}}}
                             open_mission {data{id attributes{  mission {data{id}}
-                                            declined {data{ id}} iskvua isRishon sqadualed dates publicklinks tafkidims {data{ id }}
+                                            declined {data{ id}} iskvua isRishon sqadualed dates publicklinks 
+                                           skills{data{id attributes{skillName localizations {data{attributes{skillName }}}}}} 
+                             work_ways {data{ id attributes{ workWayName ${
+                                  $lang === 'he'
+                                    ? 'localizations{data{attributes{workWayName }}}'
+                                    : ''
+                                }}}}  
+                             tafkidims{data{id attributes{roleDescription localizations{data{attributes{roleDescription }}}}}}  
                                             noofhours perhour privatlinks descrip hearotMeyuchadot name}}}
                             project {data{ id }}
-                            users_permissions_user {data{ id attributes{ username email profilePic {data{attributes{ url formats }}}}}}
+                            users_permissions_user {data{ id attributes{ username 
+                             skills{data{id attributes{skillName localizations {data{attributes{skillName }}}}}} 
+                             work_ways {data{ id attributes{ workWayName ${
+                                  $lang === 'he'
+                                    ? 'localizations{data{attributes{workWayName }}}'
+                                    : ''
+                                }}}}  
+                             tafkidims{data{id attributes{roleDescription localizations{data{attributes{roleDescription }}}}}}   email profilePic {data{attributes{ url formats }}}}}}
       									}}}
     			finiapruvals(filters: { archived: { eq: false } }){ data{ id attributes{
                         timegrama {data{id attributes{date}}}

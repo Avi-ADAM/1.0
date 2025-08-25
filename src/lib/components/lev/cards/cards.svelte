@@ -803,6 +803,11 @@ $effect(() => {
                       iskvua={buble.iskvua}
                       email={buble.email}
                       role={buble.role}
+                      workways={buble.workways}
+                      userSkills={buble.userSkills}
+                      userRole={buble.userRole}
+                      userWorkway={buble.userWorkway}
+                      skills={buble.skills}
                       coinlapach={buble.coinlapach}
                       {low}
                       pid={buble.pid}

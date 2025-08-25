@@ -120,7 +120,11 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     sqedualed,
     timegramaId,
     cards = false,
-    isRishon = false
+    isRishon = false,
+    workways = [],
+    userSkills,
+    userRole,
+    userWorkway
   } = $props();
     let dialogOpen = $state(false)
 let resP = [];
@@ -966,6 +970,9 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
   onHover={hoverc} 
   onChat={tochat}
   {low}
+  {skills}
+  {role}
+  {workways}
   {already} 
   {projectName}
    {src} 
@@ -980,6 +987,9 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
    {openmissionName} 
    {iskvua}
    {isRishon}
+   {userSkills}
+    {userRole}
+    {userWorkway}
    {missionDetails} {noofusersNo}/>
       </div>
       </Drawer.Content>
@@ -1009,7 +1019,14 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
    {openmissionName} 
    {iskvua}
    {isRishon}
-   {missionDetails} {noofusersNo}/>
+   {missionDetails} {noofusersNo}
+     {skills}
+  {role}
+  {workways}
+   {userSkills}
+    {userRole}
+    {userWorkway}
+   />
 {/if}
 {/await}
 <style>

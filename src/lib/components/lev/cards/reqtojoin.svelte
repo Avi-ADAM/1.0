@@ -37,6 +37,12 @@
     isVisible = false,
     iskvua,
     projectName,
+    skills,
+    role,
+    workways,
+    userSkills,
+    userRole,
+    userWorkway,
     src,
     openmissionName,
     missionDetails,
@@ -104,7 +110,10 @@
     onPrevious: { he: 'על גרסה קודמת', en: 'on previous version' }
   };
     import tr from '$lib/translations/tr.json';
-
+  import Tile from '$lib/celim/tile.svelte';
+function getSkillNames(arr) {
+            return arr.map(s => s.attributes.skillName);
+          }
 </script>
 
 <div
@@ -122,7 +131,7 @@
       : 'boxright'
     : ''} leading-normal {isMobileOrTablet()
     ? 'w-full h-full'
-    : ' w-[90%] h-[90%]'} bg-white lg:w-[90%] d"
+    : ' w-[90%] h-[90%]'} bg-white lg:w-[90%] d overflow-y-auto"
 >
   <div
     class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
@@ -147,9 +156,9 @@
   <div
     class="{isScrolable
       ? 'bg-white'
-      : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
+      : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 mb-12 flex flex-col justify-between leading-normal"
   >
- <div class="mb-8">
+ <div class="mb-4">
       <p
         style="line-height: 1;"
         class="text-sm sm:text-xl text-gray-600 flex items-center"
@@ -243,6 +252,153 @@
         </p>
       </div>
     </div>
+
+    <!-- Skill Comparison Section -->
+    {#if skills?.data && userSkills?.data}
+      {#key skills.data.length + userSkills.data.length}
+        {@const required = getSkillNames(skills.data)}
+        {@const user = getSkillNames(userSkills.data)}
+        {@const matched = required.filter(s => user.includes(s))}
+        {@const missing = required.filter(s => !user.includes(s))}
+        {@const extra = user.filter(s => !required.includes(s))}
+        <div class="mt-6">
+          <div class="mb-2 font-bold text-barbi text-xl">
+            {t.skneed[$lang]}
+          </div>
+          <div class="mb-2 text-md font-semibold text-gray-700">
+            {tr.common.comparisonHeadline?.[$lang] || ($lang === 'he' ? 'השוואת כישורים' : 'Skills Comparison')}
+          </div>
+          <div class="border-2 border-barbi rounded-lg p-4 bg-gray-50">
+            <div class="mb-2 font-bold text-green-700">
+              {tr.common.matchedSkillsHeadline?.[$lang] || ($lang === 'he' ? 'כישורים תואמים' : 'Matched skills')}
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {#each matched as skill}
+                <Tile sm={true} big={true} bg="green" word={skill} />
+              {/each}
+            </div>
+            {#if missing.length > 0}
+              <div class="mt-4 mb-2 font-bold text-red-700">
+                {tr.common.missingSkillsHeadline?.[$lang] || ($lang === 'he' ? 'כישורים חסרים' : 'Missing skills')}
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {#each missing as skill}
+                  <Tile sm={true} big={true} bg="red" word={skill} />
+                {/each}
+              </div>
+            {/if}
+            {#if extra.length > 0}
+              <div class="mt-4 mb-2 font-bold text-blue-700">
+                {tr.common.extraSkillsHeadline?.[$lang] || ($lang === 'he' ? 'כישורים נוספים' : 'Extra skills')}
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {#each extra as skill}
+                  <Tile sm={true} big={true} bg="blue" word={skill} />
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/key}
+    {/if}
+
+    <!-- Role Comparison Section -->
+    {#if role?.data && userRole?.data}
+      {#key role.data.length + userRole.data.length}
+        {@const requiredRoles = role.data.map(r => r.attributes.roleDescription)}
+        {@const userRoles = userRole.data.map(r => r.attributes.roleDescription)}
+        {@const matchedRoles = requiredRoles.filter(r => userRoles.includes(r))}
+        {@const missingRoles = requiredRoles.filter(r => !userRoles.includes(r))}
+        {@const extraRoles = userRoles.filter(r => !requiredRoles.includes(r))}
+        <div class="mt-6">
+          <div class="mb-2 font-bold text-barbi text-xl">
+            {t.rneed[$lang]}
+          </div>
+          <div class="mb-2 text-md font-semibold text-gray-700">
+            {tr.common.roleComparisonHeadline?.[$lang] || ($lang === 'he' ? 'השוואת תפקידים' : 'Role Comparison')}
+          </div>
+          <div class="border-2 border-barbi rounded-lg p-4 bg-gray-50">
+            <div class="mb-2 font-bold text-green-700">
+              {tr.common.matchedRolesHeadline?.[$lang] || ($lang === 'he' ? 'תפקידים תואמים' : 'Matched roles')}
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {#each matchedRoles as roleDesc}
+                <Tile sm={true} big={true} bg="green" word={roleDesc} />
+              {/each}
+            </div>
+            {#if missingRoles.length > 0}
+              <div class="mt-4 mb-2 font-bold text-red-700">
+                {tr.common.missingRolesHeadline?.[$lang] || ($lang === 'he' ? 'תפקידים חסרים' : 'Missing roles')}
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {#each missingRoles as roleDesc}
+                  <Tile sm={true} big={true} bg="red" word={roleDesc} />
+                {/each}
+              </div>
+            {/if}
+            {#if extraRoles.length > 0}
+              <div class="mt-4 mb-2 font-bold text-blue-700">
+                {tr.common.extraRolesHeadline?.[$lang] || ($lang === 'he' ? 'תפקידים נוספים' : 'Extra roles')}
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {#each extraRoles as roleDesc}
+                  <Tile sm={true} big={true} bg="blue" word={roleDesc} />
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/key}
+    {/if}
+
+    <!-- Workway Comparison Section -->
+    {#if workways?.data && userWorkway?.data}
+      {#key workways.data.length + userWorkway.data.length}
+        {@const requiredWays = workways.data.map(w => w.attributes.workWayName)}
+        {@const userWays = userWorkway.data.map(w => w.attributes.workWayName)}
+        {@const matchedWays = requiredWays.filter(w => userWays.includes(w))}
+        {@const missingWays = requiredWays.filter(w => !userWays.includes(w))}
+        {@const extraWays = userWays.filter(w => !requiredWays.includes(w))}
+        <div class="mt-6">
+          <div class="mb-2 font-bold text-barbi text-xl">
+            {t.wwneed[$lang]}
+          </div>
+          <div class="mb-2 text-md font-semibold text-gray-700">
+            {tr.common.workwayComparisonHeadline?.[$lang] || ($lang === 'he' ? 'השוואת דרכי עבודה' : 'Workway Comparison')}
+          </div>
+          <div class="border-2 border-barbi rounded-lg p-4 bg-gray-50">
+            <div class="mb-2 font-bold text-green-700">
+              {tr.common.matchedWaysHeadline?.[$lang] || ($lang === 'he' ? 'דרכי עבודה תואמות' : 'Matched workways')}
+            </div>
+            <div class="flex flex-wrap gap-2">
+              {#each matchedWays as wayName}
+                <Tile sm={true} big={true} bg="green" word={wayName} />
+              {/each}
+            </div>
+            {#if missingWays.length > 0}
+              <div class="mt-4 mb-2 font-bold text-red-700">
+                {tr.common.missingWaysHeadline?.[$lang] || ($lang === 'he' ? 'דרכי עבודה חסרות' : 'Missing workways')}
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {#each missingWays as wayName}
+                  <Tile sm={true} big={true} bg="red" word={wayName} />
+                {/each}
+              </div>
+            {/if}
+            {#if extraWays.length > 0}
+              <div class="mt-4 mb-2 font-bold text-blue-700">
+                {tr.common.extraWaysHeadline?.[$lang] || ($lang === 'he' ? 'דרכי עבודה נוספות' : 'Extra workways')}
+              </div>
+              <div class="flex flex-wrap gap-2">
+                {#each extraWays as wayName}
+                  <Tile sm={true} big={true} bg="blue" word={wayName} />
+                {/each}
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/key}
+    {/if}
   </div>
   {#if low == false}
     {#if already === false}
