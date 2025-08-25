@@ -975,6 +975,8 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
    {src2} 
    noofhours={nhours}
    perhour={valph}
+   {sqedualed}
+   dates={deadline}
    {openmissionName} 
    {iskvua}
    {isRishon}
@@ -992,6 +994,8 @@ role="button" transition:fly|local={{y: 250, opacity: 0.9, duration: 2000} }>
   onHover={hoverc} 
   onChat={tochat}
   {isVisible}
+   {sqedualed}
+   dates={deadline}
   {low}
   {already} 
   {projectName}
