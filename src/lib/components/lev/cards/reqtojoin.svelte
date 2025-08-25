@@ -204,7 +204,7 @@ function getSkillNames(arr) {
           class="text-md flex items-center lg:text-2xl lg:m-5"
         >
           <img
-            class="lg:block lg:w-12 lg:mx-2"
+            class="lg:block lg:w-12 lg:mx-2 w-10 block mx-1"
             src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
             alt="calendar"
           />
@@ -224,32 +224,37 @@ function getSkillNames(arr) {
     </div>
     <div class="flex items-center">
       <img
-        style="width: 2.5rem;"
-        class="w-10 h-10 rounded-full mr-4"
+        class="w-10 h-10 sm:w-16 sm:h-16 rounded-full mr-4"
         src={src.length > 0
           ? src
           : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
         alt=""
       />
-      <div class="text-sm">
+      <div class="text-lg sm:text-2xl">
         <p class="text-gray-900 leading-none">{useraplyname}</p>
         <p class="vo ef">
-          <span
-            onmouseenter={() => hover('סך ההצבעות בעד')}
-            onmouseleave={() => hover('0')}
-            style="color:#7EE081;">{noofusersOk}-בעד</span
-          >
-          <span
-            onmouseenter={() => hover('לא הצביעו')}
-            onmouseleave={() => hover('0')}
-            style="color:#0000cc;"
-            >{noofusersWaiting}-טרם
-          </span><span
-            onmouseenter={() => hover('כמות ההצבעות נגד')}
-            onmouseleave={() => hover('0')}
-            style="color:#80037e;">{noofusersNo}-נגד</span
-          >
-        </p>
+<span
+  onmouseenter={() => hover(tr.vots.totalin[$lang])}
+  onmouseleave={() => hover('0')}
+  style="color:#7EE081;"
+>
+  {noofusersOk}-{tr.vots.inFavor[$lang]}
+</span>
+<span
+  onmouseenter={() => hover(tr.vots.notyet[$lang])}
+  onmouseleave={() => hover('0')}
+  style="color:#0000cc;"
+>
+  {noofusersWaiting}-{tr.vots.notyet[$lang]}
+</span>
+<span
+  onmouseenter={() => hover(tr.vots.totalno[$lang])}
+  onmouseleave={() => hover('0')}
+  style="color:#80037e;"
+>
+  {noofusersNo}-{tr.vots.against[$lang]}
+</span>
+</p>
       </div>
     </div>
 
@@ -403,7 +408,8 @@ function getSkillNames(arr) {
   {#if low == false}
     {#if already === false}
       <button
-        onmouseenter={() => hover('אישור')}
+        aria-label={tr?.common.approve[$lang]}
+        onmouseenter={() => hover(tr?.common.approve[$lang])}
         onmouseleave={() => hover('0')}
         onclick={agree}
         class="btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
@@ -423,7 +429,8 @@ function getSkillNames(arr) {
       </button>
     {/if}
     <button
-      onmouseenter={() => hover('לצפיה בדיון')}
+      aria-label={tr?.common.watchthe[$lang]}
+      onmouseenter={() => hover(tr?.common.watchthe[$lang])}
       onmouseleave={() => hover('0')}
       class="btnc bg-gradient-to-br hover:from-gold hover:via-mpink hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-gold hover:text-barbi hover:scale-110"
       onclick={() => tochat()}

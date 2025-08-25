@@ -676,13 +676,13 @@ function hover (id){
     u = id
   }
     onHover?.({ id: u });
-}
-function hoverc (event){
-   if (event.x == "0"){
- u = " הצבעה על בקשה לביצוע משימה והצטרפות לרקמה"
-  } else {
-    u = event.x
   }
+  function hoverc(event) {
+    if (event == '0') {
+      u = ' הצבעה על בקשה לביצוע משימה והצטרפות לרקמה';
+    } else {
+      u = event;
+    }
     onHover?.({ id: u });
 }
 let clicked = $state(false)
