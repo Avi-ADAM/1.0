@@ -272,6 +272,9 @@ $effect(() => {
     console.log(filter,filter2, 'uniqueProjects');
   });
   import { isScrolable } from './isScrolable.svelte.js'
+  $effect(() => {
+    console.log(isScrolable.value, 'isScrolable');
+  });
 </script>
 
 {#if !isMobileOrTablet()}
@@ -463,7 +466,6 @@ $effect(() => {
                 enabled: isScrolable.value ? false : true 
               }}
               mousewheel={isMobileOrTablet() ? isScrolable.value ? false : true : false}
-              allowTouchMove={isMobileOrTablet() ? isScrolable.value ? false : true : false}
               effect={'slide'}
               grabCursor={true}
               modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
