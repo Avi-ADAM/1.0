@@ -7,6 +7,36 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { formatTime } from '../utils';
+  import { onMount, onDestroy } from 'svelte';
+
+  let container;
+
+  function wheelHandler(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  function updateWheelListener() {
+    if (container) {
+      container.removeEventListener('wheel', wheelHandler);
+      if (!isScrolable && isMobileOrTablet()) {
+        container.addEventListener('wheel', wheelHandler, { passive: false });
+      }
+    }
+  }
+
+  onMount(() => {
+    updateWheelListener();
+    return () => {
+      if (container) {
+        container.removeEventListener('wheel', wheelHandler);
+      }
+    };
+  });
+
+  $effect(() => { updateWheelListener(); });
 
   /**
    * @typedef {Object} Props
@@ -89,17 +119,17 @@
         en: 'appruval of joining and mission assigned'
       };
   let isScrolable = $state(true);
-  function preventSwiperScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
+function preventSwiperScroll(event) {
+    console.log(event);
+    if (!isScrolable) {
       event.preventDefault();
       event.stopPropagation();
     }
-  }
+}
 
   // מניעת פרופוגציה של גלילה במגע
   function preventTouchScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
-      event.preventDefault();
       event.stopPropagation();
     }
   }
@@ -115,14 +145,14 @@
   import Tile from '$lib/celim/tile.svelte';
 function getSkillNames(arr) {
             return arr.map(s => s.attributes.skillName);
-          }
+          }//    isMobileOrTablet() ? (isScrolable = !isScrolable) : (isScrolable = true)}
+
 </script>
 
 <div
-  onwheel={(event)=>preventSwiperScroll(event)}
   ontouchmove={(event)=>preventTouchScroll(event)}
   onclick={() =>
-    isMobileOrTablet() ? (isScrolable = !isScrolable) : (isScrolable = true)}
+    isScrolable = !isScrolable}
   role="button"
   tabindex="0"
   onkeypress={(event)=>preventSwiperScroll(event)}
