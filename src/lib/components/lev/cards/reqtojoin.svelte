@@ -91,6 +91,7 @@
   let isScrolable = $state(true);
   function preventSwiperScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
+      event.preventDefault();
       event.stopPropagation();
     }
   }
@@ -98,6 +99,7 @@
   // מניעת פרופוגציה של גלילה במגע
   function preventTouchScroll(event) {
     if (!isScrolable && isMobileOrTablet()) {
+      event.preventDefault();
       event.stopPropagation();
     }
   }
