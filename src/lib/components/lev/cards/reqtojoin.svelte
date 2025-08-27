@@ -18,25 +18,35 @@
     }
   }
 
-  function updateWheelListener() {
+  function touchMoveHandler(event) {
+    if (!isScrolable && isMobileOrTablet()) {
+      event.preventDefault();
+      event.stopPropagation();
+    }
+  }
+
+  function updateListeners() {
     if (container) {
       container.removeEventListener('wheel', wheelHandler);
+      container.removeEventListener('touchmove', touchMoveHandler);
       if (!isScrolable && isMobileOrTablet()) {
         container.addEventListener('wheel', wheelHandler, { passive: false });
+        container.addEventListener('touchmove', touchMoveHandler, { passive: false });
       }
     }
   }
 
   onMount(() => {
-    updateWheelListener();
+    updateListeners();
     return () => {
       if (container) {
         container.removeEventListener('wheel', wheelHandler);
+        container.removeEventListener('touchmove', touchMoveHandler);
       }
     };
   });
 
-  $effect(() => { updateWheelListener(); });
+  $effect(() => { updateListeners(); });
 
   /**
    * @typedef {Object} Props
@@ -150,7 +160,6 @@ function getSkillNames(arr) {
 </script>
 
 <div
-  ontouchmove={(event)=>preventTouchScroll(event)}
   onclick={() =>
     isScrolable = !isScrolable}
   role="button"
