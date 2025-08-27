@@ -6,6 +6,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
      // import Chaticon from '../../../celim/chaticon.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
+  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   /**
    * @typedef {Object} Props
    * @property {number} [x]
@@ -119,29 +120,16 @@ const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric
 console.log(hearotMeyuchadot)
 const hed = {"he": "משימה בתהליך ביצוע ","en": "mission in progress"}
 let totali = $derived({"he":`${iskvua == true ? "שעות חודשיות":"שעות סך הכל"}`,"en":`${iskvua == true ? "monthly hours":"total hours"}`})
-let isScrolable = $state(true); 
-function preventSwiperScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
-
-  // מניעת פרופוגציה של גלילה במגע
-  function preventTouchScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
   const editButton = {"he": "עריכת הטיימר","en": "edit Timer"}
 
 </script>
 
-<div onwheel={preventSwiperScroll} 
-ontouchmove={preventTouchScroll}
-onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
-role="button"
-tabindex="0" 
-onkeypress={preventSwiperScroll} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} {isScrolable ? "bg-white" : "bg-gray-200"} lg:w-[90%]">
+<div   onclick={toggleScrollable}
+  role="button"
+  tabindex="0"
+  onkeypress={(e)=>{
+    e.key === 'Enter' && toggleScrollable()
+  }} dir={$lang == "he" ? "rtl" : "ltr"}  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} pb-16 leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} {isScrolable.value ? "bg-white" : "bg-gray-200"} lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">

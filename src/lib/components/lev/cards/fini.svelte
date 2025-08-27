@@ -8,6 +8,8 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { formatTime } from '../utils';
   import TimetToTimegrama from './timetToTimegrama.svelte';
+    import { toggleScrollable, isScrolable } from './isScrolable.svelte.js'
+
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -87,28 +89,16 @@ const tri = import('$lib/translations/tr.json')
 const neged ={"he":"נגד","en":"against"}
 const bead = {"he":"בעד","en":"in favor"}
 const notyet = {"he":"טרם","en":"not yet"}
-let isScrolable = $state(true); 
-function preventSwiperScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
 
-  // מניעת פרופוגציה של גלילה במגע
-  function preventTouchScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
 </script>
 
 
-<div onwheel={preventSwiperScroll} 
-ontouchmove={preventTouchScroll}
-onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
-role="button"
-tabindex="0" 
-onkeypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
+<div   onclick={toggleScrollable}
+  role="button"
+  tabindex="0"
+  onkeypress={(e)=>{
+    e.key === 'Enter' && toggleScrollable()
+  }} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -124,7 +114,7 @@ onkeypress={preventSwiperScroll} dir="{$lang == 'he' ? 'rtl' : 'ltr'}"  style="o
          </div>
          </div>
          </div>
-  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable.value ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
          <p style="line-height: 1;" class="text-sm text-gray-600 flex items-center">
             <img style="width:2.5rem;" class=""  src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>

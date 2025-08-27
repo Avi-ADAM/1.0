@@ -10,6 +10,7 @@
   import { formatTime } from '../utils';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
+  import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -113,33 +114,17 @@
     he: 'מונה זמן לסיום הדיון',
     en: 'time counter for end of discution'
   };
-  let isScrolable = $state(true);
-  function preventSwiperScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
-
-  // מניעת פרופוגציה של גלילה במגע
-  function preventTouchScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
-  $effect(() => {
-    console.log('SQWWWWW', dates, sqadualed);
-  });
+  
 </script>
 
 <div
-  dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  onwheel={preventSwiperScroll}
-  ontouchmove={preventTouchScroll}
-  onclick={() =>
-    isMobileOrTablet() ? (isScrolable = !isScrolable) : (isScrolable = true)}
+  onclick={toggleScrollable}
   role="button"
   tabindex="0"
-  onkeypress={preventSwiperScroll}
+  onkeypress={(e)=>{
+    e.key === 'Enter' && toggleScrollable()
+  }}
+  dir={$lang == "he" ? "rtl" : "ltr"}
   style="overflow-y:auto"
   class="d {isVisible
     ? lang == 'he'
@@ -172,7 +157,7 @@
     </div>
   </div>
   <div
-    class=" {isScrolable
+    class=" {isScrolable.value
       ? 'bg-white'
       : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
   >

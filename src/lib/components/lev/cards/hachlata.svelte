@@ -1,6 +1,6 @@
 <script>
-
-        import tr from '$lib/translations/tr.json'
+  import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
+  import tr from '$lib/translations/tr.json';
   import { onMount } from 'svelte';
   import Lev from '../../../celim/lev.svelte';
   import {lang} from '$lib/stores/lang.js'
@@ -97,28 +97,15 @@ function linke(t){
   console.log(t)
 }
 const tri = import('$lib/translations/tr.json')
-let isScrolable = $state(true); 
-function preventSwiperScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
-
-  // מניעת פרופוגציה של גלילה במגע
-  function preventTouchScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
 </script>
 
 
-<div onwheel={preventSwiperScroll} 
-ontouchmove={preventTouchScroll}
-onclick={() => (isMobileOrTablet() ?  isScrolable = !isScrolable : isScrolable = true)}
-role="button"
-tabindex="0" 
-onkeypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
+<div   onclick={toggleScrollable}
+  role="button"
+  tabindex="0"
+  onkeypress={(e)=>{
+    e.key === 'Enter' && toggleScrollable()
+  }} dir="rtl"  style="overflow-y:auto" class=" d {isVisible ? $lang == 'he' ? 'boxleft' : 'boxright' : ''} leading-normal {isMobileOrTablet() ? "w-full h-full" : " w-[90%] h-[90%]"} bg-white lg:w-[90%]">
         <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
@@ -134,7 +121,7 @@ onkeypress={preventSwiperScroll} dir="rtl"  style="overflow-y:auto" class=" d {i
          </div>
          </div>
          </div>
-  <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
+  <div  class="{isScrolable.value ? "bg-white" : "bg-gray-200"} transition-all-300  rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div  class="mb-8">
         {#if kind == "sheirutpends"}
               <h1 class="text-gray-900 font-bold text:2xl sm:text-3xl mb-2">{spdata.sheirut.data.attributes.name}</h1>
