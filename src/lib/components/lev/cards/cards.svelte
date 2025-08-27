@@ -463,7 +463,7 @@ $effect(() => {
                 enabled: isScrolable.value ? false : true 
               }}
               mousewheel={isMobileOrTablet() ? isScrolable.value ? false : true : false}
-              allowTouchMove={isMobileOrTablet() ? isScrolable ? false : true : false}
+              allowTouchMove={isMobileOrTablet() ? isScrolable.value ? false : true : false}
               effect={'slide'}
               grabCursor={true}
               modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
