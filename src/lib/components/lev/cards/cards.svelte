@@ -231,8 +231,9 @@
     }
   });
   $effect(() => {
+    console.log(swiperRef,"swiperREF")
     if(swiperRef){
-      if(isScrolable.value){
+      if(!isScrolable.value){
         swiperRef.allowTouchMove = false;
         swiperRef.mousewheel.disable();
       }else{
