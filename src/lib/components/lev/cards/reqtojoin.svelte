@@ -6,48 +6,7 @@
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import { formatTime } from '../utils';
-  import { onMount, onDestroy } from 'svelte';
-
-  let container;
-
-  function wheelHandler(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }
-
-  function touchMoveHandler(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-  }
-
-  function updateListeners() {
-    if (container) {
-      container.removeEventListener('wheel', wheelHandler);
-      container.removeEventListener('touchmove', touchMoveHandler);
-      if (!isScrolable && isMobileOrTablet()) {
-        container.addEventListener('wheel', wheelHandler, { passive: false });
-        container.addEventListener('touchmove', touchMoveHandler, { passive: false });
-      }
-    }
-  }
-
-  onMount(() => {
-    updateListeners();
-    return () => {
-      if (container) {
-        container.removeEventListener('wheel', wheelHandler);
-        container.removeEventListener('touchmove', touchMoveHandler);
-      }
-    };
-  });
-
-  $effect(() => { updateListeners(); });
-
+  import { toggleScrollable, isScrolable } from './isScrolable.svelte.js'
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -128,21 +87,7 @@
         he: 'אישור צירוף לריקמה והשמת משימה',
         en: 'appruval of joining and mission assigned'
       };
-  let isScrolable = $state(true);
-function preventSwiperScroll(event) {
-    console.log(event);
-    if (!isScrolable) {
-      event.preventDefault();
-      event.stopPropagation();
-    }
-}
 
-  // מניעת פרופוגציה של גלילה במגע
-  function preventTouchScroll(event) {
-    if (!isScrolable && isMobileOrTablet()) {
-      event.stopPropagation();
-    }
-  }
     const t = {
     wwneed: { he: 'דרכי עבודה מבוקשות:', en: 'ways of work for the mission:' },
     skneed: { he: 'הכישורים הנדרשים:', en: 'needed skills:' },
@@ -160,11 +105,12 @@ function getSkillNames(arr) {
 </script>
 
 <div
-  onclick={() =>
-    isScrolable = !isScrolable}
+  onclick={toggleScrollable}
   role="button"
   tabindex="0"
-  onkeypress={(event)=>preventSwiperScroll(event)}
+  onkeypress={(e)=>{
+    e.key === 'Enter' && toggleScrollable()
+  }}
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
   class="{isVisible
     ? $lang == 'he'
@@ -195,7 +141,7 @@ function getSkillNames(arr) {
     </div>
   </div>
   <div
-    class="{isScrolable
+    class="{isScrolable.value
       ? 'bg-white'
       : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 mb-12 flex flex-col justify-between leading-normal"
   >
