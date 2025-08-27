@@ -77,16 +77,7 @@
     en: 'to the profile page'
   };
 
-  onMount(() => {
-    // הסר את האתחול הישיר של Swiper כאן
-    // swiperInstance = new Swiper('.swiper', {
-    //   on: {
-    //     slideChange: () => {
-    //       currentIndex = swiperInstance.realIndex;
-    //     },
-    //   },
-    // });
-  });
+
 
   // הוסף פונקציה לטיפול באירוע swiper
   function handleSwiper(e) {
@@ -239,7 +230,17 @@
       filteredArr = arr1;
     }
   });
-
+  $effect(() => {
+    if(swiperRef){
+      if(isScrolable.value){
+        swiperRef.allowTouchMove = false;
+        swiperRef.mousewheel.disable();
+      }else{
+        swiperRef.allowTouchMove = true;
+        swiperRef.mousewheel.enable();
+      }
+    }
+  });
   function filterByProjectId(projectId) {
     currentProjectIdFilter = projectId; // Setting this will trigger the effect
     console.log(filteredArr);
@@ -285,6 +286,7 @@ $effect(() => {
   >
     <Header second="/moach" secondTitle={{ he: 'למוח', en: 'to Brain' }} />
   </span>
+
 {/if}
 {#key arr1}
   {#key low}
@@ -465,7 +467,7 @@ $effect(() => {
               keyboard={{
                 enabled: isScrolable.value ? false : true 
               }}
-              mousewheel={isMobileOrTablet() ? isScrolable.value ? false : true : false}
+              mousewheel={ isScrolable.value ? false : true }
               effect={'slide'}
               grabCursor={true}
               modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
