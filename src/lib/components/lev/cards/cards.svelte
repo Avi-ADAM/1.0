@@ -463,11 +463,11 @@ $effect(() => {
               direction={!isMobileOrTablet() ? 'horizontal' : 'vertical'}
               slidesPerView={isMobileOrTablet() ? 1 : 'auto'}
               spaceBetween={isMobileOrTablet() ? 0 : null}
-              on:swiper={handleSwiper}
+              on:swiper={(e)=>handleSwiper(e)}
               keyboard={{
-                enabled: isScrolable.value ? false : true 
+                enabled: true 
               }}
-              mousewheel={ isScrolable.value ? false : true }
+              mousewheel={true}
               effect={'slide'}
               grabCursor={true}
               modules={[Manipulation, Mousewheel, Keyboard, Navigation]}
