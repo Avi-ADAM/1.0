@@ -81,6 +81,7 @@
 
   // הוסף פונקציה לטיפול באירוע swiper
   function handleSwiper(e) {
+    console.log('swiper event', e);
     const [swiper] = e.detail;
     swiperInstance = swiper;
     swiperRef = swiper;
@@ -232,13 +233,23 @@
   });
   $effect(() => {
     console.log(swiperRef,"swiperREF")
-    if(swiperRef){
       if(!isScrolable.value){
+            if(swiperRef){
         swiperRef.allowTouchMove = false;
+        swiperRef.allowSlideNext = false;
+        swiperRef.allowSlidePrev = false;
         swiperRef.mousewheel.disable();
-      }else{
+        swiperRef.disable()
+        swiperRef.update()
+      }
+    }else{
+      if(swiperRef){
+        swiperRef.enable()
         swiperRef.allowTouchMove = true;
+        swiperRef.allowSlideNext = true;
+        swiperRef.allowSlidePrev = true;
         swiperRef.mousewheel.enable();
+        swiperRef.update();
       }
     }
   });
