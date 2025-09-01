@@ -32,8 +32,10 @@ import "../app.postcss";
 import { Toaster } from 'svelte-sonner';
 import { lang, doesLang, langUs } from '$lib/stores/lang.js'
 import { theme, themeConfig } from '$lib/stores/theme';
-  import { onMount } from 'svelte';
+import { onMount } from 'svelte';
+import { locale } from '$lib/translations';
 import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
+import { Bot } from '$lib/components/bot';
   // עדכון המשנה בטעינה
   onMount(() => {
     const unsubscribe = theme.subscribe((currentTheme) => {
@@ -56,6 +58,10 @@ import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
 
   /** @type {Props} */
   let { data, children } = $props();
+
+  if (data.lang) {
+    locale.set(data.lang);
+  }
 function getLang() {
   console.log(data)
     let la;
@@ -83,6 +89,7 @@ function getLang() {
    // return navigator.language;
     lang.set(la)
     document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+    locale.set($lang);
 }
 
 onMount(() => {
@@ -107,4 +114,5 @@ onMount(() => {
 <Toaster toastOptions={{
   style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
 }} richColors  closeButton  position="top-center" />
+<Bot {data} />
 </main>

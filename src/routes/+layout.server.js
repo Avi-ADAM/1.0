@@ -1,25 +1,15 @@
 
-/*import { locale, loadTranslations } from '$lib/translations';
+import { loadTranslations, locale } from '$lib/translations';
 
-export const load = async ({ url }) => {
+export const load = async ({ url, locals }) => {
   const { pathname } = url;
-
-  const defaultLocale = 'he'; // get from cookie, user session, ...
+  const { lang, uid, un, email, isDesktop, userAgent } = locals;
+  const defaultLocale = lang || 'he'; // get from cookie, user session, ...
   
   const initLocale = locale.get() || defaultLocale; // set default if no locale already set
 
   await loadTranslations(initLocale, pathname); // keep this just before the `return`
 
-  return {};
-}
-*/
-export function load({ locals }) {
-  const userAgent = locals.userAgent;
-  const lang = locals.lang
-  const uid = locals.uid
-  const isDesktop = locals.isDesktop
-  const un = locals.un
-  const email = locals.email
   return {
     email,
     isDesktop,

@@ -12,6 +12,11 @@ export const config = {
             key: 'love',
             loader: async () => (await import('./en/love.json')).default,
         },
+        {
+            locale: 'en',
+            key: 'bot',
+            loader: async () => (await import('./en/bot.json')).default,
+        },
       /*  {
             locale: 'en',
             key: 'about',
@@ -28,6 +33,11 @@ export const config = {
             locale: 'he',
             key: 'love',
             loader: async () => (await import('./he/love.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'bot',
+            loader: async () => (await import('./he/bot.json')).default,
         },
       /*  {
             locale: 'cs',

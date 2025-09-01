@@ -1,0 +1,11 @@
+{
+  "title": "Bot",
+  "timerTitle": "Timer Bot",
+  "welcomeTitle": "Welcome to 1💗1",
+  "initialMessage": "Ask me anything about the site!",
+  "errorMessage": "Sorry, something went wrong.",
+  "timerPlaceholder": "Start or stop a timer...",
+  "questionPlaceholder": "Ask a question...",
+  "sendButton": "Send",
+  "typing": "..."
+}

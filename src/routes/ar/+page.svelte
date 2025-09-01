@@ -46,12 +46,12 @@ const desc = {
   "he": [
     "חיבור מתוך חירות",
     "שותפות מתוך הסכמה",
-    "עשייה מתוך לב"
+    "עשייה מתוך חיבור"
   ],
   "en": [
     "Connection through freedom",
     "Partnership through agreement",
-    "Action through heart"
+    "Action through connection"
   ],
   "ar": [
     "اتصال من خلال الحرية",
