@@ -896,5 +896,22 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       id: $id,
       data: { status: $status }
     ) { data { id } }
+  }`,
+  "64getUserProjectList": `query GetUserProjectList($uid: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        id
+        attributes {
+          projects_1s {
+            data {
+              id
+              attributes {
+                projectName
+              }
+            }
+          }
+        }
+      }
+    }
   }`
-}
+}; 

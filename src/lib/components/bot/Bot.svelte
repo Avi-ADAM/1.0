@@ -1,6 +1,9 @@
 <script>
   import { fly } from 'svelte/transition';
   import { t, locale } from '$lib/translations';
+  import { goto } from '$app/navigation';
+  import { idPr } from '$lib/stores/idPr';
+  import { Circle3 } from 'svelte-loading-spinners';
 
   let { data } = $props();
   let user = $derived(data.uid ? true : false);
@@ -33,6 +36,14 @@
       const responseData = await response.json();
       if (responseData.reply) {
         messages = [...messages, { text: responseData.reply, user: false }];
+      }
+      if (responseData.navigation?.url) {
+        goto(responseData.navigation.url);
+        console.log('Navigating to:', responseData.navigation);
+        if (responseData.navigation?.idPr) {
+          idPr.set(responseData.navigation.idPr);
+        }
+        visible = false; // Close the bot after navigation
       }
     } catch (error) {
       console.error('Error sending message to bot:', error);
@@ -80,7 +91,7 @@
         {/each}
         {#if loading}
           <div class="chat chat-start">
-            <div class="chat-bubble bg-gray-200 text-gray-800">{$t('bot.typing')}</div>
+            <div class="chat-bubble bg-gray-200 text-gray-800"><Circle3  /></div>
           </div>
         {/if}
       </div>

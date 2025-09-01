@@ -2,6 +2,7 @@
   // import Scab from '$lib/celim/moach/scad.svelte'
   //   import Siduri from '$lib/celim/moach/siduri.svelte'
   //   import Taskk from '$lib/celim/moach/taskkk.svelte'
+  import { page } from '$app/state';
   import { mi, role, ww, skil } from '$lib/components/prPr/mi.js';
   import Tile from '$lib/celim/tile.svelte';
   import { Confetti } from 'svelte-confetti';
@@ -453,58 +454,29 @@
   }
   async function prog() {
     if ($idPr == 0) {
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      token = cookieValue;
-      let bearer1 = 'bearer' + ' ' + token;
-      const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-      const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
+      try{
+        idL = page.data.uid;
+       await sendToSer({uid:idL},"64getUserProjectList",idL,0,false,fetch).then((res)=>{
+                console.log(res);
+        if(res.error && res.error.status == 401){
+           goto("/login?from=moach")
         }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      let linkg = baseUrl + '/graphql';
-      try {
-        await fetch(linkg, {
-          method: 'POST',
-
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `{  usersPermissionsUser (id:${idL}) {data{ attributes{
-                            projects_1s {data {id attributes{ projectName }}}
-                            } }}}`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (user = data));
-          if(user.data){
-               errorM = false
-        console.log(user);
-        if (user.errors) {
-          if (user.errors[0].message === 'Invalid token.') {
+        if(res.data){
+           errorM = false
+        console.log(res);
+        if (res.errors) {
+          if (res.errors[0].message === 'Invalid token.') {
                 goto("/login?from=moach");
           }
         }
         projects =
-          user.data.usersPermissionsUser.data.attributes.projects_1s.data;
+          res.data.usersPermissionsUser.data.attributes.projects_1s.data;
       }else{
-         if(user.error && user.error.status == 401)
+         if(res.error && res.error.status == 401)
             goto("/login?from=moach")
       }
-      } catch (e) {
+      })
+     } catch (e) {
         console.log(e);
         if(e == "TypeError: Failed to fetch"){
           const nonet = {"he":"נראה שאין חיבור לאינטרנט, כדאי לנסות שוב","en":"no internet connection, try again"}
@@ -517,6 +489,7 @@
       return projects;
     }
   }
+
 
   let li = [];
   let miData = $state([]);

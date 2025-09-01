@@ -1,11 +1,11 @@
 {
   "title": "בוט",
-  "timerTitle": "בוט טיימר",
+  "timerTitle": "בוט לעזרה ופעולות באתר",
   "welcomeTitle": "ברוכים הבאים ל-1💗1",
   "initialMessage": "שאלו אותי כל דבר על האתר!",
   "errorMessage": "מצטערים, משהו השתבש.",
-  "timerPlaceholder": "התחל או הפסק טיימר...",
-  "questionPlaceholder": "שאל שאלה...",
-  "sendButton": "שלח",
+  "timerPlaceholder": "התחל או הפסק טיימר או נווט לדף אחר באתר...",
+  "questionPlaceholder": "שאלת שאלה...",
+  "sendButton": "שליחה",
   "typing": "..."
 }
