@@ -104,6 +104,7 @@ async function understandUserIntent(userText, uid, lang, fetchInstance) {
 - all the availiable missions to apply for: /availableMission
 - all my timers (registered users only): /timers
 - my calendar that shows all my done timers: /myCalendar
+- create new project: /me?action=createproject
 `;
 
     const prompt = `
