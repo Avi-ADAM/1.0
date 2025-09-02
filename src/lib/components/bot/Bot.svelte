@@ -4,6 +4,7 @@
   import { goto } from '$app/navigation';
   import { idPr } from '$lib/stores/idPr';
   import { Circle3 } from 'svelte-loading-spinners';
+  import { browser } from '$app/environment';
 
   let { data } = $props();
   let user = $derived(data.uid ? true : false);
@@ -13,10 +14,26 @@
   let userInput = $state('');
   let loading = $state(false);
 
+  $effect(() => {
+    if (browser) {
+      const storedMessages = localStorage.getItem('bot_message_history');
+      if (storedMessages) {
+        messages = JSON.parse(storedMessages);
+      }
+    }
+  });
+
+  $effect(() => {
+    if (browser) {
+      localStorage.setItem('bot_message_history', JSON.stringify(messages));
+    }
+  });
+
   async function handleSend() {
     if (!userInput.trim()) return;
 
     const currentInput = userInput;
+    const messageHistory = [...messages];
     messages = [...messages, { text: currentInput, user: true }];
     userInput = '';
     loading = true;
@@ -28,7 +45,7 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action,
-          payload: { text: currentInput },
+          payload: { text: currentInput, history: messageHistory },
           user: { id: data.uid ?? null, lang: data.lang }
         })
       });
@@ -66,8 +83,8 @@
       in:fly={{ y: 20, duration: 300 }}
       out:fly={{ y: 20, duration: 300 }}
       class="absolute bottom-16 {$locale == 'he' || $locale == 'ar'
-        ? 'left-0'
-        : 'right-0'} w-80 h-96 bg-white rounded-xl shadow-2xl flex flex-col overflow-hidden"
+        ? 'left-2'
+        : 'right-2'} w-80 h-96 bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
     >
       <div class="p-4 bg-gradient-to-r from-blue-500 to-purple-600 text-white">
         <h2 class="text-lg font-semibold">{user ? $t('bot.timerTitle') : $t('bot.welcomeTitle')}</h2>

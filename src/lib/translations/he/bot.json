@@ -7,5 +7,18 @@
   "timerPlaceholder": "התחל או הפסק טיימר או נווט לדף אחר באתר...",
   "questionPlaceholder": "שאלת שאלה...",
   "sendButton": "שליחה",
-  "typing": "..."
+  "typing": "...",
+  "understandingError": "מצטער, התקשיתי להבין את זה.",
+  "unauthorized": "לא מורשה",
+  "timerStarted": "טיימר התחיל למשימה \"{missionName}\".",
+  "clarifyStart": "לאיזו משימה תרצה להתחיל טיימר?",
+  "noActiveTimer": "לא נמצא טיימר פעיל למשימה זו.",
+  "timerStopped": "הטיימר נעצר.",
+  "clarifyStop": "את הטיימר של איזו משימה תרצה לעצור?",
+  "clarifyStartSpecific": "לאיזו משימה תרצה להתחיל טיימר? אנא פרט יותר.",
+  "clarifyStopSpecific": "את הטיימר של איזו משימה תרצה לעצור? אנא פרט יותר.",
+  "navigatingTo": "מעביר אותך לדף {pageName}.",
+  "navigationUnsure": "אני לא בטוח לאן אתה רוצה ללכת. תוכל להיות יותר ספציפי?",
+  "rephrase": "מצטער, לא הצלחתי להבין את זה. נסה לנסח מחדש.",
+  "internalError": "שגיאה פנימית בשרת"
 }

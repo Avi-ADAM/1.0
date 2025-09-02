@@ -7,5 +7,18 @@
   "timerPlaceholder": "Start or stop a timer...",
   "questionPlaceholder": "Ask a question...",
   "sendButton": "Send",
-  "typing": "..."
+  "typing": "...",
+  "understandingError": "Sorry, I had trouble understanding that.",
+  "unauthorized": "Unauthorized",
+  "timerStarted": "Timer started for mission \"{missionName}\".",
+  "clarifyStart": "Which mission would you like to start a timer for?",
+  "noActiveTimer": "No active timer found for this mission.",
+  "timerStopped": "Timer stopped.",
+  "clarifyStop": "Which mission's timer would you like to stop?",
+  "clarifyStartSpecific": "Which mission would you like to start a timer for? Please be more specific.",
+  "clarifyStopSpecific": "Which mission's timer would you like to stop? Please be more specific.",
+  "navigatingTo": "Navigating you to the {pageName} page.",
+  "navigationUnsure": "I'm not sure where you want to go. Can you be more specific?",
+  "rephrase": "Sorry, I couldn't understand that. Please try rephrasing.",
+  "internalError": "Internal Server Error"
 }

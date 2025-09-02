@@ -1,4 +1,5 @@
 import { json } from '@sveltejs/kit';
+import { t, locale, loadTranslations } from '$lib/translations';
 import { startTimer, stopTimer } from '$lib/func/timers.js';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { SITE_CONTEXT, createGeminiClient } from '$lib/bot/context.js';
@@ -7,7 +8,8 @@ const geminiApiKey = import.meta.env.VITE_GEMINI_API_KEY;
 
 const geminiModel = createGeminiClient(geminiApiKey);
 
-async function answerUnregisteredUserQuery(userText, lang = 'he') {
+async function answerUnregisteredUserQuery(userText, history = [], lang = 'he') {
+    const historyText = history.map(msg => `${msg.user ? 'User' : 'Assistant'}: ${msg.text}`).join('\n');
     const prompt = `
 You are a helpful assistant for the 1lev1.com platform. A user is asking a question.
 Your goal is to answer the user's question based *only* on the provided context about the 1lev1 platform.
@@ -22,6 +24,11 @@ Context about 1lev1 Platform:
 ${SITE_CONTEXT}
 ---
 
+Conversation History:
+---
+${historyText}
+---
+
 User's Question: "${userText}"
 
 Your Answer (in ${lang}):
@@ -32,7 +39,9 @@ Your Answer (in ${lang}):
         return response.text().trim();
     } catch (error) {
         console.error("Gemini Q&A Error:", error);
-        return 'Sorry, I had trouble understanding that.';
+        await locale.set(lang);
+        await loadTranslations(lang);
+        return t.get('bot.understandingError');
     }
 }
 
@@ -67,7 +76,7 @@ async function getUserProjects(uid, fetchInstance) {
         const res = await sendToSer({ uid: uid }, "64getUserProjectList", uid, 0, false, fetchInstance);
         // NOTE: The response structure is an assumption based on the existing code.
         // It might need adjustment if the actual API response is different.
-        const projects = res?.data?.projects?.data ?? [];
+        const projects = res?.data?.usersPermissionsUser?.data?.attributes?.projects_1s?.data ?? [];
         return projects.map(item => ({
             id: item.id,
             name: item.attributes.projectName,
@@ -78,14 +87,15 @@ async function getUserProjects(uid, fetchInstance) {
     }
 }
 
-async function understandUserIntent(userText, uid, lang, fetchInstance) {
+async function understandUserIntent(userText, history = [], uid, lang, fetchInstance) {
     const startableMissions = await getUserMissions(uid, fetchInstance, true);
     const stoppableMissions = await getUserMissions(uid, fetchInstance, false, true);
     const userProjects = await getUserProjects(uid, fetchInstance);
 
-    const missionListText = startableMissions.map(m => `- "${m.name}" (Mission ID: ${m.id}, Project ID: ${m.projectId})`).join('\n');
-    const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (Mission ID: ${m.id}, Project ID: ${m.projectId})`).join('\n');
+    const missionListText = startableMissions.map(m => `- "${m.name}" (Mission ID: ${m.id}, Project Name: ${m.projectName})`).join('\n');
+    const activeTimersText = stoppableMissions.map(m => `- "${m.name}" (Mission ID: ${m.id}, Project Name: ${m.projectName})`).join('\n');
     const projectListText = userProjects.map(p => `- "${p.name}" (Project ID: ${p.id})`).join('\n');
+    const historyText = history.map(msg => `${msg.user ? 'User' : 'Assistant'}: ${msg.text}`).join('\n');
 
     const sitePages = `
 - Home: /
@@ -112,7 +122,7 @@ async function understandUserIntent(userText, uid, lang, fetchInstance) {
 You are a helpful assistant for the 1lev1 platform bot. Your goal is to understand the user's request. The user might want to manage timers for their missions or navigate to a page on the site.
 
 User ID: ${uid}
-User Language: ${lang}
+User Language: ${lang == "he"? "hebrew" : lang == "ar" ? "arabic" : "English"}
 
 Available actions:
 1.  'start_timer': User wants to start a timer for a specific mission. Requires 'missionId' and 'missionName'.
@@ -135,6 +145,11 @@ ${projectListText || 'None'}
 Available pages for navigation:
 ${sitePages}
 
+Conversation History:
+---
+${historyText}
+---
+
 User request: "${userText}"
 
 Analyze the user request considering the available missions, active timers, user's projects, and site pages.
@@ -156,11 +171,12 @@ Examples:
 - User: "i want to edit my profile or register for telegram notification" -> {"intent": "navigate", "parameters": {"url": "/me?action=editbasic", "pageName": "Edit Profile"}}
 Your JSON response:
 `;
-
+console.log('prompt', prompt )
     try {
         const result = await geminiModel.generateContent(prompt);
         const response = await result.response;
         const jsonResponse = response.text().trim().replace(/```json/g, '').replace(/```/g, '');
+        console.log('jsonResponse', JSON.parse(jsonResponse));
         return JSON.parse(jsonResponse);
     } catch (error) {
         console.error("Gemini Timer Intent Error:", error);
@@ -170,18 +186,21 @@ Your JSON response:
 
 export async function POST({ request, fetch, cookies }) {
   const { action, payload, user } = await request.json();
+  const lang = user.lang || 'he';
+  await locale.set(lang);
+  await loadTranslations(lang);
 
   try {
     if (action === 'ask') {
-      const reply = await answerUnregisteredUserQuery(payload.text);
+      const reply = await answerUnregisteredUserQuery(payload.text, payload.history, lang);
       return json({ reply });
     }
     console.log('Bot API Request:', { action, payload, user });
     if (!user?.id) {
-      return json({ error: 'Unauthorized' }, { status: 401 });
+      return json({ error: t.get('bot.unauthorized') }, { status: 401 });
     }
 
-    const aiResponse = await understandUserIntent(payload.text, user.id, user.lang || 'he', fetch);
+    const aiResponse = await understandUserIntent(payload.text, payload.history, user.id, lang, fetch);
 
     switch (aiResponse.intent) {
       case 'start_timer':
@@ -193,9 +212,9 @@ export async function POST({ request, fetch, cookies }) {
           const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
           if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
           await startTimer(activeTimer, missionId, user.id, projectId, timerId, false, fetch);
-          return json({ reply: `Timer started for mission "${missionName}".` });
+          return json({ reply: t.get('bot.timerStarted', { missionName }) });
         }
-        return json({ reply: "Which mission would you like to start a timer for?" });
+        return json({ reply: t.get('bot.clarifyStart') });
 
       case 'stop_timer':
         if (aiResponse.parameters?.missionId) {
@@ -203,34 +222,34 @@ export async function POST({ request, fetch, cookies }) {
           const missionData = await sendToSer({ missionId }, '36getMissionTimer', 0, 0, false, fetch);
           const activeTimerData = missionData?.data?.mesimabetahalich?.data?.attributes?.activeTimer?.data;
           if (!activeTimerData || !activeTimerData.attributes.isActive) {
-            return json({ reply: "No active timer found for this mission." });
+            return json({ reply: t.get('bot.noActiveTimer') });
           }
           await stopTimer(activeTimerData, fetch, false);
-          return json({ reply: "Timer stopped." });
+          return json({ reply: t.get('bot.timerStopped') });
         }
-        return json({ reply: "Which mission's timer would you like to stop?" });
+        return json({ reply: t.get('bot.clarifyStop') });
 
       case 'clarify_start':
-        return json({ reply: "Which mission would you like to start a timer for? Please be more specific." });
+        return json({ reply: t.get('bot.clarifyStartSpecific') });
 
       case 'clarify_stop':
-        return json({ reply: "Which mission's timer would you like to stop? Please be more specific." });
+        return json({ reply: t.get('bot.clarifyStopSpecific') });
 
       case 'navigate':
         if (aiResponse.parameters?.url) {
           const { url, pageName, idPr } = aiResponse.parameters;
-          return json({ 
-            reply: `Navigating you to the ${pageName} page.`,
-            navigation: { url, idPr } 
+          return json({
+            reply: t.get('bot.navigatingTo', { pageName }),
+            navigation: { url, idPr }
           });
         }
-        return json({ reply: "I'm not sure where you want to go. Can you be more specific?" });
+        return json({ reply: t.get('bot.navigationUnsure') });
 
       default:
-        return json({ reply: "Sorry, I couldn't understand that. Please try rephrasing." });
+        return json({ reply: t.get('bot.rephrase') });
     }
   } catch (error) {
     console.error('Bot API Error:', error);
-    return json({ error: 'Internal Server Error' }, { status: 500 });
+    return json({ error: t.get('bot.internalError') }, { status: 500 });
   }
 }
