@@ -151,6 +151,7 @@ Examples:
 - User: "stop my timer", Multiple active timers -> {"intent": "clarify_stop"}
 - User: "help" or "how does this work?" -> {"intent": "ask_help"}
 - User: "What's the weather?" -> {"intent": "unknown"}
+- User: "create a new project" -> {"intent": "navigate", "parameters": {"url": "/me?action=createproject", "pageName": "Create Project"}}
 
 Your JSON response:
 `;
