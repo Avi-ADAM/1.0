@@ -97,14 +97,15 @@ async function understandUserIntent(userText, uid, lang, fetchInstance) {
 - users Profile: /user/[id]
 - Public page of a Project: /project/[id]
 - manage my projects (registered users only): /moach
-- manage specific project (registered users only) require to pass the id of the project to the idPr store: /moach 
-- user profile (registered users only): /me
+- manage specific project (registered users only) require to pass the id of the project to the idPr store: /moach
+- user profile , edit your skills, roles, values, way of work, resources list (registered users only): /me
 - main page nutification suggestions vots (registered users only): /lev
 - specific mission availiable for apply: /availableMission/[id]
 - all the availiable missions to apply for: /availableMission
 - all my timers (registered users only): /timers
 - my calendar that shows all my done timers: /myCalendar
 - create new project: /me?action=createproject
+- edit basic profile and register for telegram/device notification: /me?action=editbasic
 `;
 
     const prompt = `
@@ -123,13 +124,13 @@ Available actions:
 7.  'unknown': The user's intent is unclear or unrelated.
 
 Missions available to START a timer for:
-${missionListText || "None"}
+${missionListText || 'None'}
 
 Missions with currently ACTIVE timers (can be stopped):
-${activeTimersText || "None"}
+${activeTimersText || 'None'}
 
 User's Projects:
-${projectListText || "None"}
+${projectListText || 'None'}
 
 Available pages for navigation:
 ${sitePages}
@@ -144,7 +145,7 @@ Examples:
 - User: "start timer for Design UI", Mission "Design UI" (ID 123) exists -> {"intent": "start_timer", "parameters": {"missionId": "123", "missionName": "Design UI"}}
 - User: "stop the timer for API integration", Mission "API integration" (ID 456) has active timer -> {"intent": "stop_timer", "parameters": {"missionId": "456"}}
 - User: "take me to the about page" -> {"intent": "navigate", "parameters": {"url": "/about", "pageName": "About"}}
-- User: "I want to see my profile" -> {"intent": "navigate", "parameters": {"url": "/me", "pageName": "My Profile"}}
+- User: "I want to see my profile or edit my skills, roles , vallues, resources, way of working etc" -> {"intent": "navigate", "parameters": {"url": "/me", "pageName": "My Profile"}}
 - User: "open my project dashboard" -> {"intent": "navigate", "parameters": {"url": "/moach", "pageName": "Project Management"}}
 - User: "take me to my project 'New Website'", Project "New Website" (ID 789) exists -> {"intent": "navigate", "parameters": {"url": "/moach", "pageName": "New Website", "idPr": "789"}}
 - User: "start a timer", Multiple startable missions exist -> {"intent": "clarify_start"}
@@ -152,7 +153,7 @@ Examples:
 - User: "help" or "how does this work?" -> {"intent": "ask_help"}
 - User: "What's the weather?" -> {"intent": "unknown"}
 - User: "create a new project" -> {"intent": "navigate", "parameters": {"url": "/me?action=createproject", "pageName": "Create Project"}}
-
+- User: "i want to edit my profile or register for telegram notification" -> {"intent": "navigate", "parameters": {"url": "/me?action=editbasic", "pageName": "Edit Profile"}}
 Your JSON response:
 `;
 

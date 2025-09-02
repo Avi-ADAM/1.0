@@ -789,10 +789,15 @@
   }
   //
   $effect(async()=>{
-    if(page.url.searchParams.has('action') && page.url.searchParams.get('action') === 'createproject') {
+    if(page.url.searchParams.has('action')) {
       await tick();
-      iwant = false;
-      addP = true;
+      if(page.url.searchParams.get('action') === 'createproject'){
+        iwant = false;
+        addP = true;
+      } else if(page.url.searchParams.get('action') === 'editbasic') {
+        isOpen = true;
+        a = 1;
+      }
     }
   })
   function guid() {
