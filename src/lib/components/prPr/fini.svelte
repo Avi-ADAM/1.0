@@ -211,6 +211,34 @@ let fir = $state(),ssec = $state();
  const hea = {"he":"חלוקת שווי הריקמה", "en": "FreeMate value distribution"}
  const cl = {"he": "סגירת הפירוט", "en": "close the details"}
  const pehe = {"he": "פעולות שבוצעו ואושרו", "en": "approved missions"}
+ const details = {"he":"פירוט","en":"Details"}
+ const options = {"he": "אפשרויות", "en": "Options"};
+ const name = {"he": "שם", "en": "Name"};
+ const description = {"he": "תיאור", "en": "Description"};
+ const executionDate = {"he": "תאריך ביצוע", "en": "Execution Date"};
+ const publicLinks = {"he": "קישורים ציבוריים", "en": "Public Links"};
+ const privateNotes = {"he": "הערות יחודיות לריקמה שלי", "en": "My unique notes for FreeMate"};
+ const privateLinks = {"he": "קישורים יחודיים לריקמה שלי", "en": "My unique links for FreeMate"};
+ const hoursTaken = {"he": "כמה שעות זה לקח", "en": "Hours Taken"};
+ const valuePerHour = {"he": "כמה שווה שעה", "en": "Value Per Hour"};
+ const totalValueForMission = {"he": "שווי סך הכל למשימה", "en": "Total Value for Mission"};
+ const closingComments = {"he": "הערות סיום", "en": "Closing Comments"};
+ const doneBy = {"he": "בוצע על ידי", "en": "Done By"};
+ const approvedResources = {"he": "משאבים שהתקבלו ואושרו", "en": "Approved Resources"};
+ const type = {"he": "סוג", "en": "Type"};
+ const amount = {"he": "כמות", "en": "Amount"};
+ const startDate = {"he": "תאריך התחלה", "en": "Start Date"};
+ const endDate = {"he": "תאריך סיום", "en": "End Date"};
+ const specialNotes = {"he": "הערות מיוחדות", "en": "Special Notes"};
+ const maxVal = {"he": "שווי מקסימלי לחישוב בריקמה", "en": "Maximum value for FreeMate calculation"};
+ const monetaryValue = {"he": "שווי כספי", "en": "Monetary Value"};
+ const perMonth = {"he": "לכל חודש", "en": "per month"};
+ const perYear = {"he": "לכל שנה", "en": "per year"};
+ const forPeriod = {"he": "לכל התקופה", "en": "for the whole period"};
+ const perUnit = {"he": "ליחידה", "en": "per unit"};
+ const totalCost = {"he": "עלות סה\"כ", "en": "Total Cost"};
+ const productLink = {"he": "לינק לפרטי מוצר\\ מחיר \\ רכישה", "en": "Link to product details/price/purchase"};
+ const sharedBy = {"he": "שותף על ידי", "en": "Shared By"};
     </script>
 
     {#if hagdel === false}
@@ -235,7 +263,7 @@ let fir = $state(),ssec = $state();
 </svg>    </Tooltip>
 </div>
 </div>
-<button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" onclick={() => hagdel = true} >פירוט</button><br>
+<button class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold p-2 rounded-full" onclick={() => hagdel = true} >{details[$lang]}</button><br>
    
 {:else}
      <button
@@ -256,25 +284,25 @@ let fir = $state(),ssec = $state();
     </caption>
     <thead>
         <tr class="gg">
-          <th class="gg">אפשרויות</th>
+          <th class="gg">{options[$lang]}</th>
           {#each fmiData as data, i}
           <td class="gg" style="font-size: 3rem">
             {i + 1}
         </td>
           {/each}
     </tr> <tr class="ggr">
-      <th class="ggr">שם</th>
+      <th class="ggr">{name[$lang]}</th>
       {#each fmiData as data, i}
             <td class="ggr">{data.attributes.missionName}</td>
             {/each}
           </tr> <tr>
-            <th>תיאור</th>
+            <th>{description[$lang]}</th>
             {#each fmiData as data, i}
             <td>{#if data.attributes.descrip != "undefined"}{data.attributes.descrip}{/if}</td>
               {/each}
             </tr>
          <tr>
-              <th>תאריך ביצוע</th>
+              <th>{executionDate[$lang]}</th>
               {#each fmiData as data, i}
             <td>              {#if data.attributes.Sqadualed}
               {data.attributes.Sqadualed}
@@ -282,7 +310,7 @@ let fir = $state(),ssec = $state();
             </td>
             {/each}
           </tr> <tr>
-            <th>קישורים ציבוריים</th>
+            <th>{publicLinks[$lang]}</th>
             {#each fmiData as data, i}
             <td>
               {#if data.attributes.publicklinks}
@@ -291,7 +319,7 @@ let fir = $state(),ssec = $state();
              </td>
              {/each}
         </tr><tr>
-          <th>הערות יחודיות לריקמה שלי</th>
+          <th>{privateNotes[$lang]}</th>
           {#each fmiData as data, i}
           <td>
             {#if data.attributes.hearotMeyuchadot != "undefined" && data.attributes.hearotMeyuchadot != null}
@@ -300,7 +328,7 @@ let fir = $state(),ssec = $state();
            </td>
            {/each}
       </tr><tr>
-        <th>קישורים יחודיים לריקמה שלי</th>
+        <th>{privateLinks[$lang]}</th>
         {#each fmiData as data, i}
         <td>          {#if data.attributes.privatlinks} 
 
@@ -309,7 +337,7 @@ let fir = $state(),ssec = $state();
          </td>
          {/each}
     </tr><tr style="display:''" id="hoursD">
-          <th >כמה שעות זה  לקח </th>
+          <th >{hoursTaken[$lang]} </th>
           {#each fmiData as data, i}
           <td>
             {#if data.attributes.noofhours > 0}
@@ -319,7 +347,7 @@ let fir = $state(),ssec = $state();
           </td>
           {/each}
         </tr><tr style="display:''" id="vallueperhourN" >
-          <th>כמה שווה שעה</th>
+          <th>{valuePerHour[$lang]}</th>
           {#each fmiData as data, i}
           <td>
             {#if data.attributes.perhour > 0}
@@ -329,7 +357,7 @@ let fir = $state(),ssec = $state();
           </td>
           {/each}
         </tr><tr >
-      <th>שווי סך הכל למשימה </th>
+      <th>{totalValueForMission[$lang]} </th>
       {#each fmiData as data, i}
       <td>
       {data.attributes.total.toLocaleString('en-US', {maximumFractionDigits:2})}
@@ -337,7 +365,7 @@ let fir = $state(),ssec = $state();
       {/each}
     </tr>
      <tr>
-            <th> הערות סיום</th>
+            <th>{closingComments[$lang]}</th>
             {#each fmiData as data, i}
             <td>
               {#if data.attributes.why}
@@ -347,7 +375,7 @@ let fir = $state(),ssec = $state();
              {/each}
         </tr>
          <tr>
-            <th>בוצע על ידי</th>
+            <th>{doneBy[$lang]}</th>
             {#each fmiData as data, i}
             <td>
               {data.attributes.users_permissions_user.data.attributes.username}
@@ -362,7 +390,7 @@ let fir = $state(),ssec = $state();
   <table dir="rtl" >
     <caption class="sm:text-right md:text-center text-right ">  
       <h1 class="md:text-center text-2xl md:text-2xl font-bold"
-      >משאבים שהתקבלו ואושרו</h1>
+      >{approvedResources[$lang]}</h1>
     </caption>
     <thead>
         <tr class="gg">
@@ -373,7 +401,7 @@ let fir = $state(),ssec = $state();
             </td>
           {/each}
     </tr> <tr class="ggr">
-      <th class="ggr">שם</th>
+      <th class="ggr">{name[$lang]}</th>
       {#each meData as data, i}
             <td class="ggr">
                 {data.attributes.name}
@@ -381,37 +409,37 @@ let fir = $state(),ssec = $state();
             {/each}
           </tr>
   <tr>
-      <th>תיאור</th>
+      <th>{description[$lang]}</th>
       {#each meData as data, i}
       <td> {#if data.attributes.descrip} {data.attributes.descrip}{/if}
 </td>
         {/each}
     </tr> <tr>
-      <th>סוג</th>
+      <th>{type[$lang]}</th>
       {#each meData as data, i}
       <td>
       <h1>{data.attributes.kindOf}</h1>
         </td>
       {/each}
     </tr> <tr style="display:{kc ? "" : "none"};">
-      <th>כמות</th>
+      <th>{amount[$lang]}</th>
       {#each meData as data, i}
       <td >
        {data.attributes.hm}
        </td>
       {/each}
     </tr><tr style="display:{ ky  ? "" : "none"};" >
-      <th>תאריך התחלה </th>
+      <th>{startDate[$lang]} </th>
       {#each meData as data, i}
       <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};"  >{moment(data.attributes.sqadualed).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr style="display:{ ky  ? "" : "none"};" >
-      <th >תאריך סיום </th>
+      <th >{endDate[$lang]} </th>
       {#each meData as data, i}
       <td ><h1 style="display:{ meData[i].ky  ? "" : "none"};" >{moment(data.attributes.sqadualedf).format("dddd, MMMM Do YYYY, H:mm:ss ")}</h1></td>
       {/each}
     </tr> <tr>
-      <th>הערות מיוחדות</th>
+      <th>{specialNotes[$lang]}</th>
       {#each meData as data, i}
       <td>{#if data.attributes.spnot}
  {data.attributes.spnot}{/if}</td>
@@ -420,32 +448,32 @@ let fir = $state(),ssec = $state();
       <th>עלות</th>
       {#each meData as data, i}
       <td>
-  <small for="name" class='label'>שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
+  <small for="name" class='label'>{monetaryValue[$lang]} <span style="display:{ meData[i].m  ? "" : "none"};">{perMonth[$lang]}</span><span style="display:{ meData[i].y  ? "" : "none"};">{perYear[$lang]}</span><span style="display:{ meData[i].r  ? "" : "none"};">{forPeriod[$lang]}</span><span style="display:{meData[i].kc ? "" : "none"};">{perUnit[$lang]}</span> </small>
   <h2>{data.price.toFixed(2)}</h2>  
   {/each}
     </tr>--><tr>
-      <th>שווי מקסימלי לחישוב בריקמה</th>
+      <th>{maxVal[$lang]}</th>
       {#each meData as data, i}
       <td>
-  <small for="name" >שווי כספי <span style="display:{ meData[i].m  ? "" : "none"};">לכל חודש</span><span style="display:{ meData[i].y  ? "" : "none"};">לכל שנה</span><span style="display:{ meData[i].r  ? "" : "none"};">לכל התקופה</span><span style="display:{meData[i].kc ? "" : "none"};">ליחידה</span> </small>
+  <small for="name" >{monetaryValue[$lang]} <span style="display:{ meData[i].m  ? "" : "none"};">{perMonth[$lang]}</span><span style="display:{ meData[i].y  ? "" : "none"};">{perYear[$lang]}</span><span style="display:{ meData[i].r  ? "" : "none"};">{forPeriod[$lang]}</span><span style="display:{meData[i].kc ? "" : "none"};">{perUnit[$lang]}</span> </small>
         {data.attributes.agprice.toFixed(2)}
         </td>
       {/each}
     </tr><tr style="display:{kc || ky ? "" : "none"};" >
-      <th>עלות סה"כ</th>
+      <th>{totalCost[$lang]}</th>
       {#each meData as data, i}
       <td  >
       <h3 style="display:{meData[i].m || meData[i].y  || meData[i].kc ? "" : "none"};">{data.attributes.total.toFixed(2)}</h3>
       </td>
       {/each}
     </tr> <tr>
-      <th>לינק לפרטי מוצר\ מחיר \ רכישה</th>
+      <th>{productLink[$lang]}</th>
       {#each meData as data, i}
       <td>{#if data.attributes.linkto}{data.attributes.linkto}{/if}
 </td>
         {/each}
   </tr><tr>
-            <th>שותף על ידי</th>
+            <th>{sharedBy[$lang]}</th>
             {#each meData as data, i}
             <td>
               {data.attributes.users_permissions_user.data.attributes.username}
