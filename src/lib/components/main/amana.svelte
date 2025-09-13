@@ -910,22 +910,23 @@ top: -36px;
               <br />
               <div
                 class="text-center justify-center flex items-center text-bold text-transparent bg-clip-text bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]"
-                style="flex-wrap: wrap; font-family:StamSefarad,David;"
+                 style="flex-wrap: wrap; font-family:StamSefarad,David;"
               >
-                אני <span
-                  style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);"
-                  >{formName ? formName : '__'}</span
+                 אני <span
+                  style="flex-wrap: nowrap; white-space: pre;  color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);"
+                  > { formName ? " " + formName + " ": ' __ '} </span
                 >
-                תמיד אצור, אתנהל ואפתור חילוקי דעות ב<span
+                 אצור, אתנהל ואפתור חילוקי דעות ב <span
                   role="contentinfo"
                   class="hover:text-barbi"
                   onkeypress={() => info()}
-                  onclick={() => info()}>"רקמות"</span
+                  onclick={() => info()}
+                   style="flex-wrap: wrap;">"רקמות"</span
                 >
                 המתנהלות באתר
                 <div
                   dir="ltr"
-                  style="text-shadow:none;"
+                  style="text-shadow:none; flex-wrap: wrap;"
                   class=" font-bold mx-2 mt-2 text-transparent
           bg-clip-text bg-[length:auto_200%] animate-gradienty
           bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]

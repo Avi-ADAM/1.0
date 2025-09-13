@@ -32,16 +32,16 @@ show.subscribe(newValue => {
   let { idx = 1 } = $props();
 let ty = 0;
 let w = $state(1);
-let vb = 3322.126 + w;
-const txx = spring(600+(w*20),{stiffness: 0.55,damping: 0.99});
+let vb = $derived(3322.126 + w);
+const txx = spring(600+(()=>w*20),{stiffness: 0.55,damping: 0.99});
 function add (event){
   txx.set(event.tx+(w*event.txx));
   console.log(txx)
 }
 let title = {"he": "הרשמה ל-1💗1", "en": "1💗1 registration"};
-let tu = { "he": "תודה", "en": "thank you"};
+let tu = { "he": "מייל אישור נשלח. תודה" , "en": "please check your email, thank you"};
 let see = { "he": "ולהתראות בקרוב", "en": "see you soon!"}
-const buttn = { "he": "מייל אישור נשלח. לכל בעיה לחצו כדי לשלוח לנו מייל","en": "please check your email, if you did not receive please click here to contact us"}
+const buttn = { "he": " לכל בעיה לחצו כדי לשלוח לנו מייל","en": "if you did not receive please click here to contact us"}
 const gtl = {"he":" להתחברות לאתר","en": "go to login "}
 </script>
 <svelte:head>

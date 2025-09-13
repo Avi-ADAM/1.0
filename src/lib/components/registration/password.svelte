@@ -216,13 +216,15 @@ function back() {
 		        passwordx = e.target.value
 		const password = e.target.value;
 		validations = [
-		//	password.length > 1,
+			password.length > 1,
+			password.length > 5,
 			password.length >= 8,
 			password.search(/[A-Z]/) > -1,
 		//	password.search(/[0-9]/) > -1,
 		//	password.search(/[$&+,:;=?@#]/) > -1,
 		];
 		strength = validations.reduce((acc, cur) => acc + cur, 0);
+		console.log(strength)
 		if (validations[0] == true){onProgres?.({
 		tx: 0,
 		txx: 6
@@ -285,18 +287,18 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 				
 
 		<div class="strength">
-			<span class="bar bar-1" class:bar-show={strength > 0}></span>
-			<span class="bar bar-2" class:bar-show={strength > 0}></span>
-			<span class="bar bar-3" class:bar-show={strength > 1}></span>
-			<span class="bar bar-4" class:bar-show={strength > 1}></span>
+			<span class="bar bar-1 {strength > 0 ? "bar-show" : ""}"></span>
+			<span class="bar bar-2 {strength > 1 ? "bar-show" : ""}"></span>
+			<span class="bar bar-3 {strength > 2 ? "bar-show" : ""}" ></span>
+			<span class="bar bar-4 {strength > 3 ? "bar-show" : ""}" ></span>
 		</div>
 
 		<ul dir="rtl">
 			<li>
-				{validations[0] ? "🏆" : "❌"} {val1[$lang]}
+				{validations[2] ? "🏆" : "❌"} {val1[$lang]}
 			</li>
 			<li>
-				{validations[1] ? "🏆" : "❌"} {val2[$lang]}
+				{validations[3] ? "🏆" : "❌"} {val2[$lang]}
 			</li>
 			<!--<li>{validations[3] ? "🏆" : "❌"} {val3[$lang]}</li>
 			<li>
@@ -308,7 +310,7 @@ const om = {"he":"רק רגע בבקשה", "en": "one moment please"}
 		  <button class="button-2"   onclick={back}  >
     <img alt="go"  class="img-4"  src="{srca[$lang]}"/>
     </button>
-  <button disabled={strength < 2} class="button-in-1-2" class:non={strength < 2 }  onclick={increment}>
+  <button disabled={strength < 4} class="button-in-1-2" class:non={strength < 2 }  onclick={increment}>
     <img alt="go" class="img-4"  src="{srcb[$lang]}"/>
     </button>
 </div>

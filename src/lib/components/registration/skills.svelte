@@ -62,6 +62,18 @@
       skills2 = skills2;
       console.log(skills2);
 
+      // טעינת הכישורים שנבחרו בעבר
+      const currentSkills = $skills1;
+      if (currentSkills && currentSkills.length > 0) {
+        const skillNames = currentSkills
+          .map((skillId) => {
+            const skill = skills2.find((s) => s.id == skillId);
+            return skill ? skill.attributes.skillName : null;
+          })
+          .filter(Boolean);
+        selected = skillNames;
+      }
+
       newcontent = false;
     } catch (e) {
       error1 = e;
@@ -85,6 +97,21 @@
 
   let userName_value = $state();
   let show_value = 0;
+
+  // טעינת הנתונים מה-store כשהקומפוננט נטען
+  onMount(() => {
+    const currentSkills = $skills1;
+    if (currentSkills && currentSkills.length > 0 && skills2.length > 0) {
+      // המרת מזהים חזרה לשמות כישורים
+      const skillNames = currentSkills
+        .map((skillId) => {
+          const skill = skills2.find((s) => s.id == skillId);
+          return skill ? skill.attributes.skillName : null;
+        })
+        .filter(Boolean);
+      selected = skillNames;
+    }
+  });
 
   userName.subscribe((value) => {
     userName_value = value;
@@ -145,10 +172,8 @@
             .then((r) => r.json())
             .then((data) => (meData = data));
           const newOb = meData.data.createSkill.data;
-          const newValues = skills2;
-          newValues.push(newOb);
-
-          skills2 = newValues;
+          // יצירת מערך חדש במקום שינוי הקיים - חשוב לריאקטיביות
+          skills2 = [...skills2, newOb];
           let userName_value = $userName;
           let data = {
             name: userName_value,
@@ -171,13 +196,17 @@
             });
         } catch (error) {
           console.log('צריך לתקן:', error.response);
-          error = error1;
+          error1 = error;
           console.log(error1);
         }
       }
     }
-    skills1.set(find_skill_id(selected));
-    console.log($skills1);
+    const skillIds = find_skill_id(selected);
+    console.log('Selected skills:', selected);
+    console.log('Found skill IDs:', skillIds);
+    console.log('Current skills2:', skills2);
+    skills1.set(skillIds);
+    console.log('Updated skills1:', $skills1);
   }
 
   let ugug = $state(``);
@@ -196,7 +225,6 @@
     he: 'דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל',
     en: 'skip to end of registration, you can always add those details from your profile page'
   };
-
 </script>
 
 <h1 class="midscreenText-2 mt-[26vh]">
@@ -206,7 +234,6 @@
 </h1>
 <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
   <MultiSelect
-
     loading={newcontent}
     --sms-width={page.data.isDesktop ? '' : '30vw'}
     outerDivClass="!bg-gold !text-barbi"

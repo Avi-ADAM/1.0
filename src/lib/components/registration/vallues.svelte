@@ -73,6 +73,17 @@ let {
               }
             }
             vallues = vallues
+            
+            // טעינת הערכים שנבחרו בעבר
+            const currentVallues = $valluss;
+            if (currentVallues && currentVallues.length > 0) {
+              const vallueNames = currentVallues.map(vallueId => {
+                const vallue = vallues.find(v => v.id == vallueId);
+                return vallue ? vallue.attributes.valueName : null;
+              }).filter(Boolean);
+              selected = vallueNames;
+            }
+            
             newcontent = false
         } catch (e) {
             error1 = e

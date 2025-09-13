@@ -56,6 +56,17 @@ let { onProgres } = $props();
               }
             }
             workways2 = workways2
+            
+            // טעינת דרכי העבודה שנבחרו בעבר
+            const currentWorkways = $workways1;
+            if (currentWorkways && currentWorkways.length > 0) {
+              const workwayNames = currentWorkways.map(workwayId => {
+                const workway = workways2.find(w => w.id == workwayId);
+                return workway ? workway.attributes.workWayName : null;
+              }).filter(Boolean);
+              selected = workwayNames;
+            }
+            
             newcontent = false
             console.log(workways2)
         } catch (e) {

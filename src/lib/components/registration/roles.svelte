@@ -83,6 +83,17 @@ let {
               }
             }
             roles1 = roles1
+            
+            // טעינת התפקידים שנבחרו בעבר
+            const currentRoles = $roles2;
+            if (currentRoles && currentRoles.length > 0) {
+              const roleNames = currentRoles.map(roleId => {
+                const role = roles1.find(r => r.id == roleId);
+                return role ? role.attributes.roleDescription : null;
+              }).filter(Boolean);
+              selected = roleNames;
+            }
+            
             newcontent = false
         } catch (e) {
             error1 = e
