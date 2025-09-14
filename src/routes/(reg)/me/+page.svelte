@@ -905,11 +905,11 @@
     {innerText}
     {innerDialogButton}
     {clearButton}
-    onSave-timer={() => {
+    onSaveTimer={() => {
       showSaveDialog = false;
       run();
     }}
-    onClear-timer={() => {
+    onClearTimer={() => {
       showSaveDialog = false;
       isG = true; // Mark as viewed without showing
     }}
