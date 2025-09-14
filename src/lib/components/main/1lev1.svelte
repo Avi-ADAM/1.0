@@ -30,7 +30,8 @@ onMount(()=>{
     ss = $bindable(0),
     fi = false,
     hover = false,
-    scrolli = false
+    scrolli = false,
+    size = {w:0,h:0}
   } = $props();
 
 let rotationt = $state(0)
