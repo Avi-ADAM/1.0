@@ -2137,6 +2137,7 @@
     			pendms(filters: { archived: { eq: false } }){ data{ id attributes{ 
         					name createdAt iskvua hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
                             rishon {data{id}}
+                            acts{data{id attributes{shem  link  des dateF dateS  }}}
                             negopendmissions{data{id attributes{
                                 name hearotMeyuchadot descrip createdAt noofhours perhour isOriginal date dates isMonth 
                                 users_permissions_user{data{id}}
@@ -2206,7 +2207,7 @@
       projects.set(miData.data.usersPermissionsUser.data.attributes.projects_1s.data);
       userId.set(miData.data.usersPermissionsUser.data.id);
       localStorage.setItem('miDataL', JSON.stringify(miData));
-      if (isEqual(miData, miDataold) && update != true) {
+      if (!isEqual(miData, miDataold) && update != true) {
         console.log('nada',nowT - Date.now());
         low = false;
       } else {
@@ -3181,6 +3182,7 @@
         const pend = projects[i].attributes.pendms.data[j];
         pends.push({
           mysrc: src24,
+          acts: pend.attributes.acts,
           orderon: pend.attributes.negopendmissions.data.length || 0,
           negopendmissions: pend.attributes.negopendmissions.data,
           isKavua: pend.attributes.iskvua,

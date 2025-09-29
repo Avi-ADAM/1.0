@@ -34,6 +34,8 @@ import { lang, doesLang, langUs } from '$lib/stores/lang.js'
 import { theme, themeConfig } from '$lib/stores/theme';
 import { onMount } from 'svelte';
 import { locale } from '$lib/translations';
+import { goto } from '$app/navigation';
+import { browser } from '$app/environment';
 import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
 import { Bot } from '$lib/components/bot';
   // עדכון המשנה בטעינה
@@ -59,11 +61,18 @@ import { Bot } from '$lib/components/bot';
   /** @type {Props} */
   let { data, children } = $props();
 
-  if (data.lang) {
-    locale.set(data.lang);
-  }
+  // Ensure locale is set from data if available, or determine it from other sources
+  $effect(() => {
+    if (data?.lang) {
+      console.log('Setting locale from data.lang:', data.lang);
+      locale.set(data.lang);
+    } else if (data && browser) {
+      console.log('No data.lang, calling getLang()');
+      getLang();
+    }
+  }) 
 function getLang() {
-  console.log(data)
+  console.log('getLang called with data:', data)
     let la;
     if(!data?.lang){
     const fromSe = data?.userAgent
@@ -94,7 +103,7 @@ function getLang() {
 
 onMount(() => {
   if (data) {
-    getLang();
+    // getLang() is now called in the effect above, so we just handle navigation
     let x;
     let user;
     if ($lang != "he" && $lang != "ar" && x == null && user == 0) {

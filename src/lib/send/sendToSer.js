@@ -2,6 +2,7 @@ const NODE_URL = import.meta.env.VITE_NURL
     export async function sendToSer(arg = {},queId = "", me = 0, project = 0, isSer = false, fetch) {
          
         let datau = {isSer: isSer, data:{arg,queId}}
+        console.log("Sending to server:", isSer);
       let da = []
        await fetch("/api/send", {
   method: 'POST',

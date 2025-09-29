@@ -5,6 +5,7 @@ export const config = {
     translations: {
         en: { lang },
         he: { lang },
+        ar: { lang },
     },
     loaders: [
         {
@@ -38,6 +39,16 @@ export const config = {
             locale: 'he',
             key: 'bot',
             loader: async () => (await import('./he/bot.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'love',
+            loader: async () => (await import('./ar/love.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'bot',
+            loader: async () => (await import('./ar/bot.json')).default,
         },
       /*  {
             locale: 'cs',

@@ -665,6 +665,7 @@ $effect(() => {
                       pendId={buble.pendId}
                       isKavua={buble.isKavua}
                       diun={buble.diun}
+                      acts={buble.acts}
                       users={buble.users}
                       sqadualed={buble.sqadualed}
                       cards="true"

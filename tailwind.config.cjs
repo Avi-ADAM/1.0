@@ -68,6 +68,7 @@ const config = {
         primary: 'var(--primary)',
         secondary: 'var(--secondary)',
         greeni: '#2effa8',
+        bluesun: '#2c384a',
         accent: '#B38728',
         blu: 'var(--blu)',
         silver: 'var(--silver)',

@@ -1,4 +1,4 @@
-import { sendToSer } from '$lib/send/sendToSer.js';
+import { sendToSer } from './../send/sendToSer.js';
     // Function to start (or resume) the timer for a mission
     /**
      * Starts a timer for tracking activities

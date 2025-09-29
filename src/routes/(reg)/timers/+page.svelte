@@ -229,7 +229,6 @@
         orders = checkLines($timers);
     }
 </script>
-{#key $timers}
 
 <div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} 
      style="position: fixed; width: 100vw; height: 100vh; top: 0; left: 0; max-width: 100vw; max-height: 100vh;" 
@@ -238,7 +237,8 @@
         <div id="timer-content" dir="ltr" bind:clientWidth={w} bind:clientHeight={h} 
             style="position: relative; width: {w}px; height: {h}px;" 
             class="screen d">
-            
+            {#key $timers}
+
             {#each $timers as timer, index (timer.id)}
             <Timer
                 orders={orders[index]}
@@ -255,13 +255,13 @@
                 hoursAssigned={timer.hoursAssigned}
             />
             {/each}
-            
+            {/key}
+
             <!-- סמן מרכז - שימושי לפיתוח - להסרת ההערה לצורך בדיקות -->
             <!-- <div class="center-marker"></div> -->
         </div>
     </div>
 </div>
-{/key}
 
 <style>
     .timer-container {

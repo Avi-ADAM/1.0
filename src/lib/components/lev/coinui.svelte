@@ -351,6 +351,7 @@ let h = $state(500);
                             vallues={buble.vallues}
                             pendId={buble.pendId}
                             users={buble.users}
+                            acts={buble.acts}
                             sqadualed={buble.sqadualed}
                             {low}
                             /></div>

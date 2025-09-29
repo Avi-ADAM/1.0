@@ -3,6 +3,10 @@
       "1.0 Docs": {
         "type": "sse",
         "url": "https://gitmcp.io/Avi-ADAM/1.0"
-      }
+      },
+      "mastra": {
+      "command": "cmd",
+      "args": ["/c", "npx", "-y", "@mastra/mcp-docs-server"]
+    }
     }
   }

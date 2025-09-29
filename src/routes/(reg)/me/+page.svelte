@@ -349,7 +349,7 @@
           mail = meData.email;
           liUN.set(meData.username);
           letters(meData.username);
-          lango = meData.lang;
+          lango = meData.lang || 'he';
           if (lango == 'en' || lango == 'he') {
             // Check if lang store is different from lango
             if ($lang !== lango) {

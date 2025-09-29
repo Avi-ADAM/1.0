@@ -4,7 +4,9 @@
   "scripts": {
     "dev": "vite dev --host",
     "build": "vite build ",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "dev:mastra": "mastra dev",
+    "build:mastra": "mastra build"
   },
   "engines": {
     "node": "20.x"
@@ -38,6 +40,7 @@
     "utf-8-validate": "^5.0.10"
   },
   "dependencies": {
+    "@ai-sdk/google": "^2.0.11",
     "@capacitor/android": "^6.1.2",
     "@capacitor/cli": "^6.1.2",
     "@capacitor/core": "^6.1.2",
@@ -51,6 +54,9 @@
     "@google/generative-ai": "^0.24.0",
     "@internationalized/date": "^3.8.2",
     "@lucide/svelte": "^0.525.0",
+    "@mastra/core": "^0.15.3",
+    "@mastra/libsql": "^0.13.8",
+    "@mastra/memory": "^0.14.3",
     "@mediakular/gridcraft": "1.0.5-beta",
     "@number-flow/svelte": "^0.3.3",
     "@sentry/sveltekit": "^8.27.0",
@@ -88,6 +94,7 @@
     "local-access": "^1.1.0",
     "lodash.has": "^4.5.2",
     "lodash.isequal": "^4.5.0",
+    "mastra": "^0.11.3",
     "moment": "^2.30.1",
     "nodemailer": "^6.9.14",
     "postcss": "^8.4.42",
