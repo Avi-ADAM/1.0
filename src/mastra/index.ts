@@ -3,9 +3,7 @@ import { Mastra } from '@mastra/core/mastra';
 import { PinoLogger } from '@mastra/loggers';
 import { Agent } from '@mastra/core';
 import { LibSQLStore } from '@mastra/libsql';
-import { chatWorkflow } from './workflows/chat-workflow'
-import { weatherWorkflow } from './workflows/weather-workflow';
-import { weatherAgent } from './agents/weather-agent';
+import { chatWorkflow } from './workflows/chat-workflow';
 import { createUnregisteredBotAgent } from './agents/nonreg-bot';
 import { createEnhancedBotAgent } from './agents/reg-bot';
  import { createNavigationAgent } from './agents/navigation-agent'
@@ -13,9 +11,8 @@ import { createEnhancedBotAgent } from './agents/reg-bot';
 
  
 export const mastra = new Mastra({
-  workflows: { weatherWorkflow, chatWorkflow },
+  workflows: { chatWorkflow },
   agents: {
-    weatherAgent,
     IntentAgent: createIntentAgent(),
     NavigationAgent: createNavigationAgent('apiKey','language','useId'),
     unregisteredBotAgent: createUnregisteredBotAgent('lang') as Agent<

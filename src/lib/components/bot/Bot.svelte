@@ -85,7 +85,7 @@
 
 <div
   dir={$locale == 'he' || $locale == 'ar' ? 'rtl' : 'ltr'}
-  class="fixed bottom-12 {$locale == 'he' || $locale == 'ar'
+  class="fixed bottom-12 {$locale !== 'he' && $locale !== 'ar'
     ? 'left-4'
     : 'right-4'} z-50"
 >
@@ -103,7 +103,7 @@
     <div
       in:fly={{ y: 20, duration: 300 }}
       out:fly={{ y: 20, duration: 300 }}
-      class="absolute bottom-20 {$locale == 'he' || $locale == 'ar'
+      class="absolute bottom-20 {$locale !== 'he' && $locale !== 'ar'
         ? 'left-3'
         : 'right-3'} w-80 h-96 bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
     >
@@ -130,7 +130,7 @@
             <div
               style="white-space: pre-wrap;"
               class="chat-bubble {message.user
-                ? 'bg-liteGoldTobr text-barbi shadow-md'
+                ? 'bg-liteGoldTobr text-bluesun border border-liteGoldTobr shadow-md'
                 : 'bg-gradient-to-r from-gray-100 to-gray-50 text-gray-800 border border-gray-200 shadow-sm'}"
             >
               {message.text}
@@ -164,8 +164,8 @@
                 ? $t('bot.timerPlaceholder')
                 : $t('bot.questionPlaceholder')}
               rows="1"
-              class="w-full px-4 py-3 border-2 border-amber-200 rounded-{$locale ==
-                'he' || $locale == 'ar'
+              class="w-full px-4 py-3 border-2 border-amber-200 rounded-{$locale !==
+                'he' && $locale !== 'ar'
                 ? 'r'
                 : 'l'}-2xl
                      focus:border-amber-300 focus:ring-2 focus:ring-rose-200 focus:outline-none
