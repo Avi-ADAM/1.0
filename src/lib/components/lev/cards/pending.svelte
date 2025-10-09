@@ -35,6 +35,7 @@
    * @property {any} already
    * @property {boolean} [allr]
    * @property {any} timegramaDate
+   * @property {any} [acts]
    * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
    * @property {(payload: { alr: any, y: string }) => void} [onAgree] - Callback for agree event
    * @property {(payload: { alr: any, y: string }) => void} [onDecline] - Callback for decline event
@@ -66,6 +67,7 @@
     already = $bindable(),
     allr = false,
     timegramaDate,
+    acts = { data: [] },
     onHover,
     onAgree,
     onDecline,
@@ -103,6 +105,7 @@
     onTochat?.();
   }
   const t = {
+    acts: { he: 'מטלות:', en: 'Tasks:' },
     wwneed: { he: 'דרכי עבודה מבוקשות:', en: 'ways of work for the mission:' },
     skneed: { he: 'הכישורים הנדרשים:', en: 'needed skills:' },
     rneed: { he: 'תפקיד מבוקש:', en: 'requested role:' },
@@ -302,6 +305,23 @@
               />
             </p>{/each}
         </div>{/if}
+      {#if acts.data.length > 0}
+<div class="border-2 border-gold mt-5 p-2">
+<small class="text-barbi text-md ">{t.acts[$lang]}</small>
+
+ <ul>
+   {#each acts?.data as datai, t}
+     <li>
+       <div
+         class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
+       >
+         <span class="p-1">✅</span>
+         <h2 class="md:text-xl p-1 text-barbi">{datai.attributes.shem}</h2>
+       </div>
+     </li>
+   {/each}
+ </ul>
+</div> {/if}
     </div>
     <div class="flex items-center">
       <p>
