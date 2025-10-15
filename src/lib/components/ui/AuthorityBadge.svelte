@@ -13,19 +13,20 @@
   // בדיקה אם הטקסט בעברית
   const isRTL = $derived(/[\u0590-\u05FF]/.test(projectName));
   
-  // חישוב גודל הפונט בהתאם לגודל הכללי - הטקסט יתפוס 30% מהגודל
-  const fontSize = $derived(Math.max(10, size * 0.08));
+  // חישוב גודל הפונט בהתאם לגודל הכללי - גודל מאוזן לכל הגדלים
+  const fontSize = $derived(Math.max(12, Math.min(32, Math.sqrt(size) * 2.5)));
   const logoSize = $derived(size * 0.6); // הלוגו 60%
   const strokeWidth = $derived(size * 0.01);
-  
   // אנימציה לטקסט ארוך
   const shouldAnimate = $derived.by(() => {
     if (textElement && projectName) {
       const textLength = projectName.length;
-      return textLength > 36;
+      return textLength > 20;
     }
     return false;
   });
+let startOffset = $derived(shouldAnimate ? 50 : 25)
+
 </script>
 
 <div 
@@ -69,7 +70,7 @@
       >
         <textPath 
           href="#circle-path" 
-          startOffset="25%" 
+          startOffset="{startOffset}%" 
           text-anchor="middle"
         >
           {projectName}
@@ -242,8 +243,8 @@
     flex-direction: column;
     align-items: center;
     text-align: center;
-    min-width: 45px;
-    min-height: 45px;
+    min-width: 30px;
+    min-height: 30px;
     justify-content: center;
     z-index: 4;
     border: 1px solid rgba(146, 64, 14, 0.8);

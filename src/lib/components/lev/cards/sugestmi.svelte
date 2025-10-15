@@ -8,6 +8,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import No from '$lib/celim/no.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
+  import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -73,8 +74,10 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     onDecline,
     onNego,
     onProject,
-    onTochat
+    onTochat,
+    noOfusers
   } = $props();
+  console.log(noOfusers)
 function hover(x){
 onHover?.(x);
 }
@@ -134,14 +137,18 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
       <div class="relative flex items-center space-x-1">
          <div class="relative">
-         <img src={src}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+         <AuthorityBadge 
+           logoSrc={src}
+           projectName={projectName}
+           memberCount={noOfusers}
+           size={isMobileOrTablet() ? 80 : 120}
+         />
          </div>
-         <div class="flex flex-col leading-tight">
+         <div class="flex flex-col leading-tight ml-4">
             <div class="sm:text-sm text-lg mt-1 flex items-center">
                <span class="text-barbi text-center mr-3 sm:text-2xl text-xl">{headi[$lang]}</span>
             </div>
-            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-lg sm:text-xl text-barbi ">{projectName}</span>
-
+            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-lg sm:text-xl text-barbi ">{missionName}</span>
          </div>
 
          </div>
@@ -151,7 +158,6 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
   <div  class="{isScrolable.value ? "bg-white dark:bg-slate-800" : "bg-gray-200 dark:bg-slate-700"} transition-all-300   rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row  leading-normal">
     
     <div  class="mb-8">
-            <div class="sm:text-3xl text-xl text-mturk font-bold  mb-2">{missionName}</div>
       <!----  {#if data.alld.sqadualed || data.alld.sqadualedf}
                                 <p
                   style="line-height: 1;"

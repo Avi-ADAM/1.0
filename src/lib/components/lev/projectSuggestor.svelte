@@ -53,6 +53,7 @@
    */
   /** @type {ComponentProps} */
   let {
+    noOfusers,
     onLess,
     onHover,
     onMesima,
@@ -548,7 +549,7 @@
   {timegramaId}
   projectId = {projectId}
   total ={total}
-  noofusers={noofusers}
+  noofusers={noOfusers}
   price={price}
   easy = {easy}
   linkto = {linkto}
@@ -3004,6 +3005,7 @@
               {src}
               {workways}
               {timeToP}
+              {noOfusers}
             />
           </div>
           <!---<div>
@@ -3024,6 +3026,7 @@
     onHover={hoverc}
     onTochat={tochat}
     {isVisible}
+    {noOfusers}
     {acts}
     {low}
     {hearotMeyuchadot}

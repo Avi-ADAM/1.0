@@ -930,6 +930,7 @@ $effect(() => {
                       coinlapach={buble.coinlapach}
                       {low}
                       pid={buble.pid}
+                      noOfusers={buble.attributes.project.data.attributes.user_1s.data.length}
                       acts={buble.attributes.acts}
                       restime={buble.attributes.project.data.attributes.restime}
                       chat={buble.chat ?? null}
