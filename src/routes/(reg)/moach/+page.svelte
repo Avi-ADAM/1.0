@@ -1339,6 +1339,7 @@
   import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { sendToSer } from '$lib/send/sendToSer';
+  import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   import { calcX } from '$lib/func/calcX.svelte';
   import Button from '$lib/celim/ui/button.svelte';
   import { link } from 'd3-shape';
@@ -1716,15 +1717,16 @@ pointer-events: none;"
         </div>
       {/if}
       <div>
-        {#if srcP !== null}
-          <img
-            width="100"
-            height="100"
-            style="border-radius: 50%; margin-right:auto; margin-left:auto ;"
-            src={srcP}
-            alt="profilePic"
-          />
-        {/if}
+      <div class="flex justify-center items-center w-full">
+        <!-- Authority Badge Component -->
+        <AuthorityBadge 
+          logoSrc={srcP}
+          projectName={projectname}
+          memberCount={projectUsers?.length || 0}
+          size={200}
+        />
+        </div>
+       
         <div class="flex flex-row items-center justify-center">
           {#if srcP !== null}
             <button
@@ -1883,7 +1885,7 @@ pointer-events: none;"
             <Pub />
           </button>
         </div>
-        <h1 class="1">{projectname}</h1>
+        <!-- Project name is now displayed in the AuthorityBadge component -->
         <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
         class="flex items-center justify-center">
           <div       dir="{$lang == "he" ? "rtl" : "ltr"}"

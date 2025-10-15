@@ -205,7 +205,19 @@
     background-color: #e4e4e4;
     border-radius: 100px;
 }
+@keyframes textPathMove {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
 
+.animate-text-move {
+  animation: textPathMove 10s linear infinite;
+  transform-origin: center;
+}
 .d::-webkit-scrollbar-thumb {
     background-color: #d4aa70;
     border-radius: 100px;
