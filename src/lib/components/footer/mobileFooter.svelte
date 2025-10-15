@@ -33,7 +33,22 @@
         <div class="absolute inset-0 rounded-full border-2 border-gold animate-pulse pointer-events-none"></div>
     {/if}
     <div class="grid h-full max-w-lg grid-cols-5 mx-auto" >
-         <ProfileMenu />
+                <button onclick={()=>{
+            activeRoute = "moach"
+            goto("/moach")
+        }} type="button" class="{activeRoute == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-s-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
+            <div class="relative">
+                <MoachIcon active={navigating?.to?.url.pathname == "/moach"}/>
+                {#if navigating && navigating.to?.url.pathname === '/moach'}
+                    <div class="absolute -inset-1 rounded-full border-2 border-transparent border-t-gold animate-spin"></div>
+                {/if}
+            </div>
+            <span class="sr-only">{brainLeb[$lang]}</span>
+        </button>
+        <div id="tooltip-home" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
+            {brainLeb[$lang]}
+            <div class="tooltip-arrow" ></div>
+        </div>
        
         <button onclick={() => addi('chat')} type="button" 
             class="{$isChatOpen ? "border-b-2 border-gold" :""} inline-flex flex-col items-center justify-center px-5 hover:bg-gray-50 dark:hover:bg-gray-800 group">
@@ -74,21 +89,7 @@
             Lev
             <div class="tooltip-arrow" data-popper-arrow></div>
         </div>
-        <button onclick={()=>{
-            activeRoute = "moach"
-            goto("/moach")
-        }} type="button" class="{activeRoute == "/moach" ? "border-b-2 border-gold" : ""} inline-flex flex-col items-center justify-center px-5 rounded-e-full hover:bg-gray-50 dark:hover:bg-gray-800 group">
-            <div class="relative">
-                <MoachIcon active={navigating?.to?.url.pathname == "/moach"}/>
-                {#if navigating && navigating.to?.url.pathname === '/moach'}
-                    <div class="absolute -inset-1 rounded-full border-2 border-transparent border-t-gold animate-spin"></div>
-                {/if}
-            </div>
-            <span class="sr-only">{brainLeb[$lang]}</span>
-        </button>
-        <div id="tooltip-home" role="tooltip" class="absolute z-10 invisible inline-block px-3 py-2 text-sm font-medium text-white transition-opacity duration-300 bg-gray-900 rounded-lg shadow-sm opacity-0 tooltip dark:bg-gray-700">
-            {brainLeb[$lang]}
-            <div class="tooltip-arrow" ></div>
-        </div>
+
+         <ProfileMenu />
     </div>
 </div>
