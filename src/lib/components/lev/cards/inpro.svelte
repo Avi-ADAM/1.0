@@ -7,6 +7,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
+  import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
   /**
    * @typedef {Object} Props
    * @property {number} [x]
@@ -33,6 +34,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
    * @property {any} storeTimer
    * @property {boolean} [isVisible]
    * @property {any} [startDate]
+   * @property {number} [noOfusers]
    * @property {() => void} [onStart] - Callback for start event
    * @property {() => void} [onDone] - Callback for done event
    * @property {() => void} [onSave] - Callback for save event
@@ -69,6 +71,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
     storeTimer,
     isVisible = false,
     startDate = null,
+    noOfusers = 0,
     onStart,
     onDone,
     onSave,
@@ -135,13 +138,18 @@ let totali = $derived({"he":`${iskvua == true ? "שעות חודשיות":"שע�
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
       <div class="relative flex items-center space-x-1">
          <div class="relative">
-         <img src={src}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
+         <AuthorityBadge 
+           logoSrc={src}
+           projectName={projectName}
+           memberCount={noOfusers}
+           size={isMobileOrTablet() ? 80 : 120}
+         />
          </div>
-         <div class="flex flex-col leading-tight">
+         <div class="flex flex-col leading-tight ml-4">
             <div class=" text-md mt-1 flex items-center">
                <span class="text-barbi text-center mr-3 sm:text-3xl text-sm">{hed[$lang]}</span>
             </div>
-            <span style=" text-shadow: 1px 1px white;" class=" ml-1 sm:text-2xl text-sm text-barbi ">{projectName}</span>
+            <span style=" text-shadow: 1px 1px white;" class=" ml-1 sm:text-2xl text-sm text-barbi ">{missionName}</span>
          </div>
          </div>
          {#key isVisible}
@@ -158,7 +166,6 @@ let totali = $derived({"he":`${iskvua == true ? "שעות חודשיות":"שע�
   <div  class="{isScrolable ? "bg-white" : "bg-gray-200"} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal">
     <div   class="mb-8">
        <!--use:textfit={{parent,mode:"multi"}}  bind:this={parent}-->
-              <div class="text-mturk font-bold text-lg md:text-4xl  mb-2">{missionName}</div>
               <h5 style="line-height: 1;" class="sm:text-xl text-lg text-gray-600  flex items-center">
                <img style="width:2.5rem;"   src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg" alt="howmuch"/>
                                  <span onmouseenter={()=>hover(nooftitle[$lang])} onmouseleave={()=>hover("0")} role="contentinfo"

@@ -63,10 +63,14 @@ let startOffset = $derived(shouldAnimate ? 50 : 25)
         class="curved-text"
         class:rtl={isRTL}
         direction={isRTL ? 'rtl' : 'ltr'}
-        fill="#92400e"
+        fill="#f7eeac"
         font-size={fontSize}
+stroke="#92400e"
+        stroke-width="0.3"
+        paint-order="stroke fill"
         font-weight="bold"
         font-family="Arial, sans-serif"
+        
       >
         <textPath 
           href="#circle-path" 
@@ -221,16 +225,16 @@ let startOffset = $derived(shouldAnimate ? 50 : 25)
   
   .member-count {
     position: absolute;
-    bottom: 0%;
+    bottom: 1%;
     left: 50%;
     transform: translateX(-50%);
     background: 
       radial-gradient(ellipse at center top, rgba(255, 255, 255, 0.3) 0%, transparent 50%),
       linear-gradient(135deg, #fbbf24 0%, #f59e0b 30%, #d97706 60%, #92400e 100%);
     color: #2d1b0e;
-    padding: 10px 14px;
+    padding: calc(var(--size) * 0.02) calc(var(--size) * 0.03);
     border-radius: 50%;
-    font-size: calc(var(--font-size) * 0.8);
+    font-size: calc(var(--font-size) * 0.6);
     font-weight: 900;
     font-family: 'Georgia', 'Times New Roman', serif;
     box-shadow: 
@@ -243,8 +247,10 @@ let startOffset = $derived(shouldAnimate ? 50 : 25)
     flex-direction: column;
     align-items: center;
     text-align: center;
-    min-width: 30px;
-    min-height: 30px;
+    min-width: calc(var(--size) * 0.2);
+    min-height: calc(var(--size) * 0.2);
+    max-width: calc(var(--size) * 0.3);
+    max-height: calc(var(--size) * 0.3);
     justify-content: center;
     z-index: 4;
     border: 1px solid rgba(146, 64, 14, 0.8);
