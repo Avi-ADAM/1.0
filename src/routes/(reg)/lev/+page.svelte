@@ -2207,7 +2207,7 @@
       projects.set(miData.data.usersPermissionsUser.data.attributes.projects_1s.data);
       userId.set(miData.data.usersPermissionsUser.data.id);
       localStorage.setItem('miDataL', JSON.stringify(miData));
-      if (!isEqual(miData, miDataold) && update != true) {
+      if (isEqual(miData, miDataold) && update != true) {
         console.log('nada',nowT - Date.now());
         low = false;
       } else {
