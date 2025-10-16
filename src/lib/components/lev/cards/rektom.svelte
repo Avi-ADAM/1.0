@@ -6,6 +6,7 @@ import Lowbtn from '$lib/celim/lowbtn.svelte'
   import { isMobileOrTablet } from '$lib/utilities/device';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
+  import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -80,14 +81,18 @@ onDecline?.(alr);
   </div>-->
    <div class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
       <div class="relative flex items-center space-x-1">
-         <div class="relative">
-         <img src={src2}  alt="" class="w-10 sm:w-16 h-10 sm:h-16  rounded-full">
-         </div>
-         <div class="flex flex-col leading-tight">
-            <div class="sm:text-sm text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-xl text-sm">הצבעה על שיתוף משאב והצטרפות לריקמה </span>
+         <AuthorityBadge 
+           logoSrc={src2} 
+           projectName={projectName}
+           size={isMobileOrTablet() ? 80 : 120}
+         />
+         <div class="flex flex-col leading-tight ml-4">
+            <div class="sm:text-lg text-md mt-1 flex items-center">
+               <span class="text-barbi text-center mr-3 sm:text-3xl text-xl">הצבעה על שיתוף משאב והצטרפות לריקמה </span>
             </div>
-            <span style="text-shadow: 1px 1px white;" class="pn ml-1 text-sm sm:text-lg text-barbi ">{projectName}</span>
+            <div class="text-gray-900 font-bold text-lg sm:text-2xl">
+              {openmissionName}
+            </div>
          </div>
          </div>
          </div>
@@ -98,7 +103,7 @@ onDecline?.(alr);
         <span onmouseenter={()=>hover("ההצעה שהתקבלה")} onmouseleave={()=>hover("0")} style="color: var(--barbi-pink)" >{myp} השווי המוצע</span> /<span onmouseenter={()=>hover("ההצעה של הריקמה")} onmouseleave={()=>hover("0")} > {easy} השווי שהצענו</span>
         </p>
               <h3 onmouseenter={()=>hover("שווי")} onmouseleave={()=>hover("0")} class="ltn" >{price} <span>שווי מקובל</span></h3>
-      <div class="text-gray-900 font-bold text-xl mb-2">{openmissionName}</div>
+
      {#if missionDetails} <RichText outpot={missionDetails} editable={false} />{/if}
     </div>
     <div class="flex items-center">

@@ -11,6 +11,7 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
+  import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -117,17 +118,16 @@
     he: 'מונה זמן לסיום הדיון',
     en: 'time counter for end of discution'
   };
-  
 </script>
 
 <div
   onclick={toggleScrollable}
   role="button"
   tabindex="0"
-  onkeypress={(e)=>{
-    e.key === 'Enter' && toggleScrollable()
+  onkeypress={(e) => {
+    e.key === 'Enter' && toggleScrollable();
   }}
-  dir={$lang == "he" ? "rtl" : "ltr"}
+  dir={$lang == 'he' ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
   class="d {isVisible
     ? lang == 'he'
@@ -140,23 +140,39 @@
   <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
   <div
-    class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
+    class="flex flex-wrap sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre gap-2"
   >
-    <div class="relative flex items-center space-x-1">
-      <div class="relative">
-        <img {src} alt="" class="w-10 sm:w-16 h-10 sm:h-16 rounded-full" />
-      </div>
-      <div class="flex flex-col leading-tight">
-        <div class="sm:text-2xl text-sm text-md mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-2xl text-sm"
+    <div class="relative flex items-center space-x-1 flex-1 min-w-0">
+      <AuthorityBadge
+        logoSrc={src}
+        {projectName}
+        size={isMobileOrTablet() ? 80 : 120}
+      />
+      <div class="flex flex-col leading-tight ml-4 min-w-0 flex-1">
+        <div class="sm:text-lg text-md mt-1 flex items-center">
+          <span class="text-barbi text-center mr-3 sm:text-3xl text-xl"
             >{tr?.pending.head[$lang]}</span
           >
         </div>
-        <span
-          style=" text-shadow: 1px 1px white;"
-          class="pn ml-1 text-sm text-barbi sm:text-xl">{projectName}</span
-        >
+        <div class="text-gray-900 font-bold text-lg sm:text-2xl truncate">
+          {name}
+        </div>
       </div>
+    </div>
+
+    <!-- Timer - responsive positioning -->
+    <div class="flex items-center justify-center w-full sm:w-auto sm:justify-end">
+      <span
+        role="contentinfo"
+        aria-label={timero[$lang]}
+        class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl rounded whitespace-nowrap"
+        style:font-family="Digital"
+        onmouseenter={() => hover(timero[$lang])}
+        onmouseleave={() => hover('0')}
+        style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
+      >
+        {formatTime(zman)}
+      </span>
     </div>
   </div>
   <div
@@ -222,20 +238,6 @@
           {/if}
         </p>
       {/if}
-      <div class="text-mturk font-bold text-lg sm:text-2xl mb-2">{name}</div>
-      <div class="flex items-center justify-center m-1">
-        <span
-          role="contentinfo"
-          aria-label={timero[$lang]}
-          class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl"
-          style:font-family="Digital"
-          onmouseenter={() => hover(timero[$lang])}
-          onmouseleave={() => hover('0')}
-          style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
-        >
-          {formatTime(zman)}
-        </span>
-      </div>
 
       {#if descrip !== null && descrip !== 'null'}
         <RichText outpot={descrip} editable={false} />
@@ -306,22 +308,25 @@
             </p>{/each}
         </div>{/if}
       {#if acts.data.length > 0}
-<div class="border-2 border-gold mt-5 p-2">
-<small class="text-barbi text-md ">{t.acts[$lang]}</small>
+        <div class="border-2 border-gold mt-5 p-2">
+          <small class="text-barbi text-md">{t.acts[$lang]}</small>
 
- <ul>
-   {#each acts?.data as datai, t}
-     <li>
-       <div
-         class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
-       >
-         <span class="p-1">✅</span>
-         <h2 class="md:text-xl p-1 text-barbi">{datai.attributes.shem}</h2>
-       </div>
-     </li>
-   {/each}
- </ul>
-</div> {/if}
+          <ul>
+            {#each acts?.data as datai, t}
+              <li>
+                <div
+                  class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
+                >
+                  <span class="p-1">✅</span>
+                  <h2 class="md:text-xl p-1 text-barbi">
+                    {datai.attributes.shem}
+                  </h2>
+                </div>
+              </li>
+            {/each}
+          </ul>
+        </div>
+      {/if}
     </div>
     <div class="flex items-center">
       <p>

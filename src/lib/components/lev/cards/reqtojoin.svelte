@@ -6,7 +6,8 @@
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import RichText from '$lib/celim/ui/richText.svelte';
-  import { toggleScrollable, isScrolable } from './isScrolable.svelte.js'
+  import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
+  import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -88,7 +89,7 @@
         en: 'appruval of joining and mission assigned'
       };
 
-    const t = {
+  const t = {
     wwneed: { he: 'דרכי עבודה מבוקשות:', en: 'ways of work for the mission:' },
     skneed: { he: 'הכישורים הנדרשים:', en: 'needed skills:' },
     rneed: { he: 'תפקיד מבוקש:', en: 'requested role:' },
@@ -96,20 +97,19 @@
     formonth: { he: 'בכל חודש', en: 'every month' },
     onPrevious: { he: 'על גרסה קודמת', en: 'on previous version' }
   };
-    import tr from '$lib/translations/tr.json';
+  import tr from '$lib/translations/tr.json';
   import Tile from '$lib/celim/tile.svelte';
-function getSkillNames(arr) {
-            return arr.map(s => s.attributes.skillName);
-          }//    isMobileOrTablet() ? (isScrolable = !isScrolable) : (isScrolable = true)}
-
+  function getSkillNames(arr) {
+    return arr.map((s) => s.attributes.skillName);
+  } //    isMobileOrTablet() ? (isScrolable = !isScrolable) : (isScrolable = true)}
 </script>
 
 <div
   onclick={toggleScrollable}
   role="button"
   tabindex="0"
-  onkeypress={(e)=>{
-    e.key === 'Enter' && toggleScrollable()
+  onkeypress={(e) => {
+    e.key === 'Enter' && toggleScrollable();
   }}
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
   class="{isVisible
@@ -124,19 +124,20 @@ function getSkillNames(arr) {
     class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
   >
     <div class="relative flex items-center space-x-1">
-      <div class="relative">
-        <img src={src2} alt="" class="w-10 sm:w-16 h-10 sm:h-16 rounded-full" />
-      </div>
-      <div class="flex flex-col leading-tight">
-        <div class="sm:text-sm text-md mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-3xl text-sm"
+      <AuthorityBadge
+        logoSrc={src2}
+        {projectName}
+        size={isMobileOrTablet() ? 80 : 120}
+      />
+      <div class="flex flex-col leading-tight ml-4">
+        <div class="sm:text-lg text-md mt-1 flex items-center">
+          <span class="text-barbi text-center mr-3 sm:text-3xl text-xl"
             >{hed[$lang]}</span
           >
         </div>
-        <span
-          style="text-shadow: 1px 1px white;"
-          class="pn ml-1 text-lg sm:text-2xl text-barbi">{projectName}</span
-        >
+        <div class="text-gray-900 font-bold text-lg sm:text-2xl">
+          {openmissionName}
+        </div>
       </div>
     </div>
   </div>
@@ -145,7 +146,7 @@ function getSkillNames(arr) {
       ? 'bg-white'
       : 'bg-gray-200'}  transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 mb-12 flex flex-col justify-between leading-normal"
   >
- <div class="mb-4">
+    <div class="mb-4">
       <p
         style="line-height: 1;"
         class="text-sm sm:text-xl text-gray-600 flex items-center"
@@ -203,9 +204,7 @@ function getSkillNames(arr) {
           {/if}
         </p>
       {/if}
-      <div class="text-gray-900 font-bold md:text-3xl mb-2">
-        {openmissionName}
-      </div>
+
       {#if missionDetails !== ''}
         <RichText outpot={missionDetails} editable={false} trans={true} />{/if}
     </div>
@@ -220,28 +219,28 @@ function getSkillNames(arr) {
       <div class="text-lg sm:text-2xl">
         <p class="text-gray-900 leading-none">{useraplyname}</p>
         <p class="vo ef">
-<span
-  onmouseenter={() => hover(tr.vots.totalin[$lang])}
-  onmouseleave={() => hover('0')}
-  style="color:#7EE081;"
->
-  {noofusersOk}-{tr.vots.inFavor[$lang]}
-</span>
-<span
-  onmouseenter={() => hover(tr.vots.notyet[$lang])}
-  onmouseleave={() => hover('0')}
-  style="color:#0000cc;"
->
-  {noofusersWaiting}-{tr.vots.notyet[$lang]}
-</span>
-<span
-  onmouseenter={() => hover(tr.vots.totalno[$lang])}
-  onmouseleave={() => hover('0')}
-  style="color:#80037e;"
->
-  {noofusersNo}-{tr.vots.against[$lang]}
-</span>
-</p>
+          <span
+            onmouseenter={() => hover(tr.vots.totalin[$lang])}
+            onmouseleave={() => hover('0')}
+            style="color:#7EE081;"
+          >
+            {noofusersOk}-{tr.vots.inFavor[$lang]}
+          </span>
+          <span
+            onmouseenter={() => hover(tr.vots.notyet[$lang])}
+            onmouseleave={() => hover('0')}
+            style="color:#0000cc;"
+          >
+            {noofusersWaiting}-{tr.vots.notyet[$lang]}
+          </span>
+          <span
+            onmouseenter={() => hover(tr.vots.totalno[$lang])}
+            onmouseleave={() => hover('0')}
+            style="color:#80037e;"
+          >
+            {noofusersNo}-{tr.vots.against[$lang]}
+          </span>
+        </p>
       </div>
     </div>
 
@@ -250,19 +249,21 @@ function getSkillNames(arr) {
       {#key skills.data.length + userSkills.data.length}
         {@const required = getSkillNames(skills.data)}
         {@const user = getSkillNames(userSkills.data)}
-        {@const matched = required.filter(s => user.includes(s))}
-        {@const missing = required.filter(s => !user.includes(s))}
-        {@const extra = user.filter(s => !required.includes(s))}
+        {@const matched = required.filter((s) => user.includes(s))}
+        {@const missing = required.filter((s) => !user.includes(s))}
+        {@const extra = user.filter((s) => !required.includes(s))}
         <div class="mt-6">
           <div class="mb-2 font-bold text-barbi text-xl">
             {t.skneed[$lang]}
           </div>
           <div class="mb-2 text-md font-semibold text-gray-700">
-            {tr.common.comparisonHeadline?.[$lang] || ($lang === 'he' ? 'השוואת כישורים' : 'Skills Comparison')}
+            {tr.common.comparisonHeadline?.[$lang] ||
+              ($lang === 'he' ? 'השוואת כישורים' : 'Skills Comparison')}
           </div>
           <div class="border-2 border-barbi rounded-lg p-4 bg-gray-50">
             <div class="mb-2 font-bold text-green-700">
-              {tr.common.matchedSkillsHeadline?.[$lang] || ($lang === 'he' ? 'כישורים תואמים' : 'Matched skills')}
+              {tr.common.matchedSkillsHeadline?.[$lang] ||
+                ($lang === 'he' ? 'כישורים תואמים' : 'Matched skills')}
             </div>
             <div class="flex flex-wrap gap-2">
               {#each matched as skill}
@@ -271,7 +272,8 @@ function getSkillNames(arr) {
             </div>
             {#if missing.length > 0}
               <div class="mt-4 mb-2 font-bold text-red-700">
-                {tr.common.missingSkillsHeadline?.[$lang] || ($lang === 'he' ? 'כישורים חסרים' : 'Missing skills')}
+                {tr.common.missingSkillsHeadline?.[$lang] ||
+                  ($lang === 'he' ? 'כישורים חסרים' : 'Missing skills')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each missing as skill}
@@ -281,7 +283,8 @@ function getSkillNames(arr) {
             {/if}
             {#if extra.length > 0}
               <div class="mt-4 mb-2 font-bold text-blue-700">
-                {tr.common.extraSkillsHeadline?.[$lang] || ($lang === 'he' ? 'כישורים נוספים' : 'Extra skills')}
+                {tr.common.extraSkillsHeadline?.[$lang] ||
+                  ($lang === 'he' ? 'כישורים נוספים' : 'Extra skills')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each extra as skill}
@@ -297,21 +300,33 @@ function getSkillNames(arr) {
     <!-- Role Comparison Section -->
     {#if role?.data && userRole?.data}
       {#key role.data.length + userRole.data.length}
-        {@const requiredRoles = role.data.map(r => r.attributes.roleDescription)}
-        {@const userRoles = userRole.data.map(r => r.attributes.roleDescription)}
-        {@const matchedRoles = requiredRoles.filter(r => userRoles.includes(r))}
-        {@const missingRoles = requiredRoles.filter(r => !userRoles.includes(r))}
-        {@const extraRoles = userRoles.filter(r => !requiredRoles.includes(r))}
+        {@const requiredRoles = role.data.map(
+          (r) => r.attributes.roleDescription
+        )}
+        {@const userRoles = userRole.data.map(
+          (r) => r.attributes.roleDescription
+        )}
+        {@const matchedRoles = requiredRoles.filter((r) =>
+          userRoles.includes(r)
+        )}
+        {@const missingRoles = requiredRoles.filter(
+          (r) => !userRoles.includes(r)
+        )}
+        {@const extraRoles = userRoles.filter(
+          (r) => !requiredRoles.includes(r)
+        )}
         <div class="mt-6">
           <div class="mb-2 font-bold text-barbi text-xl">
             {t.rneed[$lang]}
           </div>
           <div class="mb-2 text-md font-semibold text-gray-700">
-            {tr.common.roleComparisonHeadline?.[$lang] || ($lang === 'he' ? 'השוואת תפקידים' : 'Role Comparison')}
+            {tr.common.roleComparisonHeadline?.[$lang] ||
+              ($lang === 'he' ? 'השוואת תפקידים' : 'Role Comparison')}
           </div>
           <div class="border-2 border-barbi rounded-lg p-4 bg-gray-50">
             <div class="mb-2 font-bold text-green-700">
-              {tr.common.matchedRolesHeadline?.[$lang] || ($lang === 'he' ? 'תפקידים תואמים' : 'Matched roles')}
+              {tr.common.matchedRolesHeadline?.[$lang] ||
+                ($lang === 'he' ? 'תפקידים תואמים' : 'Matched roles')}
             </div>
             <div class="flex flex-wrap gap-2">
               {#each matchedRoles as roleDesc}
@@ -320,7 +335,8 @@ function getSkillNames(arr) {
             </div>
             {#if missingRoles.length > 0}
               <div class="mt-4 mb-2 font-bold text-red-700">
-                {tr.common.missingRolesHeadline?.[$lang] || ($lang === 'he' ? 'תפקידים חסרים' : 'Missing roles')}
+                {tr.common.missingRolesHeadline?.[$lang] ||
+                  ($lang === 'he' ? 'תפקידים חסרים' : 'Missing roles')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each missingRoles as roleDesc}
@@ -330,7 +346,8 @@ function getSkillNames(arr) {
             {/if}
             {#if extraRoles.length > 0}
               <div class="mt-4 mb-2 font-bold text-blue-700">
-                {tr.common.extraRolesHeadline?.[$lang] || ($lang === 'he' ? 'תפקידים נוספים' : 'Extra roles')}
+                {tr.common.extraRolesHeadline?.[$lang] ||
+                  ($lang === 'he' ? 'תפקידים נוספים' : 'Extra roles')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each extraRoles as roleDesc}
@@ -346,21 +363,27 @@ function getSkillNames(arr) {
     <!-- Workway Comparison Section -->
     {#if workways?.data && userWorkway?.data}
       {#key workways.data.length + userWorkway.data.length}
-        {@const requiredWays = workways.data.map(w => w.attributes.workWayName)}
-        {@const userWays = userWorkway.data.map(w => w.attributes.workWayName)}
-        {@const matchedWays = requiredWays.filter(w => userWays.includes(w))}
-        {@const missingWays = requiredWays.filter(w => !userWays.includes(w))}
-        {@const extraWays = userWays.filter(w => !requiredWays.includes(w))}
+        {@const requiredWays = workways.data.map(
+          (w) => w.attributes.workWayName
+        )}
+        {@const userWays = userWorkway.data.map(
+          (w) => w.attributes.workWayName
+        )}
+        {@const matchedWays = requiredWays.filter((w) => userWays.includes(w))}
+        {@const missingWays = requiredWays.filter((w) => !userWays.includes(w))}
+        {@const extraWays = userWays.filter((w) => !requiredWays.includes(w))}
         <div class="mt-6">
           <div class="mb-2 font-bold text-barbi text-xl">
             {t.wwneed[$lang]}
           </div>
           <div class="mb-2 text-md font-semibold text-gray-700">
-            {tr.common.workwayComparisonHeadline?.[$lang] || ($lang === 'he' ? 'השוואת דרכי עבודה' : 'Workway Comparison')}
+            {tr.common.workwayComparisonHeadline?.[$lang] ||
+              ($lang === 'he' ? 'השוואת דרכי עבודה' : 'Workway Comparison')}
           </div>
           <div class="border-2 border-barbi rounded-lg p-4 bg-gray-50">
             <div class="mb-2 font-bold text-green-700">
-              {tr.common.matchedWaysHeadline?.[$lang] || ($lang === 'he' ? 'דרכי עבודה תואמות' : 'Matched workways')}
+              {tr.common.matchedWaysHeadline?.[$lang] ||
+                ($lang === 'he' ? 'דרכי עבודה תואמות' : 'Matched workways')}
             </div>
             <div class="flex flex-wrap gap-2">
               {#each matchedWays as wayName}
@@ -369,7 +392,8 @@ function getSkillNames(arr) {
             </div>
             {#if missingWays.length > 0}
               <div class="mt-4 mb-2 font-bold text-red-700">
-                {tr.common.missingWaysHeadline?.[$lang] || ($lang === 'he' ? 'דרכי עבודה חסרות' : 'Missing workways')}
+                {tr.common.missingWaysHeadline?.[$lang] ||
+                  ($lang === 'he' ? 'דרכי עבודה חסרות' : 'Missing workways')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each missingWays as wayName}
@@ -379,7 +403,8 @@ function getSkillNames(arr) {
             {/if}
             {#if extraWays.length > 0}
               <div class="mt-4 mb-2 font-bold text-blue-700">
-                {tr.common.extraWaysHeadline?.[$lang] || ($lang === 'he' ? 'דרכי עבודה נוספות' : 'Extra workways')}
+                {tr.common.extraWaysHeadline?.[$lang] ||
+                  ($lang === 'he' ? 'דרכי עבודה נוספות' : 'Extra workways')}
               </div>
               <div class="flex flex-wrap gap-2">
                 {#each extraWays as wayName}
@@ -404,7 +429,7 @@ function getSkillNames(arr) {
       >
         <Lev />
       </button>
-        <button
+      <button
         aria-label={tr?.common.nego[$lang]}
         onmouseenter={() => hover(tr?.common.nego[$lang])}
         onmouseleave={() => hover('0')}

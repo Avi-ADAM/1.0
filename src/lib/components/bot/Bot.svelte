@@ -85,7 +85,7 @@
 
 <div
   dir={$locale == 'he' || $locale == 'ar' ? 'rtl' : 'ltr'}
-  class="fixed bottom-12 {$locale !== 'he' && $locale !== 'ar'
+  class="fixed bottom-12 {$locale == 'he' || $locale == 'ar'
     ? 'left-4'
     : 'right-4'} z-50"
 >
@@ -103,7 +103,7 @@
     <div
       in:fly={{ y: 20, duration: 300 }}
       out:fly={{ y: 20, duration: 300 }}
-      class="absolute bottom-20 {$locale !== 'he' && $locale !== 'ar'
+      class="absolute bottom-20 {$locale == 'he' || $locale == 'ar'
         ? 'left-3'
         : 'right-3'} w-80 h-96 bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
     >

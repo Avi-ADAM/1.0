@@ -147,9 +147,9 @@ let totali = $derived({"he":`${iskvua == true ? "שעות חודשיות":"שע�
          </div>
          <div class="flex flex-col leading-tight ml-4">
             <div class=" text-md mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-3xl text-sm">{hed[$lang]}</span>
+               <span class="text-barbi text-center mr-3 sm:text-3xl text-xl">{hed[$lang]}</span>
             </div>
-            <span style=" text-shadow: 1px 1px white;" class=" ml-1 sm:text-2xl text-sm text-barbi ">{missionName}</span>
+            <span style=" text-shadow: 1px 1px white;" class=" ml-1 sm:text-2xl text-md text-barbi ">{missionName}</span>
          </div>
          </div>
          {#key isVisible}
