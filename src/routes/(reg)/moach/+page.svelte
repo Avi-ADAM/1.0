@@ -2532,7 +2532,7 @@ pointer-events: none;"
 
       {#each projects as data, i}
         <button
-          class="md:text-xl border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-2xl shadow-fuchsia-400 shadow"
+          class="md:text-xl border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-md shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400"
           onclick={() => projectn(data.id)}
         >
           {data.attributes.projectName}

@@ -143,7 +143,7 @@ function getSkillNames(arr) {
   <div
     class="{isScrolable.value
       ? 'bg-white'
-      : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 mb-12 flex flex-col justify-between leading-normal"
+      : 'bg-gray-200'}  transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 mb-12 flex flex-col justify-between leading-normal"
   >
  <div class="mb-4">
       <p
