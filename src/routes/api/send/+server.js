@@ -50,7 +50,19 @@ export async function POST({ request, cookies }) {
 		}
 
 		if (newd.errors) {
-			// Handle GraphQL errors by throwing the first error message.
+			// Check for authentication errors
+			const authError = newd.errors.find(err => 
+				err.message === 'Invalid token.' || 
+				err.extensions?.code === 'UNAUTHENTICATED' ||
+				err.message.includes('401') ||
+				err.message.includes('Unauthorized')
+			);
+			
+			if (authError) {
+				throw error(401, authError.message);
+			}
+			
+			// Handle other GraphQL errors by throwing the first error message.
 			throw error(500, newd.errors[0].message);
 		}
 		
