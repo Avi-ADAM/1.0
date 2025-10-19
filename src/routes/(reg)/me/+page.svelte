@@ -905,13 +905,82 @@
     {innerText}
     {innerDialogButton}
     {clearButton}
-    onSaveTimer={() => {
+    onSaveTimer={async () => {
       showSaveDialog = false;
+      
+      // Update server to mark guide as not viewed (so it can show again)
+      try {
+        const cookieValue = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('jwt='))
+          ?.split('=')[1];
+        
+        if (cookieValue) {
+          const bearer1 = 'bearer' + ' ' + cookieValue;
+          await fetch(`${baseUrl}/graphql`, {
+            method: 'POST',
+            headers: {
+              Authorization: bearer1,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              query: `mutation { 
+                updateUsersPermissionsUser(
+                  id: ${parseInt(idL)}, 
+                  data: { profilManualAlready: false }
+                ) { 
+                  data { id } 
+                } 
+              }`
+            })
+          });
+          
+          // Set cookie to show guide
+          document.cookie = `guidMe=again; expires=${new Date(2026, 0, 1).toUTCString()}; path=/`;
+        }
+      } catch (e) {
+        console.error('Failed to update guide status:', e);
+      }
+      
       run();
     }}
-    onClearTimer={() => {
+    onClearTimer={async () => {
       showSaveDialog = false;
       isG = true; // Mark as viewed without showing
+      
+      // Update server to mark guide as viewed
+      try {
+        const cookieValue = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('jwt='))
+          ?.split('=')[1];
+        
+        if (cookieValue) {
+          const bearer1 = 'bearer' + ' ' + cookieValue;
+          await fetch(`${baseUrl}/graphql`, {
+            method: 'POST',
+            headers: {
+              Authorization: bearer1,
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              query: `mutation { 
+                updateUsersPermissionsUser(
+                  id: ${parseInt(idL)}, 
+                  data: { profilManualAlready: true }
+                ) { 
+                  data { id } 
+                } 
+              }`
+            })
+          });
+          
+          // Also set cookie to remember choice
+          document.cookie = `guidMe=done; expires=${new Date(2026, 0, 1).toUTCString()}; path=/`;
+        }
+      } catch (e) {
+        console.error('Failed to update guide status:', e);
+      }
     }}
   />
   <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
@@ -935,7 +1004,8 @@
             <EditB
               machshirs={meData?.machshirs.data}
               projectIds={meData.projects_1s.data.map((c) => c.id)}
-              bind:isGuidMe={isG}
+              isGuidMe={!isG}
+              onGuidMeChange={(value) => isG = !value}
               checked={cards}
               lango={$lang}
               uid={meDataa.data.me.id}
