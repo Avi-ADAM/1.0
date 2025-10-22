@@ -2,9 +2,10 @@
   //טבלת מתנות כפתור מכירה מקפיץ תפריט של איפה הכסף יושב
   import Col from './column/main.svelte';
   import New from './newmatana.svelte';
-  import Sale from './sale.svelte';
+  import { SaleComponent } from '$lib/components/sales';
   import dayjs from 'dayjs';
   import { lang } from '$lib/stores/lang.js';
+  import { idPr } from '$lib/stores/idPr.js';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly } from 'svelte/transition';
   import Halu from './whowhat.svelte';
@@ -204,14 +205,16 @@
           onclick={closer}>{cencel[$lang]}</button
         >
         {#if a == 0}
-          <Sale
-            {projectUsers}
-            {each}
-            {quant}
-            {kindUlimit}
-            {maid}
+          <SaleComponent
+            productId={maid}
+            productName=""
+            availableQuantity={quant}
+            price={each}
             {kindOf}
-            onDoner={closer}
+            projectId={$idPr}
+            {projectUsers}
+            {kindUlimit}
+            onDoners={closer}
             onDone={sale}
             onError={() => (a = 3)}
           />
@@ -275,13 +278,13 @@
               <th>{quanti[$lang]}</th>
               {#each bmiData as data, i}
                 <td>
-                  {#if data.attributes.quant > 0}
+                  {#if data.attributes.quant > 0 || data.attributes.quant === -1}
                     <p
                       style="display:{data.attributes.kindOf == 'unlimited'
                         ? 'none'
                         : ''} ;"
                     >
-                      {data.attributes.quant}
+                      {data.attributes.quant === -1 ? ($lang === 'he' ? 'ללא הגבלה' : 'Unlimited') : data.attributes.quant}
                     </p>
                   {/if}
                 </td>

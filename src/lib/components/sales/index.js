@@ -1,0 +1,1 @@
+export { default as SaleComponent } from './SaleComponent.svelte';

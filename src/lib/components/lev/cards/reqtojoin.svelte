@@ -461,6 +461,3 @@
     <Lowbtn isCart="true" />
   {/if}
 </div>
-
-<style>
-</style>
