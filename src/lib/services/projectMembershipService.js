@@ -26,7 +26,9 @@ import { storageUtils } from '../utils/salesUtils.js';
 
 export class ProjectMembershipService {
   constructor() {
-    this.baseUrl = (typeof import.meta !== 'undefined' && import.meta.env?.VITE_URL) || 'http://localhost:1337';
+    this.baseUrl =
+      (typeof import.meta !== 'undefined' && import.meta.env?.VITE_URL) ||
+      'http://localhost:1337';
     this.graphqlEndpoint = `${this.baseUrl}/graphql`;
     this.cachePrefix = 'project_membership_';
     this.defaultCacheTTL = 15; // 15 minutes default cache
@@ -49,7 +51,7 @@ export class ProjectMembershipService {
     } = options;
 
     const cacheKey = `${this.cachePrefix}${userId}_${projectId}`;
-    
+
     try {
       // Check cache first if enabled
       if (useCache) {
@@ -65,85 +67,20 @@ export class ProjectMembershipService {
         }
       }
 
-      // Get authentication data
-      const authData = authUtils.getAuthData();
-      if (!authData) {
-        throw new Error('Authentication required');
-      }
+      // Use sendToSer for GraphQL query
+      const { sendToSer } = await import('../send/sendToSer.js');
 
-      // Build GraphQL query
-      const query = `
-        query {
-          usersPermissionsUser(id: ${userId}) {
-            data {
-              attributes {
-                projectcreates(filters: { id: { eq: ${projectId} } }) {
-                  data {
-                    id
-                    ${includeProjectInfo ? `
-                    attributes {
-                      projectName
-                      profilePic {
-                        data {
-                          attributes {
-                            url
-                          }
-                        }
-                      }
-                    }
-                    ` : ''}
-                  }
-                }
-                projectmembers(filters: { projectcreate: { id: { eq: ${projectId} } } }) {
-                  data {
-                    id
-                    attributes {
-                      projectcreate {
-                        data {
-                          id
-                          ${includeProjectInfo ? `
-                          attributes {
-                            projectName
-                            profilePic {
-                              data {
-                                attributes {
-                                  url
-                                }
-                              }
-                            }
-                          }
-                          ` : ''}
-                        }
-                      }
-                      ${includeProjectInfo ? `
-                      createdAt
-                      ` : ''}
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
+      const result = await sendToSer(
+        { uid: userId, projectId: projectId },
+        '65checkProjectMembership',
+        0,
+        0,
+        false,
+        fetch
+      );
 
-      const response = await fetch(this.graphqlEndpoint, {
-        method: 'POST',
-        headers: {
-          'Authorization': authData.bearer,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-
-      if (result.errors) {
-        throw new Error(result.errors[0]?.message || 'GraphQL query failed');
+      if (!result || result.errors) {
+        throw new Error(result?.errors?.[0]?.message || 'GraphQL query failed');
       }
 
       const userData = result.data?.usersPermissionsUser?.data?.attributes;
@@ -151,42 +88,28 @@ export class ProjectMembershipService {
         throw new Error('User data not found');
       }
 
-      // Check if user is project creator
-      const createdProjects = userData.projectcreates?.data || [];
-      const isCreator = createdProjects.length > 0;
-
-      // Check if user is project member
-      const memberProjects = userData.projectmembers?.data || [];
-      const isMember = memberProjects.length > 0;
+      // Check if user has access to this project
+      const userProjects = userData.projects_1s?.data || [];
+      const isMember = userProjects.length > 0;
 
       // Determine membership type and get project info
       let membershipType = 'none';
       let projectInfo = null;
 
-      if (isCreator) {
-        membershipType = 'creator';
-        if (includeProjectInfo && createdProjects[0]?.attributes) {
+      if (isMember) {
+        membershipType = 'member'; // For now, we'll treat all as members since we can't distinguish creator vs member with projects_1s
+        if (includeProjectInfo && userProjects[0]?.attributes) {
           projectInfo = {
             id: projectId,
-            name: createdProjects[0].attributes.projectName,
-            profilePic: createdProjects[0].attributes.profilePic
-          };
-        }
-      } else if (isMember) {
-        membershipType = 'member';
-        if (includeProjectInfo && memberProjects[0]?.attributes?.projectcreate?.data?.attributes) {
-          const projectData = memberProjects[0].attributes.projectcreate.data;
-          projectInfo = {
-            id: projectId,
-            name: projectData.attributes.projectName,
-            profilePic: projectData.attributes.profilePic,
-            joinedAt: memberProjects[0].attributes.createdAt
+            name: userProjects[0].attributes.projectName,
+            profilePic: userProjects[0].attributes.profilePic,
+            joinedAt: userProjects[0].attributes.createdAt
           };
         }
       }
 
       const membershipResult = {
-        isMember: isCreator || isMember,
+        isMember,
         membershipType,
         projectInfo
       };
@@ -201,7 +124,6 @@ export class ProjectMembershipService {
         ...membershipResult,
         fromCache: false
       };
-
     } catch (error) {
       console.error('Project membership check failed:', error);
 
@@ -240,17 +162,17 @@ export class ProjectMembershipService {
     } = options;
 
     const cacheKey = `${this.cachePrefix}user_projects_${userId}`;
-    
+
     try {
       // Check cache first
       if (useCache) {
         const cached = storageUtils.getWithExpiry(cacheKey);
         if (cached) {
           // Filter by membership types if specified
-          const filteredProjects = cached.projects.filter(project => 
+          const filteredProjects = cached.projects.filter((project) =>
             membershipTypes.includes(project.membershipType)
           );
-          
+
           return {
             success: true,
             data: {
@@ -263,79 +185,22 @@ export class ProjectMembershipService {
         }
       }
 
-      // Get authentication data
-      const authData = authUtils.getAuthData();
-      if (!authData) {
-        throw new Error('Authentication required');
-      }
+      // Use sendToSer for GraphQL query
+      const { sendToSer } = await import('../send/sendToSer.js');
 
-      const query = `
-        query {
-          usersPermissionsUser(id: ${userId}) {
-            data {
-              attributes {
-                projectcreates {
-                  data {
-                    id
-                    attributes {
-                      projectName
-                      profilePic {
-                        data {
-                          attributes {
-                            url
-                          }
-                        }
-                      }
-                      createdAt
-                    }
-                  }
-                }
-                projectmembers {
-                  data {
-                    id
-                    attributes {
-                      createdAt
-                      projectcreate {
-                        data {
-                          id
-                          attributes {
-                            projectName
-                            profilePic {
-                              data {
-                                attributes {
-                                  url
-                                }
-                              }
-                            }
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      `;
+      const result = await sendToSer(
+        { uid: userId },
+        '64getUserProjectList',
+        0,
+        0,
+        false,
+        fetch
+      );
 
-      const response = await fetch(this.graphqlEndpoint, {
-        method: 'POST',
-        headers: {
-          'Authorization': authData.bearer,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({ query })
-      });
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${response.statusText}`);
-      }
-
-      const result = await response.json();
-
-      if (result.errors) {
-        throw new Error(result.errors[0]?.message || 'Failed to fetch user projects');
+      if (!result || result.errors) {
+        throw new Error(
+          result?.errors?.[0]?.message || 'Failed to fetch user projects'
+        );
       }
 
       const userData = result.data?.usersPermissionsUser?.data?.attributes;
@@ -343,57 +208,31 @@ export class ProjectMembershipService {
         throw new Error('User data not found');
       }
 
-      // Process created projects
-      const createdProjects = (userData.projectcreates?.data || []).map(project => ({
+      // Process user projects
+      const allProjects = (userData.projects_1s?.data || []).map((project) => ({
         projectId: project.id,
         projectName: project.attributes.projectName,
-        membershipType: 'creator',
+        membershipType: 'member', // Using 'member' as default since we can't distinguish creator vs member with projects_1s
         joinedAt: project.attributes.createdAt,
-        projectInfo: includeProjectInfo ? {
-          id: project.id,
-          name: project.attributes.projectName,
-          profilePic: project.attributes.profilePic
-        } : null
+        projectInfo: includeProjectInfo
+          ? {
+              id: project.id,
+              name: project.attributes.projectName,
+              profilePic: project.attributes.profilePic
+            }
+          : null
       }));
 
-      // Process member projects
-      const memberProjects = (userData.projectmembers?.data || [])
-        .filter(member => member.attributes?.projectcreate?.data)
-        .map(member => {
-          const projectData = member.attributes.projectcreate.data;
-          return {
-            projectId: projectData.id,
-            projectName: projectData.attributes.projectName,
-            membershipType: 'member',
-            joinedAt: member.attributes.createdAt,
-            projectInfo: includeProjectInfo ? {
-              id: projectData.id,
-              name: projectData.attributes.projectName,
-              profilePic: projectData.attributes.profilePic
-            } : null
-          };
-        });
-
-      // Combine and deduplicate projects
-      const allProjects = [...createdProjects];
-      memberProjects.forEach(memberProject => {
-        // Check if user is already listed as creator for this project
-        const existingProject = allProjects.find(p => p.projectId === memberProject.projectId);
-        if (!existingProject) {
-          allProjects.push(memberProject);
-        }
-      });
-
       // Filter by membership types
-      const filteredProjects = allProjects.filter(project => 
+      const filteredProjects = allProjects.filter((project) =>
         membershipTypes.includes(project.membershipType)
       );
 
       const resultData = {
         projects: filteredProjects,
         totalProjects: filteredProjects.length,
-        createdProjects: createdProjects.length,
-        memberProjects: memberProjects.length,
+        createdProjects: 0, // Can't distinguish with projects_1s
+        memberProjects: allProjects.length,
         fetchedAt: new Date().toISOString()
       };
 
@@ -402,8 +241,8 @@ export class ProjectMembershipService {
         const cacheData = {
           projects: allProjects,
           totalProjects: allProjects.length,
-          createdProjects: createdProjects.length,
-          memberProjects: memberProjects.length,
+          createdProjects: 0, // Can't distinguish with projects_1s
+          memberProjects: allProjects.length,
           fetchedAt: new Date().toISOString()
         };
         storageUtils.setWithExpiry(cacheKey, cacheData, cacheTTL);
@@ -414,10 +253,9 @@ export class ProjectMembershipService {
         data: resultData,
         fromCache: false
       };
-
     } catch (error) {
       console.error('Failed to fetch user project memberships:', error);
-      
+
       return {
         success: false,
         error: error.message,
@@ -453,12 +291,12 @@ export class ProjectMembershipService {
       }
 
       const userProjects = userProjectsResult.data.projects;
-      const userProjectIds = new Set(userProjects.map(p => p.projectId));
+      const userProjectIds = new Set(userProjects.map((p) => p.projectId));
 
       // Create results for each requested project
-      const results = projectIds.map(projectId => {
-        const userProject = userProjects.find(p => p.projectId === projectId);
-        
+      const results = projectIds.map((projectId) => {
+        const userProject = userProjects.find((p) => p.projectId === projectId);
+
         if (userProject) {
           return {
             projectId,
@@ -482,7 +320,7 @@ export class ProjectMembershipService {
 
       // Cache individual results for future single checks
       if (useCache) {
-        results.forEach(result => {
+        results.forEach((result) => {
           const cacheKey = `${this.cachePrefix}${userId}_${result.projectId}`;
           const cacheData = {
             isMember: result.isMember,
@@ -498,15 +336,14 @@ export class ProjectMembershipService {
         data: {
           results,
           totalChecked: projectIds.length,
-          memberCount: results.filter(r => r.isMember).length,
+          memberCount: results.filter((r) => r.isMember).length,
           checkedAt: new Date().toISOString()
         },
         fromCache: userProjectsResult.fromCache
       };
-
     } catch (error) {
       console.error('Batch membership check failed:', error);
-      
+
       return {
         success: false,
         error: error.message,
@@ -530,10 +367,10 @@ export class ProjectMembershipService {
         // Clear all membership cache for user
         const userProjectsKey = `${this.cachePrefix}user_projects_${userId}`;
         storageUtils.remove(userProjectsKey);
-        
+
         // Clear individual project caches (this is a bit brute force)
         const keys = Object.keys(localStorage);
-        keys.forEach(key => {
+        keys.forEach((key) => {
           if (key.startsWith(`sales_cache_${this.cachePrefix}${userId}_`)) {
             localStorage.removeItem(key);
           }
@@ -552,11 +389,11 @@ export class ProjectMembershipService {
    */
   async refreshMembershipData(userId, options = {}) {
     const { includeProjectInfo = true } = options;
-    
+
     try {
       // Clear cache first
       this.invalidateMembershipCache(userId);
-      
+
       // Fetch fresh data
       return await this.getUserProjectMemberships(userId, {
         useCache: false, // Force fresh fetch
@@ -564,7 +401,7 @@ export class ProjectMembershipService {
       });
     } catch (error) {
       console.error('Failed to refresh membership data:', error);
-      
+
       return {
         success: false,
         error: error.message,
@@ -576,7 +413,7 @@ export class ProjectMembershipService {
   /**
    * Utility methods
    */
-  
+
   /**
    * Checks if an error is retryable
    * @param {Error} error - Error to check
@@ -584,17 +421,22 @@ export class ProjectMembershipService {
    */
   isRetryableError(error) {
     if (!error) return false;
-    
+
     const message = error.message?.toLowerCase() || '';
-    
+
     // Network errors are retryable
     if (message.includes('fetch') || message.includes('network')) return true;
     if (message.includes('timeout')) return true;
     if (message.includes('connection')) return true;
-    
+
     // Server errors (5xx) are retryable
-    if (message.includes('500') || message.includes('502') || message.includes('503')) return true;
-    
+    if (
+      message.includes('500') ||
+      message.includes('502') ||
+      message.includes('503')
+    )
+      return true;
+
     return false;
   }
 
@@ -604,7 +446,7 @@ export class ProjectMembershipService {
    * @returns {Promise} Promise that resolves after delay
    */
   delay(ms) {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**
@@ -649,28 +491,34 @@ export class ProjectMembershipService {
 export const projectMembershipService = new ProjectMembershipService();
 
 // Export utility functions for direct use
-export const checkProjectMembership = (userId, projectId, options) => 
+export const checkProjectMembership = (userId, projectId, options) =>
   projectMembershipService.checkProjectMembership(userId, projectId, options);
 
-export const getUserProjectMemberships = (userId, options) => 
+export const getUserProjectMemberships = (userId, options) =>
   projectMembershipService.getUserProjectMemberships(userId, options);
 
-export const batchCheckMembership = (userId, projectIds, options) => 
+export const batchCheckMembership = (userId, projectIds, options) =>
   projectMembershipService.batchCheckMembership(userId, projectIds, options);
 
-export const invalidateMembershipCache = (userId, projectId) => 
+export const invalidateMembershipCache = (userId, projectId) =>
   projectMembershipService.invalidateMembershipCache(userId, projectId);
 
-export const refreshMembershipData = (userId, options) => 
+export const refreshMembershipData = (userId, options) =>
   projectMembershipService.refreshMembershipData(userId, options);
 
 // Export convenience functions that match the existing authUtils API
 export const isProjectMember = async (userId, projectId) => {
-  const result = await projectMembershipService.checkProjectMembership(userId, projectId);
+  const result = await projectMembershipService.checkProjectMembership(
+    userId,
+    projectId
+  );
   return result.success && result.isMember;
 };
 
 export const getProjectMembershipType = async (userId, projectId) => {
-  const result = await projectMembershipService.checkProjectMembership(userId, projectId);
+  const result = await projectMembershipService.checkProjectMembership(
+    userId,
+    projectId
+  );
   return result.success ? result.membershipType : 'none';
 };

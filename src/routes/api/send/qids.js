@@ -913,5 +913,30 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
+  }`,
+  
+  "65checkProjectMembership": `query CheckProjectMembership($uid: ID!, $projectId: ID!) {
+    usersPermissionsUser(id: $uid) {
+      data {
+        attributes {
+          projects_1s(filters: { id: { eq: $projectId } }) {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic {
+                  data {
+                    attributes {
+                      url
+                    }
+                  }
+                }
+                createdAt
+              }
+            }
+          }
+        }
+      }
+    }
   }`
 }; 

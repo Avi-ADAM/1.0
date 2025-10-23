@@ -6,10 +6,21 @@
   import Share from '$lib/components/share/shareButtons/index.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { goto } from '$app/navigation';
+  import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
+  import { projectMembershipService } from '$lib/services/projectMembershipService.js';
+  import { salesService } from '$lib/services/salesService.js';
+  import { getCurrentUserId } from '$lib/utils/authUtils.js';
+  import { toast } from 'svelte-sonner';
   //import MissionCard from '$lib/components/cards/missionCard.svelte';
 
   let { data } = $props();
   let showOpen = $state(false);
+  let showSaleInterface = $state(false);
+  let isMember = $state(false);
+  let membershipType = $state('none');
+  let projectUsers = $state([]);
+  let isLoadingMembership = $state(false);
+  let currentQuantity = $state(data.alld?.quant || 0);
 
   const headi = { he: 'מתנה', en: 'Gift' };
   const seePr = { he: 'לצפיה בריקמה', en: 'See project' };
@@ -24,6 +35,10 @@
   const registratio = { "he": "להרשמה", "en": "To Registration"} 
   const logi = { "he": "להתחברות", "en":"To Login"}
   const left = { he: 'נותרו', en: 'left' };
+  const reportSale = { he: 'דיווח מכירה', en: 'Report Sale' };
+  const hideSaleReport = { he: 'הסתר דיווח מכירה', en: 'Hide Sale Report' };
+  const saleReported = { he: 'מכירה דווחה בהצלחה', en: 'Sale reported successfully' };
+  const saleError = { he: 'שגיאה בדיווח המכירה', en: 'Error reporting sale' };
 
   function project(x) {
     goto('/project/' + x);
@@ -33,6 +48,82 @@
     // Placeholder for buy logic
     console.log('Buy flow TBD for gift ID:', page.data.mId);
     // We can add navigation to a checkout page or open a payment modal here.
+  }
+
+  function toggleSaleInterface() {
+    showSaleInterface = !showSaleInterface;
+  }
+
+  function handleSaleSuccess(saleResult) {
+    // Update the current quantity display
+    if (saleResult.un !== undefined) {
+      currentQuantity = saleResult.un;
+    }
+    
+    // Show success message
+    toast.success(saleReported[$lang]);
+    
+    // Hide the sale interface
+    showSaleInterface = false;
+  }
+
+  function handleSaleError(error) {
+    console.error('Sale error:', error);
+    toast.error(error || saleError[$lang]);
+  }
+
+  async function checkProjectMembership() {
+    if (!data.tok || !data.alld?.projectcreates?.data?.[0]?.id) {
+      return;
+    }
+
+    const userId = getCurrentUserId();
+    const projectId = data.alld.projectcreates.data[0].id;
+
+    if (!userId || !projectId) {
+      return;
+    }
+
+    isLoadingMembership = true;
+
+    try {
+      // Check if user is a member of this project
+      const membershipResult = await projectMembershipService.checkProjectMembership(
+        userId, 
+        projectId, 
+        { includeProjectInfo: true }
+      );
+      console.log(membershipResult)
+      if (membershipResult.success) {
+        isMember = membershipResult.isMember;
+        membershipType = membershipResult.membershipType;
+
+        // If user is a member, get project users for the sale component
+        if (isMember) {
+          // Get auth data to get the token
+          const authData = getCurrentUserId();
+          if (authData) {
+            // Get token from cookies for the service call
+            const jwtCookie = document.cookie
+              .split('; ')
+              .find(row => row.startsWith('jwt='));
+            
+            if (jwtCookie) {
+              const token = jwtCookie.split('=')[1];
+              const projectResult = await salesService.getProjectProducts(projectId, token);
+
+              if (projectResult.success) {
+                projectUsers = projectResult.data.project.users;
+              }
+            }
+          }
+        }
+      }
+    } catch (error) {
+      console.error('Error checking project membership:', error);
+    } finally {
+      isLoadingMembership = false;
+    }
   }
   
   function reg (){
@@ -52,7 +143,13 @@
   let description = data.alld?.desc || headi[$lang];
   let url = page.url.toString();
   $effect(() => {
-    console.log(data.alld)
+    console.log(data.alld);
+    // Update current quantity when data changes
+    if (data.alld?.quant !== undefined) {
+      currentQuantity = data.alld.quant;
+    }
+    // Check project membership when data is loaded
+    checkProjectMembership();
   })
 </script>
 
@@ -134,19 +231,48 @@
           <div class="mt-6 flex items-center gap-4 {$lang === 'he' ? 'flex-row-reverse' : ''}">
             <button
               class="px-6 py-3 text-xl font-bold border-2 border-gold bg-gradient-to-br from-barbi to-mpink text-gold hover:border-barbi rounded"
-              disabled={data.alld.archived === true || (data.alld.quant !== -1 && data.alld.quant <= 0)}
+              disabled={data.alld.archived === true || (currentQuantity !== -1 && currentQuantity <= 0)}
               onclick={handleBuyNow}
             >
-              {#if data.alld.archived === true || (data.alld.quant !== -1 && data.alld.quant <= 0)}
+              {#if data.alld.archived === true || (currentQuantity !== -1 && currentQuantity <= 0)}
                 {notAvailable[$lang]}
               {:else}
                 {buyNow[$lang]}
               {/if}
             </button>
-            {#if data.alld.quant != null}
-              <span class="text-gray-300">{data.alld.quant === -1 ? unlimited[$lang] : `${data.alld.quant} ${left[$lang]}`}</span>
+            {#if currentQuantity != null}
+              <span class="text-gray-300">{currentQuantity === -1 ? unlimited[$lang] : `${currentQuantity} ${left[$lang]}`}</span>
             {/if}
           </div>
+
+          <!-- Sale Reporting Interface for Project Members -->
+          {#if isMember && !isLoadingMembership}
+            <div class="mt-4">
+              <button
+                class="px-4 py-2 text-lg font-bold border-2 border-barbi bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold rounded"
+                onclick={toggleSaleInterface}
+              >
+                {showSaleInterface ? hideSaleReport[$lang] : reportSale[$lang]}
+              </button>
+              
+              {#if showSaleInterface}
+                <div class="mt-4 p-4 border-2 border-barbi rounded bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre">
+                  <h3 class="text-barbi font-bold text-lg mb-4">{reportSale[$lang]} - {data.alld.name}</h3>
+                  <SaleComponent
+                    productId={data.mId}
+                    productName={data.alld.name}
+                    availableQuantity={currentQuantity}
+                    price={data.alld.price || 0}
+                    kindOf={data.alld.kindOf || 'total'}
+                    projectId={data.alld.projectcreates.data[0].id}
+                    {projectUsers}
+                    onDone={handleSaleSuccess}
+                    onError={handleSaleError}
+                  />
+                </div>
+              {/if}
+            </div>
+          {/if}
         {:else}
           <div class="flex justify-center">
             <div class="mx-8 mt-7 text-barbi hover:text-black button-perl">
