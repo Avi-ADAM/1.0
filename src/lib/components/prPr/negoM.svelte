@@ -1,5 +1,5 @@
 <script>
- import { role, ww, skil } from '$lib/components/prPr/mi.js';
+  import { role, ww, skil } from '$lib/components/prPr/mi.js';
   import { onMount } from 'svelte';
   import { lang } from '$lib/stores/lang';
   import tr from '$lib/translations/tr.json';
@@ -11,6 +11,8 @@
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
+  import ActsNego from '../conf/actsNego.svelte';
+  import { crTask } from '$lib/func/moach/crtask.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -48,6 +50,7 @@
    * @property {number} [ordern]
    * @property {boolean} [masaalr]
    * @property {any} restime
+   * @property {any} [acts]
    */
 
   /** @type {Props} */
@@ -87,33 +90,39 @@
     ordern = 0,
     masaalr = false,
     restime,
+    acts = [],
     onClose,
     onLoad
   } = $props();
-
+  $inspect(acts);
   let datai = $state([]);
-  
+
   $effect(() => {
-    if(negopendmissions.length > 0){
-    datai = [
-      {
-        leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
-        value: noofhours2 * perhour2
-      },
-      {
-        leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
-        value: noofhours * perhour
+    if (negopendmissions.length > 0) {
+      datai = [
+        {
+          leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
+          value: noofhours2 * perhour2
+        },
+        {
+          leb: `${tri?.nego?.original[$lang]},${noofhours * perhour}`,
+          value: noofhours * perhour
+        }
+      ];
+      for (let i = 0; i < negopendmissions.length; i++) {
+        if (
+          negopendmissions[i].attributes.perhour != null ||
+          negopendmissions[i].attributes.noofhours != null
+        ) {
+          datai.push({
+            leb: `${tri?.nego?.oldno[$lang]}-${i + 1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
+            value:
+              (negopendmissions[i].attributes.noofhours ?? noofhours) *
+              (negopendmissions[i].attributes.perhour ?? perhour)
+          });
+        }
       }
-    ];
-    for(let i = 0; i < negopendmissions.length; i++){
-      if(negopendmissions[i].attributes.perhour != null || negopendmissions[i].attributes.noofhours != null){
-        datai.push({
-          leb: `${tri?.nego?.oldno[$lang]}-${i+1}, ${(negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)}`,
-          value: (negopendmissions[i].attributes.noofhours ?? noofhours) * (negopendmissions[i].attributes.perhour ?? perhour)
-    })
-      }
-    }
-    }else{
+    } else {
       datai = [
         {
           leb: `${tri?.nego?.new[$lang]},${noofhours2 * perhour2}`,
@@ -126,7 +135,7 @@
       ];
     }
   });
-  console.log(negopendmissions)
+  console.log(negopendmissions);
   const tri = tr;
   let isKavua2 = $state();
   let newcontent = $state(true);
@@ -170,6 +179,9 @@
   let skills3 = $state({ data: [] });
   let tafkidims2 = $state({ data: [] });
   let workways3 = $state([]);
+  let acts2 = $state(
+    acts?.data && Array.isArray(acts.data) ? [...acts.data] : []
+  );
 
   let rishon = 0;
   function myMission() {
@@ -286,6 +298,108 @@
       }
     }
     return str;
+  }
+
+  function hasActsChanged() {
+    const actsArray = acts?.data && Array.isArray(acts.data) ? acts.data : [];
+    const acts2Array = Array.isArray(acts2) ? acts2 : [];
+
+    if (actsArray.length === 0 && acts2Array.length === 0) return false;
+    if (actsArray.length !== acts2Array.length) return true;
+
+    return actsArray.some((originalAct, index) => {
+      const negotiatedAct = acts2Array[index];
+      if (!negotiatedAct) return true;
+
+      const orig = originalAct.attributes;
+      const nego = negotiatedAct.attributes;
+
+      return (
+        orig.shem !== nego.shem ||
+        orig.link !== nego.link ||
+        orig.des !== nego.des ||
+        orig.dateF !== nego.dateF ||
+        orig.dateS !== nego.dateS
+      );
+    });
+  }
+
+  async function handleActsChanges() {
+    const acts2Array = Array.isArray(acts2) ? acts2 : [];
+    const actsArray = acts?.data && Array.isArray(acts.data) ? acts.data : [];
+
+    const newActsIds = [];
+    const originalActsIds = actsArray.map((act) => act.id);
+
+    try {
+      // Process all acts in acts2
+      for (const act of acts2Array) {
+        if (act.id && act.id.startsWith('temp_')) {
+          // This is a new task that was added in negotiation
+          console.log('Creating new task:', act.attributes.shem);
+          console.log('Dates from datetime-local:', {
+            dateS: act.attributes.dateS,
+            dateF: act.attributes.dateF
+          });
+
+          // Convert datetime-local format to ISO format for GraphQL
+          let dateS = null;
+          let dateF = null;
+
+          try {
+            if (act.attributes.dateS) {
+              // datetime-local gives us "YYYY-MM-DDTHH:mm" format, we need to add seconds and timezone
+              dateS = new Date(act.attributes.dateS + ':00.000Z').toISOString();
+            }
+            if (act.attributes.dateF) {
+              dateF = new Date(act.attributes.dateF + ':00.000Z').toISOString();
+            }
+          } catch (dateError) {
+            console.error('Error converting datetime-local dates:', dateError);
+            dateS = null;
+            dateF = null;
+          }
+
+          console.log('Converted to ISO dates:', { dateS, dateF });
+
+          const result = await crTask(
+            projectId, // pid
+            null, // mbId
+            null, // assignedId
+            pendId, // pendm
+            null, // open_mission
+            dateS, // dateS
+            dateF, // dateF
+            null, // myIshur
+            act.attributes.shem, // shem
+            act.attributes.des || null, // des
+            act.attributes.link || null, // link
+            null // askId
+          );
+
+          console.log('crTask result:', result);
+
+          if (result && result.data && result.data.createAct) {
+            const newActId = result.data.createAct.data.id;
+            newActsIds.push(newActId);
+            console.log('Added new act ID:', newActId);
+          } else if (result && result !== 'error') {
+            console.warn('Unexpected crTask result structure:', result);
+          } else {
+            console.error('Failed to create task for:', act.attributes.shem);
+          }
+        } else if (act.id && !act.id.startsWith('temp_')) {
+          // This is an existing task
+          newActsIds.push(act.id);
+        }
+      }
+
+      return { newActsIds, originalActsIds };
+    } catch (error) {
+      console.error('Error handling acts changes:', error);
+      // Return original IDs if creation fails
+      return { newActsIds: originalActsIds, originalActsIds };
+    }
   }
   let userss;
   async function increment() {
@@ -412,12 +526,12 @@
       perhour4nego = `perhour: ${perhour},`;
       what4 = false;
     }
-    const skillsId = skills.data.map((c) => c.id);
-    const skills2Id = skills3.data.map((c) => c.id);
-    const roId = tafkidims.data.map((c) => c.id);
-    const ro2Id = tafkidims2.data.map((c) => c.id);
-    const wwId = workways.data.map((c) => c.id);
-    const ww2Id = workways3.data.map((c) => c.id);
+    const skillsId = skills?.data ? skills.data.map((c) => c.id) : [];
+    const skills2Id = skills3?.data ? skills3.data.map((c) => c.id) : [];
+    const roId = tafkidims?.data ? tafkidims.data.map((c) => c.id) : [];
+    const ro2Id = tafkidims2?.data ? tafkidims2.data.map((c) => c.id) : [];
+    const wwId = workways?.data ? workways.data.map((c) => c.id) : [];
+    const ww2Id = Array.isArray(workways3) ? workways3.map((c) => c.id) : [];
     if (arraysEqual(skillsId, skills2Id) === false) {
       skills4 = ` skills: [${skills2Id}], `;
       skills4nego = ` skills: [${skillsId}], `;
@@ -441,6 +555,35 @@
     } else {
       ww4 = ``;
       ww4nego = ``;
+    }
+    // Handle acts before main mutation
+    const actsChanged = hasActsChanged();
+    let newActsIds = [];
+    let originalActsIds = [];
+
+    try {
+      if (actsChanged) {
+        what4 = false;
+        // Create new acts and get their IDs
+        console.log('Acts changed, creating new tasks...');
+        const actsResult = await handleActsChanges();
+        newActsIds = actsResult.newActsIds;
+        originalActsIds = actsResult.originalActsIds;
+        console.log('New acts IDs:', newActsIds);
+        console.log('Original acts IDs:', originalActsIds);
+      } else {
+        // If no changes, use existing acts IDs
+        const actsArray =
+          acts?.data && Array.isArray(acts.data) ? acts.data : [];
+        originalActsIds = actsArray.map((act) => act.id);
+        newActsIds = [...originalActsIds];
+      }
+    } catch (error) {
+      console.error('Error handling acts before mutation:', error);
+      // Fallback to original acts if there's an error
+      const actsArray = acts?.data && Array.isArray(acts.data) ? acts.data : [];
+      originalActsIds = actsArray.map((act) => act.id);
+      newActsIds = [...originalActsIds];
     }
     let another = ``;
     if (
@@ -493,6 +636,7 @@
     ${ww4nego}
     ${date4nego}
     ${dates4nego}
+    ${originalActsIds.length > 0 ? `acts: [${originalActsIds.join(',')}],` : ''}
               }
              ){data{id}}
             updatePendm(
@@ -509,6 +653,7 @@
     ${ww4}
     ${date4}
     ${dates4}
+    ${newActsIds.length > 0 ? `acts: [${newActsIds.join(',')}],` : ''}
         users:[  ${userss}, 
      {
       what: true
@@ -532,7 +677,6 @@
           .then((data) => (miDatan = data));
         console.log(miDatan);
         toast.success(tr?.toasts.suc[$lang]);
-
         close();
       } catch (e) {
         error1 = e;
@@ -543,7 +687,11 @@
   }
   let x;
   let linkg = import.meta.env.VITE_URL + '/graphql';
-  let dataibno = $state({ skillName: [], roleDescription: [], workWayName: [] });
+  let dataibno = $state({
+    skillName: [],
+    roleDescription: [],
+    workWayName: []
+  });
   function addnew(event) {
     const newOb = event.skob;
     const valc = event.valc;
@@ -586,7 +734,19 @@
     skills3 = JSON.parse(JSON.stringify(skills));
     tafkidims2 = JSON.parse(JSON.stringify(tafkidims));
     workways3 = JSON.parse(JSON.stringify(workways.data));
-    console.log('mounted', $lang);
+    console.log('negoM mounted', $lang);
+    console.log(
+      'acts prop received:',
+      acts,
+      'type:',
+      typeof acts,
+      'has data:',
+      !!acts?.data,
+      'data isArray:',
+      Array.isArray(acts?.data)
+    );
+    console.log('acts.data:', acts?.data);
+    console.log('acts2 state:', acts2);
     const cookieValue = document.cookie
       .split('; ')
       .find((row) => row.startsWith('jwt='))
@@ -679,7 +839,6 @@
     x = x;
     console.log(new Date(Date.now() + x).toLocaleString(), restime);
   });
- 
 </script>
 
 <div class="text-barbi" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
@@ -688,11 +847,14 @@
     {name1}
   </h1>
   <div class="flex flex-col align-middle justify-center">
-    <Text text={name1} bind:textb={name2} lebel={tri?.common?.name}  
-       old={negopendmissions.map((c) => c?.attributes?.name)}
-      />
+    <Text
+      text={name1}
+      bind:textb={name2}
+      lebel={tri?.common?.name}
+      old={negopendmissions.map((c) => c?.attributes?.name)}
+    />
     <Rich
-    old={negopendmissions.map((c) => c?.attributes?.descrip)}
+      old={negopendmissions.map((c) => c?.attributes?.descrip)}
       text={descrip}
       bind:textb={descrip2}
       lebel={tri?.common?.description}
@@ -753,7 +915,7 @@
             : null}
     />
     <Number
-    old={negopendmissions.map((c) => c?.attributes?.perhour)}
+      old={negopendmissions.map((c) => c?.attributes?.perhour)}
       number={perhour}
       bind:numberb={perhour2}
       lebel={tri?.mission?.hourlyVallue[$lang]}
@@ -763,6 +925,12 @@
       date={mdates}
       bind:dateb={mdates2}
       lebel={tri?.common.finishDate}
+    />
+
+    <ActsNego
+      {acts}
+      bind:actsb={acts2}
+      lebel={{ he: 'מטלות', en: 'Tasks' }}
     />
     <div
       class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2"

@@ -1,8 +1,8 @@
 <script>
   import { io } from 'socket.io-client';
-  const baseUrl = import.meta.env.VITE_URL
-  const levVersion = 1
-  let updateV = null
+  const baseUrl = import.meta.env.VITE_URL;
+  const levVersion = 1;
+  let updateV = null;
   import {
     pendMisMes,
     pendMasMes,
@@ -25,9 +25,9 @@
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
   import { onMount } from 'svelte';
   import { goto } from '$app/navigation';
-  import { fetchTimers } from '$lib/stores/timers'
+  import { fetchTimers } from '$lib/stores/timers';
   import pkg from 'lodash';
-  const {isEqual} = pkg;
+  const { isEqual } = pkg;
   import Rikma from '$lib/components/lev/rikma.svelte';
   import Hevel from '$lib/components/lev/hevel.svelte';
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
@@ -44,7 +44,44 @@
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { page } from '$app/state';
   import { get } from 'svelte/store';
-  import { projects, userId, getProjectData } from '$lib/stores/projectStore.js';
+  import {
+    projects,
+    userId,
+    getProjectData
+  } from '$lib/stores/projectStore.js';
+
+  // Import utility functions
+  import {
+    letters,
+    txx,
+    checkStb,
+    checkHst,
+    filterArrayd,
+    filterArray
+  } from '$lib/utils/levDataProcessors.js';
+  import {
+    mesimabetahalicha,
+    ishursium
+  } from '$lib/utils/levMissionProcessors.js';
+  import {
+    processVotingData,
+    processComplexVoting,
+    hachla
+  } from '$lib/utils/levVotingProcessors.js';
+  import {
+    createMessagesForAsked,
+    createNegoMessages,
+    createVotingMessages
+  } from '$lib/utils/levMessageProcessors.js';
+  import {
+    gen,
+    createFlashAnimation,
+    reverseString
+  } from '$lib/utils/levAnimationUtils.js';
+  import {
+    fetchMainUserData,
+    fetchOpenMissions
+  } from '$lib/utils/levGraphQLQueries.js';
   let { data } = $props();
   let low = $state(true);
   let indexi = $state(-1);
@@ -76,20 +113,21 @@
   let beta = $state(0);
   let des = 0;
   let fia = $state(0);
-  let hachlot = $state(0)
+  let hachlot = $state(0);
   let fiapp = [];
   let askedm = [];
   let askm = 0;
   let ma = 0;
   let wegets = [];
   let arr1 = $state([]);
-  let askWants = [] 
+  let askWants = [];
   function close() {
     if (mode !== 4) {
       isOpen = false;
     }
   }
-  let eizeish = $state(), eizep = $state();
+  let eizeish = $state(),
+    eizep = $state();
   let mode = $state(0);
 
   function user(event) {
@@ -119,52 +157,11 @@
     mode = 5;
     isOpen = true;
   }
-  function txx(na) {
-    let tx = 680;
-    if (na.length < 10) {
-      tx = 440;
-    } else if (na.length < 20) {
-      tx = 580;
-    } else if (na.length < 28) {
-      tx = 680;
-    } else if (na.length > 28) {
-      tx = 780;
-    }
-    return tx;
-  }
-  function mesimabetahalicha(data) {
-    const mtahan =
-      data.data.usersPermissionsUser.data.attributes.mesimabetahaliches.data;
+  function processMesimabetahalicha(data) {
+    const result = mesimabetahalicha(data, mtaha, beta, $lang);
+    mtaha = result.mtaha;
+    beta = result.beta;
 
-    for (let i = 0; i < mtahan.length; i++) {
-      mtaha[i] = { ...mtahan[i].attributes };
-      mtaha[i].id = mtahan[i].id;
-      mtaha[i].tx = txx(mtahan[i].attributes.name);
-      mtaha[i].ani = 'mtaha';
-      mtaha[i].azmi = 'mesima';
-      mtaha[i].restime = getProjectData(
-        mtahan[i].attributes.project.data.id,
-        'restime'
-      );
-      mtaha[i].projectId = mtahan[i].attributes.project.data.id;
-      mtaha[i].pl = 0 + i;
-      mtaha[i].usernames =
-        data.data.usersPermissionsUser.data.attributes.username;
-      mtaha[i].noofpu = getProjectData(
-        mtahan[i].attributes.project.data.id,
-        'noof'
-      );
-      mtaha[i].projectName = getProjectData(
-        mtahan[i].attributes.project.data.id,
-        'pn'
-      );
-      mtaha[i].src = getProjectData(mtahan[i].attributes.project.data.id, 'pp');
-      mtaha[i].pu = getProjectData(mtahan[i].attributes.project.data.id, 'us');
-    }
-    mtaha = mtaha;
-
-    beta = mtaha.length;
-    localStorage.setItem('beta', beta);
     if (!isEqual(mtaha, mtahaold) && counter > 1) {
       if (mtahaold.length < mtaha.length) {
         const usernames =
@@ -178,6 +175,18 @@
         nutifi('1💗1 משימה חדשה', text, linkop);
       }
     }
+  }
+
+  function processIshursium(data) {
+    const result = ishursium(data, fiapp, fia, $lang, idL);
+    fiapp = result.fiapp;
+    fia = result.fia;
+  }
+
+  function processHachla(data) {
+    const result = hachla(data, hachlatot, hachlot, $lang, idL);
+    hachlatot = result.hachlatot;
+    hachlot = result.hachlot;
   }
 
   function gvots(data) {
@@ -222,125 +231,6 @@
       const noofusersWaiting = fiapp[t].noof - fiapp[t].users.length;
       fiapp[t].noofusersWaiting = noofusersWaiting;
     }
-  }
-
-  function ishursium(dati) {
-    const start =
-      dati.data.usersPermissionsUser.data.attributes.projects_1s.data;
-    const myid = dati.data.usersPermissionsUser.data.id;
-    for (let i = 0; i < start.length; i++) {
-      for (let j = 0; j < start[i].attributes.finiapruvals.data.length; j++) {
-        const rt = letters(
-          start[i].attributes.finiapruvals.data[j].attributes.missname
-        );
-        let src22 = getProjectData(
-          start[i].id,
-          'upic',
-          start[i].attributes.finiapruvals.data[j].attributes
-            .users_permissions_user.data.id
-        );
-        fiapp.push({
-          uid: start[i].attributes.finiapruvals.data[j].attributes
-            .users_permissions_user.data.id,
-          username: getProjectData(
-            start[i].id,
-            'un',
-            start[i].attributes.finiapruvals.data[j].attributes
-              .users_permissions_user.data.id
-          ),
-          src: src22,
-          hearotMeyuchadot:
-            start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich
-              .data.attributes.hearotMeyuchadot,
-          missionDetails:
-            start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich
-              .data.attributes.descrip,
-          nhours: start[i].attributes.finiapruvals.data[j].attributes.noofhours,
-          mId: start[i].attributes.finiapruvals.data[j].attributes
-            .mesimabetahalich.data.id,
-          perhour:
-            start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich
-              .data.attributes.perhour,
-          missId:
-            start[i].attributes.finiapruvals.data[j].attributes.mesimabetahalich
-              .data.attributes.mission.data.id,
-          // deadline: start[i].asks[j].open_mission.sqadualed,
-          openName:
-            start[i].attributes.finiapruvals.data[j].attributes.missname,
-          omid: start[i].attributes.finiapruvals.data[j].id,
-          askId: start[i].attributes.finiapruvals.data[j].id,
-          why: start[i].attributes.finiapruvals.data[j].attributes.why,
-          whatt:
-            start[i].attributes.finiapruvals.data[j].attributes.what?.data
-              ?.attributes?.url,
-          whattid:
-            start[i].attributes.finiapruvals.data[j].attributes.what?.data?.id,
-          users: start[i].attributes.finiapruvals.data[j].attributes.vots,
-          name: rt[0],
-          stylef: rt[1],
-          st: rt[2],
-          projectId:
-            start[i].attributes.finiapruvals.data[j].attributes.project.data.id,
-          timegramaDate:
-            start[i].attributes.finiapruvals.data[j].attributes.timegrama?.data?.attributes?.date || null,
-          timegramaId:
-            start[i].attributes.finiapruvals.data[j].attributes.timegrama?.data?.id || null,  
-          projectName: getProjectData(start[i].id, 'pn'),
-          noof: getProjectData(start[i].id, 'noof'),
-          src2: getProjectData(start[i].id, 'pp'),
-          myid: myid,
-          ani: 'fiapp',
-          azmi: 'ishrur',
-          pl: -2
-        });
-      }
-    }
-    for (let k = 0; k < fiapp.length; k++) {
-      const x = fiapp[k].users;
-      fiapp[k].uids = [];
-      for (let z = 0; z < x.length; z++) {
-        fiapp[k].uids.push(x[z].users_permissions_user.data.id);
-        fiapp[k].what = [];
-        fiapp[k].what.push(x[z].what);
-      }
-    }
-
-    for (let t = 0; t < fiapp.length; t++) {
-      const allid = fiapp[t].uids;
-      const myid = fiapp[t].myid;
-      fiapp[t].already = false;
-      fiapp[t].noofusersOk = 0;
-      fiapp[t].noofusersNo = 0;
-      fiapp[t].whyno = [];
-      fiapp[t].whyes = [];
-      fiapp[t].mypos = null;
-      if (allid.includes(myid)) {
-        fiapp[t].already = true;
-        fiapp[t].pl += 20;
-
-        for (let l = 0; l < fiapp[t].users.length; l++) {
-          if (fiapp[t].users[l].users_permissions_user.id === myid)
-            fiapp[t].mypos = fiapp[t].users[l].what;
-        }
-      }
-
-      for (let r = 0; r < fiapp[t].users.length; r++) {
-        if (fiapp[t].users[r].what === true) {
-          fiapp[t].noofusersOk += 1;
-          fiapp[t].whyes.push(fiapp[t].users[r].why);
-        } else if (fiapp[t].users[r].what === false) {
-          fiapp[t].noofusersNo += 1;
-          fiapp[t].whyno.push(fiapp[t].users[r].why);
-        }
-      }
-
-      const noofusersWaiting = fiapp[t].noof - fiapp[t].users.length;
-      fiapp[t].noofusersWaiting = noofusersWaiting;
-    }
-    fiapp = fiapp;
-    fia = fiapp.length;
-    localStorage.setItem('fia', fia);
-    //createD()
   }
 
   function crMaap(hh) {
@@ -676,7 +566,9 @@
     console.log(dictasked);
     let filters = [idL];
 
-    let result = dictasked.filter((val) => val.isRishon || !filters.includes(val.uid));
+    let result = dictasked.filter(
+      (val) => val.isRishon || !filters.includes(val.uid)
+    );
     dictasked = result;
     console.log(dictasked);
 
@@ -784,103 +676,6 @@
     localStorage.setItem('askma', askma);
   }
 
-  function letters(data) {
-    let namer = [];
-    let st = 175;
-    let stylef = '24px';
-    if (/[\u0590-\u05FF]/.test(data) | /[\u0600-\u06FF]/.test(data)) {
-      let sep = '';
-      sep = data.split(' ').filter((w) => w !== '');
-      for (let i = 0; i < sep.length; i++) {
-        if (/[\u0590-\u05FF]/.test(sep[i]) | /[\u0600-\u06FF]/.test(sep[i])) {
-          namer[i] = sep[i].split('').reverse().join('');
-        } else {
-          namer[i] = sep[i];
-        }
-      }
-      const x = namer.reverse().join(' ');
-      data = x;
-      st = 275;
-    }
-
-    //  if (data.length >= 2 && data.length < 4) {
-    //       st = 185;
-    //    }
-    // else if (data.length >= 4 && data.length < 5) {
-    //       st = 180;
-    //    }
-    // else if (data.length >= 5 && data.length < 6) {
-    //       st = 170;
-    //    } else if (data.length >= 6 && data.length < 7) {
-    //       st = 165
-    //    } else if (data.length >= 7 && data.length < 8) {
-    //       st = 160
-    //    }else if (data.length >= 8 && data.length < 9) {
-    //       st = 150
-    //    }else if (data.length >= 9 && data.length < 10) {
-    //           st = 140
-    //    }else if (data.length >= 10 && data.length < 11) {
-    //           st = 130;
-    //    }else if (data.length >= 11 && data.length < 12) {
-    //           st = 135;
-    //           stylef = '29px';
-    //   } else  if (data.length >= 12 && data.length <13) {
-    //               st = 130;
-    //               stylef = '29px';
-    //    }else  if (data.length >= 13 && data.length <14) {
-    //               st = 125;
-    //               stylef = '25px';
-    //    }else  if (data.length >= 14 && data.length <15) {
-    //               st = 125;
-    //               stylef = '25px';
-    //    }else  if (data.length >= 15 && data.length <17) {
-    //               st = 125;
-    //               stylef = '25px';
-    //    }else  if (data.length >= 17 && data.length <19) {
-    //               st = 130;
-    //               stylef = '19px';
-    //    }else  if (data.length >= 19 && data.length <20) {
-    //               st = 130;
-    //               stylef = '17px';
-    //    }else  if (data.length >= 20 && data.length <21) {
-    //               st = 125;
-    //               stylef = '17px';
-    //    }else  if (data.length >= 21 && data.length <22) {
-    //               st = 125;
-    //               stylef = '16px';
-    //    } else  if (data.length >= 22){
-    //                      st = 125;
-    //        stylef = '14px';
-    //   }
-
-    if (data.length >= 15 && data.length < 19) {
-      stylef = '21px';
-      st = 275;
-    } else if (data.length >= 19 && data.length < 20) {
-      stylef = '20px';
-      st = 255;
-    } else if (data.length >= 20 && data.length < 21) {
-      stylef = '18px';
-      st = 270;
-    } else if (data.length >= 21) {
-      stylef = '16px';
-      st = 285;
-    }
-    return [data, stylef, st];
-  }
-
-  const filterArrayd = (arr1, arr2) => {
-    const filterede = arr1.filter((el) => {
-      return arr2.indexOf(el) === -1;
-    });
-    return filterede;
-  };
-  const filterArray = (arr1, arr2) => {
-    const filterede = arr1.filter((el) => {
-      return arr2.indexOf(el) !== -1;
-    });
-    return filterede;
-  };
   async function showOpenPro(mi) {
     //req
     const r = mi.data.usersPermissionsUser.data.attributes.askeds.data;
@@ -1138,51 +933,18 @@
       idL = cookieValueId;
       token = cookieValue;
       let bearer1 = 'bearer' + ' ' + token;
-      let link = baseUrl+'/graphql';
+      let link = baseUrl + '/graphql';
       try {
-        await fetch(link, {
-          method: 'POST',
-
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `{openMissions (filters: {id:{in: [${keysSorted}]}}){data{ id attributes{
-            project {data{ id attributes{ projectName restime timeToP user_1s {data{id }} profilePic{data{attributes {url formats }}}}}}
-            sqadualed
-            acts{data{id attributes{
-              shem des
-            }}}
-            tafkidims{data {attributes {roleDescription ${
-              $lang == 'he'
-                ? 'localizations {data{attributes {roleDescription }}}'
-                : ''
-            }}}}
-            skills {data{attributes{skillName ${
-              $lang == 'he'
-                ? 'localizations {data{attributes{skillName }}}'
-                : ''
-            }}}}
-            descrip
-            hearotMeyuchadot
-            name dates
-            work_ways {data{attributes{workWayName ${
-              $lang == 'he'
-                ? 'localizations{data{attributes{workWayName }}}'
-                : ''
-            }}}}
-            noofhours perhour
-            }
-            }
-                }}`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (meData = data.data.openMissions.data));
+        const openMissionsData = await fetchOpenMissions(
+          baseUrl,
+          token,
+          keysSorted,
+          $lang
+        );
+        meData = openMissionsData.data.openMissions.data;
         for (let i = 0; i < meData.length; i++) {
           meData[i].alreadyi = askedarr.includes(meData[i].id);
-          (meData[i].ani = 'meData'),
+          ((meData[i].ani = 'meData'),
             (meData[i].azmi = 'hazaa'),
             (meData[i].pl = 10 + i),
             (meData[i].pid = meData[
@@ -1190,7 +952,7 @@
             ].attributes.project.data.attributes.user_1s.data.map((t) => t.id)),
             (meData[i].hst = checkHst(
               meData[i].attributes.project.data.attributes.projectName
-            ));
+            )));
           meData[i].stb = checkStb(meData[i].attributes.name);
           if (askedarr.includes(meData[i].id)) {
             const asksar =
@@ -1212,8 +974,9 @@
         }
       } catch (e) {
         //ErrorId=1
+        console.error('Error in showOpenPro (ErrorId=1):', e);
         error1 = e;
-        sendEror(idL,e,1)
+        sendEror(idL, e, 1);
       }
     } else {
       tyu = true;
@@ -1250,40 +1013,6 @@
       }
     }
   }
-  function checkStb(dat) {
-    let hst;
-    if (dat.length < 4) {
-      hst = 165;
-    } else if (dat.length < 5) {
-      hst = 180;
-    } else if (dat.length < 8) {
-      hst = 185;
-    } else if (dat.length < 16) {
-      hst = 200;
-    } else if (dat.length < 24) {
-      hst = 240;
-    } else if (dat.length < 32) {
-      hst = 250;
-    }
-    return hst;
-  }
-  function checkHst(dat) {
-    let hst;
-    if (dat.length < 4) {
-      hst = 160;
-    } else if (dat.length < 5) {
-      hst = 170;
-    } else if (dat.length < 8) {
-      hst = 190;
-    } else if (dat.length < 16) {
-      hst = 195;
-    } else if (dat.length < 24) {
-      hst = 260;
-    } else if (dat.length < 32) {
-      hst = 285;
-    }
-    return hst;
-  }
 
   // מיון ראשוני עדיף לפי האם סיים כבר משימה כזו
   let tyu = false;
@@ -1318,9 +1047,6 @@
   let mtahaold = [];
   let counter = 0;
 
-  function reverseString(str) {
-    return str.split('').reverse().join('');
-  }
   let innerFlash = 'rgb(255,0,255)';
   let outerFlash = 'rgb(255,55,255)';
   let x = [],
@@ -1328,141 +1054,107 @@
     xyz = $state(['1,2']),
     c = 0;
 
-  function sortNumber(a, b) {
-    return a - b;
-  }
-
-  function prcnt(a, b) {
-    return parseInt((a * b) / 100, 10);
-  }
   let h = $state(),
     w = $state(),
     initX = 0;
 
-  function gen() {
-    let xMax = prcnt(16, w);
-    let yMin = prcnt(7, h);
-    let yMax = prcnt(25, h);
-    x = [];
-    y = [];
-    xyz = [];
-    let step = 0;
-    let a = w / 2;
-    let b = w / 4.5;
-    let e = b / 2;
-    initX = (a + Math.random() * b - e) | 0;
-    for (let i = 0; i < 50; i++) {
-      let g = (20 + Math.random() * yMax) | 0;
-      step += g;
-      y[i] = step | 0;
-      if (step > h) {
-        break;
-      }
-    }
-    y.push(0);
-    y.sort(sortNumber);
-    x[0] = initX;
-    for (let i = 0; i < y.length; i++) {
-      if (y[i + 1] - y[i] < yMin) {
-        x[i + 1] = x[i] + Math.floor(Math.random() * 10 - 8);
-      } else {
-        x[i + 1] = x[i] + Math.floor(Math.random() * xMax - xMax / 2);
-      }
-      xyz[i] = x[i] + ',' + y[i] + ' ';
-    }
-    return xyz, initX;
+  function generateLightning() {
+    const result = gen(w, h);
+    xyz = result.xyz;
+    initX = result.initX;
   }
   let repeater = null;
   let update = false;
-  function localRec(){
-        if (localStorage.getItem('pendMasMes') !== null) {
-          pendMasMes.set(JSON.parse(localStorage.getItem('pendMasMes')));
-        }
-        if (localStorage.getItem('askMisMes') !== null) {
-          askMisMes.set(JSON.parse(localStorage.getItem('askMisMes')));
-        }
-        if (localStorage.getItem('meAskMisMes') !== null) {
-          meAskMisMes.set(JSON.parse(localStorage.getItem('meAskMisMes')));
-        }
-        if (localStorage.getItem('pendMisMes') !== null) {
-          pendMisMes.set(JSON.parse(localStorage.getItem('pendMisMes')));
-        }
-        if (localStorage.getItem('meAskMasMes') !== null) {
-          meAskMasMes.set(JSON.parse(localStorage.getItem('meAskMasMes')));
-        }
-        if (localStorage.getItem('askMasMes') !== null) {
-          askMasMes.set(JSON.parse(localStorage.getItem('askMasMes')));
-        }
-        if (localStorage.getItem('miDataLM') !== null) {
-          arr1 = JSON.parse(localStorage.getItem('miDataLM'));
-        }
-        if (localStorage.getItem('nam') !== null) {
-          nam = JSON.parse(localStorage.getItem('nam'));
-        }
-        if (localStorage.getItem('picLink') !== null) {
-          picLink = JSON.parse(localStorage.getItem('picLink'));
-        }
-        if (localStorage.getItem('betha') !== null) {
-          betha.set(JSON.parse(localStorage.getItem('betha')));
-        }
-        if (localStorage.getItem('miDataL') !== null) {
-          miData = JSON.parse(localStorage.getItem('miDataL'));
-        }
-        if (localStorage.getItem('pmashd') !== null) {
-          pmashd = localStorage.getItem('pmashd');
-        }
-        if (localStorage.getItem('fia') !== null) {
-          fia = localStorage.getItem('fia');
-        }
-        if (localStorage.getItem('beta') !== null) {
-          beta = localStorage.getItem('beta');
-        }
-        if (localStorage.getItem('askma') !== null) {
-          askma = localStorage.getItem('askma');
-        }
-        if (localStorage.getItem('wel') !== null) {
-          wel = localStorage.getItem('wel');
-        }
-        if (localStorage.getItem('halu') !== null) {
-          halu = localStorage.getItem('halu');
-        }
-        if (localStorage.getItem('ask') !== null) {
-          ask = localStorage.getItem('ask');
-        }
-        if (localStorage.getItem('pen') !== null) {
-          pen = localStorage.getItem('pen');
-        }
-        if (localStorage.getItem('sug') !== null) {
-          sug = localStorage.getItem('sug');
-        }
-        if (localStorage.getItem('maap') !== null) {
-          maap = localStorage.getItem('maap');
-        }
-        if (localStorage.getItem('mashs') !== null) {
-          mashs = localStorage.getItem('mashs');
-        }
-  }
-  let nowT 
-  onMount(async () => {
-    nowT = Date.now();
-  //check if code updated
-  const storedVersion = localStorage.getItem('version');
-  if (storedVersion != levVersion) {
-    updateV = true;
-    localStorage.setItem('version', levVersion);
-    console.log("here VERSION")
-  } else {
-    updateV = false;
-    console.log("here VERSION OK")
-
-    // קודם כל מנסה לשחזר מהסנאפשוט
-    const storedSnapshot = localStorage.getItem('arr1Snapshot');
-    if (storedSnapshot) {
-      arr1 = JSON.parse(storedSnapshot);
+  function localRec() {
+    if (localStorage.getItem('pendMasMes') !== null) {
+      pendMasMes.set(JSON.parse(localStorage.getItem('pendMasMes')));
     }
-    //אם אין סנאפשוט, משחזר מהלוקל סטורג' הרגיל
-    localRec();
+    if (localStorage.getItem('askMisMes') !== null) {
+      askMisMes.set(JSON.parse(localStorage.getItem('askMisMes')));
+    }
+    if (localStorage.getItem('meAskMisMes') !== null) {
+      meAskMisMes.set(JSON.parse(localStorage.getItem('meAskMisMes')));
+    }
+    if (localStorage.getItem('pendMisMes') !== null) {
+      pendMisMes.set(JSON.parse(localStorage.getItem('pendMisMes')));
+    }
+    if (localStorage.getItem('meAskMasMes') !== null) {
+      meAskMasMes.set(JSON.parse(localStorage.getItem('meAskMasMes')));
+    }
+    if (localStorage.getItem('askMasMes') !== null) {
+      askMasMes.set(JSON.parse(localStorage.getItem('askMasMes')));
+    }
+    if (localStorage.getItem('miDataLM') !== null) {
+      arr1 = JSON.parse(localStorage.getItem('miDataLM'));
+    }
+    if (localStorage.getItem('nam') !== null) {
+      nam = JSON.parse(localStorage.getItem('nam'));
+    }
+    if (localStorage.getItem('picLink') !== null) {
+      picLink = JSON.parse(localStorage.getItem('picLink'));
+    }
+    if (localStorage.getItem('betha') !== null) {
+      betha.set(JSON.parse(localStorage.getItem('betha')));
+    }
+    if (localStorage.getItem('miDataL') !== null) {
+      miData = JSON.parse(localStorage.getItem('miDataL'));
+    }
+    if (localStorage.getItem('pmashd') !== null) {
+      pmashd = localStorage.getItem('pmashd');
+    }
+    if (localStorage.getItem('fia') !== null) {
+      fia = localStorage.getItem('fia');
+    }
+    if (localStorage.getItem('beta') !== null) {
+      beta = localStorage.getItem('beta');
+    }
+    if (localStorage.getItem('askma') !== null) {
+      askma = localStorage.getItem('askma');
+    }
+    if (localStorage.getItem('wel') !== null) {
+      wel = localStorage.getItem('wel');
+    }
+    if (localStorage.getItem('halu') !== null) {
+      halu = localStorage.getItem('halu');
+    }
+    if (localStorage.getItem('ask') !== null) {
+      ask = localStorage.getItem('ask');
+    }
+    if (localStorage.getItem('pen') !== null) {
+      pen = localStorage.getItem('pen');
+    }
+    if (localStorage.getItem('sug') !== null) {
+      sug = localStorage.getItem('sug');
+    }
+    if (localStorage.getItem('maap') !== null) {
+      maap = localStorage.getItem('maap');
+    }
+    if (localStorage.getItem('mashs') !== null) {
+      mashs = localStorage.getItem('mashs');
+    }
   }
+  let nowT;
+  onMount(async () => {
+    console.log('=== ONMOUNT STARTED ===');
+    nowT = Date.now();
+    //check if code updated
+    const storedVersion = localStorage.getItem('version');
+    if (storedVersion != levVersion) {
+      updateV = true;
+      localStorage.setItem('version', levVersion);
+      console.log('here VERSION');
+    } else {
+      updateV = false;
+      console.log('here VERSION OK');
+
+      // קודם כל מנסה לשחזר מהסנאפשוט
+      const storedSnapshot = localStorage.getItem('arr1Snapshot');
+      if (storedSnapshot) {
+        arr1 = JSON.parse(storedSnapshot);
+      }
+      //אם אין סנאפשוט, משחזר מהלוקל סטורג' הרגיל
+      localRec();
+    }
 
     /*  if ('serviceWorker' in navigator) {
         navigator.serviceWorker.register('service-worker.js', {
@@ -1501,12 +1193,12 @@
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
-      fetchTimers(page.data.uid,fetch)
+      fetchTimers(page.data.uid, fetch);
       token = cookieValu;
       const elem = document.getElementById('screen');
 
       function flash() {
-        if (low == true &&cards == false) {
+        if (low == true && cards == false) {
           elem.style.backgroundImage =
             'radial-gradient(ellipse farthest-corner at ' +
             initX +
@@ -1551,7 +1243,7 @@
 
         function repeaterFn() {
           c = 0;
-          gen();
+          generateLightning();
           flash();
           finito();
           if (changeSpeed != speed) {
@@ -1576,7 +1268,9 @@
           //  document.getElementById("my_audio").pause();
         }
       }
+      console.log('=== ABOUT TO CALL START FROM ONMOUNT ===');
       await start();
+      console.log('=== START COMPLETED FROM ONMOUNT ===');
       const SERVER_URL = baseUrl;
 
       // token will be verified, connection will be rejected if not a valid JWT
@@ -1604,8 +1298,9 @@
             if (
               arr1[index].diun &&
               arr1[index].diun.length == datan.data.attributes?.diun?.length &&
-              datan.data.attributes.diun[datan.data.attributes?.diun?.length - 1]
-                .id != $nowId
+              datan.data.attributes.diun[
+                datan.data.attributes?.diun?.length - 1
+              ].id != $nowId
             ) {
               start();
             } else {
@@ -1667,7 +1362,7 @@
                     datan.data.attributes.diun.length - 1
                   ].why;
                 if (document.visibilityState == 'visible') {
-                  toast.info(head,{description:body});
+                  toast.info(head, { description: body });
                 } else {
                   nutifi(head, body);
                 }
@@ -1752,7 +1447,7 @@
                     datan.data.attributes.diun.length - 1
                   ].why;
                 if (document.visibilityState == 'visible') {
-                  toast(head, {description:body});
+                  toast(head, { description: body });
                 } else {
                   nutifi(head, body);
                 }
@@ -1910,26 +1605,25 @@
     }
   });
   export const snapshot = {
-  capture: () => {
-    const snapshotData = JSON.stringify(arr1);
-    localStorage.setItem('arr1Snapshot', snapshotData);
-    return JSON.parse(snapshotData);
-  },
-  restore: async (value) => {
-    while(updateV === null){
-      await new Promise(resolve => setTimeout(resolve, 1000));
+    capture: () => {
+      const snapshotData = JSON.stringify(arr1);
+      localStorage.setItem('arr1Snapshot', snapshotData);
+      return JSON.parse(snapshotData);
+    },
+    restore: async (value) => {
+      while (updateV === null) {
+        await new Promise((resolve) => setTimeout(resolve, 1000));
+      }
+      if (updateV === false) {
+        arr1 = value;
+        localStorage.setItem('arr1Snapshot', JSON.stringify(value));
+      }
     }
-    if(updateV === false){     
-      arr1 = value;
-      localStorage.setItem('arr1Snapshot', JSON.stringify(value));
-    }
-  }
-  /*   await sendToSer({uid: page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
+    /*   await sendToSer({uid: page.data.uid},"25UserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON__out_ser",v)
       })*/
-};
+  };
 
-  
   let usernames;
   const tolog = {
     he: 'תוקף ההתחברות שלך פג, אנו מעבירים אותך להתחברות מחדש',
@@ -1941,256 +1635,43 @@
     hachlatot = [],
     iAskMi = [];
   async function start() {
+    console.log('=== START FUNCTION CALLED ===');
     lang.set(data.lang);
-    console.log($lang, 'start');
+    console.log($lang, 'start function beginning');
     miDataold = miData;
     const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      token = cookieValue;
-    let bearer1 = 'bearer' + ' ' + token;
-    let link = baseUrl+'/graphql';
-    try {
-      await fetch(link, {
-        method: 'POST',
+      .split('; ')
+      .find((row) => row.startsWith('jwt='))
+      .split('=')[1];
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    token = cookieValue;
+    console.log('Cookies extracted:', {
+      idL,
+      tokenExists: !!token,
+      tokenLength: token?.length
+    });
 
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `{ usersPermissionsUser (id: ${idL}){
-    data {
-      id attributes{ 
-      haskama
-      asks (filters: { archived: { eq: false } }){ data{ id attributes{
-            archived
-            project{data{id attributes{projectName profilePic {data{attributes{ url formats }}} }}} 
-            vots{what  zman users_permissions_user{data{id}}}
-            timegrama {data{id attributes{date}}}
-            createdAt
-            open_mission {data{id attributes{  
-                  name isRishon
-                }}}            
-            chat{why ide what zman id users_permissions_user {data{id attributes{username profilePic {data{attributes {url formats }}}}}} }
-        }}}
-      askms (filters: { archived: { eq: false } }){ data{ id attributes{
-                    vots  {what why zman id users_permissions_user {data{id}}}
-                    timegrama {data{id attributes{date}}}
-                    open_mashaabim { data {id attributes{  price descrip spnot kindOf  sqadualedf sqadualed linkto createdAt hm name easy }}}
-                    project {data {id attributes{ projectName user_1s {data{id}} profilePic {data{ attributes{url formats }}}}}}
-                    users_permissions_user{data {id attributes {haskama username profilePic {data{attributes{url formats }}}}}}
-                      }}}
-      sps {data{id attributes{ name unit price myp 
-                		mashaabim {data{id attributes{ price 
-                              open_mashaabims (filters: { archived: { eq: false } }){ data{ id attributes{
-                                        declinedsps {data{ id }} price hm descrip spnot kindOf users {data{ id }} 
-                                        sqadualedf sqadualed linkto createdAt hm name easy
-                												project {data{id attributes {projectName  user_1s {data{id}} profilePic {data{attributes{url formats}}}}}} 
-                     }}}}}}}}} 
-      mesimabetahaliches (filters: { forappruval: { eq: false },finnished:{ eq: false } }) {data{ id attributes{ 
-        						status stname timer hearotMeyuchadot name descrip hoursassinged perhour privatlinks publicklinks iskvua howmanyhoursalready  admaticedai dates
-        						mission {data{id}}
-        						project{data{id}}
-                                acts{data{id attributes{shem myIshur link hashivut valiIshur des dateF dateS status naasa}}}
-            			   }}}
-      welcom_tops (filters: { clicked: { eq: false } }){ data{ id attributes{
-                	 project{data{id attributes{descripFor publicDescription}}}
-   								   }}}
-      skills{data{id attributes{ 
-            			 open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
-                								 skills {data{ id }} 
-                   							 tafkidims {data {id}}  
-                    						 work_ways {data{ id}}
-        													}}}
-      								}}}
-	  username hervachti
-      profilePic {data{attributes {url formats }}}  
-      askeds  {data{ id }}
-      declined {data{ id }}
-      work_ways {data{ id }} 
-      tafkidims {data{ id attributes{
-                        open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
-                								 skills {data{ id }} 
-                   							 tafkidims {data {id}}  
-                    						 work_ways {data{ id}}
-        													}}}
-     									 }}} 
-  	projects_1s {data{id attributes{ projectName restime
-    			user_1s {data{id attributes{username haskamaz haskamac email noMail haskama profilePic {data{attributes{ url formats }}}}}} 
-    			profilePic {data{attributes{ url formats }}} 
-          sheirutpends(filters:{ archived: { eq: false } }){data{id attributes{
-            sheirut{data{id attributes{name descrip equaliSplited oneTime}}}
-            createdAt
-            vots {what id order zman ide users_permissions_user {data{id}}}
-            timegrama{data{id attributes{date}}}
-          }}}
-    			decisions (filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					kind createdAt 
-                  timegrama{data{id attributes{date}}}
-        					newpic {data{id attributes{ url formats }}}
-        					vots  {what why id order users_permissions_user {data{id}}}
-      							}}}
-    			tosplits (filters: { finished: { eq: false } }){ data{ id attributes{ 
-        					name 
-                            halukas {data {id}}
-        					vots  {what why id users_permissions_user {data {id}}}
-                            hervachti {amount noten mekabel users_permissions_user {data {id attributes{hervachti}}}}
-      							}}}
-                halukas (filters: {and:[{ ushar: { eq: true } } { confirmed: { eq: false }}]}){ data{ id attributes{ 
-                    amount senderconf chatre {freetext send {data{id}} when seen} usersend {data {id}} userrecive {data{id}}  tosplit{data{id attributes{halukas{data{id attributes{confirmed}}} hervachti{nirsham amount noten mekabel users_permissions_user{data{id attributes{hervachti}}}}}}}
-                }}} 
-    			maaps(filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					createdAt name  
-        					sp{data {id attributes{ name myp unit 
-                		            users_permissions_user {data {id attributes{ username profilePic {data{attributes {url formats } }}}}}}}}
-                		    open_mashaabim{data{id attributes{ name sqadualed sqadualedf kindOf spnot easy}}}
-                            vots {what why id users_permissions_user {data { id}}}
-                                }}}
-    			pmashes (filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot 
-        					nego_mashes{data{id attributes{
-                                hm sqadualedf sqadualed linkto createdAt name descrip easy price kindOf spnot users_permissions_user {data { id}}
-                            }}}
-                            mashaabim {data{id}} 
-                            timegrama {data{id attributes{date}}}
-        					diun {what why order id zman users_permissions_user {data {id }}}
-        					users { what order why id users_permissions_user {data{id }}}
-      							}}}
-    			open_mashaabims {data{ id attributes{ name 
-                	        project {data{ id }} 
-                	        mashaabim {data{attributes{ sps{data{id attributes {name price kindOf spnot  myp 
-                												users_permissions_user {data{id attributes{ username profilePic {data{attributes{url formats }}}}}}
-                    }}}}}}}}}  
-          askwants(filters:{archived:{eq:false}}){
-            data{
-              id attributes{
-                timegrama{
-                  data{id}
-                }
-                vots{what why order ide zman users_permissions_user{
-                  data{
-                    id
-                  }
-                }}
-                users_permissions_user{
-                  data{
-                    id
-                  }
-                }
-                sheirut{
-                  data{
-                    id
-                  }
-                }
-              }
-            }
-          }          
-    			askms(filters: { archived: { eq: false } }){ data{ id attributes{
-                            vots {what zman why id users_permissions_user {data{id}}}
-                            timegrama {data{id attributes{date}}}
-                            createdAt                            
-                            chat{why ide what zman id users_permissions_user {data{id }} }
-                            users_permissions_user {data{id attributes{ username  profilePic{data{attributes {url formats }}}}}}
-                        	open_mashaabim {data{ id attributes{  price descrip spnot kindOf  sqadualedf sqadualed linkto createdAt hm name easy }}}
-                          	sp {data{ id attributes{ price myp }}}
-      											}}}
-   				asks(filters: { archived: { eq: false } }){ data{ id attributes{
-                            vots  {what why zman id users_permissions_user {data{id}}}
-                            timegrama {data{id attributes{date}}}
-                            createdAt
-                            chat{why id ide what zman users_permissions_user {data{id}}}
-                            open_mission {data{id attributes{  mission {data{id}}
-                                            declined {data{ id}} iskvua isRishon sqadualed dates publicklinks 
-                                           skills{data{id attributes{skillName localizations {data{attributes{skillName }}}}}} 
-                             work_ways {data{ id attributes{ workWayName ${
-                                  $lang === 'he'
-                                    ? 'localizations{data{attributes{workWayName }}}'
-                                    : ''
-                                }}}}  
-                             tafkidims{data{id attributes{roleDescription localizations{data{attributes{roleDescription }}}}}}  
-                                            noofhours perhour privatlinks descrip hearotMeyuchadot name}}}
-                            project {data{ id }}
-                            users_permissions_user {data{ id attributes{ username 
-                             skills{data{id attributes{skillName localizations {data{attributes{skillName }}}}}} 
-                             work_ways {data{ id attributes{ workWayName ${
-                                  $lang === 'he'
-                                    ? 'localizations{data{attributes{workWayName }}}'
-                                    : ''
-                                }}}}  
-                             tafkidims{data{id attributes{roleDescription localizations{data{attributes{roleDescription }}}}}}   email profilePic {data{attributes{ url formats }}}}}}
-      									}}}
-    			finiapruvals(filters: { archived: { eq: false } }){ data{ id attributes{
-                        timegrama {data{id attributes{date}}}
-              			    missname noofhours why what{data{id attributes {url formats}}} 
-        					mesimabetahalich {data{id attributes{ perhour hearotMeyuchadot descrip mission {data {id}}}}}
-                            vots  {what why id users_permissions_user {data{id}}}
-          					project {data{ id}} 
-            				users_permissions_user {data{ id} }
-      											}}}
-    			pendms(filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					name createdAt iskvua hearotMeyuchadot descrip noofhours perhour sqadualed privatlinks publicklinks dates
-                            rishon {data{id}}
-                            acts{data{id attributes{shem  link  des dateF dateS  }}}
-                            negopendmissions{data{id attributes{
-                                name hearotMeyuchadot descrip createdAt noofhours perhour isOriginal date dates isMonth 
-                                users_permissions_user{data{id}}
-                                skills {data{ id attributes{ skillName ${
-                                  $lang == 'he'
-                                    ? 'localizations {data{attributes{skillName }}}'
-                                    : ''
-                                }}}}
-                                tafkidims {data{id attributes{ roleDescription ${
-                                  $lang == 'he'
-                                    ? 'localizations {data{attributes {roleDescription }}}'
-                                    : ''
-                                }}}}
-                                work_ways {data{id attributes{ workWayName ${
-                                  $lang == 'he'
-                                    ? 'localizations{data{attributes{workWayName }}}'
-                                    : ''
-                                }}}}
-                            }}}
-                            skills {data{ id attributes{ skillName ${
-                              $lang == 'he'
-                                ? 'localizations {data{attributes{skillName }}}'
-                                : ''
-                            }}}}
-                            tafkidims {data{id attributes{ roleDescription ${
-                              $lang == 'he'
-                                ? 'localizations {data{attributes {roleDescription }}}'
-                                : ''
-                            }}}}
-                            work_ways {data{id attributes{ workWayName ${
-                              $lang == 'he'
-                                ? 'localizations{data{attributes{workWayName }}}'
-                                : ''
-                            }}}}
-                            mission {data{ id}}
-                            vallues {data{ id}}
-                            timegrama{data{id attributes{date}}}
-                            nego { noofhours perhour users_permissions_user {data {id}}}
-                            diun {what why id zman order users_permissions_user {data{ id}}}  
-                            users { what order why zman id users_permissions_user {data{id }}}                                   
-      													}}}
-    			open_missions(filters: { archived: { eq: false } }){ data{ id attributes{ 
-        					declined {data{ id}} 
-        					users  {data{id} } 
-      								}}}
-    }}}
-      }}}
-}`
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miData = data));
-        console.log("1",nowT - Date.now(),miData)
+    let bearer1 = 'bearer' + ' ' + token;
+    let link = baseUrl + '/graphql';
+
+    try {
+      console.log('About to call fetchMainUserData with:', {
+        baseUrl,
+        token: token?.substring(0, 10) + '...',
+        idL,
+        lang: $lang
+      });
+      miData = await fetchMainUserData(baseUrl, token, idL, $lang);
+      console.log(
+        'fetchMainUserData completed. Result:',
+        nowT - Date.now(),
+        miData?.data ? 'Data received' : 'No data',
+        miData
+      );
       if (
         miData?.data?.usersPermissionsUser == null ||
         miData?.data == null ||
@@ -2204,15 +1685,17 @@
       console.log('nologin');
 
       counter += 1;
-      projects.set(miData.data.usersPermissionsUser.data.attributes.projects_1s.data);
+      projects.set(
+        miData.data.usersPermissionsUser.data.attributes.projects_1s.data
+      );
       userId.set(miData.data.usersPermissionsUser.data.id);
       localStorage.setItem('miDataL', JSON.stringify(miData));
       if (isEqual(miData, miDataold) && update != true) {
-        console.log('nada',nowT - Date.now());
+        console.log('nada', nowT - Date.now());
         low = false;
       } else {
         console.log(miDataold);
-        console.log('tada',nowT - Date.now());
+        console.log('tada', nowT - Date.now());
         console.log(miData);
         miData = miData;
         askedm = [];
@@ -2238,45 +1721,46 @@
         tverias = [];
         usernames = miData.data.usersPermissionsUser.data.attributes.username;
         showOpenPro(miData);
-        console.log('openpro',nowT - Date.now());
+        console.log('openpro', nowT - Date.now());
         midd(miData);
-        console.log('midd',nowT - Date.now());
+        console.log('midd', nowT - Date.now());
         makeWalcom(miData);
-        console.log('makeWalcom',nowT - Date.now());
+        console.log('makeWalcom', nowT - Date.now());
         createasked(miData); // לא עבד כשלא היו משימות פתוחות.. כפילויות אחרי מחיקה
-        console.log('createasked',nowT - Date.now());
+        console.log('createasked', nowT - Date.now());
         createpends(miData);
-        console.log('createpends',nowT - Date.now());
-        mesimabetahalicha(miData);
-        console.log('mtaha',nowT - Date.now());
-        ishursium(miData);
-        console.log('ishursium',nowT - Date.now());
+        console.log('createpends', nowT - Date.now());
+        processMesimabetahalicha(miData);
+        console.log('mtaha', nowT - Date.now());
+        processIshursium(miData);
+        console.log('ishursium', nowT - Date.now());
         sds(miData);
-        console.log('sds',nowT - Date.now());
+        console.log('sds', nowT - Date.now());
         pmash(miData);
-        console.log('pmash',nowT - Date.now());
+        console.log('pmash', nowT - Date.now());
         sps(miData);
-        console.log('sps',nowT - Date.now());
+        console.log('sps', nowT - Date.now());
         createmask(miData);
-        console.log('createmask',nowT - Date.now());
+        console.log('createmask', nowT - Date.now());
         crMaap(miData);
-        console.log('crMaap',nowT - Date.now());
+        console.log('crMaap', nowT - Date.now());
         rashbi(miData);
-        console.log('rashbi',nowT - Date.now());
-        hachla(miData);
-        console.log('hachla',nowT - Date.now());
+        console.log('rashbi', nowT - Date.now());
+        processHachla(miData);
+        console.log('hachla', nowT - Date.now());
         tveria(miData);
-        console.log('tveria',nowT - Date.now());
-        askWants = sharLimud(miData)
-        console.log('scharLimud',askWants,nowT - Date.now());
+        console.log('tveria', nowT - Date.now());
+        askWants = sharLimud(miData);
+        console.log('scharLimud', askWants, nowT - Date.now());
         bubleUiAngin();
-        console.log('bubleUiAngin',nowT - Date.now());
+        console.log('bubleUiAngin', nowT - Date.now());
         low = false;
         update = false;
       }
     } catch (e) {
       //errorId=2
-      sendEror(idL,e,2)
+      console.error('Error in start function (ErrorId=2):', e);
+      sendEror(idL, e, 2);
     }
   }
   let pmashes = [];
@@ -2358,174 +1842,6 @@
 
     tverias = tverias;
   }
-  function hachla(data) {
-    const myid = data.data.usersPermissionsUser.data.id;
-    let src24 = '';
-    if (
-      data.data.usersPermissionsUser.data.attributes.profilePic.data !== null
-    ) {
-      src24 =
-        data.data.usersPermissionsUser.data.attributes.profilePic.data
-          .attributes.url;
-    } else {
-      src24 = '';
-    }
-    const projects =
-      data.data.usersPermissionsUser.data.attributes.projects_1s.data;
-    for (let i = 0; i < projects.length; i++) {
-      const proj = projects[i];
-      for (let j = 0; j < projects[i].attributes.decisions.data.length; j++) {
-        const pend = projects[i].attributes.decisions.data[j].attributes;
-        let newpicid;
-        let newpic = "";
-        if (pend.kind == 'pic') {
-          newpicid = pend.newpic.data.id;
-          newpic = pend.newpic.data.attributes.url;
-        }
-        hachlatot.push({
-          newpicid: newpicid,
-          mysrc: src24,
-          projectId: proj.id,
-          kind: pend.kind,
-          created_at: pend.createdAt,
-          projectName: getProjectData(proj.id, 'pn'),
-          user_1s: getProjectData(proj.id, 'us'),
-          src: getProjectData(proj.id, 'pp'),
-          noofpu: getProjectData(proj.id, 'noof'),
-          timegramaId:pend.timegrama?.data?.id || null,
-          timegramaDate:pend.timegrama?.data?.attributes?.date || null,
-          restime:getProjectData(proj.id, 'restime'),
-          users: pend.vots,
-          myid: myid,
-          newpic: newpic,
-          pendId: projects[i].attributes.decisions.data[j].id,
-          //   diun: pend.diun,
-          ani: 'hachla',
-          azmi: 'hachla',
-          pl: 1 + pend.vots.length,
-          messege: []
-        });
-      }
-      for (let j = 0; j < projects[i].attributes.sheirutpends.data.length; j++) {
-        const pend = projects[i].attributes.sheirutpends.data[j].attributes;
-        hachlatot.push({
-          mysrc: src24,
-          kind: "sheirutpends",
-          spdata: pend,
-          projectId: proj.id,
-          created_at: pend.createdAt,
-          projectName: getProjectData(proj.id, 'pn'),
-          user_1s: getProjectData(proj.id, 'us'),
-          src: getProjectData(proj.id, 'pp'),
-          noofpu: getProjectData(proj.id, 'noof'),
-          timegramaId:pend.timegrama?.data?.id || null,
-          timegramaDate:pend.timegrama?.data?.attributes?.date || null,
-          restime:getProjectData(proj.id, 'restime'),
-          users: pend.vots,
-          myid: myid,
-          newpic: "",
-          pendId: projects[i].attributes.sheirutpends.data[j].id,
-          //   diun: pend.diun,
-          ani: 'hachla',//sheirutpends
-          azmi: 'hachla',
-          pl: 1 + pend.vots.length,
-          messege: []
-        });
-      }
-    }
-    for (let k = 0; k < hachlatot.length; k++) {
-      const x = hachlatot[k].users;
-      hachlatot[k].uids = [];
-      for (let z = 0; z < x.length; z++) {
-        hachlatot[k].uids.push(x[z].users_permissions_user.data.id);
-      }
-    }
-    for (let t = 0; t < hachlatot.length; t++) {
-      const allid = hachlatot[t].uids;
-      const myid = hachlatot[t].myid;
-      hachlatot[t].already = false;
-      hachlatot[t].noofusersOk = 0;
-      hachlatot[t].noofusersNo = 0;
-      hachlatot[t].cv = 0;
-      hachlatot[t].mypos = null;
-      if (allid.includes(myid)) {
-        hachlatot[t].already = true;
-        hachlatot[t].pl += 48;
-        for (let l = 0; l < hachlatot[t].users.length; l++) {
-          if (hachlatot[t].users[l].users_permissions_user.data.id === myid)
-            if (hachlatot[t].users[l].order !== 1) {
-              hachlatot[t].mypos = hachlatot[t].users[l].what;
-            }
-        }
-      }
-      for (let r = 0; r < hachlatot[t].users.length; r++) {
-        if (hachlatot[t].users[r].order !== 1) {
-          hachlatot[t].cv += 1;
-          if (hachlatot[t].users[r].what === true) {
-            hachlatot[t].noofusersOk += 1;
-          } else if (hachlatot[t].users[r].what === false) {
-            hachlatot[t].noofusersNo += 1;
-          }
-        }
-      }
-      const noofusersWaiting = hachlatot[t].user_1s.length - hachlatot[t].cv;
-      hachlatot[t].noofusersWaiting = noofusersWaiting;
-      if (hachlatot[t].users.length > 0) {
-        for (let x = 0; x < hachlatot[t].users.length; x++) {
-          let src22 = '';
-          /*  if(hachlatot[t].users[x].users_permissions_user.profilePic !== null){
-                    src22 = hachlatot[t].users[x].users_permissions_user.profilePic.url
-                  } else{
-                    src22 = ""
-                  }*/
-          hachlatot[t].messege.push({
-            message: `${getProjectData(
-              hachlatot[t].projectId,
-              'un',
-              hachlatot[t].users[x].users_permissions_user.data.id
-            )}  
-                     ${
-                       hachlatot[t].users[x].what == true
-                         ? 'בעד'
-                         : ` נגד
-                      ${
-                        hachlatot[t].users[x].why !== null
-                          ? `בנימוק: ${hachlatot[t].users[x].why}`
-                          : ``
-                      }`
-                     }`,
-            what: hachlatot[t].users[x].what,
-            pic: src22,
-            sentByMe:
-              hachlatot[t].users[x].users_permissions_user.data.id === myid
-                ? true
-                : false,
-            changed: hachlatot[t].users[x].order == 1 ? true : false
-          });
-        }
-      }
-      /*
-         if (pmashes[t].diun.length > 0){
-                         for (let x = 0; x < pmashes[t].diun.length; x++){
-                           let src22 = ""
-                          if(pmashes[t].diun[x].users_permissions_user.profilePic !== null){
-                            src22 = pmashes[t].diun[x].users_permissions_user.profilePic.url
-                          } else{
-                            src22 = ""
-                          }
-                          pmashes[t].messege.push({
-                            message: pmashes[t].diun[x].why,
-                            what: pmashes[t].diun[x].what,
-                            pic:src22,
-                            sentByMe: pmashes[t].diun[x].users_permissions_user.id === myid ? true : false,       
-                          })
-                         }
-                       }*/
-    }
-
-    hachlot = hachlatot.length;
-    localStorage.setItem('halu', halu);
-  }
 
   function rashbi(data) {
     const myid = data.data.usersPermissionsUser.data.id;
@@ -2588,7 +1904,7 @@
     halu = haluask.length;
     localStorage.setItem('halu', halu);
   }
-//suggest mash
+  //suggest mash
   function sps(pp) {
     const usernames = pp.data.usersPermissionsUser.data.attributes.username;
     for (
@@ -2642,8 +1958,8 @@
       }
     }
     huca = huca;
-    console.log(pp.data.usersPermissionsUser.data.attributes.askms)
-   /* const askedarrmash =
+    console.log(pp.data.usersPermissionsUser.data.attributes.askms);
+    /* const askedarrmash =
       pp.data.usersPermissionsUser.data.attributes.askms.data.map(
         (d) => d.attributes.open_mashaabims.data[t].id
       );
@@ -2936,20 +2252,21 @@
                       pmashes[t].nego_mashes[x].attributes?.price
                         ? pmashes[t].nego_mashes[x].attributes?.price
                         : pmashes[t].price *
-                          montsi(
-                            pmashes[t].nego_mashes[x].attributes.kindOf
-                              ? pmashes[t].nego_mashes[x].attributes.kindOf
-                              : pmashes[t].kindOf,
-                            pmashes[t].nego_mashes[x].attributes.sqadualed
-                              ? pmashes[t].nego_mashes[x].attributes.sqadualed
-                              : pmashes[t].sqadualed,
-                            pmashes[t].nego_mashes[x].attributes.sqadualedf
-                              ? pmashes[t].nego_mashes[x].attributes.sqadualedf
-                              : pmashes[t].sqadualedf
-                          ) *
-                          pmashes[t].nego_mashes[x].attributes.hm
-                        ? pmashes[t].nego_mashes[x].attributes.hm
-                        : pmashes[t].hm ?? 0
+                            montsi(
+                              pmashes[t].nego_mashes[x].attributes.kindOf
+                                ? pmashes[t].nego_mashes[x].attributes.kindOf
+                                : pmashes[t].kindOf,
+                              pmashes[t].nego_mashes[x].attributes.sqadualed
+                                ? pmashes[t].nego_mashes[x].attributes.sqadualed
+                                : pmashes[t].sqadualed,
+                              pmashes[t].nego_mashes[x].attributes.sqadualedf
+                                ? pmashes[t].nego_mashes[x].attributes
+                                    .sqadualedf
+                                : pmashes[t].sqadualedf
+                            ) *
+                            pmashes[t].nego_mashes[x].attributes.hm
+                          ? pmashes[t].nego_mashes[x].attributes.hm
+                          : (pmashes[t].hm ?? 0)
                     }`
                       : ``
                   }           
@@ -2973,19 +2290,19 @@
                       ) *
                       pmashes[t].nego_mashes[x].attributes.hm
                         ? pmashes[t].nego_mashes[x].attributes.hm
-                        : pmashes[t].hm ?? 0
+                        : (pmashes[t].hm ?? 0)
                     } 
                     ${tr?.nego.insted[$lang]} 
                     ${
                       pmashes[t].nego_mashes[x].attributes.easy
                         ? pmashes[t].nego_mashes[x].attributes.easy
-                        : pmashes[t].easy *
+                        : (pmashes[t].easy *
                             montsi(
                               pmashes[t].nego_mashes[x].attributes.kindOf,
                               pmashes[t].nego_mashes[x].attributes.sqadualed,
                               pmashes[t].nego_mashes[x].attributes.sqadualedf
                             ) *
-                            pmashes[t].nego_mashes[x].attributes.hm ?? 0
+                            pmashes[t].nego_mashes[x].attributes.hm ?? 0)
                     }`
                       : ``
                   }                                      
@@ -3106,23 +2423,17 @@
       const wal =
         ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i];
       console.log(
-        "welcomen",
+        'welcomen',
         ata.data.usersPermissionsUser.data.attributes.welcom_tops.data[i],
-        getProjectData(
-          wal.attributes.project.data.id,
-          'pp'
-        )
-      )
+        getProjectData(wal.attributes.project.data.id, 'pp')
+      );
       walcomen.push({
         welcomId: wal.id,
         id: wal.attributes.project.data.id,
-        details:wal.attributes.project.data.attributes.publicDescription,
+        details: wal.attributes.project.data.attributes.publicDescription,
         pd: wal.attributes.project.data.attributes.descripFor,
         username: usernames,
-        src: getProjectData(
-          wal.attributes.project.data.id,
-          'pp'
-        ),
+        src: getProjectData(wal.attributes.project.data.id, 'pp'),
         projectName: getProjectData(wal.attributes.project.data.id, 'pn'),
         ani: 'walcomen',
         azmi: 'mesima',
@@ -3277,7 +2588,7 @@
           } else {
             pends[t].cv += 1;
             pends[t].noofusersNo += 1;
-            console.log("somehow")
+            console.log('somehow');
           }
         }
       }
@@ -3459,12 +2770,12 @@
   }
 
   function coinLapach(event) {
-    const indexy = arr1.findIndex(c => c.coinlapach === event.coinlapach);
+    const indexy = arr1.findIndex((c) => c.coinlapach === event.coinlapach);
     if (indexy > -1) {
       arr1.splice(indexy, 1);
       arr1 = [...arr1];
     }
-    
+
     counter = 0;
     cards == event.cards;
     let ani = event.ani;
@@ -3473,7 +2784,7 @@
     }
     //harchava mesima ishrur ziruf hazaa hachla
     console.log('im starting 2');
-     start();
+    start();
   }
 
   // one function to rull them all , pass all the difrrent to one arry then to sort by important then to have them render with if to check wwhat kind and which component.....
@@ -3511,7 +2822,7 @@
     createD();
     console.log(arr1);
     const x = new Date();
-      const d = x.toISOString();
+    const d = x.toISOString();
     /*  await sendToSer({uid: page.data.uid,arr:JSON.stringify(arr1),arrDate:d},"26addUserArr1",null,null,false,fetch).then(v =>{
         console.log("ARR!JSON",v)
       })*/
@@ -3567,8 +2878,9 @@
       milon[key] = true;
     }
   }
-  let success = false
+  let success = false;
 </script>
+
 <SucssesConf {success} />
 
 <svelte:head>
@@ -3706,17 +3018,17 @@
           {askedarr}
           {declineddarr}
           {sug}
-{pen}
-{ask}
-{wel}
-{beta}
-{des}
-{fia}
-{pmash}
-{mashs}
-{maap}
-{askma}
-{hachlot}
+          {pen}
+          {ask}
+          {wel}
+          {beta}
+          {des}
+          {fia}
+          {pmash}
+          {mashs}
+          {maap}
+          {askma}
+          {hachlot}
         />
       </Tooltip>
     </div>

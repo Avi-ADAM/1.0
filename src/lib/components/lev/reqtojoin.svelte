@@ -865,6 +865,7 @@ function afternego (event) {
            {restime}
         pendId={pendId}
         users={users}
+        {acts}
       />
   {/if}
       </div>

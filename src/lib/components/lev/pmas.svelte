@@ -56,6 +56,7 @@ import { idPr } from '../../stores/idPr.js';
    * @property {number} [ordern]
    * @property {any} timegramaId
    * @property {any} restime
+   * @property {any} [acts]
    * @property {boolean} [cards]
    * @property {() => void} [onModal]
    */
@@ -98,6 +99,7 @@ import { idPr } from '../../stores/idPr.js';
     ordern = 0,
     timegramaId,
     restime,
+    acts = [],
     cards = false,
     onCoinLapach,
     onHover,
@@ -117,6 +119,10 @@ import { idPr } from '../../stores/idPr.js';
     let masa = $state(false);
 let monts = $state(0)
 let diunm = $state(false);
+
+$effect(() => {
+  console.log('pmas component acts:', acts);
+});
  let why = "";
 let isOpen = $state(false);
 let loading = $state(false);
@@ -765,6 +771,7 @@ title="ביטול"
   sqadualedf={sqadualedf}
   sqadualed={sqadualed}
   users={users}
+  {acts}
 {restime}
 />
   {:else if diunm === true}

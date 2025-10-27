@@ -141,7 +141,7 @@ let masa = $state(false);
 let why = "";
 let isOpen = $state(false);
 let loading = $state(false);
-
+$inspect(acts)
 onMount(() => {
     skills = oneLangAdj({
         data: skills
@@ -769,6 +769,7 @@ function claf(event) {
               <Nego
                 {masaalr}
                 {mypos}
+               {acts}
                 onLoad={() => (loading = true)}
                 onClose={afternego}
                 {timegramaId}

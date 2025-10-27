@@ -1,7 +1,8 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { sentrySvelteKit } from '@sentry/sveltekit';
 import tailwindcss from "@tailwindcss/vite";
-
+//import {defineConfig} from 'vite';
+import devtoolsJson from 'vite-plugin-devtools-json';
 /** @type {import('vite').UserConfig} */
 const config = {
   ssr: {
@@ -40,8 +41,11 @@ const config = {
       },
     }),*/
     sveltekit(),
-    tailwindcss()
+    tailwindcss(),
+     devtoolsJson()
   ]
 };
 
 export default config;
+
+

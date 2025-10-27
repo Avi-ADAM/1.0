@@ -492,6 +492,7 @@
               linkto={buble.linkto}
               pendId={buble.pendId}
               users={buble.users}
+              acts={buble.acts || []}
               {low}
             />
           </div>

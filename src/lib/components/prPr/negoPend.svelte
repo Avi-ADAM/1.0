@@ -16,7 +16,7 @@
   let bearer1;
   let token;
   let idL;
- let miDatan = [];
+  let miDatan = [];
   let error1;
   let clicked = false;
   /**
@@ -90,7 +90,7 @@
     onClose,
     onLoad
   } = $props();
-  
+
   let userss;
   const less = {
     he: 'הסרה',
@@ -126,10 +126,19 @@
     return obj
       .map((item) => {
         const props = Object.entries(item)
-          .filter(([key]) => key !== '__typename' && item[key] !== null && item[key] !== undefined)
+          .filter(
+            ([key]) =>
+              key !== '__typename' &&
+              item[key] !== null &&
+              item[key] !== undefined
+          )
           .map(([key, val]) => {
             let formattedVal;
-            if (key === 'users_permissions_user' && typeof val === 'object' && val !== null) {
+            if (
+              key === 'users_permissions_user' &&
+              typeof val === 'object' &&
+              val !== null
+            ) {
               formattedVal = `"${val.data.id}"`;
             } else if (typeof val === 'string') {
               formattedVal = `"${val.replace(/"/g, '\\"')}"`;
@@ -148,7 +157,7 @@
   function objToStringC(obj) {
     return objToString(obj);
   }
- 
+
   async function increment() {
     onLoad?.();
     //TODO: update timegrama, add now pend that is changed to nego
@@ -268,6 +277,7 @@
       kindOf4nego = `kindOf:${kindOf},`;
       what4 = false;
     }
+
     let fd = new Date(Date.now() + x);
     let d = new Date();
     let another = ``;

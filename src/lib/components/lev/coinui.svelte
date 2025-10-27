@@ -300,6 +300,7 @@ let h = $state(500);
                     linkto={buble.linkto}
                     pendId={buble.pendId}
                     users={buble.users}
+                    acts={buble.acts || []}
                     {low}
                     nego_mashes={buble.nego_mashes || []}
                       timeGramaDate={buble.timeGramaDate}
