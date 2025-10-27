@@ -523,6 +523,10 @@ const close = () => {
     if (no === true) {
         already = false
     }
+    // Reset already to false when closing negotiation panel without changes
+    if (masa === true && !loading) {
+        already = false;
+    }
     no = false;
     masa = false;
     allr = false;
