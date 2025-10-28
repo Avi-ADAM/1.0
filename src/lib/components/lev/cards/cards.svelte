@@ -858,6 +858,7 @@ $effect(() => {
                       sqedualed={buble.sqedualed}
                       missId={buble.missId}
                       id={buble.id}
+                      acts={buble.acts}
                       openMid={buble.omid}
                       stylef={buble.stylef}
                       st={buble.st}

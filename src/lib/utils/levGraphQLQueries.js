@@ -142,7 +142,9 @@ export function buildMainUserQuery(idL, lang) {
                             timegrama {data{id attributes{date}}}
                             createdAt
                             chat{why id ide what zman users_permissions_user {data{id}}}
-                            open_mission {data{id attributes{  mission {data{id}}
+                            open_mission {data{id attributes{
+                            acts{data{id attributes{shem  link  des dateF dateS  }}}
+                              mission {data{id}}
                                             declined {data{ id}} iskvua isRishon sqadualed dates publicklinks 
                                            skills{data{id attributes{skillName localizations {data{attributes{skillName }}}}}} 
                              work_ways {data{ id attributes{ workWayName ${
@@ -211,7 +213,6 @@ export function buildMainUserQuery(idL, lang) {
                             mission {data{ id}}
                             vallues {data{ id}}
                             timegrama{data{id attributes{date}}}
-                            nego { noofhours perhour users_permissions_user {data {id}}}
                             diun {what why id zman order users_permissions_user {data{ id}}}  
                             users { what order why zman id users_permissions_user {data{id }}}                                   
       													}}}

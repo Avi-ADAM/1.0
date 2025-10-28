@@ -125,10 +125,16 @@
     workways = [],
     userSkills,
     userRole,
-    userWorkway
+    userWorkway,
+    negopendmissions = [],
+    acts = []
   } = $props();
   let dialogOpen = $state(false);
   let resP = [];
+
+  // Negotiation state management using Svelte 5 $state runes
+  let negotiationMode = $state(false);
+  let negotiationLoading = $state(false);
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
   }
@@ -628,6 +634,16 @@ ${adduser2}
     // plain text? list? terms???
   }
 
+  // Negotiation mode toggle function
+  function toggleNegotiationMode() {
+    negotiationMode = !negotiationMode;
+    if (negotiationMode) {
+      already = true; // Set to true when entering negotiation mode
+      masa = true;
+      isOpen = true;
+    }
+  }
+
   async function decline() {
     already = true;
     noofusersNo += 1;
@@ -794,6 +810,7 @@ updateOpenMission(
   import { nowId } from '$lib/stores/pendMisMes.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import NegoM from '../prPr/negoM.svelte';
+  import { getProjectData } from '$lib/stores/projectStore.js';
 
   function tochat() {
     isOpen = true;
@@ -808,17 +825,24 @@ updateOpenMission(
   const close = () => {
     isOpen = false;
     diunm = false;
-    masa = false
-  };
-function afternego (event) {
-  isOpen = false;
-  loading = false;
+    // Reset already to false when closing negotiation panel without saving
+    if (negotiationMode && !negotiationLoading) {
+      already = false;
+    }
     masa = false;
-    onAcsept({
+    negotiationMode = false;
+  };
+  function afternego(event) {
+    isOpen = false;
+    negotiationLoading = false;
+    masa = false;
+    negotiationMode = false;
+    // Only call onAcsept if negotiation was successful (saved)
+    onAcsept?.({
       ani: 'asked',
       coinlapach
-    })
-}
+    });
+  }
 </script>
 
 {#await ser}
@@ -826,68 +850,77 @@ function afternego (event) {
 {:then ser}
   <DialogOverlay {isOpen} onDismiss={close} class="overlay">
     <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    {#if masa === true}
-          <DialogContent aria-label="form" class="nego d">
+      {#if masa === true}
+        <DialogContent aria-label="form" class="nego d">
           <div dir="rtl" class="grid items-center justify-center text-center">
-             <button style="margin: 0 auto;" onclick={close} class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title="ביטול"
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-            <path fill="currentColor" d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41" />
-          </svg></button>
-  {#if loading === true}
-         <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"></RingLoader>
-  {:else}
-      <NegoM
-      {masaalr}
-      onLoad={()=>loading = true}
-              onClose={afternego}
-              {timegramaId}
-  {negopendmissions}
-        descrip ={descrip}
-        projectName ={projectName}
-        name1 ={name}
-        hearotMeyuchadot = {hearotMeyuchadot}
-        noofhours ={noofhours}
-        perhour = {perhour}
-        projectId = {projectId}
-        total ={total}
-        {ordern}
-        noofusers={noofusers}
-        missionId={missionId}
-        skills = {skills}
-        tafkidims = {tafkidims}
-        workways ={workways}
-        mdate={mdate}
-        {mdates}
-        {isKavua}
-        {publicklinks}
-        {privatlinks}
-           {restime}
-        pendId={pendId}
-        users={users}
-        {acts}
-      />
-  {/if}
-      </div>
-  </DialogContent>
-  {:else if diunm === true}
-      <DialogContent class="chat" aria-label="form">
-        <div dir="rtl" class="grid items-center justify-center aling-center">
-          <button
-            onclick={close}
-            style="margin: 0 auto;"
-            class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title="ביטול"
-            ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+            <button
+              style="margin: 0 auto;"
+              onclick={close}
+              class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+              title="ביטול"
+              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                />
+              </svg></button
+            >
+            {#if loading === true}
+              <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
+              ></RingLoader>
+            {:else}
+              <NegoM
+                masaalr={false}
+                onLoad={() => (negotiationLoading = true)}
+                onClose={afternego}
+                {timegramaId}
+                negopendmissions={[]}
+                descrip={missionDetails}
+                {projectName}
+                name1={openmissionName}
+                {hearotMeyuchadot}
+                noofhours={nhours}
+                perhour={valph}
+                {projectId}
+                total={nhours * valph}
+                ordern={0}
+                noofusers={noofpu}
+                missionId={missId}
+                {skills}
+                isAsk={askId}
+                tafkidims={role}
+                {workways}
+                mdate={sqedualed}
+                mdates={deadline}
+                {iskvua}
+                {publicklinks}
+                {privatlinks}
+                restime={getProjectData(projectId,"restime")}
+                pendId={openMid}
+                {users}
+                {acts}
               />
-            </svg></button
-          >
-          {#if loading === true}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-            ></RingLoader>
+            {/if}
+          </div>
+        </DialogContent>
+      {:else if diunm === true}
+        <DialogContent class="chat" aria-label="form">
+          <div dir="rtl" class="grid items-center justify-center aling-center">
+            <button
+              onclick={close}
+              style="margin: 0 auto;"
+              class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+              title="ביטול"
+              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                />
+              </svg></button
+            >
+            {#if loading === true}
+              <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
+              ></RingLoader>
             {/if}
             <Diun
               onRect={afreact}
@@ -902,9 +935,9 @@ function afternego (event) {
                 : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
               ani="askedMi"
             />
-        </div>
-      </DialogContent>
-    {/if}
+          </div>
+        </DialogContent>
+      {/if}
     </div>
   </DialogOverlay>
   {#if cards == false}
@@ -1202,7 +1235,7 @@ function afternego (event) {
               <div class="swiper-slidec mx-auto">
                 <Card
                   onAgree={() => agree()}
-                  onNego={() => decline()}
+                  onNego={isRishon ? toggleNegotiationMode : () => decline()}
                   onHover={() => hoverc()}
                   onChat={tochat}
                   {low}
@@ -1228,6 +1261,8 @@ function afternego (event) {
                   {userWorkway}
                   {missionDetails}
                   {noofusersNo}
+                  {negotiationMode}
+                  {acts}
                 />
               </div>
             </Drawer.Content>
@@ -1238,7 +1273,7 @@ function afternego (event) {
   {:else}
     <Card
       onAgree={() => agree()}
-      onNego={() => decline()}
+      onNego={isRishon ? toggleNegotiationMode : () => decline()}
       onHover={hoverc}
       onChat={tochat}
       {isVisible}
@@ -1265,6 +1300,8 @@ function afternego (event) {
       {userSkills}
       {userRole}
       {userWorkway}
+      {negotiationMode}
+      {acts}
     />
   {/if}
 {/await}

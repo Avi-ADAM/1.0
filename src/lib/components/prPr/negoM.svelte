@@ -92,7 +92,8 @@
     restime,
     acts = [],
     onClose,
-    onLoad
+    onLoad,
+    isAsk = 0
   } = $props();
   $inspect(acts);
   let datai = $state([]);
@@ -366,8 +367,8 @@
             projectId, // pid
             null, // mbId
             null, // assignedId
-            pendId, // pendm
-            null, // open_mission
+            isAsk === 0 ? pendId : null, // pendm
+            isAsk !== 0 ? pendId : null, // open_mission
             dateS, // dateS
             dateF, // dateF
             null, // myIshur
@@ -498,16 +499,16 @@
       descrip4 = ``;
       descrip4nego = ``;
     } else {
-      descrip4 = `descrip: "${descrip2}",`;
-      descrip4nego = `descrip: "${descrip}",`;
+      descrip4 = `descrip: """${descrip2}""",`;
+      descrip4nego = `descrip: """${descrip}""",`;
       what4 = false;
     }
     if (hearotMeyuchadot === hearotMeyuchadot2) {
       hearotMeyuchadot4 = ``;
       hearotMeyuchadot4nego = ``;
     } else {
-      hearotMeyuchadot4 = `hearotMeyuchadot: "${hearotMeyuchadot2}",`;
-      hearotMeyuchadot4nego = `hearotMeyuchadot: "${hearotMeyuchadot}",`;
+      hearotMeyuchadot4 = `hearotMeyuchadot: """${hearotMeyuchadot2}""",`;
+      hearotMeyuchadot4nego = `hearotMeyuchadot: """${hearotMeyuchadot}""",`;
       what4 = false;
     }
     if (noofhours === noofhours2) {
@@ -622,7 +623,7 @@
              createNegopendmission(
               data:{
                 publishedAt: "${d.toISOString()}",
-                pendm:${pendId},
+                ${isAsk === 0 ?  `pendm:${pendId}` : `open_mission:${pendId}`},
                  users_permissions_user: "${idL}",
                  isOriginal:${stepState == 2 ? true : false},
     ${iskvua4nego}             
@@ -639,7 +640,7 @@
     ${originalActsIds.length > 0 ? `acts: [${originalActsIds.join(',')}],` : ''}
               }
              ){data{id}}
-            updatePendm(
+          ${isAsk === 0 ?  "updatePendm" : "updateOpenMission" }(
      id: ${pendId}
       data:  { 
             ${iskvua4}             
@@ -654,7 +655,7 @@
     ${date4}
     ${dates4}
     ${newActsIds.length > 0 ? `acts: [${newActsIds.join(',')}],` : ''}
-        users:[  ${userss}, 
+       ${isAsk ===  0 ? `users:[  ${userss}, 
      {
       what: true
       users_permissions_user: "${idL}"
@@ -666,9 +667,23 @@
 {
     users_permissions_user: "${idL}"
 }
-  ]
+  ]` : ``}
       }
-  ){data { attributes{ users { users_permissions_user {data{ id}}}}}}
+  ){data {id}}
+  ${isAsk ===  0 ? `` : `
+  updateAsk(
+  id:${isAsk}
+  data:{
+  vots:[  ${userss}, 
+     {
+      what: true
+      users_permissions_user: "${idL}"
+      order: ${ordern + 1}
+      zman:"${d.toISOString()}"
+      ide:${idL}
+    }
+  ]
+  }){data{id}}`}
 } `
             // make coin desapire
           })
