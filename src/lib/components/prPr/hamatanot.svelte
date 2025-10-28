@@ -30,16 +30,18 @@
     projectUsers = [],
     restime
   } = $props();
-  let quant = $state(), each = $state(), maid = $state();
+  let quant = $state(),
+    each = $state(),
+    maid = $state();
   function sell(id, v, z, isto) {
     maid = id;
     each = v;
     quant = z;
     kindOf = isto;
     if (isto == 'unlimited') {
-      console.log('unlimited',isto);
+      console.log('unlimited', isto);
       kindUlimit = true;
-    }else{
+    } else {
       kindUlimit = false;
     }
     isOpen = true;
@@ -115,6 +117,7 @@
   const gn = { he: 'שם המתנה', en: 'gift name' };
   const qu = { he: 'סכום', en: 'amount' };
   const whoo = { he: 'הכסף ממתין אצל: ', en: 'who guard the money' };
+  const noteLabel = { he: 'הערה:', en: 'Note:' };
   const tot = { he: 'סך הכל:', en: 'total:' };
   const req = { he: 'בקשת חלוקה', en: 'request money spliting' };
   const see = { he: 'צפיה בהצעת החלוקה', en: 'see existed sppliting offer' };
@@ -199,10 +202,9 @@
     transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
   >
     <DialogContent class="content" aria-label="form">
-      <div style="z-index: 400;" dir="{$lang == 'he' ? 'rtl' : 'ltr'}">
-        <button
-          class=" hover:bg-barbi text-mturk rounded-full"
-          onclick={closer}>{cencel[$lang]}</button
+      <div style="z-index: 400;" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
+        <button class=" hover:bg-barbi text-mturk rounded-full" onclick={closer}
+          >{cencel[$lang]}</button
         >
         {#if a == 0}
           <SaleComponent
@@ -228,7 +230,11 @@
             ></RingLoader>
           </div>
         {:else if a == 3}
-          <h1 class="text-center text-barbi text-bold underline decoration-mturk">{errmsg[$lang]}</h1>
+          <h1
+            class="text-center text-barbi text-bold underline decoration-mturk"
+          >
+            {errmsg[$lang]}
+          </h1>
           <button
             class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
             onclick={() => (a = 0)}>{trya[$lang]}</button
@@ -241,70 +247,74 @@
 <div class="sm:flex sm:flex-col sm:justify-evenly">
   <div class="flex flex-col sm:flex-row sm:justify-evenly">
     <div>
-    <div class="dd md:items-center">
-      <div class="body items-center d">
-        {#if bmiData.length > 0}
-          <table dir="rtl">
-            <caption class="sm:text-right md:text-center text-right">
-              <h1
-                class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
-              >
-                {our[$lang]}
-              </h1>
-            </caption>
-            <thead>
-            <tr class="gg">
-              <th class="gg"></th>
-              {#each bmiData as data, i}
-                <td class="gg" style="font-size: 3rem">
-                  {i + 1}
-                  <!--    <button>מחיקה</button>-->
-                </td>
-              {/each}
-            </tr>
-            <tr>
-              <th>{nm[$lang]}</th>
-              {#each bmiData as data, i}
-                <td>{data.attributes.name} </td>
-              {/each}
-            </tr>
-            <tr>
-              <th>{pric[$lang]}</th>
-              {#each bmiData as data, i}
-                <td>{data.attributes.price}</td>
-              {/each}
-            </tr>
-            <tr>
-              <th>{quanti[$lang]}</th>
-              {#each bmiData as data, i}
-                <td>
-                  {#if data.attributes.quant > 0 || data.attributes.quant === -1}
-                    <p
-                      style="display:{data.attributes.kindOf == 'unlimited'
-                        ? 'none'
-                        : ''} ;"
-                    >
-                      {data.attributes.quant === -1 ? ($lang === 'he' ? 'ללא הגבלה' : 'Unlimited') : data.attributes.quant}
-                    </p>
-                  {/if}
-                </td>
-              {/each}
-            </tr><tr>
-              <th>{kinde[$lang]}</th>
-              {#each bmiData as data, i}
-                <td>
-                  {#if data.attributes.kindOf == 'total'}
-                    {py[$lang]}
-                  {:else if data.attributes.kindOf == 'monthly'}
-                    {pm[$lang]}
-                  {:else if data.attributes.kindOf == 'yearly'}
-                    {pye[$lang]}
-                  {:else if data.attributes.kindOf == 'unlimited'}
-                    {unl[$lang]}
-                  {/if}
-                </td>
-              {/each}
-            </tr><!--<tr>
+      <div class="dd md:items-center">
+        <div class="body items-center d">
+          {#if bmiData.length > 0}
+            <table dir="rtl">
+              <caption class="sm:text-right md:text-center text-right">
+                <h1
+                  class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
+                >
+                  {our[$lang]}
+                </h1>
+              </caption>
+              <thead>
+                <tr class="gg">
+                  <th class="gg"></th>
+                  {#each bmiData as data, i}
+                    <td class="gg" style="font-size: 3rem">
+                      {i + 1}
+                      <!--    <button>מחיקה</button>-->
+                    </td>
+                  {/each}
+                </tr>
+                <tr>
+                  <th>{nm[$lang]}</th>
+                  {#each bmiData as data, i}
+                    <td>{data.attributes.name} </td>
+                  {/each}
+                </tr>
+                <tr>
+                  <th>{pric[$lang]}</th>
+                  {#each bmiData as data, i}
+                    <td>{data.attributes.price}</td>
+                  {/each}
+                </tr>
+                <tr>
+                  <th>{quanti[$lang]}</th>
+                  {#each bmiData as data, i}
+                    <td>
+                      {#if data.attributes.quant > 0 || data.attributes.quant === -1}
+                        <p
+                          style="display:{data.attributes.kindOf == 'unlimited'
+                            ? 'none'
+                            : ''} ;"
+                        >
+                          {data.attributes.quant === -1
+                            ? $lang === 'he'
+                              ? 'ללא הגבלה'
+                              : 'Unlimited'
+                            : data.attributes.quant}
+                        </p>
+                      {/if}
+                    </td>
+                  {/each}
+                </tr><tr>
+                  <th>{kinde[$lang]}</th>
+                  {#each bmiData as data, i}
+                    <td>
+                      {#if data.attributes.kindOf == 'total'}
+                        {py[$lang]}
+                      {:else if data.attributes.kindOf == 'monthly'}
+                        {pm[$lang]}
+                      {:else if data.attributes.kindOf == 'yearly'}
+                        {pye[$lang]}
+                      {:else if data.attributes.kindOf == 'unlimited'}
+                        {unl[$lang]}
+                      {/if}
+                    </td>
+                  {/each}
+                </tr><!--<tr>
         <th> מכירות</th>
         {#each bmiData as data, i}
         <td>          {#if data.sale.in} 
@@ -327,48 +337,49 @@
       {/each}
     </tr>-->
 
-            <tr class="ggd">
-              <th class="ggd">{res[$lang]}</th>
-              {#each bmiData as data, i}
-                <td class="ggd" style="font-size: 3rem">
-                  <button
-                    class=" hover:bg-gold rounded-full p-0.5"
-                    title={res[$lang]}
-                    onclick={()=>sell(
-                      data.id,
-                      data.attributes.price,
-                      data.attributes.quant,
-                      data.attributes.kindOf
-                    )}
-                    ><svg
-                      class="svggg"
-                      version="1.1"
-                      id="Layer_1"
-                      xmlns="http://www.w3.org/2000/svg"
-                      xmlns:xlink="http://www.w3.org/1999/xlink"
-                      x="0px"
-                      y="0px"
-                      viewBox="0 0 496 496"
-                      style=" width:24px;height:24px;"
-                      xml:space="preserve"
-                    >
-                      <g>
-                        <g>
+                <tr class="ggd">
+                  <th class="ggd">{res[$lang]}</th>
+                  {#each bmiData as data, i}
+                    <td class="ggd" style="font-size: 3rem">
+                      <button
+                        class=" hover:bg-gold rounded-full p-0.5"
+                        title={res[$lang]}
+                        onclick={() =>
+                          sell(
+                            data.id,
+                            data.attributes.price,
+                            data.attributes.quant,
+                            data.attributes.kindOf
+                          )}
+                        ><svg
+                          class="svggg"
+                          version="1.1"
+                          id="Layer_1"
+                          xmlns="http://www.w3.org/2000/svg"
+                          xmlns:xlink="http://www.w3.org/1999/xlink"
+                          x="0px"
+                          y="0px"
+                          viewBox="0 0 496 496"
+                          style=" width:24px;height:24px;"
+                          xml:space="preserve"
+                        >
                           <g>
-                            <path
-                              d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
+                            <g>
+                              <g>
+                                <path
+                                  d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
 				h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V104h16v-8.408c9.12-1.856,16-9.936,16-19.592
 				c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4
 				C272,42.344,265.12,34.264,256,32.408z"
-                            />
-                            <path
-                              d="M104,128.408V120H88v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
+                                />
+                                <path
+                                  d="M104,128.408V120H88v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
 				h-8c-2.208,0-4-1.792-4-4v-4H72v4c0,9.656,6.88,17.736,16,19.592V200h16v-8.408c9.12-1.856,16-9.936,16-19.592
 				c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4
 				C120,138.344,113.12,130.264,104,128.408z"
-                            />
-                            <path
-                              d="M400,48c-35.288,0-64,28.712-64,64c0,32.144,23.848,58.752,54.76,63.256C387.664,184.928,378.688,192,368,192H256
+                                />
+                                <path
+                                  d="M400,48c-35.288,0-64,28.712-64,64c0,32.144,23.848,58.752,54.76,63.256C387.664,184.928,378.688,192,368,192H256
 				v-64.552c31.52-3.96,56-30.872,56-63.448c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.576,24.48,59.488,56,63.448
 				V240H128c-10.688,0-19.664-7.072-22.76-16.744C136.152,218.752,160,192.144,160,160c0-35.288-28.712-64-64-64
 				c-35.288,0-64,28.712-64,64c0,32.84,24.872,59.952,56.768,63.56C92.312,242.008,108.536,256,128,256h112v16H104v64h16.76l16,160
@@ -377,47 +388,47 @@
 				 M344.76,480H151.24l-14.4-144h222.32L344.76,480z M376,288v32H120v-32H376z M248,112c-26.472,0-48-21.528-48-48s21.528-48,48-48
 				s48,21.528,48,48S274.472,112,248,112z M400,160c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S426.472,160,400,160
 				z"
-                            />
-                            <path
-                              d="M408,80.408V72h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
+                                />
+                                <path
+                                  d="M408,80.408V72h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
 				h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V152h16v-8.408c9.12-1.856,16-9.936,16-19.592
 				c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4
 				C424,90.344,417.12,82.264,408,80.408z"
-                            />
-                            <rect x="320" y="352" width="16" height="16" />
-                            <rect x="160" y="352" width="144" height="16" />
+                                />
+                                <rect x="320" y="352" width="16" height="16" />
+                                <rect x="160" y="352" width="144" height="16" />
+                              </g>
+                            </g>
                           </g>
-                        </g>
-                      </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                      <g> </g>
-                    </svg>
-                  </button>
-                </td>
-              {/each}
-            </tr>
-          </thead>
-          </table>
-        {/if}
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                          <g> </g>
+                        </svg>
+                      </button>
+                    </td>
+                  {/each}
+                </tr>
+              </thead>
+            </table>
+          {/if}
+        </div>
       </div>
-    </div>
-    <button
-      class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
-      onclick={addnew}>{cr[$lang]}</button
-    >
+      <button
+        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg"
+        onclick={addnew}>{cr[$lang]}</button
+      >
     </div>
     {#if salee.length > 0}
       <div class=" text-center border-2 border-barbi rounded m-4 flex flex-col">
@@ -446,6 +457,16 @@
                   alt=""
                 />
               </span>
+              {#if data.attributes.note}
+                <div class="mt-2 pt-2 border-t border-barbi/30">
+                  <small class="text-barbi/80 font-medium"
+                    >{noteLabel[$lang]}</small
+                  >
+                  <p class="text-sm text-barbi/90 mt-1 italic">
+                    {data.attributes.note}
+                  </p>
+                </div>
+              {/if}
             </div>
           {/each}
         </div>
@@ -463,9 +484,9 @@
             onclick={ask}>{trili.length == 0 ? see[$lang] : req[$lang]}</button
           >
         {:else}
-         <button
+          <button
             class="m-4 mx-auto border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-            onclick={()=>hal = false}><Close/></button
+            onclick={() => (hal = false)}><Close /></button
           >
           <Halu
             {trili}
@@ -481,7 +502,7 @@
       </div>
     {/if}
   </div>
-  {#if salee.length > 0 &&  arr?.length > 0}
+  {#if salee.length > 0 && arr?.length > 0}
     <div class="flex flex-col sm:flex-row-reverse justify-center">
       <div>
         <h1 class="text-center text-barbi text-bold underline decoration-mturk">

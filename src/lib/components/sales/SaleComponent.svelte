@@ -46,6 +46,7 @@
   let selected = $state([]);
   let total = $state(0);
   let hm = $state(1);
+  let note = $state('');
   let placeholder = {
     he: 'אצל מי הכסף',
     en: 'With whom is the money'
@@ -150,6 +151,11 @@
         publishedAt: d.toISOString(),
       };
 
+      // Add note if provided
+      if (note.trim()) {
+        saleData.note = note.trim();
+      }
+
       if (kindOf === 'monthly' || kindOf === 'yearly') {
         if (dates !== null) {
           datesE = false;
@@ -183,30 +189,36 @@
       const miDatan = await response.json();
 
       if (hm > 0) {
-        if (kindOf === 'monthly' || kindOf === 'yearly') {
+        // יצירת monter רק אם אין תאריך סיום מוגדר (מכירה מתמשכת)
+        if ((kindOf === 'monthly' || kindOf === 'yearly') && datef === null) {
           let chiluzh = miDatan.data.createSale.data.id;
           let monti = `mutation{
             createMonter(
               data:{
                 sale: "${chiluzh}",
-                ani: "sale"
-               start: "${sdate.toISOString()}"
-             ${datef !== null ? `finish: "${fdate.toISOString()}" ` : ``}
+                ani: "sale",
+                start: "${sdate.toISOString()}"
               }
             ){data{id}}
             }`;
           await SendTo(monti)
-            .then(() => console.log('Monthly sale created'))
-            .catch(() => console.log('Monthly sale creation error'));
+            .then(() => console.log('Ongoing monthly sale created'))
+            .catch(() => console.log('Ongoing monthly sale creation error'));
         }
         
+        // בדיקה אם יש עדכון כמות לפני הגישה לנתונים
         const saleResult = {
-          id: miDatan.data.updateMatanot.data.id,
+          id: miDatan.data.createSale.data.id,
           in: miDatan.data.createSale.data.attributes.in,
-          un: miDatan.data.updateMatanot.data.attributes.quant,
           unit: hm, // Add unit count for quantity tracking
           matana: miDatan.data.createSale.data,
         };
+        
+        // הוספת נתוני עדכון הכמות רק אם הם קיימים
+        if (miDatan.data.updateMatanot) {
+          saleResult.id = miDatan.data.updateMatanot.data.id;
+          saleResult.un = miDatan.data.updateMatanot.data.attributes.quant;
+        }
         
         onDone?.(saleResult, currentOperationId);
       } else {
@@ -239,6 +251,8 @@
   const end = { he: 'תאריך סיום', en: 'End Date' };
   const addL = { he: 'הוספת מכירה', en: 'Add Sale' };
   const totalT = { he: 'סה"כ', en: 'Total' };
+  const noteT = { he: 'הערה (אופציונלי)', en: 'Note (optional)' };
+  const notePlaceholder = { he: 'הוספת הערה למכירה...', en: 'Add a note to the sale...' };
 
   $effect(() => {
     dayjs.locale($lang);
@@ -327,6 +341,21 @@
     />
     {#if noSelectedE}
       <small class="text-barbi text-center"><mark>{noSelected[$lang]}</mark></small>
+    {/if}
+  </div>
+
+  <!-- Note input -->
+  <div class="mt-4">
+    <small class="text-barbi text-center block mb-2">{noteT[$lang]}</small>
+    <textarea
+      class="w-full bg-gold hover:bg-mtork border-2 border-barbi rounded p-2 text-barbi placeholder-barbi/70 resize-none"
+      rows="3"
+      placeholder={notePlaceholder[$lang]}
+      bind:value={note}
+      maxlength="500"
+    ></textarea>
+    {#if note.length > 0}
+      <small class="text-barbi/70 text-xs">{note.length}/500</small>
     {/if}
   </div>
   <small class="text-barbi text-center"
