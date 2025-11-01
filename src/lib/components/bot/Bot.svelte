@@ -96,21 +96,43 @@
     <img
       src="/botlogo.jpeg"
       alt={$t('bot.title')}
-      class="w-14 h-14 rounded-full"
+      class="sm:w-14 sm:h-14 h-4 w-4 rounded-full"
     />
   </button>
   {#if visible}
     <div
       in:fly={{ y: 20, duration: 300 }}
       out:fly={{ y: 20, duration: 300 }}
-      class="absolute bottom-20 {$locale == 'he' || $locale == 'ar'
+      class="absolute sm:bottom-20 bottom-5 {$locale == 'he' || $locale == 'ar'
         ? 'left-3'
-        : 'right-3'} w-80 h-96 bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
+        : 'right-3'} sm:w-80 sm:h-96 h-[75vh] w-[75vw] bg-gold shadow-teal-500 rounded-xl shadow-2xl flex flex-col overflow-hidden"
     >
-      <div class="p-4 bg-liteGoldTobr shadow-lg">
+      <div
+        class="p-4 bg-liteGoldTobr shadow-lg flex justify-between items-center"
+      >
         <h2 class="text-lg font-semibold text-bluesun drop-shadow-sm">
           {user ? $t('bot.timerTitle') : $t('bot.welcomeTitle')}
         </h2>
+        <button
+          onclick={() => (visible = false)}
+          class="text-bluesun hover:text-red-600 bg-gold transition-colors duration-200 p-1 rounded-full hover:bg-white/20"
+          aria-label="Close bot"
+        >
+          <svg
+            class="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M6 18L18 6M6 6l12 12"
+            ></path>
+          </svg>
+        </button>
       </div>
       <div
         bind:this={messagesContainer}

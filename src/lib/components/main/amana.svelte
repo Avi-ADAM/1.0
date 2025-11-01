@@ -1287,7 +1287,7 @@ animation: AnimationName 13s ease infinite;*/
     line-height: 60px;
     position: absolute;
     left: 50%;
-    bottom: 50%;
+    bottom: 15%;
     color: #fff;
     text-align: center;
     font-size: 70px;
