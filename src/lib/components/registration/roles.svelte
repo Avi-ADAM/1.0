@@ -222,7 +222,7 @@ const newOb = meData.data.createTafkidim.data;
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
-     --sms-width={page.data.isDesktop ? '' : '30vw'}
+     --sms-width="var(--multiselect-width)"
      outerDivClass="!bg-gold !text-barbi"
      inputClass="!bg-gold !text-barbi"
      liSelectedClass="!bg-barbi !text-gold"
@@ -296,7 +296,11 @@ text-shadow: 1px 1px purple;
     grid-column: 2/4;
     grid-row: 2/3;
         margin-top:0;
-
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    justify-self: center;
+    --multiselect-width: 30vw;
     }
 }
  
@@ -322,7 +326,11 @@ text-shadow: 1px 1px purple;
     grid-column: 2/4;
     grid-row: 2/3;
         margin-top: -8vh;
-
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    justify-self: center;
+    --multiselect-width: auto;
     }
     .input-2-2{
     grid-column: 1/5;

@@ -235,7 +235,7 @@
 <div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
   <MultiSelect
     loading={newcontent}
-    --sms-width={page.data.isDesktop ? '' : '30vw'}
+    --sms-width="var(--multiselect-width)"
     outerDivClass="!bg-gold !text-barbi"
     inputClass="!bg-gold !text-barbi"
     liSelectedClass="!bg-barbi !text-gold"
@@ -304,6 +304,9 @@
       grid-row: 2/3;
       align-self: center;
       justify-self: center;
+      display: flex;
+      justify-content: center;
+      --multiselect-width: 30vw;
     }
   }
   .input-2-2 {
@@ -338,5 +341,8 @@
     margin-top: -4vh;
     align-self: center;
     justify-self: center;
+    display: flex;
+    justify-content: center;
+    --multiselect-width: auto;
   }
 </style>

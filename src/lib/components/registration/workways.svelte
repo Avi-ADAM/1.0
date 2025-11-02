@@ -221,7 +221,7 @@ let searchText = $state(``);
    </h1> 
    <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
      <MultiSelect
-     --sms-width={page.data.isDesktop ? '' : '30vw'}
+     --sms-width="var(--multiselect-width)"
      outerDivClass="!bg-gold !text-barbi"
      inputClass="!bg-gold !text-barbi"
      liSelectedClass="!bg-barbi !text-gold"
@@ -273,7 +273,15 @@ text-shadow: 1px 1px purple;
   font-size: 0.9rem;
   margin-top: 26vh;
 	 }
-
+    .input-2{
+    grid-column: 2/4;
+    grid-row: 2/3;
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    justify-self: center;
+    --multiselect-width: 30vw;
+    }
 }
     
    
@@ -298,7 +306,11 @@ text-shadow: 1px 1px purple;
     .input-2{
     grid-column: 2/4;
     grid-row: 2/3;
-
+    display: flex;
+    justify-content: center;
+    align-self: center;
+    justify-self: center;
+    --multiselect-width: auto;
     }
  
 </style>
