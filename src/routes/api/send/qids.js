@@ -938,5 +938,25 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
+  }`,
+  
+  "66getProjectsCount": `query GetProjectsCount {
+    projects {
+      meta {
+        pagination {
+          total
+        }
+      }
+    }
+  }`,
+  
+  "67getMembersCount": `query GetMembersCount {
+    chezins {
+      meta {
+        pagination {
+          total
+        }
+      }
+    }
   }`
 }; 

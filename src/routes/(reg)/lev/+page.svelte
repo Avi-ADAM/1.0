@@ -439,6 +439,8 @@
           users: t.vots,
           chat: t.chat,
           decid: t.open_mission.data.attributes.declined.data,
+          orderon: t.open_mission.data.attributes.negopendmissions.data.length || 0,
+          negopendmissions: t.open_mission.data.attributes.negopendmissions.data,
           name: rt[0],
           stylef: rt[1],
           st: rt[2],
@@ -476,25 +478,54 @@
         dictasked[t].already = false;
         dictasked[t].noofusersOk = 0;
         dictasked[t].noofusersNo = 0;
+        dictasked[t].cv = 0;
+        dictasked[t].mypos = null;
 
         if (allid.includes(myid)) {
-          dictasked[t].already = true;
-          //  dictasked.splice(t, 1);
-          //  dictasked. = dictasked
+          for (let l = 0; l < dictasked[t].users.length; l++) {
+            if (dictasked[t].users[l].users_permissions_user.data.id === myid)
+              if (dictasked[t].users[l].order == dictasked[t].orderon) {
+                dictasked[t].already = true;
+                dictasked[t].pl += 48;
+                dictasked[t].mypos = dictasked[t].users[l].what;
+              }
+          }
         }
-        if (dictasked.length > 0) {
-          for (let r = 0; r < dictasked[t].users.length; r++) {
-            if (dictasked[t].users[r].what === true) {
-              dictasked[t].noofusersOk += 1;
-            } else if (dictasked[t].users[r].what === false) {
+        
+        for (let r = 0; r < dictasked[t].users.length; r++) {
+          if (dictasked[t].users[r].order == dictasked[t].orderon) {
+            dictasked[t].cv += 1;
+            dictasked[t].noofusersOk += 1;
+          } else {
+            if (
+              getOccurrence(
+                dictasked[t].uids,
+                dictasked[t].users[r].users_permissions_user.data.id
+              ) > 1
+            ) {
+              const results = dictasked[t].users.filter((obj) => {
+                return (
+                  obj.users_permissions_user.data.id ===
+                  dictasked[t].users[r].users_permissions_user.data.id
+                );
+              });
+              dictasked[t].cv += 1;
+              dictasked[t].noofusersNo += 1;
+              for (let n = 0; n < results.length; n++) {
+                if (results[n].order === dictasked[t].orderon) {
+                  dictasked[t].cv -= 1;
+                  dictasked[t].noofusersNo -= 1;
+                }
+              }
+            } else {
+              dictasked[t].cv += 1;
               dictasked[t].noofusersNo += 1;
             }
           }
         }
-        if (dictasked.length > 0) {
-          const noofusersWaiting =
-            dictasked[t].noof - dictasked[t].users.length;
-          dictasked[t].noofusersWaiting = noofusersWaiting;
+        
+        const noofusersWaiting = dictasked[t].noof - dictasked[t].cv;
+        dictasked[t].noofusersWaiting = noofusersWaiting;
 
           dictasked[t].messeges = [];
           dictasked[t].messeges.push({
@@ -522,15 +553,20 @@
                     dictasked[t].users[x].what == true
                       ? tr?.vots.inFavor[$lang]
                       : tr?.vots.against[$lang]
-                  } `,
-                what: dictasked[t].users[x].what,
+                  }
+                  ${
+                    dictasked[t].users[x].order != dictasked[t].orderon
+                      ? ' ' + tr?.nego.olderVersion[$lang]
+                      : ``
+                  }`,
+                what: dictasked[t].users[x].order != dictasked[t].orderon ? false : dictasked[t].users[x].what,
                 pic: src22,
                 timestamp: new Date(dictasked[t].users[x].zman),
                 sentByMe:
                   dictasked[t].users[x].users_permissions_user.data.id === myid
                     ? true
                     : false,
-                changed: false
+                changed: dictasked[t].users[x].order < dictasked[t].orderon ? true : false
               });
             }
           }
@@ -553,7 +589,67 @@
               });
             }
           }
-        }
+          // Negotiation messages handling
+          if (dictasked[t].negopendmissions && dictasked[t].negopendmissions.length > 0) {
+            for (let x = 0; x < dictasked[t].negopendmissions.length; x++) {
+              let src22 = getProjectData(
+                dictasked[t].projectId,
+                'upic',
+                dictasked[t].negopendmissions[x].attributes.users_permissions_user.data.id
+              );
+              const negoUser = getProjectData(
+                dictasked[t].projectId,
+                'un',
+                dictasked[t].negopendmissions[x].attributes.users_permissions_user.data.id
+              );
+              let negoMessage = '<span class="underline">' + negoUser + ' ' + (tr?.nego?.didNego?.[$lang] || 'negotiated') + '</span>';
+              
+              const negoAttrs = dictasked[t].negopendmissions[x].attributes;
+              
+              if (negoAttrs.noofhours && negoAttrs.noofhours !== dictasked[t].nhours) {
+                negoMessage += '<br>⚙️ ' + (tr?.nego?.thatMission?.[$lang] || 'Mission') + ' ' + (dictasked[t].nhours || 0) + ' ' + (tr?.nego?.hoursInsted?.[$lang] || 'hours instead') + ' ' + (negoAttrs.noofhours || 0) + ' ' + (tr?.common?.hours?.[$lang] || 'hours');
+              }
+              
+              if (negoAttrs.perhour && negoAttrs.perhour !== dictasked[t].perhour) {
+                negoMessage += '<br>⚙️ ' + (tr?.nego?.perhourNego?.[$lang] || 'Per hour') + ' ' + (dictasked[t].perhour || 0) + ' ' + (tr?.nego?.insted?.[$lang] || 'instead') + ' ' + (negoAttrs.perhour || 0);
+              }
+              
+              if ((negoAttrs.perhour && negoAttrs.perhour !== dictasked[t].perhour) ||
+                  (negoAttrs.noofhours && negoAttrs.noofhours !== dictasked[t].nhours)) {
+                const originalTotal = (dictasked[t].perhour || 0) * (dictasked[t].nhours || 0);
+                const negoTotal = (negoAttrs.perhour || 0) * (negoAttrs.noofhours || 0);
+                negoMessage += '<br>⚙️ ' + (tr?.nego?.total?.[$lang] || 'Total') + ' ' + originalTotal + ' ' + (tr?.nego?.insted?.[$lang] || 'instead') + ' ' + negoTotal;
+              }
+              
+              if (negoAttrs.name && negoAttrs.name !== dictasked[t].openName) {
+                negoMessage += '<br>⚙️ ' + (tr?.nego?.nameNego?.[$lang] || 'Name') + ' "' + dictasked[t].openName + '" ' + (tr?.nego?.insted?.[$lang] || 'instead') + ': "' + negoAttrs.name + '"';
+              }
+              
+              if (negoAttrs.descrip && negoAttrs.descrip !== dictasked[t].missionDetails) {
+                negoMessage += '<br>⚙️ ' + (tr?.nego?.desNego?.[$lang] || 'Description') + ' "' + dictasked[t].missionDetails + '" ' + (tr?.nego?.insted?.[$lang] || 'instead') + ': "' + negoAttrs.descrip + '"';
+              }
+              
+              if (negoAttrs.hearotMeyuchadot && negoAttrs.hearotMeyuchadot !== dictasked[t].hearotMeyuchadot) {
+                negoMessage += '<br>⚙️ ' + (tr?.nego?.heaNego?.[$lang] || 'Special notes') + ' "' + dictasked[t].hearotMeyuchadot + '" ' + (tr?.nego?.insted?.[$lang] || 'instead') + ': "' + negoAttrs.hearotMeyuchadot + '"';
+              }
+              
+              if (negoAttrs.isMonth !== dictasked[t].iskvua) {
+                const originalType = dictasked[t].iskvua ? (tr?.nego?.montly?.[$lang] || 'monthly') : (tr?.nego?.ont?.[$lang] || 'one-time');
+                const negoType = negoAttrs.isMonth ? (tr?.nego?.montly?.[$lang] || 'monthly') : (tr?.nego?.ont?.[$lang] || 'one-time');
+                negoMessage += '<br>⚙️ ' + (tr?.nego?.moaNego?.[$lang] || 'Type') + ' "' + originalType + '" ' + (tr?.nego?.insted?.[$lang] || 'instead') + ': "' + negoType + '"';
+              }
+              
+              dictasked[t].messeges.push({
+                message: negoMessage,
+                what: true,
+                pic: src22,
+                timestamp: new Date(negoAttrs.createdAt),
+                sentByMe: negoAttrs.users_permissions_user.data.id === myid,
+                changed: false
+              });
+            }
+          }
+        
         dictasked[t].messeges = dictasked[t].messeges
           .sort(function (a, b) {
             return b.timestamp - a.timestamp;
@@ -563,6 +659,7 @@
         old[dictasked[t].askId] = dictasked[t].messeges;
         askMisMes.set(old);
       }
+    
     }
     console.log(dictasked);
     let filters = [idL];
@@ -579,7 +676,6 @@
     ask = askedcoin.length;
     localStorage.setItem('ask', ask);
   }
-
   async function createmask(da) {
     const start = da.data.usersPermissionsUser.data.attributes.projects_1s.data;
     for (let i = 0; i < start.length; i++) {

@@ -138,14 +138,35 @@ export function buildMainUserQuery(idL, lang) {
                           	sp {data{ id attributes{ price myp }}}
       											}}}
    				asks(filters: { archived: { eq: false } }){ data{ id attributes{
-                            vots  {what why zman id users_permissions_user {data{id}}}
+                            vots  {what why zman order id users_permissions_user {data{id}}}
                             timegrama {data{id attributes{date}}}
                             createdAt
                             chat{why id ide what zman users_permissions_user {data{id}}}
                             open_mission {data{id attributes{
                             acts{data{id attributes{shem  link  des dateF dateS  }}}
                               mission {data{id}}
-                                            declined {data{ id}} iskvua isRishon sqadualed dates publicklinks 
+                               negopendmissions{data{id attributes{
+                                name hearotMeyuchadot descrip createdAt noofhours perhour isOriginal date dates isMonth 
+                                users_permissions_user{data{id attributes{username}}}
+                                skills {data{ id attributes{ skillName ${
+                                  lang == 'he'
+                                    ? 'localizations {data{attributes{skillName }}}'
+                                    : ''
+                                }}}}
+                                tafkidims {data{id attributes{ roleDescription ${
+                                  lang == 'he'
+                                    ? 'localizations {data{attributes {roleDescription }}}'
+                                    : ''
+                                }}}}
+                                work_ways {data{id attributes{ workWayName ${
+                                  lang == 'he'
+                                    ? 'localizations{data{attributes{workWayName }}}'
+                                    : ''
+                                }}}}
+                              acts{data{id attributes{shem  link  des dateF dateS  }}}
+
+                            }}}
+                                    declined {data{ id}} iskvua isRishon sqadualed dates publicklinks 
                                            skills{data{id attributes{skillName localizations {data{attributes{skillName }}}}}} 
                              work_ways {data{ id attributes{ workWayName ${
                                   lang === 'he'
@@ -178,7 +199,7 @@ export function buildMainUserQuery(idL, lang) {
                             acts{data{id attributes{shem  link  des dateF dateS  }}}
                             negopendmissions{data{id attributes{
                                 name hearotMeyuchadot descrip createdAt noofhours perhour isOriginal date dates isMonth 
-                                users_permissions_user{data{id}}
+                                users_permissions_user{data{id attributes{username}}}
                                 skills {data{ id attributes{ skillName ${
                                   lang == 'he'
                                     ? 'localizations {data{attributes{skillName }}}'
@@ -194,6 +215,7 @@ export function buildMainUserQuery(idL, lang) {
                                     ? 'localizations{data{attributes{workWayName }}}'
                                     : ''
                                 }}}}
+                             acts{data{id attributes{shem  link  des dateF dateS  }}}
                             }}}
                             skills {data{ id attributes{ skillName ${
                               lang == 'he'

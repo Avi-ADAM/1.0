@@ -946,7 +946,10 @@ role="content-info"
    perhour={valph}
    {openmissionName} 
    {iskvua}
-   {missionDetails} {noofusersNo}/>
+   {missionDetails} 
+   {noofusersNo}
+   negopendmissions={[]}
+   orderon={0}/>
 {/if}
 {/await}
 <style>

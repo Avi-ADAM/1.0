@@ -866,6 +866,8 @@ $effect(() => {
                       declined={buble.decid}
                       timegramaId={buble.timegramaId}
                       timegramaDate={buble.timegramaDate}
+                      negopendmissions={buble.negopendmissions || []}
+                      orderon={buble.orderon || 0}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'askedm' && milon.askmap == true}

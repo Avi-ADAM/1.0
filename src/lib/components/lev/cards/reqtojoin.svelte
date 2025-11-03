@@ -7,6 +7,8 @@
   import RichText from '$lib/celim/ui/richText.svelte';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
+  import ComparisonDisplay from '../../ui/ComparisonDisplay.svelte';
+  import NegotiationHistory from '../../ui/NegotiationHistory.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -36,6 +38,8 @@
     isVisible = false,
     iskvua,
     projectName,
+    projectId,
+    hearotMeyuchadot,
     skills,
     role,
     workways,
@@ -61,7 +65,9 @@
     onNego,
     onChat,
     isRishon = false,
-    negotiationMode = false
+    negotiationMode = false,
+    negopendmissions = [],
+    orderon = 0
   } = $props();
   function hover(x) {
     onHover?.(x);
@@ -98,6 +104,7 @@
   };
   import tr from '$lib/translations/tr.json';
   import Tile from '$lib/celim/tile.svelte';
+  import { getProjectData } from '$lib/stores/projectStore';
   function getSkillNames(arr) {
     return arr.map((s) => s.attributes.skillName);
   } //    isMobileOrTablet() ? (isScrolable = !isScrolable) : (isScrolable = true)}
@@ -141,6 +148,15 @@
               class="text-sm bg-gold text-white px-2 py-1 rounded-full ml-2"
             >
               {$lang === 'he' ? 'מצב משא ומתן' : 'Negotiation Mode'}
+            </span>
+          {/if}
+          {#if negopendmissions && negopendmissions.length > 0}
+            <span
+              class="text-xs bg-blue-500 text-white px-2 py-1 rounded-full ml-2"
+            >
+              {$lang === 'he'
+                ? `${negopendmissions.length} משא ומתן`
+                : `${negopendmissions.length} negotiations`}
             </span>
           {/if}
         </div>
@@ -246,11 +262,14 @@
           <span
             role="button"
             tabindex="0"
-            onmouseenter={() => hover(tr.vots.totalno[$lang])}
+            onmouseenter={() =>
+              hover(orderon > 0 ? t.onPrevious[$lang] : tr.vots.totalno[$lang])}
             onmouseleave={() => hover('0')}
             style="color:#80037e;"
           >
-            {noofusersNo}-{tr.vots.against[$lang]}
+            {noofusersNo}-{orderon > 0
+              ? t.onPrevious[$lang]
+              : tr.vots.against[$lang]}
           </span>
         </p>
       </div>
@@ -428,6 +447,18 @@
         </div>
       {/key}
     {/if}
+
+    <!-- Negotiation History Section -->
+    <NegotiationHistory
+      {negopendmissions}
+      {openmissionName}
+      {noofhours}
+      {perhour}
+      {missionDetails}
+      {hearotMeyuchadot}
+      {acts}
+      {projectId}
+    />
 
     <!-- Acts Display Section -->
     {#if acts?.data && acts.data.length > 0}

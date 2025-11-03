@@ -118,6 +118,7 @@
     chat = $bindable(),
     mypose = true,
     order = $bindable(1),
+    orderon = 0,
     sqedualed,
     timegramaId,
     cards = false,
@@ -874,7 +875,7 @@ updateOpenMission(
                 onLoad={() => (negotiationLoading = true)}
                 onClose={afternego}
                 {timegramaId}
-                negopendmissions={[]}
+                {negopendmissions}
                 descrip={missionDetails}
                 {projectName}
                 name1={openmissionName}
@@ -883,7 +884,7 @@ updateOpenMission(
                 perhour={valph}
                 {projectId}
                 total={nhours * valph}
-                ordern={0}
+                ordern={orderon}
                 noofusers={noofpu}
                 missionId={missId}
                 {skills}
@@ -1255,13 +1256,17 @@ updateOpenMission(
                   dates={deadline}
                   {openmissionName}
                   {iskvua}
+                  {projectId}
                   {isRishon}
                   {userSkills}
+                  {hearotMeyuchadot}
                   {userRole}
                   {userWorkway}
                   {missionDetails}
                   {noofusersNo}
                   {negotiationMode}
+                  {negopendmissions}
+                  {orderon}
                   {acts}
                 />
               </div>
@@ -1277,7 +1282,9 @@ updateOpenMission(
       onHover={hoverc}
       onChat={tochat}
       {isVisible}
+      {projectId}
       {sqedualed}
+      {hearotMeyuchadot}
       dates={deadline}
       {low}
       {already}
@@ -1301,6 +1308,8 @@ updateOpenMission(
       {userRole}
       {userWorkway}
       {negotiationMode}
+      {negopendmissions}
+      {orderon}
       {acts}
     />
   {/if}

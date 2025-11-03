@@ -12,6 +12,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
+  import NegotiationHistory from '../../ui/NegotiationHistory.svelte';
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -75,6 +76,8 @@
     onNego,
     onTochat,
     sqadualed,
+    negotiationMode = false,
+    negopendmissions = [],
     dates
   } = $props();
   let zman = $state();
@@ -327,6 +330,17 @@
           </ul>
         </div>
       {/if}
+      
+      <!-- Negotiation History Section -->
+      <NegotiationHistory
+        {negopendmissions}
+        openmissionName={name}
+        {noofhours}
+        {perhour}
+        missionDetails={descrip}
+        {hearotMeyuchadot}
+        {acts}
+      />
     </div>
     <div class="flex items-center">
       <p>

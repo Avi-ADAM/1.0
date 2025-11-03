@@ -663,6 +663,11 @@
               iskvua={buble.iskvua}
               email={buble.email}
               role={buble.role}
+              workways={buble.workways}
+              userSkills={buble.userSkills}
+              userRole={buble.userRole}
+              userWorkway={buble.userWorkway}
+              skills={buble.skills}
               coinlapach={buble.coinlapach}
               pid={buble.pid}
               noofusersWaiting={buble.noofusersWaiting}
@@ -676,7 +681,7 @@
               projectName={buble.projectName}
               useraplyname={buble.username}
               userId={buble.uid}
-              missionDetails={buble.descrip}
+              missionDetails={buble.missionDetails}
               src={buble.src}
               src2={buble.src2}
               openmissionName={buble.openName}
@@ -692,11 +697,17 @@
               sqedualed={buble.sqedualed}
               missId={buble.missId}
               id={buble.id}
+              acts={buble.acts}
               openMid={buble.omid}
               stylef={buble.stylef}
               st={buble.st}
               chat={buble.chat}
               declined={buble.decid}
+              isRishon={buble.isRishon}
+              timegramaId={buble.timegramaId}
+              timegramaDate={buble.timegramaDate}
+              negopendmissions={buble.negopendmissions || []}
+              orderon={buble.orderon || 0}
               {low}
             />
           </div>

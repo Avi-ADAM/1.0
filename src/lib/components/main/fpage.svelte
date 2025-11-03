@@ -188,6 +188,27 @@
     ar: ' وستفتح لك الطريق لخلق واقع جديد. معًا سنخلق عالمًا أفضل'
   };
 
+  const statsText = {
+    he: {
+      currently: 'כרגע יש באתר',
+      partnerships: 'רקמות (שותפויות) פעילות',
+      members: 'חברים וחברות',
+      loading: 'טוען נתונים...'
+    },
+    en: {
+      currently: 'Currently on the site',
+      partnerships: 'active partnerships',
+      members: 'members',
+      loading: 'Loading data...'
+    },
+    ar: {
+      currently: 'حاليًا على الموقع',
+      partnerships: 'شراكات نشطة',
+      members: 'أعضاء',
+      loading: 'تحميل البيانات...'
+    }
+  };
+
   const mapa = {
     he: 'מפת ההסכמה',
     ar: 'خريطة الاتفاق',
@@ -210,8 +231,14 @@
   //w*1.8 < h ? w : h > 639 ? w*0.8 : h
 
   import { Head } from 'svead';
+  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { onMount } from 'svelte';
 
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
+  
+  let projectsCount = $state(0);
+  let membersCount = $state(0);
+  let statsLoaded = $state(false);
   const description = {
     he: '1💗1 הסכמה עולמית על חי | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
     en: '1💗1 WorldWide consensus for Security and Peace | colaboration platform, create together harmoniously | consensus based partnerships manegment platform | we can together',
@@ -234,6 +261,48 @@
   });
   $effect(() => {
     console.log(size, h);
+  });
+
+  // פונקציה לטעינת נתוני הסטטיסטיקות
+  async function loadStats() {
+    try {
+      // קבלת מספר הפרויקטים
+      const projectsResult = await sendToSer(
+        {}, 
+        "66getProjectsCount", 
+        0, 
+        0, 
+        true, // isSer = true כדי לאפשר גישה למשתמשים לא רשומים
+        fetch
+      );
+      
+      // קבלת מספר החברים
+      const membersResult = await sendToSer(
+        {}, 
+        "67getMembersCount", 
+        0, 
+        0, 
+        true, // isSer = true כדי לאפשר גישה למשתמשים לא רשומים
+        fetch
+      );
+      
+      if (projectsResult?.data?.projects?.meta?.pagination?.total) {
+        projectsCount = projectsResult.data.projects.meta.pagination.total;
+      }
+      
+      if (membersResult?.data?.chezins?.meta?.pagination?.total) {
+        membersCount = membersResult.data.chezins.meta.pagination.total;
+      }
+      
+      statsLoaded = true;
+    } catch (error) {
+      console.error('Error loading stats:', error);
+      statsLoaded = true; // עדיין מציינים שהטעינה הסתיימה
+    }
+  }
+
+  onMount(() => {
+    loadStats();
   });
 </script>
 
@@ -480,6 +549,34 @@
         <Tile bg={'gold'} big={true} sm={true} word={word10[$lang]} />
         <!--<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>-->
       </div>
+      <!-- סטטיסטיקות האתר -->
+      <div
+        class="bg-gradient-to-br from-sky-400 via-mturk to-sky-400 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
+      >
+        {#if statsLoaded}
+          <div class="text-center">
+            <p class="text-white font-semibold text-lg mb-2" style="font-family: 'Sababa', sans-serif;">
+              {statsText[$lang].currently}
+            </p>
+            <div class="flex justify-center items-center gap-4 flex-wrap">
+              <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                <div class="text-2xl font-bold text-gold">{projectsCount}</div>
+                <div class="text-white text-sm">{statsText[$lang].partnerships}</div>
+              </div>
+              <div class="text-gold text-2xl">•</div>
+              <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                <div class="text-2xl font-bold text-gold">{membersCount}</div>
+                <div class="text-white text-sm">{statsText[$lang].members}</div>
+              </div>
+            </div>
+          </div>
+        {:else}
+          <div class="text-center text-white font-semibold" style="font-family: 'Sababa', sans-serif;">
+            {statsText[$lang].loading}
+          </div>
+        {/if}
+      </div>
+
       <div
         class="bg-gradient-to-br from-[#c67c7f] via-barbi to-[#c67c7f] px-3 py-4 mt-1 border-4 border-spacing-2"
       >

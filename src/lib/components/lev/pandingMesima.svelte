@@ -1077,6 +1077,7 @@ function claf(event) {
                   {noofhours}
                   {perhour}
                   {hearotMeyuchadot}
+                  {negopendmissions}
                   {already}
                   {projectName}
                   {src}
@@ -1120,6 +1121,7 @@ function claf(event) {
       {hearotMeyuchadot}
       {already}
       {projectName}
+      {negopendmissions}
       {src}
       {noofusersWaiting}
       {noofusersOk}
