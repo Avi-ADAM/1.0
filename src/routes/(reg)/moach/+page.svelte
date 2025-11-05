@@ -241,7 +241,8 @@
               body: JSON.stringify({
                 query: `
         {project(id:${$idPr}){ data{attributes{
-            tosplits (filters: { finished: { eq: false } }){data{attributes{  prectentage vots {what users_permissions_user {data{ id}}}}}}
+            tosplits (filters: { finished: { eq: false } }){data{ id attributes{  prectentage halukas{data{id attributes{
+              confirmed userrecive{data{id}} amount usersend{data{id}}}}} hervachti {users_permissions_user{data{id}}  noten mekabel amount} vots {what users_permissions_user {data{ id}}}}}}
             projectName
             descripFor
             publicDescription

@@ -958,5 +958,68 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
+  }`,
+  
+  "68updateTosplit": `mutation UpdateTosplit($id: ID!, $halukas: [ID], $hervachti: [ComponentProjectsHervachtiInput]) {
+    updateTosplit(
+      id: $id,
+      data: {
+        halukas: $halukas,
+        hervachti: $hervachti
+      }
+    ) {
+      data {
+        id
+        attributes {
+          halukas {
+            data {
+              id
+              attributes {
+                usersend { data { id } }
+                userrecive { data { id } }
+                amount
+              }
+            }
+          }
+          hervachti {
+            users_permissions_user { data { id } }
+            amount
+            noten
+            mekabel
+          }
+        }
+      }
+    }
+  }`,
+  
+
+  
+  "69createHaluka": `mutation CreateHaluka($data: HalukaInput!) {
+    createHaluka(data: $data) {
+      data {
+        id
+      }
+    }
+  }`,
+  
+  "70updateHaluka": `mutation UpdateHaluka($id: ID!, $amount: Float, $usersend: ID, $userrecive: ID) {
+    updateHaluka(
+      id: $id,
+      data: {
+        amount: $amount,
+        usersend: $usersend,
+        userrecive: $userrecive
+      }
+    ) {
+      data {
+        id
+        attributes {
+          amount
+          usersend { data { id } }
+          userrecive { data { id } }
+          confirmed
+        }
+      }
+    }
   }`
 }; 

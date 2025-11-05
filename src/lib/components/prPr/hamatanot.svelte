@@ -248,7 +248,7 @@
   <div class="flex flex-col sm:flex-row sm:justify-evenly">
     <div>
       <div class="dd md:items-center">
-        <div class="body items-center d">
+        <div class="bodyi items-center d">
           {#if bmiData.length > 0}
             <table dir="rtl">
               <caption class="sm:text-right md:text-center text-right">
@@ -608,7 +608,7 @@
     justify-content: center;
     flex-direction: column;
   }
-  .body {
+  .bodyi {
     overflow-x: auto;
     overflow-y: auto;
     max-width: 96vw;
