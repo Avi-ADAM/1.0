@@ -178,6 +178,23 @@
       }
     }
 
+    // Check for new sales
+    const existingSalesIds = currentTosplit.attributes.sales?.data?.map(s => s.id) || [];
+    const currentUnsplitedIds = unsplitedSales.map(s => s.id);
+    
+    const newSales = currentUnsplitedIds.filter(id => !existingSalesIds.includes(id));
+    
+    if (newSales.length > 0) {
+      hasChanges = true;
+      const newSalesText = $lang === 'he' ? 'מכירות חדשות נוספו' : 'new sales added';
+      changes.push(`${newSales.length} ${newSalesText}`);
+      changesForDisplay.push({
+        label: $lang === 'he' ? 'מכירות חדשות:' : 'New sales:',
+        oldValue: existingSalesIds.length.toString(),
+        newValue: (existingSalesIds.length + newSales.length).toString()
+      });
+    }
+
     splitChanged = hasChanges;
     showUpdateSuggestion = hasChanges;
     changeDetails = changes.join(', ');
@@ -293,12 +310,16 @@
         }
       }
 
-      // Update the tosplit with new halukas and hervachti
+      // Get all unsplited sales IDs
+      const salesIds = unsplitedSales.map(sale => sale.id);
+
+      // Update the tosplit with new halukas, hervachti, and sales
       await sendToSer(
         {
           id: currentTosplit.id,
           halukas: updatedHalukaIds,
-          hervachti: hervachtiArray
+          hervachti: hervachtiArray,
+          sales: salesIds
         },
         '68updateTosplit',
         null,
@@ -306,6 +327,22 @@
         false,
         fetch
       );
+
+      // Update each sale to mark as splited
+      for (let saleId of salesIds) {
+        await sendToSer(
+          {
+            id: saleId,
+            splited: true,
+            tosplits: [currentTosplit.id]
+          },
+          '71updateSaleSplited',
+          null,
+          null,
+          false,
+          fetch
+        );
+      }
 
       showUpdateSuggestion = false;
       splitChanged = false;
@@ -408,6 +445,11 @@ createHaluka(
       }
     }
     hervachti = hervachti;
+    
+    // Get all unsplited sales IDs
+    const salesIds = unsplitedSales.map(sale => sale.id);
+    const salesString = salesIds.length > 0 ? `sales: [${salesIds.join(',')}],` : '';
+    
     try {
       await fetch(linkg, {
         method: 'POST',
@@ -429,6 +471,7 @@ createHaluka(
   ],
     halukas: [${naminator}],
     ${hervachti}
+    ${salesString}
 }
     
   ){data { id }}
@@ -440,6 +483,23 @@ createHaluka(
       console.log(miDatan);
       //get ids put in tosplitname for now
       let timegramaId = miDatan.data.createTosplit.data.id;
+      
+      // Update each sale to mark as splited
+      for (let saleId of salesIds) {
+        await sendToSer(
+          {
+            id: saleId,
+            splited: true,
+            tosplits: [timegramaId]
+          },
+          '71updateSaleSplited',
+          null,
+          null,
+          false,
+          fetch
+        );
+      }
+      
       let x = calcX(restime);
       let fd = new Date(Date.now() + x);
       await sendToSer(
@@ -465,8 +525,15 @@ createHaluka(
   let showUpdateSuggestion = $state(false);
   let changeDetails = $state('');
   let changesList = $state([]);
+  let unsplitedSales = $state([]);
 
   onMount(async () => {
+    // Filter unsplited sales
+    unsplitedSales = salee.filter(sale => 
+      !sale.attributes.splited && 
+      (!sale.attributes.tosplits?.data || sale.attributes.tosplits.data.length === 0)
+    );
+
     cal();
 
     pre();
@@ -489,17 +556,20 @@ createHaluka(
     }
   });
   function cal() {
+    // Only calculate with unsplited sales
+    const unsplitedOnly = salee.filter(s => !s.attributes.splited);
+    
     for (let i = 0; i < users.length; i++) {
-      for (let j = 0; j < salee.length; j++) {
+      for (let j = 0; j < unsplitedOnly.length; j++) {
         if (
-          salee[j].attributes.users_permissions_user.data.id === users[i].id
+          unsplitedOnly[j].attributes.users_permissions_user.data.id === users[i].id
         ) {
-          if (salee[j].attributes.users_permissions_user.data.id in dictidi) {
-            dictidi[salee[j].attributes.users_permissions_user.data.id] +=
-              salee[j].attributes.in;
+          if (unsplitedOnly[j].attributes.users_permissions_user.data.id in dictidi) {
+            dictidi[unsplitedOnly[j].attributes.users_permissions_user.data.id] +=
+              unsplitedOnly[j].attributes.in;
           } else {
-            dictidi[salee[j].attributes.users_permissions_user.data.id] =
-              salee[j].attributes.in;
+            dictidi[unsplitedOnly[j].attributes.users_permissions_user.data.id] =
+              unsplitedOnly[j].attributes.in;
           }
         }
       }

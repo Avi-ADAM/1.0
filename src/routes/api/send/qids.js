@@ -960,12 +960,13 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
   
-  "68updateTosplit": `mutation UpdateTosplit($id: ID!, $halukas: [ID], $hervachti: [ComponentProjectsHervachtiInput]) {
+  "68updateTosplit": `mutation UpdateTosplit($id: ID!, $halukas: [ID], $hervachti: [ComponentProjectsHervachtiInput], $sales: [ID]) {
     updateTosplit(
       id: $id,
       data: {
         halukas: $halukas,
-        hervachti: $hervachti
+        hervachti: $hervachti,
+        sales: $sales
       }
     ) {
       data {
@@ -986,6 +987,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             amount
             noten
             mekabel
+          }
+          sales {
+            data {
+              id
+            }
           }
         }
       }
@@ -1018,6 +1024,24 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           usersend { data { id } }
           userrecive { data { id } }
           confirmed
+        }
+      }
+    }
+  }`,
+  
+  "71updateSaleSplited": `mutation UpdateSaleSplited($id: ID!, $splited: Boolean, $tosplits: [ID]) {
+    updateSale(
+      id: $id,
+      data: {
+        splited: $splited,
+        tosplits: $tosplits
+      }
+    ) {
+      data {
+        id
+        attributes {
+          splited
+          tosplits { data { id } }
         }
       }
     }

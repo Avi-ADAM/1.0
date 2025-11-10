@@ -260,7 +260,7 @@
                  myIshur valiIshur status mesimabetahaliches{data{id 
                   attributes{name forums{data{id}}}}}}}}
             sheiruts{data{ id attributes{name descrip equaliSplited oneTime isApruved}}}
-            sales {data{ id attributes{ in date note matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
+            sales {data{ id attributes{ in date splited tosplits{data{id}} note matanot {data{id attributes{ name }}} users_permissions_user {data{ id attributes{ username}}}}}}
             matanotofs {data{ id attributes{ name price quant kindOf startDate finnishDate }}}
             finnished_missions {data{ id attributes{ missionName start finish mesimabetahalich {data{attributes{ createdAt}}} createdAt why total descrip hearotMeyuchadot noofhours perhour users_permissions_user {data{ id attributes{ username}}}}}}
             rikmashes{data{ id attributes{ name kindOf total hm price agprice sp { data{id} } spnot users_permissions_user {data{ id attributes {username}}}}}}

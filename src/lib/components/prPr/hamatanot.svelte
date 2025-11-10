@@ -123,8 +123,11 @@
   const see = { he: 'צפיה בהצעת החלוקה', en: 'see existed sppliting offer' };
   const sbp = { he: 'התפלגות המכירות לפי מוצר', en: 'sales by product' };
   const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
+  const awaitingSplit = { he: '(ממתינות לחלוקה)', en: '(awaiting split)' };
   $effect(() => {
-    fermatana = salee.reduce((acc, sale) => {
+    // Only show unsplited sales in graphs
+    const unsplitedSales = salee.filter(s => !s.attributes.splited);
+    fermatana = unsplitedSales.reduce((acc, sale) => {
       const matanaName = sale.attributes.matanot.data.attributes.name;
       const saleIn = sale.attributes.in;
       acc[matanaName] = (acc[matanaName] || 0) + saleIn;
@@ -132,8 +135,10 @@
     }, {});
   });
   $effect(() => {
+    // Only show unsplited sales in graphs
+    const unsplitedSales = salee.filter(s => !s.attributes.splited);
     const newFerdate = {};
-    for (const sale of salee) {
+    for (const sale of unsplitedSales) {
       const dateKey = dayjs(sale.attributes.date).format('YYYY-MM-DD');
       const matanaName = sale.attributes.matanot.data.attributes.name;
       const saleIn = sale.attributes.in;
@@ -192,7 +197,10 @@
     }
   });
   $effect(() => {
-    allin = salee.reduce((total, s) => total + s.attributes.in, 0);
+    // Only count unsplited sales
+    allin = salee
+      .filter(s => !s.attributes.splited)
+      .reduce((total, s) => total + s.attributes.in, 0);
   });
 </script>
 
@@ -440,8 +448,13 @@
         <div class="flex d overflow-auto">
           {#each salee as data, i}
             <div
-              class=" button-whitegold py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400"
+              class="relative button-whitegold py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : ''}"
             >
+              {#if data.attributes.splited}
+                <div class="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                  ✓ {$lang === 'he' ? 'חולק' : 'Split'}
+                </div>
+              {/if}
               <h3 title={gn[$lang]}>
                 {data.attributes.matanot.data.attributes.name}
               </h3>
@@ -475,6 +488,11 @@
         >
           <h2>{tot[$lang]}</h2>
           <p class="font-bold">{allin}</p>
+          {#if salee.some(s => s.attributes.splited)}
+            <small class="text-barbi/70 mt-1 block">
+              {$lang === 'he' ? '(לא כולל מכירות שכבר חולקו)' : '(excluding already split sales)'}
+            </small>
+          {/if}
         </div>
 
         {#if hal === false}
@@ -507,6 +525,8 @@
       <div>
         <h1 class="text-center text-barbi text-bold underline decoration-mturk">
           {sbp[$lang]}
+          <br>
+          <small class="text-sm font-normal">{awaitingSplit[$lang]}</small>
         </h1>
 
         <div class="sm:w-96 [width:95vw] [height:95vw] sm:h-96 m-4">
@@ -519,6 +539,8 @@
             class="text-center text-barbi text-bold underline decoration-mturk"
           >
             {sbd[$lang]}
+            <br>
+            <small class="text-sm font-normal">{awaitingSplit[$lang]}</small>
           </h1>
 
           <div class="  sm:[width:calc(95vw-24rem)] w-4/5 h-96 m-2">

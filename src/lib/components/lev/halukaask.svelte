@@ -187,12 +187,50 @@ if (noofusersOk  === noofusers){
   ],
  finished: true
  }
-  ){data {attributes{ vots { users_permissions_user {data{ id}}}}}}
+  ){data {
+    id
+    attributes{ 
+      vots { users_permissions_user {data{ id}}}
+      sales {
+        data {
+          id
+        }
+      }
+    }
+  }}
  } `   
  } )})
   .then(r => r.json())
   .then(data => miDatan = data); 
         console.log(miDatan)
+        
+        // Update all sales to mark as splited
+        const salesData = miDatan?.data?.updateTosplit?.data?.attributes?.sales?.data || [];
+        for (let sale of salesData) {
+          try {
+            await fetch(linkg, {
+              method: 'POST',
+              headers: {
+                'Authorization': bearer1,
+                'Content-Type': 'application/json'
+              },
+              body: JSON.stringify({
+                query: `mutation {
+                  updateSale(
+                    id: ${sale.id}
+                    data: { splited: true }
+                  ) {
+                    data { id }
+                  }
+                }`
+              })
+            })
+            .then(r => r.json())
+            .then(data => console.log('Sale updated:', data));
+          } catch (e) {
+            console.error('Error updating sale:', e);
+          }
+        }
         for (let t = 0; t < halukot.length; t++) {
           const idd = halukot[t].id;
           //send apruved for each haluka
@@ -428,48 +466,7 @@ async function react (){
       isOpen = true;
 }
 async function afreact (){
-       const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
-    token  = cookieValue; 
-     bearer1 = 'bearer' + ' ' + token;
-    try {
-             await fetch(linkg, {
-              method: 'POST',
-        headers: {
-            'Authorization': bearer1,
-            'Content-Type': 'application/json'
-                  },
-        body: 
-        JSON.stringify({query:
-          `mutation { updatePmash(
-id: ${pendId}
-      data: { diun:[  ${diunim}, 
-         
-     {
-      what: ${mypos}
-      users_permissions_user: "${idL}"
-      why: "${why}"
-      order: ${order+=1}
-    }
-  ]}
-  ){data {  id}}
-} `   
-// make coin desapire
- } )})
-  .then(r => r.json())
-  .then(data => miDatan = data);
-         console.log(miDatan)
-        } catch (e) {
-            error1 = e
-            console.log(error1)
-        }
+    console.log("todo")
 }
 
  import { Swiper, SwiperSlide } from "swiper/svelte";
