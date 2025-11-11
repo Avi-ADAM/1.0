@@ -278,114 +278,7 @@
 
   const userss = objToString(users);
   let welcome = ``;
-  let adduser = ``;
-  let adduser2 = ``;
-  async function after(miDatan, newnew) {
-    const d = new Date();
-    let chiluzh = miDatan.data.createMesimabetahalich.data.id;
-    let monti = ``;
-    if (iskvua == true) {
-      monti = `
-            createMonter(
-              data:{
-                mesimabetahalich: "${chiluzh}",
-                ani: "mesimabetahalich"
-                ${sqedualed != undefined && sqedualed != null ? `start: "${sqedualed > d ? sqedualed : d.toISOString()}"` : `start: "${d.toISOString()}"`}
-                ${deadline != undefined && deadline != null ? `finish: "${deadline}"` : ``}
-              }
-        ){data{id}}
-          `;
-    }
 
-    const otherasks = miDatan.data.updateOpenMission.data.attributes.asks.data;
-    console.log(otherasks);
-    if (otherasks.length > 1) {
-      let nextquery = ``;
-      for (let i = 0; i < otherasks.length; i++) {
-        nextquery = `
-               ${i == 0 ? monti : ``}
-                updateAsk(
-                       id: "${otherasks[i].id}" 
-                                data: { archived: true
-                            }
-                        ){data{id}}`;
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation { 
-                      ${nextquery}
-                        }`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
-        console.log(miDatan);
-      }
-    }
-    if (newnew == true) {
-      let emailt;
-      let ema = miDatan.data.updateProject.data.attributes.user_1s.data;
-      let la;
-      for (let i = 0; i < ema.length; i++) {
-        if (ema[i].id == userId) {
-          emailt = ema[i].attributes.email;
-          la = ema[i].attributes.lang;
-        }
-      }
-      let langi = $lang;
-      if (la == 'he' || la == 'en') {
-        langi = la;
-      }
-      console.log(langi);
-      let data = {
-        user: useraplyname,
-        projectName: projectName,
-        projectSrc: src2,
-        missionName: openmissionName,
-        email: emailt,
-        lang: langi,
-        kind: 'exeptedMission'
-      }; //username email projectname projectsrc lang openmissionName
-      fetch('/api/sma', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify(data)
-      })
-        .then((response) => response)
-        .then((data) => {
-          console.log('Success:', data);
-        })
-        .catch((error) => {
-          console.error('Error:', error);
-        });
-    }
-    const acts = miDatan.data.updateOpenMission.data.attributes.acts.data;
-    console.log(acts);
-    for (let i = 0; i < acts.length; i++) {
-      await sendToSer(
-        {
-          id: acts[i].id,
-          myIshur: true,
-          isAssigned: true,
-          uid: [idL],
-          mesimabetahaliches: [chiluzh]
-        },
-        '31updateTask',
-        null,
-        null,
-        false,
-        fetch
-      ).then((x) => {
-        console.log(x);
-      });
-    }
-  }
   async function agree() {
     already = true;
     noofusersOk += 1;
@@ -446,72 +339,52 @@
       console.log('agree, ecsepted');
 
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createMesimabetahalich(
-      data: {project: "${projectId}",
-             mission:  "${missId}",
-             hearotMeyuchadot: """${hearotMeyuchadot}""",
-             name: """${openmissionName}""",
-             descrip: """${missionDetails}""",
-             hoursassinged: ${nhours},
-             perhour: ${valph}, 
-             iskvua:${iskvua},  
-             privatlinks: """${privatlinks}""",
-             publicklinks: """${publicklinks}""", 
-             users_permissions_user: "${userId}",
-              tafkidims: [${tafkidimsa}],
-                      publishedAt: "${d.toISOString()}",
-            ${date}
-            ${sdate}
-                  }
-  ) {data{id attributes{project{data{id }}}}}
-
-updateOpenMission(
-  id: "${openMid}"
-  data: {archived: true}
-) {data{id attributes{archived
- acts{data{id}}
- asks{data{id}}
- }}}
-${welcome}
-${adduser}
- updateAsk(
-                 id: "${askId}" 
-                                data: { archived: true,
-                                    vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-
-                                      }
-                                    ]}
-                        ){data{id}}
-                        ${
-                          timegramaId > 0
-                            ? ` updateTimegrama(
-     id: ${timegramaId}
-             data:{
-              done: true
-             }){
-              data{id}
-             }
-`
-                            : ``
-                        }
-                    }`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
+        const { createMesimabetahalich, afterMesimabetahalikhCreation } = await import('$lib/utils/createMesimabetahalich.js');
+        
+        miDatan = await createMesimabetahalich({
+          projectId,
+          missId,
+          openMid,
+          askId,
+          userId,
+          currentUserId: idL,
+          openmissionName,
+          missionDetails,
+          nhours,
+          valph,
+          iskvua,
+          hearotMeyuchadot,
+          privatlinks,
+          publicklinks,
+          tafkidims: role.data,
+          deadline,
+          sqedualed,
+          timegramaId,
+          projectUserIds: pid,
+          userss,
+          token: cookieValue,
+          linkg
+        });
+        
         console.log(miDatan);
-        after(miDatan, newnew, idL, bearer1);
+        
+        await afterMesimabetahalikhCreation({
+          miDatan,
+          isNewUser: newnew,
+          iskvua,
+          sqedualed,
+          deadline,
+          userId,
+          currentUserId: idL,
+          useraplyname,
+          projectName,
+          src2,
+          openmissionName,
+          lang: $lang,
+          token: cookieValue,
+          linkg,
+          sendToSer
+        });
 
         onAcsept?.({
           ani: 'asked',
@@ -525,60 +398,52 @@ ${adduser}
       console.log('create new as above and add vote and archive asked');
       //arcive all other asks
       try {
-        await fetch(linkg, {
-          method: 'POST',
-          headers: {
-            Authorization: bearer1,
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            query: `mutation 
-                        { createMesimabetahalich(
-      data: {project: "${projectId}",
-             mission:  "${missId}",
-             hearotMeyuchadot: """${hearotMeyuchadot}""",
-             name: """${openmissionName}""",
-             descrip: """${missionDetails}""",
-             hoursassinged: ${nhours},
-             perhour: ${valph},  
-              iskvua:${iskvua},   
-             privatlinks: """${privatlinks}""",
-             publicklinks: """${publicklinks}""", 
-             users_permissions_user: "${userId}",
-             tafkidims: [${tafkidimsa}],
-                     publishedAt: "${d.toISOString()}",
-            ${date}
-            ${sdate}
-                  }
-  ) {data{id attributes{project{data{id }}}}}
-
-updateOpenMission(
-  id: "${openMid}"
-  data: {archived: true}
-) {data{id attributes{ archived  acts{data{id}}
- asks{data{id}}}}}
-${welcome}
-${adduser2}
- updateAsk(
-            id: "${askId}"
-                                data: { 
-                                  archived: true,
-                                    vots: [${userss}, 
-                                       {
-                                        what: true
-                                        users_permissions_user: "${idL}"
-                                      }
-                                    ]}
-                        ){data{id}}
-}
-`
-          })
-        })
-          .then((r) => r.json())
-          .then((data) => (miDatan = data));
+        const { createMesimabetahalich, afterMesimabetahalikhCreation } = await import('$lib/utils/createMesimabetahalich.js');
+        
+        miDatan = await createMesimabetahalich({
+          projectId,
+          missId,
+          openMid,
+          askId,
+          userId,
+          currentUserId: idL,
+          openmissionName,
+          missionDetails,
+          nhours,
+          valph,
+          iskvua,
+          hearotMeyuchadot,
+          privatlinks,
+          publicklinks,
+          tafkidims: role.data,
+          deadline,
+          sqedualed,
+          timegramaId,
+          projectUserIds: pid,
+          userss,
+          token: cookieValue,
+          linkg
+        });
+        
         console.log(miDatan);
-        //TODO: timegrama if dates
-        after(miDatan, newnew, idL, bearer1);
+        
+        await afterMesimabetahalikhCreation({
+          miDatan,
+          isNewUser: newnew,
+          iskvua,
+          sqedualed,
+          deadline,
+          userId,
+          currentUserId: idL,
+          useraplyname,
+          projectName,
+          src2,
+          openmissionName,
+          lang: $lang,
+          token: cookieValue,
+          linkg,
+          sendToSer
+        });
 
         onAcsept?.({
           ani: 'asked',

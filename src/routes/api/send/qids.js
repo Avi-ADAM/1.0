@@ -838,16 +838,19 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         attributes {
           sqadualed
           archived
-          acts { data { attributes { shem } } }
+          acts { data { id attributes { shem des dateF dateS link } } }
           users { data { id } }
+          mission { data { id } }
           project { data { id attributes { projectName user_1s { data { id } } restime timeToP profilePic { data { attributes { url } } } } } }
-          tafkidims { data { attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
+          tafkidims { data { id attributes { roleDescription localizations { data { attributes { roleDescription } } } } } }
           skills { data { attributes { skillName localizations { data { attributes { skillName } } } } } }
           descrip
           hearotMeyuchadot
           name
           dates
           iskvua
+          privatlinks
+          publicklinks
           work_ways { data { attributes { workWayName localizations { data { attributes { workWayName } } } } } }
           noofhours
           perhour

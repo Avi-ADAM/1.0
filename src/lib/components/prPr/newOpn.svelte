@@ -50,8 +50,8 @@ const requireSkills = {
     "en": "required skills:"
 }
 const seePr = {
-    "he": "לצפיה בריקמה",
-    "en": "see the freeMates page"
+    "he": "לצפיה בדף המשימה",
+    "en": "View Mission Page"
 }
 const requiredRoles = {
     "he": "תפקידים נדרשים:",
@@ -146,7 +146,15 @@ bg-gray-700">
         {/if}  
         </div>-->
            </div>
-            <div class="basis-14" >
+            <div class="basis-14 flex flex-col gap-2" >
+                <a 
+                  href="/availableMission/{datai.id}" 
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  class="bg-gold hover:bg-barbi text-gray-900 font-bold py-2 px-4 rounded-lg text-center transition-colors duration-200 shadow-md hover:shadow-lg"
+                >
+                  {seePr[$lang]}
+                </a>
                 
                 <Share
                 slug="{"/availableMission/"+datai.id}"

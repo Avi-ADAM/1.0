@@ -16,6 +16,8 @@ import {
   import {SendTo} from '$lib/send/sendTo.svelte';
 //TODO: get asked from server then show you alr .., find a way to get title
 let error1 = null;
+const baseUrl = import.meta.env.VITE_URL;
+const linkg = baseUrl + '/graphql';
   /**
    * @typedef {Object} Props
    * @property {any} [askedarr]
@@ -31,7 +33,6 @@ function project(x) {
     goto('/project/'+x)
 }
 async function ask() {
-  //TODO: if only me in the freemates and its me create mesimabetahalich
   alr = true
     const inD = data.alld
     if (!inD || !inD.attributes.project || !inD.attributes.project.data) {
@@ -50,6 +51,79 @@ async function ask() {
     }
 
     const uId = cookieValueId;
+    const projectUserIds = inD.attributes.project.data.attributes.user_1s.data.map(t => t.id);
+    
+    // If only one user in project and it's me - create mesimabetahalich directly
+    if (projectUserIds.length === 1 && projectUserIds.includes(uId)) {
+        const cookieValue = document.cookie
+            .split('; ')
+            .find(row => row.startsWith('jwt='))
+            ?.split('=')[1];
+        
+        if (!cookieValue) {
+            toast.error("נא להתחבר מחדש למערכת");
+            return;
+        }
+
+        try {
+            const { createMesimabetahalich, afterMesimabetahalikhCreation } = await import('$lib/utils/createMesimabetahalich.js');
+            const { sendToSer } = await import('$lib/send/sendToSer.js');
+            
+            const result = await createMesimabetahalich({
+                projectId: inD.attributes.project.data.id,
+                missId: inD.attributes.mission?.data?.id || data.mId,
+                openMid: data.mId,
+                userId: uId,
+                currentUserId: uId,
+                openmissionName: inD.attributes.name,
+                missionDetails: inD.attributes.descrip || '',
+                nhours: inD.attributes.noofhours,
+                valph: inD.attributes.perhour,
+                iskvua: inD.attributes.iskvua || false,
+                hearotMeyuchadot: inD.attributes.hearotMeyuchadot || '',
+                privatlinks: inD.attributes.privatlinks || '',
+                publicklinks: inD.attributes.publicklinks || '',
+                tafkidims: inD.attributes.tafkidims.data,
+                deadline: inD.attributes.dates,
+                sqedualed: inD.attributes.sqadualed,
+                projectUserIds: projectUserIds,
+                token: cookieValue,
+                linkg: linkg
+            });
+
+            if (result?.data?.createMesimabetahalich) {
+                await afterMesimabetahalikhCreation({
+                    miDatan: result,
+                    isNewUser: false,
+                    iskvua: inD.attributes.iskvua || false,
+                    sqedualed: inD.attributes.sqadualed,
+                    deadline: inD.attributes.dates,
+                    userId: uId,
+                    currentUserId: uId,
+                    useraplyname: data.username || '',
+                    projectName: inD.attributes.project.data.attributes.projectName,
+                    src2: inD.attributes.project.data.attributes.profilePic.data?.attributes.url || '',
+                    openmissionName: inD.attributes.name,
+                    lang: $lang,
+                    token: cookieValue,
+                    linkg: linkg,
+                    sendToSer
+                });
+                
+                success = true;
+                setTimeout(() => { success = false }, 15000);
+                toast.success("המשימה נוצרה בהצלחה!");
+                return;
+            } else {
+                toast.error("שגיאה ביצירת המשימה");
+                return;
+            }
+        } catch (error) {
+            console.error("שגיאה ביצירת משימה:", error);
+            toast.error("אירעה שגיאה ביצירת המשימה");
+            return;
+        }
+    }
    
  const que1 = `query { usersPermissionsUser (id: ${uId}){
     data {
