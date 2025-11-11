@@ -182,6 +182,7 @@
   let idL;
   let bearer1;
   let token;
+  
 
   let ucli = $state(0);
 
@@ -277,8 +278,9 @@
   }
 
   const userss = objToString(users);
-  let welcome = ``;
-
+$effect(()=>{
+  console.log("noofusersOk",noofusersOk,openMid)
+})
   async function agree() {
     already = true;
     noofusersOk += 1;
@@ -310,29 +312,13 @@
     let newnew = false;
     console.log(pid);
     if (pid.includes(userId)) {
-      welcome = ``;
-      adduser2 = ``;
-      adduser = ``;
-      console.log(welcome, 'member');
+     
     } else {
       newnew = true;
       pid.push(userId);
       pid = pid;
-      welcome = `createWelcomTop(
-    data: {users_permissions_user: "${userId}",
-          project: "${projectId}"
-                publishedAt: "${d.toISOString()}",
-        }
-) {data{id}}`;
-      adduser = `updateProject(
-  id: "${projectId}"
- data: {user_1s: ["${idL}","${userId}"]}
-  ){data{attributes {user_1s{data {id attributes{ email lang}}}}}}`;
-      adduser2 = `updateProject(
-  id: "${projectId}"
- data: {user_1s: [${pid}]}
-  ){data{attributes {user_1s{data {id}}}}}`;
-      console.log(welcome, 'not member');
+   
+     
     }
     //add to pr users create missioninprogres, create welcom ballun;  first check for no of pr users and full consent ,(delete or save for refernce but put archive ) openM and asked
     if (noofpu === 1) {
@@ -361,12 +347,25 @@
           sqedualed,
           timegramaId,
           projectUserIds: pid,
-          userss,
-          token: cookieValue,
-          linkg
+          userss: users,
+          sendToSer
         });
         
         console.log(miDatan);
+        
+        // Get project user data if new user for email
+        let projectUserData = null;
+        if (newnew) {
+          const projectData = await sendToSer(
+            { id: projectId },
+            '49GetProjectById',
+            null,
+            null,
+            false,
+            fetch
+          );
+          projectUserData = projectData?.data?.project?.data?.attributes?.user_1s?.data;
+        }
         
         await afterMesimabetahalikhCreation({
           miDatan,
@@ -381,9 +380,8 @@
           src2,
           openmissionName,
           lang: $lang,
-          token: cookieValue,
-          linkg,
-          sendToSer
+          sendToSer,
+          projectUserData
         });
 
         onAcsept?.({
@@ -420,12 +418,25 @@
           sqedualed,
           timegramaId,
           projectUserIds: pid,
-          userss,
-          token: cookieValue,
-          linkg
+          userss: users,
+          sendToSer
         });
         
         console.log(miDatan);
+        
+        // Get project user data if new user for email
+        let projectUserData = null;
+        if (newnew) {
+          const projectData = await sendToSer(
+            { id: projectId },
+            '49GetProjectById',
+            null,
+            null,
+            false,
+            fetch
+          );
+          projectUserData = projectData?.data?.project?.data?.attributes?.user_1s?.data;
+        }
         
         await afterMesimabetahalikhCreation({
           miDatan,
@@ -440,9 +451,8 @@
           src2,
           openmissionName,
           lang: $lang,
-          token: cookieValue,
-          linkg,
-          sendToSer
+          sendToSer,
+          projectUserData
         });
 
         onAcsept?.({

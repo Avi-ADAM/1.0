@@ -1048,5 +1048,121 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
+  }`,
+  
+  "72createMesimabetahalich": `mutation CreateMesimabetahalich(
+    $projectId: ID!,
+    $missId: ID!,
+    $userId: ID!,
+    $openmissionName: String!,
+    $missionDetails: String,
+    $nhours: Float!,
+    $valph: Float!,
+    $iskvua: Boolean,
+    $hearotMeyuchadot: String,
+    $privatlinks: String,
+    $publicklinks: String,
+    $tafkidims: [ID],
+    $deadline: DateTime,
+    $sqedualed: DateTime,
+    $publishedAt: DateTime!
+  ) {
+    createMesimabetahalich(data: {
+      project: $projectId,
+      mission: $missId,
+      hearotMeyuchadot: $hearotMeyuchadot,
+      name: $openmissionName,
+      descrip: $missionDetails,
+      hoursassinged: $nhours,
+      perhour: $valph,
+      iskvua: $iskvua,
+      privatlinks: $privatlinks,
+      publicklinks: $publicklinks,
+      users_permissions_user: $userId,
+      tafkidims: $tafkidims,
+      publishedAt: $publishedAt,
+      admaticedai: $deadline,
+      start: $sqedualed
+    }) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+        }
+      }
+    }
+  }`,
+  
+  "73archiveOpenMission": `mutation ArchiveOpenMission($openMid: ID!) {
+    updateOpenMission(id: $openMid, data: { archived: true }) {
+      data {
+        id
+        attributes {
+          archived
+          acts { data { id } }
+          asks { data { id } }
+        }
+      }
+    }
+  }`,
+  
+  "74addUserToProject": `mutation AddUserToProject($projectId: ID!, $userIds: [ID]!) {
+    updateProject(id: $projectId, data: { user_1s: $userIds }) {
+      data {
+        id
+        attributes {
+          user_1s {
+            data {
+              id
+              attributes {
+                email
+                lang
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  
+  "75createWelcomeTop": `mutation CreateWelcomeTop($userId: ID!, $projectId: ID!, $publishedAt: DateTime!) {
+    createWelcomTop(data: {
+      users_permissions_user: $userId,
+      project: $projectId,
+      publishedAt: $publishedAt
+    }) {
+      data {
+        id
+      }
+    }
+  }`,
+  
+  "76archiveAsk": `mutation ArchiveAsk($askId: ID!, $vots: [ComponentProjectsVotsInput]) {
+    updateAsk(id: $askId, data: { archived: true, vots: $vots }) {
+      data {
+        id
+      }
+    }
+  }`,
+  
+  "77createMonter": `mutation CreateMonter($mesimabetahalikhId: ID!, $start: DateTime!, $finish: DateTime) {
+    createMonter(data: {
+      mesimabetahalich: $mesimabetahalikhId,
+      ani: "mesimabetahalich",
+      start: $start,
+      finish: $finish
+    }) {
+      data {
+        id
+      }
+    }
+  }`,
+  
+  "78archiveMultipleAsks": `mutation ArchiveMultipleAsks($askIds: [ID]!) {
+    updateAsks(ids: $askIds, data: { archived: true }) {
+      data {
+        id
+      }
+    }
   }`
 }; 

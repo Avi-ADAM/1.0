@@ -16,8 +16,6 @@ import {
   import {SendTo} from '$lib/send/sendTo.svelte';
 //TODO: get asked from server then show you alr .., find a way to get title
 let error1 = null;
-const baseUrl = import.meta.env.VITE_URL;
-const linkg = baseUrl + '/graphql';
   /**
    * @typedef {Object} Props
    * @property {any} [askedarr]
@@ -87,8 +85,7 @@ async function ask() {
                 deadline: inD.attributes.dates,
                 sqedualed: inD.attributes.sqadualed,
                 projectUserIds: projectUserIds,
-                token: cookieValue,
-                linkg: linkg
+                sendToSer
             });
 
             if (result?.data?.createMesimabetahalich) {
@@ -105,9 +102,8 @@ async function ask() {
                     src2: inD.attributes.project.data.attributes.profilePic.data?.attributes.url || '',
                     openmissionName: inD.attributes.name,
                     lang: $lang,
-                    token: cookieValue,
-                    linkg: linkg,
-                    sendToSer
+                    sendToSer,
+                    projectUserData: null
                 });
                 
                 success = true;
@@ -294,7 +290,7 @@ const foreg = {"he":"כדי לראות את כל המידע נדרשת התחב�
 <SucssesConf {success} />
 
 {#if data != null}
-{#if data.archived != true}
+{#if data?.alld?.attributes?.archived !== true}
 <div bind:clientWidth={wid} dir="rtl"  style="overflow-y:auto" class=" d mb-4 sm:pt-4 w-full   lg:w-1/2 mx-auto">
     <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
     </div>-->

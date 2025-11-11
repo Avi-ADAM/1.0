@@ -480,23 +480,38 @@
         dictasked[t].noofusersNo = 0;
         dictasked[t].cv = 0;
         dictasked[t].mypos = null;
+        console.log("noofusersNo",dictasked[t].users,dictasked[t].noofusersOk,dictasked[t].noofusersNo,dictasked[t].omid,"orderon:",dictasked[t].orderon)
 
         if (allid.includes(myid)) {
           for (let l = 0; l < dictasked[t].users.length; l++) {
-            if (dictasked[t].users[l].users_permissions_user.data.id === myid)
-              if (dictasked[t].users[l].order == dictasked[t].orderon) {
+            if (dictasked[t].users[l].users_permissions_user.data.id === myid) {
+              // Treat null order as 0 (original version before any negotiations)
+              const voteOrder = dictasked[t].users[l].order ?? 0;
+              if (voteOrder == dictasked[t].orderon) {
                 dictasked[t].already = true;
                 dictasked[t].pl += 48;
                 dictasked[t].mypos = dictasked[t].users[l].what;
+              }
               }
           }
         }
         
         for (let r = 0; r < dictasked[t].users.length; r++) {
-          if (dictasked[t].users[r].order == dictasked[t].orderon) {
+          // Treat null order as 0 (original version before any negotiations)
+          const voteOrder = dictasked[t].users[r].order ?? 0;
+          console.log("Vote check:", "order:", voteOrder, "orderon:", dictasked[t].orderon, "what:", dictasked[t].users[r].what);
+          if (voteOrder == dictasked[t].orderon) {
             dictasked[t].cv += 1;
+            // Check the actual vote value (what field)
+            if (dictasked[t].users[r].what === true) {
             dictasked[t].noofusersOk += 1;
+              console.log("Counted as OK");
+            } else if (dictasked[t].users[r].what === false) {
+              dictasked[t].noofusersNo += 1;
+              console.log("Counted as No");
+            }
           } else {
+            console.log("Order mismatch - going to else branch");
             if (
               getOccurrence(
                 dictasked[t].uids,
@@ -589,6 +604,8 @@
               });
             }
           }
+                  console.log("noofusersNo1",dictasked[t].noofusersOk,dictasked[t].noofusersNo,dictasked[t].omid)
+
           // Negotiation messages handling
           if (dictasked[t].negopendmissions && dictasked[t].negopendmissions.length > 0) {
             for (let x = 0; x < dictasked[t].negopendmissions.length; x++) {
@@ -658,6 +675,7 @@
         let old = $askMisMes;
         old[dictasked[t].askId] = dictasked[t].messeges;
         askMisMes.set(old);
+        console.log("noofusersNo",dictasked[t].noofusersOk,dictasked[t].noofusersNo,dictasked[t].omid)
       }
     
     }

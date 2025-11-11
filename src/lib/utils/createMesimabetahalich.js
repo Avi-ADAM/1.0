@@ -26,8 +26,7 @@
  * @param {number} params.timegramaId - Timegrama ID (optional)
  * @param {Array} params.projectUserIds - All project user IDs
  * @param {Array} params.userss - Current votes (optional, for voting scenarios)
- * @param {string} params.token - JWT token
- * @param {string} params.linkg - GraphQL endpoint
+ * @param {Function} params.sendToSer - sendToSer function
  * @returns {Promise<Object>} The mutation result
  */
 export async function createMesimabetahalich({
@@ -51,99 +50,146 @@ export async function createMesimabetahalich({
   timegramaId = null,
   projectUserIds = [],
   userss = [],
-  token,
-  linkg
+  sendToSer
 }) {
   const d = new Date();
-  const bearer = 'bearer ' + token;
-  
   const tafkidimsa = tafkidims.map((c) => c.id || c);
   
-  const sdate = sqedualed ? `start: "${sqedualed}"` : '';
-  const date = deadline ? `admaticedai: "${deadline}"` : '';
+  // Convert proxy to regular array and ensure string comparison
+  const userIdsArray = Array.from(projectUserIds).map(String);
+  const userIdString = String(userId);
+  const needsWelcome = !userIdsArray.includes(userIdString);
   
-  // Check if user needs to be added to project
-  const needsWelcome = !projectUserIds.includes(userId);
-  
-  const welcomeMutation = needsWelcome
-    ? `createWelcomTop(
-        data: {
-          users_permissions_user: "${userId}",
-          project: "${projectId}"
-          publishedAt: "${d.toISOString()}",
-        }
-      ) {data{id}}`
-    : '';
-  
-  const addUserMutation = needsWelcome
-    ? `updateProject(
-        id: "${projectId}"
-        data: {user_1s: [${[...projectUserIds, userId].map(id => `"${id}"`).join(',')}]}
-      ) {data{attributes {user_1s{data {id attributes{ email lang}}}}}}`
-    : '';
-  
-  const updateAskMutation = askId
-    ? `updateAsk(
-        id: "${askId}" 
-        data: { 
-          archived: true,
-          vots: [${userss}, {
-            what: true
-            users_permissions_user: "${currentUserId}"
-          }]
-        }
-      ) {data{id}}`
-    : '';
-  
-  const updateTimegramaMutation = timegramaId
-    ? `updateTimegrama(
-        id: ${timegramaId}
-        data: {done: true}
-      ) {data{id}}`
-    : '';
-
-  const mutation = `mutation {
-    createMesimabetahalich(
-      data: {
-        project: "${projectId}",
-        mission: "${missId}",
-        hearotMeyuchadot: """${hearotMeyuchadot}""",
-        name: """${openmissionName}""",
-        descrip: """${missionDetails}""",
-        hoursassinged: ${nhours},
-        perhour: ${valph}, 
-        iskvua: ${iskvua},  
-        privatlinks: """${privatlinks}""",
-        publicklinks: """${publicklinks}""", 
-        users_permissions_user: "${userId}",
-        tafkidims: [${tafkidimsa}],
-        publishedAt: "${d.toISOString()}",
-        ${date}
-        ${sdate}
-      }
-    ) {data{id attributes{project{data{id}}}}}
-
-    updateOpenMission(
-      id: "${openMid}"
-      data: {archived: true}
-    ) {data{id attributes{archived acts{data{id}} asks{data{id}}}}}
-    
-    ${welcomeMutation}
-    ${addUserMutation}
-    ${updateAskMutation}
-    ${updateTimegramaMutation}
-  }`;
-
-  const response = await fetch(linkg, {
-    method: 'POST',
-    headers: {
-      Authorization: bearer,
-      'Content-Type': 'application/json'
+  console.log("UIDD Debug:", {
+    needsWelcome,
+    userIdsArray,
+    userIdString,
+    includes: userIdsArray.includes(userIdString)
+  })
+  // Step 1: Create mesimabetahalich
+  const mesimabetahalikhResult = await sendToSer(
+    {
+      projectId,
+      missId,
+      userId,
+      openmissionName,
+      missionDetails: missionDetails || '',
+      nhours,
+      valph,
+      iskvua: iskvua || false,
+      hearotMeyuchadot: hearotMeyuchadot || '',
+      privatlinks: privatlinks || '',
+      publicklinks: publicklinks || '',
+      tafkidims: tafkidimsa,
+      deadline,
+      sqedualed,
+      publishedAt: d.toISOString()
     },
-    body: JSON.stringify({ query: mutation })
-  });
+    '72createMesimabetahalich',
+    null,
+    null,
+    false,
+    fetch
+  );
 
-  return response.json();
+  if (!mesimabetahalikhResult?.data?.createMesimabetahalich) {
+    throw new Error('Failed to create mesimabetahalich');
+  }
+
+  // Step 2: Archive open mission
+  const archiveResult = await sendToSer(
+    { openMid },
+    '73archiveOpenMission',
+    null,
+    null,
+    false,
+    fetch
+  );
+
+  // Step 3: Add user to project if needed
+  if (needsWelcome) {
+    await sendToSer(
+      {
+        userId,
+        projectId,
+        publishedAt: d.toISOString()
+      },
+      '75createWelcomeTop',
+      null,
+      null,
+      false,
+      fetch
+    );
+
+    await sendToSer(
+      {
+        projectId,
+        userIds: [...projectUserIds, userId]
+      },
+      '74addUserToProject',
+      null,
+      null,
+      false,
+      fetch
+    );
+  }
+
+  // Step 4: Archive ask with votes if provided
+  if (askId) {
+    // Ensure userss is an array and normalize the structure
+    const votesArray = Array.isArray(userss) ? userss : [];
+    
+    // Normalize votes to extract user IDs from nested structures
+    const normalizedVotes = votesArray.map(vote => {
+      const normalized = { ...vote };
+      
+      // Extract user ID if it's in nested structure
+      if (vote.users_permissions_user?.data?.id) {
+        normalized.users_permissions_user = vote.users_permissions_user.data.id;
+      }
+      
+      return normalized;
+    });
+    
+    const vots = normalizedVotes.length > 0 
+      ? [...normalizedVotes, { what: true, users_permissions_user: currentUserId }]
+      : [{ what: true, users_permissions_user: currentUserId }];
+    
+    await sendToSer(
+      {
+        askId,
+        vots
+      },
+      '76archiveAsk',
+      null,
+      null,
+      false,
+      fetch
+    );
+  }
+
+  // Step 5: Update timegrama if provided
+  if (timegramaId) {
+    await sendToSer(
+      {
+        id: timegramaId,
+        done: true
+      },
+      '35updateTimeGrama',
+      null,
+      null,
+      false,
+      fetch
+    );
+  }
+
+  // Return combined result in expected format
+  return {
+    data: {
+      createMesimabetahalich: mesimabetahalikhResult.data.createMesimabetahalich,
+      updateOpenMission: archiveResult.data.updateOpenMission
+    }
+  };
 }
 
 /**
@@ -166,9 +212,8 @@ export async function createMesimabetahalich({
  * @param {string} params.src2 - Project image source
  * @param {string} params.openmissionName - Mission name
  * @param {string} params.lang - Language
- * @param {string} params.token - JWT token
- * @param {string} params.linkg - GraphQL endpoint
  * @param {Function} params.sendToSer - sendToSer function
+ * @param {Object} params.projectUserData - Project user data (optional, for email)
  * @returns {Promise<void>}
  */
 export async function afterMesimabetahalikhCreation({
@@ -184,95 +229,81 @@ export async function afterMesimabetahalikhCreation({
   src2,
   openmissionName,
   lang,
-  token,
-  linkg,
-  sendToSer
+  sendToSer,
+  projectUserData = null
 }) {
   const d = new Date();
-  const bearer = 'bearer ' + token;
   const chiluzh = miDatan.data.createMesimabetahalich.data.id;
   
   // Create monter if iskvua
-  let monti = '';
   if (iskvua === true) {
     const startDate = sqedualed && new Date(sqedualed) > d 
       ? sqedualed 
       : d.toISOString();
-    const finishDate = deadline ? `finish: "${deadline}"` : '';
     
-    monti = `createMonter(
-      data: {
-        mesimabetahalich: "${chiluzh}",
-        ani: "mesimabetahalich"
-        start: "${startDate}"
-        ${finishDate}
-      }
-    ) {data{id}}`;
+    await sendToSer(
+      {
+        mesimabetahalikhId: chiluzh,
+        start: startDate,
+        finish: deadline || null
+      },
+      '77createMonter',
+      null,
+      null,
+      false,
+      fetch
+    );
   }
 
-  // Archive other asks
+  // Archive other asks (if there are multiple)
   const otherasks = miDatan.data.updateOpenMission.data.attributes.asks.data;
   if (otherasks.length > 1) {
+    // Archive all other asks except the current one
     for (let i = 0; i < otherasks.length; i++) {
-      const nextquery = `mutation {
-        ${i === 0 ? monti : ''}
-        updateAsk(
-          id: "${otherasks[i].id}" 
-          data: { archived: true }
-        ) {data{id}}
-      }`;
-      
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer,
-          'Content-Type': 'application/json'
+      await sendToSer(
+        {
+          askId: otherasks[i].id,
+          vots: null
         },
-        body: JSON.stringify({ query: nextquery })
-      });
+        '76archiveAsk',
+        null,
+        null,
+        false,
+        fetch
+      );
     }
-  } else if (monti && otherasks.length === 1) {
-    // If only one ask and we need to create monter
-    await fetch(linkg, {
-      method: 'POST',
-      headers: {
-        Authorization: bearer,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ 
-        query: `mutation { ${monti} }` 
-      })
-    });
   }
 
   // Send email if new user
-  if (isNewUser && miDatan.data.updateProject) {
-    const ema = miDatan.data.updateProject.data.attributes.user_1s.data;
+  if (isNewUser && projectUserData) {
+    const ema = projectUserData;
     let emailt, userLang;
     
     for (let i = 0; i < ema.length; i++) {
       if (ema[i].id === userId) {
-        emailt = ema[i].attributes.email;
-        userLang = ema[i].attributes.lang;
+        emailt = ema[i].attributes?.email;
+        userLang = ema[i].attributes?.lang;
         break;
       }
     }
     
-    const langi = (userLang === 'he' || userLang === 'en') ? userLang : lang;
-    
-    await fetch('/api/sma', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        user: useraplyname,
-        projectName,
-        projectSrc: src2,
-        missionName: openmissionName,
-        email: emailt,
-        lang: langi,
-        kind: 'exeptedMission'
-      })
-    });
+    if (emailt) {
+      const langi = (userLang === 'he' || userLang === 'en') ? userLang : lang;
+      
+      await fetch('/api/sma', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          user: useraplyname,
+          projectName,
+          projectSrc: src2,
+          missionName: openmissionName,
+          email: emailt,
+          lang: langi,
+          kind: 'exeptedMission'
+        })
+      });
+    }
   }
 
   // Update acts with mesimabetahalich reference
