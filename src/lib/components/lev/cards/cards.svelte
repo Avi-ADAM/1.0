@@ -503,8 +503,11 @@ $effect(() => {
                     ><Hal
                       isVisible={currentIndex === i}
                       user_1s={buble.user_1s}
+                      halukot={buble.halukot}
                       onHover={hover}
                       onProj={proj}
+                      onCoinLapach={delo}
+                      hervach={buble.hervach}
                       onUser={user}
                       {low}
                       cards="true"

@@ -231,8 +231,11 @@ if (noofusersOk  === noofusers){
             console.error('Error updating sale:', e);
           }
         }
+        console.log('Starting halukot updates, count:', halukot.length);
         for (let t = 0; t < halukot.length; t++) {
           const idd = halukot[t].id;
+          console.log(`Updating haluka ${t + 1}/${halukot.length}, id:`, idd);
+          
           //send apruved for each haluka
          const qurer =  `  
 updateHaluka( id:${idd}
@@ -242,7 +245,7 @@ updateHaluka( id:${idd}
     ){data{ id  }} `
          
  try {
-             await fetch(linkg, {
+             const response = await fetch(linkg, {
               method: 'POST',
         headers: {
             'Authorization': bearer1,
@@ -253,23 +256,24 @@ updateHaluka( id:${idd}
           `mutation 
           { ${qurer}
 }`   
-} )})
-  .then(r => r.json())
-  .then(data => miDatani = data);
-            console.log(miDatani)
+} )});
+            const halukaResult = await response.json();
+            console.log(`Haluka ${idd} updated successfully:`, halukaResult);
         } catch (e) {
             error1 = e
-            console.log(error1)
+            console.error(`Error updating haluka ${idd}:`, e);
 }
 //if hervach has user with resiv and giv fls then update his hervachti
+console.log('Starting hervach updates, count:', hervach.length);
 for (let o = 0; o < hervach.length; o++) {
   const element = hervach[o];
-  console.log(element.noten,element.mekabel,element.users_permissions_user.data.id,element.users_permissions_user.data.attributes.hervachti,element.amount)
+  console.log(`Hervach ${o + 1}/${hervach.length}:`, element.noten, element.mekabel, element.users_permissions_user.data.id, element.users_permissions_user.data.attributes.hervachti, element.amount)
   if (element.noten != true && element.mekabel != true){
     const iduse = element.users_permissions_user.data.id
     const amount = element.users_permissions_user.data.attributes.hervachti + element.amount
+    console.log(`Updating user ${iduse} hervachti to ${amount}`);
      try {
-             await fetch(linkg, {
+             const response = await fetch(linkg, {
               method: 'POST',
         headers: {
             'Authorization': bearer1,
@@ -288,13 +292,12 @@ for (let o = 0; o < hervach.length; o++) {
   }
 }
 }`   
-} )})
-  .then(r => r.json())
-  .then(data => miDatani = data);
-            console.log(miDatani)
+} )});
+            const hervachResult = await response.json();
+            console.log(`User ${iduse} hervachti updated successfully:`, hervachResult);
         } catch (e) {
             error1 = e
-            console.log(error1)
+            console.error(`Error updating user ${iduse} hervachti:`, e);
 }
   }
 }

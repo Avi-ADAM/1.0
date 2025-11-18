@@ -580,6 +580,7 @@ createHaluka(
     }
   }
   function pre() {
+    // Calculate totals for each user
     for (let i = 0; i < users.length; i++) {
       for (let j = 0; j < fmiData.length; j++) {
         if (
@@ -610,6 +611,8 @@ createHaluka(
         }
       }
     }
+    
+    // Calculate net total
     for (let j = 0; j < fmiData.length; j++) {
       if ('net' in dictid) {
         dictid['net'] += fmiData[j].attributes.total;
@@ -624,64 +627,59 @@ createHaluka(
         dictid['net'] = rikmashes[j].attributes.total;
       }
     }
-    const filteredw = Object.keys(dictid);
-    const filtered = Object.keys(dictidi);
 
+    // Build ulist for ALL users
+    let counter = 0;
+    let pmcounter = 0;
+    
     for (let i = 0; i < users.length; i++) {
-      //arr from obj key and val then add needed data
-      for (let t = 0; t < filteredw.length; t++) {
-        if (filteredw[t] === users[i].id) {
-          for (let m = 0; m < filtered.length; m++) {
-            if (filtered[m] === users[i].id) {
-              if ('counter' in dictid) {
-                dictid['counter'] += 1;
-              } else {
-                dictid['counter'] = 1;
-              }
-              if ('pmcounter' in dictid) {
-                dictid['pmcounter'] -= ulist[ulist.length - 1].p;
-              } else {
-                dictid['pmcounter'] = 0;
-              }
-              let src22 = ``;
-              if (users[i].attributes.profilePic.data !== null) {
-                src22 = users[i].attributes.profilePic.data.attributes.url;
-              } else {
-                src22 = pic;
-              }
-              ulist.push({
-                ihave: dictidi[filtered[m]],
-                total: dictid[filteredw[t]],
-                uid: users[i].id,
-                username: users[i].attributes.username,
-                src: src22,
-                p: percentage(dictid[filteredw[t]], dictid['net']),
-                un: users[i].username,
-                s: percentage(dictid[filteredw[t]], dictid['net']),
-                s2: 100,
-                d: dictid['pmcounter'],
-                o: 'visible',
-                c: `url(#img${dictid['counter']})`,
-                imid: `img${dictid['counter']}`
-              });
-            }
-          }
-        }
+      counter += 1;
+      
+      const userId = users[i].id;
+      const userTotal = dictid[userId] || 0; // Default to 0 if no data
+      const userIhave = dictidi[userId] || 0; // Default to 0 if no data
+      const userPercentage = dictid['net'] > 0 ? percentage(userTotal, dictid['net']) : 0;
+      
+      let src22 = ``;
+      if (users[i].attributes.profilePic.data !== null) {
+        src22 = users[i].attributes.profilePic.data.attributes.url;
+      } else {
+        src22 = pic;
       }
-      for (let i = 0; i < ulist.length; i++) {
-        ulist[i].x = (ulist[i].p / 100) * revach;
-        if (ulist[i].ihave - ulist[i].x < 0) {
-          ulist[i].meca = ulist[i].x - ulist[i].ihave;
-          ulist[i].noten = 0;
-          ulist[i].cama = 0;
-        } else if (ulist[i].ihave - ulist[i].x > 0) {
-          ulist[i].noten = ulist[i].ihave - ulist[i].x;
-          ulist[i].meca = 0;
-        } else {
-          ulist[i].meca = 0;
-          ulist[i].noten = 0;
-          ulist[i].cama = 0;
-        }
+      
+      ulist.push({
+        ihave: userIhave,
+        total: userTotal,
+        uid: userId,
+        username: users[i].attributes.username,
+        src: src22,
+        p: userPercentage,
+        un: users[i].username,
+        s: userPercentage,
+        s2: 100,
+        d: pmcounter,
+        o: 'visible',
+        c: `url(#img${counter})`,
+        imid: `img${counter}`
+      });
+      
+      pmcounter -= userPercentage;
+    }
+    
+    // Calculate meca/noten for each user
+    for (let i = 0; i < ulist.length; i++) {
+      ulist[i].x = (ulist[i].p / 100) * revach;
+      if (ulist[i].ihave - ulist[i].x < 0) {
+        ulist[i].meca = ulist[i].x - ulist[i].ihave;
+        ulist[i].noten = 0;
+        ulist[i].cama = 0;
+      } else if (ulist[i].ihave - ulist[i].x > 0) {
+        ulist[i].noten = ulist[i].ihave - ulist[i].x;
+        ulist[i].meca = 0;
+      } else {
+        ulist[i].meca = 0;
+        ulist[i].noten = 0;
+        ulist[i].cama = 0;
       }
     }
     // Reset transfer arrays
