@@ -52,14 +52,16 @@
                              </div>
                                 </div>
                         <div class="flex flex-col items-center  basis-1/4">
-                             <span class="text-gray-300">   {#if isToday(chat?.messages[chat.messages.length - 1].timestamp)}
-				{ new Date(chat?.messages[chat.messages.length - 1].timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}) }
+                             <span class="text-gray-300">   {#if chat?.messages?.length > 0 && chat.messages[chat.messages.length - 1]?.timestamp}
+                                {#if isToday(chat.messages[chat.messages.length - 1].timestamp)}
+				{ new Date(chat.messages[chat.messages.length - 1].timestamp).toLocaleTimeString([], {hour: '2-digit', minute:'2-digit', hour12: false}) }
 					{:else}
-				{new Date(chat?.messages[chat.messages.length - 1].timestamp).toLocaleString([$lang], {year: 'numeric', month: '2-digit', day: '2-digit'})}
-					{/if}</span>
+				{new Date(chat.messages[chat.messages.length - 1].timestamp).toLocaleString([$lang], {year: 'numeric', month: '2-digit', day: '2-digit'})}
+					{/if}
+                                {/if}</span>
                              <span><svg class="w-5 h-5 fill-barbi" viewBox="0 0 100 100"><circle r="50" cx=50 cy=50 ></circle></svg></span> </div>
                     </div>
-                  <div class="text-sm text-gray-500 truncate w-full"><span class="font-bold">{chat.messages[chat.messages.length - 1].username ?? "מערכת 1💗1"}:</span> {chat?.messages[chat.messages.length - 1].message ?? " יש אמונה לא אכנע"}
+                  <div class="text-sm text-gray-500 truncate w-full"><span class="font-bold">{chat?.messages?.length > 0 ? (chat.messages[chat.messages.length - 1].username ?? "מערכת 1💗1") : "מערכת 1💗1"}:</span> {chat?.messages?.length > 0 ? (chat.messages[chat.messages.length - 1].message ?? " יש אמונה לא אכנע") : " יש אמונה לא אכנע"}
                  
                 </div>
                             

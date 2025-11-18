@@ -77,7 +77,8 @@ async function afreact (e){
     }
   }else{
     console.log(m)
-    let t = await createForum($newChat.md.pid,$newChat.md.mbId).then(t=>t = t)
+    // אם יש halukId, מעבירים אותו לפונקציה עם רשימת המשתתפים
+    let t = await createForum($newChat.md.pid,$newChat.md.mbId,$newChat.md.halukId,$newChat.md.participants).then(t=>t = t)
         if(t != "error"){
       const forumId = t.data.createForum.data.id
       console.log($forum[forumId],"55")
@@ -113,17 +114,39 @@ let nameChatPartner = {"he":"דיון על משימה בתהליך ","en":"chat 
 <ListSmall bind:chatId chats={messagesArray}/>  
 {/key}
 {:else}
- <Diun
-    dont={true}
-  rikmaName={$forum[$nowChatId].md.projectName}
-  onRect={afreact}
-  smalldes={$forum[$nowChatId].md.mesimaName}
-  nameChatPartner={nameChatPartner[$lang]}
-  mypos={true}
-  bind:clicked
-  pendId={$nowChatId}
-  rect={true}
-  profilePicChatPartner={$forum[$nowChatId].md.projectPic}
-  {ani}
-/>
+  {#if $forum[$nowChatId]?.md}
+    {@const md = $forum[$nowChatId].md}
+    <Diun
+      dont={true}
+      rikmaName={md.projectName || ""}
+      onRect={afreact}
+      smalldes={md.mesimaName || md.transferDetails || ""}
+      nameChatPartner={md.transferDetails ? {"he":"צ'אט על העברת כסף","en":"chat on money transfer"}[$lang] : nameChatPartner[$lang]}
+      mypos={true}
+      bind:clicked
+      pendId={$nowChatId}
+      rect={true}
+      profilePicChatPartner={md.projectPic || '/favicon.ico'}
+      {ani}
+    />
+  {:else if $meetingsData[$nowChatId]}
+    {@const meeting = $meetingsData[$nowChatId]}
+    <Diun
+      dont={true}
+      rikmaName={meeting.attributes?.title || "פגישה"}
+      onRect={afreact}
+      smalldes={meeting.attributes?.description || ""}
+      nameChatPartner={{"he":"צ'אט על פגישה","en":"chat on meeting"}[$lang]}
+      mypos={true}
+      bind:clicked
+      pendId={$nowChatId}
+      rect={true}
+      profilePicChatPartner={'/favicon.ico'}
+      {ani}
+    />
+  {:else}
+    <div class="flex items-center justify-center h-full">
+      <p class="text-gray-500">טוען נתונים...</p>
+    </div>
+  {/if}
 {/if}

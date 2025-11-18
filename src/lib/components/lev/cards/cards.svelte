@@ -506,6 +506,7 @@ $effect(() => {
                       isVisible={currentIndex === i}
                       user_1s={buble.user_1s}
                       halukot={buble.halukot}
+                      forumId={buble.forumId}
                       onHover={hover}
                       onProj={proj}
                       onCoinLapach={delo}
@@ -565,6 +566,7 @@ $effect(() => {
                       created_at={buble.created_at}
                       messege={buble.messege}
                       order={buble.order}
+                      forumId={buble.forumId}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'mtaha' && milon.betaha == true}

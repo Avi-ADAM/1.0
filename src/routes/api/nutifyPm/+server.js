@@ -14,9 +14,10 @@ export async function POST({request, cookies, fetch}){
   const pid = da.pid || 0;
   const title = da.title || { he: '', en: '' };
   const body = da.body || { he: '', en: '' };
+  const userIds = da.userIds || null; // רשימת IDs ספציפית (אופציונלי)
   const lang = cookies.get('lang') || "he";
   const idL = cookies.get('id');
-  console.log(pid,idL,"nutifyPm 19")
+  console.log(pid,idL,"nutifyPm 19", userIds ? "specific users" : "all project users")
   let datau = { data: { arg:{pid}, queId: '3projectJSONQue' } };
   let jsonim = []
   await fetch('/api/send', {
@@ -37,8 +38,17 @@ export async function POST({request, cookies, fetch}){
     });
  
   console.log(jsonim.data.project.data.attributes.user_1s.data);
+  
+  // אם יש userIds, נסנן רק את המשתמשים האלה
+  let projectUsers = jsonim.data.project.data.attributes.user_1s.data;
+  if (userIds && Array.isArray(userIds) && userIds.length > 0) {
+    projectUsers = projectUsers.filter(user => 
+      userIds.includes(String(user.id)) || userIds.includes(Number(user.id))
+    );
+    console.log(`Filtered to ${projectUsers.length} specific users:`, userIds);
+  }
   // Assuming 'data' is the result of your GraphQL query
- /* const transformedData = jsonim.data.project.data.attributes.user_1s.data.map(
+ /* const transformedData = projectUsers.map(
     (user) => {
        console.log(user.attributes.machshirs.data)
         user.attributes.machshirs.data.map(
@@ -59,7 +69,7 @@ export async function POST({request, cookies, fetch}){
     }
   );*/
   const transformedData =
-    jsonim.data.project.data.attributes.user_1s.data.flatMap((user) => {
+    projectUsers.flatMap((user) => {
       // Filter out machshirs that don't have a value
       const validMachshirs = user.attributes.machshirs.data.filter(
         (machshir) =>
@@ -83,7 +93,7 @@ export async function POST({request, cookies, fetch}){
       });
     });
       //validate that user has telegramId
-     const valid = jsonim.data.project.data.attributes.user_1s.data.filter(
+     const valid = projectUsers.filter(
        (user) => user.attributes.telegramId
      );
      const transformedDataTel = valid;
@@ -94,13 +104,13 @@ export async function POST({request, cookies, fetch}){
     //    ?.thumbnails.url ??
      // jsonim.data.project.data.attributes.profilePic.data?.attributes?.url
         //jsonim myid messege mainlang pic
-        console.log('before',title,body, transformedData);
+       // console.log('before',title,body, transformedData);
 
         pusherer('https://www.1lev1.com/lev', transformedData, idL,pic,title,body,lang,fetch);
-        console.log('after', transformedDataTel);
+     //   console.log('after', transformedDataTel);
         sendBolkTelegram(transformedDataTel, idL,title,body,lang,fetch);
         
-  const transformedDataMailPromises = jsonim.data.project.data.attributes.user_1s.data
+  const transformedDataMailPromises = projectUsers
     .filter(user => user.attributes.noMail !== true)
     .map(async (user) => {
       const emailHtml = await render(SimpleNuti, {

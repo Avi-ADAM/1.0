@@ -5,6 +5,7 @@
     import {pendMisMes, pendMasMes, askMisMes, meAskMisMes,meAskMasMes,askMasMes,forum, addMes} from '$lib/stores/pendMisMes.js'
   import { slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
+  import { lang } from '$lib/stores/lang.js';
    let why = $state("");
   /**
    * @typedef {Object} Props
@@ -52,6 +53,37 @@
     node.scroll({ top: node.scrollHeight, behavior: 'smooth' });
   }; 
  let dow = $state()
+ 
+ // תרגומים עבור ה-label
+ const labelTexts = {
+   money: {
+     he: "פרטים שיעזרו לההעברה להתבצע (מספר חשבון, פרטי העברה וכו')",
+     en: "Details to help complete the transfer (account number, transfer details, etc.)",
+     ar: "تفاصيل للمساعدة في إتمام التحويل (رقم الحساب، تفاصيل التحويل، إلخ)"
+   },
+   rejection: {
+     he: "נימוק לדחייה (מינימום 27 תווים)",
+     en: "Reason for rejection (minimum 27 characters)",
+     ar: "سبب الرفض (27 حرفًا على الأقل)"
+   },
+   discussion: {
+     he: "הודעה - נא להתייחס להודעות קודמות",
+     en: "Message - please refer to previous messages",
+     ar: "رسالة - يرجى الرجوع إلى الرسائل السابقة"
+   },
+   forum: {
+     he: "כתוב הודעה...",
+     en: "Write a message...",
+     ar: "اكتب رسالة..."
+   }
+ };
+ 
+ let labelText = $derived(
+   money ? labelTexts.money[$lang] :
+   no ? labelTexts.rejection[$lang] :
+   ani === "forum" ? labelTexts.forum[$lang] :
+   labelTexts.discussion[$lang]
+ );
 async function click() {
    if(why.length > 0){
    clicked = true
@@ -100,205 +132,120 @@ async function click() {
   border-color: transparent  transparent var(--gold)  var(--gold);
 }
 	
-   .textinput {
-  position: relative;
-  width: 100%;
-  display: block;
-}
-
-.input {
-  border: none;
-  margin: 0;
-  padding: 10px 0;
-  outline: none;
-  border-bottom: solid 1px var(--barbi-pink);
-  margin-top: 12px;
-  width: 100%;
- color:  var(--gold);
-  -webkit-tap-highlight-color: transparent;
-  background: transparent;
-}
-
-
-.label {
-
-  font-size: 15px;
-  position: absolute;
-  right: 0;
-  top: 22px;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-  pointer-events: none;
-  color:grey;
-  user-select: none;
-}
-
-.line {
-  height: 2px;
-  background-color: #2196F3;
-  position: absolute;
-  transform: translateX(-50%);
-  left: 50%;
-  bottom: 0;
-  width: 0;
-  transition: 0.2s cubic-bezier(0, 0, 0.3, 1);
-}
-
-.input:focus ~ .line, .input:valid ~ .line {
-  width: 100%;
-}
-
-.input:focus ~ .label, .input:valid ~ .label {
-  font-size: 14px;
-  color: turquoise;
-  top: -10px;
-}
-.input:focus ,.input:valid  {
-  border: 0;
-}
-.t{
-    height: 75vh;
-     width: 100%;
-     border-bottom-left-radius:10%;
-          border-bottom-right-radius:10%;
- }
-.dont{
-       border-radius: 10%;
-}
-@media (max-width:600px){
- .t{
-    height: 65vh;
-    width: 100%;
-    border-radius: 10%;
- }
 .textinput {
   position: relative;
   width: 100%;
   display: block;
 }
+
+.dont {
+  border-radius: 0.75rem;
+}
+
+/* Custom scrollbar for messages */
+#messages::-webkit-scrollbar {
+  width: 6px;
+}
+
+#messages::-webkit-scrollbar-track {
+  background: rgba(31, 41, 55, 0.3);
+  border-radius: 3px;
+}
+
+#messages::-webkit-scrollbar-thumb {
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.6), rgba(236, 72, 153, 0.6));
+  border-radius: 3px;
+}
+
+#messages::-webkit-scrollbar-thumb:hover {
+  background: linear-gradient(180deg, rgba(139, 92, 246, 0.8), rgba(236, 72, 153, 0.8));
+}
+
+@media (max-width: 600px) {
+  .textinput {
+    position: relative;
+    width: 100%;
+    display: block;
+  }
 }
 </style>
 
-<div style="background-color: #242526;" dir="rtl" class="flex-1 p:2 sm:p-6 justify-between flex flex-col {dont == false ? "dont" : "shadow-md shadow-fuchsia-400"} t">
-   <div class="flex sm:items-center justify-between py-3 border-b-2 border-gray-200">
-      <div class="relative flex items-center space-x-4">
-         <div class="relative">
-            <span class="absolute text-green-500 right-0 bottom-0">
-               <svg width="20" height="20">
-                  <circle cx="8" cy="8" r="8" fill={mypos === true ? "green":"red"}></circle>
-               </svg>
-            </span>
-         <img src={profilePicChatPartner}  alt="" class="w-10 sm:w-16 h-10 sm:h-16 pr-2 sm:pr-0 rounded-full">
+<div dir={$lang === 'en' ? 'ltr' : 'rtl'} class="flex flex-col {dont == false ? "dont h-[75vh] sm:h-[80vh]" : "shadow-lg shadow-fuchsia-400/20 h-full"} max-h-[calc(100vh-100px)] bg-gradient-to-br from-gray-900 via-gray-800 to-gray-900 rounded-xl overflow-hidden">
+   <!-- Header -->
+   <div class="flex items-center justify-between px-4 sm:px-6 py-3 sm:py-4 bg-gradient-to-r from-gray-800/60 to-gray-800/40 backdrop-blur-md border-b border-gray-700/30">
+      <div class="flex items-center gap-3 sm:gap-4 flex-1 min-w-0">
+         <div class="relative flex-shrink-0">
+            <img src={profilePicChatPartner} alt={nameChatPartner} class="w-11 h-11 sm:w-14 sm:h-14 rounded-full ring-2 ring-gray-700/50 hover:ring-fuchsia-500/50 object-cover transition-all duration-200">
+            <span class="absolute -bottom-0.5 {$lang === 'en' ? '-right-0.5' : '-left-0.5'} w-3.5 h-3.5 sm:w-4 sm:h-4 rounded-full border-2 border-gray-800 {mypos === true ? 'bg-green-500 shadow-lg shadow-green-500/50' : 'bg-red-500 shadow-lg shadow-red-500/50'} transition-all duration-200"></span>
          </div>
-         <div class="flex flex-col leading-tight">
-            <div class="sm:text-2xl text-lg mt-1 flex items-center">
-               <span class="text-gray-200 mr-3">{nameChatPartner}</span>
-            </div>
-            <span class="sm:text-lg text-md mx-5  text-barbi">{rikmaName}</span>
-            <span class="sm:text-lg text-md ml-3 text-gold">{smalldes}</span>
+         <div class="flex flex-col min-w-0 flex-1 gap-0.5">
+            <h3 class="text-base sm:text-xl font-semibold text-white truncate">{nameChatPartner}</h3>
+            {#if rikmaName}
+               <p class="text-xs sm:text-sm text-barbi truncate font-medium">{rikmaName}</p>
+            {/if}
+            {#if smalldes}
+               <p class="text-xs text-gold truncate ">{smalldes}</p>
+            {/if}
          </div>
-      </div>
-      <div class="flex items-center space-x-2">
-       <!--  <button type="button" class="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-            </svg>
-         </button>
-         <button type="button" class="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"></path>
-            </svg>
-         </button>
-         <button type="button" class="inline-flex items-center justify-center rounded-lg border h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6">
-               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path>
-            </svg>
-         </button>-->
-
       </div>
    </div>
   
-   <div bind:this={dow} bind:offsetHeight={off} id="messages" class="flex flex-col space-y-4 p-3 overflow-y-auto d">
-<!--
-<div class="card card-danger direct-chat direct-chat-danger">
-    <div class="card-header">
-        <div class="card-tools d-flex">
-            <img class="contacts-img" src={profilePicChatPartner} alt="profilePic">
-            <span class="contacts-name">{nameChatPartner}</span>
-           
-        //על הצאט  <button type="button" class="btn btn-tool" title="Contacts"><Fa icon={faUsers} /></button>
-          //למזער  <button type="button" class="btn btn-tool"><Fa icon={faCompressArrowsAlt} /></button>
-       -->
-            {#each messagesi as message}
-                <ChatMessage
-                    nameMe = {nameMe}
-                    profilePicMe = {profilePicMe}
-                    nameChatPartner = {nameChatPartner}
-                    profilePicChatPartner = {message.pic}
-										message={message.message}
-									  timestamp={message.timestamp}
-										sentByMe={message.sentByMe} 
-										timeRead={message.timeRead}
-                              what={message.what}
-                              changed={message.changed}
-                              pending={message.pending ?? false}
-										/>
-            {/each}
-					
+   <!-- Messages Area -->
+   <div bind:this={dow} bind:offsetHeight={off} id="messages" class="flex-1 overflow-y-auto overflow-x-hidden px-3 sm:px-4 py-4 sm:py-6 space-y-2 sm:space-y-3 bg-gray-900/30 scroll-smooth min-h-0">
+      {#each messagesi as message}
+         <ChatMessage
+            nameMe = {nameMe}
+            profilePicMe = {profilePicMe}
+            nameChatPartner = {nameChatPartner}
+            profilePicChatPartner = {message.pic}
+            message={message.message}
+            timestamp={message.timestamp}
+            sentByMe={message.sentByMe} 
+            timeRead={message.timeRead}
+            what={message.what}
+            changed={message.changed}
+            pending={message.pending ?? false}
+         />
+      {/each}
+   </div>
 
-					
-		</div>
-
-    <div dir="rtl" class:pb-8={rect == false && no == false}  class="{loading == true ? "" : "border-t-2"} border-gray-200 pr-4 pl-8 sm:px-4 pt-4 mb-2 sm:mb-0" >
-      {#if loading == true} 	
-      <div class="w-full flex items-center justify-center" ><div class="mx-auto"><BarLoader size="120" color="#ff00ae" unit="px" duration="2s"></BarLoader></div>
+   <!-- Input Area -->
+   <div dir={$lang === 'en' ? 'ltr' : 'rtl'} class:pb-8={rect == false && no == false} class="px-4 py-3 bg-gradient-to-r from-gray-800/40 to-gray-800/60 backdrop-blur-md {loading == true ? '' : 'border-t border-gray-700/30'}">
+      {#if loading == true}
+         <div class="w-full flex items-center justify-center py-6">
+            <BarLoader size="120" color="#ff00ae" unit="px" duration="2s"></BarLoader>
          </div>
-         {/if}
+      {/if}
+      
       {#if rect == true || no == true}
-
-      <div class="relative flex ">
-         <!---<span class="absolute inset-y-0 flex items-center">
-            <button type="button" class="inline-flex items-center justify-center rounded-full h-12 w-12 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-gray-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11a7 7 0 01-7 7m0 0a7 7 0 01-7-7m7 7v4m0 0H8m4 0h4m-4-8a3 3 0 01-3-3V5a3 3 0 116 0v6a3 3 0 01-3 3z"></path>
-               </svg>
-            </button>
-         </span>-->  
-      <!--   <input type="textarea" placeholder={no === true ? "נימוק" : "נימוק, נא להתייחס לנימוקים שכבר הועלו"} class="w-full focus:outline-none focus:placeholder-gray-400 text-gray-600 placeholder-gray-600 pl-12 bg-gray-200 rounded-md py-3">-->
-       <div dir="rtl" class='textinput'>
-  <textarea name="s"  bind:value={why}     
- type='text' minlength="26" class='input sm:text-lg text-gold d' required></textarea>
-  <label for="s" class='label'>{money == true ? "פרטים שיעזרו לההעברה להתבצע" : no === true ? "נימוק" : "נימוק, נא להתייחס לנימוקים שכבר הועלו"}</label>
-  <span class='line'></span>
-</div>  
-      <div  class="absolute -left-8 items-center inset-y-8 flex ">
-          <!--  <button type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-gray-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.172 7l-6.586 6.586a2 2 0 102.828 2.828l6.414-6.586a4 4 0 00-5.656-5.656l-6.415 6.585a6 6 0 108.486 8.486L20.5 13"></path>
-               </svg>
-            </button>
-            <button type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-gray-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path>
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path>
-               </svg>
-            </button>
-            <button type="button" class="inline-flex items-center justify-center rounded-full h-10 w-10 transition duration-500 ease-in-out text-gray-500 hover:bg-gray-300 focus:outline-none">
-               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-6 w-6 text-gray-600">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
-               </svg>
-            </button>-->
-            {#key  clicked}
-            {#if clicked == false}
-            <button onclick={click} type="button" class="inline-flex items-center justify-center rounded-lg  transition duration-500 ease-in-out text-mturk hover:text-barbi focus:outline-none">
-               <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="h-4 w-4 sm:ml-2 transform -rotate-90">
-                  <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
-               </svg>
-            </button>
-            {/if}
+         <div class="relative flex items-end gap-2 sm:gap-3">
+            <div dir={$lang === 'en' ? 'ltr' : 'rtl'} class='textinput flex-1'>
+               <textarea 
+                  name="s" 
+                  bind:value={why}     
+                  minlength="26" 
+                  placeholder={labelText}
+                  class='input text-base sm:text-lg text-white bg-gray-700/30 backdrop-blur-sm border border-gray-600/30 rounded-2xl px-3 sm:px-4 py-2.5 sm:py-3 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-fuchsia-500/50 focus:border-fuchsia-500/50 hover:border-gray-500/50 hover:bg-gray-700/40 resize-none transition-all duration-200 max-h-32' 
+                  rows="1"
+                  required
+               ></textarea>
+            </div>
+            
+            {#key clicked}
+               {#if clicked == false}
+                  <button 
+                     onclick={click} 
+                     type="button"
+                     aria-label="Send message"
+                     class="flex-shrink-0 w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-2xl bg-gradient-to-br from-fuchsia-600 via-pink-600 to-fuchsia-700 hover:from-fuchsia-500 hover:via-pink-500 hover:to-fuchsia-600 active:scale-95 text-white transition-all duration-200 shadow-lg shadow-fuchsia-500/30 hover:shadow-fuchsia-500/50 focus:outline-none focus:ring-2 focus:ring-fuchsia-400 focus:ring-offset-2 focus:ring-offset-gray-800"
+                  >
+                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" class="w-5 h-5 transform {$lang === 'en' ? 'rotate-90' : '-rotate-90'}">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"></path>
+                     </svg>
+                  </button>
+               {/if}
             {/key}
          </div>
-      </div>
-         {/if}
-
+      {/if}
    </div>
-        </div>
+</div>

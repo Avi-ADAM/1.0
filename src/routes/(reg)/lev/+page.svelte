@@ -82,21 +82,51 @@
     fetchMainUserData,
     fetchOpenMissions
   } from '$lib/utils/levGraphQLQueries.js';
+  
+  /**
+   * @typedef {Object} PageData
+   * @property {any} user - User data from server
+   * @property {Array<any>} missions - Mission data
+   * @property {string} [token] - Authentication token
+   */
+  
+  /** @type {{ data: PageData }} */
   let { data } = $props();
+  
   let low = $state(true);
   let indexi = $state(-1);
 
   let isOpen = $state(false);
   //  import Viewport from 'svelte-viewport-info'
+  
+  /** @type {string | undefined} */
   let idL;
+  
+  /** @type {Array<any>} */
   let meData = [];
+  
+  /** @type {Array<any>} */
   let miData = [];
+  
+  /** @type {string | undefined} */
   let token;
+  
+  /** @type {Array<any>} */
   let askedarr = $state([]);
+  
+  /** @type {Array<any>} */
   let declineddarr = $state([]);
+  
+  /** @type {Array<any>} */
   let d = [];
+  
+  /** @type {Array<any>} */
   let sk = [];
+  
+  /** @type {Record<string, any>} */
   let dictids = {};
+  
+  /** @type {Array<any>} */
   let dictasked = [];
   let askedcoin = [];
   let error1 = null;
@@ -492,7 +522,7 @@
                 dictasked[t].pl += 48;
                 dictasked[t].mypos = dictasked[t].users[l].what;
               }
-              }
+            }
           }
         }
         
@@ -504,7 +534,7 @@
             dictasked[t].cv += 1;
             // Check the actual vote value (what field)
             if (dictasked[t].users[r].what === true) {
-            dictasked[t].noofusersOk += 1;
+              dictasked[t].noofusersOk += 1;
               console.log("Counted as OK");
             } else if (dictasked[t].users[r].what === false) {
               dictasked[t].noofusersNo += 1;
@@ -538,7 +568,8 @@
             }
           }
         }
-        
+                console.log("noofusersNo2",dictasked[t].noofusersOk,dictasked[t].noofusersNo,dictasked[t].omid)
+
         const noofusersWaiting = dictasked[t].noof - dictasked[t].cv;
         dictasked[t].noofusersWaiting = noofusersWaiting;
 
@@ -1925,6 +1956,7 @@
             src: getProjectData(proj.id, 'pp'),
             //   noofpu: getProjectData(proj.id,"noof"),
             myid: myid,
+            forumId: el.attributes.forum?.data?.id,
             pendId: projects[i].attributes.halukas.data[j].id,
             chat: el.attributes.chatre,
             amount: el.attributes.amount,

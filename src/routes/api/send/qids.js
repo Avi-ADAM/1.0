@@ -25,6 +25,16 @@ export const qids = {
        }
         ){data{id}}
       }`,
+  '2forumCrHaluka': `mutation  CreateForumHaluka($pid : ID, $halukId: ID , $da: DateTime, $participants: [ID])
+   { createForum(
+       data: {
+        project:$pid,
+        haluka:$halukId,
+        publishedAt:$da,
+        users_permissions_users:$participants
+       }
+        ){data{id}}
+      }`,
   '3projectJSONQue': `query GetProjectJSON($pid: ID!) {
   project(id: $pid) {
     data {

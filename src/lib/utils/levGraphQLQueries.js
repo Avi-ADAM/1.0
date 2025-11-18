@@ -1,5 +1,23 @@
+/**
+ * @typedef {import('$lib/types/strapiTypes').StrapiResponse} StrapiResponse
+ * @typedef {import('$lib/types/strapiTypes').StrapiEntity} StrapiEntity
+ * @typedef {import('$lib/types/strapiTypes').StrapiCollection} StrapiCollection
+ */
+
 // GraphQL query builders for lev page
 
+/**
+ * Build the main user GraphQL query for the lev page.
+ * This query fetches comprehensive user data including projects, missions, asks, and more.
+ * 
+ * @param {string | number} idL - The user ID to query
+ * @param {string} lang - Language code ('he' or 'en') for localized fields
+ * @returns {string} The GraphQL query string
+ * 
+ * @example
+ * const query = buildMainUserQuery('123', 'he');
+ * // Returns a GraphQL query string for user 123 with Hebrew localizations
+ */
 export function buildMainUserQuery(idL, lang) {
   return `{ usersPermissionsUser (id: ${idL}){
     data {
@@ -80,7 +98,7 @@ export function buildMainUserQuery(idL, lang) {
                             hervachti {amount noten mekabel users_permissions_user {data {id attributes{hervachti}}}}
       							}}}
                 halukas (filters: {and:[{ ushar: { eq: true } } { confirmed: { eq: false }}]}){ data{ id attributes{ 
-                    amount senderconf chatre {freetext send {data{id}} when seen} usersend {data {id}} userrecive {data{id}}  tosplit{data{id attributes{halukas{data{id attributes{confirmed}}} hervachti{nirsham amount noten mekabel users_permissions_user{data{id attributes{hervachti}}}}}}}
+                    amount senderconf forum{data{id}} chatre {freetext send {data{id}} when seen} usersend {data {id}} userrecive {data{id}}  tosplit{data{id attributes{halukas{data{id attributes{confirmed}}} hervachti{nirsham amount noten mekabel users_permissions_user{data{id attributes{hervachti}}}}}}}
                 }}} 
     			maaps(filters: { archived: { eq: false } }){ data{ id attributes{ 
         					createdAt name  
@@ -247,6 +265,18 @@ export function buildMainUserQuery(idL, lang) {
 }`;
 }
 
+/**
+ * Build the open missions GraphQL query.
+ * Fetches detailed information about specific open missions by their IDs.
+ * 
+ * @param {Array<string | number>} keysSorted - Array of mission IDs to query
+ * @param {string} lang - Language code ('he' or 'en') for localized fields
+ * @returns {string} The GraphQL query string
+ * 
+ * @example
+ * const query = buildOpenMissionsQuery([1, 2, 3], 'en');
+ * // Returns a GraphQL query for missions with IDs 1, 2, and 3
+ */
 export function buildOpenMissionsQuery(keysSorted, lang) {
   return `{openMissions (filters: {id:{in: [${keysSorted}]}}){data{ id attributes{
             project {data{ id attributes{ projectName restime timeToP user_1s {data{id }} profilePic{data{attributes {url formats }}}}}}
@@ -278,10 +308,34 @@ export function buildOpenMissionsQuery(keysSorted, lang) {
                 }}`;
 }
 
+/**
+ * Fetch main user data from the Strapi GraphQL API.
+ * This function retrieves comprehensive user information including projects, missions, and related data.
+ * 
+ * @param {string} baseUrl - The base URL of the Strapi API (e.g., 'https://api.example.com')
+ * @param {string} token - JWT authentication token
+ * @param {string | number} idL - The user ID to fetch data for
+ * @param {string} lang - Language code ('he' or 'en') for localized content
+ * @returns {Promise<StrapiResponse<{ usersPermissionsUser: StrapiEntity<any> }>>} The GraphQL response with user data
+ * 
+ * @throws {Error} If the HTTP request fails or returns a non-OK status
+ * 
+ * @example
+ * const userData = await fetchMainUserData(
+ *   'https://api.example.com',
+ *   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+ *   '123',
+ *   'he'
+ * );
+ * // Access user data: userData.data.usersPermissionsUser.data.attributes
+ */
 export async function fetchMainUserData(baseUrl, token, idL, lang) {
   console.log('fetchMainUserData called with:', { baseUrl, tokenLength: token?.length, idL, lang });
   
+  /** @type {string} */
   let bearer1 = 'bearer' + ' ' + token;
+  
+  /** @type {string} */
   let link = baseUrl + '/graphql';
   
   console.log('Making GraphQL request to:', link);
@@ -314,8 +368,30 @@ export async function fetchMainUserData(baseUrl, token, idL, lang) {
   }
 }
 
+/**
+ * Fetch open missions data from the Strapi GraphQL API.
+ * Retrieves detailed information about specific missions by their IDs.
+ * 
+ * @param {string} baseUrl - The base URL of the Strapi API
+ * @param {string} token - JWT authentication token
+ * @param {Array<string | number>} keysSorted - Array of mission IDs to fetch
+ * @param {string} lang - Language code ('he' or 'en') for localized content
+ * @returns {Promise<StrapiResponse<{ openMissions: StrapiCollection<any> }>>} The GraphQL response with missions data
+ * 
+ * @example
+ * const missions = await fetchOpenMissions(
+ *   'https://api.example.com',
+ *   'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...',
+ *   [1, 2, 3],
+ *   'en'
+ * );
+ * // Access missions: missions.data.openMissions.data
+ */
 export async function fetchOpenMissions(baseUrl, token, keysSorted, lang) {
+  /** @type {string} */
   let bearer1 = 'bearer' + ' ' + token;
+  
+  /** @type {string} */
   let link = baseUrl + '/graphql';
   
   const response = await fetch(link, {

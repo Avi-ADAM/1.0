@@ -2,7 +2,7 @@ import nodemailer from 'nodemailer';
 
 export async function POST({ request }) {
     const data = await request.json();
-    console.log("bolkmail 44", data); 
+    console.log("bolkmail 44", data.email); 
     const emailHtml = data.emailHtml.html;
     const emailText = data.emailHtml.text
     const email = data.email

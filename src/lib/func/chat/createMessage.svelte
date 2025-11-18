@@ -12,9 +12,25 @@
       nowId.set(d.data.createMessage.data.id)
       updSend(id,0)
       //nutify all subscribers and nutify
-      sendApi({pid:md.pid,
-        title:{"he":md.projectName+"-"+md.mesimaName+": הודעה חדשה","en":md.projectName+"-"+md.mesimaName+"new Messaage:"},
-      body:{"he":un+": "+mes,"en":un+": "+mes}},"nutifyPm")
+      console.log("createMessage md:", md);
+      const notificationData = {
+        pid: md.pid,
+        title: {
+          "he": (md.projectName || "") + "-" + (md.mesimaName || md.transferDetails || "") + ": הודעה חדשה",
+          "en": (md.projectName || "") + "-" + (md.mesimaName || md.transferDetails || "") + " new Message:"
+        },
+        body: {"he": un + ": " + mes, "en": un + ": " + mes}
+      };
+      
+      // אם יש participants (רשימת משתתפים ספציפית), נשלח רק אליהם
+      if (md.participants && Array.isArray(md.participants)) {
+        console.log("Adding userIds to notification:", md.participants);
+        notificationData.userIds = md.participants;
+      } else {
+        console.log("No participants found in md, sending to all project users");
+      }
+      
+      sendApi(notificationData, "nutifyPm")
       return "sucsses"
       }else{
       console.error(d)

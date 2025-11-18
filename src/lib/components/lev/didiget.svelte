@@ -15,6 +15,7 @@
   import { fly } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
+  import { nowChatId, isChatOpen, newChat, forum } from '../../stores/pendMisMes.js';
   import moment from 'moment';
   import { ProgressBar } from 'progressbar-svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
@@ -49,6 +50,7 @@
    * @property {any} [messege]
    * @property {any} [order]
    * @property {boolean} [cards]
+   * @property {number | null} [forumId] - Forum ID for existing chat, null for new chat
    * @property {(payload: { ani: string, coinlapach: string }) => void} [onCoinLapach] - Callback for 'coinLapach' event
    * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
    * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
@@ -84,6 +86,7 @@
     messege = $bindable([]),
     order = messege.length,
     cards = false,
+    forumId = null,
     onCoinLapach,
     onHover,
     onProj,
@@ -420,9 +423,66 @@ id: ${pendId}
   let rect = $state(false);
   let allr = false;
   async function react() {
-    allr = true;
-    rect = true;
-    isOpen = true;
+    // אם יש forumId קיים - פותחים את הצ'אט הקיים
+    if (forumId) {
+      // אם אין metadata לפורום, נוסיף אותו
+      let tempF = $forum;
+      if (!tempF[forumId] || !tempF[forumId].md) {
+        tempF[forumId] = {
+          loading: false,
+          messages: tempF[forumId]?.messages || [],
+          md: {
+            pid: Number(projectId),
+            mbId: 0,
+            halukId: Number(pendId),
+            projectName: projectName,
+            projectPic: src,
+            transferDetails: `${kind === 'send' ? 'העברת' : 'קבלת'} ${amount}`,
+            senderId: send,
+            receiverId: recive,
+            participants: [send, recive]  // גם לפורום קיים
+          }
+        };
+        forum.set(tempF);
+      }
+      nowChatId.set(forumId);
+      isChatOpen.set(true);
+    } else {
+      // אם אין forumId - יוצרים צ'אט זמני
+      newChat.set({
+        started: true,
+        created: false,
+        id: 0,
+        md: { 
+          mbId: 0,  // אין mesimabetahalich, זה haluka
+          pid: Number(projectId),
+          halukId: Number(pendId),
+          senderId: send,
+          receiverId: recive,
+          participants: [send, recive]  // רשימת המשתתפים - רק הנותן והמקבל
+        }
+      });
+      
+      let tempF = $forum;
+      tempF[-1] = {
+        loading: false,
+        messages: messege || [],
+        md: {
+          pid: Number(projectId),
+          mbId: 0,
+          halukId: Number(pendId),
+          projectName: projectName,
+          projectPic: src,
+          transferDetails: `${kind === 'send' ? 'העברת' : 'קבלת'} ${amount}`,
+          senderId: send,
+          receiverId: recive,
+          participants: [send, recive]
+        }
+      };
+      forum.set(tempF);
+      nowChatId.set(-1);
+      isChatOpen.set(true);
+    }
   }
   async function afreact(event) {
     why = event.why;
@@ -502,6 +562,8 @@ id: ${pendId}
 
   // import required modules
   import { EffectFlip, Navigation } from 'swiper';
+  import { Drawer } from 'vaul-svelte';
+
   let swiperRef = null;
 
   const setSwiperRef = ({ detail }) => {

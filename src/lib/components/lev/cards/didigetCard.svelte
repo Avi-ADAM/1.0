@@ -24,6 +24,7 @@
    * @property {boolean} already
    * @property {boolean} [sendcon] - האם הנותן אישר שהעביר
    * @property {boolean} [confirmed] - האם המקבל אישר שקיבל
+   * @property {number | null} [forumId] - Forum ID for existing chat
    * @property {(payload: { x: any }) => void} [onHover]
    * @property {(payload: { alr: any, y: string }) => void} [onAgree]
    * @property {(payload: { alr: any, y: string }) => void} [onDecline]
@@ -48,6 +49,7 @@
     already = $bindable(false),
     sendcon = false,
     confirmed = false,
+    forumId = null,
     onHover,
     onAgree,
     onDecline,
@@ -238,7 +240,7 @@
               stroke-linecap="round"
               stroke-linejoin="round"
               stroke-width="2"
-              d="M11 17l-5-5m0 0l5-5m-5 5h12"
+              d={$lang === 'en' ? "M13 7l5 5m0 0l-5 5m5-5H6" : "M11 17l-5-5m0 0l5-5m-5 5h12"}
             />
           </svg>
         </div>

@@ -1,14 +1,30 @@
 {
   "compilerOptions": {
     "baseUrl": ".",
+    "checkJs": true,
+    "strict": false,
+    "allowJs": true,
+    "resolveJsonModule": true,
+    "esModuleInterop": true,
+    "typeRoots": [
+      "./node_modules/@types",
+      "./src/types",
+      "./src/lib/types"
+    ],
     "paths": {
       "$lib": ["src/lib"],
       "$lib/*": ["src/lib/*"]
     }
-  }, 
-  "resolveJsonModule":true,
-  "esModueInterop":true,
+  },
   "extends": "./.svelte-kit/tsconfig.json",
-  "exclude": ["dist", ".mastra"],
-  "include": ["src/**/*.d.ts", "src/**/*.js",  "src/**/*.svelte", "service-worker.js-worker.js", "src/lib/func/animation.ts"]
+  "exclude": ["dist", ".mastra", "node_modules"],
+  "include": [
+    "src/**/*.d.ts",
+    "src/**/*.ts",
+    "src/**/*.js",
+    "src/**/*.svelte",
+    "service-worker.js",
+    "src/lib/func/animation.ts",
+    "src/lib/types/**/*"
+  ]
 }

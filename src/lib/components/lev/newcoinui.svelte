@@ -399,6 +399,7 @@
               onUser={user}
               hervach={buble.hervach}
               halukot={buble.halukot}
+              forumId={buble.forumId}
               coinlapach={buble.coinlapach}
               myid={buble.myid}
               pendId={buble.pendId}
