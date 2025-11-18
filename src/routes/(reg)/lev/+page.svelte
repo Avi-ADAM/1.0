@@ -1490,12 +1490,24 @@
           goto('/login?from=/lev');
         }
       }
-      const cookieValueId = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      fetchTimers(page.data.uid,fetch)
+      // מנסה לקרוא את ה-UID מה-page store
+      if (page.data.uid) {
+        idL = page.data.uid;
+      } else {
+        // אם לא קיים ב-page store, מנסה לקרוא מ-cookie
+        const cookieValueId = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('id='));
+        
+        if (cookieValueId) {
+          idL = cookieValueId.split('=')[1];
+        } else {
+          // אם אין UID, מפנה להתחברות
+          goto('/login?from=/lev');
+          return;
+        }
+      }
+      fetchTimers(page.data.uid || idL, fetch)
       token = cookieValu;
       const elem = document.getElementById('screen');
 
@@ -1938,16 +1950,34 @@
     lang.set(data.lang);
     console.log($lang, 'start');
     miDataold = miData;
-    const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+    
+    // מנסה לקרוא מ-page store קודם
+    if (page.data.uid) {
+      idL = page.data.uid;
+    } else {
+      // אם לא קיים, מנסה לקרוא מ-cookie
       const cookieValueId = document.cookie
         .split('; ')
-        .find((row) => row.startsWith('id='))
-        .split('=')[1];
-      idL = cookieValueId;
-      token = cookieValue;
+        .find((row) => row.startsWith('id='));
+      
+      if (cookieValueId) {
+        idL = cookieValueId.split('=')[1];
+      } else {
+        goto('/login?from=/lev');
+        return;
+      }
+    }
+    
+    const cookieValue = document.cookie
+      .split('; ')
+      .find((row) => row.startsWith('jwt='));
+    
+    if (!cookieValue) {
+      goto('/login?from=/lev');
+      return;
+    }
+    
+    token = cookieValue.split('=')[1];
     let bearer1 = 'bearer' + ' ' + token;
     let link = baseUrl+'/graphql';
     try {
