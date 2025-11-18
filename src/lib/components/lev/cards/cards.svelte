@@ -13,6 +13,7 @@
   import Reqtom from '../../../components/lev/reqtom.svelte';
   import Weget from '../../../components/lev/weget.svelte';
   import Hal from '../../../components/lev/halukaask.svelte';
+  import Vid from '../../../components/lev/didiget.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -56,7 +57,8 @@
     pmashs: true,
     pmaap: true,
     askmap: true,
-    hachla: true
+    hachla: true,
+    vidu: true
   });
   // Import Swiper styles
   import 'swiper/css';
@@ -527,6 +529,41 @@ $effect(() => {
                       created_at={buble.created_at}
                       users={buble.users}
                       diun={buble.diun}
+                      order={buble.order}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'vidu' && milon.vidu == true}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><Vid
+                      isVisible={currentIndex === i}
+                      onHover={hover}
+                      onProj={proj}
+                      onCoinLapach={delo}
+                      onUser={user}
+                      {low}
+                      cards="true"
+                      coinlapach={buble.coinlapach}
+                      myid={buble.myid}
+                      pendId={buble.pendId}
+                      projectName={buble.projectName}
+                      src={buble.src}
+                      projectId={buble.projectId}
+                      sendpropic={buble.sendpropic}
+                      sendname={buble.sendname}
+                      respropic={buble.respropic}
+                      resname={buble.resname}
+                      kind={buble.kind}
+                      amount={buble.amount}
+                      sendcon={buble.sendcon}
+                      confirmed={buble.confirmed}
+                      already={buble.already}
+                      shear={buble.shear}
+                      hervachti={buble.hervachti}
+                      created_at={buble.created_at}
+                      messege={buble.messege}
                       order={buble.order}
                     /></SwiperSlide
                   >

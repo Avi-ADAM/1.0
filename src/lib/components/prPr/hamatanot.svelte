@@ -79,6 +79,7 @@
     //ליצור מטבע אישור של חלוקה ליצור טופס של פרטי חלוקה כמה אחוז לחלק וכמה להעמיד להוצאות
   }
   let allin = $state(0);
+  let totalSales = $state(0);
   function getSrc(id) {
     let src;
     for (let i = 0; i < projectUsers.length; i++) {
@@ -125,9 +126,8 @@
   const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
   const awaitingSplit = { he: '(ממתינות לחלוקה)', en: '(awaiting split)' };
   $effect(() => {
-    // Only show unsplited sales in graphs
-    const unsplitedSales = salee.filter(s => !s.attributes.splited);
-    fermatana = unsplitedSales.reduce((acc, sale) => {
+    // Show all sales in graphs
+    fermatana = salee.reduce((acc, sale) => {
       const matanaName = sale.attributes.matanot.data.attributes.name;
       const saleIn = sale.attributes.in;
       acc[matanaName] = (acc[matanaName] || 0) + saleIn;
@@ -135,10 +135,9 @@
     }, {});
   });
   $effect(() => {
-    // Only show unsplited sales in graphs
-    const unsplitedSales = salee.filter(s => !s.attributes.splited);
+    // Show all sales in graphs
     const newFerdate = {};
-    for (const sale of unsplitedSales) {
+    for (const sale of salee) {
       const dateKey = dayjs(sale.attributes.date).format('YYYY-MM-DD');
       const matanaName = sale.attributes.matanot.data.attributes.name;
       const saleIn = sale.attributes.in;
@@ -197,6 +196,8 @@
     }
   });
   $effect(() => {
+    // Count all sales
+    totalSales = salee.reduce((total, s) => total + s.attributes.in, 0);
     // Only count unsplited sales
     allin = salee
       .filter(s => !s.attributes.splited)
@@ -486,12 +487,20 @@
         <div
           class="button-silver m-1 mt-2 py-4 px-8 mx-auto text-barbi rounded"
         >
-          <h2>{tot[$lang]}</h2>
-          <p class="font-bold">{allin}</p>
+          <div class="mb-2">
+            <h2 class="text-sm font-medium">{$lang === 'he' ? 'סך הכל מכירות:' : 'Total Sales:'}</h2>
+            <p class="font-bold text-lg">{totalSales}</p>
+          </div>
           {#if salee.some(s => s.attributes.splited)}
-            <small class="text-barbi/70 mt-1 block">
-              {$lang === 'he' ? '(לא כולל מכירות שכבר חולקו)' : '(excluding already split sales)'}
-            </small>
+            <div class="border-t border-barbi/30 pt-2">
+              <h2 class="text-sm font-medium">{$lang === 'he' ? 'ממתין לחלוקה:' : 'Awaiting Split:'}</h2>
+              <p class="font-bold text-lg">{allin}</p>
+            </div>
+          {:else}
+            <div class="border-t border-barbi/30 pt-2">
+              <h2>{tot[$lang]}</h2>
+              <p class="font-bold">{allin}</p>
+            </div>
           {/if}
         </div>
 
@@ -525,8 +534,6 @@
       <div>
         <h1 class="text-center text-barbi text-bold underline decoration-mturk">
           {sbp[$lang]}
-          <br>
-          <small class="text-sm font-normal">{awaitingSplit[$lang]}</small>
         </h1>
 
         <div class="sm:w-96 [width:95vw] [height:95vw] sm:h-96 m-4">
@@ -539,8 +546,6 @@
             class="text-center text-barbi text-bold underline decoration-mturk"
           >
             {sbd[$lang]}
-            <br>
-            <small class="text-sm font-normal">{awaitingSplit[$lang]}</small>
           </h1>
 
           <div class="  sm:[width:calc(95vw-24rem)] w-4/5 h-96 m-2">

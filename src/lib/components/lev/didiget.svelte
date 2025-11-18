@@ -2,6 +2,7 @@
   import Chaticon from '../../celim/chaticon.svelte';
   import Diun from './diun.svelte';
   import { toast } from 'svelte-sonner';
+  import DidigetCard from './cards/didigetCard.svelte';
 
     let dialogOpen = $state(false)
   const baseUrl = import.meta.env.VITE_URL
@@ -18,7 +19,76 @@
   import { ProgressBar } from 'progressbar-svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import { SendTo } from '$lib/send/sendTo.svelte';
+  import Cards from './cards/haluka.svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {boolean} [modal]
+   * @property {boolean} [isVisible]
+   * @property {any} [shear]
+   * @property {boolean} [low]
+   * @property {string} [sendpropic]
+   * @property {string} [sendname]
+   * @property {string} [respropic]
+   * @property {string} [resname]
+   * @property {string} [projectId]
+   * @property {string} [kind]
+   * @property {string} [projectName]
+   * @property {string} [src]
+   * @property {string} [myid]
+   * @property {number} [pendId]
+   * @property {string} [chat]
+   * @property {string} [amount]
+   * @property {string} [send]
+   * @property {string} [recive]
+   * @property {boolean} [sendcon]
+   * @property {string} [coinlapach]
+   * @property {boolean} [already]
+   * @property {any} [whyno]
+   * @property {any} [hervachti]
+   * @property {any} created_at
+   * @property {any} [messege]
+   * @property {any} [order]
+   * @property {boolean} [cards]
+   * @property {(payload: { ani: string, coinlapach: string }) => void} [onCoinLapach] - Callback for 'coinLapach' event
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+   * @property {() => void} [onModal] - Callback for 'modal' event
+   */
 
+  /** @type {Props} */
+  let {
+    modal = $bindable(false),
+    isVisible = false,
+    shear = [],
+    low = false,
+    sendpropic = '',
+    sendname = '',
+    respropic = '',
+    resname = '',
+    projectId = '',
+    kind = '',
+    projectName = '',
+    src = '',
+    myid = '',
+    pendId = 0,
+    chat = '',
+    amount = '',
+    send = '',
+    recive = '',
+    sendcon = false,
+    coinlapach = '',
+    already = $bindable(false),
+    whyno = [],
+    hervachti = [],
+    created_at,
+    messege = $bindable([]),
+    order = messege.length,
+    cards = false,
+    onCoinLapach,
+    onHover,
+    onProj,
+    onModal
+  } = $props();
   let miDatan = [];
   let error1;
   let bearer1;
@@ -104,6 +174,7 @@
   };
 
   async function agree(alr) {
+    console.log('agree called with alr:', alr, 'kind:', kind);
     if (alr == 'alr') {
       alert('soon');
     } else {
@@ -123,6 +194,7 @@
       idL = cookieValueId;
       token = cookieValue;
       bearer1 = 'bearer' + ' ' + token;
+      console.log("kind value:",kind)
       if (kind == 'send') {
         try {
           await fetch(linkg, {
@@ -150,7 +222,7 @@
           error1 = e;
           console.log(error1);
         }
-      } else if (kind == 'recive') {
+      } else if (kind == 'recive' || kind == 'receive') {
         let add = ``;
 
         let allsp = spCheck();
@@ -486,76 +558,7 @@ id: ${pendId}
     }
     onHover?.({ id: t });
   }
-  import Cards from './cards/haluka.svelte';
-  /**
-   * @typedef {Object} Props
-   * @property {boolean} [modal]
-   * @property {boolean} [isVisible]
-   * @property {any} [shear]
-   * @property {boolean} [low]
-   * @property {string} [sendpropic]
-   * @property {string} [sendname]
-   * @property {string} [respropic]
-   * @property {string} [resname]
-   * @property {string} [projectId]
-   * @property {string} [kind]
-   * @property {string} [projectName]
-   * @property {string} [src]
-   * @property {string} [myid]
-   * @property {number} [pendId]
-   * @property {string} [chat]
-   * @property {string} [amount]
-   * @property {string} [send]
-   * @property {string} [recive]
-   * @property {boolean} [sendcon]
-   * @property {string} [coinlapach]
-   * @property {boolean} [already]
-   * @property {any} [whyno]
-   * @property {any} [hervachti]
-   * @property {any} created_at
-   * @property {any} [messege]
-   * @property {any} [order]
-   * @property {boolean} [cards]
-   * @property {(payload: { ani: string, coinlapach: string }) => void} [onCoinLapach] - Callback for 'coinLapach' event
-   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
-   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
-   * @property {() => void} [onModal] - Callback for 'modal' event
-   */
 
-  /** @type {Props} */
-  let {
-    modal = $bindable(false),
-    isVisible = false,
-    shear = [],
-    low = false,
-    sendpropic = '',
-    sendname = '',
-    respropic = '',
-    resname = '',
-    projectId = '',
-    kind = '',
-    projectName = '',
-    src = '',
-    myid = '',
-    pendId = 0,
-    chat = '',
-    amount = '',
-    send = '',
-    recive = '',
-    sendcon = false,
-    coinlapach = '',
-    already = $bindable(false),
-    whyno = [],
-    hervachti = [],
-    created_at,
-    messege = $bindable([]),
-    order = messege.length,
-    cards = false,
-    onCoinLapach,
-    onHover,
-    onProj,
-    onModal
-  } = $props();
   function claf(event) {
     let o = event.alr;
     let d = event.y;
@@ -876,17 +879,26 @@ role="button"
 		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
 		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
 			<div class="swiper-slidec mx-auto ">
-        <Cards
-      onAgree={claf}
-      onDecline={claf}
+         <DidigetCard
+      onAgree={(e) => agree(e.alr)}
+      onDecline={(e) => decline(e.alr)}
+      onNego={(e) => nego(e.alr)}
+      onTochat={react}
       onHover={hoverc}
-      {why}
+      onProj={project}
+      {isVisible}
       {already}
       {projectName}
       {src}
-      {noofusersWaiting}
-      {noofusersOk}
-      {noofusersNo}
+      {sendpropic}
+      {sendname}
+      {respropic}
+      {resname}
+      {projectId}
+      {kind}
+      {amount}
+      {sendcon}
+      {low}
     />
       </div>
       </Drawer.Content>
@@ -895,18 +907,26 @@ role="button"
       </div>
       {/if}
   {:else}
-    <Cards
-      onAgree={claf}
-      onDecline={claf}
+    <DidigetCard
+      onAgree={(e) => agree(e.alr)}
+      onDecline={(e) => decline(e.alr)}
+      onNego={(e) => nego(e.alr)}
+      onTochat={react}
       onHover={hoverc}
-      {why}
+      onProj={project}
       {isVisible}
       {already}
       {projectName}
       {src}
-      {noofusersWaiting}
-      {noofusersOk}
-      {noofusersNo}
+      {sendpropic}
+      {sendname}
+      {respropic}
+      {resname}
+      {projectId}
+      {kind}
+      {amount}
+      {sendcon}
+      {low}
     />
   {/if}
 {/await}

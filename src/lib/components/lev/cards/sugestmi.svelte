@@ -146,9 +146,9 @@ const ttne = {"he":"ללא רווח","en":"not profitable"}
          </div>
          <div class="flex flex-col leading-tight ml-4">
             <div class="sm:text-sm text-lg mt-1 flex items-center">
-               <span class="text-barbi text-center mr-3 sm:text-2xl text-xl">{headi[$lang]}</span>
+               <span class="text-barbi text-center mr-3 sm:text-4xl text-xl">{headi[$lang]}</span>
             </div>
-            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-lg sm:text-xl text-barbi ">{missionName}</span>
+            <span style=" text-shadow: 1px 1px white;" class="pn ml-1 text-lg sm:text-2xl text-barbi ">{missionName}</span>
          </div>
 
          </div>
