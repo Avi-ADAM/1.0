@@ -15,10 +15,10 @@
   const url = 'https://1lev1.com/';
   const title = '1️💗1️';
   const setitle = {
-    he: 'ליצור מציאות חדשה, יחד',
-    en: 'Creating a new reality, together',
-    ar: 'خلق واقع جديد، معًا'
-  }; //"טעם לחיים!"
+    he: 'שותפות עסקית חכמה: ליצור מתוך תשוקה, להרוויח בהוגנות',
+    en: 'Smart Business Partnership: Create with Passion, Earn with Fairness',
+    ar: 'شراكة تجارية ذكية: الإبداع بشغف، والكسب بإنصاف'
+};//"טעם לחיים!"
   function change(lan) {
     if (lan == 'en') {
       doesLang.set(true);
@@ -49,30 +49,40 @@
     he: 'עברית',
     ar: 'العربية'
   };
-  const desc = {
-    he: ['חיבור מתוך חירות', 'שותפות מתוך הסכמה', 'עשייה מתוך חיבור'],
-    en: [
-      'Connection through freedom',
-      'Partnership through agreement',
-      'Action through connection'
+const desc = {
+    he: [
+        'ביטחון כלכלי מיצירה משותפת',
+        'ניהול עסקי חכם עם לב פתוח',   
+        'עצמאות מלאה בתוך קהילה תומכת'
     ],
-    ar: ['اتصال من خلال الحرية', 'شراكة من خلال الاتفاق', 'عمل من خلال القلب']
-  };
+    en: [
+        'Financial security through co-creation',
+        'Smart business management with an open heart',
+        'Full independence within a supportive community'
+    ],
+    ar: [ // (התרגום נשאר ברוח הדברים)
+        'الأمان المالي من خلال الإبداع المشترك',
+        'إدارة أعمال ذكية بقلب مفتوح',
+        'استقلالية كاملة داخل مجتمع داعم'
+    ]
+};
 
-  const introQuestions = {
+
+ const introQuestions = {
     he: {
-      q1: 'האם את מרגישה שיש לך מה לתת – אבל לבד זה קשה',
-      q2: 'האם אתה יודע שאתה נועד ליותר – אבל מחפש את האנשים הנכונים לצעוד איתם     '
+        q1: 'יש לך כישרון מדהים בידיים – אבל קשה לך לתרגם אותו לכסף לבד?',
+        q2: 'האם היית רוצה להפסיק לרדוף אחרי הפרנסה ולהתחיל לבנות נכס מניב, יחד עם אנשים כמוך?'
     },
     en: {
-      q1: "Do you feel you have something to give – but it's hard alone?",
-      q2: "Do you know you're meant for more – but looking for the right people to walk with?"
+        q1: "You have amazing talent – but struggle to monetize it alone?",
+        q2: "Do you want to stop chasing a paycheck and start building a yielding asset, together?"
     },
     ar: {
-      q1: 'هل تشعرين أن لديك ما تقدمينه – لكنه صعب بمفردك؟',
-      q2: 'هل تعرف أنك مخصص لأكثر من ذلك – لكنك تبحث عن الأشخاص المناسبين للمشي معهم؟'
+        q1: 'لديك موهبة مذهلة – لكن هل تجد صعوبة في تحويلها إلى مال بمفردك؟',
+        q2: 'هل ترغب في التوقف عن مطاردة لقمة العيش والبدء في بناء أصل مربح، مع أشخاص مثلك؟'
     }
-  };
+};
+ 
 
   const desc2 = {
     he: 'האם את מרגישה שיש לך מה לתת – אבל לבד זה קשה?',
@@ -95,11 +105,12 @@
     en: 'Joining existing Rikmas that perfectly match your schedule, skills, and passion',
     ar: 'الانضمام إلى ريكمات موجودة تتطابق تمامًا مع جدولك الزمني ومهاراتك وشغفك'
   };
-  const word3 = {
-    he: 'הכנסות פאסיביות אמיתיות – רווחים לכל החיים, לפי השקעה, לפי הסכמה',
-    en: 'Real passive income – lifetime profits, based on investment, based on agreement',
-    ar: 'دخل سلبي حقيقي – أرباح مدى الحياة، بناءً على الاستثمار، بناءً على الاتفاق'
-  };
+const word3 = {
+    he: 'פרנסה שהיא גם שליחות: כל שעת עבודה וכל ציוד שנתת הופכים לאחוזים במיזם. שותפות אמיתית ברווחים, לא רק משכורת.',
+    en: 'Livelihood with purpose: Every hour worked and resource shared becomes equity. True profit sharing, not just a salary.',
+    ar: 'رزق ورسالة: كل ساعة عمل وكل معدات قدمتها تتحول إلى حصة في المشروع. مشاركة حقيقية في الأرباح، وليس مجرد راتب.'
+};
+
   const word4 = {
     he: 'ניהול משותף: הצבעות, החלטות, תקציבים – בהסכמה מלאה של כל קבוצת השותפות',
     en: 'Shared management: voting, decisions, budgets – with full agreement of the entire partnership group',
@@ -119,28 +130,28 @@
   };
 
   const word7 = {
-    he: 'שיתוף חפצים ושפע בין ריקמות ואנשים – ממחזר, מחבר ומרוויח',
-    en: 'Sharing items and abundance between Rikmas and people – recycling, connecting, and earning',
-    ar: 'مشاركة العناصر والوفرة بين الريكمات والناس – إعادة التدوير، الاتصال، والكسب'
-  };
+  he: 'לא סתם משכורת – אלא בעלות. כל השקעה של זמן או ציוד הופכת לאחוזים במיזם ולרווחים עתידיים.',
+  en: 'Not just a salary – but ownership. Every investment of time or resources transforms into equity and future profits.',
+  ar: 'ليس مجرد راتب – بل ملكية. كل استثمار للوقت أو الموارد يتحول إلى حصة في المشروع وأرباح مستقبلية.'
+};
 
-  const word8 = {
-    he: 'רוצה לצעוד איתנו? זה פשוט. עליך להסכים לאמנת החירות העולמית – מסמך של ערכים, לא של חוקים.',
-    en: "Want to walk with us? It's simple. You need to agree to the Global Freedom Charter – a document of values, not laws.",
-    ar: 'هل تريد المشي معنا؟ الأمر بسيط. عليك الموافقة على ميثاق الحرية العالمي – وثيقة قيم، وليست قوانين.'
-  };
+const word8 = {
+  he: 'הנוסחה שלנו: (זמן + משאבים) = % ברווחים. \n ב-1💗1, אף אחד לא מחליט עליך. כל משימה וכל תשלום עוברים הסכמה קבוצתית שקופה.',
+  en: 'Our formula: (Time + Resources) = % in Profits. \n At 1💗1, no one decides for you. Every task and payment passes through transparent group agreement.',
+  ar: 'معادلتنا: (الوقت + الموارد) = % من الأرباح. \n في 1💗1، لا أحد يقرر نيابة عنك. كل مهمة وكل دفعة تمر عبر اتفاق جماعي شفاف.'
+};
+const word9 = {
+    he: 'רוצה לצעוד איתנו? זה פשוט. החיבור מתחיל ב"אמנת החירות העולמית" – ברית של ערכים, לא של חוקים. הסכמתך תופיע על מפת ההסכמה ותפתח עבורך את הדלת ליצירת מציאות חדשה.',
+    en: "Want to walk with us? It's simple. Connect through the 'Global Freedom Charter' – a bond of values, not laws. Your agreement will mark your place on the Agreement Map and open the door to creating a new reality.",
+    ar: 'هل تريد السير معنا؟ الأمر بسيط. يبدأ الاتصال بـ "ميثاق الحرية العالمي" – ميثاق قيم لا قوانين. ستظهر موافقتك على خريطة الاتفاق وتفتح لك الباب لخلق واقع جديد.'
+}; 
 
-  const word9 = {
-    he: 'כמתך תופיע במפת ההסכמה ותפתח עבורך את הדרך ליצירת מציאות חדשה',
-    en: 'Your agreement will appear on the Agreement Map and open the way for you to create a new reality',
-    ar: 'ستظهر موافقتك على خريطة الاتفاق وستفتح لك الطريق لخلق واقع جديد'
-  };
+const word10 = {
+    he: 'ב-1💗1 אנחנו הופכים את "מלחמת ההישרדות" ל"ריקמה של שגשוג". אנחנו משתמשים בטכנולוגיה כדי להבטיח שכל אחד יקבל בדיוק את מה שמגיע לו, כדי שתוכלו ליצור בראש שקט.',
+    en: 'At 1💗1 we turn the "survival war" into a "tapestry of prosperity". We use technology to ensure everyone gets exactly what they deserve, so you can create with peace of mind.',
+    ar: 'في 1💗1 نحول "حرب البقاء" إلى "نسيج من الازدهار". نستخدم التكنولوجيا لضمان حصول كل شخص على ما يستحقه بالضبط، لتبدع براحة بال.'
+};
 
-  const word10 = {
-    he: 'ריקמה היא קבוצה של אנשים בעלי כישורים ומשאבים שונים, היוצרים יחד מוצר או נותנים שירות ומתחלקים ברווחים לפי השקעה יחסית והסכמה',
-    en: 'A Rikma is a group of people with different skills and resources, creating together a product or providing a service and sharing profits based on relative investment and agreement',
-    ar: 'الريكما هي مجموعة من الأشخاص ذوي المهارات والموارد المختلفة، يخلقون معًا منتجًا أو يقدمون خدمة ويتقاسمون الأرباح بناءً على الاستثمار النسبي والاتفاق'
-  };
 
   const regesh1 = {
     he: '?רוצה להביא משמעות ושמחה לחיים שלך',
