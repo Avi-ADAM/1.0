@@ -2,7 +2,8 @@
   import { liUN } from '$lib/stores/liUN.js';
   import { Canvas } from '@threlte/core';
   import Scene from './globu.svelte';
-  import { doesLang, langUs } from '$lib/stores/lang.js';
+  import { doesLang, langUs, lang } from '$lib/stores/lang.js';
+  import { locale } from '$lib/translations';
   import { goto } from '$app/navigation';
   import Maze from './maze.svelte';
   import MultiSelect from 'svelte-multiselect';
@@ -444,10 +445,10 @@ meta {
     { value: 243, label: 'Zimbabwe', heb: 'זימבבואה' }
   ];
   const name = `countries`;
-  let lang = 'he';
+  let localLang = 'he';
   let nameuse = $state(false);
   const placeholdr = { he: '', ar: '', en: '' };
-  const pl = `${placeholdr}.${lang}`;
+  const pl = `${placeholdr}.${localLang}`;
   const placeholder = `המקום שלי`;
   const required = true;
   let erorim = $state({
@@ -545,7 +546,7 @@ meta {
           variables: {
             name: formName,
             email: mail,
-            countries: find_contry_id(selected), 
+            countries: find_contry_id(selected),
             publishedAt: new Date().toISOString()
           }
         })
@@ -562,8 +563,7 @@ meta {
       document.cookie =
         `email=${mail}; expires=` + new Date(2026, 0, 1).toUTCString();
       document.cookie =
-        `un=${formName}; expires=` +
-        new Date(2026, 0, 1).toUTCString();
+        `un=${formName}; expires=` + new Date(2026, 0, 1).toUTCString();
       userName.set(formName);
       liUN.set(formName);
       email.set(mail);
@@ -634,14 +634,22 @@ const lines = document.getElementById("lines")
   }
   function change(la) {
     if (la == 'en') {
-      doesLang.set(true);
-      langUs.set('en');
+      // Sync all stores
       lang.set('en');
+      locale.set('en');
+      langUs.set('en');
+      doesLang.set(true);
+      document.cookie =
+        `lang=en; expires=` + new Date(2026, 0, 1).toUTCString();
       goto('/convention');
     } else if (la == 'ar') {
-      doesLang.set(true);
-      langUs.set('ar');
+      // Sync all stores
       lang.set('ar');
+      locale.set('ar');
+      langUs.set('ar');
+      doesLang.set(true);
+      document.cookie =
+        `lang=ar; expires=` + new Date(2026, 0, 1).toUTCString();
       goto('aitifaqia');
     }
   }
@@ -912,18 +920,20 @@ top: -36px;
               <br />
               <div
                 class="text-center justify-center flex items-center text-bold text-transparent bg-clip-text bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]"
-                 style="flex-wrap: wrap; font-family:StamSefarad,David;"
+                style="flex-wrap: wrap; font-family:StamSefarad,David;"
               >
-                 אני <span
+                אני <span
                   style="flex-wrap: nowrap; white-space: pre;  color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);"
-                  > { formName ? " " + formName + " ": ' __ '} </span
                 >
-                 אצור, אתנהל ואפתור חילוקי דעות ב <span
+                  {formName ? ' ' + formName + ' ' : ' __ '}
+                </span>
+                אצור, אתנהל ואפתור חילוקי דעות ב
+                <span
                   role="contentinfo"
                   class="hover:text-barbi"
                   onkeypress={() => info()}
                   onclick={() => info()}
-                   style="flex-wrap: wrap;">"רקמות"</span
+                  style="flex-wrap: wrap;">"רקמות"</span
                 >
                 המתנהלות באתר
                 <div
@@ -959,7 +969,7 @@ top: -36px;
                     </h1>
                   </div>
                 </div>
-                 רק בהסכמה הדדית.
+                רק בהסכמה הדדית.
               </div>
               <!----
 אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב הבסיסי שבאדם, ולכך מקווה ומצפה שכאשר כל האנושות כולה תסכים אלימות, קרבות וכפיה בכוח יפסיקו להיות צורה של תקשורת אנושית.

@@ -22,8 +22,9 @@ import {
 } from '$lib/stores/fbl.js';
 
 import {
-    lang
+    lang, langUs, doesLang
 } from '$lib/stores/lang.js'
+import { locale } from '$lib/translations'
 import {
     page
 } from '$app/state'
@@ -72,8 +73,13 @@ if (x != null) {
     userName.set(decodeURIComponent(page.url.searchParams.get('un')))
     kvar = page.url.searchParams.get('em');
     email.set(decodeURIComponent(page.url.searchParams.get('em')));
-    lang.set(decodeURIComponent(page.url.searchParams.get('lang'))) //cuontry freeppid
-       const oneYearFromNow = new Date();
+    const langParam = decodeURIComponent(page.url.searchParams.get('lang'));
+    // Sync both stores
+    lang.set(langParam);
+    locale.set(langParam);
+    langUs.set(langParam);
+    doesLang.set(true);
+    const oneYearFromNow = new Date();
 oneYearFromNow.setFullYear(oneYearFromNow.getFullYear() + 1);
 
 document.cookie = `lang=${page.url.searchParams.get('lang')}; expires=${oneYearFromNow.toUTCString()}; path=/; SameSite=Strict`;

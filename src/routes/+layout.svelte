@@ -61,16 +61,21 @@ import { Bot } from '$lib/components/bot';
   /** @type {Props} */
   let { data, children } = $props();
 
-  // Ensure locale is set from data if available, or determine it from other sources
+  // Ensure locale and lang are synchronized
   $effect(() => {
     if (data?.lang) {
-      console.log('Setting locale from data.lang:', data.lang);
+      console.log('Setting locale and lang from data.lang:', data.lang);
+      // Sync both stores
+      lang.set(data.lang);
       locale.set(data.lang);
+      langUs.set(data.lang);
+      doesLang.set(true);
     } else if (data && browser) {
       console.log('No data.lang, calling getLang()');
       getLang();
     }
   }) 
+
 function getLang() {
   console.log('getLang called with data:', data)
     let la;
@@ -96,9 +101,13 @@ function getLang() {
    // if (navigator.languages != undefined)
    //     return navigator.languages[0];
    // return navigator.language;
-    lang.set(la)
-    document.cookie = `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
-    locale.set($lang);
+    
+    // Sync all language stores
+    lang.set(la);
+    locale.set(la);
+    langUs.set(la);
+    doesLang.set(true);
+    document.cookie = `lang=${la}; expires=` + new Date(2026, 0, 1).toUTCString();
 }
 
 onMount(() => {
@@ -121,7 +130,7 @@ onMount(() => {
 <main>
 	{@render children?.()}
 <Toaster toastOptions={{
-  style: `dir: ${$lang == "en" ? "ltr" : "rtl"}; text-align: ${$lang == "en" ? "left" : "right"}; `,
+  style: `dir: ${$locale == "en" ? "ltr" : "rtl"}; text-align: ${$locale == "en" ? "left" : "right"}; `,
 }} richColors  closeButton  position="top-center" />
 <Bot {data} />
 </main>

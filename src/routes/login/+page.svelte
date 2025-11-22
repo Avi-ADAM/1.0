@@ -1,5 +1,5 @@
 <script>
-  import { lang } from '$lib/stores/lang.js';
+  import { locale, t } from '$lib/translations';
   import { fade } from 'svelte/transition';
   import { goto } from '$app/navigation';
   import { enhance } from '$app/forms'; // Import enhance for form actions
@@ -11,23 +11,9 @@
   let showPassword = $state(false);
   let redirectTo = $derived(page.url.searchParams.get('from') || ''); // Get 'from' URL parameter
 
-  let emailenter = {
-    en: 'Enter your email',
-    he: 'כתובת מייל'
-  };
-  let passenter = {
-    en: 'Enter your password',
-    he: 'סיסמה'
-  };
-
   function handleclick() {
     goto('/login/passwordReset');
   }
-
-  let buttonForgot = {
-    he: 'במקרה של סיסמה שאבדה מהזיכרון יש ללחוץ',
-    en: 'if lost password please press me'
-  };
 
   import {
     emailValidator,
@@ -37,13 +23,10 @@
 
   let { data, form } = $props(); // Receive form data from server action
 
-  const iwanttoreg = { he: 'עדיין לא נרשמתי', en: 'I wand to register' };
-  const loginButtonText = { he: 'התחברות', en: 'Login' };
   const [validity, validate] = createFieldValidator(
     requiredValidator(),
     emailValidator()
   );
-  const title = { he: 'התחברות ל-1💗1', en: 'login to 1💗1' };
 
   // Handle server-side errors
   $effect(() => {
@@ -61,7 +44,7 @@
 </script>
 
 <svelte:head>
-  <title>{title[$lang]}</title>
+  <title>{$t('auth.login.title')}</title>
 </svelte:head>
 <div class="body">
   <div class="login">
@@ -87,8 +70,8 @@
           </h1>
           <button
             onclick={handleclick}
-            title={buttonForgot[$lang]}
-            aria-label={buttonForgot[$lang]}
+            title={$t('auth.login.forgotPassword')}
+            aria-label={$t('auth.login.forgotPassword')}
             in:fade
             style=" position: fixed;
                                 top: 70%;
@@ -114,7 +97,7 @@
           class:field-danger={!$validity.valid}
           class:field-success={$validity.valid}
           use:validate={email}
-          placeholder={emailenter[$lang]}
+          placeholder={$t('auth.login.emailPlaceholder')}
           id="email"
           aria-required="true"
           autocomplete="email"
@@ -125,7 +108,7 @@
           type={showPassword ? 'text' : 'password'}
           name="password"
           bind:value={password}
-          placeholder={passenter[$lang]}
+          placeholder={$t('auth.login.passwordPlaceholder')}
           id="password"
           aria-required="true"
           autocomplete="current-password"
@@ -134,8 +117,8 @@
           type="button"
           class="password-toggle"
           onclick={() => (showPassword = !showPassword)}
-          aria-label={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
-          title={showPassword ? 'הסתר סיסמה' : 'הצג סיסמה'}
+          aria-label={showPassword ? $t('auth.login.hidePassword') : $t('auth.login.showPassword')}
+          title={showPassword ? $t('auth.login.hidePassword') : $t('auth.login.showPassword')}
         >
           {#if showPassword}
             <!-- Eye slash icon (hide password) -->
@@ -191,15 +174,15 @@
             class:active
             disabled={!$validity.valid}
             class="center hover:scale-150 bt"
-            aria-label={loginButtonText[$lang]}
+            aria-label={$t('auth.login.loginButton')}
           >
-            <span class="login-text">{loginButtonText[$lang]}</span>
+            <span class="login-text">{$t('auth.login.loginButton')}</span>
           </button>
           <button
             class="text-gold bg-barbi px-1 py-1 rounded-md hover:text-barbi hover:bg-gold"
             onclick={() =>
               goto(`/${data.params ? `?from=${data.params}` : ``}`)}
-            >{iwanttoreg[$lang]}</button
+            >{$t('auth.login.notRegistered')}</button
           >
         </div>
       </div>

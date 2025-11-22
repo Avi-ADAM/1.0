@@ -15,6 +15,7 @@
       import Tikun from './tikunar.svelte';
             import TRan from './tranarb.svelte';
       import {  doesLang, langUs, lang } from '$lib/stores/lang.js'
+      import { locale } from '$lib/translations'
 const baseUrl = import.meta.env.VITE_URL
 import { Head } from 'svead'
   let title = ' 1💗1 | التوافق العالمي من أجل الحرية'
@@ -383,9 +384,13 @@ onSubmit: values => {
             datar = data;
             already = true;
             liUN.set($form.name);
-            setTimeout(function() { doesLang.set(true)
-                                    langUs.set("en")
+            setTimeout(function() { 
+                                    // Sync all stores
                                     lang.set("en")
+                                    locale.set("en")
+                                    langUs.set("en")
+                                    doesLang.set(true)
+                                    document.cookie = `lang=en; expires=` + new Date(2026, 0, 1).toUTCString();
                                    goto("/convention")}, 2500)
           }
         });
@@ -401,16 +406,22 @@ trans = !trans;
 let error;
 function change(la){
   if (la == "he"){
-    doesLang.set(true)
-    langUs.set("he")
+    // Sync all stores
     lang.set("he")
+    locale.set("he")
+    langUs.set("he")
+    doesLang.set(true)
+    document.cookie = `lang=he; expires=` + new Date(2026, 0, 1).toUTCString();
     console.log("change", $lang)
     goto("/hascama")
     
   }else if(la == "en"){
-    doesLang.set(true)
-    langUs.set("en")
+    // Sync all stores
     lang.set("en")
+    locale.set("en")
+    langUs.set("en")
+    doesLang.set(true)
+    document.cookie = `lang=en; expires=` + new Date(2026, 0, 1).toUTCString();
     console.log("change", $lang)
     goto("/en")
   }

@@ -9,6 +9,7 @@
 
                 import axios from 'axios';
     import { lang, doesLang, langUs } from '$lib/stores/lang.js'
+    import { locale } from '$lib/translations'
   import { goto } from '$app/navigation';
 
           import { contriesi } from '../registration/contries.js';
@@ -478,16 +479,22 @@ function erorer(){
 }
 function change(la){
   if (la == "he"){
-    doesLang.set(true)
-    langUs.set("he")
+    // Sync all stores
     lang.set("he")
+    locale.set("he")
+    langUs.set("he")
+    doesLang.set(true)
+    document.cookie = `lang=he; expires=` + new Date(2026, 0, 1).toUTCString();
     console.log("change", $lang)
     goto("/hascama")
     
   }else if(la == "ar"){
-    doesLang.set(true)
-    langUs.set("ar")
+    // Sync all stores
     lang.set("ar")
+    locale.set("ar")
+    langUs.set("ar")
+    doesLang.set(true)
+    document.cookie = `lang=ar; expires=` + new Date(2026, 0, 1).toUTCString();
     console.log("change", $lang)
     goto("/aitifaqia")
   }

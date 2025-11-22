@@ -11,6 +11,7 @@
   import { Tour } from 'svelte-tour';
   import TourTip from '$lib/components/tour/tourMeEnd.svelte';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
+  import { locale } from '$lib/translations';
   import { onMount, tick } from 'svelte';
   import axios from 'axios';
   import { draw } from 'svelte/transition';
@@ -353,9 +354,11 @@
           if (lango == 'en' || lango == 'he') {
             // Check if lang store is different from lango
             if ($lang !== lango) {
+              // Sync all stores
               lang.set(lango);
-              doesLang.set(true);
+              locale.set(lango);
               langUs.set(lango);
+              doesLang.set(true);
               // Add to cookies
               document.cookie =
                 `lang=${lango}; expires=` + new Date(2026, 0, 1).toUTCString();
@@ -363,11 +366,13 @@
               await start();
               return;
             } else {
+              // Sync all stores
               lang.set(lango);
-              doesLang.set(true);
+              locale.set(lango);
               langUs.set(lango);
+              doesLang.set(true);
               document.cookie =
-                `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+                `lang=${lango}; expires=` + new Date(2026, 0, 1).toUTCString();
             }
           }
           if ($lang == 'he') {
@@ -721,6 +726,7 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
   import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
+  import { end } from 'happy-dom/lib/PropertySymbol.js';
   let mass = $state(false);
 
   function massss(event) {

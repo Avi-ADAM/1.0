@@ -1,5 +1,5 @@
 <script>
-  import { locale } from '$lib/translations';
+  import { locale, t } from '$lib/translations';
   import { AnimatedHeadline } from 'svelte-animated-headline';
   import { goto } from '$app/navigation';
   import Arrow from '$lib/celim/icons/arrow.svelte';
@@ -14,11 +14,6 @@
   const { progress } = useProgress();
   const url = 'https://1lev1.com/';
   const title = '1️💗1️';
-  const setitle = {
-    he: 'שותפות עסקית חכמה: ליצור מתוך תשוקה, להרוויח בהוגנות',
-    en: 'Smart Business Partnership: Create with Passion, Earn with Fairness',
-    ar: 'شراكة تجارية ذكية: الإبداع بشغف، والكسب بإنصاف'
-};//"טעם לחיים!"
   function change(lan) {
     if (lan == 'en') {
       doesLang.set(true);
@@ -44,186 +39,13 @@
     }
     trans = false;
   }
-  const changel = {
-    en: 'English',
-    he: 'עברית',
-    ar: 'العربية'
-  };
-const desc = {
-    he: [
-        'ביטחון כלכלי מיצירה משותפת',
-        'ניהול עסקי חכם עם לב פתוח',   
-        'עצמאות מלאה בתוך קהילה תומכת'
-    ],
-    en: [
-        'Financial security through co-creation',
-        'Smart business management with an open heart',
-        'Full independence within a supportive community'
-    ],
-    ar: [ // (התרגום נשאר ברוח הדברים)
-        'الأمان المالي من خلال الإبداع المشترك',
-        'إدارة أعمال ذكية بقلب مفتوح',
-        'استقلالية كاملة داخل مجتمع داعم'
-    ]
-};
 
-
- const introQuestions = {
-    he: {
-        q1: 'יש לך כישרון מדהים בידיים – אבל קשה לך לתרגם אותו לכסף לבד?',
-        q2: 'האם היית רוצה להפסיק לרדוף אחרי הפרנסה ולהתחיל לבנות נכס מניב, יחד עם אנשים כמוך?'
-    },
-    en: {
-        q1: "You have amazing talent – but struggle to monetize it alone?",
-        q2: "Do you want to stop chasing a paycheck and start building a yielding asset, together?"
-    },
-    ar: {
-        q1: 'لديك موهبة مذهلة – لكن هل تجد صعوبة في تحويلها إلى مال بمفردك؟',
-        q2: 'هل ترغب في التوقف عن مطاردة لقمة العيش والبدء في بناء أصل مربح، مع أشخاص مثلك؟'
-    }
-};
- 
-
-  const desc2 = {
-    he: 'האם את מרגישה שיש לך מה לתת – אבל לבד זה קשה?',
-    en: "Do you feel you have something to give – but it's hard alone?",
-    ar: 'هل تشعرين أن لديك ما تقدمينه – لكنه صعب بمفردك؟'
-  };
-  const word1 = {
-    he: "הקמת 'ריקמה' – שותפות דינמית ומבוססת ערכים",
-    en: "Creating a 'Rikma' – a dynamic, value-based partnership",
-    ar: "إنشاء 'ريكما' – شراكة ديناميكية قائمة على القيم"
-  };
-  const wordNew = {
-    he: 'נעים להכיר: 1💗1 – פלטפורמה של שותפות חדשה. כאן, כל אחת היא מלכה. כל אחד הוא מלך. כאן יוצרים יחד – בלי לוותר על העצמאות.',
-    en: 'Welcome to 1💗1 – a new partnership platform. Here, every woman is a queen. Every man is a king. Here we create together – without giving up independence.',
-    ar: 'مرحبًا بك في 1💗1 – منصة شراكة جديدة. هنا، كل امرأة هي ملكة. كل رجل هو ملك. هنا نخلق معًا – دون التخلي عن الاستقلالية.'
-  };
-
-  const word2 = {
-    he: 'הצטרפות לריקמות קיימות שמתאימות בדיוק ללוח הזמנים, הכישורים ולתשוקה שלך',
-    en: 'Joining existing Rikmas that perfectly match your schedule, skills, and passion',
-    ar: 'الانضمام إلى ريكمات موجودة تتطابق تمامًا مع جدولك الزمني ومهاراتك وشغفك'
-  };
-const word3 = {
-    he: 'פרנסה שהיא גם שליחות: כל שעת עבודה וכל ציוד שנתת הופכים לאחוזים במיזם. שותפות אמיתית ברווחים, לא רק משכורת.',
-    en: 'Livelihood with purpose: Every hour worked and resource shared becomes equity. True profit sharing, not just a salary.',
-    ar: 'رزق ورسالة: كل ساعة عمل وكل معدات قدمتها تتحول إلى حصة في المشروع. مشاركة حقيقية في الأرباح، وليس مجرد راتب.'
-};
-
-  const word4 = {
-    he: 'ניהול משותף: הצבעות, החלטות, תקציבים – בהסכמה מלאה של כל קבוצת השותפות',
-    en: 'Shared management: voting, decisions, budgets – with full agreement of the entire partnership group',
-    ar: 'إدارة مشتركة: التصويت، القرارات، الميزانيات – بموافقة كاملة من مجموعة الشراكة بأكملها'
-  };
-const word5 = {
-    he: 'שקיפות טכנולוגית מלאה: המערכת מתעדת כל פעולה וכל החלטה בזמן אמת. בונים אמון דרך שקיפות, לא דרך בירוקרטיה.',
-    en: 'Full Technological Transparency: The system records every action and decision in real-time. Building trust through transparency, not bureaucracy.',
-    ar: 'شفافية تكنولوجية كاملة: يسجل النظام كل إجراء وقرار في الوقت الفعلي. بناء الثقة من خلال الشفافية، وليس البيروقراطية.'
-  };
-
-  const word6 = {
-    he: 'משימות, לוחות, גרפים, בוט בינה מלאכותית עוזר אישי, וכלים נוספים לניהול שיתופי פשוט ויעיל',
-    en: 'Tasks, boards, graphs, and additional tools for simple and efficient collaborative management',
-    ar: 'مهام، لوحات، رسوم بيانية، وأدوات إضافية لإدارة تعاونية بسيطة وفعالة'
-  };
-
-  const word7 = {
-  he: 'לא סתם משכורת – אלא בעלות. כל השקעה של זמן או ציוד הופכת לאחוזים במיזם ולרווחים עתידיים.',
-  en: 'Not just a salary – but ownership. Every investment of time or resources transforms into equity and future profits.',
-  ar: 'ليس مجرد راتب – بل ملكية. كل استثمار للوقت أو الموارد يتحول إلى حصة في المشروع وأرباح مستقبلية.'
-};
-
-const word8 = {
-  he: 'הנוסחה שלנו: (זמן + משאבים) = % ברווחים. \n ב-1💗1, אף אחד לא מחליט עליך. כל משימה וכל תשלום עוברים הסכמה קבוצתית שקופה.',
-  en: 'Our formula: (Time + Resources) = % in Profits. \n At 1💗1, no one decides for you. Every task and payment passes through transparent group agreement.',
-  ar: 'معادلتنا: (الوقت + الموارد) = % من الأرباح. \n في 1💗1، لا أحد يقرر نيابة عنك. كل مهمة وكل دفعة تمر عبر اتفاق جماعي شفاف.'
-};
-const word9 = {
-    he: 'רוצה לצעוד איתנו? זה פשוט. החיבור מתחיל ב"אמנת החירות העולמית" – ברית של ערכים, לא של חוקים. הסכמתך תופיע על מפת ההסכמה ותפתח עבורך את הדלת ליצירת מציאות חדשה.',
-    en: "Want to walk with us? It's simple. Connect through the 'Global Freedom Charter' – a bond of values, not laws. Your agreement will mark your place on the Agreement Map and open the door to creating a new reality.",
-    ar: 'هل تريد السير معنا؟ الأمر بسيط. يبدأ الاتصال بـ "ميثاق الحرية العالمي" – ميثاق قيم لا قوانين. ستظهر موافقتك على خريطة الاتفاق وتفتح لك الباب لخلق واقع جديد.'
-}; 
-
-const word10 = {
-    he: 'ב-1💗1 אנחנו הופכים את "מלחמת ההישרדות" ל"ריקמה של שגשוג". אנחנו משתמשים בטכנולוגיה כדי להבטיח שכל אחד יקבל בדיוק את מה שמגיע לו, כדי שתוכלו ליצור בראש שקט.',
-    en: 'At 1💗1 we turn the "survival war" into a "tapestry of prosperity". We use technology to ensure everyone gets exactly what they deserve, so you can create with peace of mind.',
-    ar: 'في 1💗1 نحول "حرب البقاء" إلى "نسيج من الازدهار". نستخدم التكنولوجيا لضمان حصول كل شخص على ما يستحقه بالضبط، لتبدع براحة بال.'
-};
-
-
-  const regesh1 = {
-    he: '?רוצה להביא משמעות ושמחה לחיים שלך',
-    en: 'Want to bring meaning and joy to your life?',
-    ar: 'هل تريد إضفاء الدلالة والفرح على حياتك؟'
-  };
-
-  const regesh2 = {
-    he: '?רוצה לפתוח דלת אל מציאות חדשה',
-    en: 'Want to open the door to a new reality?',
-    ar: 'هل تريد فتح الباب أمام واقع جديد؟'
-  };
-
-  const login = {
-    he: 'להתחברות',
-    en: 'Login',
-    ar: 'تسجيل الدخول'
-  };
-
-  const reg = {
-    he: 'להסכמה והרשמה',
-    en: 'Agreement and Registration',
-    ar: 'الموافقة والتسجيل'
-  };
-  const loadingTitle = {
-    he: 'טעינת אלמנט עיצובי תלת מימדי',
-    en: 'Loading a three-dimensional design element',
-    ar: 'تحميل عنصر تصميم ثلاثي الأبعاد'
-  };
-  const agree = {
-    he: 'רוצה להביא משמעות ושמחה לחיים שלך? רוצה לפתוח דלת אל מציאות חדשה? התחבר/י להסכמה – והירשם/י עכשיו. הסכמתך תופיע ב',
-    en: 'Want to bring meaning and joy to your life? Want to open the door to a new reality? Connect to agreement – and register now. Your agreement will appear on the ',
-    ar: 'هل تريد إضفاء المعنى والفرح على حياتك؟ هل تريد فتح الباب أمام واقع جديد؟ تواصل مع الاتفاق – وسجل الآن. ستظهر موافقتك على '
-  };
-
-  const agree2 = {
-    he: 'מפת ההסכמה',
-    en: 'Agreement Map',
-    ar: 'خريطة الاتفاق'
-  };
-
-  const agree3 = {
-    he: ' ותפתח עבורך את הדרך ליצירת מציאות חדשה. \n יחד ניצור עולם טוב יותר',
-    en: ' and open the way for you to create a new reality. Together we will create a better world',
-    ar: ' وستفتح لك الطريق لخلق واقع جديد. معًا سنخلق عالمًا أفضل'
-  };
-
-  const statsText = {
-    he: {
-      currently: 'כרגע יש באתר',
-      partnerships: 'רקמות (שותפויות) פעילות',
-      members: 'חברים וחברות',
-      loading: 'טוען נתונים...'
-    },
-    en: {
-      currently: 'Currently on the site',
-      partnerships: 'active partnerships',
-      members: 'members',
-      loading: 'Loading data...'
-    },
-    ar: {
-      currently: 'حاليًا على الموقع',
-      partnerships: 'شراكات نشطة',
-      members: 'أعضاء',
-      loading: 'تحميل البيانات...'
-    }
-  };
-
-  const mapa = {
-    he: 'מפת ההסכמה',
-    ar: 'خريطة الاتفاق',
-    en: 'Agreement Map'
-  };
+  // Derived value for headlines array
+  let headlines = $derived([
+    $t('home.hero.headline1'),
+    $t('home.hero.headline2'),
+    $t('home.hero.headline3')
+  ]);
 
   let btna = $state(false);
 
@@ -249,17 +71,7 @@ const word10 = {
   let projectsCount = $state(0);
   let membersCount = $state(0);
   let statsLoaded = $state(false);
-  const description = {
-    he: '1💗1 הסכמה עולמית על חי | ליצור יחד בהסכמה. לכל 1 יש כישרונות ויכולות ייחודים, לכל 1 יש חלום. ביחד ניתן ליצור כל דבר, לשתף פעולה, לחלום, להעז, להצליח ולהרוויח בגדול.',
-    en: '1💗1 WorldWide consensus for Security and Peace | colaboration platform, create together harmoniously | consensus based partnerships manegment platform | we can together',
-    ar: '1💗1 اتفاق عالمي للحرية والسلام، منصة تعاون، نخلق معًا بتناغم | نظام إدارة الشراكات القائم على التوافق، يمكننا معًا'
-  };
-  //To establish consensus for non-violence, To allow a network of harmoneus creation
-  const pagetitle = {
-    en: '1💗1 | Create together harmoniously | Worldwide Consensus for Freedom',
-    he: ' ליצור ביחד בהסכמה | הסכמה עולמית על חירות וביטחון | 1💗1',
-    ar: '1💗1 | نخلق معًا بتناغم | اتفاق عالمي للحرية'
-  };
+  
   let pageurl = {
     ar: 'https://1lev1.com/ar',
     en: 'https://1lev1.com/en',
@@ -317,8 +129,8 @@ const word10 = {
 </script>
 
 <Head
-  title={pagetitle[$lang]}
-  description={description[$lang]}
+  title={$t('home.meta.title')}
+  description={$t('home.meta.description')}
   {image}
   url={pageurl[$lang]}
 />
@@ -349,7 +161,7 @@ const word10 = {
         onclick={() => change('en')}
         title="change language to English"
         class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{changel['en']}</button
+        >{$t('home.languages.en')}</button
       >
     {/if}
 
@@ -358,7 +170,7 @@ const word10 = {
         onclick={() => change('ar')}
         title="change language to Arabic"
         class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{changel['ar']}</button
+        >{$t('home.languages.ar')}</button
       >
     {/if}
     {#if $lang != 'he'}
@@ -366,7 +178,7 @@ const word10 = {
         onclick={() => change('he')}
         title="change language to Hebrew"
         class="text-barbi border-2 border-lturk text-bold hover:text-gold bg-gold text-center hover:bg-barbi px-1 py-0.5"
-        >{changel['he']}</button
+        >{$t('home.languages.he')}</button
       >
     {/if}
     {#if $lang == 'he'}
@@ -376,18 +188,18 @@ const word10 = {
         data-sveltekit-prefetch
         href="/about"
       >
-        אודות</a
+        {$t('home.nav.about')}</a
       >
     {/if}
     <a
       class="text-barbi border-2 border-lturk text-bold hover:text-gold text-center bg-gold hover:bg-barbi px-1 py-0.5"
       data-sveltekit-prefetch
-      href="/love">{mapa[$lang]}</a
+      href="/love">{$t('home.nav.agreementMap')}</a
     >
   {/if}
 </div>
 <div
-  dir={$lang === 'he' || $lang == 'ar' ? 'rtl' : 'ltr'}
+  dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
   class="h-screen w-screen flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden bg-[length:200%_auto] animate-gradientx"
 >
   <div
@@ -435,7 +247,7 @@ const word10 = {
     </div>
     <div
       class="overflow-auto d"
-      dir={$lang !== 'en' ? 'ltr' : 'rtl'}
+      dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
       onscroll={() => {
         scrolli = true;
         setTimeout(() => (scrolli = false), 1500);
@@ -445,7 +257,7 @@ const word10 = {
         class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))] overline decoration-mturk text-xl"
         style="text-shadow:none;"
       >
-        {setitle[$lang]}
+        {$t('home.hero.subtitle')}
       </h2>
 
       <h3
@@ -453,7 +265,7 @@ const word10 = {
         style="font-family: Sababa, system-ui;text-shadow:none;"
       >
         <AnimatedHeadline
-          texts={desc[$lang]}
+          texts={headlines}
           wait={3000}
           fade={500}
           slide={300}
@@ -472,24 +284,24 @@ const word10 = {
           class="text-xl sm:text-2xl mb-2 text-white font-semibold relative"
           style="font-family: 'Sababa', sans-serif;"
         >
-          {introQuestions[$lang].q1}
+          {$t('home.intro.q1')}
         </p>
         <p
           class="text-xl sm:text-2xl text-white font-semibold relative"
           style="font-family: 'Sababa', sans-serif;"
         >
-          {introQuestions[$lang].q2}
+          {$t('home.intro.q2')}
         </p>
       </div>
 
-      <div dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+      <div dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}>
         <Tile
           bg={'neww'}
           big={true}
           sm={true}
           reverse={true}
           openi={true}
-          word={wordNew[$lang]}
+          word={$t('home.features.welcome')}
         />
         <Tile
           bg={'neww'}
@@ -497,7 +309,7 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word1[$lang]}
+          word={$t('home.features.createRikma')}
         />
         <Tile
           bg={'neww'}
@@ -505,7 +317,7 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word2[$lang]}
+          word={$t('home.features.joinRikma')}
         />
         <Tile
           bg={'neww'}
@@ -513,7 +325,7 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word3[$lang]}
+          word={$t('home.features.livelihood')}
         />
         <Tile
           bg={'neww'}
@@ -521,7 +333,7 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word4[$lang]}
+          word={$t('home.features.sharedManagement')}
         />
         <Tile
           bg={'neww'}
@@ -529,7 +341,7 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word5[$lang]}
+          word={$t('home.features.transparency')}
         />
         <Tile
           bg={'neww'}
@@ -537,7 +349,7 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word6[$lang]}
+          word={$t('home.features.tools')}
         />
         <Tile
           bg={'neww'}
@@ -545,7 +357,7 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word7[$lang]}
+          word={$t('home.features.ownership')}
         />
         <Tile
           bg={'neww'}
@@ -553,11 +365,9 @@ const word10 = {
           sm={true}
           reverse={true}
           openi={true}
-          word={word8[$lang]}
+          word={$t('home.features.formula')}
         />
-        <!-- <Tile bg={"neww"} big={true} sm={true} reverse={true} openi={true} word={word9[$lang]} />-->
-        <Tile bg={'gold'} big={true} sm={true} word={word10[$lang]} />
-        <!--<Tile bg={"pink"} big={true} sm={true} word={"<div>"+agree[$lang]+`<a style="color:var(--barbi-pink)" href="./love">`+agree2[$lang]+"</a>"+agree3[$lang]+"</div>"}/>-->
+        <Tile bg={'gold'} big={true} sm={true} word={$t('home.features.mission')} />
       </div>
       <!-- סטטיסטיקות האתר -->
       <div
@@ -566,23 +376,23 @@ const word10 = {
         {#if statsLoaded}
           <div class="text-center">
             <p class="text-white font-semibold text-lg mb-2" style="font-family: 'Sababa', sans-serif;">
-              {statsText[$lang].currently}
+              {$t('home.stats.currently')}
             </p>
             <div class="flex justify-center items-center gap-4 flex-wrap">
               <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                 <div class="text-2xl font-bold text-gold">{projectsCount}</div>
-                <div class="text-white text-sm">{statsText[$lang].partnerships}</div>
+                <div class="text-white text-sm">{$t('home.stats.partnerships')}</div>
               </div>
               <div class="text-gold text-2xl">•</div>
               <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                 <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                <div class="text-white text-sm">{statsText[$lang].members}</div>
+                <div class="text-white text-sm">{$t('home.stats.members')}</div>
               </div>
             </div>
           </div>
         {:else}
           <div class="text-center text-white font-semibold" style="font-family: 'Sababa', sans-serif;">
-            {statsText[$lang].loading}
+            {$t('home.stats.loading')}
           </div>
         {/if}
       </div>
@@ -594,11 +404,11 @@ const word10 = {
           style="text-shadow:none;"
           class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]"
         >
-          {agree[$lang]}<a
+          {$t('home.cta.agree')}<a
             class="text-gold hover:text-lturk font-bold underline"
-            href="/love">{agree2[$lang]}</a
+            href="/love">{$t('home.cta.agreementMap')}</a
           >
-          {agree3[$lang]}
+          {$t('home.cta.agreeEnd')}
         </h2>
       </div>
     </div>
@@ -615,7 +425,7 @@ const word10 = {
         onfocus={() => (btna = true)}
         onmouseover={() => (btna = true)}
         onmouseleave={() => (btna = false)}
-        >{login[$lang]}
+        >{$t('home.cta.login')}
         {#if btna == true && loadinga == false}
           <span class="mx-2 mb-0.5"
             ><Arrow
@@ -634,7 +444,7 @@ const word10 = {
         class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"
         onclick={() => {
           goto(
-            `${$lang == 'he' ? '/hascama' : $lang == 'ar' ? '/aitifaqia' : '/convention'}`
+            `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`
           );
           loading = true;
           fi = true;
@@ -644,11 +454,11 @@ const word10 = {
         onfocus={() => (btnb = true)}
         onmouseover={() => (btnb = true)}
         onmouseleave={() => (btnb = false)}
-        >{reg[$lang]}
+        >{$t('home.cta.register')}
         {#if btnb == true && loading == false}
           <span class="mx-2 mb-0.5"
             ><Arrow
-              back={$lang == 'he' || $lang == 'ar' ? false : true}
+              back={$locale == 'he' || $locale == 'ar' ? false : true}
               height="32"
               color={'var(--gold)'}
               fill="var(--barbi-pink)"
@@ -671,7 +481,7 @@ const word10 = {
     {#if $progress < 1}
       <div
         class="w-full h-full sm:h-screen flex flex-col items-center justify-end sm:justify-center"
-        title={loadingTitle[$lang]}
+        title={$t('home.loading.title')}
       >
         <img
           class="ani"

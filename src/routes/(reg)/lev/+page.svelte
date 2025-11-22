@@ -34,6 +34,7 @@
   import { fly } from 'svelte/transition';
   import Levchat from '$lib/components/lev/levchat.svelte';
   import { lang, doesLang, langUs } from '$lib/stores/lang.js';
+  import { locale } from '$lib/translations';
   import { getOccurrence } from '$lib/func/getOccurrence.svelte';
   import { montsi } from '$lib/func/montsi.svelte';
   import { kindOfTranslation } from '$lib/func/kindOfTranslate.svelte';
@@ -1782,7 +1783,11 @@
     iAskMi = [];
   async function start() {
     console.log('=== START FUNCTION CALLED ===');
+    // Sync all stores
     lang.set(data.lang);
+    locale.set(data.lang);
+    langUs.set(data.lang);
+    doesLang.set(true);
     console.log($lang, 'start function beginning');
     miDataold = miData;
     const cookieValue = document.cookie

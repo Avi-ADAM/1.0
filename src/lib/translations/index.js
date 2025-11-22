@@ -18,18 +18,21 @@ export const config = {
             key: 'bot',
             loader: async () => (await import('./en/bot.json')).default,
         },
-      /*  {
-            locale: 'en',
-            key: 'about',
-            routes: ['/about'],
-            loader: async () => (await import('./en/about.json')).default,
-        },
         {
             locale: 'en',
             key: 'home',
-            routes: ['/'],
             loader: async () => (await import('./en/home.json')).default,
-        },*/
+        },
+        {
+            locale: 'en',
+            key: 'nav',
+            loader: async () => (await import('./en/nav.json')).default,
+        },
+        {
+            locale: 'en',
+            key: 'auth',
+            loader: async () => (await import('./en/auth.json')).default,
+        },
         {
             locale: 'he',
             key: 'love',
@@ -41,6 +44,21 @@ export const config = {
             loader: async () => (await import('./he/bot.json')).default,
         },
         {
+            locale: 'he',
+            key: 'home',
+            loader: async () => (await import('./he/home.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'nav',
+            loader: async () => (await import('./he/nav.json')).default,
+        },
+        {
+            locale: 'he',
+            key: 'auth',
+            loader: async () => (await import('./he/auth.json')).default,
+        },
+        {
             locale: 'ar',
             key: 'love',
             loader: async () => (await import('./ar/love.json')).default,
@@ -50,18 +68,21 @@ export const config = {
             key: 'bot',
             loader: async () => (await import('./ar/bot.json')).default,
         },
-      /*  {
-            locale: 'cs',
-            key: 'about',
-            routes: ['/about'],
-            loader: async () => (await import('./cs/about.json')).default,
+        {
+            locale: 'ar',
+            key: 'home',
+            loader: async () => (await import('./ar/home.json')).default,
         },
         {
-            locale: 'cs',
-            key: 'home',
-            routes: ['/'],
-            loader: async () => (await import('./cs/home.json')).default,
-        },*/
+            locale: 'ar',
+            key: 'nav',
+            loader: async () => (await import('./ar/nav.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'auth',
+            loader: async () => (await import('./ar/auth.json')).default,
+        },
     ],
 };
 

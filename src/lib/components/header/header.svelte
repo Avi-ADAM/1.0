@@ -1,6 +1,6 @@
 <script>
   import { goto } from '$app/navigation';
-    import { lang} from '$lib/stores/lang.js'
+  import { locale, t } from '$lib/translations';
   /**
    * @typedef {Object} Props
    * @property {string} [second]
@@ -8,8 +8,7 @@
    */
 
   /** @type {Props} */
-  let { second = "/lev", secondTitle = {"he":"ללב 1💗1", "en":"to heart of 1💗1"} } = $props();
-    const title = {"he": "לעמוד הפרופיל האישי","en":"to the profile page"}
+  let { second = "/lev", secondTitle } = $props();
     let clicked = false
     let acli = $state(false)
     let bcli = $state(false)
@@ -28,19 +27,19 @@
 }
 </script>
 <span style="overflow:hidden;">
-<img onkeypress={()=>cl("a")} title={title[$lang ?? "he"]}  onclick={()=>cl("a")}
+<img onkeypress={()=>cl("a")} title={$t('nav.header.profileTitle')}  onclick={()=>cl("a")}
  class:rounda={acli == true}
   class:translate-x-12={acli == false}
   class:-translate-y-12={acli == false}
   class:hover:translate-x-9={acli == false} class:hover:-translate-y-9={acli == false}   class:hover:scale-150={acli == false}
-  class="right"  alt="פרופיל אישי" src="https://res.cloudinary.com/love1/image/upload/v1644446152/PicsArt_01-28-06.01.26_1_a7ky2k.png"/>
+  class="right"  alt={$t('nav.header.profileAlt')} src="https://res.cloudinary.com/love1/image/upload/v1644446152/PicsArt_01-28-06.01.26_1_a7ky2k.png"/>
 <img onkeypress={()=>cl("b")} onclick={()=>cl("b")}
-    class:roundb={bcli == true} title="{secondTitle[$lang ?? "he"]}"
+    class:roundb={bcli == true} title={secondTitle || $t('nav.header.heartTitle')}
     class:-translate-x-12={bcli == false} class:-translate-y-12={bcli == false}
      class:hover:-translate-x-9={bcli == false}
     class:hover:-translate-y-9={bcli == false} class:hover:scale-150={bcli == false}
     class="left "
-    alt="לוגו" src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/>
+    alt={$t('nav.header.logoAlt')} src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"/>
 </span>
 <style>
 
