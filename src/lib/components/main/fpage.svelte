@@ -116,11 +116,10 @@ const word3 = {
     en: 'Shared management: voting, decisions, budgets – with full agreement of the entire partnership group',
     ar: 'إدارة مشتركة: التصويت، القرارات، الميزانيات – بموافقة كاملة من مجموعة الشراكة بأكملها'
   };
-
-  const word5 = {
-    he: 'פנקס דיגיטלי מבוזר – שקיפות מלאה, בלי בירוקרטיה',
-    en: 'Distributed digital ledger – full transparency, no bureaucracy',
-    ar: 'دفتر أستاذ رقمي موزع – شفافية كاملة، بدون بيروقراطية'
+const word5 = {
+    he: 'שקיפות טכנולוגית מלאה: המערכת מתעדת כל פעולה וכל החלטה בזמן אמת. בונים אמון דרך שקיפות, לא דרך בירוקרטיה.',
+    en: 'Full Technological Transparency: The system records every action and decision in real-time. Building trust through transparency, not bureaucracy.',
+    ar: 'شفافية تكنولوجية كاملة: يسجل النظام كل إجراء وقرار في الوقت الفعلي. بناء الثقة من خلال الشفافية، وليس البيروقراطية.'
   };
 
   const word6 = {
