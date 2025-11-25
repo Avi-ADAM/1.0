@@ -14,20 +14,91 @@
   let a = $state(0);
   import { RingLoader } from 'svelte-loading-spinners';
   import Close from '$lib/celim/close.svelte';
+  
+  /** @type {Record<string, number>} */
   let fermatana = $state({});
+  
+  /** @type {Record<string, Record<string, number>>} */
   let ferdate = $state({});
+  
+  /** @type {Array<{key: string, value: number}>} */
   let arr = $state([]);
+  
+  /** @type {Array<Record<string, string | number>>} */
   let arrt = $state([]);
+  
+  /** @type {string | undefined} */
   let kindOf = $state();
+  
   let kindUlimit = $state(false);
+  
+  /**
+   * @typedef {Object} MatanaAttributes
+   * @property {string} name - Gift name
+   * @property {number} price - Gift price
+   * @property {number} quant - Available quantity (-1 for unlimited)
+   * @property {string} kindOf - Type: 'total', 'monthly', 'yearly', or 'unlimited'
+   */
+  
+  /**
+   * @typedef {Object} Matana
+   * @property {string} id - Gift ID
+   * @property {Object} attributes
+   * @property {string} attributes.name
+   * @property {number} attributes.price
+   * @property {number} attributes.quant
+   * @property {string} attributes.kindOf
+   */
+  
+  /**
+   * @typedef {Object} SaleAttributes
+   * @property {number} in - Sale amount
+   * @property {string} date - Sale date
+   * @property {boolean} [splited] - Whether the sale has been split
+   * @property {string} [note] - Optional note about the sale
+   * @property {Object} matanot - Related gift
+   * @property {Object} matanot.data
+   * @property {MatanaAttributes} matanot.data.attributes
+   * @property {Object} users_permissions_user - User who made the sale
+   * @property {Object} users_permissions_user.data
+   * @property {string} users_permissions_user.data.id
+   * @property {Object} users_permissions_user.data.attributes
+   * @property {string} users_permissions_user.data.attributes.username
+   */
+  
+  /**
+   * @typedef {Object} Sale
+   * @property {string} id - Sale ID
+   * @property {SaleAttributes} attributes
+   */
+  
+  /**
+   * @typedef {Object} ProjectUser
+   * @property {string} id - User ID
+   * @property {Object} attributes
+   * @property {string} attributes.username
+   * @property {Object} attributes.profilePic
+   * @property {Object | null} attributes.profilePic.data
+   * @property {Object} [attributes.profilePic.data.attributes]
+   * @property {string} [attributes.profilePic.data.attributes.url]
+   */
+  
   let {
+    /** @type {Array<any>} */
     fmiData = [],
+    /** @type {Array<any>} */
     rikmashes = [],
+    /** @type {string} */
     projectId,
+    /** @type {Array<any>} */
     trili,
+    /** @type {Array<Matana>} */
     bmiData = $bindable([]),
+    /** @type {Array<Sale>} */
     salee = $bindable([]),
+    /** @type {Array<ProjectUser>} */
     projectUsers = [],
+    /** @type {any} */
     restime
   } = $props();
   let quant = $state(),
@@ -62,12 +133,25 @@
     let oldob = bmiData;
     const x = oldob.map((c) => c.id);
     const indexy = x.indexOf(id);
-    oldob[indexy].quant = un;
-    bmiData = oldob;
+    
+    // עדכון כמות רק אם יש un (לא unlimited) והאינדקס נמצא
+    if (un !== undefined && indexy !== -1) {
+      oldob[indexy].quant = un;
+      bmiData = oldob;
+    }
+    
     isOpen = false;
     a = 0;
     salee.push(event.matana);
   };
+  
+  function saleUnlimited() {
+    // עבור מוצרים unlimited - סגירת הדיאלוג בלבד
+    // המכירה כבר נוצרה בשרת, אין צורך לעדכן כמות
+    isOpen = false;
+    a = 0;
+  };
+  
   function done(event) {
     isOpen = false;
     a = 0;
@@ -225,7 +309,7 @@
             projectId={$idPr}
             {projectUsers}
             {kindUlimit}
-            onDoners={closer}
+            onDoners={saleUnlimited}
             onDone={sale}
             onError={() => (a = 3)}
           />

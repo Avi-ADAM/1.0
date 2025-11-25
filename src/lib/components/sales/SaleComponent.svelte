@@ -210,17 +210,19 @@
         const saleResult = {
           id: miDatan.data.createSale.data.id,
           in: miDatan.data.createSale.data.attributes.in,
-          unit: hm, // Add unit count for quantity tracking
+          un: undefined, // Will be set if quantity was updated
           matana: miDatan.data.createSale.data,
         };
         
-        // הוספת נתוני עדכון הכמות רק אם הם קיימים
+        // הוספת נתוני עדכון הכמות רק אם הם קיימים (לא unlimited)
         if (miDatan.data.updateMatanot) {
           saleResult.id = miDatan.data.updateMatanot.data.id;
           saleResult.un = miDatan.data.updateMatanot.data.attributes.quant;
+          onDone?.(saleResult, currentOperationId);
+        } else {
+          // במקרה של unlimited, אין עדכון כמות אבל המכירה הצליחה
+          onDoners?.();
         }
-        
-        onDone?.(saleResult, currentOperationId);
       } else {
         onDoners?.();
       }
