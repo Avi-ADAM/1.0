@@ -8,6 +8,7 @@
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
   import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
+  import { getProjectData } from '$lib/stores/projectStore.js';
 
   /**
    * @typedef {Object} Props
@@ -34,6 +35,9 @@
    * @property {(payload: { alr: any, y: string }) => void} [onDecline] - Callback for decline event
    * @property {(payload: { alr: any, y: string }) => void} [onNego] - Callback for nego event
    * @property {() => void} [onTochat] - Callback for tochat event
+   * @property {any} [halukot]
+   * @property {any} [hervach]
+   * @property {any} [projectId]
    */
 
   /** @type {Props} */
@@ -60,8 +64,118 @@
     onAgree,
     onDecline,
     onNego,
-    onTochat
+    onTochat,
+    halukot = [],
+    hervach = [],
+    projectId
   } = $props();
+
+  let ulist = $state([]);
+
+  function processSplitDetails() {
+    if (!hervach) {
+      console.log('Missing hervach data:', { hervach });
+      return;
+    }
+
+    if (hervach.length === 0) {
+      console.log('Empty hervach array');
+      return;
+    }
+
+    console.log('Processing split details from hervach:', { 
+      hervachLength: hervach.length,
+      hervach
+    });
+
+    let tempUlist = [];
+    let givers = []; // Those who need to give (noten: true)
+    let receivers = []; // Those who need to receive (mekabel: true)
+    
+    // Process hervach (profit shares) - build user list
+    for (let i = 0; i < hervach.length; i++) {
+      let item = hervach[i];
+      let user = item?.users_permissions_user?.data || item?.users_permissions_user;
+      let amount = item?.amount || 0;
+      let isMekabel = item?.mekabel || false;
+      let isNoten = item?.noten || false;
+
+      console.log(`Hervach ${i}:`, { item, user, amount, isMekabel, isNoten });
+
+      if (user) {
+        let userId = user.id || user;
+        let username = user.attributes?.username || user.username || getProjectData(projectId, 'un', userId) || 'Unknown';
+        
+        let userObj = {
+          uid: userId,
+          username: username,
+          x: amount, // What they should get (their share)
+          p: 0,
+          ihave: amount, // Final amount they'll have
+          meca: isMekabel ? amount : 0, // What they need to receive
+          noten: isNoten ? amount : 0, // What they need to give
+          le: [], // List of transfers they make
+          isMekabel: isMekabel,
+          isNoten: isNoten
+        };
+        
+        tempUlist.push(userObj);
+        
+        if (isNoten) {
+          givers.push(userObj);
+        }
+        if (isMekabel) {
+          receivers.push(userObj);
+        }
+      }
+    }
+
+    console.log('After hervach processing:', { tempUlist, givers, receivers });
+
+    // Calculate transfers: distribute from givers to receivers
+    // This mimics the logic from whowhat.svelte
+    for (let giver of givers) {
+      let remainingToGive = giver.noten;
+      
+      for (let receiver of receivers) {
+        if (remainingToGive <= 0) break;
+        if (receiver.meca <= 0) continue;
+        
+        // Calculate transfer amount
+        let transferAmount = Math.min(remainingToGive, receiver.meca);
+        
+        if (transferAmount > 0.01) {
+          // Add to giver's transfer list
+          giver.le.push({
+            le: receiver.username,
+            leid: receiver.uid,
+            cama: transferAmount
+          });
+          
+          // Update remaining amounts
+          remainingToGive -= transferAmount;
+          receiver.meca -= transferAmount;
+          
+          console.log(`Transfer calculated: ${giver.username} -> ${receiver.username}: ${transferAmount}`);
+        }
+      }
+    }
+
+    // Reset meca values to original for display
+    for (let user of tempUlist) {
+      if (user.isMekabel) {
+        user.meca = user.x;
+      }
+    }
+
+    console.log('Final ulist with transfers:', tempUlist);
+    ulist = tempUlist;
+  }
+
+  $effect(() => {
+    processSplitDetails();
+  });
+
   function hover(x) {
     onHover?.({ x: x });
   }
@@ -149,6 +263,99 @@
         >
       </p>
     </div>
+
+    {#if ulist.length > 0}
+      <div class="w-full overflow-x-auto p-2">
+        <!-- Mobile View -->
+        <div class="block md:hidden space-y-2">
+          {#each ulist as user}
+            <div class="bg-gradient-to-br from-gray-50 to-gray-100 rounded-lg p-3 border border-gray-300 shadow-sm">
+              <div class="font-bold text-barbi text-base mb-2">{user.username}</div>
+              <div class="grid grid-cols-2 gap-2 text-xs">
+                <div class="bg-white rounded p-2">
+                  <div class="text-gray-600">מגיע:</div>
+                  <div class="font-semibold text-barbi">{user.x.toFixed(2)}</div>
+                </div>
+                <div class="bg-white rounded p-2">
+                  <div class="text-gray-600">בפועל:</div>
+                  <div class="font-semibold text-green-600">{user.ihave.toFixed(2)}</div>
+                </div>
+                {#if user.noten > 0}
+                  <div class="bg-red-50 rounded p-2">
+                    <div class="text-gray-600">נותן:</div>
+                    <div class="font-semibold text-red-600">{user.noten.toFixed(2)}</div>
+                  </div>
+                {/if}
+                {#if user.meca > 0}
+                  <div class="bg-green-50 rounded p-2">
+                    <div class="text-gray-600">מקבל:</div>
+                    <div class="font-semibold text-green-600">{user.meca.toFixed(2)}</div>
+                  </div>
+                {/if}
+              </div>
+              {#if user.le && user.le.length > 0}
+                <div class="mt-2 pt-2 border-t border-gray-300">
+                  <div class="text-xs text-gray-600 mb-1">העברות:</div>
+                  <div class="space-y-1">
+                    {#each user.le as transfer}
+                      <div class="bg-blue-50 rounded px-2 py-1 text-xs flex justify-between items-center">
+                        <span class="text-blue-800">→ {transfer.le}</span>
+                        <span class="font-semibold text-blue-600">{transfer.cama.toFixed(2)}</span>
+                      </div>
+                    {/each}
+                  </div>
+                </div>
+              {/if}
+            </div>
+          {/each}
+        </div>
+
+        <!-- Desktop View -->
+        <div class="hidden md:block">
+          <table class="w-full text-center border-collapse text-sm">
+            <thead>
+              <tr class="bg-gradient-to-br from-barbi to-mpink text-gold sticky top-0">
+                <th class="p-2 border border-gold rounded-tl-lg">שם</th>
+                <th class="p-2 border border-gold">מגיע</th>
+                <th class="p-2 border border-gold">בפועל</th>
+                <th class="p-2 border border-gold">נותן</th>
+                <th class="p-2 border border-gold">מקבל</th>
+                <th class="p-2 border border-gold rounded-tr-lg">העברות</th>
+              </tr>
+            </thead>
+            <tbody>
+              {#each ulist as user, i}
+                <tr class="hover:bg-gray-100 transition-colors {i % 2 === 0 ? 'bg-white' : 'bg-gray-50'}">
+                  <td class="p-2 border border-gray-300 font-semibold text-barbi">{user.username}</td>
+                  <td class="p-2 border border-gray-300 font-mono">{user.x.toFixed(2)}</td>
+                  <td class="p-2 border border-gray-300 font-mono font-semibold text-green-600">{user.ihave.toFixed(2)}</td>
+                  <td class="p-2 border border-gray-300 font-mono {user.noten > 0 ? 'text-red-600 font-semibold' : 'text-gray-400'}">
+                    {user.noten > 0 ? user.noten.toFixed(2) : '-'}
+                  </td>
+                  <td class="p-2 border border-gray-300 font-mono {user.meca > 0 ? 'text-green-600 font-semibold' : 'text-gray-400'}">
+                    {user.meca > 0 ? user.meca.toFixed(2) : '-'}
+                  </td>
+                  <td class="p-2 border border-gray-300 text-xs">
+                    {#if user.le && user.le.length > 0}
+                      <div class="space-y-1">
+                        {#each user.le as transfer}
+                          <div class="bg-blue-50 rounded px-2 py-1 inline-block m-0.5">
+                            <span class="text-blue-800">→ {transfer.le}:</span>
+                            <span class="font-semibold text-blue-600">{transfer.cama.toFixed(2)}</span>
+                          </div>
+                        {/each}
+                      </div>
+                    {:else}
+                      <span class="text-gray-400">-</span>
+                    {/if}
+                  </td>
+                </tr>
+              {/each}
+            </tbody>
+          </table>
+        </div>
+      </div>
+    {/if}
   </div>
   {#if low == false}
     {#if already === false && allr === false}
