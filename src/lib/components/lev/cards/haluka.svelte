@@ -92,6 +92,12 @@
     let givers = []; // Those who need to give (noten: true)
     let receivers = []; // Those who need to receive (mekabel: true)
     
+    // Calculate total amount to distribute
+    let totalAmount = 0;
+    for (let i = 0; i < hervach.length; i++) {
+      totalAmount += hervach[i]?.amount || 0;
+    }
+
     // Process hervach (profit shares) - build user list
     for (let i = 0; i < hervach.length; i++) {
       let item = hervach[i];
@@ -111,9 +117,9 @@
           username: username,
           x: amount, // What they should get (their share)
           p: 0,
-          ihave: amount, // Final amount they'll have
+          ihave: isNoten ? totalAmount : 0, // Giver has everything, receivers have nothing
           meca: isMekabel ? amount : 0, // What they need to receive
-          noten: isNoten ? amount : 0, // What they need to give
+          noten: 0, // Will be calculated based on transfers
           le: [], // List of transfers they make
           isMekabel: isMekabel,
           isNoten: isNoten
@@ -133,16 +139,14 @@
     console.log('After hervach processing:', { tempUlist, givers, receivers });
 
     // Calculate transfers: distribute from givers to receivers
-    // This mimics the logic from whowhat.svelte
     for (let giver of givers) {
-      let remainingToGive = giver.noten;
+      let totalGiving = 0;
       
       for (let receiver of receivers) {
-        if (remainingToGive <= 0) break;
         if (receiver.meca <= 0) continue;
         
-        // Calculate transfer amount
-        let transferAmount = Math.min(remainingToGive, receiver.meca);
+        // Transfer the receiver's share amount
+        let transferAmount = receiver.x;
         
         if (transferAmount > 0.01) {
           // Add to giver's transfer list
@@ -152,13 +156,14 @@
             cama: transferAmount
           });
           
-          // Update remaining amounts
-          remainingToGive -= transferAmount;
-          receiver.meca -= transferAmount;
+          totalGiving += transferAmount;
           
           console.log(`Transfer calculated: ${giver.username} -> ${receiver.username}: ${transferAmount}`);
         }
       }
+      
+      // Set the total amount the giver is giving
+      giver.noten = totalGiving;
     }
 
     // Reset meca values to original for display
@@ -226,7 +231,7 @@
       />
       <div class="flex flex-col leading-tight ml-4">
         <div class="sm:text-lg text-md mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-3xl text-xl"
+          <span class="text-barbi text-center mr-3 sm:text-3xl text-2xl"
             >{tr.headers.haluka[$lang]}</span
           >
         </div>
@@ -243,8 +248,7 @@
       ? 'bg-white'
       : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
   >
-    <div class="mb-8"></div>
-    <div class="flex items-center">
+    <div class="flex items-center ">
       <p>
         <span
           onmouseenter={() => hover('סך ההצבעות בעד')}
@@ -265,7 +269,7 @@
     </div>
 
     {#if ulist.length > 0}
-      <div class="w-full overflow-x-auto p-2">
+      <div class="w-full overflow-x-auto p-2 mb-20">
         <!-- Mobile View -->
         <div class="block md:hidden space-y-2">
           {#each ulist as user}
