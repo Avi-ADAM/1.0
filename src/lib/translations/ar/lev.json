@@ -1,1 +1,11 @@
-{}
+{
+  "missionInProgress": {
+    "uploadTitle": "تحميل ملف أو وصف إكمال المهمة",
+    "uploadDescription": "يرجى تحميل ملف يحتوي على إكمال المهمة أو وصفه بالكلمات",
+    "fileLabel": "تحميل ملف",
+    "descriptionPlaceholder": "صف إكمال المهمة بالكلمات...",
+    "submitButton": "إرسال للموافقة",
+    "pleaseWait": "لحظة من فضلك...",
+    "cancel": "إلغاء"
+  }
+}

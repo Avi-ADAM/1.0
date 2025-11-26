@@ -1,0 +1,29 @@
+{
+  "name": "unified-action-socket-server",
+  "version": "1.0.0",
+  "description": "Socket.IO server for real-time updates in the Unified Action System",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc",
+    "start": "node dist/index.js",
+    "test": "vitest --run"
+  },
+  "keywords": ["socket.io", "real-time", "notifications"],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "socket.io": "^4.7.2",
+    "jsonwebtoken": "^9.0.2",
+    "dotenv": "^16.3.1"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.0",
+    "@types/jsonwebtoken": "^9.0.5",
+    "tsx": "^4.7.0",
+    "typescript": "^5.3.3",
+    "vitest": "^1.0.4",
+    "socket.io-client": "^4.7.2"
+  }
+}

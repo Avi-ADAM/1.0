@@ -5,7 +5,10 @@
   import { onMount } from 'svelte';
   import { calcX } from '$lib/func/calcX.svelte';
   import { sendToSer } from '$lib/send/sendToSer.js';
+  import { executeAction } from '$lib/client/actionClient.js';
   import ComparisonDisplay from '$lib/components/ui/ComparisonDisplay.svelte';
+  import { toast } from 'svelte-sonner';
+  import Button from '$lib/celim/ui/button.svelte';
   /**
    * @typedef {Object} Props
    * @property {any} [fmiData]
@@ -13,6 +16,7 @@
    * @property {boolean} [hagdel]
    * @property {any} [salee]
    * @property {number} [allin]
+   * @property {any} restime
    * @property {any} trili
    * @property {any} users
    * @property {boolean} [already]
@@ -328,12 +332,12 @@
         fetch
       );
 
-      // Update each sale to mark as splited
+      // Update each sale to mark as pending (not splited yet, waiting for votes)
       for (let saleId of salesIds) {
         await sendToSer(
           {
             id: saleId,
-            splited: true,
+            pending: true,
             tosplits: [currentTosplit.id]
           },
           '71updateSaleSplited',
@@ -352,145 +356,109 @@
   }
 
   async function ask() {
+    isLoading = true;
+    isSuccess = false;
+    isError = false;
     already = true;
+    
     let d = new Date();
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
-      .split('=')[1];
-    let idL = cookieValueId;
-    let token = cookieValue;
-    let bearer1 = 'bearer' + ' ' + token;
-    let qurer = ``;
-    let naminator = [];
-    for (let i = 0; i < ulist.length; i++) {
-      console.log(qurer, ulist[i]);
-      if (ulist[i].noten > 0) {
-        for (let x = 0; x < ulist[i].le.length; x++) {
-          qurer = `  
-createHaluka( 
-      data: { 
-                project: "${$idPr}",
-        usersend: "${ulist[i].uid}",
-        userrecive: "${ulist[i].le[x].leid}",
-        amount: ${ulist[i].le[x].cama.toFixed(2)},
-        matbea: "2",
-        confirmed: false,
-        publishedAt: "${d.toISOString()}",
-      }
+      ?.split('=')[1];
     
-    ){data{ id  }} `;
+    if (!cookieValueId) {
+      console.error('User ID not found in cookies');
+      toast.error($lang === 'he' ? 'לא נמצא מזהה משתמש' : 'User ID not found');
+      isLoading = false;
+      isError = true;
+      return;
+    }
 
-          try {
-            await fetch(linkg, {
-              method: 'POST',
-              headers: {
-                Authorization: bearer1,
-                'Content-Type': 'application/json'
-              },
-              body: JSON.stringify({
-                query: `mutation 
-          { ${qurer}
-}`
-              })
-            })
-              .then((r) => r.json())
-              .then((data) => (miDatan = data));
-            console.log(miDatan);
-            naminator.push(`${miDatan.data.createHaluka.data.id}`);
-          } catch (e) {
-            error1 = e;
-            console.log(error1);
+    try {
+      // Step 1: Create all halukot using the new action system
+      let halukaIds = [];
+      for (let i = 0; i < ulist.length; i++) {
+        if (ulist[i].noten > 0) {
+          for (let x = 0; x < ulist[i].le.length; x++) {
+            const halukaData = {
+              project: $idPr,
+              usersend: String(ulist[i].uid),
+              userrecive: String(ulist[i].le[x].leid),
+              amount: parseFloat(ulist[i].le[x].cama.toFixed(2)),
+              matbea: '2',
+              confirmed: false,
+              publishedAt: d.toISOString()
+            };
+
+            const result = await executeAction('createHaluka', { data: halukaData });
+            
+            if (result.success && result.data?.data?.createHaluka?.data?.id) {
+              halukaIds.push(result.data.data.createHaluka.data.id);
+            } else {
+              console.error('Failed to create haluka:', result.error);
+            }
           }
         }
       }
-    }
 
-    console.log(naminator);
-    //create hervachti compo
-    let hervachti = ``;
-    let counter = 0;
-    let mored = ``;
-    for (let c = 0; c < ulist.length; c++) {
-      const amount = ulist[c].x;
-      const user = ulist[c].uid;
-      if (amount > 0) {
-        counter += 1;
-        if (counter == 1) {
-          mored = `
-             {
-              users_permissions_user: ${user},
-              amount: ${amount},
-              ${ulist[c].meca > 0 ? 'mekabel:true,' : ``}
-              ${ulist[c].noten > 0 ? 'noten:true' : ``}
-             },
-             `;
-          hervachti = `hervachti:[${mored}]`;
-        } else {
-          mored += `
-             {
-              users_permissions_user: ${user},
-              amount: ${amount},
-              ${ulist[c].meca > 0 ? 'mekabel:true,' : ``}
-              ${ulist[c].noten > 0 ? 'noten:true' : ``}
-             },
-            `;
-          hervachti = `hervachti:[${mored}]`;
-          console.log('here', hervachti);
+      // Step 2: Build hervachti array
+      let hervachtiArray = [];
+      for (let c = 0; c < ulist.length; c++) {
+        const amount = ulist[c].x;
+        const user = ulist[c].uid;
+        if (amount > 0) {
+          hervachtiArray.push({
+            users_permissions_user: parseInt(user),
+            amount: amount,
+            mekabel: ulist[c].meca > 0,
+            noten: ulist[c].noten > 0,
+            nirsham: false // Add missing required field
+          });
         }
       }
-    }
-    hervachti = hervachti;
-    
-    // Get all unsplited sales IDs
-    const salesIds = unsplitedSales.map(sale => sale.id);
-    const salesString = salesIds.length > 0 ? `sales: [${salesIds.join(',')}],` : '';
-    
-    try {
-      await fetch(linkg, {
-        method: 'POST',
-        headers: {
-          Authorization: bearer1,
-          'Content-Type': 'application/json'
-        },
-        body: JSON.stringify({
-          query: `mutation
-           { createTosplit(
-      data: { 
-        publishedAt: "${d.toISOString()}",
-        project: "${$idPr}",
-      vots: [
-     {
-      what: true
-      users_permissions_user: "${idL}"
-    }
-  ],
-    halukas: [${naminator}],
-    ${hervachti}
-    ${salesString}
-}
-    
-  ){data { id }}
-} `
-        })
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      //get ids put in tosplitname for now
-      let timegramaId = miDatan.data.createTosplit.data.id;
-      
-      // Update each sale to mark as splited
+
+      // Step 3: Get all unsplited sales IDs
+      const salesIds = unsplitedSales.map(sale => parseInt(sale.id));
+
+      // Step 4: Create tosplit using the new action system
+      // This will automatically send notifications to all project members!
+      const tosplitData = {
+        publishedAt: d.toISOString(),
+        project: $idPr,
+        vots: [
+          {
+            what: true,
+            users_permissions_user: cookieValueId
+          }
+        ],
+        halukas: halukaIds,
+        hervachti: hervachtiArray,
+        ...(salesIds.length > 0 && { sales: salesIds })
+      };
+
+      const tosplitResult = await executeAction('createTosplit', { data: tosplitData });
+
+      if (!tosplitResult.success || !tosplitResult.data?.data?.createTosplit?.data?.id) {
+        const errorMsg = typeof tosplitResult.error === 'string' 
+          ? tosplitResult.error 
+          : tosplitResult.error?.message || 'Failed to create tosplit';
+        toast.error(errorMsg);
+        isLoading = false;
+        isError = true;
+        return;
+      }
+
+      const tosplitId = tosplitResult.data.data.createTosplit.data.id;
+      console.log('Tosplit created successfully:', tosplitId);
+
+      // Step 5: Update each sale to mark as pending (waiting for votes)
       for (let saleId of salesIds) {
         await sendToSer(
           {
             id: saleId,
-            splited: true,
-            tosplits: [timegramaId]
+            pending: true,
+            tosplits: [tosplitId]
           },
           '71updateSaleSplited',
           null,
@@ -499,20 +467,30 @@ createHaluka(
           fetch
         );
       }
-      
+
+      // Step 6: Create timegrama for the tosplit
       let x = calcX(restime);
       let fd = new Date(Date.now() + x);
       await sendToSer(
-        { whatami: 'tosplit', tosplit: timegramaId, date: fd },
+        { whatami: 'tosplit', tosplit: tosplitId, date: fd },
         '32createTimeGrama',
         null,
         null,
         false,
         fetch
       );
+
+      console.log('✅ Tosplit created successfully with automatic notifications!');
+      toast.success($lang === 'he' ? 'החלוקה נוצרה בהצלחה!' : 'Split created successfully!');
+      isLoading = false;
+      isSuccess = true;
+      
     } catch (e) {
       error1 = e;
-      console.log(error1);
+      console.error('Error creating tosplit:', error1);
+      toast.error($lang === 'he' ? 'שגיאה ביצירת החלוקה' : 'Error creating split');
+      isLoading = false;
+      isError = true;
     }
   }
 
@@ -526,13 +504,26 @@ createHaluka(
   let changeDetails = $state('');
   let changesList = $state([]);
   let unsplitedSales = $state([]);
+  
+  // Button states
+  let isLoading = $state(false);
+  let isSuccess = $state(false);
+  let isError = $state(false);
+  let availableForNewSplit = $state(0); // Count of truly available sales (not pending)
 
   onMount(async () => {
-    // Filter unsplited sales
+    // Filter sales: include pending sales OR unsplited sales (exclude only fully splited)
+    // This ensures pending sales appear in the table
     unsplitedSales = salee.filter(sale => 
-      !sale.attributes.splited && 
+      !sale.attributes.splited &&
       (!sale.attributes.tosplits?.data || sale.attributes.tosplits.data.length === 0)
     );
+
+    // Count truly available sales (not pending, not splited)
+    availableForNewSplit = salee.filter(sale => 
+      !sale.attributes.splited && 
+      !sale.attributes.pending
+    ).length;
 
     cal();
 
@@ -556,7 +547,8 @@ createHaluka(
     }
   });
   function cal() {
-    // Only calculate with unsplited sales
+    // Calculate with all non-splited sales (including pending ones)
+    // This ensures pending sales appear in the table
     const unsplitedOnly = salee.filter(s => !s.attributes.splited);
     
     for (let i = 0; i < users.length; i++) {
@@ -872,14 +864,18 @@ createHaluka(
         </tr>
       </tbody>
     </table>
-
-    {#if already === false}<!--//hal === false &&-->
-      <button
-        class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-        onclick={ask}>{appbu[$lang]}</button
-      >
+<br>
+    {#if availableForNewSplit > 0 && revach > 0 && !hatzaa}
+      <Button
+        text={appbu}
+        loading={isLoading}
+        success={isSuccess}
+        error={isError}
+        onClick={ask}
+        disabled={isLoading || isSuccess || already}
+      />
     {/if}
-
+<br>
     {#if showUpdateSuggestion}
       <div class="border border-yellow-500 bg-yellow-50 m-2 p-4 rounded">
         <h2 class="font-bold text-yellow-800 mb-2">

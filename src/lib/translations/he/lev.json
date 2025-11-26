@@ -1,0 +1,11 @@
+{
+  "missionInProgress": {
+    "uploadTitle": "העלאת קובץ או תיאור סיום המשימה",
+    "uploadDescription": "יש להעלות קובץ המכיל את ביצוע המשימה או לתאר במילים את הסיום",
+    "fileLabel": "העלאת קובץ",
+    "descriptionPlaceholder": "נא לתאר במילים את סיום המשימה...",
+    "submitButton": "שליחה לאישור",
+    "pleaseWait": "רק רגע...",
+    "cancel": "ביטול"
+  }
+}

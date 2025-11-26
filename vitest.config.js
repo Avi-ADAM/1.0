@@ -8,6 +8,8 @@ export default defineConfig({
     exclude: ['src/routes/**/*.test.js'], // Exclude route tests to avoid SvelteKit conflicts
     environment: 'happy-dom', // Use happy-dom instead of jsdom
     setupFiles: ['./src/test-setup.js'],
-    globals: true
+    globals: true,
+    // Property-based testing configuration
+    testTimeout: 10000 // Increase timeout for property-based tests
   }
 });

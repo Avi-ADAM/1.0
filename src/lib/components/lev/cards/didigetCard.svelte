@@ -185,7 +185,7 @@
     : ' w-[90%] h-[90%]'} bg-white lg:w-[90%]"
 >
   <div
-    class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre"
+    class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-colorfulGrad"
   >
     <div class="relative flex items-center space-x-1">
       <button onclick={project}>

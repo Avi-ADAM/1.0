@@ -232,7 +232,7 @@
     : ' w-[90%] h-[90%]'} bg-white lg:w-[90%]"
 >
   <div
-    class="flex flex-wrap sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre gap-2"
+    class="flex flex-wrap sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-colorfulGrad gap-2"
   >
     <div class="relative flex items-center space-x-1 flex-1 min-w-0">
       <AuthorityBadge

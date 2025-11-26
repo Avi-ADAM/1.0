@@ -1041,12 +1041,35 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
+
+  "70.5createTosplit": `mutation CreateTosplit($data: TosplitInput!) {
+    createTosplit(data: $data) {
+      data {
+        id
+        attributes {
+          project { data { id } }
+          halukas { data { id } }
+          hervachti {
+            users_permissions_user { data { id } }
+            amount
+            mekabel
+            noten
+          }
+          vots {
+            what
+            users_permissions_user { data { id } }
+          }
+        }
+      }
+    }
+  }`,
   
-  "71updateSaleSplited": `mutation UpdateSaleSplited($id: ID!, $splited: Boolean, $tosplits: [ID]) {
+  "71updateSaleSplited": `mutation UpdateSaleSplited($id: ID!, $splited: Boolean, $pending: Boolean, $tosplits: [ID]) {
     updateSale(
       id: $id,
       data: {
         splited: $splited,
+        pending: $pending,
         tosplits: $tosplits
       }
     ) {
@@ -1054,6 +1077,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
         attributes {
           splited
+          pending
           tosplits { data { id } }
         }
       }
@@ -1170,6 +1194,64 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   
   "78archiveMultipleAsks": `mutation ArchiveMultipleAsks($askIds: [ID]!) {
     updateAsks(ids: $askIds, data: { archived: true }) {
+      data {
+        id
+      }
+    }
+  }`,
+
+  "79approveTosplit": `mutation ApproveTosplit(
+    $tosplitId: ID!
+    $vots: [ComponentProjectsVotsInput]
+  ) {
+    updateTosplit(
+      id: $tosplitId
+      data: {
+        vots: $vots
+        finished: true
+      }
+    ) {
+      data {
+        id
+        attributes {
+          vots {
+            what
+            why
+            users_permissions_user {
+              data {
+                id
+              }
+            }
+          }
+          sales {
+            data {
+              id
+            }
+          }
+        }
+      }
+    }
+  }`,
+
+  "80updateSale": `mutation UpdateSale($saleId: ID!) {
+    updateSale(
+      id: $saleId
+      data: { 
+        splited: true,
+        pending: false
+      }
+    ) {
+      data {
+        id
+      }
+    }
+  }`,
+
+  "81updateHaluka": `mutation UpdateHaluka($halukaId: ID!) {
+    updateHaluka(
+      id: $halukaId
+      data: { ushar: true }
+    ) {
       data {
         id
       }

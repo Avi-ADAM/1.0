@@ -5456,6 +5456,7 @@ export interface ApiSaleSale extends Schema.CollectionType {
       'manyToMany',
       'api::tosplit.tosplit'
     >;
+    pending: Attribute.Boolean;
     createdAt: Attribute.DateTime;
     updatedAt: Attribute.DateTime;
     publishedAt: Attribute.DateTime;

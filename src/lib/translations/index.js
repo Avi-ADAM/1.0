@@ -34,6 +34,11 @@ export const config = {
             loader: async () => (await import('./en/auth.json')).default,
         },
         {
+            locale: 'en',
+            key: 'lev',
+            loader: async () => (await import('./en/lev.json')).default,
+        },
+        {
             locale: 'he',
             key: 'love',
             loader: async () => (await import('./he/love.json')).default,
@@ -59,6 +64,11 @@ export const config = {
             loader: async () => (await import('./he/auth.json')).default,
         },
         {
+            locale: 'he',
+            key: 'lev',
+            loader: async () => (await import('./he/lev.json')).default,
+        },
+        {
             locale: 'ar',
             key: 'love',
             loader: async () => (await import('./ar/love.json')).default,
@@ -82,6 +92,11 @@ export const config = {
             locale: 'ar',
             key: 'auth',
             loader: async () => (await import('./ar/auth.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'lev',
+            loader: async () => (await import('./ar/lev.json')).default,
         },
     ],
 };

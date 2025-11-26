@@ -4,6 +4,8 @@
   import { Drawer } from 'vaul-svelte';
   import { goto } from '$app/navigation';
   import { idPr } from '../../stores/idPr.js';
+  import { lang } from '$lib/stores/lang.js';
+  import { toast } from 'svelte-sonner';
   import moment from 'moment';
   import { ProgressBar } from 'progressbar-svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
@@ -16,6 +18,7 @@
    * @property {boolean} [low]
    * @property {any} [halukot]
    * @property {any} [hervach]
+   * @property {any} [sales]
    * @property {any} [mypos]
    * @property {any} coinlapach
    * @property {any} [whyno]
@@ -47,6 +50,7 @@
     low = false,
     halukot = [],
     hervach = [],
+    sales = [],
     mypos = null,
     coinlapach,
     whyno = [],
@@ -148,182 +152,129 @@
     if (alr == 'alr') {
       alert('soon');
     } else {
-      let miDatani = [];
       already = true;
       noofusersOk += 1;
       noofusersWaiting -= 1;
       ser = xyz();
-      const userss = objToString(users);
-      const diunim = objToString(diun);
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+      
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
-        .split('=')[1];
+        ?.split('=')[1];
+      
       idL = cookieValueId;
-      token = cookieValue;
-      bearer1 = 'bearer' + ' ' + token;
+
       if (noofusersOk === noofusers) {
+        // All users approved - use new API endpoint
         try {
-          await fetch(linkg, {
+          const response = await fetch('/api/approveHaluka', {
             method: 'POST',
             headers: {
-              Authorization: bearer1,
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              query:
-                //create splits coin for each giver and reciver, archive haluask.
-                `mutation { 
-  updateTosplit(
-      id: ${pendId}
-      data: { vots:[  ${userss ? userss + ',' : ''}      
-     {
-      what: true
-      users_permissions_user: "${idL}"
-    }
-  ],
- finished: true
- }
-  ){data {
-    id
-    attributes{ 
-      vots { users_permissions_user {data{ id}}}
-      sales {
-        data {
-          id
-        }
-      }
-    }
-  }}
- } `
+              tosplitId: pendId,
+              userId: idL,
+              users: users,
+              halukot: halukot,
+              sales: sales || []
             })
-          })
-            .then((r) => r.json())
-            .then((data) => (miDatan = data));
-          console.log(miDatan);
+          });
 
-          // Update all sales to mark as splited
-          const salesData =
-            miDatan?.data?.updateTosplit?.data?.attributes?.sales?.data || [];
-          for (let sale of salesData) {
-            try {
-              await fetch(linkg, {
-                method: 'POST',
-                headers: {
-                  Authorization: bearer1,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  query: `mutation {
-                  updateSale(
-                    id: ${sale.id}
-                    data: { splited: true }
-                  ) {
-                    data { id }
-                  }
-                }`
-                })
-              })
-                .then((r) => r.json())
-                .then((data) => console.log('Sale updated:', data));
-            } catch (e) {
-              console.error('Error updating sale:', e);
-            }
+          const result = await response.json();
+          
+          if (!result.success) {
+            throw new Error(result.error || 'Failed to approve haluka');
           }
-          console.log('Starting halukot updates, count:', halukot.length);
-          for (let t = 0; t < halukot.length; t++) {
-            const idd = halukot[t].id;
-            console.log(`Updating haluka ${t + 1}/${halukot.length}, id:`, idd);
 
-            //send apruved for each haluka
-            const qurer = `  
-updateHaluka( id:${idd}
-      data: { ushar:true
-      }
-    
-    ){data{ id  }} `;
+          console.log('Haluka approved successfully:', result);
+          miDatan = result.data;
+          
+          const successMsg = {
+            he: 'החלוקה אושרה בהצלחה! 🎉',
+            en: 'Division approved successfully! 🎉'
+          };
+          toast.success(successMsg[$lang] || successMsg.he);
 
-            try {
-              const response = await fetch(linkg, {
-                method: 'POST',
-                headers: {
-                  Authorization: bearer1,
-                  'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                  query: `mutation 
-          { ${qurer}
-}`
-                })
-              });
-              const halukaResult = await response.json();
-              console.log(`Haluka ${idd} updated successfully:`, halukaResult);
-            } catch (e) {
-              error1 = e;
-              console.error(`Error updating haluka ${idd}:`, e);
-            }
-            //if hervach has user with resiv and giv fls then update his hervachti
-            console.log('Starting hervach updates, count:', hervach.length);
-            for (let o = 0; o < hervach.length; o++) {
-              const element = hervach[o];
-              console.log(
-                `Hervach ${o + 1}/${hervach.length}:`,
-                element.noten,
-                element.mekabel,
-                element.users_permissions_user.data.id,
-                element.users_permissions_user.data.attributes.hervachti,
-                element.amount
-              );
-              if (element.noten != true && element.mekabel != true) {
-                const iduse = element.users_permissions_user.data.id;
-                const amount =
-                  element.users_permissions_user.data.attributes.hervachti +
-                  element.amount;
-                console.log(`Updating user ${iduse} hervachti to ${amount}`);
-                try {
-                  const response = await fetch(linkg, {
-                    method: 'POST',
-                    headers: {
-                      Authorization: bearer1,
-                      'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                      query: `mutation 
-          { updateUsersPermissionsUser(
-    id:${iduse} 
-      data: { hervachti: ${amount} }
-    
-  ){
-      data {
-        id
-  }
-}
-}`
-                    })
-                  });
-                  const hervachResult = await response.json();
-                  console.log(
-                    `User ${iduse} hervachti updated successfully:`,
-                    hervachResult
-                  );
-                } catch (e) {
-                  error1 = e;
-                  console.error(`Error updating user ${iduse} hervachti:`, e);
-                }
+          // Update hervachti for users
+          console.log('Starting hervach updates, count:', hervach.length);
+          for (let o = 0; o < hervach.length; o++) {
+            const element = hervach[o];
+            console.log(
+              `Hervach ${o + 1}/${hervach.length}:`,
+              element.noten,
+              element.mekabel,
+              element.users_permissions_user.data.id,
+              element.users_permissions_user.data.attributes.hervachti,
+              element.amount
+            );
+            
+            if (element.noten != true && element.mekabel != true) {
+              const iduse = element.users_permissions_user.data.id;
+              const amount =
+                element.users_permissions_user.data.attributes.hervachti +
+                element.amount;
+              console.log(`Updating user ${iduse} hervachti to ${amount}`);
+              
+              try {
+                const token = document.cookie
+                  .split('; ')
+                  .find((row) => row.startsWith('jwt='))
+                  ?.split('=')[1];
+                const bearer1 = 'bearer ' + token;
+                
+                const response = await fetch(linkg, {
+                  method: 'POST',
+                  headers: {
+                    Authorization: bearer1,
+                    'Content-Type': 'application/json'
+                  },
+                  body: JSON.stringify({
+                    query: `mutation {
+                      updateUsersPermissionsUser(
+                        id: ${iduse}
+                        data: { hervachti: ${amount} }
+                      ) {
+                        data {
+                          id
+                        }
+                      }
+                    }`
+                  })
+                });
+                
+                const hervachResult = await response.json();
+                console.log(
+                  `User ${iduse} hervachti updated successfully:`,
+                  hervachResult
+                );
+              } catch (e) {
+                error1 = e;
+                console.error(`Error updating user ${iduse} hervachti:`, e);
               }
             }
           }
+          
           coinLapach();
         } catch (e) {
           error1 = e;
-          console.log(error1);
+          console.error('Error approving haluka:', e);
+          const errorMsg = {
+            he: 'שגיאה באישור החלוקה. נסה שוב.',
+            en: 'Error approving division. Please try again.'
+          };
+          toast.error(errorMsg[$lang] || errorMsg.he);
         }
       } else {
+        // Not all users approved yet - just add vote
         try {
+          const userss = objToString(users);
+          const token = document.cookie
+            .split('; ')
+            .find((row) => row.startsWith('jwt='))
+            ?.split('=')[1];
+          const bearer1 = 'bearer ' + token;
+          
           await fetch(linkg, {
             method: 'POST',
             headers: {
@@ -331,18 +282,24 @@ updateHaluka( id:${idd}
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              query: `mutation {  updateTosplit(
-     id: "${pendId}"
-      data: { vots:[  ${userss ? userss + ',' : ''}      
-     {
-      what: true
-      users_permissions_user: "${idL}"
-    }
-  ],
- }
-  ){data { id}}
- } `
-              // make coin desapire
+              query: `mutation {
+                updateTosplit(
+                  id: "${pendId}"
+                  data: {
+                    vots: [
+                      ${userss ? userss + ',' : ''}
+                      {
+                        what: true
+                        users_permissions_user: "${idL}"
+                      }
+                    ]
+                  }
+                ) {
+                  data {
+                    id
+                  }
+                }
+              }`
             })
           })
             .then((r) => r.json())

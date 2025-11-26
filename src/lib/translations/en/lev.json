@@ -1,0 +1,11 @@
+{
+  "missionInProgress": {
+    "uploadTitle": "Upload File or Describe Mission Completion",
+    "uploadDescription": "Please upload a file containing the mission completion or describe it in words",
+    "fileLabel": "Upload File",
+    "descriptionPlaceholder": "Describe the mission completion in words...",
+    "submitButton": "Submit for Approval",
+    "pleaseWait": "Please wait...",
+    "cancel": "Cancel"
+  }
+}

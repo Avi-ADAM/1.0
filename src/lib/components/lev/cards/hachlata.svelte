@@ -132,7 +132,7 @@
   <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
   </div>-->
   <div
-    class="flex flex-wrap sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre gap-2"
+    class="flex flex-wrap sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-colorfulGrad gap-2"
   >
     <div class="relative flex items-center space-x-1 flex-1 min-w-0">
       <AuthorityBadge

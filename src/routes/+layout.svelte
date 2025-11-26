@@ -38,6 +38,8 @@ import { goto } from '$app/navigation';
 import { browser } from '$app/environment';
 import ThemeToggle from '$lib/celim/main/ThemeToggle.svelte';
 import { Bot } from '$lib/components/bot';
+import { socketClient } from '$lib/stores/socketClient';
+import { toast } from 'svelte-sonner';
   // עדכון המשנה בטעינה
   onMount(() => {
     const unsubscribe = theme.subscribe((currentTheme) => {
@@ -122,6 +124,43 @@ onMount(() => {
       console.log('Registration', $lang);
       goto("/ar");
     }
+  }
+
+  // Connect to Socket.IO if user is authenticated
+  if (browser && data?.id) {
+    console.log('[Layout] Connecting to Socket.IO for user', data.id);
+    
+    // Connect - will read JWT from cookie automatically
+    socketClient.connect(data.id);
+
+    // Listen for notifications
+    const unsubscribe = socketClient.onNotification((notification) => {
+      console.log('[Layout] Received notification:', notification);
+      
+      // Get the message in the user's language
+      const userLang = $locale || 'he';
+      const title = notification.title[userLang] || notification.title.he || '';
+      const body = notification.body[userLang] || notification.body.he || '';
+      
+      // Display notification using toast
+      toast.info(`${title}: ${body}`, {
+        duration: 5000,
+        action: notification.metadata?.url ? {
+          label: 'View',
+          onClick: () => {
+            if (notification.metadata?.url) {
+              goto(notification.metadata.url);
+            }
+          }
+        } : undefined
+      });
+    });
+
+    // Cleanup on unmount
+    return () => {
+      unsubscribe();
+      socketClient.disconnect();
+    };
   }
 });
 </script>

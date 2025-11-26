@@ -1,5 +1,7 @@
 <script>
   import { io } from 'socket.io-client';
+  import { socketClient } from '$lib/stores/socketClient';
+  import { onDestroy } from 'svelte';
   const baseUrl = import.meta.env.VITE_URL;
   const levVersion = 1;
   let updateV = null;
@@ -1730,6 +1732,11 @@
             }*/
           }
         });
+
+        // ===== OLD SOCKET - Keep for legacy pmash:update events =====
+        // Note: New unified action system uses socketClient from layout
+        // This socket.on('notification') is NOT called by the new system
+        // ===== END OLD SOCKET =====
       });
       setInterval(start, tickSpeed);
       if (
@@ -1751,6 +1758,52 @@
       goto('/');
     }
   });
+
+  // ===== NEW UNIFIED ACTION SYSTEM LISTENER =====
+  // Listen for notifications from the new socketClient (managed in +layout.svelte)
+  const unsubscribeNotifications = socketClient.onNotification(async (notification) => {
+    console.log('🔔 [LEV PAGE] Received notification from socketClient:', notification);
+    
+    // Check if this notification requires a data refresh
+    // @ts-ignore - updateStrategy exists but not in type definition
+    const { actionKey, updateStrategy, data: notificationData } = notification;
+    
+    // Handle different update strategies
+    if (updateStrategy?.type === 'fullRefresh') {
+      console.log('📥 [LEV PAGE] Full refresh triggered by:', actionKey);
+      update = true;
+      await start();
+      console.log('✅ [LEV PAGE] Data refreshed after fullRefresh');
+    } 
+    else if (updateStrategy?.type === 'partialUpdate') {
+      console.log('🔄 [LEV PAGE] Partial update triggered by:', actionKey, 'Keys:', updateStrategy.config?.dataKeys);
+      
+      // For now, do a full refresh for partial updates too
+      // In the future, we can optimize this to only refresh specific data
+      update = true;
+      await start();
+      console.log('✅ [LEV PAGE] Data refreshed after partialUpdate');
+    }
+    else if (updateStrategy?.type === 'optimistic') {
+      console.log('⚡ [LEV PAGE] Optimistic update - no refresh needed:', actionKey);
+      // For optimistic updates, we might not need to refresh
+      // The UI should already be updated optimistically
+    }
+    else {
+      console.log('📢 [LEV PAGE] Notification only (no update strategy):', actionKey);
+      // No specific update strategy, no action needed
+    }
+  });
+
+  // Cleanup on component destroy
+  onDestroy(() => {
+    if (unsubscribeNotifications) {
+      unsubscribeNotifications();
+      console.log('🧹 [LEV PAGE] Unsubscribed from socketClient notifications');
+    }
+  });
+  // ===== END NEW UNIFIED ACTION SYSTEM LISTENER =====
+
   export const snapshot = {
     capture: () => {
       const snapshotData = JSON.stringify(arr1);

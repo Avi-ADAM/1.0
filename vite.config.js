@@ -1,6 +1,7 @@
 import { sveltekit } from '@sveltejs/kit/vite';
 import { sentrySvelteKit } from '@sentry/sveltekit';
 import tailwindcss from "@tailwindcss/vite";
+import fs from 'fs'
 //import {defineConfig} from 'vite';
 import devtoolsJson from 'vite-plugin-devtools-json';
 /** @type {import('vite').UserConfig} */
@@ -16,7 +17,8 @@ const config = {
       'd3-scale',
       'd3-shape',
       'layercake',
-      'topojson-client'
+      'topojson-client',
+      'bits-ui'
     ]
   },
   optimizeDeps: {
@@ -43,7 +45,15 @@ const config = {
     sveltekit(),
     tailwindcss(),
      devtoolsJson()
-  ]
+  ],
+  /*  server:{
+    https:{
+      key: fs.readFileSync('./cert.key'),
+      cert: fs.readFileSync('./cert.crt')
+    },
+    host: true,
+    port: 5173
+  }*/
 };
 
 export default config;

@@ -6,6 +6,7 @@ This guide explains how to use TypeScript types with Strapi GraphQL queries in y
 
 - [Quick Start](#quick-start)
 - [Type Helper Utilities](#type-helper-utilities)
+- [Runtime Validation](#runtime-validation)
 - [Common Patterns](#common-patterns)
 - [Working with Relations](#working-with-relations)
 - [Working with Components](#working-with-components)
@@ -148,6 +149,270 @@ type FlatProject = FlattenRelation<ProjectRelation>;
 // For collection relations
 type FlatProjects = FlattenRelationArray<ProjectsRelation>;
 ```
+
+## Runtime Validation
+
+While TypeScript provides compile-time type safety, runtime validation ensures that API responses actually match the expected structure. The `validation.ts` module provides Yup schemas that match the TypeScript types.
+
+### Why Use Runtime Validation?
+
+1. **API Changes**: Detect when the backend API structure changes
+2. **Data Integrity**: Ensure data is in the expected format before processing
+3. **Error Handling**: Provide clear error messages when data is invalid
+4. **Type Safety**: Validate data at runtime, not just compile time
+
+### Basic Validation
+
+```typescript
+import { sendToSer } from '$lib/send/sendToSer.js';
+import { validateResponse, userProjectListResponseSchema } from '$lib/types/validation';
+import type { UserProjectListResponse } from '$lib/types/queryTypes';
+
+async function getUserProjects(userId: string) {
+  // Fetch data from API
+  const rawResponse = await sendToSer(
+    { uid: userId },
+    "64getUserProjectList",
+    0,
+    0,
+    false,
+    fetch
+  );
+  
+  // Validate the response
+  try {
+    const validatedResponse: UserProjectListResponse = await validateResponse(
+      userProjectListResponseSchema,
+      rawResponse
+    );
+    
+    // Now you can safely use the data
+    return validatedResponse.data.usersPermissionsUser.data?.attributes.projects_1s.data ?? [];
+  } catch (error) {
+    console.error('Validation failed:', error.message);
+    throw new Error('Invalid API response structure');
+  }
+}
+```
+
+### Safe Validation (No Exceptions)
+
+Use `safeValidate` when you want to handle validation errors without try-catch:
+
+```typescript
+import { safeValidate, projectDetailsResponseSchema } from '$lib/types/validation';
+
+async function getProjectDetails(projectId: string) {
+  const rawResponse = await sendToSer(
+    { id: projectId },
+    "49GetProjectById",
+    0,
+    0,
+    false,
+    fetch
+  );
+  
+  const result = await safeValidate(projectDetailsResponseSchema, rawResponse);
+  
+  if (result.success) {
+    // Data is valid
+    const project = result.data.data.project.data?.attributes;
+    return project;
+  } else {
+    // Handle validation errors
+    console.error('Validation errors:', result.errors.errors);
+    return null;
+  }
+}
+```
+
+### Type Guard Validation
+
+Use `isValidResponse` as a type guard:
+
+```typescript
+import { isValidResponse, userDetailsResponseSchema } from '$lib/types/validation';
+import type { UserDetailsResponse } from '$lib/types/queryTypes';
+
+async function getUserDetails(userId: string) {
+  const rawResponse = await sendToSer(
+    { id: userId },
+    "52GetUserById",
+    0,
+    0,
+    false,
+    fetch
+  );
+  
+  if (isValidResponse(userDetailsResponseSchema, rawResponse)) {
+    // TypeScript knows rawResponse is UserDetailsResponse
+    const user = rawResponse.data.usersPermissionsUser.data?.attributes;
+    return user;
+  } else {
+    throw new Error('Invalid user data');
+  }
+}
+```
+
+### Synchronous Validation
+
+For synchronous validation (useful in derived stores or computed values):
+
+```typescript
+import { validateResponseSync, checkProjectMembershipResponseSchema } from '$lib/types/validation';
+
+function processProjectMembership(rawData: unknown) {
+  try {
+    const validData = validateResponseSync(checkProjectMembershipResponseSchema, rawData);
+    return validData.data.usersPermissionsUser.data?.attributes.projects_1s.data ?? [];
+  } catch (error) {
+    console.error('Invalid data:', error.message);
+    return [];
+  }
+}
+```
+
+### Available Validation Schemas
+
+The following schemas are available in `validation.ts`:
+
+- `userProjectListResponseSchema` - For getUserProjectList query
+- `checkProjectMembershipResponseSchema` - For checkProjectMembership query
+- `projectDetailsResponseSchema` - For GetProjectById query
+- `userDetailsResponseSchema` - For GetUserById query
+- `openMissionDetailsResponseSchema` - For GetOpenMissionById query
+- `missionsOnProgressResponseSchema` - For GetMissionsOnProgress query
+- `negotiationDetailsResponseSchema` - For GetNegotiation query
+
+### Creating Custom Validation Schemas
+
+You can create your own validation schemas for custom queries:
+
+```typescript
+import { 
+  createStrapiResponseSchema, 
+  createStrapiEntitySchema, 
+  createStrapiCollectionSchema,
+  strapiMediaSchema
+} from '$lib/types/validation';
+import * as yup from 'yup';
+
+// Define your custom schema
+export const myCustomQuerySchema = createStrapiResponseSchema(
+  yup.object({
+    myContentType: createStrapiEntitySchema(
+      yup.object({
+        title: yup.string().required(),
+        description: yup.string().required(),
+        publishedAt: yup.string().nullable().default(null),
+        coverImage: strapiMediaSchema.optional(),
+        tags: createStrapiCollectionSchema(
+          yup.object({
+            name: yup.string().required()
+          })
+        ).required()
+      })
+    ).required()
+  })
+);
+
+// Use it
+const result = await validateResponse(myCustomQuerySchema, apiResponse);
+```
+
+### Validation in Svelte Components
+
+```svelte
+<script>
+  import { sendToSer } from '$lib/send/sendToSer.js';
+  import { safeValidate, userProjectListResponseSchema } from '$lib/types/validation';
+  
+  let projects = $state([]);
+  let error = $state(null);
+  
+  async function loadProjects() {
+    const rawResponse = await sendToSer(
+      { uid: userId },
+      "64getUserProjectList",
+      0,
+      0,
+      false,
+      fetch
+    );
+    
+    const result = await safeValidate(userProjectListResponseSchema, rawResponse);
+    
+    if (result.success) {
+      projects = result.data.data.usersPermissionsUser.data?.attributes.projects_1s.data ?? [];
+      error = null;
+    } else {
+      error = 'Failed to load projects: Invalid data structure';
+      console.error(result.errors);
+    }
+  }
+</script>
+
+{#if error}
+  <div class="error">{error}</div>
+{:else}
+  {#each projects as project}
+    <div>{project.attributes.projectName}</div>
+  {/each}
+{/if}
+```
+
+### Validation Best Practices
+
+1. **Validate at API boundaries**: Always validate data when it enters your application
+2. **Use safe validation in UI**: Use `safeValidate` in components to avoid crashes
+3. **Log validation errors**: Always log validation errors for debugging
+4. **Fail gracefully**: Provide fallback values or error states when validation fails
+5. **Validate critical paths**: Focus validation on critical user flows first
+6. **Custom error messages**: Provide user-friendly error messages, not raw validation errors
+
+### Validation Error Handling
+
+```typescript
+import { validateResponse, userDetailsResponseSchema } from '$lib/types/validation';
+import { ValidationError } from 'yup';
+
+async function getUserWithErrorHandling(userId: string) {
+  try {
+    const rawResponse = await sendToSer(
+      { id: userId },
+      "52GetUserById",
+      0,
+      0,
+      false,
+      fetch
+    );
+    
+    const validData = await validateResponse(userDetailsResponseSchema, rawResponse);
+    return validData.data.usersPermissionsUser.data?.attributes;
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      // Handle validation errors specifically
+      console.error('Data validation failed:');
+      error.errors.forEach(err => console.error('  -', err));
+      
+      // You can also access specific error details
+      console.error('Validation details:', error.inner);
+    } else {
+      // Handle other errors (network, etc.)
+      console.error('Failed to fetch user:', error);
+    }
+    
+    return null;
+  }
+}
+```
+
+### Performance Considerations
+
+- **Validation overhead**: Validation adds minimal overhead (~1-5ms for typical responses)
+- **Async vs Sync**: Use async validation for large responses, sync for small ones
+- **Selective validation**: You don't need to validate every response - focus on critical paths
+- **Development vs Production**: Consider more aggressive validation in development, lighter in production
 
 ## Common Patterns
 
@@ -721,8 +986,19 @@ const simplifiedProject = {
 6. **Map complex responses** to simpler structures in your components
 7. **Refer to existing query types** in `queryTypes.ts` as examples when creating new ones
 
+## Migrating to TypeScript
+
+If you're converting existing JavaScript components to use TypeScript with Strapi types, see the comprehensive [Migration Guide](./MIGRATION_GUIDE.md). It includes:
+
+- Step-by-step migration process
+- Before/after code examples
+- Common migration patterns
+- Solutions to common gotchas
+- Testing and rollback strategies
+
 ## Additional Resources
 
+- [Migration Guide](./MIGRATION_GUIDE.md) - Complete guide for converting components to TypeScript
 - [Strapi GraphQL Documentation](https://docs.strapi.io/dev-docs/plugins/graphql)
 - [TypeScript Handbook](https://www.typescriptlang.org/docs/handbook/intro.html)
 - [SvelteKit TypeScript Support](https://kit.svelte.dev/docs/types)
@@ -731,7 +1007,8 @@ const simplifiedProject = {
 
 If you encounter issues not covered in this guide:
 
-1. Check the existing query types in `src/lib/types/queryTypes.ts` for examples
-2. Review the GraphQL queries in `src/routes/api/send/qids.js`
-3. Use TypeScript's error messages to understand what's expected
-4. Test your queries in the GraphQL playground to verify the response structure
+1. Check the [Migration Guide](./MIGRATION_GUIDE.md) for step-by-step conversion instructions
+2. Check the existing query types in `src/lib/types/queryTypes.ts` for examples
+3. Review the GraphQL queries in `src/routes/api/send/qids.js`
+4. Use TypeScript's error messages to understand what's expected
+5. Test your queries in the GraphQL playground to verify the response structure

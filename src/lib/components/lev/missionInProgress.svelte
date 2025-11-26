@@ -6,6 +6,7 @@ import { Drawer } from 'vaul-svelte';
     import { toast } from 'svelte-sonner';
   import RangeSlider from "svelte-range-slider-pips";
     import { lang } from '$lib/stores/lang.js'
+    import { locale, t } from '$lib/translations';
 	  import { fly, scale } from 'svelte/transition';
     import { clickOutside } from './outsidclick.js';
     import { formatTime } from './utils.js';
@@ -967,15 +968,62 @@ onUpdate-timer={({ detail }) => {
     <DialogOverlay {isOpen} onDismiss={close} class="overlay">
         <div transition:fly|local={{y: 450, opacity: 0.5, duration: 2000}}>
   <DialogContent aria-label="form" class="content">
-      <div dir="rtl" >
-              <button onclick={close}>ביטול</button>
+      <div dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'} class="p-6 space-y-4">
+              <button 
+                onclick={close}
+                class="absolute top-4 {$locale === 'he' || $locale === 'ar' ? 'left-4' : 'right-4'} text-gray-500 hover:text-gray-700"
+              >
+                {$t('lev.missionInProgress.cancel')}
+              </button>
              {#if a == 1}
-              <h5>יש להעלות קובץ סיום משימה או לתאר במילים</h5>
-      <input  type="file" bind:files={what} >
-      <input class="border border-gold" type="text" bind:value={why} placeholder="יש לתאר במילים את סיום המשימה">
-          {#if butt == false}  <button class="bg-gold p-2 m-1 rounded-xl" onclick={afterwhy}>אישור</button>
-           {:else} <small>כמה שניות בבקשה</small>{/if}
-      <br/> {#if activE}<small>{activE}</small>{/if}
+              <div class="space-y-4">
+                <h5 class="text-xl font-semibold text-gray-800">{$t('lev.missionInProgress.uploadTitle')}</h5>
+                <p class="text-sm text-gray-600">{$t('lev.missionInProgress.uploadDescription')}</p>
+                
+                <div class="space-y-3">
+                  <label class="block">
+                    <span class="text-sm font-medium text-gray-700">{$t('lev.missionInProgress.fileLabel')}</span>
+                    <input 
+                      type="file" 
+                      bind:files={what}
+                      class="mt-1 block w-full text-sm text-gray-500
+                        file:mr-4 file:py-2 file:px-4
+                        file:rounded-lg file:border-0
+                        file:text-sm file:font-semibold
+                        file:bg-gold file:text-white
+                        hover:file:bg-yellow-600
+                        file:cursor-pointer"
+                    >
+                  </label>
+                  
+                  <label class="block">
+                    <span class="text-sm font-medium text-gray-700">{$t('lev.missionInProgress.descriptionPlaceholder')}</span>
+                    <textarea 
+                      bind:value={why}
+                      placeholder={$t('lev.missionInProgress.descriptionPlaceholder')}
+                      rows="4"
+                      class="mt-1 block w-full rounded-lg border border-gold focus:border-yellow-600 focus:ring focus:ring-yellow-200 focus:ring-opacity-50 p-3 text-gray-700"
+                    ></textarea>
+                  </label>
+                </div>
+
+                {#if butt == false}
+                  <button 
+                    onclick={afterwhy}
+                    class="w-full bg-gold hover:bg-yellow-600 text-white font-semibold py-3 px-6 rounded-xl transition-colors duration-200"
+                  >
+                    {$t('lev.missionInProgress.submitButton')}
+                  </button>
+                {:else}
+                  <div class="text-center text-gray-600 py-3">
+                    {$t('lev.missionInProgress.pleaseWait')}
+                  </div>
+                {/if}
+                
+                {#if activE}
+                  <div class="text-sm text-red-600 bg-red-50 p-3 rounded-lg">{activE}</div>
+                {/if}
+              </div>
         {:else if a == 2}
         <div dir="ltr" class="flex flex-col justify-center items-center w-full">
 <h2 class="text-center">{sta[$lang]}</h2>

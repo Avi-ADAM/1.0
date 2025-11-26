@@ -41,7 +41,9 @@ const config = {
           goldShain:
           'linear-gradient(110deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771c, #FBF5B7, #B38728, #FCF6BA, #BF953F)',
         customGradient:
-          'linear-gradient(to right, #ff7e5f, #feb47b, #86e3ce, #d4a5a5, #ffdfd3, #d4a5a5, #86e3ce, #feb47b, #ff7e5f)'
+          'linear-gradient(to right, #ff7e5f, #feb47b, #86e3ce, #d4a5a5, #ffdfd3, #d4a5a5, #86e3ce, #feb47b, #ff7e5f)',
+        colorfulGrad:
+          'linear-gradient(to left, var(--grb), var(--gra), var(--grc))'
       },
       animation: {
         shine: "shine 2s linear infinite",

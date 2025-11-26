@@ -282,7 +282,7 @@
   $effect(() => {
     // Count all sales
     totalSales = salee.reduce((total, s) => total + s.attributes.in, 0);
-    // Only count unsplited sales
+    // Count all unsplited sales (including pending ones) - these are awaiting split
     allin = salee
       .filter(s => !s.attributes.splited)
       .reduce((total, s) => total + s.attributes.in, 0);
@@ -533,11 +533,15 @@
         <div class="flex d overflow-auto">
           {#each salee as data, i}
             <div
-              class="relative button-whitegold py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : ''}"
+              class="relative button-whitegold py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : data.attributes.pending ? 'opacity-75 border-2 border-blue-500' : ''}"
             >
               {#if data.attributes.splited}
                 <div class="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded">
                   ✓ {$lang === 'he' ? 'חולק' : 'Split'}
+                </div>
+              {:else if data.attributes.pending}
+                <div class="absolute top-1 right-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                  ⏳ {$lang === 'he' ? 'בהצבעה' : 'Pending'}
                 </div>
               {/if}
               <h3 title={gn[$lang]}>
@@ -575,11 +579,19 @@
             <h2 class="text-sm font-medium">{$lang === 'he' ? 'סך הכל מכירות:' : 'Total Sales:'}</h2>
             <p class="font-bold text-lg">{totalSales}</p>
           </div>
-          {#if salee.some(s => s.attributes.splited)}
+          {#if salee.some(s => s.attributes.splited || s.attributes.pending)}
             <div class="border-t border-barbi/30 pt-2">
               <h2 class="text-sm font-medium">{$lang === 'he' ? 'ממתין לחלוקה:' : 'Awaiting Split:'}</h2>
               <p class="font-bold text-lg">{allin}</p>
             </div>
+            {#if salee.some(s => s.attributes.pending)}
+              <div class="border-t border-barbi/30 pt-2 mt-2">
+                <h2 class="text-sm font-medium text-blue-600">{$lang === 'he' ? 'בהצבעה:' : 'In Voting:'}</h2>
+                <p class="font-bold text-lg text-blue-600">
+                  {salee.filter(s => s.attributes.pending).reduce((total, s) => total + s.attributes.in, 0)}
+                </p>
+              </div>
+            {/if}
           {:else}
             <div class="border-t border-barbi/30 pt-2">
               <h2>{tot[$lang]}</h2>
