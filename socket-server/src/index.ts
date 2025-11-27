@@ -7,7 +7,9 @@
  */
 
 import { Server } from 'socket.io';
-import { createServer } from 'http';
+import { createServer as createHttpServer } from 'http';
+import { createServer as createHttpsServer } from 'https';
+import { readFileSync } from 'fs';
 import { config } from 'dotenv';
 import { verifyToken, extractToken } from './auth.js';
 import { SessionManager } from './session-manager.js';
@@ -20,8 +22,24 @@ const PORT = process.env.PORT || 3001;
 const CLIENT_URL = process.env.CLIENT_URL || 'http://localhost:5173';
 const NODE_ENV = process.env.NODE_ENV || 'development';
 
-// Create HTTP server
-const httpServer = createServer();
+// SSL Configuration for production
+let httpServer;
+if (NODE_ENV === 'production' && process.env.SSL_CERT && process.env.SSL_KEY) {
+  try {
+    const sslOptions = {
+      cert: readFileSync(process.env.SSL_CERT),
+      key: readFileSync(process.env.SSL_KEY)
+    };
+    httpServer = createHttpsServer(sslOptions);
+    console.log('[SSL] HTTPS server created with SSL certificates');
+  } catch (error) {
+    console.error('[SSL] Failed to load SSL certificates, falling back to HTTP:', error);
+    httpServer = createHttpServer();
+  }
+} else {
+  httpServer = createHttpServer();
+  console.log('[Server] HTTP server created (development mode)');
+}
 
 // Create Socket.IO server with CORS configuration
 const io = new Server(httpServer, {

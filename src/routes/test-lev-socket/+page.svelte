@@ -3,6 +3,8 @@
   import { executeAction } from '$lib/client/actionClient';
   import { toast } from 'svelte-sonner';
   import { socketClient } from '$lib/stores/socketClient';
+  import { page } from '$app/state';
+  import { add } from 'date-fns';
   
   let projectId = $state('');
   let userId = $state('');
@@ -18,19 +20,15 @@
   
   onMount(() => {
     // Get credentials from cookies
-    const jwtCookie = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='));
+
     
     const idCookie = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='));
     
-    if (jwtCookie) {
-      jwt = jwtCookie.split('=')[1];
-      addLog('✅ JWT נמצא');
-    }
-    
+   
+      jwt = page.data.tok;
+    addLog(`🔑 JWT Token: ${jwt ? 'נמצא' : 'לא נמצא'}`);
     if (idCookie) {
       userId = idCookie.split('=')[1];
       addLog(`✅ User ID: ${userId}`);

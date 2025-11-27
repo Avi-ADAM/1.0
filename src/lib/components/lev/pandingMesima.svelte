@@ -297,16 +297,13 @@ async function agree(alr) {
     const date = (mdate !== undefined && mdate !== null) ? ` sqadualed: "${mdate}"` : ``;
     const dates = (mdates !== undefined && mdates !== null) ? ` dates: "${mdates}"` : ``;
 
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     if (noofusersOk === noofusers) {
         const skillsa = (skills?.data || skills)?.map(c => c.id) || [];
@@ -473,16 +470,13 @@ async function afterwhy(event) {
     noofusersNo += 1;
     noofusersWaiting -= 1;
     ser = xyz();
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+   
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     try {
         await fetch(linkg, {
@@ -557,16 +551,13 @@ async function afreact(event) {
     console.log(why)
     let d = new Date()
     //  loading = true;
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+  
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     let dataa = {
         data: {
@@ -730,6 +721,7 @@ import {
 import {
     Drawer
 } from 'vaul-svelte';
+  import { page } from '$app/state';
 
 function claf(event) {
     let o = event.alr

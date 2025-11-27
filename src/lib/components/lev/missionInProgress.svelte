@@ -289,16 +289,13 @@ async function handleClearClick () {
         tdtd[coinlapach-1].lapse = 0
        tdtd[coinlapach-1].running = false
       betha.set(tdtd)
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+   
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
         try {
             await fetch(linkg, {
@@ -354,16 +351,13 @@ async function save() {
         tdtd[coinlapach-1].lapse = 0
         tdtd[coinlapach-1].zman = msdon
         tdtd[coinlapach-1].running = false
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+   
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
         try {
             await fetch(linkg, {
@@ -444,16 +438,13 @@ async function afterwhy () {
    butt = true
   already = true;
   let d = new Date
-const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     let newwhat = false;
  if (what && what[0]){
@@ -667,6 +658,7 @@ function hover (id){
    import Cards from './cards/inpro.svelte'
   import { sendToSer } from '$lib/send/sendToSer.js';
   import { calcX } from '$lib/func/calcX.svelte';
+  import { page } from '$app/state';
   /**
    * @typedef {Object} Props
    * @property {boolean} [isVisible]
@@ -754,16 +746,12 @@ function claf (event){
  async function stat (){
   a=3
   console.log(status[0])
-  const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
         try {
           console.log("try")

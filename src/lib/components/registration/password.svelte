@@ -151,12 +151,10 @@
             txx: 0
           });
           const id = response.data.user.id;
-          //	let token  = miDatan.data.register.jwt;
           document.cookie =
             `await=${Date.now}; expires=` + new Date(2026, 0, 1).toUTCString();
           document.cookie =
             `when=${Date.now}; expires=` + new Date(2026, 0, 1).toUTCString();
-          //  document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2026, 0, 1).toUTCString();
           document.cookie =
             `id=${response.data.user.id}; expires=` +
             new Date(2026, 0, 1).toUTCString();
@@ -203,12 +201,10 @@
             txx: 0
           });
           const id = 0;
-          //	let token  = miDatan.data.register.jwt;
           document.cookie =
             `await=${Date.now()}; expires=` + new Date(2026, 0, 1).toUTCString();
           document.cookie =
             `when=${Date.now()}; expires=` + new Date(2026, 0, 1).toUTCString();
-          //  document.cookie = `jwt=${miDatan.data.register.jwt}; expires=` + new Date(2026, 0, 1).toUTCString();
           document.cookie =
             `id=0; expires=` + new Date(2026, 0, 1).toUTCString();
           document.cookie =

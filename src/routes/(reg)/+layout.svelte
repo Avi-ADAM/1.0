@@ -64,19 +64,15 @@ onMount(async () => {
     initialWebS(data.tok,data.uid)
     initialWebSP(data.tok,data.uid)
 
-}else{
-   const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-         if (cookieValue != null) {
+} else {
+   // jwt is httpOnly now; rely on server-provided token or the 'when' cookie for auth flag
   const cookieT = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('when='))
-  .split('=')[1];
-          if(cookieT != null){
-                isAuthed = true
-          }
-         }
+    .split('; ')
+    .find(row => row.startsWith('when='))
+    ?.split('=')[1];
+  if (cookieT != null) {
+    isAuthed = true;
+  }
 }
 });
 function reg (){

@@ -152,17 +152,13 @@ async function agree() {
 
     const sdate = (sqedualed !== undefined && sqedualed != null) ? `start: "${sqedualed}"` : ``;
     const date = (deadline !== undefined && deadline != null) ? ` admaticedai: "${deadline}"` : ``;
-        const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
      console.log(idL);
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     let newnew = false
     console.log(pid);
@@ -489,18 +485,13 @@ const declineda = declined.map(c => c.id)
 
     // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
         if (noofpu === 1) {
-    console.log("decline2");
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
     console.log(idL);
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
         try {
             await fetch(linkg, {
@@ -571,16 +562,12 @@ async function react (){
   console.log(why)
   let d = new Date()
          //  loading = true;
-       const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok; 
      bearer1 = 'bearer' + ' ' + token;
      let dataa = {
           data: { 
@@ -638,6 +625,7 @@ function hoverede(){
   import { RingLoader } from "svelte-loading-spinners";
   import Diun from "./diun.svelte";
   import { nowId } from "$lib/stores/pendMisMes.js";
+  import { page } from "$app/state";
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]

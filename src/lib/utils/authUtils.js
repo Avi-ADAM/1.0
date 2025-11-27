@@ -3,6 +3,7 @@
  * Handles authentication, authorization, and user context for sales
  */
 
+import { page } from '$app/state';
 import { storageUtils } from './salesUtils.js';
 
 /**
@@ -38,19 +39,16 @@ export class AuthUtils {
       }
 
       // Get from cookies
-      const jwtCookie = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='));
       
       const idCookie = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='));
 
-      if (!jwtCookie || !idCookie) {
+      if (!idCookie) {
         return null;
       }
 
-      const token = jwtCookie.split('=')[1];
+      const token = page.data.tok;
       const userId = idCookie.split('=')[1];
 
       const authData = {

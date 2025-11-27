@@ -265,17 +265,12 @@ async function agree() {
  {total = agprice * monts} 
           else if (kindOf === "yearly")
     {total = agprice * yers} 
-
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     uids.push(userId);
     uids = uids;
@@ -395,16 +390,12 @@ async function decline() {
   noofusersWaiting -= 1;
   ser = xyz();
     // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב      
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
         try {
             await fetch(linkg, {
@@ -492,6 +483,7 @@ u ="בקשה לאישור ביצוע משימה בהצלחה"
     onHover?.({id: u});
 }
    import Cards from './cards/dowegeot.svelte'
+  import { page } from '$app/state';
 
 
 </script>

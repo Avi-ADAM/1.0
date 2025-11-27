@@ -7,6 +7,7 @@
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import { toast } from 'svelte-sonner';
   import { SendTo } from '$lib/send/sendTo.svelte';
+  import { page } from '$app/state';
 
   /**
    * @typedef {Object} Props
@@ -124,16 +125,13 @@
     }
 
     let d = new Date();
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+  
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     
-    const token = cookieValue;
+    const token = page.data.tok;
     const bearer1 = 'bearer' + ' ' + token;
 
     try {

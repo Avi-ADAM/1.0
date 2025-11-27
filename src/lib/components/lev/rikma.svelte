@@ -7,6 +7,7 @@ import { lang } from '$lib/stores/lang.js'
   import { RingLoader
 } from 'svelte-loading-spinners';
   import RichText from '$lib/celim/ui/richText.svelte';
+  import { page } from '$app/state';
 let projectUsers =$state([]);
 let token;
 let idL;
@@ -20,16 +21,12 @@ const baseUrl = import.meta.env.VITE_URL
          let fblink = $state(), discordlink = $state(), twiterlink = $state();
 let projecto = $state([]);
 async function xyd () {
-    const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok; 
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {

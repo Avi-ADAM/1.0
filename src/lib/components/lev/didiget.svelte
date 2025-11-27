@@ -186,16 +186,13 @@
       noofusersOk += 1;
       noofusersWaiting -= 1;
       ser = xyz();
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+     
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
-      token = cookieValue;
+      token = page.data.tok;
       bearer1 = 'bearer' + ' ' + token;
       console.log("kind value:",kind)
       if (kind == 'send') {
@@ -337,10 +334,7 @@
   ser = xyz();      
     const userss = objToString(users);
     const diunim = objToString(diun);  
-  const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+ 
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
@@ -487,17 +481,12 @@ id: ${pendId}
   async function afreact(event) {
     why = event.why;
     const diunim = objToString(chat);
-
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     let d = new Date();
     try {
@@ -563,6 +552,7 @@ id: ${pendId}
   // import required modules
   import { EffectFlip, Navigation } from 'swiper';
   import { Drawer } from 'vaul-svelte';
+  import { page } from '$app/state';
 
   let swiperRef = null;
 

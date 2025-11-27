@@ -70,19 +70,17 @@ const baseUrl = import.meta.env.VITE_URL
 let linkg = baseUrl+'/graphql'
 let miDatan;
 let errr = $state({k: false, m: "", p: false})
+import { page } from '$app/state';
 async function increment() {    
-errr.p = true;
- const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
- let uid = cookieValueId;
-   let token  = cookieValue; 
-    let bearer1 = 'bearer' + ' ' + token;
+	errr.p = true;
+	// jwt is httpOnly now; read token from server-provided page data
+	const cookieValueId = document.cookie
+		.split('; ')
+		.find(row => row.startsWith('id='))
+		.split('=')[1];
+	let uid = cookieValueId;
+	let token = page.data.tok;
+	let bearer1 = 'bearer' + ' ' + token;
     let link =baseUrl+"/graphql" ;
      axios
   .post(baseUrl+'/password', {
@@ -133,8 +131,8 @@ errr.p = true;
 		tx: 0,
 		txx: 0
 	} );
-    document.cookie = `jwt=${miDatan.data.jwt}; expires=` + new Date(2026, 0, 1).toUTCString();
-    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2026, 0, 1).toUTCString();
+    document.cookie = `jwt=${miDatan.data.jwt ? true : false}; expires=` + new Date(2027, 0, 1).toUTCString();
+    document.cookie = `id=${miDatan.data.user.id}; expires=` + new Date(2027, 0, 1).toUTCString();
 } catch (e) {
             error1 = e
             console.log(error1);

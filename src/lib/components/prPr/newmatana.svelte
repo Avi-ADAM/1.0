@@ -9,6 +9,7 @@
   import Button from '$lib/celim/ui/button.svelte';
   import UploadPic from '../userPr/uploadPic.svelte';
   import axios from 'axios';
+  import { page } from '$app/state';
   let oneForeProject = $state(false)
   let description = $state('');
   let loading = $state(false);
@@ -59,11 +60,8 @@
 
     let d = new Date();
     already = true;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
-    token = cookieValue;
+    
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     try {
       if (croppedImage) {

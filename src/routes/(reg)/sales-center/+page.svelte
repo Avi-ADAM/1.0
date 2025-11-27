@@ -5,6 +5,7 @@
   import SaleComponent from '$lib/components/sales/SaleComponent.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { toast } from 'svelte-sonner';
+  import { page } from '$app/state';
 
   let loading = $state(true);
   let error = $state(null);
@@ -82,23 +83,20 @@
   onMount(async () => {
     try {
       // Get authentication data from cookies
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        ?.split('=')[1];
+      
 
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         ?.split('=')[1];
 
-      if (!cookieValue || !cookieValueId) {
+      if ( !cookieValueId) {
         error = 'Authentication required';
         loading = false;
         return;
       }
 
-      token = cookieValue;
+      token = page.data.tok;
       userId = cookieValueId;
 
       await loadProducts();

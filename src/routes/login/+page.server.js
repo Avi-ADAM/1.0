@@ -7,7 +7,7 @@ export const actions = {
         const data = await request.formData();
         const email = data.get('email');
         const password = data.get('password');
-        const redirectTo = data.get('from') || '/me'; // Get 'from' parameter, default to '/me'
+        const redirectTo = String(data.get('from') || '/me'); // Get 'from' parameter, default to '/me'
 
         if (!email || !password) {
             return {
@@ -31,41 +31,41 @@ export const actions = {
 
             const { jwt, user } = await response.json();
 
-            // Set httpOnly cookies on the server
+            // Set cookies on the server
+            // domain: '.1lev1.com' allows subdomain access (socket.1lev1.com)
+            const isProduction = process.env.NODE_ENV === 'production';
+            const cookieOptions = {
+                path: '/',
+                expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
+                secure: isProduction,
+                sameSite: /** @type {'lax'} */ ('lax'),
+                domain: isProduction ? '.1lev1.com' : undefined // Subdomain support in production
+            };
+
+            // JWT cookie - can be httpOnly in production with subdomain
             cookies.set('jwt', jwt, {
-                path: '/',
-                expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax'
+                ...cookieOptions,
+                httpOnly: isProduction // httpOnly in production for security
             });
-            cookies.set('id', user.id, {
-                path: '/',
-                expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax'
+            
+            cookies.set('id', String(user.id), {
+                ...cookieOptions,
+                httpOnly: false // Keep accessible for client
             });
+            
             cookies.set('un', user.username, {
-                path: '/',
-                expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax'
+                ...cookieOptions,
+                httpOnly: false
             });
+            
             cookies.set('when', Date.now().toString(), {
-                path: '/',
-                expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax'
+                ...cookieOptions,
+                httpOnly: false
             });
-            cookies.set('email', email, {
-                path: '/',
-                expires: new Date(new Date().setFullYear(new Date().getFullYear() + 1)),
-                httpOnly: false,
-                secure: process.env.NODE_ENV === 'production',
-                sameSite: 'lax'
+            
+            cookies.set('email', String(email), {
+                ...cookieOptions,
+                httpOnly: false
             });
 
             console.log('success');

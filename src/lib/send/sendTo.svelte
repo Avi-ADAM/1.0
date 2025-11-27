@@ -1,15 +1,12 @@
 <script module>
+import { page } from '$app/state';
 const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
 export async function SendTo(dat,toc) {
 	const ep = HTTP_ST_ENDPOINT + "/graphql"
 	 let token;
 	if (toc == null){
-    const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-  
-   token  = cookieValue; 
+	  // jwt is httpOnly now; read token from server-provided page data
+	  token = page.data.tok;
 	}else {
 		token = toc
 	}

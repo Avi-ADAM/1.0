@@ -37,14 +37,12 @@ let vallues = $state([]);
     let addval = $state(false);
     const baseUrl = import.meta.env.VITE_URL
 
+    import { page } from '$app/state';
     onMount(async () => {
       basis = projectName_value
-       const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-    token  = cookieValue; 
-    let bearer1 = 'bearer' + ' ' + token;
+      // jwt is httpOnly now; read token from server-provided page data
+      token = page.data.tok;
+      let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
         if (resp.status >= 200 && resp.status < 300) {
@@ -238,7 +236,7 @@ addval == false;
     onclick={() => addval = true} 
     class="bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink  text-gold hover:text-barbi font-bold py-2 px-4 rounded-full"
     >הוספת ערך חדש</button>
-  {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} onAddnew={addnew} fn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
+  {:else if addval == true} <AddnewVal color={"--barbi-pink"} addS={true} onAddnew={addnew} rn={vallues.map(c => c.attributes.valueName)}/>{/if}</div>
   <br>
  <div dir="rtl" class="mb-3 xl:w-96 ">
    <h2 class=" text-barbi">זמן תגובה לקבלת החלטות בריקמה</h2>

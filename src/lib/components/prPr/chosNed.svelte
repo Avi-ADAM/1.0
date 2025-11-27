@@ -11,13 +11,10 @@
   //  let error = null
     let addnee = $state(false);  
   let isLow = $state(true)
+import { page } from '$app/state';
 onMount(async () => {
-         const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
- 
-    token  = cookieValue; 
+    // jwt is httpOnly now; read token from server-provided page data
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {

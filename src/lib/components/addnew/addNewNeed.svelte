@@ -1,4 +1,5 @@
 <script>
+  import {page} from '$app/state'
  let idNewNeed;
 const baseUrl = import.meta.env.VITE_URL
 
@@ -15,11 +16,7 @@ let meData = [];
 
 async function subm() {
   clicked = true
-   const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-    token  = cookieValue; 
+    token  = page.data.tok; 
     let bearer1 = 'bearer' + ' ' + token;
     let d = new Date
     try {

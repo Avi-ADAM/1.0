@@ -199,16 +199,13 @@
     console.log('Handling assignments for meData:', $state.snapshot(meData));
     already = true;
     let d = new Date();
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+   
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     if (userslength > 1) {
       linkop = 'createPmash';

@@ -53,15 +53,13 @@ async function ask() {
     
     // If only one user in project and it's me - create mesimabetahalich directly
     if (projectUserIds.length === 1 && projectUserIds.includes(uId)) {
-        const cookieValue = document.cookie
-            .split('; ')
-            .find(row => row.startsWith('jwt='))
-            ?.split('=')[1];
-        
-        if (!cookieValue) {
-            toast.error("נא להתחבר מחדש למערכת");
-            return;
-        }
+    // jwt is httpOnly now; read token from server-provided page data
+    const token = page.data.tok;
+
+    if (!token) {
+      toast.error("נא להתחבר מחדש למערכת");
+      return;
+    }
 
         try {
             const { createMesimabetahalich, afterMesimabetahalikhCreation } = await import('$lib/utils/createMesimabetahalich.js');

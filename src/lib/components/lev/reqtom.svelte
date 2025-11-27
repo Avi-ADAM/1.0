@@ -219,6 +219,7 @@
     }
   }
   import { idPr } from '$lib/stores/idPr.js';
+  import { page } from '$app/state';
 
   function project(id) {
     pmcli += 1;
@@ -252,17 +253,13 @@
     noofusersWaiting -= 1;
     ser = xyz();
     const date = deadline !== undefined ? ` admaticedai: ${deadline}` : ``;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
     console.log(idL);
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
 
     console.log(uids);
@@ -459,16 +456,13 @@ ${adduser2}
 
     // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
     if (noofpu === 1) {
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+    
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
-      token = cookieValue;
+      token = page.data.tok;
       bearer1 = 'bearer' + ' ' + token;
       try {
         await fetch(linkg, {
@@ -585,16 +579,12 @@ updateAskm(
     console.log(why);
     let d = new Date();
     //  loading = true;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     let idL = cookieValueId;
-    let token = cookieValue;
+    let token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let dataa = {
       data: {

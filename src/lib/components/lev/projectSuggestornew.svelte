@@ -4,6 +4,7 @@
     import axios from 'axios';
      import { onMount } from 'svelte';
 import Lowbtn from '$lib/celim/lowbtn.svelte'
+  import { page } from '$app/state';
 
   /**
    * @typedef {Object} Props
@@ -73,19 +74,14 @@ let miData = [];
 async function agree(oid) {
  const as = askedarr;
  as.push(`${oid}`);
- console.log(as)
- const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
-  .split('=')[1];
+  .split('=')[1];   
   uId = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok; 
     let bearer1 = 'bearer' + ' ' + token;
-    let link = '/graphql';
+    let link = '/graphql';  
     try {
              await fetch(link, {
               method: 'POST',
@@ -138,17 +134,12 @@ async function decline(oid) {
         console.log("decline", oid);
        const ds = declineddarr;
  ds.push(`${oid}`);
- console.log(ds)
- const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   uId = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok; 
     let bearer1 = 'bearer' + ' ' + token;
     let link = '/graphql';
     try {

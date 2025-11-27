@@ -189,6 +189,7 @@ let ser = $state(xyz());
 
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
+  import { page } from "$app/state";
    let swiperRef = null;
 
   const setSwiperRef = ({ detail }) => {
@@ -237,16 +238,13 @@ async function agree() {
   ser = xyz();
   let d = new Date
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     uids.push(userId);
     uids = uids;
@@ -369,16 +367,13 @@ function ask() {
 async function decline() {
         already = true;
     // negativ rating and reason text!! בועה שמראה לאחרחם את ההתנגדות הסיבה ואפשרות להגיב      
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
+   
     const cookieValueId = document.cookie
         .split('; ')
         .find(row => row.startsWith('id='))
         .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
         try {
             await fetch(linkg, {

@@ -88,7 +88,6 @@ function dispatchb () {
   /**
    * @typedef {Object} Props
    * @property {string} [color]
-   * @property {any} vallId
    * @property {any} [rn]
    * @property {boolean} [addS]
    * @property {(payload: { id: any, skob: any }) => void} [onAddnew] - Callback for addnew event
@@ -98,7 +97,6 @@ function dispatchb () {
   /** @type {Props} */
   let {
     color = "--gold",
-    vallId,
     rn = [],
     addS = $bindable(false),
     onAddnew,

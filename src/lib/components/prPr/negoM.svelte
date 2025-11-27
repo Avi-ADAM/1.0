@@ -13,6 +13,7 @@
   import Rich from '../conf/rich.svelte';
   import ActsNego from '../conf/actsNego.svelte';
   import { crTask } from '$lib/func/moach/crtask.svelte';
+  import { page } from '$app/state';
   /**
    * @typedef {Object} Props
    * @property {any} [negopendmissions]
@@ -424,16 +425,12 @@
       rishonves4nego;
     let d = new Date();
     const negoss = ``;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     if (rishon !== 0) {
       rishon4 = `rishon: "${rishon}"`;
@@ -762,16 +759,12 @@
     );
     console.log('acts.data:', acts?.data);
     console.log('acts2 state:', acts2);
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {

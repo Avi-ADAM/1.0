@@ -32,16 +32,13 @@
   let listt = [];
   let error1 = null;
   async function get() {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+   
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idLi = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
@@ -116,16 +113,13 @@ console.log("skillslist",skillslist);
     }
     if (datan !== 'mash') {
       let list = data.map((c) => c.id);
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+     
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       uid = cookieValueId;
-      token = cookieValue;
+      token = page.data.tok;
       let bearer1 = 'bearer' + ' ' + token;
       let link = baseUrl + '/graphql';
       try {
@@ -191,6 +185,7 @@ console.log("skillslist",skillslist);
   }
 
   import { RingLoader } from 'svelte-loading-spinners';
+  import { page } from '$app/state';
   let yy = $state(0);
   $effect(() => {
     console.log(yy, 'yy');
@@ -358,11 +353,8 @@ console.log("skillslist",skillslist);
   }
   async function updi() {
     let res = [];
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
-    token = cookieValue;
+   
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
@@ -486,11 +478,8 @@ console.log("skillslist",skillslist);
   async function edit(id) {
     g = true;
     console.log(id);
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
-    token = cookieValue;
+   
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {

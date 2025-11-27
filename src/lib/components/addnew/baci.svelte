@@ -46,17 +46,14 @@ async function sendP () {
   shgi = true; 
 } else{
   loading = true;
-  const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.jwt;
     let bearer1 = 'bearer' + ' ' + token;
 //let fd = new FormData();
 if (files) {
@@ -84,17 +81,14 @@ async function sendPP(){
   await newnew()
     .then()
    let d = new Date;
-     const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+   
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.jwt; 
     let bearer1 = 'bearer' + ' ' + token;
     try {
            const res = await fetch(baseUrl+"/graphql", {
@@ -159,11 +153,8 @@ let vallues = $state([]);
     let addval = false;
     
     onMount(async () => {
-       const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-    token  = cookieValue; 
+     
+    token  = page.data.jwt; 
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {
@@ -231,6 +222,7 @@ let suc = $state(false);
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device.js';
   import MobileModal from '$lib/celim/ui/mobileModal.svelte';
+  import { page } from '$app/state';
   let { userName_value } = $props();
  const closer = () => {
     isOpen = false;

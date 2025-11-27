@@ -217,10 +217,7 @@
               console.log(`Updating user ${iduse} hervachti to ${amount}`);
               
               try {
-                const token = document.cookie
-                  .split('; ')
-                  .find((row) => row.startsWith('jwt='))
-                  ?.split('=')[1];
+                const token = page.data.tok;
                 const bearer1 = 'bearer ' + token;
                 
                 const response = await fetch(linkg, {
@@ -269,10 +266,7 @@
         // Not all users approved yet - just add vote
         try {
           const userss = objToString(users);
-          const token = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('jwt='))
-            ?.split('=')[1];
+          const token = page.data.tok;
           const bearer1 = 'bearer ' + token;
           
           await fetch(linkg, {
@@ -345,16 +339,13 @@
       ser = xyz();
       const userss = objToString(users);
       const diunim = objToString(diun);
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+     
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
-      token = cookieValue;
+      token = page.data.tok;
       bearer1 = 'bearer' + ' ' + token;
       try {
         await fetch(linkg, {
@@ -495,6 +486,7 @@ id: ${pendId}
     onHover?.({ id: u });
   }
   import Cards from './cards/haluka.svelte';
+  import { page } from '$app/state';
 
   function claf(event) {
     let o = event.alr;

@@ -269,16 +269,13 @@ async function agree(alr) {
       }
     const date = (sqadualed !== undefined) ? `sqadualed: "${new Date(sqadualed).toISOString()}",` : ``;
         const sdate = (sqadualedf !== undefined) ? `sqadualedf: "${new Date(sqadualedf).toISOString()}",` : ``;
-    const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+  
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok; 
      bearer1 = 'bearer' + ' ' + token;
           if (noofusersOk === noofusers){
     try {
@@ -420,16 +417,13 @@ async function afterwhy (event){
   loading = true;
   noofusersNo += 1;
   noofusersWaiting -= 1;
-         const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+       
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok; 
      bearer1 = 'bearer' + ' ' + token;
         try {
              await fetch(linkg, {
@@ -527,16 +521,12 @@ async function react (){
   console.log(why)
   let d = new Date()
          //  loading = true;
-       const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok; 
      bearer1 = 'bearer' + ' ' + token;
      let dataa = {
           data: { 
@@ -590,10 +580,7 @@ diunim = ` ${diu},`
   console.log(why)
   let d = new Date
            loading = true;
-       const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+     
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
@@ -654,6 +641,7 @@ diunim = ` ${diu},`
 
   // import required modules
   import { EffectFlip, Navigation } from "swiper";
+  import { page } from '$app/state';
    let swiperRef = null;
 
   const setSwiperRef = ({ detail }) => {

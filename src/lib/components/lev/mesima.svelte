@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/state';
 import Tile from '$lib/celim/tile.svelte'
 import { lang } from '$lib/stores/lang.js'
   import { RingLoader
@@ -12,16 +13,13 @@ let srcP;
 let error1 = null;
 let projecto = [];
 async function xyd () {
-    const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+   
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok;
     let datar;
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);

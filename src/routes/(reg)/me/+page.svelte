@@ -127,16 +127,13 @@
   //
 
   function sendP() {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+  
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idLi = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let link = `${baseUrl}/api/users/${idLi}`;
     // Check if FormData is empty
@@ -178,16 +175,12 @@
   }
 
   async function sendpg(imageId) {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idLi = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let res;
     let linkg = `${baseUrl}/graphql`;
@@ -248,16 +241,13 @@
     lango;
   let cards = $state(true);
   async function start() {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+ 
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     let linkgra = `${baseUrl}/graphql`;
@@ -527,16 +517,13 @@
     githublink = $state(),
     noMail = $state();
   async function sendD() {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+  
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idLi = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let link = `${baseUrl}/api/users/${idLi}`;
     axios
@@ -753,11 +740,8 @@
   async function han() {
     a = 2;
     console.log(spid);
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
-    token = cookieValue;
+   
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let linkgra = `${baseUrl}/graphql`;
     try {
@@ -916,13 +900,9 @@
       
       // Update server to mark guide as not viewed (so it can show again)
       try {
-        const cookieValue = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('jwt='))
-          ?.split('=')[1];
-        
-        if (cookieValue) {
-          const bearer1 = 'bearer' + ' ' + cookieValue;
+       
+        if (page.data.tok) {
+          const bearer1 = 'bearer' + ' ' + page.data.tok;
           await fetch(`${baseUrl}/graphql`, {
             method: 'POST',
             headers: {
@@ -956,13 +936,9 @@
       
       // Update server to mark guide as viewed
       try {
-        const cookieValue = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('jwt='))
-          ?.split('=')[1];
         
-        if (cookieValue) {
-          const bearer1 = 'bearer' + ' ' + cookieValue;
+        if (page.data.tok) {
+          const bearer1 = 'bearer' + ' ' + page.data.tok;
           await fetch(`${baseUrl}/graphql`, {
             method: 'POST',
             headers: {

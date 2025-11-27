@@ -2,6 +2,7 @@
 import Addnewskil from './addNewSkill.svelte';
            import { lang } from '$lib/stores/lang.js'
 const baseUrl = import.meta.env.VITE_URL
+import { page } from '$app/state'
 let addskil = false;
 import Addnewro from './addNewRole.svelte';
 let addro = false;
@@ -109,12 +110,7 @@ let missionName_value = $state();
      let loading = $state(true)
 
 async function subm() {
-  const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-  
-    token  = cookieValue; 
+    token  = page.data.tok; 
     let bearer1 = 'bearer' + ' ' + token;
 tafkidimslist= find_role_id(selectedrole)
   skillslist = find_skill_id(selected);

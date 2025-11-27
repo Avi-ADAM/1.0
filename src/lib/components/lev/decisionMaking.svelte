@@ -6,6 +6,7 @@
  import { lang } from '$lib/stores/lang.js';
 import Close from '../../celim/close.svelte'
 import { onMount }from 'svelte'
+import { page } from '$app/state';
 import {
     clickOutside
 } from './outsidclick.js';
@@ -252,18 +253,15 @@ async function agree() {
   noofusersWaiting -= 1;
   ser = xyz();
     const date = (deadline !== undefined) ? ` admaticedai: ${deadline}` : ``;
-    const cookieValue = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('jwt='))
-        .split('=')[1];
-    const cookieValueId = document.cookie
-        .split('; ')
-        .find(row => row.startsWith('id='))
-        .split('=')[1];
-    idL = cookieValueId;
-     console.log(idL);
-    token = cookieValue;
-    bearer1 = 'bearer' + ' ' + token;
+  // jwt is httpOnly now; read token from server-provided page data
+  const cookieValueId = document.cookie
+    .split('; ')
+    .find(row => row.startsWith('id='))
+    .split('=')[1];
+  idL = cookieValueId;
+  console.log(idL);
+  token = page.data.tok;
+  bearer1 = 'bearer' + ' ' + token;
     let update = ``
     let d = new Date()
   if (kind == 'pic'){

@@ -6,6 +6,7 @@
 import dayjs from 'dayjs';
 import 'dayjs/locale/he.js';
 import { SendTo } from '$lib/send/sendTo.svelte';
+import { page } from '$app/state';
 
 /**
  * @typedef {Object} SaleData
@@ -145,9 +146,7 @@ export class SalesService {
    */
   getAuthData() {
     try {
-      const jwtCookie = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='));
+      const jwtCookie = page.data.tok;
 
       const idCookie = document.cookie
         .split('; ')

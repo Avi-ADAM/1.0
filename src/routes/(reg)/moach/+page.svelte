@@ -63,16 +63,13 @@
   let hosaf = $state();
   let error2 = null;
   async function findM() {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+   
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
@@ -174,16 +171,13 @@
   async function start() {
     if ($idPr !== 0) {
       // ולידציה שהיוזר חבר ברקמה
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+       let token = page.data.tok;
+        
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       let idL = cookieValueId;
-      let token = cookieValue;
       let bearer1 = 'bearer' + ' ' + token;
       const parseJSON = (resp) => (resp.json ? resp.json() : resp);
       const checkStatus = (resp) => {
@@ -540,11 +534,7 @@
   }
   async function findiM() {
     let res = [];
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
@@ -694,11 +684,8 @@
   let meDatamm = $state([]);
   async function updi() {
     let res = [];
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
-    token = cookieValue;
+   
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
@@ -819,16 +806,13 @@
   let mecata = [];
   async function sendP() {
     let d = new Date();
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let linkdi = baseUrl + '/api/projects/' + $idPr;
     //  let fd = new FormData();
@@ -1013,16 +997,13 @@
       watsapplinkii = `watsapplink: "${event.watsapplink}",`;
       counter = true;
     }
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+    
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let linkg = baseUrl + '/graphql';
     try {

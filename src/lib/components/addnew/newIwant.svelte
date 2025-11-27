@@ -45,12 +45,8 @@
         shgi = true;
       } else {
         loading = true;
-        const cookieValue = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('jwt='))
-          .split('=')[1];
-
-        token = cookieValue;
+       
+        token = page.data.tok;
         let bearer1 = 'bearer' + ' ' + token;
         //let fd = new FormData();
         if (files) {
@@ -129,11 +125,8 @@
   let addval = false;
 
   onMount(async () => {
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
-    token = cookieValue;
+  
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
@@ -203,6 +196,7 @@
   import { crRatson } from '$lib/func/send/crratson.svelte';
   import NumberInput from '$lib/celim/ui/numberInput.svelte';
   import moment from 'moment';
+  import { page } from '$app/state';
   let { idL, userName_value } = $props();
   const closer = () => {
     pic = false;

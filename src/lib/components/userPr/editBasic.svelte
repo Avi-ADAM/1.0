@@ -22,6 +22,7 @@
   } from '$lib/components/ui/card';
   import Separator from '$lib/celim/ui/separator.svelte';
   import ObjectChooser from '$lib/celim/ui/objectChooser.svelte';
+  import { page } from '$app/state';
 
   // Props
   let {
@@ -251,11 +252,7 @@
   }
 
   async function handleChangePassword() {
-    const token = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      ?.split('=')[1];
-
+    const token = page.data.tok;
     if (!token) {
       errorl = 'Authentication error';
       return;
@@ -346,11 +343,7 @@
     ).toUTCString()}; path=/`;
 
     try {
-      const token = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        ?.split('=')[1];
-
+      const token = page.data.tok;
       if (!token) {
         throw new Error('Authentication token not found');
       }

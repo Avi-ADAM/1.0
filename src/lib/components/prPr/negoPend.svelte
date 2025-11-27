@@ -12,6 +12,7 @@
   import moment from 'moment';
   import { toast } from 'svelte-sonner';
   import Rich from '../conf/rich.svelte';
+  import { page } from '$app/state';
 
   let bearer1;
   let token;
@@ -178,16 +179,13 @@
       rishonves4nego;
 
     const negoss = ``;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+  
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     if (rishon !== 0) {
       rishon4 = `rishon: "${rishon}"`;

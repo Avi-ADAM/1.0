@@ -40,19 +40,17 @@ let { onClose, meData = [] } = $props();
  let idL;
 const baseUrl = import.meta.env.VITE_URL
 
+import { page } from '$app/state';
 async function han (){
     console.log(meData)
     already = true;
- const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
-  const cookieValueId = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('id='))
-  .split('=')[1];
-  idL = cookieValueId;
-    token  = cookieValue; 
+    // jwt is httpOnly now; read token from server-provided page data
+    const cookieValueId = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('id='))
+      .split('=')[1];
+    idL = cookieValueId;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
    const hm = (meData.hm > 0) ? meData.hm : 1;
   const price = (meData.price > 0) ? meData.price : 0;

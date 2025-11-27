@@ -297,17 +297,13 @@ $effect(()=>{
       deadline !== undefined && deadline != null
         ? ` admaticedai: "${deadline}"`
         : ``;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
     console.log(idL);
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     let newnew = false;
     console.log(pid);
@@ -532,17 +528,14 @@ $effect(()=>{
     // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
     if (noofpu === 1) {
       console.log('decline2');
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
+   
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
       console.log(idL);
-      token = cookieValue;
+      token = page.data.tok;
       bearer1 = 'bearer' + ' ' + token;
       try {
         await fetch(linkg, {
@@ -613,16 +606,13 @@ updateOpenMission(
     console.log(why);
     let d = new Date();
     //  loading = true;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+    
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     bearer1 = 'bearer' + ' ' + token;
     let dataa = {
       data: {
@@ -687,6 +677,7 @@ updateOpenMission(
   import { sendToSer } from '$lib/send/sendToSer.js';
   import NegoM from '../prPr/negoM.svelte';
   import { getProjectData } from '$lib/stores/projectStore.js';
+  import { page } from '$app/state';
 
   function tochat() {
     isOpen = true;

@@ -21,6 +21,26 @@
   //import AddNewWorkway from '../addnew/addnewWorkway.svelte';
   import { RingLoader } from 'svelte-loading-spinners';
   import { addslashes } from '$lib/func/uti/string.js';
+  
+  import tr from '$lib/translations/tr.json';
+  import RichText from '$lib/celim/ui/richText.svelte';
+  import { quintOut } from 'svelte/easing';
+  import Expand from '$lib/celim/icons/expand.svelte';
+  import { crTask } from '$lib/func/moach/crtask.svelte';
+  import  { sendToSer } from '$lib/send/sendToSer.js';
+  import Button from '$lib/celim/ui/button.svelte';
+  import Tile from '$lib/celim/tile.svelte';
+  import TextInput from '$lib/celim/ui/input/textInput.svelte';
+  import EditIcon from '$lib/celim/icons/editIcon.svelte';
+  import Done from '$lib/celim/icons/done.svelte';
+  import NumberInput from '$lib/celim/ui/input/numberInput.svelte';
+  import Chooser from '$lib/celim/ui/chooser.svelte';
+  import AddPerson from '$lib/celim/icons/addPerson.svelte';
+  import LinkIcon from '$lib/celim/icons/linkIcon.svelte';
+  import LinkToIcon from '$lib/celim/icons/linkToIcon.svelte';
+  import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
+  import MobileModal from '$lib/celim/ui/mobileModal.svelte';
+  import { page } from '$app/state';
   const baseUrl = import.meta.env.VITE_URL;
 
   let { pu = [], vallues = [], onClose, newcontent = true, newcontentR = true, newcontentW = true, pn, pl, restime, id, userslength = 0, projectId, name = '' } = $props();
@@ -213,17 +233,14 @@
     // ולידציה שהיוזר חבר ברקמה מהקוקיות ומאקספורט של רשימת חברים
     // א השמה של לעצמי אם לבד לעשות קוורי למיסיון אין פרוגרס ריקמה גדול לאסקד
     // סיימתי את המשימה אם לבד השמה של קוורי לפינישד מיסיון אם עוד לפיניאפרובל
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+    
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
     console.log(idL);
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let d = new Date();
     let fd = new Date(Date.now() + x);
@@ -1001,25 +1018,6 @@
     en: 'choosen missions'
   };
 
-  import tr from '$lib/translations/tr.json';
-  import RichText from '$lib/celim/ui/richText.svelte';
-  import { quintOut } from 'svelte/easing';
-  import Expand from '$lib/celim/icons/expand.svelte';
-  import { crTask } from '$lib/func/moach/crtask.svelte';
-  import  { sendToSer } from '$lib/send/sendToSer.js';
-  import Button from '$lib/celim/ui/button.svelte';
-  import Tile from '$lib/celim/tile.svelte';
-  import TextInput from '$lib/celim/ui/input/textInput.svelte';
-  import EditIcon from '$lib/celim/icons/editIcon.svelte';
-  import Done from '$lib/celim/icons/done.svelte';
-  import NumberInput from '$lib/celim/ui/input/numberInput.svelte';
-  import Chooser from '$lib/celim/ui/chooser.svelte';
-  import AddPerson from '$lib/celim/icons/addPerson.svelte';
-  import LinkIcon from '$lib/celim/icons/linkIcon.svelte';
-  import LinkToIcon from '$lib/celim/icons/linkToIcon.svelte';
-  import ShiftsIcon from '$lib/celim/icons/shiftsIcon.svelte';
-  import MobileModal from '$lib/celim/ui/mobileModal.svelte';
-  import { page } from '$app/state';
   let error = $state(false), success = $state(false), loading = $state(false)  
   const tri = tr;
   let wid = $state(0)

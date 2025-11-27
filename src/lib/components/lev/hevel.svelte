@@ -1,4 +1,5 @@
 <script>
+  import { page } from '$app/state';
  import { lang } from '$lib/stores/lang.js'
   import { onMount } from 'svelte';
   let { userId, onProj } = $props();
@@ -22,16 +23,13 @@ let error1 = null;
 const baseUrl = import.meta.env.VITE_URL
 
      onMount(async () => {
-    const cookieValue = document.cookie
-  .split('; ')
-  .find(row => row.startsWith('jwt='))
-  .split('=')[1];
+   
   const cookieValueId = document.cookie
   .split('; ')
   .find(row => row.startsWith('id='))
   .split('=')[1];
   idL = cookieValueId;
-    token  = cookieValue; 
+    token  = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
         const parseJSON = (resp) => (resp.json ? resp.json() : resp);
         const checkStatus = (resp) => {

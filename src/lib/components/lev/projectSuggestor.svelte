@@ -111,17 +111,14 @@
     console.log(as);
     let myvote = ``;
     //todo if project member voted yes
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+  
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     uId = cookieValueId;
 
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let d = new Date();
 
@@ -242,16 +239,13 @@
     const ds = declineddarr;
     ds.push(`${oid}`);
     console.log(ds);
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+    
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     uId = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let link = baseUrl + '/graphql';
     try {
@@ -445,16 +439,13 @@
     console.log(why);
     let d = new Date();
     //  loading = true;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+   
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     let idL = cookieValueId;
-    let token = cookieValue;
+    let token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     let dataa = {
       data: {

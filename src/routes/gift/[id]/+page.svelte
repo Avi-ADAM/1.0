@@ -104,12 +104,9 @@
           const authData = getCurrentUserId();
           if (authData) {
             // Get token from cookies for the service call
-            const jwtCookie = document.cookie
-              .split('; ')
-              .find(row => row.startsWith('jwt='));
-            
-            if (jwtCookie) {
-              const token = jwtCookie.split('=')[1];
+            // jwt is httpOnly now; read token from server-provided page data
+            const token = page.data.tok;
+            if (token) {
               const projectResult = await salesService.getProjectProducts(projectId, token);
 
               if (projectResult.success) {

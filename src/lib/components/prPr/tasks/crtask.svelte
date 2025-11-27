@@ -158,16 +158,13 @@
             adMatai !== undefined && adMatai !== null
               ? `dateF: "${momebtt.toISOString()}",`
               : ``;
-          const cookieValue = document.cookie
-            .split('; ')
-            .find((row) => row.startsWith('jwt='))
-            .split('=')[1];
+          
           const cookieValueId = document.cookie
             .split('; ')
             .find((row) => row.startsWith('id='))
             .split('=')[1];
           userMevakeshId = cookieValueId;
-          let token = cookieValue;
+          let token = page.data.tok;
           let bearer1 = 'bearer' + ' ' + token;
           try {
             await fetch(linkg, {

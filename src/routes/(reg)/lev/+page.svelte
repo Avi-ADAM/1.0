@@ -1071,16 +1071,12 @@
 
     if (keysSorted.length > 0) {
       let resultString = keysSorted.join(' , ');
-      const cookieValue = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
-      token = cookieValue;
+      token = page.data.tok;
       let bearer1 = 'bearer' + ' ' + token;
       let link = baseUrl + '/graphql';
       try {
@@ -1316,34 +1312,16 @@
             console.log('Registration failed with ' + error);
         });
     };*/
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='));
-    if (cookieValue != null) {
-      const cookieValu = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('jwt='))
-        .split('=')[1];
-      const cookieRe = document.cookie
-        .split('; ')
-        .find((row) => row.startsWith('when='));
-      if (cookieRe != null) {
-        const cookieR = document.cookie
-          .split('; ')
-          .find((row) => row.startsWith('when='))
-          .split('=')[1];
-        const today = Date.now();
-        if (cookieR + 2592000000 < today) {
-          goto('/login?from=/lev');
-        }
-      }
+  
+    if (page.data.tok) {
+   
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
         .split('=')[1];
       idL = cookieValueId;
       fetchTimers(page.data.uid, fetch);
-      token = cookieValu;
+      token = page.data.tok;
       const elem = document.getElementById('screen');
 
       function flash() {
@@ -1843,16 +1821,13 @@
     doesLang.set(true);
     console.log($lang, 'start function beginning');
     miDataold = miData;
-    const cookieValue = document.cookie
-      .split('; ')
-      .find((row) => row.startsWith('jwt='))
-      .split('=')[1];
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = cookieValue;
+    token = page.data.tok;
     console.log('Cookies extracted:', {
       idL,
       tokenExists: !!token,
