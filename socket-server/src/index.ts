@@ -142,16 +142,6 @@ io.on('connection', (socket) => {
   }
   
   /**
-   * Legacy auth event - kept for backward compatibility
-   * @deprecated Use cookie-based authentication instead
-   */
-  socket.on('auth', (data: AuthData) => {
-    console.warn(`[Socket.IO] Received legacy 'auth' event from ${socket.id} - this is deprecated, use cookie-based auth`);
-    // Socket is already authenticated via cookies, just acknowledge
-    socket.emit('auth_success', { userId: socket.data.userId });
-  });
-  
-  /**
    * Disconnect handler
    */
   socket.on('disconnect', (reason) => {

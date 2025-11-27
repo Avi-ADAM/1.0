@@ -1319,12 +1319,13 @@
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
-  import { RingLoader } from 'svelte-loading-spinners';
-  import { sendToSer } from '$lib/send/sendToSer';
-  import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
-  import { calcX } from '$lib/func/calcX.svelte';
-  import Button from '$lib/celim/ui/button.svelte';
-  import { link } from 'd3-shape';
+import { RingLoader } from 'svelte-loading-spinners';
+import { sendToSer } from '$lib/send/sendToSer';
+import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
+import { calcX } from '$lib/func/calcX.svelte';
+import Button from '$lib/celim/ui/button.svelte';
+import { link } from 'd3-shape';
+import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
 
     onDestroy(() => {
         if (unsubscribe) {
@@ -1514,10 +1515,17 @@ async function createMes(id,mes){
   }
   let tab = $state(1);
   
-const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"}
-function add(event){
-  console.log(event)
-}
+  const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"};
+  function add(event){
+    console.log(event)
+  }
+  const backList = { he: 'בחירת ריקמה אחרת', en: 'choose another FreeMate' };
+  const createNewRikma = { he: 'יצירת ריקמה חדשה', en: 'Create new FreeMate' };
+
+  function backToProjects() {
+    idPr.set(0);
+    projects = prog();
+  }
 </script>
 
 <svelte:head>
@@ -1699,7 +1707,18 @@ pointer-events: none;"
         </div>
       {/if}
       <div>
-      <div class="flex justify-center items-center w-full">
+      <div class="flex justify-center items-center w-full relative">
+        <!-- Back button - positioned at top left -->
+        <button
+          class="absolute left-14 top-0 flex items-center border border-gold gap-1 text-barbi hover:text-gold hover:bg-barbi/20 rounded-full p-2 transition-colors"
+          onclick={backToProjects}
+          title={backList[$lang]}
+        >
+          <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
+          </svg>
+          <span class="text-sm font-medium hidden sm:inline">{backList[$lang]}</span>
+        </button>
         <!-- Authority Badge Component -->
         <AuthorityBadge 
           logoSrc={srcP}
@@ -2507,7 +2526,7 @@ pointer-events: none;"
       <Lowding />
     </div>
   {:then projects}
-    <div class=" text-center border-2 border-barbi rounded m-4 {isMobileOrTablet() ? 'pb-12' : ''}">
+    <div class=" text-center border-2 border-barbi rounded m-4">
       <h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">
         {choo[$lang]}
       </h1>
@@ -2520,6 +2539,16 @@ pointer-events: none;"
           {data.attributes.projectName}
         </button>
       {/each}
+    </div>
+    <div class="flex justify-center items-center pb-64">
+      <button
+        class="inline-flex items-center gap-2 border-2 border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-3 px-6 m-4 rounded-full shadow-md shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400 transition-all"
+        onclick={() => goto('/me?action=createproject')}
+        title={createNewRikma[$lang]}
+      >
+        <CrNewProject />
+        <span class="text-lg md:text-xl">{createNewRikma[$lang]}</span>
+      </button>
     </div>
   {/await}
 {/if}

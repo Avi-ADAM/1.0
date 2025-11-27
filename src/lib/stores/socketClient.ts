@@ -85,7 +85,6 @@ function createSocketClient() {
   let notificationListeners: NotificationListener[] = [];
   let reconnectTimer: ReturnType<typeof setTimeout> | null = null;
   let currentUserId: string | null = null;
-  let currentJwt: string | null = null;
 
   /**
    * Handle update strategy from socket notification
@@ -138,8 +137,8 @@ function createSocketClient() {
   /**
    * Connect to the Socket.IO server
    * 
-   * Note: Currently uses explicit JWT parameter because Socket.IO runs on different port.
-   * In production with reverse proxy, this can be simplified to cookie-only auth.
+   * Note: Authentication is now handled server-side via cookie headers.
+   * The server reads the JWT cookie automatically, so we don't need to pass it.
    */
   function connect(userId?: string, jwt?: string): void {
     if (!browser) {
@@ -147,27 +146,26 @@ function createSocketClient() {
       return;
     }
 
-    // Try to get JWT from cookie if not provided
-    if (!jwt && browser) {
+    // If userId not provided, try to get from cookie
+    if (!userId && browser) {
       const cookies = document.cookie.split(';').reduce((acc, cookie) => {
         const [name, value] = cookie.trim().split('=');
         acc[name] = value;
         return acc;
       }, {} as Record<string, string>);
       
-      jwt = cookies.jwt;
       userId = userId || cookies.id;
     }
 
-    if (!userId || !jwt) {
-      console.error('[SocketClient] Missing userId or JWT');
-      update(state => ({ ...state, error: 'Missing authentication credentials' }));
+    if (!userId) {
+      console.error('[SocketClient] Missing userId');
+      update(state => ({ ...state, error: 'Missing user ID' }));
       return;
     }
 
-    // Store credentials for reconnection
+    // Store userId (jwt is now read by server from cookies automatically)
     currentUserId = userId;
-    currentJwt = jwt;
+    // JWT is no longer needed for client-side auth - server reads it from cookies
 
     // Disconnect existing connection if any
     if (socket) {
@@ -186,12 +184,12 @@ function createSocketClient() {
       reconnectionAttempts: MAX_RECONNECT_ATTEMPTS,
       timeout: 20000,
       transports: ['websocket', 'polling'],
-      withCredentials: true // Sends cookies if same-origin
+      withCredentials: true // Sends cookies automatically
     });
 
     // Connection established
     socket.on('connect', () => {
-      console.log('[SocketClient] Connected, authenticating...');
+      console.log('[SocketClient] Connected, waiting for server authentication via cookies...');
       update(state => ({
         ...state,
         connected: true,
@@ -200,13 +198,8 @@ function createSocketClient() {
         error: null
       }));
 
-      // Send authentication (required because cross-origin)
-      if (socket && currentUserId && currentJwt) {
-        socket.emit('auth', {
-          userId: currentUserId,
-          jwt: currentJwt
-        });
-      }
+      // Note: Authentication is now handled by the server via cookies
+      // No need to send explicit auth event - the server reads JWT from cookie header
     });
 
     // Authentication successful
@@ -338,9 +331,9 @@ function createSocketClient() {
     console.log(`[SocketClient] Scheduling reconnection in ${delay}ms`);
 
     reconnectTimer = setTimeout(() => {
-      if (currentUserId && currentJwt) {
+      if (currentUserId) {
         console.log('[SocketClient] Attempting manual reconnection');
-        connect(currentUserId, currentJwt);
+        connect(currentUserId); // JWT is read from cookies automatically
       }
     }, delay);
   }
@@ -362,7 +355,6 @@ function createSocketClient() {
     }
 
     currentUserId = null;
-    currentJwt = null;
     notificationListeners = [];
 
     set(initialState);

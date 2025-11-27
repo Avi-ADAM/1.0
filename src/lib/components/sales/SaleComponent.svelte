@@ -265,13 +265,16 @@
         total = 0;
         let a = new Date(dates);
         let b = new Date(datef);
+        
+        // חישוב מספר הימים בפועל בין התאריכים
+        const days = Math.ceil((b - a) / (1000 * 60 * 60 * 24));
+        
         if (kindOf == 'monthly') {
-          total =
-            ((b.getFullYear() - a.getFullYear()) * 12 + (b.getMonth() - a.getMonth())) *
-            each *
-            hm;
+          // חישוב כמות חודשים כחלק עשרוני (חלוקה ב-30 ימים)
+          total = (days / 30) * each * hm;
         } else if (kindOf == 'yearly') {
-          total = (b.getFullYear() - a.getFullYear()) * each * hm;
+          // חישוב כמות שנים כחלק עשרוני (חלוקה ב-365 ימים)
+          total = (days / 365) * each * hm;
         }
       } else {
         total = hm * each;

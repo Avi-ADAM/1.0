@@ -337,8 +337,8 @@
     >
   </div>
 </DialogOverlay>
-<div class="sm:flex sm:flex-col sm:justify-evenly">
-  <div class="flex flex-col sm:flex-row sm:justify-evenly">
+<div class="sm:flex sm:flex-col sm:justify-evenly overflow-x-hidden max-w-full">
+  <div class="flex flex-col sm:flex-row sm:justify-evenly overflow-x-hidden max-w-full">
     <div>
       <div class="dd md:items-center">
         <div class="bodyi items-center d">
@@ -524,13 +524,13 @@
       >
     </div>
     {#if salee.length > 0}
-      <div class=" text-center border-2 border-barbi rounded m-4 flex flex-col">
+      <div class=" text-center border-2 border-barbi rounded m-4 flex flex-col overflow-x-hidden max-w-full">
         <h1
           class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
         >
           {erhe[$lang]}
         </h1>
-        <div class="flex d overflow-auto">
+        <div class="flex d overflow-x-auto w-full">
           {#each salee as data, i}
             <div
               class="relative button-whitegold py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : data.attributes.pending ? 'opacity-75 border-2 border-blue-500' : ''}"
