@@ -33,7 +33,7 @@ export const actions = {
 
             // Set cookies on the server
             // domain: '.1lev1.com' allows subdomain access (socket.1lev1.com)
-            const isProduction = process.env.NODE_ENV === 'production';
+            const isProduction = false//process.env.NODE_ENV === 'production';
             
             // In production: use 'none' for cross-subdomain (requires secure: true)
             // In development: use 'lax' for localhost (no domain/secure needed)
