@@ -9,7 +9,8 @@ export const meAskMisMes = writable({})
 export const askMisMes = writable({});
 export const meAskMasMes = writable({});
 export const askMasMes = writable({});
-export const forum = writable({}) 
+export const forum = writable({})
+export const userProjects = writable([]);
 export const nowId = writable(0)
 export const nowChatId = writable(0)
 export const isChatOpen = writable(false)
@@ -155,6 +156,19 @@ export async function initialForum (all = false,ids = [],myId = 0){
             console.log(res4.data,"res4")
             if(all == true){
               username.set(res4.data.usersPermissionsUser.data.attributes.username)
+
+              // חילוץ רשימת הפרויקטים
+              const projects = res4.data.usersPermissionsUser.data.attributes.projects_1s.data.map(project => ({
+                id: project.id,
+                projectName: project.attributes.projectName,
+                profilePic: project.attributes.profilePic.data?.attributes?.formats?.thumbnail?.url ||
+                           project.attributes.profilePic.data?.attributes?.url ||
+                           null
+              }));
+              userProjects.set(projects);
+              console.log(userProjects.subscribe((projects) => {
+                console.log(projects);
+              }))
               function extractForums(data) {
                 let forums = [];
                 

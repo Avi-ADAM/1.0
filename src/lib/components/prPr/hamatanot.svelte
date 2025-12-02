@@ -14,6 +14,7 @@
   let a = $state(0);
   import { RingLoader } from 'svelte-loading-spinners';
   import Close from '$lib/celim/close.svelte';
+  import ShareButtons from '$lib/components/share/shareButtons/index.svelte';
   
   /** @type {Record<string, number>} */
   let fermatana = $state({});
@@ -343,59 +344,32 @@
       <div class="dd md:items-center">
         <div class="bodyi items-center d">
           {#if bmiData.length > 0}
-            <table dir="rtl">
-              <caption class="sm:text-right md:text-center text-right">
-                <h1
-                  class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
-                >
-                  {our[$lang]}
-                </h1>
-              </caption>
-              <thead>
-                <tr class="gg">
-                  <th class="gg"></th>
-                  {#each bmiData as data, i}
-                    <td class="gg" style="font-size: 3rem">
-                      {i + 1}
-                      <!--    <button>מחיקה</button>-->
-                    </td>
-                  {/each}
-                </tr>
-                <tr>
-                  <th>{nm[$lang]}</th>
-                  {#each bmiData as data, i}
-                    <td>{data.attributes.name} </td>
-                  {/each}
-                </tr>
-                <tr>
-                  <th>{pric[$lang]}</th>
-                  {#each bmiData as data, i}
-                    <td>{data.attributes.price}</td>
-                  {/each}
-                </tr>
-                <tr>
-                  <th>{quanti[$lang]}</th>
-                  {#each bmiData as data, i}
-                    <td>
+            <div class="gifts-header">
+              <h1 class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk text-center">
+                {our[$lang]}
+              </h1>
+            </div>
+            <div class="gifts-grid max-h-[calc(100vh-200px)] overflow-y-auto d">
+              {#each bmiData as data, i}
+                <div class="gift-card">
+                  <div class="card-header">
+                    <span class="card-number">{i + 1}</span>
+                    <a href="/gift/{data.id}" class="gift-link">
+                      <h3 class="gift-name">{data.attributes.name}</h3>
+                    </a>
+                  </div>
+                  <div class="card-body">
+                    <p class="gift-price"><strong>{pric[$lang]}:</strong> {data.attributes.price}</p>
+                    <p class="gift-quantity"><strong>{quanti[$lang]}:</strong>
                       {#if data.attributes.quant > 0 || data.attributes.quant === -1}
-                        <p
-                          style="display:{data.attributes.kindOf == 'unlimited'
-                            ? 'none'
-                            : ''} ;"
-                        >
-                          {data.attributes.quant === -1
-                            ? $lang === 'he'
-                              ? 'ללא הגבלה'
-                              : 'Unlimited'
-                            : data.attributes.quant}
-                        </p>
+                        {#if data.attributes.kindOf == 'unlimited'}
+                          <span>{unl[$lang]}</span>
+                        {:else}
+                          {data.attributes.quant === -1 ? ($lang === 'he' ? 'ללא הגבלה' : 'Unlimited') : data.attributes.quant}
+                        {/if}
                       {/if}
-                    </td>
-                  {/each}
-                </tr><tr>
-                  <th>{kinde[$lang]}</th>
-                  {#each bmiData as data, i}
-                    <td>
+                    </p>
+                    <p class="gift-kind"><strong>{kinde[$lang]}:</strong>
                       {#if data.attributes.kindOf == 'total'}
                         {py[$lang]}
                       {:else if data.attributes.kindOf == 'monthly'}
@@ -405,116 +379,32 @@
                       {:else if data.attributes.kindOf == 'unlimited'}
                         {unl[$lang]}
                       {/if}
-                    </td>
-                  {/each}
-                </tr><!--<tr>
-        <th> מכירות</th>
-        {#each bmiData as data, i}
-        <td>          {#if data.sale.in} 
-
-          {data.sale.in} 
-          {/if}
-         </td>
-         {/each} 
-    </tr><tr >
-      <th>סך הכל הכנסה למתנה</th>
-      {#each bmiData as data, i}
-      <td>
-      {#if data.sale.in > 0 & data.price > 0}
-      
-      {data.price * data.sale.in}
-      
-      {:else} <p>0</p>
-      {/if}
-      </td>
-      {/each}
-    </tr>-->
-
-                <tr class="ggd">
-                  <th class="ggd">{res[$lang]}</th>
-                  {#each bmiData as data, i}
-                    <td class="ggd" style="font-size: 3rem">
-                      <button
-                        class=" hover:bg-gold rounded-full p-0.5"
-                        title={res[$lang]}
-                        onclick={() =>
-                          sell(
-                            data.id,
-                            data.attributes.price,
-                            data.attributes.quant,
-                            data.attributes.kindOf
-                          )}
-                        ><svg
-                          class="svggg"
-                          version="1.1"
-                          id="Layer_1"
-                          xmlns="http://www.w3.org/2000/svg"
-                          xmlns:xlink="http://www.w3.org/1999/xlink"
-                          x="0px"
-                          y="0px"
-                          viewBox="0 0 496 496"
-                          style=" width:24px;height:24px;"
-                          xml:space="preserve"
-                        >
+                    </p>
+                  </div>
+                  <div class="card-actions">
+                    <div class="share-button-container">
+                      <ShareButtons slug="gift/{data.id}" title={data.attributes.name} desc={`Check out this amazing gift: ${data.attributes.name} for ${data.attributes.price}`} />
+                    </div>
+                    <button class="report-sale-btn" title={res[$lang]} onclick={() => sell(data.id, data.attributes.price, data.attributes.quant, data.attributes.kindOf)}>
+                      <svg class="svggg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 496 496" style="width:32px;height:32px;" xml:space="preserve">
+                        <g>
                           <g>
                             <g>
-                              <g>
-                                <path
-                                  d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
-				h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V104h16v-8.408c9.12-1.856,16-9.936,16-19.592
-				c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4
-				C272,42.344,265.12,34.264,256,32.408z"
-                                />
-                                <path
-                                  d="M104,128.408V120H88v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
-				h-8c-2.208,0-4-1.792-4-4v-4H72v4c0,9.656,6.88,17.736,16,19.592V200h16v-8.408c9.12-1.856,16-9.936,16-19.592
-				c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4
-				C120,138.344,113.12,130.264,104,128.408z"
-                                />
-                                <path
-                                  d="M400,48c-35.288,0-64,28.712-64,64c0,32.144,23.848,58.752,54.76,63.256C387.664,184.928,378.688,192,368,192H256
-				v-64.552c31.52-3.96,56-30.872,56-63.448c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.576,24.48,59.488,56,63.448
-				V240H128c-10.688,0-19.664-7.072-22.76-16.744C136.152,218.752,160,192.144,160,160c0-35.288-28.712-64-64-64
-				c-35.288,0-64,28.712-64,64c0,32.84,24.872,59.952,56.768,63.56C92.312,242.008,108.536,256,128,256h112v16H104v64h16.76l16,160
-				h222.48l16-160H392v-64H256v-64h112c19.464,0,35.688-13.992,39.232-32.44C439.128,171.952,464,144.84,464,112
-				C464,76.712,435.288,48,400,48z M96,208c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S122.472,208,96,208z
-				 M344.76,480H151.24l-14.4-144h222.32L344.76,480z M376,288v32H120v-32H376z M248,112c-26.472,0-48-21.528-48-48s21.528-48,48-48
-				s48,21.528,48,48S274.472,112,248,112z M400,160c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S426.472,160,400,160
-				z"
-                                />
-                                <path
-                                  d="M408,80.408V72h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4
-				h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V152h16v-8.408c9.12-1.856,16-9.936,16-19.592
-				c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4
-				C424,90.344,417.12,82.264,408,80.408z"
-                                />
-                                <rect x="320" y="352" width="16" height="16" />
-                                <rect x="160" y="352" width="144" height="16" />
-                              </g>
+                              <path d="M256,32.408V24h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V104h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C272,42.344,265.12,34.264,256,32.408z"/>
+                              <path d="M104,128.408V120H88v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4H72v4c0,9.656,6.88,17.736,16,19.592V200h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C120,138.344,113.12,130.264,104,128.408z"/>
+                              <path d="M400,48c-35.288,0-64,28.712-64,64c0,32.144,23.848,58.752,54.76,63.256C387.664,184.928,378.688,192,368,192H256v-64.552c31.52-3.96,56-30.872,56-63.448c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.576,24.48,59.488,56,63.448V240H128c-10.688,0-19.664-7.072-22.76-16.744C136.152,218.752,160,192.144,160,160c0-35.288-28.712-64-64-64c-35.288,0-64,28.712-64,64c0,32.84,24.872,59.952,56.768,63.56C92.312,242.008,108.536,256,128,256h112v16H104v64h16.76l16,160h222.48l16-160H392v-64H256v-64h112c19.464,0,35.688-13.992,39.232-32.44C439.128,171.952,464,144.84,464,112C464,76.712,435.288,48,400,48z M96,208c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S122.472,208,96,208z M344.76,480H151.24l-14.4-144h222.32L344.76,480z M376,288v32H120v-32H376z M248,112c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S274.472,112,248,112z M400,160c-26.472,0-48-21.528-48-48s21.528-48,48-48s48,21.528,48,48S426.472,160,400,160z"/>
+                              <path d="M408,80.408V72h-16v8.408c-9.12,1.856-16,9.936-16,19.592c0,11.024,8.976,20,20,20h8c2.208,0,4,1.792,4,4s-1.792,4-4,4h-8c-2.208,0-4-1.792-4-4v-4h-16v4c0,9.656,6.88,17.736,16,19.592V152h16v-8.408c9.12-1.856,16-9.936,16-19.592c0-11.024-8.976-20-20-20h-8c-2.208,0-4-1.792-4-4s1.792-4,4-4h8c2.208,0,4,1.792,4,4v4h16v-4C424,90.344,417.12,82.264,408,80.408z"/>
+                              <rect x="320" y="352" width="16" height="16"/>
+                              <rect x="160" y="352" width="144" height="16"/>
                             </g>
                           </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                          <g> </g>
-                        </svg>
-                      </button>
-                    </td>
-                  {/each}
-                </tr>
-              </thead>
-            </table>
+                        </g>
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              {/each}
+            </div>
           {/if}
         </div>
       </div>
@@ -533,7 +423,7 @@
         <div class="flex d overflow-x-auto w-full">
           {#each salee as data, i}
             <div
-              class="relative button-whitegold py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : data.attributes.pending ? 'opacity-75 border-2 border-blue-500' : ''}"
+              class="relative bg-colorfulGrad justify-between flex flex-col py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : data.attributes.pending ? 'opacity-75 border-2 border-blue-500' : ''}"
             >
               {#if data.attributes.splited}
                 <div class="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded">
@@ -544,27 +434,53 @@
                   ⏳ {$lang === 'he' ? 'בהצבעה' : 'Pending'}
                 </div>
               {/if}
-              <h3 title={gn[$lang]}>
-                {data.attributes.matanot.data.attributes.name}
-              </h3>
-              <p title={qu[$lang]}>{data.attributes.in}</p>
-              <span class="flex flex-row">
-                <h5 class="text-barbi font-bold" title={whoo[$lang]}>
-                  {data.attributes.users_permissions_user.data.attributes
-                    .username}
-                </h5>
-                <img
-                  class=" h-4 w-4 rounded-full ring-2 ring-gold"
-                  src={getSrc(data.attributes.users_permissions_user.data.id)}
-                  alt=""
-                />
-              </span>
+              <!-- Gift Name with Modern Styling -->
+              <div class="mb-3">
+                <h3
+                  class="text-lg font-bold bg-gradient-to-r from-barbi via-mpink to-cyan-500 bg-clip-text text-transparent hover:from-gold hover:via-mpink hover:to-barbi transition-all duration-300 transform hover:scale-105"
+                  title={gn[$lang]}
+                >
+                  {data.attributes.matanot.data.attributes.name}
+                </h3>
+              </div>
+
+              <!-- Amount with Enhanced Design -->
+              <div class="mb-4 p-2 bg-gradient-to-r from-gold/10 to-mpink/10 rounded-lg border border-gold/20">
+                <p
+                  class="text-xl font-semibold text-center bg-gradient-to-r from-cyan-500 to-barbi bg-clip-text text-transparent"
+                  title={qu[$lang]}
+                >
+                  ₪{data.attributes.in}
+                </p>
+              </div>
+
+              <!-- User Info with Avatar -->
+              <div class="flex items-center justify-between space-x-3 mb-3"
+                title={whoo[$lang]}>
+                <div class="flex items-center space-x-3">
+                    <img
+                      class="w-6 h-6 rounded-full ring-2 ring-gold shadow-md hover:ring-mpink transition-all duration-300 transform hover:scale-105"
+                      src={getSrc(data.attributes.users_permissions_user.data.id)}
+                      alt="User avatar"
+                    />
+                  <div class="flex flex-col">
+                    <h5 class="text-barbi font-bold text-sm hover:text-gold transition-colors duration-200">
+                      {data.attributes.users_permissions_user.data.attributes.username}
+                    </h5>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Note Section with Modern Card Design -->
               {#if data.attributes.note}
-                <div class="mt-2 pt-2 border-t border-barbi/30">
-                  <small class="text-barbi/80 font-medium"
-                    >{noteLabel[$lang]}</small
-                  >
-                  <p class="text-sm text-barbi/90 mt-1 italic">
+                <div class="mt-4 p-3 bg-gradient-to-br from-barbi/5 to-gold/5 rounded-xl border-l-4 border-gold/30 backdrop-blur-sm">
+                  <div class="flex items-center mb-2">
+                    <div class="w-2 h-2 bg-gold rounded-full mr-2"></div>
+                    <small class="text-barbi/70 font-semibold text-xs uppercase tracking-wider">
+                      {noteLabel[$lang]}
+                    </small>
+                  </div>
+                  <p class="text-sm text-barbi/90 leading-relaxed italic border-t border-barbi/20 pt-2">
                     {data.attributes.note}
                   </p>
                 </div>
@@ -615,7 +531,6 @@
             {trili}
             {salee}
             {allin}
-            meData={rikmashes}
             {fmiData}
             users={projectUsers}
             {rikmashes}
@@ -775,5 +690,119 @@
       max-width: 100vw;
       margin: 0 auto;
     }
+  }
+
+  .gifts-header {
+    text-align: center;
+    margin-bottom: 1rem;
+  }
+
+  .gifts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 1rem;
+    padding: 0 0.5rem;
+  }
+
+  .gift-card {
+    background: linear-gradient(135deg, #5efaf2 0%, #eee 74%);
+    border: 2px solid rgb(103, 232, 249);
+    border-radius: 10px;
+    padding: 1rem;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+  }
+
+  .gift-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+  }
+
+  .card-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.5rem;
+  }
+
+  .card-number {
+    background: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+    color: rgb(132, 241, 223);
+    border-radius: 50%;
+    width: 2rem;
+    height: 2rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    margin-left: 0.5rem;
+  }
+
+  .gift-link {
+    text-decoration: none;
+    color: inherit;
+    flex: 1;
+  }
+
+  .gift-name {
+    color: var(--barbi-pink);
+    margin: 0;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+  }
+
+  .gift-name:hover {
+    color: var(--gold);
+  }
+
+  .card-body p {
+    margin: 0.5rem 0;
+    color: var(--barbi-pink);
+  }
+
+  .card-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 1rem;
+  }
+
+  .share-button-container {
+    transform: scale(0.6);
+    transform-origin: center;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 8px;
+    padding: 2px;
+  }
+
+  .report-sale-btn {
+    background: var(--gold);
+    border: 2px solid var(--barbi-pink);
+    cursor: pointer;
+    padding: 0.5rem;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  }
+
+  .report-sale-btn:hover {
+    background: var(--barbi-pink);
+    border-color: var(--gold);
+    transform: scale(1.1);
+    box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+  }
+
+  .report-sale-btn:hover .svggg {
+    transform: scale(1.2);
+    transition: transform 0.3s ease;
+  }
+
+  .svggg {
+    fill: var(--barbi-pink);
+    transition: fill 0.3s ease, transform 0.3s ease;
+  }
+
+  .report-sale-btn:hover .svggg {
+    fill: var(--gold);
   }
 </style>

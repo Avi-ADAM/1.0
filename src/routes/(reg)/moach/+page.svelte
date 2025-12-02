@@ -47,7 +47,7 @@
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Diun from '$lib/components/lev/diun.svelte';
-  import { forum, initialForum, isChatOpen, updSend, nowChatId, newChat } from '$lib/stores/pendMisMes';
+  import { forum, initialForum, isChatOpen, updSend, nowChatId, newChat, userProjects } from '$lib/stores/pendMisMes';
   import {SendTo} from '$lib/send/sendTo.svelte';
   let idL;
   let success = $state(false);
@@ -164,7 +164,7 @@
   let noofopenm = $state(0);
   let salee = $state([]);
   let trili = $state([]);
-  let projects = $state(prog());
+
   let meData = $state(start());
   let alit = $state([]);
   //sale {id in}
@@ -447,42 +447,15 @@
       return meData;
     }
   }
-  async function prog() {
+
+
+  function loadProjects() {
     if ($idPr == 0) {
-      try{
-        idL = page.data.uid;
-       await sendToSer({uid:idL},"64getUserProjectList",idL,0,false,fetch).then((res)=>{
-                console.log(res);
-        if(res.error && res.error.status == 401){
-           goto("/login?from=moach")
-        }
-        if(res.data){
-           errorM = false
-        console.log(res);
-        if (res.errors) {
-          if (res.errors[0].message === 'Invalid token.') {
-                goto("/login?from=moach");
-          }
-        }
-        projects =
-          res.data.usersPermissionsUser.data.attributes.projects_1s.data;
-      }else{
-         if(res.error && res.error.status == 401)
-            goto("/login?from=moach")
-      }
-      })
-     } catch (e) {
-        console.log(e);
-        if(e == "TypeError: Failed to fetch"){
-          const nonet = {"he":"נראה שאין חיבור לאינטרנט, כדאי לנסות שוב","en":"no internet connection, try again"}
-          errorM = true
-          noneti =`${nonet[$lang]}`
-          console.log(noneti)
-          return []
-              }
-      }
-      return projects;
+      // החזר את הנתונים מה-store בלבד
+      console.log($userProjects);
+      return $userProjects;
     }
+    return [];
   }
 
 
@@ -1524,7 +1497,7 @@ async function createMes(id,mes){
 
   function backToProjects() {
     idPr.set(0);
-    projects = prog();
+    loadProjects(true);
   }
 </script>
 
@@ -2521,36 +2494,46 @@ pointer-events: none;"
     {/if}-->
   {/await}
 {:else}
-  {#await projects}
-    <div class="alli grid items-center justify-center">
-      <Lowding />
-    </div>
-  {:then projects}
-    <div class=" text-center border-2 border-barbi rounded m-4">
-      <h1 class="text-barbi font-bold py-2 px-4 m-4 rounded-full">
-        {choo[$lang]}
-      </h1>
-
-      {#each projects as data, i}
-        <button
-          class="md:text-xl border font-bold border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold py-2 px-5 m-2 rounded-full shadow-md shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400"
-          onclick={() => projectn(data.id)}
-        >
-          {data.attributes.projectName}
-        </button>
+  <div class="border-2 border-barbi rounded m-4 p-4">
+    <h1 class="text-barbi underline text-2xl decoration-lturk font-bold py-2 px-4 mb-4 text-center rounded-full">
+      {choo[$lang]}
+    </h1>
+    <div class="flex flex-wrap justify-center items-center gap-4">
+      {#each $userProjects as data, i}
+        {#if data}
+          <button
+            class="group relative overflow-hidden border-2 border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold p-2 m-1 rounded-xl shadow-lg shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400 transition-all duration-300 transform hover:scale-105 flex items-center gap-3"
+            onclick={() => projectn(data.id)}
+          >
+            <span class="text-base font-semibold text-center leading-tight">{data.projectName}</span>
+            {#if data.profilePic}
+              <div class="w-6 h-6 rounded-full overflow-hidden ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0">
+                <img
+                  src={data.profilePic}
+                  alt={`${data.projectName} logo`}
+                  class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-300"
+                />
+              </div>
+            {:else}
+              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gold to-barbi flex items-center justify-center ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0">
+                <span class="text-xl font-bold text-white">{data.projectName.charAt(0).toUpperCase()}</span>
+              </div>
+            {/if}
+          </button>
+        {/if}
       {/each}
     </div>
-    <div class="flex justify-center items-center pb-64">
-      <button
-        class="inline-flex items-center gap-2 border-2 border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-3 px-6 m-4 rounded-full shadow-md shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400 transition-all"
-        onclick={() => goto('/me?action=createproject')}
-        title={createNewRikma[$lang]}
-      >
-        <CrNewProject />
-        <span class="text-lg md:text-xl">{createNewRikma[$lang]}</span>
-      </button>
-    </div>
-  {/await}
+  </div>
+  <div class="flex justify-center items-center pb-64">
+    <button
+      class="inline-flex items-center gap-2 border-2 border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-3 px-6 m-4 rounded-full shadow-md shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400 transition-all"
+      onclick={() => goto('/me?action=createproject')}
+      title={createNewRikma[$lang]}
+    >
+      <CrNewProject />
+      <span class="text-lg md:text-xl">{createNewRikma[$lang]}</span>
+    </button>
+  </div>
 {/if}
 
 <style>

@@ -910,7 +910,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       data: { status: $status }
     ) { data { id } }
   }`,
-  "64getUserProjectList": `query GetUserProjectList($uid: ID!) {
+"64getUserProjectList": `query GetUserProjectList($uid: ID!) {
     usersPermissionsUser(id: $uid) {
       data {
         id
@@ -920,6 +920,14 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               id
               attributes {
                 projectName
+                profilePic {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
               }
             }
           }
@@ -1011,7 +1019,43 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
   
-
+"71createSheirutpend": `mutation CreateSheirutpend(
+  $project: ID!,
+  $userId: ID!,
+  $matanots: [ID],
+  $price: Float,
+  $quant: Float,
+  $total: Float,
+  $startDate: DateTime,
+  $finnishDate: DateTime,
+  $appruved: Boolean
+) {
+  createSheirutpend(
+    data: {
+      project: $project,
+      users_permissions_user: $userId,
+      matanots: $matanots,
+      price: $price,
+      quant: $quant,
+      total: $total,
+      startDate: $startDate,
+      finnishDate: $finnishDate,
+      appruved: $appruved
+    }
+  ) {
+    data {
+      id
+      attributes {
+        price
+        quant
+        total
+        startDate
+        finnishDate
+        appruved
+      }
+    }
+  }
+}`,
   
   "69createHaluka": `mutation CreateHaluka($data: HalukaInput!) {
     createHaluka(data: $data) {
@@ -1257,4 +1301,4 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`
-}; 
+};
