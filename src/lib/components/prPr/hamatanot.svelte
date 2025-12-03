@@ -423,14 +423,14 @@
         <div class="flex d overflow-x-auto w-full">
           {#each salee as data, i}
             <div
-              class="relative bg-colorfulGrad justify-between flex flex-col py-2 px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : data.attributes.pending ? 'opacity-75 border-2 border-blue-500' : ''}"
+              class="relative bg-colorfulGrad justify-between flex flex-col py-2  px-5 m-2 rounded shadow-2xl shadow-fuchsia-400 {data.attributes.splited ? 'opacity-50 border-2 border-green-500' : data.attributes.pending ? 'opacity-75 border-2 border-blue-500' : ''}"
             >
               {#if data.attributes.splited}
-                <div class="absolute top-1 right-1 bg-green-500 text-white text-xs px-2 py-1 rounded">
+                <div class="absolute -top-3 -right-3 bg-green-500 text-white text-xs px-2 py-1 rounded">
                   ✓ {$lang === 'he' ? 'חולק' : 'Split'}
                 </div>
               {:else if data.attributes.pending}
-                <div class="absolute top-1 right-1 bg-blue-500 text-white text-xs px-2 py-1 rounded">
+                <div class="absolute -top-3 -right-3 bg-blue-500 text-white text-xs px-2 py-1 rounded">
                   ⏳ {$lang === 'he' ? 'בהצבעה' : 'Pending'}
                 </div>
               {/if}

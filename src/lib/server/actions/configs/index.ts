@@ -10,6 +10,7 @@ import { updateTaskAction } from './updateTask.js';
 import { approveHalukaConfig } from './approveHaluka.js';
 import { createHalukaConfig } from './createHaluka.js';
 import { createTosplitConfig } from './createTosplit.js';
+import { createSheirutpendConfig } from './createSheirutpend.js';
 
 /**
  * Register all actions
@@ -23,6 +24,7 @@ export function registerAllActions(): void {
   registerAction(approveHalukaConfig);
   registerAction(createHalukaConfig);
   registerAction(createTosplitConfig);
+  registerAction(createSheirutpendConfig);
   
   // Future actions will be registered here
   // registerAction(createMessageAction);

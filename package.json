@@ -51,6 +51,7 @@
     "vitest": "^3.2.4"
   },
   "dependencies": {
+    "@1lev1/svelte-share": "^0.0.9",
     "@ai-sdk/google": "^2.0.11",
     "@capacitor/android": "^6.1.2",
     "@capacitor/cli": "^6.1.2",

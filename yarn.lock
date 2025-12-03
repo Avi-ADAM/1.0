@@ -2,6 +2,13 @@
 # yarn lockfile v1
 
 
+"@1lev1/svelte-share@^0.0.9":
+  version "0.0.9"
+  resolved "https://registry.npmjs.org/@1lev1/svelte-share/-/svelte-share-0.0.9.tgz"
+  integrity sha512-FrhuBDJReFH2UqMcQbD8MTiuTYpbWTWOXnT4SQBUvAw8GKAg4p4qm6NzomSHPY1mLnFP/7FrYT1axH/C65aCNQ==
+  dependencies:
+    "@sveltejs/adapter-static" "^3.0.9"
+
 "@a2a-js/sdk@~0.2.4":
   version "0.2.5"
   resolved "https://registry.npmjs.org/@a2a-js/sdk/-/sdk-0.2.5.tgz"
@@ -3379,10 +3386,10 @@
     "@rollup/plugin-node-resolve" "^16.0.0"
     rollup "^4.9.5"
 
-"@sveltejs/adapter-static@^3.0.8":
-  version "3.0.8"
-  resolved "https://registry.npmjs.org/@sveltejs/adapter-static/-/adapter-static-3.0.8.tgz"
-  integrity sha512-YaDrquRpZwfcXbnlDsSrBQNCChVOT9MGuSg+dMAyfsAa1SmiAhrA5jUYUiIMC59G92kIbY/AaQOWcBdq+lh+zg==
+"@sveltejs/adapter-static@^3.0.8", "@sveltejs/adapter-static@^3.0.9":
+  version "3.0.10"
+  resolved "https://registry.npmjs.org/@sveltejs/adapter-static/-/adapter-static-3.0.10.tgz"
+  integrity sha512-7D9lYFWJmB7zxZyTE/qxjksvMqzMuYrrsyh1f4AlZqeZeACPRySjbC3aFiY55wb1tWUaKOQG9PVbm74JcN2Iew==
 
 "@sveltejs/adapter-vercel@^5.7.2":
   version "5.7.2"
@@ -4907,9 +4914,9 @@ caniuse-api@^3.0.0:
     lodash.uniq "^4.5.0"
 
 caniuse-lite@^1.0.0, caniuse-lite@^1.0.30001702, caniuse-lite@^1.0.30001718:
-  version "1.0.30001723"
-  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001723.tgz"
-  integrity sha512-1R/elMjtehrFejxwmexeXAtae5UO9iSyFn6G/I806CYC/BLyyBk1EPhrKBkWhy6wM6Xnm47dSJQec+tLJ39WHw==
+  version "1.0.30001757"
+  resolved "https://registry.npmjs.org/caniuse-lite/-/caniuse-lite-1.0.30001757.tgz"
+  integrity sha512-r0nnL/I28Zi/yjk1el6ilj27tKcdjLsNqAOZr0yVjWPrSQyHgKI2INaEWw21bAQSv2LXRt1XuCS/GomNpWOxsQ==
 
 chai@^5.2.0:
   version "5.3.3"
