@@ -230,6 +230,9 @@
     }
     totalPrice = Number.isFinite(total) ? total : 0;
   });
+  $effect(() => {
+   console.log(data?.alld) 
+  })
 </script>
 
 <Head {title} {description} {image} {url} />
