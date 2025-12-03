@@ -213,6 +213,16 @@
     transform: rotate(360deg);
   }
 }
+ .animate-spin-slow {
+  animation: textPathMove 40s linear infinite;
+    transform-origin: center;
+  }
+
+  /* האנימציה משנה את ה-startOffset כדי לסובב את הטקסט */
+  @keyframes rotateText {
+    from { startOffset: 25%; }
+    to { startOffset: 125%; }
+  }
 
 .animate-text-move {
   animation: textPathMove 40s linear infinite;

@@ -304,6 +304,8 @@
                   quote={data.alld.title ? data.alld.title[$lang] : null}
                   related={[]}
                   via={''}
+                  siteTitle={t.gift[$lang]}
+                  siteUrl={page.url.toString()}
                 />
               </div>
             </div>
@@ -431,7 +433,7 @@
 <!-- Purchase Modal -->
 {#if showPurchaseForm}
   <div class="fixed inset-0 bg-black/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 animate-fade-in" onclick={closePurchaseForm} aria-hidden="true">
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-hidden relative" onclick={e => e.stopPropagation()} aria-hidden="true">
+    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-2xl w-full max-w-md overflow-y-auto max-h-[80vh] d relative" onclick={e => e.stopPropagation()} aria-hidden="true">
       
       <!-- Modal Header -->
       <div class="bg-gradient-to-r from-barbi to-mpink p-4 flex justify-between items-center text-white">
@@ -465,7 +467,7 @@
               noNegative={true}
             />
           </div>
-
+          {#if data.alld.kindOf === 'monthly' || data.alld.kindOf === 'yearly'}
           <div class="grid grid-cols-1 gap-4">
             <div>
               <label for="startDate" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
@@ -494,7 +496,7 @@
               />
             </div>
           </div>
-
+          {/if}
           <div class="flex items-center gap-3 pt-4 mt-2 border-t dark:border-gray-700">
             <button
               type="button"

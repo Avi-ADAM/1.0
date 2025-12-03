@@ -792,7 +792,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           user_1s { data { id attributes { username profilePic { data { attributes { url } } } } } }
           linkToWebsite
           restime
-          sheiruts(filters: { isApruved: { eq: true } }) { data { id attributes { name descrip equaliSplited oneTime isApruved } } }
+          matanotofs{data{id attributes{name price }}}
           githublink
           fblink
           discordlink
