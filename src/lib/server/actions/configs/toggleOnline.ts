@@ -11,7 +11,7 @@ export const toggleOnlineConfig: ActionConfig = {
     graphqlOperation: async (params, context, { strapi, notifier }) => {
         const { status, meetingId } = params; // status: boolean, meetingId?: string
         const userId = context.userId;
-
+        console.log('toggleOnline', params, context);
         // 1. Get all user meeting records
         const userMeetingRes = await strapi.execute(
             '23myUserMeeting',
@@ -92,14 +92,18 @@ export const toggleOnlineConfig: ActionConfig = {
                     .filter((id: string) => id);
 
                 // Re-calculate allOnline status
-                // We trust the targets we just updated for our own status, but need others from Strapi
                 const onlineCount = participants.filter((p: any) => {
-                    const isMe = p.attributes.users_permissions_user?.data?.id === userId;
+                    const pUserId = p.attributes.users_permissions_user?.data?.id;
+                    const isMe = pUserId === userId;
+                    // If it's me, use the new status. If someone else, use their current 'available' field.
                     return isMe ? status : p.attributes.available === true;
                 }).length;
 
                 const allOnline = onlineCount === participants.length && participants.length > 1;
 
+                console.log(`Meeting ${mId} status: onlineCount=${onlineCount}, total=${participants.length}, allOnline=${allOnline}, userStatus=${status}`);
+
+                // 4a. Notify others about current user's status change
                 if (otherUserIds.length > 0) {
                     await notifier.notify(
                         {
@@ -127,16 +131,25 @@ export const toggleOnlineConfig: ActionConfig = {
                         lastResult,
                         context
                     );
+                }
 
-                    if (allOnline && status === true) {
-                        // Update meeting overall availability
-                        await strapi.execute(
-                            'updateMeetingAvailability',
-                            { id: mId, available: true },
-                            context.jwt,
-                            context.fetch
-                        );
+                // 4b. Sync Meeting Availability
+                // If status is false, the meeting is definitely NOT available (everyone must be online)
+                // If status is true, we check if everyone else is also online
+                const newMeetingAvailable = allOnline; // Meeting is available ONLY if ALL are online
 
+                // Only update if it changed or if becoming available
+                if (newMeetingAvailable !== meeting.attributes.available) {
+                    console.log(`Updating meeting ${mId} availability to ${newMeetingAvailable}`);
+                    await strapi.execute(
+                        'updateMeetingAvailability',
+                        { id: mId, available: newMeetingAvailable },
+                        context.jwt,
+                        context.fetch
+                    );
+
+                    if (newMeetingAvailable && status === true) {
+                        // Notify everyone that the meeting is ready to start
                         await notifier.notify(
                             {
                                 recipients: { type: 'specificUsers', config: { userIdsParam: 'allParticipants' } },

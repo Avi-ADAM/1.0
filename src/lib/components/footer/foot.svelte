@@ -221,7 +221,7 @@
             <div>
               <OnlineSwitch
                 bind:checked={$isOnline}
-                onchange={onlineSwitcher}
+                onChange={onlineSwitcher}
               />
             </div>
             <button

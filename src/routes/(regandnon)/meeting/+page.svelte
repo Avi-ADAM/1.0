@@ -237,8 +237,8 @@
   }
 
   // Handle global online status toggle
-  async function toggleGlobalOnline(e) {
-    const status = e.checked;
+  async function toggleGlobalOnline(payload) {
+    const status = payload.checked;
     isOnline.set(status);
 
     try {
@@ -251,17 +251,32 @@
         })
       });
       const res = await response.json();
-      if (!res.success) isOnline.set(!status);
+      if (res.success) {
+        // Update all meetings to reflect global status
+        meetingsData.update((meetings) => {
+          Object.keys(meetings).forEach((id) => {
+            meetings[id].isMyStatusOnline = status;
+          });
+          return meetings;
+        });
+      } else {
+        isOnline.set(!status);
+        toast.error(
+          $lang === 'he' ? 'עדכון הסטטוס נכשל' : 'Status update failed'
+        );
+      }
     } catch (err) {
       console.error('Global toggle failed:', err);
       isOnline.set(!status);
+      toast.error($lang === 'he' ? 'אירעה שגיאה' : 'An error occurred');
     }
   }
 
   // Handle specific meeting online status toggle
   let togglingMeetingId = $state(null);
-  async function toggleMeetingOnline(meeting, e) {
-    const status = e.checked;
+  async function toggleMeetingOnline(meeting, payload) {
+    console.log('toggleMeetingOnline', meeting, payload);
+    const status = payload.checked;
     togglingMeetingId = meeting.id;
 
     try {
@@ -286,12 +301,27 @@
           return meetings;
         });
       } else {
-        // Revert switch UI (e is a checkbox event)
-        e.target.checked = !status;
+        // Revert UI by updating store back
+        meetingsData.update((meetings) => {
+          if (meetings[meeting.id]) {
+            meetings[meeting.id].isMyStatusOnline = !status;
+          }
+          return meetings;
+        });
+        toast.error(
+          res.error || ($lang === 'he' ? 'עדכון נכשל' : 'Update failed')
+        );
       }
     } catch (err) {
       console.error('Meeting toggle failed:', err);
-      e.target.checked = !status;
+      // Revert store
+      meetingsData.update((meetings) => {
+        if (meetings[meeting.id]) {
+          meetings[meeting.id].isMyStatusOnline = !status;
+        }
+        return meetings;
+      });
+      toast.error($lang === 'he' ? 'אירעה שגיאה' : 'An error occurred');
     } finally {
       togglingMeetingId = null;
     }
@@ -393,7 +423,7 @@
         >
           {t.globalOnline}
         </span>
-        <OnlineSwitch bind:checked={$isOnline} onchange={toggleGlobalOnline} />
+        <OnlineSwitch bind:checked={$isOnline} onChange={toggleGlobalOnline} />
       </div>
     </div>
   </header>

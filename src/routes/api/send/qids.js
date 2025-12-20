@@ -1570,5 +1570,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
+  }`,
+  'updateMeetingAvailability': `mutation UpdateMeetingAvailability($id: ID!, $available: Boolean) {
+    updatePgisha(id: $id, data: { available: $available }) {
+      data {
+        id
+        attributes {
+          available
+        }
+      }
+    }
   }`
 };

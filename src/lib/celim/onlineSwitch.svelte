@@ -12,29 +12,27 @@
 </script>
 
 <div {title} dir="ltr" class="flex justify-center items-center">
-  <div class="btn-status">
+  <label class="btn-status cursor-pointer">
     <input
       bind:checked
       onchange={() => onChange?.({ checked })}
       type="checkbox"
       name="checkbox"
-      id="checkbox"
       class="hidden"
     />
-    <label
-      for="checkbox"
+    <div
       style={checked
         ? '--bg-btn: #C6F6D5; --btn-color: #38A169;'
         : '--bg-btn: #fed7d7; --btn-color: #e53e3e;'}
-      class="btn-change flex items-center p-1 rounded-lg w-12 h-6 cursor-pointer {checked
+      class="btn-change flex items-center p-1 rounded-lg w-12 h-6 {checked
         ? 'is-checked'
         : ''}"
     >
       {#if checked}
         <div class="live-animation"></div>
       {/if}
-    </label>
-  </div>
+    </div>
+  </label>
 </div>
 
 <style>

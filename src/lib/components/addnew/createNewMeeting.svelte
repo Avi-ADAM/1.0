@@ -159,6 +159,8 @@
     bind:selected
     options={users.map((c) => c.attributes.username)}
     placeholder={placeholder[$lang]}
+    outerDivClass="!bg-gold !text-barbi"
+    inputClass="!bg-gold !text-barbi"
   />
   <div class="flex items-center justify-center w-full">
     <div class="w-fit m-4">

@@ -277,50 +277,59 @@ export function cleanupMeetingSocketListeners() {
 // Initialize meeting data from server
 export async function initiatePgishot(idL) {
   await sendToSer({ id: idL }, "23myUserMeeting", null, null, false, fetch).then(d => {
-    console.log('[Pgishot] Initial data loaded:', d);
+    const pgishausers = d.data?.pgishausers?.data || [];
+    console.log('[Pgishot] Initial data loaded:', pgishausers.length, 'profiles');
     
     // Store current user ID
     currentUserId = idL;
     
-    myUserMeeting.set(d.data?.pgishausers?.data[0]?.id || 0);
-    isOnline.set(d.data?.pgishausers?.data[0]?.attributes?.available || false);
-    
-    if (d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data.length > 0) {
+    if (pgishausers.length > 0) {
+      myUserMeeting.set(pgishausers[0].id);
+      isOnline.set(pgishausers.some(p => p.attributes.available === true));
+      
       let users = {};
       let meetings = {};
       
-      for (let i = 0; i < d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data.length; i++) {
-        const meeting = d.data.pgishausers.data[0].attributes.pgishas.data[i];
-        meetings[meeting.id] = meeting;
-        meetings[meeting.id].messages = [];
-        meetings[meeting.id].kind = "meeting";
-        
-        meetings[meeting.id].messages.push({
-          timestamp: meeting.attributes.publishedAt,
-          message: "הפגישה נוצרה"
-        });
-        
-        // Track participants
-        for (let j = 0; j < meeting.attributes?.pgishausers?.data.length; j++) {
-          const participant = meeting.attributes.pgishausers.data[j];
-          if (participant.id !== get(myUserMeeting)) {
-            if (!users[participant.id]) {
-              users[participant.id] = {
-                meetings: [meeting.id],
-                status: participant.attributes.available,
-                userId: participant.attributes.users_permissions_user?.data?.id
-              };
-            } else {
-              users[participant.id].meetings.push(meeting.id);
+      pgishausers.forEach(pu => {
+        const ms = pu.attributes.pgishas?.data || [];
+        ms.forEach(meeting => {
+          meetings[meeting.id] = meeting;
+          meetings[meeting.id].messages = [];
+          meetings[meeting.id].kind = "meeting";
+          // Add this for UI binding (used in +page.svelte)
+          meetings[meeting.id].isMyStatusOnline = pu.attributes.available;
+          
+          meetings[meeting.id].messages.push({
+            timestamp: meeting.attributes.publishedAt,
+            message: "הפגישה נוצרה"
+          });
+          
+          // Track participants
+          const participants = meeting.attributes?.pgishausers?.data || [];
+          participants.forEach(participant => {
+            const pUserId = participant.attributes.users_permissions_user?.data?.id;
+            // Identify 'not me' using the real user ID
+            if (pUserId && String(pUserId) !== String(idL)) {
+              if (!users[participant.id]) {
+                users[participant.id] = {
+                  meetings: [meeting.id],
+                  status: participant.attributes.available,
+                  userId: pUserId
+                };
+              } else {
+                if (!users[participant.id].meetings.includes(meeting.id)) {
+                  users[participant.id].meetings.push(meeting.id);
+                }
+              }
             }
-          }
-        }
-      }
+          });
+        });
+      });
       
       whoToFollow.set(users);
       meetingsData.set(meetings);
-      console.log('[Pgishot] Users to follow:', users);
-      console.log('[Pgishot] Meetings:', meetings);
+      console.log('[Pgishot] Users to follow:', Object.keys(users).length);
+      console.log('[Pgishot] Meetings:', Object.keys(meetings).length);
     }
     
     // Initialize socket listeners with the unified NEW system
