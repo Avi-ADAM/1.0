@@ -14,7 +14,6 @@
   import { lang } from '$lib/stores/lang';
   import { onMount } from 'svelte';
   import { MultiSelect } from 'svelte-multiselect';
-  import { nutifyUser } from '$lib/func/nutifyUser.svelte';
   const placeholder = {
     he: 'צירוף לפגישה',
     en: 'Choose Users to add to your meeting'
@@ -37,6 +36,7 @@
   let error = $state(false);
 
   let outpot = $state('');
+  $inspect(outpot, 'outpot');
   let explanetionOpen = $state(false);
   let users = $state([]);
   let selected = $state([]);
@@ -50,102 +50,52 @@
       loading = false;
     });
   });
-  function create() {
+  async function create() {
     loadingBtn = true;
-    let d = new Date();
-    let publishedAt = d.toISOString();
-    sendToSer(
-      { name, outpot, publishedAt },
-      '18createNewMeeting',
-      null,
-      null,
-      false,
-      fetch
-    )
-      .then((data) => {
-        let me = page.data.uid;
-        if (data.data != null) {
-          console.log(data, data.data.createPgisha.data.id);
-          selected.forEach((us) => {
-            //get user id from username
-            let id = users.filter((u) => u.attributes.username == us)[0].id;
-            if (id != me) {
-              sendToSer(
-                { id, pgishaId: data.data.createPgisha.data.id },
-                '19CreatePendMeeting',
-                null,
-                null,
-                false,
-                fetch
-              ).then((data) => {
-                console.log(data);
-                if (data.data != null) {
-                  //notify the requested user
-                  let title = {
-                    he: `${$username} רוצה לקבוע איתך פגישה`,
-                    en: `${username} want to have a meeting with you`
-                  };
-                  let body = {
-                    he: `${$username} רוצה לקבוע איתך ${selected.length > 2 ? `ועם עוד ${selected.length}` : ''} פגישה בנושא: ${name} `,
-                    en: `${username} want to have a meeting with you ${selected.length > 2 ? `and ${selected.length - 2} others` : ''} on the subject ${name} `
-                  };
-                  nutifyUser(id, title, body, $lang, fetch).then((data) => {
-                    console.log(data);
-                  });
-                  //check that it is the last run of the for loop
-                  if (selected.indexOf(us) == selected.length - 1) {
-                    loadingBtn = false;
-                    sucsses = true;
-                    setTimeout(() => {
-                      onClose?.();
-                    }, 5000);
-                  }
-                }
-              });
-            } else {
-              const uid = encodeURIComponent(
-                'meeting-' +
-                  data.data.createPgisha.data.id +
-                  '-' +
-                  page.data.uid
-              );
-              sendToSer(
-                {
-                  id,
-                  pgishaId: data.data.createPgisha.data.id,
-                  uid,
-                  publishedAt
-                },
-                '20CreateUserMeeting',
-                null,
-                null,
-                false,
-                fetch
-              ).then((data) => {
-                console.log(data);
-                if (data.data != null) {
-                  //check that it is the last run of the for loop
-                  if (selected.indexOf(us) == selected.length - 1) {
-                    loadingBtn = false;
-                    sucsses = true;
-                    setTimeout(() => {
-                      onClose?.();
-                    }, 5000);
-                  }
-                }
-              });
-            }
-          });
-        } else {
-          loadingBtn = false;
-          error = true;
-        }
+
+    // Map selected usernames to IDs
+    const selectedIds = selected
+      .map((username) => {
+        const user = users.find((u) => u.attributes.username === username);
+        return user ? user.id : null;
       })
-      .catch((e) => {
-        console.log(e);
+      .filter((id) => id !== null);
+
+    try {
+      const response = await fetch('/api/action', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          actionKey: 'createNewMeeting',
+          params: {
+            name,
+            outpot,
+            selected: selectedIds,
+            initiatorName: $username
+          }
+        })
+      });
+
+      const result = await response.json();
+
+      if (result.success) {
+        loadingBtn = false;
+        sucsses = true;
+        setTimeout(() => {
+          onClose?.();
+        }, 5000);
+      } else {
+        console.error('Action failed:', result.error);
         loadingBtn = false;
         error = true;
-      });
+      }
+    } catch (e) {
+      console.error('Error calling action:', e);
+      loadingBtn = false;
+      error = true;
+    }
   }
 </script>
 
@@ -200,7 +150,7 @@
   <h3 class="text-start underline decoration-barbi text-barbi">
     {addn[$lang]}
   </h3>
-  <RichText {outpot} />
+  <RichText bind:outpot />
   <h3 class="text-start underline decoration-barbi text-barbi">
     {placeholder[$lang]}
   </h3>

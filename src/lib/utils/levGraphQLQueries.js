@@ -4,6 +4,8 @@
  * @typedef {import('$lib/types/strapiTypes').StrapiCollection} StrapiCollection
  */
 
+import { goto } from '$app/navigation';
+
 // GraphQL query builders for lev page
 
 /**
@@ -59,10 +61,10 @@ export function buildMainUserQuery(idL, lang) {
    								   }}}
       skills{data{id attributes{ 
             			 open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
-                								 skills {data{ id }} 
+                								 skills {data{ id}} 
                    							 tafkidims {data {id}}  
-                    						 work_ways {data{ id}}
-        													}}}
+                    						 work_ways {data{ id}} 
+                                }}}
       								}}}
 	  username hervachti
       profilePic {data{attributes {url formats }}}  
@@ -73,9 +75,10 @@ export function buildMainUserQuery(idL, lang) {
                         open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
                 								 skills {data{ id }} 
                    							 tafkidims {data {id}}  
-                    						 work_ways {data{ id}}
-        													}}}
-     									 }}} 
+                    						 work_ways {data{ id }}
+                                }}}}
+     									 }}
+
   	projects_1s {data{id attributes{ projectName restime
     			user_1s {data{id attributes{username haskamaz haskamac email noMail haskama profilePic {data{attributes{ url formats }}}}}} 
     			profilePic {data{attributes{ url formats }}} 
@@ -364,6 +367,9 @@ export async function fetchMainUserData(baseUrl, token, idL, lang) {
     return result;
   } catch (error) {
     console.error('Error in fetchMainUserData:', error);
+    if( error?.message.includes('Unauthorized')) {
+    goto('/login?from=lev');
+    }
     throw error;
   }
 }

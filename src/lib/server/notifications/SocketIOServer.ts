@@ -25,8 +25,8 @@ export class SocketIOServer {
   private serverUrl: string;
 
   constructor(serverUrl?: string) {
-    // Use environment variable or default to localhost
-    this.serverUrl = serverUrl || process.env.SOCKET_SERVER_URL || 'http://localhost:3001';
+    // Use environment variable or default to 127.0.0.1 to avoid ECONNREFUSED on some systems
+    this.serverUrl = serverUrl || process.env.SOCKET_SERVER_URL || 'http://127.0.0.1:3001';
   }
 
   /**
@@ -74,7 +74,7 @@ export class SocketIOServer {
       }
 
       const result: BroadcastResponse = await response.json();
-      
+
       console.log(
         `[SocketIOServer] Broadcast successful: ${result.deliveredTo}/${result.requestedUsers} users ` +
         `(${result.totalSockets} sockets)`
@@ -83,7 +83,7 @@ export class SocketIOServer {
       return result;
     } catch (error) {
       console.error('[SocketIOServer] Broadcast error:', error);
-      
+
       // Return error response but don't throw
       // Socket notifications should not block the main action
       return {

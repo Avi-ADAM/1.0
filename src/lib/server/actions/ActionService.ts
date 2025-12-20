@@ -38,7 +38,7 @@ export class ActionError extends Error {
     super(message);
     this.name = 'ActionError';
   }
-  
+
   /**
    * Convert to ActionErrorType for response
    */
@@ -68,15 +68,15 @@ class ConsoleLogger implements ILogger {
   info(message: string, data?: any): void {
     console.log(`[INFO] ${message}`, data || '');
   }
-  
+
   warn(message: string, data?: any): void {
     console.warn(`[WARN] ${message}`, data || '');
   }
-  
+
   error(message: string, data?: any): void {
     console.error(`[ERROR] ${message}`, data || '');
   }
-  
+
   debug(message: string, data?: any): void {
     if (process.env.NODE_ENV === 'development') {
       console.debug(`[DEBUG] ${message}`, data || '');
@@ -104,7 +104,7 @@ export interface INotificationOrchestrator {
  */
 export class ActionService {
   private logger: ILogger;
-  
+
   constructor(
     private validator: ValidationEngine,
     private authorizer: AuthorizationEngine,
@@ -114,7 +114,7 @@ export class ActionService {
   ) {
     this.logger = logger || new ConsoleLogger();
   }
-  
+
   /**
    * Execute an action
    * 
@@ -132,14 +132,14 @@ export class ActionService {
     context: ActionContext
   ): Promise<ActionResult> {
     const startTime = Date.now();
-    
+
     // Log the action request
     this.logger.info('Action execution started', {
       actionKey,
       userId: context.userId,
       timestamp: new Date().toISOString()
     });
-    
+
     try {
       // Step 1: Get action configuration
       const config = actionRegistry.get(actionKey);
@@ -149,18 +149,18 @@ export class ActionService {
           `Action "${actionKey}" not found in registry`
         );
       }
-      
+
       this.logger.debug('Action configuration retrieved', {
         actionKey,
         description: config.description
       });
-      
+
       // Step 2: Validate parameters
       const validationResult = await this.validator.validate(
         params,
         config.paramSchema
       );
-      
+
       if (!validationResult.valid) {
         throw new ActionError(
           'VALIDATION_FAILED',
@@ -168,9 +168,9 @@ export class ActionService {
           validationResult.errors
         );
       }
-      
+
       this.logger.debug('Parameter validation passed', { actionKey });
-      
+
       // Step 3: Check authorization
       const authResult = await this.authorizer.authorize(
         context.userId,
@@ -178,32 +178,50 @@ export class ActionService {
         params,
         context
       );
-      
+
       if (!authResult.authorized) {
         throw new ActionError(
           'UNAUTHORIZED',
           authResult.reason || 'User is not authorized to perform this action'
         );
       }
-      
+
       this.logger.debug('Authorization check passed', {
         actionKey,
         userId: context.userId
       });
-      
-      // Step 4: Execute GraphQL operation
-      const strapiResult = await this.strapiClient.execute(
-        config.graphqlOperation,
-        params,
-        context.jwt,
-        context.fetch
-      );
-      
+
+      // Step 4: Execute Operation
+      let result;
+
+      if (typeof config.graphqlOperation === 'function') {
+        // Execute custom handler
+        result = await config.graphqlOperation(
+          params,
+          context,
+          {
+            strapi: this.strapiClient,
+            notifier: this.notifier
+          }
+        );
+      } else {
+        // Execute GraphQL operation
+        result = await this.strapiClient.execute(
+          config.graphqlOperation,
+          params,
+          context.jwt,
+          context.fetch
+        );
+      }
+
+      // Use the result variable for consistency (renaming strapiResult to result in subsequent code)
+      const strapiResult = result;
+
       this.logger.debug('Strapi operation completed', {
         actionKey,
         hasData: !!strapiResult.data
       });
-      
+
       // Step 5: Trigger notifications (async, don't wait)
       if (config.notification && this.notifier) {
         // Fire and forget - notifications shouldn't block the response
@@ -220,13 +238,13 @@ export class ActionService {
             stack: err instanceof Error ? err.stack : undefined
           });
         });
-        
+
         this.logger.debug('Notifications triggered', { actionKey });
       }
-      
+
       // Calculate execution time
       const executionTime = Date.now() - startTime;
-      
+
       // Record migration metrics
       migrationMetrics.record({
         system: 'action',
@@ -235,7 +253,7 @@ export class ActionService {
         success: true,
         responseTime: executionTime
       });
-      
+
       // Log successful completion
       this.logger.info('Action execution completed', {
         actionKey,
@@ -243,18 +261,18 @@ export class ActionService {
         executionTime: `${executionTime}ms`,
         timestamp: new Date().toISOString()
       });
-      
+
       // Step 6: Return result with update strategy
       return {
         success: true,
         data: strapiResult,
         updateStrategy: config.updateStrategy
       };
-      
+
     } catch (error) {
       // Calculate execution time
       const executionTime = Date.now() - startTime;
-      
+
       // Handle different error types
       if (error instanceof ActionError) {
         // Record migration metrics for failure
@@ -266,7 +284,7 @@ export class ActionService {
           responseTime: executionTime,
           error: error.message
         });
-        
+
         // Log action errors
         this.logger.error('Action execution failed', {
           actionKey,
@@ -277,13 +295,13 @@ export class ActionService {
           executionTime: `${executionTime}ms`,
           timestamp: new Date().toISOString()
         });
-        
+
         return {
           success: false,
           error: error.toErrorObject()
         };
       }
-      
+
       // Handle Strapi errors
       if (error && typeof error === 'object' && 'errors' in error) {
         // Record migration metrics for Strapi failure
@@ -295,11 +313,11 @@ export class ActionService {
           responseTime: executionTime,
           error: 'STRAPI_ERROR'
         });
-        
+
         // Extract detailed error information
         const strapiErrors = (error as any).errors || [];
         const firstError = strapiErrors[0] || {};
-        
+
         this.logger.error('Strapi operation failed', {
           actionKey,
           userId: context.userId,
@@ -310,7 +328,7 @@ export class ActionService {
           executionTime: `${executionTime}ms`,
           timestamp: new Date().toISOString()
         });
-        
+
         return {
           success: false,
           error: {
@@ -320,11 +338,11 @@ export class ActionService {
           }
         };
       }
-      
+
       // Handle unexpected errors
       const errorMessage = error instanceof Error ? error.message : String(error);
       const errorStack = error instanceof Error ? error.stack : undefined;
-      
+
       // Record migration metrics for unexpected failure
       migrationMetrics.record({
         system: 'action',
@@ -334,7 +352,7 @@ export class ActionService {
         responseTime: executionTime,
         error: errorMessage
       });
-      
+
       this.logger.error('Unexpected error during action execution', {
         actionKey,
         userId: context.userId,
@@ -343,7 +361,7 @@ export class ActionService {
         executionTime: `${executionTime}ms`,
         timestamp: new Date().toISOString()
       });
-      
+
       return {
         success: false,
         error: {

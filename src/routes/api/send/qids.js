@@ -238,8 +238,45 @@ export const qids = {
       data{id attributes{available}}}
   }`,
   "23myUserMeeting": `query GetMyUserMeeting($id: ID!) {
-  pgishausers(filters: {users_permissions_user: {id: {eq: $id}}}) {data{id attributes{available uid pgishas{data{id 
-  attributes{name publishedAt pgishausers {data{id attributes{available users_permissions_user{data{id attributes{username}}}} }}}}}}}}
+    pgishausers(filters: {users_permissions_user: {id: {eq: $id}}}) {
+      data {
+        id
+        attributes {
+          available
+          readyForStart
+          uid
+          pgishas {
+            data {
+              id
+              attributes {
+                name
+                isLive
+                available
+                pendingStart
+                pgishausers {
+                  data {
+                    id
+                    attributes {
+                      available
+                      readyForStart
+                      users_permissions_user {
+                        data {
+                          id
+                          attributes {
+                            username
+                            profilePic { data { attributes { url } } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
   }`,
   '24userJSONQue': `query GetUserJSON($uid: ID!) {	
   usersPermissionsUser(id: $uid) {
@@ -1291,13 +1328,246 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
-  "81updateHaluka": `mutation UpdateHaluka($halukaId: ID!) {
+  '81updateHaluka': `mutation UpdateHaluka($halukaId: ID!) {
     updateHaluka(
       id: $halukaId
       data: { ushar: true }
     ) {
       data {
         id
+      }
+    }
+  }`,
+  '53GetPendingMeetings': `query GetPendingMeetings($userId: ID!) {
+    pgishauserpends(filters: { users_permissions_user: { id: { eq: $userId } }, archived: { ne: true } }) {
+      data {
+        id
+        attributes {
+          pgisha {
+            data {
+              id
+              attributes {
+                name
+                desc
+                publishedAt
+                pgishausers {
+                  data {
+                    attributes {
+                       users_permissions_user { data { attributes { username profilePic { data { attributes { url } } } } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '54ApprovePendMeeting': `mutation ApprovePendMeeting($id: ID!) {
+    updatePgishauserpend(id: $id, data: { approved: true, archived: true }) {
+      data {
+        id
+      }
+    }
+  }`,
+  '55CheckMeetingStatus': `query CheckMeetingStatus($pgishaId: ID!) {
+    pgisha(id: $pgishaId) {
+      data {
+        id
+        attributes {
+          name
+          set
+          pgishauserpends(filters: { archived: { ne: true } }) {
+            data {
+              id
+            }
+          }
+          pgishausers {
+            data {
+              attributes {
+                users_permissions_user {
+                  data {
+                    id
+                    attributes {
+                      username
+                      email
+                      lang
+                      telegramId
+                      machshirs { data { attributes { jsoni } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '56SetMeetingSet': `mutation SetMeetingSet($id: ID!) {
+    updatePgisha(id: $id, data: { set: true }) {
+      data {
+        id
+        attributes {
+          set
+        }
+      }
+    }
+  }`,
+  '57StartMeeting': `mutation StartMeeting($id: ID!, $videoLink: String!, $isLive: Boolean!, $meetingStartedAt: DateTime!, $startedBy: ID!, $forum: ID) {
+    updatePgisha(id: $id, data: { 
+      videoLink: $videoLink, 
+      isLive: $isLive, 
+      meetingStartedAt: $meetingStartedAt,
+      startedBy: $startedBy,
+      forum: $forum
+    }) {
+      data {
+        id
+        attributes {
+          videoLink
+          isLive
+          meetingStartedAt
+          forum { data { id } }
+        }
+      }
+    }
+  }`,
+  '58CreateMeetingForum': `mutation CreateMeetingForum($pgishaId: ID!, $publishedAt: DateTime!, $participants: [ID]) {
+    createForum(data: { 
+      pgisha: $pgishaId,
+      publishedAt: $publishedAt,
+      users_permissions_users: $participants
+    }) {
+      data {
+        id
+      }
+    }
+  }`,
+  '59GetMeetingDetails': `query GetMeetingDetails($id: ID!) {
+    pgisha(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          desc
+          available
+          set
+          isLive
+          videoLink
+          meetingStartedAt
+          forum { data { id } }
+          startedBy { data { id attributes { username } } }
+          pgishausers {
+            data {
+              id
+              attributes {
+                available
+                users_permissions_user {
+                  data {
+                    id
+                    attributes {
+                      username
+                      email
+                      lang
+                      telegramId
+                      profilePic { data { attributes { url } } }
+                      machshirs { data { attributes { jsoni } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '60EndMeeting': `mutation EndMeeting($id: ID!) {
+    updatePgisha(id: $id, data: { isLive: false }) {
+      data {
+        id
+        attributes {
+          isLive
+        }
+      }
+    }
+  }`,
+  '61RequestMeetingStart': `mutation RequestMeetingStart($id: ID!, $videoLink: String!, $pendingStart: Boolean!, $startRequestedAt: DateTime!, $startRequestedBy: ID!, $forum: ID) {
+    updatePgisha(id: $id, data: { 
+      videoLink: $videoLink, 
+      pendingStart: $pendingStart, 
+      startRequestedAt: $startRequestedAt,
+      startRequestedBy: $startRequestedBy,
+      forum: $forum
+    }) {
+      data {
+        id
+        attributes {
+          videoLink
+          pendingStart
+          startRequestedAt
+          forum { data { id } }
+        }
+      }
+    }
+  }`,
+  '62SetUserReadyForStart': `mutation SetUserReadyForStart($id: ID!, $ready: Boolean!) {
+    updatePgishauser(id: $id, data: { readyForStart: $ready }) {
+      data {
+        id
+        attributes {
+          readyForStart
+        }
+      }
+    }
+  }`,
+  '63CheckMeetingReadyStatus': `query CheckMeetingReadyStatus($id: ID!) {
+    pgisha(id: $id) {
+      data {
+        id
+        attributes {
+          name
+          pendingStart
+          isLive
+          videoLink
+          startRequestedAt
+          startRequestedBy { data { id attributes { username } } }
+          forum { data { id } }
+          pgishausers {
+            data {
+              id
+              attributes {
+                readyForStart
+                available
+                users_permissions_user {
+                  data {
+                    id
+                    attributes {
+                      username
+                      email
+                      lang
+                      telegramId
+                      profilePic { data { attributes { url } } }
+                      machshirs { data { attributes { jsoni } } }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '64ClearPendingStart': `mutation ClearPendingStart($id: ID!) {
+    updatePgisha(id: $id, data: { pendingStart: false }) {
+      data {
+        id
+        attributes {
+          pendingStart
+        }
       }
     }
   }`

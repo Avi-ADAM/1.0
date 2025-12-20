@@ -16,7 +16,13 @@ export async function POST({request, cookies, fetch}){
   const body = da.body || { he: '', en: '' };
   const lang = cookies.get('lang') || "he";
   const idL = cookies.get('id');
-  console.log(uid,"nutifyUser 15")
+  console.log(uid,"nutifyUser 19");
+  if(uid == 0){
+    return new Response(JSON.stringify({ error: 'User not found' }), {
+      status: 404,
+      headers: { 'Content-Type': 'application/json' }
+    });
+  }
   let datau = { data: { arg:{uid}, queId: '24userJSONQue' } };
   let jsonim = []
   await fetch('/api/send', {

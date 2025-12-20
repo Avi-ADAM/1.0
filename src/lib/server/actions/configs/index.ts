@@ -11,6 +11,12 @@ import { approveHalukaConfig } from './approveHaluka.js';
 import { createHalukaConfig } from './createHaluka.js';
 import { createTosplitConfig } from './createTosplit.js';
 import { createSheirutpendConfig } from './createSheirutpend.js';
+import { createNewMeetingConfig } from './createNewMeeting.js';
+import { approveMeetingConfig } from './approveMeeting.js';
+import { toggleOnlineConfig } from './toggleOnline.js';
+import { startMeetingConfig } from './startMeeting.js';
+import { joinMeetingConfig } from './joinMeeting.js';
+import { sendMeetingMessageConfig } from './sendMeetingMessage.js';
 
 /**
  * Register all actions
@@ -25,9 +31,14 @@ export function registerAllActions(): void {
   registerAction(createHalukaConfig);
   registerAction(createTosplitConfig);
   registerAction(createSheirutpendConfig);
-  
+  registerAction(createNewMeetingConfig);
+  registerAction(approveMeetingConfig);
+  registerAction(toggleOnlineConfig);
+  registerAction(startMeetingConfig);
+  registerAction(joinMeetingConfig);
+  registerAction(sendMeetingMessageConfig);
+
   // Future actions will be registered here
-  // registerAction(createMessageAction);
   // registerAction(createTaskAction);
   // etc.
 }
@@ -36,9 +47,14 @@ export function registerAllActions(): void {
 registerAllActions();
 
 // Export individual actions for testing
-export { 
+export {
   updateTaskAction,
   approveHalukaConfig,
   createHalukaConfig,
-  createTosplitConfig
+  createTosplitConfig,
+  approveMeetingConfig,
+  toggleOnlineConfig,
+  startMeetingConfig,
+  joinMeetingConfig,
+  sendMeetingMessageConfig
 };

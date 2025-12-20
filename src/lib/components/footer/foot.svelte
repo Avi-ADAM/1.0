@@ -3,13 +3,9 @@
 </script>
 
 <script>
-  import { sendToSer } from '$lib/send/sendToSer.js';
   import NewIwant from '$lib/components/addnew/newIwant.svelte';
-  import { quintOut } from 'svelte/easing';
-  import { fly, slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import { lang } from '$lib/stores/lang.js';
-  import Plus from '$lib/celim/icons/plus.svelte';
-  import Chaticon from '$lib/celim/chaticon.svelte';
   import { isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
   import { onMount } from 'svelte';
   import Drag from '$lib/celim/icons/drag.svelte';
@@ -20,15 +16,18 @@
   import NewMeetingIcon from '$lib/celim/3d/newMeetingIcon.svelte';
   import { Canvas } from '@threlte/core';
   import CreateNewMeeting from '../addnew/createNewMeeting.svelte';
-  import { initiatePgishot, isOnline, myUserMeeting } from '$lib/stores/pgishot';
-  import { isMobileOrTablet } from '$lib/utilities/device';
+  import {
+    initiatePgishot,
+    isOnline,
+    myUserMeeting
+  } from '$lib/stores/pgishot';
   import MobileFooter from './mobileFooter.svelte';
   let draggable = $state();
-  onMount(async () => {
-    initiatePgishot(idL);
-    draggable = (await import('svelte-agnostic-draggable')).draggable;
+  $effect(() => {
+    if (isAuthed) {
+      mapTouchToMouseFor('.draggable');
+    }
   });
-  mapTouchToMouseFor('.draggable');
 
   let username = '';
   let iwant = false,
@@ -40,7 +39,7 @@
       mapTouchToMouseFor('.draggable');
       isChatOpen.set(true);
     } else {
-      newMeeting = false
+      newMeeting = false;
       dialogOpen = true;
     }
   }
@@ -53,6 +52,7 @@
   let loading = false;
   let newMeeting = $state(false);
   const cencel = { he: 'ביטול', en: 'cencel' };
+
   /**
    * @typedef {Object} Props
    * @property {any} un
@@ -62,20 +62,49 @@
    */
 
   /** @type {Props} */
-  let {
-    un,
-    idL,
-    chatId = $bindable(0),
-    online = true
-  } = $props();
-  function onlineSwitcher(e) {
-    const changedTo = e.checked
-    console.log(changedTo, $myUserMeeting)
-    if($myUserMeeting == 0){
-      console.log(0)
-      //create usermeeting and make it online
-    }else{
-      sendToSer( { id: $myUserMeeting, online: changedTo },'22setOnline', null, null, false, fetch)
+  let { un = '', idL = 0, chatId = $bindable(0), online = true } = $props();
+  let isAuthed = $derived(idL != 0);
+
+  onMount(async () => {
+    draggable = (await import('svelte-agnostic-draggable')).draggable;
+    if (idL && idL > 0) {
+      initiatePgishot(idL);
+    }
+  });
+
+  async function onlineSwitcher(e) {
+    const changedTo = e.checked;
+    console.log(
+      'Changing online status to:',
+      changedTo,
+      'My UserMeeting ID:',
+      $myUserMeeting
+    );
+
+    // Optimistic update
+    isOnline.set(changedTo);
+
+    try {
+      const response = await fetch('/api/action', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          actionKey: 'toggleOnline',
+          params: {
+            status: changedTo
+          }
+        })
+      });
+
+      const res = await response.json();
+      if (!res.success) {
+        console.error('Failed to toggle online status:', res.error);
+        // Revert on failure
+        isOnline.set(!changedTo);
+      }
+    } catch (err) {
+      console.error('Error calling toggleOnline:', err);
+      isOnline.set(!changedTo);
     }
   }
   const back = { he: "חזרה לרשימת הצ'אטים", en: 'back to chat list' };
@@ -98,105 +127,122 @@
     console.log('Draggable was destroyed');
   }
 </script>
-<div data-vaul-drawer-wrapper >
-	<Drawer.Root  bind:open={dialogOpen}   shouldScaleBackground>
-    	<Drawer.Trigger/>
-		<Drawer.Portal>
-			<Drawer.Overlay class="fixed inset-0 bg-black/40 z-[1000]" />
-			<Drawer.Content
-				class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
-			>
-				<div class="flex-1 rounded-t-[10px] p-4">
-          <div class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi"></div>
 
-					<div class="mx-auto d overflow-auto flex flex-col ">
-					
-      <div>
-        					<div class="mx-auto h-[85vh] d overflow-auto flex flex-col z-[1001]">
-        {#if newMeeting == false}
-        <NewIwant {idL} userName_value={username} />
-        {:else}
-        <CreateNewMeeting onClose={()=>{newMeeting = false
-        dialogOpen = false
-        }}/>
-        {/if}
-</div>
+{#if isAuthed}
+  <div data-vaul-drawer-wrapper>
+    <Drawer.Root bind:open={dialogOpen} shouldScaleBackground>
+      <Drawer.Trigger />
+      <Drawer.Portal>
+        <Drawer.Overlay class="fixed inset-0 bg-black/40 z-[1000]" />
+        <Drawer.Content
+          class="fixed bottom-0 left-0 right-0 mt-24 flex max-h-[96%] flex-col rounded-t-[10px] z-[1000] bg-gold"
+        >
+          <div class="flex-1 rounded-t-[10px] p-4">
+            <div
+              class="mx-auto mb-8 h-1.5 w-12 flex-shrink-0 rounded-full bg-barbi"
+            ></div>
 
+            <div class="mx-auto d overflow-auto flex flex-col">
+              <div>
+                <div
+                  class="mx-auto h-[85vh] d overflow-auto flex flex-col z-[1001]"
+                >
+                  {#if newMeeting == false}
+                    <NewIwant {idL} userName_value={username} />
+                  {:else}
+                    <CreateNewMeeting
+                      onClose={() => {
+                        newMeeting = false;
+                        dialogOpen = false;
+                      }}
+                    />
+                  {/if}
+                </div>
+              </div>
             </div>
-    </Drawer.Content>
-  </Drawer.Portal>
-</Drawer.Root>
-</div>
+          </div></Drawer.Content
+        >
+      </Drawer.Portal>
+    </Drawer.Root>
+  </div>
 
-{#if $isChatOpen == true}
-  <div
-    use:draggable={{
-      containment: 'window',
-      cursor: 'grabbing'
-    }}
-    style="
+  {#if $isChatOpen == true}
+    <div
+      use:draggable={{
+        containment: 'window',
+        cursor: 'grabbing'
+      }}
+      style="
     display:block; cursor:grab
   "
-    ondraggable:init={onDraggableInit}
-    ondraggable:destroy={onDraggableDestroy}
-    ondrag:start={onDragStart}
-    ondrag:move={onDragMove}
-    ondrag:stop={onDragStop}
-    transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
-    dir="rtl"
-    class=" draggable z-[9999] absolute top-0 left-0 w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded"
-  >
-  <div>
-    <div class="flex flex-row bg-gold rounded  justify-between">
-      <div class="flex flex-row  items-start justify-start">
+      ondraggable:init={onDraggableInit}
+      ondraggable:destroy={onDraggableDestroy}
+      ondrag:start={onDragStart}
+      ondrag:move={onDragMove}
+      ondrag:stop={onDragStop}
+      transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
+      dir="rtl"
+      class=" draggable z-[9999] absolute top-0 left-0 w-[340px] max-h-[420px] grid items-center justify-center aling-center rounded"
+    >
       <div>
-        <button
-          onclick={close}
-          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title={cencel[$lang]}
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-            />
-          </svg></button
-        >
-      </div>
-      <div class="hover:bg-wow text-barbi hover:text-barbi font-bold rounded">
-        <Drag />
-      </div>
-      {#if $nowChatId != 0}
-        <div
-          class="hover:bg-wow justify-end flex text-barbi hover:text-barbi font-bold rounded"
-        >
-          <button
-            onclick={() => ($nowChatId = 0)}
-            class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title={back[$lang]}><Arrow back={true} /></button
-          >
+        <div class="flex flex-row bg-gold rounded justify-between">
+          <div class="flex flex-row items-start justify-start">
+            <div>
+              <button
+                onclick={close}
+                class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+                title={cencel[$lang]}
+                ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                  />
+                </svg></button
+              >
+            </div>
+            <div
+              class="hover:bg-wow text-barbi hover:text-barbi font-bold rounded"
+            >
+              <Drag />
+            </div>
+            {#if $nowChatId != 0}
+              <div
+                class="hover:bg-wow justify-end flex text-barbi hover:text-barbi font-bold rounded"
+              >
+                <button
+                  onclick={() => ($nowChatId = 0)}
+                  class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+                  title={back[$lang]}><Arrow back={true} /></button
+                >
+              </div>
+            {/if}
+          </div>
+          <div class="flex flex-row gap-2 items-start justify-end">
+            <div>
+              <OnlineSwitch
+                bind:checked={$isOnline}
+                onchange={onlineSwitcher}
+              />
+            </div>
+            <button
+              class="h-6 w-6 mx-2 my-1"
+              onclick={() => {
+                isChatOpen.set(false);
+                newMeeting = true;
+                dialogOpen = true;
+              }}
+            >
+              <Canvas>
+                <NewMeetingIcon />
+              </Canvas>
+            </button>
+          </div>
         </div>
-      {/if}
+        <ChatSmall bind:chatId {un} />
       </div>
-      <div class="flex flex-row gap-2 items-start justify-end "	>
-      <div>
-        <OnlineSwitch bind:checked={$isOnline} on:change={()=>onlineSwitcher} />
-      </div>
-      <button class="h-6 w-6 mx-2 my-1" onclick={() => {
-        isChatOpen.set(false);
-        newMeeting = true
-        dialogOpen = true
-      }}>
-        <Canvas >
-          <NewMeetingIcon />
-        </Canvas>
-      </button>
-      </div>
-  </div>
-    <ChatSmall bind:chatId {un}/>
-  </div>
-</div>
-{/if}
-<!--{#if isMobileOrTablet()}
+    </div>
+  {/if}
+  <!--{#if isMobileOrTablet()}
 
 <button
   style="position: fixed; color: var(--gold); font-weight:bold; height:25px width:25px; z-index:500;"
@@ -228,11 +274,11 @@
   >
 {/if}
 {:else}{/if}-->
-<MobileFooter onChat={() => addi("chat")} onNew={() => addi()}/>
-
+  <MobileFooter {isAuthed} onChat={() => addi('chat')} onNew={() => addi()} />
+{/if}
 
 <style>
-   .draggable {
+  .draggable {
     -webkit-touch-callout: none;
     -ms-touch-action: none;
     touch-action: none;
@@ -260,8 +306,8 @@
     width: 50px;
     height: 50px;
   }
-  .online{
-     border-radius: 50%;
+  .online {
+    border-radius: 50%;
     background: rgb(31, 246, 35);
     background: -moz-linear-gradient(
       -45deg,
@@ -282,7 +328,6 @@
     box-shadow: 0 10px 30px 0px rgba(0, 0, 0, 0.6);
     transform: translatey(0px);
     animation: float 6s ease-in-out infinite;
-
   }
   .ww {
     border-radius: 50%;
@@ -321,5 +366,4 @@
       transform: translatey(0px);
     }
   }
- 
 </style>

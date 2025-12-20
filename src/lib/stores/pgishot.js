@@ -1,87 +1,379 @@
 import { sendToSer } from "$lib/send/sendToSer.js";
-import { io } from "socket.io-client";
 import { writable, get } from "svelte/store";
-const baseUrl = import.meta.env.VITE_URL
+import { socketClient } from './socketClient';
+import { browser } from '$app/environment';
+
+// Stores
 export const whoToFollow = writable({});
 export const meetingsData = writable({});
 export const isOnline = writable(false);
 export const myUserMeeting = writable(0);
-export async function initialWebSP (token,myId){
-    const socket = io(baseUrl, {
-        auth: {
-          token: token
+export const liveMeetings = writable({}); // Track live meetings
+
+// Current user ID for filtering
+let currentUserId = null;
+
+// Meeting event handlers - these update the stores based on socket notifications
+const meetingEventHandlers = {
+  // When a meeting is started
+  meetingStarted: (data) => {
+    const { meetingId, videoLink, forumId, startedBy } = data;
+    
+    meetingsData.update(meetings => {
+      if (meetings[meetingId]) {
+        meetings[meetingId].attributes = {
+          ...meetings[meetingId].attributes,
+          isLive: true,
+          videoLink: videoLink,
+          forumId: forumId,
+          startedBy: startedBy
+        };
+      }
+      return meetings;
+    });
+    
+    liveMeetings.update(live => {
+      live[meetingId] = { videoLink, forumId, startedBy, startedAt: new Date().toISOString() };
+      return live;
+    });
+    
+    console.log('[Pgishot] Meeting started:', meetingId);
+  },
+  
+  // When a meeting ends
+  meetingEnded: (data) => {
+    const { meetingId } = data;
+    
+    meetingsData.update(meetings => {
+      if (meetings[meetingId]) {
+        meetings[meetingId].attributes = {
+          ...meetings[meetingId].attributes,
+          isLive: false
+        };
+      }
+      return meetings;
+    });
+    
+    liveMeetings.update(live => {
+      delete live[meetingId];
+      return live;
+    });
+    
+    console.log('[Pgishot] Meeting ended:', meetingId);
+  },
+  
+  // When participant availability changes
+  participantAvailability: (data) => {
+    const { meetingId, userId, available, allOnline } = data;
+    
+    // Update my own online status if it's me
+    if (userId === currentUserId) {
+      isOnline.set(available);
+    }
+    
+    // Update whoToFollow - other participants' status
+    whoToFollow.update(users => {
+      if (users[userId]) {
+        users[userId].status = available;
+      }
+      return users;
+    });
+    
+    // Update meeting availability status
+    if (allOnline !== undefined && meetingId) {
+      meetingsData.update(meetings => {
+        if (meetings[meetingId]) {
+          meetings[meetingId].attributes = {
+            ...meetings[meetingId].attributes,
+            available: allOnline
+          };
         }
+        return meetings;
       });
+    }
+    
+    console.log('[Pgishot] Participant availability changed:', { meetingId, userId, available, allOnline });
+  },
+  
+  // When a new message is sent in a meeting forum
+  meetingMessage: (data) => {
+    const { meetingId, message, forumId } = data;
+    
+    meetingsData.update(meetings => {
+      if (meetings[meetingId]) {
+        if (!meetings[meetingId].messages) {
+          meetings[meetingId].messages = [];
+        }
+        meetings[meetingId].messages.push(message);
+      }
+      return meetings;
+    });
+    
+    console.log('[Pgishot] New meeting message:', { meetingId, forumId });
+  },
+  
+  // When meeting is confirmed (all participants approved)
+  meetingConfirmed: (data) => {
+    const { meetingId } = data;
+    
+    meetingsData.update(meetings => {
+      if (meetings[meetingId]) {
+        meetings[meetingId].attributes = {
+          ...meetings[meetingId].attributes,
+          set: true
+        };
+      }
+      return meetings;
+    });
+    
+    console.log('[Pgishot] Meeting confirmed:', meetingId);
+  },
 
-      //  wait until socket connects before adding event listeners
-      socket.on('connect', () => {
-        console.log('connected',myId);
-        socket.on('pgishauser:update', (datan) => {
-          console.log('io= ', datan);
-          //get array of relevant forum ids\
-                      console.log(
-                        'yallla cvar, geula',
-                        datan,
-                        datan.data
-                      );
+  // New participant joined a meeting
+  participantJoined: (data) => {
+    const { meetingId } = data;
+    // Refresh the meeting data to get updated participant list
+    refreshMeetingData(meetingId);
+    console.log('[Pgishot] Participant joined meeting:', meetingId);
+  }
+};
 
-          if (datan.data.id != myId) {
-            if(whoToFollow[datan.data.id]){
-                //check if more partners
-                if(meetingsData[whoToFollow[datan.data.id]].pgishausers.data.length < 2){
-                    //check for every partner if availiable
-                }else{
-                    //nutify
-                }
-            }
-            //check if one of my meetings parters
-          }else if(datan.data.id == myId){
+// Handle notification from socketClient - the NEW targeted system
+function handleMeetingNotification(notification) {
+  const metadata = notification.metadata || notification.data?.metadata || {};
+  const type = metadata.type;
+  
+  console.log('[Pgishot] Processing notification (NEW system):', type, metadata);
+  
+  switch (type) {
+    case 'meetingStarted':
+      meetingEventHandlers.meetingStarted({
+        meetingId: metadata.meetingId,
+        videoLink: metadata.videoLink,
+        forumId: metadata.forumId,
+        startedBy: metadata.startedBy
+      });
+      break;
+      
+    case 'meetingReady':
+      meetingEventHandlers.participantAvailability({
+        meetingId: metadata.meetingId,
+        allOnline: metadata.allOnline
+      });
+      break;
+      
+    case 'userAvailability':
+      meetingEventHandlers.participantAvailability({
+        meetingId: metadata.meetingId,
+        userId: metadata.userId,
+        available: metadata.status === 'online',
+        allOnline: metadata.allOnline
+      });
+      break;
+      
+    case 'meetingUpdate':
+      meetingEventHandlers.participantJoined({
+        meetingId: metadata.meetingId
+      });
+      break;
+      
+    case 'meetingConfirmed':
+      meetingEventHandlers.meetingConfirmed({
+        meetingId: metadata.meetingId
+      });
+      break;
+      
+    case 'newMessage':
+    case 'meetingMessage':
+      meetingEventHandlers.meetingMessage({
+        meetingId: metadata.meetingId,
+        forumId: metadata.forumId,
+        message: notification.data?.message
+      });
+      break;
+    
+    // New ready-check flow events
+    case 'meetingJoinRequest':
+      // Someone requested to start the meeting - show join button
+      meetingsData.update(meetings => {
+        if (meetings[metadata.meetingId]) {
+          meetings[metadata.meetingId].attributes = {
+            ...meetings[metadata.meetingId].attributes,
+            pendingStart: true,
+            videoLink: metadata.videoLink,
+            forumId: metadata.forumId,
+            startRequestedBy: metadata.startRequestedBy
+          };
+        }
+        return meetings;
+      });
+      console.log('[Pgishot] Meeting join request received:', metadata.meetingId);
+      break;
+      
+    case 'participantReady':
+      // Update the ready count for the meeting
+      meetingsData.update(meetings => {
+        if (meetings[metadata.meetingId]) {
+          meetings[metadata.meetingId].readyCount = metadata.readyCount;
+          meetings[metadata.meetingId].totalCount = metadata.totalCount;
+        }
+        return meetings;
+      });
+      console.log('[Pgishot] Participant ready:', metadata);
+      break;
+      
+    default:
+      // Unknown type, but might still be meeting-related
+      if (metadata.meetingId) {
+        console.log('[Pgishot] Unknown meeting event type:', type);
+      }
+  }
+}
 
-            if(datan.data.attributes.available){
-              isOnline.set(true)
-            }else{
-              isOnline.set(false)
+/**
+ * @deprecated Use initializeMeetingSocketListeners instead.
+ * This function uses the old Strapi socket which broadcasts to everyone.
+ * Kept for backwards compatibility only.
+ */
+export async function initialWebSP(token, myId) {
+  console.warn('[Pgishot] initialWebSP is DEPRECATED. Use the new socketClient system instead.');
+  // The old Strapi socket is no longer used for meeting updates.
+  // All updates now come through socketClient which uses targeted notifications.
+}
+
+// Initialize with socketClient for unified notification system (THE NEW WAY)
+let socketUnsubscribe = null;
+
+export function initializeMeetingSocketListeners(myId) {
+  if (!browser) return () => {};
+  
+  // Store current user ID for filtering
+  currentUserId = myId;
+  
+  // Unsubscribe previous listener if exists
+  if (socketUnsubscribe) {
+    socketUnsubscribe();
+  }
+  
+  // Register notification listener with socketClient (NEW targeted system)
+  socketUnsubscribe = socketClient.onNotification((notification) => {
+    handleMeetingNotification(notification);
+  });
+  
+  console.log('[Pgishot] Registered meeting notification listener (NEW targeted system) for user:', myId);
+  
+  return socketUnsubscribe;
+}
+
+// Cleanup function
+export function cleanupMeetingSocketListeners() {
+  if (socketUnsubscribe) {
+    socketUnsubscribe();
+    socketUnsubscribe = null;
+  }
+  currentUserId = null;
+}
+
+// Initialize meeting data from server
+export async function initiatePgishot(idL) {
+  await sendToSer({ id: idL }, "23myUserMeeting", null, null, false, fetch).then(d => {
+    console.log('[Pgishot] Initial data loaded:', d);
+    
+    // Store current user ID
+    currentUserId = idL;
+    
+    myUserMeeting.set(d.data?.pgishausers?.data[0]?.id || 0);
+    isOnline.set(d.data?.pgishausers?.data[0]?.attributes?.available || false);
+    
+    if (d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data.length > 0) {
+      let users = {};
+      let meetings = {};
+      
+      for (let i = 0; i < d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data.length; i++) {
+        const meeting = d.data.pgishausers.data[0].attributes.pgishas.data[i];
+        meetings[meeting.id] = meeting;
+        meetings[meeting.id].messages = [];
+        meetings[meeting.id].kind = "meeting";
+        
+        meetings[meeting.id].messages.push({
+          timestamp: meeting.attributes.publishedAt,
+          message: "הפגישה נוצרה"
+        });
+        
+        // Track participants
+        for (let j = 0; j < meeting.attributes?.pgishausers?.data.length; j++) {
+          const participant = meeting.attributes.pgishausers.data[j];
+          if (participant.id !== get(myUserMeeting)) {
+            if (!users[participant.id]) {
+              users[participant.id] = {
+                meetings: [meeting.id],
+                status: participant.attributes.available,
+                userId: participant.attributes.users_permissions_user?.data?.id
+              };
+            } else {
+              users[participant.id].meetings.push(meeting.id);
             }
           }
-        })
+        }
+      }
       
-    })
+      whoToFollow.set(users);
+      meetingsData.set(meetings);
+      console.log('[Pgishot] Users to follow:', users);
+      console.log('[Pgishot] Meetings:', meetings);
+    }
+    
+    // Initialize socket listeners with the unified NEW system
+    initializeMeetingSocketListeners(idL);
+  });
 }
-export async function initiatePgishot(idL) {
-    await sendToSer({id:idL},"23myUserMeeting",null,null,false,
-        fetch).then(d=> {
-            console.log(d,d.data,d.data?.pgishausers?.data[0]?.attributes?.available)
-            myUserMeeting.set(d.data?.pgishausers?.data[0]?.id || 0)
-        isOnline.set(d.data?.pgishausers?.data[0]?.attributes?.available || false)
-        console.log(d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data,get(myUserMeeting))
 
-        if(d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data.length > 0){
-            let users = {}
-            let meetings = {}
-            for(let i=0;i<d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data.length;i++){
-                meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id] = d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]
-                meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id].messages = []
-                meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id].kind = "meeting"
+// Helper to refresh meeting data from server
+export async function refreshMeetingData(meetingId) {
+  try {
+    const result = await sendToSer({ id: meetingId }, "59GetMeetingDetails", null, null, false, fetch);
+    
+    if (result?.data?.pgisha?.data) {
+      const meeting = result.data.pgisha.data;
+      
+      meetingsData.update(meetings => {
+        meetings[meetingId] = {
+          ...meetings[meetingId],
+          id: meeting.id,
+          attributes: meeting.attributes
+        };
+        return meetings;
+      });
+      
+      console.log('[Pgishot] Meeting refreshed:', meetingId);
+    }
+  } catch (error) {
+    console.error('[Pgishot] Error refreshing meeting:', error);
+  }
+}
 
-                meetings[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id].messages.push({
-                  timestamp: d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i].attributes.publishedAt,
-                  message: "הפגישה נוצרה"
-                })
-                for(let j=0;j<d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes?.pgishausers?.data.length;j++){
-                  console.log(d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes?.pgishausers?.data[j]?.id, get(myUserMeeting))
-                    if(d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes?.pgishausers?.data[j]?.id !== get(myUserMeeting)){
-                        if(!users[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes?.pgishausers?.data[j]?.id]){
-                          users[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes.pgishausers?.data[j]?.id] = {meetings:[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id],status:d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes.pgishausers?.data[j]?.attributes.available}
-                        }else{
-                            users[d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.attributes.pgishausers?.data[j]?.id].meetings.push(d.data?.pgishausers?.data[0]?.attributes?.pgishas?.data[i]?.id)
-                        }
-
-                }
-            }
-        }
-        whoToFollow.set(users)
-        meetingsData.set(meetings)
-        console.log(users,meetings)
-        }
-        })
+// Toggle online status - uses the action system which sends targeted notifications
+export async function toggleAvailability(newStatus) {
+  try {
+    const response = await fetch('/api/action', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        actionKey: 'toggleOnline',
+        params: { status: newStatus }
+      })
+    });
+    
+    const result = await response.json();
+    
+    if (result.success || result.data) {
+      isOnline.set(newStatus);
+      console.log('[Pgishot] Availability toggled to:', newStatus);
+    }
+    
+    return result;
+  } catch (error) {
+    console.error('[Pgishot] Error toggling availability:', error);
+    throw error;
+  }
 }

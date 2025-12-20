@@ -40,36 +40,83 @@
   let editor = $state();
   let menu = $state();
 
+  let activeStates = $state({
+    bold: false,
+    strike: false,
+    italic: false,
+    underline: false,
+    link: false,
+    alignCenter: false,
+    alignLeft: false,
+    alignRight: false,
+    alignJustify: false,
+    heading1: false,
+    heading3: false,
+    paragraph: false,
+    bulletList: false,
+    orderedList: false,
+    blockquote: false
+  });
+
+  function updateActiveStates() {
+    if (!editor) return;
+    activeStates.bold = editor.isActive('bold');
+    activeStates.strike = editor.isActive('strike');
+    activeStates.italic = editor.isActive('italic');
+    activeStates.underline = editor.isActive('underline');
+    activeStates.link = editor.isActive('link');
+    activeStates.alignCenter = editor.isActive({ textAlign: 'center' });
+    activeStates.alignLeft = editor.isActive({ textAlign: 'left' });
+    activeStates.alignRight = editor.isActive({ textAlign: 'right' });
+    activeStates.alignJustify = editor.isActive({ textAlign: 'justify' });
+    activeStates.heading1 = editor.isActive('heading', { level: 1 });
+    activeStates.heading3 = editor.isActive('heading', { level: 3 });
+    activeStates.paragraph = editor.isActive('paragraph');
+    activeStates.bulletList = editor.isActive('bulletList');
+    activeStates.orderedList = editor.isActive('orderedList');
+    activeStates.blockquote = editor.isActive('blockquote');
+  }
+
   // --- פונקציית המרה מסטראפי ל-HTML ---
   function parseStrapiToHtml(blocks) {
     if (!blocks || !Array.isArray(blocks)) return '';
-    
-    return blocks.map(block => {
-      // 1. פסקאות (Paragraphs)
-      if (block.type === 'paragraph') {
-        const childrenHtml = block.children ? block.children.map(parseChild).join('') : '';
-        return childrenHtml ? `<p>${childrenHtml}</p>` : '<p><br></p>';
-      }
-      
-      // 2. כותרות (Headings)
-      if (block.type === 'heading') {
-        const level = block.level || 1;
-        const childrenHtml = block.children ? block.children.map(parseChild).join('') : '';
-        return `<h${level}>${childrenHtml}</h${level}>`;
-      }
 
-      // 3. רשימות (Lists)
-      if (block.type === 'list') {
-        const tag = block.format === 'ordered' ? 'ol' : 'ul';
-        const items = block.children ? block.children.map(item => {
-            const itemContent = item.children.map(parseChild).join('');
-            return `<li>${itemContent}</li>`;
-        }).join('') : '';
-        return `<${tag}>${items}</${tag}>`;
-      }
+    return blocks
+      .map((block) => {
+        // 1. פסקאות (Paragraphs)
+        if (block.type === 'paragraph') {
+          const childrenHtml = block.children
+            ? block.children.map(parseChild).join('')
+            : '';
+          return childrenHtml ? `<p>${childrenHtml}</p>` : '<p><br></p>';
+        }
 
-      return '';
-    }).join('');
+        // 2. כותרות (Headings)
+        if (block.type === 'heading') {
+          const level = block.level || 1;
+          const childrenHtml = block.children
+            ? block.children.map(parseChild).join('')
+            : '';
+          return `<h${level}>${childrenHtml}</h${level}>`;
+        }
+
+        // 3. רשימות (Lists)
+        if (block.type === 'list') {
+          const tag = block.format === 'ordered' ? 'ol' : 'ul';
+          const items = block.children
+            ? block.children
+                .map((item) => {
+                  const itemContent = item.children.map(parseChild).join('');
+                  return `<li>${itemContent}</li>`;
+                })
+                .join('')
+            : '';
+          return `<${tag}>${items}</${tag}>`;
+        }
+
+        return '';
+      })
+      .join('');
   }
 
   // פונקציית עזר לפרסור הילדים (Text nodes, Links)
@@ -78,13 +125,15 @@
 
     // טיפול בלינקים (Link node)
     if (child.type === 'link') {
-        const linkText = child.children ? child.children.map(c => c.text).join('') : '';
-        return `<a href="${child.url}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
+      const linkText = child.children
+        ? child.children.map((c) => c.text).join('')
+        : '';
+      return `<a href="${child.url}" target="_blank" rel="noopener noreferrer">${linkText}</a>`;
     }
 
     // טיפול בטקסט רגיל (Text node)
     let text = child.text || '';
-    
+
     // החלפת ירידות שורה
     text = text.replace(/\n/g, '<br>');
 
@@ -94,7 +143,7 @@
     if (child.underline) text = `<u>${text}</u>`;
     if (child.strikethrough) text = `<s>${text}</s>`;
     if (child.code) text = `<code>${text}</code>`;
-    
+
     return text;
   }
 
@@ -102,22 +151,26 @@
   function resolveInitialContent() {
     // 1. בדיקה אם הוזן JSON במפורש בפרופ הייעודי
     if (strapiJson && Array.isArray(strapiJson) && strapiJson.length > 0) {
-        return parseStrapiToHtml(strapiJson);
+      return parseStrapiToHtml(strapiJson);
     }
 
     // 2. בדיקה אם ה-output עצמו הוא מערך (Strapi Format passed to output)
     if (Array.isArray(outpot)) {
-        return parseStrapiToHtml(outpot);
+      return parseStrapiToHtml(outpot);
     }
 
     // 3. בדיקה אם זה מחרוזת שנראית כמו JSON (מקרי קצה)
-    if (typeof outpot === 'string' && outpot.trim().startsWith('[') && outpot.trim().endsWith(']')) {
-        try {
-            const parsed = JSON.parse(outpot);
-            if (Array.isArray(parsed)) return parseStrapiToHtml(parsed);
-        } catch (e) {
-            // לא JSON תקין, נמשיך הלאה
-        }
+    if (
+      typeof outpot === 'string' &&
+      outpot.trim().startsWith('[') &&
+      outpot.trim().endsWith(']')
+    ) {
+      try {
+        const parsed = JSON.parse(outpot);
+        if (Array.isArray(parsed)) return parseStrapiToHtml(parsed);
+      } catch (e) {
+        // לא JSON תקין, נמשיך הלאה
+      }
     }
 
     // 4. ברירת מחדל: זה כנראה HTML רגיל או ריק
@@ -130,7 +183,7 @@
 
     // אם קיבלנו מערך ב-outpot, נעדכן אותו ל-HTML מיד כדי למנוע בעיות סנכרון בהמשך
     if (Array.isArray(outpot)) {
-        outpot = initialContent;
+      outpot = initialContent;
     }
 
     editor = new Editor({
@@ -151,8 +204,8 @@
         Link.configure({
           openOnClick: false,
           HTMLAttributes: {
-            class: 'text-barbi underline decoration-gold',
-          },
+            class: 'text-barbi underline decoration-gold'
+          }
         }),
         Highlight.configure({
           multicolor: true
@@ -169,6 +222,7 @@
       ],
       onTransaction: () => {
         editor = editor;
+        updateActiveStates();
         const html = editor.getHTML();
         const jsonc = editor.getJSON();
         outjson = jsonc;
@@ -222,57 +276,117 @@
 
 <div
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  class="editor-wrapper rounded-lg transition-all duration-300 {minw ? 'max-w-[50vw]' : ''} {trans ? 'bg-transparent' : 'bg-gold/10'}"
+  class="editor-wrapper rounded-lg transition-all duration-300 {minw
+    ? 'max-w-[50vw]'
+    : ''} {trans ? 'bg-transparent' : 'bg-gold/10'}"
   style="--barbi-pink: #E0218A; --gold: #D4AF37;"
 >
   {#if editor && editable}
     <!-- Toolbar -->
     <div class="flex flex-wrap gap-2 p-3 border-b border-gold/30 items-center">
-      
       <!-- Basic Formatting -->
-      <button onclick={() => editor.chain().focus().toggleBold().run()} class:active={editor.isActive('bold')}>
+      <button
+        onclick={() => editor.chain().focus().toggleBold().run()}
+        class:active={activeStates.bold}
+      >
         <strong>{bet[$lang]}</strong>
       </button>
-      <button onclick={() => editor.chain().focus().toggleStrike().run()} class:active={editor.isActive('strike')}>
+      <button
+        onclick={() => editor.chain().focus().toggleStrike().run()}
+        class:active={activeStates.strike}
+      >
         <s>{bet[$lang]}</s>
       </button>
-      <button onclick={() => editor.chain().focus().toggleItalic().run()} class:active={editor.isActive('italic')}>
+      <button
+        onclick={() => editor.chain().focus().toggleItalic().run()}
+        class:active={activeStates.italic}
+      >
         <em>{bet[$lang]}</em>
       </button>
-      <button onclick={() => editor.chain().focus().toggleUnderline().run()} class:active={editor.isActive('underline')}>
+      <button
+        onclick={() => editor.chain().focus().toggleUnderline().run()}
+        class:active={activeStates.underline}
+      >
         <u>{bet[$lang]}</u>
       </button>
-      
+
       <div class="w-px h-6 bg-gold/50 mx-1"></div>
 
       <!-- Link -->
       <button
-        onclick={!editor.isActive('link') ? setLink() : () => editor.chain().focus().unsetLink().run()}
-        class:active={editor.isActive('link')}
+        onclick={() =>
+          !activeStates.link
+            ? setLink()
+            : editor.chain().focus().unsetLink().run()}
+        class:active={activeStates.link}
       >
         <LinkIcon />
       </button>
 
       <!-- Alignment Dropdown -->
       <div class="relative">
-        <button onclick={() => (hides = !hides)} class="flex items-center gap-1 min-w-[3rem] justify-center">
+        <button
+          onclick={() => (hides = !hides)}
+          class="flex items-center gap-1 min-w-[3rem] justify-center"
+        >
           {@html actives}
-          <svg class="w-2.5 h-2.5 opacity-70" fill="none" viewBox="0 0 10 6" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+          <svg
+            class="w-2.5 h-2.5 opacity-70"
+            fill="none"
+            viewBox="0 0 10 6"
+            stroke="currentColor"
+          >
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 1 4 4 4-4"
+            />
           </svg>
         </button>
-        
-        <div class:hidden={hides} class="absolute top-full mt-1 z-20 bg-white border border-gold rounded shadow-lg flex flex-col p-1 min-w-[3rem]">
-          <button onclick={() => { editor.chain().focus().setTextAlign('center').run(); actives = centersvg; hides = true; }} class:active={editor.isActive({ textAlign: 'center' })}>
+
+        <div
+          class:hidden={hides}
+          class="absolute top-full mt-1 z-20 bg-white border border-gold rounded shadow-lg flex flex-col p-1 min-w-[3rem]"
+        >
+          <button
+            onclick={() => {
+              editor.chain().focus().setTextAlign('center').run();
+              actives = centersvg;
+              hides = true;
+            }}
+            class:active={activeStates.alignCenter}
+          >
             {@html centersvg}
           </button>
-          <button onclick={() => { editor.chain().focus().setTextAlign('left').run(); actives = leftsvg; hides = true; }} class:active={editor.isActive({ textAlign: 'left' })}>
+          <button
+            onclick={() => {
+              editor.chain().focus().setTextAlign('left').run();
+              actives = leftsvg;
+              hides = true;
+            }}
+            class:active={activeStates.alignLeft}
+          >
             {@html leftsvg}
           </button>
-          <button onclick={() => { editor.chain().focus().setTextAlign('right').run(); actives = rightsvg; hides = true; }} class:active={editor.isActive({ textAlign: 'right' })}>
+          <button
+            onclick={() => {
+              editor.chain().focus().setTextAlign('right').run();
+              actives = rightsvg;
+              hides = true;
+            }}
+            class:active={activeStates.alignRight}
+          >
             {@html rightsvg}
           </button>
-          <button onclick={() => { editor.chain().focus().setTextAlign('justify').run(); actives = justifysvg; hides = true; }} class:active={editor.isActive({ textAlign: 'justify' })}>
+          <button
+            onclick={() => {
+              editor.chain().focus().setTextAlign('justify').run();
+              actives = justifysvg;
+              hides = true;
+            }}
+            class:active={activeStates.alignJustify}
+          >
             {@html justifysvg}
           </button>
         </div>
@@ -281,20 +395,50 @@
       <div class="flex-grow"></div>
 
       <!-- Undo/Redo -->
-       <div class="flex gap-1">
-        <button onclick={() => editor.chain().focus().undo().run()} disabled={!editor.can().chain().focus().undo().run()} class="opacity-80 hover:opacity-100 disabled:opacity-30">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 7v6h6"/><path d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"/></svg>
+      <div class="flex gap-1">
+        <button
+          onclick={() => editor.chain().focus().undo().run()}
+          disabled={!editor.can().chain().focus().undo().run()}
+          class="opacity-80 hover:opacity-100 disabled:opacity-30"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            ><path d="M3 7v6h6" /><path
+              d="M21 17a9 9 0 00-9-9 9 9 0 00-6 2.3L3 13"
+            /></svg
+          >
         </button>
-        <button onclick={() => editor.chain().focus().redo().run()} disabled={!editor.can().chain().focus().redo().run()} class="opacity-80 hover:opacity-100 disabled:opacity-30">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 7v6h-6"/><path d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"/></svg>
+        <button
+          onclick={() => editor.chain().focus().redo().run()}
+          disabled={!editor.can().chain().focus().redo().run()}
+          class="opacity-80 hover:opacity-100 disabled:opacity-30"
+        >
+          <svg
+            width="18"
+            height="18"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2"
+            ><path d="M21 7v6h-6" /><path
+              d="M3 17a9 9 0 019-9 9 9 0 016 2.3l3 2.7"
+            /></svg
+          >
         </button>
-       </div>
+      </div>
     </div>
   {/if}
 
   <!-- Editor Content -->
   <div
-    class="tiptap-content text-barbi min-h-[150px] outline-none {sml ? '' : 'p-6'}"
+    class="tiptap-content text-barbi min-h-[150px] outline-none {sml
+      ? ''
+      : 'p-6'}"
     bind:this={element}
   ></div>
 
@@ -303,43 +447,107 @@
     <Separator gradient={true}>
       {#snippet label()}
         <div class="relative group">
-            <button 
-                onclick={() => show = !show}
-                class="bg-white border-2 border-gold text-barbi rounded-full p-1.5 hover:bg-gold hover:text-white transition-colors focus:outline-none"
+          <button
+            onclick={() => (show = !show)}
+            class="bg-white border-2 border-gold text-barbi rounded-full p-1.5 hover:bg-gold hover:text-white transition-colors focus:outline-none"
+          >
+            <svg
+              width="20"
+              height="20"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              stroke-width="2.5"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              class="transition-transform duration-200 {show
+                ? 'rotate-45'
+                : ''}"
             >
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" class="transition-transform duration-200 {show ? 'rotate-45' : ''}">
-                    <path d="M12 5v14M5 12h14"/>
-                </svg>
-            </button>
-            
-            <!-- Context Menu for Block Types -->
-            {#if show}
-                <div bind:this={menu} class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-20 bg-white border border-gold rounded-lg shadow-xl p-2 flex flex-col gap-1 min-w-[160px]">
-                    <button onclick={() => { editor.chain().focus().toggleHeading({ level: 1 }).run(); show = false; }} class:active={editor.isActive('heading', { level: 1 })} class="menu-item">
-                        {@html h1Leb[$lang]}
-                    </button>
-                    <button onclick={() => { editor.chain().focus().toggleHeading({ level: 3 }).run(); show = false; }} class:active={editor.isActive('heading', { level: 3 })} class="menu-item">
-                        {@html h3Leb[$lang]}
-                    </button>
-                    <button onclick={() => { editor.chain().focus().setParagraph().run(); show = false; }} class:active={editor.isActive('paragraph')} class="menu-item">
-                        {@html parLeb[$lang]}
-                    </button>
-                    <div class="h-px bg-gray-100 my-1"></div>
-                    <button onclick={() => { editor.chain().focus().toggleBulletList().run(); show = false; }} class:active={editor.isActive('bulletList')} class="menu-item flex items-center gap-2">
-                         <List class="w-4 h-4"/> {@html listLeb[$lang]}
-                    </button>
-                    <button onclick={() => { editor.chain().focus().toggleOrderedList().run(); show = false; }} class:active={editor.isActive('orderedList')} class="menu-item">
-                         {listNLeb[$lang]}
-                    </button>
-                     <button onclick={() => { editor.chain().focus().toggleBlockquote().run(); show = false; }} class:active={editor.isActive('blockquote')} class="menu-item">
-                        {quoteLeb[$lang]}
-                    </button>
-                    <div class="h-px bg-gray-100 my-1"></div>
-                     <button onclick={() => { editor.chain().focus().setHorizontalRule().run(); show = false; }} class="menu-item text-xs">
-                        {lineLeb[$lang]}
-                    </button>
-                </div>
-            {/if}
+              <path d="M12 5v14M5 12h14" />
+            </svg>
+          </button>
+
+          <!-- Context Menu for Block Types -->
+          {#if show}
+            <div
+              bind:this={menu}
+              class="absolute bottom-full mb-2 left-1/2 -translate-x-1/2 z-20 bg-white border border-gold rounded-lg shadow-xl p-2 flex flex-col gap-1 min-w-[160px]"
+            >
+              <button
+                onclick={() => {
+                  editor.chain().focus().toggleHeading({ level: 1 }).run();
+                  show = false;
+                }}
+                class:active={activeStates.heading1}
+                class="menu-item"
+              >
+                {@html h1Leb[$lang]}
+              </button>
+              <button
+                onclick={() => {
+                  editor.chain().focus().toggleHeading({ level: 3 }).run();
+                  show = false;
+                }}
+                class:active={activeStates.heading3}
+                class="menu-item"
+              >
+                {@html h3Leb[$lang]}
+              </button>
+              <button
+                onclick={() => {
+                  editor.chain().focus().setParagraph().run();
+                  show = false;
+                }}
+                class:active={activeStates.paragraph}
+                class="menu-item"
+              >
+                {@html parLeb[$lang]}
+              </button>
+              <div class="h-px bg-gray-100 my-1"></div>
+              <button
+                onclick={() => {
+                  editor.chain().focus().toggleBulletList().run();
+                  show = false;
+                }}
+                class:active={activeStates.bulletList}
+                class="menu-item flex items-center gap-2"
+              >
+                <List class="w-4 h-4" />
+                {@html listLeb[$lang]}
+              </button>
+              <button
+                onclick={() => {
+                  editor.chain().focus().toggleOrderedList().run();
+                  show = false;
+                }}
+                class:active={activeStates.orderedList}
+                class="menu-item"
+              >
+                {listNLeb[$lang]}
+              </button>
+              <button
+                onclick={() => {
+                  editor.chain().focus().toggleBlockquote().run();
+                  show = false;
+                }}
+                class:active={activeStates.blockquote}
+                class="menu-item"
+              >
+                {quoteLeb[$lang]}
+              </button>
+              <div class="h-px bg-gray-100 my-1"></div>
+              <button
+                onclick={() => {
+                  editor.chain().focus().setHorizontalRule().run();
+                  show = false;
+                }}
+                class="menu-item text-xs"
+              >
+                {lineLeb[$lang]}
+              </button>
+            </div>
+          {/if}
         </div>
       {/snippet}
     </Separator>
@@ -357,23 +565,24 @@
   button {
     background: transparent;
     color: var(--barbi-pink);
-    border-radius: 0.375rem; 
+    border-radius: 0.375rem;
     padding: 0.25rem 0.5rem;
     border: 1px solid transparent;
     transition: all 0.2s;
   }
 
   button:hover {
-    background: rgba(212, 175, 55, 0.1); 
+    background: rgba(212, 175, 55, 0.1);
     border-color: var(--gold);
   }
 
   button.active {
-    background: var(--barbi-pink);
-    color: white;
+    background: var(--barbi-pink) !important;
+    color: white !important;
     box-shadow: 0 2px 4px rgba(224, 33, 138, 0.3);
+    border-color: var(--barbi-pink) !important;
   }
-  
+
   /* Menu Items specific styling */
   .menu-item {
     text-align: start;
@@ -385,12 +594,15 @@
     color: #4a4a4a;
   }
   .menu-item:hover {
-    background: #fff5f9; 
+    background: #fff5f9;
     color: var(--barbi-pink);
   }
   .menu-item.active {
-    background: var(--gold);
+    background: var(--barbi-pink);
     color: white;
+    box-shadow: 0 2px 4px rgba(224, 33, 138, 0.3);
+    border-radius: 0.375rem;
+    border: 1px solid var(--barbi-pink);
   }
 
   /* Prose Overrides */
@@ -406,7 +618,10 @@
     color: var(--barbi-pink);
     opacity: 0.8;
   }
-  :global(.custom-prose strong), :global(.custom-prose h1), :global(.custom-prose h2), :global(.custom-prose h3) {
+  :global(.custom-prose strong),
+  :global(.custom-prose h1),
+  :global(.custom-prose h2),
+  :global(.custom-prose h3) {
     color: var(--barbi-pink);
   }
 </style>

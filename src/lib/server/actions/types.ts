@@ -16,25 +16,37 @@
 export interface ActionConfig {
   /** Unique identifier for this action (e.g., 'createTask', 'updateUser') */
   key: string;
-  
+
   /** Human-readable description of what this action does */
   description: string;
-  
-  /** GraphQL query/mutation ID from QIDS */
-  graphqlOperation: string;
-  
+
+  /** GraphQL query/mutation ID from QIDS OR a custom handler function */
+  graphqlOperation: string | ActionExecutionHandler;
+
   /** Parameter validation schema */
   paramSchema: ParamSchema;
-  
+
   /** Authorization rules that must be satisfied */
   authRules: AuthRule[];
-  
+
   /** Notification configuration (optional) */
   notification?: NotificationConfig;
-  
+
   /** Update strategy for client-side updates (optional) */
   updateStrategy?: UpdateStrategy;
 }
+
+/**
+ * Custom action execution handler
+ */
+export type ActionExecutionHandler = (
+  params: Record<string, any>,
+  context: ActionContext,
+  util: {
+    strapi: any;
+    notifier?: any;
+  }
+) => Promise<any>;
 
 /**
  * Parameter validation schema
@@ -47,13 +59,13 @@ export type ParamSchema = Record<string, ParamRule>;
 export interface ParamRule {
   /** Expected type of the parameter */
   type: 'string' | 'number' | 'boolean' | 'array' | 'object';
-  
+
   /** Whether this parameter is required */
   required: boolean;
-  
+
   /** Custom validation function (optional) */
   validate?: (value: any) => boolean;
-  
+
   /** Human-readable description of validation requirements */
   description?: string;
 }
@@ -68,10 +80,10 @@ export interface ParamRule {
 export interface AuthRule {
   /** Type of authorization check */
   type: 'jwt' | 'projectMember' | 'role' | 'custom';
-  
+
   /** Configuration specific to the auth rule type */
   config?: AuthRuleConfig;
-  
+
   /** Error message to return if authorization fails */
   errorMessage?: string;
 }
@@ -82,10 +94,10 @@ export interface AuthRule {
 export interface AuthRuleConfig {
   /** Parameter name containing project ID (for projectMember check) */
   projectIdParam?: string;
-  
+
   /** Required role name (for role check) */
   requiredRole?: string;
-  
+
   /** Custom authorization function (for custom check) */
   checkFunction?: (
     userId: string,
@@ -100,7 +112,7 @@ export interface AuthRuleConfig {
 export interface AuthorizationResult {
   /** Whether the user is authorized */
   authorized: boolean;
-  
+
   /** Reason for denial (if not authorized) */
   reason?: string;
 }
@@ -115,16 +127,16 @@ export interface AuthorizationResult {
 export interface NotificationConfig {
   /** Rules for determining who receives notifications */
   recipients: RecipientRule;
-  
+
   /** Notification content templates (multilingual) */
   templates: NotificationTemplates;
-  
+
   /** Which channels to use for notifications */
   channels: NotificationChannel[];
-  
+
   /** Email template component name (optional, defaults to 'SimpleNuti') */
   emailTemplate?: string;
-  
+
   /** Additional metadata for notifications */
   metadata?: NotificationMetadata;
 }
@@ -135,7 +147,7 @@ export interface NotificationConfig {
 export interface RecipientRule {
   /** Type of recipient selection strategy */
   type: 'projectMembers' | 'specificUsers' | 'skillBased' | 'custom';
-  
+
   /** Configuration for recipient selection */
   config?: RecipientRuleConfig;
 }
@@ -146,16 +158,16 @@ export interface RecipientRule {
 export interface RecipientRuleConfig {
   /** Parameter name containing project ID */
   projectIdParam?: string;
-  
+
   /** Parameter name containing array of user IDs */
   userIdsParam?: string;
-  
+
   /** Whether to exclude the action initiator from notifications */
   excludeSender?: boolean;
-  
+
   /** Required skills for skill-based selection */
   skills?: string[];
-  
+
   /** Custom GraphQL query for recipient selection */
   customQuery?: string;
 }
@@ -166,7 +178,7 @@ export interface RecipientRuleConfig {
 export interface NotificationTemplates {
   /** Notification title in different languages */
   title: LanguageStrings;
-  
+
   /** Notification body in different languages */
   body: LanguageStrings;
 }
@@ -191,16 +203,16 @@ export type NotificationChannel = 'socket' | 'email' | 'telegram' | 'push';
 export interface NotificationMetadata {
   /** Icon URL for the notification */
   icon?: string;
-  
+
   /** URL to navigate to when notification is clicked */
   url?: string;
-  
+
   /** Priority level of the notification */
   priority?: 'low' | 'normal' | 'high';
-  
+
   /** Project picture URL */
   projectPic?: string;
-  
+
   /** Any additional custom data */
   [key: string]: any;
 }
@@ -215,7 +227,7 @@ export interface NotificationMetadata {
 export interface UpdateStrategy {
   /** Type of update strategy */
   type: 'fullRefresh' | 'partialUpdate' | 'optimistic' | 'none';
-  
+
   /** Configuration for the update strategy */
   config?: UpdateStrategyConfig;
 }
@@ -226,10 +238,10 @@ export interface UpdateStrategy {
 export interface UpdateStrategyConfig {
   /** Data keys to refresh (for partialUpdate) */
   dataKeys?: string[];
-  
+
   /** Name of client-side update function to call */
   updateFunction?: string;
-  
+
   /** Additional configuration data */
   [key: string]: any;
 }
@@ -244,13 +256,13 @@ export interface UpdateStrategyConfig {
 export interface ActionContext {
   /** User ID of the action initiator */
   userId: string;
-  
+
   /** JWT token for authentication */
   jwt: string;
-  
+
   /** User's preferred language */
   lang: string;
-  
+
   /** Fetch function for making HTTP requests */
   fetch: typeof globalThis.fetch;
 }
@@ -261,13 +273,13 @@ export interface ActionContext {
 export interface ActionResult {
   /** Whether the action succeeded */
   success: boolean;
-  
+
   /** Data returned from the action (if successful) */
   data?: any;
-  
+
   /** Update strategy to apply on the client */
   updateStrategy?: UpdateStrategy;
-  
+
   /** Error information (if failed) */
   error?: ActionError;
 }
@@ -278,10 +290,10 @@ export interface ActionResult {
 export interface ActionError {
   /** Error code for programmatic handling */
   code: string;
-  
+
   /** Human-readable error message */
   message: string;
-  
+
   /** Additional error details */
   details?: any;
 }
@@ -296,22 +308,22 @@ export interface ActionError {
 export interface UserProfile {
   /** User ID */
   id: string;
-  
+
   /** Username */
   username: string;
-  
+
   /** Email address */
   email: string;
-  
+
   /** Preferred language */
   lang: string;
-  
+
   /** Telegram ID (optional) */
   telegramId?: string;
-  
+
   /** Whether user has opted out of email notifications */
   noMail?: boolean;
-  
+
   /** User's registered devices for push notifications */
   machshirs: DeviceInfo[];
 }
@@ -322,12 +334,12 @@ export interface UserProfile {
 export interface DeviceInfo {
   /** Device ID */
   id: string;
-  
+
   /** Device attributes */
   attributes?: {
     /** Push notification endpoint configuration */
     jsoni?: any;
-    
+
     /** Additional device metadata */
     [key: string]: any;
   };
@@ -343,7 +355,7 @@ export interface DeviceInfo {
 export interface ValidationResult {
   /** Whether validation passed */
   valid: boolean;
-  
+
   /** List of validation errors (if any) */
   errors: string[];
 }
@@ -358,16 +370,16 @@ export interface ValidationResult {
 export interface NotificationPayload {
   /** Action key that triggered the notification */
   actionKey: string;
-  
+
   /** Notification title in multiple languages */
   title: LanguageStrings;
-  
+
   /** Notification body in multiple languages */
   body: LanguageStrings;
-  
+
   /** Additional metadata */
   metadata?: NotificationMetadata;
-  
+
   /** Action-specific data */
   data?: any;
 }
@@ -382,7 +394,7 @@ export interface NotificationPayload {
 export interface ActionRequest {
   /** Action key to execute */
   actionKey: string;
-  
+
   /** Parameters for the action */
   params: Record<string, any>;
 }
@@ -393,17 +405,17 @@ export interface ActionRequest {
 export interface ActionResponse {
   /** Whether the action succeeded */
   success: boolean;
-  
+
   /** Data returned from the action (if successful) */
   data?: any;
-  
+
   /** Error information (if failed) */
   error?: {
     code: string;
     message: string;
     details?: any;
   };
-  
+
   /** Update strategy to apply on the client */
   updateStrategy?: UpdateStrategy;
 }

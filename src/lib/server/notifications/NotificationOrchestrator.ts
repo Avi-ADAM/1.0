@@ -5,10 +5,10 @@
  * Handles recipient identification, filtering, and parallel notification sending.
  */
 
-import type { 
-  NotificationConfig, 
-  RecipientRule, 
-  ActionContext 
+import type {
+  NotificationConfig,
+  RecipientRule,
+  ActionContext
 } from '../actions/types';
 import type { StrapiClient } from '../actions/StrapiClient';
 import { EmailService } from './EmailService';
@@ -43,6 +43,7 @@ export interface NotificationData {
  * Key: projectId, Value: { users: UserProfile[], timestamp: number }
  */
 const projectMembershipCache = new Map<string, { users: UserProfile[]; timestamp: number }>();
+const userProfileCache = new Map<string, { profile: UserProfile; timestamp: number }>();
 const CACHE_TTL = 5 * 60 * 1000; // 5 minutes
 
 export class NotificationOrchestrator {
@@ -145,14 +146,14 @@ export class NotificationOrchestrator {
 
       // Wait for all notifications (but don't fail if some fail)
       const results = await Promise.allSettled(promises);
-      
+
       // Log any failures
-      const channelNames = [];
+      const channelNames: string[] = [];
       if (config.channels.includes('socket')) channelNames.push('socket');
       if (config.channels.includes('email')) channelNames.push('email');
       if (config.channels.includes('telegram')) channelNames.push('telegram');
       if (config.channels.includes('push')) channelNames.push('push');
-      
+
       results.forEach((result, index) => {
         if (result.status === 'rejected') {
           console.error(`Notification channel ${channelNames[index]} failed:`, result.reason);
@@ -191,18 +192,25 @@ export class NotificationOrchestrator {
       case 'specificUsers':
         const userIdsParam = rule.config?.userIdsParam || 'userIds';
         const userIds = this.getNestedValue(params, userIdsParam);
-        if (!userIds) {
-          // If no specific users provided, fall back to all project members
-          const fallbackProjectIdParam = rule.config?.projectIdParam || 'projectId';
-          const fallbackProjectId = this.getNestedValue(params, fallbackProjectIdParam);
-          return await this.getProjectMembers(fallbackProjectId, context);
+
+        if (userIds && Array.isArray(userIds)) {
+          // Fetch profiles for specific users directly
+          const profiles = await Promise.all(
+            userIds.map(id => this.getUserProfile(String(id), context))
+          );
+          return profiles.filter((p): p is UserProfile => p !== null);
         }
+
+        // Fallback to project members filtering (legacy behavior)
         const projectIdForSpecific = rule.config?.projectIdParam || 'projectId';
         const projectIdValue = this.getNestedValue(params, projectIdForSpecific);
-        const allMembers = await this.getProjectMembers(projectIdValue, context);
-        return allMembers.filter(u =>
-          userIds.includes(String(u.id)) || userIds.includes(Number(u.id))
-        );
+        if (projectIdValue) {
+          const allMembers = await this.getProjectMembers(projectIdValue, context);
+          return allMembers;
+        }
+
+        console.warn('No userIds or projectId provided for specificUsers recipient rule');
+        return [];
 
       case 'skillBased':
         // TODO: Implement skill-based filtering
@@ -217,6 +225,49 @@ export class NotificationOrchestrator {
       default:
         console.warn(`Unknown recipient rule type: ${rule.type}`);
         return [];
+    }
+  }
+
+  /**
+   * Get a single user profile by ID (with caching)
+   */
+  private async getUserProfile(userId: string, context: ActionContext): Promise<UserProfile | null> {
+    // Check cache
+    const cached = userProfileCache.get(userId);
+    if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
+      return cached.profile;
+    }
+
+    try {
+      const result = await this.strapiClient.execute(
+        '24userJSONQue',
+        { uid: userId },
+        context.jwt
+      );
+
+      const userData = result?.data?.usersPermissionsUser?.data;
+      if (!userData) return null;
+
+      const profile: UserProfile = {
+        id: String(userData.id),
+        username: userData.attributes.username,
+        email: userData.attributes.email,
+        lang: userData.attributes.lang || 'he',
+        telegramId: userData.attributes.telegramId,
+        noMail: userData.attributes.noMail,
+        machshirs: userData.attributes.machshirs?.data || []
+      };
+
+      // Update cache
+      userProfileCache.set(userId, {
+        profile,
+        timestamp: Date.now()
+      });
+
+      return profile;
+    } catch (error) {
+      console.error(`Error fetching user profile for ${userId}:`, error);
+      return null;
     }
   }
 
@@ -272,27 +323,43 @@ export class NotificationOrchestrator {
     }
   }
 
-
-
-
-
-
-
   /**
-   * Clear cache for a specific project (useful for testing or when membership changes)
+   * Clear cache for a specific project
    */
   clearCache(projectId?: string): void {
     if (projectId) {
       projectMembershipCache.delete(projectId);
     } else {
       projectMembershipCache.clear();
+      userProfileCache.clear();
     }
   }
 
   /**
-   * Get the SocketIOServer instance (useful for testing and direct access)
+   * Get the SocketIOServer instance
    */
   getSocketIOServer(): SocketIOServer {
     return this.socketIOServer;
+  }
+
+  /**
+   * Get the EmailService instance
+   */
+  getEmailService(): EmailService {
+    return this.emailService;
+  }
+
+  /**
+   * Get the PushService instance
+   */
+  getPushService(): PushService {
+    return this.pushService;
+  }
+
+  /**
+   * Get the TelegramService instance
+   */
+  getTelegramService(): TelegramService {
+    return this.telegramService;
   }
 }

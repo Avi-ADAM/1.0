@@ -6,7 +6,7 @@ This directory contains all action configurations for the Unified Action System.
 
 Each action configuration defines:
 - **Action Key**: Unique identifier for the action
-- **GraphQL Operation**: QIDS query ID to execute
+- **GraphQL Operation**: QIDS query ID to execute (string) OR Custom Logic (function)
 - **Parameter Schema**: Validation rules for parameters
 - **Authorization Rules**: Who can execute the action
 - **Notification Configuration**: Who gets notified and how
@@ -16,7 +16,9 @@ Each action configuration defines:
 
 ### 1. Create Configuration File
 
-Create a new file `src/lib/server/actions/configs/yourAction.ts`:
+Create a new file `src/lib/server/actions/configs/yourAction.ts`.
+
+#### Option A: Simple GraphQL Operation
 
 ```typescript
 import type { ActionConfig } from '../types.js';
@@ -26,6 +28,51 @@ export const yourActionConfig: ActionConfig = {
   description: 'Description of what this action does',
   graphqlOperation: 'XXyourQidsQuery', // QIDS query ID
   
+  // ... rest of config
+```
+
+#### Option B: Custom Logic Handler
+
+```typescript
+import type { ActionConfig } from '../types.js';
+
+export const yourActionConfig: ActionConfig = {
+  key: 'yourAction',
+  description: 'Description of what this action does',
+  
+  // Custom execution handler
+  graphqlOperation: async (params, context, { strapi, notifier }) => {
+    // 1. Perform complex logic
+    // 2. Execute Strapi operations
+    const result = await strapi.execute('XXyourQidsQuery', params, context.jwt);
+    
+    // 3. Send custom notifications if needed
+    if (notifier) {
+      await notifier.getSocketIOServer().broadcast(
+        ['userId1', 'userId2'], 
+        { 
+          title: { he: '...', en: '...' }, 
+          body: { he: '...', en: '...' }
+        }, 
+        context
+      );
+    }
+    
+    return result;
+  },
+  
+  // ... rest of config
+```
+
+### Full Configuration Example
+```typescript
+import type { ActionConfig } from '../types.js';
+
+export const yourActionConfig: ActionConfig = {
+  key: 'yourAction',
+  description: 'Description of what this action does',
+  graphqlOperation: 'XXyourQidsQuery', // QIDS query ID Or Custom Function
+
   paramSchema: {
     // Required parameters
     id: {
