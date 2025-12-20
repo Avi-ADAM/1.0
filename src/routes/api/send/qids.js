@@ -1434,11 +1434,10 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
       }
     }
   }`,
-  '58CreateMeetingForum': `mutation CreateMeetingForum($pgishaId: ID!, $publishedAt: DateTime!, $participants: [ID]) {
+  '58CreateMeetingForum': `mutation CreateMeetingForum($pgishaId: ID!, $publishedAt: DateTime!) {
     createForum(data: { 
       pgisha: $pgishaId,
-      publishedAt: $publishedAt,
-      users_permissions_users: $participants
+      publishedAt: $publishedAt
     }) {
       data {
         id

@@ -62,8 +62,7 @@ export const startMeetingConfig: ActionConfig = {
             '58CreateMeetingForum',
             {
                 pgishaId: meetingId,
-                publishedAt,
-                participants: participantUserIds
+                publishedAt
             },
             context.jwt,
             context.fetch
