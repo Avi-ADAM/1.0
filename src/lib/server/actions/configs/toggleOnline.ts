@@ -72,7 +72,8 @@ export const toggleOnlineConfig: ActionConfig = {
         // 4. Notify participants of affected meetings
         const notificationsSent = [];
         const ctx: any = context;
-        const myName = ctx.username || 'A participant';
+        // Get my name from the first user profile found (all belong to same user)
+        const myName = pgishausers[0]?.attributes?.users_permissions_user?.data?.attributes?.username || ctx.username || 'A participant';
 
         if (notifier) {
             for (const target of targets) {
@@ -110,16 +111,21 @@ export const toggleOnlineConfig: ActionConfig = {
                             recipients: { type: 'specificUsers', config: { userIdsParam: 'others' } },
                             templates: {
                                 title: {
-                                    he: status ? '🤝 משתתף זמין לפגישה!' : '💤 משתתף כבר לא זמין',
-                                    en: status ? '🤝 Participant is available!' : '💤 Participant is unavailable'
+                                    he: status ? '✨ הזדמנות לפגישה!' : '💤 משתתף כבר לא זמין',
+                                    en: status ? '✨ Meeting Opportunity!' : '💤 Participant is unavailable'
                                 },
                                 body: {
-                                    he: `${myName} ${status ? 'פנוי/ה כעת' : 'כבר לא פנוי/ה'} לפגישה: ${mName}`,
-                                    en: `${myName} is now ${status ? 'available' : 'unavailable'} for: ${mName}`
+                                    he: status
+                                        ? `${myName} פנוי/ה כעת לפגישה: ${mName}. בוא/י נתחיל!`
+                                        : `${myName} כבר לא פנוי/ה לפגישה: ${mName}`,
+                                    en: status
+                                        ? `${myName} is now available for: ${mName}`
+                                        : `${myName} is no longer available for: ${mName}`
                                 }
                             },
-                            channels: ['socket'],
+                            channels: status ? ['socket', 'push'] : ['socket'],
                             metadata: {
+                                url: '/meeting',
                                 type: 'userAvailability',
                                 meetingId: mId,
                                 userId: userId,

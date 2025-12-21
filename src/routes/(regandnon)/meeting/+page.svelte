@@ -143,13 +143,30 @@
             : '🎥 Meeting started! All participants have been notified'
         );
 
-        // Update the meeting in the store to show it's live
         if ($meetingsData[selectedMeetingForStart.id]) {
-          $meetingsData[selectedMeetingForStart.id].attributes.isLive = true;
+          $meetingsData[selectedMeetingForStart.id].attributes.pendingStart =
+            true;
           $meetingsData[selectedMeetingForStart.id].attributes.videoLink =
             videoLinkInput;
           $meetingsData[selectedMeetingForStart.id].attributes.forumId =
             result.forumId;
+          $meetingsData[selectedMeetingForStart.id].isMyStatusReady = true;
+
+          // Also mark current user as ready in the participants list
+          const pUsers =
+            $meetingsData[selectedMeetingForStart.id].attributes.pgishausers
+              ?.data || [];
+          pUsers.forEach((pu) => {
+            if (
+              String(pu.attributes.users_permissions_user?.data?.id) ===
+              String(data.id)
+            ) {
+              pu.attributes.readyForStart = true;
+            }
+          });
+
+          // Trigger reactivity
+          $meetingsData = { ...$meetingsData };
         }
 
         closeStartMeetingModal();
@@ -215,6 +232,14 @@
             window.location.href = '/meeting/' + meeting.id;
           }, 1000);
         } else {
+          // Update local status to ready
+          meetingsData.update((meetings) => {
+            if (meetings[meeting.id]) {
+              meetings[meeting.id].isMyStatusReady = true;
+            }
+            return meetings;
+          });
+
           toast.info(
             $lang === 'he'
               ? `✅ אישרת! ממתין לעוד ${result.waitingFor} משתתפ/ים...`
@@ -353,6 +378,7 @@
       openChat: "פתח צ'אט",
       pendingStart: 'ממתין לאישורי הצטרפות',
       joinMeeting: 'אישור הצטרפות',
+      ready: 'מוכן לצאת לדרך!',
       globalOnline: 'סטטוס זמינות כללי',
       meetingOnline: 'זמין לפגישה זו'
     },
@@ -383,6 +409,7 @@
       openChat: 'Open Chat',
       pendingStart: 'Waiting for participants',
       joinMeeting: 'Join Meeting',
+      ready: 'Ready to go!',
       globalOnline: 'Global Availability',
       meetingOnline: 'Available for this meeting'
     }
@@ -392,7 +419,7 @@
 </script>
 
 <div
-  class="min-h-screen bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white p-6"
+  class="min-h-screen pb-16 bg-gradient-to-br from-gray-900 via-purple-900 to-gray-900 text-white p-6"
   dir={$lang === 'he' ? 'rtl' : 'ltr'}
 >
   <header
@@ -544,6 +571,14 @@
                               alt={puser.attributes.users_permissions_user.data
                                 .attributes.username}
                             />
+
+                            <!-- Online Indicator Dot -->
+                            {#if puser.attributes.available}
+                              <span
+                                class="absolute bottom-0 right-0 block h-2 w-2 rounded-full bg-green-500 ring-1 ring-gray-900 animate-pulse shadow-[0_0_8px_rgba(34,197,94,0.8)]"
+                              ></span>
+                            {/if}
+
                             <div
                               class="absolute bottom-full mb-2 hidden group-hover:block z-20"
                             >
@@ -552,6 +587,9 @@
                               >
                                 {puser.attributes.users_permissions_user.data
                                   .attributes.username}
+                                {#if puser.attributes.available}
+                                  <span class="text-green-400 ml-1">●</span>
+                                {/if}
                               </div>
                             </div>
                           </div>
@@ -635,20 +673,29 @@
                             ({meeting.readyCount}/{meeting.totalCount})
                           {/if}
                         </div>
-                        <button
-                          class="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-yellow-500/30 flex items-center gap-2"
-                          onclick={() => handleJoinMeeting(meeting)}
-                          disabled={joiningMeetingId === meeting.id}
-                        >
-                          {#if joiningMeetingId === meeting.id}
-                            <span
-                              class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"
-                            ></span>
-                          {:else}
-                            <span>✋</span>
-                          {/if}
-                          {t.joinMeeting}
-                        </button>
+                        {#if meeting.isMyStatusReady}
+                          <div
+                            class="bg-green-500/20 text-green-400 text-xs font-bold px-4 py-2 rounded-xl flex items-center gap-2 border border-green-500/30"
+                          >
+                            <span>✅</span>
+                            {t.ready}
+                          </div>
+                        {:else}
+                          <button
+                            class="bg-gradient-to-r from-yellow-500 to-orange-600 hover:from-yellow-600 hover:to-orange-700 text-white text-sm font-bold py-2 px-4 rounded-full shadow-lg transform transition hover:-translate-y-1 hover:shadow-yellow-500/30 flex items-center gap-2"
+                            onclick={() => handleJoinMeeting(meeting)}
+                            disabled={joiningMeetingId === meeting.id}
+                          >
+                            {#if joiningMeetingId === meeting.id}
+                              <span
+                                class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"
+                              ></span>
+                            {:else}
+                              <span>✋</span>
+                            {/if}
+                            {t.joinMeeting}
+                          </button>
+                        {/if}
                       </div>
                     {:else if meeting.attributes.available}
                       <!-- Meeting available - show start button -->

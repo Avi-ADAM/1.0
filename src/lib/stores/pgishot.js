@@ -68,25 +68,61 @@ const meetingEventHandlers = {
     
     // Update my own online status if it's me
     if (userId === currentUserId) {
-      isOnline.set(available);
+      if (available === false) {
+        // Rule: if even one meeting is false, general status is false
+        isOnline.set(false);
+      }
+      
+      if (meetingId) {
+        meetingsData.update(meetings => {
+          if (meetings[meetingId]) {
+            meetings[meetingId].isMyStatusOnline = available;
+          }
+          
+          if (available !== false) {
+            // If we became available in one meeting, check if we are now available in ALL
+            const allMeetings = Object.values(meetings);
+            const allOnline = allMeetings.length > 0 && allMeetings.every(m => m.isMyStatusOnline === true);
+            isOnline.set(allOnline);
+          }
+          
+          return meetings;
+        });
+      }
     }
     
     // Update whoToFollow - other participants' status
     whoToFollow.update(users => {
-      if (users[userId]) {
-        users[userId].status = available;
-      }
+      // Find the user entry in whoToFollow. Note: whoToFollow uses pgishauser.id as key, but socket sends userId.
+      Object.keys(users).forEach(puId => {
+        if (String(users[puId].userId) === String(userId)) {
+          users[puId].status = available;
+        }
+      });
       return users;
     });
     
-    // Update meeting availability status
-    if (allOnline !== undefined && meetingId) {
+    // Update meeting availability status AND deep participant availability
+    if (meetingId) {
       meetingsData.update(meetings => {
         if (meetings[meetingId]) {
-          meetings[meetingId].attributes = {
-            ...meetings[meetingId].attributes,
-            available: allOnline
-          };
+          // 1. Update overall meeting availability
+          if (allOnline !== undefined) {
+            meetings[meetingId].attributes.available = allOnline;
+          }
+          
+          // 2. Update specific participant's availability in the nested list
+          if (userId && meetings[meetingId].attributes.pgishausers?.data) {
+            meetings[meetingId].attributes.pgishausers.data.forEach(puser => {
+              const pUserId = puser.attributes.users_permissions_user?.data?.id;
+              if (String(pUserId) === String(userId)) {
+                puser.attributes.available = available;
+              }
+            });
+          }
+          
+          // Trigger reactivity by creating a shallow copy of attributes
+          meetings[meetingId].attributes = { ...meetings[meetingId].attributes };
         }
         return meetings;
       });
@@ -211,11 +247,28 @@ function handleMeetingNotification(notification) {
       break;
       
     case 'participantReady':
-      // Update the ready count for the meeting
+      // Update the ready count and specific user status for the meeting
       meetingsData.update(meetings => {
         if (meetings[metadata.meetingId]) {
           meetings[metadata.meetingId].readyCount = metadata.readyCount;
           meetings[metadata.meetingId].totalCount = metadata.totalCount;
+          
+          if (metadata.userId) {
+            // Update the initiator's own ready status if it's them
+            if (String(metadata.userId) === String(currentUserId)) {
+              meetings[metadata.meetingId].isMyStatusReady = true;
+            }
+            
+            // Update deep participant list
+            if (meetings[metadata.meetingId].attributes.pgishausers?.data) {
+              meetings[metadata.meetingId].attributes.pgishausers.data.forEach(puser => {
+                if (String(puser.attributes.users_permissions_user?.data?.id) === String(metadata.userId)) {
+                  puser.attributes.readyForStart = true;
+                }
+              });
+            }
+            meetings[metadata.meetingId].attributes = { ...meetings[metadata.meetingId].attributes };
+          }
         }
         return meetings;
       });
@@ -285,7 +338,7 @@ export async function initiatePgishot(idL) {
     
     if (pgishausers.length > 0) {
       myUserMeeting.set(pgishausers[0].id);
-      isOnline.set(pgishausers.some(p => p.attributes.available === true));
+      isOnline.set(pgishausers.every(p => p.attributes.available === true));
       
       let users = {};
       let meetings = {};
@@ -298,6 +351,7 @@ export async function initiatePgishot(idL) {
           meetings[meeting.id].kind = "meeting";
           // Add this for UI binding (used in +page.svelte)
           meetings[meeting.id].isMyStatusOnline = pu.attributes.available;
+          meetings[meeting.id].isMyStatusReady = pu.attributes.readyForStart;
           
           meetings[meeting.id].messages.push({
             timestamp: meeting.attributes.publishedAt,
