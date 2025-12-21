@@ -380,7 +380,11 @@
       joinMeeting: 'אישור הצטרפות',
       ready: 'מוכן לצאת לדרך!',
       globalOnline: 'סטטוס זמינות כללי',
-      meetingOnline: 'זמין לפגישה זו'
+      meetingOnline: 'זמין לפגישה זו',
+      goldExplanation:
+        'פגישת זהב היא פגישה ללא תאריך מוגדר מראש, זמן הפגישה נקבע בזמן הזהב - הזמן שבו כל המשתתפים זמינים בו זמנית.',
+      goldMagic:
+        'בכדי שהקסם יקרה יש לעדכן סטטוס לזמין בכל פעם שיש לך זמן לפגישה, כאן למעלה או דרך הבוט שלנו בטלגרם.'
     },
     en: {
       title: 'Magic Meetings',
@@ -411,7 +415,11 @@
       joinMeeting: 'Join Meeting',
       ready: 'Ready to go!',
       globalOnline: 'Global Availability',
-      meetingOnline: 'Available for this meeting'
+      meetingOnline: 'Available for this meeting',
+      goldExplanation:
+        'A Gold Meeting is a meeting without a predefined date. The timing is set during the "Golden window" when all participants are available simultaneously.',
+      goldMagic:
+        "For the magic to happen, update your status whenever you're available, either here or via our Telegram bot."
     }
   };
 
@@ -437,6 +445,20 @@
     <p class="text-xl text-gray-200 font-light relative z-10 drop-shadow-md">
       {t.subtitle}
     </p>
+
+    <!-- Gold Meeting Explanation -->
+    <div
+      class="max-w-2xl mx-auto mt-6 relative z-10 flex flex-col gap-3 text-sm text-gray-300 bg-white/5 p-4 rounded-2xl border border-white/10 backdrop-blur-sm"
+    >
+      <div class="flex items-center gap-2 text-pink-300 font-bold mb-1">
+        <span>✨</span>
+        <span>{t.goldExplanation}</span>
+      </div>
+      <div class="flex items-center gap-2 text-purple-300 leading-relaxed">
+        <span>🪄</span>
+        <span>{t.goldMagic}</span>
+      </div>
+    </div>
 
     <!-- Global Online Toggle -->
     <div class="mt-8 relative z-10 flex flex-col items-center gap-2">

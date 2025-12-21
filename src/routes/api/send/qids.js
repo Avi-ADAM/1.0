@@ -245,6 +245,14 @@ export const qids = {
           available
           readyForStart
           uid
+          users_permissions_user {
+            data {
+              id
+              attributes {
+                username
+              }
+            }
+          }
           pgishas {
             data {
               id
