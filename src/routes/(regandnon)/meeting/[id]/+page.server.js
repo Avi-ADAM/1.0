@@ -30,10 +30,13 @@ export async function load({ locals, params, fetch }) {
 
     if (result?.data?.pgisha?.data) {
       const meeting = result.data.pgisha.data;
-      
+
+      console.log('[MeetingLoad] Meeting data:', JSON.stringify(meeting, null, 2));
+
       // Process messages if forum exists
       let messages = [];
       if (meeting.attributes.forum?.data?.attributes?.messages?.data) {
+        console.log('[MeetingLoad] Found messages:', meeting.attributes.forum.data.attributes.messages.data.length);
         messages = meeting.attributes.forum.data.attributes.messages.data.map((msg) => ({
           id: msg.id,
           content: msg.attributes.content,
@@ -41,9 +44,18 @@ export async function load({ locals, params, fetch }) {
           userId: msg.attributes.users_permissions_user?.data?.id,
           username: msg.attributes.users_permissions_user?.data?.attributes?.username || 'Unknown',
           profilePic: msg.attributes.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url
-        })).reverse(); // Reverse to show oldest first
+        })).sort((a, b) => new Date(a.createdAt) - new Date(b.createdAt)); // Sort by creation time, oldest first
+      } else {
+        console.log('[MeetingLoad] No messages found. Forum structure:', {
+          hasForumData: !!meeting.attributes.forum?.data,
+          hasForumAttributes: !!meeting.attributes.forum?.data?.attributes,
+          hasMessages: !!meeting.attributes.forum?.data?.attributes?.messages,
+          hasMessagesData: !!meeting.attributes.forum?.data?.attributes?.messages?.data
+        });
       }
-      
+
+      console.log('[MeetingLoad] Processed messages:', messages.length);
+
       // Process participants
       const participants = meeting.attributes.pgishausers?.data?.map((p) => ({
         id: p.id,
@@ -73,7 +85,7 @@ export async function load({ locals, params, fetch }) {
         error: null
       };
     }
-    
+
     return {
       uid,
       meetingId,

@@ -1,12 +1,20 @@
-<script>
+<script lang="ts">
   import { lang } from '$lib/stores/lang';
-  import { fade, fly, slide } from 'svelte/transition';
+  import { fly } from 'svelte/transition';
   import { toast } from 'svelte-sonner';
   import { onMount, onDestroy } from 'svelte';
   import { socketClient } from '$lib/stores/socketClient';
   import { meetingsData, refreshMeetingData } from '$lib/stores/pgishot';
 
   let { data } = $props();
+
+  console.log('[MeetingPage] Received data:', {
+    messagesCount: data.messages?.length || 0,
+    messages: data.messages,
+    meetingId: data.meetingId,
+    hasMeeting: !!data.meeting,
+    forumId: data.meeting?.forumId
+  });
 
   let messageInput = $state('');
   let sendingMessage = $state(false);
@@ -44,11 +52,10 @@
   // Setup socket listener for real-time updates
   onMount(() => {
     unsubscribeSocket = socketClient.onNotification((notification) => {
-      // @ts-ignore - metadata can have additional fields at runtime
-      const metadata = notification.metadata || {};
+      // Cast metadata to any to handle dynamic properties
+      const metadata = (notification.metadata as any) || {};
 
       // Only process notifications for this meeting
-      // @ts-ignore
       if (metadata.meetingId !== data.meetingId) return;
 
       console.log(
@@ -73,7 +80,7 @@
         case 'userAvailability':
         case 'meetingReady':
           // Update participant status
-          participants = participants.map((p) => {
+          participants = participants.map((p: any) => {
             if (p.userId === metadata.userId) {
               return { ...p, available: metadata.status === 'online' };
             }
@@ -91,9 +98,13 @@
         case 'newMessage':
         case 'meetingMessage':
           // Add new message from socket
+          console.log('[MeetingPage] Received new message:', notification.data);
           const newMsg = notification.data?.message;
-          if (newMsg && !messages.find((m) => m.id === newMsg.id)) {
+          if (newMsg && !messages.find((m: any) => m.id === newMsg.id)) {
+            console.log('[MeetingPage] Adding new message to list:', newMsg);
             messages = [...messages, newMsg];
+          } else {
+            console.log('[MeetingPage] Message already exists or invalid:', { newMsg, existingCount: messages.length });
           }
           break;
       }
@@ -118,6 +129,8 @@
     messageInput = '';
     sendingMessage = true;
 
+    console.log('[MeetingPage] Sending message:', { content, forumId: data.meeting?.forumId });
+
     try {
       const response = await fetch('/api/action', {
         method: 'POST',
@@ -132,21 +145,22 @@
       });
 
       const result = await response.json();
+      console.log('[MeetingPage] Send message result:', result);
 
       if (result.success) {
         // Add message to local state
-        messages = [
-          ...messages,
-          {
-            id: result.messageId || Date.now(),
-            content: content,
-            createdAt: new Date().toISOString(),
-            userId: data.uid,
-            username: 'You',
-            profilePic: null
-          }
-        ];
+        const newMessage = {
+          id: result.messageId || Date.now(),
+          content: content,
+          createdAt: new Date().toISOString(),
+          userId: data.uid,
+          username: 'You',
+          profilePic: null
+        };
+        console.log('[MeetingPage] Adding message to local state:', newMessage);
+        messages = [...messages, newMessage];
       } else {
+        console.error('[MeetingPage] Failed to send message:', result);
         toast.error(
           $lang === 'he' ? 'שגיאה בשליחת ההודעה' : 'Error sending message'
         );
@@ -195,20 +209,35 @@
     }
   }
 
-  function handleKeyPress(e) {
+  function handleKeyPress(e: KeyboardEvent) {
     if (e.key === 'Enter' && !e.shiftKey) {
       e.preventDefault();
       sendMessage();
     }
   }
 
-  function formatTime(dateString) {
+  function formatTime(dateString: string) {
     if (!dateString) return '';
     const date = new Date(dateString);
     return date.toLocaleTimeString($lang === 'he' ? 'he-IL' : 'en-US', {
       hour: '2-digit',
       minute: '2-digit'
     });
+  }
+
+  async function refreshMessages() {
+    try {
+      const response = await fetch(`/api/meeting/${data.meetingId}/messages`);
+      if (response.ok) {
+        const result = await response.json();
+        if (result.success) {
+          messages = result.messages || [];
+          console.log('[MeetingPage] Refreshed messages:', messages.length);
+        }
+      }
+    } catch (e) {
+      console.error('Error refreshing messages:', e);
+    }
   }
 
   const t = $derived(
@@ -416,10 +445,19 @@
         class="lg:col-span-3 flex flex-col bg-white/5 backdrop-blur-md rounded-2xl border border-white/10 overflow-hidden"
       >
         <div class="p-4 border-b border-white/10 bg-gray-800/30">
-          <h2 class="text-lg font-bold text-green-300 flex items-center gap-2">
-            <span>💬</span>
-            {t.chat}
-          </h2>
+          <div class="flex items-center justify-between">
+            <h2 class="text-lg font-bold text-green-300 flex items-center gap-2">
+              <span>💬</span>
+              {t.chat}
+            </h2>
+            <button
+              onclick={refreshMessages}
+              class="text-gray-400 hover:text-white transition-colors p-1 rounded"
+              title="Refresh messages"
+            >
+              🔄
+            </button>
+          </div>
         </div>
 
         <!-- Messages -->
@@ -432,9 +470,13 @@
               <div class="text-center">
                 <span class="text-4xl mb-2 block">💬</span>
                 <p>{t.noMessages}</p>
+                <p class="text-xs mt-2">Debug: {JSON.stringify({ messagesLength: messages.length, hasForumId: !!data.meeting?.forumId })}</p>
               </div>
             </div>
           {:else}
+            <div class="text-xs text-gray-400 mb-2">
+              Debug: Showing {messages.length} messages
+            </div>
             {#each messages as message (message.id)}
               <div
                 class="flex gap-3 {message.userId === data.uid

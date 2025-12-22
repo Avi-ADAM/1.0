@@ -1464,7 +1464,31 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           isLive
           videoLink
           meetingStartedAt
-          forum { data { id } }
+          forum { 
+            data { 
+              id 
+              attributes {
+                messages {
+                  data {
+                    id
+                    attributes {
+                      content
+                      createdAt
+                      users_permissions_user {
+                        data {
+                          id
+                          attributes {
+                            username
+                            profilePic { data { attributes { url } } }
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            } 
+          }
           startedBy { data { id attributes { username } } }
           pgishausers {
             data {

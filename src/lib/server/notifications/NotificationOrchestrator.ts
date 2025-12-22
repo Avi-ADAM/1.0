@@ -222,6 +222,11 @@ export class NotificationOrchestrator {
         console.warn('Custom recipient selection not yet implemented');
         return [];
 
+      case 'meetingParticipants':
+        const forumIdParam = rule.config?.forumIdParam || 'forumId';
+        const forumId = this.getNestedValue(params, forumIdParam);
+        return await this.getMeetingParticipants(forumId, context);
+
       default:
         console.warn(`Unknown recipient rule type: ${rule.type}`);
         return [];
@@ -319,6 +324,46 @@ export class NotificationOrchestrator {
       return profiles;
     } catch (error) {
       console.error('Error fetching project members:', error);
+      return [];
+    }
+  }
+
+  /**
+   * Get meeting participants from forum ID
+   */
+  private async getMeetingParticipants(
+    forumId: string,
+    context: ActionContext
+  ): Promise<UserProfile[]> {
+    if (!forumId) {
+      console.warn('No forumId provided for getMeetingParticipants');
+      return [];
+    }
+
+    try {
+      // Get meeting details to find participants
+      const result = await this.strapiClient.execute(
+        '59GetMeetingDetails',
+        { id: forumId }, // This might need adjustment based on the actual query structure
+        context.jwt
+      );
+
+      const meeting = result?.data?.pgisha?.data;
+      if (!meeting) {
+        console.warn(`Meeting with forum ${forumId} not found`);
+        return [];
+      }
+
+      const participants = meeting.attributes?.pgishausers?.data || [];
+      const profiles = await Promise.all(
+        participants.map((participant: any) => 
+          this.getUserProfile(participant.attributes?.users_permissions_user?.data?.id, context)
+        )
+      );
+
+      return profiles.filter((p): p is UserProfile => p !== null);
+    } catch (error) {
+      console.error(`Error fetching meeting participants for forum ${forumId}:`, error);
       return [];
     }
   }

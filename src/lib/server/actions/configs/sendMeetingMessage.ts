@@ -52,6 +52,34 @@ export const sendMeetingMessageConfig: ActionConfig = {
     authRules: [
         { type: 'jwt' }
     ],
+    notification: {
+        recipients: {
+            type: 'meetingParticipants',
+            config: {
+                forumIdParam: 'forumId',
+                excludeSender: true
+            }
+        },
+        templates: {
+            title: {
+                he: 'הודעה חדשה בפגישה',
+                en: 'New message in meeting',
+                ar: 'رسالة جديدة في الاجتماع'
+            },
+            body: {
+                he: '{{senderName}} שלח הודעה: {{content}}',
+                en: '{{senderName}} sent a message: {{content}}',
+                ar: '{{senderName}} أرسل رسالة: {{content}}'
+            }
+        },
+        channels: ['socket'],
+        metadata: {
+            priority: 'normal',
+            type: 'meetingMessage',
+            forumId: '{{forumId}}',
+            messageId: '{{messageId}}'
+        }
+    },
     updateStrategy: {
         type: 'partialUpdate',
         config: {}
