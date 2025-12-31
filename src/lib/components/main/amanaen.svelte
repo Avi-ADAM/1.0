@@ -484,7 +484,7 @@ function change(la){
     locale.set("he")
     langUs.set("he")
     doesLang.set(true)
-    document.cookie = `lang=he; expires=` + new Date(2026, 0, 1).toUTCString();
+    document.cookie = `lang=he; expires=` + new Date(2027, 0, 1).toUTCString();
     console.log("change", $lang)
     goto("/hascama")
     
@@ -494,7 +494,7 @@ function change(la){
     locale.set("ar")
     langUs.set("ar")
     doesLang.set(true)
-    document.cookie = `lang=ar; expires=` + new Date(2026, 0, 1).toUTCString();
+    document.cookie = `lang=ar; expires=` + new Date(2027, 0, 1).toUTCString();
     console.log("change", $lang)
     goto("/aitifaqia")
   }

@@ -21,21 +21,21 @@
       lang.set('en');
       locale.set('en');
       document.cookie =
-        `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+        `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
     } else if (lan == 'he') {
       doesLang.set(true);
       langUs.set('he');
       lang.set('he');
       locale.set('he');
       document.cookie =
-        `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+        `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
     } else if (lan == 'ar') {
       doesLang.set(true);
       langUs.set('ar');
       lang.set('ar');
       locale.set('ar');
       document.cookie =
-        `lang=${$lang}; expires=` + new Date(2026, 0, 1).toUTCString();
+        `lang=${$lang}; expires=` + new Date(2027, 0, 1).toUTCString();
     }
     trans = false;
   }
@@ -67,11 +67,11 @@
   import { onMount } from 'svelte';
 
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
-  
+
   let projectsCount = $state(0);
   let membersCount = $state(0);
   let statsLoaded = $state(false);
-  
+
   let pageurl = {
     ar: 'https://1lev1.com/ar',
     en: 'https://1lev1.com/en',
@@ -90,32 +90,32 @@
     try {
       // קבלת מספר הפרויקטים
       const projectsResult = await sendToSer(
-        {}, 
-        "66getProjectsCount", 
-        0, 
-        0, 
+        {},
+        '66getProjectsCount',
+        0,
+        0,
         true, // isSer = true כדי לאפשר גישה למשתמשים לא רשומים
         fetch
       );
-      
+
       // קבלת מספר החברים
       const membersResult = await sendToSer(
-        {}, 
-        "67getMembersCount", 
-        0, 
-        0, 
+        {},
+        '67getMembersCount',
+        0,
+        0,
         true, // isSer = true כדי לאפשר גישה למשתמשים לא רשומים
         fetch
       );
-      
+
       if (projectsResult?.data?.projects?.meta?.pagination?.total) {
         projectsCount = projectsResult.data.projects.meta.pagination.total;
       }
-      
+
       if (membersResult?.data?.chezins?.meta?.pagination?.total) {
         membersCount = membersResult.data.chezins.meta.pagination.total;
       }
-      
+
       statsLoaded = true;
     } catch (error) {
       console.error('Error loading stats:', error);
@@ -367,7 +367,12 @@
           openi={true}
           word={$t('home.features.formula')}
         />
-        <Tile bg={'gold'} big={true} sm={true} word={$t('home.features.mission')} />
+        <Tile
+          bg={'gold'}
+          big={true}
+          sm={true}
+          word={$t('home.features.mission')}
+        />
       </div>
       <!-- סטטיסטיקות האתר -->
       <div
@@ -375,13 +380,18 @@
       >
         {#if statsLoaded}
           <div class="text-center">
-            <p class="text-white font-semibold text-lg mb-2" style="font-family: 'Sababa', sans-serif;">
+            <p
+              class="text-white font-semibold text-lg mb-2"
+              style="font-family: 'Sababa', sans-serif;"
+            >
               {$t('home.stats.currently')}
             </p>
             <div class="flex justify-center items-center gap-4 flex-wrap">
               <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
                 <div class="text-2xl font-bold text-gold">{projectsCount}</div>
-                <div class="text-white text-sm">{$t('home.stats.partnerships')}</div>
+                <div class="text-white text-sm">
+                  {$t('home.stats.partnerships')}
+                </div>
               </div>
               <div class="text-gold text-2xl">•</div>
               <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
@@ -391,7 +401,10 @@
             </div>
           </div>
         {:else}
-          <div class="text-center text-white font-semibold" style="font-family: 'Sababa', sans-serif;">
+          <div
+            class="text-center text-white font-semibold"
+            style="font-family: 'Sababa', sans-serif;"
+          >
             {$t('home.stats.loading')}
           </div>
         {/if}

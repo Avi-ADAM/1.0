@@ -561,9 +561,9 @@ meta {
       g = false;
       already = true;
       document.cookie =
-        `email=${mail}; expires=` + new Date(2026, 0, 1).toUTCString();
+        `email=${mail}; expires=` + new Date(2027, 0, 1).toUTCString();
       document.cookie =
-        `un=${formName}; expires=` + new Date(2026, 0, 1).toUTCString();
+        `un=${formName}; expires=` + new Date(2027, 0, 1).toUTCString();
       userName.set(formName);
       liUN.set(formName);
       email.set(mail);
@@ -640,7 +640,7 @@ const lines = document.getElementById("lines")
       langUs.set('en');
       doesLang.set(true);
       document.cookie =
-        `lang=en; expires=` + new Date(2026, 0, 1).toUTCString();
+        `lang=en; expires=` + new Date(2027, 0, 1).toUTCString();
       goto('/convention');
     } else if (la == 'ar') {
       // Sync all stores
@@ -649,7 +649,7 @@ const lines = document.getElementById("lines")
       langUs.set('ar');
       doesLang.set(true);
       document.cookie =
-        `lang=ar; expires=` + new Date(2026, 0, 1).toUTCString();
+        `lang=ar; expires=` + new Date(2027, 0, 1).toUTCString();
       goto('aitifaqia');
     }
   }

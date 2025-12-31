@@ -152,14 +152,14 @@
           });
           const id = response.data.user.id;
           document.cookie =
-            `await=${Date.now}; expires=` + new Date(2026, 0, 1).toUTCString();
+            `await=${Date.now}; expires=` + new Date(2027, 0, 1).toUTCString();
           document.cookie =
-            `when=${Date.now}; expires=` + new Date(2026, 0, 1).toUTCString();
+            `when=${Date.now}; expires=` + new Date(2027, 0, 1).toUTCString();
           document.cookie =
             `id=${response.data.user.id}; expires=` +
-            new Date(2026, 0, 1).toUTCString();
+            new Date(2027, 0, 1).toUTCString();
           document.cookie =
-            `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
+            `guidMe=again; expires=` + new Date(2027, 0, 1).toUTCString();
           /*	let bearer1 = 'bearer' + ' ' + token;          
 	await fetch(linkg, {
               method: 'POST',
@@ -202,13 +202,14 @@
           });
           const id = 0;
           document.cookie =
-            `await=${Date.now()}; expires=` + new Date(2026, 0, 1).toUTCString();
+            `await=${Date.now()}; expires=` +
+            new Date(2027, 0, 1).toUTCString();
           document.cookie =
-            `when=${Date.now()}; expires=` + new Date(2026, 0, 1).toUTCString();
+            `when=${Date.now()}; expires=` + new Date(2027, 0, 1).toUTCString();
           document.cookie =
-            `id=0; expires=` + new Date(2026, 0, 1).toUTCString();
+            `id=0; expires=` + new Date(2027, 0, 1).toUTCString();
           document.cookie =
-            `guidMe=again; expires=` + new Date(2026, 0, 1).toUTCString();
+            `guidMe=again; expires=` + new Date(2027, 0, 1).toUTCString();
         }
       })
       .catch((error) => {

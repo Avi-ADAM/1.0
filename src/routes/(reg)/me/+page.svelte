@@ -351,7 +351,7 @@
               doesLang.set(true);
               // Add to cookies
               document.cookie =
-                `lang=${lango}; expires=` + new Date(2026, 0, 1).toUTCString();
+                `lang=${lango}; expires=` + new Date(2027, 0, 1).toUTCString();
               // Re-fetch data to include new lang data
               await start();
               return;
@@ -362,7 +362,7 @@
               langUs.set(lango);
               doesLang.set(true);
               document.cookie =
-                `lang=${lango}; expires=` + new Date(2026, 0, 1).toUTCString();
+                `lang=${lango}; expires=` + new Date(2027, 0, 1).toUTCString();
             }
           }
           if ($lang == 'he') {
@@ -922,7 +922,7 @@
           });
           
           // Set cookie to show guide
-          document.cookie = `guidMe=again; expires=${new Date(2026, 0, 1).toUTCString()}; path=/`;
+          document.cookie = `guidMe=again; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
         }
       } catch (e) {
         console.error('Failed to update guide status:', e);
@@ -958,7 +958,7 @@
           });
           
           // Also set cookie to remember choice
-          document.cookie = `guidMe=done; expires=${new Date(2026, 0, 1).toUTCString()}; path=/`;
+          document.cookie = `guidMe=done; expires=${new Date(2027, 0, 1).toUTCString()}; path=/`;
         }
       } catch (e) {
         console.error('Failed to update guide status:', e);

@@ -109,7 +109,8 @@ function getLang() {
     locale.set(la);
     langUs.set(la);
     doesLang.set(true);
-    document.cookie = `lang=${la}; expires=` + new Date(2026, 0, 1).toUTCString();
+    document.cookie =
+      `lang=${la}; expires=` + new Date(2027, 0, 1).toUTCString();
 }
 
 onMount(() => {
