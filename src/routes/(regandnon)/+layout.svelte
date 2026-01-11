@@ -42,7 +42,7 @@
       initialWebS(data.tok, data.uid);
       initialWebSP(data.tok, data.uid);
     } else {
-      // jwt is httpOnly now; rely on server-provided token or the 'when' cookie for auth flag
+      // jwt is httpOnly now; rely on server-provided token or 'when' cookie for auth flag
       const cookieT = document.cookie
         .split('; ')
         .find((row) => row.startsWith('when='))

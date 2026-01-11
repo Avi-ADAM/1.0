@@ -1611,5 +1611,90 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         }
       }
     }
-  }`
+  }`,
+  '65GetAskById': `query GetAskById($id: ID!) {
+      ask(id: $id) {
+        data {
+          id
+          attributes {
+            users_permissions_user { data { id } }
+            project { data { id attributes { projectName } } }
+            forums { data { id } }
+          }
+        }
+      }
+    }`,
+  '66CreateForumForAsk': `mutation CreateForumForAsk($publishedAt: DateTime, $subject: String, $pid: ID) {
+      createForum(data: { publishedAt: $publishedAt, subject: $subject, project: $pid }) {
+        data { id }
+      }
+    }`,
+  '67UpdateAskForum': `mutation UpdateAskForum($id: ID!, $forumId: ID!) {
+      updateAsk(id: $id, data: { forums: [$forumId] }) {
+        data { id }
+      }
+    }`,
+  '80usersPermissionsUserWithAskeds': `query GetUsersPermissionsUserWithAskeds($id: ID!) {
+        usersPermissionsUser(id: $id) {
+          data {
+            id
+            attributes {
+              askeds {
+                data {
+                  id
+                }
+              }
+            }
+          }
+        }
+      }`,
+  '81updateAskedsAndCreateAsk': `mutation UpdateAskedsAndCreateAsk(
+      $userId: ID!,
+      $askeds: [ID],
+      $openMissionId: ID,
+      $projectId: ID!,
+      $publishedAt: DateTime,
+      $vote: [ComponentProjectsVotsInput]
+    ) {
+      updateUsersPermissionsUser(
+        id: $userId
+        data: { askeds: $askeds }
+      ) {
+        data {
+          attributes {
+            askeds {
+              data {
+                id
+              }
+            }
+          }
+        }
+      }
+      createAsk(
+        data: {
+          open_mission: $openMissionId,
+          project: $projectId,
+          users_permissions_user: $userId,
+          publishedAt: $publishedAt,
+          vots: $vote
+        }
+      ) {
+        data {
+          id
+        }
+      }
+    }`,
+  '82createTimegramaForAsk': `mutation CreateTimegramaForAsk($date: DateTime, $whatami: String, $askId: ID) {
+      createTimegrama(
+        data: {
+          date: $date,
+          whatami: $whatami,
+          ask: $askId
+        }
+      ) {
+        data {
+          id
+        }
+      }
+    }`,
 };
