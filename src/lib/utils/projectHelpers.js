@@ -8,6 +8,7 @@
  */
 
 import { getProjectData } from '$lib/stores/projectStore.js';
+export { getProjectData };
 
 /**
  * יצירת אובייקט מידע פרויקט בסיסי
@@ -162,6 +163,16 @@ export function getProjectMembers(projectId) {
     username: user.attributes?.username || '',
     src: getProjectData(projectId, 'upic', user.id)
   }));
+}
+
+/**
+ * קבלת רשימת חברי הפרויקט (מבנה גולמי)
+ * 
+ * @param {string|number} projectId - מזהה הפרויקט
+ * @returns {Array} מערך של אובייקטי משתמשים כפי שהם ב-Strapi
+ */
+export function getProjectUsers(projectId) {
+  return getProjectData(projectId, 'us');
 }
 
 /**

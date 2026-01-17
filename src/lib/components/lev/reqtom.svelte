@@ -4,7 +4,7 @@
   import { goto } from '$app/navigation';
   import Chaticon from '../../celim/chaticon.svelte';
   import { Drawer } from 'vaul-svelte';
-    import {  getProjectData } from '$lib/stores/projectStore.js';
+  import { getProjectData } from '$lib/stores/projectStore.js';
 
   import { clickOutside } from './outsidclick.js';
   import { fly } from 'svelte/transition';
@@ -14,7 +14,7 @@
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
   import Diun from './diun.svelte';
-  const baseUrl = import.meta.env.VITE_URL
+  const baseUrl = import.meta.env.VITE_URL;
   let clicked = $state(false);
   /**
    * @typedef {Object} Props
@@ -72,7 +72,12 @@
 
   /** @type {Props} */
   let {
-    onUser, onProj, onAcsept, onDecline, onHover, onModal,
+    onUser,
+    onProj,
+    onAcsept,
+    onDecline,
+    onHover,
+    onModal,
     low = false,
     modal = $bindable(false),
     isVisible = false,
@@ -118,7 +123,7 @@
     chat = $bindable([]),
     order = $bindable(0)
   } = $props();
-  let dialogOpen = $state(false)
+  let dialogOpen = $state(false);
   let resP = [];
 
   let idL;
@@ -154,7 +159,7 @@
   }
   let error1;
   let miDatan = [];
-  let linkg = baseUrl+'/graphql';
+  let linkg = baseUrl + '/graphql';
 
   function percentage(partialValue, totalValue) {
     return (100 * partialValue) / totalValue;
@@ -165,7 +170,7 @@
   let tryot = $state('-10.5%');
   let tryoti = $state('-5.25%');
   let nut;
-  async function xyz() {
+  function xyz() {
     ok = percentage(noofusersOk, noofpu);
     nook = percentage(noofusersNo, noofpu);
     nut = percentage(noofusersWaiting, noofpu);
@@ -200,11 +205,11 @@
   let ser = $state(xyz());
 
   let ucli = $state(0);
-  
+
   let pcli = $state(0);
-  
+
   let pmcli = $state(0);
-  
+
   function linke(s) {
     if (s == 'u') {
       ucli += 1;
@@ -229,17 +234,33 @@
     }
   }
   function objToString(obj) {
-    let str = '';
-    for (let i = 0; i < obj.length; i++) {
-      for (const [p, val] of Object.entries(obj[i])) {
-        if ((typeof val == 'string') | 'number' | 'boolean') {
-          str += `{${p}:${val}\n},`;
-        } else if (typeof val == 'null') {
-          str += `{${p}:${val.map((c) => c.id)}\n},`;
+    if (!obj || !Array.isArray(obj)) return '';
+    return obj
+      .map((item) => {
+        let fields = [];
+        for (const [key, val] of Object.entries(item)) {
+          if (val === null || val === undefined || key === '__typename')
+            continue;
+
+          // Handle Strapi relation objects (e.g. users_permissions_user: {data: {id: ...}})
+          if (typeof val === 'object' && val !== null && !Array.isArray(val)) {
+            if (val.data && val.data.id) {
+              fields.push(`${key}: "${val.data.id}"`);
+            } else if (val.id) {
+              fields.push(`${key}: "${val.id}"`);
+            } else {
+              // Fallback: This might still produce quoted keys if it's a raw object,
+              // but we'll try to stick to primitives and known ID patterns.
+              fields.push(`${key}: ${JSON.stringify(val)}`);
+            }
+          } else {
+            // Primitives (strings, numbers, booleans)
+            fields.push(`${key}: ${JSON.stringify(val)}`);
+          }
         }
-      }
-    }
-    return str;
+        return `{${fields.join(', ')}}`;
+      })
+      .join(', ');
   }
   const userss = objToString(users);
   let welcome = ``;
@@ -316,7 +337,7 @@
  updateAskm(
                id: "${askId}" 
                                 data: { archived: true,
-                                    vots: [${userss}${userss ? "," : ""}
+                                    vots: [${userss}${userss ? ',' : ''}
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
@@ -368,7 +389,7 @@ ${adduser2}
  updateAskm(
             id: "${askId}" 
                                 data: { archived: true,
-                                    vots: [${userss}${userss ? "," : ""}
+                                    vots: [${userss}${userss ? ',' : ''}
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
@@ -393,7 +414,7 @@ ${adduser2}
     } else {
       console.log('just add vote to asked and update to not show for me again');
       let timeG = ``;
-      if(isFirst){
+      if (isFirst) {
         let fd = getProjectData(projectId, 'finishDate');
         timeG = `createTimegrama(
           data: {
@@ -403,7 +424,7 @@ ${adduser2}
           }
         ){
             data {id}
-          }`
+          }`;
       }
       try {
         await fetch(linkg, {
@@ -417,7 +438,7 @@ ${adduser2}
                         {
                             updateAskm(
                           id: "${askId}" 
-                                data: { vots: [${userss}${userss ? "," : ""} 
+                                data: { vots: [${userss}${userss ? ',' : ''} 
                                        {
                                         what: true
                                         users_permissions_user: "${idL}"
@@ -456,7 +477,6 @@ ${adduser2}
 
     // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
     if (noofpu === 1) {
-    
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
@@ -477,7 +497,7 @@ ${adduser2}
                         { 
 updateAskm(
   id: "${id}"
-  data: {vots: [${userss}${userss ? "," : ""}
+  data: {vots: [${userss}${userss ? ',' : ''}
                                        {
                                         what: false
                                         users_permissions_user: "${idL}"
@@ -504,13 +524,13 @@ updateAskm(
     } else if (noofpu > 1) {
       console.log('if another uprove explain why you decline');
       //TODO: add decline reason to db
-      alert("soon")
+      alert('soon');
     }
   }
   let hovered = $state(false);
 
   let w = $state(0);
-  
+
   const u = {
     he: 'הצבעה על בקשה לשיתוף משאב והצטרפות לרקמה',
     en: 'vote on request to join the FreeMates and share a resorce '
@@ -566,7 +586,7 @@ updateAskm(
     isOpen = true;
     diunm = true;
   }
- 
+
   let isOpen = $state(false),
     diunm = $state(false),
     loading = false;
@@ -636,28 +656,25 @@ updateAskm(
   const chatdes2 = { he: "צ'אט על הצטרפות לריקמה", en: 'chat on joining' };
 </script>
 
-{#await ser}
-  <h1>loop</h1>
-{:then ser}
-  <DialogOverlay {isOpen} onDismiss={close} class="overlay">
-    <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
-      <DialogContent class="chat" aria-label="form">
-        <div dir="rtl" class="grid items-center justify-center aling-center">
-          <button
-            onclick={close}
-            style="margin: 0 auto;"
-            class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-            title={tit[$lang]}
-            ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-              />
-            </svg></button
-          >
-          {#if loading === true}
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
-            <!--   
+<DialogOverlay {isOpen} onDismiss={close} class="overlay">
+  <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
+    <DialogContent class="chat" aria-label="form">
+      <div dir="rtl" class="grid items-center justify-center aling-center">
+        <button
+          onclick={close}
+          style="margin: 0 auto;"
+          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
+          title={tit[$lang]}
+          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+            <path
+              fill="currentColor"
+              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+            />
+          </svg></button
+        >
+        {#if loading === true}
+          <RingLoader size="260" color="#ff00ae" unit="px" duration="2s" />
+          <!--   
 {:else if masa === true}
 
 <Nego
@@ -683,395 +700,402 @@ updateAskm(
   users={users}
 {restime}
 />-->
-          {:else if diunm === true}
-            <Diun
-              onRect={afreact}
-              smalldes={projectName + '-' + openmissionName}
-              nameChatPartner={`${chatdes2[$lang]} ${useraplyname}
+        {:else if diunm === true}
+          <Diun
+            onRect={afreact}
+            smalldes={projectName + '-' + openmissionName}
+            nameChatPartner={`${chatdes2[$lang]} ${useraplyname}
    ${projectName} `}
-              mypos={true}
-              rect={true}
-              {clicked}
-              pendId={askId}
-              profilePicChatPartner={src.length > 0
-                ? src
-                : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-              ani="askedMa"
-            />
-          {/if}
-        </div>
-      </DialogContent>
-    </div>
-  </DialogOverlay>
-
-  {#if cards == false}
-    <div
-onclick={()=>{modal = true
-  onModal?.()
-dialogOpen = true}}
-role="button"
-      style="position: relative;"
-      style:z-index={hovered === false ? 11 : 16}
-      onmouseenter={() => hoverede()}
-      onmouseleave={() => hoverede()}
-      use:clickOutside
-      onclick_outside={toggleShow}
-      class="hover:scale-290 duration-1000 ease-in"
-      transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
-    >
-      <Swiper
-        dir="rtl"
-        on:swiper={setSwiperRef}
-        effect={'flip'}
-        grabCursor={true}
-        modules={[EffectFlip, Navigation]}
-        flipEffect={{ slideShadows: false }}
-        class="mySwiper swiperg"
-        navigation={{
-          nextEl: `.normSml${askId}-noo`,
-          prevEl: `.normSmll${askId}-noo`
-        }}
-      >
-        <div
-          bind:clientWidth={w}
-          style:width={tryo}
-          style:top={tryot}
-          style:left={tryoti}
-          style="position:absolute;"
-        >
-          <ProgressBar
-            cls="transition: all 1000ms ease-in-out;"
-            series={ser}
-            width={w}
-            textSize={0}
-            thickness={4}
-            style="radial"
+            mypos={true}
+            rect={true}
+            {clicked}
+            pendId={askId}
+            profilePicChatPartner={src.length > 0
+              ? src
+              : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+            ani="askedMa"
           />
-        </div>
-        <SwiperSlide class="swiper-slideg"
-          ><div id="normSml">
-            <div style="--the:{stylef};">
-              <svg
-                version="1.1"
-                viewBox="-106 -106 212 212"
-                xmlns="http://www.w3.org/2000/svg"
-              >
-                <defs>
-                  <linearGradient id="lggm" x1="1" y1="1" spreadMethod="pad">
-                    <stop offset="0" style="stop-color: rgb(100, 71, 105);" />
-                    <stop offset="1" style="stop-color: rgb(54, 241, 155);" />
-                  </linearGradient>
-                  <linearGradient id="lgbgm" x1="1" y1="1">
-                    <stop offset="0" style="stop-color: rgb(125, 105, 155);" />
-                    <stop offset="1" style="stop-color: rgb(0, 100, 120);" />
-                  </linearGradient>
-                </defs>
-                <circle
-                  r="100"
-                  fill="url(#lggm)"
-                  transform="rotate(135)"
-                  stroke="url(#lgbgm)"
-                  stroke-width="6"
-                  style="fill-rule: nonzero; paint-order: fill;"
-                />
-                <circle
-                  r="80"
-                  fill="url(#lggm)"
-                  transform="rotate(315)"
-                  stroke="none"
-                />
+        {/if}
+      </div>
+    </DialogContent>
+  </div>
+</DialogOverlay>
 
-                <g
-                  role="button"
-                  tabindex="0"
-                  onkeypress={() => linke('u')}
-                  onclick={() => linke('u')}
-                  onmouseenter={() => hover(clicktoup[$lang])}
-                  onmouseleave={() => hover('0')}
-                  x="0"
-                  y="40"
-                  style="margin-top: 2px; margin-bottom: 2px"
-                >
-                  <foreignObject
-                    x="0"
-                    y="0"
-                    width="56px"
-                    height="56px"
-                    transform="translate(-28,-28)"
-                  >
-                    <span class={`normSml${askId}-noo`}></span>
-                    <img
-                      width="56px"
-                      height="56px"
-                      alt={useraplyname}
-                      {src}
-                      style="border-radius: 50%;"
-                    />
-                  </foreignObject>
-                  <text
-                    fill="#EEE8AA "
-                    text-anchor="middle"
-                    x="0"
-                    y="46"
-                    style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;"
-                    >{useraplyname}</text
-                  >
-                </g>
-                <path
-                  id="curvee"
-                  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"
-                />
-                <text
-                  color="#EEE8AA"
-                  width="208.55"
-                  x="-90"
-                  y="-90"
-                  style="white-space: pre-wrap;"
-                >
-                  <textPath
-                    role="contentinfo"
-                    onmouseenter={() => hover(resorcename[$lang])}
-                    onmouseleave={() => hover('0')}
-                    color="#EEE8AA"
-                    x="-90"
-                    y="-90"
-                    class="curved-text"
-                    startOffset={st}
-                    xlink:href="#curvee"
-                  >
-                    {openmissionName}
-                  </textPath>
-                </text>
-                <g
-                  role="button"
-                  tabindex="0"
-                  onkeypress={() => linke('p')}
-                  onclick={() => linke('p')}
-                  onmouseenter={() => hover(clicktofree[$lang])}
-                  onmouseleave={() => hover('0')}
-                  data-sveltekit-prefetch
-                  x="0"
-                  y="-40"
-                >
-                  <text
-                    fill="#FF0092"
-                    text-anchor="middle"
-                    x="0"
-                    y="-29"
-                    style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;"
-                    >{projectName}</text
-                  >
-                </g>
+{#if cards == false}
+  <div
+    onclick={() => {
+      modal = true;
+      onModal?.();
+      dialogOpen = true;
+    }}
+    role="button"
+    style="position: relative;"
+    style:z-index={hovered === false ? 11 : 16}
+    onmouseenter={() => hoverede()}
+    onmouseleave={() => hoverede()}
+    use:clickOutside
+    onclick_outside={toggleShow}
+    class="hover:scale-290 duration-1000 ease-in"
+    transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
+  >
+    <Swiper
+      dir="rtl"
+      on:swiper={setSwiperRef}
+      effect={'flip'}
+      grabCursor={true}
+      modules={[EffectFlip, Navigation]}
+      flipEffect={{ slideShadows: false }}
+      class="mySwiper swiperg"
+      navigation={{
+        nextEl: `.normSml${askId}-noo`,
+        prevEl: `.normSmll${askId}-noo`
+      }}
+    >
+      <div
+        bind:clientWidth={w}
+        style:width={tryo}
+        style:top={tryot}
+        style:left={tryoti}
+        style="position:absolute;"
+      >
+        <ProgressBar
+          cls="transition: all 1000ms ease-in-out;"
+          series={ser}
+          width={w}
+          textSize={0}
+          thickness={4}
+          style="radial"
+        />
+      </div>
+      <SwiperSlide class="swiper-slideg"
+        ><div id="normSml">
+          <div style="--the:{stylef};">
+            <svg
+              version="1.1"
+              viewBox="-106 -106 212 212"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="lggm" x1="1" y1="1" spreadMethod="pad">
+                  <stop offset="0" style="stop-color: rgb(100, 71, 105);" />
+                  <stop offset="1" style="stop-color: rgb(54, 241, 155);" />
+                </linearGradient>
+                <linearGradient id="lgbgm" x1="1" y1="1">
+                  <stop offset="0" style="stop-color: rgb(125, 105, 155);" />
+                  <stop offset="1" style="stop-color: rgb(0, 100, 120);" />
+                </linearGradient>
+              </defs>
+              <circle
+                r="100"
+                fill="url(#lggm)"
+                transform="rotate(135)"
+                stroke="url(#lgbgm)"
+                stroke-width="6"
+                style="fill-rule: nonzero; paint-order: fill;"
+              />
+              <circle
+                r="80"
+                fill="url(#lggm)"
+                transform="rotate(315)"
+                stroke="none"
+              />
+
+              <g
+                role="button"
+                tabindex="0"
+                onkeypress={() => linke('u')}
+                onclick={() => linke('u')}
+                onmouseenter={() => hover(clicktoup[$lang])}
+                onmouseleave={() => hover('0')}
+                x="0"
+                y="40"
+                style="margin-top: 2px; margin-bottom: 2px"
+              >
                 <foreignObject
                   x="0"
-                  y="-60 "
-                  width="40px"
-                  height="40px"
-                  transform="translate(-20,-20)"
+                  y="0"
+                  width="56px"
+                  height="56px"
+                  transform="translate(-28,-28)"
                 >
-                  <button
-                    onclick={() => project()}
-                    onmouseenter={() => hover(clicktobrain[$lang])}
+                  <span class={`normSml${askId}-noo`}></span>
+                  <img
+                    width="56px"
+                    height="56px"
+                    alt={useraplyname}
+                    {src}
+                    style="border-radius: 50%;"
+                  />
+                </foreignObject>
+                <text
+                  fill="#EEE8AA "
+                  text-anchor="middle"
+                  x="0"
+                  y="46"
+                  style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;"
+                  >{useraplyname}</text
+                >
+              </g>
+              <path
+                id="curvee"
+                d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"
+              />
+              <text
+                color="#EEE8AA"
+                width="208.55"
+                x="-90"
+                y="-90"
+                style="white-space: pre-wrap;"
+              >
+                <textPath
+                  role="contentinfo"
+                  onmouseenter={() => hover(resorcename[$lang])}
+                  onmouseleave={() => hover('0')}
+                  color="#EEE8AA"
+                  x="-90"
+                  y="-90"
+                  class="curved-text"
+                  startOffset={st}
+                  xlink:href="#curvee"
+                >
+                  {openmissionName}
+                </textPath>
+              </text>
+              <g
+                role="button"
+                tabindex="0"
+                onkeypress={() => linke('p')}
+                onclick={() => linke('p')}
+                onmouseenter={() => hover(clicktofree[$lang])}
+                onmouseleave={() => hover('0')}
+                data-sveltekit-prefetch
+                x="0"
+                y="-40"
+              >
+                <text
+                  fill="#FF0092"
+                  text-anchor="middle"
+                  x="0"
+                  y="-29"
+                  style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;"
+                  >{projectName}</text
+                >
+              </g>
+              <foreignObject
+                x="0"
+                y="-60 "
+                width="40px"
+                height="40px"
+                transform="translate(-20,-20)"
+              >
+                <button
+                  onclick={() => project()}
+                  onmouseenter={() => hover(clicktobrain[$lang])}
+                  onmouseleave={() => hover('0')}
+                >
+                  <img
+                    style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
+                    src={src2}
+                    width="40"
+                    height="40"
+                    alt="projectlogo"
+                    title={projectName}
+                  />
+                </button>
+              </foreignObject>
+              <foreignObject x="-25" y="55" width="50px" height="20px">
+                <p style="margin-top: 10px;">
+                  <span
+                    role="contentinfo"
+                    onmouseenter={() => hover('בעד')}
                     onmouseleave={() => hover('0')}
-                  >
-                    <img
-                      style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
-                      src={src2}
-                      width="40"
-                      height="40"
-                      alt="projectlogo"
-                      title={projectName}
-                    />
-                  </button>
-                </foreignObject>
-                <foreignObject x="-25" y="55" width="50px" height="20px">
-                  <p style="margin-top: 10px;">
-                    <span
-                      role="contentinfo"
-                      onmouseenter={() => hover('בעד')}
-                      onmouseleave={() => hover('0')}
-                      style="color:var(--gold)"
-                      >{noofusersOk}
-                    </span><span
-                      role="contentinfo"
-                      onmouseenter={() => hover('לא הצביעו')}
-                      onmouseleave={() => hover('0')}
-                      style="color:aqua"
-                      >{noofusersWaiting}
-                    </span><span
-                      role="contentinfo"
-                      onmouseenter={() => hover('נגד')}
-                      onmouseleave={() => hover('0')}
-                      style="color:var(--barbi-pink)"
-                      title="נגד"
-                      >{noofusersNo}
-                    </span>
-                  </p>
-                </foreignObject>
-              </svg>
-            </div>
+                    style="color:var(--gold)"
+                    >{noofusersOk}
+                  </span><span
+                    role="contentinfo"
+                    onmouseenter={() => hover('לא הצביעו')}
+                    onmouseleave={() => hover('0')}
+                    style="color:aqua"
+                    >{noofusersWaiting}
+                  </span><span
+                    role="contentinfo"
+                    onmouseenter={() => hover('נגד')}
+                    onmouseleave={() => hover('0')}
+                    style="color:var(--barbi-pink)"
+                    title="נגד"
+                    >{noofusersNo}
+                  </span>
+                </p>
+              </foreignObject>
+            </svg>
           </div>
-        </SwiperSlide><SwiperSlide class="swiper-slideg"
-          ><div id="normSmll">
-            <div class={`normSmll${askId}-noo`}></div>
-            <!--  <button on:click={tochat}><Chaticon/></button>-->
-            {#if deadline}
-              <p
-                onmouseenter={() => hover('תאריך הביצוע')}
-                onmouseleave={() => hover('0')}
-                class="hslink ab"
-              >
-                {new Date(deadline).toLocaleDateString('he-IL')}
-              </p>{/if}
+        </div>
+      </SwiperSlide><SwiperSlide class="swiper-slideg"
+        ><div id="normSmll">
+          <div class={`normSmll${askId}-noo`}></div>
+          <!--  <button on:click={tochat}><Chaticon/></button>-->
+          {#if deadline}
             <p
-              onmouseenter={() => hover('שווי')}
+              onmouseenter={() => hover('תאריך הביצוע')}
               onmouseleave={() => hover('0')}
-              class="hslink bc"
+              class="hslink ab"
             >
-              {price}
-            </p>
-            <p class="hslink cd">
-              <span
-                role="contentinfo"
-                onmouseenter={() => hover('ההצעה שהתקבלה')}
+              {new Date(deadline).toLocaleDateString('he-IL')}
+            </p>{/if}
+          <p
+            onmouseenter={() => hover('שווי')}
+            onmouseleave={() => hover('0')}
+            class="hslink bc"
+          >
+            {price}
+          </p>
+          <p class="hslink cd">
+            <span
+              role="contentinfo"
+              onmouseenter={() => hover('ההצעה שהתקבלה')}
+              onmouseleave={() => hover('0')}
+              style="color: var(--gold)">{myp}</span
+            >
+            /<span
+              role="contentinfo"
+              onmouseenter={() => hover('ההצעה של הריקמה')}
+              onmouseleave={() => hover('0')}
+            >
+              {easy}</span
+            >
+          </p>
+          {#if missionDetails !== null}
+            <p
+              onmouseenter={() => hover('פרטי ההצעה ')}
+              onmouseleave={() => hover('0')}
+              class="hslink de d"
+            >
+              {missionDetails}
+            </p>{/if}
+          {#if low == false}
+            {#if already === false}
+              <button
+                onmouseenter={() => hover('אישור')}
                 onmouseleave={() => hover('0')}
-                style="color: var(--gold)">{myp}</span
+                onclick={agree}
+                class="btn ga"
+                name="requestToJoin"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  version="1.1"
+                  class="btin"
+                  viewBox="0 0 24 24"
+                  ><path
+                    fill="currentColor"
+                    d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
+                  /></svg
+                ></button
               >
-              /<span
-                role="contentinfo"
-                onmouseenter={() => hover('ההצעה של הריקמה')}
+              <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
+              <button
+                onmouseenter={() => hover('דחיה')}
                 onmouseleave={() => hover('0')}
+                onclick={decline}
+                class="btn gb"
+                name="decline"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  version="1.1"
+                  class="btin"
+                  viewBox="0 0 24 24"
+                  ><path
+                    fill="currentColor"
+                    d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                  /></svg
+                ></button
               >
-                {easy}</span
-              >
-            </p>
-            {#if missionDetails !== null}
-              <p
-                onmouseenter={() => hover('פרטי ההצעה ')}
-                onmouseleave={() => hover('0')}
-                class="hslink de d"
-              >
-                {missionDetails}
-              </p>{/if}
-            {#if low == false}
-              {#if already === false}
-                <button
-                  onmouseenter={() => hover('אישור')}
-                  onmouseleave={() => hover('0')}
-                  onclick={agree}
-                  class="btn ga"
-                  name="requestToJoin"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                    version="1.1"
-                    class="btin"
-                    viewBox="0 0 24 24"
-                    ><path
-                      fill="currentColor"
-                      d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-                    /></svg
-                  ></button
-                >
-                <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
-                <button
-                  onmouseenter={() => hover('דחיה')}
-                  onmouseleave={() => hover('0')}
-                  onclick={decline}
-                  class="btn gb"
-                  name="decline"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                    version="1.1"
-                    class="btin"
-                    viewBox="0 0 24 24"
-                    ><path
-                      fill="currentColor"
-                      d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                    /></svg
-                  ></button
-                >
-              {/if}
-            {:else if low == true}
-              <Lowbtn />
             {/if}
-          </div>
-        </SwiperSlide>
-      </Swiper>
-    </div>
-    {#if modal}
-<div data-vaul-drawer-wrapper>
-<Drawer.Root bind:open={dialogOpen} direction="right" shouldScaleBackground>
-	<Drawer.Trigger/>
-	<Drawer.Portal>
-		<Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-		<Drawer.Content class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse">
-			<div class="swiper-slidec mx-auto ">
-        <Card
-      onTochat={tochat}
-      onAgree={() => agree()}
-      onDecline={() => decline()}
-      onHover={hoverc}
-      {already}
-      {projectName}
-      {src}
-      {low}
-      {deadline}
-      {easy}
-      {myp}
-      {price}
-      {noofusersWaiting}
-      {useraplyname}
-      {noofusersOk}
-      {src2}
-      {openmissionName}
-      {missionDetails}
-      {noofusersNo}
-    />
-      </div>
-      </Drawer.Content>
-      </Drawer.Portal>
+          {:else if low == true}
+            <Lowbtn />
+          {/if}
+        </div>
+      </SwiperSlide>
+    </Swiper>
+  </div>
+  {#if modal}
+    <div data-vaul-drawer-wrapper>
+      <Drawer.Root
+        bind:open={dialogOpen}
+        direction="right"
+        shouldScaleBackground
+      >
+        <Drawer.Trigger />
+        <Drawer.Portal>
+          <Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+          <Drawer.Content
+            class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse"
+          >
+            <div class="swiper-slidec mx-auto">
+              <Card
+                onTochat={tochat}
+                onAgree={() => agree()}
+                onDecline={() => decline()}
+                onHover={hoverc}
+                {already}
+                {projectName}
+                {src}
+                {low}
+                {deadline}
+                {easy}
+                {myp}
+                {price}
+                {noofusersWaiting}
+                {useraplyname}
+                {noofusersOk}
+                {src2}
+                {openmissionName}
+                {missionDetails}
+                {noofusersNo}
+              />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
       </Drawer.Root>
-      </div>
-      {/if}
-  {:else}
-    <Card
-      onTochat={tochat}
-      onAgree={() => agree()}
-      onDecline={() => decline()}
-      onHover={hoverc}
-      {isVisible}
-      {already}
-      {projectName}
-      {src}
-      {low}
-      {deadline}
-      {easy}
-      {myp}
-      {price}
-      {noofusersWaiting}
-      {useraplyname}
-      {noofusersOk}
-      {src2}
-      {openmissionName}
-      {missionDetails}
-      {noofusersNo}
-    />
+    </div>
   {/if}
-{/await}
+{:else}
+  <Card
+    onTochat={tochat}
+    onAgree={() => agree()}
+    onDecline={() => decline()}
+    onHover={hoverc}
+    {isVisible}
+    {already}
+    {projectName}
+    {src}
+    {low}
+    {deadline}
+    {easy}
+    {myp}
+    {price}
+    {noofusersWaiting}
+    {useraplyname}
+    {noofusersOk}
+    {src2}
+    {openmissionName}
+    {missionDetails}
+    {noofusersNo}
+  />
+{/if}
 
 <style>
   .swiper-slidec {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  border-radius: 18px !important;
-  font-size: 22px;
-  font-weight: bold;
-  min-height:100vh;
-  min-width: 25vw !important;
-  max-width: 80vw !important;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 18px !important;
+    font-size: 22px;
+    font-weight: bold;
+    min-height: 100vh;
+    min-width: 25vw !important;
+    max-width: 80vw !important;
   }
   .btin {
     width: 13px;

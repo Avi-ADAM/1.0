@@ -91,6 +91,47 @@ export interface AskedResourceData {
   username: string;
   requestType?: string;
   priority?: number;
+  price?: number;
+  easy?: number;
+  spnot?: string;
+  descrip?: string;
+  hm?: number;
+  myp?: number;
+  kindOf?: string;
+  spid?: string;
+  deadline?: string;
+  openName?: string;
+  omid?: string;
+  askId?: string;
+  users?: any[];
+  [key: string]: any;
+}
+
+/** Resource Suggestion data (huca) */
+export interface ResourceSuggestionData {
+  id: string; // open mashaabim id
+  projectId: string; // will be extracted from project relation
+  oid: string; // user's SP id
+  priority?: number;
+
+  // Basic info from open_mashaabim
+  spnot?: string;
+  price?: number;
+  easy?: number;
+  kindOf?: string;
+  mashname?: string;
+  descrip?: string;
+  sqedualed?: string;
+  sqedualedf?: string;
+
+  // Derived/Related
+  myp?: number; // from user SP
+  declineddarra?: string[]; // IDs of declined open_mashaabims from SP
+
+  // Project info embedded if needed, or fetched via helpers
+  projectName?: string;
+  srcb?: string;
+
   [key: string]: any;
 }
 
@@ -105,6 +146,7 @@ export interface SuggestionData {
     description?: string;
     src?: string;
     membersCount?: number;
+    memberIds?: string[];
     restime?: any;
   };
   [key: string]: any;
@@ -201,6 +243,9 @@ export const pendsStore: Writable<PendMissionData[]> = writable([]);
 /** Missions in progress (mtaha) */
 export const mtahaStore: Writable<InProgressMissionData[]> = writable([]);
 
+/** Resource suggestions (huca) */
+export const resourceSuggestionsStore: Writable<ResourceSuggestionData[]> = writable([]);
+
 /** Mission approval requests (fiapp) */
 export const fiappStore: Writable<ApprovalData[]> = writable([]);
 
@@ -279,6 +324,7 @@ export interface SnapshotData {
     welcome: WelcomeData[];
     transfers: TransferData[];
     decisions: DecisionData[];
+    resourceSuggestions: ResourceSuggestionData[];
   };
 }
 

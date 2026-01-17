@@ -8,7 +8,7 @@
   import { Confetti } from 'svelte-confetti';
   const baseUrl = import.meta.env.VITE_URL;
   import pkg from 'lodash';
-  const {isEqual} = pkg;
+  const { isEqual } = pkg;
   import Bethas from '$lib/components/prPr/bethas.svelte';
   import Sidur from '$lib/components/prPr/sidur/sidur.svelte';
   import { toast } from 'svelte-sonner';
@@ -47,8 +47,16 @@
   import Sheirut from '$lib/components/prPr/sheirut.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import Diun from '$lib/components/lev/diun.svelte';
-  import { forum, initialForum, isChatOpen, updSend, nowChatId, newChat, userProjects } from '$lib/stores/pendMisMes';
-  import {SendTo} from '$lib/send/sendTo.svelte';
+  import {
+    forum,
+    initialForum,
+    isChatOpen,
+    updSend,
+    nowChatId,
+    newChat,
+    userProjects
+  } from '$lib/stores/pendMisMes';
+  import { SendTo } from '$lib/send/sendTo.svelte';
   let idL;
   let success = $state(false);
   let isOpen = $state(false);
@@ -63,7 +71,6 @@
   let hosaf = $state();
   let error2 = null;
   async function findM() {
-   
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -114,13 +121,13 @@
     en: 'add needed resources to FreeMates'
   };
   const noVallue = {
-    "he": "לא נשמרו עדיין משאבים שהתקבלו או משימות שהסתיימו בהצלחה ברקמה זו, לכך השווי הוא 0 ואי אפשר לחלק לפיו, יש ליצור ולשמור משאבים ומשימות כדי שניתן יהיה לחלק",
-    "en": "No values were saved yet for resources received or missions completed successfully in this FreeMates, so the value is 0 and it cannot be divided, you must create and save resources and missions in order to divide."
-  }
+    he: 'לא נשמרו עדיין משאבים שהתקבלו או משימות שהסתיימו בהצלחה ברקמה זו, לכך השווי הוא 0 ואי אפשר לחלק לפיו, יש ליצור ולשמור משאבים ומשימות כדי שניתן יהיה לחלק',
+    en: 'No values were saved yet for resources received or missions completed successfully in this FreeMates, so the value is 0 and it cannot be divided, you must create and save resources and missions in order to divide.'
+  };
   const crNow = {
-    "he": "ליצור עכשיו",
-    "en": "create now!"
-  }
+    he: 'ליצור עכשיו',
+    en: 'create now!'
+  };
   let cencel = { he: 'ביטול', en: 'cencel' };
   let showvd = $state(false);
 
@@ -140,10 +147,10 @@
     drivelink = $state(),
     twiterlink = $state(),
     watsapplink = $state();
-    let errorM = $state(false);
-  
-    let noneti = $state("");
-  
+  let errorM = $state(false);
+
+  let noneti = $state('');
+
   let newcontent = true;
   let newcontentR = true;
   let newcontentW = true;
@@ -171,8 +178,8 @@
   async function start() {
     if ($idPr !== 0) {
       // ולידציה שהיוזר חבר ברקמה
-       let token = page.data.tok;
-        
+      let token = page.data.tok;
+
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
@@ -206,7 +213,7 @@
         })
           .then(checkStatus)
           .then(parseJSON);
-               errorM = false
+        errorM = false;
 
         ata = res.data.project.data.attributes;
         console.log(res);
@@ -242,10 +249,10 @@
             publicDescription
              acts{data{id attributes{shem
                tafkidims {data{ id attributes{ roleDescription ${
-                $lang == 'he'
-                  ? 'localizations{data {attributes{ roleDescription}} }'
-                  : ''
-              } }}}
+                 $lang == 'he'
+                   ? 'localizations{data {attributes{ roleDescription}} }'
+                   : ''
+               } }}}
                   isAssigned
                 open_mission{data{id attributes {name}}}
                 pendm{data{id attributes{name}}}
@@ -331,102 +338,102 @@
               .then(checkStatus)
               .then(parseJSON);
             console.log(res);
-            if(res.data){
-                errorM = false
+            if (res.data) {
+              errorM = false;
 
-            meData = res.data.project.data.attributes;
-            console.log("ACTS",meData.acts)
-            project = res.data.project.data.attributes;
-            projectname = res.data.project.data.attributes.projectName;
-            desP = project.publicDescription;
-            linkP = res.data.project.data.attributes.linkToWebsite;
-            descPri = meData.descripFor;
-            descripFor = meData.descripFor;
-            projectUsers = project.user_1s.data;
-            restime = project.restime;
-            if (project.mesimabetahaliches.data.length > 0) {
-              bmiData = project.mesimabetahaliches.data;
-            } else if (project.mesimabetahaliches.data.length == null) {
-              bmiData.push(project.mesimabetahaliches.data);
-            }
-            if (project.sales.data.length > 0) {
-              salee = project.sales.data;
-            } else if (project.sales.data.length == null) {
-              salee.push(project.sales.data);
-            }
-            salee = salee;
-            if (project.matanotofs?.data?.length > 0) {
-              bmimData = project.matanotofs.data;
-            } else if (project.matanotofs?.data?.length == null) {
-              if (project.matanotofs?.data == null) {
-                //bmimData.push([]);
-              } else {
-                bmimData.push(project.matanotofs.data);
+              meData = res.data.project.data.attributes;
+              console.log('ACTS', meData.acts);
+              project = res.data.project.data.attributes;
+              projectname = res.data.project.data.attributes.projectName;
+              desP = project.publicDescription;
+              linkP = res.data.project.data.attributes.linkToWebsite;
+              descPri = meData.descripFor;
+              descripFor = meData.descripFor;
+              projectUsers = project.user_1s.data;
+              restime = project.restime;
+              if (project.mesimabetahaliches.data.length > 0) {
+                bmiData = project.mesimabetahaliches.data;
+              } else if (project.mesimabetahaliches.data.length == null) {
+                bmiData.push(project.mesimabetahaliches.data);
               }
-            }
-            console.log(project);
-            if (project.open_mashaabims.data.length > 0) {
-              opmash = project.open_mashaabims.data;
-            } else if (project.open_mashaabims.data.length == null) {
-              opmash.push(project.open_mashaabims.data);
-            }
-            if (project.finnished_missions.data.length > 0) {
-              fmiData = project.finnished_missions.data;
-            } else if (project.finnished_missions.data.length == null) {
-              fmiData.push(project.finnished_missions.data);
-            }
-            if (project.rikmashes.data.length > 0) {
-              rikmashes = project.rikmashes.data;
-            } else if (project.rikmashes.data.length == null) {
-              rikmashes.push(project.rikmashes.data);
-            }
-            rikmashes = rikmashes;
-            //  if (project.open_missions.length > 1){
-            bmimData = bmimData;
-
-            omiData = project.open_missions.data;
-            //  } else if (project.open_missions.length == null){
-            //  omiData.push(project.open_missions);
-            //  }
-            if (project.pendms.data.length > 0) {
-              pmiData = project.pendms.data;
-            } else if (project.pendms.data.length == null) {
-              pmiData.push(project.pendms.data);
-            }
-            //    omiData = omiData;
-            pmiData = pmiData;
-            bmiData = bmiData;
-            vallues = project.vallues.data;
-            if ($lang == 'he') {
-              for (let i = 0; i < vallues.length; i++) {
-                if (vallues[i].attributes.localizations.data.length > 0) {
-                  vallues[i].attributes.valueName =
-                    vallues[
-                      i
-                    ].attributes.localizations.data[0].attributes.valueName;
+              if (project.sales.data.length > 0) {
+                salee = project.sales.data;
+              } else if (project.sales.data.length == null) {
+                salee.push(project.sales.data);
+              }
+              salee = salee;
+              if (project.matanotofs?.data?.length > 0) {
+                bmimData = project.matanotofs.data;
+              } else if (project.matanotofs?.data?.length == null) {
+                if (project.matanotofs?.data == null) {
+                  //bmimData.push([]);
+                } else {
+                  bmimData.push(project.matanotofs.data);
                 }
               }
+              console.log(project);
+              if (project.open_mashaabims.data.length > 0) {
+                opmash = project.open_mashaabims.data;
+              } else if (project.open_mashaabims.data.length == null) {
+                opmash.push(project.open_mashaabims.data);
+              }
+              if (project.finnished_missions.data.length > 0) {
+                fmiData = project.finnished_missions.data;
+              } else if (project.finnished_missions.data.length == null) {
+                fmiData.push(project.finnished_missions.data);
+              }
+              if (project.rikmashes.data.length > 0) {
+                rikmashes = project.rikmashes.data;
+              } else if (project.rikmashes.data.length == null) {
+                rikmashes.push(project.rikmashes.data);
+              }
+              rikmashes = rikmashes;
+              //  if (project.open_missions.length > 1){
+              bmimData = bmimData;
+
+              omiData = project.open_missions.data;
+              //  } else if (project.open_missions.length == null){
+              //  omiData.push(project.open_missions);
+              //  }
+              if (project.pendms.data.length > 0) {
+                pmiData = project.pendms.data;
+              } else if (project.pendms.data.length == null) {
+                pmiData.push(project.pendms.data);
+              }
+              //    omiData = omiData;
+              pmiData = pmiData;
+              bmiData = bmiData;
+              vallues = project.vallues.data;
+              if ($lang == 'he') {
+                for (let i = 0; i < vallues.length; i++) {
+                  if (vallues[i].attributes.localizations.data.length > 0) {
+                    vallues[i].attributes.valueName =
+                      vallues[
+                        i
+                      ].attributes.localizations.data[0].attributes.valueName;
+                  }
+                }
+              }
+              valit = vallues.map((c) => c.attributes.valueName);
+              alit = vallues.map((c) => c.id);
+              linkP = meData.linkToWebsite;
+              githublink = meData.githubLink;
+              fblink = meData.fblink;
+              discordlink = meData.discordLink;
+              drivelink = meData.drivelink;
+              twiterlink = meData.twiterLink;
+              watsapplink = meData.watsapplink;
+              noofopenm = opmash.length;
+              noofopen = project.open_missions.data.length;
+              if (project.profilePic.data !== null) {
+                srcP = project.profilePic.data.attributes.url;
+              }
+              trili = meData.tosplits.data;
+              // pre(projectUsers, fmiData)
+            } else {
+              if (res.error && res.error.status == 401)
+                goto('/login?from=moach');
             }
-            valit = vallues.map((c) => c.attributes.valueName);
-            alit = vallues.map((c) => c.id);
-            linkP = meData.linkToWebsite;
-            githublink = meData.githubLink;
-            fblink = meData.fblink;
-            discordlink = meData.discordLink;
-            drivelink = meData.drivelink;
-            twiterlink = meData.twiterLink;
-            watsapplink = meData.watsapplink;
-            noofopenm = opmash.length;
-            noofopen = project.open_missions.data.length;
-            if (project.profilePic.data !== null) {
-              srcP = project.profilePic.data.attributes.url;
-            }
-            trili = meData.tosplits.data;
-            // pre(projectUsers, fmiData)
-          }else{
-            if(res.error && res.error.status == 401)
-            goto("/login?from=moach")
-          }
           } catch (e) {
             error1 = e;
             console.log(error1);
@@ -437,17 +444,18 @@
       } catch (e) {
         error1 = e;
         console.log(error1);
-         if(e == "TypeError: Failed to fetch"){
-          const nonet = {"he":"נראה שאין חיבור לאינטרנט, כדאי לנסות שוב","en":"no internet connection, try again"}
-                   errorM = true
-                  noneti = `${nonet[$lang]}`
-
-              }
+        if (e == 'TypeError: Failed to fetch') {
+          const nonet = {
+            he: 'נראה שאין חיבור לאינטרנט, כדאי לנסות שוב',
+            en: 'no internet connection, try again'
+          };
+          errorM = true;
+          noneti = `${nonet[$lang]}`;
+        }
       }
       return meData;
     }
   }
-
 
   function loadProjects() {
     if ($idPr == 0) {
@@ -457,7 +465,6 @@
     }
     return [];
   }
-
 
   let li = [];
   let miData = $state([]);
@@ -599,8 +606,6 @@
   let skills2 = [];
 
   let workways2 = [];
-  
- 
 
   async function hosa() {
     addM = true;
@@ -636,7 +641,6 @@
 
   let descripFor = $state();
 
- 
   let openMA = $state(false);
   let cencel1 = { he: 'סגירה', en: 'close' };
 
@@ -657,7 +661,7 @@
   let meDatamm = $state([]);
   async function updi() {
     let res = [];
-   
+
     token = page.data.tok;
     let bearer1 = 'bearer' + ' ' + token;
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -703,7 +707,7 @@
       success = false;
     }, 15000);
     toast.success(cloma[$lang]);
-    start()
+    start();
   }
   let noofopen = $state(2);
 
@@ -798,27 +802,37 @@
       })
       .then(({ data }) => {
         const imageId = data[0].id;
-        if(projectUsers.length == 1){
-        sendToSer({projectId: $idPr, imageId: imageId}, "43updateProfilePic",null,null,true,fetch)
-        .then((data) => {
-          console.log(data);
-          meDatap = data;
-              srcP = meDatap.data.updateProject.data.attributes.profilePic.formats.thumbnail.url;
-              srcP = meDatap.data.updateProject.data.attributes.profilePic.formats.small.url;
+        if (projectUsers.length == 1) {
+          sendToSer(
+            { projectId: $idPr, imageId: imageId },
+            '43updateProfilePic',
+            null,
+            null,
+            true,
+            fetch
+          )
+            .then((data) => {
+              console.log(data);
+              meDatap = data;
+              srcP =
+                meDatap.data.updateProject.data.attributes.profilePic.formats
+                  .thumbnail.url;
+              srcP =
+                meDatap.data.updateProject.data.attributes.profilePic.formats
+                  .small.url;
               srcP = meDatap.data.updateProject.data.attributes.profilePic.url;
               isOpenM = false;
               a = 0;
               toast.success(`${picupsu[$lang]}`);
-        })
-      .catch((error) => {
-        console.log(error);
-        a = 3;
-      });
-
-    } else {
+            })
+            .catch((error) => {
+              console.log(error);
+              a = 3;
+            });
+        } else {
           let linkg = baseUrl + '/graphql';
           try {
-           fetch(linkg, {
+            fetch(linkg, {
               method: 'POST',
 
               headers: {
@@ -849,11 +863,23 @@
               .then((r) => r.json())
               .then((data) => {
                 meDatap = data;
-                if (meDatap && meDatap.data && meDatap.data.createDecision && meDatap.data.createDecision.data) {
+                if (
+                  meDatap &&
+                  meDatap.data &&
+                  meDatap.data.createDecision &&
+                  meDatap.data.createDecision.data
+                ) {
                   let timegramaId = meDatap.data.createDecision.data.id;
                   let x = calcX(restime);
                   let fd = new Date(Date.now() + x);
-                  sendToSer({whatami:"decision",decision:timegramaId,date:fd},"32createTimeGrama",null,null,false,fetch);
+                  sendToSer(
+                    { whatami: 'decision', decision: timegramaId, date: fd },
+                    '32createTimeGrama',
+                    null,
+                    null,
+                    false,
+                    fetch
+                  );
                   isOpenM = false;
                   a = 0;
                   toast.success(`${picvots[$lang]}`);
@@ -934,10 +960,7 @@
       restimeii = `restime: ${event.restime},`;
       counter = true;
     }
-    if (
-      event.githublink != githublink &&
-      event.githublink != null
-    ) {
+    if (event.githublink != githublink && event.githublink != null) {
       githublinkii = `githublink: "${event.githublink}",`;
       counter = true;
     }
@@ -945,10 +968,7 @@
       fblinkii = `fblink: "${event.fblink}",`;
       counter = true;
     }
-    if (
-      event.discordlink != discordlink &&
-      event.discordlink != null
-    ) {
+    if (event.discordlink != discordlink && event.discordlink != null) {
       discordlinkii = `discordlink: "${event.discordlink}",`;
       counter = true;
     }
@@ -956,21 +976,15 @@
       drivelinkii = `drivelink: "${event.drivelink}",`;
       counter = true;
     }
-    if (
-      event.twiterlink != projectname &&
-      event.twiterlink != null
-    ) {
+    if (event.twiterlink != projectname && event.twiterlink != null) {
       twiterlinkii = `twiterlink: "${event.twiterlink}",`;
       counter = true;
     }
-    if (
-      event.watsapplink != watsapplink &&
-      event.watsapplink != null
-    ) {
+    if (event.watsapplink != watsapplink && event.watsapplink != null) {
       watsapplinkii = `watsapplink: "${event.watsapplink}",`;
       counter = true;
     }
-    
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -1149,7 +1163,7 @@
   function openDescrip(event) {
     const id = event.id;
     const is = event.kind;
-    who = id
+    who = id;
     if (is == 'pendm') {
       isOpen = true;
       a = 4;
@@ -1159,9 +1173,9 @@
     } else if (is == 'openM') {
       isOpen = true;
       a = 6;
-    }else if(is == "assign"){
+    } else if (is == 'assign') {
       isOpen = true;
-      a = 9
+      a = 9;
     }
   }
   let hover = false;
@@ -1184,7 +1198,7 @@
   }
   function tofinish() {
     hagdel = true;
-    tab = 4
+    tab = 4;
     finiss.scrollIntoView(true);
   }
   const title = { he: 'מוח הריקמה 1💗1', en: '1💗1 FreeMates Brain' };
@@ -1238,96 +1252,99 @@
     en: ''
   };
   const neww = {
-    he:"יצירה",
-    en:"add"
-  }
-  const mechirot ={
-    he:"מכירות",
-    en:"sales"
-  }
+    he: 'יצירה',
+    en: 'add'
+  };
+  const mechirot = {
+    he: 'מכירות',
+    en: 'sales'
+  };
   const haluka = {
-    he:"חלוקה",
-    en:"spliting"
-  }
-  const shirutims ={
-    he:"שירותים",
-    en:"services"
-  }
+    he: 'חלוקה',
+    en: 'spliting'
+  };
+  const shirutims = {
+    he: 'שירותים',
+    en: 'services'
+  };
   const actL = {
-    he:"פעולות",
-    en:"todo"
-  }
+    he: 'פעולות',
+    en: 'todo'
+  };
 
-  const maini = {he: "ראשי", en:"main"}
+  const maini = { he: 'ראשי', en: 'main' };
   const choo = { he: 'בחירת ריקמה', en: 'choose FreeMate' };
-  const timers = {he: 'טיימרים', en: 'timers'};
+  const timers = { he: 'טיימרים', en: 'timers' };
   let sid = false;
   let gan = false;
   let bett = false;
-    let width = $state(0);
-  
+  let width = $state(0);
+
   let chatId = $state();
   let newID;
   let smalldes;
   let nameChatPartner;
   let clicked = $state(false);
-  
+
   let ani;
-  let isNew = false
-      const er = {"he": "אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ","en":"error: please try again, if the problem continue contact at baruch@1lev1.com"}
+  let isNew = false;
+  const er = {
+    he: 'אם הבעיה נמשכת baruch@1lev1.com שגיאה יש לנסות שנית, ניתן ליצור קשר במייל ',
+    en: 'error: please try again, if the problem continue contact at baruch@1lev1.com'
+  };
 
-  const messs = {"he":"הודעתך נשלחה בהצלחה","en":"your message was send succsefully"}
-     
-    let unsubscribe;
+  const messs = {
+    he: 'הודעתך נשלחה בהצלחה',
+    en: 'your message was send succsefully'
+  };
 
-    function subs() {
-        unsubscribe = newChat.subscribe(value => {
-            if (value.created == true) {
-                addTo();
-            }
-        });
-    }
-    import { onDestroy } from 'svelte';
+  let unsubscribe;
+
+  function subs() {
+    unsubscribe = newChat.subscribe((value) => {
+      if (value.created == true) {
+        addTo();
+      }
+    });
+  }
+  import { onDestroy } from 'svelte';
   import ActsTable from '$lib/components/prPr/tasks/actsTable.svelte';
   import ChooseM from '$lib/components/prPr/tasks/chooseM.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import TimersOfUsers from '$lib/components/prPr/timersOfUsers.svelte';
-import { RingLoader } from 'svelte-loading-spinners';
-import { sendToSer } from '$lib/send/sendToSer';
-import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
-import { calcX } from '$lib/func/calcX.svelte';
-import Button from '$lib/celim/ui/button.svelte';
-import { link } from 'd3-shape';
-import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
+  import { RingLoader } from 'svelte-loading-spinners';
+  import { sendToSer } from '$lib/send/sendToSer';
+  import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
+  import { calcX } from '$lib/func/calcX.svelte';
+  import Button from '$lib/celim/ui/button.svelte';
+  import { link } from 'd3-shape';
+  import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
 
-    onDestroy(() => {
-        if (unsubscribe) {
-            unsubscribe();
-        }
-    });
+  onDestroy(() => {
+    if (unsubscribe) {
+      unsubscribe();
+    }
+  });
 
-    function addTo() {
-      
-        let oldbmiData = bmiData
-        let bmiDataSp = oldbmiData.findIndex(obj=> obj.id == $newChat.id)
-        if(bmiDataSp !== -1){
-            oldbmiData[bmiDataSp].attributes.forums = {data:[{id:id}]}
-            bmiData = oldbmiData
-            bmiData = bmiData
-            console.log(bmiData)
-             if (unsubscribe) {
-            unsubscribe();
-        }
-            }
-              }
-  
-
+  function addTo() {
+    let oldbmiData = bmiData;
+    let bmiDataSp = oldbmiData.findIndex((obj) => obj.id == $newChat.id);
+    if (bmiDataSp !== -1) {
+      oldbmiData[bmiDataSp].attributes.forums = { data: [{ id: id }] };
+      bmiData = oldbmiData;
+      bmiData = bmiData;
+      console.log(bmiData);
+      if (unsubscribe) {
+        unsubscribe();
+      }
+    }
+  }
 
   async function afreact(e) {
-    const m = e.why
-    console.log(m)
-    let da = new Date
-    if(isNew == true){
+    const m = e.why;
+    console.log(m);
+    let da = new Date();
+    if (isNew == true) {
       let queFor = `mutation { createForum(
        data: {
         project:"${$idPr}",
@@ -1335,29 +1352,28 @@ import CrNewProject from '$lib/celim/icons/crNewProject.svelte';
         publishedAt:"${da.toISOString()}"
        }
         ){data{id}}
-      }`
-     let d = await SendTo(queFor).then(d=> d = d.data)
-     if(d != null){
-      const forumId = d.createForum.data.id
-      createMes(forumId,m)
-     }else{
-      console.error(d)
-      toast.warning(`${er[$lang]}`);
-     }
-    }else{
-     createMes(chatId,m)
+      }`;
+      let d = await SendTo(queFor).then((d) => (d = d.data));
+      if (d != null) {
+        const forumId = d.createForum.data.id;
+        createMes(forumId, m);
+      } else {
+        console.error(d);
+        toast.warning(`${er[$lang]}`);
+      }
+    } else {
+      createMes(chatId, m);
     }
-
   }
 
-async function createMes(id,mes){
-       const cookieValueId = document.cookie
+  async function createMes(id, mes) {
+    const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
-      idL = cookieValueId;
-      let da = new Date()
-      let queFor = `mutation { createMessage(
+    idL = cookieValueId;
+    let da = new Date();
+    let queFor = `mutation { createMessage(
        data: {
         forum:"${id}",
         users_permissions_user:"${idL}",
@@ -1366,43 +1382,43 @@ async function createMes(id,mes){
         content:"""${mes}"""
        }
         ){data{id}}
-      }`
-     let d = await SendTo(queFor).then(d=> d = d.data)
-     if(d != null){
-      if(isNew == true){
-        //update bmidata, 
-        updSend(0,0)
-        let oldbmiData = bmiData
-        let bmiDataSp = oldbmiData.findIndex(obj=> obj.id == newID)
-        if(bmiDataSp !== -1){
-            oldbmiData[bmiDataSp].attributes.forums = {data:[{id:id}]}
-            bmiData = oldbmiData
-            bmiData = bmiData
-            console.log(bmiData)
-        }else{
-          console.error(1570)
+      }`;
+    let d = await SendTo(queFor).then((d) => (d = d.data));
+    if (d != null) {
+      if (isNew == true) {
+        //update bmidata,
+        updSend(0, 0);
+        let oldbmiData = bmiData;
+        let bmiDataSp = oldbmiData.findIndex((obj) => obj.id == newID);
+        if (bmiDataSp !== -1) {
+          oldbmiData[bmiDataSp].attributes.forums = { data: [{ id: id }] };
+          bmiData = oldbmiData;
+          bmiData = bmiData;
+          console.log(bmiData);
+        } else {
+          console.error(1570);
         }
-        chatId = id
+        chatId = id;
         //inititate with new id
-              initialForum(false,[chatId],idL)
-      }else{
-      //message sended
-      updSend(chatId,0)
+        initialForum(false, [chatId], idL);
+      } else {
+        //message sended
+        updSend(chatId, 0);
       }
-      clicked = false
-      console.log(clicked,"sdfaw")
+      clicked = false;
+      console.log(clicked, 'sdfaw');
       toast.success(`${messs[$lang]}`);
-     }else{
-      console.error(d)
+    } else {
+      console.error(d);
       toast.warning(`${er[$lang]}`);
-     }
+    }
   }
   function openChat(e) {
-     isNew = e.isNew;
-     console.log(e)
+    isNew = e.isNew;
+    console.log(e);
     if (isNew == false) {
-      $nowChatId = e.id
-      $isChatOpen = true
+      $nowChatId = e.id;
+      $isChatOpen = true;
       /*
        initialForum(false,[e.id],idL)
       chatId = e.id;
@@ -1411,28 +1427,28 @@ async function createMes(id,mes){
       //TODO: meanwhile show loading on chat
     } else {
       $newChat = {
-          started:true,
-          created: false,
-          id: 0,
-          md: { mbId:e.id, pid:$idPr}
-            }
-      let tempF = $forum
+        started: true,
+        created: false,
+        id: 0,
+        md: { mbId: e.id, pid: $idPr }
+      };
+      let tempF = $forum;
       tempF[-1] = {
         loading: false,
-        messages:[],
-        md:{
-          pid:$idPr,
-          mbId:e.id,
-          projectName:projectname,
-          projectPic:srcP,
-          mesimaName:e.smalldes
+        messages: [],
+        md: {
+          pid: $idPr,
+          mbId: e.id,
+          projectName: projectname,
+          projectPic: srcP,
+          mesimaName: e.smalldes
         }
       };
-      forum.set(tempF)
-      nowChatId.set(-1)
-      $isChatOpen = true
-      subs()
-      console.log($nowChatId)
+      forum.set(tempF);
+      nowChatId.set(-1);
+      $isChatOpen = true;
+      subs();
+      console.log($nowChatId);
       /*newID = e.id
       smalldes = e.smalldes;
       nameChatPartner = e.nameChatPartner[$lang];
@@ -1441,8 +1457,6 @@ async function createMes(id,mes){
     a = 8;
     isOpen = true;*/
     }
-
-    
   }
   function forums(dat) {
     let oldForums = $forum;
@@ -1462,7 +1476,7 @@ async function createMes(id,mes){
     }
     function addMes() {
       let arr = [];
-      let datan
+      let datan;
       arr.push({
         message:
           datan.data.attributes.diun[datan.data.attributes.diun.length - 1].why,
@@ -1487,10 +1501,13 @@ async function createMes(id,mes){
     localStorage.setItem('pendMisMes', JSON.stringify($forum));
   }
   let tab = $state(1);
-  
-  const mesimaBetaHe = {"he":"פעולות בתהליך ביצוע","en":"missions in progress"};
-  function add(event){
-    console.log(event)
+
+  const mesimaBetaHe = {
+    he: 'פעולות בתהליך ביצוע',
+    en: 'missions in progress'
+  };
+  function add(event) {
+    console.log(event);
   }
   const backList = { he: 'בחירת ריקמה אחרת', en: 'choose another FreeMate' };
   const createNewRikma = { he: 'יצירת ריקמה חדשה', en: 'Create new FreeMate' };
@@ -1514,12 +1531,18 @@ async function createMes(id,mes){
     href=" https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
   />
 </svelte:head>
-<div class="alli bg-[radial-gradient(circle_at_45%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),theme(colors.black))]"></div>
-  {#key errorM}
-        {#if errorM != false}
-      <h2   class="absolute bg-barbi text-gold py-3 px-6 rounded-sm bottom-6 -translate-x-1/2 left-1/2 ">{noneti}</h2>
-    {/if}
-    {/key}
+<div
+  class="alli bg-[radial-gradient(circle_at_45%,theme(colors.slate.400),theme(colors.slate.500)_10%,theme(colors.slate.600)_20%,theme(colors.slate.800),theme(colors.slate.900),theme(colors.black))]"
+></div>
+{#key errorM}
+  {#if errorM != false}
+    <h2
+      class="absolute bg-barbi text-gold py-3 px-6 rounded-sm bottom-6 -translate-x-1/2 left-1/2"
+    >
+      {noneti}
+    </h2>
+  {/if}
+{/key}
 {#if $idPr}
   {#await meData}
     <div class="alli grid items-center justify-center">
@@ -1527,26 +1550,28 @@ async function createMes(id,mes){
       <Lowding />
     </div>
   {:then meData}
-  {#if a == 0 && isOpenM}
-  <div class="center-upload">
-    <Uplad onMessage={allbackFunction} current={srcP}/>
-    <button onclick={closer}>{cencel[$lang]}</button>
-  </div>
-  {:else if a == 2 && isOpenM}
-  <div class="center-upload">
- <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"></RingLoader>
- </div> 
- {/if}
+    {#if a == 0 && isOpenM}
+      <div class="center-upload">
+        <Uplad onMessage={allbackFunction} current={srcP} />
+        <button onclick={closer}>{cencel[$lang]}</button>
+      </div>
+    {:else if a == 2 && isOpenM}
+      <div class="center-upload">
+        <RingLoader size="40" color="#ff00ae" unit="px" duration="2s"
+        ></RingLoader>
+      </div>
+    {/if}
     <!--   <Tooltip title="{ti}" >-->
     <DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
       <div
         style="z-index: 700;"
         transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}
       >
-        <DialogContent aria-label="form"
-         class={a != 8 ? a != 5 ? "content" : "betha" :"chat"}>
-          <div style="z-index: 400;"      dir="{$lang == "he" ? "rtl" : "ltr"}"
-          >
+        <DialogContent
+          aria-label="form"
+          class={a != 8 ? (a != 5 ? 'content' : 'betha') : 'chat'}
+        >
+          <div style="z-index: 400;" dir={$lang == 'he' ? 'rtl' : 'ltr'}>
             <button
               class=" hover:bg-barbi text-mturk rounded-full"
               onclick={closer}
@@ -1587,43 +1612,42 @@ async function createMes(id,mes){
             {:else if a == 7}
               <Finisin {who} {fmiData} />
             {:else if a === 8}
-            {#key clicked}
-              <Diun
-                rikmaName={projectname}
-                onRect={afreact}
-                {smalldes}
-                {nameChatPartner}
-                mypos={true}
-                {clicked}
-                pendId={chatId}
-                rect={true}
-                profilePicChatPartner={srcP}
-                {ani}
-              />
+              {#key clicked}
+                <Diun
+                  rikmaName={projectname}
+                  onRect={afreact}
+                  {smalldes}
+                  {nameChatPartner}
+                  mypos={true}
+                  {clicked}
+                  pendId={chatId}
+                  rect={true}
+                  profilePicChatPartner={srcP}
+                  {ani}
+                />
               {/key}
             {:else if a === 9}
-            <span class="text-gold">
-            </span>
-            <ChooseM {bmiData} taskId={who} onClose={closer}/>
+              <span class="text-gold"> </span>
+              <ChooseM {bmiData} taskId={who} onClose={closer} />
             {/if}
           </div></DialogContent
         >
       </div>
     </DialogOverlay>
-  
+
     <!--{#if idUst.map(c => c.id) == idUsl} 
 בנוסף במקרה של רענון יעלם האידי של הרקמה
 לכן לוודא שיש ערכים ואם לא לתת אפשרות לבחור רקמה או להחזיר לדף הבית-->
 
     <div
-      dir="{$lang == "he" ? "rtl" : "ltr"}"
+      dir={$lang == 'he' ? 'rtl' : 'ltr'}
       bind:clientWidth={width}
-      class="all text-barbi text-center  overflow-y-auto max-h-[calc(100vh-3rem)]  scroll-smooth d mb-12"
+      class="all text-barbi text-center overflow-y-auto max-h-[calc(100vh-3rem)] scroll-smooth d mb-12"
       style="-webkit-scrollbar:0px;"
     >
-    {#if !isMobileOrTablet()}
-    <Header />
-    {/if}
+      {#if !isMobileOrTablet()}
+        <Header />
+      {/if}
       {#if success}
         <div
           style="
@@ -1680,27 +1704,35 @@ pointer-events: none;"
         </div>
       {/if}
       <div>
-      <div class="flex justify-center items-center w-full relative">
-        <!-- Back button - positioned at top left -->
-        <button
-          class="absolute left-14 top-0 flex items-center border border-gold gap-1 text-barbi hover:text-gold hover:bg-barbi/20 rounded-full p-2 transition-colors"
-          onclick={backToProjects}
-          title={backList[$lang]}
-        >
-          <svg style="width:20px;height:20px" viewBox="0 0 24 24" fill="currentColor">
-            <path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/>
-          </svg>
-          <span class="text-sm font-medium hidden sm:inline">{backList[$lang]}</span>
-        </button>
-        <!-- Authority Badge Component -->
-        <AuthorityBadge 
-          logoSrc={srcP}
-          projectName={projectname}
-          memberCount={projectUsers?.length || 0}
-          size={200}
-        />
+        <div class="flex justify-center items-center w-full relative">
+          <!-- Back button - positioned at top left -->
+          <button
+            class="absolute left-14 top-0 flex items-center border border-gold gap-1 text-barbi hover:text-gold hover:bg-barbi/20 rounded-full p-2 transition-colors"
+            onclick={backToProjects}
+            title={backList[$lang]}
+          >
+            <svg
+              style="width:20px;height:20px"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+            >
+              <path
+                d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"
+              />
+            </svg>
+            <span class="text-sm font-medium hidden sm:inline"
+              >{backList[$lang]}</span
+            >
+          </button>
+          <!-- Authority Badge Component -->
+          <AuthorityBadge
+            logoSrc={srcP}
+            projectName={projectname}
+            memberCount={projectUsers?.length || 0}
+            size={200}
+          />
         </div>
-       
+
         <div class="flex flex-row items-center justify-center">
           {#if srcP !== null}
             <button
@@ -1755,7 +1787,7 @@ pointer-events: none;"
               />
             </a>
           {/if}
-          {#if linkP && linkP != undefined && linkP != null && linkP != "" && linkP != "null" && linkP != "undefined"}
+          {#if linkP && linkP != undefined && linkP != null && linkP != '' && linkP != 'null' && linkP != 'undefined'}
             <a
               rel="noreferrer"
               target="_blank"
@@ -1860,10 +1892,11 @@ pointer-events: none;"
           </button>
         </div>
         <!-- Project name is now displayed in the AuthorityBadge component -->
-        <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
-        class="flex items-center justify-center">
-          <div       dir="{$lang == "he" ? "rtl" : "ltr"}"
-          class="flex -space-x-2 ">
+        <div
+          dir={$lang == 'he' ? 'rtl' : 'ltr'}
+          class="flex items-center justify-center"
+        >
+          <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="flex -space-x-2">
             {#each projectUsers as user}
               <button
                 title={user.attributes.username}
@@ -1882,101 +1915,125 @@ pointer-events: none;"
             {/each}
           </div>
         </div>
-<!--tab header-->
-   <nav class="flex justify-center bg- max-w-screen flex-wrap overflow-x-auto d py-0.5 ">
-                  <button
-                onclick={() => (tab = 1)}
-                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 1 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={maini[$lang]}
-                ><div
-                  class="flex flex-col items-center justify-center align-middle"
-                >
-                  <h2 style="{tab == 1 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {maini[$lang]}
-                  </h2>
-                  <!--<Scab/>-->
-                </div></button
-              >
-              <button
-                onclick={() => (tab = 2)}
-                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 2 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={neww[$lang]}
-                ><div
-                  class="flex flex-col items-center justify-center align-middle"
-                >
-                  <h2 style="{tab == 2 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {neww[$lang]}
-                  </h2>
-                  <!--<Scab/>-->
-                </div></button
-              >
-              <button
-                onclick={() => (tab = 3)}
-                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 3 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={gann[$lang]}
-                ><div
-                  class="flex flex-col items-center justify-center align-middle"
-                >
-                  <h2 style="{tab == 3 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {gann[$lang]}
-                  </h2>
-                  <!--<Scab/>-->
-                </div></button
-              >
-              <button
-                onclick={() => (tab = 4)}
-                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 4 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={haluka[$lang]}
-                ><div
-                  class="flex flex-col items-center justify-center align-middle"
-                >
-                  <h2 style="{tab == 4 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {haluka[$lang]}
-                  </h2>
-                  <!--<Siduri/>-->
-                </div></button
-              >
-            {#if bmiData.length > 0}
-                <button
-                  onclick={() => (tab = 5)}
-                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 5 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                  title={bet[$lang]}
-                  ><div
-                    class="flex flex-col items-center justify-center align-middle"
-                  >
-                  <h2 style="{tab == 5 ? "": "text-shadow:1px 1px #fff ;"}">
-                      {bet[$lang]}
-                    </h2>
-                    <!--<Taskk/>-->
-                  </div></button
-                >
-            {/if}
-            {#if meData?.acts.data.length > 0}
-            <button
-            onclick={() => (tab = 9)}
-            class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi  hover:bg-gold {tab == 9 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-            title={actL[$lang]}
+        <!--tab header-->
+        <nav
+          class="flex justify-center bg- max-w-screen flex-wrap overflow-x-auto d py-0.5"
+        >
+          <button
+            onclick={() => (tab = 1)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            1
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={maini[$lang]}
             ><div
               class="flex flex-col items-center justify-center align-middle"
             >
-              <h2 style="{tab == 9 ? "": "text-shadow:1px 1px #fff ;"}">
-                {actL[$lang]}
+              <h2 style={tab == 1 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {maini[$lang]}
+              </h2>
+              <!--<Scab/>-->
+            </div></button
+          >
+          <button
+            onclick={() => (tab = 2)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            2
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={neww[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 2 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {neww[$lang]}
+              </h2>
+              <!--<Scab/>-->
+            </div></button
+          >
+          <button
+            onclick={() => (tab = 3)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            3
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={gann[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 3 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {gann[$lang]}
+              </h2>
+              <!--<Scab/>-->
+            </div></button
+          >
+          <button
+            onclick={() => (tab = 4)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            4
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={haluka[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 4 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {haluka[$lang]}
+              </h2>
+              <!--<Siduri/>-->
+            </div></button
+          >
+          {#if bmiData.length > 0}
+            <button
+              onclick={() => (tab = 5)}
+              class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+              5
+                ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+                : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+              title={bet[$lang]}
+              ><div
+                class="flex flex-col items-center justify-center align-middle"
+              >
+                <h2 style={tab == 5 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                  {bet[$lang]}
+                </h2>
+                <!--<Taskk/>-->
+              </div></button
+            >
+          {/if}
+          {#if meData?.acts.data.length > 0}
+            <button
+              onclick={() => (tab = 9)}
+              class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+              9
+                ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+                : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+              title={actL[$lang]}
+              ><div
+                class="flex flex-col items-center justify-center align-middle"
+              >
+                <h2 style={tab == 9 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                  {actL[$lang]}
+                </h2>
+              </div></button
+            >
+          {/if}
+          <button
+            onclick={() => (tab = 10)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            10
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={timers[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 10 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {timers[$lang]}
               </h2>
             </div></button
           >
-            {/if}
-            <button
-                onclick={() => (tab = 10)}
-                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 10 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={timers[$lang]}
-                ><div
-                  class="flex flex-col items-center justify-center align-middle"
-                >
-                  <h2 style="{tab == 10 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {timers[$lang]}
-                  </h2>
-                </div></button>
-            <!-- <button
+          <!-- <button
                 onclick={() => (tab = 6)}
                 class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 6 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
                 title={shirutims[$lang]}
@@ -1987,111 +2044,122 @@ pointer-events: none;"
                     {shirutims[$lang]}
                   </h2>
                 </div></button>-->
-               <button
-                onclick={() => (tab = 7)}
-                class="hover:border  hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab == 7 ? "bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold" : "bg-gradient-to-r from-gra via-grb  to-gre text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={mechirot[$lang]}
-                ><div
-                  class="flex flex-col items-center justify-center align-middle"
-                >
-                  <h2 style="{tab == 7 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {mechirot[$lang]}
-                  </h2>
-                  <!--<Siduri/>-->
-                </div></button>
-               <button
-                onclick={() => (tab = 8)}
-                class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold  {tab == 8 ? "bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold " : " bg-gradient-to-r from-gra via-grb  to-grc text-barbi"} px-4 py-2 drop-shadow-lg shadow-gold"
-                title={sidd[$lang]}
-                ><div
-                  class="flex flex-col items-center justify-center align-middle"
-                >
-                  <h2 style="{tab == 8 ? "": "text-shadow:1px 1px #fff ;"}">
-                    {sidd[$lang]}
-                  </h2>
-                  <!--<Siduri/>-->
-                </div></button>
-              </nav>
-<!--tabs-->
-<div class="border-t-2 border-mturk">
-{#if tab === 1}
-        {#if project.publicDescription != 'undefined' && project.publicDescription != null && project.publicDescription != ""}
-            <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
-            <RichText editable={false} outpot={project?.publicDescription} />
-        {/if}
-        {#if project.descripFor != 'undefined' && project.descripFor != null && project.descripFor != ""}
-            <RichText editable={false} outpot={project?.descripFor} />
-            <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
-        {/if}
-
-        <div>
-          {#if vallues.length > 0}
-            <h2 class="text-sm text-barbi">{vap[$lang]}</h2>
-            <div
-              class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2"
+          <button
+            onclick={() => (tab = 7)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            7
+              ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
+              : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={mechirot[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
             >
-              {#each vallues as vallue}<p class="m-0" style="text-shadow:none;">
-                  <Tile
-                    bg="gold"
-                    sm={width > 500 ? true : false}
-                    big={width > 500 ? true : false}
-                    word={vallue.attributes.valueName}
-                  />
-                </p>{/each}
-            </div>{/if}
+              <h2 style={tab == 7 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {mechirot[$lang]}
+              </h2>
+              <!--<Siduri/>-->
+            </div></button
+          >
+          <button
+            onclick={() => (tab = 8)}
+            class="hover:border hover:underline hover:decoration-mturk sm:text-xl hover:border-barbi hover:bg-gold {tab ==
+            8
+              ? 'bg-gradient-to-r from-barbi via-fuchsia-400 to-mpink text-gold '
+              : ' bg-gradient-to-r from-gra via-grb  to-grc text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
+            title={sidd[$lang]}
+            ><div
+              class="flex flex-col items-center justify-center align-middle"
+            >
+              <h2 style={tab == 8 ? '' : 'text-shadow:1px 1px #fff ;'}>
+                {sidd[$lang]}
+              </h2>
+              <!--<Siduri/>-->
+            </div></button
+          >
+        </nav>
+        <!--tabs-->
+        <div class="border-t-2 border-mturk">
+          {#if tab === 1}
+            {#if project.publicDescription != 'undefined' && project.publicDescription != null && project.publicDescription != ''}
+              <!----<pre style="overflow-y:auto;  white-space: pre-wrap;" class="2 d max-h-24 p-2">{desP}</pre>-->
+              <RichText editable={false} outpot={project?.publicDescription} />
+            {/if}
+            {#if project.descripFor != 'undefined' && project.descripFor != null && project.descripFor != ''}
+              <RichText editable={false} outpot={project?.descripFor} />
+              <!---- <pre style="overflow-y:auto; white-space: pre-wrap;" class="2 d max-h-24 p-2 ">{descripFor}</pre>-->
+            {/if}
+
+            <div>
+              {#if vallues.length > 0}
+                <h2 class="text-sm text-barbi">{vap[$lang]}</h2>
+                <div
+                  class="border border-gold flex sm:flex-row flex-wrap justify-center align-middle d cd p-2"
+                >
+                  {#each vallues as vallue}<p
+                      class="m-0"
+                      style="text-shadow:none;"
+                    >
+                      <Tile
+                        bg="gold"
+                        sm={width > 500 ? true : false}
+                        big={width > 500 ? true : false}
+                        word={vallue.attributes.valueName}
+                      />
+                    </p>{/each}
+                </div>{/if}
             </div>
-{:else if tab == 2}            
-          <!--
+          {:else if tab == 2}
+            <!--
   <div>
  <Fini users={projectUsers} {fmiData}/></div>-->
 
-          <div class=" hhh">
-            {#if hovered}
-              <button onclick={hosa} onmouseleave={bighand}
-                ><img
-                  title={hosafa[$lang]}
-                  style="max-width:45vw; max-height:45vw;"
-                  width="240px"
-                  height="240px"
-                  src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
-                  alt="cheked"
-                /></button
-              >
-            {:else}
-              <Hand
-                onHosa={hosa}
-                onProgres={bighand}
-                onTrym={trym}
-                {noofopen}
-                {openMS}
-                {addM}
-                hosafa={hosafa[$lang]}
-              />
-            {/if}
-            {#if hoveredd}
-              <button onclick={masi} onmouseleave={bighandd}
-                ><img
-                  title={hosafat[$lang]}
-                  style="max-width:45vw; max-height:45vw;"
-                  width="240px"
-                  height="240px"
-                  src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
-                  alt="cheked"
-                /></button
-              >
-            {:else}
-              <Handd
-                onTrym={tryma}
-                onMasi={masi}
-                onBighandd={bighandd}
-                {noofopenm}
-                {openMA}
-                {addN}
-                hosafat={hosafat[$lang]}
-              />
-            {/if}
+            <div class=" hhh">
+              {#if hovered}
+                <button onclick={hosa} onmouseleave={bighand}
+                  ><img
+                    title={hosafa[$lang]}
+                    style="max-width:45vw; max-height:45vw;"
+                    width="240px"
+                    height="240px"
+                    src="https://res.cloudinary.com/love1/image/upload/v1642614850/buttonP2_tock4d.svg"
+                    alt="cheked"
+                  /></button
+                >
+              {:else}
+                <Hand
+                  onHosa={hosa}
+                  onProgres={bighand}
+                  onTrym={trym}
+                  {noofopen}
+                  {openMS}
+                  {addM}
+                  hosafa={hosafa[$lang]}
+                />
+              {/if}
+              {#if hoveredd}
+                <button onclick={masi} onmouseleave={bighandd}
+                  ><img
+                    title={hosafat[$lang]}
+                    style="max-width:45vw; max-height:45vw;"
+                    width="240px"
+                    height="240px"
+                    src="https://res.cloudinary.com/love1/image/upload/v1647481283/mashahab_ge9ant.svg"
+                    alt="cheked"
+                  /></button
+                >
+              {:else}
+                <Handd
+                  onTrym={tryma}
+                  onMasi={masi}
+                  onBighandd={bighandd}
+                  {noofopenm}
+                  {openMA}
+                  {addN}
+                  hosafat={hosafat[$lang]}
+                />
+              {/if}
 
-            <!--{#if gan == false}
+              <!--{#if gan == false}
 <button onclick={()=>gan = true} class="border mx-2  border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre px-2 drop-shadow-lg shadow-gold"title={gann[$lang]}><div class="flex flex-col items-center justify-center align-middle"><p style="text-shadow:1px 1px var(--gold) ;">{gann[$lang]}</p><Scab/></div></button>
 {/if}
 
@@ -2105,8 +2173,8 @@ pointer-events: none;"
 {/if}
 {/if}
 -->
-          </div>
-  
+            </div>
+
             <!-- כפתור שרק איתו יש את האפשרות כנ"ל על משאבים
   כן להוסיף סקשן שמראה את שלל סוגי המשימות בדיפולט
 כולל לפי יוזרים וכו-->
@@ -2145,89 +2213,87 @@ pointer-events: none;"
               {/if}
             </div>
 
-          <div bind:this={cow}>
-            {#if load === true}
-              <div
-                class="grid justify-center items-center border-2 border-barbi rounded p-4"
-              >
-                <Lowding />
-              </div>
-            {/if}
-            {#if showvd == true}
-              {#key miData}
-                <Mission
-                  pn={projectname}
-                  pl={srcP}
-                  {restime}
-                  {newcontent}
-                  {newcontentR}
-                  {newcontentW}
-                  pu={projectUsers}
-                  userslength={projectUsers.length}
-                  vallues={alit}
-                  {miData}
-                  projectId={$idPr}
-                  onRemove={removeF}
-                  onClose={close}
-                />
-              {/key}
-            {/if}
-          </div>
-
-          <div class=" m-4" bind:this={dow}>
-            {#if addN == true}
-              <div
-                bind:this={fff}
-                id="hosafn"
-                class="m-4 border-2 border-barbi rounded"
-              >
-                <button
-                  title={cencel[$lang]}
-                  onclick={() => (addN = false)}
-                  class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
-                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                    />
-                  </svg></button
-                >
-                <ChoosNeed
-                  onStr={() => (loadr = false)}
-                  onAdd={needad}
-                  onAddm={needadm}
-                  selectedi={needr}
-                />
-              </div>
-            {/if}
-
-            <div class=" m-4" bind:this={lll}>
-              {#if loadr === true}
+            <div bind:this={cow}>
+              {#if load === true}
                 <div
                   class="grid justify-center items-center border-2 border-barbi rounded p-4"
                 >
                   <Lowding />
                 </div>
               {/if}
-              {#if totalneed === true}
-                <TotalNeeds
-                  pn={projectname}
-                  pl={srcP}
-                  {restime}
-                  pu={projectUsers}
-                  projectId={$idPr}
-                  userslength={projectUsers.length}
-                  {needr}
-                  meData={meDatamm}
-                  onClose={clo}
-                  onRemove={wdwd}
-                />{/if}
+              {#if showvd == true}
+                {#key miData}
+                  <Mission
+                    pn={projectname}
+                    pl={srcP}
+                    {restime}
+                    {newcontent}
+                    {newcontentR}
+                    {newcontentW}
+                    pu={projectUsers}
+                    userslength={projectUsers.length}
+                    vallues={alit}
+                    {miData}
+                    projectId={$idPr}
+                    onRemove={removeF}
+                    onClose={close}
+                  />
+                {/key}
+              {/if}
             </div>
-          </div>
-{:else if tab == 3}          
-          <div      dir="{$lang == "he" ? "rtl" : "ltr"}"
-          class="pt-2">
-          
+
+            <div class=" m-4" bind:this={dow}>
+              {#if addN == true}
+                <div
+                  bind:this={fff}
+                  id="hosafn"
+                  class="m-4 border-2 border-barbi rounded"
+                >
+                  <button
+                    title={cencel[$lang]}
+                    onclick={() => (addN = false)}
+                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                      <path
+                        fill="currentColor"
+                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                      />
+                    </svg></button
+                  >
+                  <ChoosNeed
+                    onStr={() => (loadr = false)}
+                    onAdd={needad}
+                    onAddm={needadm}
+                    selectedi={needr}
+                  />
+                </div>
+              {/if}
+
+              <div class=" m-4" bind:this={lll}>
+                {#if loadr === true}
+                  <div
+                    class="grid justify-center items-center border-2 border-barbi rounded p-4"
+                  >
+                    <Lowding />
+                  </div>
+                {/if}
+                {#if totalneed === true}
+                  <TotalNeeds
+                    pn={projectname}
+                    pl={srcP}
+                    {restime}
+                    pu={projectUsers}
+                    projectId={$idPr}
+                    userslength={projectUsers.length}
+                    {needr}
+                    meData={meDatamm}
+                    onClose={clo}
+                    onRemove={wdwd}
+                  />{/if}
+              </div>
+            </div>
+          {:else if tab == 3}
+            <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="pt-2">
               {#if pmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br bg-pinki hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold px-4 rounded"
@@ -2244,8 +2310,7 @@ pointer-events: none;"
               {#if bmiData.length > 0}
                 <button
                   class="border sm:text-2xl border-barbi hover:border-gold hover:bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre bg-blueg text-barbi hover:text-barbi font-bold px-4 rounded"
-                  onclick={tobetha}
-                >{mesimaBetaHe[$lang]}</button
+                  onclick={tobetha}>{mesimaBetaHe[$lang]}</button
                 >
               {/if}
               {#if fmiData.length > 0}
@@ -2257,8 +2322,7 @@ pointer-events: none;"
                 >
               {/if}
               <div
-              dir="{$lang == "he" ? "rtl" : "ltr"}"
-
+                dir={$lang == 'he' ? 'rtl' : 'ltr'}
                 style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; "
                 class="d bg-wow"
               >
@@ -2270,71 +2334,71 @@ pointer-events: none;"
                   onSelected={openTheDesc}
                 />
               </div>
-              </div>
-{:else if tab === 4}
-         <div class=" p-2">
-            
-            {#if fmiData.length > 0 || rikmashes.length > 0}
-              <div
-                class="m-4 border-2 border-barbi rounded p-4"
-                bind:this={finiss}
-              >
-                <Fini
-                  {fmiData}
-                  {hagdel}
-                  users={projectUsers}
-                  {rikmashes}
-                  onTit={titlel}
-                />
-                <br />
-                {#if hal === false}
-                  <button
-                    onclick={() => (hal = true)}
-                    class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
-                  >
-                    חישוב רווח בגירסה ראשונית
-                  </button>
-                {:else if hal === true}
-                  <button
-                    title={cencel[$lang]}
-                    onclick={() => (hal = false)}
-                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
-                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                      />
-                    </svg></button
-                  >
-
-                  <Hach
-                    meData={rikmashes}
+            </div>
+          {:else if tab === 4}
+            <div class=" p-2">
+              {#if fmiData.length > 0 || rikmashes.length > 0}
+                <div
+                  class="m-4 border-2 border-barbi rounded p-4"
+                  bind:this={finiss}
+                >
+                  <Fini
                     {fmiData}
+                    {hagdel}
                     users={projectUsers}
                     {rikmashes}
+                    onTit={titlel}
                   />
-                {/if}
-              </div>
+                  <br />
+                  {#if hal === false}
+                    <button
+                      onclick={() => (hal = true)}
+                      class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-full"
+                    >
+                      חישוב רווח בגירסה ראשונית
+                    </button>
+                  {:else if hal === true}
+                    <button
+                      title={cencel[$lang]}
+                      onclick={() => (hal = false)}
+                      class=" hover:bg-barbi text-barbi hover:text-gold font-bold py-0.5 rounded-full"
+                      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                        <path
+                          fill="currentColor"
+                          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                        />
+                      </svg></button
+                    >
+
+                    <Hach
+                      meData={rikmashes}
+                      {fmiData}
+                      users={projectUsers}
+                      {rikmashes}
+                    />
+                  {/if}
+                </div>
               {:else}
-              <div
-                class="m-4 border-2 border-barbi rounded p-4 bg-gold"
-                bind:this={finiss}
-              >
-                <h2 class="text-4xl text-barbi font-bold text-center">{noVallue[$lang]}</h2>
-                <Button onClick={()=> tab = 2} text={crNow} />
-              </div>
-            {/if}
-          </div>
-{:else if tab === 5}
-              <div
-              dir="{$lang == "he" ? "rtl" : "ltr"}"
+                <div
+                  class="m-4 border-2 border-barbi rounded p-4 bg-gold"
+                  bind:this={finiss}
+                >
+                  <h2 class="text-4xl text-barbi font-bold text-center">
+                    {noVallue[$lang]}
+                  </h2>
+                  <Button onClick={() => (tab = 2)} text={crNow} />
+                </div>
+              {/if}
+            </div>
+          {:else if tab === 5}
+            <div
+              dir={$lang == 'he' ? 'rtl' : 'ltr'}
               class="rounded-lg"
-                style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
-              >
-            
-                <Bethas {bmiData} onChat={openChat} />
-              </div>
-<!--{:else if tab === 6}
+              style=" margin: 20px auto;  overflow-x: auto; background: linear-gradient(to right, #25c481, #25b7c4);background: -webkit-linear-gradient(left, #25c481, #25b7c4); "
+            >
+              <Bethas {bmiData} onChat={openChat} />
+            </div>
+            <!--{:else if tab === 6}
                      <div class="p-8">
             <Sheirut
             onNew={findM}
@@ -2346,9 +2410,8 @@ pointer-events: none;"
    
             />
           </div>-->
-        
-{:else if tab === 7}
-          <Hamatanot
+          {:else if tab === 7}
+            <Hamatanot
               {trili}
               {fmiData}
               {rikmashes}
@@ -2357,30 +2420,121 @@ pointer-events: none;"
               {projectUsers}
               bmiData={bmimData}
             />
-{:else if tab === 8}
-      
-              <div
-              dir="{$lang == "he" ? "rtl" : "ltr"}"
+          {:else if tab === 8}
+            <div
+              dir={$lang == 'he' ? 'rtl' : 'ltr'}
               style="width: 95vw; margin: 20px auto; max-height: 88vh; overflow-y: auto; overflow-x: auto; background-color:rgb(2, 255, 187); "
-                class="d"
+              class="d"
+            >
+              <Sidur />
+            </div>
+          {:else if tab === 9}
+            <ActsTable acts={meData.acts.data} onTaskClick={openDescrip} />
+          {:else if tab === 10}
+            <div class="sm:p-8 p-1">
+              <TimersOfUsers
+                projectId={$idPr}
+                onMission={openDescrip}
+                onTasks={() => (tab = 9)}
+              />
+            </div>
+          {/if}
+        </div>
+        <div class=" m-4" bind:this={openss}>
+          {#if openMS === true && omiData.length > 0}
+            <span>
+              <button
+                title={cencel1[$lang]}
+                onclick={() => (openMS = false)}
+                class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+                ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                  <path
+                    fill="currentColor"
+                    d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                  />
+                </svg></button
               >
-                <Sidur />
-              </div>
-{:else if tab === 9}
-  <ActsTable acts={meData.acts.data} onTaskClick={openDescrip}/>                
-         
-{:else if tab === 10}
-  <div class="sm:p-8 p-1">
-    <TimersOfUsers projectId={$idPr} onMission={openDescrip} onTasks={()=>tab = 9} />
-  </div>
-{/if}              
-          </div>
-                   <div class=" m-4" bind:this={openss}>
-              {#if openMS === true && omiData.length > 0}
-                <span >
+              <OpenM {omiData} projectName={projectname} />
+            </span>
+          {:else if openMS === true && omiData.length == 0}
+            <button
+              title={cencel1[$lang]}
+              onclick={() => (openMS = false)}
+              class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                />
+              </svg></button
+            >
+            <h2>
+              אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו
+              <br />
+              (לחצו על היד המחזיקה מנורה שלמעלה)
+            </h2>
+          {/if}
+        </div>
+        <div class="m-4">
+          {#if openMA === true && opmash.length > 0}
+            <button
+              title={cencel1[$lang]}
+              onclick={() => (openMA = false)}
+              class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                />
+              </svg></button
+            >
+            <Mashman meData={opmash} />
+          {:else if openMA === true && opmash.length == 0}
+            <button
+              title={cencel1[$lang]}
+              onclick={() => (openMA = false)}
+              class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
+              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                <path
+                  fill="currentColor"
+                  d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                />
+              </svg></button
+            >
+            <h2>
+              אין משאבים מבוקשים לריקמה זו, מומלץ ליצור כבר עכשיו
+              <br />
+              (לחצו על היד המחזיקה מגנט שלמעלה)
+            </h2>
+          {/if}
+        </div>
+        <!-- TODO: הכל בחלונות נפתחים-->
+        <div class=" m-4">
+          {#if pmiData.length > 0}
+            <span bind:this={pendss}>
+              {#if pendS === true}
+                <button
+                  title={cencel1[$lang]}
+                  onclick={() => (pendS = false)}
+                  class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
+                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
+                    <path
+                      fill="currentColor"
+                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+                    />
+                  </svg></button
+                >
+                <PendsM {pmiData} user_1s={projectUsers.length} />
+              {/if}
+            </span>
+          {/if}
+          <div>
+            {#if bmiData.length > 0}
+              <span bind:this={bmiss}>
+                {#if tahaS === true}
                   <button
                     title={cencel1[$lang]}
-                    onclick={() => (openMS = false)}
+                    onclick={() => (tahaS = false)}
                     class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
                     ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
                       <path
@@ -2389,105 +2543,15 @@ pointer-events: none;"
                       />
                     </svg></button
                   >
-                  <OpenM {omiData} projectName={projectname} />
-                </span>
-              {:else if openMS === true && omiData.length == 0}
-                <button
-                  title={cencel1[$lang]}
-                  onclick={() => (openMS = false)}
-                  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
-                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                    />
-                  </svg></button
-                >
-                <h2>
-                  אין פעולות פתוחות לריקמה זו, מומלץ ליצור כבר עכשיו
-                  <br />
-                  (לחצו על היד המחזיקה מנורה שלמעלה)
-                </h2>
-              {/if}
-            </div>
-            <div class="m-4">
-              {#if openMA === true && opmash.length > 0}
-                <button
-                  title={cencel1[$lang]}
-                  onclick={() => (openMA = false)}
-                  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
-                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                    />
-                  </svg></button
-                >
-                <Mashman meData={opmash} />
-              {:else if openMA === true && opmash.length == 0}
-                <button
-                  title={cencel1[$lang]}
-                  onclick={() => (openMA = false)}
-                  class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
-                  ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                    <path
-                      fill="currentColor"
-                      d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                    />
-                  </svg></button
-                >
-                <h2>
-                  אין משאבים מבוקשים לריקמה זו, מומלץ ליצור כבר עכשיו
-                  <br />
-                  (לחצו על היד המחזיקה מגנט שלמעלה)
-                </h2>
-              {/if}
-            </div>
-          <!-- TODO: הכל בחלונות נפתחים-->
-          <div class=" m-4">
-            {#if pmiData.length > 0}
-              <span bind:this={pendss}>
-                {#if pendS === true}
-                  <button
-                    title={cencel1[$lang]}
-                    onclick={() => (pendS = false)}
-                    class=" hover:bg-barbi text-barbi hover:text-gold font-bold p-0.5 rounded-full"
-                    ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                      <path
-                        fill="currentColor"
-                        d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                      />
-                    </svg></button
-                  >
-                  <PendsM {pmiData} user_1s={projectUsers.length} />
+                  <Betaha {bmiData} />
                 {/if}
               </span>
             {/if}
-            <div>
-              {#if bmiData.length > 0}
-                <span bind:this={bmiss}>
-                  {#if tahaS === true}
-                    <button
-                      title={cencel1[$lang]}
-                      onclick={() => (tahaS = false)}
-                      class="bg-pink-200 hover:bg-barbi text-mturk hover:text-gold font-bold p-0.5 rounded-full"
-                      ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                        <path
-                          fill="currentColor"
-                          d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                        />
-                      </svg></button
-                    >
-                    <Betaha {bmiData} />
-                  {/if}
-                </span>
-              {/if}
-            </div>
-           
-   </div>
-   </div>
-   </div>
-          
+          </div>
+        </div>
+      </div>
+    </div>
+
     <!-- </Tooltip> {:else}
     לשלוח אותו לרקמה ציבורי לקחת ID וכו'
     <h1 class="bg-white">לא מורשה</h1>
@@ -2495,7 +2559,9 @@ pointer-events: none;"
   {/await}
 {:else}
   <div class="border-2 border-barbi rounded m-4 p-4">
-    <h1 class="text-barbi underline text-2xl decoration-lturk font-bold py-2 px-4 mb-4 text-center rounded-full">
+    <h1
+      class="text-barbi underline text-2xl decoration-lturk font-bold py-2 px-4 mb-4 text-center rounded-full"
+    >
       {choo[$lang]}
     </h1>
     <div class="flex flex-wrap justify-center items-center gap-4">
@@ -2505,9 +2571,13 @@ pointer-events: none;"
             class="group relative overflow-hidden border-2 border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-gray-700 hover:text-gold p-2 m-1 rounded-xl shadow-lg shadow-fuchsia-400 hover:shadow-2xl hover:shadow-fuchsia-400 transition-all duration-300 transform hover:scale-105 flex items-center gap-3"
             onclick={() => projectn(data.id)}
           >
-            <span class="text-base font-semibold text-center leading-tight">{data.projectName}</span>
+            <span class="text-base font-semibold text-center leading-tight"
+              >{data.projectName}</span
+            >
             {#if data.profilePic}
-              <div class="w-6 h-6 rounded-full overflow-hidden ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0">
+              <div
+                class="w-6 h-6 rounded-full overflow-hidden ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0"
+              >
                 <img
                   src={data.profilePic}
                   alt={`${data.projectName} logo`}
@@ -2515,8 +2585,12 @@ pointer-events: none;"
                 />
               </div>
             {:else}
-              <div class="w-12 h-12 rounded-full bg-gradient-to-br from-gold to-barbi flex items-center justify-center ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0">
-                <span class="text-xl font-bold text-white">{data.projectName.charAt(0).toUpperCase()}</span>
+              <div
+                class="w-12 h-12 rounded-full bg-gradient-to-br from-gold to-barbi flex items-center justify-center ring-2 ring-gold/30 group-hover:ring-gold transition-all duration-300 flex-shrink-0"
+              >
+                <span class="text-xl font-bold text-white"
+                  >{data.projectName.charAt(0).toUpperCase()}</span
+                >
               </div>
             {/if}
           </button>
@@ -2537,45 +2611,44 @@ pointer-events: none;"
 {/if}
 
 <style>
-     :global([data-svelte-dialog-content].chat) {
-       z-index: 1000;
-      padding: 0px;
-      background-color: #242526;
-          margin: 0px;
-                height: 70vh; 
-      aspect-ratio: 1/1.7;
-          margin-top: 30vh;
-                          border-radius: 10%;
-      overflow-y: auto;
-        }
+  :global([data-svelte-dialog-content].chat) {
+    z-index: 1000;
+    padding: 0px;
+    background-color: #242526;
+    margin: 0px;
+    height: 70vh;
+    aspect-ratio: 1/1.7;
+    margin-top: 30vh;
+    border-radius: 10%;
+    overflow-y: auto;
+  }
 
- @media (max-width: 450px){
-        :global([data-svelte-dialog-content].chat) {
-              width: 80vw;
-        }
-     
-      }
- @media (max-width: 800px){
-  :global([data-svelte-dialog-content].betha) {
-          width: 92vw;
-        }
- }
-  @media (min-width: 720px){
-        :global([data-svelte-dialog-content].chat) {
-                overflow-y: auto;
-       z-index: 1000;
+  @media (max-width: 450px) {
+    :global([data-svelte-dialog-content].chat) {
+      width: 80vw;
+    }
+  }
+  @media (max-width: 800px) {
+    :global([data-svelte-dialog-content].betha) {
+      width: 92vw;
+    }
+  }
+  @media (min-width: 720px) {
+    :global([data-svelte-dialog-content].chat) {
+      overflow-y: auto;
+      z-index: 1000;
       padding: 0px;
       background-color: #242526;
       margin: 0px;
-                      height: 80vh; 
-                margin-top: 20vh;
-                border-radius: 5%;
-              width: auto !important;
-        }
-      }
+      height: 80vh;
+      margin-top: 20vh;
+      border-radius: 5%;
+      width: auto !important;
+    }
+  }
   .alli {
     /*   background: radial-gradient(circle at 0.9% 49.5%, rgb(0, 250, 255) 0%, rgb(2, 255, 187) 100.2%); */
-  /*  background: radial-gradient(
+    /*  background: radial-gradient(
       circle at 0.9%,
       rgb(2, 255, 187) 0%,
       rgb(238 232 170) 50%,
@@ -2594,8 +2667,7 @@ pointer-events: none;"
     justify-content: center;
     flex-wrap: wrap;
   }
- 
-  
+
   .all::-webkit-scrollbar {
     width: 0px;
   }
@@ -2625,17 +2697,17 @@ pointer-events: none;"
     }
   }
   .center-upload {
-  position: fixed;
-  top: 50%;
-  left: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 9;
-  background: white;
-  border-radius: 1em;
-  box-shadow: 0 0 20px #0002;
-  padding: 2em;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-}
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 9;
+    background: white;
+    border-radius: 1em;
+    box-shadow: 0 0 20px #0002;
+    padding: 2em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
 </style>

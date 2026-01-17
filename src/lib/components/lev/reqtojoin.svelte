@@ -103,21 +103,22 @@
     missId,
     id,
     openMid,
-    st = 188,
-    pid = $bindable(),
+    st = 0,
+    pid,
     declined = [],
-    noofusersWaiting = $bindable(),
+    noofusersWaiting,
     uids,
     what,
-    noofusersOk = $bindable(),
-    noofusersNo = $bindable(),
-    already = $bindable(false),
-    stylef = '24px',
+    noofusersOk,
+    noofusersNo,
+    already = false,
+    stylef = '',
     askId,
+    forumId, // Add forumId here
     users,
-    chat = $bindable(),
-    mypose = true,
-    order = $bindable(1),
+    chat,
+    mypose = false,
+    order = 0,
     orderon = 0,
     sqedualed,
     timegramaId,
@@ -145,7 +146,7 @@
   let tryot = $state('-10.5%');
   let tryoti = $state('-5.25%');
   let nut;
-  async function xyz() {
+  function xyz() {
     ok = percentage(noofusersOk, noofpu);
     nook = percentage(noofusersNo, noofpu);
     nut = percentage(noofusersWaiting, noofpu);
@@ -182,7 +183,6 @@
   let idL;
   let bearer1;
   let token;
-  
 
   let ucli = $state(0);
 
@@ -278,9 +278,9 @@
   }
 
   const userss = objToString(users);
-$effect(()=>{
-  console.log("noofusersOk",noofusersOk,openMid)
-})
+  $effect(() => {
+    console.log('noofusersOk', noofusersOk, openMid);
+  });
   async function agree() {
     already = true;
     noofusersOk += 1;
@@ -308,21 +308,19 @@ $effect(()=>{
     let newnew = false;
     console.log(pid);
     if (pid.includes(userId)) {
-     
     } else {
       newnew = true;
       pid.push(userId);
       pid = pid;
-   
-     
     }
     //add to pr users create missioninprogres, create welcom ballun;  first check for no of pr users and full consent ,(delete or save for refernce but put archive ) openM and asked
     if (noofpu === 1) {
       console.log('agree, ecsepted');
 
       try {
-        const { createMesimabetahalich, afterMesimabetahalikhCreation } = await import('$lib/utils/createMesimabetahalich.js');
-        
+        const { createMesimabetahalich, afterMesimabetahalikhCreation } =
+          await import('$lib/utils/createMesimabetahalich.js');
+
         miDatan = await createMesimabetahalich({
           projectId,
           missId,
@@ -346,9 +344,9 @@ $effect(()=>{
           userss: users,
           sendToSer
         });
-        
+
         console.log(miDatan);
-        
+
         // Get project user data if new user for email
         let projectUserData = null;
         if (newnew) {
@@ -360,9 +358,10 @@ $effect(()=>{
             false,
             fetch
           );
-          projectUserData = projectData?.data?.project?.data?.attributes?.user_1s?.data;
+          projectUserData =
+            projectData?.data?.project?.data?.attributes?.user_1s?.data;
         }
-        
+
         await afterMesimabetahalikhCreation({
           miDatan,
           isNewUser: newnew,
@@ -392,8 +391,9 @@ $effect(()=>{
       console.log('create new as above and add vote and archive asked');
       //arcive all other asks
       try {
-        const { createMesimabetahalich, afterMesimabetahalikhCreation } = await import('$lib/utils/createMesimabetahalich.js');
-        
+        const { createMesimabetahalich, afterMesimabetahalikhCreation } =
+          await import('$lib/utils/createMesimabetahalich.js');
+
         miDatan = await createMesimabetahalich({
           projectId,
           missId,
@@ -417,9 +417,9 @@ $effect(()=>{
           userss: users,
           sendToSer
         });
-        
+
         console.log(miDatan);
-        
+
         // Get project user data if new user for email
         let projectUserData = null;
         if (newnew) {
@@ -431,9 +431,10 @@ $effect(()=>{
             false,
             fetch
           );
-          projectUserData = projectData?.data?.project?.data?.attributes?.user_1s?.data;
+          projectUserData =
+            projectData?.data?.project?.data?.attributes?.user_1s?.data;
         }
-        
+
         await afterMesimabetahalikhCreation({
           miDatan,
           isNewUser: newnew,
@@ -528,7 +529,7 @@ $effect(()=>{
     // delete asked coin forever but keep asked on user ////matrix(1, 0, 0, 1, -61.718609, -47.72295)
     if (noofpu === 1) {
       console.log('decline2');
-   
+
       const cookieValueId = document.cookie
         .split('; ')
         .find((row) => row.startsWith('id='))
@@ -597,64 +598,78 @@ updateOpenMission(
   async function react() {
     allr = true;
     isOpen = true;
+    if (forumId) {
+      forumStore.initForum(forumId.toString(), page.data.id);
+    }
   }
   async function afreact(event) {
     if (chat !== null) {
-      const diu = objToString(chat);
+      // const diu = objToString(chat);
     }
     let why = event.why;
     console.log(why);
     let d = new Date();
     //  loading = true;
-    
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     idL = cookieValueId;
-    token = page.data.tok;
-    bearer1 = 'bearer' + ' ' + token;
-    let dataa = {
-      data: {
-        chat: [
-          ...chat,
-          {
-            what: mypose,
-            users_permissions_user: idL,
-            why: why,
-            order: (order += 1),
-            zman: d.toISOString(),
-            ide: idL
-          }
-        ]
-      }
-    };
+
     try {
-      await fetch(`${baseUrl}/api/asks/${askId}?populate=*`, {
-        method: 'PUT',
+      const response = await fetch('/api/action', {
+        method: 'POST',
         headers: {
-          Authorization: bearer1,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(dataa)
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      chat.push({
-        what: mypose,
-        users_permissions_user: idL,
-        why: why,
-        order: (order += 1),
-        zman: d.toISOString(),
-        ide: idL
+        body: JSON.stringify({
+          actionKey: 'sendAskMessage',
+          params: {
+            askId: askId,
+            content: why
+          }
+        })
       });
-      chat = chat;
-      clicked = false;
-      nowId.set(
-        miDatan.data.attributes.chat[miDatan.data.attributes.chat.length - 1].id
-      );
-      //   loading = false;
+
+      const result = await response.json();
+      console.log(result);
+
+      if (result.success && result.data) {
+        const {
+          messageId,
+          forumId: resForumId,
+          content,
+          createdAt
+        } = result.data;
+
+        // Update forumStore
+        let picLink =
+          'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
+        if (
+          typeof localStorage !== 'undefined' &&
+          localStorage.getItem('picLink')
+        ) {
+          try {
+            picLink = JSON.parse(localStorage.getItem('picLink'));
+          } catch (e) {}
+        }
+
+        forumStore.addMessage(resForumId.toString(), {
+          id: messageId,
+          message: content,
+          username: page.data.un || 'You',
+          pic: picLink,
+          timestamp: createdAt,
+          sentByMe: true,
+          pending: false
+        });
+
+        clicked = false;
+        // loading = false;
+      } else {
+        console.error('Failed to send message', result.error);
+      }
     } catch (e) {
       error1 = e;
       console.log(error1);
@@ -672,14 +687,24 @@ updateOpenMission(
   import Card from './cards/reqtojoin.svelte';
   import { DialogContent, DialogOverlay } from 'svelte-accessible-dialog';
   import { RingLoader } from 'svelte-loading-spinners';
+  import { forumStore } from '$lib/stores/forumStore';
   import Diun from './diun.svelte';
-  import { nowId } from '$lib/stores/pendMisMes.js';
+  import {
+    nowId,
+    addMes,
+    pendMisMes,
+    initialForum
+  } from '$lib/stores/pendMisMes.js';
   import { sendToSer } from '$lib/send/sendToSer.js';
   import NegoM from '../prPr/negoM.svelte';
   import { getProjectData } from '$lib/stores/projectStore.js';
   import { page } from '$app/state';
 
   function tochat() {
+    console.log('forumId', forumId);
+    if (forumId) {
+      forumStore.initForum(forumId.toString(), page.data.id);
+    }
     isOpen = true;
     diunm = true;
   }
@@ -712,474 +737,446 @@ updateOpenMission(
   }
 </script>
 
-{#await ser}
-  <h1>loop</h1>
-{:then ser}
-  <DialogOverlay {isOpen} onDismiss={close} class="overlay">
-    <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
-      {#if masa === true}
-        <DialogContent aria-label="form" class="nego d">
-          <div dir="rtl" class="grid items-center justify-center text-center">
-            <button
-              style="margin: 0 auto;"
-              onclick={close}
-              class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-              title="ביטול"
-              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                />
-              </svg></button
-            >
-            {#if loading === true}
-              <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-              ></RingLoader>
-            {:else}
-              <NegoM
-                masaalr={false}
-                onLoad={() => (negotiationLoading = true)}
-                onClose={afternego}
-                {timegramaId}
-                {negopendmissions}
-                descrip={missionDetails}
-                {projectName}
-                name1={openmissionName}
-                {hearotMeyuchadot}
-                noofhours={nhours}
-                perhour={valph}
-                {projectId}
-                total={nhours * valph}
-                ordern={orderon}
-                noofusers={noofpu}
-                missionId={missId}
-                {skills}
-                isAsk={askId}
-                tafkidims={role}
-                {workways}
-                mdate={sqedualed}
-                mdates={deadline}
-                {iskvua}
-                {publicklinks}
-                {privatlinks}
-                restime={getProjectData(projectId,"restime")}
-                pendId={openMid}
-                {users}
-                {acts}
-              />
-            {/if}
-          </div>
-        </DialogContent>
-      {:else if diunm === true}
-        <DialogContent class="chat" aria-label="form">
-          <div dir="rtl" class="grid items-center justify-center aling-center">
-            <button
-              onclick={close}
-              style="margin: 0 auto;"
-              class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-              title="ביטול"
-              ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-                <path
-                  fill="currentColor"
-                  d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-                />
-              </svg></button
-            >
-            {#if loading === true}
-              <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-              ></RingLoader>
-            {/if}
-            <Diun
-              onRect={afreact}
-              smalldes={projectName + '-' + openmissionName}
-              nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`}
-              mypos={true}
-              {clicked}
-              pendId={askId}
-              rect={true}
-              profilePicChatPartner={src.length > 0
-                ? src
-                : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-              ani="askedMi"
+<DialogOverlay {isOpen} onDismiss={close} class="overlay">
+  <div transition:fly|local={{ y: 450, opacity: 0.5, duration: 2000 }}>
+    {#if masa === true}
+      <DialogContent aria-label="form" class="nego d">
+        <div dir="rtl" class="grid items-center justify-center text-center">
+          {#if loading === true}
+            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
+            ></RingLoader>
+          {:else}
+            <NegoM
+              masaalr={false}
+              onLoad={() => (negotiationLoading = true)}
+              onClose={afternego}
+              {timegramaId}
+              {negopendmissions}
+              descrip={missionDetails}
+              {projectName}
+              name1={openmissionName}
+              {hearotMeyuchadot}
+              noofhours={nhours}
+              perhour={valph}
+              {projectId}
+              total={nhours * valph}
+              ordern={orderon}
+              noofusers={noofpu}
+              missionId={missId}
+              {skills}
+              isAsk={askId}
+              tafkidims={role}
+              {workways}
+              mdate={sqedualed}
+              mdates={deadline}
+              {iskvua}
+              {publicklinks}
+              {privatlinks}
+              restime={getProjectData(projectId, 'restime')}
+              pendId={openMid}
+              {users}
+              {acts}
             />
-          </div>
-        </DialogContent>
-      {/if}
-    </div>
-  </DialogOverlay>
-  {#if cards == false}
-    <div
-      style="position: relative;"
-      style:z-index={hovered === false ? 11 : 16}
-      onmouseenter={() => hoverede()}
-      onmouseleave={() => hoverede()}
-      use:clickOutside
-      onclick_outside={toggleShow}
-      class="hover:scale-290 duration-1000 ease-in"
-      onclick={() => {
-        modal = true;
-        onModal?.();
-        dialogOpen = true;
-      }}
-      role="button"
-      transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
-    >
-      <Swiper
-        dir="rtl"
-        on:swiper={setSwiperRef}
-        effect={'flip'}
-        grabCursor={true}
-        modules={[EffectFlip, Navigation]}
-        flipEffect={{ slideShadows: false }}
-        class="mySwiper swiperg"
-        navigation={{
-          nextEl: `.normSml${askId}-noo`,
-          prevEl: `.normSmll${askId}-noo`
-        }}
-      >
-        <div
-          bind:clientWidth={w}
-          style:width={tryo}
-          style:top={tryot}
-          style:left={tryoti}
-          style="position:absolute;"
-        >
-          <ProgressBar
-            cls="transition: all 1000ms ease-in-out;"
-            series={ser}
-            width={w}
-            textSize={0}
-            thickness={4}
-            style="radial"
+          {/if}
+        </div>
+      </DialogContent>
+    {:else if diunm === true}
+      <DialogContent class="chat d" aria-label="form">
+        <div dir="rtl" class="grid items-center justify-center aling-center">
+          {#if loading === true}
+            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
+            ></RingLoader>
+          {/if}
+          <Diun
+            onRect={afreact}
+            smalldes={projectName + '-' + openmissionName}
+            nameChatPartner={`${chatdes[$lang]} ${useraplyname} ${chatdes2[$lang]}`}
+            mypos={true}
+            {clicked}
+            pendId={forumId}
+            rect={true}
+            profilePicChatPartner={src.length > 0
+              ? src
+              : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+            ani={forumId ? 'new-forum' : 'pendM'}
+            messages={forumId ? $forumStore[forumId]?.messages || [] : []}
+            isLoading={forumId ? $forumStore[forumId]?.loading || false : false}
           />
         </div>
-        <SwiperSlide class="swiper-slideg"
-          ><div id="normSml">
-            <div style="--the:{stylef};">
-              <svg
-                version="1.1"
-                viewBox="-106 -106 212 212"
-                xmlns="http://www.w3.org/2000/svg"
+      </DialogContent>
+    {/if}
+  </div>
+</DialogOverlay>
+{#if cards == false}
+  <div
+    style="position: relative;"
+    style:z-index={hovered === false ? 11 : 16}
+    onmouseenter={() => hoverede()}
+    onmouseleave={() => hoverede()}
+    use:clickOutside
+    onclick_outside={toggleShow}
+    class="hover:scale-290 duration-1000 ease-in"
+    onclick={() => {
+      modal = true;
+      onModal?.();
+      dialogOpen = true;
+    }}
+    role="button"
+    transition:fly|local={{ y: 250, opacity: 0.9, duration: 2000 }}
+  >
+    <Swiper
+      dir="rtl"
+      on:swiper={setSwiperRef}
+      effect={'flip'}
+      grabCursor={true}
+      modules={[EffectFlip, Navigation]}
+      flipEffect={{ slideShadows: false }}
+      class="mySwiper swiperg"
+      navigation={{
+        nextEl: `.normSml${askId}-noo`,
+        prevEl: `.normSmll${askId}-noo`
+      }}
+    >
+      <div
+        bind:clientWidth={w}
+        style:width={tryo}
+        style:top={tryot}
+        style:left={tryoti}
+        style="position:absolute;"
+      >
+        <ProgressBar
+          cls="transition: all 1000ms ease-in-out;"
+          series={ser}
+          width={w}
+          textSize={0}
+          thickness={4}
+          style="radial"
+        />
+      </div>
+      <SwiperSlide class="swiper-slideg"
+        ><div id="normSml">
+          <div style="--the:{stylef};">
+            <svg
+              version="1.1"
+              viewBox="-106 -106 212 212"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <defs>
+                <linearGradient id="lgg" x1="1" y1="1" spreadMethod="pad">
+                  <stop offset="0" style="stop-color: rgb(243, 71, 255);" />
+                  <stop offset="1" style="stop-color: rgb(173, 241, 255);" />
+                </linearGradient>
+                <linearGradient id="lgbg" x1="1" y1="1">
+                  <stop offset="0" style="stop-color: rgb(185, 185, 255);" />
+                  <stop offset="1" style="stop-color: rgb(0, 170, 170);" />
+                </linearGradient>
+              </defs>
+              <circle
+                r="100"
+                fill="url(#lgg)"
+                transform="rotate(135)"
+                stroke="url(#lgbg)"
+                stroke-width="6"
+                style="fill-rule: nonzero; paint-order: fill;"
+              />
+              <circle
+                r="80"
+                fill="url(#lgg)"
+                transform="rotate(315)"
+                stroke="none"
+              />
+
+              <g
+                onclick={() => linke('u')}
+                onmouseenter={() =>
+                  hover(` לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`)}
+                onmouseleave={() => hover('0')}
+                x="0"
+                y="40"
+                style="margin-top: 2px; margin-bottom: 2px"
               >
-                <defs>
-                  <linearGradient id="lgg" x1="1" y1="1" spreadMethod="pad">
-                    <stop offset="0" style="stop-color: rgb(243, 71, 255);" />
-                    <stop offset="1" style="stop-color: rgb(173, 241, 255);" />
-                  </linearGradient>
-                  <linearGradient id="lgbg" x1="1" y1="1">
-                    <stop offset="0" style="stop-color: rgb(185, 185, 255);" />
-                    <stop offset="1" style="stop-color: rgb(0, 170, 170);" />
-                  </linearGradient>
-                </defs>
-                <circle
-                  r="100"
-                  fill="url(#lgg)"
-                  transform="rotate(135)"
-                  stroke="url(#lgbg)"
-                  stroke-width="6"
-                  style="fill-rule: nonzero; paint-order: fill;"
-                />
-                <circle
-                  r="80"
-                  fill="url(#lgg)"
-                  transform="rotate(315)"
-                  stroke="none"
-                />
-
-                <g
-                  onclick={() => linke('u')}
-                  onmouseenter={() =>
-                    hover(
-                      ` לחיצה כפולה לצפיה בעמוד הפרופיל של ${useraplyname}`
-                    )}
-                  onmouseleave={() => hover('0')}
-                  x="0"
-                  y="40"
-                  style="margin-top: 2px; margin-bottom: 2px"
-                >
-                  <foreignObject
-                    x="0"
-                    y="0"
-                    width="56px"
-                    height="56px"
-                    transform="translate(-28,-28)"
-                  >
-                    <span class={`normSml${askId}-noo`}></span>
-                    <img
-                      width="56px"
-                      height="56px"
-                      alt={useraplyname}
-                      src={src.length > 0
-                        ? src
-                        : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-                      style="border-radius: 50%;"
-                    />
-                  </foreignObject>
-                  <text
-                    fill="#EEE8AA "
-                    text-anchor="middle"
-                    x="0"
-                    y="46"
-                    style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;"
-                    >{useraplyname}</text
-                  >
-                </g>
-
-                <path
-                  id="curvee"
-                  d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"
-                />
-                <text
-                  color="#EEE8AA"
-                  width="208.55"
-                  x="-90"
-                  y="-90"
-                  style="white-space: pre-wrap;"
-                >
-                  <textPath
-                    onmouseenter={() => hover('שם המשימה')}
-                    onmouseleave={() => hover('0')}
-                    font-family="Rubik"
-                    color="#EEE8AA"
-                    x="-90"
-                    y="-90"
-                    class="curved-text"
-                    startOffset={st}
-                    xlink:href="#curvee"
-                  >
-                    {openmissionName}
-                  </textPath>
-                </text>
-                <g
-                  onclick={() => linke('p')}
-                  onmouseenter={() =>
-                    hover('לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה')}
-                  onmouseleave={() => hover('0')}
-                  x="0"
-                  y="-40"
-                >
-                  <text
-                    fill="#FF0092"
-                    text-anchor="middle"
-                    x="0"
-                    y="-29"
-                    style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;"
-                    >{projectName}</text
-                  >
-                </g>
                 <foreignObject
                   x="0"
-                  y="-60 "
-                  width="40px"
-                  height="40px"
-                  transform="translate(-20,-20)"
+                  y="0"
+                  width="56px"
+                  height="56px"
+                  transform="translate(-28,-28)"
                 >
-                  <button
-                    onclick={() => project()}
-                    onmouseenter={() =>
-                      hover(` לחיצה כפולה למעבר למוח ריקמת ${projectName}`)}
-                    onmouseleave={() => hover('0')}
-                  >
-                    <img
-                      style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
-                      src={src2}
-                      width="40"
-                      height="40"
-                      alt="projectlogo"
-                    />
-                  </button>
+                  <span class={`normSml${askId}-noo`}></span>
+                  <img
+                    width="56px"
+                    height="56px"
+                    alt={useraplyname}
+                    src={src.length > 0
+                      ? src
+                      : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+                    style="border-radius: 50%;"
+                  />
                 </foreignObject>
+                <text
+                  fill="#EEE8AA "
+                  text-anchor="middle"
+                  x="0"
+                  y="46"
+                  style="margin: 2px; font-size: 24px; line-height: 1; font-weight: bold;"
+                  >{useraplyname}</text
+                >
+              </g>
 
-                <!--     <g  x='-90' y='0' width="29" height="29">
+              <path
+                id="curvee"
+                d="M -79.587 0 C -81.732 -2.923 -75.008 -81.366 0 -80.446 C 74.342 -79.534 81.282 -3.522 80.257 0"
+              />
+              <text
+                color="#EEE8AA"
+                width="208.55"
+                x="-90"
+                y="-90"
+                style="white-space: pre-wrap;"
+              >
+                <textPath
+                  onmouseenter={() => hover('שם המשימה')}
+                  onmouseleave={() => hover('0')}
+                  font-family="Rubik"
+                  color="#EEE8AA"
+                  x="-90"
+                  y="-90"
+                  class="curved-text"
+                  startOffset={st}
+                  xlink:href="#curvee"
+                >
+                  {openmissionName}
+                </textPath>
+              </text>
+              <g
+                onclick={() => linke('p')}
+                onmouseenter={() =>
+                  hover('לחיצה כפולה לצפיה בעמוד הציבורי של הריקמה')}
+                onmouseleave={() => hover('0')}
+                x="0"
+                y="-40"
+              >
+                <text
+                  fill="#FF0092"
+                  text-anchor="middle"
+                  x="0"
+                  y="-29"
+                  style="font-size: 15px; line-height: 1; font-weight: bold; white-space: pre;"
+                  >{projectName}</text
+                >
+              </g>
+              <foreignObject
+                x="0"
+                y="-60 "
+                width="40px"
+                height="40px"
+                transform="translate(-20,-20)"
+              >
+                <button
+                  onclick={() => project()}
+                  onmouseenter={() =>
+                    hover(` לחיצה כפולה למעבר למוח ריקמת ${projectName}`)}
+                  onmouseleave={() => hover('0')}
+                >
+                  <img
+                    style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
+                    src={src2}
+                    width="40"
+                    height="40"
+                    alt="projectlogo"
+                  />
+                </button>
+              </foreignObject>
+
+              <!--     <g  x='-90' y='0' width="29" height="29">
 <path fill="currentColor" d="M256 8C119.033 8 8 119.033 8 256s111.033 248 248 248 248-111.033 248-248S392.967 8 256 8zm0 48c110.532 0 200 89.451 200 200 0 110.532-89.451 200-200 200-110.532 0-200-89.451-200-200 0-110.532 89.451-200 200-200m140.204 130.267l-22.536-22.718c-4.667-4.705-12.265-4.736-16.97-.068L215.346 303.697l-59.792-60.277c-4.667-4.705-12.265-4.736-16.97-.069l-22.719 22.536c-4.705 4.667-4.736 12.265-.068 16.971l90.781 91.516c4.667 4.705 12.265 4.736 16.97.068l172.589-171.204c4.704-4.668 4.734-12.266.067-16.971z"></path>
                                                   </g> -->
-              </svg>
-            </div>
+            </svg>
           </div>
-        </SwiperSlide>
-        <SwiperSlide class="swiper-slideg">
-          <div id="normSmll">
-            {#if deadline}
-              <h5
-                onmouseenter={() => hover('תאריך הביצוע')}
-                onmouseleave={() => hover('0')}
-                class="hslink ab {`normSmll${askId}-noo`}"
-              >
-                {dayjs(deadline).format('dddd, MMMM Do YYYY, H:mm:ss ')}
-              </h5>{/if}
-            {#if missionDetails}
-              <h6
-                onmouseenter={() => hover('פרטי המשימה')}
-                onmouseleave={() => hover('0')}
-                class="hslink bc"
-              >
-                {missionDetails}
-              </h6>{/if}
+        </div>
+      </SwiperSlide>
+      <SwiperSlide class="swiper-slideg">
+        <div id="normSmll">
+          {#if deadline}
+            <h5
+              onmouseenter={() => hover('תאריך הביצוע')}
+              onmouseleave={() => hover('0')}
+              class="hslink ab {`normSmll${askId}-noo`}"
+            >
+              {dayjs(deadline).format('dddd, MMMM Do YYYY, H:mm:ss ')}
+            </h5>{/if}
+          {#if missionDetails}
+            <h6
+              onmouseenter={() => hover('פרטי המשימה')}
+              onmouseleave={() => hover('0')}
+              class="hslink bc"
+            >
+              {missionDetails}
+            </h6>{/if}
 
-            <!-- <h5 on:mouseenter={()=>hover("תפקיד")} on:mouseleave={()=>hover("0")} class="hslink cd">{role}</h5>
+          <!-- <h5 on:mouseenter={()=>hover("תפקיד")} on:mouseleave={()=>hover("0")} class="hslink cd">{role}</h5>
 
             <h6 on:mouseenter={()=>hover("כישורים נדרשים")} on:mouseleave={()=>hover("0")} class="hslink de">{skills}</h6>-->
-            <p class="vo ef">
-              <span
-                onmouseenter={() => hover('סך ההצבעות בעד')}
-                onmouseleave={() => hover('0')}
-                style="color:#7EE081;"
-                >{noofusersOk}
-              </span>
-              <span
-                onmouseenter={() => hover('לא הצביעו')}
-                onmouseleave={() => hover('0')}
-                style="color:#0000cc;"
-              >
-                {noofusersWaiting}
-              </span><span
-                onmouseenter={() => hover('כמות ההצבעות נגד')}
-                onmouseleave={() => hover('0')}
-                style="color:#80037e;"
-                >{noofusersNo}
-              </span>
-            </p>
-            {#if low == false}
-              {#if already === false}
-                <button
-                  onmouseenter={() => hover('אישור')}
-                  onmouseleave={() => hover('0')}
-                  onclick={agree}
-                  class="btn ga"
-                  name="requestToJoin"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                    version="1.1"
-                    class="btin"
-                    viewBox="0 0 24 24"
-                    ><path
-                      fill="currentColor"
-                      d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
-                    /></svg
-                  ></button
-                >
-                <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
-                <button
-                  onmouseenter={() => hover('התנגדות')}
-                  onmouseleave={() => hover('0')}
-                  onclick={decline}
-                  class="btn gb"
-                  name="decline"
-                  ><svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    xmlns:xlink="http://www.w3.org/1999/xlink"
-                    version="1.1"
-                    class="btin"
-                    viewBox="0 0 24 24"
-                    ><path
-                      fill="currentColor"
-                      d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
-                    /></svg
-                  ></button
-                >
-              {/if}
-            {:else if low == true}
-              <Lowbtn />
-            {/if}
-          </div>
-        </SwiperSlide>
-      </Swiper>
-    </div>
-    {#if modal}
-      <div data-vaul-drawer-wrapper>
-        <Drawer.Root
-          bind:open={dialogOpen}
-          direction="right"
-          shouldScaleBackground
-        >
-          <Drawer.Trigger />
-          <Drawer.Portal>
-            <Drawer.Overlay class="fixed inset-0 bg-black/40 " />
-            <Drawer.Content
-              class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse"
+          <p class="vo ef">
+            <span
+              onmouseenter={() => hover('סך ההצבעות בעד')}
+              onmouseleave={() => hover('0')}
+              style="color:#7EE081;"
+              >{noofusersOk}
+            </span>
+            <span
+              onmouseenter={() => hover('לא הצביעו')}
+              onmouseleave={() => hover('0')}
+              style="color:#0000cc;"
             >
-              <div class="swiper-slidec mx-auto">
-                <Card
-                  onAgree={() => agree()}
-                  onNego={isRishon ? toggleNegotiationMode : () => decline()}
-                  onHover={() => hoverc()}
-                  onChat={tochat}
-                  {low}
-                  {skills}
-                  {role}
-                  {workways}
-                  {already}
-                  {projectName}
-                  {src}
-                  {noofusersWaiting}
-                  {useraplyname}
-                  {noofusersOk}
-                  {src2}
-                  noofhours={nhours}
-                  perhour={valph}
-                  {sqedualed}
-                  dates={deadline}
-                  {openmissionName}
-                  {iskvua}
-                  {projectId}
-                  {isRishon}
-                  {userSkills}
-                  {hearotMeyuchadot}
-                  {userRole}
-                  {userWorkway}
-                  {missionDetails}
-                  {noofusersNo}
-                  {negotiationMode}
-                  {negopendmissions}
-                  {orderon}
-                  {acts}
-                />
-              </div>
-            </Drawer.Content>
-          </Drawer.Portal>
-        </Drawer.Root>
-      </div>
-    {/if}
-  {:else}
-    <Card
-      onAgree={() => agree()}
-      onNego={isRishon ? toggleNegotiationMode : () => decline()}
-      onHover={hoverc}
-      onChat={tochat}
-      {isVisible}
-      {projectId}
-      {sqedualed}
-      {hearotMeyuchadot}
-      dates={deadline}
-      {low}
-      {already}
-      {projectName}
-      {src}
-      {noofusersWaiting}
-      {useraplyname}
-      {noofusersOk}
-      {src2}
-      noofhours={nhours}
-      perhour={valph}
-      {openmissionName}
-      {iskvua}
-      {isRishon}
-      {missionDetails}
-      {noofusersNo}
-      {skills}
-      {role}
-      {workways}
-      {userSkills}
-      {userRole}
-      {userWorkway}
-      {negotiationMode}
-      {negopendmissions}
-      {orderon}
-      {acts}
-    />
+              {noofusersWaiting}
+            </span><span
+              onmouseenter={() => hover('כמות ההצבעות נגד')}
+              onmouseleave={() => hover('0')}
+              style="color:#80037e;"
+              >{noofusersNo}
+            </span>
+          </p>
+          {#if low == false}
+            {#if already === false}
+              <button
+                onmouseenter={() => hover('אישור')}
+                onmouseleave={() => hover('0')}
+                onclick={agree}
+                class="btn ga"
+                name="requestToJoin"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  version="1.1"
+                  class="btin"
+                  viewBox="0 0 24 24"
+                  ><path
+                    fill="currentColor"
+                    d="M12,21.35L10.55,20.03C5.4,15.36 2,12.27 2,8.5C2,5.41 4.42,3 7.5,3C9.24,3 10.91,3.81 12,5.08C13.09,3.81 14.76,3 16.5,3C19.58,3 22,5.41 22,8.5C22,12.27 18.6,15.36 13.45,20.03L12,21.35Z"
+                  /></svg
+                ></button
+              >
+              <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
+              <button
+                onmouseenter={() => hover('התנגדות')}
+                onmouseleave={() => hover('0')}
+                onclick={decline}
+                class="btn gb"
+                name="decline"
+                ><svg
+                  xmlns="http://www.w3.org/2000/svg"
+                  xmlns:xlink="http://www.w3.org/1999/xlink"
+                  version="1.1"
+                  class="btin"
+                  viewBox="0 0 24 24"
+                  ><path
+                    fill="currentColor"
+                    d="M17,13H7V11H17M12,2A10,10 0 0,0 2,12A10,10 0 0,0 12,22A10,10 0 0,0 22,12A10,10 0 0,0 12,2Z"
+                  /></svg
+                ></button
+              >
+            {/if}
+          {:else if low == true}
+            <Lowbtn />
+          {/if}
+        </div>
+      </SwiperSlide>
+    </Swiper>
+  </div>
+  {#if modal}
+    <div data-vaul-drawer-wrapper>
+      <Drawer.Root
+        bind:open={dialogOpen}
+        direction="right"
+        shouldScaleBackground
+      >
+        <Drawer.Trigger />
+        <Drawer.Portal>
+          <Drawer.Overlay class="fixed inset-0 bg-black/40 " />
+          <Drawer.Content
+            class="fixed bottom-0 top-0 right-0 max-h-[96%] rounded-t-[10px] z-[1000] flex flex-row-reverse"
+          >
+            <div class="swiper-slidec mx-auto">
+              <Card
+                onAgree={() => agree()}
+                onNego={isRishon ? toggleNegotiationMode : () => decline()}
+                onHover={() => hoverc()}
+                onChat={tochat}
+                {low}
+                {skills}
+                {role}
+                {workways}
+                {already}
+                {projectName}
+                {src}
+                {noofusersWaiting}
+                {useraplyname}
+                {noofusersOk}
+                {src2}
+                noofhours={nhours}
+                perhour={valph}
+                {sqedualed}
+                dates={deadline}
+                {openmissionName}
+                {iskvua}
+                {projectId}
+                {isRishon}
+                {userSkills}
+                {hearotMeyuchadot}
+                {userRole}
+                {userWorkway}
+                {missionDetails}
+                {noofusersNo}
+                {negotiationMode}
+                {negopendmissions}
+                {orderon}
+                {acts}
+              />
+            </div>
+          </Drawer.Content>
+        </Drawer.Portal>
+      </Drawer.Root>
+    </div>
   {/if}
-{/await}
+{:else}
+  <Card
+    onAgree={() => agree()}
+    onNego={isRishon ? toggleNegotiationMode : () => decline()}
+    onHover={hoverc}
+    onChat={tochat}
+    {isVisible}
+    {projectId}
+    {sqedualed}
+    {hearotMeyuchadot}
+    dates={deadline}
+    {low}
+    {already}
+    {projectName}
+    {src}
+    {noofusersWaiting}
+    {useraplyname}
+    {noofusersOk}
+    {src2}
+    noofhours={nhours}
+    perhour={valph}
+    {openmissionName}
+    {iskvua}
+    {isRishon}
+    {missionDetails}
+    {noofusersNo}
+    {skills}
+    {role}
+    {workways}
+    {userSkills}
+    {userRole}
+    {userWorkway}
+    {negotiationMode}
+    {negopendmissions}
+    {orderon}
+    {acts}
+  />
+{/if}
 
 <style>
   .swiper-slidec {

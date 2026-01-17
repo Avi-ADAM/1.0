@@ -20,7 +20,8 @@ import type {
   HalukaData,
   WelcomeData,
   TransferData,
-  DecisionData
+  DecisionData,
+  ResourceSuggestionData
 } from '$lib/stores/levStores';
 import { calculateScore } from './suggestionMatchers';
 
@@ -67,19 +68,19 @@ export function extractPends(userData: any): PendMissionData[] {
         noofhours: pend.attributes.noofhours || 0,
         perhour: pend.attributes.perhour || 0,
         sqadualed: pend.attributes.sqadualed || '',
-        privatlinks: pend.attributes.privatlinks || [],
-        publicklinks: pend.attributes.publicklinks || [],
-        dates: pend.attributes.dates || [],
+        privatlinks: pend.attributes.privatlinks || '',
+        publicklinks: pend.attributes.publicklinks || '',
+        dates: pend.attributes.dates || null,
         diun: pend.attributes.diun || [],
-        skills: pend.attributes.skills?.data || [],
-        tafkidims: pend.attributes.tafkidims?.data || [],
-        work_ways: pend.attributes.work_ways?.data || [],
-        vallues: pend.attributes.vallues?.data || [],
+        skills: pend.attributes.skills || { data: [] },
+        tafkidims: pend.attributes.tafkidims || { data: [] },
+        workways: pend.attributes.work_ways || { data: [] },
+        vallues: pend.attributes.vallues || { data: [] },
         missionId: pend.attributes.mission?.data?.id,
         timegramaId: pend.attributes.timegrama?.data?.id,
         timegramaDate: pend.attributes.timegrama?.data?.attributes?.date,
-        acts: pend.attributes.acts?.data || [],
-        negopendmissions: pend.attributes.negopendmissions?.data || [],
+        acts: pend.attributes.acts || { data: [] },
+        negopendmissions: pend.attributes.negopendmissions.data || [],
         rishonId: pend.attributes.rishon?.data?.id
       });
     }
@@ -132,7 +133,7 @@ export function extractMtaha(userData: any): InProgressMissionData[] {
       timer: mission.attributes.timer,
       activeTimer: mission.attributes.activeTimer, // Add activeTimer for checks
       admaticedai: mission.attributes.admaticedai,
-      acts: mission.attributes.acts?.data || []
+      acts: mission.attributes.acts || { data: [] }
     });
   }
 
@@ -176,7 +177,7 @@ export function extractFiapp(userData: any): ApprovalData[] {
         missname: approval.attributes.missname || '',
         noofhours: approval.attributes.noofhours || 0,
         why: approval.attributes.why || '',
-        what: approval.attributes.what?.data || [],
+        what: approval.attributes.what || { data: [] },
         vots: approval.attributes.vots || [],
         timegramaId: approval.attributes.timegrama?.data?.id,
         timegramaDate: approval.attributes.timegrama?.data?.attributes?.date,
@@ -235,13 +236,16 @@ export function extractAsked(userData: any): AskData[] {
         users: ask.attributes.vots || [],
         nhours: ask.attributes.open_mission?.data?.attributes?.noofhours || 0,
         perhour: ask.attributes.open_mission?.data?.attributes?.perhour || 0,
-        src: ask.attributes.project?.data?.attributes?.profilePic?.data?.attributes?.url || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'
+        src: ask.attributes.project?.data?.attributes?.profilePic?.data?.attributes?.url || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
+        forumId: (ask.attributes.forums?.data && ask.attributes.forums.data.length > 0) ? ask.attributes.forums.data[0].id : null
       });
     }
   }
 
   return asked;
 }
+
+
 
 /**
  * Extract suggested missions (open_missions from skills/tafkidims) from GraphQL user data
@@ -386,6 +390,7 @@ export function extractSuggestions(userData: any): SuggestionData[] {
       alreadyAsked: !!askData,
       askId: askData?.id,
       chat: askData?.attributes?.chat,
+      forumId: (askData?.attributes?.forums?.data && askData.attributes.forums.data.length > 0) ? askData.attributes.forums.data[0].id : null,
 
       // Project details extracted from mission attributes
       // Project details extracted from mission attributes
@@ -393,6 +398,7 @@ export function extractSuggestions(userData: any): SuggestionData[] {
         name: mission.attributes.project.data.attributes.projectName,
         src: mission.attributes.project.data.attributes.profilePic?.data?.attributes?.url,
         membersCount: mission.attributes.project.data.attributes.user_1s?.data?.length || 0,
+        memberIds: mission.attributes.project.data.attributes.user_1s?.data?.map((u: any) => u.id) || [],
         restime: mission.attributes.project.data.attributes.restime
       } : undefined,
 
@@ -403,12 +409,14 @@ export function extractSuggestions(userData: any): SuggestionData[] {
       noofhours: mission.attributes.noofhours || 0,
       perhour: mission.attributes.perhour || 0,
       sqadualed: mission.attributes.sqadualed || '',
-      acts: mission.attributes.acts?.data || [],
+      dates: mission.attributes.dates || '',
+
+      acts: mission.attributes.acts || { data: [] },
 
       // Pass arrays for completeness
-      skills: mission.attributes.skills?.data || [],
-      tafkidims: mission.attributes.tafkidims?.data || [],
-      work_ways: mission.attributes.work_ways?.data || []
+      skills: mission.attributes.skills || { data: [] },
+      tafkidims: mission.attributes.tafkidims || { data: [] },
+      work_ways: mission.attributes.work_ways || { data: [] }
     });
   }
 
@@ -489,7 +497,7 @@ export function extractPmashes(userData: any): PendResourceData[] {
         mashaabimId: pmash.attributes.mashaabim?.data?.id,
         timegramaId: pmash.attributes.timegrama?.data?.id,
         timegramaDate: pmash.attributes.timegrama?.data?.attributes?.date,
-        nego_mashes: pmash.attributes.nego_mashes?.data || []
+        nego_mashes: pmash.attributes.nego_mashes || { data: [] }
       });
     }
   }
@@ -549,7 +557,8 @@ export function extractWegets(userData: any): ResourceRequestData[] {
           openName: maap.attributes.open_mashaabim?.data?.attributes?.name,
           userId: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.id,
           username: maap.attributes.sp?.data?.attributes?.users_permissions_user?.data?.attributes?.username,
-          myp: maap.attributes.sp?.data?.attributes?.myp
+          myp: maap.attributes.sp?.data?.attributes?.myp,
+          myid: userData.id
         });
       }
     }
@@ -598,7 +607,7 @@ export function extractHalukas(userData: any): HalukaData[] {
         // Data needed for rashbi logic
         name: attrs.name || '',
         users: attrs.vots || [],
-        halukot: attrs.halukas?.data || [],
+        halukot: attrs.halukas || { data: [] },
         hervach: attrs.hervachti || [],
         pendId: tosplit.id,
 
@@ -631,21 +640,27 @@ export function extractWelcome(userData: any): WelcomeData[] {
       continue;
     }
 
+    // Extract projectId - this is the key field needed
+    // Project details (name, pic) will be fetched via createProjectInfo in processor
     const projectId = welcom.attributes.project?.data?.id || '';
+
+    // Try to get data from nested project if available (might be in query)
+    // But don't rely on it - processor will use createProjectInfo for reliable data
     const projectData = welcom.attributes.project?.data?.attributes;
 
     welcome.push({
       id: welcom.id,
+      welcomeId: welcom.id, // Add welcomeId explicitly as old code used it
       projectId: projectId,
       message: projectData?.descripFor || projectData?.publicDescription || '',
       priority: 1, // Restored priority to 1 as per original makeWalcom
-      // Additional fields
+      // Additional fields - some might come from GraphQL, some from processor
       details: projectData?.publicDescription || '',
       pd: projectData?.descripFor || '',
       username: userData?.attributes?.username || '',
-      projectName: projectData?.projectName || '', // Ensure projectName is available
       clicked: welcom.attributes.clicked || false,
-      projectData: projectData
+      // Note: projectName and src will be populated by processor using createProjectInfo
+      // We don't set them here since the nested data might not be reliable
     });
   }
 
@@ -653,7 +668,7 @@ export function extractWelcome(userData: any): WelcomeData[] {
 }
 
 /**
- * Extract money transfers (from tosplits/hervachti) from GraphQL user data
+ * Extract money transfers (halukas) from GraphQL user data
  * 
  * @param userData - Raw GraphQL response data
  * @returns Array of transfer data
@@ -667,42 +682,83 @@ export function extractTransfers(userData: any): TransferData[] {
     return transfers;
   }
 
+  const myid = userData.id;
   const projects = userData.attributes.projects_1s.data;
 
   for (const project of projects) {
-    if (!project?.attributes?.tosplits?.data) {
+    if (!project?.attributes?.halukas?.data) {
       continue;
     }
 
-    for (const tosplit of project.attributes.tosplits.data) {
-      if (!tosplit?.id || !tosplit?.attributes) {
+    // Create a lookup map for project users to get names and pics
+    const projectUsers = new Map<string, { name: string; pic: string }>();
+    if (project.attributes.user_1s?.data) {
+      project.attributes.user_1s.data.forEach((u: any) => {
+        if (u.id) {
+          projectUsers.set(u.id, {
+            name: u.attributes?.username || '',
+            pic: u.attributes?.profilePic?.data?.attributes?.url || ''
+          });
+        }
+      });
+    }
+
+    // Add current user to lookup if not present
+    if (myid && !projectUsers.has(myid)) {
+      projectUsers.set(myid, {
+        name: userData.attributes?.username || '',
+        pic: userData.attributes?.profilePic?.data?.attributes?.url || ''
+      });
+    }
+
+    for (const el of project.attributes.halukas.data) {
+      if (!el?.id || !el?.attributes) {
         continue;
       }
 
-      // Extract hervachti (transfer details) from tosplit
-      if (tosplit.attributes.hervachti) {
-        for (const hervach of tosplit.attributes.hervachti) {
-          if (!hervach?.amount) {
-            continue;
-          }
+      const attrs = el.attributes;
+      const sendId = attrs.usersend?.data?.id;
+      const recId = attrs.userrecive?.data?.id;
 
-          transfers.push({
-            id: `${tosplit.id}-${hervach.users_permissions_user?.data?.id || 'unknown'}`,
-            projectId: project.id,
-            amount: hervach.amount || 0,
-            priority: 9,
-            // Additional fields
-            tosplitId: tosplit.id,
-            tosplitName: tosplit.attributes.name || '',
-            noten: hervach.noten || false,
-            mekabel: hervach.mekabel || false,
-            nirsham: hervach.nirsham || false,
-            userId: hervach.users_permissions_user?.data?.id,
-            userHervachti: hervach.users_permissions_user?.data?.attributes?.hervachti,
-            vots: tosplit.attributes.vots || [],
-            halukasIds: tosplit.attributes.halukas?.data?.map((h: any) => h.id) || []
-          });
-        }
+      // Filter: user must be either sender or receiver
+      if (sendId === myid || recId === myid) {
+        const sendDetails = sendId ? projectUsers.get(sendId) : null;
+        const recDetails = recId ? projectUsers.get(recId) : null;
+
+        transfers.push({
+          id: el.id,
+          projectId: project.id,
+          amount: attrs.amount || 0,
+          priority: 1, // Matches 'pl: 1' from tveria
+
+          // Replicated fields from old logic (tveria)
+          kind: sendId === myid ? 'send' : 'recive',
+          send: sendId,
+          recive: recId,
+
+          sendname: sendDetails?.name || '',
+          sendpropic: sendDetails?.pic || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
+
+          resname: recDetails?.name || '',
+          respropic: recDetails?.pic || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
+
+          projectName: project.attributes.projectName || '',
+          src: project.attributes.profilePic?.data?.attributes?.url || '',
+
+          myid: myid,
+          forumId: attrs.forum?.data?.id,
+          pendId: el.id,
+          chat: attrs.chatre || [],
+          senderconf: attrs.senderconf,
+
+          // Nested tosplit data if available
+          shear: attrs.tosplit?.data?.attributes?.halukas?.data || [],
+          hervachti: attrs.tosplit?.data?.attributes?.hervachti || [],
+
+          // Processor metadata
+          ani: 'vidu',
+          azmi: 'vidu'
+        });
       }
     }
   }
@@ -777,6 +833,125 @@ export function extractDecisions(userData: any): DecisionData[] {
   }
 
   return decisions;
+}
+
+/**
+ * Extract resource suggestions (huca) from GraphQL user data
+ * 
+ * @param userData - Raw GraphQL response data
+ * @returns Array of resource suggestion data
+ * 
+ * **Validates: Requirements 1.1, 1.4**
+ */
+export function extractResourceSuggestions(userData: any): ResourceSuggestionData[] {
+  const huca: ResourceSuggestionData[] = [];
+
+  if (!userData?.attributes?.sps?.data) {
+    return huca;
+  }
+
+  // Get all declined suggestions IDs for filtering (handled partly in loop)
+  // Replicating logic: declineddarra per SP
+
+  const sps = userData.attributes.sps.data;
+
+  for (const sp of sps) {
+    if (!sp?.attributes?.mashaabim?.data?.attributes?.open_mashaabims?.data) {
+      continue;
+    }
+
+    // Check if open_mashaabims exists
+    const omList = sp.attributes.mashaabim.data.attributes.open_mashaabims.data;
+    if (omList.length === 0) continue;
+
+    const myp = sp.attributes.myp;
+    const spId = sp.id;
+
+    for (const om of omList) {
+      if (!om?.id || !om?.attributes) continue;
+
+      const omAttrs = om.attributes;
+      const project = omAttrs.project?.data;
+
+      if (!project) continue; // Must have project
+
+      const projectAttrs = project.attributes;
+
+      // Check declined list
+      const declineds = omAttrs.declinedsps?.data?.map((d: any) => d.id) || [];
+
+      // If NOT declined (logic: !declineddarra.includes(id)) - ID of open_mashaabim or SP?
+      // Old code: declineddarra.includes(om[t].id) where declineddarra = x.declinedsps.data.map(c=>c.id)
+      // Wait, declinedsps relate to SPs or OM IDs?
+      // "declineddarra = x.declinedsps.data.map((c) => c.id)" -> X is om[t].attributes. So 'declinedsps' is a relation on OM.
+      // Logic: if (!declineddarra.includes(om[t].id))... wait, declineddarra are IDs from declinedsps.
+      // If OM ID is in its OWN declined list? That seems circular unless declinedsps points to OTHER entities (maybe SPs?).
+      // Let's assume the old code meant "If THIS SP ID is not in the declined list of the suggestion".
+      // But old code: "declineddarra.includes(y.mashaabim.data.attributes.open_mashaabims.data[t].id)"
+      // This literally checks if the OM ID is in the list of IDs derived from... declinedsps relation of THAT SAME OM.
+      // It implies declinedsps might hold IDs of... something else?
+      // Let's implement strict translation: declinedsps returns objects with IDs.
+      // If the *current* OM ID is in that list... which is weird.
+      // BUT, maybe declinedsps is a relation to *User* or *SP*? 
+      // If it's a relation to SPs (Service Providers/Users), then we should check if *our* SP ID is in it.
+
+      // Let's look at old code:
+      // declineddarra = x.declinedsps.data.map((c) => c.id);
+      // if (!declineddarra.includes(omData[t].id)) ...
+      // This looks like it checks if the OM ID itself is in 'declinedsps'.
+      // This implies 'declinedsps' contains OM entities? Or maybe it's a list of blocked/declined items.
+      // Wait, if it checks `omData[t].id` (the ID of the suggestion being iterated), it filters it out if found.
+      // So if 'declinedsps' relation on OM contains ITSELF? Unlikely.
+
+      // More likely interpretation:
+      // "declineds" is a list of SPs (User personas) that declined this resource.
+      // The verification `includes(omId)` is suspicious. 
+      // Maybe it meant: `!declineddarra.includes(currentSpId)`?
+      // Re-reading user request code:
+      // `const declineddarra = x.declinedsps.data.map((c) => c.id);`
+      // `if (!declineddarra.includes(y.mashaabim.data.attributes.open_mashaabims.data[t].id))`
+      // Where `y` is the user's SP. 
+      // It compares the ID of the OM (open_mashaabims[t].id) against the IDs in `declinedsps`.
+      // If `declinedsps` holds *other* OMs, then it checks if THIS OM is in the declined list.
+      // We will preserve this logic exactly as written for now.
+
+      const declinedIds = declineds; // Array of IDs
+
+      if (!declinedIds.includes(om.id)) {
+        huca.push({
+          id: om.id,
+          projectId: project.id,
+          projectName: projectAttrs.projectName,
+          srcb: projectAttrs.profilePic?.data?.attributes?.formats?.thumbnail?.url || projectAttrs.profilePic?.data?.attributes?.url,
+
+          mashname: omAttrs.name,
+          price: omAttrs.price,
+          easy: omAttrs.easy,
+          kindOf: omAttrs.kindOf,
+          spnot: omAttrs.spnot,
+          descrip: omAttrs.descrip,
+          sqedualed: omAttrs.sqedualed,
+          sqedualedf: omAttrs.sqedualedf,
+
+          myp: myp,
+          oid: spId,
+          declineddarra: declinedIds,
+          already: false,
+          priority: 6,
+
+          // Additional fields
+          ani: 'huca', // Identifiers for processor/UI
+          azmi: 'hazaa',
+
+          // Pass raw attrs if needed
+          openMashaabimId: om.id,
+          spId: spId
+        });
+      }
+    }
+  }
+
+  return huca;
 }
 
 /**

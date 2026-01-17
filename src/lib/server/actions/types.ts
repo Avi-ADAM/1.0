@@ -146,7 +146,7 @@ export interface NotificationConfig {
  */
 export interface RecipientRule {
   /** Type of recipient selection strategy */
-  type: 'projectMembers' | 'specificUsers' | 'skillBased' | 'custom' | 'meetingParticipants';
+  type: 'projectMembers' | 'specificUsers' | 'skillBased' | 'custom' | 'meetingParticipants' | 'askParticipants';
 
   /** Configuration for recipient selection */
   config?: RecipientRuleConfig;
@@ -164,6 +164,9 @@ export interface RecipientRuleConfig {
 
   /** Parameter name containing forum ID (for meeting participants) */
   forumIdParam?: string;
+
+  /** Parameter name containing ask ID (for ask participants) */
+  askIdParam?: string;
 
   /** Whether to exclude the action initiator from notifications */
   excludeSender?: boolean;

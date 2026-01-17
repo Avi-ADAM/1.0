@@ -1,17 +1,17 @@
 <script>
   let w = $state(1200);
-  
+
   let h = $state(1200);
-  
+
   let ow = $state(500);
-  
+
   let oh = $state(500);
-  
-  let screen
-  let top = $derived(0)
-  let left = $derived(0)
-  let maxW = $derived(100)
-  let maxH = $derived(100)
+
+  let screen;
+  let top = $derived(0);
+  let left = $derived(0);
+  let maxW = $derived(100);
+  let maxH = $derived(100);
   let center;
   $effect(() => {
     center = { x: w / 2, y: h / 2 };
@@ -23,11 +23,10 @@
   //placeCircles();
 
   // Add your infinite scroll mechanism here
-  
 
-  let size = $derived(ow>550? 125:115);
-  let bigsize = $derived(ow>550? 225: 100);
-  let add = $derived(ow>550? 70: 70);
+  let size = $derived(ow > 550 ? 125 : 115);
+  let bigsize = $derived(ow > 550 ? 225 : 100);
+  let add = $derived(ow > 550 ? 70 : 70);
 
   // פונקציה למירכוז המסך על אזור התוכן
   function centerViewOnLoad() {
@@ -38,13 +37,13 @@
         try {
           // מציאת מרכז התוכן
           const contentCenter = { x: w / 2, y: h / 2 };
-          
+
           // חישוב מיקום הגלילה
-          const scrollLeft = contentCenter.x - (container.clientWidth / 2);
-          const scrollTop = contentCenter.y - (container.clientHeight / 2);
-          
+          const scrollLeft = contentCenter.x - container.clientWidth / 2;
+          const scrollTop = contentCenter.y - container.clientHeight / 2;
+
           console.log('גלילה למיקום:', scrollLeft, scrollTop);
-          
+
           // גלילה למרכז
           container.scrollTo({
             left: Math.max(0, scrollLeft),
@@ -61,38 +60,41 @@
   function checkLine(i) {
     // נחשב את המיקום של האלמנטים במעגלים סביב האלמנט המרכזי
     // תחילה נחשב באיזה מעגל אנחנו נמצאים (myLine)
-    let myLine = 1;  // מתחילים ממעגל ראשון סביב המרכז
+    let myLine = 1; // מתחילים ממעגל ראשון סביב המרכז
     let calculated = 0;
     let maxElementsInCurrentCircle = 0;
-    
+
     // מחשבים כמה אלמנטים יכולים להכנס בכל מעגל
     while (true) {
       // מחשב כמה אלמנטים מתאימים למעגל הנוכחי - זה מבוסס על היקף המעגל
-      const radius = myLine * (size * 1.1);  // צמצום הרדיוס מ-1.3 ל-1.1
-      const circumference = 2 * Math.PI * radius;  // היקף המעגל
-      maxElementsInCurrentCircle = Math.max(1, Math.floor(circumference / (size * 1.0)));  // הגדלת כמות האלמנטים במעגל מ-1.2 ל-1.0
-      
+      const radius = myLine * (size * 1.1); // צמצום הרדיוס מ-1.3 ל-1.1
+      const circumference = 2 * Math.PI * radius; // היקף המעגל
+      maxElementsInCurrentCircle = Math.max(
+        1,
+        Math.floor(circumference / (size * 1.0))
+      ); // הגדלת כמות האלמנטים במעגל מ-1.2 ל-1.0
+
       // בדיקה האם האלמנט הנוכחי שייך למעגל הזה
       if (i < calculated + maxElementsInCurrentCircle) {
-        break;  // מצאנו את המעגל שבו האלמנט נמצא
+        break; // מצאנו את המעגל שבו האלמנט נמצא
       }
-      
-      calculated += maxElementsInCurrentCircle;  // עוברים למעגל הבא
-      myLine++;  // עוברים למעגל הבא
+
+      calculated += maxElementsInCurrentCircle; // עוברים למעגל הבא
+      myLine++; // עוברים למעגל הבא
     }
-    
+
     // חישוב המיקום של האלמנט במעגל
-    const positionInCircle = i - calculated;  // מיקום האלמנט במעגל הנוכחי (0 עד maxElementsInCurrentCircle-1)
-    const angleStep = (2 * Math.PI) / maxElementsInCurrentCircle;  // הזווית בין אלמנטים במעגל
-    const angle = positionInCircle * angleStep;  // הזווית של האלמנט הנוכחי
-    
+    const positionInCircle = i - calculated; // מיקום האלמנט במעגל הנוכחי (0 עד maxElementsInCurrentCircle-1)
+    const angleStep = (2 * Math.PI) / maxElementsInCurrentCircle; // הזווית בין אלמנטים במעגל
+    const angle = positionInCircle * angleStep; // הזווית של האלמנט הנוכחי
+
     // חישוב המיקום במישור דו-ממדי
     // נוסיף מרווח התחלתי (initialRadius) שהוא קטן יותר מהקודם
-    const initialRadius = bigsize * 0.6;  // הקטנת המרווח בין המרכז לעיגול הראשון מ-0.8 ל-0.6
-    const radius = initialRadius + myLine * (size * 1.1);  // עדכון הרדיוס כדי להתאים לשינויים
-    const x = center.x + radius * Math.cos(angle) - (size / 2);  // מיקום X, עם התחשבות בגודל האלמנט
-    const y = center.y + radius * Math.sin(angle) - (size / 2);  // מיקום Y, עם התחשבות בגודל האלמנט
-    
+    const initialRadius = bigsize * 0.6; // הקטנת המרווח בין המרכז לעיגול הראשון מ-0.8 ל-0.6
+    const radius = initialRadius + myLine * (size * 1.1); // עדכון הרדיוס כדי להתאים לשינויים
+    const x = center.x + radius * Math.cos(angle) - size / 2; // מיקום X, עם התחשבות בגודל האלמנט
+    const y = center.y + radius * Math.sin(angle) - size / 2; // מיקום Y, עם התחשבות בגודל האלמנט
+
     return {
       myline: myLine,
       lineCircels: maxElementsInCurrentCircle,
@@ -102,7 +104,12 @@
     };
   }
 
-  import { animateScroll, scrollto, scrolltobottom, scrolltotop } from 'svelte-scrollto-element';
+  import {
+    animateScroll,
+    scrollto,
+    scrolltobottom,
+    scrolltotop
+  } from 'svelte-scrollto-element';
   import Vid from './didiget.svelte';
   import Desi from './decisionMaking.svelte';
   import Mid from './midi.svelte';
@@ -122,7 +129,6 @@
   import { onMount } from 'svelte';
   import { page } from '$app/state';
   import { isMobileOrTablet } from '$lib/utilities/device';
-
 
   let modal = $state(false);
 
@@ -222,7 +228,12 @@
 
   /** @type {Props} */
   let {
-    onStart, onUser, onMesima, onHover, onCards, onProj,
+    onStart,
+    onUser,
+    onMesima,
+    onHover,
+    onCards,
+    onProj,
     adder = [],
     arr1 = $bindable([]),
     askedarr = [],
@@ -243,36 +254,36 @@
     picLink,
     total,
     milon = $bindable({
-    hachla: true,
-    fiap: true,
-    welc: true,
-    sugg: true,
-    pend: true,
-    asks: true,
-    betaha: true,
-    desi: true,
-    ppmash: true,
-    pmashs: true,
-    pmaap: true,
-    askmap: true
-  }),
+      hachla: true,
+      fiap: true,
+      welc: true,
+      sugg: true,
+      pend: true,
+      asks: true,
+      betaha: true,
+      desi: true,
+      ppmash: true,
+      pmashs: true,
+      pmaap: true,
+      askmap: true
+    }),
     sml = false
   } = $props();
-  function checkLines(arr,w,h){
-    let c = {}
+  function checkLines(arr, w, h) {
+    let c = {};
     for (let i = 0; i < arr.length; i++) {
-      c[i] = checkLine(i)    
-      c = c 
+      c[i] = checkLine(i);
+      c = c;
     }
-    return c
+    return c;
   }
-  
+
   // פונקציה לעדכון מידות והתאמת האזור
   function updateSizes() {
     // קבלת גודל החלון
     ow = window.innerWidth;
     oh = window.innerHeight;
-    
+
     // התאמת גודל האזור לפי מספר האלמנטים
     if (arr1.length > 50) {
       w = 2500;
@@ -287,78 +298,100 @@
       w = 1200;
       h = 1200;
     }
-    
+
     // עדכון מידות האלמנטים לפי גודל המסך
     size = ow > 550 ? 125 : 75;
     bigsize = ow > 550 ? 225 : 165;
-    
+
     // חישוב מחדש של מרכז האזור
     center = { x: w / 2, y: h / 2 };
-    
+
     // עדכון המיקומים
     orders = checkLines(arr1, w, h);
   }
-  
+
   // פונקציה לפיזור מחדש של האלמנטים
   function redistributeElements() {
     // עדכון מידות ומיקומים
     updateSizes();
-    
+
     // מירכוז התצוגה
     centerViewOnLoad();
   }
-  
-  onMount(()=>{
+
+  onMount(() => {
     // עדכון מידות ראשוני
     updateSizes();
-    
+
     // מירכוז התצוגה
     centerViewOnLoad();
-    
+
     // האזנה לשינויי גודל החלון
     window.addEventListener('resize', () => {
       updateSizes();
       centerViewOnLoad();
     });
-    
-    console.log(orders, w, "mount");
-  })
-  
+
+    console.log(orders, w, 'mount');
+  });
+
   let orders = $state([]);
   $effect(() => {
     orders = checkLines(arr1, w, h);
   });
-  
+
   export const snapshot = {
     capture: () => JSON.parse(JSON.stringify(orders)),
     restore: (value) => (orders = value)
   };
 </script>
-<div id="screen" bind:clientWidth={ow} bind:clientHeight={oh} dir="ltr" 
-     style="position:fixed; width:100vw; height:100vh; overflow: auto; top:0; left:0; 
-            max-width: 100vw; max-height:{isMobileOrTablet() ? "calc(100vh - 3rem)" : "100vh"};" 
-     class="coin-container d">
 
+<div
+  id="screen"
+  bind:clientWidth={ow}
+  bind:clientHeight={oh}
+  dir="ltr"
+  style="position:fixed; width:100vw; height:100vh; overflow: auto; top:0; left:0; 
+            max-width: 100vw; max-height:{isMobileOrTablet()
+    ? 'calc(100vh - 3rem)'
+    : '100vh'};"
+  class="coin-container d"
+>
   <!-- כפתורי שליטה -->
   <div class="control-buttons">
-    <button class="control-button center-button" onclick={centerViewOnLoad} title="חזרה למרכז">
+    <button
+      class="control-button center-button"
+      onclick={centerViewOnLoad}
+      title="חזרה למרכז"
+    >
       <span>⌘</span>
     </button>
-    
-    <button class="control-button redistribute-button" onclick={redistributeElements} title="פיזור מחדש">
+
+    <button
+      class="control-button redistribute-button"
+      onclick={redistributeElements}
+      title="פיזור מחדש"
+    >
       <span>⟳</span>
     </button>
   </div>
-  
+
   {#key arr1}
-    <div id="content-area" dir="ltr" bind:clientWidth={w} bind:clientHeight={h} 
-         style="position: relative; width: {w}px; height: {h}px;" 
-         class="screen d">
-      
+    <div
+      id="content-area"
+      dir="ltr"
+      bind:clientWidth={w}
+      bind:clientHeight={h}
+      style="position: relative; width: {w}px; height: {h}px;"
+      class="screen d"
+    >
       {#each arr1 as buble, i}
-        {@const myline = orders[i] ?? {x:0,y:0}}
+        {@const myline = orders[i] ?? { x: 0, y: 0 }}
         {#if buble.ani === 'vidu' && milon.desi == true}
-          <div class="vidu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="vidu normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Vid
               onModal={() => (modal = true)}
               onHover={hover}
@@ -389,7 +422,10 @@
             />
           </div>
         {:else if buble.ani === 'haluk' && milon.desi == true}
-          <div class=" halu normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class=" halu normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Hal
               onModal={() => (modal = true)}
               onCoinLapach={delo}
@@ -421,7 +457,10 @@
             />
           </div>
         {:else if buble.ani === 'mtaha' && milon.betaha == true}
-          <div class="betaha normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="betaha normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <MissionInProgress
               onProj={proj}
               onUser={user}
@@ -435,13 +474,13 @@
               iskvua={buble.iskvua}
               coinlapach={buble.coinlapach}
               usernames={buble.usernames}
-              noofpu={buble.noofpu}
+              noofpu={buble.noof}
               oldzman={buble.timer}
               stname={buble.stname}
               mId={buble.id}
-              missId={buble.mission.data.id}
+              missId={buble.missionId}
               missionName={buble.name}
-              projectId={buble.project.data.id}
+              projectId={buble.projectId}
               projectName={buble.projectName}
               missionDetails={buble.descrip}
               src={buble.src}
@@ -456,7 +495,10 @@
             />
           </div>
         {:else if buble.ani === 'pmashes' && milon.ppmash == true}
-          <div class="normSml ppmash" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="normSml ppmash"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <PendingMa
               onHover={hover}
               onProj={proj}
@@ -498,7 +540,10 @@
             />
           </div>
         {:else if buble.ani === 'pends' && milon.pend == true}
-          <div class="normSml pend" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="normSml pend"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <PendingM
               onHover={hover}
               onModal={modali}
@@ -547,7 +592,10 @@
             />
           </div>
         {:else if buble.ani === 'wegets' && milon.pmaap == true}
-          <div class="pmaap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="pmaap normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Weget
               onAcsept={delo}
               onDecline={delo}
@@ -596,7 +644,10 @@
             />
           </div>
         {:else if buble.ani === 'fiapp' && milon.fiap == true}
-          <div class="fiap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="fiap normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Fiappru
               onAcsept={delo}
               onDecline={delo}
@@ -643,17 +694,29 @@
             />
           </div>
         {:else if buble.ani === 'walcomen' && milon.welc == true}
-          <div class="welc normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="welc normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Welcomt
+              welcomId={buble.welcomeId}
               id={buble.id}
+              src={buble.src}
               onHover={hover}
               coinlapach={buble.coinlapach}
+              onCoinLapach={delo}
               username={buble.username}
               projectName={buble.projectName}
+              projectId={buble.projectId}
+              partnershipDetails={buble.details}
+              pd={buble.pd}
             />
           </div>
         {:else if buble.ani === 'askedcoin' && milon.asks == true}
-          <div class="asks normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="asks normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Reqtojoin
               onAcsept={delo}
               onHover={hover}
@@ -704,7 +767,8 @@
               st={buble.st}
               chat={buble.chat}
               declined={buble.decid}
-              isRishon={buble.isRishon}
+              isRishon={buble?.openMissionData?.isRishon || buble.isRishon}
+              forumId={buble.forumId}
               timegramaId={buble.timegramaId}
               timegramaDate={buble.timegramaDate}
               negopendmissions={buble.negopendmissions || []}
@@ -713,7 +777,10 @@
             />
           </div>
         {:else if buble.ani === 'askedm' && milon.askmap == true}
-          <div class="askmap normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="askmap normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Reqtom
               onAcsept={delo}
               onDecline={delo}
@@ -758,7 +825,10 @@
             />
           </div>
         {:else if buble.ani === 'hachla' && milon.hachla == true}
-          <div class="hachla normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="hachla normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Desi
               onAcsept={delo}
               onDecline={delo}
@@ -766,7 +836,7 @@
               onModal={modali}
               onProj={proj}
               onChat={chat}
-              noofpu={buble.noofpu}
+              noofpu={buble.noof}
               newpicid={buble?.newpicid}
               coinlapach={buble.coinlapach}
               created_at={buble.created_at}
@@ -797,7 +867,10 @@
             />
           </div>
         {:else if buble.ani === 'meData' && milon.sugg == true}
-          <div class="sugg normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="sugg normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <ProjectSuggestor
               onModal={modali}
               onLess={delo}
@@ -805,37 +878,40 @@
               onProj={proj}
               onUser={user}
               onMesima={mesima}
-              timeToP={buble.attributes.project.data.attributes.timeToP}
               coinlapach={buble.coinlapach}
-              acts={buble.attributes.acts}
-              restime={buble.attributes.project.data.attributes.restime}
+              acts={buble.acts}
+              restime={buble.restime}
               {askedarr}
               {declineddarr}
               pid={buble.pid}
               chat={buble.chat ?? null}
               askId={buble.askId ?? null}
-              deadLine={buble.attributes.sqadualed}
+              alreadyi={buble.alreadyi}
+              deadLine={buble.sqadualed}
               oid={buble.id}
               hst={buble.hst}
               stb={buble.stb}
-              projectName={buble.attributes.project.data.attributes.projectName}
-              role={buble.attributes.tafkidims}
-              skills={buble.attributes.skills}
-              missionDetails={buble.attributes.descrip}
-              notes={buble.attributes.hearotMeyuchadot}
-              src={buble.attributes.project.data.attributes.profilePic.data
-                ?.attributes.formats.thumbnail.url}
-              missionName={buble.attributes.name}
-              projectId={buble.attributes.project.data.id}
-              workways={buble.attributes.work_ways}
-              noOfHours={buble.attributes.noofhours}
-              perhour={buble.attributes.perhour}
-              total={buble.attributes.noofhours * buble.attributes.perhour}
+              projectName={buble.projectName}
+              role={buble.tafkidims}
+              skills={buble.skills}
+              missionDetails={buble.descrip}
+              notes={buble.hearotMeyuchadot}
+              src={buble.src}
+              missionName={buble.name}
+              projectId={buble.projectId}
+              workways={buble.work_ways}
+              noOfHours={buble.noofhours}
+              perhour={buble.perhour}
+              total={(buble.noofhours || 0) * (buble.perhour || 0)}
+              noOfusers={buble.noOfusers}
               {low}
             />
           </div>
         {:else if buble.ani === 'huca' && milon.pmashs == true}
-          <div class="pmashs normSml" style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px">
+          <div
+            class="pmashs normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
             <Mashsug
               onLess={delo}
               onHover={hover}
@@ -869,33 +945,33 @@
       {/each}
 
       <div class="midCom">
-      <Mid
-        {sml}
-        onCards={cards}
-        onHover={hover}
-        onShowall={showall}
-        onShowonly={showonly}
-        {total}
-        {picLink}
-        {ask}
-        {wel}
-        name={nam}
-        {low}
-        {sug}
-        {pen}
-        {beta}
-        {fia}
-        pmash={pmashd}
-        {mashs}
-        {maap}
-        {askma}
-        des={halu}
-      />
+        <Mid
+          {sml}
+          onCards={cards}
+          onHover={hover}
+          onShowall={showall}
+          onShowonly={showonly}
+          {total}
+          {picLink}
+          {ask}
+          {wel}
+          name={nam}
+          {low}
+          {sug}
+          {pen}
+          {beta}
+          {fia}
+          pmash={pmashd}
+          {mashs}
+          {maap}
+          {askma}
+          des={halu}
+        />
+      </div>
     </div>
-  </div>
-
   {/key}
 </div>
+
 <style>
   .coin-container {
     background-color: #000000;
@@ -905,26 +981,26 @@
     -webkit-overflow-scrolling: touch;
     padding: 0;
   }
-  
+
   .screen {
     background-color: #000000;
     background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
     margin: 0 auto;
     transform-origin: center center;
   }
-  
-  .midCom{
-    position:absolute;
+
+  .midCom {
+    position: absolute;
     top: 50%;
-    left:50%;
-    transform: translate(-50%,-50%);
+    left: 50%;
+    transform: translate(-50%, -50%);
     z-index: 10;
   }
-  
-  .midCom:hover{
-    z-index:444;
+
+  .midCom:hover {
+    z-index: 444;
   }
-  
+
   .normSml {
     position: absolute;
     transition: transform 500ms ease-in-out;
@@ -941,7 +1017,7 @@
     gap: 1rem;
     z-index: 999;
   }
-  
+
   .control-button {
     width: 3rem;
     height: 3rem;
@@ -957,20 +1033,20 @@
     transition: all 0.3s ease;
     box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
   }
-  
+
   .control-button:hover {
     background-color: rgba(255, 255, 255, 0.25);
     transform: scale(1.1);
   }
-  
+
   .control-button:active {
     transform: scale(0.95);
   }
-  
+
   .redistribute-button {
     background-color: rgba(100, 200, 255, 0.15);
   }
-  
+
   .redistribute-button:hover {
     background-color: rgba(100, 200, 255, 0.25);
   }

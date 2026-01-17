@@ -10,7 +10,8 @@
   import { lang } from '$lib/stores/lang.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import dayjs from 'dayjs';
-  import { nowId } from '$lib/stores/pendMisMes.js';
+  import { nowId, addMes, initialForum } from '$lib/stores/pendMisMes.js';
+  import { forumStore } from '$lib/stores/forumStore';
   const baseUrl = import.meta.env.VITE_URL;
   /**
    * @typedef {Object} ComponentProps
@@ -70,15 +71,15 @@
     deadLinefi,
     projectName,
     missionName,
-    role = $bindable([]),
-    skills = $bindable([]),
+    role = [],
+    skills = [],
     acts = [],
     missionDetails,
     src = 'coin.png',
     projectId,
     linki = '/project/',
     oid = 0,
-    workways = $bindable([]),
+    workways = [],
     noOfHours = 0,
     perhour = 0,
     total = 0,
@@ -87,12 +88,14 @@
     hearotMeyuchadot,
     pid,
     cards = false,
-    chat = $bindable([]),
+    chat = [],
     askId,
-    order = $bindable(),
+    forumId, // Add forumId to props
+    order = {},
     onModal
   } = $props();
   let already = $state(false);
+  // Remove dataib
   let token;
   let uId;
 
@@ -111,7 +114,7 @@
     console.log(as);
     let myvote = ``;
     //todo if project member voted yes
-  
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -123,7 +126,7 @@
     let d = new Date();
 
     console.log(pid);
-    if (pid.includes(uId)) {
+    if (Array.isArray(pid) && pid.includes(uId)) {
       myvote = `vots: [{
                         what: true
                         users_permissions_user: "${uId}"
@@ -159,7 +162,7 @@
   }
   createAsk(
       data:{ open_mission: ${oid},
-            project: ${projectId},
+            project: ${projectId || 'null'},
             users_permissions_user: ${uId},
             publishedAt: "${d.toISOString()}",
             ${myvote}
@@ -239,7 +242,7 @@
     const ds = declineddarr;
     ds.push(`${oid}`);
     console.log(ds);
-    
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
@@ -366,35 +369,7 @@
     onProj?.({ id: projectId });
   }
   onMount(function () {
-    if ($lang != 'en') {
-      for (let i = 0; i < skills.data.length; i++) {
-        if (skills.data[i].attributes.localizations.data.length > 0) {
-          skills.data[i].attributes.skillName =
-            skills.data[
-              i
-            ].attributes.localizations.data[0].attributes.skillName;
-        }
-      }
-      for (let i = 0; i < role.data.length; i++) {
-        if (role.data[i].attributes.localizations.data.length > 0) {
-          role.data[i].attributes.roleDescription =
-            role.data[
-              i
-            ].attributes.localizations.data[0].attributes.roleDescription;
-        }
-      }
-      for (let i = 0; i < workways?.data.length; i++) {
-        if (workways.data[i].attributes.localizations.data.length > 0) {
-          workways.data[i].attributes.workWayName =
-            workways.data[
-              i
-            ].attributes.localizations.data[0].attributes.workWayName;
-        }
-      }
-    }
-    role = role;
-    skills = skills;
-    workways = workways;
+    // Localization is now handled by the processor utility
   });
   function hoverc(event) {
     if (event == '0') {
@@ -432,69 +407,97 @@
   };
 
   let clicked = $state(false);
+  // dataib removed
 
   let miDatan = [];
   async function afreact(event) {
     let why = event.why;
     console.log(why);
-    let d = new Date();
-    //  loading = true;
-   
+
+    // loading = true;
+
     const cookieValueId = document.cookie
       .split('; ')
       .find((row) => row.startsWith('id='))
       .split('=')[1];
     let idL = cookieValueId;
-    let token = page.data.tok;
-    let bearer1 = 'bearer' + ' ' + token;
-    let dataa = {
-      data: {
-        chat: [
-          ...chat,
-          {
-            what: true,
-            users_permissions_user: idL,
-            why: why,
-            order: (order += 1),
-            zman: d.toISOString(),
-            ide: idL
-          }
-        ]
-      }
-    };
+
     try {
-      await fetch(`${baseUrl}/api/asks/${askId}?populate=*`, {
-        method: 'PUT',
+      const response = await fetch('/api/action', {
+        method: 'POST',
         headers: {
-          Authorization: bearer1,
           'Content-Type': 'application/json'
         },
-        body: JSON.stringify(dataa)
-      })
-        .then((r) => r.json())
-        .then((data) => (miDatan = data));
-      console.log(miDatan);
-      chat.push({
-        what: true,
-        users_permissions_user: idL,
-        why: why,
-        order: (order += 1),
-        zman: d.toISOString(),
-        ide: idL
+        body: JSON.stringify({
+          actionKey: 'sendAskMessage',
+          params: {
+            askId: askId,
+            content: why
+          }
+        })
       });
-      chat = chat;
-      clicked = false;
-      nowId.set(
-        miDatan.data.attributes.chat[miDatan.data.attributes.chat.length - 1].id
-      );
-      //   loading = false;
+
+      const result = await response.json();
+      console.log(result);
+
+      if (result.success && result.data) {
+        const {
+          messageId,
+          forumId: resForumId,
+          content,
+          createdAt
+        } = result.data;
+
+        // Update forumStore
+        let picLink =
+          'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
+        if (
+          typeof localStorage !== 'undefined' &&
+          localStorage.getItem('picLink')
+        ) {
+          try {
+            picLink = JSON.parse(localStorage.getItem('picLink'));
+          } catch (e) {}
+        }
+
+        forumStore.addMessage(resForumId.toString(), {
+          id: messageId,
+          message: content,
+          username: page.data.un || 'You',
+          pic: picLink,
+          timestamp: createdAt,
+          sentByMe: true,
+          pending: false
+        });
+
+        // Update legacy store using addMes
+        addMes(
+          content,
+          resForumId,
+          false, // pending
+          true, // sentByMe
+          picLink,
+          createdAt,
+          messageId,
+          page.data.un || 'You'
+        );
+
+        clicked = false;
+        // loading = false;
+      } else {
+        console.error('Failed to send message', result.error);
+        // Fallback or error handling
+      }
     } catch (e) {
       let error1 = e;
       console.log(error1);
     }
   }
   function tochat() {
-    console.log('chat');
+    console.log('opening chat', forumId);
+    if (forumId) {
+      forumStore.initForum(forumId.toString(), page.data.id);
+    }
     isOpen = true;
     diunm = true;
   }
@@ -508,20 +511,8 @@
 
 <DialogOverlay {isOpen} onDismiss={close} class="overlay">
   <div transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}>
-    <DialogContent class="chat" aria-label="form">
-      <div dir="rtl" class="grid items-center justify-center aling-center">
-        <button
-          onclick={close}
-          style="margin: 0 auto;"
-          class="hover:bg-barbi text-barbi hover:text-gold font-bold rounded-full"
-          title="ביטול"
-          ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-            <path
-              fill="currentColor"
-              d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
-            />
-          </svg></button
-        >
+    <DialogContent class="chat d" aria-label="form">
+      <div dir="rtl" class="grid items-center justify-center aling-center d">
         {#if loading === true}
           <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
           ></RingLoader>
@@ -560,11 +551,13 @@
             mypos={true}
             rect={true}
             {clicked}
-            pendId={oid}
+            pendId={forumId ? forumId : oid}
             profilePicChatPartner={src.length > 0
               ? src
               : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
-            ani="iaskedMi"
+            ani={forumId ? 'new-forum' : 'iaskedMi'}
+            messages={forumId ? $forumStore[forumId]?.messages || [] : []}
+            isLoading={forumId ? $forumStore[forumId]?.loading || false : false}
           />
         {/if}
       </div>
@@ -2865,9 +2858,11 @@
               hover({ he: 'הכישורים הנדרשים', en: 'needed skills' })}
             onmouseleave={() => hover('0')}
           >
-            {#each skills.data as skill}
-              <Tile bg="green" word={skill.attributes.skillName} />
-            {/each}
+            {#if skills}
+              {#each skills as skill}
+                <Tile bg="green" word={skill.attributes.skillName} />
+              {/each}
+            {/if}
           </div>
           {#if deadLine != undefined && deadLine != 'undefined'}
             <h5
@@ -2910,9 +2905,11 @@
             style="text-shadow:none;"
             class="ltn de d flex flex-wrap items-center justify-middle"
           >
-            {#each role.data as d}
-              <Tile bg="pink" word={d.attributes.roleDescription} />
-            {/each}
+            {#if role}
+              {#each role as d}
+                <Tile bg="pink" word={d.attributes.roleDescription} />
+              {/each}
+            {/if}
           </div>
           {#if low == false}
             {#if already === false}

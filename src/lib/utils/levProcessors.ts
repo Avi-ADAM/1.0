@@ -1,11 +1,11 @@
-// src/lib/utils/levProcessors.ts
-
 import type {
   PendMissionData,
   InProgressMissionData,
   ApprovalData,
   AskData,
+  AskedResourceData,
   SuggestionData,
+  ResourceSuggestionData,
   PendResourceData,
   ResourceRequestData,
   HalukaData,
@@ -15,7 +15,7 @@ import type {
   ProjectData
 } from '$lib/stores/levStores';
 // @ts-ignore
-import { createProjectInfo, createUserInfo, getProjectMembers } from '$lib/utils/projectHelpers.js';
+import { createProjectInfo, createUserInfo, getProjectMembers, getProjectUsers, getProjectRestime } from '$lib/utils/projectHelpers.js';
 import { applyLocalization } from './localizationUtils';
 // @ts-ignore
 import { checkStb, checkHst, txx, letters } from '$lib/utils/levDataProcessors.js';
@@ -92,70 +92,104 @@ export function processPends(
 
     const users = pend.users || []; // Votes
     const diun = pend.diun || []; // Chat
-    const negos = pend.negopendmissions || []; // Negotiations
-
-    const orderon = negos.length || 0;
+    const negos = pend.negopendmissions?.data || []; // Negotiations
 
     // 2. Logic: Already voted? Vote Counts?
+    const maxUserOrder = users.reduce((max, u) => Math.max(max, u.order || 0), 0);
+    const orderon = Math.max(negos.length || 0, maxUserOrder);
+
     let already = false;
     let mypos = null;
     let cv = 0;
     let noofusersOk = 0;
     let noofusersNo = 0;
 
-    // Check if I voted in the current order
-    if (myid) {
-      for (const u of users) {
-        const uid = u.users_permissions_user?.data?.id;
-        if (uid === myid) {
-          // Loose equality to match old code
-          if ((u.order || 0) == orderon) {
-            already = true;
-            mypos = u.what;
-          }
-        }
-      }
-    }
-
-    // Count votes for current version
-    for (const u of users) {
-      if ((u.order || 0) == orderon) {
-        cv++;
-        if (u.what === true) noofusersOk++;
-        else if (u.what === false) noofusersNo++;
-      }
-    }
-
-    const memberCount = projectInfo.noof || 0;
-    const noofusersWaiting = memberCount - cv;
-
-    // 3. Messages Construction
-    const messege: any[] = []; // Using 'messege' spelling from old code
-
-    // 3.1 Votes
+    // Group votes by user
+    const votersMap = new Map<string, any[]>();
     for (const u of users) {
       const uid = u.users_permissions_user?.data?.id;
+      if (uid) {
+        if (!votersMap.has(uid)) votersMap.set(uid, []);
+        votersMap.get(uid)?.push(u);
+      }
+    }
+
+    // Ensure the proposer (rishonId) is counted as 'Favor' for the current version
+    // if they haven't voted differently or at all on the high order.
+    if (pend.rishonId && !votersMap.has(pend.rishonId)) {
+      votersMap.set(pend.rishonId, [{
+        what: true,
+        order: orderon,
+        users_permissions_user: { data: { id: pend.rishonId } },
+        zman: pend.createdAt
+      }]);
+    }
+
+    // Process each unique voter
+    votersMap.forEach((votes, uid) => {
+      // Find the vote for the current version
+      const currentVote = votes.find(v => (v.order || 0) == orderon);
+
+      if (currentVote) {
+        cv++;
+        if (currentVote.what === true) noofusersOk++;
+        else if (currentVote.what === false) noofusersNo++;
+
+        if (uid === myid) {
+          already = true;
+          mypos = currentVote.what;
+        }
+      } else {
+        // Voted on old but not current -> Count as 'No' in current context
+        cv++;
+        noofusersNo++;
+
+        if (uid === myid) {
+          already = false; // Need to vote on new version
+          mypos = null;
+        }
+      }
+    });
+
+    const restime = getProjectRestime(pend.projectId);
+    const user_1s = getProjectUsers(pend.projectId) || [];
+    const noofusers = projectInfo.noof;
+
+    const uids = (projectInfo.pid || []).filter(id => id !== myid);
+    const noofusersWaiting = noofusers - cv;
+
+    // 3. Messages Construction
+    const messege: any[] = [];
+
+    // 3.1 Votes - Show only the most recent vote for each user to avoid confusion
+    votersMap.forEach((votes, uid) => {
+      // Sort user votes by order desc to get the latest
+      const sortedUserVotes = [...votes].sort((a, b) => (b.order || 0) - (a.order || 0));
+      const latestVote = sortedUserVotes[0];
+
       const voterInfo = createUserInfo(pend.projectId, uid);
       const voterName = voterInfo.username || 'User';
       const voterPic = voterInfo.src || projectInfo.src2;
-      const uOrder = u.order || 0;
+      const uOrder = latestVote.order || 0;
 
-      const isFavor = u.what === true; // or check specific value
-      let msgText = `${voterName} ${isFavor ? 'בעד' : 'נגד'}`; // Hebrew: In Favor / Against
+      // Logic: If it's an old version vote, it's effectively 'Against' the current version
+      const isCurrentVersion = uOrder == orderon;
+      const isFavor = isCurrentVersion ? latestVote.what === true : false;
 
-      if (uOrder != orderon) {
-        msgText += ' גרסה ישנה'; // Hebrew: Older Version
+      let msgText = `${voterName} ${isFavor ? 'בעד' : 'נגד'}`;
+      if (!isCurrentVersion) {
+        msgText += ' גרסה ישנה';
       }
 
       messege.push({
         message: msgText,
-        what: uOrder != orderon ? false : true,
+        what: isCurrentVersion ? latestVote.what : false,
         pic: voterPic,
-        timestamp: new Date(u.zman || u.createdAt || new Date()),
+        timestamp: new Date(latestVote.zman || latestVote.createdAt || new Date()),
         sentByMe: uid === myid,
         changed: uOrder < orderon
       });
-    }
+    });
 
     // 3.2 Diun (Chat)
     for (const d of diun) {
@@ -172,6 +206,38 @@ export function processPends(
       });
     }
 
+    // 3.3 Forum messages (Migrated Chat)
+    // forums is not typed in PendMissionData interface yet but will be available from query
+    // @ts-ignore
+    const forums = pend.forums?.data;
+    if (forums && Array.isArray(forums)) {
+      for (const forum of forums) {
+        const forumMessages = forum.attributes?.messages?.data;
+        if (forumMessages && Array.isArray(forumMessages)) {
+          for (const msg of forumMessages) {
+            const attr = msg.attributes;
+            const msgUser = attr.users_permissions_user?.data;
+            const msgUserId = msgUser?.id;
+            let msgUserPic = projectInfo.src2;
+
+            if (msgUser?.attributes?.profilePic?.data?.attributes?.url) {
+              msgUserPic = msgUser.attributes.profilePic.data.attributes.url;
+            } else if (msgUser?.attributes?.profilePic?.data?.attributes?.formats?.thumbnail?.url) {
+              msgUserPic = msgUser.attributes.profilePic.data.attributes.formats.thumbnail.url;
+            }
+
+            messege.push({
+              message: attr.content,
+              what: true,
+              pic: msgUserPic,
+              timestamp: new Date(attr.createdAt),
+              sentByMe: msgUserId === myid
+            });
+          }
+        }
+      }
+    }
+
     // 3.3 Negotiations
     for (const n of negos) {
       const attr = n.attributes;
@@ -183,6 +249,10 @@ export function processPends(
       let msgText = `<span class="underline">${negoName} ביצע משא ומתן</span>`; // Hebrew: Did Nego
 
       // Detailed Diff Logic (matching old code)
+      // Note: Comparing 'pend' (current values) with 'nego' (historical proposal attributes)
+      // The old code compared pend vs nego. 
+      // Assuming 'pend' holds the *current* state of the mission in the new architecture as well.
+
       if (attr.noofhours && attr.noofhours !== pend.noofhours) {
         msgText += `<br>⚙️ משימה זו ${pend.noofhours} שעות במקום ${attr.noofhours} שעות`;
       }
@@ -203,7 +273,7 @@ export function processPends(
       if (attr.hearotMeyuchadot && attr.hearotMeyuchadot !== pend.hearotMeyuchadot) {
         msgText += `<br>⚙️ הערות "${pend.hearotMeyuchadot}" במקום: "${attr.hearotMeyuchadot}"`;
       }
-      if (attr.isMonth && attr.isMonth !== pend.iskvua) {
+      if (attr.isMonth !== undefined && attr.isMonth !== pend.iskvua) {
         // Basic boolean text fallback
         const currentVal = pend.iskvua ? 'חודשי' : 'חד פעמי';
         const negoVal = attr.isMonth ? 'חודשי' : 'חד פעמי';
@@ -219,9 +289,9 @@ export function processPends(
       });
     }
 
-    // Sort messages: Ascending order (Oldest -> Newest)?
-    // Old code: .sort((a,b) => b.time - a.time).reverse() -> Ascending
-    messege.sort((a, b) => a.timestamp.getTime() - b.timestamp.getTime());
+    // Sort messages: Descending timestamp first, then reverse -> Ascending (Oldest first)
+    messege.sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
+    messege.reverse();
 
     // 4. Priority Calculation
     let priority = 1 + users.length;
@@ -229,15 +299,17 @@ export function processPends(
       priority += 48;
     }
 
+    const { src2, ...projectInfoWithoutSrc2 } = projectInfo;
+
     return {
       // Common display fields
       ani: 'pends',
       azmi: 'harchava',
       pl: priority,
       coinlapach: `pend-${pend.id}`,
-      // Pass project info from helper (includes projectId, projectName, noof, src2, pid)
-      ...projectInfo,
-      src: projectInfo.src2 || '',
+      // Pass project info without src2
+      ...projectInfoWithoutSrc2,
+      src: src2 || '',
 
       // Pend-specific fields
       pendId: pend.id,
@@ -247,13 +319,29 @@ export function processPends(
       noofusersNo,
       noofusersWaiting,
       messege: messege,
+      cv,
+      mdate: null,
+      noofusers,
+      restime,
+      user_1s,
+      uids,
 
       already,
       mypos,
       orderon,
 
+      forumId: (pend.forums?.data && pend.forums.data.length > 0) ? pend.forums.data[0].id : null,
+
       // Pass through all other fields from raw data
-      ...pend
+      ...pend,
+      // Map and localize fields for component compatibility
+      skills: applyLocalization(pend.skills),
+      tafkidims: applyLocalization(pend.tafkidims),
+      workways: applyLocalization(pend.workways),
+      vallues: applyLocalization(pend.vallues),
+
+      sqadualed: pend.sqadualed || null,
+      dates: pend.dates || null
     };
   });
 }
@@ -262,15 +350,17 @@ export function processPends(
  * Process missions in progress into display items
  * 
  * Pure function that transforms raw in-progress mission data into display items.
- * Does not modify input data.
+ * Timer data is now pulled from the timers store for real-time updates.
  * 
  * @param mtaha - Array of in-progress mission data
  * @param projects - Array of project data for lookups
+ * @param timersData - Array of timer data from timers store for real-time timer info
  * @returns Array of display items ready for rendering
  */
 export function processMtaha(
   mtaha: InProgressMissionData[],
-  projects: ProjectData[]
+  projects: ProjectData[],
+  timersData?: any[]
 ): DisplayItem[] {
   if (!mtaha || !Array.isArray(mtaha)) {
     return [];
@@ -283,11 +373,20 @@ export function processMtaha(
     // Calculate priority - missions in progress have higher priority
     const basePriority = mission.priority ?? 150;
 
-    // Timer Logic (mirrors timers.js)
+    // Timer Logic - Try to get from timers store first (for real-time updates)
     let totalMilliseconds = 0;
     let isActive = false;
 
-    if (mission.activeTimer) {
+    // Look for this mission in the timers store
+    // Use loose equality (==) to handle string/number type mismatches
+    const timerFromStore = timersData?.find((t: any) => t.id == mission.id || t.mId == mission.id);
+
+    if (timerFromStore) {
+      // Use timer data from store (real-time, updated via WebSocket)
+      totalMilliseconds = timerFromStore.zman || 0;
+      isActive = timerFromStore.running || false;
+    } else if (mission.activeTimer) {
+      // Fallback to local calculation if not in timers store
       isActive = mission.activeTimer.isActive;
       totalMilliseconds = mission.activeTimer.totalHours || 0;
 
@@ -309,6 +408,7 @@ export function processMtaha(
       // Pass project info from helper
       ...projectInfo,
       src: projectInfo.src2 || '',
+      restime: getProjectRestime(mission.projectId),
 
       // Mtaha-specific fields
       missionId: mission.id,
@@ -316,7 +416,7 @@ export function processMtaha(
       assignedTo: mission.assignedTo,
       progress: mission.progress,
 
-      // Timer fields
+      // Timer fields - from store or calculated
       zman: totalMilliseconds,
       running: isActive,
 
@@ -527,16 +627,16 @@ export function processAsked(
       userPic = userAttrs.profilePic.data.attributes.url;
     }
 
-    // 3. Open Mission Data
-    const omData = ask.openMissionData || {};
-    const missionId = omData.mission?.data?.id;
+    // 3. Open Mission Data or Resource Data
+    const omData = ask.openMissionData || ask.openMashaabimData || {};
+    const isResource = !!ask.openMashaabimData;
+    const missionId = omData.mission?.data?.id || ask.openMashaabimId;
 
     // 4. Voting Logic
-    const allVotes = ask.vots || []; // or ask.users
-    const userIdsWhoVoted = allVotes.map((v: any) => v.users_permissions_user?.data?.id).filter(Boolean);
-
-    const memberCount = projectInfo.noof || 0;
-    const orderon = omData.negopendmissions?.data?.length || 0;
+    // 4. Voting Logic
+    const allVotes = ask.vots || [];
+    const maxUserOrder = allVotes.reduce((max, v) => Math.max(max, v.order || 0), 0);
+    const orderon = Math.max(omData.negopendmissions?.data?.length || 0, maxUserOrder);
 
     let noofusersOk = 0;
     let noofusersNo = 0;
@@ -544,45 +644,52 @@ export function processAsked(
     let already = false;
     let mypos = null;
 
-    // Check if viewer voted
-    if (viewerId && userIdsWhoVoted.includes(viewerId)) {
-      const myVote = allVotes.find((v: any) => v.users_permissions_user?.data?.id === viewerId);
-      if (myVote) {
-        // Treat null order as 0
-        const voteOrder = myVote.order ?? 0;
-        if (voteOrder == orderon) {
+    // Group votes by user
+    const votersMap = new Map<string, any[]>();
+    for (const v of allVotes) {
+      const uid = v.users_permissions_user?.data?.id;
+      if (uid) {
+        if (!votersMap.has(uid)) votersMap.set(uid, []);
+        votersMap.get(uid)?.push(v);
+      }
+    }
+
+    // Process each unique voter for counts
+    votersMap.forEach((votes, uid) => {
+      const currentVote = votes.find(v => (v.order ?? 0) == orderon);
+      if (currentVote) {
+        cv++;
+        if (currentVote.what === true) noofusersOk++;
+        else if (currentVote.what === false) noofusersNo++;
+
+        if (uid === viewerId) {
           already = true;
-          mypos = myVote.what;
+          mypos = currentVote.what;
+        }
+      } else {
+        // Voted on old but not current
+        cv++;
+        noofusersNo++;
+        if (uid === viewerId) {
+          already = false;
+          mypos = null;
         }
       }
-    }
+    });
 
-    // Count valid votes
-    for (const vote of allVotes) {
-      const voteOrder = vote.order ?? 0;
+    const noofusersWaiting = (projectInfo.noof || 0) - cv;
 
-      if (voteOrder == orderon) {
-        cv++;
-        if (vote.what === true) noofusersOk++;
-        else if (vote.what === false) noofusersNo++;
-      } else {
-        // Handle older votes or mismatches - logic copied from old component
-        // Simplified: if duplicate votes exist (one old, one new), only count the relevant one?
-        // The old logic had a complex 'getOccurrence' check. 
-        // Here we'll stick to basic counting for current order to be safe, 
-        // effectively ignoring old votes for the summary counts.
-        // (Old logic attempted to subtract/adjust counts, which suggests re-voting scenarios)
-      }
-    }
-
-    const noofusersWaiting = memberCount - cv;
+    const restime = getProjectRestime(ask.projectId);
+    const user_1s = getProjectUsers(ask.projectId) || [];
+    const noofusers = projectInfo.noof;
+    const uids = (projectInfo.pid || []).filter(id => id !== viewerId);
 
     // 5. Build Message History (Messages + Negotiations)
     const messages: any[] = [];
 
     // 5.1 Initial "Asked to join" message
     messages.push({
-      message: `${userAttrs.username || 'User'} ביקש להצטרף ל ${omData.name || 'Mission'}`, // Hebrew fallback: Asked to join
+      message: `${userAttrs.username || 'User'} ביקש להצטרף ל ${omData.name || 'Mission'}`,
       what: true,
       pic: userPic,
       timestamp: new Date(ask.createdAt),
@@ -590,28 +697,28 @@ export function processAsked(
       changed: false
     });
 
-    // 5.2 Vote messages
-    if (allVotes.length > 0) {
-      for (const vote of allVotes) {
-        // Get voter info
-        const voterId = vote.users_permissions_user?.data?.id;
+    // 5.2 Vote messages - Show only the most recent vote for each user
+    votersMap.forEach((votes, uid) => {
+      const sortedUserVotes = [...votes].sort((a, b) => (b.order || 0) - (a.order || 0));
+      const latestVote = sortedUserVotes[0];
 
-        // Use helper to get up-to-date member info
-        const voterInfo = createUserInfo(ask.projectId, voterId);
+      const voterInfo = createUserInfo(ask.projectId, uid);
+      const voterName = voterInfo.username || 'Member';
+      const voterPic = voterInfo.src || projectInfo.src2;
+      const uOrder = latestVote.order || 0;
 
-        const voterName = voterInfo.username || vote.users_permissions_user?.data?.attributes?.username || 'Member';
-        const voterPic = voterInfo.src || projectInfo.src2;
+      const isCurrentVersion = uOrder == orderon;
+      const isFavor = isCurrentVersion ? latestVote.what === true : false;
 
-        messages.push({
-          message: `${voterName} ${vote.what ? 'בעד' : 'נגד'}`,
-          what: vote.order != orderon ? false : vote.what,
-          pic: voterPic,
-          timestamp: new Date(vote.zman || vote.createdAt || new Date()),
-          sentByMe: voterId === viewerId,
-          changed: (vote.order || 0) < orderon
-        });
-      }
-    }
+      messages.push({
+        message: `${voterName} ${isFavor ? 'בעד' : 'נגד'}${!isCurrentVersion ? ' גרסה ישנה' : ''}`,
+        what: isCurrentVersion ? latestVote.what : false,
+        pic: voterPic,
+        timestamp: new Date(latestVote.zman || latestVote.createdAt || new Date()),
+        sentByMe: uid === viewerId,
+        changed: (latestVote.order || 0) < orderon
+      });
+    });
 
     // 5.3 Chat messages
     if (ask.chat && Array.isArray(ask.chat)) {
@@ -631,6 +738,38 @@ export function processAsked(
           sentByMe: chatMsg.ide === viewerId, // 'ide' was used in old code
           changed: false
         });
+      }
+    }
+
+    // 5.5 Forum messages (Migrated Chat)
+    const forums = ask.forums?.data;
+    if (forums && Array.isArray(forums)) {
+      for (const forum of forums) {
+        const forumMessages = forum.attributes?.messages?.data;
+        if (forumMessages && Array.isArray(forumMessages)) {
+          for (const msg of forumMessages) {
+            const attr = msg.attributes;
+            const msgUser = attr.users_permissions_user?.data;
+            const msgUserId = msgUser?.id;
+            let msgUserPic = projectInfo.src2;
+
+            // Try to get user pic
+            if (msgUser?.attributes?.profilePic?.data?.attributes?.url) {
+              msgUserPic = msgUser.attributes.profilePic.data.attributes.url;
+            } else if (msgUser?.attributes?.profilePic?.data?.attributes?.formats?.thumbnail?.url) {
+              msgUserPic = msgUser.attributes.profilePic.data.attributes.formats.thumbnail.url;
+            }
+
+            messages.push({
+              message: attr.content,
+              what: true,
+              pic: msgUserPic,
+              timestamp: new Date(attr.createdAt),
+              sentByMe: msgUserId === viewerId,
+              changed: false
+            });
+          }
+        }
       }
     }
 
@@ -704,10 +843,15 @@ export function processAsked(
     }
     // Add logic from createasked: pl: 1 + i + j (essentially index based, but we stick to fixed priorities)
 
+    const rt = letters(omData.name || '');
+
     return {
       // Common display fields
-      ani: 'askedcoin',
-      azmi: 'ziruf', // 'request' in English, sticking to 'ziruf' as per old code
+      name: rt[0],
+      stylef: rt[1],
+      st: rt[2],
+      ani: isResource ? 'askedm' : 'askedcoin',
+      azmi: 'ziruf',
       pl: priority,
       coinlapach: `asked-${ask.id}`,
 
@@ -721,6 +865,9 @@ export function processAsked(
       // Data fields
       askId: ask.id,
       userId: userId,
+      uid: userId,
+      missId: missionId,
+      forumId: (ask.forums?.data && ask.forums.data.length > 0) ? ask.forums.data[0].id : null,
 
       // Restored Logic Fields
       username: userAttrs.username,
@@ -743,6 +890,8 @@ export function processAsked(
       role: applyLocalization(omData.tafkidims?.data ? omData.tafkidims : { data: [] }),
       deadline: omData.dates,
       acts: omData.acts,
+      decid: omData.declined.data,
+      negopendmissions: omData.negopendmissions?.data || [],
       sqedualed: omData.sqadualed,
       publicklinks: omData.publicklinks,
       privatlinks: omData.privatlinks,
@@ -756,6 +905,11 @@ export function processAsked(
       already,
       mypos,
       orderon,
+      mdate: null,
+      restime,
+      user_1s,
+      uids,
+      noofusers,
 
       // Messages
       messeges: messages,
@@ -763,6 +917,108 @@ export function processAsked(
 
       // Raw data fallback
       ...ask
+    };
+  });
+}
+
+/**
+ * Process asked resources (askms) into display items
+ * 
+ * @param askedResources - Array of asked resource data
+ * @param projects - Array of project data for lookups
+ * @returns Array of display items ready for rendering
+ */
+export function processAskedResources(
+  askedResources: AskedResourceData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!askedResources || !Array.isArray(askedResources)) {
+    return [];
+  }
+
+  return askedResources.map(res => {
+    const projectInfo = createProjectInfo(res.projectId);
+    const myid = res.myid;
+
+    // Voting Logic
+    const users = res.users || [];
+
+    let noofusersOk = 0;
+    let noofusersNo = 0;
+    let already = false;
+    let mypos = null;
+    let uids: string[] = [];
+
+    for (const u of users) {
+      if (u.users_permissions_user?.data?.id) {
+        uids.push(u.users_permissions_user.data.id);
+      }
+
+      if (u.what === true) {
+        noofusersOk++;
+      } else if (u.what === false) {
+        noofusersNo++;
+      }
+    }
+
+    if (myid && uids.includes(myid)) {
+      already = true;
+      const myVote = users.find((u: any) => u.users_permissions_user?.data?.id === myid);
+      if (myVote) mypos = myVote.what;
+    }
+
+    const noofusersWaiting = (projectInfo.noof || 0) - users.length;
+
+    let basePriority = res.priority || 7;
+
+    // Letters styling
+    const rt = letters(res.openName || '');
+
+    return {
+      // Common
+      ani: 'askedm',
+      azmi: 'ziruf',
+      pl: basePriority,
+      coinlapach: `askm-${res.id}`,
+
+      ...projectInfo,
+      src: res.src || projectInfo.src2 || '', // requesting user pic
+      src2: projectInfo.src2, // project pic
+
+      // Fields
+      askId: res.id,
+      uid: res.uid,
+      username: res.username,
+
+      // Resource specific
+      price: res.price,
+      easy: res.easy,
+      spnot: res.spnot,
+      descrip: res.descrip,
+      hm: res.hm,
+      myp: res.myp,
+      kindOf: res.kindOf,
+      spid: res.spid,
+      deadline: res.deadline,
+      openName: res.openName,
+      omid: res.omid,
+
+      // Helper fields
+      name: rt[0],
+      stylef: rt[1],
+      st: rt[2],
+
+      users: users,
+      uids: uids,
+      already: already,
+      mypos: mypos,
+      noofusersOk: noofusersOk,
+      noofusersNo: noofusersNo,
+      noofusersWaiting: noofusersWaiting,
+
+
+      // Pass through
+      ...res
     };
   });
 }
@@ -794,6 +1050,7 @@ export function processSuggestions(
     const project = getProjectById(projects, suggestion.projectId);
 
     // Use stored project data if available (member), otherwise use embedded details (non-member)
+    const projectInfo = createProjectInfo(suggestion.projectId);
     const projectName = project?.attributes.projectName || suggestion.projectDetails?.name || '';
     const projectImageUrl = project?.attributes.profilePic?.data?.attributes?.url || suggestion.projectDetails?.src || '';
     const memberCount = project?.attributes.user_1s?.data?.length || suggestion.projectDetails?.membersCount || 0;
@@ -812,7 +1069,8 @@ export function processSuggestions(
       azmi: 'hazaa', // Legacy category 'hazaa'
       pl: basePriority,
       coinlapach: `suggestion-${suggestion.id}`,
-      projectId: suggestion.projectId,
+      projectId: projectInfo.projectId || suggestion.projectId,
+      pid: projectInfo.pid || suggestion.projectDetails?.memberIds || [],
       projectName,
       src: projectImageUrl,
 
@@ -822,15 +1080,107 @@ export function processSuggestions(
       noOfusers: memberCount,
       restime: restime,
 
-      // Mapped fields from old logic
+      // Pass through all other fields from raw data
+      ...suggestion,
+
+      // UI Styling helpers
       hst,
       stb,
       askId: suggestion.askId,
       chat: suggestion.chat,
+      forumId: suggestion.forumId,
       alreadyi: suggestion.alreadyAsked,
 
-      // Pass through all other fields from raw data
-      ...suggestion
+      // Map and localize fields for component compatibility
+      // We ensure we get a flat array for the UI components
+      skills: (() => {
+        const res = applyLocalization(suggestion.skills);
+        return Array.isArray(res) ? res : res?.data || [];
+      })(),
+      role: (() => {
+        const res = applyLocalization(suggestion.tafkidims);
+        return Array.isArray(res) ? res : res?.data || [];
+      })(),
+      workways: (() => {
+        const res = applyLocalization(suggestion.work_ways);
+        return Array.isArray(res) ? res : res?.data || [];
+      })(),
+
+      // Overwrite original fields so UI components that still use mapping 
+      // (like newcoinui.svelte passing tafkidims -> role) get the localized version.
+      tafkidims: (() => {
+        const res = applyLocalization(suggestion.tafkidims);
+        return Array.isArray(res) ? res : res?.data || [];
+      })(),
+      work_ways: (() => {
+        const res = applyLocalization(suggestion.work_ways);
+        return Array.isArray(res) ? res : res?.data || [];
+      })()
+    };
+  });
+}
+
+/**
+ * Process resource suggestions (huca) into display items
+ * 
+ * @param resourceSuggestions - Array of resource suggestions
+ * @param projects - Array of project data for lookups
+ * @returns Array of display items ready for rendering
+ */
+export function processResourceSuggestions(
+  resourceSuggestions: ResourceSuggestionData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!resourceSuggestions || !Array.isArray(resourceSuggestions)) {
+    return [];
+  }
+
+  return resourceSuggestions.map(huca => {
+    // Basic info
+    const projectId = huca.projectId;
+    // Check if we have project data in store, if not rely on huca embedded data
+    // Usually extracting uses 'projectHelper' which looks up by ID.
+    // But huca extraction embedded 'projectName' and 'srcb'.
+
+    // We try to get "real" project info if available to ensure consistency (like member counts)
+    const projectInfo = createProjectInfo(projectId);
+
+    // Fallback/Override with huca specific embedded data
+    const finalProjectName = huca.projectName || projectInfo.projectName;
+    const finalSrc = huca.srcb || projectInfo.src || projectInfo.profilePic?.data?.attributes?.url || '';
+
+    const restime = getProjectRestime(projectId);
+
+    const basePriority = huca.priority ?? 6;
+
+    return {
+      ani: 'huca',
+      azmi: 'hazaa',
+      pl: basePriority,
+      coinlapach: `huca-${huca.id}`,
+
+      ...projectInfo,
+      projectName: finalProjectName,
+      src: finalSrc, // project pic for huca logic is 'srcb'
+
+      // Huca specific
+      id: huca.id,
+      price: huca.price,
+      mashname: huca.mashname,
+      myp: huca.myp,
+      easy: huca.easy,
+      kindOf: huca.kindOf,
+      sqedualed: huca.sqedualed,
+      sqedualedf: huca.sqedualedf,
+      restime: restime, // from helper
+      spnot: huca.spnot,
+      descrip: huca.descrip,
+      oid: huca.oid,
+      already: huca.already,
+      declineddarra: huca.declineddarra,
+
+      // Pass through
+      ...huca
     };
   });
 }
@@ -865,7 +1215,7 @@ export function processPmashes(
     // 2. Voting Logic
     const users = pmash.users || [];
     const diun = pmash.diun || [];
-    const nego_mashes = pmash.nego_mashes || [];
+    const nego_mashes = pmash.nego_mashes?.data || [];
     const orderon = nego_mashes.length || 0; // Current negotiation version
 
     // Extract user IDs who voted
@@ -930,7 +1280,14 @@ export function processPmashes(
       }
     }
 
-    const noofusersWaiting = (projectInfo.noof || 0) - cv;
+    const restime = getProjectRestime(pmash.projectId);
+    const user_1s = getProjectUsers(pmash.projectId) || [];
+    const noofusers = projectInfo.noof;
+
+    // uids = all ids beside my id in flat array
+    const uids_members = (projectInfo.pid || []).filter(id => id !== myid);
+
+    const noofusersWaiting = noofusers - cv;
 
     // 3. Build Message History
     const messege: any[] = [];
@@ -1049,6 +1406,9 @@ export function processPmashes(
       priority += 48; // Move down if already voted
     }
 
+    const { src2, ...projectInfoWithoutSrc2 } = projectInfo;
+    const { nego_mashes: _rawNego, ...pmashRest } = pmash;
+
     return {
       // Common display fields
       ani: 'pmashes',
@@ -1056,9 +1416,9 @@ export function processPmashes(
       pl: priority,
       coinlapach: `pmash-${pmash.id}`,
 
-      // Project Info
-      ...projectInfo,
-      src: projectInfo.src2 || '',
+      // Project Info without src2
+      ...projectInfoWithoutSrc2,
+      src: src2 || '',
 
       // Pmash-specific fields
       pendId: pmash.id,
@@ -1079,10 +1439,14 @@ export function processPmashes(
 
       // Voting & Status
       users,
-      uids,
+      uids: uids_members,
       already,
       mypos,
       cv,
+      mdate: null,
+      noofusers,
+      restime,
+      user_1s,
       noofusersOk,
       noofusersNo,
       noofusersWaiting,
@@ -1097,10 +1461,9 @@ export function processPmashes(
       myid,
       mshaabId: pmash.mashaabimId,
       created_at: pmash.createdAt,
-      restime: projectInfo.restime,
 
       // Pass through all other fields from raw data
-      ...pmash
+      ...pmashRest
     };
   });
 }
@@ -1126,6 +1489,10 @@ export function processWegets(
   return wegets.map(weget => {
     // Use projectHelpers to get project info
     const projectInfo = createProjectInfo(weget.projectId);
+
+    // Use helper for user info (Fixes src, username, uid consistency)
+    const userInfo = createUserInfo(weget.projectId, weget.userId);
+
     const myid = weget.myid;
 
     // Logic from crMaap - letters function for name styling
@@ -1178,18 +1545,25 @@ export function processWegets(
     const basePriority = -1 + users.length;
 
     return {
+      // Pass through all other fields from raw data FIRST so they can be overridden
+      ...weget,
+
       // Common display fields
       ani: 'wegets',
       azmi: 'ishrur', // Keep 'ishrur' to match old code
       pl: basePriority,
       coinlapach: `weget-${weget.id}`,
-      // Pass project info from helper
+
+      // Pass project info from helper (overwrites fields if needed)
       ...projectInfo,
-      src: projectInfo.src2 || '',
+
+      // User Info from Helper (Fixes src, username, uid consistency)
+      // This MUST be after ...weget to overwrite the default src from extractor
+      src: userInfo.src || '',
+      uid: userInfo.uid,
+      username: userInfo.username,
 
       // Weget-specific fields from crMaap
-      uid: weget.userId,
-      username: weget.username,
       myp: weget.myp,
       spid: weget.spId,
       omid: weget.openMashaabimId,
@@ -1221,10 +1595,7 @@ export function processWegets(
       noofusersNo,
       whyno,
       whyes,
-      noofusersWaiting,
-
-      // Pass through all other fields from raw data
-      ...weget
+      noofusersWaiting
     };
   });
 }
@@ -1303,7 +1674,7 @@ export function processHalukas(
       // Pass project info from helper
       ...projectInfo,
       src: projectInfo.src2 || '',
-
+      noofusers: projectInfo.noof,
       // Haluka/Tosplit fields
       pendId: haluka.id, // mapped from rashbi: pendId: projects[i].attributes.tosplits.data[j].id
       name: haluka.name,
@@ -1400,10 +1771,31 @@ export function processTransfers(
     // Transfers have medium priority
     const basePriority = transfer.priority ?? 90;
 
+    // Process Chat Logic
+    const messege: any[] = [];
+    const chat = transfer.chat || [];
+    const myid = transfer.myid;
+
+    if (Array.isArray(chat)) {
+      for (const c of chat) {
+        const senderId = c.send?.data?.id;
+        // Helper to get user info (pic)
+        const userInfo = createUserInfo(transfer.projectId, senderId);
+
+        messege.push({
+          message: c.freetext,
+          when: c.when,
+          pic: userInfo.src || 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
+          sentByMe: senderId === myid,
+          seen: c.seen
+        });
+      }
+    }
+
     return {
       // Common display fields
       ani: 'vidu',
-      azmi: 'transfer',
+      azmi: 'vidu',
       pl: basePriority,
       coinlapach: `transfer-${transfer.id}`,
       // Pass project info from helper
@@ -1413,6 +1805,7 @@ export function processTransfers(
       // Transfer-specific fields
       transferId: transfer.id,
       amount: transfer.amount,
+      messege: messege, // Add processed messages
 
       // Pass through all other fields from raw data
       ...transfer
@@ -1551,6 +1944,7 @@ export function processDecisions(
         ...commonFields,
         ...decision,
         pendId: decision.id,
+        restime: getProjectRestime(decision.projectId),
         // newpic, newpicid are passed from decision extract
         created_at: decision.createdAt
       };

@@ -164,7 +164,9 @@
     </div>
 
     <!-- Timer - responsive positioning -->
-    <div class="flex items-center justify-center w-full sm:w-auto sm:justify-end">
+    <div
+      class="flex items-center justify-center w-full sm:w-auto sm:justify-end"
+    >
       <span
         role="contentinfo"
         aria-label={timero[$lang]}
@@ -251,7 +253,7 @@
      <p onmouseenter={()=>hover(tr?.mission.specialNotes[$lang])} onmouseleave={()=>hover("0")} class="text-grey-700 max-h-16 cd text-sm sm:text-lg d">{hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== "undefined" ? hearotMeyuchadot : ""}</p>
     -->
       {/if}
-      {#if skills.data.length > 0}
+      {#if skills?.data?.length > 0}
         <small class="text-barbi text-md">{t.skneed[$lang]}</small>
         <div class=" flex d flex-wrap">
           {#each skills.data as skill}
@@ -270,7 +272,7 @@
               />
             </p>{/each}
         </div>{/if}
-      {#if tafkidims.data.length > 0}
+      {#if tafkidims?.data?.length > 0}
         <small class="text-md text-barbi">{t.rneed[$lang]}</small>
         <div class=" flex d flex-wrap">
           {#each tafkidims.data as rol}
@@ -289,7 +291,7 @@
               />
             </p>{/each}
         </div>{/if}
-      {#if workways.data.length > 0}
+      {#if workways?.data?.length > 0}
         <small class="text-md text-barbi">{t.wwneed[$lang]}</small>
         <div class=" flex d flex-wrap">
           {#each workways.data as wo}<p
@@ -330,7 +332,7 @@
           </ul>
         </div>
       {/if}
-      
+
       <!-- Negotiation History Section -->
       <NegotiationHistory
         {negopendmissions}

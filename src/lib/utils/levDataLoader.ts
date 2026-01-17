@@ -20,6 +20,7 @@ import {
   fiappStore,
   askedStore,
   askedResourcesStore,
+  resourceSuggestionsStore,
   suggestionsStore,
   pmashesStore,
   wegetsStore,
@@ -41,6 +42,7 @@ import {
   extractFiapp,
   extractAsked,
   extractAskedResources,
+  extractResourceSuggestions,
   extractSuggestions,
   extractProjects,
   extractPmashes,
@@ -214,6 +216,7 @@ export function restoreFromSnapshot(snapshot: SnapshotData): void {
     fiappStore.set(snapshot.data.fiapp);
     askedStore.set(snapshot.data.asked);
     askedResourcesStore.set(snapshot.data.askedResources);
+    resourceSuggestionsStore.set(snapshot.data.resourceSuggestions);
     suggestionsStore.set(snapshot.data.suggestions);
     pmashesStore.set(snapshot.data.pmashes);
     wegetsStore.set(snapshot.data.wegets);
@@ -301,6 +304,11 @@ export function populateStores(data: any, userId: string): void {
     askedResourcesStore.set(askedResources);
     console.log(`✅ [levDataLoader] Asked resources set (${askedResources.length} items)`);
 
+    // Extract and set resource suggestions (huca)
+    const resourceSuggestions = extractResourceSuggestions(userData);
+    resourceSuggestionsStore.set(resourceSuggestions);
+    console.log(`✅ [levDataLoader] Resource suggestions set (${resourceSuggestions.length} items)`);
+
     // Extract and set suggestions
     const suggestions = extractSuggestions(userData);
     suggestionsStore.set(suggestions);
@@ -378,7 +386,8 @@ export function saveCurrentSnapshot(): void {
         halukas: get(halukasStore),
         welcome: get(welcomeStore),
         transfers: get(transfersStore),
-        decisions: get(decisionsStore)
+        decisions: get(decisionsStore),
+        resourceSuggestions: get(resourceSuggestionsStore)
       }
     };
 
@@ -411,6 +420,7 @@ export function clearAllData(): void {
   fiappStore.set([]);
   askedStore.set([]);
   askedResourcesStore.set([]);
+  resourceSuggestionsStore.set([]);
   suggestionsStore.set([]);
   pmashesStore.set([]);
   wegetsStore.set([]);
@@ -445,12 +455,15 @@ function updateSuggestionsWithDetails(missionsData: any[]) {
         perhour: detail.attributes.perhour || suggestion.perhour,
         sqadualed: detail.attributes.sqadualed || suggestion.sqadualed,
         acts: detail.attributes.acts?.data || suggestion.acts,
+        dates: detail.attributes.dates || suggestion.dates,
+        projectId: detail.attributes.project?.data?.id || suggestion.projectId,
 
         // Project details from the secondary fetch
         projectDetails: detail.attributes.project?.data?.attributes ? {
           name: detail.attributes.project.data.attributes.projectName,
           src: detail.attributes.project.data.attributes.profilePic?.data?.attributes?.url,
           membersCount: detail.attributes.project.data.attributes.user_1s?.data?.length || 0,
+          memberIds: detail.attributes.project.data.attributes.user_1s?.data?.map((u: any) => u.id) || [],
           restime: detail.attributes.project.data.attributes.restime,
           ...suggestion.projectDetails // keep existing if any
         } : suggestion.projectDetails,

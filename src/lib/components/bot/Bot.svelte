@@ -6,6 +6,8 @@
   import { Circle3 } from 'svelte-loading-spinners';
   import { browser } from '$app/environment';
 
+  import { page } from '$app/stores';
+
   let { data } = $props();
   let user = $derived(data.uid ? true : false);
 
@@ -54,7 +56,11 @@
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           action,
-          payload: { text: currentInput, history: messageHistory },
+          payload: {
+            text: currentInput,
+            history: messageHistory,
+            currentPath: $page.url.pathname // Added current path
+          },
           user: { id: data.uid ?? null, lang: data.lang }
         })
       });

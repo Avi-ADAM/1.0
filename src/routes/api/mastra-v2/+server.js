@@ -12,6 +12,9 @@ export async function POST({ request, fetch }) {
   // await loadTranslations(lang);
 
   try {
+    const currentPath = payload.currentPath || '/';
+    console.log('📍 Current Page Path:', currentPath);
+
     // Check if user is registered (has an ID)
     if (!user?.id) {
       console.log('🔓 Unregistered user detected, using nonreg-bot');
@@ -35,10 +38,10 @@ export async function POST({ request, fetch }) {
         }
       }
 
-      // Add current message
+      // Add current message with context if available
       messages.push({
         role: 'user',
-        content: payload.text
+        content: `User is on page: ${currentPath}\n\nMessage: ${payload.text}`
       });
 
       console.log(
@@ -84,16 +87,10 @@ export async function POST({ request, fetch }) {
     }
 
     console.log('🚀 Starting chat workflow for registered user');
-    console.log(
-      payload.text,
-      user?.id,
-      lang,
-      GOOGLE_GENERATIVE_AI_API_KEY,
-      fetch
-    );
     global.botContext = {
       fetchInstance: fetch,
-      userId: user.id.toString()
+      userId: user.id.toString(),
+      currentPath: currentPath
     };
     // Execute the workflow
     const run = await mastra.getWorkflow('chatWorkflow').createRunAsync();
@@ -105,7 +102,8 @@ export async function POST({ request, fetch }) {
         userId: user?.id.toString(),
         language: lang,
         apiKey: GOOGLE_GENERATIVE_AI_API_KEY,
-        fetchInstance: fetch
+        fetchInstance: fetch,
+        currentPath: currentPath
       }
     });
 
@@ -117,7 +115,8 @@ export async function POST({ request, fetch }) {
           userId: user?.id,
           language: lang,
           apiKey: GOOGLE_GENERATIVE_AI_API_KEY,
-          fetchInstance: fetch
+          fetchInstance: fetch,
+          currentPath: currentPath
         }
       });
     }

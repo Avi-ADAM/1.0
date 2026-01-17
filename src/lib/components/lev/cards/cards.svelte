@@ -79,8 +79,6 @@
     en: 'to the profile page'
   };
 
-
-
   // הוסף פונקציה לטיפול באירוע swiper
   function handleSwiper(e) {
     console.log('swiper event', e);
@@ -234,19 +232,19 @@
     }
   });
   $effect(() => {
-    console.log(swiperRef,"swiperREF")
-      if(!isScrolable.value){
-            if(swiperRef){
+    console.log(swiperRef, 'swiperREF');
+    if (!isScrolable.value) {
+      if (swiperRef) {
         swiperRef.allowTouchMove = false;
         swiperRef.allowSlideNext = false;
         swiperRef.allowSlidePrev = false;
         swiperRef.mousewheel.disable();
-        swiperRef.disable()
-        swiperRef.update()
+        swiperRef.disable();
+        swiperRef.update();
       }
-    }else{
-      if(swiperRef){
-        swiperRef.enable()
+    } else {
+      if (swiperRef) {
+        swiperRef.enable();
         swiperRef.allowTouchMove = true;
         swiperRef.allowSlideNext = true;
         swiperRef.allowSlidePrev = true;
@@ -283,10 +281,10 @@
       count
     }))
   );
-$effect(() => {
-    console.log(filter,filter2, 'uniqueProjects');
+  $effect(() => {
+    console.log(filter, filter2, 'uniqueProjects');
   });
-  import { isScrolable } from './isScrolable.svelte.js'
+  import { isScrolable } from './isScrolable.svelte.js';
   $effect(() => {
     console.log(isScrolable.value, 'isScrolable');
   });
@@ -300,7 +298,6 @@ $effect(() => {
   >
     <Header second="/moach" secondTitle={{ he: 'למוח', en: 'to Brain' }} />
   </span>
-
 {/if}
 {#key arr1}
   {#key low}
@@ -311,7 +308,6 @@ $effect(() => {
         class="body box-border h-screen"
       >
         {#if !isMobileOrTablet()}
- 
           <img
             onmouseenter={() => hoverc(nexttitle[$lang])}
             onmouseleave={() => hoverc('0')}
@@ -328,7 +324,7 @@ $effect(() => {
             alt={$lang == 'he' ? 'הבא' : '	next'}
           />
           <div
-                      dir="ltr"
+            dir="ltr"
             role="contentinfo"
             onmouseenter={() => hoverc('שינוי התצוגה מקלפים למטבעות')}
             onmouseleave={() => hoverc('0')}
@@ -337,7 +333,6 @@ $effect(() => {
           >
             <Switch
               bind:value={cards}
-
               onChange={() => change()}
               design="multi"
               options={[true, false]}
@@ -477,9 +472,9 @@ $effect(() => {
               direction={!isMobileOrTablet() ? 'horizontal' : 'vertical'}
               slidesPerView={isMobileOrTablet() ? 1 : 'auto'}
               spaceBetween={isMobileOrTablet() ? 0 : null}
-              on:swiper={(e)=>handleSwiper(e)}
+              on:swiper={(e) => handleSwiper(e)}
               keyboard={{
-                enabled: true 
+                enabled: true
               }}
               mousewheel={true}
               effect={'slide'}
@@ -590,11 +585,11 @@ $effect(() => {
                       iskvua={buble.iskvua}
                       coinlapach={buble.coinlapach}
                       usernames={buble.usernames}
-                      noofpu={buble.noofpu}
+                      noofpu={buble.noof}
                       oldzman={buble.timer}
                       stname={buble.stname}
                       mId={buble.id}
-                      missId={buble.mission.data.id}
+                      missId={buble.missionId}
                       missionName={buble.name}
                       projectId={buble.projectId}
                       projectName={buble.projectName}
@@ -692,7 +687,7 @@ $effect(() => {
                       uids={buble.uids}
                       what={buble.what}
                       noofusersOk={buble.noofusersOk}
-                      total={buble.noOfHours * buble.perhour}
+                      total={buble.noofhours * buble.perhour}
                       perhour={buble.perhour}
                       noofusersNo={buble.noofusersNo}
                       already={buble.already}
@@ -830,25 +825,26 @@ $effect(() => {
        /></SwiperSlide>
 
    -->
-       {:else if buble.ani === "walcomen" && milon.welc == true}
-                                     <SwiperSlide
+                {:else if buble.ani === 'walcomen' && milon.welc == true}
+                  <SwiperSlide
                     class={isMobileOrTablet()
                       ? 'swipr-slidemobile'
                       : 'swiper-slidec'}
                     ><Welcomt
-                                        welcomId={buble.welcomId}
-                                        id={buble.id}
-                                        src={buble.src}
-                                        onHover={hover}
-                                        coinlapach={buble.coinlapach}
-                                        onCoinLapach={delo}
-                                        username={buble.username}
-                                        projectName={buble.projectName}
-                                        projectId={buble.id}
-                                        partnershipDetails={buble.details}
-                                        pd={buble.pd}
-                                        /></SwiperSlide>
-   {:else if buble.ani === 'askedcoin' && milon.asks == true}
+                      welcomId={buble.welcomeId}
+                      id={buble.id}
+                      src={buble.src}
+                      onHover={hover}
+                      coinlapach={buble.coinlapach}
+                      onCoinLapach={delo}
+                      username={buble.username}
+                      projectName={buble.projectName}
+                      projectId={buble.projectId}
+                      partnershipDetails={buble.details}
+                      pd={buble.pd}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'askedcoin' && milon.asks == true}
                   <SwiperSlide
                     class={isMobileOrTablet()
                       ? 'swipr-slidemobile'
@@ -904,12 +900,14 @@ $effect(() => {
                       openMid={buble.omid}
                       stylef={buble.stylef}
                       st={buble.st}
-                      isRishon={buble.isRishon}
+                      isRishon={buble?.openMissionData?.isRishon ||
+                        buble.isRishon}
                       declined={buble.decid}
                       timegramaId={buble.timegramaId}
                       timegramaDate={buble.timegramaDate}
                       negopendmissions={buble.negopendmissions || []}
                       orderon={buble.orderon || 0}
+                      forumId={buble.forumId}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'askedm' && milon.askmap == true}
@@ -975,31 +973,29 @@ $effect(() => {
                       coinlapach={buble.coinlapach}
                       {low}
                       pid={buble.pid}
-                      noOfusers={buble.attributes.project.data.attributes.user_1s.data.length}
-                      acts={buble.attributes.acts}
-                      restime={buble.attributes.project.data.attributes.restime}
+                      noOfusers={buble.noOfusers}
+                      acts={buble.acts}
+                      restime={buble.restime}
                       chat={buble.chat ?? null}
                       askId={buble.askId ?? null}
                       alreadyi={buble.alreadyi}
                       {askedarr}
                       {declineddarr}
-                      deadLine={buble.attributes.sqadualed}
+                      deadLine={buble.sqadualed}
+                      forumId={buble.forumId}
                       oid={buble.id}
-                      projectName={buble.attributes.project.data.attributes
-                        .projectName}
-                      role={buble.attributes.tafkidims}
-                      skills={buble.attributes.skills}
-                      missionDetails={buble.attributes.descrip}
-                      hearotMeyuchadot={buble.attributes.hearotMeyuchadot}
-                      src={buble.attributes.project.data.attributes.profilePic
-                        .data?.attributes.formats.thumbnail.url}
-                      missionName={buble.attributes.name}
-                      projectId={buble.attributes.project.data.id}
-                      workways={buble.attributes.work_ways}
-                      noOfHours={buble.attributes.noofhours}
-                      perhour={buble.attributes.perhour}
-                      total={buble.attributes.noofhours *
-                        buble.attributes.perhour}
+                      projectName={buble.projectName}
+                      role={buble.tafkidims}
+                      skills={buble.skills}
+                      missionDetails={buble.descrip}
+                      hearotMeyuchadot={buble.hearotMeyuchadot}
+                      src={buble.src}
+                      missionName={buble.name}
+                      projectId={buble.projectId}
+                      workways={buble.work_ways}
+                      noOfHours={buble.noofhours}
+                      perhour={buble.perhour}
+                      total={buble.noofhours * buble.perhour}
                       cards="true"
                     /></SwiperSlide
                   >
@@ -1055,7 +1051,7 @@ $effect(() => {
                       timegramaDate={buble.timegramaDate}
                       timegramaId={buble.timegramaId}
                       restime={buble.restime}
-                      noofpu={buble.noofpu}
+                      noofpu={buble.noofpu ?? buble.noof}
                       newpicid={buble?.newpicid}
                       coinlapach={buble.coinlapach}
                       created_at={buble.created_at}
@@ -1086,7 +1082,9 @@ $effect(() => {
                 {/if}
               {/each}
               <SwiperSlide
-                class="{isMobileOrTablet() ? 'swipr-slidemobile' : 'swiper-slidec'}"
+                class={isMobileOrTablet()
+                  ? 'swipr-slidemobile'
+                  : 'swiper-slidec'}
               >
                 <div
                   class="flex flex-col items-center justify-center h-full w-full"

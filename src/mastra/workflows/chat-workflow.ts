@@ -39,7 +39,8 @@ const analyzeIntent = createStep({
     userId: z.string().optional(),
     language: z.string(),
     apiKey: z.string(),
-    fetchInstance: z.any().optional()
+    fetchInstance: z.any().optional(),
+    currentPath: z.string().optional()
   }),
   outputSchema: z.object({
     message: z.string(),
@@ -53,6 +54,7 @@ const analyzeIntent = createStep({
     language: z.string(),
     apiKey: z.string(),
     fetchInstance: z.any().optional(),
+    currentPath: z.string().optional(),
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general']),
       confidence: z.number(),
@@ -89,13 +91,13 @@ const analyzeIntent = createStep({
     try {
       // Extract JSON from markdown code blocks if present
       let jsonText = result.text.trim();
-      
+
       // Try to extract from markdown code blocks
       const jsonMatch = jsonText.match(/```json\s*([\s\S]*?)\s*```/);
       if (jsonMatch) {
         jsonText = jsonMatch[1].trim();
       }
-      
+
       // Try to extract JSON object from text
       const jsonObjectMatch = jsonText.match(/\{[\s\S]*\}/);
       if (jsonObjectMatch) {
@@ -103,21 +105,21 @@ const analyzeIntent = createStep({
       }
 
       intent = JSON.parse(jsonText);
-      
+
       // Validate the parsed intent has required fields
       if (!intent.type || !intent.confidence || !intent.details) {
         throw new Error('Invalid intent structure');
       }
-      
+
     } catch (e) {
       console.error('Failed to parse intent:', result.text);
       console.error('Parse error:', e);
-      
+
       // Try to determine intent from the message content as fallback
       const messageText = message.toLowerCase();
-      if (messageText.includes('טיימר') || messageText.includes('timer') || 
-          messageText.includes('התחל') || messageText.includes('start') ||
-          messageText.includes('עצור') || messageText.includes('stop')) {
+      if (messageText.includes('טיימר') || messageText.includes('timer') ||
+        messageText.includes('התחל') || messageText.includes('start') ||
+        messageText.includes('עצור') || messageText.includes('stop')) {
         intent = {
           type: 'timer' as const,
           confidence: 0.7,
@@ -165,6 +167,7 @@ const routeToAgent = createStep({
     language: z.string(),
     apiKey: z.string(),
     fetchInstance: z.any().optional(),
+    currentPath: z.string().optional(),
     intent: z.object({
       type: z.enum(['timer', 'navigation', 'general']),
       confidence: z.number(),
@@ -258,25 +261,25 @@ const routeToAgent = createStep({
       userId: userId,
       intent: intent
     });
-   function logAgentResult(result: any) {
-     const cleanResult = {
-       text: result.text,
-       usage: result.usage
-         ? {
-             inputTokens: result.usage.inputTokens,
-             outputTokens: result.usage.outputTokens,
-             totalTokens: result.usage.totalTokens
-           }
-         : undefined,
-       finishReason: result.finishReason,
-       warnings: result.warnings,
-       hasSteps: Boolean(result.steps?.length),
-       hasToolCalls: Boolean(result.toolCalls?.length)
-     };
+    function logAgentResult(result: any) {
+      const cleanResult = {
+        text: result.text,
+        usage: result.usage
+          ? {
+            inputTokens: result.usage.inputTokens,
+            outputTokens: result.usage.outputTokens,
+            totalTokens: result.usage.totalTokens
+          }
+          : undefined,
+        finishReason: result.finishReason,
+        warnings: result.warnings,
+        hasSteps: Boolean(result.steps?.length),
+        hasToolCalls: Boolean(result.toolCalls?.length)
+      };
 
-     console.log('🔍 Agent result:', cleanResult);
-   }
-   logAgentResult(result);
+      console.log('🔍 Agent result:', cleanResult);
+    }
+    logAgentResult(result);
     console.log(
       '🔧 Tool calls in response:',
       result.response?.messages?.filter((m: any) => m.role === 'tool')
@@ -389,7 +392,8 @@ const chatWorkflow = createWorkflow({
     userId: z.string().optional(),
     language: z.string(),
     apiKey: z.string(),
-    fetchInstance: z.any().optional()
+    fetchInstance: z.any().optional(),
+    currentPath: z.string().optional()
   }),
   outputSchema: z.object({
     reply: z.string(),

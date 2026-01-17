@@ -37,6 +37,8 @@ export interface NotificationPayload {
     icon?: string;
     url?: string;
     priority?: 'low' | 'normal' | 'high';
+    forumId?: string;
+    type?: string;
   };
   data?: any;
 }
@@ -113,7 +115,7 @@ function createSocketClient() {
             // Try to get update function from window
             const updateFn = (window as any).updateStrategies?.[strategy.config.updateFunction]
               || (window as any)[strategy.config.updateFunction];
-            
+
             if (typeof updateFn === 'function') {
               await updateFn(data, strategy.config);
             } else {
@@ -153,7 +155,7 @@ function createSocketClient() {
         acc[name] = value;
         return acc;
       }, {} as Record<string, string>);
-      
+
       userId = userId || cookies.id;
     }
 
@@ -221,7 +223,7 @@ function createSocketClient() {
         authenticated: false,
         error: data.message
       }));
-      
+
       // Disconnect on auth failure
       if (socket) {
         socket.disconnect();
@@ -231,7 +233,7 @@ function createSocketClient() {
     // Notification received
     socket.on('notification', (notification: NotificationPayload) => {
       console.log('[SocketClient] Notification received:', notification);
-      
+
       // Handle update strategy if present
       if ((notification as any).updateStrategy) {
         handleUpdateStrategy((notification as any).updateStrategy, (notification as any).data)
@@ -239,7 +241,7 @@ function createSocketClient() {
             console.error('[SocketClient] Error handling update strategy:', error);
           });
       }
-      
+
       // Call all registered listeners
       notificationListeners.forEach(listener => {
         try {

@@ -35,6 +35,7 @@ export function buildMainUserQuery(idL, lang) {
                   name isRishon
                 }}}            
             chat{why ide what zman id users_permissions_user {data{id attributes{username profilePic {data{attributes {url formats }}}}}} }
+            forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } } } } }
         }}}
       askms (filters: { archived: { eq: false } }){ data{ id attributes{
                     vots  {what why zman id users_permissions_user {data{id}}}
@@ -61,7 +62,8 @@ export function buildMainUserQuery(idL, lang) {
    								   }}}
       skills{data{id attributes{ 
             			 open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
-                								 skills {data{ id}} 
+                                                 project { data { id } }
+                 								 skills {data{ id}} 
                    							 tafkidims {data {id}}  
                     						 work_ways {data{ id}} 
                                 }}}
@@ -73,7 +75,8 @@ export function buildMainUserQuery(idL, lang) {
       work_ways {data{ id }} 
       tafkidims {data{ id attributes{
                         open_missions(filters: { archived: { eq: false } }){ data{ id attributes{
-                								 skills {data{ id }} 
+                                                 project { data { id } }
+                 								 skills {data{ id }} 
                    							 tafkidims {data {id}}  
                     						 work_ways {data{ id }}
                                 }}}}
@@ -163,6 +166,7 @@ export function buildMainUserQuery(idL, lang) {
                             timegrama {data{id attributes{date}}}
                             createdAt
                             chat{why id ide what zman users_permissions_user {data{id}}}
+                            forums { data { id attributes { messages(pagination: { limit: 100 }) { data { id attributes { content createdAt users_permissions_user { data { id attributes { username profilePic { data { attributes { url formats } } } } } } } } } } } }
                             open_mission {data{id attributes{
                             acts{data{id attributes{shem  link  des dateF dateS  }}}
                               mission {data{id}}
@@ -258,7 +262,7 @@ export function buildMainUserQuery(idL, lang) {
                             timegrama{data{id attributes{date}}}
                             diun {what why id zman order users_permissions_user {data{ id}}}  
                             users { what order why zman id users_permissions_user {data{id }}}                                   
-      													}}}
+       													}}}
     			open_missions(filters: { archived: { eq: false } }){ data{ id attributes{ 
         					declined {data{ id}} 
         					users  {data{id} } 
@@ -356,14 +360,13 @@ export async function fetchMainUserData(baseUrl, token, idL, lang) {
     });
     
     console.log('GraphQL response status:', response.status, response.statusText);
-    
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
     const result = await response.json();
     console.log('GraphQL response received:', result?.data ? 'Has data' : 'No data', result?.errors ? 'Has errors' : 'No errors');
-    
+    console.log('GraphQL response body:', result.data);
     return result;
   } catch (error) {
     console.error('Error in fetchMainUserData:', error);

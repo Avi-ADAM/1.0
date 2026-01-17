@@ -1,63 +1,61 @@
 <script>
-import * as animateScroll from "svelte-scrollto-element";
-import Vid from './didiget.svelte'
-import Desi from './decisionMaking.svelte'
-import Mid from "./midi.svelte"
-import MissionInProgress from "./missionInProgress.svelte"
-import ProjectSuggestor from "./projectSuggestor.svelte"
-import Reqtojoin from './reqtojoin.svelte';
-import PendingM from "./pandingMesima.svelte";
-import PendingMa from "./pmas.svelte"
-import Welcomt from "./welcomTo.svelte";
-import Fiappru from './fiappru.svelte';
-import Mashsug from './mashsuggest.svelte'
-import Reqtom from './reqtom.svelte'
-import Weget from './weget.svelte'
-import Hal from './halukaask.svelte'
-import {
-    fly
-} from 'svelte/transition';
+  import * as animateScroll from 'svelte-scrollto-element';
+  import Vid from './didiget.svelte';
+  import Desi from './decisionMaking.svelte';
+  import Mid from './midi.svelte';
+  import MissionInProgress from './missionInProgress.svelte';
+  import ProjectSuggestor from './projectSuggestor.svelte';
+  import Reqtojoin from './reqtojoin.svelte';
+  import PendingM from './pandingMesima.svelte';
+  import PendingMa from './pmas.svelte';
+  import Welcomt from './welcomTo.svelte';
+  import Fiappru from './fiappru.svelte';
+  import Mashsug from './mashsuggest.svelte';
+  import Reqtom from './reqtom.svelte';
+  import Weget from './weget.svelte';
+  import Hal from './halukaask.svelte';
+  import { fly } from 'svelte/transition';
 
-let modal = $state(false);
+  let modal = $state(false);
 
-function modali() {
+  function modali() {
     modal = true;
-    animateScroll.scrollToTop()
-}
+    animateScroll.scrollToTop();
+  }
 
-/**
- * @typedef {Object} Props
- * @property {any} [adder]
- * @property {any} [arr1]
- * @property {any} [askedarr]
- * @property {any} [declineddarr]
- * @property {number} [halu]
- * @property {number} [askma]
- * @property {number} [maap]
- * @property {number} [mashs]
- * @property {number} [pmashd]
- * @property {number} [fia]
- * @property {number} [beta]
- * @property {number} [pen]
- * @property {number} [sug]
- * @property {boolean} [low]
- * @property {any} nam
- * @property {number} [wel]
- * @property {number} [ask]
- * @property {any} picLink
- * @property {any} total
- * @property {any} [milon]
- * @property {boolean} [sml]
- * @property {(payload: { cards: boolean, ani: any }) => void} [onStart] - Callback for 'start' event
- * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
- * @property {(payload: { id: any }) => void} [onMesima] - Callback for 'mesima' event
- * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
- * @property {(payload: { cards: boolean }) => void} [onCards] - Callback for 'cards' event
- * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
- */
+  /**
+   * @typedef {Object} Props
+   * @property {any} [adder]
+   * @property {any} [arr1]
+   * @property {any} [askedarr]
+   * @property {any} [declineddarr]
+   * @property {number} [halu]
+   * @property {number} [askma]
+   * @property {number} [maap]
+   * @property {number} [mashs]
+   * @property {number} [pmashd]
+   * @property {number} [fia]
+   * @property {number} [beta]
+   * @property {number} [pen]
+   * @property {number} [sug]
+   * @property {boolean} [low]
+   * @property {any} nam
+   * @property {number} [wel]
+   * @property {number} [ask]
+   * @property {any} picLink
+   * @property {any} total
+   * @property {any} [milon]
+   * @property {boolean} [sml]
+   * @property {(payload: { cards: boolean, ani: any }) => void} [onStart] - Callback for 'start' event
+   * @property {(payload: { id: any }) => void} [onUser] - Callback for 'user' event
+   * @property {(payload: { id: any }) => void} [onMesima] - Callback for 'mesima' event
+   * @property {(payload: { id: any }) => void} [onHover] - Callback for 'hover' event
+   * @property {(payload: { cards: boolean }) => void} [onCards] - Callback for 'cards' event
+   * @property {(payload: { id: any }) => void} [onProj] - Callback for 'proj' event
+   */
 
-/** @type {Props} */
-let {
+  /** @type {Props} */
+  let {
     adder = [],
     arr1 = $bindable([]),
     askedarr = [],
@@ -78,18 +76,18 @@ let {
     picLink,
     total,
     milon = $bindable({
-        hachla: true,
-        fiap: true,
-        welc: true,
-        sugg: true,
-        pend: true,
-        asks: true,
-        betaha: true,
-        desi: true,
-        ppmash: true,
-        pmashs: true,
-        pmaap: true,
-        askmap: true
+      hachla: true,
+      fiap: true,
+      welc: true,
+      sugg: true,
+      pend: true,
+      asks: true,
+      betaha: true,
+      desi: true,
+      ppmash: true,
+      pmashs: true,
+      pmaap: true,
+      askmap: true
     }),
     sml = false,
     onStart,
@@ -98,144 +96,150 @@ let {
     onHover,
     onCards,
     onProj
-} = $props();
+  } = $props();
 
-function delo(event) {
+  function delo(event) {
     let oldob = arr1;
-    const x = oldob.map(c => c.coinlapach);
+    const x = oldob.map((c) => c.coinlapach);
     const indexy = x.indexOf(event.coinlapach);
     oldob.splice(indexy, 1);
-    arr1 = oldob
+    arr1 = oldob;
     onStart?.({
-        cards: false,
-        ani: event.ani
-    })
-}
+      cards: false,
+      ani: event.ani
+    });
+  }
 
-function user(event) {
+  function user(event) {
     onUser?.({
-        id: event.id
-    })
-}
+      id: event.id
+    });
+  }
 
-function mesima(event) {
+  function mesima(event) {
     onMesima?.({
-        id: event.id
-    })
-}
+      id: event.id
+    });
+  }
 
-function hover(event) {
-
+  function hover(event) {
     onHover?.({
-        id: event.id
-    })
+      id: event.id
+    });
+  }
 
-}
+  function chat() {}
 
-function chat() {}
-
-function cards() {
+  function cards() {
     onCards?.({
-        cards: true
-    })
-}
+      cards: true
+    });
+  }
 
-function proj(event) {
+  function proj(event) {
     onProj?.({
-        id: event.id
-    })
-}
+      id: event.id
+    });
+  }
 
-function showonly(event) {
+  function showonly(event) {
     const value = event.data;
     for (const key in milon) {
-        milon[key] = false
+      milon[key] = false;
     }
 
     milon[value] = true;
-}
+  }
 
-function showall(event) {
+  function showall(event) {
     for (const key in milon) {
-        milon[key] = true
+      milon[key] = true;
     }
-
-}
-let h = $state(500);
+  }
+  let h = $state(500);
 </script>
 
-<div id="scree" bind:clientHeight={h} class="screen" transition:fly={{delay: 0, y: -h, opacity: 0.5, duration: 4000}} >
-
-    {#each adder as add }
+<div
+  id="scree"
+  bind:clientHeight={h}
+  class="screen"
+  transition:fly={{ delay: 0, y: -h, opacity: 0.5, duration: 4000 }}
+>
+  {#each adder as add}
     {@html add}
-    {/each}
-    {#key arr1}
+  {/each}
+  {#key arr1}
     {#each arr1 as buble, i}
-    {#if buble.ani === "vidu" && milon.desi == true}
-    <div class:normSml={modal == false} class="vidu normSml"><Vid
-        onModal={() =>modal = true}
-        onHover={hover}
-        onProj={proj}
-        onUser={user}
-        onCoinLapach={delo}
-        shear={buble.shear}
-        hervachti={buble.hervachti}
-         sendpropic={buble.sendpropic}
-                sendname={buble.sendname}    
-                respropic={buble.respropic}
-                resname={buble.resname}   
-                projectId={buble.projectId}
-                kind={buble.kind}
-                projectName={buble.projectName}
-                src={buble.src}
-                myid={buble.myid}
-                pendId={buble.pendId}
-                chat={buble.chat}
-                amount={buble.amount}
-                send={buble.send}
-                recive={buble.recive}
-                sendcon={buble.senderconf}
-        coinlapach={buble.coinlapach}
-        messege={buble.messege}
-        already={buble.already}
-        {low}
-        /></div>
-    {:else if buble.ani === "haluk" && milon.desi == true}
-    <div class:normSml={modal == false} class=" halu normSml"><Hal
-        onModal={() =>modal = true}
-        onCoinLapach={delo}
-        user_1s={buble.user_1s}
-        onHover={hover}
-        onProj={proj}
-        onUser={user}
-        hervach={buble.hervach}
-        halukot={buble.halukot}
-        coinlapach={buble.coinlapach}
-        myid={buble.myid}
-        pendId={buble.pendId}
-        mypos={buble.mypos}
-        projectName={buble.projectName}
-        name={buble.name}
-        src={buble.src}
-        projectId={buble.projectId}
-        noofusersOk={buble.noofusersOk}
-        noofusersNo={buble.noofusersNo}
-        noofusersWaiting={buble.noofusersWaiting}
-        noofusers={buble.noofusers}
-        already={buble.already}
-        created_at={buble.created_at}
-        users={buble.users}
-        diun={buble.diun}
-        order={buble.order}
-        {low}
-        /></div>
-        {:else if buble.ani === "mtaha" &&  milon.betaha == true}
-        <div class:normSml={modal == false}  class="betaha normSml" ><MissionInProgress
+      {#if buble.ani === 'vidu' && milon.desi == true}
+        <div class:normSml={modal == false} class="vidu normSml">
+          <Vid
+            onModal={() => (modal = true)}
+            onHover={hover}
+            onProj={proj}
+            onUser={user}
+            onCoinLapach={delo}
+            shear={buble.shear}
+            hervachti={buble.hervachti}
+            sendpropic={buble.sendpropic}
+            sendname={buble.sendname}
+            respropic={buble.respropic}
+            resname={buble.resname}
+            projectId={buble.projectId}
+            kind={buble.kind}
+            projectName={buble.projectName}
+            src={buble.src}
+            myid={buble.myid}
+            pendId={buble.pendId}
+            chat={buble.chat}
+            amount={buble.amount}
+            send={buble.send}
+            recive={buble.recive}
+            sendcon={buble.senderconf}
+            coinlapach={buble.coinlapach}
+            messege={buble.messege}
+            already={buble.already}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'haluk' && milon.desi == true}
+        <div class:normSml={modal == false} class=" halu normSml">
+          <Hal
+            onModal={() => (modal = true)}
+            onCoinLapach={delo}
+            user_1s={buble.user_1s}
+            onHover={hover}
+            onProj={proj}
+            onUser={user}
+            hervach={buble.hervach}
+            halukot={buble.halukot}
+            coinlapach={buble.coinlapach}
+            myid={buble.myid}
+            pendId={buble.pendId}
+            mypos={buble.mypos}
+            projectName={buble.projectName}
+            name={buble.name}
+            src={buble.src}
+            projectId={buble.projectId}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            noofusersWaiting={buble.noofusersWaiting}
+            noofusers={buble.noofusers}
+            already={buble.already}
+            created_at={buble.created_at}
+            users={buble.users}
+            diun={buble.diun}
+            order={buble.order}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'mtaha' && milon.betaha == true}
+        <div class:normSml={modal == false} class="betaha normSml">
+          <MissionInProgress
             onProj={proj}
             onUser={user}
             onHover={hover}
             onCoinLapach={delo}
-            onModal={() =>modal = true}
+            onModal={() => (modal = true)}
             pu={buble.pu}
             tasks={buble.acts.data}
             status={buble.status}
@@ -254,418 +258,442 @@ let h = $state(500);
             missionDetails={buble.descrip}
             src={buble.src}
             link={buble.privatlinks}
-            dueDateOrCountToDedline ={buble.admaticedai}
-            hoursdon ={buble.howmanyhoursalready}
-            hourstotal = {buble.hoursassinged}
-            perhour = {buble.perhour}
+            dueDateOrCountToDedline={buble.admaticedai}
+            hoursdon={buble.howmanyhoursalready}
+            hourstotal={buble.hoursassinged}
+            perhour={buble.perhour}
             restime={buble.restime}
             onDone={delo}
             {low}
-            /></div>
-            {:else if buble.ani === "pmashes" && milon.ppmash == true}
-            <div class="normSml ppmash"
-                ><PendingMa
-                    onHover={hover}
-                    onProj={proj}
-                    onUser={user}
-                    onCoinLapach={delo}
-                    onModal={modali}
-                            ordern={buble.orderon}
-                    timegramaId={buble.timegramaId}
-                    restime={buble.restime}
-                    coinlapach={buble.coinlapach}
-                    messege={buble.messege}
-                    mysrc={buble.mysrc}
-                    mypos={buble.mypos}
-                    diun={buble.diun}
-                    descrip={buble.descrip}
-                    projectName = {buble.projectName}
-                    name = {buble.name}
-                    hearotMeyuchadot = {buble.hearotMeyuchadot}
-                    kindOf = {buble.kindOf}
-                    src = {buble.src}
-                    noofusersWaiting={buble.noofusersWaiting}
-                    projectId={buble.projectId}
-                    noofusersOk={buble.noofusersOk}
-                    created_at={buble.created_at}
-                    noofusersNo={buble.noofusersNo}
-                    already={buble.already}
-                    noofusers={buble.noofusers}
-                    mshaabId={buble.mshaabId}
-                    hm={buble.hm}
-                    price={buble.price}
-                    easy={buble.easy}
-                    sqadualed={buble.sqadualed}
-                    sqadualedf={buble.sqadualedf}
-                    linkto={buble.linkto}
-                    pendId={buble.pendId}
-                    users={buble.users}
-                    acts={buble.acts || []}
-                    {low}
-                    nego_mashes={buble.nego_mashes || []}
-                      timeGramaDate={buble.timeGramaDate}
-                    /></div>
-                    {:else if buble.ani === "pends" && milon.pend == true}
-                    <div  class="normSml pend"
-                        ><PendingM
-                            onHover={hover}
-                            onModal={modali}
-                            onProj={proj}
-                            onUser={user}
-                            onCoinLapach={delo}
-                            diun={buble.diun}
-                            negopendmissions={buble.negopendmissions}
-                            timegramaId={buble.timegramaId}
-                            timegramaDate={buble.timegramaDate}
-                            publicklinks={buble.publicklinks}
-                            privatlinks={buble.privatlinks}
-                            coinlapach={buble.coinlapach}
-                            isKavua={buble.isKavua}
-                            createdAt={buble.createdAt}
-                            messege={buble.messege}
-                            restime={buble.restime}
-                            mysrc={buble.mysrc}
-                            mypos={buble.mypos}
-                            descrip={buble.descrip}
-                            projectName = {buble.projectName}
-                            name = {buble.name}
-                            hearotMeyuchadot = {buble.hearotMeyuchadot}
-                            noofhours = {buble.noofhours}
-                            src = {buble.src}
-                            noofusersWaiting={buble.noofusersWaiting}
-                            projectId={buble.projectId}
-                            uids={buble.uids}
-                            what={buble.what}
-                            noofusersOk={buble.noofusersOk}
-                            total={buble.noOfHours * buble.perhour}
-                            perhour={buble.perhour}
-                            noofusersNo={buble.noofusersNo}
-                            already={buble.already}
-                            noofusers={buble.noofusers}
-                            missionId={buble.missionId}
-                            ordern={buble.orderon}
-                            skills={buble.skills}
-                            tafkidims={buble.tafkidims}
-                            workways={buble.workways}
-                            mdate={buble.mdate}
-                            mdates={buble.dates}
-                            vallues={buble.vallues}
-                            pendId={buble.pendId}
-                            users={buble.users}
-                            acts={buble.acts}
-                            sqadualed={buble.sqadualed}
-                            {low}
-                            /></div>
-                            {:else if buble.ani === "wegets" && milon.pmaap == true}
-                            <div class="pmaap normSml" ><Weget
-                                onAcsept={delo}
-                                onDecline={delo}
-                                onHover={hover}
-                                onModal={modali}
-
-                                onProj={proj}
-                                onUser={user}
-                                coinlapach={buble.coinlapach}
-                                mId={buble.mId}
-                                noofusersWaiting={buble.noofusersWaiting}
-                                uids={buble.uids}
-                                kindOf={buble.kindOf}
-                                noofusersOk={buble.noofusersOk}
-                                noofusersNo={buble.noofusersNo}
-                                already={buble.already}
-                                users={buble.users}
-                                askId={buble.askId}
-                                myp={buble.myp}
-                                projectName = {buble.projectName}
-                                useraplyname ={buble.username}
-                                userId ={ buble.uid}
-                                spid = {buble.spid}
-                                src = {buble.src}
-                                price={buble.price}
-                                hm={buble.hm}
-                                src2 = {buble.src2}
-                                why={buble.why}
-                                whatt={buble.whatt}
-                                missionBName={buble.openName}
-                                name={buble.name}
-                                projectId={buble.projectId}
-                                noofpu={buble.noof}
-                                sqadualedf={buble.sqadualedf}
-                                sqadualed={buble.sqadualed}
-                                spnot={buble.spnot}
-                                easy ={buble.easy}
-                                nhours={buble.nhours}
-                                deadline={buble.deadline}
-                                missId={buble.missId}
-                                id={buble.id}
-                                openMid={buble.omid}
-                                stylef={buble.stylef}
-                                st={buble.st}
-                                declined={buble.decid}
-                                {low}
-                                /></div>
-                                {:else if buble.ani === "fiapp" && milon.fiap == true}
-                                <div  class="fiap normSml" ><Fiappru
-                                    onAcsept={delo}
-                                    onDecline={delo}
-                                    onHover={hover}
-                                    onModal={modali}
-
-                                    onProj={proj}
-                                    onUser={user}
-                                    coinlapach={buble.coinlapach}
-                                    mId={buble.mId}
-                                    noofusersWaiting={buble.noofusersWaiting}
-                                    uids={buble.uids}
-                                    what={buble.what}
-                                    noofusersOk={buble.noofusersOk}
-                                    noofusersNo={buble.noofusersNo}
-                                    already={buble.already}
-                                    users={buble.users}
-                                    askId={buble.askId}
-                                    projectName = {buble.projectName}
-                                    useraplyname ={buble.username}
-                                    userId ={ buble.uid}
-                                    missionDetails = {buble.descrip}
-                                    src = {buble.src}
-                                    src2 = {buble.src2}
-                                    why={buble.why}
-                                    whatt={buble.whatt}
-                                    whattid={buble.whattid}
-                                    missionBName={buble.openName}
-                                    name={buble.name}
-                                    projectId={buble.projectId}
-                                    noofpu={buble.noof}
-                                    publicklinks={buble.publicklinks}
-                                    privatlinks={buble.privatlinks}
-                                    hearotMeyuchadot={buble.hearotMeyuchadot}
-                                    valph ={buble.perhour}
-                                    nhours={buble.nhours}
-                                    deadline={buble.deadline}
-                                    missId={buble.missId}
-                                    timegramaId={buble.timegramaId}
-                                    timegramaDate={buble.timegramaDate}
-                                    id={buble.id}
-                                    openMid={buble.omid}
-                                    stylef={buble.stylef}
-                                    st={buble.st}
-                                    declined={buble.decid}
-                                    {low}
-                                    /></div>
-                                    {:else if buble.ani === "walcomen" && milon.welc == true}
-                                    <div  class="welc normSml" ><Welcomt
-                                        id={buble.id}
-                                        onHover={hover}
-                                        coinlapach={buble.coinlapach}
-                                        username={buble.username}
-                                        projectName={buble.projectName}
-                                        /></div>
-                                        {:else if buble.ani === "askedcoin" && milon.asks == true}
-                                        <div  class="asks normSml" ><Reqtojoin
-                                            onAcsept={delo}
-                                            onHover={hover}
-                                            onModal={modali}
-                                            onProj={proj}
-                                            onUser={user}
-                                            onDecline={delo}
-                                            iskvua={buble.iskvua}
-                                            email={buble.email}
-                                            role={buble.role}
-                                            workways={buble.workways}
-                                            userSkills={buble.userSkills}
-                                            userRole={buble.userRole}
-                                            userWorkway={buble.userWorkway}
-                                            skills={buble.skills}
-                                            coinlapach={buble.coinlapach}
-                                            pid={buble.pid}
-                                            noofusersWaiting={buble.noofusersWaiting}
-                                            uids={buble.uids}
-                                            what={buble.what}
-                                            noofusersOk={buble.noofusersOk}
-                                            noofusersNo={buble.noofusersNo}
-                                            already={buble.already}
-                                            users={buble.users}
-                                            askId={buble.askId}
-                                            projectName = {buble.projectName}
-                                            useraplyname ={buble.username}
-                                            userId ={ buble.uid}
-                                            missionDetails = {buble.missionDetails}
-                                            src = {buble.src}
-                                            src2 = {buble.src2}
-                                            openmissionName={buble.openName}
-                                            name={buble.name}
-                                            projectId={buble.projectId}
-                                            noofpu={buble.noof}
-                                            publicklinks={buble.publicklinks}
-                                            privatlinks={buble.privatlinks}
-                                            hearotMeyuchadot={buble.hearotMeyuchadot}
-                                            valph ={buble.perhour}
-                                            nhours={buble.nhours}
-                                            deadline={buble.deadline}
-                                            sqedualed={buble.sqedualed}
-                                            missId={buble.missId}
-                                            id={buble.id}
-                                            acts={buble.acts}
-                                            openMid={buble.omid}
-                                            stylef={buble.stylef}
-                                            st={buble.st}
-                                            chat={buble.chat}
-                                            declined={buble.decid}
-                                            isRishon={buble.isRishon}
-                                            timegramaId={buble.timegramaId}
-                                            timegramaDate={buble.timegramaDate}
-                                            negopendmissions={buble.negopendmissions || []}
-                                            orderon={buble.orderon || 0}
-                                            {low}
-                                            /></div>
-                                            {:else if buble.ani === "askedm" && milon.askmap == true}
-                                            <div  class="askmap normSml" ><Reqtom
-                                                onAcsept={delo}
-                                                onDecline={delo}
-                                                onHover={hover}
-                                                onModal={modali}
-                                                onProj={proj}
-                                                onUser={user}
-                                                onChat={chat}
-                                                coinlapach={buble.coinlapach}
-                                                pid={buble.pid}
-                                                noofusersWaiting={buble.noofusersWaiting}
-                                                uids={buble.uids}
-                                                what={buble.what}
-                                                noofusersOk={buble.noofusersOk}
-                                                noofusersNo={buble.noofusersNo}
-                                                already={buble.already}
-                                                users={buble.users}
-                                                askId={buble.askId}
-                                                projectName = {buble.projectName}
-                                                useraplyname ={buble.username}
-                                                userId ={ buble.uid}
-                                                missionDetails = {buble.descrip}
-                                                src = {buble.src}
-                                                src2 = {buble.src2}
-                                                openmissionName={buble.openName}
-                                                name={buble.name}
-                                                projectId={buble.projectId}
-                                                noofpu={buble.noof}
-                                                myp={buble.myp}
-                                                easy={buble.easy}
-                                                spnot={buble.spnot}
-                                                price ={buble.price}
-                                                deadline={buble.deadline}
-                                                missId={buble.missId}
-                                                id={buble.id}
-                                                openMid={buble.omid}
-                                                stylef={buble.stylef}
-                                                st={buble.st}
-                                                declined={buble.decid}
-                                                spid={buble.spid}
-                                                {low}
-                                                /></div>
-                                                {:else if buble.ani === "hachla" && milon.hachla == true}
-                                                <div class:normSml={modal == false} class="hachla normSml" ><Desi
-                                                    onAcsept={delo}
-                                                    onDecline={delo}
-                                                    onHover={hover}
-                                                    onModal={modali}
-                                                    onProj={proj}
-                                                    onChat={chat}
-                                                    noofpu={buble.noofpu}
-                                                    newpicid={buble?.newpicid}
-                                                    coinlapach={buble.coinlapach}
-                                                    created_at={buble.created_at}
-                                                    spdata={buble.spdata}
-                                                    kind={buble.kind}
-                                                    timegramaId={buble.timegramaId}
-                                                    timegramaDate={buble.timegramaDate}
-                                                    restime={buble.restime}
-                                                    messege={buble.messege}
-                                                    myid={buble.myid}
-                                                    noofusersWaiting={buble.noofusersWaiting}
-                                                    uids={buble.uids}
-                                                    what={buble.mypos}
-                                                    noofusersOk={buble.noofusersOk}
-                                                    noofusersNo={buble.noofusersNo}
-                                                    already={buble.already}
-                                                    users={buble.users}
-                                                    askId={buble.pendId}
-                                                    projectName = {buble.projectName}
-                                                    projectId ={buble.projectId}
-                                                    userId ={ buble.uid}
-                                                    src = {buble.src}
-                                                    src2 = {buble?.newpic}
-                                                    stylef={buble.stylef}
-                                                    st={buble.st}
-                                                    spid={buble.spid}
-                                                    {low}
-                                                    /></div>
-                                                    {:else if buble.ani === "meData" && milon.sugg == true}
-                                                    <div class="sugg normSml" ><ProjectSuggestor
-                                                        onLess={delo}
-                                                        onHover={hover}
-                                                        onProj={proj}
-                                                        onUser={user}
-                                                        onMesima={mesima}
-                                                        acts={buble.attributes.acts}
-                                                        timeToP={buble.attributes.project.data.attributes.timeToP}
-                                                        coinlapach={buble.coinlapach}
-                                                        restime={buble.attributes.project.data.attributes.restime}
-                                                        askedarr={askedarr}
-                                                        {declineddarr}
-                                                        pid={buble.pid}
-                                                        chat = {buble.chat ?? null}
-                                                        askId = {buble.askId ?? null}
-                                                        deadLine = {buble.attributes.sqadualed}
-                                                        oid = {buble.id}
-                                                        hst = {buble.hst}
-                                                        stb = {buble.stb}
-                                                        projectName = {buble.attributes.project.data.attributes.projectName}
-                                                        role ={buble.attributes.tafkidims}
-                                                        skills ={ buble.attributes.skills}
-                                                        missionDetails = {buble.attributes.descrip}
-                                                        notes = {buble.attributes.hearotMeyuchadot}
-                                                        src = {buble.attributes.project.data.attributes.profilePic.data?.attributes.formats.thumbnail.url}
-                                                        missionName={buble.attributes.name}
-                                                        projectId={buble.attributes.project.data.id}
-                                                        workways={buble.attributes.work_ways}
-                                                        noOfHours={buble.attributes.noofhours}
-                                                        perhour={buble.attributes.perhour}
-                                                        total={buble.attributes.noofhours * buble.attributes.perhour}
-                                                        {low}
-                                                        /></div>
-                                                        {:else if buble.ani === "huca" && milon.pmashs == true}
-                                                        <div  class="pmashs normSml" ><Mashsug
-                                                            onLess={delo}
-                                                            onHover={hover}
-                                                            onProj={proj}
-                                                            onUser={user}
-                                                            messege={buble.messege}
-                                                            i={i}
-                                                            restime={buble.restime}
-                                                            coinlapach={buble.coinlapach}
-                                                            askedarr={askedarr}
-                                                            declineddarra= {buble.declineddarra}
-                                                            deadLine = {buble.sqadualed}
-                                                            sqadualedf = {buble.sqadualedf}
-                                                            oid = {buble.oid}
-                                                            id = {buble.id}
-                                                            price= {buble.price}
-                                                            myp={buble.myp}
-                                                            already= {buble.already}
-                                                            projectName = {buble.projectName}
-                                                            missionDetails = {buble.descrip}
-                                                            notes = {buble.hearotMeyuchadot}
-                                                            src = {buble.srcb}
-                                                            mashName={buble.mashname}
-                                                            projectId={buble.projectid}
-                                                            descrip={buble.descrip}
-                                                            spnot={buble.spnot}
-                                                            easy={buble.easy}
-                                                            {low}
-                                                            /></div>
-                                                            {/if}
-                                                            {/each}
-                                                            {/key}
-                                                            <!--
+          />
+        </div>
+      {:else if buble.ani === 'pmashes' && milon.ppmash == true}
+        <div class="normSml ppmash">
+          <PendingMa
+            onHover={hover}
+            onProj={proj}
+            onUser={user}
+            onCoinLapach={delo}
+            onModal={modali}
+            ordern={buble.orderon}
+            timegramaId={buble.timegramaId}
+            restime={buble.restime}
+            coinlapach={buble.coinlapach}
+            messege={buble.messege}
+            mysrc={buble.mysrc}
+            mypos={buble.mypos}
+            diun={buble.diun}
+            descrip={buble.descrip}
+            projectName={buble.projectName}
+            name={buble.name}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            kindOf={buble.kindOf}
+            src={buble.src}
+            noofusersWaiting={buble.noofusersWaiting}
+            projectId={buble.projectId}
+            noofusersOk={buble.noofusersOk}
+            created_at={buble.created_at}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            noofusers={buble.noofusers}
+            mshaabId={buble.mshaabId}
+            hm={buble.hm}
+            price={buble.price}
+            easy={buble.easy}
+            sqadualed={buble.sqadualed}
+            sqadualedf={buble.sqadualedf}
+            linkto={buble.linkto}
+            pendId={buble.pendId}
+            users={buble.users}
+            acts={buble.acts || []}
+            {low}
+            nego_mashes={buble.nego_mashes || []}
+            timeGramaDate={buble.timeGramaDate}
+          />
+        </div>
+      {:else if buble.ani === 'pends' && milon.pend == true}
+        <div class="normSml pend">
+          <PendingM
+            onHover={hover}
+            onModal={modali}
+            onProj={proj}
+            onUser={user}
+            onCoinLapach={delo}
+            diun={buble.diun}
+            negopendmissions={buble.negopendmissions}
+            timegramaId={buble.timegramaId}
+            timegramaDate={buble.timegramaDate}
+            publicklinks={buble.publicklinks}
+            privatlinks={buble.privatlinks}
+            coinlapach={buble.coinlapach}
+            isKavua={buble.isKavua}
+            createdAt={buble.createdAt}
+            messege={buble.messege}
+            restime={buble.restime}
+            mysrc={buble.mysrc}
+            mypos={buble.mypos}
+            descrip={buble.descrip}
+            projectName={buble.projectName}
+            name={buble.name}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            noofhours={buble.noofhours}
+            src={buble.src}
+            noofusersWaiting={buble.noofusersWaiting}
+            projectId={buble.projectId}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            total={buble.noOfHours * buble.perhour}
+            perhour={buble.perhour}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            noofusers={buble.noofusers}
+            missionId={buble.missionId}
+            ordern={buble.orderon}
+            skills={buble.skills}
+            tafkidims={buble.tafkidims}
+            workways={buble.workways}
+            mdate={buble.mdate}
+            mdates={buble.dates}
+            vallues={buble.vallues}
+            pendId={buble.pendId}
+            users={buble.users}
+            acts={buble.acts}
+            sqadualed={buble.sqadualed}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'wegets' && milon.pmaap == true}
+        <div class="pmaap normSml">
+          <Weget
+            onAcsept={delo}
+            onDecline={delo}
+            onHover={hover}
+            onModal={modali}
+            onProj={proj}
+            onUser={user}
+            coinlapach={buble.coinlapach}
+            mId={buble.mId}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            kindOf={buble.kindOf}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            myp={buble.myp}
+            projectName={buble.projectName}
+            useraplyname={buble.username}
+            userId={buble.uid}
+            spid={buble.spid}
+            src={buble.src}
+            price={buble.price}
+            hm={buble.hm}
+            src2={buble.src2}
+            why={buble.why}
+            whatt={buble.whatt}
+            missionBName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+            noofpu={buble.noof}
+            sqadualedf={buble.sqadualedf}
+            sqadualed={buble.sqadualed}
+            spnot={buble.spnot}
+            easy={buble.easy}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+            missId={buble.missId}
+            id={buble.id}
+            openMid={buble.omid}
+            stylef={buble.stylef}
+            st={buble.st}
+            declined={buble.decid}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'fiapp' && milon.fiap == true}
+        <div class="fiap normSml">
+          <Fiappru
+            onAcsept={delo}
+            onDecline={delo}
+            onHover={hover}
+            onModal={modali}
+            onProj={proj}
+            onUser={user}
+            coinlapach={buble.coinlapach}
+            mId={buble.mId}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName={buble.projectName}
+            useraplyname={buble.username}
+            userId={buble.uid}
+            missionDetails={buble.descrip}
+            src={buble.src}
+            src2={buble.src2}
+            why={buble.why}
+            whatt={buble.whatt}
+            whattid={buble.whattid}
+            missionBName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+            noofpu={buble.noof}
+            publicklinks={buble.publicklinks}
+            privatlinks={buble.privatlinks}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            valph={buble.perhour}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+            missId={buble.missId}
+            timegramaId={buble.timegramaId}
+            timegramaDate={buble.timegramaDate}
+            id={buble.id}
+            openMid={buble.omid}
+            stylef={buble.stylef}
+            st={buble.st}
+            declined={buble.decid}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'walcomen' && milon.welc == true}
+        <div class="welc normSml">
+          <Welcomt
+            welcomId={buble.welcomeId}
+            id={buble.id}
+            src={buble.src}
+            onHover={hover}
+            coinlapach={buble.coinlapach}
+            onCoinLapach={delo}
+            username={buble.username}
+            projectName={buble.projectName}
+            projectId={buble.projectId}
+            partnershipDetails={buble.details}
+            pd={buble.pd}
+          />
+        </div>
+      {:else if buble.ani === 'askedcoin' && milon.asks == true}
+        <div class="asks normSml">
+          <Reqtojoin
+            onAcsept={delo}
+            onHover={hover}
+            onModal={modali}
+            onProj={proj}
+            onUser={user}
+            onDecline={delo}
+            iskvua={buble.iskvua}
+            email={buble.email}
+            role={buble.role}
+            workways={buble.workways}
+            userSkills={buble.userSkills}
+            userRole={buble.userRole}
+            userWorkway={buble.userWorkway}
+            skills={buble.skills}
+            coinlapach={buble.coinlapach}
+            pid={buble.pid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName={buble.projectName}
+            useraplyname={buble.username}
+            userId={buble.uid}
+            missionDetails={buble.missionDetails}
+            src={buble.src}
+            src2={buble.src2}
+            openmissionName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+            noofpu={buble.noof}
+            publicklinks={buble.publicklinks}
+            privatlinks={buble.privatlinks}
+            hearotMeyuchadot={buble.hearotMeyuchadot}
+            valph={buble.perhour}
+            nhours={buble.nhours}
+            deadline={buble.deadline}
+            sqedualed={buble.sqedualed}
+            missId={buble.missId}
+            id={buble.id}
+            acts={buble.acts}
+            openMid={buble.omid}
+            stylef={buble.stylef}
+            st={buble.st}
+            chat={buble.chat}
+            declined={buble.decid}
+            isRishon={buble.openMissionData.isRishon}
+            timegramaId={buble.timegramaId}
+            timegramaDate={buble.timegramaDate}
+            negopendmissions={buble.negopendmissions || []}
+            orderon={buble.orderon || 0}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'askedm' && milon.askmap == true}
+        <div class="askmap normSml">
+          <Reqtom
+            onAcsept={delo}
+            onDecline={delo}
+            onHover={hover}
+            onModal={modali}
+            onProj={proj}
+            onUser={user}
+            onChat={chat}
+            coinlapach={buble.coinlapach}
+            pid={buble.pid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.what}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.askId}
+            projectName={buble.projectName}
+            useraplyname={buble.username}
+            userId={buble.uid}
+            missionDetails={buble.descrip}
+            src={buble.src}
+            src2={buble.src2}
+            openmissionName={buble.openName}
+            name={buble.name}
+            projectId={buble.projectId}
+            noofpu={buble.noof}
+            myp={buble.myp}
+            easy={buble.easy}
+            spnot={buble.spnot}
+            price={buble.price}
+            deadline={buble.deadline}
+            missId={buble.missId}
+            id={buble.id}
+            openMid={buble.omid}
+            stylef={buble.stylef}
+            st={buble.st}
+            declined={buble.decid}
+            spid={buble.spid}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'hachla' && milon.hachla == true}
+        <div class:normSml={modal == false} class="hachla normSml">
+          <Desi
+            onAcsept={delo}
+            onDecline={delo}
+            onHover={hover}
+            onModal={modali}
+            onProj={proj}
+            onChat={chat}
+            noofpu={buble.noofpu}
+            newpicid={buble?.newpicid}
+            coinlapach={buble.coinlapach}
+            created_at={buble.created_at}
+            spdata={buble.spdata}
+            kind={buble.kind}
+            timegramaId={buble.timegramaId}
+            timegramaDate={buble.timegramaDate}
+            restime={buble.restime}
+            messege={buble.messege}
+            myid={buble.myid}
+            noofusersWaiting={buble.noofusersWaiting}
+            uids={buble.uids}
+            what={buble.mypos}
+            noofusersOk={buble.noofusersOk}
+            noofusersNo={buble.noofusersNo}
+            already={buble.already}
+            users={buble.users}
+            askId={buble.pendId}
+            projectName={buble.projectName}
+            projectId={buble.projectId}
+            userId={buble.uid}
+            src={buble.src}
+            src2={buble?.newpic}
+            stylef={buble.stylef}
+            st={buble.st}
+            spid={buble.spid}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'meData' && milon.sugg == true}
+        <div class="sugg normSml">
+          <ProjectSuggestor
+            onLess={delo}
+            onHover={hover}
+            onProj={proj}
+            onUser={user}
+            onMesima={mesima}
+            coinlapach={buble.coinlapach}
+            acts={buble.acts}
+            restime={buble.restime}
+            {askedarr}
+            {declineddarr}
+            pid={buble.pid}
+            chat={buble.chat ?? null}
+            askId={buble.askId ?? null}
+            alreadyi={buble.alreadyi}
+            deadLine={buble.sqadualed}
+            oid={buble.id}
+            hst={buble.hst}
+            stb={buble.stb}
+            projectName={buble.projectName}
+            role={buble.tafkidims}
+            skills={buble.skills}
+            missionDetails={buble.descrip}
+            notes={buble.hearotMeyuchadot}
+            src={buble.src}
+            missionName={buble.name}
+            projectId={buble.projectId}
+            workways={buble.work_ways}
+            noOfHours={buble.noofhours}
+            perhour={buble.perhour}
+            total={(buble.noofhours || 0) * (buble.perhour || 0)}
+            noOfusers={buble.noOfusers}
+            {low}
+          />
+        </div>
+      {:else if buble.ani === 'huca' && milon.pmashs == true}
+        <div class="pmashs normSml">
+          <Mashsug
+            onLess={delo}
+            onHover={hover}
+            onProj={proj}
+            onUser={user}
+            messege={buble.messege}
+            {i}
+            restime={buble.restime}
+            coinlapach={buble.coinlapach}
+            {askedarr}
+            declineddarra={buble.declineddarra}
+            deadLine={buble.sqadualed}
+            sqadualedf={buble.sqadualedf}
+            oid={buble.oid}
+            id={buble.id}
+            price={buble.price}
+            myp={buble.myp}
+            already={buble.already}
+            projectName={buble.projectName}
+            missionDetails={buble.descrip}
+            notes={buble.hearotMeyuchadot}
+            src={buble.srcb}
+            mashName={buble.mashname}
+            projectId={buble.projectid}
+            descrip={buble.descrip}
+            spnot={buble.spnot}
+            easy={buble.easy}
+            {low}
+          />
+        </div>
+      {/if}
+    {/each}
+  {/key}
+  <!--
         <div  class="normSml desi" style="display:'';"><DecisionMaking  decisionName={"?לפתוח קבוצת ווצאפ"} projectName={"פסיפס"} projectId={6}/></div> 
     <div class="normSml desi"><DecisionMaking decisionName={"?מה לבנות קודם"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"} deadLine={"10.7.2021"}/></div> 
 
@@ -699,33 +727,34 @@ let h = $state(500);
     <div class="normSml"><MissionInProgress missionName={"הזנת מוצרים"}  projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
    <div class="normSml"><ProjectSuggestor missionName={"ייבוא מסין"} projectId={2} projectName={"BARB"} src={"barbi.jpeg"}/></div>
                                                             -->
-                                                            <div
-                                                                class="midCom">
-                                                                <Mid
-                                                                {sml}
-                                                                    onCards={cards}
-                                                                    onHover={hover}
-                                                                    onShowall={showall}
-                                                                    onShowonly={showonly}
-                                                                    {total}
-                                                                    picLink={picLink} {ask}
-                                                                    {wel}
-                                                                    name={nam}
-                                                                    {low}
-                                                                    {sug}
-                                                                    {pen}
-                                                                    {beta}
-                                                                    {fia}
-                                                                    pmash={pmashd}
-                                                                    {mashs}
-                                                                    {maap}
-                                                                    {askma}
-                                                                    des={halu}  />
-                                                            </div>
-                                                            </div>
+  <div class="midCom">
+    <Mid
+      {sml}
+      onCards={cards}
+      onHover={hover}
+      onShowall={showall}
+      onShowonly={showonly}
+      {total}
+      {picLink}
+      {ask}
+      {wel}
+      name={nam}
+      {low}
+      {sug}
+      {pen}
+      {beta}
+      {fia}
+      pmash={pmashd}
+      {mashs}
+      {maap}
+      {askma}
+      des={halu}
+    />
+  </div>
+</div>
 
 <style>
-/*  .svggg{
+  /*  .svggg{
         min-width:75px; 
         min-height:75px;
         aspect-ratio: 1;
@@ -736,66 +765,66 @@ let h = $state(500);
         height:125px;
     }
 } */
-.normSml {
+  .normSml {
     transition: all 500ms ease-in-out;
-}
+  }
 
-.normSml:nth-child(1):hover {
+  .normSml:nth-child(1):hover {
     transform: translate(75%, 75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(2):hover {
+  .normSml:nth-child(2):hover {
     transform: translateY(75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(3):hover {
+  .normSml:nth-child(3):hover {
     transform: translateY(75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(4):hover {
+  .normSml:nth-child(4):hover {
     transform: translate(-75%, 75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(5):hover {
+  .normSml:nth-child(5):hover {
     transform: translateX(75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(6):hover {
+  .normSml:nth-child(6):hover {
     transform: translateX(-75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(7):hover {
+  .normSml:nth-child(7):hover {
     transform: translateX(75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(8):hover {
+  .normSml:nth-child(8):hover {
     transform: translateX(-75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(n+9):hover {
+  .normSml:nth-child(n + 9):hover {
     transform: translateY(-75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(4n+9):hover {
+  .normSml:nth-child(4n + 9):hover {
     transform: translate(75%, -75%);
     z-index: 998;
-}
+  }
 
-.normSml:nth-child(4n+12):hover {
+  .normSml:nth-child(4n + 12):hover {
     transform: translate(-75%, -75%);
     z-index: 998;
-}
+  }
 
-.screen {
+  .screen {
     background-color: #000000;
     background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
     display: grid;
@@ -808,121 +837,117 @@ let h = $state(500);
     width: 100vw;
     height: 100vh;
     overflow: scroll;
-}
+  }
 
-.midCom {
+  .midCom {
     grid-row: 2/ 4;
     grid-column: 2 /4;
     align-self: center;
     justify-self: center;
     border-radius: 50%;
-}
+  }
 
-.normSml {
+  .normSml {
     align-items: center;
-}
+  }
 
-.normSml:hover {
-
+  .normSml:hover {
     border-radius: 50%;
-}
+  }
 
-@media (min-width: 840px) {
+  @media (min-width: 840px) {
     .normSml:nth-child(4):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(5):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(6):hover {
-        transform: translate(-75%, 75%);
-        z-index: 998;
+      transform: translate(-75%, 75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(7):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(10):hover {
-        transform: translateX(-75%);
-        z-index: 998;
+      transform: translateX(-75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(11):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(12):hover {
-        transform: translateX(0%);
-        z-index: 998;
+      transform: translateX(0%);
+      z-index: 998;
     }
 
     .normSml:nth-child(14):hover {
-        transform: translateX(-75%);
-        z-index: 998;
+      transform: translateX(-75%);
+      z-index: 998;
     }
 
-    .normSml:nth-child(n+15):hover {
-        transform: translateY(-75%);
-        z-index: 998;
+    .normSml:nth-child(n + 15):hover {
+      transform: translateY(-75%);
+      z-index: 998;
     }
 
-    .normSml:nth-child(6n+15):hover {
-        transform: translate(75%, -75%);
-        z-index: 998;
+    .normSml:nth-child(6n + 15):hover {
+      transform: translate(75%, -75%);
+      z-index: 998;
     }
 
-    .normSml:nth-child(6n+20):hover {
-        transform: translate(-75%, -75%);
-        z-index: 998;
+    .normSml:nth-child(6n + 20):hover {
+      transform: translate(-75%, -75%);
+      z-index: 998;
     }
 
     .screen {
-        /*   perspective: 1000px;
+      /*   perspective: 1000px;
 background-color: #000000;
 background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);*/
-        /* Created with https://www.css-gradient.com */
-        background: #60B9B6;
-        background: -webkit-radial-gradient(center, #60B9B6, #0F0248, #050117);
-        background: -moz-radial-gradient(center, #60B9B6, #0F0248, #050117);
-        background: radial-gradient(ellipse at center, #60B9B6, #0F0248, #050117);
-        display: grid;
-        grid-template-columns: repeat(6, 1fr);
-        grid-template-rows: repeat(4, 1fr);
-        grid-row: center;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-        height: 100vh;
-        overflow: scroll;
+      /* Created with https://www.css-gradient.com */
+      background: #60b9b6;
+      background: -webkit-radial-gradient(center, #60b9b6, #0f0248, #050117);
+      background: -moz-radial-gradient(center, #60b9b6, #0f0248, #050117);
+      background: radial-gradient(ellipse at center, #60b9b6, #0f0248, #050117);
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      grid-row: center;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      height: 100vh;
+      overflow: scroll;
     }
 
     .midCom {
-        grid-row: 2 / 4;
-        grid-column: 3 /5;
-        align-self: center;
-        border-radius: 50%;
+      grid-row: 2 / 4;
+      grid-column: 3 /5;
+      align-self: center;
+      border-radius: 50%;
     }
 
     .normSml {
-        align-items: center;
+      align-items: center;
     }
 
     .normSml:hover {
-
-        border-radius: 50%;
+      border-radius: 50%;
     }
+  }
 
-}
-
-@media (min-width: 1240px) {
-
+  @media (min-width: 1240px) {
     /* .normSml:nth-child(1){
     position: absolute;
     top: 18%;   
@@ -1080,148 +1105,146 @@ background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);*/
     transform: translate(-50%, -50%);
   } */
     .normSml:nth-child(1):hover {
-        transform: translate(75%, 75%);
-        z-index: 998;
+      transform: translate(75%, 75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(2):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(3):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(4):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(5):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(6):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(7):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(8):hover {
-        transform: translate(-75%, 75%);
-        z-index: 998;
+      transform: translate(-75%, 75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(9):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(10):hover {
-        transform: translateX(0%);
-        z-index: 998;
+      transform: translateX(0%);
+      z-index: 998;
     }
 
     .normSml:nth-child(11):hover {
-        transform: translateX(0%);
-        z-index: 998;
+      transform: translateX(0%);
+      z-index: 998;
     }
 
     .normSml:nth-child(14):hover {
-        transform: translateX(-75%);
-        z-index: 998;
+      transform: translateX(-75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(15):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(16):hover {
-        transform: translateX(0%);
-        z-index: 998;
+      transform: translateX(0%);
+      z-index: 998;
     }
 
     .normSml:nth-child(17):hover {
-        transform: translateX(0%);
-        z-index: 998;
+      transform: translateX(0%);
+      z-index: 998;
     }
 
     .normSml:nth-child(18):hover {
-        transform: translateX(0%);
-        z-index: 998;
+      transform: translateX(0%);
+      z-index: 998;
     }
 
     .normSml:nth-child(19):hover {
-        transform: translateX(0%);
-        z-index: 998;
+      transform: translateX(0%);
+      z-index: 998;
     }
 
     .normSml:nth-child(20):hover {
-        transform: translateX(-75%);
-        z-index: 998;
+      transform: translateX(-75%);
+      z-index: 998;
     }
 
-    .normSml:nth-child(n+21):hover {
-        transform: translateY(-75%);
-        z-index: 998;
+    .normSml:nth-child(n + 21):hover {
+      transform: translateY(-75%);
+      z-index: 998;
     }
 
-    .normSml:nth-child(8n+21):hover {
-        transform: translate(75%, -75%);
-        z-index: 998;
+    .normSml:nth-child(8n + 21):hover {
+      transform: translate(75%, -75%);
+      z-index: 998;
     }
 
-    .normSml:nth-child(8n+28):hover {
-        transform: translate(-75%, -75%);
-        z-index: 998;
+    .normSml:nth-child(8n + 28):hover {
+      transform: translate(-75%, -75%);
+      z-index: 998;
     }
 
     .screen {
-        padding: 20px 20px;
-        /*   background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) ;
+      padding: 20px 20px;
+      /*   background-image: url(https://res.cloudinary.com/love1/image/upload/v1641997213/4nd_us6lck.svg) ;
         background-size: cover;*/
-        height: 100vh !important;
-        display: grid;
-        grid-template-columns: repeat(8, 1fr);
-        grid-template-rows: repeat(4, 1fr);
-        grid-row: center;
-        align-items: center;
-        justify-content: center;
-        width: 100vw;
-        overflow: auto;
-
+      height: 100vh !important;
+      display: grid;
+      grid-template-columns: repeat(8, 1fr);
+      grid-template-rows: repeat(4, 1fr);
+      grid-row: center;
+      align-items: center;
+      justify-content: center;
+      width: 100vw;
+      overflow: auto;
     }
 
     .midCom {
-        /*  position: absolute;
+      /*  position: absolute;
         top: 50%;
         left: 50%;
         transform: translate(-50%, -50%);*/
-        padding: 20px 20px;
-        grid-row: 2 / 4;
-        grid-column: 4 /6;
-        align-self: center;
+      padding: 20px 20px;
+      grid-row: 2 / 4;
+      grid-column: 4 /6;
+      align-self: center;
     }
 
     .normSml {
-        margin: 0;
+      margin: 0;
     }
 
     .normSml:hover {
-
-        border-radius: 50%;
+      border-radius: 50%;
     }
-}
+  }
 
-/*
+  /*
  @media  (min-width: 1240px){
     .screen{
         padding:20px 20px;
@@ -1266,191 +1289,188 @@ margin-left: 125px
         border-radius: 50%;
     }
     }*/
-@media (min-width: 1640px) {
+  @media (min-width: 1640px) {
     .normSml:nth-child(4):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(5):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(6):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(7):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(8):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(9):hover {
-        transform: translateY(75%);
-        z-index: 998;
+      transform: translateY(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(10):hover {
-        transform: translate(-75%, 75%);
-        z-index: 998;
+      transform: translate(-75%, 75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(11):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(20):hover {
-        transform: translateX(-75%);
-        z-index: 998;
+      transform: translateX(-75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(21):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(28):hover {
-        transform: translateX(-75%);
-        z-index: 998;
+      transform: translateX(-75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(29):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(36):hover {
-        transform: translateX(-75%);
-        z-index: 998;
+      transform: translateX(-75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(37):hover {
-        transform: translateX(75%);
-        z-index: 998;
+      transform: translateX(75%);
+      z-index: 998;
     }
 
     .normSml:nth-child(46):hover {
+      transform: translateX(-75%);
+      z-index: 998;
+    }
+
+    .normSml:nth-child(n + 47):hover {
+      transform: translateY(-75%);
+      z-index: 998;
+    }
+
+    .normSml:nth-child(10n + 47):hover {
+      transform: translate(75%, -75%);
+      z-index: 998;
+    }
+
+    .normSml:nth-child(10n + 56):hover {
+      transform: translate(-75%, -75%);
+      z-index: 998;
+    }
+
+    .screen {
+      grid-template-columns: repeat(10, 1fr);
+    }
+
+    .midCom {
+      padding: 13px 0px;
+      grid-row: 2 / 4;
+      grid-column: 5 /7;
+      align-self: center;
+    }
+  }
+
+  @media (min-height: 750px) {
+    @media (max-width: 839px) {
+      .normSml:nth-child(6):hover {
+        transform: translateX(0%);
+        z-index: 998;
+      }
+
+      .normSml:nth-child(7):hover {
+        transform: translateX(0%);
+        z-index: 998;
+      }
+
+      .normSml:nth-child(8):hover {
         transform: translateX(-75%);
         z-index: 998;
-    }
+      }
 
-    .normSml:nth-child(n+47):hover {
-        transform: translateY(-75%);
+      .normSml:nth-child(9):hover {
+        transform: translateX(75%);
         z-index: 998;
-    }
+      }
 
-    .normSml:nth-child(10n+47):hover {
+      .normSml:nth-child(10):hover {
+        transform: translateX(-75%);
+        z-index: 998;
+      }
+
+      .normSml:nth-child(11):hover {
+        transform: translateX(75%);
+        z-index: 998;
+      }
+
+      .normSml:nth-child(12):hover {
+        transform: translateX(-75%);
+        z-index: 998;
+      }
+
+      .normSml:nth-child(13):hover {
         transform: translate(75%, -75%);
         z-index: 998;
-    }
+      }
 
-    .normSml:nth-child(10n+56):hover {
+      .normSml:nth-child(16):hover {
         transform: translate(-75%, -75%);
         z-index: 998;
-    }
+      }
 
-    .screen {
-        grid-template-columns: repeat(10, 1fr);
+      .normSml:nth-child(n + 17):hover {
+        transform: translateY(-75%);
+        z-index: 998;
+      }
 
-    }
+      .normSml:nth-child(4n + 17):hover {
+        transform: translate(75%, -75%);
+        z-index: 998;
+      }
 
-    .midCom {
-        padding: 13px 0px;
-        grid-row: 2 / 4;
-        grid-column: 5 /7;
-        align-self: center;
-    }
-}
-
-@media (min-height: 750px) {
-    @media (max-width: 839px) {
-        .normSml:nth-child(6):hover {
-            transform: translateX(0%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(7):hover {
-            transform: translateX(0%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(8):hover {
-            transform: translateX(-75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(9):hover {
-            transform: translateX(75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(10):hover {
-            transform: translateX(-75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(11):hover {
-            transform: translateX(75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(12):hover {
-            transform: translateX(-75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(13):hover {
-            transform: translate(75%, -75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(16):hover {
-            transform: translate(-75%, -75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(n+17):hover {
-            transform: translateY(-75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(4n+17):hover {
-            transform: translate(75%, -75%);
-            z-index: 998;
-        }
-
-        .normSml:nth-child(4n+20):hover {
-            transform: translate(-75%, -75%);
-            z-index: 998;
-        }
+      .normSml:nth-child(4n + 20):hover {
+        transform: translate(-75%, -75%);
+        z-index: 998;
+      }
     }
 
     .midCom {
-        grid-row: 3 / 5;
+      grid-row: 3 / 5;
     }
 
     .screen {
-        grid-template-rows: repeat(6, 1fr);
-
+      grid-template-rows: repeat(6, 1fr);
     }
-}
+  }
 
-@media (min-height: 1040px) {
+  @media (min-height: 1040px) {
     .midCom {
-        grid-row: 4 / 5;
+      grid-row: 4 / 5;
     }
 
     .screen {
-        grid-template-rows: repeat(8, 1fr);
-
+      grid-template-rows: repeat(8, 1fr);
     }
-}
+  }
 </style>

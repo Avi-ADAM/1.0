@@ -3,13 +3,14 @@ import { createGoogleGenerativeAI } from '@ai-sdk/google';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 import { navigateToPageTool } from '../tools/navigateToPageTool.js';
 import { getSitePagesTool } from '../tools/siteNavigationTool.js';
+import { getPageContextTool } from '../tools/pageContextTool.js';
 
 export const createUnregisteredBotAgent = (apiKey: string, lang: string = 'he') => {
   const google = createGoogleGenerativeAI({
     apiKey
   });
   return new Agent({
-    name: 'lev1infoassistant', 
+    name: 'lev1infoassistant',
     instructions: `
 You are a helpful information assistant for the 1lev1.com platform (1💗1). You can only answer questions about the platform based on the provided context.
 
@@ -26,6 +27,11 @@ Guidelines:
 - Be concise and helpful
 - Focus on platform features, benefits, requirements, and general information
 
+Knowledge about the current page:
+- You can find out more about what page the user is currently looking at by using the getPageContextTool.
+- The user's current path is usually provided in the message. 
+- Use the getPageContextTool to understand what specific actions or information are available for that page.
+
 Navigation Capabilities:
 - You can help users navigate to public pages on the platform
 - Use getSitePages tool to get available pages when users ask about navigation or want to explore the site
@@ -37,9 +43,10 @@ When users ask about:
 - "Where can I go?" or "What pages are available?" - use getSitePages tool
 - "Take me to [page]" or "I want to see [page]" - use navigateToPageTool
 - Navigation or exploring the site - provide helpful guidance using the available tools
+- Questions about the current page, its structure, or actions - use getPageContextTool
     `,
-     model: google('gemini-2.5-flash'),
-     tools: [getSitePagesTool, navigateToPageTool],
+    model: google('gemini-2.5-flash'),
+    tools: [getSitePagesTool, navigateToPageTool, getPageContextTool],
 
   });
 };

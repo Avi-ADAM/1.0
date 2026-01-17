@@ -17,6 +17,7 @@ import { toggleOnlineConfig } from './toggleOnline.js';
 import { startMeetingConfig } from './startMeeting.js';
 import { joinMeetingConfig } from './joinMeeting.js';
 import { sendMeetingMessageConfig } from './sendMeetingMessage.js';
+import { sendAskMessageConfig } from './sendAskMessage.js';
 
 /**
  * Register all actions
@@ -37,6 +38,7 @@ export function registerAllActions(): void {
   registerAction(startMeetingConfig);
   registerAction(joinMeetingConfig);
   registerAction(sendMeetingMessageConfig);
+  registerAction(sendAskMessageConfig);
 
   // Future actions will be registered here
   // registerAction(createTaskAction);
@@ -56,5 +58,6 @@ export {
   toggleOnlineConfig,
   startMeetingConfig,
   joinMeetingConfig,
-  sendMeetingMessageConfig
+  sendMeetingMessageConfig,
+  sendAskMessageConfig
 };

@@ -1,16 +1,19 @@
 // lib/mastra/enhanced-bot-agent.ts
 import { Agent } from '@mastra/core';
-import { getMissionDetailsTool,
+import {
+  getMissionDetailsTool,
   listUserMissionsTool,
   getMissionStatsTool,
   getActiveTimersTool,
   getTimerHistoryTool,
   startTimerWithNotesTool,
-  stopTimerWithSummaryTool } from '../tools/missionTimers';
+  stopTimerWithSummaryTool
+} from '../tools/missionTimers';
 import { getSitePagesTool } from '../tools/siteNavigationTool';
 import { navigateToPageTool } from '../tools/navigateToPageTool';
 import { findMissionTool } from '../tools/findMissionTool';
 import { findUserProjectsTool } from '../tools/findUserProjectsTool';
+import { getPageContextTool } from '../tools/pageContextTool';
 import { SITE_CONTEXT } from '../../lib/bot/context.js';
 import { createGoogleGenerativeAI } from '@ai-sdk/google';
 
@@ -37,8 +40,15 @@ Your enhanced capabilities:
 4. **Data Analytics**: Provide insights about work patterns and productivity
 5. **Intelligent Search**: Find missions and projects by partial names or descriptions
 6. **Project Awareness**: Access a user's project list to provide context-aware navigation and suggestions
+7. **Page Context Awareness**: Use the getPageContextTool to understand the current page the user is on and provide specific help for that page.
 
 User Language: ${lang === 'he' ? 'Hebrew' : lang === 'ar' ? 'Arabic' : 'English'}
+
+## Knowledge about the current page:
+- You can find out more about what page the user is currently looking at by using the getPageContextTool.
+- The user's current path is usually provided in the message or passed in the conversation context.
+- Use the getPageContextTool to understand what specific actions or information are available for that page.
+- This is particularly useful for page-specific questions like "what can I do here?" or "how does this page work?".
 
 ## ENHANCED WORKFLOWS:
 
@@ -176,30 +186,33 @@ User Language: ${lang === 'he' ? 'Hebrew' : lang === 'ar' ? 'Arabic' : 'English'
 - Helpful with suggestions
 - Respectful of user's work style and preferences
     `,
-   model: google('gemini-2.5-flash-lite'),
-    tools: { getMissionDetailsTool,
-  listUserMissionsTool,
-  getMissionStatsTool,
-  getActiveTimersTool,
-  getTimerHistoryTool,
-  startTimerWithNotesTool,
-  stopTimerWithSummaryTool,
-  getSitePagesTool,
-  navigateToPageTool,
-  findMissionTool,
-  findUserProjectsTool
-}});
+    model: google('gemini-2.5-flash-lite'),
+    tools: {
+      getMissionDetailsTool,
+      listUserMissionsTool,
+      getMissionStatsTool,
+      getActiveTimersTool,
+      getTimerHistoryTool,
+      startTimerWithNotesTool,
+      stopTimerWithSummaryTool,
+      getSitePagesTool,
+      navigateToPageTool,
+      findMissionTool,
+      findUserProjectsTool,
+      getPageContextTool
+    }
+  });
 };
 
 // Usage examples in different languages:
 export const EXAMPLE_INTERACTIONS = {
   hebrew: [
     {
-user: "התחל טיימר לעיצוב הלוגו",
+      user: "התחל טיימר לעיצוב הלוגו",
       expectedFlow: "listUserMissionsTool({ query: 'עיצוב לוגו' }) → startTimerWithNotes(missionId, optional notes)"
     },
     {
-      user: "כמה זמן עבדתי השבוע?", 
+      user: "כמה זמן עבדתי השבוע?",
       expectedFlow: "getTimerHistory(days: 7) → calculate total duration → present stats"
     },
     {
@@ -209,7 +222,7 @@ user: "התחל טיימר לעיצוב הלוגו",
   ],
   english: [
     {
-user: "Start timer for API development",
+      user: "Start timer for API development",
       expectedFlow: "listUserMissionsTool({ query: 'API development' }) → startTimerWithNotes(missionId)"
     },
     {

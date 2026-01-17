@@ -14,13 +14,18 @@ import {
   decisionsStore,
   projectsStore,
   milon,
-  projectFilter
+  projectFilter,
+  askedResourcesStore,
+  resourceSuggestionsStore
 } from './levStores';
+import { timers } from './timers';
 import {
   processPends,
   processMtaha,
   processFiapp,
   processAsked,
+  processAskedResources,
+  processResourceSuggestions,
   processSuggestions,
   processPmashes,
   processWegets,
@@ -57,12 +62,13 @@ export const processedPends: Readable<DisplayItem[]> = derived(
 /**
  * Derived store for processed missions in progress
  * 
- * Automatically recomputes when mtahaStore or projectsStore changes.
+ * Automatically recomputes when mtahaStore, projectsStore, or timers changes.
+ * Timer data is pulled from the timers store for real-time updates.
  * Returns an array of DisplayItem objects ready for rendering.
  */
 export const processedMtaha: Readable<DisplayItem[]> = derived(
-  [mtahaStore, projectsStore],
-  ([$mtaha, $projects]) => processMtaha($mtaha, $projects)
+  [mtahaStore, projectsStore, timers],
+  ([$mtaha, $projects, $timers]) => processMtaha($mtaha, $projects, $timers)
 );
 
 /**
@@ -85,6 +91,27 @@ export const processedFiapp: Readable<DisplayItem[]> = derived(
 export const processedAsked: Readable<DisplayItem[]> = derived(
   [askedStore, projectsStore],
   ([$asked, $projects]) => processAsked($asked, $projects)
+);
+
+/**
+ * Derived store for processed asked resources (askms)
+ * 
+ * Automatically recomputes when askedResourcesStore or projectsStore changes.
+ * Returns an array of DisplayItem objects ready for rendering.
+ */
+export const processedAskedResources: Readable<DisplayItem[]> = derived(
+  [askedResourcesStore, projectsStore],
+  ([$askedResources, $projects]) => processAskedResources($askedResources, $projects)
+);
+
+/**
+ * Derived store for processed resource suggestions (huca)
+ * 
+ * Automatically recomputes when resourceSuggestionsStore or projectsStore changes.
+ */
+export const processedResourceSuggestions: Readable<DisplayItem[]> = derived(
+  [resourceSuggestionsStore, projectsStore],
+  ([$resourceSuggestions, $projects]) => processResourceSuggestions($resourceSuggestions, $projects)
 );
 
 /**
@@ -196,7 +223,9 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedMtaha,
     processedFiapp,
     processedAsked,
+    processedAskedResources,
     processedSuggestions,
+    processedResourceSuggestions,
     processedPmashes,
     processedWegets,
     processedHalukas,
@@ -211,7 +240,9 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $mtaha,
     $fiapp,
     $asked,
+    $askedResources,
     $suggestions,
+    $resourceSuggestions,
     $pmashes,
     $wegets,
     $halukas,
@@ -227,7 +258,9 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $mtaha,
       $fiapp,
       $asked,
+      $askedResources,
       $suggestions,
+      $resourceSuggestions,
       $pmashes,
       $wegets,
       $halukas,
@@ -247,6 +280,13 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return $milon.fiap;
         case 'askedcoin':
           return $milon.asks;
+        case 'askedm':
+          // Logic for askedm similar to askedcoin or new filter?
+          // Assuming it falls under 'asks' or 'askmap' if that's what user meant by 'askma'
+          // User had 'askmap: true' in MilonConfig in levStores.ts
+          return $milon.askmap || true;
+        case 'huca':
+          return $milon.pmashs;
         case 'meData':
           return $milon.sugg;
         case 'pmashes':

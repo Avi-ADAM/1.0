@@ -76,7 +76,8 @@ export class NotificationOrchestrator {
       const recipients = await this.getRecipients(
         config.recipients,
         actionParams,
-        context
+        context,
+        actionResult
       );
 
       // 2. Filter out sender if configured
@@ -90,10 +91,34 @@ export class NotificationOrchestrator {
       }
 
       // 3. Prepare notification data
+      const contextData = { actionParams, actionResult };
+
+      const title = {
+        he: this.replacePlaceholders(config.templates.title.he, contextData),
+        en: this.replacePlaceholders(config.templates.title.en, contextData),
+        ar: config.templates.title.ar ? this.replacePlaceholders(config.templates.title.ar, contextData) : undefined
+      };
+
+      const body = {
+        he: this.replacePlaceholders(config.templates.body.he, contextData),
+        en: this.replacePlaceholders(config.templates.body.en, contextData),
+        ar: config.templates.body.ar ? this.replacePlaceholders(config.templates.body.ar, contextData) : undefined
+      };
+
+      // Process metadata values if they contain placeholders
+      const metadata = { ...config.metadata };
+      if (metadata) {
+        Object.keys(metadata).forEach((key: any) => {
+          if (typeof metadata[key] === 'string' && metadata[key].includes('{{')) {
+            metadata[key] = this.replacePlaceholders(metadata[key], contextData);
+          }
+        });
+      }
+
       const notificationData: NotificationData = {
-        title: config.templates.title,
-        body: config.templates.body,
-        metadata: config.metadata,
+        title,
+        body,
+        metadata,
         actionParams,
         actionResult
       };
@@ -166,6 +191,24 @@ export class NotificationOrchestrator {
   }
 
   /**
+   * Replace placeholders in template strings
+   * Supported placeholders: {{senderName}}, {{content}}, {{projectName}}, etc.
+   */
+  private replacePlaceholders(template: string, data: Record<string, any>): string {
+    if (!template) return '';
+    return template.replace(/\{\{(\w+)\}\}/g, (match, key) => {
+      // Check in actionResult first, then actionParams
+      if (data.actionResult && data.actionResult[key] !== undefined) {
+        return String(data.actionResult[key]);
+      }
+      if (data.actionParams && data.actionParams[key] !== undefined) {
+        return String(data.actionParams[key]);
+      }
+      return match; // Keep placeholder if not found
+    });
+  }
+
+  /**
    * Get a nested value from an object using dot notation
    * @param obj The object to search
    * @param path The path to the value (e.g., 'data.project')
@@ -181,7 +224,8 @@ export class NotificationOrchestrator {
   private async getRecipients(
     rule: RecipientRule,
     params: Record<string, any>,
-    context: ActionContext
+    context: ActionContext,
+    actionResult?: any
   ): Promise<UserProfile[]> {
     switch (rule.type) {
       case 'projectMembers':
@@ -226,6 +270,11 @@ export class NotificationOrchestrator {
         const forumIdParam = rule.config?.forumIdParam || 'forumId';
         const forumId = this.getNestedValue(params, forumIdParam);
         return await this.getMeetingParticipants(forumId, context);
+
+      case 'askParticipants':
+        const askIdParam = rule.config?.askIdParam || 'askId';
+        const askId = this.getNestedValue(params, askIdParam);
+        return await this.getAskParticipants(askId, context, actionResult);
 
       default:
         console.warn(`Unknown recipient rule type: ${rule.type}`);
@@ -356,7 +405,7 @@ export class NotificationOrchestrator {
 
       const participants = meeting.attributes?.pgishausers?.data || [];
       const profiles = await Promise.all(
-        participants.map((participant: any) => 
+        participants.map((participant: any) =>
           this.getUserProfile(participant.attributes?.users_permissions_user?.data?.id, context)
         )
       );
@@ -366,6 +415,61 @@ export class NotificationOrchestrator {
       console.error(`Error fetching meeting participants for forum ${forumId}:`, error);
       return [];
     }
+  }
+
+  /**
+   * Get ask participants (project members + asker)
+   */
+  private async getAskParticipants(
+    askId: string,
+    context: ActionContext,
+    actionResult?: any
+  ): Promise<UserProfile[]> {
+    if (!askId) {
+      console.warn('No askId provided for getAskParticipants');
+      return [];
+    }
+
+    let projectId: string | undefined;
+    let askerId: string | undefined;
+
+    // Try to get IDs from action result to avoid extra queries
+    if (actionResult) {
+      projectId = actionResult.projectId;
+      askerId = actionResult.askerId;
+    }
+
+    // If missing, we might need a query (omitted for now as we ensure action returns them)
+    if (!projectId || !askerId) {
+      console.log('Ask details not in action result, falling back to cache/separate logic if implemented');
+      // For now, if not in result, we return empty or implement a fallback query?
+      // Let's rely on the action returning them for performance.
+      if (!projectId) console.warn('Could not determine projectId for Ask ' + askId);
+      if (!askerId) console.warn('Could not determine askerId for Ask ' + askId);
+      // We can continue with partial data
+    }
+
+    const participants: UserProfile[] = [];
+
+    // Get Project Members
+    if (projectId) {
+      const members = await this.getProjectMembers(projectId, context);
+      participants.push(...members);
+    }
+
+    // Get Asker
+    if (askerId) {
+      const asker = await this.getUserProfile(askerId, context);
+      if (asker) {
+        participants.push(asker);
+      }
+    }
+
+    // Dedup by ID
+    const unique = new Map<string, UserProfile>();
+    participants.forEach(p => unique.set(p.id, p));
+
+    return Array.from(unique.values());
   }
 
   /**

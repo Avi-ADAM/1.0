@@ -52,6 +52,9 @@
    * @property {boolean} [masaalr]
    * @property {any} restime
    * @property {any} [acts]
+   * @property {Function} [onClose]
+   * @property {Function} [onLoad]
+   * @property {number} [isAsk]
    */
 
   /** @type {Props} */
@@ -180,7 +183,7 @@
   let done;
   let skills3 = $state({ data: [] });
   let tafkidims2 = $state({ data: [] });
-  let workways3 = $state([]);
+  let workways3 = $state({ data: [] });
   let acts2 = $state(
     acts?.data && Array.isArray(acts.data) ? [...acts.data] : []
   );
@@ -252,52 +255,42 @@
   let rishonves4 = ``;
   let what4 = true;
   function objToString(obj) {
+    if (!obj || !Array.isArray(obj)) return '';
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
+      str += '{';
       for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
         if (typeof val == 'string') {
           str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
+        } else if (typeof val == 'number' || typeof val == 'boolean') {
           str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
+        } else if (Array.isArray(val)) {
+          str += `${p}:[${val.map((c) => (c && typeof c === 'object' ? c.id : c)).join(',')}]\n`;
+        } else if (val === null) {
+          str += `${p}:null\n`;
         }
       }
+      str += '},';
     }
     return str;
   }
   function objToStringC(obj) {
+    if (!obj || !Array.isArray(obj)) return '';
     let str = '';
     for (let i = 0; i < obj.length; i++) {
-      const length = Object.keys(obj[i]).length;
-      let t = 0;
+      str += '{';
       for (const [p, val] of Object.entries(obj[i])) {
-        const last = t === length - 1;
-        t++;
         if (typeof val == 'string') {
           str += `${p}:"${val}"\n`;
-        } else if ((typeof val == 'number') | 'boolean') {
+        } else if (typeof val == 'number' || typeof val == 'boolean') {
           str += `${p}:${val}\n`;
-        } else if (typeof val == 'null') {
-          str += `${p}:${val.map((c) => c.id)}\n`;
-        }
-        if (last) {
-          str += '},';
-        }
-        if (t == 1) {
-          str += '{';
+        } else if (Array.isArray(val)) {
+          str += `${p}:[${val.map((c) => (c && typeof c === 'object' ? c.id : c)).join(',')}]\n`;
+        } else if (val === null) {
+          str += `${p}:null\n`;
         }
       }
+      str += '},';
     }
     return str;
   }
@@ -529,7 +522,7 @@
     const roId = tafkidims?.data ? tafkidims.data.map((c) => c.id) : [];
     const ro2Id = tafkidims2?.data ? tafkidims2.data.map((c) => c.id) : [];
     const wwId = workways?.data ? workways.data.map((c) => c.id) : [];
-    const ww2Id = Array.isArray(workways3) ? workways3.map((c) => c.id) : [];
+    const ww2Id = workways3?.data ? workways3.data.map((c) => c.id) : [];
     if (arraysEqual(skillsId, skills2Id) === false) {
       skills4 = ` skills: [${skills2Id}], `;
       skills4nego = ` skills: [${skillsId}], `;
@@ -620,7 +613,7 @@
              createNegopendmission(
               data:{
                 publishedAt: "${d.toISOString()}",
-                ${isAsk === 0 ?  `pendm:${pendId}` : `open_mission:${pendId}`},
+                ${isAsk === 0 ? `pendm:${pendId}` : `open_mission:${pendId}`},
                  users_permissions_user: "${idL}",
                  isOriginal:${stepState == 2 ? true : false},
     ${iskvua4nego}             
@@ -637,7 +630,7 @@
     ${originalActsIds.length > 0 ? `acts: [${originalActsIds.join(',')}],` : ''}
               }
              ){data{id}}
-          ${isAsk === 0 ?  "updatePendm" : "updateOpenMission" }(
+          ${isAsk === 0 ? 'updatePendm' : 'updateOpenMission'}(
      id: ${pendId}
       data:  { 
             ${iskvua4}             
@@ -652,7 +645,9 @@
     ${date4}
     ${dates4}
     ${newActsIds.length > 0 ? `acts: [${newActsIds.join(',')}],` : ''}
-       ${isAsk ===  0 ? `users:[  ${userss}, 
+       ${
+         isAsk === 0
+           ? `users:[  ${userss} 
      {
       what: true
       users_permissions_user: "${idL}"
@@ -664,14 +659,19 @@
 {
     users_permissions_user: "${idL}"
 }
-  ]` : ``}
+  ]`
+           : ``
+       }
       }
   ){data {id}}
-  ${isAsk ===  0 ? `` : `
+  ${
+    isAsk === 0
+      ? ``
+      : `
   updateAsk(
   id:${isAsk}
   data:{
-  vots:[  ${userss}, 
+  vots:[  ${userss} 
      {
       what: true
       users_permissions_user: "${idL}"
@@ -680,7 +680,8 @@
       ide:${idL}
     }
   ]
-  }){data{id}}`}
+  }){data{id}}`
+  }
 } `
             // make coin desapire
           })
@@ -729,14 +730,21 @@
       workways2 = newValues;
       ww.set(workways2);
     }
-    const newSele = dataib;
+    const newSele =
+      valc == 'skillName'
+        ? skills3.data
+        : valc == 'roleDescription'
+          ? tafkidims2.data
+          : valc == 'workWayName'
+            ? workways3.data
+            : [];
     newSele.push(newOb);
     if (valc == 'skillName') {
       skills3.data = newSele;
     } else if (valc == 'roleDescription') {
       tafkidims2.data = newSele;
     } else if (valc == 'workWayName') {
-      workways3 = newSele;
+      workways3.data = newSele;
     }
     dataibno[valc].push(newN);
     dataibno = dataibno;
@@ -745,7 +753,7 @@
     isKavua2 = isKavua;
     skills3 = JSON.parse(JSON.stringify(skills));
     tafkidims2 = JSON.parse(JSON.stringify(tafkidims));
-    workways3 = JSON.parse(JSON.stringify(workways.data));
+    workways3 = JSON.parse(JSON.stringify(workways));
     console.log('negoM mounted', $lang);
     console.log(
       'acts prop received:',
@@ -935,11 +943,7 @@
       lebel={tri?.common.finishDate}
     />
 
-    <ActsNego
-      {acts}
-      bind:actsb={acts2}
-      lebel={{ he: 'מטלות', en: 'Tasks' }}
-    />
+    <ActsNego {acts} bind:actsb={acts2} lebel={{ he: 'מטלות', en: 'Tasks' }} />
     <div
       class="border border-gold border-opacity-20 rounded m-2 flex flex-col align-middle justify-center gap-x-2"
     >
@@ -968,7 +972,7 @@
   >
     <h2 class="underline decoration-mturk">{tri?.mission.total[$lang]}</h2>
     {#if noofhours == noofhours2 && perhour == perhour2}
-      {#if (noofhours > 0) & (perhour > 0)}
+      {#if noofhours > 0 && perhour > 0}
         {noofhours * perhour}
       {:else}
         <p>0</p>
