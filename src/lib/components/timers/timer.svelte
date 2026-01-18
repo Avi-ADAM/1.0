@@ -35,89 +35,96 @@
   onMount(() => {
     timer = $timers?.find((t) => t.mId == missionId);
 
-    console.log(timer)
-    if(timer.attributes.activeTimer.data?.attributes?.isActive) {
-      console.log("running")  
-    // Get the timers array from the timer data
-    let timers = timer.attributes.activeTimer.data.attributes.timers;
-    
-    if (timers && timers.length > 0) {
-      // Get the most recent timer entry
-      let lastTimer = timers[timers.length - 1];
-      
-      // Calculate elapsed time since the last start
-      let startTime = new Date(lastTimer.start).getTime();
-      let currentTime = Date.now();
-      
-      // Update local state
-      localZman = (currentTime - startTime) + timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
-      isRunning = true;
-      timer.running = true;
-      console.log(localZman, isRunning)
+    console.log(timer);
+    if (timer.attributes.activeTimer.data?.attributes?.isActive) {
+      console.log('running');
+      // Get the timers array from the timer data
+      let timers = timer.attributes.activeTimer.data.attributes.timers;
+
+      if (timers && timers.length > 0) {
+        // Get the most recent timer entry
+        let lastTimer = timers[timers.length - 1];
+
+        // Calculate elapsed time since the last start
+        let startTime = new Date(lastTimer.start).getTime();
+        let currentTime = Date.now();
+
+        // Update local state
+        localZman =
+          currentTime -
+          startTime +
+          timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
+        isRunning = true;
+        timer.running = true;
+        console.log(localZman, isRunning);
+      }
+    } else if (
+      timer.attributes.activeTimer.data?.attributes?.isActive == false
+    ) {
+      console.log('stopped');
+      let totalHours = timer.attributes.activeTimer.data.attributes.totalHours;
+      localZman = totalHours * 3600000;
+      isRunning = false;
+      timer.running = false;
     }
-  }else if(timer.attributes.activeTimer.data?.attributes?.isActive == false){
-    console.log("stopped")
-    let totalHours = timer.attributes.activeTimer.data.attributes.totalHours;
-    localZman = totalHours * 3600000;
-    isRunning = false;
-    timer.running = false;
-  
-}
-    selectedTasks = timer?.attributes.activeTimer?.data?.attributes.acts.data.map(task => task.id) ?? []
-  })
+    selectedTasks =
+      timer?.attributes.activeTimer?.data?.attributes.acts.data.map(
+        (task) => task.id
+      ) ?? [];
+  });
 
   // Calculate total hours done (saved + current running)
   let totalHoursDone = $derived(
-    (localZman / 3600000) + (timer?.attributes?.howmanyhoursalready || 0)
+    localZman / 3600000 + (timer?.attributes?.howmanyhoursalready || 0)
   );
 
- // Start/stop timer function
- async function startTimerLocal(only=false) {
-    console.log("start",only)
+  // Start/stop timer function
+  async function startTimerLocal(only = false) {
+    console.log('start', only);
     if (timerInterval) clearInterval(timerInterval);
     const startTime = Date.now() - localZman;
     timerInterval = setInterval(() => {
       localZman = Date.now() - startTime;
     }, 100);
-  if (only) return;
-  // Call startTimer with all required params
- await startTimer(
-    timer.attributes?.activeTimer, // Active timer object from props
-    timer.mId,                     // Mission ID
-    page.data.uid,                        // User ID
-    timer.projectId,                     // Project ID
-    timer.attributes?.activeTimer?.data?.id || 0, // Timer ID or 0 if none
-    false,                         // isSer flag
-    fetch                          // fetch function
-  ).then((res) => {
-    console.log(res)
-    if (res) {
-      console.log(res)
-      timer.attributes.activeTimer = res;
-            timer.attributes.activeTimer.isActive = true; // Make sure to update isActive flag
-            
-            // Update global timers store
-           updateTimers(
-                $timers.map((t) =>
-                  t.mId === timer.mId
-                    ? {
-                        ...t,
-                        running: true,
-                        attributes: {
-                          ...t.attributes,
-                          activeTimer: {
-                            ...t.attributes.activeTimer,
-                            data: res,
-                            isActive: true,
-                          },
-                        },
-                      }
-                    : t
-                )
-              );
-            console.log($timers)
-            }
-  });
+    if (only) return;
+    // Call startTimer with all required params
+    await startTimer(
+      timer.attributes?.activeTimer, // Active timer object from props
+      timer.mId, // Mission ID
+      page.data.uid, // User ID
+      timer.projectId, // Project ID
+      timer.attributes?.activeTimer?.data?.id || 0, // Timer ID or 0 if none
+      false, // isSer flag
+      fetch // fetch function
+    ).then((res) => {
+      console.log(res);
+      if (res) {
+        console.log(res);
+        timer.attributes.activeTimer = res;
+        timer.attributes.activeTimer.isActive = true; // Make sure to update isActive flag
+
+        // Update global timers store
+        updateTimers(
+          $timers.map((t) =>
+            t.mId === timer.mId
+              ? {
+                  ...t,
+                  running: true,
+                  attributes: {
+                    ...t.attributes,
+                    activeTimer: {
+                      ...t.attributes.activeTimer,
+                      data: res,
+                      isActive: true
+                    }
+                  }
+                }
+              : t
+          )
+        );
+        console.log($timers);
+      }
+    });
   }
 
   async function stopTimerLocal(only = false) {
@@ -129,42 +136,47 @@
     }
     if (only) return;
     // Call stopTimer with all required params
-   await stopTimer(timer.attributes.activeTimer.data,fetch,false).then((res) => {
-    if (res) {
-      console.log(res)
-      timer.attributes.activeTimer.data = res;
-            timer.attributes.activeTimer.isActive = false; // Make sure to update isActive flag
-            
-            // Update global timers store
-            updateTimers(
-                $timers.map((t) =>
-                  t.mId === timer.mId
-                    ? {
-                        ...t,
-                        running: false,
-                        attributes: {
-                          ...t.attributes,
-                          activeTimer: {
-                            ...t.attributes.activeTimer,
-                            data: res,
-                            isActive: false,
-                          },
-                        },
-                      }
-                    : t
-                )
-              );
-                   // Show save dialog after successful stop
-      const { hours, minutes, seconds } = getTimeComponents(localZman);
-      elapsedTime = `${hours}:${minutes}:${seconds}`;
-      console.log('hereeee')
-      showSaveDialog = true;
-      dialogEdit = false
-      console.log(showSaveDialog)
-    }
-  });
-  }
+    await stopTimer(
+      timer.attributes.activeTimer.data,
+      fetch,
+      false,
+      timer.projectId,
+      page.data.uid
+    ).then((res) => {
+      if (res) {
+        console.log(res);
+        timer.attributes.activeTimer.data = res;
+        timer.attributes.activeTimer.isActive = false; // Make sure to update isActive flag
 
+        // Update global timers store
+        updateTimers(
+          $timers.map((t) =>
+            t.mId === timer.mId
+              ? {
+                  ...t,
+                  running: false,
+                  attributes: {
+                    ...t.attributes,
+                    activeTimer: {
+                      ...t.attributes.activeTimer,
+                      data: res,
+                      isActive: false
+                    }
+                  }
+                }
+              : t
+          )
+        );
+        // Show save dialog after successful stop
+        const { hours, minutes, seconds } = getTimeComponents(localZman);
+        elapsedTime = `${hours}:${minutes}:${seconds}`;
+        console.log('hereeee');
+        showSaveDialog = true;
+        dialogEdit = false;
+        console.log(showSaveDialog);
+      }
+    });
+  }
 
   async function handleToggleTimer() {
     const timerId =
@@ -204,8 +216,6 @@
     };
   }
 
- 
-
   // Update local state when timer prop changes
   $effect(() => {
     isRunning = timer?.running || false;
@@ -216,13 +226,17 @@
     }
   });
   // Reactive rotations based on localZman
-  
+
   let rotation = $derived((localZman / 1000) * 6);
-  let rotationm = $derived((localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6);
-  let rotationh =
-    $derived((localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30);
+  let rotationm = $derived(
+    (localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6
+  );
+  let rotationh = $derived(
+    (localZman / 3600000) * 30 + ((localZman % 3_600_000) / 3_600_000) * 30
+  );
   let orbitalRotation = $derived((localZman / 60000) * 360); // Complete rotation every minute
 </script>
+
 <TimerDialogs
   bind:timer
   bind:showSaveDialog
@@ -236,11 +250,11 @@
     if (detail.timer) {
       timer.attributes.activeTimer.data = detail.timer;
       timer.attributes.activeTimer.isActive = detail.running;
-      
+
       if (detail.hoursdon !== undefined) {
         timer.attributes.howmanyhoursalready = detail.hoursdon;
       }
-      
+
       // Update global timers store
       updateTimers(
         $timers.map((t) =>
@@ -250,13 +264,16 @@
                 running: detail.running,
                 attributes: {
                   ...t.attributes,
-                  howmanyhoursalready: detail.hoursdon !== undefined ? detail.hoursdon : t.attributes.howmanyhoursalready,
+                  howmanyhoursalready:
+                    detail.hoursdon !== undefined
+                      ? detail.hoursdon
+                      : t.attributes.howmanyhoursalready,
                   activeTimer: {
                     ...t.attributes.activeTimer,
                     data: detail.timer,
-                    isActive: detail.running,
-                  },
-                },
+                    isActive: detail.running
+                  }
+                }
               }
             : t
         )
@@ -271,12 +288,11 @@
       }
       // Ensure isRunning state is also updated based on the event
       isRunning = detail.running;
-
     } else {
-       // Handle cases where detail.timer might be null or undefined if necessary
-       console.warn("update-timer event received without timer data:", detail);
-       localZman = 0; // Default to 0 if timer data is missing
-       isRunning = false;
+      // Handle cases where detail.timer might be null or undefined if necessary
+      console.warn('update-timer event received without timer data:', detail);
+      localZman = 0; // Default to 0 if timer data is missing
+      isRunning = false;
     }
   }}
 />
@@ -293,8 +309,24 @@
 >
   <defs>
     <!-- Your gradients and filters here (no changes needed) -->
-    <linearGradient id="gradient-15-18" gradientUnits="userSpaceOnUse" x1="12.639" y1="8.381" x2="12.639" y2="21.5" xlink:href="#gradient-15"/>
-    <linearGradient id="gradient-234-0" gradientUnits="userSpaceOnUse" x1="12.3" y1="3.752" x2="12.3" y2="16.871" xlink:href="#gradient-234"/>
+    <linearGradient
+      id="gradient-15-18"
+      gradientUnits="userSpaceOnUse"
+      x1="12.639"
+      y1="8.381"
+      x2="12.639"
+      y2="21.5"
+      xlink:href="#gradient-15"
+    />
+    <linearGradient
+      id="gradient-234-0"
+      gradientUnits="userSpaceOnUse"
+      x1="12.3"
+      y1="3.752"
+      x2="12.3"
+      y2="16.871"
+      xlink:href="#gradient-234"
+    />
     <radialGradient id="rg1" bx:pinned="true">
       <stop offset="0" style="stop-color: rgb(66, 221, 210);" />
       <stop offset="0.249" style="stop-color: rgb(34, 0, 255);" />
@@ -592,12 +624,13 @@
       <path d="M300,14l0,12" transform="rotate(18,300,300)" />
       <path d="M300,14l0,12" transform="rotate(24,300,300)" />
     </g>
-    
+
     <!-- Centered Control Buttons -->
-    <g transform="translate(300,280)"> <!-- Changed Y from 300 to 280 to move up -->
+    <g transform="translate(300,280)">
+      <!-- Changed Y from 300 to 280 to move up -->
       <!-- Left Button - Play/Stop -->
-      <g 
-        transform="translate(-80,0)" 
+      <g
+        transform="translate(-80,0)"
         class="control-button"
         onclick={handleToggleTimer}
         onkeypress={handleToggleTimer}
@@ -615,28 +648,18 @@
           stroke-width="3"
         />
         {#if timer.running}
-          <rect
-            x="-20"
-            y="-20"
-            width="40"
-            height="40"
-            fill="#ff3366"
-            rx="4"
-          />
+          <rect x="-20" y="-20" width="40" height="40" fill="#ff3366" rx="4" />
         {:else}
-          <path
-            d="M -16 -24 L 24 0 L -16 24 Z"
-            fill="#00ff88"
-          />
+          <path d="M -16 -24 L 24 0 L -16 24 Z" fill="#00ff88" />
         {/if}
       </g>
 
       <!-- Right Button - Edit -->
-      <g 
-        transform="translate(80,0)" 
+      <g
+        transform="translate(80,0)"
         class="control-button"
-        onclick={() => showSaveDialog = true}
-        onkeypress={() => showSaveDialog = true}
+        onclick={() => (showSaveDialog = true)}
+        onkeypress={() => (showSaveDialog = true)}
         style="cursor: pointer;"
         role="button"
         tabindex="0"
@@ -656,15 +679,15 @@
         />
       </g>
     </g>
-       <!-- Timer Display -->
-       <g transform="translate(300,380)">
-        <foreignObject x="-150" y="-20" width="300" height="120">
-          <div
-            style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;"
-          >
-            <NumberFlowGroup>
-              <div
-                style="
+    <!-- Timer Display -->
+    <g transform="translate(300,380)">
+      <foreignObject x="-150" y="-20" width="300" height="120">
+        <div
+          style="width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;"
+        >
+          <NumberFlowGroup>
+            <div
+              style="
                   font-variant-numeric: tabular-nums;
                   --number-flow-char-height: 1em;
                   font-size: 48px;
@@ -677,33 +700,33 @@
                   padding: 8px 15px;
                   border-radius: 8px;
                   border: 1px solid rgba(51, 255, 51, 0.3);"
-                class="flex items-baseline"
-              >
-                <NumberFlow
-                  trend={-1}
-                  value={getTimeComponents(localZman).hours}
-                  format={{ minimumIntegerDigits: 2 }}
-                />
-                <NumberFlow
-                  prefix=":"
-                  trend={-1}
-                  value={getTimeComponents(localZman).minutes}
-                  digits={{ 1: { max: 5 } }}
-                  format={{ minimumIntegerDigits: 2 }}
-                />
-                <NumberFlow
-                  prefix=":"
-                  trend={-1}
-                  value={getTimeComponents(localZman).seconds}
-                  digits={{ 1: { max: 2 } }}
-                  format={{ minimumIntegerDigits: 2 }}
-                />
-              </div>
-            </NumberFlowGroup>
-          </div>
-        </foreignObject>
-      </g>
-      <g
+              class="flex items-baseline"
+            >
+              <NumberFlow
+                trend={-1}
+                value={getTimeComponents(localZman).hours}
+                format={{ minimumIntegerDigits: 2 }}
+              />
+              <NumberFlow
+                prefix=":"
+                trend={-1}
+                value={getTimeComponents(localZman).minutes}
+                digits={{ 1: { max: 5 } }}
+                format={{ minimumIntegerDigits: 2 }}
+              />
+              <NumberFlow
+                prefix=":"
+                trend={-1}
+                value={getTimeComponents(localZman).seconds}
+                digits={{ 1: { max: 2 } }}
+                format={{ minimumIntegerDigits: 2 }}
+              />
+            </div>
+          </NumberFlowGroup>
+        </div>
+      </foreignObject>
+    </g>
+    <g
       transform="matrix(0.542341, 0, 0, 0.542341, 267.0672, 302.203613)"
       style=""
     >
@@ -848,9 +871,7 @@
     </foreignObject>
 
     <!-- Project Name -->
-    <g
-      style="overflow:hidden; text-anchor: middle;"
-    >
+    <g style="overflow:hidden; text-anchor: middle;">
       <!-- Text with glow and outline -->
       <text
         x="300"
@@ -893,19 +914,21 @@
     >
       <circle cx="298.282" cy="436.598" r="4" style="fill:url(#rg1);" />
     </g>
- 
-    <g transform="translate(300,300)"> <!-- Center point -->
-        <g transform={`rotate(${orbitalRotation})`}>
-          <g transform="translate(0,-220) rotate(-120)" > <!-- Adjust radius by changing -220 -->
-            <g transform="matrix(0.876067, -1.904102, 2.169019, 0.860512, 0, 0)">
-              <path 
-                d="M 17.426 8.381 C 20.657 8.381 23.277 10.153 23.277 12.636 C 23.277 17.6 15.298 20.436 12.638 21.5 C 10.534 20.658 5.102 18.708 2.923 15.472 L 2.223 14.054 C 2.079 13.602 2 13.129 2 12.636 C 2 10.153 4.66 8.381 7.851 8.381 C 9.83 8.381 11.574 9.09 12.638 9.799 C 13.702 9.09 15.447 8.381 17.426 8.381 Z"
-                style="fill: url(#gradient-15-18); stroke: url(#gradient-234-0);"
-              />
-            </g>
+
+    <g transform="translate(300,300)">
+      <!-- Center point -->
+      <g transform={`rotate(${orbitalRotation})`}>
+        <g transform="translate(0,-220) rotate(-120)">
+          <!-- Adjust radius by changing -220 -->
+          <g transform="matrix(0.876067, -1.904102, 2.169019, 0.860512, 0, 0)">
+            <path
+              d="M 17.426 8.381 C 20.657 8.381 23.277 10.153 23.277 12.636 C 23.277 17.6 15.298 20.436 12.638 21.5 C 10.534 20.658 5.102 18.708 2.923 15.472 L 2.223 14.054 C 2.079 13.602 2 13.129 2 12.636 C 2 10.153 4.66 8.381 7.851 8.381 C 9.83 8.381 11.574 9.09 12.638 9.799 C 13.702 9.09 15.447 8.381 17.426 8.381 Z"
+              style="fill: url(#gradient-15-18); stroke: url(#gradient-234-0);"
+            />
           </g>
         </g>
       </g>
+    </g>
     <!-- Mission Name (curved text) -->
     <path
       transform="matrix(1.4, 0, 0, 1.4 , 20, 280)"
@@ -921,7 +944,7 @@
         font-weight="bold"
         stroke="purple"
         xlink:href="#curveooo8"
-             startOffset="50%"
+        startOffset="50%"
         text-anchor="middle"
       >
         <tspan fill="#00ffff" font-weight="bold" stroke="purple" dy="-5"
@@ -929,7 +952,7 @@
         >
       </textPath>
     </text>
-  
+
     <!-- New curved path for Total Hours Display --><!-- Adjusted Y position for top curve -->
     <!-- New curved path for Total Hours Display -->
     <path
@@ -947,104 +970,102 @@
       >
         <tspan fill="#FFFFFF" font-weight="900">
           {#if $lang === 'he'}
-          {Math.floor(totalHoursDone)} / {hoursAssigned} שעות
+            {Math.floor(totalHoursDone)} / {hoursAssigned} שעות
           {:else}
             Hours: {hoursAssigned} / {Math.floor(totalHoursDone)}
           {/if}
         </tspan>
       </textPath>
     </text>
- 
-
   </g></svg
 >
 
 <style>
   .edit-fields {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
 
-.datetime-input {
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 4px;
-  color: #fff;
-  padding: 0.25rem;
-  font-size: 0.9rem;
-}
+  .datetime-input {
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+    color: #fff;
+    padding: 0.25rem;
+    font-size: 0.9rem;
+  }
 
-.edit-actions {
-  display: flex;
-  gap: 0.5rem;
-}
+  .edit-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
 
-.save-edit-btn,
-.cancel-edit-btn {
-  background: transparent;
-  border: none;
-  color: inherit;
-  padding: 0.25rem;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+  .save-edit-btn,
+  .cancel-edit-btn {
+    background: transparent;
+    border: none;
+    color: inherit;
+    padding: 0.25rem;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
 
-.save-edit-btn {
-  color: #00ff88;
-}
+  .save-edit-btn {
+    color: #00ff88;
+  }
 
-.cancel-edit-btn {
-  color: #ff3366;
-}
+  .cancel-edit-btn {
+    color: #ff3366;
+  }
 
-.save-edit-btn:hover,
-.cancel-edit-btn:hover {
-  background: rgba(255,255,255,0.1);
-}
+  .save-edit-btn:hover,
+  .cancel-edit-btn:hover {
+    background: rgba(255, 255, 255, 0.1);
+  }
 
-.timer-actions {
-  display: flex;
-  gap: 0.5rem;
-}
+  .timer-actions {
+    display: flex;
+    gap: 0.5rem;
+  }
 
-.edit-btn {
-  background: transparent;
-  border: none;
-  color: #00ffff;
-  padding: 0.5rem;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+  .edit-btn {
+    background: transparent;
+    border: none;
+    color: #00ffff;
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
 
-.edit-btn:hover {
-  background: rgba(0,255,255,0.1);
-  transform: scale(1.1);
-}
+  .edit-btn:hover {
+    background: rgba(0, 255, 255, 0.1);
+    transform: scale(1.1);
+  }
 
-.add-interval-btn {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  padding: 0.75rem;
-  background: linear-gradient(45deg, #00ff88, #00bbff);
-  border: none;
-  border-radius: 6px;
-  color: #000;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
-  margin-top: 1rem;
-}
+  .add-interval-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+    width: 100%;
+    padding: 0.75rem;
+    background: linear-gradient(45deg, #00ff88, #00bbff);
+    border: none;
+    border-radius: 6px;
+    color: #000;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 1rem;
+  }
 
-.add-interval-btn:hover {
-  transform: translateY(-2px);
-}
-   :global(.svelte-dialog-overlay) {
+  .add-interval-btn:hover {
+    transform: translateY(-2px);
+  }
+  :global(.svelte-dialog-overlay) {
     position: fixed;
     top: 0;
     left: 0;
@@ -1065,32 +1086,32 @@
     z-index: 701;
   }
   .close-button {
-  position: absolute;
-  top: 1rem;
-  right: 1rem;
-  background: transparent;
-  border: none;
-  color: #fff;
-  width: 32px;
-  height: 32px;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    background: transparent;
+    border: none;
+    color: #fff;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
 
-.close-button:hover {
-  background: rgba(255, 255, 255, 0.1);
-  transform: rotate(90deg);
-}
+  .close-button:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(90deg);
+  }
 
-.close-button svg {
-  width: 20px;
-  height: 20px;
-}
-     :global([data-svelte-dialog-content].timer-dialog) {
+  .close-button svg {
+    width: 20px;
+    height: 20px;
+  }
+  :global([data-svelte-dialog-content].timer-dialog) {
     background: linear-gradient(147deg, #000000 0%, #04619f 74%);
     padding: 2rem;
     border-radius: 12px;
@@ -1146,16 +1167,22 @@
   .clear-btn:hover {
     transform: translateY(-2px);
   }
-@keyframes pulse {
-  0% { transform: scale(1); }
-  50% { transform: scale(1.2); }
-  100% { transform: scale(1); }
-}
+  @keyframes pulse {
+    0% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.2);
+    }
+    100% {
+      transform: scale(1);
+    }
+  }
 
-.heart-orbit {
-  transform-origin: center;
-  animation: pulse 2s infinite;
-}
+  .heart-orbit {
+    transform-origin: center;
+    animation: pulse 2s infinite;
+  }
   .timer-container {
     position: relative; /* Important for absolute positioning of timers */
     width: 100%; /* Or set a specific width */
@@ -1206,156 +1233,156 @@
   }
 
   .timer-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-  max-height: 60vh;
-  overflow-y: auto;
-  padding: 1rem;
-  background: rgba(0,0,0,0.2);
-  border-radius: 8px;
-}
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-height: 60vh;
+    overflow-y: auto;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+  }
 
-.timer-entry {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 0.75rem;
-  background: rgba(255,255,255,0.1);
-  border-radius: 6px;
-  transition: background 0.2s;
-}
+  .timer-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.75rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 6px;
+    transition: background 0.2s;
+  }
 
-.timer-entry:hover {
-  background: rgba(255,255,255,0.15);
-}
+  .timer-entry:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
 
-.timer-info {
-  display: flex;
-  flex-direction: column;
-  gap: 0.25rem;
-}
+  .timer-info {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
 
-.timer-time {
-  font-size: 0.9rem;
-  color: #00ffff;
-}
+  .timer-time {
+    font-size: 0.9rem;
+    color: #00ffff;
+  }
 
-.timer-duration {
-  font-size: 0.8rem;
-  color: #aaa;
-}
+  .timer-duration {
+    font-size: 0.8rem;
+    color: #aaa;
+  }
 
-.clear-single-btn {
-  background: transparent;
-  border: none;
-  color: #ff3366;
-  padding: 0.5rem;
-  border-radius: 50%;
-  cursor: pointer;
-  transition: all 0.2s;
-}
+  .clear-single-btn {
+    background: transparent;
+    border: none;
+    color: #ff3366;
+    padding: 0.5rem;
+    border-radius: 50%;
+    cursor: pointer;
+    transition: all 0.2s;
+  }
 
-.clear-single-btn:hover {
-  background: rgba(255,51,102,0.1);
-  transform: scale(1.1);
-}
+  .clear-single-btn:hover {
+    background: rgba(255, 51, 102, 0.1);
+    transform: scale(1.1);
+  }
 
-.clear-all-btn {
-  width: 100%;
-  padding: 1rem;
-  background: linear-gradient(45deg, #ff3366, #ff0066);
-  border: none;
-  border-radius: 6px;
-  color: white;
-  font-weight: bold;
-  cursor: pointer;
-  transition: transform 0.2s;
-  margin-top: 1rem;
-}
+  .clear-all-btn {
+    width: 100%;
+    padding: 1rem;
+    background: linear-gradient(45deg, #ff3366, #ff0066);
+    border: none;
+    border-radius: 6px;
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    transition: transform 0.2s;
+    margin-top: 1rem;
+  }
 
-.clear-all-btn:hover {
-  transform: translateY(-2px);
-}
+  .clear-all-btn:hover {
+    transform: translateY(-2px);
+  }
 
-.no-timers {
-  text-align: center;
-  color: #aaa;
-  font-style: italic;
-  padding: 2rem;
-}
-.task-selection {
-  display: flex;
-  flex-direction: column;
-  gap: 1rem;
-}
+  .no-timers {
+    text-align: center;
+    color: #aaa;
+    font-style: italic;
+    padding: 2rem;
+  }
+  .task-selection {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
 
-.task-search {
-  padding: 0.5rem;
-  border-radius: 4px;
-  border: 1px solid rgba(255,255,255,0.2);
-  background: rgba(0,0,0,0.2);
-  color: #fff;
-}
+  .task-search {
+    padding: 0.5rem;
+    border-radius: 4px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: rgba(0, 0, 0, 0.2);
+    color: #fff;
+  }
 
-.task-list {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-  max-height: 200px;
-  overflow-y: auto;
-  padding: 0.5rem;
-  background: rgba(0,0,0,0.2);
-  border-radius: 4px;
-}
+  .task-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    max-height: 200px;
+    overflow-y: auto;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 4px;
+  }
 
-.task-item {
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem;
-  background: rgba(255,255,255,0.1);
-  border-radius: 4px;
-  cursor: pointer;
-}
+  .task-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    cursor: pointer;
+  }
 
-.task-item:hover {
-  background: rgba(255,255,255,0.15);
-}
+  .task-item:hover {
+    background: rgba(255, 255, 255, 0.15);
+  }
 
-.time-summary {
-  text-align: center;
-  font-size: 1.2rem;
-  color: #00ffff;
-}
+  .time-summary {
+    text-align: center;
+    font-size: 1.2rem;
+    color: #00ffff;
+  }
 
-.save-btn:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
+  .save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
 
-.control-button > g {
-  transform: scale(1);
-  transition: transform 0.2s ease;
-}
+  .control-button > g {
+    transform: scale(1);
+    transition: transform 0.2s ease;
+  }
 
-.control-button:hover > g {
-  transform: scale(1.1);
-}
+  .control-button:hover > g {
+    transform: scale(1.1);
+  }
 
-.control-button:focus {
-  outline: none;
-}
+  .control-button:focus {
+    outline: none;
+  }
 
-.control-button:focus .button-bg {
-  filter: brightness(1.2);
-}
+  .control-button:focus .button-bg {
+    filter: brightness(1.2);
+  }
 
-.button-bg {
-  transition: filter 0.2s ease; /* Changed from 'all' to just 'filter' to prevent size animation */
-}
+  .button-bg {
+    transition: filter 0.2s ease; /* Changed from 'all' to just 'filter' to prevent size animation */
+  }
 
-.control-button:hover .button-bg {
-  filter: brightness(1.2);
-}
+  .control-button:hover .button-bg {
+    filter: brightness(1.2);
+  }
 </style>

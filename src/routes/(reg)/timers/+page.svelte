@@ -1,9 +1,10 @@
 <script>
-  import { onMount } from 'svelte';
+  import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/state';
   import {
     fetchTimers,
     initialWebSocketForTimer,
+    cleanupTimerListener,
     timers
   } from '$lib/stores/timers';
   import Timer from '$lib/components/timers/timer.svelte';
@@ -33,7 +34,7 @@
     };
   }
   let newState = $state(false);
-  // Function to fetch timer data
+  let timerCleanup = null;
 
   onMount(async () => {
     console.log(page.data);
@@ -52,9 +53,20 @@
         centerViewOnLoad();
       });
     });
-    // Call initialWebSocketForTimer without the token, as it will be handled server-side
-    // Assuming page.data.uid is the 'id' needed for the socket connection
-    initialWebSocketForTimer(page.data.uid, page.data.tok, fetch);
+    // Initialize the timer listener using the new socketClient-based approach
+    timerCleanup = initialWebSocketForTimer(
+      page.data.uid,
+      page.data.tok,
+      fetch
+    );
+  });
+
+  onDestroy(() => {
+    // Clean up the timer listener when the component is destroyed
+    if (timerCleanup) {
+      timerCleanup();
+    }
+    cleanupTimerListener();
   });
 
   function project() {}

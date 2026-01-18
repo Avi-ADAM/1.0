@@ -81,8 +81,6 @@ import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
  *   toast.error('Failed to load data');
  * }
  * ```
- * 
- * **Validates: Requirements 4.1, 4.2, 4.3, 4.4**
  */
 export async function initializeLevData(
   userId: string,
@@ -141,8 +139,6 @@ export async function initializeLevData(
 
       try {
         const detailsData = await fetchOpenMissions(
-          import.meta.env.VITE_URL,
-          token,
           topIds,
           lang
         );

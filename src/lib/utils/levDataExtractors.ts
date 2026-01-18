@@ -271,13 +271,19 @@ export function extractSuggestions(userData: any): SuggestionData[] {
     return suggestions;
   }
 
-  // Map of asked missions for lookup
+  // Map of asked missions for lookup (from asks)
   const askedMap = new Map<string, any>();
+  // Map to store mission data from asks (for askeds that don't come from filters)
+  const askedMissionsFromAsks = new Map<string, any>();
   if (userData.attributes.asks?.data) {
     for (const ask of userData.attributes.asks.data) {
       const missionId = ask.attributes?.open_mission?.data?.id;
       if (missionId) {
         askedMap.set(missionId, ask);
+        // Store the mission data from ask if available
+        if (ask.attributes?.open_mission?.data) {
+          askedMissionsFromAsks.set(missionId, ask.attributes.open_mission.data);
+        }
       }
     }
   }
@@ -348,14 +354,30 @@ export function extractSuggestions(userData: any): SuggestionData[] {
   }
 
   // Add Unfiltered Asked Missions (with default score 2)
+  // These are missions the user asked to join but didn't come from filters
   for (const askedId of askedIds) {
+    // Skip if already in scores (from filters)
     if (!scores.has(askedId)) {
-      // Only if we HAVE the data (it was in the tree somewhere)
-      if (missionDataMap.has(askedId)) {
+      // Try to get mission data from asks map first
+      let missionData = missionDataMap.get(askedId);
+      if (!missionData) {
+        missionData = askedMissionsFromAsks.get(askedId);
+        // If we found it in asks, add it to missionDataMap for later use
+        if (missionData) {
+          missionDataMap.set(askedId, missionData);
+        }
+      }
+      
+      // Only add if we have some data (from filters or from asks)
+      if (missionData) {
         scores.set(askedId, 2);
       } else {
-        // Logic to handle missing data if architecture allowed secondary fetch
+        // If we don't have data at all, we can't display it properly
+        // This case would require a secondary fetch which is not in current architecture
       }
+    } else {
+      // Mission is already in scores from filters, ensure it's marked as asked
+      // The askedMap check later will set alreadyAsked: true
     }
   }
 
@@ -370,12 +392,20 @@ export function extractSuggestions(userData: any): SuggestionData[] {
   });
 
   // Build Result
+  // Create a Set for quick lookup of asked IDs
+  const askedIdsSet = new Set(askedIds);
+  
   for (const id of sortedIds) {
     const mission = missionDataMap.get(id);
     if (!mission) continue;
 
     const score = scores.get(id) || 0;
     const askData = askedMap.get(id);
+    
+    // Mission is "already asked" if:
+    // 1. It has askData (user sent a join request) OR
+    // 2. It's in askeds list (user asked to do this mission)
+    const isAlreadyAsked = !!askData || askedIdsSet.has(id);
 
     // Map to SuggestionData
     suggestions.push({
@@ -387,7 +417,7 @@ export function extractSuggestions(userData: any): SuggestionData[] {
       // Additional fields
       type: 'suggestion',
       score: score,
-      alreadyAsked: !!askData,
+      alreadyAsked: isAlreadyAsked,
       askId: askData?.id,
       chat: askData?.attributes?.chat,
       forumId: (askData?.attributes?.forums?.data && askData.attributes.forums.data.length > 0) ? askData.attributes.forums.data[0].id : null,

@@ -14,7 +14,11 @@
   import { isCardsView } from '$lib/stores/levStores';
   import { initializeLevData } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
-  import { fetchTimers, initialWebSocketForTimer } from '$lib/stores/timers';
+  import {
+    fetchTimers,
+    initialWebSocketForTimer,
+    cleanupTimerListener
+  } from '$lib/stores/timers';
 
   // UI Components
   import Coinsui from '$lib/components/lev/newcoinui.svelte';
@@ -36,6 +40,7 @@
   let loading = $state(true);
   let error = $state(null);
   let unsubscribeSocket = null;
+  let timerCleanup = null;
 
   // Subscribe to finalSwiperArray from new architecture
   let displayItems = $state([]);
@@ -119,28 +124,24 @@
     langUs.set(data.lang);
     doesLang.set(true);
 
-    // Check authentication
-    if (!page.data.tok) {
-      goto('/login');
+    // Check authentication (uid is provided by server if session is valid)
+    if (!page.data.uid) {
+      goto('/login?from=lev');
       return;
     }
 
     try {
-      // Initialize data using new architecture
-      await initializeLevData(page.data.uid, page.data.tok, data.lang);
+      // Initialize data using new architecture (token is now handled by server cookies)
+      await initializeLevData(page.data.uid, '', data.lang);
 
       // Fetch timers to populate timers store (needed for missionInProgress)
       await fetchTimers(page.data.uid, fetch);
 
-      // Initialize WebSocket for timer updates
-      initialWebSocketForTimer(page.data.uid, page.data.tok, fetch);
+      // Initialize WebSocket for timer updates (uses the new socketClient-based approach)
+      timerCleanup = initialWebSocketForTimer(page.data.uid, '', fetch);
 
       // Setup socket listeners using new architecture
-      unsubscribeSocket = setupSocketListeners(
-        page.data.uid,
-        page.data.tok,
-        data.lang
-      );
+      unsubscribeSocket = setupSocketListeners(page.data.uid, '', data.lang);
 
       loading = false;
       console.log('✅ LEV PAGE INITIALIZED SUCCESSFULLY');
@@ -159,10 +160,16 @@
   });
 
   onDestroy(() => {
+    // Clean up socket listener
     if (unsubscribeSocket) {
       unsubscribeSocket();
-      console.log('🧹 LEV PAGE CLEANUP COMPLETE');
     }
+    // Clean up timer listener
+    if (timerCleanup) {
+      timerCleanup();
+    }
+    cleanupTimerListener();
+    console.log('🧹 LEV PAGE CLEANUP COMPLETE');
   });
 
   const title = { he: 'לב 1💗1', en: 'heart of 1💗1' };

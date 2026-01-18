@@ -1,27 +1,41 @@
-//TODO: get token, decryp it with our imported env salt, get query, return data ,,,,גם אם ישלח רק שם משתמש וסיסמה עדיין הקוורי יכולה להיות מעוותת. הפתרון ה יחיד וולידציה צד שרת, או וולידציה מלאה או מעין קי ווליו בשלב ראשון של סוג הקוורי ואימות עליה
+// TODO: Validation and server-side logic for GraphQL queries.
+// Secure endpoint that uses HttpOnly cookies for authentication.
 const HTTP_ST_ENDPOINT = import.meta.env.VITE_URL
-	const ep = HTTP_ST_ENDPOINT + "/graphql"
-	import {qids} from './qids.js'
-    import {json, error} from '@sveltejs/kit'
+const ep = HTTP_ST_ENDPOINT + "/graphql"
+import { qids } from './qids.js'
+import { json, error } from '@sveltejs/kit'
 const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 
 export async function POST({ request, cookies }) {
 	const data = await request.json();
+
+	if (!data?.data?.queId) {
+		throw error(400, 'queId is required');
+	}
+
 	let isSer = data.isSer ?? false;
 	let idL = cookies.get('id');
+	let jw = isSer ? VITE_ADMINMONTHER : cookies.get('jwt');
+
+	if (!jw && !isSer) {
+		throw error(401, 'Unauthorized: No token found');
+	}
+
 	let variablesObject = {};
-	let keyValueObject = data.data.arg;
+	let keyValueObject = data.data.arg || {};
 	for (let key in keyValueObject) {
 		if (keyValueObject[key] != null)
 			if (key === 'idL') {
-				variablesObject[key] = idL; // Use the local uid for 'idL'
+				variablesObject[key] = idL; // Use the local uid from 'idL' cookie for security
 			} else {
 				variablesObject[key] = keyValueObject[key];
 			}
 	}
 	const dat = qids[data.data.queId];
-	console.log(dat, variablesObject);
-	let jw = isSer ? VITE_ADMINMONTHER : cookies.get('jwt');
+	if (!dat) {
+		throw error(400, `Invalid queId: ${data.data.queId}`);
+	}
+
 	let bearer1 = 'bearer' + ' ' + jw;
 
 	const controller = new AbortController();
@@ -43,7 +57,6 @@ export async function POST({ request, cookies }) {
 		clearTimeout(timeoutId);
 
 		const newd = await res.json();
-		console.log('server:', newd);
 
 		if (newd.data) {
 			return json(newd);
@@ -51,21 +64,21 @@ export async function POST({ request, cookies }) {
 
 		if (newd.errors) {
 			// Check for authentication errors
-			const authError = newd.errors.find(err => 
-				err.message === 'Invalid token.' || 
+			const authError = newd.errors.find(err =>
+				err.message === 'Invalid token.' ||
 				err.extensions?.code === 'UNAUTHENTICATED' ||
 				err.message.includes('401') ||
 				err.message.includes('Unauthorized')
 			);
-			
+
 			if (authError) {
 				throw error(401, authError.message);
 			}
-			
+
 			// Handle other GraphQL errors by throwing the first error message.
 			throw error(500, newd.errors[0].message);
 		}
-		
+
 		// Fallback for unexpected response structure from the server.
 		throw error(500, 'Unexpected response from server');
 

@@ -342,6 +342,7 @@
           timegramaId,
           projectUserIds: pid,
           userss: users,
+          newnew,
           sendToSer
         });
 
@@ -415,6 +416,7 @@
           timegramaId,
           projectUserIds: pid,
           userss: users,
+          newnew,
           sendToSer
         });
 

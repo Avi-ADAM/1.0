@@ -1,62 +1,92 @@
 import { browser } from '$app/environment';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { writable, get } from 'svelte/store';
-import { io } from 'socket.io-client';
-const baseUrl = import.meta.env.VITE_URL
+import { socketClient } from '$lib/stores/socketClient';
 
 let currentUid = null;
 let currentFetch = null;
 let fetchTimeout = null; // Add a variable to hold the timeout ID
+let timerUnsubscribe = null; // For unsubscribing from notifications
 
-export async function initialWebSocketForTimer (id,token, fetch){
+/**
+ * Initialize timer updates listener using the new socketClient.
+ * This replaces the old WebSocket-based timer updates.
+ * 
+ * @param {string} id - User ID
+ * @param {string} token - JWT token (no longer used, kept for backwards compatibility)
+ * @param {Function} fetch - Fetch function for making HTTP requests
+ * @returns {Function} Unsubscribe function to stop listening
+ */
+export function initialWebSocketForTimer(id, token, fetch) {
     currentUid = id;
     currentFetch = fetch;
 
-    const socket = io(baseUrl, {
-        auth: {
-          token: token,
-          id: id
-        },
-      });
-      console.log("cv",socket)
-      //  wait until socket connects before adding event listeners
-      socket.on('connect', () => {
-        console.log('connected',id);
-        socket.on('timer:update', (datan) => {
-          console.log('io= ', datan);
-          //get array of relevant forum ids\
-                      console.log(
-                        'yallla cvar, geula',
-                        datan,
-                        datan.data
-                      );
-          if (datan && datan.data && datan.data.id) {
-            const updatedTimerId = datan.data.id;
-            const currentTimers = get(timers);
-            console.log("currentTimers",currentTimers,updatedTimerId)
-            const isOurTimer = currentTimers.some(timer => timer.attributes?.activeTimer?.data?.id == updatedTimerId);
+    // Clean up any existing subscription
+    if (timerUnsubscribe) {
+        timerUnsubscribe();
+        timerUnsubscribe = null;
+    }
 
-            if (isOurTimer) {
-              console.log(`Timer with ID ${updatedTimerId} updated. Reloading timers.`);
-              if (currentUid && currentFetch) {
-                // Clear any existing timeout to prevent multiple rapid fetches
-                if (fetchTimeout) {
-                  clearTimeout(fetchTimeout);
-                }
-                // Set a new timeout to debounce the fetchTimers call
-                fetchTimeout = setTimeout(() => {
-                  fetchTimers(currentUid, currentFetch);
-                  fetchTimeout = null; // Clear the timeout ID after execution
-                }, 300); // Adjust debounce time as needed (e.g., 300ms)
-              } else {
-                console.error('Cannot reload timers: uid or fetch not available.');
-              }
+    console.log('[Timers] Initializing timer updates listener for user:', id);
+
+    // Subscribe to notifications from the new socketClient
+    timerUnsubscribe = socketClient.onNotification((notification) => {
+        console.log('[Timers] Received notification:', notification);
+
+        // Check if this is a timer-related notification
+        const meta = notification.metadata || {};
+        const notificationType = meta.type;
+
+        if (notificationType === 'timerUpdate') {
+            console.log('[Timers] Timer update notification received');
+
+            // Debounce the fetchTimers call to prevent multiple rapid fetches
+            if (fetchTimeout) {
+                clearTimeout(fetchTimeout);
             }
-          }
-        })
-      
-    })
+
+            fetchTimeout = setTimeout(() => {
+                if (currentUid && currentFetch) {
+                    console.log('[Timers] Refreshing timers after notification');
+                    fetchTimers(currentUid, currentFetch);
+                } else {
+                    console.error('[Timers] Cannot reload timers: uid or fetch not available.');
+                }
+                fetchTimeout = null;
+            }, 300);
+        }
+    });
+
+    // Return unsubscribe function for cleanup
+    return () => {
+        if (timerUnsubscribe) {
+            timerUnsubscribe();
+            timerUnsubscribe = null;
+        }
+        if (fetchTimeout) {
+            clearTimeout(fetchTimeout);
+            fetchTimeout = null;
+        }
+    };
 }
+
+/**
+ * Clean up timer listener.
+ * Call this when unmounting components that use timers.
+ */
+export function cleanupTimerListener() {
+    if (timerUnsubscribe) {
+        timerUnsubscribe();
+        timerUnsubscribe = null;
+    }
+    if (fetchTimeout) {
+        clearTimeout(fetchTimeout);
+        fetchTimeout = null;
+    }
+    currentUid = null;
+    currentFetch = null;
+}
+
 
 // Initialize timers with data from localStorage or empty array
 const storedTimers = browser ? localStorage.getItem('timers') : null;

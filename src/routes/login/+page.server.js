@@ -33,7 +33,7 @@ export const actions = {
 
             // Set cookies on the server
             // domain: '.1lev1.com' allows subdomain access (socket.1lev1.com)
-            const isProduction = false//process.env.NODE_ENV === 'production';
+            const isProduction = import.meta.env.PROD;
             
             // In production: use 'none' for cross-subdomain (requires secure: true)
             // In development: use 'lax' for localhost (no domain/secure needed)
@@ -45,10 +45,10 @@ export const actions = {
                 domain: isProduction ? '.1lev1.com' : undefined // Subdomain support only in production
             };
 
-            // JWT cookie - can be httpOnly in production with subdomain
+            // JWT cookie - now httpOnly for security, preventing client-side exposure.
             cookies.set('jwt', jwt, {
                 ...cookieOptions,
-                httpOnly: isProduction // httpOnly in production for security
+                httpOnly: true 
             });
             
             cookies.set('id', String(user.id), {

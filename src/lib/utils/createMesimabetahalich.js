@@ -26,6 +26,7 @@
  * @param {number} params.timegramaId - Timegrama ID (optional)
  * @param {Array} params.projectUserIds - All project user IDs
  * @param {Array} params.userss - Current votes (optional, for voting scenarios)
+ * @param {boolean} params.newnew - Whether user is new to project
  * @param {Function} params.sendToSer - sendToSer function
  * @returns {Promise<Object>} The mutation result
  */
@@ -50,6 +51,7 @@ export async function createMesimabetahalich({
   timegramaId = null,
   projectUserIds = [],
   userss = [],
+  newnew,
   sendToSer
 }) {
   const d = new Date();
@@ -58,7 +60,7 @@ export async function createMesimabetahalich({
   // Convert proxy to regular array and ensure string comparison
   const userIdsArray = Array.from(projectUserIds).map(String);
   const userIdString = String(userId);
-  const needsWelcome = !userIdsArray.includes(userIdString);
+  const needsWelcome = newnew === true;
   
   console.log("UIDD Debug:", {
     needsWelcome,

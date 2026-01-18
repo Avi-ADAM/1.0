@@ -237,7 +237,19 @@
         ?.activeTimer?.data;
 
       if (currentTimer) {
-        const result = await stopTimer(currentTimer, fetch, false);
+        // Get user ID from cookie (similar to how start() does it)
+        const cookieValueId = document.cookie
+          .split('; ')
+          .find((row) => row.startsWith('id='))
+          ?.split('=')[1];
+
+        const result = await stopTimer(
+          currentTimer,
+          fetch,
+          false,
+          projectId,
+          cookieValueId
+        );
 
         if (result) {
           // Update timers store

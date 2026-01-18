@@ -1,43 +1,108 @@
 import { sendToSer } from './../send/sendToSer.js';
-    // Function to start (or resume) the timer for a mission
-    /**
-     * Starts a timer for tracking activities
-     * @param {Object} activeTimer - The active timer object to be started
-     * @param {string} missionID - The ID of the mission associated with the timer
-     * @param {string} uId - User ID
-     * @param {string} pId - Project ID
-     * @param {number} [timerId=0] - Optional timer ID, defaults to 0
-     * @param {boolean} [isSer=false] - Flag indicating if this is a server operation, defaults to false
-     * @param {Function} fetch - Fetch function for making HTTP requests
-     * @returns {Promise<void>}
-     */
-    export async function startTimer(activeTimer,missionID,uId,pId,timerId=0,isSer=false,fetch) {
-    // Ensure we have the mission data
-    console.log(activeTimer,missionID,uId,pId,timerId,isSer);
+import { browser } from '$app/environment';
 
-   
-    // Case 1: No active timer exists – create one
-    if (timerId == 0) {
-      const x = await sendToSer({missionId: missionID, start:new Date().toISOString(), userId:uId, projectId: pId},'33CreateTimer',null,null,isSer,fetch).then((x) => {
-        console.log("Created new timer:", x.data);
-        return x.data.createTimer.data;
-      });
-      return x;
-      }else if (timerId != 0 && activeTimer.data.attributes && !activeTimer.data.attributes.isActive) {
-      //get old timers json and update it with the new start time
-      // Clean the timers array to only include 'start' and 'stop' properties
-      let timers = activeTimer.data.attributes.timers.map(t => ({ start: t.start, stop: t.stop }));
-      timers.push({ start: new Date().toISOString() }); 
-      const x = await sendToSer({timerId: timerId,isActive: true, newStart: new Date().toISOString(), timers: timers},'34UpdateTimer',null,null,isSer,fetch).then((x) => {
-        console.log("Resumed timer:", x.data);
-        return x.data.updateTimer.data;
-      });
-      return x;
-    }else {
-      console.log("Timer is already active");
-      return activeTimer.data;
+/**
+ * Send timer notification via the unified action system.
+ * This triggers real-time updates for connected users.
+ * 
+ * @param {string} actionType - Type of timer action: 'timerStart', 'timerStop', or 'timerSave'
+ * @param {Object} params - Parameters for the notification
+ * @param {Function} [fetchFn] - Optional fetch function
+ */
+async function sendTimerNotification(actionType, params, fetchFn = null) {
+  // Only send notifications from browser context
+  if (!browser) return;
+  
+  try {
+    const useFetch = fetchFn || fetch;
+    const response = await useFetch('/api/action', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        actionKey: actionType,
+        params
+      })
+    });
+    
+    if (response.ok) {
+      console.log(`[Timers] ${actionType} notification sent successfully`);
+    } else {
+      console.warn(`[Timers] Failed to send ${actionType} notification:`, await response.text());
     }
+  } catch (error) {
+    // Don't throw - notifications are nice-to-have, not critical
+    console.warn(`[Timers] Error sending ${actionType} notification:`, error);
   }
+}
+
+// Function to start (or resume) the timer for a mission
+/**
+ * Starts a timer for tracking activities
+ * @param {Object} activeTimer - The active timer object to be started
+ * @param {string} missionID - The ID of the mission associated with the timer
+ * @param {string} uId - User ID
+ * @param {string} pId - Project ID
+ * @param {number} [timerId=0] - Optional timer ID, defaults to 0
+ * @param {boolean} [isSer=false] - Flag indicating if this is a server operation, defaults to false
+ * @param {Function} fetch - Fetch function for making HTTP requests
+ * @param {Object} [options={}] - Optional additional options (notes, etc.)
+ * @returns {Promise<Object>} - The created or updated timer data
+ */
+export async function startTimer(activeTimer, missionID, uId, pId, timerId = 0, isSer = false, fetch, options) {
+  console.log(activeTimer, missionID, uId, pId, timerId, isSer);
+  
+  let result;
+  
+  // Case 1: No active timer exists – create one
+  if (timerId == 0) {
+    result = await sendToSer(
+      { missionId: missionID, start: new Date().toISOString(), userId: uId, projectId: pId },
+      '33CreateTimer',
+      null,
+      null,
+      isSer,
+      fetch
+    ).then((x) => {
+      console.log("Created new timer:", x.data);
+      return x.data.createTimer.data;
+    });
+  } else if (timerId != 0 && activeTimer.data.attributes && !activeTimer.data.attributes.isActive) {
+    // Case 2: Resume existing timer
+    let timers = activeTimer.data.attributes.timers.map(t => ({ start: t.start, stop: t.stop }));
+    timers.push({ start: new Date().toISOString() });
+    
+    result = await sendToSer(
+      { timerId: timerId, isActive: true, newStart: new Date().toISOString(), timers: timers },
+      '34UpdateTimer',
+      null,
+      null,
+      isSer,
+      fetch
+    ).then((x) => {
+      console.log("Resumed timer:", x.data);
+      return x.data.updateTimer.data;
+    });
+  } else {
+    console.log("Timer is already active");
+    result = activeTimer.data;
+  }
+  
+  // Send notification for real-time updates (async, don't wait)
+  // We send the current time so the server-side action (which mirrors the GraphQL call) has all required fields
+  const now = new Date().toISOString();
+  sendTimerNotification('timerStart', {
+    missionId: missionID,
+    projectId: pId,
+    userId: uId,
+    timerId: result?.id || timerId.toString(),
+    start: now,
+    newStart: now // Use the same for resume if needed
+  }, fetch).catch(() => {}); // Ignore errors
+  
+  return result;
+}
  
 
   // פונקציה לשליפת נתוני המשימה והטיימר
@@ -98,29 +163,38 @@ import { sendToSer } from './../send/sendToSer.js';
 
 
   // עצירת הטיימר: מסיימים את האינטרוול הפעיל ומעדכנים את הזמן המצטבר
- export async function stopTimer(timer,fetch,isSer=false) {
+/**
+ * Stops a timer for a mission
+ * @param {Object} timer - The timer object to stop
+ * @param {Function} fetch - Fetch function for making HTTP requests
+ * @param {boolean} [isSer=false] - Flag indicating if this is a server operation
+ * @param {string} [projectId=''] - Project ID for notification
+ * @param {string} [userId=''] - User ID for notification
+ * @returns {Promise<Object>} - The updated timer data
+ */
+export async function stopTimer(timer, fetch, isSer = false, projectId = '', userId = '') {
   console.log(timer);
-    if (timer && timer.attributes.isActive) {
-      const now = new Date().toISOString();
-      let intervals = timer.attributes.timers;
-      // נניח שהאינטרוול הפעיל הוא האחרון במערך
-      const lastInterval = intervals[intervals.length - 1];
-      console.log(lastInterval);
-      if (lastInterval ) {//&& !lastInterval.stop
-        const startTime = new Date(lastInterval.start);
-        const stopTime = new Date(now);
-        intervals[intervals.length - 1].stop = now;
-        // חישוב משך הזמן באינטרוול (בשעות)
-        const duration = (stopTime.getTime() - startTime.getTime()) / 1000 / 60 / 60;
-        let accumulatedTime = timer.attributes.totalHours || 0;
-        // עדכון הזמן המצטבר
-        accumulatedTime += duration;
+  if (timer && timer.attributes.isActive) {
+    const now = new Date().toISOString();
+    let intervals = timer.attributes.timers;
+    // נניח שהאינטרוול הפעיל הוא האחרון במערך
+    const lastInterval = intervals[intervals.length - 1];
+    console.log(lastInterval);
+    if (lastInterval) {
+      const startTime = new Date(lastInterval.start);
+      const stopTime = new Date(now);
+      intervals[intervals.length - 1].stop = now;
+      // חישוב משך הזמן באינטרוול (בשעות)
+      const duration = (stopTime.getTime() - startTime.getTime()) / 1000 / 60 / 60;
+      let accumulatedTime = timer.attributes.totalHours || 0;
+      // עדכון הזמן המצטבר
+      accumulatedTime += duration;
 
-        const response = await sendToSer(
+      const response = await sendToSer(
         {
           timerId: timer.id,
-          isActive: false, 
-          totalHours: accumulatedTime, 
+          isActive: false,
+          totalHours: accumulatedTime,
           timers: intervals
         },
         '34UpdateTimer',
@@ -129,12 +203,26 @@ import { sendToSer } from './../send/sendToSer.js';
         isSer,
         fetch
       );
-      
+
       console.log("Stopped timer:", response.data);
-      return response.data.updateTimer.data;
-    }
+      const result = response.data.updateTimer.data;
+
+        // Send notification for real-time updates (async, don't wait)
+      if (projectId && userId) {
+        sendTimerNotification('timerStop', {
+          timerId: timer.id,
+          projectId: projectId,
+          userId: userId,
+          totalHours: accumulatedTime,
+          isActive: false,
+          saved: false
+        }, fetch).catch(() => {}); // Ignore errors
+      }
+
+      return result;
     }
   }
+}
   export async function handleClearSingle(index, timer,fetch,isSer=false) {
   let timers = [...timer.attributes.activeTimer.data.attributes.timers];
 
@@ -327,9 +415,11 @@ export function calculateTotalHours(timers) {
  * @param {Function} fetch - פונקציית fetch לביצוע קריאות רשת
  * @param {boolean} [isSer=false] - האם מדובר בקריאת שרת
  * @param {Array} [tasks=null] - מערך של מזהי מטלות לקישור לטיימר (אופציונלי)
+ * @param {string} [projectId=''] - מזהה הפרויקט (לנוטיפיקציה)
+ * @param {string} [userId=''] - מזהה המשתמש (לנוטיפיקציה)
  * @returns {Promise<Object>} - אובייקט עם התוצאות של עדכון הטיימר והמשימה בתהליך
  */
-export async function saveTimer(timer, missionID, fetch, isSer=false, tasks=null) {
+export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = null, projectId = '', userId = '') {
   try {
     if (!timer || !missionID) {
       console.error("חסרים פרמטרים לשמירת הטיימר");
@@ -420,12 +510,31 @@ export async function saveTimer(timer, missionID, fetch, isSer=false, tasks=null
     
     console.log("משימה עודכנה עם שעות חדשות:", missionUpdateResponse.data);
     
-    return {
+    const result = {
       timer: timerUpdateResponse.data?.updateTimer?.data || null,
       mission: missionUpdateResponse.data?.updateMesimabetahalich?.data || null
     };
+
+    // Send notification for real-time updates (async, don't wait)
+    if (projectId && userId) {
+      sendTimerNotification('timerSave', {
+        missionId: missionID,
+        mId: missionID, // GraphQL alias
+        timerId: timer.attributes.activeTimer.data.id,
+        projectId: projectId,
+        userId: userId,
+        totalHours: totalHoursToSave,
+        howmanyhoursalready: totalHoursToSave, // GraphQL alias
+        stname: "saved",
+        x: 0,
+        tasks: tasks || []
+      }, fetch).catch(() => {}); // Ignore errors
+    }
+    
+    return result;
   } catch (error) {
     console.error("שגיאה בשמירת הטיימר:", error);
     return null;
   }
 }
+

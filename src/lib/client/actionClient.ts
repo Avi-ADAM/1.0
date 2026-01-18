@@ -63,22 +63,22 @@ export interface ActionResponse<T = any> {
 export interface ExecuteActionOptions {
   /** Fetch function (required in SSR context) */
   fetch?: typeof globalThis.fetch;
-  
+
   /** Callback on successful action */
   onSuccess?: (data: any) => void;
-  
+
   /** Callback on action error */
   onError?: (error: any) => void;
-  
+
   /** Skip automatic update strategy execution */
   skipUpdateStrategy?: boolean;
-  
+
   /** Show success toast notification */
   showSuccessToast?: boolean;
-  
+
   /** Success message for toast */
   successMessage?: string;
-  
+
   /** Show error toast notification */
   showErrorToast?: boolean;
 }
@@ -93,22 +93,22 @@ export interface ExecuteActionOptions {
 export interface UpdateTaskParams {
   /** ID of the task (Act) to update */
   id: string;
-  
+
   /** ID of the project containing the task */
   projectId: string;
-  
+
   /** Task approval status by assignee */
   myIshur?: boolean;
-  
+
   /** Task approval status by validator */
   valiIshur?: boolean;
-  
+
   /** Whether the task is assigned */
   isAssigned?: boolean;
-  
+
   /** Array of user IDs assigned to the task */
   uid?: string[];
-  
+
   /** Array of mission IDs associated with the task */
   mesimabetahaliches?: string[];
 }
@@ -151,30 +151,80 @@ export interface CreateTosplitParams {
 }
 
 /**
- * All available action keys
+ * Parameters for timerStart action
  */
-export type ActionKey = 
+export interface TimerStartParams {
+  /** ID of the mission to start timer for */
+  missionId: string;
+
+  /** ID of the project containing the mission */
+  projectId: string;
+
+  /** ID of the user starting the timer */
+  userId: string;
+
+  /** ID of existing timer to resume (optional) */
+  timerId?: string;
+}
+
+/**
+ * Parameters for timerStop action
+ */
+export interface TimerStopParams {
+  /** ID of the timer to stop */
+  timerId: string;
+
+  /** ID of the project containing the mission */
+  projectId: string;
+
+  /** ID of the user stopping the timer */
+  userId: string;
+
+  /** Total accumulated hours (optional) */
+  totalHours?: number;
+}
+
+/**
+ * Parameters for timerSave action
+ */
+export interface TimerSaveParams {
+  /** ID of the mission to save timer for */
+  missionId: string;
+
+  /** ID of the timer to save */
+  timerId: string;
+
+  /** ID of the project containing the mission */
+  projectId: string;
+
+  /** ID of the user saving the timer */
+  userId: string;
+
+  /** Total hours to commit */
+  totalHours: number;
+
+  /** Array of task IDs associated with this timer session */
+  tasks?: string[];
+}
+
+export type ActionKey =
   | 'updateTask'
   | 'createHaluka'
   | 'createTosplit'
   | 'approveHaluka'
-  // Future actions will be added here
-  // | 'createMessage'
-  // | 'createTask'
-  // | 'startTimer'
-  // | 'stopTimer'
-  // etc.
+  | 'timerStart'
+  | 'timerStop'
+  | 'timerSave'
   ;
 
-/**
- * Map of action keys to their parameter types
- */
 export interface ActionParamsMap {
   updateTask: UpdateTaskParams;
   createHaluka: CreateHalukaParams;
   createTosplit: CreateTosplitParams;
   approveHaluka: any; // TODO: Add proper type
-  // Future actions will be added here
+  timerStart: TimerStartParams;
+  timerStop: TimerStopParams;
+  timerSave: TimerSaveParams;
 }
 
 // ============================================================================
@@ -236,12 +286,12 @@ export async function executeAction<K extends ActionKey>(
 
     if (!response.ok || !result.success) {
       console.error(`[ActionClient] Action failed:`, result.error);
-      
+
       // Show error toast if requested
       if (options.showErrorToast !== false) {
         displayActionError(result.error);
       }
-      
+
       if (options.onError) {
         options.onError(result.error);
       }
@@ -323,7 +373,7 @@ async function executeUpdateStrategy(
           console.log('[ActionClient] Performing partial update', {
             keys: strategy.config.dataKeys
           });
-          
+
           for (const key of strategy.config.dataKeys) {
             await invalidate(key);
           }
@@ -339,16 +389,16 @@ async function executeUpdateStrategy(
         // This provides immediate UI feedback without waiting for server
         if (strategy.config?.updateFunction) {
           const updateFn = getUpdateFunction(strategy.config.updateFunction);
-          
+
           if (updateFn) {
             console.log('[ActionClient] Applying optimistic update', {
               function: strategy.config.updateFunction
             });
-            
+
             await updateFn(data, strategy.config);
           } else {
             console.warn(`[ActionClient] Update function not found: ${strategy.config.updateFunction}`);
-            
+
             // Fall back to partial or full refresh if function not found
             if (strategy.config?.dataKeys) {
               await invalidate(strategy.config.dataKeys[0]);
@@ -371,7 +421,7 @@ async function executeUpdateStrategy(
     }
   } catch (error) {
     console.error('[ActionClient] Error executing update strategy:', error);
-    
+
     // On error, try to fall back to full refresh to ensure consistency
     if (browser) {
       console.log('[ActionClient] Falling back to full refresh due to error');
@@ -439,10 +489,82 @@ export async function updateTask(
   return executeAction('updateTask', params, options);
 }
 
-// Future action helpers will be added here:
-// export async function createMessage(params: CreateMessageParams, options?: ExecuteActionOptions) { ... }
-// export async function createTask(params: CreateTaskParams, options?: ExecuteActionOptions) { ... }
-// export async function createHaluka(params: CreateHalukaParams, options?: ExecuteActionOptions) { ... }
+/**
+ * Start or resume a timer for a mission
+ * 
+ * This action notifies relevant users via WebSocket when a timer is started.
+ * 
+ * @param params - Timer start parameters
+ * @param options - Execution options
+ * @returns Promise with the action result
+ * 
+ * @example
+ * ```typescript
+ * const result = await timerStart({
+ *   missionId: '123',
+ *   projectId: '456',
+ *   userId: '789'
+ * });
+ * ```
+ */
+export async function timerStart(
+  params: TimerStartParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('timerStart', params, options);
+}
+
+/**
+ * Stop a timer for a mission
+ * 
+ * This action notifies relevant users via WebSocket when a timer is stopped.
+ * 
+ * @param params - Timer stop parameters
+ * @param options - Execution options
+ * @returns Promise with the action result
+ * 
+ * @example
+ * ```typescript
+ * const result = await timerStop({
+ *   timerId: '123',
+ *   projectId: '456',
+ *   userId: '789'
+ * });
+ * ```
+ */
+export async function timerStop(
+  params: TimerStopParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('timerStop', params, options);
+}
+
+/**
+ * Save a timer and commit hours to mission
+ * 
+ * This action notifies project members via WebSocket when a timer is saved.
+ * 
+ * @param params - Timer save parameters
+ * @param options - Execution options
+ * @returns Promise with the action result
+ * 
+ * @example
+ * ```typescript
+ * const result = await timerSave({
+ *   missionId: '123',
+ *   timerId: '456',
+ *   projectId: '789',
+ *   userId: '101',
+ *   totalHours: 2.5
+ * });
+ * ```
+ */
+export async function timerSave(
+  params: TimerSaveParams,
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('timerSave', params, options);
+}
 
 // ============================================================================
 // User Feedback Helpers
