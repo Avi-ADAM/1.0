@@ -213,6 +213,44 @@ export interface DecisionData {
   [key: string]: any;
 }
 
+/** Product Request data (sheirutpend) */
+export interface ProductRequestData {
+  id: string;
+  projectId: string;
+  projectName?: string;
+  projectSrc?: string;
+
+  // Requester info
+  userId: string;
+  username: string;
+  userSrc?: string;
+
+  // Request details
+  name: string; // from sheirut
+  descrip?: string; // from sheirut
+  price: number;
+  quant: number;
+  total: number;
+  kindOf?: string;
+  startDate?: string;
+  finishDate?: string;
+
+  // Metadata & Social
+  vots: any[];
+  messages?: any[];
+  priority?: number;
+  myid?: string;
+  createdAt: string;
+
+  // Relations
+  sheirutId?: string;
+  matanots?: any[];
+  timegramaId?: string;
+  timegramaDate?: string;
+
+  [key: string]: any;
+}
+
 /** Filter configuration for what to display */
 export interface MilonConfig {
   hachla: boolean;   // החלטות
@@ -227,6 +265,7 @@ export interface MilonConfig {
   pmashs: boolean;   // הצעות משאבים
   pmaap: boolean;    // בקשות משאבים
   askmap: boolean;   // בקשות משאבים ממני
+  sheirutp: boolean; // בקשות שירות/מוצר
 }
 
 // ========== Raw Data Stores ==========
@@ -276,6 +315,9 @@ export const transfersStore: Writable<TransferData[]> = writable([]);
 /** Decisions (hachlatot) */
 export const decisionsStore: Writable<DecisionData[]> = writable([]);
 
+/** Product requests (sheirutpends) */
+export const sheirutpStore: Writable<ProductRequestData[]> = writable([]);
+
 // ========== UI State Stores ==========
 
 /** Current view mode: true = cards, false = coins */
@@ -294,7 +336,8 @@ export const milon: Writable<MilonConfig> = writable({
   ppmash: true,   // משאבים ממתינים
   pmashs: true,   // הצעות משאבים
   pmaap: true,    // בקשות משאבים
-  askmap: true    // בקשות משאבים ממני
+  askmap: true,   // בקשות משאבים ממני
+  sheirutp: true  // בקשות שירות
 });
 
 /** Current project filter (null = all projects) */
@@ -325,6 +368,7 @@ export interface SnapshotData {
     transfers: TransferData[];
     decisions: DecisionData[];
     resourceSuggestions: ResourceSuggestionData[];
+    sheirutp: ProductRequestData[];
   };
 }
 

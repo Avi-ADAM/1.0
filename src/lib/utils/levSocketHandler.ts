@@ -35,6 +35,7 @@ import {
   welcomeStore,
   transfersStore,
   decisionsStore,
+  sheirutpStore,
   type PendMissionData,
   type InProgressMissionData,
   type ApprovalData,
@@ -45,7 +46,8 @@ import {
   type HalukaData,
   type WelcomeData,
   type TransferData,
-  type DecisionData
+  type DecisionData,
+  type ProductRequestData
 } from '$lib/stores/levStores';
 import { initializeLevData } from './levDataLoader';
 
@@ -202,6 +204,10 @@ function handlePartialUpdate(dataKeys: string[] | undefined, data: any): void {
 
         case 'decisions':
           updateDecisionsStore(data);
+          break;
+
+        case 'sheirutpends':
+          updateSheirutpStore(data);
           break;
 
         default:
@@ -585,6 +591,39 @@ export function updateDecisionsStore(data: Partial<DecisionData> & { id: string 
     } else {
       console.log('➕ [levSocketHandler] Adding new decision', { id: data.id });
       current.push(data as DecisionData);
+    }
+
+    return [...current];
+  });
+}
+
+/**
+ * Update sheirutpends (product requests) store
+ * 
+ * @param data - Product request data
+ */
+export function updateSheirutpStore(data: Partial<ProductRequestData> & { id: string }): void {
+  if (!data || !data.id) {
+    console.warn('⚠️ [levSocketHandler] Invalid sheirutpends data (missing id)');
+    return;
+  }
+
+  console.log('🔄 [levSocketHandler] Updating sheirutpends store', { id: data.id });
+
+  sheirutpStore.update(current => {
+    if ((data as any)._deleted) {
+      console.log('🗑️ [levSocketHandler] Removing sheirutpend', { id: data.id });
+      return current.filter(s => s.id !== data.id);
+    }
+
+    const index = current.findIndex(s => s.id === data.id);
+
+    if (index !== -1) {
+      console.log('✏️ [levSocketHandler] Updating existing sheirutpend', { id: data.id });
+      current[index] = { ...current[index], ...data };
+    } else {
+      console.log('➕ [levSocketHandler] Adding new sheirutpend', { id: data.id });
+      current.push(data as ProductRequestData);
     }
 
     return [...current];

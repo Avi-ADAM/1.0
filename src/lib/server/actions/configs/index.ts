@@ -18,6 +18,12 @@ import { startMeetingConfig } from './startMeeting.js';
 import { joinMeetingConfig } from './joinMeeting.js';
 import { sendMeetingMessageConfig } from './sendMeetingMessage.js';
 import { sendAskMessageConfig } from './sendAskMessage.js';
+import { timerStartConfig } from './timerStart.js';
+import { timerStopConfig } from './timerStop.js';
+import { timerSaveConfig } from './timerSave.js';
+import { approveSheirutpendConfig } from './approveSheirutpend.js';
+import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
+import { addVoteConfig } from './addVote.js';
 
 /**
  * Register all actions
@@ -40,6 +46,16 @@ export function registerAllActions(): void {
   registerAction(sendMeetingMessageConfig);
   registerAction(sendAskMessageConfig);
 
+  // Timer actions
+  registerAction(timerStartConfig);
+  registerAction(timerStopConfig);
+  registerAction(timerSaveConfig);
+
+  // Sheirutpend actions
+  registerAction(approveSheirutpendConfig);
+  registerAction(rejectSheirutpendConfig);
+  registerAction(addVoteConfig);
+
   // Future actions will be registered here
   // registerAction(createTaskAction);
   // etc.
@@ -59,5 +75,11 @@ export {
   startMeetingConfig,
   joinMeetingConfig,
   sendMeetingMessageConfig,
-  sendAskMessageConfig
+  sendAskMessageConfig,
+  timerStartConfig,
+  timerStopConfig,
+  timerSaveConfig,
+  approveSheirutpendConfig,
+  rejectSheirutpendConfig,
+  addVoteConfig
 };

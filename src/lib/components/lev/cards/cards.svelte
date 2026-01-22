@@ -14,6 +14,7 @@
   import Weget from '../../../components/lev/weget.svelte';
   import Hal from '../../../components/lev/halukaask.svelte';
   import Vid from '../../../components/lev/didiget.svelte';
+  import ProductRequestCard from './ProductRequestCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -58,7 +59,8 @@
     pmaap: true,
     askmap: true,
     hachla: true,
-    vidu: true
+    vidu: true,
+    sheirutp: true
   });
   // Import Swiper styles
   import 'swiper/css';
@@ -526,6 +528,17 @@
                       users={buble.users}
                       diun={buble.diun}
                       order={buble.order}
+                    /></SwiperSlide
+                  >
+                {:else if buble.ani === 'sheirutp' && milon.sheirutp == true}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><ProductRequestCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
                     /></SwiperSlide
                   >
                 {:else if buble.ani === 'vidu' && milon.vidu == true}

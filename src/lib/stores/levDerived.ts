@@ -11,12 +11,13 @@ import {
   halukasStore,
   welcomeStore,
   transfersStore,
+  resourceSuggestionsStore,
+  sheirutpStore,
+  askedResourcesStore,
   decisionsStore,
   projectsStore,
   milon,
-  projectFilter,
-  askedResourcesStore,
-  resourceSuggestionsStore
+  projectFilter
 } from './levStores';
 import { timers } from './timers';
 import {
@@ -33,6 +34,7 @@ import {
   processWelcome,
   processTransfers,
   processDecisions,
+  processProductRequests,
   mergeAndSort,
   type DisplayItem
 } from '$lib/utils/levProcessors';
@@ -191,6 +193,16 @@ export const processedDecisions: Readable<DisplayItem[]> = derived(
   ([$decisions, $projects]) => processDecisions($decisions, $projects)
 );
 
+/**
+ * Derived store for processed product requests (sheirutpends)
+ * 
+ * Automatically recomputes when sheirutpStore or projectsStore changes.
+ */
+export const processedSheirutp: Readable<DisplayItem[]> = derived(
+  [sheirutpStore, projectsStore],
+  ([$sheirutp, $projects]) => processProductRequests($sheirutp, $projects)
+);
+
 // ========== Final Merged Array ==========
 
 /**
@@ -232,6 +244,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedWelcome,
     processedTransfers,
     processedDecisions,
+    processedSheirutp,
     milon,
     projectFilter
   ],
@@ -249,6 +262,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $welcome,
     $transfers,
     $decisions,
+    $sheirutp,
     $milon,
     $projectFilter
   ]) => {
@@ -266,7 +280,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $halukas,
       $welcome,
       $transfers,
-      $decisions
+      $decisions,
+      $sheirutp
     );
 
     // Step 2: Apply milon filtering (visibility settings)
@@ -299,6 +314,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return $milon.welc;
         case 'vidu':
           return true; // Always show transfers
+        case 'sheirutp':
+          return $milon.sheirutp;
         case 'hachla':
           return $milon.hachla;
         default:

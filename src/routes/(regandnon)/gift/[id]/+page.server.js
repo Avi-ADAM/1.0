@@ -13,14 +13,15 @@ export async function load({ locals, params, fetch }) {
 
   try {
     const res = await sendToSer({ id: mId }, '48GetServiceById', null, null, isSer, fetch);
-    const node = res?.data?.matanot?.data?.attributes || null;
+    const dataNode = res?.data?.matanot?.data;
+    const node = dataNode?.attributes || null;
     if (node) {
       archived = node.archived === true;
       const title = {
         he: `1💗1 | מתנה "${node.name}" בריקמה: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`,
         en: `1💗1 | Gift "${node.name}" on freeMates: ${node.projectcreates?.data?.[0]?.attributes?.projectName || ''}`
       };
-      alld = { ...node, title };
+      alld = { ...node, id: dataNode.id, title };
     }
   } catch (e) {
     console.error('gift load error', e);

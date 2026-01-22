@@ -21,7 +21,8 @@ import type {
   WelcomeData,
   TransferData,
   DecisionData,
-  ResourceSuggestionData
+  ResourceSuggestionData,
+  ProductRequestData
 } from '$lib/stores/levStores';
 import { calculateScore } from './suggestionMatchers';
 
@@ -367,7 +368,7 @@ export function extractSuggestions(userData: any): SuggestionData[] {
           missionDataMap.set(askedId, missionData);
         }
       }
-      
+
       // Only add if we have some data (from filters or from asks)
       if (missionData) {
         scores.set(askedId, 2);
@@ -394,14 +395,14 @@ export function extractSuggestions(userData: any): SuggestionData[] {
   // Build Result
   // Create a Set for quick lookup of asked IDs
   const askedIdsSet = new Set(askedIds);
-  
+
   for (const id of sortedIds) {
     const mission = missionDataMap.get(id);
     if (!mission) continue;
 
     const score = scores.get(id) || 0;
     const askData = askedMap.get(id);
-    
+
     // Mission is "already asked" if:
     // 1. It has askData (user sent a join request) OR
     // 2. It's in askeds list (user asked to do this mission)
@@ -839,6 +840,7 @@ export function extractDecisions(userData: any): DecisionData[] {
     }
 
     // 2. Process Service Requests (Sheirut Pends)
+    /*
     if (project?.attributes?.sheirutpends?.data) {
       for (const sp of project.attributes.sheirutpends.data) {
         if (!sp?.id || !sp?.attributes) continue;
@@ -860,6 +862,7 @@ export function extractDecisions(userData: any): DecisionData[] {
         });
       }
     }
+    */
   }
 
   return decisions;
@@ -1064,4 +1067,76 @@ export function extractAskedResources(userData: any): AskedResourceData[] {
   }
 
   return askedResources;
+}
+/**
+ * Extract product requests (sheirutpends) from GraphQL user data
+ * 
+ * @param userData - Raw GraphQL response data
+ * @returns Array of product request data
+ */
+export function extractProductRequests(userData: any): ProductRequestData[] {
+  const requests: ProductRequestData[] = [];
+
+  if (!userData?.attributes?.projects_1s?.data) {
+    return requests;
+  }
+
+  const projects = userData.attributes.projects_1s.data;
+
+  for (const project of projects) {
+    if (!project?.attributes?.sheirutpends?.data) {
+      continue;
+    }
+
+    for (const req of project.attributes.sheirutpends.data) {
+      if (!req?.id || !req?.attributes) {
+        continue;
+      }
+      console.log(req, "req");
+      const attrs = req.attributes;
+      const sheirut = attrs.sheirut?.data?.attributes;
+      const firstMatana = attrs.matanots?.data?.[0]?.attributes;
+      const requester = attrs.users_permissions_user?.data;
+
+      requests.push({
+        id: req.id,
+        projectId: project.id,
+        projectName: project.attributes.projectName,
+        projectSrc: project.attributes.profilePic?.data?.attributes?.url,
+
+        // Requester
+        userId: requester?.id || '',
+        username: requester?.attributes?.username || '',
+        userSrc: requester?.attributes?.profilePic?.data?.attributes?.url,
+
+        // Details
+        name: firstMatana?.name || sheirut?.name || '',
+        descrip: firstMatana?.desc || sheirut?.descrip || '',
+        price: attrs.price || firstMatana?.price || 0,
+        quant: attrs.quant || firstMatana?.quant || 0,
+        total: attrs.total || 0,
+        kindOf: firstMatana?.kindOf || sheirut?.kindOf || '',
+        src: firstMatana?.pic?.data?.attributes?.url,
+        startDate: attrs.startDate,
+        finishDate: attrs.finnishDate,
+
+        // Metadata
+        vots: attrs.vots || [],
+        createdAt: attrs.createdAt,
+        myid: userData.id,
+
+        // Relations
+        sheirutId: attrs.sheirut?.data?.id,
+        matanots: attrs.matanots?.data || [],
+        timegramaId: attrs.timegrama?.data?.id,
+        timegramaDate: attrs.timegrama?.data?.attributes?.date,
+
+        // Processor metadata
+        ani: 'sheirutp',
+        azmi: 'sheirutp'
+      });
+    }
+  }
+
+  return requests;
 }

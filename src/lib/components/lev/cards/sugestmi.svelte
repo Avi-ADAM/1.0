@@ -35,6 +35,9 @@
    * @property {any} already
    * @property {boolean} [allr]
    * @property {boolean} [isVisible]
+   * @property {string} [sqadualed]
+   * @property {string} [sqadualedf]
+   * @property {number} [noOfusers]
    * @property {(x: any) => void} [onHover] - Callback for hover event
    * @property {() => void} [onAgree] - Callback for agree event
    * @property {() => void} [onDecline] - Callback for decline event
@@ -69,6 +72,8 @@
     already = $bindable(),
     allr = false,
     isVisible = false,
+    sqadualed,
+    sqadualedf,
     onHover,
     onAgree,
     onDecline,
@@ -179,7 +184,7 @@
       : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row leading-normal"
   >
     <div class="mb-8">
-      <!----  {#if data.alld.sqadualed || data.alld.sqadualedf}
+        {#if sqadualed || sqadualedf}
                                 <p
                   style="line-height: 1;"
                   class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
@@ -189,14 +194,14 @@
                     src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
                     alt="howmuch"
                   />
-                {#if data.alld.sqadualed}
-                <span> {new Date(data.alld?.sqadualed).toLocaleDateString()}</span>
+                {#if sqadualed}
+                <span> {new Date(sqadualed).toLocaleDateString()}</span>
                 {/if}
-                 {#if data.alld.sqadualedf}
-                <span> - {new Date(data.alld?.sqadualedf).toLocaleDateString()}</span>
+                 {#if sqadualedf}
+                <span> - {new Date(sqadualedf).toLocaleDateString()}</span>
                 {/if}
                   </p>
-                {/if}  -->
+                {/if}  
       <p
         style="line-height: 1;"
         class="sm:text-xl text-lg text-gray-600 dark:text-slate-100 flex items-center"

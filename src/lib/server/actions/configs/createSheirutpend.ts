@@ -9,41 +9,38 @@ import type { ActionConfig } from '../types';
 
 export const createSheirutpendConfig: ActionConfig = {
   key: 'createSheirutpend',
-  
+
   description: 'Create a new Sheirutpend record',
-  
+
   graphqlOperation: '71createSheirutpend',
-  
+
   paramSchema: {
-    data: {
-      type: 'object',
-      required: true,
-      validate: (value) => {
-        if (!value || typeof value !== 'object') return false;
-        
-        // Required fields
-        if (!value.project || !value.users_permissions_user) return false;
-        
-        // Validate date formats if provided
-        if (value.startDate && !(value.startDate instanceof Date || !isNaN(Date.parse(value.startDate)))) {
-          return false;
-        }
-        if (value.finnishDate && !(value.finnishDate instanceof Date || !isNaN(Date.parse(value.finnishDate)))) {
-          return false;
-        }
-        
-        return true;
-      }
-    }
+    project: { type: 'string', required: true },
+    userId: { type: 'string', required: true },
+    matanots: { type: 'array', required: false },
+    price: { type: 'number', required: false },
+    quant: { type: 'number', required: false },
+    total: { type: 'number', required: false },
+    startDate: {
+      type: 'string',
+      required: false,
+      validate: (value) => !value || !isNaN(Date.parse(value))
+    },
+    finnishDate: {
+      type: 'string',
+      required: false,
+      validate: (value) => !value || !isNaN(Date.parse(value))
+    },
+    appruved: { type: 'boolean', required: false }
   },
-  
+
   authRules: [
     {
       type: 'jwt',
       errorMessage: 'Must be authenticated to create Sheirutpend'
     }
   ],
-  
+
   notification: {
     recipients: {
       type: 'projectMembers',
@@ -68,8 +65,17 @@ export const createSheirutpendConfig: ActionConfig = {
     emailTemplate: 'SimpleNuti',
     metadata: {
       icon: 'https://res.cloudinary.com/love1/image/upload/v1645647192/apple-touch-icon_irclue.png',
+      type: 'sheirutUpdate',
       url: 'lev',
       priority: 'high' // High priority because it requires action
     }
   },
+
+  updateStrategy: {
+    type: 'partialUpdate',
+    config: {
+      dataKeys: ['sheirutpends'],
+      updateFunction: 'refreshSheirutpends'
+    }
+  }
 };

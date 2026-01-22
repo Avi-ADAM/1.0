@@ -9,8 +9,10 @@ const VITE_ADMINMONTHER = import.meta.env.VITE_ADMINMONTHER;
 export async function POST({ request, cookies }) {
 	const data = await request.json();
 
-	if (!data?.data?.queId) {
-		throw error(400, 'queId is required');
+	const query = data?.data?.queId ? qids[data.data.queId] : data?.data?.query;
+
+	if (!query) {
+		throw error(400, 'queId or query is required');
 	}
 
 	let isSer = data.isSer ?? false;
@@ -31,10 +33,6 @@ export async function POST({ request, cookies }) {
 				variablesObject[key] = keyValueObject[key];
 			}
 	}
-	const dat = qids[data.data.queId];
-	if (!dat) {
-		throw error(400, `Invalid queId: ${data.data.queId}`);
-	}
 
 	let bearer1 = 'bearer' + ' ' + jw;
 
@@ -46,7 +44,7 @@ export async function POST({ request, cookies }) {
 		const res = await fetch(ep, {
 			method: 'POST',
 			credentials: 'include',
-			body: JSON.stringify({ query: dat, variables: variablesObject || {} }),
+			body: JSON.stringify({ query: query, variables: variablesObject || {} }),
 			headers: {
 				'Content-Type': 'application/json',
 				Authorization: bearer1
@@ -63,6 +61,7 @@ export async function POST({ request, cookies }) {
 		}
 
 		if (newd.errors) {
+			console.error('GraphQL Errors from downstream:', JSON.stringify(newd.errors, null, 2));
 			// Check for authentication errors
 			const authError = newd.errors.find(err =>
 				err.message === 'Invalid token.' ||
@@ -75,12 +74,13 @@ export async function POST({ request, cookies }) {
 				throw error(401, authError.message);
 			}
 
-			// Handle other GraphQL errors by throwing the first error message.
-			throw error(500, newd.errors[0].message);
+			// Handle other GraphQL errors by returning the full error object with a 500 status.
+			return json(newd, { status: 500 });
 		}
 
 		// Fallback for unexpected response structure from the server.
-		throw error(500, 'Unexpected response from server');
+		console.error('Unexpected response structure:', newd);
+		return json({ error: 'Unexpected response from server', details: newd }, { status: 500 });
 
 	} catch (e) {
 		clearTimeout(timeoutId); // Ensure timeout is cleared on other errors too

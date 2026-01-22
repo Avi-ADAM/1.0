@@ -217,9 +217,14 @@ export class ActionService {
       // Use the result variable for consistency (renaming strapiResult to result in subsequent code)
       const strapiResult = result;
 
+      // Check if handler returned updateStrategy (for dynamic strategies)
+      const handlerUpdateStrategy = (strapiResult as any)?.updateStrategy;
+      const finalUpdateStrategy = handlerUpdateStrategy || config.updateStrategy;
+
       this.logger.debug('Strapi operation completed', {
         actionKey,
-        hasData: !!strapiResult.data
+        hasData: !!strapiResult.data,
+        hasHandlerUpdateStrategy: !!handlerUpdateStrategy
       });
 
       // Step 5: Trigger notifications (async, don't wait)
@@ -263,10 +268,15 @@ export class ActionService {
       });
 
       // Step 6: Return result with update strategy
+      // Extract data from result if it's wrapped in an object with updateStrategy
+      const resultData = (strapiResult as any)?.data !== undefined 
+        ? (strapiResult as any).data 
+        : strapiResult;
+
       return {
         success: true,
-        data: strapiResult,
-        updateStrategy: config.updateStrategy
+        data: resultData,
+        updateStrategy: finalUpdateStrategy
       };
 
     } catch (error) {

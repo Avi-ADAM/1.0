@@ -111,6 +111,7 @@
     scrolltotop
   } from 'svelte-scrollto-element';
   import Vid from './didiget.svelte';
+  import ProductRequestCoin from './ProductRequestCoin.svelte';
   import Desi from './decisionMaking.svelte';
   import Mid from './midi.svelte';
   import MissionInProgress from './missionInProgress.svelte';
@@ -455,6 +456,13 @@
               order={buble.order}
               {low}
             />
+          </div>
+        {:else if buble.ani === 'sheirutp' && milon.sheirutp == true}
+          <div
+            class="sheirutp normSml"
+            style="width:{size}px; left:{orders[i]?.x}px; top:{orders[i]?.y}px"
+          >
+            <ProductRequestCoin {buble} />
           </div>
         {:else if buble.ani === 'mtaha' && milon.betaha == true}
           <div

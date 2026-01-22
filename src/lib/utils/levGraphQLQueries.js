@@ -41,6 +41,14 @@ export async function fetchMainUserData(baseUrl, token, idL, lang) {
       if (response.status === 401) {
         goto('/login?from=lev');
       }
+      
+      try {
+        const errorData = await response.json();
+        console.error('GraphQL Error Detail:', JSON.stringify(errorData, null, 2));
+      } catch (e) {
+        console.error('Could not parse error response body');
+      }
+      
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     
@@ -62,18 +70,34 @@ export async function fetchMainUserData(baseUrl, token, idL, lang) {
  * @returns {Promise<StrapiResponse<{ openMissions: StrapiCollection<any> }>>}
  */
 export async function fetchOpenMissions(baseUrl, token, keysSorted, lang) {
-  const response = await fetch('/api/send', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json'
-    },
-    body: JSON.stringify({
-      data: {
-        queId: '84levOpenMissionsQuery',
-        arg: { ids: keysSorted, lang }
+  try {
+    const response = await fetch('/api/send', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({
+        data: {
+          queId: '84levOpenMissionsQuery',
+          arg: { ids: keysSorted, lang }
+        }
+      })
+    });
+
+    console.log('API response status (OpenMissions):', response.status, response.statusText);
+    if (!response.ok) {
+      try {
+        const errorData = await response.json();
+        console.error('GraphQL Error Detail (OpenMissions):', JSON.stringify(errorData, null, 2));
+      } catch (e) {
+        console.error('Could not parse error response body for OpenMissions');
       }
-    })
-  });
-  
-  return response.json();
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    return response.json();
+  } catch (error) {
+    console.error('Error in fetchOpenMissions:', error);
+    throw error;
+  }
 }

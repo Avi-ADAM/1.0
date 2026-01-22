@@ -12,7 +12,8 @@ import type {
   WelcomeData,
   TransferData,
   DecisionData,
-  ProjectData
+  ProjectData,
+  ProductRequestData
 } from '$lib/stores/levStores';
 // @ts-ignore
 import { createProjectInfo, createUserInfo, getProjectMembers, getProjectUsers, getProjectRestime } from '$lib/utils/projectHelpers.js';
@@ -1949,6 +1950,45 @@ export function processDecisions(
         created_at: decision.createdAt
       };
     }
+  });
+}
+
+/**
+ * Process product requests (sheirutpends) into display items
+ * 
+ * @param sheirutpends - Array of product request data
+ * @param projects - Array of project data for lookups
+ * @returns Array of display items ready for rendering
+ */
+export function processProductRequests(
+  sheirutpends: ProductRequestData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!sheirutpends || !Array.isArray(sheirutpends)) {
+    return [];
+  }
+
+  return sheirutpends.map(request => {
+    const projectInfo = createProjectInfo(request.projectId);
+
+    // Priority: moderately high, similar to other pending items
+    // If we assume these need approval, they should be visible
+    const basePriority = 10;
+
+    return {
+      // Common display fields
+      ani: 'sheirutp',
+      azmi: 'sheirut',
+      pl: basePriority,
+      coinlapach: `sheirutp-${request.id}`,
+
+      // Project Info
+      ...projectInfo,
+      src: projectInfo.src2 || '',
+
+      // Request-specific fields (already extracted in extractor usually)
+      ...request
+    };
   });
 }
 

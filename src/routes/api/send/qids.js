@@ -1322,6 +1322,113 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     }
   }`,
 
+  "72getSheirutpendById": `query GetSheirutpendById($id: ID!) {
+    sheirutpend(id: $id) {
+      data {
+        id
+        attributes {
+          project {
+            data {
+              id
+              attributes {
+                projectName
+                profilePic {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
+              }
+            }
+          }
+          sheirut {
+            data {
+              id
+              attributes {
+                name
+                descrip
+                equaliSplited
+                oneTime
+                price
+                quant
+                kindOf
+                pic {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
+              }
+            }
+          }
+          startDate
+          finishDate
+          price
+          quant
+          total
+          users_permissions_user {
+            data {
+              id
+              attributes {
+                username
+                profilePic {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
+              }
+            }
+          }
+          matanots {
+            data {
+              id
+              attributes {
+                name
+                desc
+                pic {
+                  data {
+                    attributes {
+                      url
+                      formats
+                    }
+                  }
+                }
+              }
+            }
+          }
+          vots {
+            what
+            id
+            order
+            zman
+            ide
+            users_permissions_user {
+              data {
+                id
+              }
+            }
+          }
+          timegrama {
+            data {
+              id
+              attributes {
+                date
+              }
+            }
+          }
+          createdAt
+        }
+      }
+    }
+  }`,
+
   "80updateSale": `mutation UpdateSale($saleId: ID!) {
     updateSale(
       id: $saleId
@@ -1343,6 +1450,54 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
     ) {
       data {
         id
+      }
+    }
+  }`,
+  '73updateSheirutpend': `mutation UpdateSheirutpend($id: ID!, $data: SheirutpendInput!) {
+    updateSheirutpend(id: $id, data: $data) {
+      data {
+        id
+      }
+    }
+  }`,
+  '85addVoteToPend': `mutation AddVoteToPend($id: ID!, $users: [ComponentProjectsVotsInput!]!) {
+    updatePendm(id: $id, data: { users: $users }) {
+      data {
+        id
+        attributes {
+          users {
+            what
+            order
+            ide
+            zman
+            users_permissions_user {
+              data {
+                id
+              }
+            }
+          }
+        }
+      }
+    }
+  }`,
+  '86addVoteToSheirutpend': `mutation AddVoteToSheirutpend($id: ID!, $vots: [ComponentProjectsVotsInput!]!) {
+    updateSheirutpend(id: $id, data: { vots: $vots }) {
+      data {
+        id
+        attributes {
+          vots {
+            what
+            id
+            order
+            zman
+            ide
+            users_permissions_user {
+              data {
+                id
+              }
+            }
+          }
+        }
       }
     }
   }`,
@@ -2166,6 +2321,47 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                           descrip
                           equaliSplited
                           oneTime
+                        }
+                      }
+                    }
+                    startDate
+                    finnishDate
+                    price
+                    quant
+                    total
+                    users_permissions_user {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    matanots {
+                      data {
+                        id
+                        attributes {
+                          name
+                          desc
+                          price
+                          quant
+                          kindOf
+                          pic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
                         }
                       }
                     }
