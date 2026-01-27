@@ -1353,20 +1353,11 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                 oneTime
                 price
                 quant
-                kindOf
-                pic {
-                  data {
-                    attributes {
-                      url
-                      formats
-                    }
-                  }
-                }
               }
             }
           }
           startDate
-          finishDate
+          finnishDate
           price
           quant
           total
@@ -1392,6 +1383,7 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               attributes {
                 name
                 desc
+                kindOf
                 pic {
                   data {
                     attributes {
@@ -1403,18 +1395,15 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               }
             }
           }
-          vots {
+          votes { data {id attributes{
             what
-            id
             order
-            zman
-            ide
             users_permissions_user {
               data {
                 id
               }
             }
-          }
+}}}
           timegrama {
             data {
               id
@@ -2366,15 +2355,18 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                       }
                     }
                     createdAt
-                    vots {
-                      what
-                      id
-                      order
-                      zman
-                      ide
-                      users_permissions_user {
-                        data {
-                          id
+                    votes {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          why
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
                         }
                       }
                     }
@@ -3513,4 +3505,20 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
   }
 }
 `,
+
+
+  '86addVoteToSheirutpend_v2': `mutation CreateVote($sheirutpend: ID, $user: ID, $what: Boolean, $order: Int, $why: String) {
+    createVote(data: { sheirutpend: $sheirutpend, users_permissions_user: $user, what: $what, order: $order, why: $why }) {
+      data {
+        id
+      }
+    }
+  }`,
+  '87createSheirut': `mutation CreateSheirut($data: SheirutInput!) {
+    createSheirut(data: $data) {
+      data {
+        id
+      }
+    }
+  }`
 };

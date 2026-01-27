@@ -12,6 +12,7 @@
     saveTimer
   } from '$lib/func/timers.js';
   import { timers, updateTimers } from '$lib/stores/timers';
+  import { page } from '$app/state';
 
   /**
    * @typedef {Object} Props

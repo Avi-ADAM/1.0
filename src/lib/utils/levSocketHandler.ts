@@ -77,7 +77,9 @@ export function setupSocketListeners(
       hasData: !!(notification as any).data
     });
 
-    const { actionKey, updateStrategy, data } = notification as any;
+    const { actionKey } = notification as any;
+    const updateStrategy = (notification as any).updateStrategy || (notification as any).actionResult?.updateStrategy;
+    const data = (notification as any).data || (notification as any).actionResult?.data;
 
     // Handle different update strategies
     if (!updateStrategy) {
@@ -95,7 +97,7 @@ export function setupSocketListeners(
         console.log('🔄 [levSocketHandler] Partial update triggered', {
           dataKeys: updateStrategy.config?.dataKeys
         });
-        handlePartialUpdate(updateStrategy.config?.dataKeys, data);
+        await handlePartialUpdate(updateStrategy.config?.dataKeys, data, userId, token, lang);
         break;
 
       case 'optimistic':
@@ -144,20 +146,57 @@ async function handleFullRefresh(
 }
 
 /**
+ * Extract actual item data from potentially nested responses
+ * 
+ * Strapi/GraphQL responses often nest data under the mutation name.
+ * This helper attempts to find the actual item data with an id.
+ */
+function extractData(data: any): any {
+  if (!data) return data;
+
+  // If it has an id at top level, it's already flat
+  if (data.id) return data;
+
+  // Look for Strapi-style nesting: { mutationName: { data: { id, attributes } } }
+  const keys = Object.keys(data);
+  if (keys.length === 1 && typeof data[keys[0]] === 'object') {
+    const nestedData = data[keys[0]]?.data;
+    if (nestedData && nestedData.id) {
+      // Flatten: merge id and attributes
+      return {
+        id: nestedData.id,
+        ...nestedData.attributes
+      };
+    }
+  }
+
+  return data;
+}
+
+/**
  * Handle partial update of specific stores
  * 
  * This updates only the stores specified in dataKeys with the provided data.
  * 
  * @param dataKeys - Array of store keys to update
- * @param data - Update data
+ * @param rawData - Update data (potentially nested)
  */
-function handlePartialUpdate(dataKeys: string[] | undefined, data: any): void {
+async function handlePartialUpdate(
+  dataKeys: string[] | undefined,
+  rawData: any,
+  userId: string,
+  token: string,
+  lang: string
+): Promise<void> {
   if (!dataKeys || dataKeys.length === 0) {
     console.warn('⚠️ [levSocketHandler] No dataKeys specified for partial update');
     return;
   }
 
-  console.log('🔄 [levSocketHandler] Processing partial update for keys:', dataKeys);
+  // Normalize data
+  const data = extractData(rawData);
+
+  console.log('🔄 [levSocketHandler] Processing partial update for keys:', dataKeys, { hasId: !!data?.id });
 
   for (const key of dataKeys) {
     try {
@@ -207,7 +246,12 @@ function handlePartialUpdate(dataKeys: string[] | undefined, data: any): void {
           break;
 
         case 'sheirutpends':
-          updateSheirutpStore(data);
+          if (data && data.id) {
+            updateSheirutpStore(data);
+          } else {
+            console.log('🔄 [levSocketHandler] No data for sheirutpends update, performing full refresh');
+            await handleFullRefresh(userId, token, lang);
+          }
           break;
 
         default:
@@ -620,7 +664,35 @@ export function updateSheirutpStore(data: Partial<ProductRequestData> & { id: st
 
     if (index !== -1) {
       console.log('✏️ [levSocketHandler] Updating existing sheirutpend', { id: data.id });
-      current[index] = { ...current[index], ...data };
+
+      const updatedItem = { ...current[index], ...data };
+
+      // Smart merging for 'vots' array to prevent data loss
+      if (data.vots && Array.isArray(data.vots) && current[index].vots) {
+        const existingVots = [...current[index].vots];
+        const newVots = data.vots;
+
+        for (const newVote of newVots) {
+          const voterId = newVote.attributes.users_permissions_user?.data?.id || newVote.attributes.users_permissions_user;
+          if (!voterId) continue;
+
+          // Find if this user already has a vote in existing record
+          // We want to keep all historical votes or just update the one at the same order
+          const existingVoteIndex = existingVots.findIndex(v => {
+            const vId = v.attributes.users_permissions_user?.data?.id || v.attributes.users_permissions_user;
+            return vId === voterId && v.attributes.order === newVote.attributes.order;
+          });
+
+          if (existingVoteIndex !== -1) {
+            existingVots[existingVoteIndex] = { ...existingVots[existingVoteIndex], ...newVote };
+          } else {
+            existingVots.push(newVote);
+          }
+        }
+        updatedItem.vots = existingVots;
+      }
+
+      current[index] = updatedItem;
     } else {
       console.log('➕ [levSocketHandler] Adding new sheirutpend', { id: data.id });
       current.push(data as ProductRequestData);

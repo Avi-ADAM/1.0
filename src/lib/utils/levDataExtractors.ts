@@ -1121,7 +1121,13 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
         finishDate: attrs.finnishDate,
 
         // Metadata
-        vots: attrs.vots || [],
+        vots: attrs.votes?.data?.map((v: any) => ({
+          id: v.id,
+          what: v.attributes?.what,
+          order: v.attributes?.order,
+          why: v.attributes?.why,
+          users_permissions_user: v.attributes?.users_permissions_user
+        })) || [],
         createdAt: attrs.createdAt,
         myid: userData.id,
 

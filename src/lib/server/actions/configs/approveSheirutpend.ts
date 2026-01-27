@@ -35,7 +35,7 @@ export const approveSheirutpendConfig: ActionConfig = {
             type: 'specificUsers',
             config: {
                 userIdsParam: 'requesterId', // We might need to fetch this or pass it
-                excludeSender: true
+                excludeSender: false
             }
         },
         templates: {

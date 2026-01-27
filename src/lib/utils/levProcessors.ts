@@ -1975,6 +1975,64 @@ export function processProductRequests(
     // If we assume these need approval, they should be visible
     const basePriority = 10;
 
+    const myid = request.myid;
+    const users = request.vots || [];
+
+    // Calculate max order for "Active" vote version
+    const maxOrder = users.reduce((max: number, v: any) => Math.max(max, v.order || 0), 0);
+    const orderon = maxOrder; // Active order
+
+    let noofusersOk = 0;
+    let noofusersNo = 0;
+    let already = false;
+    let mypos = null;
+    let cv = 0;
+    const uids: string[] = [];
+
+    // Collect all unique uids
+    for (const v of users) {
+      if (v.users_permissions_user?.data?.id) {
+        uids.push(v.users_permissions_user.data.id);
+      }
+    }
+
+    // Check my status on CURRENT version
+    if (myid) {
+      const myVote = users.find((v: any) => v.users_permissions_user?.data?.id === myid && (v.order || 0) === orderon);
+      if (myVote) {
+        already = true;
+        mypos = myVote.what;
+      }
+    }
+
+    // Count effective votes (current order)
+    for (const v of users) {
+      if ((v.order || 0) === orderon) {
+        cv++;
+        if (v.what === true) noofusersOk++;
+        else if (v.what === false) noofusersNo++;
+      }
+    }
+
+    // Helper for waiting count
+    const memberCount = projectInfo.noof || 0;
+    const noofusersWaiting = memberCount - cv;
+
+    // Build Messages (Optional but consistent)
+    const messege: any[] = [];
+    for (const v of users) {
+      const uid = v.users_permissions_user?.data?.id;
+      const info = createUserInfo(request.projectId, uid);
+      const isCurrent = (v.order || 0) === orderon;
+
+      messege.push({
+        message: `${info.username} ${v.what ? 'בעד' : 'נגד'}${!isCurrent ? ' (גרסה ישנה)' : ''}`,
+        what: v.what,
+        pic: info.src,
+        timestamp: new Date() // Date not always available in extracted vots, could add to extractor
+      });
+    }
+
     return {
       // Common display fields
       ani: 'sheirutp',
@@ -1986,7 +2044,18 @@ export function processProductRequests(
       ...projectInfo,
       src: projectInfo.src2 || '',
 
-      // Request-specific fields (already extracted in extractor usually)
+      // Status Fields
+      users,
+      uids, // All voters (history included)
+      already,
+      mypos,
+      noofusersOk,
+      noofusersNo,
+      noofusersWaiting,
+      orderon,
+      messege, // For chat icon history if needed
+
+      // Request-specific fields
       ...request
     };
   });

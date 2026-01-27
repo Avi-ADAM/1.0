@@ -35,7 +35,8 @@ export function createProjectInfo(projectId) {
     projectName: getProjectData(projectId, 'pn'),
     noof: getProjectData(projectId, 'noof'),
     src2: getProjectData(projectId, 'pp'),
-    pid: getProjectData(projectId, 'uids')
+    pid: getProjectData(projectId, 'uids'),
+    user_1s: getProjectData(projectId, 'us')
   };
 }
 

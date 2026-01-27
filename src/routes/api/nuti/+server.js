@@ -95,8 +95,10 @@ async function renderText(
 
 
 function getUnById(array, id) {
-  const foundObject = array.find((obj) => obj.id === id);
-  return foundObject ? foundObject.attributes.username : null;
+  if (!array || !id) return null;
+  const foundObject = array.find((obj) => (obj.id || obj.uid) == id);
+  if (!foundObject) return null;
+  return foundObject.attributes ? foundObject.attributes.username : foundObject.username;
 }
 export async function POST({ request }) {
   const data = await request.json();
@@ -113,7 +115,13 @@ export async function POST({ request }) {
   const rishon = data.rishon ?? getUnById(pu, data.rishon);
   const un = getUnById(pu, uid);
   await Promise.all(pu.map(async (element) =>{
-     if (element.id != uid && element.attributes.noMail != true) {
+     const eId = element.id || element.uid;
+     const noMail = element.attributes ? element.attributes.noMail : element.noMail;
+     if (eId != uid && noMail != true) {
+      const eEmail = element.attributes ? element.attributes.email : element.email;
+      const eUsername = element.attributes ? element.attributes.username : element.username;
+      const eLang = element.attributes ? element.attributes.lang : element.lang;
+
       await sendMail(
          restime,
          pid,
@@ -122,9 +130,9 @@ export async function POST({ request }) {
          un,
          kind,
          name,
-         element.attributes.email,
-         element.attributes.username,
-         element.attributes.lang != null ? element.attributes.lang : 'he',
+         eEmail,
+         eUsername,
+         eLang != null ? eLang : 'he',
          rishon
        );
      }

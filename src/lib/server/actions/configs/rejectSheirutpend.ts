@@ -35,7 +35,7 @@ export const rejectSheirutpendConfig: ActionConfig = {
             type: 'specificUsers',
             config: {
                 userIdsParam: 'requesterId',
-                excludeSender: true
+                excludeSender: false
             }
         },
         templates: {

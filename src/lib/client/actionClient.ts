@@ -215,16 +215,28 @@ export type ActionKey =
   | 'timerStart'
   | 'timerStop'
   | 'timerSave'
+  | 'addVote'
+  | 'approveSheirutpend'
+  | 'rejectSheirutpend'
   ;
 
 export interface ActionParamsMap {
-  updateTask: UpdateTaskParams;
-  createHaluka: CreateHalukaParams;
-  createTosplit: CreateTosplitParams;
-  approveHaluka: any; // TODO: Add proper type
-  timerStart: TimerStartParams;
-  timerStop: TimerStopParams;
   timerSave: TimerSaveParams;
+  addVote: {
+    type: 'pend' | 'sheirutpend';
+    id: string;
+    projectId: string;
+    existingComponentData: any[];
+    order?: number;
+  };
+  approveSheirutpend: {
+    id: string;
+    projectId: string;
+  };
+  rejectSheirutpend: {
+    id: string;
+    projectId: string;
+  };
 }
 
 // ============================================================================
@@ -564,6 +576,45 @@ export async function timerSave(
   options: ExecuteActionOptions = {}
 ): Promise<ActionResponse> {
   return executeAction('timerSave', params, options);
+}
+
+/**
+ * Add a vote to a pend or sheirutpend item
+ * 
+ * @param params - Vote parameters
+ * @param options - Execution options
+ */
+export async function addVote(
+  params: {
+    type: 'pend' | 'sheirutpend';
+    id: string;
+    projectId: string;
+    existingComponentData: any[];
+    order?: number;
+  },
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('addVote', params, options);
+}
+
+/**
+ * Approve a product request
+ */
+export async function approveSheirutpend(
+  params: { id: string; projectId: string },
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('approveSheirutpend', params, options);
+}
+
+/**
+ * Reject a product request
+ */
+export async function rejectSheirutpend(
+  params: { id: string; projectId: string },
+  options: ExecuteActionOptions = {}
+): Promise<ActionResponse> {
+  return executeAction('rejectSheirutpend', params, options);
 }
 
 // ============================================================================

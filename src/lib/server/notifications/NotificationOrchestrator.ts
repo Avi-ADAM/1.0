@@ -115,12 +115,16 @@ export class NotificationOrchestrator {
         });
       }
 
-      const notificationData: NotificationData = {
+      const notificationData: any = {
         title,
         body,
         metadata,
         actionParams,
-        actionResult
+        actionResult,
+        initiatorId: context.userId,
+        // Flatten for client-side handlers that expect these at top level
+        updateStrategy: actionResult?.updateStrategy,
+        data: actionResult?.data
       };
 
       // 4. Send via all configured channels (in parallel)

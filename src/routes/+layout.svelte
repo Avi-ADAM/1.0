@@ -168,20 +168,24 @@ onMessage(messaging, (payload) => {
           notification.title[userLang] || notification.title.he || '';
         const body = notification.body[userLang] || notification.body.he || '';
 
-        // Display notification using toast
-        toast.info(`${title}: ${body}`, {
-          duration: 5000,
-          action: notification.metadata?.url
-            ? {
-                label: 'View',
-                onClick: () => {
-                  if (notification.metadata?.url) {
-                    goto(notification.metadata.url);
+        // Display notification using toast (only if not from me)
+        const isFromMe = notification.initiatorId === String(data.id);
+
+        if (!isFromMe) {
+          toast.info(`${title}: ${body}`, {
+            duration: 5000,
+            action: notification.metadata?.url
+              ? {
+                  label: 'View',
+                  onClick: () => {
+                    if (notification.metadata?.url) {
+                      goto(notification.metadata.url);
+                    }
                   }
                 }
-              }
-            : undefined
-        });
+              : undefined
+          });
+        }
       });
 
       // Cleanup on unmount

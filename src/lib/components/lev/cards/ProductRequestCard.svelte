@@ -6,6 +6,8 @@
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import CardHeader from './CardHeader.svelte';
+  import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import { addVote, rejectSheirutpend } from '$lib/client/actionClient';
 
   let { buble, isFirst = false, glowColor = 'barbi', onProj } = $props();
 
@@ -42,25 +44,18 @@
 
   async function handleAction(action) {
     if (isProcessing) return;
-    
+
     // רק approve משתמש ב-addVote (עבור מקרה שעדיין יש כאלה שלא הצביעו)
     if (action === 'reject') {
       // reject נשאר עם approveSheirutpend/rejectSheirutpend הקיימים
       isProcessing = true;
       try {
-        const response = await fetch('/api/action', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            action: 'rejectSheirutpend',
-            params: {
-              id: buble.id,
-              projectId: buble.projectId
-            }
-          })
+        const result = await rejectSheirutpend({
+          id: buble.id,
+          projectId: buble.projectId
         });
 
-        if (!response.ok) throw new Error('Failed');
+        if (!result.success) throw new Error(result.error?.message || 'Failed');
 
         toast.success(t.successReject[$lang]);
       } catch (err) {
@@ -76,43 +71,14 @@
     isProcessing = true;
 
     try {
-      // הכנת הנתונים הקיימים של vots
-      const existingVots = buble.vots || [];
-      
-      // חישוב order - המקסימום + 1 או 0 אם אין קיימים
-      const maxOrder = existingVots.reduce((max: number, v: any) => {
-        const order = v.order ?? 0;
-        return Math.max(max, order);
-      }, -1);
-      const nextOrder = maxOrder + 1;
-
-      // המרת vots למבנה המתאים ל-GraphQL
-      const existingComponentData = existingVots.map((vote: any) => ({
-        what: vote.what ?? true,
-        users_permissions_user: vote.users_permissions_user?.data?.id ?? vote.users_permissions_user?.id ?? vote.users_permissions_user,
-        order: vote.order ?? 0,
-        ide: vote.ide ?? vote.users_permissions_user?.data?.id ?? vote.users_permissions_user?.id ?? vote.users_permissions_user,
-        zman: vote.zman ?? vote.createdAt ?? new Date().toISOString()
-      }));
-
-      const response = await fetch('/api/action', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action: 'addVote',
-          params: {
-            type: 'sheirutpend',
-            id: buble.id,
-            projectId: buble.projectId,
-            existingComponentData: existingComponentData,
-            order: nextOrder
-          }
-        })
+      const result = await addVote({
+        type: 'sheirutpend',
+        id: buble.id,
+        projectId: buble.projectId
       });
 
-      if (!response.ok) {
-        const errorData = await response.json().catch(() => ({}));
-        throw new Error(errorData.error?.message || 'Failed to add vote');
+      if (!result.success) {
+        throw new Error(result.error?.message || 'Failed to add vote');
       }
 
       toast.success(t.successApprove[$lang]);
@@ -137,16 +103,25 @@
   class="flex d flex-col h-full w-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
-  style:--glow-rgb={glowColor === 'gold' ? '238, 232, 170' : 
-                    glowColor === 'barbi' ? '255, 0, 146' :
-                    glowColor === 'blue' ? '116, 191, 255' :
-                    glowColor === 'green' ? '2, 255, 187' : '255, 0, 146'}
+  style:--glow-rgb={glowColor === 'gold'
+    ? '238, 232, 170'
+    : glowColor === 'barbi'
+      ? '255, 0, 146'
+      : glowColor === 'blue'
+        ? '116, 191, 255'
+        : glowColor === 'green'
+          ? '2, 255, 187'
+          : '255, 0, 146'}
 >
   <!-- Golden Header with AuthorityBadge -->
   <CardHeader
     logoSrc={buble.projectSrc}
     projectName={buble.projectName}
-    cardType={buble.ani === 'sheirutp' ? ($lang === 'he' ? 'בקשת מוצר' : 'PRODUCT REQUEST') : buble.ani}
+    cardType={buble.ani === 'sheirutp'
+      ? $lang === 'he'
+        ? 'בקשת מוצר'
+        : 'PRODUCT REQUEST'
+      : buble.ani}
     cardTitle={buble.name}
     {glowColor}
     onProjectClick={handleProjectClick}
@@ -261,13 +236,25 @@
             />
             <div class="flex items-center gap-1">
               <span class="font-semibold">{t.endDate[$lang]}</span>
-              <span>{new Date(buble.finishDate).toLocaleDateString($lang)}</span>
+              <span>{new Date(buble.finishDate).toLocaleDateString($lang)}</span
+              >
             </div>
           </div>
         {/if}
       </div>
     {/if}
   </div>
+
+  <!-- Vote Status Display -->
+  {#if buble.user_1s && buble.user_1s.length > 0}
+    <div class="px-4">
+      <VoteStatusDisplay
+        votes={buble.users || []}
+        members={buble.user_1s}
+        activeOrder={buble.orderon || 0}
+      />
+    </div>
+  {/if}
 
   <!-- Actions -->
   <div
@@ -283,9 +270,21 @@
     <button
       class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all disabled:opacity-50"
       onclick={() => handleAction('approve')}
-      disabled={isProcessing}
+      disabled={isProcessing || buble.already}
     >
-      {isProcessing ? t.submitting[$lang] : t.approve[$lang]}
+      {#if isProcessing}
+        {t.submitting[$lang]}
+      {:else if buble.already}
+        {buble.mypos === true
+          ? $lang === 'he'
+            ? 'כבר אישרת'
+            : 'Already approved'
+          : $lang === 'he'
+            ? 'כבר דחית'
+            : 'Already rejected'}
+      {:else}
+        {t.approve[$lang]}
+      {/if}
     </button>
   </div>
 </div>
@@ -296,7 +295,7 @@
   }
 
   .shadow-glow {
-    box-shadow: 
+    box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06),
       0 0 20px rgba(var(--glow-rgb), 0.4),
@@ -307,7 +306,7 @@
 
   .border-glow {
     border: 2px solid rgba(var(--glow-rgb), 0.5);
-    box-shadow: 
+    box-shadow:
       0 4px 6px -1px rgba(0, 0, 0, 0.1),
       0 2px 4px -1px rgba(0, 0, 0, 0.06),
       0 0 20px rgba(var(--glow-rgb), 0.4),

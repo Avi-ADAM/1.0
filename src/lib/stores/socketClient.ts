@@ -234,9 +234,13 @@ function createSocketClient() {
     socket.on('notification', (notification: NotificationPayload) => {
       console.log('[SocketClient] Notification received:', notification);
 
+      // Extract update strategy and data (check both top-level and nested in actionResult)
+      const updateStrategy = (notification as any).updateStrategy || (notification as any).actionResult?.updateStrategy;
+      const data = (notification as any).data || (notification as any).actionResult?.data;
+
       // Handle update strategy if present
-      if ((notification as any).updateStrategy) {
-        handleUpdateStrategy((notification as any).updateStrategy, (notification as any).data)
+      if (updateStrategy) {
+        handleUpdateStrategy(updateStrategy, data)
           .catch(error => {
             console.error('[SocketClient] Error handling update strategy:', error);
           });
