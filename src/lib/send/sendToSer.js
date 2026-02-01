@@ -64,7 +64,17 @@ export async function sendToSer(arg = {}, queId = "", me = 0, project = 0, isSer
     },
     body: JSON.stringify(datau),
   })
-    .then((res) => (res = res.json()))
+    .then(async (res) => {
+      if (res.status === 401) {
+        if (typeof window !== 'undefined') {
+          console.warn('Unauthorized (401), redirecting to login...');
+          window.location.href = '/login';
+        }
+        // Throwing error to stop further processing
+        throw new Error('Unauthorized');
+      }
+      return res.json();
+    })
     .then((data) => {
       console.log('Success:', data);
       da = data
