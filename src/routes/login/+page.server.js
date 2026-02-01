@@ -47,15 +47,20 @@ export const actions = {
 
             // JWT cookie - now httpOnly for security, preventing client-side exposure.
             
-            // Clean up potentially conflicting host-only cookies from previous sessions / configurations
-            // This prevents the "double cookie" issue where the browser sends both the old host-only cookie and the new domain cookie.
-            const deleteOptions = { path: '/' }; 
-            cookies.delete('jwt', deleteOptions);
-            cookies.delete('id', deleteOptions);
-            cookies.delete('un', deleteOptions);
-            cookies.delete('when', deleteOptions);
-            cookies.delete('email', deleteOptions);
+            // Aggressively clean up potential "zombie" cookies from previous sessions/deploys.
+            // We delete BOTH the HostOnly version (no domain) and the Domain version (.1lev1.com)
+            // to ensure no conflicting cookies persist.
+            const cookiesToDelete = ['jwt', 'id', 'un', 'when', 'email'];
+            for (const name of cookiesToDelete) {
+                // Variation 1: HostOnly cookie (default)
+                cookies.delete(name, { path: '/' });
+                
+                // Variation 2: Explicit Domain cookie
+                // Even if we are not currently in prod, clearing this doesn't hurt, and ensures clean state.
+                cookies.delete(name, { path: '/', domain: '.1lev1.com' });
+            }
 
+            // JWT cookie - now httpOnly for security, preventing client-side exposure.
             cookies.set('jwt', jwt, {
                 ...cookieOptions,
                 httpOnly: true 
@@ -63,7 +68,7 @@ export const actions = {
             
             cookies.set('id', String(user.id), {
                 ...cookieOptions,
-                httpOnly: false // Keep accessible for client
+                httpOnly: false 
             });
             
             cookies.set('un', user.username, {
