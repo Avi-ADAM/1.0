@@ -40,6 +40,31 @@
     }
   });
 
+  import { onMount } from 'svelte';
+
+  // Client-side aggressive cookie cleanup for legacy sessions
+  onMount(() => {
+    // List of cookies to possibly clear
+    const cookiesToClear = ['jwt', 'id', 'un', 'when', 'email'];
+
+    // Helper to delete a cookie by setting expired date
+    const eraseCookie = (name, domain) => {
+      let cookieStr = `${name}=; Path=/; Expires=Thu, 01 Jan 1970 00:00:01 GMT;`;
+      if (domain) {
+        cookieStr += ` Domain=${domain};`;
+      }
+      document.cookie = cookieStr;
+    };
+
+    cookiesToClear.forEach((name) => {
+      eraseCookie(name); // Clears host-only / current domain
+      eraseCookie(name, '.1lev1.com'); // Clears wildcard domain
+      eraseCookie(name, 'www.1lev1.com'); // Clears specific subdomain
+      eraseCookie(name, '1lev1.com'); // Clears root domain
+    });
+    console.log('Legacy cookies cleared on client mount');
+  });
+
   let loginError = $state(null); // State for displaying login errors
 </script>
 
@@ -117,8 +142,12 @@
           type="button"
           class="password-toggle"
           onclick={() => (showPassword = !showPassword)}
-          aria-label={showPassword ? $t('auth.login.hidePassword') : $t('auth.login.showPassword')}
-          title={showPassword ? $t('auth.login.hidePassword') : $t('auth.login.showPassword')}
+          aria-label={showPassword
+            ? $t('auth.login.hidePassword')
+            : $t('auth.login.showPassword')}
+          title={showPassword
+            ? $t('auth.login.hidePassword')
+            : $t('auth.login.showPassword')}
         >
           {#if showPassword}
             <!-- Eye slash icon (hide password) -->

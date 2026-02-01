@@ -62,6 +62,7 @@ export const actions = {
                     cookies.delete(name, opts);
                 }
             }
+            
 
             // JWT cookie - now httpOnly for security, preventing client-side exposure.
             cookies.set('jwt', jwt, {
