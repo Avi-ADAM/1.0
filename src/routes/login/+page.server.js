@@ -48,16 +48,19 @@ export const actions = {
             // JWT cookie - now httpOnly for security, preventing client-side exposure.
             
             // Aggressively clean up potential "zombie" cookies from previous sessions/deploys.
-            // We delete BOTH the HostOnly version (no domain) and the Domain version (.1lev1.com)
-            // to ensure no conflicting cookies persist.
+            // We iterate over multiple domain possibilities to catch stubborn cookies (like those set specifically on 'www').
             const cookiesToDelete = ['jwt', 'id', 'un', 'when', 'email'];
+            const deleteVariations = [
+                { path: '/' },                         // Standard HostOnly (current domain)
+                { path: '/', domain: '.1lev1.com' },   // Wildcard for all subdomains
+                { path: '/', domain: 'www.1lev1.com' },// Explicit WWW subdomain (crucial for the issue you saw)
+                { path: '/', domain: '1lev1.com' }     // Explicit root domain
+            ];
+
             for (const name of cookiesToDelete) {
-                // Variation 1: HostOnly cookie (default)
-                cookies.delete(name, { path: '/' });
-                
-                // Variation 2: Explicit Domain cookie
-                // Even if we are not currently in prod, clearing this doesn't hurt, and ensures clean state.
-                cookies.delete(name, { path: '/', domain: '.1lev1.com' });
+                for (const opts of deleteVariations) {
+                    cookies.delete(name, opts);
+                }
             }
 
             // JWT cookie - now httpOnly for security, preventing client-side exposure.
