@@ -46,6 +46,16 @@ export const actions = {
             };
 
             // JWT cookie - now httpOnly for security, preventing client-side exposure.
+            
+            // Clean up potentially conflicting host-only cookies from previous sessions / configurations
+            // This prevents the "double cookie" issue where the browser sends both the old host-only cookie and the new domain cookie.
+            const deleteOptions = { path: '/' }; 
+            cookies.delete('jwt', deleteOptions);
+            cookies.delete('id', deleteOptions);
+            cookies.delete('un', deleteOptions);
+            cookies.delete('when', deleteOptions);
+            cookies.delete('email', deleteOptions);
+
             cookies.set('jwt', jwt, {
                 ...cookieOptions,
                 httpOnly: true 
