@@ -9,7 +9,8 @@
     handleClearAll,
     handleClearSingle,
     updateTimer,
-    saveTimer
+    saveTimer,
+    recalculateMissionHours
   } from '$lib/func/timers.js';
   import { timers, updateTimers } from '$lib/stores/timers';
   import { page } from '$app/state';
@@ -232,6 +233,7 @@
 
   function handleSaveTimer() {
     showSaveDialog = false;
+    showClearDialog = false;
     dialogEdit = true;
     showSaveFinal = true;
   }
@@ -367,6 +369,29 @@
     const local = new Date(date);
     local.setMinutes(local.getMinutes() - local.getTimezoneOffset());
     return local.toISOString().slice(0, 16);
+  }
+
+  async function handleRecalculate() {
+    if (!timer?.mId) {
+      toast.error(
+        $lang === 'he' ? 'שגיאה: חסר מזהה משימה' : 'Error: Missing Mission ID'
+      );
+      return;
+    }
+
+    const result = await recalculateMissionHours(timer.mId, fetch);
+
+    if (result) {
+      const { savedHours, unsavedHours, totalHours } = result;
+      // Format for display
+      const msg = {
+        en: `Recalculation Complete:\nSaved Hours: ${savedHours.toFixed(2)}\nUnsaved (Running): ${unsavedHours.toFixed(2)}\nTotal: ${totalHours.toFixed(2)}`,
+        he: `חישוב מחדש הושלם:\nשעות שנשמרו: ${savedHours.toFixed(2)}\nשעות לא שמורות (רץ): ${unsavedHours.toFixed(2)}\nסך הכל: ${totalHours.toFixed(2)}`
+      };
+      toast.success(msg[$lang], { duration: 5000 });
+    } else {
+      toast.error($lang === 'he' ? 'חישוב נכשל' : 'Recalculation failed');
+    }
   }
   // Computed properties
   let lastTimer = $derived(
@@ -538,6 +563,26 @@
                 {$lang === 'he' ? 'הוספת מרווח זמן' : 'Add Time Interval'}
               </button>
             {/if}
+          </div>
+
+          <div
+            class="additional-actions"
+            style="margin-top: 1rem; display: flex; gap: 0.5rem; justify-content: center;"
+          >
+            <button
+              class="save-btn"
+              style="background: linear-gradient(to right, #4ade80, #3b82f6); color: black;"
+              onclick={handleSaveTimer}
+            >
+              {innerDialogButton[$lang]}
+            </button>
+            <button
+              class="recalc-btn"
+              style="padding: 0.5rem 1rem; border-radius: 6px; font-weight: bold; background: linear-gradient(to right, #f59e0b, #ef4444); color: white; border: none; cursor: pointer;"
+              onclick={handleRecalculate}
+            >
+              {$lang === 'he' ? 'חישוב מחדש' : 'Recalculate'}
+            </button>
           </div>
 
           <button

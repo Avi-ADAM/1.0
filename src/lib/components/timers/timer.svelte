@@ -639,6 +639,8 @@
         tabindex="0"
         aria-label={timer.running ? 'עצור טיימר' : 'הפעל טיימר'}
       >
+        <!-- Hit area expander -->
+        <circle cx="0" cy="0" r="75" fill="transparent" stroke="transparent" />
         <circle
           cx="0"
           cy="0"
@@ -665,6 +667,8 @@
         tabindex="0"
         aria-label="ערוך טיימר"
       >
+        <!-- Hit area expander -->
+        <circle cx="0" cy="0" r="75" fill="transparent" stroke="transparent" />
         <circle
           cx="0"
           cy="0"

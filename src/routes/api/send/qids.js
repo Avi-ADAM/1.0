@@ -35,6 +35,16 @@ export const qids = {
        }
         ){data{id}}
       }`,
+  '2forumCrBasic': `mutation CreateForumBasic($pid: ID, $da: DateTime) {
+    createForum(data: { project: $pid, publishedAt: $da }) {
+      data { id }
+    }
+  }`,
+  '2linkForumToSheirut': `mutation LinkForumToSheirut($id: ID!, $forumId: ID!) {
+    updateSheirut(id: $id, data: { forums: [$forumId] }) {
+      data { id }
+    }
+  }`,
   '3projectJSONQue': `query GetProjectJSON($pid: ID!) {
   project(id: $pid) {
     data {

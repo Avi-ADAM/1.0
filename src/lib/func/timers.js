@@ -538,3 +538,90 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
   }
 }
 
+
+/**
+ * סורק את כל הטיימרים המחוברים למשימה (היסטוריים ופעילים),
+ * מחשב מחדש את סך השעות, מעדכן את המשימה, ומחזיר סיכום.
+ * @param {string} missionId - מזהה המשימה
+ * @param {Function} fetch - פונקציית fetch
+ * @returns {Promise<Object>} - אובייקט סיכום { savedHours, unsavedHours, total }
+ */
+export async function recalculateMissionHours(missionId, fetch) {
+  try {
+    const res = await sendToSer(
+      { missionId },
+      '88GetMissionTimersForRecalc',
+      null,
+      null,
+      false,
+      fetch
+    );
+
+    const data = res?.data;
+
+    if (!data || !data.timers) {
+      console.error("Failed to fetch timers for calculation", res);
+      return null;
+    }
+
+    const allTimers = data.timers.data;
+    let totalSavedMilliseconds = 0;
+    let currentUnsavedMilliseconds = 0;
+
+    for (const t of allTimers) {
+      const intervals = t.attributes.timers || [];
+      
+      for (const interval of intervals) {
+        if (interval.start && interval.stop) {
+          const start = new Date(interval.start).getTime();
+          const stop = new Date(interval.stop).getTime();
+          if (!isNaN(start) && !isNaN(stop) && stop > start) {
+            totalSavedMilliseconds += (stop - start);
+          }
+        } else if (interval.start && !interval.stop) {
+          // טיימר רץ כרגע
+          const start = new Date(interval.start).getTime();
+          const now = new Date().getTime();
+          if (!isNaN(start) && now > start) {
+            currentUnsavedMilliseconds += (now - start);
+          }
+        }
+      }
+    }
+
+    const savedHours = totalSavedMilliseconds / 1000 / 60 / 60;
+    const unsavedHours = currentUnsavedMilliseconds / 1000 / 60 / 60;
+    const totalHoursIncludingRunning = savedHours + unsavedHours;
+
+    console.log(`Calculated: Saved=${savedHours}, Running=${unsavedHours}`);
+
+    // עדכון המשימה עם השעות ה"שמורות/סגורות" (ההיסטוריה האמיתית)
+    // אנחנו מעדכנים רק את השעות הסגורות כדי לשמור על עקביות הנתונים במסד
+    if (data.mesimabetahalich?.data) {
+      const updateResponse = await sendToSer(
+        {
+          mId: missionId,
+          howmanyhoursalready: savedHours,
+          stname: "recalculated", 
+          x: 0,
+        },
+        '11saveTimer', // משתמשים במוטציה זו שמעדכנת שעות
+        null,
+        null,
+        false, // isSer
+        fetch
+      );
+      console.log("Mission updated with recalculated hours:", updateResponse);
+    }
+
+    return {
+      savedHours,
+      unsavedHours,
+      totalHours: totalHoursIncludingRunning
+    };
+
+  } catch (error) {
+    console.error("Error recalculating mission hours:", error);
+    return null;
+  }
+}
