@@ -100,7 +100,13 @@
   }}
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
-  class="flex d flex-col h-full w-full bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+  class="{isMobileOrTablet()
+    ? 'w-full h-full'
+    : ' w-[90%] h-[90%]'}  lg:w-[90%] {isFirst
+    ? $lang == 'he'
+      ? 'boxleft'
+      : 'boxright'
+    : ''} flex d flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
     ? 'shadow-glow border-glow'
     : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
   style:--glow-rgb={glowColor === 'gold'
@@ -111,7 +117,7 @@
         ? '116, 191, 255'
         : glowColor === 'green'
           ? '2, 255, 187'
-          : '255, 0, 146'}
+          : '2, 255, 187'}
 >
   <!-- Golden Header with AuthorityBadge -->
   <CardHeader
