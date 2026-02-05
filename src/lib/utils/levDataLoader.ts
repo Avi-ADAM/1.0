@@ -29,6 +29,7 @@ import {
   transfersStore,
   decisionsStore,
   sheirutpStore,
+  salesStore,
   saveSnapshot,
   loadSnapshot,
   clearSnapshot,
@@ -52,7 +53,8 @@ import {
   extractWelcome,
   extractTransfers,
   extractDecisions,
-  extractProductRequests
+  extractProductRequests,
+  extractSales
 } from './levDataExtractors';
 import { fetchMainUserData, fetchOpenMissions } from './levGraphQLQueries';
 
@@ -223,6 +225,7 @@ export function restoreFromSnapshot(snapshot: SnapshotData): void {
     transfersStore.set(snapshot.data.transfers);
     decisionsStore.set(snapshot.data.decisions);
     sheirutpStore.set(snapshot.data.sheirutp || []);
+    salesStore.set(snapshot.data.sales || []);
 
     console.log('✅ [levDataLoader] All stores restored from snapshot');
   } catch (error) {
@@ -348,6 +351,11 @@ export function populateStores(data: any, userId: string): void {
     sheirutpStore.set(sheirutp);
     console.log(`✅ [levDataLoader] Sheirutpends set (${sheirutp.length} items)`);
 
+    // Extract and set sales (approved sales)
+    const salesData = extractSales(userData);
+    salesStore.set(salesData);
+    console.log(`✅ [levDataLoader] Sales set (${salesData.length} items)`);
+
     console.log('✅ [levDataLoader] All stores populated successfully');
   } catch (error) {
     console.error('❌ [levDataLoader] Error populating stores:', error);
@@ -392,7 +400,8 @@ export function saveCurrentSnapshot(): void {
         transfers: get(transfersStore),
         decisions: get(decisionsStore),
         resourceSuggestions: get(resourceSuggestionsStore),
-        sheirutp: get(sheirutpStore)
+        sheirutp: get(sheirutpStore),
+        sales: get(salesStore)
       }
     };
 
@@ -434,6 +443,7 @@ export function clearAllData(): void {
   transfersStore.set([]);
   decisionsStore.set([]);
   sheirutpStore.set([]);
+  salesStore.set([]);
 
   // Clear snapshot
   clearSnapshot();

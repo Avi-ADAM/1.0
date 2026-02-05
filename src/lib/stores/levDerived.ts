@@ -13,6 +13,7 @@ import {
   transfersStore,
   resourceSuggestionsStore,
   sheirutpStore,
+  salesStore,
   askedResourcesStore,
   decisionsStore,
   projectsStore,
@@ -35,6 +36,7 @@ import {
   processTransfers,
   processDecisions,
   processProductRequests,
+  processSales,
   mergeAndSort,
   type DisplayItem
 } from '$lib/utils/levProcessors';
@@ -203,6 +205,16 @@ export const processedSheirutp: Readable<DisplayItem[]> = derived(
   ([$sheirutp, $projects]) => processProductRequests($sheirutp, $projects)
 );
 
+/**
+ * Derived store for processed sales (sheiruts)
+ * 
+ * Automatically recomputes when salesStore or projectsStore changes.
+ */
+export const processedSales: Readable<DisplayItem[]> = derived(
+  [salesStore, projectsStore],
+  ([$sales, $projects]) => processSales($sales, $projects)
+);
+
 // ========== Final Merged Array ==========
 
 /**
@@ -245,6 +257,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     processedTransfers,
     processedDecisions,
     processedSheirutp,
+    processedSales,
     milon,
     projectFilter
   ],
@@ -263,6 +276,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     $transfers,
     $decisions,
     $sheirutp,
+    $sales,
     $milon,
     $projectFilter
   ]) => {
@@ -281,7 +295,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
       $welcome,
       $transfers,
       $decisions,
-      $sheirutp
+      $sheirutp,
+      $sales
     );
 
     // Step 2: Apply milon filtering (visibility settings)
@@ -316,6 +331,8 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
           return true; // Always show transfers
         case 'sheirutp':
           return $milon.sheirutp;
+        case 'sales':
+          return $milon.sales;
         case 'hachla':
           return $milon.hachla;
         default:
@@ -330,7 +347,7 @@ export const finalSwiperArray: Readable<DisplayItem[]> = derived(
     console.log(filtered.sort((a, b) => {
       const priorityA = a.pl ?? 999;
       const priorityB = b.pl ?? 999;
-      priorityA - priorityB;
+      return priorityA - priorityB;
     }))
     // Step 4: Ensure final sort by priority (pl)
     return filtered.sort((a, b) => {

@@ -13,7 +13,8 @@ import type {
   TransferData,
   DecisionData,
   ProjectData,
-  ProductRequestData
+  ProductRequestData,
+  SaleData
 } from '$lib/stores/levStores';
 // @ts-ignore
 import { createProjectInfo, createUserInfo, getProjectMembers, getProjectUsers, getProjectRestime } from '$lib/utils/projectHelpers.js';
@@ -2057,6 +2058,105 @@ export function processProductRequests(
 
       // Request-specific fields
       ...request
+    };
+  });
+}
+
+/**
+ * Process approved sales into display items
+ * 
+ * Pure function that transforms raw sale data into display items.
+ * Includes delivery confirmation voting, money transfer status, and chat.
+ * 
+ * @param sales - Array of sale data
+ * @param projects - Array of project data for lookups
+ * @returns Array of display items ready for rendering
+ */
+export function processSales(
+  sales: SaleData[],
+  projects: ProjectData[]
+): DisplayItem[] {
+  if (!sales || !Array.isArray(sales)) {
+    return [];
+  }
+
+  return sales.map(sale => {
+    const projectInfo = createProjectInfo(sale.projectId);
+    const myid = sale.myid;
+    const weFinnishVotes = sale.weFinnish || [];
+
+    // Calculate delivery confirmation status
+    let deliveryConfirmedCount = 0;
+    let alreadyVoted = false;
+    let myDeliveryVote = null;
+
+    for (const vote of weFinnishVotes) {
+      const voterId = vote.users_permissions_user?.data?.id;
+      if (vote.what === true) {
+        deliveryConfirmedCount++;
+      }
+      if (voterId === myid) {
+        alreadyVoted = true;
+        myDeliveryVote = vote.what;
+      }
+    }
+
+    const memberCount = projectInfo.noof || 0;
+    const deliveryPending = memberCount - deliveryConfirmedCount;
+
+    // Check if current user can receive money
+    const canReceiveMoney = !sale.iCanGetMonay;
+    const isMoneyRecipient = sale.iCanGetMonay?.id === myid;
+
+    // Check if money was transferred to current user
+    const moneyTransferredToMe = sale.iTransferedTo?.id === myid && sale.iTransferMoney;
+
+    // Priority calculation:
+    // - Higher priority if money needs to be received and user is recipient
+    // - Higher if delivery needs confirmation
+    // - Lower if already fully processed
+    let basePriority = 15;
+    if (moneyTransferredToMe && !sale.moneyTransfered) {
+      basePriority = 5; // Urgent: money needs confirmation
+    } else if (!alreadyVoted && !sale.productExepted) {
+      basePriority = 10; // Need to confirm delivery
+    } else if (alreadyVoted) {
+      basePriority = 25; // Already voted
+    }
+
+    // Build status indicators
+    const status = {
+      customerConfirmedDelivery: sale.iGotIt,
+      customerSaysTransferred: sale.iTransferMoney,
+      projectConfirmedMoney: sale.moneyTransfered,
+      productDelivered: sale.productExepted,
+      deliveryVoteCount: deliveryConfirmedCount,
+      totalMembers: memberCount
+    };
+
+    return {
+      // Common display fields
+      ani: 'sale',
+      azmi: 'sale',
+      pl: basePriority,
+      coinlapach: `sale-${sale.id}`,
+
+      // Project Info
+      ...projectInfo,
+      src: projectInfo.src2 || '',
+
+      // Sale-specific status
+      status,
+      alreadyVoted,
+      myDeliveryVote,
+      deliveryConfirmedCount,
+      deliveryPending,
+      canReceiveMoney,
+      isMoneyRecipient,
+      moneyTransferredToMe,
+
+      // Pass through all sale data
+      ...sale
     };
   });
 }

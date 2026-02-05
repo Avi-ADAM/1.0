@@ -254,6 +254,10 @@ async function handlePartialUpdate(
           }
           break;
 
+        case 'chat':
+          console.log('💬 [levSocketHandler] Chat update triggered - handled by pendMisMes listener');
+          break;
+
         default:
           console.warn(`⚠️ [levSocketHandler] Unknown dataKey: ${key}`);
           break;

@@ -82,8 +82,14 @@ export class NotificationOrchestrator {
 
       // 2. Filter out sender if configured
       const filteredRecipients = config.recipients.config?.excludeSender
-        ? recipients.filter(u => u.id !== context.userId)
+        ? recipients.filter(u => {
+          const isSender = String(u.id) === String(context.userId);
+          if (isSender) console.log(`[NotificationOrchestrator] Excluding sender with ID: ${u.id}`);
+          return !isSender;
+        })
         : recipients;
+
+      console.log(`[NotificationOrchestrator] Recipients for ${config.templates.title.he}: ${filteredRecipients.length}`);
 
       if (filteredRecipients.length === 0) {
         console.log('No recipients to notify');
@@ -244,9 +250,12 @@ export class NotificationOrchestrator {
         if (userIds && Array.isArray(userIds)) {
           // Fetch profiles for specific users directly
           const profiles = await Promise.all(
-            userIds.map(id => this.getUserProfile(String(id), context))
+            userIds
+              .filter(id => id && String(id).trim() !== '')
+              .map(id => this.getUserProfile(String(id), context))
           );
-          return profiles.filter((p): p is UserProfile => p !== null);
+          const results = profiles.filter((p): p is UserProfile => p !== null);
+          if (results.length > 0) return results;
         }
 
         // Fallback to project members filtering (legacy behavior)
@@ -291,6 +300,11 @@ export class NotificationOrchestrator {
    */
   private async getUserProfile(userId: string, context: ActionContext): Promise<UserProfile | null> {
     // Check cache
+    if (!userId || String(userId).trim() === '') {
+      console.warn('[NotificationOrchestrator] Attempted to fetch profile for empty/invalid userId');
+      return null;
+    }
+
     const cached = userProfileCache.get(userId);
     if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
       return cached.profile;

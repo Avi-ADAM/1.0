@@ -6,7 +6,8 @@
   import NewIwant from '$lib/components/addnew/newIwant.svelte';
   import { fly } from 'svelte/transition';
   import { lang } from '$lib/stores/lang.js';
-  import { isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
+  import { forum, isChatOpen, nowChatId } from '$lib/stores/pendMisMes.js';
+  import { initialForum } from '$lib/stores/pendMisMes.js';
   import { onMount } from 'svelte';
   import Drag from '$lib/celim/icons/drag.svelte';
   import ChatSmall from './chatSmall.svelte';
@@ -64,6 +65,17 @@
   /** @type {Props} */
   let { un = '', idL = 0, chatId = $bindable(0), online = true } = $props();
   let isAuthed = $derived(idL != 0);
+
+  $effect(() => {
+    if ($isChatOpen && $nowChatId && $nowChatId != 0 && idL && idL != 0) {
+      const fid = String($nowChatId);
+      const existing = $forum?.[fid];
+      // Load forum data only when missing md and not already loading (prevents loops)
+      if (!existing?.md && !existing?.loading) {
+        initialForum(false, [Number($nowChatId)], idL);
+      }
+    }
+  });
 
   onMount(async () => {
     draggable = (await import('svelte-agnostic-draggable')).draggable;

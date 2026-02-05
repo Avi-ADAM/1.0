@@ -15,6 +15,7 @@
   import Hal from '../../../components/lev/halukaask.svelte';
   import Vid from '../../../components/lev/didiget.svelte';
   import ProductRequestCard from './ProductRequestCard.svelte';
+  import SaleCard from './SaleCard.svelte';
   //import { fly } from 'svelte/transition';
   import { onMount } from 'svelte';
   import Header from './../../header/header.svelte';
@@ -26,6 +27,7 @@
     onUser,
     onHover,
     onProj,
+    onChat,
     low = false,
     cards = true,
     askedarr = [],
@@ -43,7 +45,9 @@
     mashs = 17,
     maap = 17,
     askma = 13,
-    hachlot = 9
+    hachlot = 99,
+    saless = 99,
+    sheirutps = 99
   } = $props();
 
   let milon = $state({
@@ -60,7 +64,8 @@
     askmap: true,
     hachla: true,
     vidu: true,
-    sheirutp: true
+    sheirutp: true,
+    sales: true
   });
   // Import Swiper styles
   import 'swiper/css';
@@ -369,6 +374,8 @@
                 {maap}
                 {askma}
                 {hachlot}
+                {saless}
+                {sheirutps}
                 filterKind="kind"
               />
             {/if}
@@ -541,6 +548,18 @@
                       onProj={proj}
                     /></SwiperSlide
                   >
+                {:else if buble.ani === 'sale' && milon.sales == true}
+                  <SwiperSlide
+                    class="{isMobileOrTablet()
+                      ? 'swipr-slidemobile'
+                      : 'swiper-slidec'} "
+                    ><SaleCard
+                      {buble}
+                      isFirst={currentIndex === i}
+                      onProj={proj}
+                      {onChat}
+                    /></SwiperSlide
+                  >
                 {:else if buble.ani === 'vidu' && milon.vidu == true}
                   <SwiperSlide
                     class="{isMobileOrTablet()
@@ -554,6 +573,8 @@
                       onUser={user}
                       {low}
                       cards="true"
+                      send={buble.send}
+                      recive={buble.recive}
                       coinlapach={buble.coinlapach}
                       myid={buble.myid}
                       pendId={buble.pendId}
@@ -588,6 +609,7 @@
                       onUser={user}
                       onHover={hover}
                       {low}
+                      forumId={buble.forumId}
                       restime={buble.restime}
                       isVisible={currentIndex === i}
                       pu={buble.pu}
@@ -1140,9 +1162,7 @@
     height: 100vh;
     width: 100vw;
     border: none;
-
-    background: #ffcba4;
-    background: linear-gradient(to bottom, #ffcba4 0%, #f0bc95 100%);
+    background: radial-gradient(circle at center, #eee8aa, transparent 90%);
   }
 
   .bg {

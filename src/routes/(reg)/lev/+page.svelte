@@ -15,6 +15,10 @@
   import { initializeLevData } from '$lib/utils/levDataLoader';
   import { setupSocketListeners } from '$lib/utils/levSocketHandler';
   import {
+    nowChatId,
+    isChatOpen
+  } from '$lib/stores/pendMisMes.js';
+  import {
     fetchTimers,
     initialWebSocketForTimer,
     cleanupTimerListener
@@ -78,10 +82,16 @@
     isOpen = true;
   }
 
-  function chat(event) {
-    isOpen = false;
-    mode = 3;
-    isOpen = true;
+  function chat(payload) {
+    if (payload && payload.forumId) {
+      nowChatId.set(payload.forumId);
+      isChatOpen.set(true);
+    } else {
+      // Fallback for components that don't pass a payload
+      isOpen = false;
+      mode = 3;
+      isOpen = true;
+    }
   }
 
   function proj(event) {
@@ -241,6 +251,7 @@
           onCards={handleViewChange}
           onUser={user}
           onProj={proj}
+          onChat={chat}
           onStart={handleCoinLapach}
           arr1={displayItems}
           askedarr={[]}

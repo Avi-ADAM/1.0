@@ -1,4 +1,4 @@
-<script>
+<script lang="ts">
   import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
   import { fly, slide } from 'svelte/transition';
   import { quintOut } from 'svelte/easing';
@@ -402,9 +402,10 @@
     lastTimer
       ? formatTime(
           lastTimer.stop
-            ? new Date(lastTimer.stop) - new Date(lastTimer.start)
-            : Date.now() - new Date(lastTimer.start),
-          { lang: $lang }
+            ? new Date(lastTimer.stop).getTime() -
+                new Date(lastTimer.start).getTime()
+            : Date.now() - new Date(lastTimer.start).getTime(),
+          { lang: $lang as 'he' | 'en' }
         )
       : 'No timer available'
   );
@@ -514,10 +515,10 @@
                     <span class="timer-duration">
                       {formatTime(
                         timerEntry.stop
-                          ? new Date(timerEntry.stop) -
-                              new Date(timerEntry.start)
-                          : Date.now() - new Date(timerEntry.start),
-                        { lang: $lang }
+                          ? new Date(timerEntry.stop).getTime() -
+                              new Date(timerEntry.start).getTime()
+                          : Date.now() - new Date(timerEntry.start).getTime(),
+                        { lang: $lang as 'he' | 'en' }
                       )}
                     </span>
                   {/if}

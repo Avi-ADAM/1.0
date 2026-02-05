@@ -1,5 +1,4 @@
 <script>
-  import { role } from './../prPr/mi.js';
   import TimerDialogs from '../timers/TimerDialogs.svelte';
   import { Drawer } from 'vaul-svelte';
   import { nutifi } from '$lib/func/nutifi.svelte';
@@ -79,7 +78,7 @@
     missionDetails = 'do x in y',
     hearotMeyuchadot,
     src = 'coin.png',
-    link = 'https://www.1lev1.com',
+    link,
     linkDescription = 'לביצוע',
     projectId,
     linkP = '/project/',
@@ -98,6 +97,7 @@
     onProj,
     onDone,
     onHover,
+    forumId,
     onModal
   } = $props();
   const baseUrl = import.meta.env.VITE_URL;
@@ -2381,6 +2381,7 @@ ${tofinished}
                   {dueDateOrCountToDedline}
                   {hearotMeyuchadot}
                   {x}
+                  {forumId}
                   {iskvua}
                   {zman}
                   {already}
@@ -2421,6 +2422,7 @@ ${tofinished}
     {low}
     {tasks}
     {storeTimer}
+    {forumId}
     {dueDateOrCountToDedline}
     {hearotMeyuchadot}
     {x}

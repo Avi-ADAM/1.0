@@ -1,7 +1,11 @@
 import { SendTo } from '$lib/send/sendTo.svelte';
 import { io } from 'socket.io-client';
-import { writable } from 'svelte/store';
+import { get, writable } from 'svelte/store';
+import { socketClient } from '$lib/stores/socketClient';
   const baseUrl = import.meta.env.VITE_URL
+
+const inFlightForumFetches = new Set();
+
 export const username = writable("")
 export const pendMisMes = writable({});
 export const pendMasMes = writable({});
@@ -21,43 +25,52 @@ export const newChat = writable({
   id: 0,
   md: { mbId:0, pid:0}
 });
-export async function initialWebS (token,id){
-    const socket = io(baseUrl, {
-        auth: {
-          token: token
-        },id
-      });
+export function initialWebS(token, id) {
+  console.log('🔌 [pendMisMes] Setting up unified chat notification listener', id);
+  
+  // Register notification listener for real-time chat updates
+  return socketClient.onNotification((notification) => {
+    // Check if it's a chat message notification
+    const n = notification;
+    const isChatMessage = 
+      n.actionKey === 'createChatMessage' || 
+      n.metadata?.type === 'chatMessage' ||
+      (n.updateStrategy && n.updateStrategy.config?.dataKeys?.includes('chat'));
 
-      //  wait until socket connects before adding event listeners
-      socket.on('connect', () => {
-        console.log('connected',id);
-        socket.on('message:create', (datan) => {
-          console.log('io= ', datan);
-          //get array of relevant forum ids\
-                      console.log(
-                        'yallla cvar, geula',
-                        datan,
-                        datan.data
-                      );
-
-          if (datan.data.id != nowId) {
-            if (datan.data.attributes.fid in forum) {
-              console.log('yallla cvar, geula');
-              initialForum(true, [], id);
-            }
-          }
-        })
+    if (isChatMessage) {
+      const forumId = n.metadata?.forumId || 
+                     (n.updateStrategy && n.updateStrategy.config?.forumId);
       
-    })
+      if (forumId) {
+        console.log('💬 [pendMisMes] Refreshing chat data for forum:', forumId);
+        // Targeted refresh for the specific forum
+        initialForum(false, [String(forumId)], id);
+      }
+    }
+  });
 }
 export async function initialForum (all = false,ids = [],myId = 0){
-  for (let i = 0; i < ids.length; i++) {
-    if(ids[i] in forum){
-      forum[ids[i]].loading = true 
-    }else{
-    forum[ids[i]] = {loading: true}; 
+  const idsToFetch = [];
+  if (ids.length > 0) {
+    const currentForums = get(forum);
+    for (let i = 0; i < ids.length; i++) {
+      const fid = String(ids[i]);
+      if (inFlightForumFetches.has(fid)) continue;
+
+      inFlightForumFetches.add(fid);
+      idsToFetch.push(fid);
+
+      if (fid in currentForums) {
+        currentForums[fid].loading = true;
+      } else {
+        currentForums[fid] = { loading: true };
+      }
+    }
+    if (idsToFetch.length > 0) {
+      forum.set(currentForums);
     }
   }
+  const idsLiteral = idsToFetch.map((fid) => `"${fid}"`).join(',');
   let que = ``
   if(all == true){
     isChatLoading.set(true)
@@ -136,11 +149,15 @@ export async function initialForum (all = false,ids = [],myId = 0){
                             } }}
       }`;
 
-  }else if(all == false && ids.length >0){
+  }else if(all == false && idsToFetch.length >0){
        que = `{
-            forums(filters: {id:{in: [${ids}]}}){
+            forums(filters: {id:{in: [${idsLiteral}]}}){
                 data{id attributes{
-                    subject spec done messages(filters:{archived: {ne:true}}){data{id attributes{
+                    subject spec done
+                    project { data { id attributes { projectName profilePic{data{attributes{url formats}}} } } }
+                    mesimabetahaliches { data { attributes { name } } }
+                    sheiruts { data { attributes { name } } }
+                    messages(filters:{archived: {ne:true}}, sort:["when:asc"]){data{id attributes{
                         content when users_permissions_user{data{id attributes{username profilePic{data{attributes{url formats}}}}}}
                     }}}
                 }}
@@ -148,6 +165,13 @@ export async function initialForum (all = false,ids = [],myId = 0){
         }`;
       }
          try {
+           if (all === false && idsToFetch.length === 0) {
+             return "ok";
+           }
+
+           if (all === false && idsToFetch.length > 0) {
+             ids = idsToFetch;
+           }
            let res4 = await SendTo(que).then(
              (res4) => (res4 = res4)
            );
@@ -171,6 +195,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
               }))
               function extractForums(data) {
                 let forums = [];
+                const currentForums = get(forum);
                 
                 // Extract forums from projects (mesimabetahaliches)
                 data.usersPermissionsUser.data.attributes.projects_1s.data.forEach(
@@ -180,9 +205,9 @@ export async function initialForum (all = false,ids = [],myId = 0){
                         (forumo) =>{
                           // רק אם יש mesimabetahaliches (לא haluka)
                           if (forumo.attributes.mesimabetahaliches?.data?.[0]) {
-                            if (forumo.id in forum) {
-                              forum[forumo.id].loading = true;
-                              forum[forumo.id].md = {
+                            if (forumo.id in currentForums) {
+                              currentForums[forumo.id].loading = true;
+                              currentForums[forumo.id].md = {
                                 pid:project.id,
                                 projectName: project.attributes.projectName,
                                 projectPic: project.attributes.profilePic.data?.attributes?.formats?.thumbnail
@@ -193,7 +218,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
                                     .attributes.name
                               };
                             } else {
-                              forum[forumo.id] = {
+                              currentForums[forumo.id] = {
                                 loading: true,
                                 md: {
                                   pid: project.id,
@@ -227,9 +252,9 @@ export async function initialForum (all = false,ids = [],myId = 0){
                         const senderId = haluka.attributes.usersend.data.id;
                         const receiverId = haluka.attributes.userrecive.data.id;
                         
-                        if (forumo.id in forum) {
-                          forum[forumo.id].loading = true;
-                          forum[forumo.id].md = {
+                        if (forumo.id in currentForums) {
+                          currentForums[forumo.id].loading = true;
+                          currentForums[forumo.id].md = {
                             pid: project.id,
                             projectName: project.attributes.projectName,
                             projectPic: project.attributes.profilePic.data?.attributes?.formats?.thumbnail
@@ -242,7 +267,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
                             participants: [String(senderId), String(receiverId)]
                           };
                         } else {
-                          forum[forumo.id] = {
+                          currentForums[forumo.id] = {
                             loading: true,
                             md: {
                               pid: project.id,
@@ -274,9 +299,9 @@ export async function initialForum (all = false,ids = [],myId = 0){
                         const senderId = haluka.attributes.usersend.data.id;
                         const receiverId = haluka.attributes.userrecive.data.id;
                         
-                        if (forumo.id in forum) {
-                          forum[forumo.id].loading = true;
-                          forum[forumo.id].md = {
+                        if (forumo.id in currentForums) {
+                          currentForums[forumo.id].loading = true;
+                          currentForums[forumo.id].md = {
                             pid: project.id,
                             projectName: project.attributes.projectName,
                             projectPic: project.attributes.profilePic.data?.attributes?.formats?.thumbnail
@@ -289,7 +314,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
                             participants: [String(senderId), String(receiverId)]
                           };
                         } else {
-                          forum[forumo.id] = {
+                          currentForums[forumo.id] = {
                             loading: true,
                             md: {
                               pid: project.id,
@@ -310,7 +335,7 @@ export async function initialForum (all = false,ids = [],myId = 0){
                     }
                   );
                 }
-                
+                forum.set(currentForums);
                 return forums;
               }
 
@@ -328,50 +353,94 @@ export async function initialForum (all = false,ids = [],myId = 0){
            }
          } catch (e) {
            console.error(e);
+
+           if (all === false && idsToFetch.length > 0) {
+             const currentForums = get(forum);
+             for (const fid of idsToFetch) {
+               if (currentForums?.[fid]) {
+                 currentForums[fid].loading = false;
+               }
+             }
+             forum.set(currentForums);
+           }
          }
+
+    if (all === false && idsToFetch.length > 0) {
+      for (const fid of idsToFetch) {
+        inFlightForumFetches.delete(fid);
+      }
+    }
     return "ok"
 }
 
-export function forums(dat,myId,all=false) {
-  let oldForums = forum;
-  //check for is forum by id if not cr
-  console.log(dat)
-    for (let t = 0; t < dat.forums.data.length; t++) {
-      //TODO: add loading object, if already then new = [] update ALL messages then and add to forum
-      if (dat.forums.data[t].id in forum){
-        forum[dat.forums.data[t].id].messages = [];
+export function forums(dat, myId, all = false) {
+  const currentForums = get(forum);
+  const forumsList = dat?.forums?.data || [];
+
+  for (let t = 0; t < forumsList.length; t++) {
+    const forumData = forumsList[t];
+    const fid = String(forumData.id);
+    const attrs = forumData.attributes || {};
+
+    try {
+      // 1. Prepare metadata from server response
+      const project = attrs.project?.data;
+      const projectPic = project?.attributes?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
+        project?.attributes?.profilePic?.data?.attributes?.url;
+      const mesimaName = attrs.mesimabetahaliches?.data?.[0]?.attributes?.name;
+      const sheirutName = attrs.sheiruts?.data?.[0]?.attributes?.name;
+
+      // Ensure the forum entry exists in our local copy
+      if (!currentForums[fid]) {
+        currentForums[fid] = { messages: [], loading: true };
       }
-        for (
-          let index = 0;
-          index < dat.forums.data[t].attributes.messages.data.length;
-          index++
-        ) {
-          const element = dat.forums.data[t].attributes.messages.data[index];
-      //    console.log(dat.forums.data[t].attributes.messages.data,element);
-          addMes(
-            element.attributes.content,
-            dat.forums.data[t].id,
-            false,
-            element.attributes.users_permissions_user.data.id === myId,
-            element.attributes.users_permissions_user.data.attributes.profilePic
-              .data?.attributes?.formats?.thumbnail.url ||
-              'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png',
-            element.attributes.when,
-            element.id,
-            element.attributes.users_permissions_user.data.attributes.username
-          );
-        }
-          if (dat.forums.data[t].id in forum) {
-            forum[dat.forums.data[t].id].loading = false;
-          }
-}
-/*
-  let old = forum;
-  old[arr1[index].pendId] = arr;
-  pendMisMes.set(forums);
-  localStorage.setItem('pendMisMes', JSON.stringify(forum));*/
+      
+      // 2. Merge Metadata (don't overwrite existing fields if new ones are missing)
+      if (!currentForums[fid].md) currentForums[fid].md = {};
+      
+      const md = currentForums[fid].md;
+      if (project?.id) md.pid = project.id;
+      if (project?.attributes?.projectName) md.projectName = project.attributes.projectName;
+      if (projectPic) md.projectPic = projectPic;
+      if (mesimaName) md.mesimaName = mesimaName;
+      if (sheirutName) md.transferDetails = `מכירה: ${sheirutName}`;
+
+      // 3. Process Messages locally to avoid triggering store reactivity mid-loop
+      const messagesData = attrs.messages?.data || [];
+      currentForums[fid].messages = messagesData.map(msg => {
+        const msgAttrs = msg.attributes || {};
+        const msgUser = msgAttrs.users_permissions_user?.data;
+        const userPic = msgUser?.attributes?.profilePic?.data?.attributes?.formats?.thumbnail?.url ||
+                       msgUser?.attributes?.profilePic?.data?.attributes?.url ||
+                       'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png';
+
+        return {
+          message: msgAttrs.content || '',
+          what: true,
+          pic: userPic,
+          pending: false,
+          sentByMe: String(msgUser?.id) === String(myId),
+          timestamp: msgAttrs.when,
+          messageId: msg.id,
+          username: msgUser?.attributes?.username || ''
+        };
+      });
+
+      // 4. Force loading to false for this forum
+      currentForums[fid].loading = false;
+
+    } catch (e) {
+      console.error(`Error processing forum ${fid}:`, e);
+      if (currentForums[fid]) {
+        currentForums[fid].loading = false;
+      }
+    }
+  }
+
+  // Final single store update
+  forum.set({ ...currentForums });
   isChatLoading.set(false);
-  return "ok"
+  return "ok";
 }
 export function addMes(
   why = '',
@@ -383,16 +452,16 @@ export function addMes(
   messageId = 0,
   username = ""
 ) {
-  let aarr = forum;
-  let arr;
-  if (id in aarr) {
-    arr = aarr[id]?.messages ?? [];
-  } else {
-    aarr[id] = {
-      messages: []
-    };
-    arr = [];
+  console.log('📝 [addMes] Adding message to forum', { forumId: id, messageId, pending, sentByMe });
+  let aarr = get(forum);
+  
+  // Ensure the forum entry exists
+  if (!(id in aarr)) {
+    aarr[id] = { messages: [] };
   }
+  
+  let arr = aarr[id].messages || [];
+  
   arr.push({
     message: why,
     what: true,
@@ -403,19 +472,45 @@ export function addMes(
     messageId,
     username
   });
-  aarr[id].messages = arr;
-  forum.set(aarr);
+  
+  // Create new references for reactivity
+  aarr[id] = {
+    ...aarr[id],
+    messages: [...arr]
+  };
+  forum.set({ ...aarr });
   return;
 }
 export function updSend(
   id = 0,
   messageId = 0
 ) {
-  let aarr = forum;
+  console.log('🚀 [updSend] Marking message as sent', { forumId: id, messageId });
+  let aarr = get(forum);
   let arr = aarr[id]?.messages ?? [];
-  //let mesIn = arr.findIndex((obj) => obj.messageId == messageId);
-  console.log(arr[arr.length -1],arr,aarr)
-  arr[arr.length - 1].pending = false;
-  aarr[id].messages = arr;
-  forum.set(aarr);
+  
+  if (arr.length > 0) {
+    // Create a new object for the last message to trigger reactivity
+    const lastIndex = arr.length - 1;
+    const updatedMessage = { 
+      ...arr[lastIndex], 
+      pending: false 
+    };
+    
+    // Also update messageId if provided and not 0
+    if (messageId) updatedMessage.messageId = messageId;
+    
+    // Update array with new message object
+    arr[lastIndex] = updatedMessage;
+    
+    // Update store with deep fresh references
+    aarr[id] = {
+      ...aarr[id],
+      messages: [...arr]
+    };
+    
+    forum.set({ ...aarr });
+  } else {
+    console.warn('⚠️ [updSend] No messages found in forum to mark as sent', id);
+  }
 }

@@ -22,7 +22,8 @@ import type {
   TransferData,
   DecisionData,
   ResourceSuggestionData,
-  ProductRequestData
+  ProductRequestData,
+  SaleData
 } from '$lib/stores/levStores';
 import { calculateScore } from './suggestionMatchers';
 
@@ -132,6 +133,7 @@ export function extractMtaha(userData: any): InProgressMissionData[] {
       publicklinks: mission.attributes.publicklinks || [],
       dates: mission.attributes.dates || [],
       timer: mission.attributes.timer,
+      forumId: mission.attributes.forums?.data[0]?.id || -1,
       activeTimer: mission.attributes.activeTimer, // Add activeTimer for checks
       admaticedai: mission.attributes.admaticedai,
       acts: mission.attributes.acts || { data: [] }
@@ -1145,4 +1147,143 @@ export function extractProductRequests(userData: any): ProductRequestData[] {
   }
 
   return requests;
+}
+
+/**
+ * Extract approved sales (sheiruts) from GraphQL user data
+ * These are active sales that project members need to manage
+ * 
+ * @param userData - Raw GraphQL response data
+ * @returns Array of sale data
+ */
+export function extractSales(userData: any): SaleData[] {
+  const sales: SaleData[] = [];
+
+  if (!userData?.attributes?.projects_1s?.data) {
+    return sales;
+  }
+
+  const projects = userData.attributes.projects_1s.data;
+
+  for (const project of projects) {
+    if (!project?.attributes?.sheiruts?.data) {
+      continue;
+    }
+
+    for (const sheirut of project.attributes.sheiruts.data) {
+      if (!sheirut?.id || !sheirut?.attributes) {
+        continue;
+      }
+
+      const attrs = sheirut.attributes;
+
+      // Skip archived sales
+      if (attrs.archived === true) {
+        continue;
+      }
+
+      // Only include approved sales that are not fully completed
+      if (!attrs.isApruved) {
+        continue;
+      }
+
+      // Skip if both money transferred and product delivered
+      if (attrs.moneyTransfered === true && attrs.productExepted === true) {
+        continue;
+      }
+
+      const customer = attrs.users_permissions_users?.data[0];
+      const firstMatana = attrs.matanots?.data?.[0]?.attributes;
+      const forumData = attrs.forums?.data?.[0];
+
+      // Extract iCanGetMonay user
+      const iCanGetMonayUser = attrs.iCanGetMonay?.data;
+      const iCanGetMonay = iCanGetMonayUser ? {
+        id: iCanGetMonayUser.id,
+        username: iCanGetMonayUser.attributes?.username || '',
+        profilePic: iCanGetMonayUser.attributes?.profilePic?.data?.attributes?.url
+      } : undefined;
+
+      // Extract iTransferedTo user
+      const iTransferedToUser = attrs.iTransferedTo?.data;
+      const iTransferedTo = iTransferedToUser ? {
+        id: iTransferedToUser.id,
+        username: iTransferedToUser.attributes?.username || '',
+        profilePic: iTransferedToUser.attributes?.profilePic?.data?.attributes?.url
+      } : undefined;
+
+      // Extract weFinnish votes
+      const weFinnish = attrs.weFinnish?.data?.map((v: any) => ({
+        id: v.id,
+        what: v.attributes?.what,
+        order: v.attributes?.order,
+        why: v.attributes?.why,
+        users_permissions_user: v.attributes?.users_permissions_user
+      })) || [];
+
+      // Extract forum messages
+      const messages = forumData?.attributes?.messages?.data?.map((m: any) => ({
+        id: m.id,
+        content: m.attributes?.content,
+        createdAt: m.attributes?.createdAt,
+        userId: m.attributes?.users_permissions_user?.data?.id,
+        username: m.attributes?.users_permissions_user?.data?.attributes?.username,
+        userPic: m.attributes?.users_permissions_user?.data?.attributes?.profilePic?.data?.attributes?.url
+      })) || [];
+
+      sales.push({
+        id: sheirut.id,
+        projectId: project.id,
+        projectName: project.attributes.projectName,
+        projectSrc: project.attributes.profilePic?.data?.attributes?.url,
+
+        // Customer info
+        customerId: customer?.id || '',
+        customerName: customer?.attributes?.username || '',
+        customerSrc: customer?.attributes?.profilePic?.data?.attributes?.url,
+
+        // Product details
+        name: firstMatana?.name || attrs.name || '',
+        descrip: firstMatana?.desc || attrs.descrip || '',
+        price: attrs.price || firstMatana?.price || 0,
+        quant: attrs.quant || firstMatana?.quant || 0,
+        total: attrs.total || 0,
+        kindOf: firstMatana?.kindOf || '',
+        startDate: attrs.startDate,
+        finnishDate: attrs.finnishDate,
+        productPic: firstMatana?.pic?.data?.attributes?.url,
+
+        // Status flags
+        isApruved: attrs.isApruved || false,
+        iGotIt: attrs.iGotIt || false,
+        iTransferMoney: attrs.iTransferMoney || false,
+        moneyTransfered: attrs.moneyTransfered || false,
+        productExepted: attrs.productExepted || false,
+
+        // Money handling
+        iCanGetMonay,
+        iTransferedTo,
+        iGotMoney: attrs.iGotMoney || [],
+
+        // Delivery confirmation voting
+        weFinnish,
+
+        // Communication
+        forumId: forumData?.id,
+        messages,
+
+        // Additional fields
+        matanots: attrs.matanots?.data || [],
+        equaliSplited: attrs.equaliSplited || false,
+        oneTime: attrs.oneTime || false,
+        myid: userData.id,
+
+        // Processor metadata
+        ani: 'sale',
+        azmi: 'sale'
+      });
+    }
+  }
+
+  return sales;
 }

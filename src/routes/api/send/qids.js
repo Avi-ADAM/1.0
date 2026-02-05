@@ -25,13 +25,12 @@ export const qids = {
        }
         ){data{id}}
       }`,
-  '2forumCrHaluka': `mutation  CreateForumHaluka($pid : ID, $halukId: ID , $da: DateTime, $participants: [ID])
+  '2forumCrHaluka': `mutation  CreateForumHaluka($pid : ID, $halukId: ID , $da: DateTime)
    { createForum(
        data: {
         project:$pid,
         haluka:$halukId,
-        publishedAt:$da,
-        users_permissions_users:$participants
+        publishedAt:$da
        }
         ){data{id}}
       }`,
@@ -2134,6 +2133,10 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
               howmanyhoursalready
               admaticedai
               dates
+              forums{ 
+              data { id 
+              }
+              }
               mission {
                 data {
                   id
@@ -2305,6 +2308,145 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
                   attributes {
                     url
                     formats
+                  }
+                }
+              }
+              sheiruts {
+                data {
+                  id
+                  attributes {
+                    name
+                    descrip
+                    equaliSplited
+                    oneTime
+                    archived
+                    isApruved
+                    isItOnlyOneInProject
+                    price
+                    quant
+                    startDate
+                    finnishDate
+                    total
+                    iGotIt
+                    iTransferMoney
+                    iGotMoney { iGotMoney users_permissions_user { data { id } } }
+                    moneyTransfered
+                    productExepted
+                    weFinnish {
+                      data {
+                        id
+                        attributes {
+                          what
+                          order
+                          why
+                          users_permissions_user {
+                            data {
+                              id
+                            }
+                          }
+                        }
+                      }
+                    }
+                    iCanGetMonay {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    iTransferedTo {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    users_permissions_users {
+                      data {
+                        id
+                        attributes {
+                          username
+                          profilePic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    matanot {
+                      data {
+                        id
+                        attributes {
+                          name
+                          desc
+                          price
+                          quant
+                          kindOf
+                          pic {
+                            data {
+                              attributes {
+                                url
+                                formats
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
+                    forums {
+                      data {
+                        id
+                        attributes {
+                          messages(pagination: { limit: 50 }) {
+                            data {
+                              id
+                              attributes {
+                                content
+                                createdAt
+                                users_permissions_user {
+                                  data {
+                                    id
+                                    attributes {
+                                      username
+                                      profilePic {
+                                        data {
+                                          attributes {
+                                            url
+                                            formats
+                                          }
+                                        }
+                                      }
+                                    }
+                                  }
+                                }
+                              }
+                            }
+                          }
+                        }
+                      }
+                    }
                   }
                 }
               }
@@ -3530,5 +3672,29 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
         id
       }
     }
-  }`
+  }`,
+  '88GetMissionTimersForRecalc': `query GetMissionTimers($missionId: ID!) {
+        timers(filters: { mesimabetahalich: { id: { eq: $missionId } } }, pagination: { limit: -1 }) {
+          data {
+            id
+            attributes {
+              saved
+              isActive
+              timers {
+                start
+                stop
+              }
+            }
+          }
+        }
+        mesimabetahalich(id: $missionId) {
+          data {
+            id
+            attributes {
+              name
+              howmanyhoursalready
+            }
+          }
+        }
+      }`
 };

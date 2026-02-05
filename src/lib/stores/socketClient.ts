@@ -41,6 +41,10 @@ export interface NotificationPayload {
     type?: string;
   };
   data?: any;
+  updateStrategy?: {
+    type: string;
+    config?: any;
+  };
 }
 
 /**

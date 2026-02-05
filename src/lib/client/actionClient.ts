@@ -226,7 +226,7 @@ export interface ActionParamsMap {
     type: 'pend' | 'sheirutpend';
     id: string;
     projectId: string;
-    existingComponentData: any[];
+    existingComponentData?: any[];
     order?: number;
   };
   approveSheirutpend: {
@@ -585,13 +585,7 @@ export async function timerSave(
  * @param options - Execution options
  */
 export async function addVote(
-  params: {
-    type: 'pend' | 'sheirutpend';
-    id: string;
-    projectId: string;
-    existingComponentData: any[];
-    order?: number;
-  },
+  params: ActionParamsMap['addVote'],
   options: ExecuteActionOptions = {}
 ): Promise<ActionResponse> {
   return executeAction('addVote', params, options);

@@ -24,6 +24,8 @@ import { timerSaveConfig } from './timerSave.js';
 import { approveSheirutpendConfig } from './approveSheirutpend.js';
 import { rejectSheirutpendConfig } from './rejectSheirutpend.js';
 import { addVoteConfig } from './addVote.js';
+import { ensureSheirutForumConfig } from './ensureSheirutForum.js';
+import { chatActions } from './chat.js';
 
 /**
  * Register all actions
@@ -56,6 +58,12 @@ export function registerAllActions(): void {
   registerAction(rejectSheirutpendConfig);
   registerAction(addVoteConfig);
 
+  // Sheirut forum helpers
+  registerAction(ensureSheirutForumConfig);
+
+  // Chat actions
+  chatActions.forEach(registerAction);
+
   // Future actions will be registered here
   // registerAction(createTaskAction);
   // etc.
@@ -81,5 +89,7 @@ export {
   timerSaveConfig,
   approveSheirutpendConfig,
   rejectSheirutpendConfig,
-  addVoteConfig
+  addVoteConfig,
+  ensureSheirutForumConfig,
+  chatActions
 };

@@ -213,6 +213,65 @@ export interface DecisionData {
   [key: string]: any;
 }
 
+/** Sale data (sheirut - approved product/service sale) */
+export interface SaleData {
+  id: string;
+  projectId: string;
+  projectName?: string;
+  projectSrc?: string;
+
+  // Customer info
+  customerId: string;
+  customerName: string;
+  customerSrc?: string;
+
+  // Product details
+  name: string;
+  descrip?: string;
+  price: number;
+  quant: number;
+  total: number;
+  kindOf?: string;
+  startDate?: string;
+  finnishDate?: string;
+  productPic?: string;
+
+  // Status flags
+  isApruved: boolean;
+  iGotIt: boolean; // Customer confirmed delivery
+  iTransferMoney: boolean; // Customer says they transferred money
+  moneyTransfered: boolean; // Project confirmed money arrived
+  productExepted: boolean; // Product delivered
+
+  // Money handling
+  iCanGetMonay?: {
+    id: string;
+    username: string;
+    profilePic?: string;
+  };
+  iTransferedTo?: {
+    id: string;
+    username: string;
+    profilePic?: string;
+  };
+  iGotMoney?: any[]; // Component (repeatable) for who got paid
+
+  // Delivery confirmation voting
+  weFinnish: any[]; // Array of Vote relations
+
+  // Communication
+  forumId?: string;
+  messages?: any[];
+
+  // Additional fields
+  matanots?: any[];
+  equaliSplited?: boolean;
+  oneTime?: boolean;
+  myid?: string;
+
+  [key: string]: any;
+}
+
 /** Product Request data (sheirutpend) */
 export interface ProductRequestData {
   id: string;
@@ -266,6 +325,7 @@ export interface MilonConfig {
   pmaap: boolean;    // בקשות משאבים
   askmap: boolean;   // בקשות משאבים ממני
   sheirutp: boolean; // בקשות שירות/מוצר
+  sales: boolean;    // מכירות מאושרות
 }
 
 // ========== Raw Data Stores ==========
@@ -318,6 +378,9 @@ export const decisionsStore: Writable<DecisionData[]> = writable([]);
 /** Product requests (sheirutpends) */
 export const sheirutpStore: Writable<ProductRequestData[]> = writable([]);
 
+/** Approved sales (sheiruts) */
+export const salesStore: Writable<SaleData[]> = writable([]);
+
 // ========== UI State Stores ==========
 
 /** Current view mode: true = cards, false = coins */
@@ -337,7 +400,8 @@ export const milon: Writable<MilonConfig> = writable({
   pmashs: true,   // הצעות משאבים
   pmaap: true,    // בקשות משאבים
   askmap: true,   // בקשות משאבים ממני
-  sheirutp: true  // בקשות שירות
+  sheirutp: true, // בקשות שירות
+  sales: true     // מכירות מאושרות
 });
 
 /** Current project filter (null = all projects) */
@@ -346,7 +410,7 @@ export const projectFilter: Writable<string | null> = writable(null);
 // ========== Snapshot Helpers ==========
 
 /** Current version of the snapshot data structure */
-const SNAPSHOT_VERSION = 3;
+const SNAPSHOT_VERSION = 4;
 
 /** Snapshot data structure for localStorage */
 export interface SnapshotData {
@@ -369,6 +433,7 @@ export interface SnapshotData {
     decisions: DecisionData[];
     resourceSuggestions: ResourceSuggestionData[];
     sheirutp: ProductRequestData[];
+    sales: SaleData[];
   };
 }
 
