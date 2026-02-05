@@ -297,15 +297,6 @@
   });
 </script>
 
-{#if !isMobileOrTablet()}
-  <span
-    role="contentinfo"
-    onmouseenter={() => hoverc(nav[$lang])}
-    onmouseleave={() => hoverc('0')}
-  >
-    <Header second="/moach" secondTitle={{ he: 'למוח', en: 'to Brain' }} />
-  </span>
-{/if}
 {#key arr1}
   {#key low}
     {#if arr1.length > 0}
@@ -336,7 +327,7 @@
             onmouseenter={() => hoverc('שינוי התצוגה מקלפים למטבעות')}
             onmouseleave={() => hoverc('0')}
             style:visibility={low == true ? 'hidden' : 'visible'}
-            class="bg z-[1000]"
+            class="bg z-[1000] p-1 bg-white/70 backdrop-blur-md rounded-full shadow-md"
           >
             <Switch
               bind:value={cards}
@@ -345,53 +336,69 @@
               options={[true, false]}
             />
           </div>
+          <!-- Left Filter (Card Type) -->
           <div
             dir="ltr"
             role="contentinfo"
             onmouseenter={() => hoverc(filterT[$lang])}
             onmouseleave={() => hoverc('0')}
             style:visibility={low == true ? 'hidden' : 'visible'}
-            class="z-[1000] top-0 absolute left-1/2 -translate-x-1/2 flex flex-row items-center justify-center"
+            class="z-[1000] top-4 absolute left-4 flex flex-row items-start justify-start"
           >
             <button
-              class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi"
+              class="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg transition-all duration-300"
               onclick={() => (filter ? showall() : (filter = true))}
             >
               <FilterIcon filterType="cardType" isX={filter} /></button
             >
             {#if filter}
-              <Filter
-                onShowonly={showonly}
-                {sug}
-                {pen}
-                {ask}
-                {wel}
-                {beta}
-                {des}
-                {fia}
-                {pmash}
-                {mashs}
-                {maap}
-                {askma}
-                {hachlot}
-                {saless}
-                {sheirutps}
-                filterKind="kind"
-              />
+              <div class="mt-2 ml-2">
+                <Filter
+                  onShowonly={showonly}
+                  {sug}
+                  {pen}
+                  {ask}
+                  {wel}
+                  {beta}
+                  {des}
+                  {fia}
+                  {pmash}
+                  {mashs}
+                  {maap}
+                  {askma}
+                  {hachlot}
+                  {saless}
+                  {sheirutps}
+                  filterKind="kind"
+                />
+              </div>
             {/if}
+          </div>
+
+          <!-- Right Filter (Projects) -->
+          <div
+            dir="ltr"
+            role="contentinfo"
+            onmouseenter={() => hoverc(filterT[$lang])}
+            onmouseleave={() => hoverc('0')}
+            style:visibility={low == true ? 'hidden' : 'visible'}
+            class="z-[1000] top-4 absolute right-4 flex flex-row-reverse items-start justify-start"
+          >
             {#if uniqueProjects.length >= 2}
               <button
-                class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi"
+                class="w-12 h-12 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg transition-all duration-300"
                 onclick={() => (filter2 ? showall() : (filter2 = true))}
               >
                 <FilterIcon isX={filter2} /></button
               >
               {#if filter2}
-                <Filter
-                  allIds={uniqueProjects}
-                  filterKind="projects"
-                  onShowonly={showonly}
-                />
+                <div class="mt-2 mr-2">
+                  <Filter
+                    allIds={uniqueProjects}
+                    filterKind="projects"
+                    onShowonly={showonly}
+                  />
+                </div>
               {/if}
             {/if}
           </div>
@@ -428,7 +435,7 @@
                 class="z-[1000] px-4 flex flex-row items-center justify-center"
               >
                 <button
-                  class="w-10 h-10 flex items-center justify-center rounded-full border-1 border-barbi"
+                  class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-md rounded-full border-1 border-barbi shadow-lg"
                   onclick={() => (filter ? showall() : (filter = true))}
                 >
                   <FilterIcon isX={filter} filterType="cardType" /></button
@@ -452,7 +459,7 @@
                   />
                 {/if}
                 <button
-                  class="w-10 h-10 flex items-center justify-center bg-slate-100 hover:bg-gold/80 rounded-full border-1 border-barbi"
+                  class="w-10 h-10 flex items-center justify-center bg-white/90 backdrop-blur-md hover:bg-gold/80 rounded-full border-1 border-barbi shadow-lg"
                   onclick={() => (filter2 ? showall() : (filter2 = true))}
                 >
                   <FilterIcon isX={filter2} /></button
@@ -1162,28 +1169,90 @@
     height: 100vh;
     width: 100vw;
     border: none;
-    background: radial-gradient(circle at center, #eee8aa, transparent 90%);
+    position: relative;
+    /* Royal Gold & Pink Mesh Gradient */
+    background:
+      radial-gradient(at 0% 0%, rgba(255, 0, 146, 0.07) 0%, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(179, 135, 40, 0.12) 0%, transparent 50%),
+      radial-gradient(
+        at 100% 100%,
+        rgba(255, 0, 146, 0.07) 0%,
+        transparent 50%
+      ),
+      radial-gradient(at 0% 100%, rgba(179, 135, 40, 0.12) 0%, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(255, 255, 255, 0.9) 0%, transparent 80%),
+      #fdfcf4; /* Very light creamy gold */
+    background-size: 100% 100%;
+    overflow: hidden;
+  }
+
+  /* Premium Gold Shimmer Effect */
+  .body::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(
+      135deg,
+      transparent 0%,
+      transparent 45%,
+      rgba(179, 135, 40, 0.05) 50%,
+      transparent 55%,
+      transparent 100%
+    );
+    background-size: 300% 300%;
+    animation: goldShimmer 15s linear infinite;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  @keyframes goldShimmer {
+    0% {
+      background-position: -150% -150%;
+    }
+    100% {
+      background-position: 150% 150%;
+    }
   }
 
   .bg {
     position: absolute;
-    top: 7%;
+    top: 1rem;
     left: 50%;
-    transform: translate(-50%, -50%);
+    transform: translateX(-50%);
   }
   .next {
     position: absolute;
-    top: calc(50% - 15px);
+    top: calc(50% - 14px);
     left: calc(100% - 50px);
     height: 30px;
     width: 50px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1)) brightness(1.1);
+    z-index: 50;
+    cursor: pointer;
   }
   .perv {
     position: absolute;
-    top: calc(50% - 15px);
+    top: calc(50% - 14px);
     right: calc(100% - 50px);
     height: 30px;
     width: 50px;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.1)) brightness(1.1);
+    z-index: 50;
+    cursor: pointer;
+  }
+  .next:hover,
+  .perv:hover {
+    transform: translateY(-2px);
+    filter: drop-shadow(0 10px 15px rgba(255, 0, 146, 0.3)) brightness(1.2);
+  }
+  .next:active,
+  .perv:active {
+    transform: scale(0.95);
   }
   @media (min-width: 528px) {
     .next {
