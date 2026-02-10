@@ -20,5 +20,11 @@
         "btn2": "Start creating networks",
         "footer": "Already signed? Great! Now make the vision a reality"
     },
+    "stats": {
+        "title": "Live Statistics",
+        "total": "Total Agreements",
+        "top": "Top Country",
+        "countries": "Active Countries"
+    },
     "loading": "One moment please"
 }

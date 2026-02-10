@@ -35,14 +35,33 @@
   let noof = $state(0);
   let isok = $state(false);
 
+  // Stats
+  let activeCountriesCount = $state(0);
+  let topCountry = $state({ name: '', count: 0 });
+
   onMount(() => {
     data.streamed.data.then(function (data) {
       isok = true;
       noof = data.total;
       console.log(noof, 'tesr');
+
+      let maxCount = 0;
+      let activeCount = 0;
+      let topC = { name: '', count: 0 };
+
       data.forEach((d) => {
         dataLookup.set(d[dataJoinKey], d);
+
+        // Calculate stats
+        if (d.agrees > 0) activeCount++;
+        if (d.agrees > maxCount) {
+          maxCount = d.agrees;
+          topC = { name: d.name, count: d.agrees };
+        }
       });
+      console.log('Stats:', activeCount, topC);
+      activeCountriesCount = activeCount;
+      topCountry = topC;
     });
   });
 
@@ -175,6 +194,25 @@
           <small>{$t('love.scroll')}</small>
         </div>
       {/if}
+    </div>
+
+    <!-- Stats Section -->
+    <div class="stats-section" dir={$lang === 'he' ? 'rtl' : 'ltr'}>
+      <div class="stat-card">
+        <div class="stat-value">{addCommas(noof)}</div>
+        <div class="stat-label">{$t('love.stats.total')}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">
+          {$t('countries.' + topCountry.name, { default: topCountry.name })}
+          <small>({addCommas(topCountry.count)})</small>
+        </div>
+        <div class="stat-label">{$t('love.stats.top')}</div>
+      </div>
+      <div class="stat-card">
+        <div class="stat-value">{addCommas(activeCountriesCount)}</div>
+        <div class="stat-label">{$t('love.stats.countries')}</div>
+      </div>
     </div>
 
     <!-- CTA Section -->
@@ -310,6 +348,58 @@
     text-shadow: 0 1px 2px rgba(255, 255, 255, 0.5);
   }
 
+  /* Stats Section */
+  .stats-section {
+    width: 100%;
+    padding: 30px 20px;
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2;
+    margin-top: -20px; /* Slight overlap or pull depending on layout */
+    direction: rtl;
+  }
+
+  .stat-card {
+    background: white;
+    padding: 20px 25px;
+    border-radius: 16px;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
+    text-align: center;
+    min-width: 160px;
+    flex: 1;
+    max-width: 300px;
+    transition: transform 0.3s ease;
+  }
+
+  .stat-card:hover {
+    transform: translateY(-5px);
+  }
+
+  .stat-value {
+    font-size: 28px;
+    font-weight: 800;
+    color: #ff0092;
+    margin-bottom: 5px;
+  }
+
+  .stat-label {
+    font-size: 14px;
+    color: #64748b;
+    font-weight: 500;
+  }
+
+  .stat-value small {
+    font-size: 0.6em;
+    color: #888;
+    font-weight: normal;
+    display: block; /* or inline depending on pref */
+  }
+
   /* CTA Section Styles */
   .cta-section {
     background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
@@ -416,6 +506,22 @@
     letter-spacing: 1px;
   }
 
+  @keyframes bounce {
+    0%,
+    20%,
+    50%,
+    80%,
+    100% {
+      transform: translateX(-50%) translateY(0);
+    }
+    40% {
+      transform: translateX(-50%) translateY(-10px);
+    }
+    60% {
+      transform: translateX(-50%) translateY(-5px);
+    }
+  }
+
   /* Tooltip Row */
   .tooltip-header {
     font-weight: bold;
@@ -450,6 +556,17 @@
     .legend {
       bottom: 30px;
       right: 30px;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .stats-section {
+      flex-direction: column;
+      align-items: center;
+    }
+    .stat-card {
+      width: 100%;
+      max-width: 100%;
     }
   }
 
