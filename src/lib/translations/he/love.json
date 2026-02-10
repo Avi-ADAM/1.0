@@ -1,4 +1,24 @@
 {
-    "title": "כמה הסכימו מכל מקום",
-    "text": "Visit <a href=\"{{link}}\">kit.svelte.dev</a> to read the documentation"
+    "title": "סך הכל הסכימו",
+    "tooltip": {
+        "Name": "שם",
+        "iso3": "ISO3",
+        "Agrees": "הסכמות"
+    },
+    "legend": {
+        "title": "📊 מפתח (הסכמות)",
+        "high": "הרבה (100+)",
+        "medium": "בינוני (10-99)",
+        "low": "מעט (1-9)",
+        "none": "עדיין ללא"
+    },
+    "scroll": "גלילה למטה",
+    "cta": {
+        "header": "💚 רוצה להצטרף למפה?",
+        "sub": "הצטרף/י לאלפי אנשים שבוחרים לחיות בהסכמה הדדית",
+        "btn1": "הצטרף/י להסכמה",
+        "btn2": "התחל/י ליצור יחד בהסכמה",
+        "footer": "כבר הסכמת? מעולה! עכשיו אפשר להפוך את החזון למציאות"
+    },
+    "loading": "רק רגע בבקשה"
 }

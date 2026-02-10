@@ -11,6 +11,7 @@ export const config = {
         {
             locale: 'en',
             key: 'love',
+            routes: ['/love'], 
             loader: async () => (await import('./en/love.json')).default,
         },
         {
@@ -39,8 +40,14 @@ export const config = {
             loader: async () => (await import('./en/lev.json')).default,
         },
         {
+            locale: 'en',
+            key: 'countries',
+            loader: async () => (await import('./en/countries.json')).default,
+        },
+        {
             locale: 'he',
             key: 'love',
+            routes: ['/love'], 
             loader: async () => (await import('./he/love.json')).default,
         },
         {
@@ -69,8 +76,15 @@ export const config = {
             loader: async () => (await import('./he/lev.json')).default,
         },
         {
+            locale: 'he',
+            key: 'countries',
+            routes: ['/love'], 
+            loader: async () => (await import('./he/countries.json')).default,
+        },
+        {
             locale: 'ar',
             key: 'love',
+            routes: ['/love'], 
             loader: async () => (await import('./ar/love.json')).default,
         },
         {
@@ -97,6 +111,11 @@ export const config = {
             locale: 'ar',
             key: 'lev',
             loader: async () => (await import('./ar/lev.json')).default,
+        },
+        {
+            locale: 'ar',
+            key: 'countries',
+            loader: async () => (await import('./ar/countries.json')).default,
         },
     ],
 };

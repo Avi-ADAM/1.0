@@ -1,21 +1,3 @@
-<!--<script context="module">
-  throw new Error("@migration task: Check code was safely removed (https://github.com/sveltejs/kit/discussions/5774#discussioncomment-3292722)");
-
-  // import { locale, loadTranslations } from '$lib/translations';
-
-  // export const load = async ({ url }) => {
-  //   const { pathname } = url;
-
-  //   const defaultLocale = 'he'; // get from cookie, user session, ...
-  //   
-  //   const initLocale = locale.get() || defaultLocale; // set default if no locale already set
-
-  //   await loadTranslations(initLocale, pathname); // keep this just before the `return`
-
-  //   return {};
-  // }
-</script>-->
-
 <script>
   /* const app = firebase()
   import { getMessaging, onMessage } from "firebase/messaging";
@@ -42,6 +24,7 @@ onMessage(messaging, (payload) => {
   import { toast } from 'svelte-sonner';
   import { addMes } from '$lib/stores/pendMisMes.js';
   import { forumStore } from '$lib/stores/forumStore';
+
   // עדכון המשנה בטעינה
   onMount(() => {
     const unsubscribe = theme.subscribe((currentTheme) => {

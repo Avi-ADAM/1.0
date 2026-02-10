@@ -14,6 +14,7 @@
    * @property {number} [strokeWidth] - [strokeWidth=0.5] - The shape's stroke width.
    * @property {any} [features] - [features] - A list of GeoJSON features. Use this if you want to draw a subset of the features in `$data` while keeping the zoom on the whole GeoJSON feature set. By default, it plots everything in `$data.features` if left unset.
    * @property {(payload: { e: MouseEvent, props: any }) => void} [onFeatureMousemove] - Callback for mousemove event on a feature.
+   * @property {(payload: { e: MouseEvent, props: any }) => void} [onFeatureClick] - Callback for click event on a feature.
    * @property {() => void} [onMouseout] - Callback for mouseout event.
    */
 
@@ -26,25 +27,36 @@
     strokeWidth = 0,
     features = undefined,
     onFeatureMousemove,
+    onFeatureClick,
     onMouseout
   } = $props();
 
-  let fitSizeRange = $derived(fixedAspectRatio ? [100, 100 / fixedAspectRatio] : [$width, $height]);
+  let fitSizeRange = $derived(
+    fixedAspectRatio ? [100, 100 / fixedAspectRatio] : [$width, $height]
+  );
 
-  let projectionFn = $derived(projection()
-    .fitSize(fitSizeRange, $data));
+  let projectionFn = $derived(projection().fitSize(fitSizeRange, $data));
 
   let geoPathFn = $derived(geoPath(projectionFn));
-  $effect(()=>{console.log(geoPathFn)})
+  $effect(() => {
+    console.log(geoPathFn);
+  });
+
   function handleMousemove(feature) {
     return function handleMousemoveFn(e) {
       raise(this);
       // When the element gets raised, it flashes 0,0 for a second so skip that
       if (e.layerX !== 0 && e.layerY !== 0) {
-        console.log('mousemove in MapSvg', feature.properties);
+        // console.log('mousemove in MapSvg', feature.properties);
         onFeatureMousemove?.({ e, props: feature.properties });
       }
-    }
+    };
+  }
+
+  function handleClick(feature) {
+    return function handleClickFn(e) {
+      onFeatureClick?.({ e, props: feature.properties });
+    };
   }
 </script>
 
@@ -52,15 +64,25 @@
   class="map-group"
   onmouseout={(e) => onMouseout?.()}
   onblur={(e) => onMouseout?.()}
+  role="presentation"
 >
-  {#each (features || $data.features) as feature}
+  {#each features || $data.features as feature}
     <path
       class="feature-path"
-      fill="{fill || $zGet(feature.properties)}"
-      stroke={stroke}
+      fill={fill || $zGet(feature.properties)}
+      {stroke}
       stroke-width={strokeWidth}
-      d="{geoPathFn(feature)}"
+      d={geoPathFn(feature)}
       onmousemove={handleMousemove(feature)}
+      onclick={handleClick(feature)}
+      role="button"
+      tabindex="0"
+      onkeydown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          handleClick(feature)(e);
+        }
+      }}
     ></path>
   {/each}
 </g>
@@ -73,6 +95,7 @@
   .feature-path:hover {
     stroke: rgb(43, 158, 110);
     stroke-width: 0.5px;
+    cursor: pointer;
   }
   /**
    * Disable the outline on feature click.
@@ -83,5 +106,7 @@
    */
   .feature-path:focus {
     outline: none;
+    stroke: rgb(43, 158, 110);
+    stroke-width: 1px;
   }
 </style>
