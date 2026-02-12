@@ -317,10 +317,10 @@
       <!-- Content Cards -->
       <div class="w-full max-w-xl flex flex-col gap-6">
         <div
-          class="bg-gradient-to-br from-sky-400/90 via-mturk/90 to-sky-400/90 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-xl backdrop-blur-sm"
+          class="bg-gradient-to-br from-amber-200 via-amber-300 to-rose-200 opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-xl backdrop-blur-sm"
         >
           <h2
-            class="text-gold font-bold text-xl mb-2 text-center"
+            class="text-rose-700 font-bold text-xl mb-2 text-center"
             style="font-family: 'Sababa', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
           >
             {#if $locale === 'he'}
@@ -332,24 +332,24 @@
             {/if}
           </h2>
           <p
-            class="text-white text-sm leading-relaxed text-center"
+            class="text-slate-900 text-md leading-relaxed text-center"
             style="font-family: 'Sababa', sans-serif;"
           >
             {#if $locale === 'he'}
-              1💗1 היא לא סתם פלטפורמה עסקית - <strong class="text-gold"
+              1💗1 היא לא סתם פלטפורמה עסקית - <strong class="text-rose-600"
                 >אנחנו חלק מתנועה עולמית</strong
               >
               של אנשים שבוחרים ליצור יחד בהסכמה וללא כפיה. כל ריקמה שנוצרת כאן היא
               הוכחה חיה שאפשר ליצור אחרת.
             {:else if $locale === 'ar'}
-              1💗1 ليست مجرد منصة عمل - <strong class="text-gold"
+              1💗1 ليست مجرد منصة عمل - <strong class="text-rose-600"
                 >نحن جزء من حركة عالمية</strong
               >
               من الأشخاص الذين يختارون العمل بالتوافق وليس بالإكراه. كل شراكة هنا
               هي دليل حي على إمكانية العمل بشكل مختلف.
             {:else}
-              1💗1 isn't just a business platform - <strong class="text-gold"
-                >we're part of a global movement</strong
+              1💗1 isn't just a business platform - <strong
+                class="text-rose-600">we're part of a global movement</strong
               >
               of people choosing to work in mutual agreement, not coercion. Every
               partnership here is living proof that working differently is possible.
@@ -362,7 +362,7 @@
                 : $locale === 'ar'
                   ? '/aitifaqia'
                   : '/convention'}
-              class="inline-block bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+              class="inline-block bg-barbi hover:bg-white hover:text-barbi text-gold font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
               style="font-family: 'Sababa', sans-serif;"
             >
               {#if $locale === 'he'}
@@ -380,7 +380,7 @@
           class="flex flex-col gap-2 items-center sm:text-md text-xs my-4 px-2"
         >
           <Tile
-            bg={'neww'}
+            bg={'roseGold'}
             big={true}
             sm={true}
             reverse={true}
@@ -388,7 +388,7 @@
             word={$t('home.features.livelihood')}
           />
           <Tile
-            bg={'neww'}
+            bg={'roseGold'}
             big={true}
             sm={true}
             reverse={true}
@@ -396,7 +396,7 @@
             word={$t('home.features.sharedManagement')}
           />
           <Tile
-            bg={'neww'}
+            bg={'roseGold'}
             big={true}
             sm={true}
             reverse={true}
@@ -404,7 +404,7 @@
             word={$t('home.features.transparency')}
           />
           <Tile
-            bg={'neww'}
+            bg={'roseGold'}
             big={true}
             sm={true}
             reverse={true}
@@ -412,7 +412,7 @@
             word={$t('home.features.tools')}
           />
           <Tile
-            bg={'neww'}
+            bg={'roseGold'}
             big={true}
             sm={true}
             reverse={true}
@@ -420,7 +420,7 @@
             word={$t('home.features.ownership')}
           />
           <Tile
-            bg={'neww'}
+            bg={'roseGold'}
             big={true}
             sm={true}
             reverse={true}
@@ -428,7 +428,7 @@
             word={$t('home.features.formula')}
           />
           <Tile
-            bg={'gold'}
+            bg={'roseGold'}
             big={true}
             sm={true}
             word={$t('home.features.mission')}
@@ -437,7 +437,7 @@
 
         <!-- Stats -->
         <div
-          class="bg-gradient-to-br from-sky-400 via-mturk to-sky-400 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
+          class="bg-gradient-to-br from-gold via-barbi to-gold opacity-80 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
         >
           {#if statsLoaded}
             <div class="text-center">
