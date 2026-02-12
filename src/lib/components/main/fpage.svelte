@@ -41,11 +41,11 @@
   }
 
   // Derived value for headlines array
-  let headlines = $derived([
+  let headlines = [
     $t('home.hero.headline1'),
     $t('home.hero.headline2'),
     $t('home.hero.headline3')
-  ]);
+  ];
 
   let btna = $state(false);
 
@@ -59,8 +59,6 @@
     h = $state(0),
     fi = $state(false),
     trans = $state(false);
-  //רוצה להתפרנס מהתשוקה.אהבה שלך
-  //w*1.8 < h ? w : h > 639 ? w*0.8 : h
 
   import { Head } from 'svead';
   import { sendToSer } from '$lib/send/sendToSer.js';
@@ -70,6 +68,7 @@
 
   let projectsCount = $state(0);
   let membersCount = $state(0);
+  let usersCount = $state(0);
   let statsLoaded = $state(false);
 
   let pageurl = {
@@ -78,33 +77,36 @@
     he: 'https://1lev1.com/he'
   };
   let size = $derived({
-    width: w < 320 ? w : Math.min(w * 1.15, h * 1.5), // הגבל רוחב לפי יחס גובה
-    height: w > 320 ? Math.min(h, w * 0.8) : h / 2 // הגבל גובה לפי יחס רוחב
-  });
-  $effect(() => {
-    console.log(size, h);
+    width: w,
+    height: h
   });
 
   // פונקציה לטעינת נתוני הסטטיסטיקות
   async function loadStats() {
     try {
-      // קבלת מספר הפרויקטים
       const projectsResult = await sendToSer(
         {},
         '66getProjectsCount',
         0,
         0,
-        true, // isSer = true כדי לאפשר גישה למשתמשים לא רשומים
+        true,
         fetch
       );
 
-      // קבלת מספר החברים
       const membersResult = await sendToSer(
         {},
         '67getMembersCount',
         0,
         0,
-        true, // isSer = true כדי לאפשר גישה למשתמשים לא רשומים
+        true,
+        fetch
+      );
+      const usersResult = await sendToSer(
+        {},
+        '89getUsersCount',
+        0,
+        0,
+        true,
         fetch
       );
 
@@ -116,15 +118,22 @@
         membersCount = membersResult.data.chezins.meta.pagination.total;
       }
 
+      if (usersResult?.data?.usersPermissionsUsers?.meta?.pagination?.total) {
+        usersCount =
+          usersResult.data.usersPermissionsUsers.meta.pagination.total;
+      }
+      // TODO: עדכן משתנה agreementCount כשהשאילתה תהיה מוכנה
+
       statsLoaded = true;
     } catch (error) {
       console.error('Error loading stats:', error);
-      statsLoaded = true; // עדיין מציינים שהטעינה הסתיימה
+      statsLoaded = true;
     }
   }
 
   onMount(() => {
     loadStats();
+    console.log($t('home.hero.headline1'));
   });
 </script>
 
@@ -198,314 +207,33 @@
     >
   {/if}
 </div>
+
 <div
   dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
-  class="h-screen w-screen flex flex-col-reverse sm:flex-row button-whitegold overflow-hidden bg-[length:200%_auto] animate-gradientx"
+  class="relative h-screen w-screen overflow-hidden bg-[length:200%_auto] animate-gradientx bg-gradient-to-br from-[#e0e7ff] via-[#f3e8ff] to-[#e0e7ff]"
 >
-  <div
-    id="text"
-    class="z-10 flex flex-col text-center align-middle justify-center items-center sm:w-1/2 h-2/3 sm:h-screen"
-  >
-    <img
-      src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
-      alt="logo"
-      class="sm:w-24 mt-2 h-6 w-6 sm:h-24 z-0"
-    />
-
-    <div
-      dir="ltr"
-      style="text-shadow:none;"
-      class="pt-2 sm:pt-6 font-bold sm:text-2xl text-xl text-transparent
-          bg-clip-text bg-[length:auto_200%] animate-gradienty
-          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
-          flex-wrap flex flex-row"
-    >
-      <div class="flip">
-        <h1
-          class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
-            bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
-        >
-          1
-        </h1>
-      </div>
-      <div>
-        <h1
-          class="font-bold mt-2 sm:text-xl text-lg text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
-          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
-        >
-          💗
-        </h1>
-      </div>
-      <div>
-        <h1
-          class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
-            bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
-        >
-          1
-        </h1>
-      </div>
-    </div>
-    <div
-      class="overflow-auto d"
-      dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}
-      onscroll={() => {
-        scrolli = true;
-        setTimeout(() => (scrolli = false), 1500);
-      }}
-    >
-      <h2
-        class="font-bold mt-3 sm:text-5xl text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_left,theme(colors.fuchsia.300),theme(colors.sky.400),theme(colors.barbi),theme(colors.mpink),theme(colors.barbi),theme(colors.sky.400),theme(colors.fuchsia.300))] overline decoration-mturk text-xl"
-        style="text-shadow:none;"
-      >
-        {$t('home.hero.subtitle')}
-      </h2>
-
-      <h3
-        class="sababa text-2xl sm:text-3xl p-2 px-2 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-goldGrad"
-        style="font-family: Sababa, system-ui;text-shadow:none;"
-      >
-        <AnimatedHeadline
-          texts={headlines}
-          wait={3000}
-          fade={500}
-          slide={300}
-          y={0}
-        />
-      </h3>
-
-      <div
-        class="intro-questions relative bg-gradient-to-r from-[#c67c7f] via-barbi to-[#c67c7f] p-4 my-4 rounded-lg shadow-lg border-2 border-"
-      >
-        <div class="absolute inset-0 overflow-hidden opacity-10">
-          <span class="absolute text-6xl font-bold text-white">?</span>
-          <span class="absolute right-0 text-6xl font-bold text-white">?</span>
-        </div>
-        <p
-          class="text-xl sm:text-2xl mb-2 text-white font-semibold relative"
-          style="font-family: 'Sababa', sans-serif;"
-        >
-          {$t('home.intro.q1')}
-        </p>
-        <p
-          class="text-xl sm:text-2xl text-white font-semibold relative"
-          style="font-family: 'Sababa', sans-serif;"
-        >
-          {$t('home.intro.q2')}
-        </p>
-      </div>
-
-      <div dir={$locale === 'he' || $locale === 'ar' ? 'rtl' : 'ltr'}>
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.welcome')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.createRikma')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.joinRikma')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.livelihood')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.sharedManagement')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.transparency')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.tools')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.ownership')}
-        />
-        <Tile
-          bg={'neww'}
-          big={true}
-          sm={true}
-          reverse={true}
-          openi={true}
-          word={$t('home.features.formula')}
-        />
-        <Tile
-          bg={'gold'}
-          big={true}
-          sm={true}
-          word={$t('home.features.mission')}
-        />
-      </div>
-      <!-- סטטיסטיקות האתר -->
-      <div
-        class="bg-gradient-to-br from-sky-400 via-mturk to-sky-400 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
-      >
-        {#if statsLoaded}
-          <div class="text-center">
-            <p
-              class="text-white font-semibold text-lg mb-2"
-              style="font-family: 'Sababa', sans-serif;"
-            >
-              {$t('home.stats.currently')}
-            </p>
-            <div class="flex justify-center items-center gap-4 flex-wrap">
-              <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
-                <div class="text-2xl font-bold text-gold">{projectsCount}</div>
-                <div class="text-white text-sm">
-                  {$t('home.stats.partnerships')}
-                </div>
-              </div>
-              <div class="text-gold text-2xl">•</div>
-              <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
-                <div class="text-2xl font-bold text-gold">{membersCount}</div>
-                <div class="text-white text-sm">{$t('home.stats.members')}</div>
-              </div>
-            </div>
-          </div>
-        {:else}
-          <div
-            class="text-center text-white font-semibold"
-            style="font-family: 'Sababa', sans-serif;"
-          >
-            {$t('home.stats.loading')}
-          </div>
-        {/if}
-      </div>
-
-      <div
-        class="bg-gradient-to-br from-[#c67c7f] via-barbi to-[#c67c7f] px-3 py-4 mt-1 border-4 border-spacing-2"
-      >
-        <h2
-          style="text-shadow:none;"
-          class="text-bold sm:text-2xl text-xl mx-6 text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]"
-        >
-          {$t('home.cta.agree')}<a
-            class="text-gold hover:text-lturk font-bold underline"
-            href="/love">{$t('home.cta.agreementMap')}</a
-          >
-          {$t('home.cta.agreeEnd')}
-        </h2>
-      </div>
-    </div>
-    <div style="font-family:Gan, Power;" class="flex flex-row">
-      <button
-        class="transition-all duration-300 flex flex-row text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl"
-        onclick={() => {
-          goto('/login');
-          loadinga = true;
-          fi = true;
-        }}
-        class:button-perl={btna == false}
-        class:button-gold={btna == true}
-        onfocus={() => (btna = true)}
-        onmouseover={() => (btna = true)}
-        onmouseleave={() => (btna = false)}
-        >{$t('home.cta.login')}
-        {#if btna == true && loadinga == false}
-          <span class="mx-2 mb-0.5"
-            ><Arrow
-              back={$lang == 'he' || $lang == 'ar' ? false : true}
-              height="32"
-              color={'var(--gold)'}
-              fill="var(--barbi-pink)"
-            /></span
-          >
-        {/if}
-        {#if loadinga == true}
-          <Lowding width="24px" height="24px" />
-        {/if}
-      </button>
-      <button
-        class="transition-all duration-300 text-barbi px-4 py-2 mx-2 my-4 text-2xl hover:text-slate-800 rounded-xl flex flex-row"
-        onclick={() => {
-          goto(
-            `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`
-          );
-          loading = true;
-          fi = true;
-        }}
-        class:button-perl={btnb == false}
-        class:button-gold={btnb == true}
-        onfocus={() => (btnb = true)}
-        onmouseover={() => (btnb = true)}
-        onmouseleave={() => (btnb = false)}
-        >{$t('home.cta.register')}
-        {#if btnb == true && loading == false}
-          <span class="mx-2 mb-0.5"
-            ><Arrow
-              back={$locale == 'he' || $locale == 'ar' ? false : true}
-              height="32"
-              color={'var(--gold)'}
-              fill="var(--barbi-pink)"
-            /></span
-          >
-        {/if}
-        {#if loading == true}
-          <Lowding width="24px" height="24px" />
-        {/if}
-      </button>
-    </div>
-  </div>
+  <!-- 3D Scene Background -->
   <div
     id="levi"
     bind:clientHeight={h}
     bind:clientWidth={w}
     class:flex={$progress == 1}
-    class="sm:w-1/2 h-1/3 sm:h-screen z-0 items-center justify-center sm:justify-end"
+    class="fixed inset-0 w-full h-full z-0 pointer-events-none sm:pointer-events-auto transition-all duration-300"
   >
     {#if $progress < 1}
       <div
-        class="w-full h-full sm:h-screen flex flex-col items-center justify-end sm:justify-center"
+        class="w-full h-full flex flex-col items-center justify-center bg-white/50 backdrop-blur-sm z-50 absolute inset-0"
         title={$t('home.loading.title')}
       >
         <img
-          class="ani"
+          class="ani w-20 h-20 mb-4"
           src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
           alt="logo"
         />
         <CircleProgresBar progress={$progress} />
       </div>
     {/if}
-    <div class=" z-0">
-      <!--- "gold coin" (https://skfb.ly/oyPLs) by alex.yefremov is licensed under Creative Commons Attribution (http://creativecommons.org/licenses/by/4.0/).-->
+    <div class="w-full h-full">
       <Canvas {size}>
         <ResizeHandler {size} />
         <Scene
@@ -516,6 +244,324 @@
         />
       </Canvas>
     </div>
+  </div>
+
+  <!-- Main Scrollable Content -->
+  <div
+    id="text"
+    class="relative d z-10 w-full h-screen overflow-y-auto overflow-x-hidden scrollbar-thin scrollbar-thumb-barbi scrollbar-track-transparent"
+    onscroll={(e) => {
+      scrolli = true;
+      if (window.scrollTimer) clearTimeout(window.scrollTimer);
+      window.scrollTimer = setTimeout(() => (scrolli = false), 150);
+    }}
+  >
+    <div
+      class="flex flex-col items-center w-full min-h-full pb-24 sm:pb-10 sm:w-1/2 p-4 transition-all duration-300"
+      class:sm:ml-auto={$locale === 'he' || $locale === 'ar'}
+      class:sm:mr-0={$locale === 'he' || $locale === 'ar'}
+      class:sm:mr-auto={$locale !== 'he' && $locale !== 'ar'}
+      class:sm:ml-0={$locale !== 'he' && $locale !== 'ar'}
+    >
+      <!-- Logo & Header -->
+      <img
+        src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
+        alt="logo"
+        class="w-8 h-8 sm:w-24 sm:h-24 mt-12 sm:mt-8 mb-2 drop-shadow-lg"
+      />
+
+      <div
+        dir="ltr"
+        style="text-shadow:none;"
+        class="pt-2 sm:pt-6 font-bold sm:text-2xl text-xl text-transparent
+          bg-clip-text bg-[length:auto_200%] animate-gradienty
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
+          flex-wrap flex flex-row"
+      >
+        <div class="flip">
+          <h1
+            class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
+          >
+            1
+          </h1>
+        </div>
+        <div>
+          <h1
+            class="font-bold mt-2 sm:text-xl text-lg text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
+          >
+            💗
+          </h1>
+        </div>
+        <div>
+          <h1
+            class="font-bold sm:text-4xl text-2xl text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
+            bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
+          >
+            1
+          </h1>
+        </div>
+      </div>
+
+      <div class="sababa mt-2 mb-8">
+        <AnimatedHeadline
+          wordWrapperClass="overflow-hidden inline-block align-bottom transition-all duration-500 ease-in-out"
+          wordClass="font-['Sababa'] font-bold sm:text-2xl text-lg overflow-hidden inline-block align-bottom text-transparent bg-clip-text bg-[length:200%_auto] animate-gradientx 
+          bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]"
+          type="rotate-1"
+          texts={headlines}
+        />
+      </div>
+
+      <!-- Content Cards -->
+      <div class="w-full max-w-xl flex flex-col gap-6">
+        <div
+          class="bg-gradient-to-br from-sky-400/90 via-mturk/90 to-sky-400/90 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-xl backdrop-blur-sm"
+        >
+          <h2
+            class="text-gold font-bold text-xl mb-2 text-center"
+            style="font-family: 'Sababa', sans-serif; text-shadow: 1px 1px 2px rgba(0,0,0,0.3);"
+          >
+            {#if $locale === 'he'}
+              💗 למה אנחנו שונים?
+            {:else if $locale === 'ar'}
+              💗 لماذا نحن مختلفون؟
+            {:else}
+              💗 Why We're Different
+            {/if}
+          </h2>
+          <p
+            class="text-white text-sm leading-relaxed text-center"
+            style="font-family: 'Sababa', sans-serif;"
+          >
+            {#if $locale === 'he'}
+              1💗1 היא לא סתם פלטפורמה עסקית - <strong class="text-gold"
+                >אנחנו חלק מתנועה עולמית</strong
+              >
+              של אנשים שבוחרים ליצור יחד בהסכמה וללא כפיה. כל ריקמה שנוצרת כאן היא
+              הוכחה חיה שאפשר ליצור אחרת.
+            {:else if $locale === 'ar'}
+              1💗1 ليست مجرد منصة عمل - <strong class="text-gold"
+                >نحن جزء من حركة عالمية</strong
+              >
+              من الأشخاص الذين يختارون العمل بالتوافق وليس بالإكراه. كل شراكة هنا
+              هي دليل حي على إمكانية العمل بشكل مختلف.
+            {:else}
+              1💗1 isn't just a business platform - <strong class="text-gold"
+                >we're part of a global movement</strong
+              >
+              of people choosing to work in mutual agreement, not coercion. Every
+              partnership here is living proof that working differently is possible.
+            {/if}
+          </p>
+          <div class="mt-3 text-center">
+            <a
+              href={$locale === 'he'
+                ? '/hascama'
+                : $locale === 'ar'
+                  ? '/aitifaqia'
+                  : '/convention'}
+              class="inline-block bg-gold hover:bg-barbi hover:text-gold text-barbi font-semibold px-4 py-2 rounded-lg transition-all duration-300 shadow-md hover:shadow-lg transform hover:scale-105"
+              style="font-family: 'Sababa', sans-serif;"
+            >
+              {#if $locale === 'he'}
+                גלו את ההסכמה העולמית ←
+              {:else if $locale === 'ar'}
+                اكتشف الاتفاق العالمي ←
+              {:else}
+                Discover the Global Agreement ➜
+              {/if}
+            </a>
+          </div>
+        </div>
+
+        <div
+          class="flex flex-col gap-2 items-center sm:text-md text-xs my-4 px-2"
+        >
+          <Tile
+            bg={'neww'}
+            big={true}
+            sm={true}
+            reverse={true}
+            openi={true}
+            word={$t('home.features.livelihood')}
+          />
+          <Tile
+            bg={'neww'}
+            big={true}
+            sm={true}
+            reverse={true}
+            openi={true}
+            word={$t('home.features.sharedManagement')}
+          />
+          <Tile
+            bg={'neww'}
+            big={true}
+            sm={true}
+            reverse={true}
+            openi={true}
+            word={$t('home.features.transparency')}
+          />
+          <Tile
+            bg={'neww'}
+            big={true}
+            sm={true}
+            reverse={true}
+            openi={true}
+            word={$t('home.features.tools')}
+          />
+          <Tile
+            bg={'neww'}
+            big={true}
+            sm={true}
+            reverse={true}
+            openi={true}
+            word={$t('home.features.ownership')}
+          />
+          <Tile
+            bg={'neww'}
+            big={true}
+            sm={true}
+            reverse={true}
+            openi={true}
+            word={$t('home.features.formula')}
+          />
+          <Tile
+            bg={'gold'}
+            big={true}
+            sm={true}
+            word={$t('home.features.mission')}
+          />
+        </div>
+
+        <!-- Stats -->
+        <div
+          class="bg-gradient-to-br from-sky-400 via-mturk to-sky-400 px-4 py-3 mt-2 rounded-lg border-2 border-gold shadow-lg"
+        >
+          {#if statsLoaded}
+            <div class="text-center">
+              <p
+                class="text-white font-semibold text-lg mb-2"
+                style="font-family: 'Sababa', sans-serif;"
+              >
+                {$t('home.stats.currently')}
+              </p>
+              <div class="flex justify-center items-center gap-3 flex-wrap">
+                <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                  <div class="text-2xl font-bold text-gold">
+                    {projectsCount}
+                  </div>
+                  <div class="text-white text-sm">
+                    {$t('home.stats.partnerships')}
+                  </div>
+                </div>
+                <div class="text-gold text-2xl">•</div>
+                <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                  <div class="text-2xl font-bold text-gold">{usersCount}</div>
+                  <div class="text-white text-sm">
+                    {$t('home.stats.members')}
+                  </div>
+                </div>
+                <div class="text-gold text-2xl">•</div>
+                <div class="bg-white/20 rounded-lg px-3 py-2 backdrop-blur-sm">
+                  <div class="text-2xl font-bold text-gold">{membersCount}</div>
+                  <div class="text-white text-sm">חתמו על ההסכמה</div>
+                </div>
+              </div>
+            </div>
+          {:else}
+            <div
+              class="text-center text-white font-semibold"
+              style="font-family: 'Sababa', sans-serif;"
+            >
+              {$t('home.stats.loading')}
+            </div>
+          {/if}
+        </div>
+
+        <!-- Mobile CTA (Original style) -->
+        <div
+          class="block sm:hidden bg-gradient-to-br from-[#c67c7f] via-barbi to-[#c67c7f] px-3 py-4 mt-6 border-4 border-spacing-2 rounded-lg"
+        >
+          <div style="font-family:Gan, Power;" class="flex flex-col gap-3">
+            <button
+              class="transition-all duration-300 flex flex-row justify-center items-center text-barbi px-4 py-2 text-xl bg-white hover:text-slate-800 rounded-xl shadow-lg"
+              onclick={() => {
+                goto('/login');
+                loadinga = true;
+                fi = true;
+              }}
+            >
+              {$t('home.cta.login')}
+            </button>
+            <button
+              class="transition-all duration-300 text-barbi px-4 py-2 text-xl bg-gold hover:text-slate-800 rounded-xl flex flex-row justify-center items-center shadow-lg"
+              onclick={() => {
+                goto(
+                  `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`
+                );
+                loading = true;
+                fi = true;
+              }}
+            >
+              {$t('home.cta.register')}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Float Buttons Desktop -->
+  <div
+    class="hidden sm:flex fixed top-1/2 -translate-y-1/2 flex-col gap-6 z-50 transition-all duration-500"
+    class:left-8={$locale == 'he' || $locale == 'ar'}
+    class:right-8={$locale !== 'he' && $locale !== 'ar'}
+  >
+    <button
+      class="group flex flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-white/40 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:bg-white/60 hover:scale-105 transition-all duration-300 min-w-[160px]"
+      onclick={() => {
+        goto('/login');
+        loadinga = true;
+        fi = true;
+      }}
+      onfocus={() => (btna = true)}
+      onmouseover={() => (btna = true)}
+      onmouseleave={() => (btna = false)}
+    >
+      {#if loadinga == true}
+        <div class="mx-auto"><Lowding width="24px" height="24px" /></div>
+      {:else}
+        <span class="text-3xl">🔑</span>
+        <span class="text-xl text-barbi font-bold font-['Sababa']"
+          >{$t('home.cta.login')}</span
+        >
+      {/if}
+    </button>
+
+    <button
+      class="group flex flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-barbi/80 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:text-gold hover:bg-barbi hover:scale-105 transition-all duration-300 min-w-[160px]"
+      onclick={() => {
+        goto(
+          `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`
+        );
+        loading = true;
+        fi = true;
+      }}
+      onfocus={() => (btnb = true)}
+      onmouseover={() => (btnb = true)}
+      onmouseleave={() => (btnb = false)}
+    >
+      {#if loading == true}
+        <div class="mx-auto"><Lowding width="24px" height="24px" /></div>
+      {:else}
+        <span class="text-3xl">✍️</span>
+        <span class="text-xl text-barbi font-bold font-['Sababa']"
+          >{$t('home.cta.register')}</span
+        >
+      {/if}
+    </button>
   </div>
 </div>
 
@@ -543,7 +589,6 @@
     }
   }
 
-  /* Keyframes */
   @keyframes wiggle {
     0%,
     7% {

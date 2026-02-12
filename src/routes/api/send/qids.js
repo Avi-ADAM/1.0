@@ -3696,5 +3696,14 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
             }
           }
         }
-      }`
+      }`,
+      "89getUsersCount": `query GetUsersCount {
+    usersPermissionsUsers {
+      meta {
+        pagination {
+          total
+        }
+      }
+    }
+  }`,
 };

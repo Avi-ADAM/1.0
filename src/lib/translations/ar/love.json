@@ -1,30 +1,30 @@
 {
-    "title": "Live Statistics",
+    "title": "إجمالي الموافقين",
     "tooltip": {
-        "Name": "Name",
+        "Name": "الاسم",
         "iso3": "ISO3",
-        "Agrees": "Agreements"
+        "Agrees": "الموافقات"
     },
     "legend": {
-        "title": "Data Key",
-        "high": "High (100+)",
-        "medium": "Medium (10-99)",
-        "low": "Low (1-9)",
-        "none": "None yet"
+        "title": "📊 مفتاح (الموافقات)",
+        "high": "كثير (100+)",
+        "medium": "متوسط (10-99)",
+        "low": "قليل (1-9)",
+        "none": "ليس بعد"
     },
-    "scroll": "Scroll down",
+    "scroll": "التمرير لأسفل",
     "cta": {
-        "header": "💚 Want to join the map?",
-        "sub": "Join thousands who choose to live by mutual consent",
-        "btn1": "Sign the agreement",
-        "btn2": "Start creating networks",
-        "footer": "Already signed? Great! Now make the vision a reality"
+        "header": "💗 هل تريد الانضمام إلى الخريطة؟",
+        "sub": "انضم إلى آلاف الأشخاص الذين يختارون العيش بموافقة متبادلة",
+        "btn1": "انضم للموافقة",
+        "btn2": "ابدأ في الإنشاء معاً بموافقة",
+        "footer": "هل وافقت بالفعل؟ ممتاز! الآن يمكننا تحويل الرؤية إلى حقيقة"
     },
     "stats": {
-        "title": "Live Statistics",
-        "total": "Total Agreements",
-        "top": "Top Country",
-        "countries": "Active Countries"
+        "title": "إحصائيات مباشرة",
+        "total": "إجمالي الموافقات",
+        "top": "الدولة الرائدة",
+        "countries": "الدول المشاركة"
     },
-    "loading": "One moment please"
+    "loading": "لحظة واحدة من فضلك"
 }
