@@ -541,7 +541,7 @@
     </button>
 
     <button
-      class="group flex flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-barbi/80 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:text-gold hover:bg-barbi hover:scale-105 transition-all duration-300 min-w-[160px]"
+      class="group flex text-barbi flex-row items-center gap-3 px-6 py-3 rounded-2xl bg-barbi/80 backdrop-blur-md border border-white/40 shadow-[0_8px_32px_0_rgba(31,38,135,0.37)] hover:text-gold hover:bg-barbi hover:scale-105 transition-all duration-300 min-w-[160px]"
       onclick={() => {
         goto(
           `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`
@@ -557,7 +557,7 @@
         <div class="mx-auto"><Lowding width="24px" height="24px" /></div>
       {:else}
         <span class="text-3xl">✍️</span>
-        <span class="text-xl text-barbi font-bold font-['Sababa']"
+        <span class="text-xl font-bold font-['Sababa']"
           >{$t('home.cta.register')}</span
         >
       {/if}
