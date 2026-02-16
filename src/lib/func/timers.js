@@ -2,16 +2,16 @@ import { sendToSer } from './../send/sendToSer.js';
 import { browser } from '$app/environment';
 
 /**
- * Send timer notification via the unified action system.
- * This triggers real-time updates for connected users.
+ * Executes a timer action via the unified action system.
  * 
- * @param {string} actionType - Type of timer action: 'timerStart', 'timerStop', or 'timerSave'
- * @param {Object} params - Parameters for the notification
+ * @param {string} actionType - 'timerStart', 'timerStop', or 'timerSave'
+ * @param {Object} params - Action parameters
  * @param {Function} [fetchFn] - Optional fetch function
+ * @returns {Promise<Object|null>} - The resulting data or null on failure
  */
-async function sendTimerNotification(actionType, params, fetchFn = null) {
-  // Only send notifications from browser context
-  if (!browser) return;
+async function executeTimerAction(actionType, params, fetchFn = null) {
+  // Only execute actions from browser context
+  if (!browser) return null;
   
   try {
     const useFetch = fetchFn || fetch;
@@ -27,13 +27,17 @@ async function sendTimerNotification(actionType, params, fetchFn = null) {
     });
     
     if (response.ok) {
-      console.log(`[Timers] ${actionType} notification sent successfully`);
+      const result = await response.json();
+      console.log(`[Timers] ${actionType} executed successfully`, result);
+      return result.data;
     } else {
-      console.warn(`[Timers] Failed to send ${actionType} notification:`, await response.text());
+      const errorText = await response.text();
+      console.warn(`[Timers] Failed to execute ${actionType}:`, errorText);
+      return null;
     }
   } catch (error) {
-    // Don't throw - notifications are nice-to-have, not critical
-    console.warn(`[Timers] Error sending ${actionType} notification:`, error);
+    console.error(`[Timers] Error executing ${actionType}:`, error);
+    return null;
   }
 }
 
@@ -44,345 +48,144 @@ async function sendTimerNotification(actionType, params, fetchFn = null) {
  * @param {string} missionID - The ID of the mission associated with the timer
  * @param {string} uId - User ID
  * @param {string} pId - Project ID
- * @param {number} [timerId=0] - Optional timer ID, defaults to 0
- * @param {boolean} [isSer=false] - Flag indicating if this is a server operation, defaults to false
- * @param {Function} fetch - Fetch function for making HTTP requests
- * @param {Object} [options={}] - Optional additional options (notes, etc.)
+ * @param {number|string} [timerId=0] - Optional timer ID, defaults to 0
+ * @param {boolean} [isSer=false] - Flag indicating if this is a server operation
+ * @param {Function} fetch - Fetch function
+ * @param {Object} [options={}] - Optional additional options
  * @returns {Promise<Object>} - The created or updated timer data
  */
-export async function startTimer(activeTimer, missionID, uId, pId, timerId = 0, isSer = false, fetch, options) {
-  console.log(activeTimer, missionID, uId, pId, timerId, isSer);
+export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerId = 0, isSer = false, options) {
+  console.log('Starting timer:', { missionID, timerId });
   
-  let result;
-  
-  // Case 1: No active timer exists – create one
-  if (timerId == 0) {
-    result = await sendToSer(
-      { missionId: missionID, start: new Date().toISOString(), userId: uId, projectId: pId },
-      '33CreateTimer',
-      null,
-      null,
-      isSer,
-      fetch
-    ).then((x) => {
-      console.log("Created new timer:", x.data);
-      return x.data.createTimer.data;
-    });
-  } else if (timerId != 0 && activeTimer.data.attributes && !activeTimer.data.attributes.isActive) {
-    // Case 2: Resume existing timer
-    let timers = activeTimer.data.attributes.timers.map(t => ({ start: t.start, stop: t.stop }));
-    timers.push({ start: new Date().toISOString() });
+  const now = new Date().toISOString();
+  const params = {
+    missionId: missionID.toString(),
+    projectId: pId.toString(),
+    userId: uId.toString(),
+    timerId: timerId.toString(),
+    isActive: true
+  };
+
+  const isSaved = activeTimer?.data?.attributes?.saved === true;
+  const timerExists = !!activeTimer?.data;
+
+  // Case 1: No active timer exists OR the existing one is already saved – create a new one
+  if (timerId == 0 || timerId == '0' || !timerExists || isSaved) {
+    console.log("[Timers] Creating new timer (either none exists or existing is saved)");
+    params.timerId = '0'; // Ensure we tell the action to create a new one
+    params.start = now;
+    params.timers = [{ start: now }];
+    params.totalHours = 0;
+  } else if (!activeTimer.data.attributes.isActive) {
+    // Case 2: Resume existing unsaved timer
+    console.log("[Timers] Resuming existing unsaved timer:", timerId);
+    let timers = (activeTimer.data.attributes.timers || []).map(t => ({ start: t.start, stop: t.stop }));
+    timers.push({ start: now });
     
-    result = await sendToSer(
-      { timerId: timerId, isActive: true, newStart: new Date().toISOString(), timers: timers },
-      '34UpdateTimer',
-      null,
-      null,
-      isSer,
-      fetch
-    ).then((x) => {
-      console.log("Resumed timer:", x.data);
-      return x.data.updateTimer.data;
-    });
+    params.timers = timers;
+    params.newStart = now;
   } else {
     console.log("Timer is already active");
-    result = activeTimer.data;
+    return activeTimer.data;
   }
   
-  // Send notification for real-time updates (async, don't wait)
-  // We send the current time so the server-side action (which mirrors the GraphQL call) has all required fields
-  const now = new Date().toISOString();
-  sendTimerNotification('timerStart', {
-    missionId: missionID,
-    projectId: pId,
-    userId: uId,
-    timerId: result?.id || timerId.toString(),
-    start: now,
-    newStart: now // Use the same for resume if needed
-  }, fetch).catch(() => {}); // Ignore errors
-  
-  return result;
+  return await executeTimerAction('timerStart', params, fetch);
 }
- 
 
-  // פונקציה לשליפת נתוני המשימה והטיימר
-  async function fetchMission() {
-    const query = `
-      query GetMissionsOnProgress($id: ID!) {
-        usersPermissionsUser(id: $id) {
-          data {
-            attributes {
-              mesimabetahaliches(filters: { finnished: { ne: true }, forappruval: { ne: true } }) {
-                data {
-                  id
-                  attributes {
-                    name
-                    howmanyhoursalready
-                    activeTimer {
-                      data {
-                        id
-                        attributes {
-                          start
-                          totalTime
-                          isActive
-                          timers {
-                            start
-                            stop
-                          }
-                        }
-                      }
-                    }
-                  }
-                }
-              }
-            }
-          }
-        }
-      }
-    `;
-    const variables = { id: userId };
-    const res = await fetch('/graphql', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ query, variables })
-    });
-    const { data } = await res.json();
-    // מציאת המשימה הרלוונטית לפי missionId – התאימו לפי מבנה הנתונים שלכם
-    const missions = data.usersPermissionsUser.data.attributes.mesimabetahaliches.data;
-    let  mission = missions.find((m /** @type any*/) => m.id === missionId);
-
-    // אם קיימת הפעלה קודמת, מאתחלים את הטיימר
-    if (mission) {
-      timer = mission.attributes.activeTimer?.data;0
-      if (timer) {rotate(90)
-        accumulatedTime = timer.attributes.totalTime || 0;
-        intervals = timer.attributes.timers || [];
-      }
-    }
-  }
-
-
-  // עצירת הטיימר: מסיימים את האינטרוול הפעיל ומעדכנים את הזמן המצטבר
+// Function to stop the timer
 /**
  * Stops a timer for a mission
  * @param {Object} timer - The timer object to stop
- * @param {Function} fetch - Fetch function for making HTTP requests
+ * @param {Function} fetch - Fetch function
  * @param {boolean} [isSer=false] - Flag indicating if this is a server operation
- * @param {string} [projectId=''] - Project ID for notification
- * @param {string} [userId=''] - User ID for notification
+ * @param {string} [projectId=''] - Project ID
+ * @param {string} [userId=''] - User ID
  * @returns {Promise<Object>} - The updated timer data
  */
 export async function stopTimer(timer, fetch, isSer = false, projectId = '', userId = '') {
-  console.log(timer);
-  if (timer && timer.attributes.isActive) {
+  console.log('Stopping timer:', timer?.id);
+  
+  if (timer && timer.attributes?.isActive) {
     const now = new Date().toISOString();
-    let intervals = timer.attributes.timers;
-    // נניח שהאינטרוול הפעיל הוא האחרון במערך
-    const lastInterval = intervals[intervals.length - 1];
-    console.log(lastInterval);
-    if (lastInterval) {
+    let intervals = [...(timer.attributes.timers || [])];
+    
+    if (intervals.length > 0) {
+      const lastInterval = { ...intervals[intervals.length - 1] };
+      lastInterval.stop = now;
+      intervals[intervals.length - 1] = lastInterval;
+      
       const startTime = new Date(lastInterval.start);
       const stopTime = new Date(now);
-      intervals[intervals.length - 1].stop = now;
-      // חישוב משך הזמן באינטרוול (בשעות)
       const duration = (stopTime.getTime() - startTime.getTime()) / 1000 / 60 / 60;
-      let accumulatedTime = timer.attributes.totalHours || 0;
-      // עדכון הזמן המצטבר
-      accumulatedTime += duration;
+      
+      let accumulatedTime = (timer.attributes.totalHours || 0) + duration;
 
-      const response = await sendToSer(
-        {
-          timerId: timer.id,
-          isActive: false,
-          totalHours: accumulatedTime,
-          timers: intervals
-        },
-        '34UpdateTimer',
-        null,
-        null,
-        isSer,
-        fetch
-      );
+      const params = {
+        timerId: timer.id.toString(),
+        projectId: projectId.toString(),
+        userId: userId.toString(),
+        isActive: false,
+        totalHours: accumulatedTime,
+        timers: intervals.map(t => ({ start: t.start, stop: t.stop }))
+      };
 
-      console.log("Stopped timer:", response.data);
-      const result = response.data.updateTimer.data;
-
-        // Send notification for real-time updates (async, don't wait)
-      if (projectId && userId) {
-        sendTimerNotification('timerStop', {
-          timerId: timer.id,
-          projectId: projectId,
-          userId: userId,
-          totalHours: accumulatedTime,
-          isActive: false,
-          saved: false
-        }, fetch).catch(() => {}); // Ignore errors
-      }
-
-      return result;
+      return await executeTimerAction('timerStop', params, fetch);
     }
   }
-}
-  export async function handleClearSingle(index, timer,fetch,isSer=false) {
-  let timers = [...timer.attributes.activeTimer.data.attributes.timers];
-
-  let total = timer.attributes.activeTimer.data.attributes.totalTime;
-  let newTotal = total - (timers[index].stop - timers[index].start);
-  timers.splice(index, 1);
-  const timersForMutation = timers.map(t => ({
-    start: t.start,
-    stop: t.stop
-}));
-const x = await sendToSer({
-    timerId: timer.attributes.activeTimer.data.id,
-    isActive: false,
-    totalHours: newTotal,
-    timers: timersForMutation
-  },'34UpdateTimer',null,null,isSer,fetch).then((x) => {
-    console.log("Updated timer:", x.data);
-    return x.data.updateTimer.data;
-  });
-  return x;
+  return timer;
 }
 
-export async function handleClearAll(timer,fetch,isSer=false) {
-
-const x = await sendToSer({
-    timerId: timer.attributes.activeTimer.data.id,
-    isActive: false,
-    totalHours: 0,
-    start: "null",
-    timers: []
-  },'34UpdateTimer',null,null,isSer,fetch).then((x) => {
-    console.log("Updated timer:", x.data);
-    return x.data.updateTimer.data;
-  });
-  return x;
-}
-
-export async function updateTimer(timer,whatToUpdate,params= {},fetch,isSer=false) {
-  // Update the timer in your backend
-  switch (whatToUpdate) {
-    case 'timers':
-
-    const oldLap = params.oldLap;
-      const newLap = params.newLap;
-      const index = params.index;
-
-      // Create a clean copy of the timers array with only the properties required by the backend
-      const timers = timer.attributes.timers.map((t, i) => {
-        if (i === index) {
-          // For the updated timer, use the new data
-          return { start: newLap.start, stop: newLap.stop };
-        }
-        // For all other timers, just keep their start and stop times
-        return { start: t.start, stop: t.stop };
-      });
-
-      // Calculate the new total time
-      const totalTime =
-        timer.attributes.totalHours -
-        ((new Date(oldLap.stop).getTime() - new Date(oldLap.start).getTime())  / 1000 / 60 / 60) +
-        ((new Date(newLap.stop).getTime() - new Date(newLap.start).getTime() ) / 1000 / 60 / 60) ;
-      console.log('Total time:', totalTime);
-      console.log('Timers:', timers);
-      // Send the updated data to the backend
-      const response = await sendToSer(
-        {
-          timerId: timer.id,
-          isActive: timer.attributes.isActive,
-          totalHours: totalTime,
-          timers, // Send the cleaned timers array
-        },
-        '34UpdateTimer',
-        null,
-        null,
-        isSer,
-        fetch
-      ).then((x) => {
-        console.log('Updated timer:', x.data);
-        return x.data.updateTimer.data;
-      });
-
-      return response;
-    case 'tasks':
-      //make the arr to be of string instead of numbers
-      const tasksArr = params.selectedTaskIds.map((x) => x.toString());
-            // Send the updated data to the backend
-        const responseT = await sendToSer(
-        {
-          timerId: timer.id,
-          tasks: tasksArr
-        },
-        '34UpdateTimer',
-        null,
-        null,
-        isSer,
-        fetch
-      ).then((x) => {
-        console.log('Updated timer:', x.data);
-        return x.data.updateTimer.data;
-      });
-
-      return responseT;
-      break;
-  }
-}
-  // ניקוי האינטרוול האחרון: מסירים את ההפעלה האחרונה ומעדכנים את הזמן הכולל
-  async function clearLastInterval() {
-    // ניתן לבצע ניקוי רק אם הטיימר במצב עצור ויש לפחות אינטרוול אחד שסיים את הפעולה
-    if (timer && !timer.attributes.isActive && intervals.length > 0) {
-      const lastInterval = intervals[intervals.length - 1];
-      if (lastInterval && lastInterval.start && lastInterval.stop) {
-        const startTime = new Date(lastInterval.start);
-        const stopTime = new Date(lastInterval.stop);
-        const duration = (stopTime.getTime() - startTime.getTime()) / 1000;
-        const newTotal = accumulatedTime - duration;
-
-        // הנחה: יש לכם מוטציה שמסירה את האינטרוול האחרון (למשל באמצעות פעולת pop)
-        const mutation = `
-          mutation ClearLastInterval($timerId: ID!, $newTotal: Float!) {
-            updateTimer(id: $timerId, input: {
-              data: {
-                totalTime: $newTotal,
-                timers: {
-                  pop: {}
-                }
-              }
-            }) {
-              data {
-                id
-                attributes {
-                  totalTime
-                  timers {
-                    start
-                    stop
-                  }
-                }
-              }
-            }
-          }
-        `;
-        const variables = {
-          timerId: timer.id,
-          newTotal
-        };
-        const res = await fetch('/graphql', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ query, variables })
-        });
-        const result = await res.json();
-        timer = result.data.updateTimer.data;
-        intervals = timer.attributes.timers;
-        accumulatedTime = newTotal;
-      }
-    }
-  }
 /**
- * מחשב את סך כל השעות מתוך מערך של timers
- * @param {Array} timers - מערך של אובייקטי timers עם start ו-stop
- * @returns {number} - סך כל השעות שהצטברו
+ * Saves the timer and updates the mission with total hours
+ * @param {Object} timer - The timer object (from store)
+ * @param {string} missionID - Mission ID
+ * @param {Function} fetch - Fetch function
+ * @param {boolean} [isSer=false] - Flag indicating if this is a server operation
+ * @param {Array} [tasks=null] - Optional task IDs
+ * @param {string} [projectId=''] - Project ID
+ * @param {string} [userId=''] - User ID
+ * @returns {Promise<Object>} - Results
+ */
+export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = null, projectId = '', userId = '') {
+  try {
+    if (!timer || !missionID) {
+      console.error("Missing parameters for saveTimer");
+      return null;
+    }
+
+    // Calculate total hours
+    let sessionHours = timer.attributes?.activeTimer?.data?.attributes?.totalHours || 0;
+    if (timer.attributes?.activeTimer?.data?.attributes?.timers) {
+      sessionHours = calculateTotalHours(timer.attributes.activeTimer.data.attributes.timers);
+    }
+    
+    const currentHoursAlready = timer.attributes?.howmanyhoursalready || 0;
+    const totalToSave = sessionHours + currentHoursAlready;
+
+    const params = {
+      missionId: missionID.toString(),
+      mId: missionID.toString(),
+      timerId: timer.attributes?.activeTimer?.data?.id?.toString(),
+      projectId: projectId.toString(),
+      userId: userId.toString(),
+      howmanyhoursalready: totalToSave,
+      totalHours: sessionHours,
+      stname: "saved",
+      x: 0,
+      tasks: tasks || []
+    };
+
+    return await executeTimerAction('timerSave', params, fetch);
+  } catch (error) {
+    console.error("Error in saveTimer:", error);
+    return null;
+  }
+}
+
+/**
+ * Calculates total hours from timer intervals
+ * @param {Array} timers - Array of timer segments with start and stop
+ * @returns {number} - Total hours
  */
 export function calculateTotalHours(timers) {
   if (!timers || !Array.isArray(timers) || timers.length === 0) {
@@ -390,187 +193,109 @@ export function calculateTotalHours(timers) {
   }
   
   let totalMilliseconds = 0;
-  
-  // עובר על כל הרשומות במערך ומחשב את הזמן הכולל
-  for (const timerEntry of timers) {
-    if (timerEntry.start && timerEntry.stop) {
-      // חישוב הזמן בין ההתחלה לסיום במילישניות
-      const startTime = new Date(timerEntry.start).getTime();
-      const stopTime = new Date(timerEntry.stop).getTime();
-      
-      if (!isNaN(startTime) && !isNaN(stopTime) && stopTime > startTime) {
-        totalMilliseconds += (stopTime - startTime);
+  for (const entry of timers) {
+    if (entry.start && entry.stop) {
+      const start = new Date(entry.start).getTime();
+      const stop = new Date(entry.stop).getTime();
+      if (!isNaN(start) && !isNaN(stop) && stop > start) {
+        totalMilliseconds += (stop - start);
       }
     }
   }
-  
-  // המרה משניות לשעות (חלוקה ב-3600000 מילישניות בשעה)
   return totalMilliseconds / 1000 / 60 / 60;
 }
 
 /**
- * שומר את הטיימר ומעדכן את המשימה בתהליך עם השעות החדשות
- * @param {Object} timer - אובייקט הטיימר
- * @param {string} missionID - מזהה המשימה בתהליך
- * @param {Function} fetch - פונקציית fetch לביצוע קריאות רשת
- * @param {boolean} [isSer=false] - האם מדובר בקריאת שרת
- * @param {Array} [tasks=null] - מערך של מזהי מטלות לקישור לטיימר (אופציונלי)
- * @param {string} [projectId=''] - מזהה הפרויקט (לנוטיפיקציה)
- * @param {string} [userId=''] - מזהה המשתמש (לנוטיפיקציה)
- * @returns {Promise<Object>} - אובייקט עם התוצאות של עדכון הטיימר והמשימה בתהליך
+ * Updates a timer with specific parameters (tasks or segments)
  */
-export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = null, projectId = '', userId = '') {
-  try {
-    if (!timer || !missionID) {
-      console.error("חסרים פרמטרים לשמירת הטיימר");
+export async function updateTimer(timer, whatToUpdate, params = {}, fetch) {
+  if (!timer) return null;
+  
+  switch (whatToUpdate) {
+    case 'timers': {
+      const { oldLap, newLap, index } = params;
+      const timers = (timer.attributes.timers || []).map((t, i) => {
+        if (i === index) return { start: newLap.start, stop: newLap.stop };
+        return { start: t.start, stop: t.stop };
+      });
+
+      const totalTime = (timer.attributes.totalHours || 0) -
+        ((new Date(oldLap.stop).getTime() - new Date(oldLap.start).getTime()) / 1000 / 60 / 60) +
+        ((new Date(newLap.stop).getTime() - new Date(newLap.start).getTime()) / 1000 / 60 / 60);
+
+      const updateParams = {
+        timerId: timer.id.toString(),
+        totalHours: totalTime,
+        timers: timers
+      };
+      
+      return await executeTimerAction('timerStop', updateParams, fetch);
+    }
+    
+    case 'tasks': {
+      const paramsToUpdate = {
+        timerId: timer.id.toString(),
+        tasks: (params.selectedTaskIds || []).map(id => id.toString())
+      };
+      
+      return await executeTimerAction('timerStop', paramsToUpdate, fetch);
+    }
+    
+    default:
+      console.warn(`[Timers] Unknown update type: ${whatToUpdate}`);
       return null;
-    }
-
-    // שלב 1: עדכן את הטיימר להיות במצב "נשמר" ואם יש מטלות, קשר אותן לטיימר
-    const updateParams = {
-      timerId: timer.attributes.activeTimer.data.id,
-      isActive: false,
-      saved: true
-    };
-
-    // אם יש מטלות, הוסף אותן לפרמטרים של העדכון
-    if (tasks && Array.isArray(tasks) && tasks.length > 0) {
-      updateParams.tasks = tasks.map(taskId => taskId.toString());
-      console.log("מקשר מטלות לטיימר:", updateParams.tasks);
-    }
-
-    const timerUpdateResponse = await sendToSer(
-      updateParams,
-      '34UpdateTimer',
-      null,
-      null,
-      isSer,
-      fetch
-    );
-    
-    console.log("טיימר סומן כנשמר:", timerUpdateResponse.data);
-    
-    // שלב 2: חשב את כמות השעות המצטברת מהטיימר
-    // אפשרות 1: לקחת את ערך totalHours מהטיימר (כפי שחושב על ידי השרת)
-    let totalHours = timer.attributes.activeTimer.data.attributes.totalHours || 0;
-    
-    // אפשרות 2: לחשב מחדש את הזמן הכולל מתוך מערך ה-timers
-    // במקרה שאנחנו לא סומכים על ערך totalHours או רוצים לוודא את דיוק החישוב
-    if (timer.attributes.activeTimer.data.attributes.timers && Array.isArray(timer.attributes.activeTimer.data.attributes.timers)) {
-      const calculatedHours = calculateTotalHours(timer.attributes.activeTimer.data.attributes.timers);
-      
-      // אם יש הבדל משמעותי בין החישובים, הדפס אזהרה
-      if (Math.abs(calculatedHours - totalHours) > 0.01) {
-        console.warn(
-          `אזהרה: הבדל בחישוב השעות - 
-           totalHours מהטיימר: ${totalHours}, 
-           חישוב מתוך מערך ה-timers: ${calculatedHours}`
-        );
-      }
-      
-      // בחר את הערך המדויק יותר (אפשר להחליט להשתמש תמיד בחישוב המקומי)
-      totalHours = calculatedHours;
-    }
-
-    
-    let currentHours = 0;
-    
-    try {
-      // בדיקה אם יש לנו כבר את השעות הקיימות בתוך הטיימר
-      if (timer.attributes.hasOwnProperty('howmanyhoursalready')) {
-        currentHours = timer.attributes.howmanyhoursalready || 0;
-        console.log("נמצאו שעות קיימות בטיימר:", currentHours);
-      } else {
-        // אם אין, ננסה לקבל את זה מהשרת
-        // (אפשר גם לא להשתמש בזה ופשוט להסתמך על מה שיש בשרת)
-        console.log(`נדרש לבדוק שעות קיימות למשימה ${missionID}`);
-      }
-    } catch (e) {
-      console.warn("שגיאה בקבלת שעות קיימות:", e);
-    }
-    
-    // הוסף את השעות החדשות לשעות הקיימות
-    const totalHoursToSave = totalHours + currentHours;
-    console.log(`סך הכל שעות לשמירה: ${totalHoursToSave} (${totalHours} חדשות + ${currentHours} קיימות)`);
-    
-    // שלב 3: עדכן את המשימה בתהליך - הוסף את השעות לשעות הקיימות ואפס את הטיימר הפעיל
-    const missionUpdateResponse = await sendToSer(
-      {
-        mId: missionID,
-        howmanyhoursalready: totalHoursToSave,
-        stname: "saved", 
-        x: 0,
-      },
-      '11saveTimer',
-      null,
-      null,
-      isSer,
-      fetch
-    );
-    
-    console.log("משימה עודכנה עם שעות חדשות:", missionUpdateResponse.data);
-    
-    const result = {
-      timer: timerUpdateResponse.data?.updateTimer?.data || null,
-      mission: missionUpdateResponse.data?.updateMesimabetahalich?.data || null
-    };
-
-    // Send notification for real-time updates (async, don't wait)
-    if (projectId && userId) {
-      sendTimerNotification('timerSave', {
-        missionId: missionID,
-        mId: missionID, // GraphQL alias
-        timerId: timer.attributes.activeTimer.data.id,
-        projectId: projectId,
-        userId: userId,
-        totalHours: totalHoursToSave,
-        howmanyhoursalready: totalHoursToSave, // GraphQL alias
-        stname: "saved",
-        x: 0,
-        tasks: tasks || []
-      }, fetch).catch(() => {}); // Ignore errors
-    }
-    
-    return result;
-  } catch (error) {
-    console.error("שגיאה בשמירת הטיימר:", error);
-    return null;
   }
 }
 
+/**
+ * Clears a single interval from the timer
+ */
+export async function handleClearSingle(index, timer, fetch, isSer = false) {
+  let timers = [...(timer.attributes.activeTimer.data.attributes.timers || [])];
+  
+  const total = timer.attributes.activeTimer.data.attributes.totalHours || 0;
+  const start = new Date(timers[index].start).getTime();
+  const stop = new Date(timers[index].stop).getTime();
+  const duration = (stop - start) / 1000 / 60 / 60;
+  
+  let newTotal = total - duration;
+  timers.splice(index, 1);
+
+  return await executeTimerAction('timerStop', {
+    timerId: timer.attributes.activeTimer.data.id.toString(),
+    isActive: false,
+    totalHours: newTotal,
+    timers: timers.map(t => ({ start: t.start, stop: t.stop }))
+  }, fetch);
+}
 
 /**
- * סורק את כל הטיימרים המחוברים למשימה (היסטוריים ופעילים),
- * מחשב מחדש את סך השעות, מעדכן את המשימה, ומחזיר סיכום.
- * @param {string} missionId - מזהה המשימה
- * @param {Function} fetch - פונקציית fetch
- * @returns {Promise<Object>} - אובייקט סיכום { savedHours, unsavedHours, total }
+ * Clears all intervals from the timer
+ */
+export async function handleClearAll(timer, fetch, isSer = false) {
+  return await executeTimerAction('timerStop', {
+    timerId: timer.attributes.activeTimer.data.id.toString(),
+    isActive: false,
+    totalHours: 0,
+    timers: []
+  }, fetch);
+}
+
+/**
+ * Recalculates mission hours from historical timers
  */
 export async function recalculateMissionHours(missionId, fetch) {
   try {
-    const res = await sendToSer(
-      { missionId },
-      '88GetMissionTimersForRecalc',
-      null,
-      null,
-      false,
-      fetch
-    );
-
+    const res = await sendToSer({ missionId }, '88GetMissionTimersForRecalc', null, null, false, fetch);
     const data = res?.data;
 
-    if (!data || !data.timers) {
-      console.error("Failed to fetch timers for calculation", res);
-      return null;
-    }
+    if (!data || !data.timers) return null;
 
     const allTimers = data.timers.data;
     let totalSavedMilliseconds = 0;
-    let currentUnsavedMilliseconds = 0;
 
     for (const t of allTimers) {
       const intervals = t.attributes.timers || [];
-      
       for (const interval of intervals) {
         if (interval.start && interval.stop) {
           const start = new Date(interval.start).getTime();
@@ -578,48 +303,22 @@ export async function recalculateMissionHours(missionId, fetch) {
           if (!isNaN(start) && !isNaN(stop) && stop > start) {
             totalSavedMilliseconds += (stop - start);
           }
-        } else if (interval.start && !interval.stop) {
-          // טיימר רץ כרגע
-          const start = new Date(interval.start).getTime();
-          const now = new Date().getTime();
-          if (!isNaN(start) && now > start) {
-            currentUnsavedMilliseconds += (now - start);
-          }
         }
       }
     }
 
     const savedHours = totalSavedMilliseconds / 1000 / 60 / 60;
-    const unsavedHours = currentUnsavedMilliseconds / 1000 / 60 / 60;
-    const totalHoursIncludingRunning = savedHours + unsavedHours;
 
-    console.log(`Calculated: Saved=${savedHours}, Running=${unsavedHours}`);
-
-    // עדכון המשימה עם השעות ה"שמורות/סגורות" (ההיסטוריה האמיתית)
-    // אנחנו מעדכנים רק את השעות הסגורות כדי לשמור על עקביות הנתונים במסד
     if (data.mesimabetahalich?.data) {
-      const updateResponse = await sendToSer(
-        {
-          mId: missionId,
-          howmanyhoursalready: savedHours,
-          stname: "recalculated", 
-          x: 0,
-        },
-        '11saveTimer', // משתמשים במוטציה זו שמעדכנת שעות
-        null,
-        null,
-        false, // isSer
-        fetch
-      );
-      console.log("Mission updated with recalculated hours:", updateResponse);
+      await sendToSer({
+        mId: missionId,
+        howmanyhoursalready: savedHours,
+        stname: "recalculated",
+        x: 0,
+      }, '11saveTimer', null, null, false, fetch);
     }
 
-    return {
-      savedHours,
-      unsavedHours,
-      totalHours: totalHoursIncludingRunning
-    };
-
+    return { savedHours, totalHours: savedHours };
   } catch (error) {
     console.error("Error recalculating mission hours:", error);
     return null;

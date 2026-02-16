@@ -126,13 +126,13 @@ export async function fetchTimers(uid, fetch) {
                         let totalMilliseconds = 0;
                         let isActive = false; // Add an isActive flag
 
-                        if (t.attributes.activeTimer) {
-                            isActive = t.attributes.activeTimer.isActive;
-                            totalMilliseconds = t.attributes.activeTimer.totalHours || 0; // Initialize
+                        if (t.attributes.activeTimer && t.attributes.activeTimer.data && t.attributes.activeTimer.data.attributes) {
+                            isActive = t.attributes.activeTimer.data.attributes.isActive;
+                            totalMilliseconds = t.attributes.activeTimer.data.attributes.totalHours || 0; // Initialize
 
                             // Iterate through past timers and add their durations
-                            if (t.attributes.activeTimer.timers) {
-                                t.attributes.activeTimer.timers.forEach((timer) => {
+                            if (t.attributes.activeTimer.data.attributes.timers) {
+                                t.attributes.activeTimer.data.attributes.timers.forEach((timer) => {
                                     if (timer.start && timer.stop) {
                                         totalMilliseconds +=
                                             new Date(timer.stop).getTime() - new Date(timer.start).getTime();

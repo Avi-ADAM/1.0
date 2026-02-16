@@ -35,7 +35,7 @@
     showClearDialog = $bindable(false),
     showSaveFinal = $bindable(false),
     dialogEdit = $bindable(true),
-    elapsedTime = '00:00:00',
+    elapsedTime = $bindable('00:00:00'),
     selectedTasks = $bindable([]),
     taskSearchTerm = $bindable(''),
     onUpdateTimer
@@ -122,7 +122,7 @@
     try {
       // Call the existing handleClearAll function for the current timer.
       // It should return the updated activeTimer data object.
-      const updatedActiveTimerData = await handleClearAll(timer, fetch, false);
+      const updatedActiveTimerData = await handleClearAll(timer, fetch);
       // Check the response: if valid, update the store and dispatch event.
       if (updatedActiveTimerData) {
         console.log(updatedActiveTimerData);
@@ -190,7 +190,7 @@
       );
 
     try {
-      const x = await handleClearSingle(i, originalTimer, fetch, false);
+      const x = await handleClearSingle(i, originalTimer, fetch);
       if (x) {
         onUpdateTimer?.({
           timer: x,
@@ -209,8 +209,7 @@
       timer.attributes.activeTimer.data,
       'tasks',
       { selectedTaskIds },
-      fetch,
-      false
+      fetch
     ).then((x) => {
       if (x) {
         onUpdateTimer?.({

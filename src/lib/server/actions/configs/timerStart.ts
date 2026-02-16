@@ -12,7 +12,15 @@ import type { ActionConfig } from '../types.js';
 export const timerStartConfig: ActionConfig = {
     key: 'timerStart',
     description: 'Start or resume a timer for a mission',
-    graphqlOperation: '33CreateTimer', // For new timers or '34UpdateTimer' for resume
+    graphqlOperation: async (params, context, { strapi }) => {
+        if (params.timerId && params.timerId !== '0') {
+            // Resume/Update existing timer
+            return strapi.execute('34UpdateTimer', params, context.jwt, context.fetch);
+        } else {
+            // Create new timer
+            return strapi.execute('33CreateTimer', params, context.jwt, context.fetch);
+        }
+    },
 
     paramSchema: {
         missionId: {

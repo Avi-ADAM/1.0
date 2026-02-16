@@ -1,12 +1,12 @@
 <script>
   import { startTimer, stopTimer } from '$lib/func/timers.js';
   import NumberFlow, { NumberFlowGroup } from '@number-flow/svelte';
-  import { onMount, onDestroy } from 'svelte';
+  import { onDestroy, untrack } from 'svelte';
   import { page } from '$app/state';
   import { timers, updateTimers } from '$lib/stores/timers';
-  import { lang } from '$lib/stores/lang'; // Import the lang store
+  import { lang } from '$lib/stores/lang';
   import TimerDialogs from './TimerDialogs.svelte';
-  let tx = $state(0);
+
   let {
     orders,
     size,
@@ -18,8 +18,10 @@
     project,
     linke,
     missionId,
-    hoursAssigned // Add this prop
+    hoursAssigned,
+    tx // Add tx to props
   } = $props();
+
   let showSaveDialog = $state(false);
   let showClearDialog = $state(false);
   let showSaveFinal = $state(false);
@@ -27,183 +29,193 @@
   let elapsedTime = $state('00:00:00');
   let selectedTasks = $state([]);
   let taskSearchTerm = $state('');
-  let timer = $state([]);
-  let localZman = $state(0); // Make localZman a state variable
-  let isRunning = $derived(timer?.running || false); // Keep isRunning derived from timer.running
-  let timerInterval = $state();
 
-  onMount(() => {
-    timer = $timers?.find((t) => t.mId == missionId);
+  // 1. Derive Timer State from Store (Single Source of Truth)
+  let timer = $derived($timers?.find((t) => t.mId == missionId));
+  let isRunning = $derived(!!timer?.running);
+  let activeTimerData = $derived(
+    timer?.attributes?.activeTimer?.data?.attributes
+  );
+  let storeTotalHours = $derived(activeTimerData?.totalHours || 0);
+  let storeTimers = $derived(activeTimerData?.timers || []);
 
-    console.log(timer);
-    if (timer.attributes.activeTimer.data?.attributes?.isActive) {
-      console.log('running');
-      // Get the timers array from the timer data
-      let timers = timer.attributes.activeTimer.data.attributes.timers;
+  // 2. Local Display State
+  let localZman = $state(0);
+  let timerInterval = null; // Changed from $state() to regular variable to avoid effect dependency loop
 
-      if (timers && timers.length > 0) {
-        // Get the most recent timer entry
-        let lastTimer = timers[timers.length - 1];
+  // 3. Reactive effect to manage the visual timer loop
+  // This automatically runs whenever the store changes `isRunning`, `storeTotalHours`, or `storeTimers`
+  $effect(() => {
+    // If running, we calculate time based on start time + accumulated
+    if (isRunning) {
+      if (storeTimers.length > 0) {
+        const lastTimer = storeTimers[storeTimers.length - 1];
+        const startTime = new Date(lastTimer.start).getTime();
 
-        // Calculate elapsed time since the last start
-        let startTime = new Date(lastTimer.start).getTime();
-        let currentTime = Date.now();
+        // Immediate update
+        localZman = Date.now() - startTime + storeTotalHours * 3600000;
 
-        // Update local state
-        localZman =
-          currentTime -
-          startTime +
-          timer.attributes.activeTimer.data.attributes.totalHours * 3600000;
-        isRunning = true;
-        timer.running = true;
-        console.log(localZman, isRunning);
+        // Start interval if not already running
+        if (!timerInterval) {
+          timerInterval = setInterval(() => {
+            localZman = Date.now() - startTime + storeTotalHours * 3600000;
+          }, 100);
+        }
       }
-    } else if (
-      timer.attributes.activeTimer.data?.attributes?.isActive == false
-    ) {
-      console.log('stopped');
-      let totalHours = timer.attributes.activeTimer.data.attributes.totalHours;
-      localZman = totalHours * 3600000;
-      isRunning = false;
-      timer.running = false;
+    } else {
+      // If stopped, just show the stored total hours
+      if (timerInterval) {
+        clearInterval(timerInterval);
+        timerInterval = null;
+      }
+      localZman = storeTotalHours * 3600000;
+
+      // Update formatted time when stopped (for dialogs)
+      const { hours, minutes, seconds } = getTimeComponents(localZman);
+      elapsedTime = `${hours}:${minutes}:${seconds}`;
     }
-    selectedTasks =
-      timer?.attributes.activeTimer?.data?.attributes.acts.data.map(
-        (task) => task.id
-      ) ?? [];
+
+    return () => {
+      if (timerInterval) clearInterval(timerInterval);
+    };
   });
 
-  // Calculate total hours done (saved + current running)
+  // Initialize selected tasks when timer loads
+  // Initialize local tasks when timer is loaded
+  $effect(() => {
+    const t = timer;
+    const acts = activeTimerData?.acts?.data;
+
+    untrack(() => {
+      if (t && selectedTasks.length === 0 && acts?.length > 0) {
+        selectedTasks = acts.map((task) => task.id);
+      }
+    });
+  });
+
+  // Calculate total hours done for display
   let totalHoursDone = $derived(
     localZman / 3600000 + (timer?.attributes?.howmanyhoursalready || 0)
   );
 
-  // Start/stop timer function
-  async function startTimerLocal(only = false) {
-    console.log('start', only);
-    if (timerInterval) clearInterval(timerInterval);
-    const startTime = Date.now() - localZman;
-    timerInterval = setInterval(() => {
-      localZman = Date.now() - startTime;
-    }, 100);
-    if (only) return;
-    // Call startTimer with all required params
-    await startTimer(
-      timer.attributes?.activeTimer, // Active timer object from props
-      timer.mId, // Mission ID
-      page.data.uid, // User ID
-      timer.projectId, // Project ID
-      timer.attributes?.activeTimer?.data?.id || 0, // Timer ID or 0 if none
-      false, // isSer flag
-      fetch // fetch function
-    ).then((res) => {
-      console.log(res);
-      if (res) {
-        console.log(res);
-        timer.attributes.activeTimer = res;
-        timer.attributes.activeTimer.isActive = true; // Make sure to update isActive flag
+  // 4. Simplified Actions (Call API -> Update Store)
 
-        // Update global timers store
-        updateTimers(
-          $timers.map((t) =>
-            t.mId === timer.mId
-              ? {
-                  ...t,
-                  running: true,
-                  attributes: {
-                    ...t.attributes,
-                    activeTimer: {
-                      ...t.attributes.activeTimer,
-                      data: res,
-                      isActive: true
-                    }
-                  }
+  // Helper to update global store
+  function updateStore(running, res = null) {
+    updateTimers(
+      $timers.map((t) =>
+        t.mId === missionId
+          ? {
+              ...t,
+              running: running,
+              attributes: {
+                ...t.attributes,
+                activeTimer: {
+                  ...t.attributes.activeTimer,
+                  data: res || t.attributes.activeTimer.data,
+                  isActive: running
                 }
-              : t
-          )
-        );
-        console.log($timers);
-      }
-    });
+              }
+            }
+          : t
+      )
+    );
   }
 
-  async function stopTimerLocal(only = false) {
-    isRunning = false;
-    timer.running = false;
-    if (timerInterval) {
-      clearInterval(timerInterval);
-      timerInterval = null;
-    }
-    if (only) return;
-    // Call stopTimer with all required params
-    await stopTimer(
-      timer.attributes.activeTimer.data,
-      fetch,
-      false,
-      timer.projectId,
-      page.data.uid
-    ).then((res) => {
-      if (res) {
-        console.log(res);
-        timer.attributes.activeTimer.data = res;
-        timer.attributes.activeTimer.isActive = false; // Make sure to update isActive flag
+  async function handleStart() {
+    const now = new Date().toISOString();
 
-        // Update global timers store
-        updateTimers(
-          $timers.map((t) =>
-            t.mId === timer.mId
-              ? {
-                  ...t,
-                  running: false,
-                  attributes: {
-                    ...t.attributes,
-                    activeTimer: {
-                      ...t.attributes.activeTimer,
-                      data: res,
-                      isActive: false
-                    }
-                  }
-                }
-              : t
-          )
-        );
-        // Show save dialog after successful stop
+    // 0. Capture current state for the API call
+    // This prevents the optimistic update from making the API call think the timer is already active/inactive
+    const activeTimerToStart = timer.attributes?.activeTimer;
+    const currentData = activeTimerToStart?.data;
+    const currentMissionId = timer.mId;
+    const currentProjectId = timer.projectId;
+    const currentTimerId = currentData?.attributes?.saved
+      ? 0
+      : currentData?.id || 0;
+
+    // 1. Create optimistic data with new running segment
+    const currentTimers = currentData?.attributes?.timers || [];
+    const optimisticTimers = [...currentTimers, { start: now, stop: null }];
+
+    const optimisticData = {
+      ...currentData,
+      id: currentData?.id,
+      attributes: {
+        ...currentData?.attributes,
+        isActive: true,
+        timers: optimisticTimers
+      }
+    };
+
+    // 2. Apply optimistic update to UI immediately
+    updateStore(true, optimisticData);
+
+    // 3. Perform actual server-side action with pre-update data
+    try {
+      const res = await startTimer(
+        activeTimerToStart,
+        currentMissionId,
+        page.data.uid,
+        currentProjectId,
+        fetch,
+        currentTimerId,
+        false
+      );
+      if (res) updateStore(true, res);
+    } catch (e) {
+      console.error('Start failed', e);
+      // Revert if failed
+      updateStore(false);
+    }
+  }
+
+  async function handleStop() {
+    // 0. Capture current state for the API call
+    const timerDataToStop = timer.attributes?.activeTimer?.data;
+    const currentProjectId = timer.projectId;
+
+    // 1. Apply optimistic update
+    updateStore(false);
+
+    // 2. Perform actual server-side action
+    try {
+      const res = await stopTimer(
+        timerDataToStop,
+        fetch,
+        false,
+        currentProjectId,
+        page.data.uid
+      );
+
+      if (res) {
+        updateStore(false, res);
+
+        // Show dialog logic
         const { hours, minutes, seconds } = getTimeComponents(localZman);
         elapsedTime = `${hours}:${minutes}:${seconds}`;
-        console.log('hereeee');
         showSaveDialog = true;
         dialogEdit = false;
-        console.log(showSaveDialog);
       }
-    });
+    } catch (e) {
+      console.error('Stop failed', e);
+      updateStore(true); // Revert
+    }
   }
 
   async function handleToggleTimer() {
-    const timerId =
-      timer.attributes.activeTimer?.data != null
-        ? timer.attributes.activeTimer?.data.attributes?.saved == false
-          ? timer.attributes.activeTimer?.data?.id
-          : 0
-        : 0;
-
-    const now = new Date().toISOString();
-
-    isRunning = !isRunning;
-    timer.running = isRunning;
-
+    if (!timer) return;
     if (isRunning) {
-      startTimerLocal();
+      await handleStop();
     } else {
-      stopTimerLocal();
-      timer.zman = localZman;
+      await handleStart();
     }
   }
 
-  // Cleanup on component destruction
+  // Cleanup
   onDestroy(() => {
-    if (timerInterval) {
-      clearInterval(timerInterval);
-    }
+    if (timerInterval) clearInterval(timerInterval);
   });
 
   function getTimeComponents(milliseconds) {
@@ -216,17 +228,7 @@
     };
   }
 
-  // Update local state when timer prop changes
-  $effect(() => {
-    isRunning = timer?.running || false;
-    if (isRunning && !timerInterval) {
-      startTimerLocal(true);
-    } else if (!isRunning && timerInterval) {
-      stopTimerLocal(true);
-    }
-  });
   // Reactive rotations based on localZman
-
   let rotation = $derived((localZman / 1000) * 6);
   let rotationm = $derived(
     (localZman / 60000) * 6 + ((localZman % 60000) / 60000) * 6
@@ -238,7 +240,7 @@
 </script>
 
 <TimerDialogs
-  bind:timer
+  {timer}
   bind:showSaveDialog
   bind:showClearDialog
   bind:showSaveFinal
@@ -248,51 +250,32 @@
   bind:taskSearchTerm
   onUpdate-timer={({ detail }) => {
     if (detail.timer) {
-      timer.attributes.activeTimer.data = detail.timer;
-      timer.attributes.activeTimer.isActive = detail.running;
+      // Ensure store is updated based on the event result
+      updateStore(detail.running, detail.timer);
 
       if (detail.hoursdon !== undefined) {
-        timer.attributes.howmanyhoursalready = detail.hoursdon;
-      }
-
-      // Update global timers store
-      updateTimers(
-        $timers.map((t) =>
-          t.mId === timer.mId
-            ? {
-                ...t,
-                running: detail.running,
-                attributes: {
-                  ...t.attributes,
-                  howmanyhoursalready:
-                    detail.hoursdon !== undefined
-                      ? detail.hoursdon
-                      : t.attributes.howmanyhoursalready,
-                  activeTimer: {
-                    ...t.attributes.activeTimer,
-                    data: detail.timer,
-                    isActive: detail.running
+        updateTimers(
+          $timers.map((t) =>
+            t.mId === missionId
+              ? {
+                  ...t,
+                  attributes: {
+                    ...t.attributes,
+                    howmanyhoursalready: detail.hoursdon
                   }
                 }
-              }
-            : t
-        )
-      );
+              : t
+          )
+        );
+      }
 
       // Reset localZman specifically for clear operations
       if (!detail.running && detail.timer?.attributes?.timers?.length === 0) {
         localZman = 0;
-      } else {
-        // Otherwise, update based on totalHours (for save, update, etc.)
-        localZman = (detail.timer?.attributes?.totalHours || 0) * 3600000;
       }
-      // Ensure isRunning state is also updated based on the event
-      isRunning = detail.running;
     } else {
-      // Handle cases where detail.timer might be null or undefined if necessary
       console.warn('update-timer event received without timer data:', detail);
-      localZman = 0; // Default to 0 if timer data is missing
-      isRunning = false;
+      updateStore(false);
     }
   }}
 />
@@ -637,7 +620,7 @@
         style="cursor: pointer;"
         role="button"
         tabindex="0"
-        aria-label={timer.running ? 'עצור טיימר' : 'הפעל טיימר'}
+        aria-label={isRunning ? 'עצור טיימר' : 'הפעל טיימר'}
       >
         <!-- Hit area expander -->
         <circle cx="0" cy="0" r="75" fill="transparent" stroke="transparent" />
@@ -646,10 +629,10 @@
           cy="0"
           r="50"
           class="fill-pink-100"
-          stroke={timer.running ? '#ff3366' : '#00ff88'}
+          stroke={isRunning ? '#ff3366' : '#00ff88'}
           stroke-width="3"
         />
-        {#if timer.running}
+        {#if isRunning}
           <rect x="-20" y="-20" width="40" height="40" fill="#ff3366" rx="4" />
         {:else}
           <path d="M -16 -24 L 24 0 L -16 24 Z" fill="#00ff88" />
@@ -809,7 +792,7 @@
         </g>
       </g>
       <g>
-        <g bind:this={rotation} transform="rotate(-{(rotation * 30) % 360})">
+        <g transform="rotate(-{(rotation * 30) % 360})">
           <path
             style="fill: rgb(244, 67, 54); stroke: url(#gradient-15-10);"
             d="M116.31,96.26c-6.38-4.14-13.3-0.02-13.3-0.02s1.43-6.67-3.91-10.58 c-6.41-4.7-15.2-3.13-18.81,6.88c-4.13,11.45,6.46,31.39,6.46,31.39s20.6,0.81,30.2-8.09C124.76,108.61,121.13,99.39,116.31,96.26 z"
@@ -833,7 +816,7 @@
         </g>
       </g>
       <g>
-        <g bind:this={rotation} transform="rotate({(rotation * 30) % 360})">
+        <g transform="rotate({(rotation * 30) % 360})">
           <path
             style="fill: rgb(244, 67, 54); stroke: url(#gradient-15-14);"
             d="M27.99,59.77c-7.12,2.67-7.92,10.68-7.92,10.68s-4.52-5.11-10.83-3.14 C1.65,69.68-2.31,77.68,3.6,86.53c6.76,10.12,29.09,13.45,29.09,13.45s12.89-16.09,11.44-29.1C42.95,60.3,33.38,57.75,27.99,59.77 z"
@@ -867,7 +850,7 @@
     >
       <img
         style=" border-radius: 50%;"
-        src={timer.src}
+        src={timer?.src}
         width="120"
         height="120"
         alt="logo"
@@ -883,7 +866,7 @@
         fill="#FF0092"
         font-family="Sababa"
         text-anchor="middle"
-        font-size="62">{timer.projectName}</text
+        font-size="62">{timer?.projectName}</text
       >
     </g>
     <!-- Hands (simplified) -->
@@ -952,7 +935,7 @@
         text-anchor="middle"
       >
         <tspan fill="#00ffff" font-weight="bold" stroke="purple" dy="-5"
-          >{timer.missionName}</tspan
+          >{timer?.missionName}</tspan
         >
       </textPath>
     </text>

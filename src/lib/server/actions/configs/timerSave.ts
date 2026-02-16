@@ -12,7 +12,25 @@ import type { ActionConfig } from '../types.js';
 export const timerSaveConfig: ActionConfig = {
     key: 'timerSave',
     description: 'Save a timer and commit hours to mission',
-    graphqlOperation: '11saveTimer',
+    graphqlOperation: async (params, context, { strapi }) => {
+        // Step 1: Mark timer as saved if timerId is provided
+        if (params.timerId) {
+            await strapi.execute('34UpdateTimer', {
+                timerId: params.timerId,
+                isActive: false,
+                saved: true,
+                tasks: params.tasks || []
+            }, context.jwt, context.fetch);
+        }
+
+        // Step 2: Commit hours to mission
+        return strapi.execute('11saveTimer', {
+            mId: params.missionId || params.mId,
+            howmanyhoursalready: params.howmanyhoursalready,
+            stname: params.stname || 'saved',
+            x: params.x || 0
+        }, context.jwt, context.fetch);
+    },
 
     paramSchema: {
         missionId: {
@@ -59,6 +77,11 @@ export const timerSaveConfig: ActionConfig = {
             type: 'string',
             required: false,
             description: 'Status name (usually "saved")'
+        },
+        tasks: {
+            type: 'array',
+            required: false,
+            description: 'Array of task IDs to link to the timer'
         }
     },
 
