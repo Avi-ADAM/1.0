@@ -18,7 +18,7 @@
   onMount(async () => {
     if ($lang == 'he') {
       skills2 = jskill;
-    } else if (lang == 'en') {
+    } else if ($lang == 'en') {
       skills2 = enjskill;
     }
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
@@ -220,14 +220,14 @@
     he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
     en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
   };
-  const ws = { he: 'מה הן היכולות שלך?', en: 'What you can do?' };
+  const ws = { he: 'מה הן היכולות והכישורים שלך?', en: 'What you can do?' };
   const skipt = {
     he: 'דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל',
     en: 'skip to end of registration, you can always add those details from your profile page'
   };
 </script>
 
-<h1 class="midscreenText-2 mt-[26vh]">
+<h1 class="midscreenText-2">
   {userName_value}
   <br />
   {ws[$lang]}
@@ -272,13 +272,13 @@
     line-height: normal;
     text-shadow: 1px 1px purple;
     color: var(--barbi-pink);
-    margin-top: 59px;
+    margin-top: 12vh;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
-    background-size: 29.5rem 9.75rem;
-    height: 9.75rem;
-    width: 29.5rem;
+    background-size: 18rem 6rem;
+    height: 6rem;
+    width: 18rem;
     text-align: center;
-    padding-top: 1rem;
+    padding-top: 0.65rem;
     -webkit-text-size-adjust: 100%;
   }
   @media (min-width: 501px) {
@@ -293,11 +293,11 @@
       width: 80vw;
     }
     .midscreenText-2 {
-      background-size: 15.25rem 5rem;
-      height: 5rem;
-      width: 15.25rem;
-      font-size: 1rem;
-      margin-top: 26vh;
+      background-size: 12rem 4rem;
+      height: 4rem;
+      width: 12rem;
+      font-size: 0.75rem;
+      margin-top: 14vh;
     }
     .input-2 {
       grid-column: 2/4;

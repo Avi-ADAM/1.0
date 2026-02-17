@@ -229,14 +229,16 @@
     he: 'כאשר העבודה שלך מגשימה את הערכים ומקדמת את המטרות שלך היא הופכת ליצירה מהנה, אנו נסייע לך לקדם את הערכים והמטרות שלך',
     en: 'When your work aligns with your values and advances your goals, it becomes enjoyable creation. We will assist you in promoting your values and goals.'
   };
-  let focused = false;
+  let focused = $state(false);
 </script>
 
-<h1 class="midscreenText-2" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
-  {userName_value}
-  <br />
-  {what[$lang]}
-</h1>
+{#if (!focused && !page.data.isDesktop) || page.data.isDesktop}
+  <h1 class="midscreenText-2" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+    {userName_value}
+    <br />
+    {what[$lang]}
+  </h1>
+{/if}
 {#if (!focused && !page.data.isDesktop) || page.data.isDesktop}
   <div class="info">
     <Tile
@@ -248,7 +250,12 @@
     />
   </div>
 {/if}
-<div class="input-2" dir={$lang == 'en' ? 'ltr' : 'rtl'}>
+<div
+  class="input-2"
+  dir={$lang == 'en' ? 'ltr' : 'rtl'}
+  onfocusin={() => (focused = true)}
+  onfocusout={() => (focused = false)}
+>
   <MultiSelect
     liSelectedStyle="z-index: 1000;"
     --sms-width="var(--multiselect-width)"
@@ -286,81 +293,98 @@
     grid-row: 1/ 2;
     align-self: center;
     justify-self: center;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     line-height: normal;
     text-shadow: 1px 1px purple;
     color: var(--barbi-pink);
-    margin-top: 68px;
+    margin-top: 12vh;
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
-    background-size: 29.5rem 9.75rem;
-    height: 9.75rem;
-    width: 29.5rem;
+    background-size: 18rem 6rem;
+    height: 6rem;
+    width: 18rem;
     text-align: center;
-    padding: 1rem 1rem 0rem 1rem;
+    padding: 0.65rem 1rem 0rem 1rem;
     -webkit-text-size-adjust: 100%;
   }
   @media (max-width: 500px) {
     .midscreenText-2 {
-      background-size: 15.25rem 5rem;
-      height: 5rem;
-      width: 15.25rem;
-      font-size: 0.7rem;
-      margin-top: 26vh;
+      background-size: 12rem 4rem;
+      height: 4rem;
+      width: 12rem;
+      font-size: 0.75rem;
+      margin-top: 14vh;
     }
     .input-2 {
       grid-column: 2/4;
-      grid-row: 4/5;
-      margin-top: 0;
+      grid-row: 3/4;
+      margin-top: 5px;
       align-self: center;
       justify-self: center;
       display: flex;
       justify-content: center;
-      --multiselect-width: 30vw;
+      --multiselect-width: 80vw;
     }
     .info {
       grid-column: 2/4;
       grid-row: 2/3;
-      margin-top: 0;
+      margin-top: 5px;
       align-self: center;
       justify-self: center;
     }
   }
   .button-in-2 {
     grid-column: 1/2;
-    grid-row: 7 / 8;
+    grid-row: 5 / 6;
     align-self: center;
     justify-self: center;
   }
   .button-2 {
     grid-column: 4/5;
-    grid-row: 7 / 8;
+    grid-row: 5 / 6;
     align-self: center;
     justify-self: center;
   }
   .button-end {
     grid-column: 2/4;
-    grid-row: 7 / 8;
+    grid-row: 5 / 6;
     align-self: center;
     justify-self: center;
   }
   .input-2 {
-    grid-column: 2/4;
-    grid-row: 3/4;
+    grid-column: 2 / 4;
+    grid-row: 3 / 4;
     align-self: center;
     justify-self: center;
     display: flex;
     justify-content: center;
     --multiselect-width: auto;
+    position: relative;
+    z-index: 100;
   }
   .info {
-    grid-column: 2/4;
-    grid-row: 2/3;
+    grid-column: 2 / 4;
+    grid-row: 2 / 3;
     align-self: center;
     justify-self: center;
+    position: relative;
+    z-index: 1;
   }
   .input-2-2 {
-    grid-column: 1/5;
-    grid-row: 5/6;
+    grid-column: 1 / 5;
+    grid-row: 5 / 6;
     text-align: center;
+  }
+  :global(.input-2 .options) {
+    bottom: 100% !important;
+    top: auto !important;
+    margin-top: 0 !important;
+    margin-bottom: 5px !important;
+    max-height: 30vh !important;
+    overflow-y: auto !important;
+    z-index: 9999 !important;
+    background: var(--gold) !important;
+    border: 2px solid var(--barbi-pink) !important;
+    border-radius: 12px !important;
+    box-shadow: 0 -4px 12px rgba(0, 0, 0, 0.15) !important;
   }
 </style>

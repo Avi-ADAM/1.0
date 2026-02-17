@@ -3,7 +3,7 @@
   import { Canvas } from '@threlte/core';
   import Scene from './globu.svelte';
   import { doesLang, langUs, lang } from '$lib/stores/lang.js';
-  import { locale } from '$lib/translations';
+  import { locale, t } from '$lib/translations';
   import { goto } from '$app/navigation';
   import Maze from './maze.svelte';
   import MultiSelect from 'svelte-multiselect';
@@ -12,10 +12,10 @@
   import { contriesi } from '../registration/contries.js';
   import { fpval } from '../registration/fpval.js';
   import { regHelper } from '../../stores/regHelper.js';
+  import { show } from '../registration/store-show.js';
 
   import { RingLoader } from 'svelte-loading-spinners';
-  import { DialogOverlay, DialogContent } from 'svelte-accessible-dialog';
-  import { fly } from 'svelte/transition';
+  import { fly, fade } from 'svelte/transition';
   import Tikun from './tikunolam.svelte';
   import TRan from './translatehe.svelte';
   import { onMount } from 'svelte';
@@ -24,45 +24,33 @@
   const { progress } = useProgress();
   import { Head } from 'svead';
   import { track } from '@vercel/analytics';
+  import { page } from '$app/stores';
+
   $effect(() => {
     console.log('amana', $progress);
   });
 
-  let title = ' 1💗1 | הסכמה עולמית על חירות';
+  let title = $derived($t('home.amana.title'));
   let image = `https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png`;
-  let description =
-    'הסכמה העולמית על חירות היא חלק מרכזי ב- 1💗1. על ידי הסכמה להצהרה זו, ניתן להירשם לפלטפורמה השיתופית 1💗1 ומשתתפים ביצירת עולם יותר בטוח. על ידי ההתחייבות ההדדית לאי-אלימות, לפתרון סכסוכים בהסכמה ולכבוד הדדי, אנו ניצור עולם בו כוח ואלימות מפסיקים להיות צורות של תקשורת אנושית. הצטרפו אלינו לקידום שלום, הסכמות וחופש. ביחד, אנחנו יכולים ליצור עולם שבו הטוב הבסיסי מנצח ובו חילוקי דעות נפתרים בהסכמה משותפת.';
+  let description = $derived($t('home.amana.description'));
   let url = 'https://1lev1.com/hascama';
 
-  // onMount(async () => {
-  //
-  //
-  //
-  //      var chatbox = document.getElementById('fb-customer-chat');
-  //      chatbox.setAttribute("page_id", "684861488632219");
-  //      chatbox.setAttribute("attribution", "biz_inbox");
-  //
-  //      window.fbAsyncInit = function() {
-  //        FB.init({
-  //          xfbml            : true,
-  //          version          : 'v12.0'
-  //        });
-  //      };
-  //
-  //      (function(d, s, id) {
-  //        var js, fjs = d.getElementsByTagName(s)[0];
-  //        if (d.getElementById(id)) return;
-  //        js = d.createElement(s); js.id = id;
-  //        js.src = 'https://connect.facebook.net/he_IL/sdk/xfbml.customerchat.js';
-  //        fjs.parentNode.insertBefore(js, fjs);
-  //      }(document, 'script', 'facebook-jssdk'));
-  // })
   let fpp = [];
   let fppp = [];
   const baseUrl = import.meta.env.VITE_URL;
 
   let error1 = null;
+
+  // Check if user came back from agreement site
+  let agreedToFullAgreement = $state(false);
+
   onMount(async () => {
+    // Check URL parameters for agreement confirmation
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.get('agreed') === 'true') {
+      agreedToFullAgreement = true;
+    }
+
     const parseJSON = (resp) => (resp.json ? resp.json() : resp);
     const checkStatus = (resp) => {
       if (resp.status >= 200 && resp.status < 300) {
@@ -71,9 +59,6 @@
       return parseJSON(resp).then((resp) => {
         throw resp;
       });
-    };
-    const headers = {
-      'Content-Type': 'application/json'
     };
 
     try {
@@ -113,7 +98,10 @@ meta {
     var arr = [];
     for (let j = 0; j < contry_name_arr.length; j++) {
       for (let i = 0; i < country.length; i++) {
-        if (country[i].heb === contry_name_arr[j]) {
+        if (
+          country[i].heb === contry_name_arr[j] ||
+          country[i].label === contry_name_arr[j]
+        ) {
           arr.push(country[i].value);
         }
       }
@@ -444,33 +432,28 @@ meta {
     { value: 244, label: 'Zambia', heb: 'זמביה' },
     { value: 243, label: 'Zimbabwe', heb: 'זימבבואה' }
   ];
-  const name = `countries`;
-  let localLang = 'he';
+
   let nameuse = $state(false);
-  const placeholdr = { he: '', ar: '', en: '' };
-  const pl = `${placeholdr}.${localLang}`;
-  const placeholder = `המקום שלי`;
-  const required = true;
+  // placeholder removed, used inline
   let erorim = $state({
     st: false,
     msg: '',
-    msg2: 'אם הבעיה נמשכת ניתן לפנות ל',
+    msg2: '',
     msg1: 'baruch@1lev1.com'
   });
   let selected = $state([]);
   let already = $state(false);
   let erorims = $state(false);
+  let agreeToBasicTerms = $state(false);
 
   // Form state variables
   let formName = $state('');
   let formEmail = $state('');
-  let formErrors = $state({ name: '', email: '' });
+  let formErrors = $state({ name: '', email: '', agreement: '' });
   let g = $state(false);
-  let datar;
   let { idx = 1 } = $props();
-  let data;
   import Close from '$lib/celim/close.svelte';
-  import { scrolltotop } from 'svelte-scrollto-element';
+  import { animateScroll } from 'svelte-scrollto-element';
   import Text1lev1 from '$lib/celim/ui/text1lev1.svelte';
   import { sendError } from '$lib/func/send/senError.svelte';
   let meData = [];
@@ -478,15 +461,15 @@ meta {
   // Manual validation function
   function validate() {
     let valid = true;
-    formErrors = { name: '', email: '' };
+    formErrors = { name: '', email: '', agreement: '' };
 
     if (!formName) {
-      formErrors.name = 'יש למלא שם';
+      formErrors.name = $t('home.amana.errors.nameRequired');
       valid = false;
     }
 
     if (!formEmail || !/^[^@]+@[^@]+\.[^@]+$/.test(formEmail)) {
-      formErrors.email = 'יש למלא מייל תקין';
+      formErrors.email = $t('home.amana.errors.emailInvalid');
       valid = false;
     }
 
@@ -497,7 +480,32 @@ meta {
       erorims = false;
     }
 
+    if (!agreeToBasicTerms && !agreedToFullAgreement) {
+      formErrors.agreement = $t('home.amana.errors.agreementRequired');
+      valid = false;
+    }
+
     return valid;
+  }
+
+  // Function to navigate to agreement site
+  function goToAgreementSite() {
+    if (formName) sessionStorage.setItem('pendingName', formName);
+    if (formEmail) sessionStorage.setItem('pendingEmail', formEmail);
+    if (selected.length > 0)
+      sessionStorage.setItem('pendingLocation', JSON.stringify(selected));
+
+    const returnUrl = encodeURIComponent(
+      window.location.origin + '/hascama?agreed=true'
+    );
+
+    let agreementUrl = `https://agreement.1lev1.com?return=${returnUrl}&lang=${$locale}`;
+    if (formName) agreementUrl += `&name=${encodeURIComponent(formName)}`;
+    if (formEmail) agreementUrl += `&email=${encodeURIComponent(formEmail)}`;
+    if (selected.length > 0)
+      agreementUrl += `&location=${encodeURIComponent(JSON.stringify(selected))}`;
+
+    window.location.href = agreementUrl;
   }
 
   // Form submit handler
@@ -507,16 +515,15 @@ meta {
 
     if (!validate()) {
       setTimeout(() => {
-        scrolltotop();
+        animateScroll.scrollToTop();
       }, 0);
       return;
     }
 
     const jjj = formName;
     if (fpp.includes(jjj)) {
-      console.log('sssss');
       nameuse = true;
-      scrolltotop();
+      animateScroll.scrollToTop();
       return;
     }
 
@@ -564,6 +571,9 @@ meta {
         `email=${mail}; expires=` + new Date(2027, 0, 1).toUTCString();
       document.cookie =
         `un=${formName}; expires=` + new Date(2027, 0, 1).toUTCString();
+      document.cookie =
+        `country=${find_contry_id(selected)}; expires=` +
+        new Date(2027, 0, 1).toUTCString();
       userName.set(formName);
       liUN.set(formName);
       email.set(mail);
@@ -571,47 +581,39 @@ meta {
       regHelper.set(1);
       meData = result.data.createChezin;
       fpval.set(meData.data.id);
-      datar = data;
+      if (agreeToBasicTerms && !agreedToFullAgreement) {
+        show.set(1);
+      }
       let linko = `ref=true&id=${$fpval}&con=${find_contry_id(selected)}&un=${$liUN}&em=${$email}`;
-      console.log(`https://www.1lev1.com?${encodeURIComponent(linko)}`);
       linkos.set(linko);
     } catch (error) {
       g = false;
       erorim.st = true;
       if (!error.response) {
-        erorim.msg = 'השרת נרדם 😴, הערנו אותו, אנו מנסים שוב';
-        sendError(JSON.stringify(error) ?? null, '/amana.svelte 467', fetch);
+        erorim.msg = $t('home.amana.errors.serverSleep');
+        sendError(JSON.stringify(error) ?? null, '/amana.svelte', fetch);
       } else {
-        erorim.msg = ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות לעולם חוזרת, הנה הפרטים היבשים `;
-        sendError(erorim.msg, '/amana.svelte 470', fetch);
+        erorim.msg = ` ${error.response.data.message}  ${error.response.data.statusCode} :טעות`;
+        sendError(erorim.msg, '/amana.svelte', fetch);
       }
     }
   }
-  let dow = $state();
-  /*function show (){
-const amana = document.getElementById("amana-show")
-const lines = document.getElementById("lines")
 
-}*/
   let trans = $state(false);
   function tran() {
     trans = !trans;
   }
-  function scrollTo() {
-    dow.scrollIntoView({ behavior: 'smooth' });
-  }
 
   let isOpen = $state(false);
-  let a = $state(0),
-    h = $state();
+  let isMazeOpen = $state(false);
+  let a = $state(0);
 
   function sell() {
     isOpen = true;
     a = 0;
   }
   function info() {
-    isOpen = true;
-    a = 6;
+    isMazeOpen = true;
   }
   function tr() {
     isOpen = true;
@@ -619,1326 +621,1454 @@ const lines = document.getElementById("lines")
   }
   const closer = () => {
     isOpen = false;
+    isMazeOpen = false;
     a = 0;
   };
   function done() {
     a = 1;
   }
-
   function erore() {
     a = 3;
   }
-
   function erorer() {
     a = 5;
   }
+
   function change(la) {
     if (la == 'en') {
-      // Sync all stores
       lang.set('en');
       locale.set('en');
       langUs.set('en');
       doesLang.set(true);
       document.cookie =
         `lang=en; expires=` + new Date(2027, 0, 1).toUTCString();
-      goto('/convention');
     } else if (la == 'ar') {
-      // Sync all stores
       lang.set('ar');
       locale.set('ar');
       langUs.set('ar');
       doesLang.set(true);
       document.cookie =
         `lang=ar; expires=` + new Date(2027, 0, 1).toUTCString();
-      goto('aitifaqia');
+    } else if (la == 'he') {
+      lang.set('he');
+      locale.set('he');
+      langUs.set('he');
+      doesLang.set(true);
+      document.cookie =
+        `lang=he; expires=` + new Date(2027, 0, 1).toUTCString();
     }
   }
-  let w = $state(0);
-  let wid = $state(0);
 
   $effect(() => {
     if (formErrors.name || formErrors.email) {
       setTimeout(() => {
-        scrolltotop();
+        animateScroll.scrollToTop();
       }, 0);
+    }
+  });
+
+  // Restore form data when returning from agreement site
+  onMount(() => {
+    if (agreedToFullAgreement) {
+      const savedName = sessionStorage.getItem('pendingName');
+      const savedEmail = sessionStorage.getItem('pendingEmail');
+      const savedLocation = sessionStorage.getItem('pendingLocation');
+
+      if (savedName) formName = savedName;
+      if (savedEmail) formEmail = savedEmail;
+      if (savedLocation) selected = JSON.parse(savedLocation);
+
+      sessionStorage.removeItem('pendingName');
+      sessionStorage.removeItem('pendingEmail');
+      sessionStorage.removeItem('pendingLocation');
     }
   });
 </script>
 
 <Head {title} {description} {image} {url} />
 
-<DialogOverlay style="z-index: 700;" {isOpen} onDismiss={closer}>
+{#if isOpen || isMazeOpen}
   <div
-    style="z-index: 700;"
-    transition:fly={{ y: 450, opacity: 0.5, duration: 2000 }}
+    class="premium-modal-overlay"
+    onclick={closer}
+    onkeydown={(e) => e.key === 'Escape' && closer()}
+    role="button"
+    tabindex="-1"
+    aria-label="סגור מודל"
+    transition:fade={{ duration: 300 }}
   >
-    <DialogContent class="content" aria-label="form">
-      <div style="z-index: 400;" dir="rtl">
-        <button class=" hover:bg-barbi text-mturk rounded-full" onclick={closer}
-          ><Close /></button
-        >
-        {#if a == 0}
+    <div
+      class="premium-modal-card"
+      class:maze-wide={isMazeOpen}
+      onclick={(e) => e.stopPropagation()}
+      onkeydown={(e) => e.stopPropagation()}
+      role="presentation"
+      transition:fly={{ y: 50, duration: 600, opacity: 0 }}
+    >
+      <button class="premium-close-btn" onclick={closer} aria-label="סגור">
+        <Close />
+      </button>
+
+      <div class="premium-modal-content" dir={$locale === 'en' ? 'ltr' : 'rtl'}>
+        {#if isMazeOpen}
+          <div class="maze-scroll-area">
+            <Maze />
+          </div>
+        {:else if a == 0}
           <Tikun onDone={done} onErore={erore} />
         {:else if a == 4}
           <TRan onDone={done} onErore={erorer} />
         {:else if a == 1}
-          <div class="sp bg-gold">
-            <h3 class="text-barbi">נשלח בהצלחה, תודה רבה לך נעמוד בקשר</h3>
+          <div class="status-view success">
+            <div class="status-icon">✨</div>
+            <h3>{$t('home.amana.status.successTitle')}</h3>
+            <p>{$t('home.amana.status.successMessage')}</p>
+            <button class="action-btn-p" onclick={closer}
+              >{$t('home.amana.common.close')}</button
+            >
           </div>
         {:else if a == 2}
-          <div class="flex text-center items-center justify-center bg-gold">
-            <h3 class="text-barbi">רק רגע בבקשה</h3>
-            <br />
-            <RingLoader size="260" color="#ff00ae" unit="px" duration="2s"
-            ></RingLoader>
+          <div class="status-view loading">
+            <RingLoader size="100" color="#ff00ae" unit="px" duration="2s" />
+            <h3>{$t('home.amana.status.loading')}</h3>
           </div>
-        {:else if a == 3}
-          <h1>אירעה שגיאה</h1>
-          <button
-            class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
-            onclick={() => (a = 0)}>לנסות שוב</button
-          >
-        {:else if a == 5}
-          <h1>אירעה שגיאה</h1>
-          <button
-            class="hover:bg-barbi text-barbi hover:text-gold bg-gold rounded-full"
-            onclick={() => ($a = 4)}>לנסות שוב</button
-          >
-        {:else if a == 6}
-          <Maze />
+        {:else if a == 3 || a == 5}
+          <div class="status-view error">
+            <div class="status-icon">❌</div>
+            <h3>{$t('home.amana.status.errorTitle')}</h3>
+            <p>{$t('home.amana.status.errorMessage')}</p>
+            <button
+              class="action-btn-p retry"
+              onclick={() => (a = a == 3 ? 0 : 4)}
+            >
+              {$t('home.amana.common.tryAgain')}
+            </button>
+          </div>
         {/if}
-      </div></DialogContent
-    >
+      </div>
+    </div>
   </div>
-</DialogOverlay>
+{/if}
 
-<!-- Messenger פלאגין של צ'אט Code
-<div id="fb-root"></div>
+<!-- Main Container -->
+<div class="page-container" dir={$locale === 'en' ? 'ltr' : 'rtl'}>
+  <!-- Background Elements -->
+  <div class="bg-gradient"></div>
+  <div class="bg-orbs">
+    <div class="orb orb-1"></div>
+    <div class="orb orb-2"></div>
+    <div class="orb orb-3"></div>
+  </div>
 
+  <!-- Top Navigation -->
+  <div class="top-nav">
+    <a href="/login" class="login-link">
+      <img
+        src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
+        alt="התחברות"
+        class="login-icon"
+      />
+      <span>{$t('home.amana.nav.login')}</span>
+    </a>
 
-<div id="fb-customer-chat" class="fb-customerchat">
-</div>
- position: absolute;
-top: -36px;
-    right: -36px;
-     height: 130px;
-    width: 130px;
-<div style=" position: absolute; top: 1%; left: 87%; color: aqua;" > <button on:click={()=> regHelper.set(1) }>טסט</button> </div>
- -->
-<button
-  style="position: absolute; color: var(--gold); font-weight:bold; height:20px width:20px; z-index:500;"
-  onclick={() => info()}
-  class="ww">?</button
->
-<div bind:clientWidth={wid} class="all">
-  <a data-sveltekit-prefetch href="/login"
-    ><img
-      title="התחברות ל-1💗1"
-      style="opacity:1; z-index:17;"
-      class=" right overlay rounded-full p-2 translate-x-11 -translate-y-11 hover:translate-x-9 hover:-translate-y-9 hover:scale-150"
-      alt="התחברות ל-1💗1"
-      src="https://res.cloudinary.com/love1/image/upload/v1640020897/cropped-PicsArt_01-28-07.49.25-1_wvt4qz.png"
-    /></a
-  >
-  <div
-    style="position:absolute ; left: 1%; top: 1%; display: flex; flex-direction: column ; z-index: 699;"
-  >
-    {#if trans === false}
-      <button onclick={tran}
-        ><img
-          class="shadow-xl rounded"
-          alt="translat-icon-by-barbi"
-          src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"
-        /></button
-      >
-    {:else}
-      <button onclick={tran} class=" text-barbi hover:text-gold p-0.5"
-        ><svg style="width:24px;height:24px" viewBox="0 0 24 24">
-          <path
-            fill="currentColor"
-            d="M8.27,3L3,8.27V15.73L8.27,21H15.73L21,15.73V8.27L15.73,3M8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59L15.59,17L12,13.41L8.41,17L7,15.59L10.59,12L7,8.41"
+    <div class="menu-buttons">
+      {#if trans === false}
+        <button onclick={tran} class="menu-btn icon-btn">
+          <img
+            src="https://res.cloudinary.com/love1/image/upload/v1639345051/icons8-translate-app_gwpwcn.svg"
+            alt="תרגום"
           />
-        </svg></button
-      >
-      <button
-        onclick={() => change('en')}
-        title="change language to English"
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5"
-        >English</button
-      >
-      <button
-        onclick={() => change('ar')}
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5"
-        >العربية</button
-      >
-      <a
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5"
-        title=" 1💗1 אודות "
-        data-sveltekit-prefetch
-        href="/about"
-      >
-        אודות</a
-      >
-      <button
-        onclick={info}
-        title="הסבר ומידע"
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5"
-        >הסבר ומידע</button
-      >
-      <button
-        onclick={() => goto('/he')}
-        title="1💗1"
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5"
-        ><Text1lev1 /></button
-      >
-      <button
-        onclick={sell}
-        title="בקשת שינוי"
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5"
-        >בקשת שינוי לטקסט</button
-      >
-      <button
-        onclick={tr}
-        title="תרגום לשפות נוספות"
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk bg-lturk text-center hover:bg-barbi px-1 py-0.5"
-        >תרגום לשפות נוספות</button
-      >
-      <a
-        class="text-barbi border-2 border-gold text-bold hover:text-lturk text-center bg-lturk hover:bg-barbi px-1 py-0.5"
-        data-sveltekit-prefetch
-        href="/love">מפת ההסכמה</a
-      >
+        </button>
+      {:else}
+        <button onclick={tran} class="menu-btn">✕</button>
+        {#if $locale !== 'en'}
+          <button onclick={() => change('en')} class="menu-btn">English</button>
+        {/if}
+        {#if $locale !== 'ar'}
+          <button onclick={() => change('ar')} class="menu-btn">العربية</button>
+        {/if}
+        {#if $locale !== 'he'}
+          <button onclick={() => change('he')} class="menu-btn">עברית</button>
+        {/if}
+        <a href="/about" class="menu-btn">{$t('home.nav.about')}</a>
+        <button onclick={info} class="menu-btn"
+          >{$t('home.amana.nav.explanation')}</button
+        >
+        <button onclick={() => goto('/he')} class="menu-btn"
+          ><Text1lev1 /></button
+        >
+        <button onclick={sell} class="menu-btn"
+          >{$t('home.amana.nav.changeRequest')}</button
+        >
+        <button onclick={tr} class="menu-btn"
+          >{$t('home.amana.nav.translation')}</button
+        >
+        <a href="/love" class="menu-btn">{$t('home.nav.agreementMap')}</a>
+      {/if}
+    </div>
+
+    <button onclick={() => info()} class="help-btn">?</button>
+  </div>
+
+  <!-- Main Content -->
+  <div class="content-wrapper">
+    {#if already == false}
+      <div class="glass-card" in:fly={{ y: 50, duration: 800, delay: 200 }}>
+        <!-- Header -->
+        <div class="card-header">
+          <div class="logo-heart">💗</div>
+          <div class="logo-section">
+            <h1 class="title">{$t('home.amana.headerTitle')}</h1>
+          </div>
+          <p class="subtitle">{$t('home.amana.headerSubtitle')}</p>
+        </div>
+
+        <!-- Agreement Badge (if came from agreement site) -->
+        {#if agreedToFullAgreement}
+          <div class="agreement-badge" in:fade={{ duration: 500 }}>
+            <div class="badge-icon">✓</div>
+            <span>{$t('home.amana.agreedFull')}</span>
+          </div>
+        {/if}
+
+        <!-- Form -->
+        <form class="registration-form" onsubmit={handleSubmit}>
+          <!-- Name Field -->
+          <div class="form-group">
+            <label for="name" class="form-label">
+              <span class="label-icon">👤</span>
+              {$t('home.amana.form.nameLabel')}
+            </label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              class="form-input"
+              placeholder={$t('home.amana.form.namePlaceholder')}
+              bind:value={formName}
+              class:error={formErrors.name || nameuse}
+            />
+            {#if formErrors.name}
+              <span class="error-msg">{formErrors.name}</span>
+            {/if}
+            {#if nameuse}
+              <span class="error-msg">{$t('home.amana.errors.nameTaken')}</span>
+            {/if}
+          </div>
+
+          <!-- Location Field -->
+          <div class="form-group">
+            <label for="location" class="form-label">
+              <span class="label-icon">🌍</span>
+              {$t('home.amana.form.locationLabel')}
+            </label>
+            <div class="multiselect-wrapper">
+              <MultiSelect
+                bind:selected
+                outerDivClass="custom-multiselect-outer"
+                inputClass="custom-multiselect-input"
+                liSelectedClass="custom-multiselect-selected"
+                --sms-options-bg={'rgba(153, 100, 136, 1)'}
+                placeholder={$t('home.amana.form.locationPlaceholder')}
+                options={country.map((c) =>
+                  $locale === 'he' ? c.heb : c.label
+                )}
+              />
+            </div>
+            {#if erorims}
+              <span class="error-msg"
+                >{$t('home.amana.errors.locationRequired')}</span
+              >
+            {/if}
+          </div>
+
+          <!-- Email Field -->
+          <div class="form-group">
+            <label for="email" class="form-label">
+              <span class="label-icon">✉️</span>
+              {$t('home.amana.form.emailLabel')}
+            </label>
+            <input
+              id="email"
+              name="email"
+              type="email"
+              class="form-input"
+              placeholder="example@mail.com"
+              bind:value={formEmail}
+              class:error={formErrors.email}
+            />
+            {#if formErrors.email}
+              <span class="error-msg">{formErrors.email}</span>
+            {/if}
+          </div>
+
+          <!-- Agreement Section -->
+          <div class="agreement-section">
+            <h3 class="agreement-title">{$t('home.amana.agreement.title')}</h3>
+
+            <!-- Full Agreement Button -->
+            <button
+              type="button"
+              onclick={goToAgreementSite}
+              class="agreement-btn-full"
+            >
+              <span class="btn-icon">✨</span>
+              <span class="text-2xl"
+                >{$t('home.amana.agreement.fullButton')}</span
+              >
+              <span class="btn-icon">✨</span>
+            </button>
+            <p class="agreement-note">{$t('home.amana.agreement.note')}</p>
+
+            <!-- Divider -->
+            <div class="divider">
+              <span>{$t('home.amana.common.or')}</span>
+            </div>
+
+            <!-- Basic Agreement -->
+            <div class="basic-agreement">
+              <p class="agreement-text">
+                {@html $t('home.amana.agreement.basicText1', {
+                  name: formName || '___'
+                })}
+                <br />
+                {@html $t('home.amana.agreement.basicText2', {
+                  name: formName || '___'
+                })}
+              </p>
+
+              <label class="checkbox-label">
+                <input
+                  type="checkbox"
+                  bind:checked={agreeToBasicTerms}
+                  class="checkbox-input"
+                />
+                <span class="checkbox-custom"></span>
+                <span class="checkbox-text"
+                  >{$t('home.amana.agreement.checkboxLabel')}</span
+                >
+              </label>
+
+              {#if formErrors.agreement}
+                <span class="error-msg">{formErrors.agreement}</span>
+              {/if}
+            </div>
+
+            <!-- Info Box -->
+            <div class="info-box">
+              <div class="info-icon">💡</div>
+              <div class="info-text">
+                <strong>{$t('home.amana.agreement.infoTitle')}</strong>
+                <ul>
+                  <li>
+                    {@html $t('home.amana.agreement.basicInfo')}
+                  </li>
+                  <li>
+                    <a
+                      href="https://agreement.1lev1.com"
+                      onclick={(e) => {
+                        e.preventDefault();
+                        goToAgreementSite();
+                      }}>{@html $t('home.amana.agreement.fullAgreementLink')}</a
+                    >{$t('home.amana.agreement.fullAgreementDesc')}
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          <!-- Submit Button -->
+          {#if g == false}
+            <button type="submit" class="submit-btn">
+              <span class="submit-text">{$t('home.amana.form.submit')}</span>
+              <span class="submit-arrow">{$locale === 'en' ? '→' : '←'}</span>
+            </button>
+          {:else}
+            <div class="loading-container">
+              <RingLoader size="60" color="#ff00ae" unit="px" duration="1.5s"
+              ></RingLoader>
+              <p>{$t('home.amana.common.justAMoment')}</p>
+            </div>
+          {/if}
+
+          <!-- Error Message -->
+          {#if erorim.st}
+            <div class="error-box">
+              <p>{erorim.msg}</p>
+              <p class="error-contact">
+                {$t('home.amana.errors.contactSupport')}
+                {erorim.msg1}
+              </p>
+            </div>
+          {/if}
+        </form>
+      </div>
     {/if}
   </div>
-  <div class="mobile">
-    <section class="container" dir="rtl" id="lines">
-      <div class="flexi">
-        <h3
-          class="amanat"
-          style="font-weight: 900; white-space: nowrap; font-family: StamSefarad, serif; font-size: 1.2em; line-height: normal;"
-          dir="rtl"
-        >
-          שמי:
-        </h3>
-        <input
-          id="name"
-          name="name"
-          placeholder="השם שלי"
-          required
-          bind:value={formName}
-        />
-        {#if formErrors.name}
-          <small style="color: red;">{formErrors.name}</small>
-        {/if}
-        {#if nameuse}
-          <small style="color: red;">השם שנבחר כבר תפוס</small>
-        {/if}
-      </div>
-      <div class="flexi1" style="white-space:nowrap;">
-        <div>
-          <h3
-            class="amanat"
-            id="m"
-            style="font-weight: 900; font-family: StamSefarad, serif; font-size: 1em;"
-            dir="rtl"
-          >
-            מ:
-          </h3>
-        </div>
-        <div>
-          <MultiSelect
-            bind:selected
-            outerDivClass="!bg-gold !text-barbi"
-            inputClass="!bg-gold !text-barbi"
-            liSelectedClass="!bg-barbi !text-gold"
-            {placeholder}
-            options={country.map((c) => c.heb)}
-          />
-        </div>
-        {#if erorims == true}
-          <small style="color: red;">יש לבחור לפחות מקום 1</small>
-        {/if}
-      </div>
-      <div class="flexi2">
-        <h3
-          class="amanat"
-          style=" font-weight: 900;   white-space: nowrap; font-family: 'StamSefarad', serif; font-size: 1.2em; line-height:normal;"
-          dir="rtl"
-        >
-          דואר L.
-        </h3>
-        <input
-          placeholder="המייל שלי"
-          id="email"
-          name="email"
-          required
-          bind:value={formEmail}
-        />
-        {#if formErrors.email}
-          <small style="color: red;">{formErrors.email}</small>
-        {/if}
-      </div>
-    </section>
-    <div class="onlym">
-      <button
-        alt="click-to-scroll-down"
-        class="ca3-scroll-down-link ca3-scroll-down-arrow"
-        data-ca3_iconfont="ETmodules"
-        onclick={scrollTo}
-        data-ca3_icon=""
-      ></button>
-    </div>
-  </div>
-  <div class="aab" bind:this={dow}>
-    <div dir="rtl" class="amana" id="amana-show">
-      <div
-        class="card bg-[length:200%_auto] animate-gradientx bg-[linear-gradient(to_right,theme(colors.gra),theme(colors.grb),theme(colors.grc),theme(colors.grd),theme(colors.gre),theme(colors.grd),theme(colors.grc),theme(colors.grb),theme(colors.gra))]"
-      >
-        <div class="card-overlay"></div>
-        <div class="card-inner d overflow-y-auto">
-          <h1 dir="rtl" style="color:#cc0066; text-shadow: 1px 1px black ; ">
-            הצהרת העצמאות של
-            <span
-              style=" text-shadow: 1px 1px var(--mturk); font-family: 'Gan';"
-              >{formName ? formName : '__'}</span
-            >
-            :
-          </h1>
-          <span
-            style="font-family:David;"
-            class="text-bold text-transparent bg-clip-text bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]"
-          >
-            <span style="font-family:StamSefarad,David;">
-              אני <span
-                style="color:black; font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);"
-                >{formName ? formName : '__'}</span
-              >
-              לא רוצה לפגוע באף אדם ולעולם לא אפגע באף אדם.<!--חיובי-->
-              <br />
-              כי לדעתי אין שום סמכות, ערך, מטרה, אמונה, ממון או אינטרס אשר יוכל להצדיק
-              פגיעה באדם, אלימות וכפיה בכוח.
-              <br />
-              <div
-                class="text-center justify-center flex items-center text-bold text-transparent bg-clip-text bg-[linear-gradient(to_bottom_right,theme(colors.gra),theme(colors.grc),theme(colors.gre),theme(colors.grc),theme(colors.gra))]"
-                style="flex-wrap: wrap; font-family:StamSefarad,David;"
-              >
-                אני <span
-                  style="flex-wrap: nowrap; white-space: pre;  color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);"
-                >
-                  {formName ? ' ' + formName + ' ' : ' __ '}
-                </span>
-                אצור, אתנהל ואפתור חילוקי דעות ב
-                <span
-                  role="contentinfo"
-                  class="hover:text-barbi"
-                  onkeypress={() => info()}
-                  onclick={() => info()}
-                  style="flex-wrap: wrap;">"רקמות"</span
-                >
-                המתנהלות באתר
-                <div
-                  dir="ltr"
-                  style="text-shadow:none; flex-wrap: wrap;"
-                  class=" font-bold mx-2 mt-2 text-transparent
-          bg-clip-text bg-[length:auto_200%] animate-gradienty
-          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]
-          flex-wrap flex flex-row"
-                >
-                  <div class="flip">
-                    <h1
-                      class="font-bold text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
-            bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
-                    >
-                      1
-                    </h1>
-                  </div>
-                  <div>
-                    <h1
-                      class="font-bold text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
-          bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
-                    >
-                      💗
-                    </h1>
-                  </div>
-                  <div>
-                    <h1
-                      class="font-bold text-transparent bg-clip-text bg-[length:auto_200%] animate-gradienty
-            bg-[linear-gradient(to_top,theme(colors.barbi),theme(colors.fuchsia.400),theme(colors.sky.400),theme(colors.mturk),theme(colors.sky.400),theme(colors.fuchsia.400),theme(colors.barbi))]"
-                    >
-                      1
-                    </h1>
-                  </div>
-                </div>
-                רק בהסכמה הדדית.
-              </div>
-              <!----
-אני <span style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);">{$form.name ? $form.name : "__"}</span> אתן את אמוני בטוב הבסיסי שבאדם, ולכך מקווה ומצפה שכאשר כל האנושות כולה תסכים אלימות, קרבות וכפיה בכוח יפסיקו להיות צורה של תקשורת אנושית.
-          <br> -->
-              כאשר כל אוכלוסיית
-              <span
-                style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);"
-                >{selected.length > 0
-                  ? `${selected.length < 2 ? selected : selected.join(' וכל אוכלוסיית ')}`
-                  : '__'}</span
-              >
-              תסכים ותחיה לפי אמנה זו אני
-              <span
-                style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--mturk);"
-                >{formName ? formName : '__'}</span
-              >
-              אוותר עם כל השאר על כלי הנשק שלי ועל השוטרים החמושים שמדינת
-              <span
-                style="color:black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);"
-                >{selected.length > 0
-                  ? `${selected.length < 2 ? selected : selected.join(' ומדינת ')}`
-                  : '__'}</span
-              >
-              {selected.length > 1 ? 'ממנות' : 'ממנה'} בשמי ונחיה בהסכמה הדדית.
-              <br />
-              כאשר כל האנושות תסכים ותחיה לפי אמנה זו אני
-              <span
-                style="color:black;font-family:StamSefarad;   text-shadow: 1px 1px var(--mturk);"
-                >{formName ? formName : '__'}</span
-              >
-              אוותר על כלי הנשק של צבא
-              <span
-                style="color: black; font-family:StamSefarad;  text-shadow: 1px 1px var(--barbi-pink);"
-                >{selected.length > 0
-                  ? `${selected.length < 2 ? selected : selected.join(' ושל צבא ')}` +
-                    '.'
-                  : '__.'}</span
-              > כאשר בו זמנית יוותרו כל צבאות העולם על נשקם ונהפוך לאנושות מפורזת
-              וחופשית
-            </span>
-          </span>
-        </div>
-      </div>
-    </div>
 
-    <form>
-      <div class="flexid" bind:clientWidth={w} bind:clientHeight={h}>
-        {#if already == false}
-          {#if g == false}
-            {#if $progress < 1}
-              <button
-                class="button hover:scale-150"
-                title="לחצת ויצאת לחופשי"
-                onsubmit={handleSubmit}
-                type="submit"
-              >
-              </button>
-            {/if}
-            <div class="cor">
-              <Canvas size={{ width: w, height: h }}>
-                <Scene
-                  onClick={() => console.log('hhuibi')}
-                  onSubmit={handleSubmit}
-                />
-              </Canvas>
-            </div>
-          {:else if g == true}
-            <div class="sp text-center">
-              <h3 class="text-barbi">רק רגע בבקשה</h3>
-              <br />
-              <RingLoader size="140" color="#ff00ae" unit="px" duration="2s"
-              ></RingLoader>
-            </div>
-          {/if}
-          {#if erorim.st == true}
-            <small style="color:red; text-align: center;"
-              >{erorim.msg} <br /><span dir="rtl">
-                {erorim.msg2} - {erorim.msg1}</span
-              >
-            </small>
-          {/if}
-        {/if}
-      </div>
-    </form>
+  <!-- Globe Background (Optional) -->
+  <div class="globe-wrapper">
+    <Canvas>
+      <Scene onClick={() => {}} onSubmit={handleSubmit} />
+    </Canvas>
   </div>
 </div>
 
 <style>
-  .card {
-    --bg: #e8e8e8;
-    --contrast: #e2e0e0;
-    --grey: #93a1a1;
+  @import url('https://fonts.googleapis.com/css2?family=Rubik:wght@300;400;500;600;700;800&display=swap');
+
+  :global(body) {
+    margin: 0;
+    padding: 0;
+    font-family: 'Rubik', sans-serif;
+    overflow-x: hidden;
+  }
+
+  /* Page Container */
+  .page-container {
+    min-height: 100vh;
     position: relative;
-    padding: 9px;
-    background-color: var(--bg);
-    border-radius: 35px;
-    box-shadow:
-      rgba(50, 50, 93, 0) 0px 50px 100px -20px,
-      rgba(0, 0, 0, 0) 0px 30px 60px -30px,
-      rgba(10, 37, 64, 0.35) 0px -2px 6px 0px inset;
+    overflow: auto;
   }
 
-  .card-overlay {
-    position: absolute;
+  /* Background */
+  .bg-gradient {
+    position: fixed;
     inset: 0;
-    border-radius: 35px;
-
-    pointer-events: none;
-    background: repeating-conic-gradient(
-        var(--bg) 0.0000001%,
-        var(--grey) 0.000104%
-      )
-      60% 60%/600% 600%;
-    filter: opacity(10%) contrast(105%);
-  }
-
-  .card-inner {
-    display: -webkit-box;
-    display: -ms-flexbox;
-    padding: 0.5em;
-    width: 84vw;
-    height: 72vh;
-    background-color: var(--contrast);
-    border-radius: 30px;
-    /* Content style */
-    font-size: 1.5em;
-    font-size-adjust: auto;
-    font-weight: 900;
-    color: #c7c4c4;
-    text-align: center;
-  }
-  .cor {
-    cursor:
-      url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg),
-      auto;
-  }
-  .ww {
-    top: calc(100% - 40px);
-    right: calc(100% - 40px);
-    width: 20px;
-    height: 20px;
-    border-radius: 50%;
-    background: rgb(26, 188, 156);
-    background: -moz-linear-gradient(
-      -45deg,
-      rgba(26, 188, 156, 1) 0%,
-      rgba(142, 68, 173, 1) 100%
-    );
-    background: -webkit-linear-gradient(
-      -45deg,
-      rgba(26, 188, 156, 1) 0%,
-      rgba(142, 68, 173, 1) 100%
-    );
     background: linear-gradient(
       135deg,
-      rgba(26, 188, 156, 1) 0%,
-      rgba(142, 68, 173, 1) 100%
+      #1a0a2e 0%,
+      #2d1522 25%,
+      #3d2630 50%,
+      #2d1522 75%,
+      #1a0a2e 100%
     );
+    z-index: 0;
+  }
 
-    box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
-    transform: translatey(0px);
-    animation: float 6s ease-in-out infinite;
+  .bg-orbs {
+    position: fixed;
+    inset: 0;
+    z-index: 1;
+    pointer-events: none;
   }
-  @keyframes float {
-    0% {
-      box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
-      transform: translatey(0px);
-    }
-    50% {
-      box-shadow: 0 25px 15px 0px rgba(0, 0, 0, 0.2);
-      transform: translatey(-20px);
-    }
-    100% {
-      box-shadow: 0 5px 15px 0px rgba(0, 0, 0, 0.6);
-      transform: translatey(0px);
-    }
+
+  .bg-orbs::before,
+  .bg-orbs::after {
+    content: '';
+    position: absolute;
+    width: 2px;
+    height: 2px;
+    background: #ffd700;
+    border-radius: 50%;
+    box-shadow:
+      100px 200px 0 #ffd700,
+      200px 300px 0 #ff00ae,
+      300px 100px 0 #ffd700,
+      400px 250px 0 #ff00ae,
+      500px 150px 0 #ffd700,
+      150px 400px 0 #ffd700,
+      250px 450px 0 #ff00ae,
+      350px 350px 0 #ffd700,
+      450px 400px 0 #ff00ae,
+      550px 250px 0 #ffd700;
+    animation: twinkle 3s ease-in-out infinite;
   }
-  .overlay {
-    background-color: #ff1a1a;
-    background-image: linear-gradient(315deg, #ff1a1a 0%, #ffff00 74%);
-    background-size: 110% 110%;
-    -webkit-animation: AnimationName 3s ease infinite;
-    -moz-animation: AnimationName 3s ease infinite;
-    animation: AnimationName 3s ease infinite;
-    /* position, height, width, etc as appropriate. */
-    z-index: 17;
-    opacity: 0;
-    animation-delay: 0.5s;
-    animation-duration: 15s;
-    animation-direction: normal;
-    animation-iteration-count: infinite;
-    animation-name: fireFlicker;
-    animation-timing-function: linear;
+
+  .bg-orbs::after {
+    animation-delay: 1.5s;
+    box-shadow:
+      120px 180px 0 #ffd700,
+      220px 320px 0 #ff00ae,
+      320px 120px 0 #ffd700,
+      420px 270px 0 #ff00ae,
+      520px 170px 0 #ffd700,
+      170px 420px 0 #ffd700,
+      270px 470px 0 #ff00ae,
+      370px 370px 0 #ffd700,
+      470px 420px 0 #ff00ae,
+      570px 270px 0 #ffd700;
   }
-  @keyframes fireFlicker {
+
+  @keyframes twinkle {
     0%,
-    10% {
-      opacity: 0;
-    }
-    15%,
-    20% {
-      opacity: 0.52;
-    }
-    22%,
-    23% {
-      opacity: 0.104;
-    }
-    25%,
-    35% {
-      opacity: 0.32;
-    }
-    39%,
-    42% {
-      opacity: 0.88;
-    }
-    44%,
-    47% {
-      opacity: 0.52;
-    }
-    49%,
-    50% {
-      opacity: 0.104;
-    }
-    52%,
-    54% {
-      opacity: 0.32;
-    }
-    57%,
-    58% {
-      opacity: 0.96;
-    }
-    60%,
-    63% {
-      opacity: 0.68;
-    }
-    65%,
-    72% {
-      opacity: 0.64;
-    }
-    77%,
-    85% {
-      opacity: 0.104;
-    }
-    90%,
-    95% {
-      opacity: 0.68;
-    }
     100% {
-      opacity: 0;
-    }
-  }
-  @-webkit-keyframes AnimationName {
-    0% {
-      background-position: 0% 50%;
+      opacity: 0.3;
+      transform: scale(1);
     }
     50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-  @-moz-keyframes AnimationName {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-  @keyframes AnimationName {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
+      opacity: 1;
+      transform: scale(1.5);
     }
   }
 
-  :global([data-svelte-dialog-content].content) {
-    background-color: #000000;
-    background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-    background-size: 400% 400%;
-    /* -webkit-animation: AnimationName 13s ease infinite;
--moz-animation: AnimationName 13s ease infinite;
-animation: AnimationName 3s ease infinite;*/
-    width: 80vw;
-  }
-  @media (min-width: 568px) {
-    :global([data-svelte-dialog-content].content) {
-      background-color: #000000;
-      background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-      background-size: 400% 400%;
-      /*  -webkit-animation: AnimationName 13s ease infinite;
--moz-animation: AnimationName 13s ease infinite;
-animation: AnimationName 13s ease infinite;*/
-      width: 78vw;
-    }
-  }
-  .onlym {
-    display: '';
-  }
-  [data-ca3_icon]::before {
-    font-weight: normal;
-    content: attr(data-ca3_icon);
-  }
-
-  .ca3-scroll-down-arrow {
-    background-image: url(data:image/svg+xml;base64,PD94bWwgdmVyc2lvbj0iMS4wIiBlbmNvZGluZz0idXRmLTgiPz48IURPQ1RZUEUgc3ZnIFBVQkxJQyAiLS8vVzNDLy9EVEQgU1ZHIDEuMS8vRU4iICJodHRwOi8vd3d3LnczLm9yZy9HcmFwaGljcy9TVkcvMS4xL0RURC9zdmcxMS5kdGQiPjxzdmcgdmVyc2lvbj0iMS4xIiBpZD0iQ2hldnJvbl90aGluX2Rvd24iIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyIgeG1sbnM6eGxpbms9Imh0dHA6Ly93d3cudzMub3JnLzE5OTkveGxpbmsiIHg9IjBweCIgeT0iMHB4IiB2aWV3Qm94PSIwIDAgMjAgMjAiIGVuYWJsZS1iYWNrZ3JvdW5kPSJuZXcgMCAwIDIwIDIwIiBmaWxsPSJ3aGl0ZSIgeG1sOnNwYWNlPSJwcmVzZXJ2ZSI+PHBhdGggZD0iTTE3LjQxOCw2LjEwOWMwLjI3Mi0wLjI2OCwwLjcwOS0wLjI2OCwwLjk3OSwwYzAuMjcsMC4yNjgsMC4yNzEsMC43MDEsMCwwLjk2OWwtNy45MDgsNy44M2MtMC4yNywwLjI2OC0wLjcwNywwLjI2OC0wLjk3OSwwbC03LjkwOC03LjgzYy0wLjI3LTAuMjY4LTAuMjctMC43MDEsMC0wLjk2OWMwLjI3MS0wLjI2OCwwLjcwOS0wLjI2OCwwLjk3OSwwTDEwLDEzLjI1TDE3LjQxOCw2LjEwOXoiLz48L3N2Zz4=);
-    background-size: contain;
-    background-repeat: no-repeat;
-  }
-
-  .ca3-scroll-down-link {
-    cursor: pointer;
-    height: 60px;
-    width: 80px;
-    margin: 0px 0 0 -40px;
-    line-height: 60px;
+  .orb {
     position: absolute;
+    border-radius: 50%;
+    filter: blur(80px);
+    opacity: 0.3;
+    animation: float 20s ease-in-out infinite;
+  }
+
+  .orb-1 {
+    width: 500px;
+    height: 500px;
+    background: radial-gradient(circle, #ff00ae, transparent);
+    top: -250px;
+    right: -250px;
+    animation-delay: 0s;
+    filter: blur(80px) brightness(1.2);
+  }
+
+  .orb-2 {
+    width: 450px;
+    height: 450px;
+    background: radial-gradient(circle, #ffb800, transparent);
+    bottom: -200px;
+    left: -200px;
+    animation-delay: 7s;
+    filter: blur(80px) brightness(1.3);
+    animation:
+      float 20s ease-in-out infinite,
+      shimmer 3s ease-in-out infinite;
+  }
+
+  .orb-3 {
+    width: 350px;
+    height: 350px;
+    background: radial-gradient(circle, #ff00ae, transparent);
+    top: 40%;
     left: 50%;
-    bottom: 15%;
-    color: #fff;
-    text-align: center;
-    font-size: 70px;
+    animation-delay: 14s;
+    filter: blur(80px);
+  }
+
+  @keyframes float {
+    0%,
+    100% {
+      transform: translate(0, 0) scale(1);
+    }
+    33% {
+      transform: translate(30px, -30px) scale(1.1);
+    }
+    66% {
+      transform: translate(-30px, 30px) scale(0.9);
+    }
+  }
+
+  @keyframes shimmer {
+    0%,
+    100% {
+      opacity: 0.3;
+      filter: blur(80px) brightness(1.3);
+    }
+    50% {
+      opacity: 0.4;
+      filter: blur(70px) brightness(1.5);
+    }
+  }
+
+  /* Premium Custom Modal */
+  .premium-modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(10, 5, 20, 0.85);
+    backdrop-filter: blur(15px);
+    z-index: 2000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    cursor: default;
+  }
+
+  .premium-modal-card {
+    width: 100%;
+    max-width: 600px;
+    background: rgba(26, 10, 46, 0.98);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    border-radius: 30px;
+    box-shadow:
+      0 30px 60px -12px rgba(0, 0, 0, 0.6),
+      0 0 50px rgba(255, 0, 174, 0.1);
+    position: relative;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    animation: premiumGlow 6s ease-in-out infinite;
+  }
+
+  .premium-modal-card.maze-wide {
+    max-width: 950px;
+  }
+
+  @keyframes premiumGlow {
+    0%,
+    100% {
+      box-shadow:
+        0 30px 60px -12px rgba(0, 0, 0, 0.6),
+        0 0 50px rgba(255, 0, 174, 0.1);
+    }
+    50% {
+      box-shadow:
+        0 30px 60px -12px rgba(0, 0, 0, 0.6),
+        0 0 70px rgba(255, 184, 0, 0.15);
+    }
+  }
+
+  .premium-close-btn {
+    position: absolute;
+    top: 1.25rem;
+    left: 1.25rem;
     z-index: 100;
+    background: rgba(255, 255, 255, 0.08);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+    color: #ffd700;
+    cursor: pointer;
+    width: 44px;
+    height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    backdrop-filter: blur(5px);
+  }
+
+  .premium-close-btn:hover {
+    background: #ff00ae;
+    color: white;
+    transform: scale(1.1) rotate(90deg);
+    box-shadow: 0 0 15px rgba(255, 0, 174, 0.5);
+  }
+
+  .premium-modal-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 2.5rem;
+    scrollbar-width: thin;
+    scrollbar-color: #ff00ae transparent;
+  }
+
+  .premium-modal-content::-webkit-scrollbar {
+    width: 6px;
+  }
+
+  .premium-modal-content::-webkit-scrollbar-thumb {
+    background: #ff00ae;
+    border-radius: 10px;
+  }
+
+  /* Status Views */
+  .status-view {
+    text-align: center;
+    padding: 2rem 1rem;
+    color: white;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1.5rem;
+  }
+
+  .status-icon {
+    font-size: 5rem;
+    line-height: 1;
+  }
+
+  .success .status-icon {
+    animation: successBounce 1.5s ease infinite;
+  }
+
+  @keyframes successBounce {
+    0%,
+    100% {
+      transform: scale(1) translateY(0);
+    }
+    50% {
+      transform: scale(1.1) translateY(-10px);
+    }
+  }
+
+  .status-view h3 {
+    font-size: 1.8rem;
+    margin: 0;
+    background: linear-gradient(135deg, #ff00ae, #ffb800);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .status-view p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    margin: 0;
+  }
+
+  .action-btn-p {
+    padding: 1rem 2.5rem;
+    background: linear-gradient(135deg, #ff00ae, #ffb800);
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-weight: 700;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-family: 'Rubik', sans-serif;
+  }
+
+  .action-btn-p:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 25px rgba(255, 0, 174, 0.4);
+  }
+
+  .retry {
+    background: linear-gradient(135deg, #ff4444, #ff00ae);
+  }
+
+  .maze-scroll-area {
+    width: 100%;
+    height: 100%;
+  }
+
+  @media (max-width: 640px) {
+    .premium-modal-card {
+      border-radius: 20px;
+    }
+    .premium-modal-content {
+      padding: 1.5rem;
+    }
+    .status-view h3 {
+      font-size: 1.4rem;
+    }
+  }
+
+  /* Top Navigation */
+  .top-nav {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    padding: 1.5rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    z-index: 100;
+    background: linear-gradient(
+      180deg,
+      rgba(26, 10, 46, 0.8) 0%,
+      transparent 100%
+    );
+    backdrop-filter: blur(10px);
+  }
+
+  .login-link {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    color: white;
     text-decoration: none;
-    text-shadow: 0px 0px 3px rgba(0, 0, 0, 0.4);
-
-    -webkit-animation: ca3_fade_move_down 2s ease-in-out infinite;
-    -moz-animation: ca3_fade_move_down 2s ease-in-out infinite;
-    animation: ca3_fade_move_down 2s ease-in-out infinite;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    padding: 0.5rem 1rem;
+    border-radius: 12px;
+    background: rgba(255, 255, 255, 0.05);
   }
 
-  /*animated scroll arrow animation*/
-  @-webkit-keyframes ca3_fade_move_down {
-    0% {
-      -webkit-transform: translate(0, -20px);
-      opacity: 0;
+  .login-link:hover {
+    background: rgba(255, 255, 255, 0.1);
+    transform: translateY(-2px);
+  }
+
+  .login-icon {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+  }
+
+  .menu-buttons {
+    display: flex;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+  }
+
+  .menu-btn {
+    padding: 0.5rem 1rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: white;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-size: 0.9rem;
+    font-family: 'Rubik', sans-serif;
+  }
+
+  .menu-btn:hover {
+    background: rgba(255, 255, 255, 0.15);
+    transform: translateY(-2px);
+  }
+
+  .icon-btn {
+    padding: 0.5rem;
+    width: 40px;
+    height: 40px;
+  }
+
+  .icon-btn img {
+    width: 100%;
+    height: 100%;
+  }
+
+  .help-btn {
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ff00ae, #ffb800);
+    border: none;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: bold;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow:
+      0 4px 15px rgba(255, 0, 174, 0.3),
+      0 0 20px rgba(255, 184, 0, 0.2);
+  }
+
+  .help-btn:hover {
+    transform: scale(1.1);
+    box-shadow:
+      0 6px 20px rgba(255, 0, 174, 0.5),
+      0 0 30px rgba(255, 184, 0, 0.3);
+  }
+
+  /* Content Wrapper */
+  .content-wrapper {
+    position: relative;
+    z-index: 10;
+    min-height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+    padding-top: 6rem;
+  }
+
+  /* Glass Card */
+  .glass-card {
+    width: 100%;
+    max-width: 600px;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(20px);
+    border-radius: 30px;
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    box-shadow:
+      0 8px 32px rgba(0, 0, 0, 0.3),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    padding: 3rem;
+    animation: cardGlow 4s ease-in-out infinite;
+  }
+
+  @keyframes cardGlow {
+    0%,
+    100% {
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 40px rgba(255, 0, 174, 0.15),
+        0 0 60px rgba(255, 184, 0, 0.1),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
     50% {
-      opacity: 1;
-    }
-    100% {
-      -webkit-transform: translate(0, 20px);
-      opacity: 0;
-    }
-  }
-  @-moz-keyframes ca3_fade_move_down {
-    0% {
-      -moz-transform: translate(0, -20px);
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      -moz-transform: translate(0, 20px);
-      opacity: 0;
+      box-shadow:
+        0 8px 32px rgba(0, 0, 0, 0.3),
+        0 0 60px rgba(255, 0, 174, 0.25),
+        0 0 80px rgba(255, 184, 0, 0.15),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
     }
   }
-  @keyframes ca3_fade_move_down {
-    0% {
-      transform: translate(0, -20px);
-      opacity: 0;
-    }
-    50% {
-      opacity: 1;
-    }
-    100% {
-      transform: translate(0, 20px);
-      opacity: 0;
-    }
-  }
-  .midscreen-link {
-    position: absolute;
 
-    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639687279/Prismatic-Hearts-Vortex-Heart-13_pyb3yh.svg);
-
-    background-position: center;
-    background-repeat: no-repeat;
-    background-size: contain;
-    color: var(--barbi-pink);
-    text-shadow: 1px 1px black;
+  /* Card Header */
+  .card-header {
     text-align: center;
-    align-self: center;
-    justify-self: center;
-  }
-  .rightt {
-    position: absolute;
-    top: 50px;
-    right: 50%;
-    height: 50px;
-    width: 50px;
-    z-index: 14;
-    aspect-ratio: 1/1;
-  }
-  .right {
-    position: absolute;
-    top: 50px;
-    right: 50px;
-    height: 50px;
-    width: 50px;
-    z-index: 14;
-    aspect-ratio: 1/1;
-  }
-  .alredy {
-    text-align: center;
-    margin: 4vh 4vw 2vh 4vw;
-    background-color: var(--gold);
-    padding: 4vh 4vw;
-    font-family: 'StamSefarad', serif;
-    color: var(--barbi-pink);
-    border: 1px var(--lturk);
+    margin-bottom: 2.5rem;
   }
 
-  #lines {
-    display: '';
-  }
-  #amana-show {
-    display: '';
-  }
-  .amanat {
-    padding: 0 1rem;
-    text-shadow: 1px 1px var(--barbi-pink);
-    background-color: #bbf0f3;
-    background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
-    background-size: 400% 400%;
-    -webkit-animation: AnimationName 3s ease infinite;
-    -moz-animation: AnimationName 3s ease infinite;
-    animation: AnimationName 3s ease infinite;
-    opacity: 0.8;
-  }
-  small {
-    background-color: white;
-  }
-  input {
-    font-family: inherit;
-    font-size: inherit;
-    max-width: 200px;
-    box-sizing: border-box;
-    border: 1px solid var(--barbi-pink);
-    border-radius: 4px;
-    transition: all 150ms ease;
-    background: var(--gold);
+  .logo-section {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    margin-bottom: 1rem;
   }
 
-  input:focus {
+  .logo-heart {
+    font-size: 3rem;
+    animation: heartbeat 2s ease-in-out infinite;
+  }
+
+  @keyframes heartbeat {
+    0%,
+    100% {
+      transform: scale(1);
+    }
+    10%,
+    30% {
+      transform: scale(1.1);
+    }
+    20%,
+    40% {
+      transform: scale(1);
+    }
+  }
+
+  .title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, #ff00ae, #ffb800, #ffd700, #ff00ae);
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    margin: 0;
+    animation: gradientShift 4s ease infinite;
+  }
+
+  @keyframes gradientShift {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
+    }
+  }
+
+  .subtitle {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+    margin: 0.5rem 0 0 0;
+  }
+
+  /* Agreement Badge */
+  .agreement-badge {
+    background: linear-gradient(
+      135deg,
+      rgba(0, 200, 0, 0.2),
+      rgba(0, 255, 100, 0.2)
+    );
+    border: 1px solid rgba(0, 255, 100, 0.3);
+    border-radius: 15px;
+    padding: 1rem 1.5rem;
+    margin-bottom: 2rem;
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    animation: badgePulse 2s ease-in-out infinite;
+  }
+
+  @keyframes badgePulse {
+    0%,
+    100% {
+      box-shadow: 0 0 20px rgba(0, 255, 100, 0.2);
+    }
+    50% {
+      box-shadow: 0 0 30px rgba(0, 255, 100, 0.4);
+    }
+  }
+
+  .badge-icon {
+    width: 30px;
+    height: 30px;
+    background: rgba(0, 255, 100, 0.3);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #00ff64;
+    font-weight: bold;
+    font-size: 1.2rem;
+  }
+
+  .agreement-badge span {
+    color: #00ff64;
+    font-weight: 600;
+  }
+
+  /* Form */
+  .registration-form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+  }
+
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .form-label {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+
+  .label-icon {
+    font-size: 1.2rem;
+  }
+
+  .form-input {
+    padding: 1rem 1.5rem;
+    background: rgba(255, 255, 255, 0.05);
+    border: 2px solid rgba(255, 255, 255, 0.1);
+    border-radius: 15px;
+    color: white;
+    font-size: 1rem;
+    font-family: 'Rubik', sans-serif;
+    transition: all 0.3s ease;
+  }
+
+  .form-input::placeholder {
+    color: rgba(255, 255, 255, 0.4);
+  }
+
+  .form-input:focus {
     outline: none;
-    box-shadow: 0 0 0 4px var(--barbi-pink);
-    border-color: var(--barbi-pink);
+    border-color: #ff00ae;
+    background: rgba(255, 255, 255, 0.08);
+    box-shadow:
+      0 0 20px rgba(255, 0, 174, 0.3),
+      0 0 30px rgba(255, 184, 0, 0.2);
   }
 
-  input:disabled,
-  textarea:disabled {
-    color: #ccc;
+  .form-input.error {
+    border-color: #ff4444;
   }
-  @media (max-width: 576px) {
-    .right {
-      position: absolute;
-      top: 50px;
-      height: 50px;
-      width: 50px;
-      z-index: 14;
-      aspect-ratio: 1/1;
-    }
-    .midscreen-link {
-      position: absolute;
-      top: 192%;
-      left: 82%;
-      font-size: 0.8em;
-      padding: 1.8em 1.8em;
-    }
 
-    .amanat {
-      margin: 0 auto;
-      padding: 0;
-      text-shadow: 1px 1px 4px var(--gold);
-      background-color: transparent;
-      opacity: 1;
-    }
-    .mobile {
-      width: 100vw;
-      height: 100vh;
-      margin: 0px auto;
-      background-color: var(--gold);
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1648338694/Gold-German-Imperial-Crown-No-Background_4_cpunhj.svg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-position: center;
-      background-size: 130vw 100vh;
-    }
-    .amana {
-      text-align: center;
-      overflow-y: auto;
-    }
-    .aab {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-      background-color: #bbf0f3;
-      background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
-      background-size: 400% 400%;
-      -webkit-animation: AnimationName 30s ease infinite;
-      -moz-animation: AnimationName 30s ease infinite;
-      animation: AnimationName 30s ease infinite;
-    }
-    .flexid {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      order: 1;
-      max-height: 20vh;
-    }
+  /* MultiSelect Custom Styling */
+  .multiselect-wrapper {
+    position: relative;
+  }
 
-    .flexi1 {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      order: 2;
-      line-height: normal;
-    }
-    .flexi2 {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      order: 3;
-      line-height: normal;
-    }
-    .container {
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      width: 100vw;
-      /*  background-size: cover;
-    background-image: url(newcoin.svg);
-  background-position: center center;
-  padding:9vh 0;*/
-    }
-    /*
-.centeron{
-    background-image: url('ceter.png');
-background-repeat: no-repeat;
-background-size: 50px;
-min-height: 50px;
-min-width: 50px;
-margin-top: -10px;
-margin-left: auto;
-margin-right: auto;
-position: absolute;
-top: 4%;
-left: 45.2%;
-}*/
+  :global(.custom-multiselect-outer) {
+    background: rgba(255, 255, 255, 0.05) !important;
+    border: 2px solid rgba(255, 255, 255, 0.1) !important;
+    border-radius: 15px !important;
+    color: white !important;
+  }
 
-    .button {
-      justify-self: center;
-      align-self: center;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
-      background-repeat: no-repeat;
-      background-size: 170px;
-      margin: auto;
-      margin-top: 30px;
-      min-height: 170px;
-      min-width: 170px;
-      cursor:
-        url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg),
-        auto;
-      -webkit-animation: spin 17s linear infinite;
-      -moz-animation: spin 17s linear infinite;
-      animation: spin 17s linear infinite;
-    }
+  :global(.custom-multiselect-input) {
+    background: transparent !important;
+    color: rgba(255, 255, 255, 0.4) !important;
+    font-family: 'Rubik', sans-serif !important;
+  }
 
-    .flexi {
-      padding-top: 2vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      order: 1;
-      white-space: nowrap;
+  :global(.custom-multiselect-selected) {
+    background: rgba(255, 0, 174, 0.3) !important;
+    border-radius: 8px !important;
+  }
+
+  /* Agreement Section */
+  .agreement-section {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: 20px;
+    padding: 2rem;
+    margin-top: 1rem;
+  }
+
+  .agreement-title {
+    color: white;
+    font-size: 1.3rem;
+    font-weight: 600;
+    margin: 0 0 1.5rem 0;
+    text-align: center;
+  }
+
+  .agreement-btn-full {
+    width: 100%;
+    padding: 1.5rem;
+    background: linear-gradient(135deg, #ff00ae 0%, #ffb800 50%, #ffd700 100%);
+    background-size: 200% 200%;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    box-shadow:
+      0 8px 25px rgba(255, 0, 174, 0.3),
+      0 0 40px rgba(255, 184, 0, 0.2);
+    font-family: 'Rubik', sans-serif;
+    animation: buttonShimmer 3s ease-in-out infinite;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .agreement-btn-full::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    left: -50%;
+    width: 200%;
+    height: 200%;
+    background: linear-gradient(
+      45deg,
+      transparent,
+      rgba(255, 255, 255, 0.3),
+      transparent
+    );
+    transform: rotate(45deg);
+    animation: sparkle 3s ease-in-out infinite;
+  }
+
+  @keyframes buttonShimmer {
+    0%,
+    100% {
+      background-position: 0% 50%;
+    }
+    50% {
+      background-position: 100% 50%;
     }
   }
 
-  @media (min-width: 577px) and (max-width: 1099px) {
-    .card-inner {
-      width: 84vw;
-      height: 60vh;
+  @keyframes sparkle {
+    0% {
+      left: -50%;
     }
-    .amanat {
-      margin: 0 auto;
-      padding: 0;
-      text-shadow: 1px 1px 4px var(--gold);
-      background-color: transparent;
-    }
-    .flexid {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      order: 1;
-      max-height: 20vh;
-    }
-    /*.centeron{
-background-image: url('ceter.png');
-background-repeat: no-repeat;
-background-size: 50px;
-align-self: center;
-min-height: 50px;
-min-width: 50px;
-}*/
-    .aab {
-      background-color: #bbf0f3;
-      background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      height: 100vh;
-    }
-    .mobile {
-      background-color: var(--gold);
-      height: 100vh;
-      margin: 0px auto;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1648335809/Gold-German-Imperial-Crown-No-Background_qs7cri.svg);
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-      background-position: center;
-      padding: 0 1vw;
-      background-size: 98vw 100vh;
-      background-repeat: no-repeat;
-    }
-    .button {
-      justify-self: center;
-      align-self: center;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
-      background-repeat: no-repeat;
-      background-size: 170px;
-      margin: auto;
-      min-height: 170px;
-      min-width: 170px;
-      cursor:
-        url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg),
-        auto;
-      -webkit-animation: spin 17s linear infinite;
-      -moz-animation: spin 17s linear infinite;
-      animation: spin 17s linear infinite;
-    }
-
-    .container {
-      padding-top: 26vh;
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      align-items: center;
-    }
-    .flexi {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      order: 1;
-      white-space: nowrap;
-    }
-    .flexi1 {
-      display: flex;
-
-      order: 2;
-      flex: 0.5;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-    }
-    .flexi2 {
-      display: flex;
-
-      order: 3;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
+    100% {
+      left: 150%;
     }
   }
 
-  @media (min-width: 942px) and (max-width: 1099px) {
-    .midscreen-link {
-      position: absolute;
-      top: 82%;
-      left: 92%;
-      font-size: 1em;
-      padding: 2em 2em;
-    }
-    .amanat {
-      padding: 0 1rem;
-      text-shadow: 1px 1px var(--barbi-pink);
-      background-color: var(--gold);
-      background-color: #bbf0f3;
-      background-image: linear-gradient(315deg, #bbf0f3 0%, #f6d285 74%);
-      opacity: 0.8;
-    }
-    .mobile {
-      width: 100vw;
-      height: 100vh;
-      margin: 0px auto;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1639597594/Prismatic-Hearts-World-Map-4_ge7z9u.svg);
-      background-position: center;
-      background-repeat: no-repeat;
-      background-size: cover;
-    }
-    /*
-.centeron{
-background-image: url('ceter.png');
-background-repeat: no-repeat;
-background-size: 50px;
-align-self: center;
-min-height: 50px;
-min-width: 50px;
-
-}*/
-    .button {
-      justify-self: center;
-      align-self: center;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
-      background-repeat: no-repeat;
-      background-size: 170px;
-      margin: auto;
-      min-height: 170px;
-      min-width: 170px;
-      cursor:
-        url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg),
-        auto;
-      -webkit-animation: spin 17s linear infinite;
-      -moz-animation: spin 17s linear infinite;
-      animation: spin 17s linear infinite;
-    }
-    .amana {
-      opacity: 0.9;
-    }
-    .container {
-      display: flex;
-      padding-top: 10em;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089083/BG_umwddj.png);
-      background-size: contain;
-      height: 170px;
-      background-repeat: no-repeat;
-      background-position: center;
-      flex-flow: row nowrap;
-      align-items: center;
-      justify-content: center;
-      flex: 0.5;
-      background-color: transparent;
-      max-width: 769px;
-    }
-
-    .flexi {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      order: 1;
-    }
-    .flexi1 {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      order: 2;
-    }
-    .flexi2 {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      order: 3;
-    }
-    .flexid {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      order: 1;
-      max-height: 20vh;
-    }
+  .agreement-btn-full:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 12px 35px rgba(255, 0, 174, 0.5),
+      0 0 60px rgba(255, 184, 0, 0.4);
   }
 
-  @media (min-width: 1100px) {
-    .card-inner {
-      width: 84vw;
-      height: calc(66vh - 180px);
-      font-size: 1.2em;
-    }
-    .onlym {
-      display: none;
-    }
-    .midscreen-link {
-      position: absolute;
-      top: 82%;
-      left: 92%;
-      font-size: 1em;
-      padding: 2em 2em;
-    }
-    .flexid {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      order: 1;
-      max-height: 33vh;
-      height: 100%;
-    }
-    .mobile {
-      max-width: 1024px;
-      width: 100%;
-      margin: 0 auto;
-      background: inherit;
-      background-size: inherit;
-    }
-    /*
-.centeron{
-background-image: url('ceter.png');
-background-repeat: no-repeat;
-background-size: 50px;
-align-self: center;
-min-height: 50px;
-min-width: 50px;
-margin-top: 0px;
-margin-left: auto;
-margin-right: auto;
-position: fixed;
-top: 2%;
-left: 47.9%;
-}*/
-    .button {
-      justify-self: center;
-      align-self: center;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1641162947/-1_orig-removebg-k_kwefjh.png);
-      background-repeat: no-repeat;
-      background-size: 130px;
-      margin: auto;
-      min-height: 130px;
-      min-width: 130px;
-      cursor:
-        url(https://res.cloudinary.com/love1/image/upload/v1639255090/Fingerprint-Heart-II_wqvlih.svg),
-        auto;
-      -webkit-animation: spin 17s linear infinite;
-      -moz-animation: spin 17s linear infinite;
-      animation: spin 17s linear infinite;
+  .agreement-btn-full:active {
+    transform: translateY(-1px);
+  }
+
+  .agreement-note {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.6);
+    font-size: 1.2rem;
+    margin: 0.8rem 0 0 0;
+  }
+
+  /* Divider */
+  .divider {
+    position: relative;
+    text-align: center;
+    margin: 2rem 0;
+  }
+
+  .divider::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.2),
+      transparent
+    );
+  }
+
+  .divider span {
+    position: relative;
+    background: rgba(45, 27, 71, 0.9);
+    padding: 0 1rem;
+    color: rgba(255, 255, 255, 0.5);
+    font-weight: 600;
+  }
+
+  /* Basic Agreement */
+  .basic-agreement {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .agreement-text {
+    color: rgba(255, 255, 255, 0.8);
+    line-height: 1.8;
+    font-size: 1rem;
+    margin: 0;
+    text-align: right;
+  }
+
+  .agreement-text :global(strong) {
+    color: #ffb800;
+    font-weight: 700;
+    text-shadow: 0 0 10px rgba(255, 184, 0, 0.3);
+  }
+
+  .checkbox-label {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    cursor: pointer;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.03);
+    border-radius: 12px;
+    transition: all 0.3s ease;
+  }
+
+  .checkbox-label:hover {
+    background: rgba(255, 255, 255, 0.06);
+  }
+
+  .checkbox-input {
+    display: none;
+  }
+
+  .checkbox-custom {
+    width: 24px;
+    height: 24px;
+    border: 2px solid rgba(255, 255, 255, 0.3);
+    border-radius: 6px;
+    position: relative;
+    transition: all 0.3s ease;
+    flex-shrink: 0;
+  }
+
+  .checkbox-input:checked + .checkbox-custom {
+    background: linear-gradient(135deg, #ff00ae, #ffb800);
+    border-color: #ff00ae;
+    box-shadow:
+      0 0 15px rgba(255, 0, 174, 0.3),
+      0 0 20px rgba(255, 184, 0, 0.2);
+  }
+
+  .checkbox-input:checked + .checkbox-custom::after {
+    content: '✓';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    color: white;
+    font-weight: bold;
+    font-size: 16px;
+  }
+
+  .checkbox-text {
+    color: white;
+    font-weight: 600;
+    font-size: 1rem;
+  }
+
+  /* Info Box */
+  .info-box {
+    background: rgba(0, 168, 255, 0.1);
+    border: 1px solid rgba(0, 168, 255, 0.3);
+    border-radius: 12px;
+    padding: 1.2rem;
+    display: flex;
+    gap: 1rem;
+    margin-top: 1rem;
+  }
+
+  .info-icon {
+    font-size: 1.5rem;
+    flex-shrink: 0;
+  }
+
+  .info-text {
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 0.9rem;
+    line-height: 1.6;
+  }
+
+  .info-text strong {
+    color: white;
+    display: block;
+    margin-bottom: 0.5rem;
+  }
+
+  .info-text ul {
+    margin: 0.5rem 0 0 0;
+    padding-right: 1.2rem;
+    list-style-type: disc;
+  }
+
+  .info-text li {
+    margin: 0.3rem 0;
+  }
+
+  /* Submit Button */
+  .submit-btn {
+    width: 100%;
+    padding: 1.2rem;
+    background: linear-gradient(135deg, #ff00ae, #ffb800);
+    background-size: 200% 200%;
+    border: none;
+    border-radius: 15px;
+    color: white;
+    font-size: 1.2rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 1rem;
+    box-shadow:
+      0 8px 25px rgba(255, 0, 174, 0.3),
+      0 0 30px rgba(255, 184, 0, 0.2);
+    margin-top: 1.5rem;
+    font-family: 'Rubik', sans-serif;
+    animation: buttonShimmer 3s ease-in-out infinite;
+  }
+
+  .submit-btn:hover {
+    transform: translateY(-3px);
+    box-shadow:
+      0 12px 35px rgba(255, 0, 174, 0.5),
+      0 0 50px rgba(255, 184, 0, 0.3);
+  }
+
+  .submit-btn:active {
+    transform: translateY(-1px);
+  }
+
+  .submit-arrow {
+    transition: transform 0.3s ease;
+  }
+
+  .submit-btn:hover .submit-arrow {
+    transform: translateX(-5px);
+  }
+
+  /* Loading */
+  .loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    padding: 2rem;
+  }
+
+  .loading-container p {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 1.1rem;
+  }
+
+  /* Error Messages */
+  .error-msg {
+    color: #ff4444;
+    font-size: 0.9rem;
+    margin-top: 0.3rem;
+  }
+
+  .error-box {
+    background: rgba(255, 68, 68, 0.1);
+    border: 1px solid rgba(255, 68, 68, 0.3);
+    border-radius: 12px;
+    padding: 1rem 1.5rem;
+    color: #ff6b6b;
+    text-align: center;
+  }
+
+  .error-contact {
+    margin-top: 0.5rem;
+    font-size: 0.9rem;
+    color: rgba(255, 107, 107, 0.8);
+  }
+
+  /* Globe Wrapper */
+  .globe-wrapper {
+    position: fixed;
+    bottom: 0;
+    right: 0;
+    width: 150vw;
+    height: 50vw;
+
+    opacity: 0.15;
+    pointer-events: none;
+    z-index: 5;
+  }
+
+  /* Responsive */
+  @media (max-width: 768px) {
+    .glass-card {
+      padding: 2rem 1.5rem;
+      margin: 1rem;
     }
 
-    .amana {
-      display: flex;
-      justify-content: center;
-    }
-    .container {
-      display: flex;
-      padding-top: 67px;
-      background-image: url(https://res.cloudinary.com/love1/image/upload/v1639089083/BG_umwddj.png);
-      background-size: contain;
-      height: 170px;
-      background-repeat: no-repeat;
-      background-position: center;
-      flex-flow: row nowrap;
-      align-items: center;
-      justify-content: center;
-      flex: 0.5;
-      width: 100%;
-      background-color: transparent;
-      margin: 0 auto;
-      max-width: 1024px;
+    .title {
+      font-size: 2rem;
     }
 
-    .flexi {
-      display: flex;
-      flex-direction: row;
-      justify-content: center;
-      align-items: center;
-      order: 1;
+    .subtitle {
+      font-size: 1rem;
+    }
+
+    .logo-heart {
+      font-size: 2.5rem;
+    }
+
+    .menu-buttons {
+      gap: 0.3rem;
+    }
+
+    .menu-btn {
+      padding: 0.4rem 0.8rem;
+      font-size: 0.85rem;
+    }
+
+    .agreement-section {
+      padding: 1.5rem;
+    }
+
+    .content-wrapper {
       padding: 1rem;
-      margin-top: 0.2rem;
+      padding-top: 5rem;
     }
-    .flexi1 {
-      order: 2;
-      flex-direction: row;
-      padding: 2rem 1rem;
-      margin-top: 0.2rem;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      line-height: normal;
-    }
-    .flexi2 {
-      order: 3;
-      flex-direction: row;
-      padding: 2rem 1rem;
-      margin-top: 0.2rem;
-      white-space: nowrap;
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      line-height: normal;
-    }
-    .all {
-      height: 100vh;
-    }
-  }
-  @-moz-keyframes spin {
-    100% {
-      -moz-transform: rotate(360deg);
-    }
-  }
-  @-webkit-keyframes spin {
-    100% {
-      -webkit-transform: rotate(360deg);
-    }
-  }
-  @keyframes spin {
-    100% {
-      -webkit-transform: rotate(360deg);
-      transform: rotate(360deg);
-    }
-  }
-  @media (min-width: 1200px) {
-    .amana {
-      font-size: 1.8em;
-    }
-    .centeron {
-      left: 48%;
+
+    .globe-wrapper {
+      width: 150vw;
+      height: 150vw;
     }
   }
 
-  @media (min-width: 1300px) {
-    .centeron {
-      left: 48%;
+  @media (max-width: 480px) {
+    .top-nav {
+      flex-direction: column;
+      gap: 1rem;
+      padding: 1rem;
     }
-  }
 
-  @media (min-width: 1450px) {
-    .centeron {
-      left: 48%;
+    .glass-card {
+      padding: 1.5rem 1rem;
     }
-  }
-  @media (min-width: 1700px) {
-    .centeron {
-      left: 48%;
+
+    .title {
+      font-size: 1.6rem;
     }
-    .button {
-      background-size: 170px;
-      min-height: 170px;
-      min-width: 170px;
+
+    .agreement-btn-full {
+      font-size: 1rem;
+      padding: 1.2rem;
     }
-  }
-  @media (min-width: 2200px) {
-    .centeron {
-      left: 48%;
-    }
-    .button {
-      background-size: 170px;
-      min-height: 170px;
-      min-width: 170px;
+
+    .submit-btn {
+      font-size: 1rem;
     }
   }
 </style>

@@ -498,9 +498,7 @@
             <button
               class="transition-all duration-300 text-barbi px-4 py-2 text-xl bg-gold hover:text-slate-800 rounded-xl flex flex-row justify-center items-center shadow-lg"
               onclick={() => {
-                goto(
-                  `${$locale == 'he' ? '/hascama' : $locale == 'ar' ? '/aitifaqia' : '/convention'}`
-                );
+                goto('/hascama');
                 loading = true;
                 fi = true;
               }}

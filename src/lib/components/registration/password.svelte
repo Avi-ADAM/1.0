@@ -522,20 +522,20 @@
   }
 
   .midscreenText-2 {
-    margin: 18vh auto 0 auto;
+    margin: 12vh auto 0 auto;
     align-self: center;
     justify-self: center;
     max-width: 100vw;
-    font-size: 1.8rem;
+    font-size: 1.5rem;
     line-height: normal;
     text-shadow: 1px 1px purple;
     color: var(--barbi-pink);
     background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
-    background-size: 29.5rem 9.75rem;
-    height: 9.75rem;
-    width: 29.5rem;
+    background-size: 18rem 6rem;
+    height: 6rem;
+    width: 18rem;
     text-align: center;
-    padding: 1rem;
+    padding: 0.65rem;
   }
 
   .button-in {
@@ -584,11 +584,11 @@
   }
   @media (max-width: 500px) {
     .midscreenText-2 {
-      background-size: 16.5rem 5rem;
-      height: 5rem;
-      width: 16.5rem;
-      font-size: 0.8rem;
-      margin-top: 26vh;
+      background-size: 12rem 4rem;
+      height: 4rem;
+      width: 12rem;
+      font-size: 0.75rem;
+      margin-top: 14vh;
       z-index: 999;
       position: relative;
     }

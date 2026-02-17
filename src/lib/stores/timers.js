@@ -1,4 +1,5 @@
 import { browser } from '$app/environment';
+import { goto } from '$app/navigation';
 import { sendToSer } from '$lib/send/sendToSer.js';
 import { writable, get } from 'svelte/store';
 import { socketClient } from '$lib/stores/socketClient';
@@ -107,7 +108,10 @@ export async function fetchTimers(uid, fetch) {
     // Ensure a user ID is provided
 
     if (!uid) {
-        console.error('User ID is missing from the route parameters.');
+        console.error('[Timers] User ID is missing. Redirecting to login...');
+        if (browser) {
+            goto('/login?from=timers');
+        }
         return;
     }
 

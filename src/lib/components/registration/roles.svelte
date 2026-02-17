@@ -1,157 +1,160 @@
 <script>
-    import { page } from '$app/state';
+  import { page } from '$app/state';
 
-    import MultiSelect from 'svelte-multiselect';
+  import MultiSelect from 'svelte-multiselect';
   import { userName } from '../../stores/store.js';
-    import { show } from './store-show.js';
-    import { roles2 } from './roles2.js';
-    import { onMount } from 'svelte';
-/**
- * @typedef {Object} Props
- * @property {string} [userName_value]
- * @property {number} [show_value]
- * @property {(payload: {tx: number, txx: number}) => void} [onProgres]
- */
-/**
- * @type {Props}
- */
-let {
-  userName_value = $bindable(),
-  show_value = $bindable(0),
-  onProgres
-} = $props();
-           import { lang } from '$lib/stores/lang.js'
-    import jroles from '$lib/data/tafkidim.json'
-    import enjrole from '$lib/data/tafkidimEn.json'
-    let roles1 = $state([]);
-    let error1 = null;
-    const baseUrl = import.meta.env.VITE_URL
+  import { show } from './store-show.js';
+  import { roles2 } from './roles2.js';
+  import { onMount } from 'svelte';
+  /**
+   * @typedef {Object} Props
+   * @property {string} [userName_value]
+   * @property {number} [show_value]
+   * @property {(payload: {tx: number, txx: number}) => void} [onProgres]
+   */
+  /**
+   * @type {Props}
+   */
+  let {
+    userName_value = $bindable(),
+    show_value = $bindable(0),
+    onProgres
+  } = $props();
+  import { lang } from '$lib/stores/lang.js';
+  import jroles from '$lib/data/tafkidim.json';
+  import enjrole from '$lib/data/tafkidimEn.json';
+  let roles1 = $state([]);
+  let error1 = null;
+  const baseUrl = import.meta.env.VITE_URL;
 
-    let addrole = 0;
-     function find_role_id(role_name_arr){
-     var  arr = [];
-      for (let j = 0; j< role_name_arr.length; j++ ){
-      for (let i = 0; i< roles1.length; i++){
-        if(roles1[i].attributes.roleDescription === role_name_arr[j]){
+  let addrole = 0;
+  function find_role_id(role_name_arr) {
+    var arr = [];
+    for (let j = 0; j < role_name_arr.length; j++) {
+      for (let i = 0; i < roles1.length; i++) {
+        if (roles1[i].attributes.roleDescription === role_name_arr[j]) {
           arr.push(roles1[i].id);
         }
       }
+    }
+    return arr;
+  }
+  let newcontent = $state(true);
+
+  onMount(async () => {
+    if ($lang == 'he') {
+      roles1 = jroles;
+    } else if ($lang == 'en') {
+      roles1 = enjrole;
+    }
+    const parseJSON = (resp) => (resp.json ? resp.json() : resp);
+    const checkStatus = (resp) => {
+      if (resp.status >= 200 && resp.status < 300) {
+        return resp;
       }
-      return arr;
-     };
-      let newcontent = $state(true)
+      return parseJSON(resp).then((resp) => {
+        throw resp;
+      });
+    };
+    const headers = {
+      'Content-Type': 'application/json'
+    };
 
-    onMount(async () => {
-     if ($lang == "he" ){
-      roles1 = jroles
-          } else if (lang == "en"){
-            roles1 = enjrole
-          }
-        const parseJSON = (resp) => (resp.json ? resp.json() : resp);
-        const checkStatus = (resp) => {
-        if (resp.status >= 200 && resp.status < 300) {
-          return resp;
-        }
-        return parseJSON(resp).then((resp) => {
-          throw resp;
-        });
-      };
-      const headers = {
-        'Content-Type': 'application/json',
-      };
-    
-        try {
-            const res = await fetch(baseUrl+"/graphql", {
-              method: "POST",
-              headers: {
-                 'Content-Type': 'application/json'
-              },body: JSON.stringify({
-                        query: `query {
-  tafkidims(sort: "roleDescription") { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ""}}
-}
-}
-}
-              `})
-            }).then(checkStatus)
-          .then(parseJSON);
-            roles1 = res.data.tafkidims.data
-            if ($lang == "he" ){
-              for (var i = 0; i < roles1.length; i++){
-                if (roles1[i].attributes.localizations.data.length > 0){
-                roles1[i].attributes.roleDescription = roles1[i].attributes.localizations.data[0].attributes.roleDescription
-                }
-              }
-            }
-            roles1 = roles1
-            
-            // טעינת התפקידים שנבחרו בעבר
-            const currentRoles = $roles2;
-            if (currentRoles && currentRoles.length > 0) {
-              const roleNames = currentRoles.map(roleId => {
-                const role = roles1.find(r => r.id == roleId);
-                return role ? role.attributes.roleDescription : null;
-              }).filter(Boolean);
-              selected = roleNames;
-            }
-            
-            newcontent = false
-        } catch (e) {
-            error1 = e
-        }
-    });
-
-
-    
-
-
-    let selected = $state([]);
-     const placeholder = `${$lang == "he" ? "תפקידים מועדפים" : "preferred roles"}`;
-
-
-userName.subscribe(value => {
-  userName_value = value;
-});
-
-show.subscribe(newValue => {
-  show_value = newValue;
-});
-
-function increment() {
-  newnew()
-		show.update(n => n + 1);
-    onProgres?.({ tx: 0, txx: 11 })
-	}
-  function toend() {
-    newnew()
-		show.set(5);
-    onProgres?.({ tx: 0, txx: 4 })
-	}
-  function back() {
-    newnew()
-		show.update(n => n - 1);
-    onProgres?.({ tx: 0, txx: 20 })
-	}
-   import Skip from '$lib/celim/icons/skip.svelte';
-
-
-  let meData = []
-async function newnew (){
-  for (let i = 0; i<selected.length ;i++){
-    if (!roles1.map(c => c.attributes.roleDescription).includes(selected[i])){
-      //create new and update roles
-        console.log(selected,roles1)
-  let link =baseUrl+"/graphql" ;
-  let d = new Date
-        try {
-             await fetch(link, {
-              method: 'POST',
-        
+    try {
+      const res = await fetch(baseUrl + '/graphql', {
+        method: 'POST',
         headers: {
-            'Content-Type': 'application/json'
-                  },
-        body:
-        JSON.stringify({query:
-           `mutation  createTafkidim {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          query: `query {
+  tafkidims(sort: "roleDescription") { data { id attributes{ roleDescription  ${$lang == 'he' ? 'localizations {data {attributes{roleDescription } }}' : ''}}
+}
+}
+}
+              `
+        })
+      })
+        .then(checkStatus)
+        .then(parseJSON);
+      roles1 = res.data.tafkidims.data;
+      if ($lang == 'he') {
+        for (var i = 0; i < roles1.length; i++) {
+          if (roles1[i].attributes.localizations.data.length > 0) {
+            roles1[i].attributes.roleDescription =
+              roles1[
+                i
+              ].attributes.localizations.data[0].attributes.roleDescription;
+          }
+        }
+      }
+      roles1 = roles1;
+
+      // טעינת התפקידים שנבחרו בעבר
+      const currentRoles = $roles2;
+      if (currentRoles && currentRoles.length > 0) {
+        const roleNames = currentRoles
+          .map((roleId) => {
+            const role = roles1.find((r) => r.id == roleId);
+            return role ? role.attributes.roleDescription : null;
+          })
+          .filter(Boolean);
+        selected = roleNames;
+      }
+
+      newcontent = false;
+    } catch (e) {
+      error1 = e;
+    }
+  });
+
+  let selected = $state([]);
+  const placeholder = `${$lang == 'he' ? 'תפקידים מועדפים' : 'preferred roles'}`;
+
+  userName.subscribe((value) => {
+    userName_value = value;
+  });
+
+  show.subscribe((newValue) => {
+    show_value = newValue;
+  });
+
+  function increment() {
+    newnew();
+    show.update((n) => n + 1);
+    onProgres?.({ tx: 0, txx: 11 });
+  }
+  function toend() {
+    newnew();
+    show.set(5);
+    onProgres?.({ tx: 0, txx: 4 });
+  }
+  function back() {
+    newnew();
+    show.update((n) => n - 1);
+    onProgres?.({ tx: 0, txx: 20 });
+  }
+  import Skip from '$lib/celim/icons/skip.svelte';
+
+  let meData = $state();
+  async function newnew() {
+    for (let i = 0; i < selected.length; i++) {
+      if (
+        !roles1.map((c) => c.attributes.roleDescription).includes(selected[i])
+      ) {
+        //create new and update roles
+        console.log(selected, roles1);
+        let link = baseUrl + '/graphql';
+        let d = new Date();
+        try {
+          await fetch(link, {
+            method: 'POST',
+
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              query: `mutation  createTafkidim {
   createTafkidim(data: {  roleDescription: "${selected[i]}",
         publishedAt: "${d.toISOString()}"}) {
     data {
@@ -163,179 +166,192 @@ async function newnew (){
        }
     }
 }`
-        })
-})
-  .then(r => r.json())
-  .then(data => meData = data);
-const newOb = meData.data.createTafkidim.data;
-    const newValues = roles1 ;
-    newValues.push(newOb);
-       
-    roles1 = newValues;
-    let userName_value = $userName
-    let data = {"name": userName_value, "action": "create תפקיד חדש בשם:", "det": `${selected[i]}`}
-   fetch("/api/ste", {
-  method: 'POST', // or 'PUT'
-  headers: {
-    'Content-Type': 'application/json',
-  },
-  body: JSON.stringify(data),
-})
-  .then((response) => response)
-  .then((data) => {
-    console.log('Success:', data);
+            })
+          })
+            .then((r) => r.json())
+            .then((data) => (meData = data));
+          const newOb = meData.data.createTafkidim.data;
+          const newValues = roles1;
+          newValues.push(newOb);
 
-  })
-  .catch((error) => {
-    console.error('Error:', error);
-  
-  })
-                  }
-      catch(error) {
-        console.log('צריך לתקן:', error.response);
-        error = error1
-        console.log(error1)
-                };}
-              }
-                  roles2.set(find_role_id(selected));
-                      console.log($roles2)
-
-            }
+          roles1 = newValues;
+          let userName_value = $userName;
+          let data = {
+            name: userName_value,
+            action: 'create תפקיד חדש בשם:',
+            det: `${selected[i]}`
+          };
+          fetch('/api/ste', {
+            method: 'POST', // or 'PUT'
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(data)
+          })
+            .then((response) => response)
+            .then((data) => {
+              console.log('Success:', data);
+            })
+            .catch((error) => {
+              console.error('Error:', error);
+            });
+        } catch (error) {
+          console.log('צריך לתקן:', error.response);
+          error = error1;
+          console.log(error1);
+        }
+      }
+    }
+    roles2.set(find_role_id(selected));
+    console.log($roles2);
+  }
 
   let ugug = $state(``);
-  
-      const srca = {"he": "https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg","en": "https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg"}
-    const srcb = {"he":"https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg", "en": "https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg"}
-  let addn = $derived({"he":`הוספת "${ugug}"`,"en": `Create "${ugug}"`})
-  const nom = {"he": "לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור \"הוספת תפקיד חדש\" שלמטה","en":"Not on the list yet , add it with the \"Add new roll\" button bellow"}
-  const what = {"he": "יש לך תפקיד מועדף?","en": "Do you have a preferred role?"}
- const skipt = {"he":"דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל","en":"skip to end of registration, you can always add those details from your profile page"}
-  </script>
 
+  const srca = {
+    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/bac_aqagcn.svg',
+    en: 'https://res.cloudinary.com/love1/image/upload/v1657761493/Untitled_sarlsc.svg'
+  };
+  const srcb = {
+    he: 'https://res.cloudinary.com/love1/image/upload/v1641155352/kad_njjz2a.svg',
+    en: 'https://res.cloudinary.com/love1/image/upload/v1657760996/%D7%A0%D7%A7%D7%A1%D7%98_uxzkv3.svg'
+  };
+  let addn = $derived({ he: `הוספת "${ugug}"`, en: `Create "${ugug}"` });
+  const nom = {
+    he: 'לא קיים עדיין ברשימה, ניתן להוסיף בלחיצה על כפתור "הוספת תפקיד חדש" שלמטה',
+    en: 'Not on the list yet , add it with the "Add new roll" button bellow'
+  };
+  const what = {
+    he: 'יש לך תפקיד מועדף?',
+    en: 'Do you have a preferred role?'
+  };
+  const skipt = {
+    he: 'דילוג לסוף ההרשמה, ניתן יהיה להוסיף את הפרטים בכל עת מעמוד הפרופיל',
+    en: 'skip to end of registration, you can always add those details from your profile page'
+  };
+</script>
 
-
-  
-<h1 class="midscreenText-2 mt-[26vh]">
-    {userName_value}
-    <br/>
-     {what[$lang]}
-   </h1> 
-   <div dir="{$lang == "en" ? "ltr" : "rtl"}" class="input-2">
-     <MultiSelect
-     --sms-width="var(--multiselect-width)"
-     outerDivClass="!bg-gold !text-barbi"
-     inputClass="!bg-gold !text-barbi"
-     liSelectedClass="!bg-barbi !text-gold"
-        --sms-max-width={"60vw"}
-           createOptionMsg={addn[$lang]}
-      allowUserOptions={"append"}
-            loading={newcontent}
-       bind:searchText={ugug}
-     bind:selected
-     {placeholder}
-     options={roles1.map(c => c.attributes.roleDescription)}
-     /></div>
-    <button class="button-in-1-2" onclick={back}>
-    <img alt="go" style="height:15vh;" src="{srca[$lang]}"/>
-    </button>
-      <button class="button-end bg-sturk hover:bg-mturk p-1 rounded-full" onclick={toend} title="{skipt[$lang]}">
-    <Skip/>
-    </button>
-  <button class="button-2" onclick={increment}>
-    <img alt="go" style="height:15vh;" src="{srcb[$lang]}"/>
-    </button>
-
+<h1 class="midscreenText-2">
+  {userName_value}
+  <br />
+  {what[$lang]}
+</h1>
+<div dir={$lang == 'en' ? 'ltr' : 'rtl'} class="input-2">
+  <MultiSelect
+    --sms-width="var(--multiselect-width)"
+    outerDivClass="!bg-gold !text-barbi"
+    inputClass="!bg-gold !text-barbi"
+    liSelectedClass="!bg-barbi !text-gold"
+    --sms-max-width={'60vw'}
+    createOptionMsg={addn[$lang]}
+    allowUserOptions={'append'}
+    loading={newcontent}
+    bind:searchText={ugug}
+    bind:selected
+    {placeholder}
+    options={roles1.map((c) => c.attributes.roleDescription)}
+  />
+</div>
+<button class="button-in-1-2" onclick={back}>
+  <img alt="go" style="height:15vh;" src={srca[$lang]} />
+</button>
+<button
+  class="button-end bg-sturk hover:bg-mturk p-1 rounded-full"
+  onclick={toend}
+  title={skipt[$lang]}
+>
+  <Skip />
+</button>
+<button class="button-2" onclick={increment}>
+  <img alt="go" style="height:15vh;" src={srcb[$lang]} />
+</button>
 
 <style>
+  :global([data-svelte-dialog-content].content) {
+    background-color: #000000;
+    background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 
+    width: 80vw;
+  }
+  @media (min-width: 501px) {
     :global([data-svelte-dialog-content].content) {
-  background-color: #000000;
-background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
+      background-color: #000000;
+      background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
 
-      width: 80vw;
-  }
-  @media (min-width: 501px){
-  
-        :global([data-svelte-dialog-content].content) {
- background-color: #000000;
-background-image: linear-gradient(147deg, #000000 0%, #04619f 74%);
-
-width:78vw;
-        }
+      width: 78vw;
+    }
   }
 
- 
-    .midscreenText-2 {
-            transition: all 1s ease-in;
-      grid-column: 1 /5;
-  grid-row: 1/ 2;
-  align-self: center;
-  justify-self: center;
-  font-size: 2rem;
-  line-height: normal;
-text-shadow: 1px 1px purple;
-  color: var(--barbi-pink);
-  margin-top: 59px;
-  background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
- background-size: 29.5rem 9.75rem;
-  height: 9.75rem;
-  width: 29.5rem;
-  text-align: center;
-    padding: 1rem ; 
-   -webkit-text-size-adjust: 100%; 
-}
- @media (max-width:500px){
-	 .midscreenText-2 {
-       font-size: 0.8rem;
-		   background-size: 15.25rem 5rem;
-  height: 5rem;
-  width: 15.25rem;
-  margin-top: 26vh;
-	 }
- .input-2{
-    grid-column: 2/4;
-    grid-row: 2/3;
-        margin-top:0;
-    display: flex;
-    justify-content: center;
+  .midscreenText-2 {
+    transition: all 1s ease-in;
+    grid-column: 1 /5;
+    grid-row: 1/ 2;
     align-self: center;
     justify-self: center;
-    --multiselect-width: 30vw;
+    font-size: 2rem;
+    line-height: normal;
+    text-shadow: 1px 1px purple;
+    color: var(--barbi-pink);
+    margin-top: 12vh;
+    background-image: url(https://res.cloudinary.com/love1/image/upload/v1639592274/line1_r0jmn5.png);
+    background-size: 18rem 6rem;
+    height: 6rem;
+    width: 18rem;
+    text-align: center;
+    padding: 0.65rem;
+    -webkit-text-size-adjust: 100%;
+  }
+  @media (max-width: 500px) {
+    .midscreenText-2 {
+      font-size: 0.75rem;
+      background-size: 12rem 4rem;
+      height: 4rem;
+      width: 12rem;
+      margin-top: 14vh;
     }
-}
- 
-   .button-in-1-2{
+    .input-2 {
+      grid-column: 2/4;
+      grid-row: 2/3;
+      margin-top: 0;
+      display: flex;
+      justify-content: center;
+      align-self: center;
+      justify-self: center;
+      --multiselect-width: 30vw;
+    }
+  }
+
+  .button-in-1-2 {
     grid-column: 1/2;
     grid-row: 7 / 8;
     align-self: center;
     justify-self: center;
   }
-    .button-2{
-      grid-column: 4/5;
+  .button-2 {
+    grid-column: 4/5;
     grid-row: 7 / 8;
-       align-self: center;
+    align-self: center;
     justify-self: center;
   }
-       .button-end{
-      grid-column: 2/4;
+  .button-end {
+    grid-column: 2/4;
     grid-row: 7 / 8;
-       align-self: center;
+    align-self: center;
     justify-self: center;
   }
-    .input-2{
+  .input-2 {
     grid-column: 2/4;
     grid-row: 2/3;
-        margin-top: -8vh;
+    margin-top: -8vh;
     display: flex;
     justify-content: center;
     align-self: center;
     justify-self: center;
     --multiselect-width: auto;
-    }
-    .input-2-2{
+  }
+  .input-2-2 {
     grid-column: 1/5;
     grid-row: 5/6;
     text-align: center;
-    }
-
-    </style>
+  }
+</style>

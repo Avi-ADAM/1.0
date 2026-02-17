@@ -80,6 +80,12 @@ export async function handle({ event, resolve }) {
   }
 
   // Redirect logic based on authentication
+  if (event.url.pathname === '/convention' || event.url.pathname === '/aitifaqia') {
+    return new Response('Redirect', {
+      status: 303,
+      headers: { Location: '/hascama' }
+    });
+  }
   if (event.url.pathname === '/' && event.locals.tok) {
     return new Response('Redirect', {
       status: 303,

@@ -1183,6 +1183,7 @@
   .timer {
     position: absolute; /* Position each timer absolutely within the container */
     /* Add any other styling you need for the timer SVG itself */
+    transition: all 0.5s ease-in-out;
   }
   /* Global styles for the SVG elements */
   #hours {

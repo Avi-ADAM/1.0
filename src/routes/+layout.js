@@ -7,7 +7,7 @@ inject({ mode: dev ? 'development' : 'production' });
 export const load = async ({ url, data }) => {
   const { pathname } = url;
   const { lang } = data;
-
+  console.log(lang,pathname);
   locale.set(lang);
   await loadTranslations(lang, pathname);
 

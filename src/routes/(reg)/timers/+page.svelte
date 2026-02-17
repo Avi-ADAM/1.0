@@ -1,6 +1,7 @@
 <script>
   import { onMount, onDestroy } from 'svelte';
   import { page } from '$app/state';
+  import { goto } from '$app/navigation';
   import {
     fetchTimers,
     initialWebSocketForTimer,
@@ -38,6 +39,12 @@
 
   onMount(async () => {
     console.log(page.data);
+    if (!page.data.uid) {
+      console.warn('User ID is missing, redirecting to login...');
+      goto('/login?from=timers');
+      return;
+    }
+
     const res = await fetchTimers(page.data.uid, fetch).then((x) => {
       newState = true;
 

@@ -50,5 +50,138 @@
   },
   "loading": {
     "title": "Loading a three-dimensional design element"
+  },
+  "maze": {
+    "title": "Let's clear things up",
+    "subtitle": "Everything you need to know before joining",
+    "tabs": {
+      "platform": "The Platform – 1💗1",
+      "agreement": "The Agreements"
+    },
+    "platform": {
+      "name": "1💗1 Platform",
+      "desc": "A platform for managing collaborations, co-creation and mutual agreements between people.",
+      "f1": "Manage groups ('rikmas') around a dream or goal",
+      "f2": "Negotiate and reach shared agreements",
+      "f3": "Distribute tasks, resources and profits",
+      "f4": "Registration only after agreeing to terms"
+    },
+    "agreementSite": {
+      "name": "Full Agreement Site",
+      "desc": "An independent site dedicated to the vision of a global agreement on freedom and peace.",
+      "f1": "Sign the full global agreement",
+      "f2": "Hundreds of thousands of signatories worldwide",
+      "f3": "Live map of the global agreement",
+      "f4": "Automatic return to the platform after signing"
+    },
+    "rikma": {
+      "title": "What is a 'Rikma'?",
+      "desc": "A rikma is a group created in 1💗1 around a shared goal – a business, project, dream or any other idea. Members negotiate, reach agreements and distribute resources and profits – all by mutual consent."
+    },
+    "flow": {
+      "title": "What happens during registration?",
+      "s1": {
+        "title": "Fill in your details",
+        "desc": "Name, location in the world and email address – that's all"
+      },
+      "s2": {
+        "title": "Choose an agreement",
+        "desc": "Basic agreement (checkbox) or full agreement (click the prominent button)"
+      },
+      "s3": {
+        "title": "Click the spinning globe button",
+        "desc": "The send button – located at the bottom of the page"
+      },
+      "s4": {
+        "title": "Welcome to 1💗1!",
+        "desc": "Registration opens, fill in more details and join the community"
+      }
+    },
+    "compare": {
+      "title": "What's the difference between the agreements?",
+      "basic": {
+        "title": "Basic Agreement",
+        "scope": "Focused: 1💗1 platform only",
+        "desc": "Commit to using the platform only with mutual consent and to respecting every user's freedom of choice.",
+        "cta": "Check the checkbox in the form"
+      },
+      "full": {
+        "title": "Full Agreement",
+        "scope": "Global vision: all of humanity",
+        "desc": "A declaration of a broad global vision – all of humanity agreeing to live in freedom, without violence and without coercion.",
+        "cta": "Go to the full agreement site"
+      }
+    },
+    "faq": {
+      "title": "Frequently Asked Questions",
+      "q1": "What exactly is 1💗1?",
+      "a1": "1💗1 is a platform for managing agreements and collaborations. It enables people to create groups ('rikmas') around shared goals, negotiate and reach agreements in a transparent and organized way.",
+      "q2": "What's the difference between 1💗1 and the agreement site?",
+      "a2": "1💗1 (1lev1.com) is the collaboration platform – the place where you create rikmas, manage projects and work together. agreement.1lev1.com is an independent site dedicated to the global vision of the worldwide agreement.",
+      "q3": "Is it mandatory to visit the full agreement site?",
+      "a3": "No! You can agree to the basic agreement (checkbox in the form) and continue straight to registration. The full agreement site is an optional extension for those who want to join the global vision.",
+      "q4": "What happens when I return from the full agreement site?",
+      "a4": "You automatically return to the registration page with confirmation that you have signed. The details you filled in the form are saved and you can continue directly to registration.",
+      "q5": "What does 'rikma' mean?",
+      "a5": "A rikma is a group in 1💗1 created around a shared goal. Like fabric weaving – different threads that together create something whole and beautiful. Each member is a thread, and together they create the rikma.",
+      "q6": "What happens after registration?",
+      "a6": "After registration you can join existing rikmas, create a new rikma, manage projects and work with people from around the world – all by mutual consent."
+    }
+  },
+  "skipToEnd": "Skip to end",
+  "amana": {
+    "title": "1💗1 | Platform Registration",
+    "description": "Join the 1💗1 collaboration platform - a place for partnership, co-creation, and mutual agreement",
+    "headerTitle": "Register to 1💗1",
+    "headerSubtitle": "Join the Co-Creation Platform",
+    "agreedFull": "You agreed to the Extended Agreement",
+    "form": {
+      "nameLabel": "My Name",
+      "namePlaceholder": "My Name",
+      "locationLabel": "My Place in the World",
+      "locationPlaceholder": "My Location",
+      "emailLabel": "My Email Address",
+      "submit": "Register"
+    },
+    "errors": {
+      "nameRequired": "Name is required",
+      "nameTaken": "The chosen name is already taken",
+      "emailInvalid": "A valid email is required",
+      "locationRequired": "At least one location must be selected",
+      "agreementRequired": "You must agree to the terms of use",
+      "serverSleep": "The server fell asleep 😴, we woke it up, trying again",
+      "contactSupport": "If the problem persists, you can contact"
+    },
+    "agreement": {
+      "title": "Agreement to Terms of Use",
+      "fullButton": "To Extended Agreement",
+      "note": "Join the Global Agreement",
+      "basicText1": "I, <strong>{{name}}</strong>, will create, conduct, and resolve disputes on the 1💗1 website only by mutual agreement.",
+      "basicText2": "I, <strong>{{name}}</strong>, do not want to harm anyone for any reason and want voluntary cooperation - without coercion.",
+      "checkboxLabel": "I have read and agreed to the Basic Agreement",
+      "infoTitle": "Difference between agreements:",
+      "basicInfo": "<strong>Basic Agreement</strong> - Commitment to use mutual agreement on the site",
+      "fullAgreementLink": "<strong>Extended Agreement</strong>",
+      "fullAgreementDesc": " - A broader global vision of peace and agreement"
+    },
+    "status": {
+      "successTitle": "Sent Successfully!",
+      "successMessage": "Thank you very much, we will be in touch soon.",
+      "loading": "Just a moment please...",
+      "errorTitle": "An Error Occurred",
+      "errorMessage": "Something went wrong. Please try again."
+    },
+    "nav": {
+      "explanation": "Explanation",
+      "changeRequest": "Change Request",
+      "translation": "Translation",
+      "login": "Login"
+    },
+    "common": {
+      "or": "Or",
+      "tryAgain": "Try Again",
+      "close": "Close",
+      "justAMoment": "Just a moment..."
+    }
   }
 }
