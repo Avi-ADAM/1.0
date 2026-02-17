@@ -15,15 +15,22 @@ async function executeTimerAction(actionType, params, fetchFn = null) {
   
   try {
     const useFetch = fetchFn || fetch;
+    const bodyPayload = {
+      actionKey: actionType,
+      params
+    };
+    if (params.isSer) {
+      bodyPayload.isSer = true;
+      // Remove isSer from params to keep it clean if desired, or keep it. 
+      // Based on +server.ts structure, isSer is expected at root or we put it there.
+    }
+
     const response = await useFetch('/api/action', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({
-        actionKey: actionType,
-        params
-      })
+      body: JSON.stringify(bodyPayload)
     });
     
     if (response.ok) {
@@ -63,7 +70,8 @@ export async function startTimer(activeTimer, missionID, uId, pId, fetch, timerI
     projectId: pId.toString(),
     userId: uId.toString(),
     timerId: timerId.toString(),
-    isActive: true
+    isActive: true,
+    isSer: isSer 
   };
 
   const isSaved = activeTimer?.data?.attributes?.saved === true;
@@ -126,7 +134,8 @@ export async function stopTimer(timer, fetch, isSer = false, projectId = '', use
         userId: userId.toString(),
         isActive: false,
         totalHours: accumulatedTime,
-        timers: intervals.map(t => ({ start: t.start, stop: t.stop }))
+        timers: intervals.map(t => ({ start: t.start, stop: t.stop })),
+        isSer: isSer
       };
 
       return await executeTimerAction('timerStop', params, fetch);
@@ -172,7 +181,8 @@ export async function saveTimer(timer, missionID, fetch, isSer = false, tasks = 
       totalHours: sessionHours,
       stname: "saved",
       x: 0,
-      tasks: tasks || []
+      tasks: tasks || [],
+      isSer: isSer
     };
 
     return await executeTimerAction('timerSave', params, fetch);
@@ -226,7 +236,8 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch) {
       const updateParams = {
         timerId: timer.id.toString(),
         totalHours: totalTime,
-        timers: timers
+        timers: timers,
+        isSer: params.isSer
       };
       
       return await executeTimerAction('timerStop', updateParams, fetch);
@@ -235,7 +246,8 @@ export async function updateTimer(timer, whatToUpdate, params = {}, fetch) {
     case 'tasks': {
       const paramsToUpdate = {
         timerId: timer.id.toString(),
-        tasks: (params.selectedTaskIds || []).map(id => id.toString())
+        tasks: (params.selectedTaskIds || []).map(id => id.toString()),
+        isSer: params.isSer
       };
       
       return await executeTimerAction('timerStop', paramsToUpdate, fetch);
@@ -265,7 +277,8 @@ export async function handleClearSingle(index, timer, fetch, isSer = false) {
     timerId: timer.attributes.activeTimer.data.id.toString(),
     isActive: false,
     totalHours: newTotal,
-    timers: timers.map(t => ({ start: t.start, stop: t.stop }))
+    timers: timers.map(t => ({ start: t.start, stop: t.stop })),
+    isSer: isSer
   }, fetch);
 }
 
@@ -277,7 +290,8 @@ export async function handleClearAll(timer, fetch, isSer = false) {
     timerId: timer.attributes.activeTimer.data.id.toString(),
     isActive: false,
     totalHours: 0,
-    timers: []
+    timers: [],
+    isSer: isSer
   }, fetch);
 }
 

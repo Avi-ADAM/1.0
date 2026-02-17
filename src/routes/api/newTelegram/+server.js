@@ -504,7 +504,8 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
         return ctx.answerCbQuery(getText('timerNotFound', lang));
     }
 
-    const stoppedTimer = await stopTimer(activeTimerData, fetch, true); // GLOBAL fetch
+    const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+    const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userId); // GLOBAL fetch
 
     if (stoppedTimer && stoppedTimer.attributes.isActive === false) {
         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
@@ -549,7 +550,8 @@ bot.action(/^saveTimer-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
          return ctx.answerCbQuery(getText('timerNotFound', lang));
      }
 
-     const savedTimer = await saveTimer(timerToSave, missionId, fetch, true);
+     const projectId = timerData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+     const savedTimer = await saveTimer(timerToSave, missionId, fetch, true, null, projectId, userId);
 
      if (savedTimer) {
          await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
@@ -645,7 +647,7 @@ bot.action(/^toggleTask-(\d+)-(\d+)-(\d+)-(\d+)$/, async (ctx) => {
           ? selectedTaskIds.filter(id => id != taskId)
           : [...selectedTaskIds, taskId];
 
-      const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds }, fetch, true);
+      const updatedTimer = await updateTimer(activeTimer, 'tasks', { acts: newSelectedTaskIds, isSer: true }, fetch);
 
       if (updatedTimer) {
           const missionDetails = await getUserMissions(userId, fetch);
@@ -785,7 +787,8 @@ bot.on('text', async (ctx) => {
                              ctx.reply(getText('timerNotFound', lang));
                              return;
                          }
-                         const stoppedTimer = await stopTimer(activeTimerData, fetch, true);
+                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
+                         const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userInfo.uid);
                          if (stoppedTimer && !stoppedTimer.attributes.isActive) {
                              ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
                                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],

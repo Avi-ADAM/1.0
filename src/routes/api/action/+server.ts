@@ -34,7 +34,7 @@ function getActionService(): ActionService {
     const validator = new ValidationEngine();
     const authorizer = new AuthorizationEngine(strapiClient);
     const notifier = new NotificationOrchestrator(strapiClient);
-    
+
     actionService = new ActionService(
       validator,
       authorizer,
@@ -42,7 +42,7 @@ function getActionService(): ActionService {
       notifier
     );
   }
-  
+
   return actionService;
 }
 
@@ -54,31 +54,40 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
   const controller = new AbortController();
   const timeout = 30000; // 30-second timeout
   const timeoutId = setTimeout(() => controller.abort(), timeout);
-  
+
   try {
     // Parse request body
     const body = await request.json();
-    const { actionKey, params } = body;
-    
+    const { actionKey, params, isSer } = body;
+
     // Validate request structure
     if (!actionKey || typeof actionKey !== 'string') {
       throw error(400, 'Missing or invalid actionKey');
     }
-    
+
     if (!params || typeof params !== 'object') {
       throw error(400, 'Missing or invalid params');
     }
-    
+
     // Extract user context from cookies
-    const userId = cookies.get('id');
-    const jwt = cookies.get('jwt');
+    let userId = cookies.get('id');
+    let jwt = cookies.get('jwt');
     const lang = cookies.get('lang') || 'he';
-    
+
+    // Server-Side Bypass Logic (e.g. from Telegram Bot)
+    if (isSer === true) {
+      jwt = ADMIN_TOKEN;
+      // If request is from server, use userId from params if available, otherwise fallback to cookie (likely undefined)
+      if (params?.userId) {
+        userId = params.userId.toString();
+      }
+    }
+
     // Validate user authentication
     if (!userId || !jwt) {
       throw error(401, 'Authentication required. Please log in.');
     }
-    
+
     // Build action context
     const context: ActionContext = {
       userId,
@@ -86,14 +95,14 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
       lang,
       fetch
     };
-    
+
     // Execute action
     const service = getActionService();
     const result = await service.executeAction(actionKey, params, context);
-    
+
     // Clear timeout
     clearTimeout(timeoutId);
-    
+
     // Return result
     if (result.success) {
       return json({
@@ -104,7 +113,7 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
     } else {
       // Map error codes to HTTP status codes
       const statusCode = getStatusCodeForError(result.error?.code);
-      
+
       return json(
         {
           success: false,
@@ -113,22 +122,22 @@ export const POST: RequestHandler = async ({ request, cookies, fetch }) => {
         { status: statusCode }
       );
     }
-    
+
   } catch (e) {
     // Clear timeout
     clearTimeout(timeoutId);
-    
+
     // Handle timeout errors
     if (e instanceof Error && e.name === 'AbortError') {
       console.error('Action request timed out');
       throw error(504, 'Gateway Timeout: The request took too long to process.');
     }
-    
+
     // Re-throw SvelteKit errors
     if (e && typeof e === 'object' && 'status' in e && 'body' in e) {
       throw e;
     }
-    
+
     // Handle unexpected errors
     console.error('Unexpected error in action endpoint:', e);
     throw error(500, e instanceof Error ? e.message : 'An internal server error occurred.');
