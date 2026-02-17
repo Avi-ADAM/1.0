@@ -507,7 +507,9 @@ bot.action(/^stopTimer-(\d+)-(\d+)$/, async (ctx) => {
     const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
     const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userId); // GLOBAL fetch
 
-    if (stoppedTimer && stoppedTimer.attributes.isActive === false) {
+    const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
+
+    if (timerAttributes && timerAttributes.isActive === false) {
         await ctx.editMessageReplyMarkup(undefined).catch(()=>{});
         // Filled reply with keyboard
         ctx.reply(
@@ -789,7 +791,9 @@ bot.on('text', async (ctx) => {
                          }
                          const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
                          const stoppedTimer = await stopTimer(activeTimerData, fetch, true, projectId, userInfo.uid);
-                         if (stoppedTimer && !stoppedTimer.attributes.isActive) {
+                         const timerAttributes = stoppedTimer?.updateTimer?.data?.attributes || stoppedTimer?.attributes;
+
+                         if (timerAttributes && !timerAttributes.isActive) {
                              ctx.reply(getText('timerStopped', lang), Markup.inlineKeyboard([
                                 [Markup.button.url(getText('editTimerBtn', lang), 'https://1lev1.com/timers')],
                                 [Markup.button.callback(getText('updateTasksBtn', lang), `updateTasks-${missionId}-${userInfo.uid}-${activeTimerData.id}`)],
