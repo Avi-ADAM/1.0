@@ -436,7 +436,7 @@ bot.action(/^startTimer-(\d+)-(\d+)$/, async (ctx) => {
       const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
       if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
 
-      const res = await startTimer(activeTimer, missionId, userId, projectId, timerId, true, fetch); // GLOBAL fetch
+      const res = await startTimer(activeTimer, missionId, userId, projectId, fetch, timerId, true); // GLOBAL fetch
 
       if (res) {
           await ctx.editMessageReplyMarkup(undefined).catch(()=>{}); // Remove choice buttons
@@ -736,7 +736,7 @@ bot.on('text', async (ctx) => {
                         const timerId = activeTimer?.data?.id || 0;
                         const projectId = missionData?.data?.mesimabetahalich?.data?.attributes?.project?.data?.id;
                         if (!projectId) throw new Error(`Project ID not found for mission ${missionId}`);
-                        const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, timerId, true, fetch);
+                        const res = await startTimer(activeTimer, missionId, userInfo.uid, projectId, fetch, timerId, true);
                         if (res) { ctx.reply(getText('timerStartedMission', lang, { missionName })); }
                         else { throw new Error("Start failed via AI"); }
                     } catch (error) {

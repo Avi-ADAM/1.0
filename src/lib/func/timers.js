@@ -10,8 +10,8 @@ import { browser } from '$app/environment';
  * @returns {Promise<Object|null>} - The resulting data or null on failure
  */
 async function executeTimerAction(actionType, params, fetchFn = null) {
-  // Only execute actions from browser context
-  if (!browser) return null;
+  // Only execute actions from browser context or if a fetch function is provided (server-side support)
+  if (!browser && !fetchFn) return null;
   
   try {
     const useFetch = fetchFn || fetch;
