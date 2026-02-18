@@ -15,9 +15,12 @@
   import { RingLoader } from 'svelte-loading-spinners';
   import Close from '$lib/celim/close.svelte';
   import ShareButtons from '$lib/components/share/shareButtons/index.svelte';
+  import { toast } from 'svelte-sonner';
   
   /** @type {Record<string, number>} */
   let fermatana = $state({});
+  
+  let showTableModal = $state(false);
   
   /** @type {Record<string, Record<string, number>>} */
   let ferdate = $state({});
@@ -210,6 +213,64 @@
   const sbp = { he: 'התפלגות המכירות לפי מוצר', en: 'sales by product' };
   const sbd = { he: 'התפלגות המכירות לפי תאריך', en: 'sales by date' };
   const awaitingSplit = { he: '(ממתינות לחלוקה)', en: '(awaiting split)' };
+  const tableView = { he: 'תצוגת טבלה', en: 'Table View' };
+  const downloadCsv = { he: 'הורדת CSV', en: 'Download CSV' };
+  const closeBtn = { he: 'סגור', en: 'Close' };
+  const salesTable = { he: 'טבלת מכירות', en: 'Sales Table' };
+  const giftName = { he: 'שם מתנה', en: 'Gift Name' };
+  const amount = { he: 'סכום', en: 'Amount' };
+  const soldBy = { he: 'נמכר על ידי', en: 'Sold By' };
+  const dateLabel = { he: 'תאריך', en: 'Date' };
+  const statusLabel = { he: 'סטטוס', en: 'Status' };
+  const noteText = { he: 'הערה', en: 'Note' };
+  const splitStatus = { he: 'חולק', en: 'Split' };
+  const pendingStatus = { he: 'בהצבעה', en: 'Pending' };
+  const awaitingStatus = { he: 'ממתין', en: 'Awaiting' };
+  
+  function exportToCSV() {
+    const headers = [
+      giftName[$lang],
+      amount[$lang],
+      soldBy[$lang],
+      dateLabel[$lang],
+      statusLabel[$lang],
+      noteText[$lang]
+    ];
+    
+    const rows = salee.map(sale => {
+      const status = sale.attributes.splited 
+        ? splitStatus[$lang]
+        : sale.attributes.pending 
+        ? pendingStatus[$lang]
+        : awaitingStatus[$lang];
+      
+      return [
+        sale.attributes.matanot.data.attributes.name,
+        sale.attributes.in,
+        sale.attributes.users_permissions_user.data.attributes.username,
+        dayjs(sale.attributes.date).format('DD/MM/YYYY HH:mm'),
+        status,
+        sale.attributes.note || ''
+      ];
+    });
+    
+    const csvContent = [
+      headers.join(','),
+      ...rows.map(row => row.map(cell => `"${cell}"`).join(','))
+    ].join('\n');
+    
+    const blob = new Blob(['\ufeff' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    const url = URL.createObjectURL(blob);
+    link.setAttribute('href', url);
+    link.setAttribute('download', `sales_${dayjs().format('YYYY-MM-DD')}.csv`);
+    link.style.visibility = 'hidden';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    toast.success($lang === 'he' ? 'הקובץ הורד בהצלחה' : 'File downloaded successfully');
+  }
   $effect(() => {
     // Show all sales in graphs
     fermatana = salee.reduce((acc, sale) => {
@@ -385,7 +446,12 @@
                     <div class="share-button-container">
                       <ShareButtons slug="gift/{data.id}" title={data.attributes.name} desc={`Check out this amazing gift: ${data.attributes.name} for ${data.attributes.price}`} />
                     </div>
-                    <button class="report-sale-btn" title={res[$lang]} onclick={() => sell(data.id, data.attributes.price, data.attributes.quant, data.attributes.kindOf)}>
+                    <button 
+                      class="report-sale-btn" 
+                      title={res[$lang]} 
+                      aria-label={res[$lang]}
+                      onclick={() => sell(data.id, data.attributes.price, data.attributes.quant, data.attributes.kindOf)}
+                    >
                       <svg class="svggg" version="1.1" id="Layer_1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px" viewBox="0 0 496 496" style="width:32px;height:32px;" xml:space="preserve">
                         <g>
                           <g>
@@ -415,11 +481,20 @@
     </div>
     {#if salee.length > 0}
       <div class=" text-center border-2 border-barbi rounded m-4 flex flex-col overflow-x-hidden max-w-full">
-        <h1
-          class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
-        >
-          {erhe[$lang]}
-        </h1>
+        <div class="flex justify-between items-center px-4 pt-4">
+          <h1
+            class="md:text-center text-2xl md:text-2xl font-bold underline decoration-mturk"
+          >
+            {erhe[$lang]}
+          </h1>
+          <button
+            class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
+            onclick={() => showTableModal = true}
+            aria-label={tableView[$lang]}
+          >
+            📊 {tableView[$lang]}
+          </button>
+        </div>
         <div class="flex d overflow-x-auto w-full">
           {#each salee as data, i}
             <div
@@ -568,12 +643,96 @@
   {/if}
 </div>
 
+<!-- Table Modal -->
+{#if showTableModal}
+  <DialogOverlay style="z-index: 800;" isOpen={showTableModal} onDismiss={() => showTableModal = false}>
+    <div
+      style="z-index: 800;"
+      transition:fly|local={{ y: 450, opacity: 0.5, duration: 500 }}
+    >
+      <DialogContent class=" table-modal-content" aria-label={salesTable[$lang]}>
+        <div style="z-index: 800;" dir={$lang == 'he' ? 'rtl' : 'ltr'} class="p-6 max-h-[90vh] overflow-y-auto">
+          <div class="flex justify-between items-center mb-4">
+            <h2 class="text-2xl font-bold text-barbi">{salesTable[$lang]}</h2>
+            <div class="flex gap-2">
+              <button
+                class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
+                onclick={exportToCSV}
+                aria-label={downloadCsv[$lang]}
+              >
+                📥 {downloadCsv[$lang]}
+              </button>
+              <button
+                class="border border-barbi hover:border-gold bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink text-barbi hover:text-gold font-bold py-2 px-4 rounded-lg transition-all duration-300"
+                onclick={() => showTableModal = false}
+                aria-label={closeBtn[$lang]}
+              >
+                ✕ {closeBtn[$lang]}
+              </button>
+            </div>
+          </div>
+          
+          <div class="overflow-x-auto">
+            <table class="sales-table w-full">
+              <thead>
+                <tr>
+                  <th>#</th>
+                  <th>{giftName[$lang]}</th>
+                  <th>{amount[$lang]}</th>
+                  <th>{soldBy[$lang]}</th>
+                  <th>{dateLabel[$lang]}</th>
+                  <th>{statusLabel[$lang]}</th>
+                  <th>{noteText[$lang]}</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each salee as sale, index}
+                  <tr class={sale.attributes.splited ? 'split-row' : sale.attributes.pending ? 'pending-row' : ''}>
+                    <td>{index + 1}</td>
+                    <td class="font-semibold">{sale.attributes.matanot.data.attributes.name}</td>
+                    <td class="font-bold">₪{sale.attributes.in}</td>
+                    <td>
+                      <div class="flex items-center gap-2">
+                        <img
+                          class="w-6 h-6 rounded-full"
+                          src={getSrc(sale.attributes.users_permissions_user.data.id)}
+                          alt="User avatar"
+                        />
+                        {sale.attributes.users_permissions_user.data.attributes.username}
+                      </div>
+                    </td>
+                    <td>{dayjs(sale.attributes.date).format('DD/MM/YYYY HH:mm')}</td>
+                    <td>
+                      {#if sale.attributes.splited}
+                        <span class="status-badge split-badge">✓ {splitStatus[$lang]}</span>
+                      {:else if sale.attributes.pending}
+                        <span class="status-badge pending-badge">⏳ {pendingStatus[$lang]}</span>
+                      {:else}
+                        <span class="status-badge awaiting-badge">{awaitingStatus[$lang]}</span>
+                      {/if}
+                    </td>
+                    <td class="max-w-xs truncate" title={sale.attributes.note || ''}>
+                      {sale.attributes.note || '-'}
+                    </td>
+                  </tr>
+                {/each}
+              </tbody>
+              <tfoot>
+                <tr class="total-row">
+                  <td colspan="2" class="font-bold">{tot[$lang]}</td>
+                  <td class="font-bold">₪{totalSales}</td>
+                  <td colspan="4"></td>
+                </tr>
+              </tfoot>
+            </table>
+          </div>
+        </div>
+      </DialogContent>
+    </div>
+  </DialogOverlay>
+{/if}
+
 <style>
-  .kff {
-    width: 290px;
-    height: 290px;
-    margin: 0 auto;
-  }
   .d::-webkit-scrollbar {
     width: 10px;
   }
@@ -601,45 +760,6 @@
   .svggg:hover {
     fill: var(--barbi-pink);
   }
-  .gg {
-    position: sticky;
-    top: 1px;
-    padding: 15px;
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-    opacity: 1;
-    color: rgb(132, 241, 223);
-  }
-  .ggd {
-    position: sticky;
-    bottom: 1px;
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-    opacity: 1;
-    color: rgb(132, 241, 223);
-  }
-  .ggr {
-    position: sticky;
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-
-    opacity: 1;
-    color: rgb(132, 241, 223);
-  }
-
-  .ggr:hover,
-  .gg:hover,
-  .ggd:hover {
-    background: var(--barbi-pink);
-  }
   .dd {
     display: flex;
     align-items: center;
@@ -652,44 +772,6 @@
     max-width: 96vw;
     padding-left: 0.5em;
     padding-right: 0.5em;
-  }
-
-  table,
-  th,
-  td {
-    border-collapse: collapse;
-    border-width: 4px;
-    border-color: rgb(103, 232, 249);
-    border-radius: 4%;
-  }
-  table {
-    text-align: center;
-    color: var(--barbi-pink);
-    margin: 0 auto;
-  }
-  th {
-    background-color: #6b0f1a;
-    background-image: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
-    color: rgb(132, 241, 223);
-  }
-  td {
-    background-color: #5efaf2;
-    background-image: linear-gradient(8deg, #5efaf2 0%, #eee 74%);
-  }
-  th:hover {
-    background: var(--barbi-pink);
-  }
-  td:hover {
-    background: rgb(132, 241, 223);
-  }
-
-  @media (min-width: 768px) {
-    .kff {
-      min-width: 450px;
-      min-height: 450px;
-      max-width: 100vw;
-      margin: 0 auto;
-    }
   }
 
   .gifts-header {
@@ -804,5 +886,88 @@
 
   .report-sale-btn:hover .svggg {
     fill: var(--gold);
+  }
+
+  /* Table Modal Styles */
+  :global(.table-modal-content) {
+    max-width: 95vw !important;
+    width: 1200px !important;
+    max-height: 95vh !important;
+  }
+
+  .sales-table {
+    border-collapse: collapse;
+    background: white;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  }
+
+  .sales-table thead {
+    background: linear-gradient(315deg, #6b0f1a 0%, #b91372 74%);
+  }
+
+  .sales-table th {
+    padding: 12px 16px;
+    text-align: right;
+    color: rgb(132, 241, 223);
+    font-weight: bold;
+    border-bottom: 2px solid rgb(103, 232, 249);
+  }
+
+  .sales-table tbody tr {
+    border-bottom: 1px solid #e5e7eb;
+    transition: background-color 0.2s;
+  }
+
+  .sales-table tbody tr:hover {
+    background-color: rgba(94, 250, 242, 0.1);
+  }
+
+  .sales-table td {
+    padding: 12px 16px;
+    text-align: right;
+    color: var(--barbi-pink);
+  }
+
+  .sales-table .split-row {
+    background-color: rgba(34, 197, 94, 0.05);
+  }
+
+  .sales-table .pending-row {
+    background-color: rgba(59, 130, 246, 0.05);
+  }
+
+  .status-badge {
+    display: inline-block;
+    padding: 4px 12px;
+    border-radius: 12px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+
+  .split-badge {
+    background-color: #dcfce7;
+    color: #166534;
+  }
+
+  .pending-badge {
+    background-color: #dbeafe;
+    color: #1e40af;
+  }
+
+  .awaiting-badge {
+    background-color: #fef3c7;
+    color: #92400e;
+  }
+
+  .sales-table tfoot .total-row {
+    background: linear-gradient(135deg, #5efaf2 0%, #eee 74%);
+    font-weight: bold;
+  }
+
+  .sales-table tfoot td {
+    padding: 16px;
+    border-top: 2px solid rgb(103, 232, 249);
   }
 </style>
