@@ -574,9 +574,17 @@ export const qids = {
                   shem
                   } }}
           mesimabetahalich{data{id
-         attributes{name  howmanyhoursalready hoursassinged
-         
-}}}
+         attributes{
+           name  
+           howmanyhoursalready 
+           hoursassinged
+           users_permissions_user{
+             data{
+               id
+             }
+           }
+         }
+       }}
           }
           }
        }        

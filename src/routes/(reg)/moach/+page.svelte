@@ -57,6 +57,7 @@
     userProjects
   } from '$lib/stores/pendMisMes';
   import { SendTo } from '$lib/send/sendTo.svelte';
+  import { projectTimersStore, fetchProjectTimers } from '$lib/stores/projectTimers.js';
   let idL;
   let success = $state(false);
   let isOpen = $state(false);
@@ -429,6 +430,10 @@
                 srcP = project.profilePic.data.attributes.url;
               }
               trili = meData.tosplits.data;
+              
+              // Load project timers for active timer indicators
+              await fetchProjectTimers($idPr, fetch);
+              
               // pre(projectUsers, fmiData)
             } else {
               if (res.error && res.error.status == 401)
@@ -1274,7 +1279,7 @@
 
   const maini = { he: 'ראשי', en: 'main' };
   const choo = { he: 'בחירת ריקמה', en: 'choose FreeMate' };
-  const timers = { he: 'טיימרים', en: 'timers' };
+  const timersT = { he: 'טיימרים', en: 'timers' };
   let sid = false;
   let gan = false;
   let bett = false;
@@ -1898,17 +1903,33 @@ pointer-events: none;"
         >
           <div dir={$lang == 'he' ? 'rtl' : 'ltr'} class="flex -space-x-2">
             {#each projectUsers as user}
+              {@const projectTimerData = $projectTimersStore[$idPr]?.data}
+              {@const timers = projectTimerData?.timers?.data || []}
+              {@const hasActiveTimer = timers.some(timer => {
+                const timerAttrs = timer.attributes;
+                const missionUserId = timerAttrs?.mesimabetahalich?.data?.attributes?.users_permissions_user?.data?.id;
+                const isActive = timerAttrs?.isActive === true;
+                
+                return missionUserId == user.id && isActive;
+              })}
               <button
-                title={user.attributes.username}
+                title={`${user.attributes.username}${hasActiveTimer ? ' 🟢 פעיל כעת' : ''}`}
                 onclick={() => goto(`/user/${user.id}`)}
+                class="relative transition-all duration-300 {hasActiveTimer ? 'scale-110' : ''}"
                 ><img
-                  class="inline-block h-8 w-8 rounded-full ring-2 ring-gold"
+                  class="inline-block h-8 w-8 rounded-full ring-2 transition-all duration-300 {hasActiveTimer ? 'ring-green-400 ring-4 shadow-lg shadow-green-400/50' : 'ring-gold'}"
                   src={user.attributes.profilePic.data != null
                     ? user.attributes.profilePic.data.attributes.url
                     : 'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
                   alt=""
-                /></button
-              >
+                />
+                {#if hasActiveTimer}
+                  <span class="absolute -top-1 -right-1 flex h-4 w-4">
+                    <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-4 w-4 bg-green-500 border-2 border-white shadow-lg"></span>
+                  </span>
+                {/if}
+              </button>
               <!--{#if hover}
     <h6 class="textlink hover:text-scale-150 hover:text-gold"></h6>
     {/if}-->
@@ -2024,12 +2045,12 @@ pointer-events: none;"
             10
               ? 'bg-gradient-to-br from-barbi via-fuchsia-400 to-mpink text-gold'
               : 'bg-gradient-to-r from-gra via-grb  to-gre text-barbi'} px-4 py-2 drop-shadow-lg shadow-gold"
-            title={timers[$lang]}
+            title={timersT[$lang]}
             ><div
               class="flex flex-col items-center justify-center align-middle"
             >
               <h2 style={tab == 10 ? '' : 'text-shadow:1px 1px #fff ;'}>
-                {timers[$lang]}
+                {timersT[$lang]}
               </h2>
             </div></button
           >

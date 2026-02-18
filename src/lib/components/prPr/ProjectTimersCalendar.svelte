@@ -25,7 +25,7 @@
   let tooltipEl = null;
   let showTimerModal = $state(false);
   let selectedTimerData = $state(null);
-  
+  console.log(timersData)
   // טקסטים בשפות שונות
   const texts = {
     he: {
@@ -154,13 +154,14 @@
   
   // פונקציה לאתחול הלוח
   function initializeCalendar() {
-    if (!timersData?.project?.data?.attributes?.timers?.data) {
+    if (!timersData?.timers?.data) {
       isLoading = false;
       return;
     }
     
-    const timers = timersData.project.data.attributes.timers.data;
+    const timers = timersData.timers.data;
     const events = createCalendarEvents(timers);
+    console.log(events)
     if (!calendarEl) return;
       
     calendar = new Calendar(calendarEl, {
@@ -285,7 +286,7 @@
   // עדכון הלוח כאשר הנתונים או השפה משתנים
   $effect(() => {
     if (timersData && calendar) {
-      const timers = timersData.project.data.attributes.timers.data;
+      const timers = timersData.timers.data;
       const events = createCalendarEvents(timers);
       calendar.setOption('events', events);
       calendar.setOption('locale', $lang === 'he' ? 'he' : 'en');
@@ -318,7 +319,7 @@
     </div>
   </div>
   
-  {#if !timersData?.project?.data?.attributes?.timers?.data?.length}
+  {#if !timersData?.timers?.data?.length}
    {#if isLoading}
     <div class="flex justify-center items-center h-64">
       <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-500"></div>
@@ -336,7 +337,7 @@
     <div class="mt-8">
       <h3 class="text-xl font-semibold mb-4">{currentTexts.detailedTimersList}</h3>
       <div class="space-y-4">
-        {#each timersData.project.data.attributes.timers.data as timer}
+        {#each timersData.timers.data as timer}
           {@const timerData = timer.attributes}
           {@const mesimabetahalich = timerData.mesimabetahalich?.data ? { ...timerData.mesimabetahalich.data.attributes, id: timerData.mesimabetahalich.data.id } : {}}
           
