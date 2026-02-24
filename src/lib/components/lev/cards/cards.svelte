@@ -1184,6 +1184,42 @@
       #fdfcf4; /* Very light creamy gold */
     background-size: 100% 100%;
     overflow: hidden;
+    transition: background 0.5s ease;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    .body {
+      background:
+        radial-gradient(at 0% 0%, rgba(255, 0, 146, 0.2) 0%, transparent 50%),
+        radial-gradient(
+          at 100% 0%,
+          rgba(179, 135, 40, 0.25) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          at 100% 100%,
+          rgba(255, 0, 146, 0.2) 0%,
+          transparent 50%
+        ),
+        radial-gradient(
+          at 0% 100%,
+          rgba(179, 135, 40, 0.25) 0%,
+          transparent 50%
+        ),
+        radial-gradient(at 50% 50%, rgba(15, 12, 0, 0.95) 0%, transparent 80%),
+        #0a0904; /* Very dark charcoal gold */
+    }
+  }
+
+  /* Support for manual .dark class if needed */
+  :global(.dark) .body {
+    background:
+      radial-gradient(at 0% 0%, rgba(255, 0, 146, 0.2) 0%, transparent 50%),
+      radial-gradient(at 100% 0%, rgba(179, 135, 40, 0.25) 0%, transparent 50%),
+      radial-gradient(at 100% 100%, rgba(255, 0, 146, 0.2) 0%, transparent 50%),
+      radial-gradient(at 0% 100%, rgba(179, 135, 40, 0.25) 0%, transparent 50%),
+      radial-gradient(at 50% 50%, rgba(15, 12, 0, 0.95) 0%, transparent 80%),
+      #0a0904;
   }
 
   /* Premium Gold Shimmer Effect */
