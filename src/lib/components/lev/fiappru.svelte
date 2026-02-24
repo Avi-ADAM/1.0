@@ -821,6 +821,8 @@ updateMesimabetahalich(
                 {noofusersNo}
                 {valph}
                 {whatt}
+                {users}
+                {onProj}
               />
             </div>
           </Drawer.Content>
@@ -835,6 +837,8 @@ updateMesimabetahalich(
     onHover={hoverc}
     {isVisible}
     {why}
+    {users}
+    {onProj}
     {useraplyname}
     {src2}
     {missionBName}
