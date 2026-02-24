@@ -7,5 +7,9 @@
     "submitButton": "Submit for Approval",
     "pleaseWait": "Please wait...",
     "cancel": "Cancel"
+  },
+  "cards": {
+    "approve": "I want",
+    "decline": "Not for me"
   }
 }

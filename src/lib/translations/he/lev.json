@@ -7,5 +7,9 @@
     "submitButton": "שליחה לאישור",
     "pleaseWait": "רק רגע...",
     "cancel": "ביטול"
+  },
+  "cards": {
+    "approve": "אני רוצה",
+    "decline": "לא מתאים"
   }
 }

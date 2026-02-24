@@ -2,6 +2,7 @@
   import Tile from '$lib/celim/tile.svelte';
   import Chaticon from '$lib/celim/chaticon.svelte';
   import { lang } from '$lib/stores/lang.js';
+  import { t } from '$lib/translations';
   import { isScrolable, toggleScrollable } from './isScrolable.svelte.js';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Lev from '$lib/celim/lev.svelte';
@@ -91,7 +92,7 @@
   const ttne = { he: 'ללא רווח', en: 'not profitable' };
   const headi = { he: 'הצעה למשימה', en: 'suggested mission' };
 
-  const t = {
+  const cardT = {
     acts: { he: 'רשימת מטלות:', en: 'todo list:' },
     wwneed: { he: 'דרכי עבודה מבוקשות:', en: 'ways of work for the mission:' },
     skneed: { he: 'הכישורים הנדרשים:', en: 'needed skills:' },
@@ -246,7 +247,7 @@
         class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl p-4 shadow-sm"
       >
         <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-3">
-          {t.acts[$lang]}
+          {cardT.acts[$lang]}
         </h4>
         <ul class="space-y-2">
           {#each acts as datai}
@@ -270,7 +271,7 @@
       {#if skills?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-            {t.skneed[$lang]}
+            {cardT.skneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
             {#each skills as skill}
@@ -288,7 +289,7 @@
       {#if role?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-            {t.rneed[$lang]}
+            {cardT.rneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
             {#each role as rol}
@@ -306,7 +307,7 @@
       {#if workways?.length > 0}
         <div>
           <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
-            {t.wwneed[$lang]}
+            {cardT.wwneed[$lang]}
           </h4>
           <div class="flex flex-wrap gap-2">
             {#each workways as wo}
@@ -352,23 +353,25 @@
       {#if already === false && allr === false && alreadyi == false}
         <!-- כפתור דחייה -->
         <button
-          class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl flex justify-center items-center transition-all hover:scale-105"
+          class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl flex justify-center items-center gap-2 transition-all hover:scale-105"
           onmouseenter={() => hover({ he: 'לא מתאים לי', en: 'not for me' })}
           onmouseleave={() => hover('0')}
           onclick={decline}
         >
           <div class="w-8 h-8"><No /></div>
+          <span class="whitespace-nowrap">{$t('lev.cards.decline')}</span>
         </button>
 
         <!-- כפתור הסכמה -->
         <button
-          class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center transform hover:-translate-y-1 transition-all"
+          class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center gap-2 transform hover:-translate-y-1 transition-all"
           style="flex: 2;"
           onmouseenter={() => hover({ he: 'אני רוצה', en: 'yes I want' })}
           onmouseleave={() => hover('0')}
           onclick={agree}
         >
           <div class="w-8 h-8 text-white"><Lev /></div>
+          <span class="whitespace-nowrap">{$t('lev.cards.approve')}</span>
         </button>
       {:else if alreadyi == true}
         <!-- מצב צ'אט -->
@@ -378,7 +381,7 @@
           onmouseleave={() => hover('0')}
           onclick={() => tochat()}
         >
-          <span>{$lang === 'he' ? "פתח צ'אט" : 'Open Chat'}</span>
+          <span>{$lang === 'he' ? "פתיחת צ'אט" : 'Open Chat'}</span>
           <div class="w-6 h-6"><Chaticon /></div>
         </button>
       {/if}
