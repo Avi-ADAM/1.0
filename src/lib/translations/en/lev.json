@@ -13,6 +13,11 @@
     "decline": "Not for me",
     "requesterDetails": "Requester Details",
     "confirmApprove": "Approve",
-    "confirmDecline": "Decline"
+    "confirmDecline": "Decline",
+    "viewChat": "View chat",
+    "replyChat": "Reply",
+    "negotiate": "Negotiate",
+    "newNegotiation": "New Negotiation",
+    "toNegotiate": "Nego"
   }
 }

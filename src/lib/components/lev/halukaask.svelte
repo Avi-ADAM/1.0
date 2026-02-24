@@ -857,6 +857,7 @@ id: ${pendId}
                 {src}
                 {noofusersWaiting}
                 {noofusersOk}
+                {users}
                 {noofusersNo}
                 {projectId}
               />
@@ -873,6 +874,8 @@ id: ${pendId}
     onHover={hoverc}
     {isVisible}
     {why}
+    {users}
+    {projectId}
     {already}
     {projectName}
     {src}
@@ -881,7 +884,6 @@ id: ${pendId}
     {noofusersNo}
     {halukot}
     {hervach}
-    {projectId}
   />
 {/if}
 

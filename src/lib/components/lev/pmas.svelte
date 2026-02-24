@@ -1156,6 +1156,10 @@ diunim = ` ${diu},`
                 {nego_mashes}
                 {timeGramaDate}
                 onNego={claf}
+                {projectId}
+                {users}
+                activeOrder={order}
+                {onProj}
               />
             </div>
           </Drawer.Content>
@@ -1191,6 +1195,10 @@ diunim = ` ${diu},`
     onNego={claf}
     {nego_mashes}
     {timeGramaDate}
+    {projectId}
+    {users}
+    activeOrder={order}
+    {onProj}
   />
 {/if}
 

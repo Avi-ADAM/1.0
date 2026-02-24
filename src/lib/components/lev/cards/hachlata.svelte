@@ -9,7 +9,10 @@
   import No from '../../../celim/no.svelte';
   import { restim } from '$lib/func/restime.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
-  import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
+  import CardHeader from './CardHeader.svelte';
+  import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+  import { getProjectData } from '$lib/stores/projectStore.js';
+
   /**
    * @typedef {Object} Props
    * @property {boolean} [low]
@@ -30,9 +33,10 @@
    * @property {any} price
    * @property {boolean} [already]
    * @property {any} timegramaDate
-   * @property {(payload: { x: any }) => void} [onHover] - Callback for hover event
-   * @property {(payload: { alr: any }) => void} [onAgree] - Callback for agree event
-   * @property {(payload: { alr: any }) => void} [onDecline] - Callback for decline event
+   * @property {string} [glowColor]
+   * @property {(payload: { x: any }) => void} [onHover]
+   * @property {(payload: { alr: any }) => void} [onAgree]
+   * @property {(payload: { alr: any }) => void} [onDecline]
    */
 
   /** @type {Props} */
@@ -55,38 +59,30 @@
     price,
     already = $bindable(false),
     timegramaDate,
+    glowColor = 'green', // כפי שהוגדר במסמך
     onHover,
     onAgree,
-    onDecline
+    onDecline,
+    projectId,
+    users = [],
+    activeOrder = 0,
+    onProj
   } = $props();
+  let user_1s = $derived.by(() => {
+    return getProjectData(projectId, 'us') || [];
+  });
   let zman = $state();
+
   onMount(() => {
-    console.log(timegramaDate, 'restime');
     let x = restim(restime);
     let cr = new Date(timegramaDate);
-    let crr = cr.getTime(); //if nego then use last nego creationtime
-    console.log(zman, Date.now(), crr, x);
     setInterval(() => {
       zman = -(Date.now() - cr - x);
     }, 1);
   });
-  const isPublikLevel = {
-    he: 'לפרסם ולפתוח את השירות לכל?',
-    en: 'is the service should be public and open for everyone ?'
-  };
-  const isPublikFl = { he: 'ציבורי', en: 'public' };
-  const isPublikTr = { he: 'פרטי', en: 'private' };
-  const oneTimeLevel = {
-    he: 'השירות הינו חד פעמי או על בסיס חודשי',
-    en: 'one time service or monthly based'
-  };
+
   const oneTimeTr = { he: 'חודשי', en: 'monthly' };
   const oneTimeFl = { he: 'חד פעמי', en: 'one time' };
-  const createLebel = { he: 'יצירת שירות חדש', en: 'create new service' };
-  const equaliSplitedLevel = {
-    he: 'עלויות השירות מחולקות באופן שווה או שאין סכום מסוים שחובה לתת',
-    en: 'is the service cost are splited equally or the subscribers pay what they want'
-  };
   const equaliSplitedFl = { he: 'חלוקה שווה', en: 'splited equally' };
   const equaliSplitedTr = { he: 'דמי מנוי', en: 'subscription' };
   const timero = {
@@ -95,6 +91,7 @@
   };
   const oldob = { he: 'הלוגו העכשווי', en: 'old Logo' };
   const newlogo = { he: 'הלוגו החדש', en: 'new logo' };
+
   function hover(x) {
     onHover?.({ x: x });
   }
@@ -109,7 +106,6 @@
   function linke(t) {
     console.log(t);
   }
-  const tri = import('$lib/translations/tr.json');
 </script>
 
 <div
@@ -119,82 +115,93 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir="rtl"
+  dir={$lang == 'he' ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
-  class=" d {isVisible
+  class="d {isMobileOrTablet()
+    ? 'w-full h-full'
+    : 'w-[90%] h-[90%]'} lg:w-[90%] {isVisible
     ? $lang == 'he'
       ? 'boxleft'
       : 'boxright'
-    : ''} leading-normal {isMobileOrTablet()
-    ? 'w-full h-full'
-    : ' w-[90%] h-[90%]'} bg-white lg:w-[90%]"
+    : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    ? 'shadow-glow border-glow'
+    : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
+  style:--glow-rgb={glowColor === 'gold'
+    ? '238, 232, 170'
+    : glowColor === 'barbi'
+      ? '255, 0, 146'
+      : glowColor === 'blue'
+        ? '116, 191, 255'
+        : '2, 255, 187'}
 >
-  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
-  </div>-->
-  <div
-    class="flex flex-wrap sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-colorfulGrad gap-2"
-  >
-    <div class="relative flex items-center space-x-1 flex-1 min-w-0">
-      <AuthorityBadge
-        logoSrc={src}
-        {projectName}
-        size={isMobileOrTablet() ? 80 : 120}
-      />
-      <div class="flex flex-col leading-tight ml-4 min-w-0 flex-1">
-        <div class="sm:text-lg text-md mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-3xl text-xl"
-            >{tr?.headers[kind][$lang]}</span
-          >
-        </div>
-    <!----    {#if kind == 'sheirutpends' && spdata?.sheirut?.data?.attributes?.name}
-          <div class="text-gray-900 font-bold text-lg sm:text-2xl truncate">
-            {spdata.sheirut.data.attributes.name}
-          </div>
-        {:else if openmissionName}
-          <div class="text-gray-900 font-bold text-lg sm:text-2xl truncate">
-            {openmissionName}
-          </div>
-        {/if}-->
-      </div>
-    </div>
+  <!-- Header Section -->
+  <CardHeader
+    logoSrc={src}
+    {projectName}
+    cardType={tr?.headers[kind]?.[$lang] || kind}
+    cardTitle={kind === 'sheirutpends' &&
+    spdata?.sheirut?.data?.attributes?.name
+      ? spdata.sheirut.data.attributes.name
+      : openmissionName?.length > 0
+        ? openmissionName
+        : ''}
+    {glowColor}
+  />
 
-    <!-- Timer - responsive positioning -->
-    <div class="flex items-center justify-center w-full sm:w-auto sm:justify-end">
-      <span
-        role="contentinfo"
-        aria-label={timero[$lang]}
-        class="bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre text-center text-barbi p-2 sm:text-2xl text-xl rounded whitespace-nowrap"
-        style:font-family="Digital"
-        onmouseenter={() => hover(timero[$lang])}
-        onmouseleave={() => hover('0')}
-        style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
-      >
-        {formatTime(zman)}
-      </span>
-    </div>
-  </div>
+  <!-- Timer Bar -->
   <div
-    class="{isScrolable.value
-      ? 'bg-white'
-      : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
+    class="bg-gray-50 dark:bg-gray-900/60 border-b border-gray-100 dark:border-gray-700 py-2 flex justify-center items-center"
   >
-    <div class="mb-8">
-      {#if kind == 'sheirutpends'}
-        <p class="text-gray-900 font-bold text-xl mb-2">
+    <span
+      role="contentinfo"
+      aria-label={timero[$lang]}
+      class="text-barbi dark:text-mpink text-xl sm:text-2xl drop-shadow-sm tracking-widest"
+      style:font-family="Digital"
+      onmouseenter={() => hover(timero[$lang])}
+      onmouseleave={() => hover('0')}
+    >
+      {formatTime(zman)}
+    </span>
+  </div>
+
+  <!-- Content Area -->
+  <div
+    class="d {isScrolable.value
+      ? 'bg-white dark:bg-slate-800'
+      : 'bg-gray-50 dark:bg-slate-700/50'} transition-all duration-300 p-4 flex-1 overflow-y-auto flex flex-col space-y-4"
+  >
+    {#if kind == 'sheirutpends'}
+      <div
+        class="space-y-3 bg-gray-100 dark:bg-gray-900/50 p-4 rounded-xl border border-gray-200 dark:border-gray-700"
+      >
+        <p class="text-gray-800 dark:text-gray-200 font-bold text-lg">
           {spdata.sheirut.data.attributes.descrip}
         </p>
-        <h5 class="text-barbi font-bold text-xl mb-2">
-          ⚙️{spdata.sheirut.data.attributes.oneTime
-            ? oneTimeTr[$lang]
-            : oneTimeFl[$lang]}
-        </h5>
-        <h5 class="text-barbi font-bold text-xl mb-2">
-          🧮{spdata.sheirut.data.attributes.equaliSplited
-            ? equaliSplitedTr[$lang]
-            : equaliSplitedFl[$lang]}
-        </h5>
-      {:else if kind == 'pic'}
-        <div class="w-full sm:w-3/4 lg:w-1/3">
+        <div class="flex flex-col gap-2">
+          <h5
+            class="text-barbi dark:text-mpink font-bold flex items-center gap-2"
+          >
+            <span>⚙️</span>
+            {spdata.sheirut.data.attributes.oneTime
+              ? oneTimeTr[$lang]
+              : oneTimeFl[$lang]}
+          </h5>
+          <h5
+            class="text-barbi dark:text-mpink font-bold flex items-center gap-2"
+          >
+            <span>🧮</span>
+            {spdata.sheirut.data.attributes.equaliSplited
+              ? equaliSplitedTr[$lang]
+              : equaliSplitedFl[$lang]}
+          </h5>
+        </div>
+      </div>
+    {:else if kind == 'pic'}
+      <div
+        class="w-full flex justify-center items-center py-4 bg-gray-50 dark:bg-gray-900/30 rounded-xl"
+      >
+        <!-- SVG Code remains identical to original for safety, wrapped nicely -->
+        <div class="w-full sm:w-3/4 lg:w-1/2">
           <svg
             class="scale-110"
             height="100%"
@@ -576,7 +583,6 @@
               height="38px"
               transform="translate(-19,-19)"
             >
-              <span class={`normSml${projectName}-noo`}></span>
               <img
                 width="38px"
                 height="38px"
@@ -585,6 +591,7 @@
                 style="border-radius: 50%;"
               />
             </foreignObject>
+
             <foreignObject
               x="1276"
               y="892"
@@ -595,7 +602,7 @@
               <img
                 onmouseenter={() => hover(newlogo)}
                 onmouseleave={() => hover('0')}
-                style="margin-top: 0px; margin-bottom: 0px; margin-right:auto; margin-left: auto; border-radius: 50%;"
+                style="margin: 0 auto; border-radius: 50%;"
                 src={src2}
                 width="50"
                 height="50"
@@ -604,56 +611,106 @@
             </foreignObject>
           </svg>
         </div>
-      {/if}
-      {#if missionDetails}
-        <p class="text-gray-700 text-base">{missionDetails}</p>{/if}
-    </div>
-    <div class="flex items-center">
-      <div class="text-lg sm:text-xl">
-        <p class="vo ef">
-          <span
-            role="contentinfo"
-            onmouseenter={() => hover('סך ההצבעות בעד')}
-            onmouseleave={() => hover('0')}
-            style="color:#7EE081;">{noofusersOk}-בעד</span
-          >
-          <span
-            onmouseenter={() => hover('לא הצביעו')}
-            onmouseleave={() => hover('0')}
-            style="color:#0000cc;"
-            >{noofusersWaiting}-טרם
-          </span><span
-            onmouseenter={() => hover('כמות ההצבעות נגד')}
-            onmouseleave={() => hover('0')}
-            style="color:#80037e;">{noofusersNo}-על גרסאות קודמות</span
-          >
-        </p>
+      </div>
+    {/if}
+
+    {#if missionDetails}
+      <p class="text-gray-700 dark:text-gray-300 text-base leading-relaxed p-2">
+        {missionDetails}
+      </p>
+    {/if}
+
+    <!-- Vote Summary -->
+    <div class="mt-auto pt-4 border-t border-gray-200 dark:border-gray-700/50">
+      <div class="flex flex-wrap gap-3 text-sm sm:text-base font-medium">
+        <span
+          role="contentinfo"
+          onmouseenter={() => hover('סך ההצבעות בעד')}
+          onmouseleave={() => hover('0')}
+          class="text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20 px-3 py-1 rounded-full border border-green-200 dark:border-green-800"
+        >
+          {noofusersOk} - בעד
+        </span>
+
+        <span
+          onmouseenter={() => hover('לא הצביעו')}
+          onmouseleave={() => hover('0')}
+          class="text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 px-3 py-1 rounded-full border border-blue-200 dark:border-blue-800"
+        >
+          {noofusersWaiting} - טרם
+        </span>
+
+        <span
+          onmouseenter={() => hover('כמות ההצבעות נגד')}
+          onmouseleave={() => hover('0')}
+          class="text-purple-600 dark:text-purple-400 bg-purple-50 dark:bg-purple-900/20 px-3 py-1 rounded-full border border-purple-200 dark:border-purple-800"
+        >
+          {noofusersNo} - גרסאות קודמות
+        </span>
       </div>
     </div>
   </div>
-  {#if low == false}
-    {#if already === false}
-      <button
-        onmouseenter={() => hover('אישור')}
-        onmouseleave={() => hover('0')}
-        onclick={agree}
-        class="btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
-        name="requestToJoin"
-      >
-        <Lev />
-      </button>
-      <!-- <button3 on:click= {ask} style="margin: 0;" class = "btn" name="negotiate"><i class="far fa-comments"></i></button3>-->
-      <button
-        onmouseenter={() => hover('התנגדות')}
-        onmouseleave={() => hover('0')}
-        onclick={decline}
-        class="btnb bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-red-400 hover:scale-110"
-        name="decline"
-      >
-        <No />
-      </button>
-    {/if}
-  {:else if low == true}
-    <Lowbtn isCart="true" />
+
+  <!-- תצוגת משתמשים והצבעות (במידה והוזרק מה-DB המודרני) -->
+  {#if user_1s && user_1s.length > 0}
+    <div class="px-4 pb-3 bg-white dark:bg-slate-800">
+      <VoteStatusDisplay votes={users || []} members={user_1s} {activeOrder} />
+    </div>
   {/if}
+  <!-- Actions Footer -->
+  <div
+    class="p-4 bg-gray-50 dark:bg-gray-900/50 flex gap-3 border-t border-gray-100 dark:border-gray-700"
+  >
+    {#if low == false}
+      {#if already === false}
+        <button
+          class="flex-1 py-2 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl transition-all flex justify-center items-center"
+          onmouseenter={() => hover('התנגדות')}
+          onmouseleave={() => hover('0')}
+          onclick={() => decline('f')}
+        >
+          <No />
+        </button>
+
+        <button
+          class="flex-2 py-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex justify-center items-center"
+          onmouseenter={() => hover('אישור')}
+          onmouseleave={() => hover('0')}
+          onclick={() => agree('f')}
+        >
+          <Lev />
+        </button>
+      {/if}
+    {:else}
+      <Lowbtn isCart={true} />
+    {/if}
+  </div>
 </div>
+
+<style>
+  .flex-2 {
+    flex: 2;
+  }
+
+  .shadow-glow {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05);
+  }
+
+  .border-glow {
+    border: 2px solid rgba(var(--glow-rgb), 0.5);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05),
+      0 0 0 1px rgba(var(--glow-rgb), 0.3);
+  }
+</style>

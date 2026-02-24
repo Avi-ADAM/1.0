@@ -13,6 +13,11 @@
     "decline": "غير مناسب",
     "requesterDetails": "تفاصيل مقدم الطلب",
     "confirmApprove": "تأكيد",
-    "confirmDecline": "معارضة"
+    "confirmDecline": "معارضة",
+    "viewChat": "عرض المحادثة",
+    "replyChat": "رد",
+    "negotiate": "تفاوض",
+    "newNegotiation": "تفاوض جديد",
+    "toNegotiate": "للتفاوض"
   }
 }

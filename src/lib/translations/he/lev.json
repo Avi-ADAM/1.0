@@ -13,6 +13,11 @@
     "decline": "לא מתאים",
     "requesterDetails": "פרטי המבקש",
     "confirmApprove": "אישור",
-    "confirmDecline": "התנגדות"
+    "confirmDecline": "התנגדות",
+    "viewChat": "צפייה בדיון",
+    "replyChat": "תגובה",
+    "negotiate": "משא ומתן",
+    "newNegotiation": "משא ומתן חדש",
+    "toNegotiate": "למו\"מ"
   }
 }

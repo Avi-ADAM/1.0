@@ -1057,6 +1057,9 @@
                 {descrip}
                 {mypos}
                 {allr}
+                {projectId}
+                {users}
+                activeOrder={ordern}
                 {noofusersNo}
                 onNego={claf}
               />
@@ -1095,6 +1098,9 @@
     {createdAt}
     {descrip}
     {mypos}
+    {projectId}
+    {users}
+    activeOrder={ordern}
     {allr}
     {noofusersNo}
     onNego={claf}

@@ -1377,6 +1377,9 @@
                 {openmissionName}
                 {missionDetails}
                 {noofusersNo}
+                {users}
+                {projectId}
+                {onProj}
               />
             </div>
           </Drawer.Content>
@@ -1396,6 +1399,9 @@
     {isVisible}
     {low}
     {kind}
+    {users}
+    {projectId}
+    {onProj}
     {spdata}
     {timegramaDate}
     {restime}
