@@ -1116,6 +1116,7 @@ updateOpenMission(
                 {useraplyname}
                 {noofusersOk}
                 {src2}
+                {users}
                 noofhours={nhours}
                 perhour={valph}
                 {sqedualed}
@@ -1154,6 +1155,7 @@ updateOpenMission(
     dates={deadline}
     {low}
     {already}
+    {users}
     {projectName}
     {src}
     {noofusersWaiting}

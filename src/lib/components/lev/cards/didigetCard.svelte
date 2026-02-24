@@ -182,7 +182,7 @@
       : 'boxright'
     : ''} leading-normal {isMobileOrTablet()
     ? 'w-full h-full'
-    : ' w-[90%] h-[90%]'} bg-white lg:w-[90%]"
+    : ' w-[90%] h-[90%]'} bg-gray-900 dark:bg-gray-950 lg:w-[90%]"
 >
   <div
     class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-colorfulGrad"
@@ -208,8 +208,8 @@
   <div
     dir={$lang == "en" ? "ltr" : "rtl"}
     class="{isScrolable.value
-      ? 'bg-white'
-      : 'bg-gray-200'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
+      ? 'bg-gray-800 dark:bg-gray-900'
+      : 'bg-gray-700 dark:bg-gray-800'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
   >
     <div class="mb-8">
       <div class="text-center mb-6">

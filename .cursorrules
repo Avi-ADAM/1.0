@@ -1,0 +1,5 @@
+# Agent Rules
+
+- Always prefer using translations from `src/lib/translations/` for any user-facing text.
+- Follow the established pattern of using `$lang` and `tr` for internationalization in Svelte components.
+- Hebrew is the primary language for communication with the user.

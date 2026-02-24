@@ -214,7 +214,7 @@ export const qids = {
 "15createPgishauser": `mutation CreatePgishauser($id: ID!) {
   createPgishauser(data: {users_permissions_user: $id}) {data{id}}
 }`,'16createPgisha': `mutation CreatePgisha($ids: [ID],$name: String, $desc: String,pendIds:[ID]) {
-  createPgisha(data: {pgishausers: $ids,pgishauserspend:$pendIds, name: $name, desc: $desc}) {data{id}}
+  createPgisha(data: {pgishausers: $ids,pgishauserpends:$pendIds, name: $name, desc: $desc}) {data{id}}
 }` , '17getUsers': `query GetUsers {
   usersPermissionsUsers{
     data{
@@ -618,6 +618,7 @@ export const qids = {
                   attributes {
                     heading
                     description
+                    aiMeta
                     author{
                     data{
                       attributes{
@@ -684,6 +685,7 @@ export const qids = {
             attributes {
               heading
               description
+              aiMeta
               author{
               data{
                 attributes{
@@ -1809,19 +1811,16 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           }
         }
       }`,
-  '81updateAskedsAndCreateAsk': `mutation UpdateAskedsAndCreateAsk(
+  '81updateAskeds': `mutation UpdateAskeds(
       $userId: ID!,
-      $askeds: [ID],
-      $openMissionId: ID,
-      $projectId: ID!,
-      $publishedAt: DateTime,
-      $vote: [ComponentProjectsVotsInput]
+      $askedsList: [ID]
     ) {
       updateUsersPermissionsUser(
         id: $userId
-        data: { askeds: $askeds }
+        data: { askeds: $askedsList }
       ) {
         data {
+          id
           attributes {
             askeds {
               data {
@@ -1831,6 +1830,14 @@ mutation UpdateProjectProfilePic($projectId: ID!, $imageId: ID!) {
           }
         }
       }
+    }`,
+  '81.5createAsk': `mutation CreateAsk(
+      $userId: ID!,
+      $openMissionId: ID,
+      $projectId: ID!,
+      $publishedAt: DateTime,
+      $vote: [ComponentProjectsVotsInput]
+    ) {
       createAsk(
         data: {
           open_mission: $openMissionId,

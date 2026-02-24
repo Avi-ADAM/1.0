@@ -63,8 +63,8 @@ function isRetryableError(error: any): boolean {
   if (error instanceof StrapiError) {
     const code = error.getCode();
     // Retry on network errors, timeouts, and 5xx server errors
-    return code === 'NETWORK_ERROR' || 
-           code === 'HTTP_ERROR' && error.errors[0]?.extensions?.status >= 500;
+    return code === 'NETWORK_ERROR' ||
+      code === 'HTTP_ERROR' && error.errors[0]?.extensions?.status >= 500;
   }
   return false;
 }
@@ -75,7 +75,7 @@ function isRetryableError(error: any): boolean {
  */
 class ConnectionPool {
   private agent: any = null;
-  
+
   constructor() {
     // Only create agent in Node.js environment
     if (typeof process !== 'undefined' && process.versions?.node) {
@@ -83,7 +83,7 @@ class ConnectionPool {
         // Try to import http/https modules (Node.js only)
         const http = require('http');
         const https = require('https');
-        
+
         // Create agents with keep-alive enabled
         this.agent = {
           http: new http.Agent({
@@ -106,7 +106,7 @@ class ConnectionPool {
       }
     }
   }
-  
+
   /**
    * Get the appropriate agent for a URL
    */
@@ -114,7 +114,7 @@ class ConnectionPool {
     if (!this.agent) return undefined;
     return url.startsWith('https:') ? this.agent.https : this.agent.http;
   }
-  
+
   /**
    * Destroy all connections in the pool
    */
@@ -138,9 +138,9 @@ export class StrapiClient {
   private adminToken: string;
   private retryConfig: RetryConfig;
   private connectionPool: ConnectionPool;
-  
+
   constructor(
-    endpoint?: string, 
+    endpoint?: string,
     adminToken?: string,
     retryConfig?: Partial<RetryConfig>
   ) {
@@ -150,7 +150,7 @@ export class StrapiClient {
     this.retryConfig = { ...DEFAULT_RETRY_CONFIG, ...retryConfig };
     this.connectionPool = new ConnectionPool();
   }
-  
+
   /**
    * Destroy the connection pool
    * Call this when shutting down the application
@@ -158,7 +158,7 @@ export class StrapiClient {
   destroy(): void {
     this.connectionPool.destroy();
   }
-  
+
   /**
    * Execute a GraphQL query or mutation with retry logic
    * 
@@ -177,7 +177,7 @@ export class StrapiClient {
   ): Promise<any> {
     let lastError: StrapiError | null = null;
     let delay = this.retryConfig.initialDelayMs;
-    
+
     // Try the operation with retries
     for (let attempt = 0; attempt <= this.retryConfig.maxRetries; attempt++) {
       try {
@@ -187,22 +187,22 @@ export class StrapiClient {
           message: error instanceof Error ? error.message : String(error),
           extensions: { code: 'UNKNOWN_ERROR' }
         }]);
-        
+
         // If this is the last attempt or error is not retryable, throw
         if (attempt === this.retryConfig.maxRetries || !isRetryableError(lastError)) {
           throw lastError;
         }
-        
+
         // Log retry attempt
         console.warn(
           `Strapi request failed (attempt ${attempt + 1}/${this.retryConfig.maxRetries + 1}), ` +
           `retrying in ${delay}ms...`,
           { queryId, error: lastError.message }
         );
-        
+
         // Wait before retrying
         await sleep(delay);
-        
+
         // Exponential backoff
         delay = Math.min(
           delay * this.retryConfig.backoffMultiplier,
@@ -210,11 +210,11 @@ export class StrapiClient {
         );
       }
     }
-    
+
     // This should never be reached, but TypeScript needs it
     throw lastError!;
   }
-  
+
   /**
    * Execute a GraphQL query or mutation once (without retry logic)
    * 
@@ -233,7 +233,7 @@ export class StrapiClient {
   ): Promise<any> {
     // Initialize QIDS if not already done
     await initQids();
-    
+
     // Get the query from QIDS
     const query = qids[queryId];
     if (!query) {
@@ -242,17 +242,17 @@ export class StrapiClient {
         extensions: { code: 'QUERY_NOT_FOUND' }
       }]);
     }
-    
+
     // Determine which token to use
     const token = userJwt || this.adminToken;
     const bearer = `bearer ${token}`;
-    
+
     // Prepare the request body
     const requestBody = {
       query,
       variables
     };
-    
+
     // Prepare fetch options with connection pooling
     const fetchOptions: RequestInit = {
       method: 'POST',
@@ -262,20 +262,20 @@ export class StrapiClient {
       },
       body: JSON.stringify(requestBody)
     };
-    
+
     // Add agent for connection pooling (Node.js only)
     const agent = this.connectionPool.getAgent(this.endpoint);
     if (agent) {
       (fetchOptions as any).agent = agent;
     }
-    
+
     // Use provided fetch or global fetch
     const fetchToUse = fetchFn || fetch;
-    
+
     try {
       // Execute the GraphQL request
       const response = await fetchToUse(this.endpoint, fetchOptions);
-      
+
       // Check if the HTTP request was successful
       if (!response.ok) {
         // Try to get response body for more details
@@ -285,7 +285,7 @@ export class StrapiClient {
         } catch {
           responseBody = await response.text();
         }
-        
+
         console.error('[STRAPI_CLIENT] HTTP Error Details:', {
           queryId,
           status: response.status,
@@ -294,10 +294,10 @@ export class StrapiClient {
           variables: JSON.stringify(variables, null, 2),
           responseBody: JSON.stringify(responseBody, null, 2)
         });
-        
+
         throw new StrapiError([{
           message: `HTTP ${response.status}: ${response.statusText}`,
-          extensions: { 
+          extensions: {
             code: 'HTTP_ERROR',
             status: response.status,
             statusText: response.statusText,
@@ -307,10 +307,10 @@ export class StrapiClient {
           }
         }]);
       }
-      
+
       // Parse the response
       const result = await response.json();
-      
+
       // Check for GraphQL errors
       if (result.errors && result.errors.length > 0) {
         console.error('[STRAPI_CLIENT] GraphQL Error Details:', {
@@ -319,7 +319,7 @@ export class StrapiClient {
           query: query.substring(0, 200) + '...',
           errors: JSON.stringify(result.errors, null, 2)
         });
-        
+
         throw new StrapiError(result.errors.map((err: any) => ({
           ...err,
           extensions: {
@@ -329,14 +329,14 @@ export class StrapiClient {
           }
         })));
       }
-      
+
       return result;
     } catch (error) {
       // If it's already a StrapiError, re-throw it
       if (error instanceof StrapiError) {
         throw error;
       }
-      
+
       // Log network errors with details
       console.error('[STRAPI_CLIENT] Network Error Details:', {
         queryId,
@@ -344,11 +344,11 @@ export class StrapiClient {
         error: error instanceof Error ? error.message : String(error),
         stack: error instanceof Error ? error.stack : undefined
       });
-      
+
       // Wrap other errors in StrapiError
       throw new StrapiError([{
         message: error instanceof Error ? error.message : String(error),
-        extensions: { 
+        extensions: {
           code: 'NETWORK_ERROR',
           queryId,
           variables
@@ -371,20 +371,20 @@ export class StrapiError extends Error {
       [key: string]: any;
     };
   }>;
-  
+
   constructor(errors: Array<{ message: string; extensions?: any }>) {
     super(errors[0]?.message || 'Strapi operation failed');
     this.name = 'StrapiError';
     this.errors = errors;
   }
-  
+
   /**
    * Get the first error code
    */
   getCode(): string | undefined {
     return this.errors[0]?.extensions?.code;
   }
-  
+
   /**
    * Get all error messages
    */

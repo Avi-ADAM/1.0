@@ -55,7 +55,7 @@
     </div>
     <div class="flex flex-col leading-tight">
       <div
-        class="text-[10px] sm:text-sm uppercase font-semibold text-barbi dark:text-barbi"
+        class="text-xl sm:text-2xl uppercase font-semibold text-barbi dark:text-barbi"
       >
         <span style="text-shadow: 1px 1px 2px rgba(255,255,255,0.8);">
           {cardType}
@@ -63,7 +63,7 @@
       </div>
       <div
         style="text-shadow: 1px 1px white;"
-        class="font-bold text-barbi dark:text-barbi sm:text-2xl text-lg"
+        class="font-bold text-barbi dark:text-barbi sm:text-3xl text-xl"
       >
         {cardTitle}
       </div>

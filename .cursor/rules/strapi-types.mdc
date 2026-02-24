@@ -1,0 +1,113 @@
+---
+description: "Strapi GraphQL Type System - How to use generated types for type-safe Strapi API integration"
+globs: ["src/**/*.ts", "src/**/*.svelte", "src/**/*.js"]
+---
+
+# Strapi GraphQL Type System
+
+## Overview
+
+This project has a comprehensive type system for the Strapi backend, auto-generated via `graphql-codegen`.
+
+## Key Files
+
+| File | Purpose |
+|------|---------|
+| `src/generated/graphql.ts` | Auto-generated types from Strapi GraphQL schema (~13,676 lines, 95 entities) |
+| `src/generated/index.ts` | Re-export hub for generated types |
+| `src/generated/STRAPI_SCHEMA_REFERENCE.md` | **👈 READ THIS** - Compact reference of ALL types for quick lookup |
+| `src/lib/types/strapiTypes.ts` | Helper utilities: `StrapiEntity`, `StrapiCollection`, `StrapiMedia`, etc. |
+| `src/lib/types/queryTypes.ts` | Pre-defined query response types for common queries |
+| `src/lib/types/validation.ts` | Yup runtime validation schemas |
+| `src/lib/types/README.md` | Detailed usage documentation |
+| `codegen.ts` | GraphQL codegen configuration |
+
+## 🚨 MANDATORY: Before Writing Strapi-Related Code
+
+1. **ALWAYS check** `src/generated/STRAPI_SCHEMA_REFERENCE.md` to find the correct field names and types
+2. **NEVER guess** field names - they may have unexpected spellings (e.g., `cuntries` not `countries`, `vallues` not `values`, `shem` not `name`)
+3. **ALWAYS use** the correct Strapi response wrapper structure: `data.attributes` pattern
+
+## How to Import Types
+
+```typescript
+// From generated types (for content type definitions)
+import type { 
+  UsersPermissionsUser,
+  Project, 
+  Act, 
+  OpenMission,
+  Mesimabetahalich 
+} from '../generated/graphql';
+
+// From helper types (for response structures)
+import type { 
+  StrapiEntity, 
+  StrapiCollection, 
+  StrapiMedia,
+  StrapiResponse,
+  FlattenEntity 
+} from '$lib/types/strapiTypes';
+
+// From query types (for specific query responses)
+import type { 
+  UserProjectListResponse,
+  ProjectDetailsResponse,
+  UserDetailsResponse 
+} from '$lib/types/queryTypes';
+```
+
+## Strapi Response Structure
+
+All Strapi GraphQL responses follow this pattern:
+
+```
+{
+  data: {
+    entityName: {                    // StrapiEntity
+      data: {
+        id: string;
+        attributes: {               // The actual content type fields
+          fieldName: value;
+          relation: {               // StrapiEntity for single relations
+            data: { id, attributes: {...} }
+          };
+          relations: {              // StrapiCollection for array relations  
+            data: [{ id, attributes: {...} }]
+          };
+        }
+      }
+    }
+  }
+}
+```
+
+## Common Content Types (Quick Reference)
+
+### UsersPermissionsUser
+Key fields: `username`, `email`, `bio`, `profilePic`, `projects_1s`, `skills`, `tafkidims`, `work_ways`, `vallues`, `cuntries`, `mesimabetahaliches`, `isAdmin`
+
+### Project  
+Key fields: `projectName`, `profilePic`, `publicDescription`, `linkToWebsite`, `user_1s`, `open_missions`, `vallues`, `sheiruts`
+
+### OpenMission
+Key fields: `name`, `noofhours`, `perhour`, `sqadualed`, `archived`, `project`, `tafkidims`, `skills`, `work_ways`
+
+### Mesimabetahalich (Mission in Progress)
+Key fields: `name`, `stname`, `hoursassinged`, `howmanyhoursalready`, `perhour`, `activeTimer`, `project`, `timers`
+
+## ⚠️ Common Gotchas
+
+1. **Field `id` vs `documentId`**: Strapi 5 uses `documentId` for some operations. Check context.
+2. **Nullable fields**: Most fields are wrapped in `Maybe<>`. Always use optional chaining (`?.`).
+3. **Hebrew field names**: Many fields use Hebrew-phonetic names (e.g., `shem` = name, `tafkidims` = roles, `mesimabetahaliches` = tasks in progress, `vallues` = values)
+4. **Typos in field names**: The schema has intentional naming (`cuntries`, `vallues`, `finnished_missions`) - always verify against the schema.
+5. **Entity wrappers**: Access entity data via `.data?.attributes`, NOT directly.
+
+## Updating Types
+
+When the Strapi schema changes:
+```bash
+npm run codegen
+node scripts/extract-graphql-types.mjs
+```

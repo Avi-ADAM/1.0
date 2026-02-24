@@ -1,16 +1,15 @@
-{   
-    "ask":{
-        "onpm":{
-            "he":"הצבעה אחת",
-            "en":"one project member vote"
+{
+    "ask": {
+        "onpm": {
+            "he": "הצבעה אחת",
+            "en": "one project member vote"
         },
-        "askedTo":{
-            "he":" רוצה להצטרף לריקמה ולבצע את המשימה",
-            "en":"want to join the FreeMates and do the mission"
+        "askedTo": {
+            "he": " רוצה להצטרף לריקמה ולבצע את המשימה",
+            "en": "want to join the FreeMates and do the mission"
         }
     },
     "headers": {
-        
         "misfini": {
             "he": "אישור סיום משימה בהצלחה",
             "en": "approval of sucsessfully finishing a mission"
@@ -19,9 +18,9 @@
             "he": "הצבעה על שינוי לוגו הריקמה",
             "en": "vote on changing FreeMates logo"
         },
-        "sheirutpends":{
-            "he":"הצבעה על יצירת שירות חדש לריקמה",
-            "en":"vote on creating new service to the FreeMates"
+        "sheirutpends": {
+            "he": "הצבעה על יצירת שירות חדש לריקמה",
+            "en": "vote on creating new service to the FreeMates"
         },
         "haluka": {
             "he": "הצעת חלוקה",
@@ -29,17 +28,17 @@
         }
     },
     "mission": {
-        "checklistadd":{
-            "he":"הוספת פריט לרשימת מטלות",
-            "en":"add item to checklist"
+        "checklistadd": {
+            "he": "הוספת פריט לרשימת מטלות",
+            "en": "add item to checklist"
         },
-        "seechecklist":{
-            "he":"צפיה ברשימת מטלות",
-            "en":"see checklist"
+        "seechecklist": {
+            "he": "צפיה ברשימת מטלות",
+            "en": "see checklist"
         },
-        "checklist":{
-            "he":"רשימת מטלות",
-            "en":"checklist"
+        "checklist": {
+            "he": "רשימת מטלות",
+            "en": "checklist"
         },
         "perMonth": {
             "he": "בכל חודש:",
@@ -225,6 +224,10 @@
             "he": "משא ומתן",
             "en": "negotiate"
         },
+        "exitNego": {
+            "he": "יציאה ממשא ומתן",
+            "en": "Exit Negotiation"
+        },
         "name": {
             "he": "שם",
             "en": "name"
@@ -232,6 +235,42 @@
         "approve": {
             "he": "אישור",
             "en": "approve"
+        },
+        "matchedSkillsHeadline": {
+            "he": "כישורים תואמים",
+            "en": "Matched skills"
+        },
+        "missingSkillsHeadline": {
+            "he": "כישורים חסרים",
+            "en": "Missing skills"
+        },
+        "extraSkillsHeadline": {
+            "he": "כישורים נוספים",
+            "en": "Extra skills"
+        },
+        "matchedRolesHeadline": {
+            "he": "תפקידים תואמים",
+            "en": "Matched roles"
+        },
+        "missingRolesHeadline": {
+            "he": "תפקידים חסרים",
+            "en": "Missing roles"
+        },
+        "extraRolesHeadline": {
+            "he": "תפקידים נוספים",
+            "en": "Extra roles"
+        },
+        "matchedWaysHeadline": {
+            "he": "דרכי עבודה תואמות",
+            "en": "Matched workways"
+        },
+        "missingWaysHeadline": {
+            "he": "דרכי עבודה חסרות",
+            "en": "Missing workways"
+        },
+        "extraWaysHeadline": {
+            "he": "דרכי עבודה נוספות",
+            "en": "Extra workways"
         }
     },
     "finiapp": {
@@ -257,9 +296,9 @@
             "he": "בעד",
             "en": "in favor"
         },
-        "against":{
-            "he":"לא בעד",
-            "en":"not in favor"
+        "against": {
+            "he": "לא בעד",
+            "en": "not in favor"
         },
         "votedOn": {
             "he": "הצביעו רק על גרסאות קודמות",
@@ -267,21 +306,21 @@
         }
     },
     "nego": {
-        "oldno":{
-            "he":"גרסה",
-            "en":"version No."
+        "oldno": {
+            "he": "גרסה",
+            "en": "version No."
         },
-        "moaNego":{
-            "he":"שהמשימה תהיה",
-            "en":"that the mission will be"
+        "moaNego": {
+            "he": "שהמשימה תהיה",
+            "en": "that the mission will be"
         },
-        "montly":{
-            "he":"קבועה כך שסך השעות יתחדש בכל חודש",
-            "en":"monthly, so every month the mission will get another hours"
+        "montly": {
+            "he": "קבועה כך שסך השעות יתחדש בכל חודש",
+            "en": "monthly, so every month the mission will get another hours"
         },
-        "ont":{
-            "he":"חד פעמית",
-            "en":"one time"
+        "ont": {
+            "he": "חד פעמית",
+            "en": "one time"
         },
         "sothatMashto": {
             "he": "כך שסך כל השווי יהיה",

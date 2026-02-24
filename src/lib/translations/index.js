@@ -9,6 +9,24 @@ export const config = {
     },
     loaders: [
         {
+            locale: 'he',
+            key: 'negotiation',
+            routes: [/^\/negotiation/], 
+            loader: async () => (await import('./he/negotiation.json')).default,
+        },
+           {
+            locale: 'ar',
+            key: 'negotiation',
+            routes: [/^\/negotiation/], 
+            loader: async () => (await import('./ar/negotiation.json')).default,
+        },
+           {
+            locale: 'en',
+            key: 'negotiation',
+            routes: [/^\/negotiation/], 
+            loader: async () => (await import('./en/negotiation.json')).default,
+        },
+        {
             locale: 'en',
             key: 'love',
             routes: ['/love'], 

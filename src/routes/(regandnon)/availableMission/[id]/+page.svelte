@@ -155,16 +155,29 @@
     const as = [...askedarr];
     as.push(`${data.mId}`);
 
+    // First, update the user's askeds list
+    await sendToSer(
+      {
+        userId: uId,
+        askedsList: as
+      },
+      '81updateAskeds',
+      0,
+      0,
+      false,
+      fetch
+    );
+
+    // Then, create the Ask
     const d2 = await sendToSer(
       {
         userId: uId,
-        askeds: as,
         openMissionId: data.mId,
         projectId: inD.attributes.project.data.id,
         publishedAt: new Date().toISOString(),
         vote: myvote
       },
-      '81updateAskedsAndCreateAsk',
+      '81.5createAsk',
       0,
       0,
       false,
@@ -173,7 +186,7 @@
 
     const r2 = d2.data;
     console.log(r2);
-    if (r2 != null) {
+    if (r2 != null && r2.createAsk) {
       let restime = inD.attributes.project.data.attributes.restime;
       let x = calcX(restime);
       let fd = new Date(Date.now() + x);
