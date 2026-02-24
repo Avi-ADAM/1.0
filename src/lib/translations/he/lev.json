@@ -10,6 +10,9 @@
   },
   "cards": {
     "approve": "אני רוצה",
-    "decline": "לא מתאים"
+    "decline": "לא מתאים",
+    "requesterDetails": "פרטי המבקש",
+    "confirmApprove": "אישור",
+    "confirmDecline": "התנגדות"
   }
 }

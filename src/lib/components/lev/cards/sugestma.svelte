@@ -274,7 +274,7 @@
       {/if}
     {:else if low == true}
       <div class="w-full flex justify-center">
-        <Lowbtn isCart="true" />
+        <Lowbtn isCart={true} />
       </div>
     {/if}
   </div>

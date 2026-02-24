@@ -386,7 +386,7 @@
         </button>
       {/if}
     {:else if low == true}
-      <Lowbtn isCart="true" />
+      <Lowbtn isCart={true} />
     {/if}
   </div>
 </div>

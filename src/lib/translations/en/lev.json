@@ -10,6 +10,9 @@
   },
   "cards": {
     "approve": "I want",
-    "decline": "Not for me"
+    "decline": "Not for me",
+    "requesterDetails": "Requester Details",
+    "confirmApprove": "Approve",
+    "confirmDecline": "Decline"
   }
 }

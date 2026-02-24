@@ -10,6 +10,9 @@
   },
   "cards": {
     "approve": "أريد",
-    "decline": "غير مناسب"
+    "decline": "غير مناسب",
+    "requesterDetails": "تفاصيل مقدم الطلب",
+    "confirmApprove": "تأكيد",
+    "confirmDecline": "معارضة"
   }
 }
