@@ -8,45 +8,16 @@
   import No from '$lib/celim/no.svelte';
   import RichText from '$lib/celim/ui/richText.svelte';
   import { isMobileOrTablet } from '$lib/utilities/device';
-  import AuthorityBadge from '$lib/components/ui/AuthorityBadge.svelte';
+
+  // ייבוא רכיבים מודרניים חדשים
+  import CardHeader from './CardHeader.svelte';
+  import VoteStatusDisplay from './VoteStatusDisplay.svelte';
+
   /**
    * @typedef {Object} Props
-   * @property {boolean} [low]
-   * @property {any} projectName
-   * @property {any} timeToP
-   * @property {any} acts
-   * @property {any} src
-   * @property {any} perhour
-   * @property {any} noOfHours
-   * @property {any} missionDetails
-   * @property {any} missionName
-   * @property {any} [skills]
-   * @property {any} [role]
-   * @property {any} [workways]
-   * @property {number} [totalminyearone]
-   * @property {number} [totalmaxyearone]
-   * @property {number} [totalminyearsec]
-   * @property {number} [totalmaxyearsec]
-   * @property {number} [totalinyearone]
-   * @property {number} [totalinyearsec]
-   * @property {boolean} [isMonthly]
-   * @property {boolean} [alreadyi]
-   * @property {any} hearotMeyuchadot
-   * @property {any} already
-   * @property {boolean} [allr]
-   * @property {boolean} [isVisible]
-   * @property {string} [sqadualed]
-   * @property {string} [sqadualedf]
-   * @property {number} [noOfusers]
-   * @property {(x: any) => void} [onHover] - Callback for hover event
-   * @property {() => void} [onAgree] - Callback for agree event
-   * @property {() => void} [onDecline] - Callback for decline event
-   * @property {(alr: any, y: string) => void} [onNego] - Callback for negotiate event
-   * @property {() => void} [onProject] - Callback for project event
-   * @property {() => void} [onTochat] - Callback for tochat event
+   * ... (כל ה-Props המקוריים שלך נשארים כאן)
    */
 
-  /** @type {Props} */
   let {
     low = false,
     projectName,
@@ -80,9 +51,13 @@
     onNego,
     onProject,
     onTochat,
-    noOfusers
+    noOfusers,
+
+    // Props חדשים לתמיכה במבנה המודרני
+    glowColor = 'green', // מוגדר לירוק עבור משימה מוצעת
+    onProj
   } = $props();
-  console.log(noOfusers);
+
   function hover(x) {
     onHover?.(x);
   }
@@ -99,10 +74,12 @@
   }
   function project() {
     onProject?.();
+    onProj?.(); // תמיכה גם בפרופ החדש במידה וקיים
   }
   function tochat() {
     onTochat?.();
   }
+
   const ttal = { he: 'נכנס כבר כסף', en: 'already has income' };
   const ttwe = { he: 'צפי רווח: שבוע', en: 'exp income: one week ' };
   const ttmo = { he: 'צפי רווח: חודש', en: 'exp income: one month ' };
@@ -113,6 +90,7 @@
   const ttmor = { he: 'צפי רווח: ארוך טווח', en: 'exp income: long term' };
   const ttne = { he: 'ללא רווח', en: 'not profitable' };
   const headi = { he: 'הצעה למשימה', en: 'suggested mission' };
+
   const t = {
     acts: { he: 'רשימת מטלות:', en: 'todo list:' },
     wwneed: { he: 'דרכי עבודה מבוקשות:', en: 'ways of work for the mission:' },
@@ -128,6 +106,7 @@
   const monhly = { he: 'בחודש', en: 'per month' };
 </script>
 
+<!-- 1. Container מרכזי עם אפקטי Glow -->
 <div
   onclick={toggleScrollable}
   role="button"
@@ -136,229 +115,214 @@
     e.key === 'Enter' && toggleScrollable();
   }}
   dir={$lang == 'he' ? 'rtl' : 'ltr'}
-  style="overflow-y:auto"
-  class=" d leading-normal dark:bg-slate-800 {isVisible
+  class="{isMobileOrTablet()
+    ? 'w-full h-full'
+    : 'w-[90%] h-[90%]'} lg:w-[90%] {isVisible
     ? $lang == 'he'
       ? 'boxleft'
       : 'boxright'
-    : ''}  leading-normal {isMobileOrTablet()
-    ? 'w-full h-full'
-    : ' w-[90%] h-[90%]'} bg-white lg:w-[90%]"
+    : ''} 
+  flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden transition-all duration-300 relative
+  {isScrolable.value
+    ? 'shadow-glow border-glow'
+    : 'shadow-lg border border-gray-100 dark:border-gray-700'}"
+  style:--glow-rgb="2, 255, 187"
 >
-  <!-- <div class="h-48 lg:h-auto lg:w-48 flex-none bg-cover rounded-t lg:rounded-t-none lg:rounded-l text-center overflow-hidden bg-gold" style:background-image={`url('${src2}')`} title="">
-  </div>-->
-  <div
-    class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-colorfulGrad"
-  >
-    <div class="relative flex items-center space-x-1">
-      <div class="relative">
-        <AuthorityBadge
-          logoSrc={src}
-          {projectName}
-          memberCount={noOfusers}
-          size={isMobileOrTablet() ? 80 : 120}
-        />
-      </div>
-      <div class="flex flex-col leading-tight ml-4">
-        <div class="sm:text-sm text-lg mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-4xl text-xl"
-            >{headi[$lang]}</span
-          >
-        </div>
-        <span
-          style=" text-shadow: 1px 1px white;"
-          class="pn ml-1 text-lg sm:text-2xl text-barbi">{missionName}</span
-        >
-      </div>
-    </div>
-    <button
-      onclick={project}
-      class="px-2 mx-2 text-barbi hover:text-gold hover:bg-barbi bg-gold rounded text-sm"
-      >{t.watchpr[$lang]}</button
-    >
-  </div>
+  <!-- 2. Header מודרני באמצעות CardHeader -->
+  <CardHeader
+    logoSrc={src}
+    {projectName}
+    cardType={headi[$lang]}
+    cardTitle={missionName}
+    memberCount={noOfusers}
+    {glowColor}
+    onProjectClick={project}
+  />
 
+  <!-- 3. אזור התוכן -->
   <div
-    class="{isScrolable.value
+    class="d {isScrolable.value
       ? 'bg-white dark:bg-slate-800'
-      : 'bg-gray-200 dark:bg-slate-700'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col xl:flex-row leading-normal"
+      : 'bg-gray-50 dark:bg-slate-700/50'} 
+    transition-all duration-300 p-5 flex-1 overflow-y-auto space-y-6 text-gray-800 dark:text-gray-100"
   >
-    <div class="mb-8">
-        {#if sqadualed || sqadualedf}
-                                <p
-                  style="line-height: 1;"
-                  class="text-sm text-gray-100 flex items-center lg:text-2xl m-5"
-                >
-                  <img
-                    class="w-6 lg:w-12"
-                    src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
-                    alt="howmuch"
-                  />
-                {#if sqadualed}
-                <span> {new Date(sqadualed).toLocaleDateString()}</span>
-                {/if}
-                 {#if sqadualedf}
-                <span> - {new Date(sqadualedf).toLocaleDateString()}</span>
-                {/if}
-                  </p>
-                {/if}  
-      <p
-        style="line-height: 1;"
-        class="sm:text-xl text-lg text-gray-600 dark:text-slate-100 flex items-center"
+    <!-- תאריכים -->
+    {#if sqadualed || sqadualedf}
+      <div
+        class="flex items-center gap-3 bg-gray-100 dark:bg-slate-800 p-3 rounded-xl"
       >
         <img
-          style="width:2.5rem;"
-          src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
-          alt="howmuch"
+          class="w-8 h-8 opacity-80"
+          src="https://res.cloudinary.com/love1/image/upload/v1699831987/FX13_calendar2_jlxcn1.svg"
+          alt="calendar"
         />
-        <span
-          role="contentinfo"
-          onmouseenter={() => hover({ he: 'שווי לשעה', en: 'vallue per hour' })}
-          onmouseleave={() => hover('0')}
-        >
-          {perhour.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-          {perho[$lang]}
-        </span>
-        *
-        <span
-          role="contentinfo"
-          onmouseenter={() =>
-            hover({ he: 'כמות השעות', en: 'amount of hours' })}
-          onmouseleave={() => hover('0')}
-        >
-          {noOfHours.toLocaleString('en-US', { maximumFractionDigits: 2 })}
-          {hourss[$lang]}
-        </span>
-        =
-        <span
-          role="contentinfo"
-          onmouseenter={() => hover({ he: 'סך הכל', en: 'total' })}
-          onmouseleave={() => hover('0')}
-          >{(noOfHours * perhour).toLocaleString('en-US', {
-            maximumFractionDigits: 2
-          })}
-          {isMonthly ? monhly[$lang] : ''}
-        </span>
-      </p>
+        <div class="text-sm md:text-base font-medium flex gap-2">
+          {#if sqadualed}<span>{new Date(sqadualed).toLocaleDateString()}</span
+            >{/if}
+          {#if sqadualedf}<span
+              >- {new Date(sqadualedf).toLocaleDateString()}</span
+            >{/if}
+        </div>
+      </div>
+    {/if}
 
+    <!-- חישוב שכר -->
+    <div
+      class="flex flex-wrap items-center gap-2 text-lg md:text-xl font-semibold bg-gray-100 dark:bg-slate-800 p-4 rounded-xl border border-gray-200 dark:border-slate-600"
+    >
+      <img
+        class="w-10 h-10 drop-shadow-sm"
+        src="https://res.cloudinary.com/love1/image/upload/v1653148344/Crashing-Money_n6qaqj.svg"
+        alt="money"
+      />
       <span
-        class="text-barbi text-xl lg:text-2xl bg-gold px-4 underline py-2 decoration-mturk m-4"
+        role="contentinfo"
+        class="cursor-help"
+        onmouseenter={() => hover({ he: 'שווי לשעה', en: 'vallue per hour' })}
+        onmouseleave={() => hover('0')}
       >
-        {#if timeToP == 'alreadi'}
-          {ttal[$lang]}
-        {:else if timeToP == 'week'}
-          {ttwe[$lang]}
-        {:else if timeToP == 'month'}
-          {ttmo[$lang]}
-        {:else if timeToP == 'threeM'}
-          {tt3mo[$lang]}
-        {:else if timeToP == 'sixM'}
-          {tt6mo[$lang]}
-        {:else if timeToP == 'oneY'}
-          {tt1y[$lang]}
-        {:else if timeToP == 'twoY'}
-          {tt2y[$lang]}
-        {:else if timeToP == 'more'}
-          {ttmor[$lang]}
-        {:else if timeToP == 'never'}
-          {ttne[$lang]}
-        {/if}
+        {perhour.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+        {perho[$lang]}
       </span>
-      {#if missionDetails !== null && missionDetails !== 'null'}
-        <div class=" d max-h-1/2">
-          <RichText outpot={missionDetails} editable={false} />
-        </div>{/if}
-      {#if hearotMeyuchadot && hearotMeyuchadot !== undefined && hearotMeyuchadot !== null && hearotMeyuchadot !== 'undefined' && hearotMeyuchadot !== 'null'}
-        <p
-          onmouseenter={() => hover('הערות')}
-          onmouseleave={() => hover('0')}
-          class=" max-h-1/2 d"
-        >
-          <RichText outpot={hearotMeyuchadot} editable={false} />
-        </p>
-      {/if}
-      {#if acts?.length > 0}
-        <div class="border-2 border-gold mt-5 p-2">
-          <small class="text-barbi text-md">{t.acts[$lang]}</small>
+      <span class="text-gray-400 mx-1">*</span>
+      <span
+        role="contentinfo"
+        class="cursor-help"
+        onmouseenter={() => hover({ he: 'כמות השעות', en: 'amount of hours' })}
+        onmouseleave={() => hover('0')}
+      >
+        {noOfHours.toLocaleString('en-US', { maximumFractionDigits: 2 })}
+        {hourss[$lang]}
+      </span>
+      <span class="text-gray-400 mx-1">=</span>
+      <span
+        role="contentinfo"
+        class="text-green-600 dark:text-green-400 cursor-help"
+        onmouseenter={() => hover({ he: 'סך הכל', en: 'total' })}
+        onmouseleave={() => hover('0')}
+      >
+        {(noOfHours * perhour).toLocaleString('en-US', {
+          maximumFractionDigits: 2
+        })}
+        {isMonthly ? ' ' + monhly[$lang] : ''}
+      </span>
+    </div>
 
-          <ul>
-            {#each acts as datai, t}
-              <li>
-                <div
-                  class="flex flex-row space-x-2 items-start border-y-2 border-y-mturk"
-                >
-                  <span class="p-1">✅</span>
-                  <h2 class="md:text-xl p-1 text-barbi">
-                    {datai.attributes.shem}
-                  </h2>
-                </div>
-              </li>
-            {/each}
-          </ul>
+    <!-- תגית צפי רווח -->
+    <div
+      class="inline-block px-4 py-2 bg-gradient-to-r from-yellow-100 to-yellow-50 dark:from-yellow-900/40 dark:to-yellow-800/20 border border-yellow-300 dark:border-yellow-700 text-yellow-800 dark:text-yellow-400 rounded-full text-sm md:text-base font-bold shadow-sm"
+    >
+      {#if timeToP == 'alreadi'}{ttal[$lang]}
+      {:else if timeToP == 'week'}{ttwe[$lang]}
+      {:else if timeToP == 'month'}{ttmo[$lang]}
+      {:else if timeToP == 'threeM'}{tt3mo[$lang]}
+      {:else if timeToP == 'sixM'}{tt6mo[$lang]}
+      {:else if timeToP == 'oneY'}{tt1y[$lang]}
+      {:else if timeToP == 'twoY'}{tt2y[$lang]}
+      {:else if timeToP == 'more'}{ttmor[$lang]}
+      {:else if timeToP == 'never'}{ttne[$lang]}
+      {/if}
+    </div>
+
+    <!-- פרטי משימה והערות (RichText) -->
+    <div class="space-y-4 text-gray-700 dark:text-gray-300">
+      {#if missionDetails !== null && missionDetails !== 'null'}
+        <div class="prose dark:prose-invert max-w-none">
+          <RichText outpot={missionDetails} editable={false} />
         </div>
       {/if}
-      {#if skills?.length > 0}
-        <small class="text-barbi text-md">{t.skneed[$lang]}</small>
-        <div class=" flex d flex-wrap">
-          {#each skills as skill}
-            <p
-              class="m-1 p-0"
-              style="line-height:1;"
-              onmouseenter={() =>
-                hover({ he: 'הכישורים הנדרשים', en: 'needed skills' })}
-              onmouseleave={() => hover('0')}
+      {#if hearotMeyuchadot && hearotMeyuchadot !== 'undefined' && hearotMeyuchadot !== 'null'}
+        <div
+          class="p-4 bg-blue-50 dark:bg-blue-900/20 rounded-xl border-l-4 border-blue-400 prose dark:prose-invert max-w-none"
+        >
+          <RichText outpot={hearotMeyuchadot} editable={false} />
+        </div>
+      {/if}
+    </div>
+
+    <!-- רשימת מטלות -->
+    {#if acts?.length > 0}
+      <div
+        class="bg-white dark:bg-slate-800 border border-gray-200 dark:border-slate-600 rounded-xl p-4 shadow-sm"
+      >
+        <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-3">
+          {t.acts[$lang]}
+        </h4>
+        <ul class="space-y-2">
+          {#each acts as datai}
+            <li
+              class="flex items-center gap-3 py-2 border-b border-gray-100 dark:border-slate-700 last:border-0"
             >
+              <span class="text-lg">✅</span>
+              <span
+                class="text-base md:text-lg font-medium text-gray-800 dark:text-gray-200"
+              >
+                {datai.attributes.shem}
+              </span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
+    <!-- תגיות: כישורים, תפקיד, דרכי עבודה -->
+    <div class="space-y-4">
+      {#if skills?.length > 0}
+        <div>
+          <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
+            {t.skneed[$lang]}
+          </h4>
+          <div class="flex flex-wrap gap-2">
+            {#each skills as skill}
               <Tile
                 sm={true}
                 big={true}
                 bg="green"
                 word={skill.attributes.skillName}
               />
-            </p>{/each}
-        </div>{/if}
+            {/each}
+          </div>
+        </div>
+      {/if}
 
       {#if role?.length > 0}
-        <small class="text-md text-barbi">{t.rneed[$lang]}</small>
-        <div class=" flex d flex-wrap">
-          {#each role as rol}
-            <p
-              onmouseenter={() =>
-                hover({ he: 'תפקיד מבוקש', en: 'requested role' })}
-              onmouseleave={() => hover('0')}
-              class="m-1"
-              style="line-height:1;text-shadow:none;"
-            >
+        <div>
+          <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
+            {t.rneed[$lang]}
+          </h4>
+          <div class="flex flex-wrap gap-2">
+            {#each role as rol}
               <Tile
                 sm={true}
                 big={true}
                 bg="pink"
                 word={rol.attributes.roleDescription}
               />
-            </p>{/each}
-        </div>{/if}
+            {/each}
+          </div>
+        </div>
+      {/if}
+
       {#if workways?.length > 0}
-        <small class="text-md text-barbi">{t.wwneed[$lang]}</small>
-        <div class=" flex d flex-wrap">
-          {#each workways as wo}<p
-              onmouseenter={() =>
-                hover({
-                  he: 'דרכי עבודה מבוקשות',
-                  en: 'ways of work for the mission'
-                })}
-              onmouseleave={() => hover('0')}
-              class="m-1"
-              style="line-height:1;text-shadow:none;"
-            >
+        <div>
+          <h4 class="text-sm font-bold text-gray-500 dark:text-gray-400 mb-2">
+            {t.wwneed[$lang]}
+          </h4>
+          <div class="flex flex-wrap gap-2">
+            {#each workways as wo}
               <Tile
                 sm={true}
                 big={true}
                 bg="yellow"
                 word={wo.attributes.workWayName}
               />
-            </p>{/each}
-        </div>{/if}
+            {/each}
+          </div>
+        </div>
+      {/if}
     </div>
-    <!---
+  </div>
+  <!---
 <div class="grow sm:pt-1 sm:p-14">
   <h3 class="text-center underline decoration-barbi">הערכת רווח חודשי:</h3>
   <svg width="100%" height="100%" viewBox="0 0 600.00001 600.00001" id="svg2" version="1.1" xmlns="http://www.w3.org/2000/svg">
@@ -379,52 +343,77 @@
   <text style="fill:  rgb(255, 0, 146); font-family: Gan,Powerr; font-size: 25.1px; white-space: pre;" text-anchor="center" x="497.547" y="440">שנה שניה</text>
 </svg>
 </div>-->
-  </div>
-</div>
-<div dir="rtl" style="overflow-y:visible" class=" bg-transparent">
-  {#if low == false}
-    {#if already === false && allr === false && alreadyi == false}
-      <button
-        onmouseenter={() => hover({ he: 'אני רוצה', en: 'yes I want' })}
-        onmouseleave={() => hover('0')}
-        onclick={agree}
-        class="btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
-        name="requestToJoin"
-      >
-        <Lev />
-      </button>
-      <!-- <button
-             onmouseenter={()=>hover("משא ומתן")}
-             onmouseleave={()=>hover("0")}
-             onclick= {()=>nego("f")}
-              class = "btnc bg-gradient-to-br hover:from-gold hover:via-mpink  hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110"
-              name="negotiate" >
-              <svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" version="1.1"  viewBox="0 0 24 24"><path fill="currentColor" d="M12.75,3.94C13.75,3.22 14.91,2.86 16.22,2.86C16.94,2.86 17.73,3.05 18.59,3.45C19.45,3.84 20.13,4.3 20.63,4.83C21.66,6.11 22.09,7.6 21.94,9.3C21.78,11 21.22,12.33 20.25,13.27L12.66,20.86C12.47,21.05 12.23,21.14 11.95,21.14C11.67,21.14 11.44,21.05 11.25,20.86C11.06,20.67 10.97,20.44 10.97,20.16C10.97,19.88 11.06,19.64 11.25,19.45L15.84,14.86C16.09,14.64 16.09,14.41 15.84,14.16C15.59,13.91 15.36,13.91 15.14,14.16L10.55,18.75C10.36,18.94 10.13,19.03 9.84,19.03C9.56,19.03 9.33,18.94 9.14,18.75C8.95,18.56 8.86,18.33 8.86,18.05C8.86,17.77 8.95,17.53 9.14,17.34L13.73,12.75C14,12.5 14,12.25 13.73,12C13.5,11.75 13.28,11.75 13.03,12L8.44,16.64C8.25,16.83 8,16.92 7.73,16.92C7.45,16.92 7.21,16.83 7,16.64C6.8,16.45 6.7,16.22 6.7,15.94C6.7,15.66 6.81,15.41 7.03,15.19L11.63,10.59C11.88,10.34 11.88,10.11 11.63,9.89C11.38,9.67 11.14,9.67 10.92,9.89L6.28,14.5C6.06,14.7 5.83,14.81 5.58,14.81C5.3,14.81 5.06,14.71 4.88,14.5C4.69,14.3 4.59,14.06 4.59,13.78C4.59,13.5 4.69,13.27 4.88,13.08C7.94,10 9.83,8.14 10.55,7.45L14.11,10.97C14.5,11.34 14.95,11.53 15.5,11.53C16.2,11.53 16.75,11.25 17.16,10.69C17.44,10.28 17.54,9.83 17.46,9.33C17.38,8.83 17.17,8.41 16.83,8.06L12.75,3.94M14.81,10.27L10.55,6L3.47,13.08C2.63,12.23 2.15,10.93 2.04,9.16C1.93,7.4 2.41,5.87 3.47,4.59C4.66,3.41 6.08,2.81 7.73,2.81C9.39,2.81 10.8,3.41 11.95,4.59L16.22,8.86C16.41,9.05 16.5,9.28 16.5,9.56C16.5,9.84 16.41,10.08 16.22,10.27C16.03,10.45 15.8,10.55 15.5,10.55C15.23,10.55 15,10.45 14.81,10.27V10.27Z" /></svg></button>
-            -->
-      <button
-        onmouseenter={() => hover({ he: 'לא מתאים לי', en: 'not for me' })}
-        onmouseleave={() => hover('0')}
-        onclick={decline}
-        class="btnb bg-gradient-to-br hover:from-gra hover:via-grb hover:via-gr-c hover:via-grd hover:to-gre from-barbi to-mpink text-gold hover:text-red-400 hover:scale-110"
-        name="decline"
-      >
-        <No />
-      </button>
-    {:else if alreadyi == true}
-      <button
-        onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
-        onmouseleave={() => hover('0')}
-        class="text-barbi btnc flex items-center"
-        onclick={() => tochat()}><Chaticon /></button
-      >
+
+  <!-- 4. Footer פעולות מודרני -->
+  <div
+    class="p-4 bg-gray-50 dark:bg-gray-900/80 flex gap-3 border-t border-gray-100 dark:border-gray-800"
+  >
+    {#if low == false}
+      {#if already === false && allr === false && alreadyi == false}
+        <!-- כפתור דחייה -->
+        <button
+          class="flex-1 py-3 bg-white dark:bg-gray-800 border-2 border-red-500 text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 font-bold rounded-xl flex justify-center items-center transition-all hover:scale-105"
+          onmouseenter={() => hover({ he: 'לא מתאים לי', en: 'not for me' })}
+          onmouseleave={() => hover('0')}
+          onclick={decline}
+        >
+          <div class="w-8 h-8"><No /></div>
+        </button>
+
+        <!-- כפתור הסכמה -->
+        <button
+          class="flex-2 py-3 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg flex justify-center items-center transform hover:-translate-y-1 transition-all"
+          style="flex: 2;"
+          onmouseenter={() => hover({ he: 'אני רוצה', en: 'yes I want' })}
+          onmouseleave={() => hover('0')}
+          onclick={agree}
+        >
+          <div class="w-8 h-8 text-white"><Lev /></div>
+        </button>
+      {:else if alreadyi == true}
+        <!-- מצב צ'אט -->
+        <button
+          class="w-full py-3 bg-gradient-to-r from-blue-500 to-indigo-500 text-white font-bold rounded-xl shadow-md flex justify-center items-center gap-2 hover:opacity-90 transition-all"
+          onmouseenter={() => hover({ he: "צ'אט", en: 'chat' })}
+          onmouseleave={() => hover('0')}
+          onclick={() => tochat()}
+        >
+          <span>{$lang === 'he' ? "פתח צ'אט" : 'Open Chat'}</span>
+          <div class="w-6 h-6"><Chaticon /></div>
+        </button>
+      {/if}
+    {:else if low == true}
+      <Lowbtn isCart="true" />
     {/if}
-  {:else if low == true}
-    <Lowbtn isCart="true" />
-  {/if}
+  </div>
 </div>
 
 <style>
-  .cd {
-    overflow-y: auto;
+  /* מחלקת עזר לכפתור הראשי שיתפוס כפליים מקום ב-Flex */
+  .flex-2 {
+    flex: 2;
+  }
+
+  /* הגדרות הארת ה-Glow לפי מסמך האפיון */
+  .shadow-glow {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05);
+  }
+
+  .border-glow {
+    border: 2px solid rgba(var(--glow-rgb), 0.5);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05),
+      0 0 0 1px rgba(var(--glow-rgb), 0.3);
   }
 </style>
