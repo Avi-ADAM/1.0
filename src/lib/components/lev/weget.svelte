@@ -885,6 +885,8 @@ updateMaap(
                 {noofusersWaiting}
                 {noofusersOk}
                 {noofusersNo}
+                {users}
+                {projectId}
                 {monts}
                 {hm}
                 {spnot}
@@ -905,6 +907,7 @@ updateMaap(
     {agprice}
     {useraplyname}
     {src2}
+    {projectId}
     {missionBName}
     {already}
     {yers}
@@ -915,6 +918,7 @@ updateMaap(
     {noofusersOk}
     {noofusersNo}
     {monts}
+    {users}
     {hm}
     {spnot}
   />

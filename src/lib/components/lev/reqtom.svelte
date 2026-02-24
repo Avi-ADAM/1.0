@@ -1053,6 +1053,8 @@ updateAskm(
                 {openmissionName}
                 {missionDetails}
                 {noofusersNo}
+                {users}
+                {projectId}
               />
             </div>
           </Drawer.Content>
@@ -1068,7 +1070,9 @@ updateAskm(
     onHover={hoverc}
     {isVisible}
     {already}
+    {users}
     {projectName}
+    {projectId}
     {src}
     {low}
     {deadline}

@@ -2,9 +2,8 @@
   import { lang } from '$lib/stores/lang.js';
   import { isMobileOrTablet } from '$lib/utilities/device';
   import { toggleScrollable, isScrolable } from './isScrolable.svelte.js';
-  import AuthorityBadge from '../../ui/AuthorityBadge.svelte';
+  import CardHeader from './CardHeader.svelte';
   import Lev from '../../../celim/lev.svelte';
-  import No from '../../../celim/no.svelte';
   import Lowbtn from '$lib/celim/lowbtn.svelte';
   import Chaticon from '../../../celim/chaticon.svelte';
 
@@ -25,6 +24,10 @@
    * @property {boolean} [sendcon] - האם הנותן אישר שהעביר
    * @property {boolean} [confirmed] - האם המקבל אישר שקיבל
    * @property {number | null} [forumId] - Forum ID for existing chat
+   * @property {string} [glowColor]
+   * @property {Array} [user_1s]
+   * @property {Array} [users]
+   * @property {number} [activeOrder]
    * @property {(payload: { x: any }) => void} [onHover]
    * @property {(payload: { alr: any, y: string }) => void} [onAgree]
    * @property {(payload: { alr: any, y: string }) => void} [onDecline]
@@ -50,6 +53,8 @@
     sendcon = false,
     confirmed = false,
     forumId = null,
+    glowColor = 'red', // Default for this card type based on guide
+
     onHover,
     onAgree,
     onDecline,
@@ -58,29 +63,45 @@
     onProj
   } = $props();
 
-  const ishur = { he: 'אישור קבלת', en: 'Approve receiving', ar: 'تأكيد الاستلام' };
+  const ishur = {
+    he: 'אישור קבלת',
+    en: 'Approve receiving',
+    ar: 'تأكيد الاستلام'
+  };
   const me = { he: 'מאת', en: 'from', ar: 'من' };
-  
+
   // תרגומים
   const translations = {
-    transferMoney: { he: 'אישור העברת כספים', en: 'Approve money transfer', ar: 'تأكيد تحويل الأموال' },
-    receiveMoney: { he: 'אישור קבלת כספים', en: 'Approve receiving money', ar: 'تأكيد استلام الأموال' },
+    transferMoney: {
+      he: 'אישור העברת כספים',
+      en: 'Approve money transfer',
+      ar: 'تأكيد تحويل الأموال'
+    },
+    receiveMoney: {
+      he: 'אישור קבלת כספים',
+      en: 'Approve receiving money',
+      ar: 'تأكيد استلام الأموال'
+    },
     transferring: { he: 'העברת', en: 'Transferring', ar: 'تحويل' },
     receiving: { he: 'קבלת', en: 'Receiving', ar: 'استلام' },
     receiver: { he: 'מקבל', en: 'Receiver', ar: 'المستلم' },
-    
+
     // הודעות מצב התחלתי
-    coordinateWith: { 
+    coordinateWith: {
       he: (name) => `💬 מומלץ לתאם עם ${name} את הדרך המועדפת להעברת הכסף`,
-      en: (name) => `💬 It's recommended to coordinate with ${name} the preferred way to transfer the money`,
-      ar: (name) => `💬 يُنصح بالتنسيق مع ${name} حول الطريقة المفضلة لتحويل الأموال`
+      en: (name) =>
+        `💬 It's recommended to coordinate with ${name} the preferred way to transfer the money`,
+      ar: (name) =>
+        `💬 يُنصح بالتنسيق مع ${name} حول الطريقة المفضلة لتحويل الأموال`
     },
     coordinateReceive: {
       he: (name) => `💬 מומלץ לתאם עם ${name} את הדרך המועדפת לקבלת הכסף`,
-      en: (name) => `💬 It's recommended to coordinate with ${name} the preferred way to receive the money`,
-      ar: (name) => `💬 يُنصح بالتنسيق مع ${name} حول الطريقة المفضلة لاستلام الأموال`
+      en: (name) =>
+        `💬 It's recommended to coordinate with ${name} the preferred way to receive the money`,
+      ar: (name) =>
+        `💬 يُنصح بالتنسيق مع ${name} حول الطريقة المفضلة لاستلام الأموال`
     },
-    
+
     // הודעות אחרי שהנותן אישר
     confirmedTransfer: {
       he: '✓ אישרת שהעברת את הכסף',
@@ -94,75 +115,76 @@
     },
     senderConfirmed: {
       he: (name, amount) => `${name} אישר שהעביר לך ${amount}`,
-      en: (name, amount) => `${name} confirmed that they transferred ${amount} to you`,
+      en: (name, amount) =>
+        `${name} confirmed that they transferred ${amount} to you`,
       ar: (name, amount) => `${name} أكد أنه حول لك ${amount}`
     },
     pleaseConfirm: {
-      he: 'אנא סמן אם קיבלת או פנה אליו בצ\'אט אם נדרש בירור',
+      he: "אנא סמן אם קיבלת או פנה אליו בצ'אט אם נדרש בירור",
       en: 'Please confirm if you received or contact them via chat if clarification is needed',
       ar: 'يرجى التأكيد إذا استلمت أو التواصل عبر الدردشة إذا كان هناك حاجة للتوضيح'
     },
-    
+
     // הודעת השלמה
     completed: {
       he: '✓ ההעברה הושלמה בהצלחה',
       en: '✓ The transfer was completed successfully',
       ar: '✓ تم التحويل بنجاح'
     },
-    
+
     // כפתורים
     confirmTransferred: {
-      he: 'אישור שהעברתי את הכסף',
-      en: 'Confirm I transferred the money',
-      ar: 'تأكيد أنني حولت الأموال'
+      he: 'אישור העברה',
+      en: 'Confirm Transfer',
+      ar: 'تأكيد التحويل'
     },
     confirmReceived: {
-      he: 'אישור שקיבלתי את הכסף',
-      en: 'Confirm I received the money',
-      ar: 'تأكيد أنني استلمت الأموال'
+      he: 'אישור קבלה',
+      en: 'Confirm Receipt',
+      ar: 'تأكيد الاستلام'
     },
     openChat: {
-      he: 'פתיחת צ\'אט לתיאום',
-      en: 'Open chat to coordinate',
-      ar: 'فتح الدردشة للتنسيق'
+      he: "צ'אט לתיאום",
+      en: 'Chat to coordinate',
+      ar: 'دردشة للتنسيق'
     },
     openChatClarify: {
-      he: 'פתיחת צ\'אט לבירור',
-      en: 'Open chat for clarification',
-      ar: 'فتح الدردشة للتوضيح'
+      he: "צ'אט לבירור",
+      en: 'Chat for clarification',
+      ar: 'دردشة للتوضيح'
     },
     viewHistory: {
-      he: 'לצפיה בהיסטוריית השיחה',
-      en: 'View conversation history',
-      ar: 'عرض سجل المحادثة'
+      he: 'היסטוריית שיחה',
+      en: 'Chat history',
+      ar: 'سجل المحادثة'
     }
   };
-  
+
   function hover(x) {
     onHover?.({ x: x });
   }
-  
+
   function agree(alr) {
     console.log('didigetCard agree called with:', alr);
     already = true;
     onAgree?.({ alr: alr, y: 'a' });
     console.log('onAgree callback called');
   }
-  
+
   function decline(alr) {
     already = true;
     onDecline?.({ alr: alr, y: 'd' });
   }
-  
+
   function nego(alr) {
     onNego?.({ alr: alr, y: 'n' });
   }
-  
+
   function tochat() {
     onTochat?.();
   }
 
-  function project() {
+  function handleProjectClick() {
     onProj?.({ id: projectId });
   }
 </script>
@@ -174,194 +196,282 @@
   onkeypress={(e) => {
     e.key === 'Enter' && toggleScrollable();
   }}
-  dir="rtl"
+  dir={$lang == 'he' ? 'rtl' : 'ltr'}
   style="overflow-y:auto"
-  class="d {isVisible
+  class="d {isMobileOrTablet()
+    ? 'w-full h-full'
+    : ' w-[90%] h-[90%]'} lg:w-[90%] {isVisible
     ? $lang == 'he'
       ? 'boxleft'
       : 'boxright'
-    : ''} leading-normal {isMobileOrTablet()
-    ? 'w-full h-full'
-    : ' w-[90%] h-[90%]'} bg-gray-900 dark:bg-gray-950 lg:w-[90%]"
+    : ''} flex flex-col bg-white dark:bg-gray-800 rounded-2xl overflow-hidden {isScrolable.value
+    ? 'shadow-glow border-glow'
+    : 'shadow-lg border border-gray-100 dark:border-gray-700'} transition-all duration-300 relative"
+  style:--glow-rgb={glowColor === 'gold'
+    ? '238, 232, 170'
+    : glowColor === 'barbi'
+      ? '255, 0, 146'
+      : glowColor === 'blue'
+        ? '116, 191, 255'
+        : glowColor === 'green'
+          ? '2, 255, 187'
+          : glowColor === 'orange'
+            ? '254, 172, 49'
+            : glowColor === 'purple'
+              ? '168, 85, 247'
+              : glowColor === 'red'
+                ? '239, 68, 68'
+                : glowColor === 'teal'
+                  ? '20, 184, 166'
+                  : '2, 255, 187'}
 >
+  <!-- Header -->
+  <CardHeader
+    logoSrc={src}
+    {projectName}
+    cardType={kind == 'send'
+      ? translations.transferMoney[$lang]
+      : translations.receiveMoney[$lang]}
+    cardTitle={`${kind == 'send' ? translations.transferring[$lang] : translations.receiving[$lang]} ${amount}`}
+    memberCount={2}
+    {glowColor}
+    onProjectClick={handleProjectClick}
+  />
+
+  <!-- Content Area -->
   <div
-    class="flex sm:items-center justify-between py-3 border-b-2 border-b-gray-200 bg-colorfulGrad"
+    dir={$lang == 'en' ? 'ltr' : 'rtl'}
+    class="{isScrolable.value
+      ? 'bg-white dark:bg-slate-800'
+      : 'bg-gray-50 dark:bg-slate-700'} transition-all duration-300 p-4 flex-1 overflow-y-auto space-y-6"
   >
-    <div class="relative flex items-center space-x-1">
-      <button onclick={project}>
-        <AuthorityBadge
-          logoSrc={src}
-          {projectName}
-          size={isMobileOrTablet() ? 80 : 120}
+    <!-- Avatars Row -->
+    <div class="flex flex-row items-center justify-center gap-6 mt-2">
+      <div class="text-center">
+        <img
+          src={sendpropic ||
+            'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+          class="rounded-full w-16 h-16 mb-2 mx-auto border-2 border-barbi shadow-sm"
+          alt="Avatar"
         />
-      </button>
-      <div class="flex flex-col leading-tight ml-4">
-        <div class="sm:text-lg text-md mt-1 flex items-center">
-          <span class="text-barbi text-center mr-3 sm:text-3xl text-xl">
-            {kind == 'send' ? translations.transferMoney[$lang] : translations.receiveMoney[$lang]}
-          </span>
-        </div>
+        <h5
+          class="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight"
+        >
+          {sendname}
+        </h5>
+        <p class="text-xs text-gray-500 dark:text-gray-400">{me[$lang]}</p>
+      </div>
+
+      <div class="flex items-center pb-4">
+        <svg
+          class="w-8 h-8 text-barbi dark:text-barbi opacity-70"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d={$lang === 'en'
+              ? 'M13 7l5 5m0 0l-5 5m5-5H6'
+              : 'M11 17l-5-5m0 0l5-5m-5 5h12'}
+          />
+        </svg>
+      </div>
+
+      <div class="text-center">
+        <img
+          src={respropic ||
+            'https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png'}
+          class="rounded-full w-16 h-16 mb-2 mx-auto border-2 border-gold shadow-sm"
+          alt="Avatar"
+        />
+        <h5
+          class="text-sm font-bold text-gray-800 dark:text-gray-100 leading-tight"
+        >
+          {resname}
+        </h5>
+        <p class="text-xs text-gray-500 dark:text-gray-400">
+          {translations.receiver[$lang]}
+        </p>
       </div>
     </div>
-  </div>
 
-  <div
-    dir={$lang == "en" ? "ltr" : "rtl"}
-    class="{isScrolable.value
-      ? 'bg-gray-800 dark:bg-gray-900'
-      : 'bg-gray-700 dark:bg-gray-800'} transition-all-300 rounded-b lg:rounded-b-none lg:rounded-r p-4 flex flex-col justify-between leading-normal"
-  >
-    <div class="mb-8">
-      <div class="text-center mb-6">
-        <h3 class="text-2xl font-bold text-barbi mb-4">
-          {kind == 'send' ? translations.transferring[$lang] : translations.receiving[$lang]} {amount}
-        </h3>
-      </div>
-
-      <div class="flex flex-row align-middle justify-center gap-4 mb-6">
-        <div class="text-center">
-          <img
-            src={sendpropic || "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}
-            class="rounded-full w-16 h-16 mb-2 mx-auto border-2 border-barbi"
-            alt="Avatar"
-          />
-          <h5 class="text-base font-medium leading-tight">{sendname}</h5>
-          <p class="text-sm text-gray-500">{me[$lang]}</p>
-        </div>
-
-        <div class="flex items-center">
-          <svg
-            class="w-8 h-8 text-barbi"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d={$lang === 'en' ? "M13 7l5 5m0 0l-5 5m5-5H6" : "M11 17l-5-5m0 0l5-5m-5 5h12"}
-            />
-          </svg>
-        </div>
-
-        <div class="text-center">
-          <img
-            src={respropic || "https://res.cloudinary.com/love1/image/upload/v1653053361/image_s1syn2.png"}
-            class="rounded-full w-16 h-16 mb-2 mx-auto border-2 border-gold"
-            alt="Avatar"
-          />
-          <h5 class="text-base font-medium leading-tight">{resname}</h5>
-          <p class="text-sm text-gray-500">{translations.receiver[$lang]}</p>
-        </div>
-      </div>
-
-      <!-- הודעות סטטוס -->
-      <div class="mt-4 p-4 rounded-lg bg-gray-50">
-        {#if !sendcon && !confirmed}
-          <!-- מצב התחלתי - אף אחד עדיין לא אישר -->
-          <p class="text-center text-gray-700 mb-2">
-            {#if kind == 'send'}
-              {translations.coordinateWith[$lang](resname)}
-            {:else}
-              {translations.coordinateReceive[$lang](sendname)}
-            {/if}
-          </p>
-        {:else if sendcon && !confirmed}
-          <!-- הנותן אישר שהעביר, המקבל עדיין לא אישר -->
+    <!-- Status Box -->
+    <div
+      class="p-4 rounded-xl bg-gray-100 dark:bg-gray-900/40 border border-gray-200 dark:border-gray-700/50"
+    >
+      {#if !sendcon && !confirmed}
+        <!-- מצב התחלתי - אף אחד עדיין לא אישר -->
+        <p
+          class="text-center text-gray-700 dark:text-gray-300 text-sm font-medium"
+        >
           {#if kind == 'send'}
-            <p class="text-center text-green-600 font-medium mb-2">
-              {translations.confirmedTransfer[$lang]}
-            </p>
-            <p class="text-center text-gray-600 text-sm">
-              {translations.waitingConfirmation[$lang](resname)}
-            </p>
+            {translations.coordinateWith[$lang](resname)}
           {:else}
-            <p class="text-center text-blue-600 font-medium mb-2">
-              {translations.senderConfirmed[$lang](sendname, amount)}
-            </p>
-            <p class="text-center text-gray-700 text-sm">
-              {translations.pleaseConfirm[$lang]}
-            </p>
+            {translations.coordinateReceive[$lang](sendname)}
           {/if}
-        {:else if confirmed}
-          <!-- שני הצדדים אישרו -->
-          <p class="text-center text-green-600 font-medium">
-            {translations.completed[$lang]}
+        </p>
+      {:else if sendcon && !confirmed}
+        <!-- הנותן אישר שהעביר, המקבל עדיין לא אישר -->
+        {#if kind == 'send'}
+          <p
+            class="text-center text-green-600 dark:text-green-400 font-bold mb-1"
+          >
+            {translations.confirmedTransfer[$lang]}
+          </p>
+          <p class="text-center text-gray-600 dark:text-gray-400 text-xs">
+            {translations.waitingConfirmation[$lang](resname)}
+          </p>
+        {:else}
+          <p
+            class="text-center text-blue-600 dark:text-blue-400 font-bold mb-1"
+          >
+            {translations.senderConfirmed[$lang](sendname, amount)}
+          </p>
+          <p class="text-center text-gray-700 dark:text-gray-300 text-xs">
+            {translations.pleaseConfirm[$lang]}
           </p>
         {/if}
-      </div>
+      {:else if confirmed}
+        <!-- שני הצדדים אישרו -->
+        <p class="text-center text-green-600 dark:text-green-400 font-bold">
+          {translations.completed[$lang]}
+        </p>
+      {/if}
     </div>
   </div>
 
-  {#if low == false}
-    {#if !sendcon && !confirmed}
-      <!-- מצב התחלתי - כפתורים לשני הצדדים -->
-      <button
-        onmouseenter={() => hover(kind == 'send' ? translations.confirmTransferred[$lang] : translations.confirmReceived[$lang])}
-        onmouseleave={() => hover('0')}
-        onclick={() => agree('f')}
-        class="btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
-        name="approve"
-      >
-        <Lev />
-      </button>
-      <button
-        onmouseenter={() => hover(translations.openChat[$lang])}
-        onmouseleave={() => hover('0')}
-        onclick={() => tochat()}
-        class="btnc bg-gradient-to-br hover:from-gold hover:via-mpink hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110"
-        name="chat"
-      >
-        <Chaticon />
-      </button>
-    {:else if sendcon && !confirmed}
-      {#if kind == 'send'}
-        <!-- הנותן אישר - רק כפתור צ'אט -->
+  <!-- Actions Footer -->
+  <div
+    class="p-4 bg-gray-50 dark:bg-gray-900/50 flex gap-3 border-t border-gray-100 dark:border-gray-700"
+  >
+    {#if low == false}
+      {#if !sendcon && !confirmed}
+        <!-- מצב התחלתי - כפתורים לשני הצדדים -->
         <button
           onmouseenter={() => hover(translations.openChat[$lang])}
           onmouseleave={() => hover('0')}
-          class="btnc bg-gradient-to-br hover:from-gold hover:via-mpink hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-gold hover:text-barbi hover:scale-110"
-          onclick={() => tochat()}
+          class="flex-1 py-2 px-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+          onclick={(e) => {
+            e.stopPropagation();
+            tochat();
+          }}
         >
-          <Chaticon />
+          <div class="w-6 h-6"><Chaticon /></div>
+          <span class="text-sm">{translations.openChat[$lang]}</span>
         </button>
-      {:else}
-        <!-- המקבל צריך לאשר -->
+
         <button
-          onmouseenter={() => hover(translations.confirmReceived[$lang])}
+          onmouseenter={() =>
+            hover(
+              kind == 'send'
+                ? translations.confirmTransferred[$lang]
+                : translations.confirmReceived[$lang]
+            )}
           onmouseleave={() => hover('0')}
-          onclick={() => agree('f')}
-          class="btna bg-gradient-to-br from-gra via-grb via-gr-c via-grd to-gre hover:from-barbi hover:to-mpink hover:text-gold text-barbi hover:scale-110"
-          name="approve"
+          onclick={(e) => {
+            e.stopPropagation();
+            agree('f');
+          }}
+          class="flex-2 py-2 px-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
         >
-          <Lev />
+          <div class="w-6 h-6"><Lev /></div>
+          <span class="text-sm"
+            >{kind == 'send'
+              ? translations.confirmTransferred[$lang]
+              : translations.confirmReceived[$lang]}</span
+          >
         </button>
+      {:else if sendcon && !confirmed}
+        {#if kind == 'send'}
+          <!-- הנותן אישר - רק כפתור צ'אט -->
+          <button
+            onmouseenter={() => hover(translations.openChat[$lang])}
+            onmouseleave={() => hover('0')}
+            class="w-full py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+            onclick={(e) => {
+              e.stopPropagation();
+              tochat();
+            }}
+          >
+            <div class="w-6 h-6"><Chaticon /></div>
+            <span>{translations.openChat[$lang]}</span>
+          </button>
+        {:else}
+          <!-- המקבל צריך לאשר -->
+          <button
+            onmouseenter={() => hover(translations.openChatClarify[$lang])}
+            onmouseleave={() => hover('0')}
+            class="flex-1 py-2 px-2 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+            onclick={(e) => {
+              e.stopPropagation();
+              tochat();
+            }}
+          >
+            <div class="w-6 h-6"><Chaticon /></div>
+            <span class="text-sm">{translations.openChatClarify[$lang]}</span>
+          </button>
+
+          <button
+            onmouseenter={() => hover(translations.confirmReceived[$lang])}
+            onmouseleave={() => hover('0')}
+            onclick={(e) => {
+              e.stopPropagation();
+              agree('f');
+            }}
+            class="flex-2 py-2 px-2 bg-gradient-to-r from-barbi to-mpink text-white font-extrabold rounded-xl shadow-md hover:shadow-lg transform hover:-translate-y-0.5 transition-all flex items-center justify-center gap-2"
+          >
+            <div class="w-6 h-6"><Lev /></div>
+            <span class="text-sm">{translations.confirmReceived[$lang]}</span>
+          </button>
+        {/if}
+      {:else if confirmed}
+        <!-- הושלם - רק כפתור צ'אט -->
         <button
-          onmouseenter={() => hover(translations.openChatClarify[$lang])}
+          onmouseenter={() => hover(translations.viewHistory[$lang])}
           onmouseleave={() => hover('0')}
-          onclick={() => tochat()}
-          class="btnc bg-gradient-to-br hover:from-gold hover:via-mpink hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-mpink hover:text-gold hover:scale-110"
-          name="chat"
+          class="w-full py-3 bg-white dark:bg-gray-800 border-2 border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-700 font-bold rounded-xl transition-all flex items-center justify-center gap-2"
+          onclick={(e) => {
+            e.stopPropagation();
+            tochat();
+          }}
         >
-          <Chaticon />
+          <div class="w-6 h-6"><Chaticon /></div>
+          <span>{translations.viewHistory[$lang]}</span>
         </button>
       {/if}
-    {:else if confirmed}
-      <!-- הושלם - רק כפתור צ'אט -->
-      <button
-        onmouseenter={() => hover(translations.viewHistory[$lang])}
-        onmouseleave={() => hover('0')}
-        class="btnc bg-gradient-to-br hover:from-gold hover:via-mpink hover:to-gold from-mpink via-gold via-wow via-gold to-mpink text-gold hover:text-barbi hover:scale-110"
-        onclick={() => tochat()}
-      >
-        <Chaticon />
-      </button>
+    {:else if low == true}
+      <Lowbtn isCart="true" />
     {/if}
-  {:else if low == true}
-    <Lowbtn isCart="true" />
-  {/if}
+  </div>
 </div>
 
 <style>
+  .flex-2 {
+    flex: 2;
+  }
+
+  .shadow-glow {
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05);
+  }
+
+  .border-glow {
+    border: 2px solid rgba(var(--glow-rgb), 0.5);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.1),
+      0 2px 4px -1px rgba(0, 0, 0, 0.06),
+      0 0 20px rgba(var(--glow-rgb), 0.4),
+      0 0 40px rgba(var(--glow-rgb), 0.3),
+      0 0 60px rgba(var(--glow-rgb), 0.2),
+      inset 0 0 20px rgba(var(--glow-rgb), 0.05),
+      0 0 0 1px rgba(var(--glow-rgb), 0.3);
+  }
 </style>

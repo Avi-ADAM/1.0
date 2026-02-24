@@ -41,7 +41,15 @@
           ? 'radial-gradient(circle at center, var(--blueg), transparent 70%)'
           : glowColor === 'green'
             ? 'radial-gradient(circle at center, var(--wow), transparent 70%)'
-            : 'radial-gradient(circle at center, var(--gold), transparent 70%)'}
+            : glowColor === 'orange'
+              ? 'radial-gradient(circle at center, var(--oranges), transparent 70%)'
+              : glowColor === 'purple'
+                ? 'radial-gradient(circle at center, #a855f7, transparent 70%)'
+                : glowColor === 'red'
+                  ? 'radial-gradient(circle at center, #ef4444, transparent 70%)'
+                  : glowColor === 'teal'
+                    ? 'radial-gradient(circle at center, #14b8a6, transparent 70%)'
+                    : 'radial-gradient(circle at center, var(--gold), transparent 70%)'}
   ></div>
 
   <div class="relative flex items-center gap-3 z-10">
