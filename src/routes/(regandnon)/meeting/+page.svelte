@@ -375,7 +375,7 @@
       starting: 'מתחיל...',
       liveMeeting: 'פגישה פעילה',
       joinVideo: 'הצטרף לוידאו',
-      openChat: "פתח צ'אט",
+      openChat: "פתיחת צ'אט",
       pendingStart: 'ממתין לאישורי הצטרפות',
       joinMeeting: 'אישור הצטרפות',
       ready: 'מוכן לצאת לדרך!',

@@ -332,9 +332,9 @@
         mId,
         cookieValueId,
         projectId,
+        fetch,
         timerId,
-        false,
-        fetch
+        false
       );
 
       if (result) {

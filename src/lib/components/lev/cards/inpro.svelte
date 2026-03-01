@@ -270,6 +270,42 @@
       ? 'bg-white dark:bg-slate-800'
       : 'bg-gray-200 dark:bg-slate-700'} d transition-all-300 p-4 flex-1 overflow-y-auto space-y-4"
   >
+    <!-- Timer Display -->
+    <div class="flex items-center justify-center">
+      <span
+        class="bg-goldGrad bg-[length:200%_auto] animate-gradientx text-center text-wow p-3 sm:text-3xl text-2xl rounded-xl"
+        style:font-family="Digital"
+        role="contentinfo"
+        onmouseenter={() => hover(timero[$lang])}
+        onmouseleave={() => hover('0')}
+        style="font-weight: 300; letter-spacing: 2px; text-shadow: 2px 2px rgba(0,0,0,0.3);"
+      >
+        {formatTime(zman)}
+      </span>
+    </div>
+
+    <!-- Progress Bar -->
+    <div
+      role="button"
+      tabindex="0"
+      onmouseenter={() => hover(sta[$lang])}
+      onmouseleave={() => hover('0')}
+      class="border-2 rounded-2xl border-blue-500 dark:border-blue-400 hover:border-purple-500 dark:hover:border-purple-400 overflow-hidden transition-colors cursor-pointer"
+      onclick={() => statusi()}
+      onkeypress={() => statusi()}
+    >
+      <div
+        class="rounded-2xl bg-goldGrad bg-[length:200%_auto] animate-gradientx transition-all duration-300"
+        style="width: {status == null ? 0 : status[0]}%"
+      >
+        <div
+          style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
+          class="text-center text-white text-xl py-1"
+        >
+          {status != null ? status[0] : '0'}%
+        </div>
+      </div>
+    </div>
     <!-- Hours Info -->
     <div
       class="flex items-center gap-3 bg-gradient-to-r from-purple-50 to-blue-50 dark:from-purple-900/30 dark:to-blue-900/30 p-3 rounded-xl border border-purple-200 dark:border-purple-700"
@@ -330,20 +366,6 @@
       </div>
     {/if}
 
-    <!-- Timer Display -->
-    <div class="flex items-center justify-center">
-      <span
-        class="bg-goldGrad bg-[length:200%_auto] animate-gradientx text-center text-wow p-3 sm:text-3xl text-2xl rounded-xl"
-        style:font-family="Digital"
-        role="contentinfo"
-        onmouseenter={() => hover(timero[$lang])}
-        onmouseleave={() => hover('0')}
-        style="font-weight: 300; letter-spacing: 2px; text-shadow: 2px 2px rgba(0,0,0,0.3);"
-      >
-        {formatTime(zman)}
-      </span>
-    </div>
-
     <!-- Mission Details -->
     {#if missionDetails !== null && missionDetails !== 'null' && missionDetails !== 'undefined' && missionDetails.length > 0}
       <div
@@ -366,29 +388,6 @@
         <RichText editable={false} outpot={hearotMeyuchadot} />
       </div>
     {/if}
-
-    <!-- Progress Bar -->
-    <div
-      role="button"
-      tabindex="0"
-      onmouseenter={() => hover(sta[$lang])}
-      onmouseleave={() => hover('0')}
-      class="border-2 rounded-2xl border-blue-500 dark:border-blue-400 hover:border-purple-500 dark:hover:border-purple-400 overflow-hidden transition-colors cursor-pointer"
-      onclick={() => statusi()}
-      onkeypress={() => statusi()}
-    >
-      <div
-        class="rounded-2xl bg-goldGrad bg-[length:200%_auto] animate-gradientx transition-all duration-300"
-        style="width: {status == null ? 0 : status[0]}%"
-      >
-        <div
-          style="font-weight: 300; letter-spacing: 1px; text-shadow: 1px 1px black;"
-          class="text-center text-white text-xl py-1"
-        >
-          {status != null ? status[0] : '0'}%
-        </div>
-      </div>
-    </div>
   </div>
 
   <!-- Actions Footer -->
